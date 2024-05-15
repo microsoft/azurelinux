@@ -25,6 +25,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-coverage
+BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
@@ -45,7 +46,6 @@ WebSocket client for python3
 
 %check
 pip3 install \
-    more-itertools \
     pluggy \
     iniconfig
 # do not execute 'echo-server' test since it requires python websockets

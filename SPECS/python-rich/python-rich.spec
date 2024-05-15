@@ -11,6 +11,9 @@ Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
 BuildArch:      noarch
 
 Patch0:         3229.patch
+# ptest warning patch for test_syntax causing failures, can be
+# removed when upgraded to a version containing the following:
+# https://github.com/Textualize/rich/commit/027a4727a5b8f8407109c01df5e24604352bbe50
 Patch1:         ptest-warning.patch
 # This patch modifies the tests to set the OLD_PYGMENTS version
 # to the current one in Azure Linux, 2.5.2. Once python-pygments
@@ -59,7 +62,7 @@ code, tracebacks, and more — out of the box.
 
 %check
 # add below to make sure initial build will catch runtime import errors
-pip3 install iniconfig pygments
+pip3 install iniconfig
 %pyproject_check_import
 %pytest -vv
 

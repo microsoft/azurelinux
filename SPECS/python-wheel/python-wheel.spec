@@ -36,7 +36,9 @@ BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
+BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 %endif
@@ -82,7 +84,7 @@ install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 
 %check
 rm setup.cfg
-%{python3} -m pip install pluggy more-itertools iniconfig
+%{python3} -m pip install iniconfig
 PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 
 %files -n python3-%{pypi_name}

@@ -22,6 +22,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
+BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-pygments
 BuildRequires:  python3-pytest
@@ -61,7 +62,7 @@ sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.
 %pyproject_save_files html5lib
 
 %check
-pip3 install more-itertools umsgpack webencodings iniconfig
+pip3 install umsgpack webencodings iniconfig
 # Disabling broken tests, see: https://github.com/html5lib/html5lib-python/issues/433
 %pytest -k "not test_parser_encoding and not test_prescan_encoding"
 
