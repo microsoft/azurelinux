@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "32.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
+          "version": "38.0.72",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v38.0.72.tar.gz"
         }
       }
     },
@@ -8181,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv9",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
+          "version": "5.15.157.mshv1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
         }
       }
     },
@@ -8201,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv16",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
+          "version": "6.1.58.mshv4",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
         }
       }
     },
