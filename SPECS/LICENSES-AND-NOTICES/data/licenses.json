@@ -2151,6 +2151,7 @@
                 "asc",
                 "azcopy",
                 "azure-iot-sdk-c",
+                "azure-nvme-utils",
                 "azure-storage-cpp",
                 "bazel",
                 "blobfuse",
