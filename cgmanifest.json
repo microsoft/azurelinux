@@ -24773,8 +24773,8 @@
         "type": "other",
         "other": {
           "name": "python-virt-firmware",
-          "version": "23.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
+          "version": "24.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ea/8d/b3417567c9b532879357fb2b6b6fc50a6b0b311f95b16b4845054852e062/virt-firmware-24.4.tar.gz"
         }
       }
     },
