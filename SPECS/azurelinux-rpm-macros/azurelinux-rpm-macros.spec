@@ -120,7 +120,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
-%{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.fonts
