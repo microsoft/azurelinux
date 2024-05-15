@@ -1,0 +1,147 @@
+From 2888695d6e1e03f727fe45d6e38fc71f7b5be123 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Fri, 30 Aug 2024 18:17:00 -0700
+Subject: [PATCH] Add a download daemon to the livenet module.
+
+---
+ .../liveos-artifacts-download.service         | 11 +++
+ .../90livenet/liveos-artifacts-download.sh    | 75 +++++++++++++++++++
+ modules.d/90livenet/module-setup.sh           |  2 +
+ modules.d/90livenet/parse-livenet.sh          |  8 ++
+ 4 files changed, 96 insertions(+)
+ create mode 100644 modules.d/90livenet/liveos-artifacts-download.service
+ create mode 100755 modules.d/90livenet/liveos-artifacts-download.sh
+
+diff --git a/modules.d/90livenet/liveos-artifacts-download.service b/modules.d/90livenet/liveos-artifacts-download.service
+new file mode 100644
+index 00000000..c700af51
+--- /dev/null
++++ b/modules.d/90livenet/liveos-artifacts-download.service
+@@ -0,0 +1,11 @@
++[Unit]
++Description=LiveOS Artifacts Download Daemon
++After=network-online.target
++Wants=network-online.target
++
++[Service]
++ExecStart=/sbin/liveos-artifacts-download
++Type=oneshot
++
++[Install]
++WantedBy=multi-user.target
+diff --git a/modules.d/90livenet/liveos-artifacts-download.sh b/modules.d/90livenet/liveos-artifacts-download.sh
+new file mode 100755
+index 00000000..c4a396e0
+--- /dev/null
++++ b/modules.d/90livenet/liveos-artifacts-download.sh
+@@ -0,0 +1,75 @@
++#!/bin/bash
++
++echo "executing liveos-artifacts-download.sh" > /dev/kmsg
++
++. /usr/lib/dracut-lib.sh
++root=$(getarg root -d "")
++
++downloadedArtifactsDirs=/run/initramfs/downloaded-artifacts
++
++set -e
++
++function isSupportedProtocol() {
++    local kernelParamValue=$1
++
++    case "$kernelParamValue" in
++        live:http://* | http://*)
++            # remove `live:` if it exists
++            urlValue="${kernelParamValue#live:}"
++            ;;
++    esac
++
++    echo $urlValue
++}
++
++function downloadArtifact () {
++    local paramValueNoLive=$1
++
++    IFS=';'
++    read -ra valueParts <<< "$paramValueNoLive"
++    IFS=$' \t\n'
++
++    sourceUrl=${valueParts[0]}
++    targetDir=
++    targetPath=
++    arrayLength=${#valueParts[@]}
++    if (( arrayLength > 1 )); then
++        targetPath=${valueParts[1]}
++    else
++        targetPath=$downloadedArtifactsDirs/${sourceUrl##*/}
++    fi
++    targetDir="${targetPath%/*}"
++
++    mkdir -p $targetDir
++    httpRetCode=$(curl $sourceUrl -o $targetPath -w "%{http_code}\n")
++    # echo "curl returned ($httpRetCode)" > /dev/kmsg
++    if [ $httpRetCode -ne 200 ]; then
++        echo "error: failed to download $sourceUrl" > /dev/kmsg
++        exit 0
++    fi
++
++    echo $targetPath
++}
++
++# download
++isoUrl=$(isSupportedProtocol "$root")
++if [[ -z "$isoUrl" ]]; then
++    # this is not a live iso url, there is nothing for us to do.
++    echo "root is set to a non-live iso url ($root)" > /dev/kmsg
++    exit 0
++fi
++localIsoPath=$(downloadArtifact "$isoUrl")
++if [[ "$localIsoPath" == "error:"* ]]; then
++    echo "failed to download ($isoUrl)" > /dev/kmsg
++    exit 1
++fi
++
++# create a loopback device and prepare rootfs
++rootDevice=$(losetup -f --show $localIsoPath)
++
++# set dracut environment
++export fstype="auto"
++export DRACUT_SYSTEMD=1
++
++# let dmsquash-live-root handle the mounting as before
++/usr/sbin/dmsquash-live-root $rootDevice
+diff --git a/modules.d/90livenet/module-setup.sh b/modules.d/90livenet/module-setup.sh
+index db0def50..74bacd6c 100755
+--- a/modules.d/90livenet/module-setup.sh
++++ b/modules.d/90livenet/module-setup.sh
+@@ -17,6 +17,8 @@ install() {
+     inst_hook cmdline 29 "$moddir/parse-livenet.sh"
+     inst_hook initqueue/online 95 "$moddir/fetch-liveupdate.sh"
+     inst_script "$moddir/livenetroot.sh" "/sbin/livenetroot"
++    inst_simple "$moddir/liveos-artifacts-download.service" "/etc/systemd/system/liveos-artifacts-download.service"
++    inst_script "$moddir/liveos-artifacts-download.sh" "/sbin/liveos-artifacts-download"
+     if dracut_module_included "systemd-initrd"; then
+         inst_script "$moddir/livenet-generator.sh" "$systemdutildir"/system-generators/dracut-livenet-generator
+     fi
+diff --git a/modules.d/90livenet/parse-livenet.sh b/modules.d/90livenet/parse-livenet.sh
+index a1d14a8f..996f5210 100755
+--- a/modules.d/90livenet/parse-livenet.sh
++++ b/modules.d/90livenet/parse-livenet.sh
+@@ -27,6 +27,14 @@ if get_url_handler "$liveurl" > /dev/null; then
+     root="livenet" # quiet complaints from init
+     # shellcheck disable=SC2034
+     rootok=1
++
++    enableAzureLinuxDownloader=$(getarg rd.live.azldownloader=)
++
++    if [[ "$enableAzureLinuxDownloader" == "enable" ]]; then
++        systemctl enable liveos-artifacts-download
++        systemctl start liveos-artifacts-download &
++    fi
++
+     wait_for_dev -n /dev/root
+ else
+     info "livenet: no url handler for $liveurl"
+-- 
+2.34.1
+
