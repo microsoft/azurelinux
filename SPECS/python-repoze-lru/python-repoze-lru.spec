@@ -1,12 +1,10 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 %define pkgname repoze-lru
 %define pypiname repoze.lru
 
 Summary:        A tiny LRU cache implementation and decorator
 Name:           python-%{pkgname}
 Version:        0.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
 Vendor:         Microsoft Corporation
@@ -27,7 +25,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 BuildRequires:  python3-setuptools
 Requires:       python3
-%if %{with check}
+%if 0%{with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -44,8 +42,7 @@ python3 setup.py build
 python3 setup.py install --root=%{buildroot}
 
 %check
-pip3 install tox
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+python3 setup.py test
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt
@@ -53,6 +50,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed May 15 2024 Sam Meluch <sammeluch@microsoft.com> - 0.7-6
+- fix with_check macro, remove sitelibs redef to fix tests
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-5
 - Updating source URL.
 
