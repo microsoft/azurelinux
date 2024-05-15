@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -175,4 +176,37 @@ func TestNotPanicMissingFile(t *testing.T) {
 		_, err := LoadLicenseExceptions(file)
 		assert.EqualError(t, err, "failed to read license exceptions file:\nopen "+file+": no such file or directory")
 	})
+}
+
+func TestInvalidRegex(t *testing.T) {
+	const invalidRegex = `.*[`
+	testCases := []struct {
+		name        string
+		json        string
+		expectedErr string
+	}{
+		{
+			name:        "Invalid regex",
+			json:        `{"PkgExceptions": [{"PackageName": "TestPackage1", "IgnoredFilesRegexList": ["` + invalidRegex + `"]}], "GlobalExceptionsRegexList": []}`,
+			expectedErr: "failed to compile regex for ignored files (.*[):\nerror parsing regexp: missing closing ]: `[`",
+		},
+		{
+			name:        "Invalid global regex",
+			json:        `{"PkgExceptions": [], "GlobalExceptionsRegexList": ["` + invalidRegex + `"]}`,
+			expectedErr: "failed to compile regex for global ignored files (.*[):\nerror parsing regexp: missing closing ]: `[`",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tempPath := t.TempDir()
+			jsonFilePath := filepath.Join(tempPath, "invalid_regex.json")
+			err := file.Write(tc.json, jsonFilePath)
+			assert.NoError(t, err)
+			exceptions, err := LoadLicenseExceptions(jsonFilePath)
+			assert.Error(t, err)
+			assert.EqualError(t, err, tc.expectedErr)
+			assert.Equal(t, LicenseExceptions{}, exceptions)
+		})
+	}
 }

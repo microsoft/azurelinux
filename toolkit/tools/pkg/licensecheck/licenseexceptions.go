@@ -59,7 +59,7 @@ func LoadLicenseExceptions(file string) (LicenseExceptions, error) {
 		for j := range config.PkgExceptions[i].IgnoredFilesRegexList {
 			regex, err := regexp.Compile(config.PkgExceptions[i].IgnoredFilesRegexList[j])
 			if err != nil {
-				return LicenseExceptions{}, fmt.Errorf("failed to compile regex for ignored file %s:\n%w", config.PkgExceptions[i].IgnoredFilesRegexList[j], err)
+				return LicenseExceptions{}, fmt.Errorf("failed to compile regex for ignored files (%s):\n%w", config.PkgExceptions[i].IgnoredFilesRegexList[j], err)
 			}
 			config.PkgExceptions[i].compiledIgnoreRegexList = append(config.PkgExceptions[i].compiledIgnoreRegexList, regex)
 		}
@@ -69,7 +69,7 @@ func LoadLicenseExceptions(file string) (LicenseExceptions, error) {
 	for i := range config.GlobalExceptionsRegexList {
 		regex, err := regexp.Compile(config.GlobalExceptionsRegexList[i])
 		if err != nil {
-			return LicenseExceptions{}, fmt.Errorf("failed to compile regex for global ignored file %s:\n%w", config.GlobalExceptionsRegexList[i], err)
+			return LicenseExceptions{}, fmt.Errorf("failed to compile regex for global ignored files (%s):\n%w", config.GlobalExceptionsRegexList[i], err)
 		}
 		config.compiledGlobalIgnoreRegexList = append(config.compiledGlobalIgnoreRegexList, regex)
 	}

@@ -53,7 +53,7 @@ func main() {
 		}
 		pkgName, licensePath := splitParts[0], splitParts[1]
 		// Check if we consider any of the test data to not be a license file
-		if !licensecheck.IsALicenseFile(licensePath) || exceptions.ShouldIgnoreFile(pkgName, licensePath) {
+		if !licensecheck.IsALicenseFile(pkgName, licensePath) || exceptions.ShouldIgnoreFile(pkgName, licensePath) {
 			formattedLine := pkgName + delimiter + licensePath
 			filesNotDetectedAsLicense = append(filesNotDetectedAsLicense, formattedLine)
 		}
@@ -80,7 +80,7 @@ func main() {
 		}
 		pkgName, docPath := splitParts[0], splitParts[1]
 
-		if licensecheck.IsALicenseFile(docPath) && !exceptions.ShouldIgnoreFile(pkgName, docPath) {
+		if licensecheck.IsALicenseFile(pkgName, docPath) && !exceptions.ShouldIgnoreFile(pkgName, docPath) {
 			formattedLine := pkgName + delimiter + docPath
 			invalidDocs = append(invalidDocs, formattedLine)
 		}

@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -182,9 +183,31 @@ func (l *LicenseChecker) CheckLicenses() error {
 	return nil
 }
 
+// GetAllResults returns the results of the search, split into:
+// - All results: Every scan result
+// - Any result that has at least one warning
+// - Any result that has at least one error
+// There may be overlap between the lists. If pedantic is true, warnings will be treated as errors.
+func (l *LicenseChecker) GetAllResults(pedantic bool) (all, warnings, errors []LicenseCheckResult) {
+	all = []LicenseCheckResult{}
+	warnings = []LicenseCheckResult{}
+	errors = []LicenseCheckResult{}
+	for _, result := range l.results {
+		all = append(all, result)
+		if result.HasBadResult() || (pedantic && result.HasWarningResult()) {
+			errors = append(errors, result)
+		}
+		if result.HasWarningResult() && !pedantic {
+			warnings = append(warnings, result)
+		}
+	}
+	return all, warnings, errors
+}
+
 // FormatResults formats the results of the search to a string. Results will be ordered as follows:
 // - Packages with warnings only, sorted alphabetically
 // - Packages with errors (and possibly warnings), sorted alphabetically
+// If pedantic is true, warnings will be treated as errors.
 func (l *LicenseChecker) FormatResults(pedantic bool) string {
 	var sb strings.Builder
 	results := sortAndFilterResults(l.results)
@@ -211,27 +234,6 @@ func (l *LicenseChecker) FormatResults(pedantic bool) string {
 	}
 
 	return sb.String()
-}
-
-// GetAllResults returns the results of the search, split into:
-// - All results: Every scan result
-// - Any result that has at least one warning
-// - Any result that has at least one error
-// There may be overlap between the lists. If pedantic is true, warnings will be treated as errors.
-func (l *LicenseChecker) GetAllResults(pedantic bool) (all, warnings, errors []LicenseCheckResult) {
-	all = []LicenseCheckResult{}
-	warnings = []LicenseCheckResult{}
-	errors = []LicenseCheckResult{}
-	for _, result := range l.results {
-		all = append(all, result)
-		if result.HasBadResult() || (pedantic && result.HasWarningResult()) {
-			errors = append(errors, result)
-		}
-		if result.HasWarningResult() && !pedantic {
-			warnings = append(warnings, result)
-		}
-	}
-	return all, warnings, errors
 }
 
 func printWarning(result LicenseCheckResult) string {
@@ -300,6 +302,8 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 	return
 }
 
+// findRpmPaths walks the chroots's mount directory to find all *.rpm files. The paths are returned relative to the
+// chroot's root.
 func (s *LicenseChecker) findRpmPaths() (foundSrpmPaths []string, err error) {
 	const rpmExtension = ".rpm"
 	err = filepath.Walk(s.simpleToolChroot.ChrootRelativeMountDir(), func(path string, info os.FileInfo, walkErr error) error {
@@ -350,8 +354,9 @@ func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel
 	}
 }
 
-// checkRpmLicenses checks the licenses of an RPM at the given path. It returns a list of bad license files.
-// This function will use the host's macros to query the RPM so it is expected to be called in a chroot.
+// checkRpmLicenses checks the licenses of an RPM at the given path. It returns result struct holding all the license
+// issues found. This function will use the host's macros to query the RPM so it is expected to be called in a chroot.
+// - rpmPath: The path to the RPM to check relative to the chroot's root.
 func (l *LicenseChecker) checkRpmLicenses(rpmPath string) (result LicenseCheckResult, err error) {
 	defines := rpm.DefaultDistroDefines(false, l.distTag)
 
@@ -409,32 +414,10 @@ func interpretResults(pkgName string, files, documentFiles, licenseFiles []strin
 	return badDocFiles, badOtherFiles, duplicatedDocs
 }
 
-// IsALicenseFile makes a best effort guess if a file is a license file or not. This is NOT foolproof however.
-// Some examples of files that may be incorrectly identified as licenses:
-// - /path/to/code/gpl/README.md ("gpl")
-// - /path/to/a/hash/CC05f4dcc3b5aa765d61d8327deb882cf ("cc0")
-// - /path/to/freebsd-parts/file.ext ("bds")
-func IsALicenseFile(pkgName, licenseFilePath string) bool {
-	// Check if the file is in the list of explicit known license files
-	for _, name := range licenseNamesVerbatim {
-		baseName := filepath.Base(licenseFilePath)
-		if strings.EqualFold(baseName, name) {
-			return true
-		}
-	}
-
-	return checkFilePath(pkgName, licenseFilePath, licenseNamesFuzzy) && !IsASkippedLicenseFile(pkgName, licenseFilePath)
-}
-
-// IsASkippedLicenseFile checks if a file is a known non-license file.
-func IsASkippedLicenseFile(pkgName, licenseFilePath string) bool {
-	return checkFilePath(pkgName, licenseFilePath, licenseNamesSkip)
-}
-
 // checkFilePath checks if a file path matches any of the given names. Any leading common path is stripped before
 // matching (i.e. "/usr/share/licenses/<pkg>/file/path" -> "file/path"). The matching is a case-insensitive sub-string
 // search.
-func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []string) bool {
+func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []*regexp.Regexp) bool {
 	// For each path, strip the prefix plus package name if it exists
 	// i.e. "/usr/share/licenses/<pkg>/file/path" -> "file/path"
 	// Those paths would always match since they contain "license" in the name.
@@ -453,7 +436,7 @@ func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []string
 	}
 
 	for _, name := range licenseFilesMatches {
-		if strings.Contains(strings.ToLower(strippedPath), strings.ToLower(name)) {
+		if name.MatchString(strippedPath) {
 			return true
 		}
 	}

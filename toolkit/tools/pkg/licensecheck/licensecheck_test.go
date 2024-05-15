@@ -254,6 +254,7 @@ func TestIsALicenseFile_Specific(t *testing.T) {
 	}{
 		{"MIT", true},
 		{"MIT_other", false},
+		{"other_MIT", false},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.file, func(t *testing.T) {
