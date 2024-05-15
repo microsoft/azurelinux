@@ -122,6 +122,11 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
+	grubMkconfigEnabled := isGrubMkconfigConfig(grub2Config)
+	if grubMkconfigEnabled {
+		return fmt.Errorf("grub-mkconfig enabled images not yet supported for verity")
+	}
+
 	grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"rd.systemd.verity", "roothash",
 		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
 	if err != nil {

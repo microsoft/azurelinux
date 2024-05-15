@@ -238,6 +238,11 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return err
 	}
 
+	grubMkconfigEnabled := isGrubMkconfigConfig(inputContentString)
+	if grubMkconfigEnabled {
+		return fmt.Errorf("grub-mkconfig enabled images not yet supported for ISO output")
+	}
+
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
 	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
 
