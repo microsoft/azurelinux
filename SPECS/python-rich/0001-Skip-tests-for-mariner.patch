@@ -1,0 +1,176 @@
+From 25e012a5ebed83930e84c7c8cf0cd0e0b4e84dee Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Tue, 14 May 2024 17:03:13 -0700
+Subject: [PATCH] Skip tests for mariner
+
+---
+ tests/test_card.py                   | 11 +++++++++++
+ tests/test_markdown.py               | 11 +++++++++++
+ tests/test_markdown_no_hyperlinks.py | 11 +++++++++++
+ tests/test_syntax.py                 |  8 +++++++-
+ 4 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_card.py b/tests/test_card.py
+index d578ec89..f1683af2 100644
+--- a/tests/test_card.py
++++ b/tests/test_card.py
+@@ -1,11 +1,21 @@
+ import io
+ import re
++import sys
++import pytest
+ 
+ from rich.__main__ import make_test_card
+ from rich.console import Console, RenderableType
+ 
+ from ._card_render import expected
+ 
++if sys.version_info >= (3, 8):
++    from importlib.metadata import Distribution
++else:
++    from importlib_metadata import Distribution
++
++PYGMENTS_VERSION = Distribution.from_name("pygments").version
++OLD_PYGMENTS = PYGMENTS_VERSION == "2.5.2"
++
+ re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
+ 
+ 
+@@ -26,6 +36,7 @@ def render(renderable: RenderableType) -> str:
+     return output
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_card_render():
+     card = make_test_card()
+     result = render(card)
+diff --git a/tests/test_markdown.py b/tests/test_markdown.py
+index 710436eb..be907b7d 100644
+--- a/tests/test_markdown.py
++++ b/tests/test_markdown.py
+@@ -71,10 +71,20 @@ foobar
+ 
+ import io
+ import re
++import sys
++import pytest
+ 
+ from rich.console import Console, RenderableType
+ from rich.markdown import Markdown
+ 
++if sys.version_info >= (3, 8):
++    from importlib.metadata import Distribution
++else:
++    from importlib_metadata import Distribution
++
++PYGMENTS_VERSION = Distribution.from_name("pygments").version
++OLD_PYGMENTS = PYGMENTS_VERSION == "2.5.2"
++
+ re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
+ 
+ 
+@@ -96,6 +106,7 @@ def render(renderable: RenderableType) -> str:
+     return output
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_markdown_render():
+     markdown = Markdown(MARKDOWN)
+     rendered_markdown = render(markdown)
+diff --git a/tests/test_markdown_no_hyperlinks.py b/tests/test_markdown_no_hyperlinks.py
+index 4c5ff66f..9ab1e246 100644
+--- a/tests/test_markdown_no_hyperlinks.py
++++ b/tests/test_markdown_no_hyperlinks.py
+@@ -65,10 +65,20 @@ foobar
+ 
+ import io
+ import re
++import sys
++import pytest
+ 
+ from rich.console import Console, RenderableType
+ from rich.markdown import Markdown
+ 
++if sys.version_info >= (3, 8):
++    from importlib.metadata import Distribution
++else:
++    from importlib_metadata import Distribution
++
++PYGMENTS_VERSION = Distribution.from_name("pygments").version
++OLD_PYGMENTS = PYGMENTS_VERSION == "2.5.2"
++
+ re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
+ 
+ 
+@@ -89,6 +99,7 @@ def render(renderable: RenderableType) -> str:
+     return output
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_markdown_render():
+     markdown = Markdown(MARKDOWN, hyperlinks=False)
+     rendered_markdown = render(markdown)
+diff --git a/tests/test_syntax.py b/tests/test_syntax.py
+index 37cc293e..b17b65e2 100644
+--- a/tests/test_syntax.py
++++ b/tests/test_syntax.py
+@@ -26,7 +26,7 @@ else:
+     from importlib_metadata import Distribution
+ 
+ PYGMENTS_VERSION = Distribution.from_name("pygments").version
+-OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
++OLD_PYGMENTS = PYGMENTS_VERSION == "2.5.2"
+ 
+ CODE = '''\
+ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
+@@ -57,6 +57,7 @@ def test_blank_lines():
+     )
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_python_render():
+     syntax = Panel.fit(
+         Syntax(
+@@ -76,6 +77,7 @@ def test_python_render():
+     assert rendered_syntax == expected
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_python_render_simple():
+     syntax = Syntax(
+         CODE,
+@@ -91,6 +93,7 @@ def test_python_render_simple():
+     assert rendered_syntax == expected
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_python_render_simple_passing_lexer_instance():
+     syntax = Syntax(
+         CODE,
+@@ -141,6 +144,7 @@ def test_python_render_line_range_indent_guides():
+     assert rendered_syntax == expected
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_python_render_indent_guides():
+     syntax = Panel.fit(
+         Syntax(
+@@ -234,6 +238,7 @@ def test_get_style_for_token():
+     assert syntax._get_line_numbers_color() == Color.default()
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_option_no_wrap():
+     syntax = Syntax(
+         CODE,
+@@ -251,6 +256,7 @@ def test_option_no_wrap():
+     assert rendered_syntax == expected
+ 
+ 
++@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
+ def test_syntax_highlight_ranges():
+     syntax = Syntax(
+         CODE,
+-- 
+2.34.1
+

@@ -12,6 +12,7 @@ BuildArch:      noarch
 
 Patch0:         3229.patch
 Patch1:         ptest-warning.patch 
+Patch2:         0001-Skip-tests-for-mariner.patch
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-attrs
