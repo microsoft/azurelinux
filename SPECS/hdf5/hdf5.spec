@@ -11,8 +11,8 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
-Version:        1.12.1
-Release:        13%{?dist}
+Version:        1.14.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,6 @@ Patch3:         hdf5-build.patch
 # Remove Fedora build flags from h5cc/h5c++/h5fc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5:         hdf5-wrappers.patch
-Patch6:         CVE-2021-37501.patch
 # For patches/rpath
 # For patches/rpath
 BuildRequires:  automake
@@ -410,6 +409,9 @@ done
 
 
 %changelog
+* Wed May 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.4-1
+- Auto-upgrade to 1.14.4 - Fix critical CVEs
+
 * Thu Oct 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.1-13
 - Patch hdf5 for CVE-2021-37501.
 
