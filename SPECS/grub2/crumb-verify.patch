@@ -1,0 +1,17 @@
+--- a/grub-core/kern/verifiers.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/kern/verifiers.c	2024-05-15 13:58:14.827536140 -0700
+@@ -86,6 +86,7 @@
+   int defer = 0;
+ 
+   grub_dprintf ("verify", "file: %s type: %d\n", io->name, type);
++  grub_printf ("GJS: grub_verifiers_open got here!!!\n\n");
+ 
+   if ((type & GRUB_FILE_TYPE_MASK) == GRUB_FILE_TYPE_SIGNATURE
+       || (type & GRUB_FILE_TYPE_MASK) == GRUB_FILE_TYPE_VERIFY_SIGNATURE
+@@ -224,5 +225,6 @@
+ void
+ grub_verifiers_init (void)
+ {
++  grub_printf ("GJS: grub_verifiers_init entry\n\n");
+   grub_file_filter_register (GRUB_FILE_FILTER_VERIFY, grub_verifiers_open);
+ }

@@ -1,0 +1,11 @@
+--- a/grub-core/kern/main.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/kern/main.c	2024-05-15 14:16:57.538496011 -0700
+@@ -278,6 +278,8 @@
+   grub_setcolorstate (GRUB_TERM_COLOR_STANDARD);
+ #endif
+ 
++  grub_printf ("GJS: grub_main registering verifiers\n\n");
++
+   /* Init verifiers API. */
+   grub_verifiers_init ();
+ 
