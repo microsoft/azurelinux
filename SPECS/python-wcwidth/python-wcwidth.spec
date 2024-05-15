@@ -26,6 +26,7 @@ BuildRequires:  python3-attrs
 BuildRequires:  python3-coverage
 BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-six
@@ -47,7 +48,6 @@ This Library is mainly for those implementing a Terminal Emulator, or programs t
 
 %check
 pip3 install \
-    pluggy \
     iniconfig
 # note tox should have been preferred but unfortunately tox.ini is set to only support python up to 3.8 => no tests will then be executed
 # => stick with pytest which has a problem with test_package_version (version is correct but test stil throw an error)

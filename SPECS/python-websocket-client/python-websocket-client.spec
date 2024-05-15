@@ -27,6 +27,7 @@ BuildRequires:  python3-attrs
 BuildRequires:  python3-coverage
 BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-six
@@ -46,7 +47,6 @@ WebSocket client for python3
 
 %check
 pip3 install \
-    pluggy \
     iniconfig
 # do not execute 'echo-server' test since it requires python websockets
 # which do not work well from a chroot
