@@ -1,0 +1,16 @@
+os:
+  users:
+  - name: test
+    password: testpassword
+    primaryGroup: sudo
+  packages:
+    install:
+    - util-linux
+    - grep
+  additionalFiles:
+    artifacts/90azl-livenet/liveos-artifacts-download.service: /etc/systemd/system/liveos-artifacts-download.service
+    artifacts/90azl-livenet/liveos-artifacts-download.sh: /usr/local/bin/liveos-artifacts-download.sh
+    artifacts/90azl-livenet/schedule-liveos-artifacts-download.sh: /usr/local/bin/schedule-liveos-artifacts-download.sh
+    artifacts/90azl-livenet/azl-livenet-genrules.sh: /usr/lib/dracut/modules.d/90azl-livenet/azl-livenet-genrules.sh
+    artifacts/90azl-livenet/module-setup.sh: /usr/lib/dracut/modules.d/90azl-livenet/module-setup.sh
+    artifacts/liveos-dracut-pxe.conf: /etc/dracut.conf.d/10-liveos-dracut-pxe.conf
