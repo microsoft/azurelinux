@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+SPEC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+SRC_DIR="${SPEC_DIR}/SOURCES"
+
+# In the pipeline and cache has been restored.
+[ "${IN_PIPELINE}" == "1" ] && [ -d "${SRC_DIR}" ] && exit 0
+
+mkdir -p "${SRC_DIR}"
+
+PKG_NAME=cloud-hypervisor-cvm
+SPEC="${SPEC_DIR}"/cloud-hypervisor-cvm.spec
+PKGVER=$(grep -m1 "%global gitver" "${SPEC}" | sed 's,%global gitver \(.*\),\1,g')
+PKGNUM=$(grep -m1 "%global gitnum" "${SPEC}" | sed 's,%global gitnum \(.*\),\1,g')
+PKG_FULL_VER="${PKGVER}.${PKGNUM}"
+
+"${REPO_ROOT_DIR}/scripts/feed-download" "${PKG_NAME}" "${PKG_FULL_VER}" "${SRC_DIR}"
+

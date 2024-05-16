@@ -1797,8 +1797,18 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
+          "version": "32.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cloud-hypervisor-cvm",
           "version": "38.0.72",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v38.0.72.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
         }
       }
     },

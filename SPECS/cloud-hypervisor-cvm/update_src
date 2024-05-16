@@ -1,0 +1,72 @@
+#/bin/bash
+
+set -x 
+
+CH_REV=$1
+CH_SPEC_DIR=$(pwd)
+CH_TMP_DIR=${CH_SPEC_DIR}/ch_tmp
+CH_SRC_DIR=${CH_SPEC_DIR}
+
+
+if [ "latest" == "$CH_REV" ]; then
+	CH_REV=main
+elif [ -z $CH_REV ]; then
+	echo "Replace sources with the given <version>"
+	echo "Usage: $0 <version>"
+	exit 1
+fi
+
+rm -rf ${CH_TMP_DIR}
+
+mkdir ${CH_TMP_DIR}
+
+pushd ${CH_TMP_DIR}
+git clone https://github.com/cloud-hypervisor/cloud-hypervisor.git
+
+pushd cloud-hypervisor
+
+git checkout ${CH_REV}
+
+CH_VER=$(git describe ${CH_REV} | cut -d'-' -f1)
+CH_VER="${CH_VER:1}"
+CH_REL=$(($(git describe ${CH_REV} | cut -d'-' -f2) + 0))
+if [ -z "${CH_REL}" -o "${CH_REL}" == "${CH_REV}" ]; then
+	CH_REL=0
+fi
+CH_HASH=$(git describe ${CH_REV} | cut -d'-' -f3)
+if [ -z "${CH_HASH}" -o "${CH_HASH}" == "${CH_REV}" ]; then
+	CH_HASH="g$(git rev-parse --short=8 ${CH_REV})"
+fi
+CH_DATE=$(date +%Y%m%d)
+CH_VER_FULL="${CH_VER}.${CH_REL}"
+
+CH_SRC_TGZ_BASENAME="cloud-hypervisor-${CH_VER_FULL}"
+CH_SRC_TGZ="${CH_SRC_TGZ_BASENAME}.tar.gz"
+CH_VENDOR_TGZ="cloud-hypervisor-${CH_VER_FULL}-vendor.tar.gz"
+CH_CONFIG_TOML=config.toml
+CH_SPEC=cloud-hypervisor.spec
+CH_SIGN=cloud-hypervisor.signatures.json
+rm -f ${CH_SRC_DIR}/${CH_SRC_TGZ} ${CH_SRC_DIR}/${CH_VENDOR_TGZ} ${CH_SRC_DIR}/${CH_CONFIG_TOML}
+
+git archive -o ${CH_SRC_DIR}/${CH_SRC_TGZ} --prefix="${CH_SRC_TGZ_BASENAME}/" ${CH_REV}
+cargo vendor > ${CH_SRC_DIR}/${CH_CONFIG_TOML}
+tar czvf ${CH_SRC_DIR}/${CH_VENDOR_TGZ} vendor
+
+SIG_FL=${CH_SPEC_DIR}/${CH_SIGN}
+echo '{"Signatures": {}}' > "${SIG_FL}"
+jq 'walk(if type=="object" then with_entries(select(.key | test("v[0-9.]+.tar.gz") | not)) else . end)' "${SIG_FL}" > tmp_sigs && mv tmp_sigs "${SIG_FL}"
+jq --arg a $(sha256sum ${CH_SRC_DIR}/${CH_CONFIG_TOML} | cut -f1 -d' ') '.Signatures."'${CH_CONFIG_TOML}'" = $a' "${SIG_FL}" > tmp_sigs && mv tmp_sigs "${SIG_FL}"
+jq --arg a $(sha256sum ${CH_SRC_DIR}/${CH_VENDOR_TGZ} | cut -f1 -d' ') '.Signatures."'${CH_VENDOR_TGZ}'" = $a' "${SIG_FL}" > tmp_sigs && mv tmp_sigs "${SIG_FL}"
+jq --arg a $(sha256sum ${CH_SRC_DIR}/${CH_SRC_TGZ} | cut -f1 -d' ') '.Signatures."'${CH_SRC_TGZ}'" = $a' "${SIG_FL}" > tmp_sigs && mv tmp_sigs "${SIG_FL}"
+
+SPEC_FL=${CH_SPEC_DIR}/${CH_SPEC}
+sed -i  's,%global gitver.*,%global gitver '${CH_VER}',g'  ${SPEC_FL}
+sed -i  's,%global gitnum.*,%global gitnum '${CH_REL}',g'  ${SPEC_FL}
+sed -i  's,%global gitrev.*,%global gitrev '${CH_HASH}',g'  ${SPEC_FL}
+
+
+popd
+popd
+
+rm -rf ${CH_TMP_DIR}
+
