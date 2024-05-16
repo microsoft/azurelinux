@@ -423,38 +423,18 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 }
 
 func TestDisableDocumentationDefines(t *testing.T) {
-	defines := map[string]string{
-		"dist":       ".azlX",
-		"with_check": "1",
-	}
-	expectedDefines := map[string]string{
-		"dist":         ".azlX",
-		"with_check":   "1",
-		"_excludedocs": "1",
-	}
-	result := DisableDocumentationDefines(defines)
-	assert.Equal(t, expectedDefines, result)
-}
-
-func TestDisableDocumentationDefinesNil(t *testing.T) {
 	expectedDefines := map[string]string{
 		"_excludedocs": "1",
 	}
-	result := DisableDocumentationDefines(nil)
+	result := DisableDocumentationDefines()
 	assert.Equal(t, expectedDefines, result)
 }
 
 func TestDisableLocaleDefines(t *testing.T) {
-	defines := map[string]string{
-		"dist":       ".azlX",
-		"with_check": "1",
-	}
 	expectedDefines := map[string]string{
-		"dist":           ".azlX",
-		"with_check":     "1",
 		"_install_langs": "NONE",
 	}
-	result := DisableLocaleDefines(defines)
+	result := DisableLocaleDefines()
 	assert.Equal(t, expectedDefines, result)
 }
 
@@ -462,21 +442,15 @@ func TestDisableLocaleDefinesNil(t *testing.T) {
 	expectedDefines := map[string]string{
 		"_install_langs": "NONE",
 	}
-	result := DisableLocaleDefines(nil)
+	result := DisableLocaleDefines()
 	assert.Equal(t, expectedDefines, result)
 }
 
 func TestOverrideLocaleDefines(t *testing.T) {
-	defines := map[string]string{
-		"dist":       ".azlX",
-		"with_check": "1",
-	}
 	expectedDefines := map[string]string{
-		"dist":           ".azlX",
-		"with_check":     "1",
 		"_install_langs": "ab:cd:ef",
 	}
-	result := OverrideLocaleDefines(defines, "ab:cd:ef")
+	result := OverrideLocaleDefines("ab:cd:ef")
 	assert.Equal(t, expectedDefines, result)
 }
 

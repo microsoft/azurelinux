@@ -312,29 +312,25 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 
 // DisableBuildRequiresDefines sets the macro to disable documentation files when installing RPMs.
 // - defines: optional map of defines to update. If nil, a new map will be created.
-func DisableDocumentationDefines(defines map[string]string) map[string]string {
-	if defines == nil {
-		defines = make(map[string]string)
+func DisableDocumentationDefines() map[string]string {
+	return map[string]string{
+		"_excludedocs": "1",
 	}
-	defines["_excludedocs"] = "1"
-	return defines
 }
 
 // DisableLocaleDefines sets the macro to disable locales when installing RPMs.
 // - defines: optional map of defines to update. If nil, a new map will be created.
-func DisableLocaleDefines(defines map[string]string) map[string]string {
-	return OverrideLocaleDefines(defines, DisableAllLocalesString)
+func DisableLocaleDefines() map[string]string {
+	return OverrideLocaleDefines(DisableAllLocalesString)
 }
 
 // OverrideLocaleDefines sets the macro to override the default locales when installing RPMs.
 // - defines: optional map of defines to update. If nil, a new map will be created.
 // - overrideLocale: the locale string to set as the default. Should be of the form ""
-func OverrideLocaleDefines(defines map[string]string, overrideLocale string) map[string]string {
-	if defines == nil {
-		defines = make(map[string]string)
+func OverrideLocaleDefines(overrideLocale string) map[string]string {
+	return map[string]string{
+		"_install_langs": overrideLocale,
 	}
-	defines["_install_langs"] = overrideLocale
-	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
