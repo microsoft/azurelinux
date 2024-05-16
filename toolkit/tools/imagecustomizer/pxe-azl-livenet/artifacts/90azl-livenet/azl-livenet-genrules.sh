@@ -3,4 +3,4 @@
 set -x
 
 systemctl enable liveos-artifacts-download
-/sbin/initqueue --settled --onetime --unique /usr/local/bin/schedule-liveos-artifacts-download.sh
+/sbin/initqueue --settled --onetime --unique /sbin/schedule-liveos-artifacts-download
