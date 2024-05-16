@@ -1,4 +1,3 @@
-%global with_check 0
 %global with_debug 1
 
 %if 0%{?with_debug}
@@ -36,7 +35,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -387,6 +386,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Tue May 14 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-23
+- Cleaning up the invalid global 'with_check' macro.
+
 * Mon May 13 2024 Chris Co <chrco@microsoft.com> - 4.1.1-22
 - Update to build dep latest glibc-static version
 
