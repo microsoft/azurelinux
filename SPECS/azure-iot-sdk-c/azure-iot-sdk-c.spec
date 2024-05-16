@@ -6,7 +6,7 @@ Name:           azure-iot-sdk-c
 # For apt-get packages they fix the version number to 0.2.0 and increase the release number with each release.
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
-Version:        2023.08.07
+Version:        2024.03.04
 Release:        1%{?dist}
 License:        MIT
 Group:          Applications/File
@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %{name}-%{version}.tar.gz %{name}
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_03_2024.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  build-essential
@@ -90,6 +90,9 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 /usr/cmake/*
 
 %changelog
+*   Mon May 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2024.03.04-1
+-   Upgrade to LTS_03_2024
+
 *   Thu Jan 04 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 2023.08.07-1
 -   Upgrate to  2023.08.07-1
 
