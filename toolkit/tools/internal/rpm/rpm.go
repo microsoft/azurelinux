@@ -5,6 +5,7 @@ package rpm
 
 import (
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -169,6 +170,29 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	shell.SetEnvironment(env)
 
 	return
+}
+
+// Queries rpm for the current macro directory via --eval %_rpmmacrodir
+func GetMacroDir() (macroDir string, err error) {
+	const (
+		macro         = "%_rpmmacrodir"
+		defaultRpmDir = "/usr/lib/rpm/macros.d"
+	)
+
+	// This should continue to work even if the rpm command is not available (ie unit tests).
+	_, err = exec.LookPath(rpmProgram)
+	if err != nil {
+		return defaultRpmDir, nil
+	}
+
+	lines, err := executeRpmCommand(rpmProgram, "--eval", macro)
+	if err != nil {
+		return "", fmt.Errorf("failed to get macro directory:\n%w", err)
+	}
+	if len(lines) != 1 {
+		return "", fmt.Errorf("unexpected output from 'rpm --eval %s': '%v'", macro, lines)
+	}
+	return lines[0], nil
 }
 
 // ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name

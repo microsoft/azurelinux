@@ -34,7 +34,7 @@ func TestAddMacroFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify the existence and contents of the macro file
-	expectedFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", macroFileName)
+	expectedFilePath := filepath.Join(tempDir, macroFileName)
 	actualContents, err := file.ReadLines(expectedFilePath)
 	assert.NoError(t, err)
 
@@ -57,7 +57,7 @@ func TestAddMacroFileWithEmptyMacros(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Ensure the file is not created
-	expectedFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", macroFileName)
+	expectedFilePath := filepath.Join(tempDir, macroFileName)
 	_, err = os.Stat(expectedFilePath)
 	assert.True(t, os.IsNotExist(err))
 }
@@ -155,7 +155,7 @@ func TestAddMacroFileComments(t *testing.T) {
 				assert.NoError(t, err)
 
 				// Verify the existence and contents of the macro file
-				expectedFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", macroFileName)
+				expectedFilePath := filepath.Join(tempDir, macroFileName)
 				actualContents, err := file.ReadLines(expectedFilePath)
 				assert.NoError(t, err)
 

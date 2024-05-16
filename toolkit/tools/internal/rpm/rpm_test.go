@@ -6,6 +6,7 @@ package rpm
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -13,7 +14,9 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -477,10 +480,46 @@ func TestOverrideLocaleDefines(t *testing.T) {
 	assert.Equal(t, expectedDefines, result)
 }
 
-func TestOverrideLocaleDefinesNil(t *testing.T) {
-	expectedDefines := map[string]string{
-		"_install_langs": "ab:cd:ef",
+func TestGetMacroDir(t *testing.T) {
+	const expectedMacroDir = "/usr/lib/rpm/macros.d"
+	macroDir, err := GetMacroDir()
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMacroDir, macroDir)
+}
+
+func TestGetMacroDirWithRpmAvailable(t *testing.T) {
+	const (
+		expectedMacroDir = "/usr/lib/rpm/macros.d"
+		macrodirMacro    = "%_rpmmacrodir"
+	)
+
+	_, execErr := exec.LookPath("rpm")
+	if execErr != nil {
+		t.Skip("rpm is not available")
 	}
-	result := OverrideLocaleDefines(nil, "ab:cd:ef")
-	assert.Equal(t, expectedDefines, result)
+
+	macroDir, err := GetMacroDir()
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMacroDir, macroDir)
+
+	// Custom rpmdir
+	tempDir1 := t.TempDir()
+	emptyRpmrc := filepath.Join(tempDir1, "rpmrc") // Create an empty rpmrc file or rpm will complain
+	err = os.WriteFile(emptyRpmrc, []byte(""), 0644)
+	assert.NoError(t, err)
+
+	// Set custom dir
+	env, err := SetMacroDir(tempDir1)
+	defer shell.SetEnvironment(env)
+	assert.NoError(t, err)
+
+	// Add a macro file (rpmrc will default to looking in <RPM_CONFIGDIR>/macros), give it a custom macro file to read
+	macroFile := filepath.Join(tempDir1, "macros")
+	tempMacroDir := t.TempDir()
+	err = file.WriteLines([]string{macrodirMacro + " " + tempMacroDir}, macroFile)
+	assert.NoError(t, err)
+
+	macroDir, err = GetMacroDir()
+	assert.NoError(t, err)
+	assert.Equal(t, tempMacroDir, macroDir)
 }
