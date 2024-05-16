@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/liveos-artifacts-download.sh
+ExecStart=/sbin/liveos-artifacts-download
 Type=oneshot
 
 [Install]
