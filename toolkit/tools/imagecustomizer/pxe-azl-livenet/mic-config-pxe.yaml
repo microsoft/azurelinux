@@ -5,7 +5,7 @@ os:
     primaryGroup: sudo
   additionalFiles:
     artifacts/90azl-livenet/liveos-artifacts-download.service:
-      - path: /etc/systemd/system/liveos-artifacts-download.service
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.service
         permission: "644"
     artifacts/90azl-livenet/liveos-artifacts-download.sh:
       - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.sh
