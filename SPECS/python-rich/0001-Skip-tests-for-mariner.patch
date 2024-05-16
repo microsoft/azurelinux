@@ -57,7 +57,7 @@ index 710436eb..43a53895 100644
 +import sys
 +import pytest
 +
-+from pacakging.version import Version
++from packaging.version import Version
  
  from rich.console import Console, RenderableType
  from rich.markdown import Markdown
