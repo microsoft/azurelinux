@@ -24,7 +24,7 @@
 # currently here's what's in our dbx: nothing
 %global dbxfile %{nil}
 
-Name:		shim-unsigned-aarch64
+Name:		shim-unsigned-%{efiarch}
 Version:	15.8
 Release:	3%{?dist}
 Summary:	First-stage UEFI bootloader
