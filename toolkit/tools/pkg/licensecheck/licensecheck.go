@@ -56,6 +56,7 @@ var jobSemaphore = make(chan struct{}, numParallelJobs) // Limit the number of p
 // LicenseCheckResult is the result of a license check on an single RPM
 type LicenseCheckResult struct {
 	RpmPath        string   `json:"RpmPath"`
+	PackageName    string   `json:"PackageName,omitempty"`
 	BadDocs        []string `json:"BadDocs,omitempty"`
 	BadFiles       []string `json:"BadFiles,omitempty"`
 	DuplicatedDocs []string `json:"DuplicatedDocs,omitempty"`
@@ -376,7 +377,15 @@ func (l *LicenseChecker) checkRpmLicenses(rpmPath string) (result LicenseCheckRe
 
 	badDocFiles, badOtherFiles, duplicatedDocs := interpretResults(pkgName, files, documentFiles, licenseFiles, l.exceptions)
 
-	return LicenseCheckResult{RpmPath: rpmPath, BadDocs: badDocFiles, BadFiles: badOtherFiles, DuplicatedDocs: duplicatedDocs}, nil
+	result = LicenseCheckResult{
+		RpmPath:        rpmPath,
+		PackageName:    pkgName,
+		BadDocs:        badDocFiles,
+		BadFiles:       badOtherFiles,
+		DuplicatedDocs: duplicatedDocs,
+	}
+
+	return result, nil
 }
 
 // interpretResults scans file lists for packing issues:
