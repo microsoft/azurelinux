@@ -1,0 +1,10 @@
+--- a/grub-core/kern/misc.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/kern/misc.c	2024-05-16 14:49:26.760384352 -0700
+@@ -188,6 +188,7 @@
+   const char *debug, *found;
+   grub_size_t clen;
+   int ret = 0;
++  return 1;
+ 
+   debug = grub_env_get ("debug");
+   if (!debug)
