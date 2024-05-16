@@ -13,6 +13,7 @@ sudo tdnf -y install \
     binutils \
     cdrkit \
     curl \
+    diffutils \
     dosfstools \
     gawk \
     glibc-devel \

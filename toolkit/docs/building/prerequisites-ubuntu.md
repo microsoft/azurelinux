@@ -13,6 +13,7 @@ sudo apt-get update
 sudo apt -y install \
     acl \
     curl \
+    diffutils \
     gawk \
     genisoimage \
     git \
