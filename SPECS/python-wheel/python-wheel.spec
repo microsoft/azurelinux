@@ -1,16 +1,17 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
+%bcond main_python 1
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
-Version:        0.33.6
-Release:        8%{?dist}
+Version:        0.43.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 %global pypi_name wheel
-%global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
+%global python_wheel_name %{pypi_name}-%{version}-py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
 %global _description \
 A built-package format for Python.\
@@ -33,15 +34,14 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-pip
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
-BuildRequires:  python3-more-itertools
-BuildRequires:  python3-pip
-BuildRequires:  python3-pluggy
 BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 %endif
+BuildRequires:  python3-flit-core
 
 %description -n python3-%{pypi_name} %{_description}
 
@@ -55,57 +55,68 @@ Summary:        The Python wheel module packaged as a wheel
 A Python wheel of wheel to use with virtualenv.
 %endif
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
 
-# Empty files make rpmlint sad
-test -s wheel/cli/install.py || echo "# empty" > wheel/cli/install.py
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%global _pyproject_wheeldir dist
+%python3 -m flit_core.wheel
 
-%if %{without bootstrap}
-%{py3_build_wheel}
-%endif
-
+%pyproject_wheel
 
 %install
-%py3_install
-mv %{buildroot}%{_bindir}/%{pypi_name}{,-%{python3_version}}
-ln -s %{pypi_name}-%{python3_version} %{buildroot}%{_bindir}/%{pypi_name}-3
-ln -s %{pypi_name}-3 %{buildroot}%{_bindir}/%{pypi_name}
-
-%if %{without bootstrap}
-mkdir -p %{buildroot}%{python_wheeldir}
-install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
+# pip is not available when bootstrapping, so we need to unpack the wheel and
+# create the entrypoints manually.
+%if %{with bootstrap}
+mkdir -p %{buildroot}%{python3_sitelib}
+unzip %{_pyproject_wheeldir}/%{python_wheel_name} \
+    -d %{buildroot}%{python3_sitelib} -x wheel-%{version}.dist-info/RECORD
+install -Dpm 0755 %{SOURCE1} %{buildroot}%{_bindir}/wheel
+%py3_shebang_fix %{buildroot}%{_bindir}/wheel
+%else
+%pyproject_install
 %endif
 
+mv %{buildroot}%{_bindir}/%{pypi_name}{,-%{python3_version}}
+%if %{with main_python}
+ln -s %{pypi_name}-%{python3_version} %{buildroot}%{_bindir}/%{pypi_name}-3
+ln -s %{pypi_name}-3 %{buildroot}%{_bindir}/%{pypi_name}
+%endif
+
+mkdir -p %{buildroot}%{python_wheel_dir}
+install -p %{_pyproject_wheeldir}/%{python_wheel_name} -t %{buildroot}%{python_wheel_dir}
 
 %check
-rm setup.cfg
-%{python3} -m pip install iniconfig
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
+pip3 install iniconfig
+# Smoke test
+%{py3_test_envvars} wheel-%{python3_version} version
+%py3_check_import wheel
+%pytest -v --ignore build
 
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
 %doc README.rst
-%{_bindir}/%{pypi_name}
-%{_bindir}/%{pypi_name}-3
 %{_bindir}/%{pypi_name}-%{python3_version}
 %{python3_sitelib}/%{pypi_name}*
+%if %{with main_python}
+%{_bindir}/%{pypi_name}
+%{_bindir}/%{pypi_name}-3
+%endif
 
 %if %{without bootstrap}
 %files wheel
 %license LICENSE.txt
 # we own the dir for simplicity
 %dir %{python_wheeldir}/
-%{python_wheeldir}/%{python_wheelname}
+%{python_wheeldir}/%{python_wheel_name}
 %endif
 
 %changelog
-* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 0.33.6-8
-- Add missing iniconfig dependency to check section
+* Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
+- Updated to 0.43.0
 
 * Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
 - BR multiple python3 modules for PTest
