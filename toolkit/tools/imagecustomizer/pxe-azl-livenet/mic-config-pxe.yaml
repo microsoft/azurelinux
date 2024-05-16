@@ -4,9 +4,21 @@ os:
     password: testpassword
     primaryGroup: sudo
   additionalFiles:
-    artifacts/90azl-livenet/liveos-artifacts-download.service: /etc/systemd/system/liveos-artifacts-download.service
-    artifacts/90azl-livenet/liveos-artifacts-download.sh: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.sh
-    artifacts/90azl-livenet/schedule-liveos-artifacts-download.sh: /usr/lib/dracut/modules.d/90azl-livenet/schedule-liveos-artifacts-download.sh
-    artifacts/90azl-livenet/azl-livenet-genrules.sh: /usr/lib/dracut/modules.d/90azl-livenet/azl-livenet-genrules.sh
-    artifacts/90azl-livenet/module-setup.sh: /usr/lib/dracut/modules.d/90azl-livenet/module-setup.sh
-    artifacts/liveos-dracut-pxe.conf: /etc/dracut.conf.d/10-liveos-dracut-pxe.conf
+    artifacts/90azl-livenet/liveos-artifacts-download.service:
+      - path: /etc/systemd/system/liveos-artifacts-download.service
+        permission: "644"
+    artifacts/90azl-livenet/liveos-artifacts-download.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.sh
+        permission: "755"
+    artifacts/90azl-livenet/schedule-liveos-artifacts-download.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/schedule-liveos-artifacts-download.sh
+        permission: "755"
+    artifacts/90azl-livenet/azl-livenet-genrules.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/azl-livenet-genrules.sh
+        permission: "755"
+    artifacts/90azl-livenet/module-setup.sh:
+      - path: /usr/lib/dracut/modules.d/90azl-livenet/module-setup.sh
+        permission: "755"
+    artifacts/liveos-dracut-pxe.conf:
+      - path: /etc/dracut.conf.d/10-liveos-dracut-pxe.conf
+        permission: "644"
