@@ -2,7 +2,7 @@
 
 set -x
 
-echo "executing liveos-artifacts-download.sh"
+echo "executing liveos-artifacts-download.sh" > /dev/kmsg
 
 type getarg > /dev/null 2>&1 || . /usr/lib/dracut-lib.sh
 root=$(getarg root -d unknown)
@@ -28,7 +28,13 @@ rootImagePath=$rootImageDir/$rootImageFile
 
 # download
 mkdir -p $rootImageDir
-curl $rootUrl -o $rootImagePath
+httpRetCode=$(curl $rootUrl -o $rootImagePath -w "%{http_code}\n")
+echo "curl returned ($httpRetCode)" > /dev/kmsg
+if [ $httpRetCode -ne 200 ]; then
+    echo "error: failed to download $rootUrl" > /dev/kmsg
+    sleep 2s
+    exit 1
+fi
 
 # create a loopback device
 rootDevice=$(losetup -f --show $rootImagePath)
