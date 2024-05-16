@@ -90,7 +90,7 @@ for f in mm fb; do
         touch ${f}-is-signed
     else
         echo "Using unsigned $efi"
-        cp -vf %{shimdir}/$efi
+        cp -vf %{shimdir}/$efi .
     fi
 done
 
