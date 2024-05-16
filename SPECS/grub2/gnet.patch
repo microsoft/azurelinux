@@ -1,0 +1,42 @@
+--- a/grub-core/net/net.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/net/net.c	2024-05-16 16:15:30.151362098 -0700
+@@ -1885,6 +1885,7 @@
+       grub_file_t file;
+ 
+       grub_dprintf ("net", "attempt to fetch config %s\n", config);
++      grub_printf ("GJS: attempt %d config %s, suffix %s\n", num_tries, config, suffix);
+ 
+       file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
+ 
+@@ -1943,6 +1944,7 @@
+       if (client_uuid)
+         {
+           grub_strcpy (suffix, client_uuid);
++          grub_printf ("GJS: uuid config %s, suffix %s\n", config, suffix);
+           if (grub_config_search_through (config, suffix, 1, 0) == 0)
+             return GRUB_ERR_NONE;
+         }
+@@ -1958,6 +1960,7 @@
+         if (*ptr == ':')
+           *ptr = '-';
+ 
++      grub_printf ("GJS: enet config %s, suffix %s\n", config, suffix);
+       if (grub_config_search_through (config, suffix, 1, 0) == 0)
+         return GRUB_ERR_NONE;
+ 
+@@ -1973,6 +1976,7 @@
+                            ((n >> 24) & 0xff), ((n >> 16) & 0xff),      \
+                            ((n >> 8) & 0xff), ((n >> 0) & 0xff));
+ 
++            grub_printf ("GJS: IPaddr config %s, suffix %s\n", config, suffix);
+             if (grub_config_search_through (config, suffix, 8, 1) == 0)
+               return GRUB_ERR_NONE;
+             break;
+@@ -1990,6 +1994,7 @@
+                 *ptr = '-';
+ 
+             grub_snprintf (suffix, GRUB_NET_MAX_STR_ADDR_LEN, "%s", buf);
++            grub_printf ("GJS: IPv6 config %s, suffix %s\n", config, suffix);
+             if (grub_config_search_through (config, suffix, 1, 0) == 0)
+               return GRUB_ERR_NONE;
+             break;
