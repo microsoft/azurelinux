@@ -27,7 +27,7 @@ associated with functional programming, within a natural Pythonic style\
 suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
-Version:        0.12.0
+Version:        0.12.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -70,6 +70,9 @@ nosetests
 %{python3_sitelib}/tlz/
 
 %changelog
+* Thu May 16 2024 Sam Meluch <sammeluch@microsoft.com> - 0.12.1-2
+- Upgrade to 0.12.1 for python 3.12 support
+
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
 
