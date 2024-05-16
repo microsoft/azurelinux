@@ -29,6 +29,7 @@ BuildRequires:  python3-poetry
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-markdown-it-py
+BuildRequires:  python3-packaging
 %endif
 
 %description
