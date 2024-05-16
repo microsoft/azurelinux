@@ -82,8 +82,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.4
-Release:        4%{?dist}
+Version:        3.1.5
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -403,6 +403,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Thu May 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.5-1
+- Auto-upgrade to 3.1.5 - CVE-2024-27282
+
 * Fri Apr 12 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.4-4
 - Add patches for CVE-2024-27280 and CVE-2024-27281
 
