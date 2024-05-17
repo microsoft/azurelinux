@@ -34,7 +34,7 @@ then
     cp "$tarball_name" "$temp_dir"
 else
     echo "Tarball '$tarball_name' doesn't exist. Will attempt to download from blobstorage."
-    if ! wget -q "https://cblmarinerstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$temp_dir/$tarball_name"
+    if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$temp_dir/$tarball_name"
     then
         echo "ERROR: failed to download the source tarball."
         exit 1

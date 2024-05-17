@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -141,6 +141,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Fri May 17 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0-4
+- Move src tarball location to AME
+
 * Fri May 11 2024 Chris Co <chrco@microsoft.com> - 3.0-3
 - Add macros to allow enabling frame pointers on x86_64 and aarch64
 
