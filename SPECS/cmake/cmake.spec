@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.28.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,6 +60,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{major_version}|" %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 
+# Collect all license files into one spot
+for f in Copyright.txt cmcppdap/NOTICE cmcurl/COPYING cmlibrhash/COPYING cmlibuv/LICENSE cmnghttp2/COPYING cmsys/Copyright.txt; do
+    filename_part=$(basename $f)
+    dir_part=$(dirname $f)
+    mkdir -p ./Licenses/$dir_part
+    mv %{buildroot}%{_prefix}/doc/%{name}-*/$f ./Licenses/$dir_part/$filename_part
+    # If folder is now empty, remove it. Use realpath to handle dirname emitting '.' which rmdir doesn't like.
+    rmdir --ignore-fail-on-non-empty -p $(realpath %{buildroot}%{_prefix}/doc/%{name}-*/$dir_part)
+done
+
 %check
 # Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
@@ -78,9 +88,11 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_datadir}/emacs/site-lisp/cmake-mode.el
 %{_datadir}/vim/vimfiles/*
 %{_libdir}/rpm/macros.d/macros.cmake
-%{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.28.2-3
+- Sanitize license files
+
 * Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.28.2-2
 - Fix JDK test issue
 
