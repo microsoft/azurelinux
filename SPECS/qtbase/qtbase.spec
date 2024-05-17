@@ -700,7 +700,10 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
-* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
+* Fri May 17 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 6.6.2-1
+- Upgrade to version 6.6.2 to fix CVE-2023-51714
+
+* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1-1
 - Upgrade to version 6.6.1 for Azure Linux 3.0
 
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
