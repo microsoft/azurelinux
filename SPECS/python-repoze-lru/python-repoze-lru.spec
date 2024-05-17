@@ -25,7 +25,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 BuildRequires:  python3-setuptools
 Requires:       python3
-%if 0%{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
