@@ -5,7 +5,7 @@ audit-devel-3.1.2-1.azl3.x86_64.rpm
 audit-libs-3.1.2-1.azl3.x86_64.rpm
 autoconf-2.72-1.azl3.noarch.rpm
 automake-1.16.5-1.azl3.noarch.rpm
-azurelinux-check-macros-3.0-3.azl3.noarch.rpm
+azurelinux-check-macros-3.0-4.azl3.noarch.rpm
 azurelinux-repos-3.0-2.azl3.noarch.rpm
 azurelinux-repos-debug-3.0-2.azl3.noarch.rpm
 azurelinux-repos-debug-preview-3.0-2.azl3.noarch.rpm
