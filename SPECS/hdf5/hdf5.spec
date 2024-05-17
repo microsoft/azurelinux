@@ -17,16 +17,26 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
+# Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
+Source0:        https://github.com/hdfgroup/hdf5/releases/download/hdf5_%{version}.2/hdf5-%{version}-2.tar.gz#/hdf5-%{version}.tar.gz
 Source1:        h5comp
-Patch0:         hdf5-LD_LIBRARY_PATH.patch
+
+# gmileka: With the move to 1.14.4, hdf5-LD_LIBRARY_PATH.patch does not apply.
+# Patch0:         hdf5-LD_LIBRARY_PATH.patch
+
+# gmileka: With the move to 1.14.4, hdf5-LD_LIBRARY_PATH.patch does not apply.
 # Fix fortran build with gcc 12
 # https://github.com/HDFGroup/hdf5/pull/1412
-Patch1:         hdf5-gfortran12.patch
-Patch3:         hdf5-build.patch
+# Patch1:         hdf5-gfortran12.patch
+
+# gmileka: Translated...
+Patch3:         hdf5-build-new.patch
+
+# gmileka: Translated...
 # Remove Fedora build flags from h5cc/h5c++/h5fc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
-Patch5:         hdf5-wrappers.patch
+Patch5:         hdf5-wrappers-new.patch
+
 # For patches/rpath
 BuildRequires:  automake
 # Needed for mpi tests
