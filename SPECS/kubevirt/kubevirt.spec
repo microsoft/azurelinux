@@ -123,7 +123,7 @@ build_tests="true" \
     cmd/virt-chroot \
     cmd/virt-controller \
     cmd/virt-freezer \
-    cmd/virt-handler \ls
+    cmd/virt-handler \
     cmd/virt-launcher \
     cmd/virt-launcher-monitor \
     cmd/virt-operator \
