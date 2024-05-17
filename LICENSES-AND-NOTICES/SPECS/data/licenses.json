@@ -1732,6 +1732,7 @@
                 "python-nose2",
                 "python-ntlm-auth",
                 "python-oauth2client",
+                "python-omegaconf",
                 "python-openpyxl",
                 "python-openstackdocstheme",
                 "python-oslo-i18n",
