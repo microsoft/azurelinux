@@ -1,6 +1,10 @@
 {
  "Signatures": {
-  "defaults.conf": "eb71a776e9f31c88cf51fdb9b499ef5e797e26e347247d0292aa2b3e7ad2bf1a",
+  "00-hostonly.conf": "b446b39e4574648d8d2a1a852b5d41010aa103dda24b3c3256835149a5ad22ee",
+  "00-hyperv.conf": "d499f617f633f320a53a16436dcd9c1aebcc175510a77a29ccafd946882c7685",
+  "00-virtio.conf": "7a999a5cbfe63825577936bbdf110c26fcef0edd219607dbb9b992982e6de281",
+  "00-vrf.conf": "e2885a4b090d8ca3771e60ce6dcd8b849e28ce5002a5c7b71ff796a92deb2810",
+  "00-xen.conf": "8b7a89b7716cb40a9c0d681caed6994d81ff4dfad4fe50cea15cd47b885dc5a6",
   "dracut-059.tar.gz": "eabf0bb685420c1e1d5475b6855ef787104508f0135ff570312845256e0fcecf",
   "lgpl-2.1.txt": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
   "megaraid.conf": "914824cdbe0c525b71efa05a75e453335b0068beb8bc28bef2a5866d74bf7dd4",
