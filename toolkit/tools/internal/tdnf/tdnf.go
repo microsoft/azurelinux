@@ -14,14 +14,14 @@ import (
 var (
 	// Every valid line will be of the form: <package_name> <architecture> <version>.<dist> <repo_id>
 	// For:
-	//     X aarch64	1.1b.8_X-22~rc1.azl3		fetcher-cloned-repo
+	//     X aarch64	5:1.1b.8_X-22~rc1.azl3		fetcher-cloned-repo
 	//
 	// We'd get:
 	//   - package_name:    X
 	//   - architecture:    aarch64
-	//   - version:         1.1b.8_X-22~rc1
+	//   - version:         5:1.1b.8_X-22~rc1
 	//   - dist:            azl3
-	InstallPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
+	InstallPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+((?:[[:digit:]]:)?[[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
 
 	// Every valid line pair will be of the form:
 	//		<package>-<version>.<arch> : <Description>
