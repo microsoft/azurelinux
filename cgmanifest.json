@@ -25183,8 +25183,8 @@
         "type": "other",
         "other": {
           "name": "qtbase",
-          "version": "6.6.1",
-          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz"
+          "version": "6.6.2",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.2/submodules/qtbase-everywhere-src-6.6.2.tar.xz"
         }
       }
     },
