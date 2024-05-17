@@ -6,6 +6,11 @@
         "cronie-anacron",
         "logrotate",
         "core-packages-base-image",
+        "dracut-hostonly",
+        "dracut-hyperv",
+        "dracut-virtio",
+        "dracut-vrf",
+        "dracut-xen",
         "initramfs"
     ],
     "_comment": "Install 'initramfs' last to avoid unnecessary regeneration when other packages, such as 'kernel', are installed."
