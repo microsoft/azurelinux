@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -75,14 +76,25 @@ func main() {
 }
 
 func printExplanation() {
-	logger.Log.Info("Errors/warnings fall into three buckets:")
-	logger.Log.Infof("\t1. 'bad %%doc files': A %%doc documentation file that the tool believes to be a license file.")
-	logger.Log.Infof("\t\tFiles should either be changed to %%license, or added to the exceptions file:")
-	logger.Log.Infof("\t\t(%s)", *exceptionFile)
-	logger.Log.Infof("\t2. 'bad general file': A file that is placed into '/usr/share/licenses/' that is not flagged as")
-	logger.Log.Infof("\t\ta license file. These files should use %%license.")
-	logger.Log.Infof("\t3. 'duplicated license files': A license file that is both a %%license and a %%doc file, pick one.")
-	logger.Log.Infof("\t\tThis is a warning, unless the tool is run in pedantic mode, in which case it is an error.")
+	const explanation = `
+Errors/warnings fall into three buckets:
+	1. 'bad %doc files': A %doc documentation file that the tool believes to be a license file.
+	2. 'bad general file': A file that is placed into '/usr/share/licenses/' that is not flagged as
+		a license file. These files should use %license instead of %doc. Ideally whey should also
+		not be placed in a directory manually. (e.g. prefer '%license COPYING' over
+		'%license %{_docdir}/%{name}/COPYING')
+	3. 'duplicated license files': A license file that is both a %license and a %doc file, pick one.")
+		This is a warning, unless the tool is run in pedantic mode, in which case it is an error.
+How to fix:
+	- 'False positives': In all cases, a detection may be suppressed by using the exception file:
+		{{.exceptionFile}}.
+		This file contains per-package and global exceptions in the form of regexes.
+	- 'bad %%doc files': Mark it using %license, ideally without using a buildroot path (e.g. use '%license COPYING').
+	- 'bad general file': Mark it using %license, ideally without using a buildroot path (e.g. use '%license COPYING').
+	- 'duplicated license files': If they are actually equivalent, remove the copy in the documentation.
+	- Query package contents with 'rpm -ql <package>.rpm' to see all files, 'rpm -qL <package>.rpm' to
+		see only the license files, and 'rpm -qd <package>.rpm' to see only the documentation files.`
+	logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
 }
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
