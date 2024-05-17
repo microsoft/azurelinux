@@ -155,7 +155,7 @@ When creating your PR, please ensure the following:
 
 * Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files. When running the check section, results will not fail a build. Check the logs for the results of this section.
 
-* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by a CBL-Mariner developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
+* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by a CBL-Mariner developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/< source tar >].
 
 * cgmanifest files are up-to-date and alphabetically sorted. The cgmanifest files are used to record all package sources. They include the following files:
 

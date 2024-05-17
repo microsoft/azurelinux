@@ -256,7 +256,7 @@
         "other": {
           "name": "antlr",
           "version": "2.7.7",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/antlr-2.7.7.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/antlr-2.7.7.tar.bz2"
         }
       }
     },
@@ -266,7 +266,7 @@
         "other": {
           "name": "aopalliance",
           "version": "1.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aopalliance-src.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aopalliance-src.tar.gz"
         }
       }
     },
@@ -686,7 +686,7 @@
         "other": {
           "name": "atinject",
           "version": "1+20100611git1f74ea7",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/atinject-1.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/atinject-1.tar.xz"
         }
       }
     },
@@ -1016,7 +1016,7 @@
         "other": {
           "name": "bcache-tools",
           "version": "1.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/bcache-tools-1.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/bcache-tools-1.1.tar.gz"
         }
       }
     },
@@ -1068,7 +1068,7 @@
         "other": {
           "name": "bea-stax",
           "version": "1.2.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/stax-src-1.2.0.zip"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/stax-src-1.2.0.zip"
         }
       }
     },
@@ -1828,7 +1828,7 @@
         "other": {
           "name": "clucene",
           "version": "2.3.3.4",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/clucene-core-2.3.3.4-e8e3d20.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/clucene-core-2.3.3.4-e8e3d20.tar.xz"
         }
       }
     },
@@ -2028,7 +2028,7 @@
         "other": {
           "name": "container-exception-logger",
           "version": "1.0.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/container-exception-logger-1.0.3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/container-exception-logger-1.0.3.tar.gz"
         }
       }
     },
@@ -2579,7 +2579,7 @@
         "other": {
           "name": "device-mapper-persistent-data",
           "version": "0.8.5",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/device-mapper-persistent-data-0.8.5.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/device-mapper-persistent-data-0.8.5.tar.gz"
         }
       }
     },
@@ -2889,7 +2889,7 @@
         "other": {
           "name": "dotconf",
           "version": "1.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/dotconf-1.3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/dotconf-1.3.tar.gz"
         }
       }
     },
@@ -3279,7 +3279,7 @@
         "other": {
           "name": "enscript",
           "version": "1.6.6",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/enscript-1.6.6.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/enscript-1.6.6.tar.gz"
         }
       }
     },
@@ -3509,7 +3509,7 @@
         "other": {
           "name": "fence-virt",
           "version": "1.0.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/fence-virt-1.0.0.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fence-virt-1.0.0.tar.bz2"
         }
       }
     },
@@ -3801,7 +3801,7 @@
         "other": {
           "name": "foomatic-db",
           "version": "4.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/foomatic-db-4.0-20201104.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/foomatic-db-4.0-20201104.tar.gz"
         }
       }
     },
@@ -4001,7 +4001,7 @@
         "other": {
           "name": "fxload",
           "version": "2008_10_13",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/fxload-2008_10_13-noa3load.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fxload-2008_10_13-noa3load.tar.gz"
         }
       }
     },
@@ -4191,7 +4191,7 @@
         "other": {
           "name": "GeoIP-GeoLite-data",
           "version": "2018.06",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/GeoIP.dat.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/GeoIP.dat.gz"
         }
       }
     },
@@ -4221,7 +4221,7 @@
         "other": {
           "name": "geronimo-specs",
           "version": "1.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/geronimo-specs-1.2.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/geronimo-specs-1.2.tar.gz"
         }
       }
     },
@@ -4701,7 +4701,7 @@
         "other": {
           "name": "google-guice",
           "version": "4.2.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/google-guice-4.2.3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/google-guice-4.2.3.tar.gz"
         }
       }
     },
@@ -4781,7 +4781,7 @@
         "other": {
           "name": "gpm",
           "version": "1.20.7",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/gpm-1.20.7.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/gpm-1.20.7.tar.xz"
         }
       }
     },
@@ -6711,7 +6711,7 @@
         "other": {
           "name": "hyphen-hu",
           "version": "0.20090612",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nagybence-huhyphn-aa3fc85.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/nagybence-huhyphn-aa3fc85.tar.gz"
         }
       }
     },
@@ -6791,7 +6791,7 @@
         "other": {
           "name": "hyphen-mi",
           "version": "0.20080630",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/hunspell-hyphen-mi-0.1.20080630-beta.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/hunspell-hyphen-mi-0.1.20080630-beta.tar.gz"
         }
       }
     },
@@ -7612,7 +7612,7 @@
         "other": {
           "name": "jakarta-taglibs-standard",
           "version": "1.1.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-taglibs-standard-1.1.1-src.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jakarta-taglibs-standard-1.1.1-src.tar.bz2"
         }
       }
     },
@@ -7672,7 +7672,7 @@
         "other": {
           "name": "java-cup",
           "version": "0.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
         }
       }
     },
@@ -7682,7 +7682,7 @@
         "other": {
           "name": "java-cup-bootstrap",
           "version": "0.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
         }
       }
     },
@@ -7962,7 +7962,7 @@
         "other": {
           "name": "jsoup",
           "version": "1.11.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jsoup-1.11.3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jsoup-1.11.3.tar.gz"
         }
       }
     },
@@ -7972,7 +7972,7 @@
         "other": {
           "name": "jsr-305",
           "version": "0.1+20130910",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jsr-305-20130910svn.tgz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jsr-305-20130910svn.tgz"
         }
       }
     },
@@ -7982,7 +7982,7 @@
         "other": {
           "name": "jtidy",
           "version": "8.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
         }
       }
     },
@@ -8182,7 +8182,7 @@
         "other": {
           "name": "kernel-mshv",
           "version": "5.15.126.mshv9",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
         }
       }
     },
@@ -8202,7 +8202,7 @@
         "other": {
           "name": "kernel-uvm",
           "version": "6.1.0.mshv16",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
@@ -10822,7 +10822,7 @@
         "other": {
           "name": "librx",
           "version": "1.5",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rx-1.5.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rx-1.5.tar.bz2"
         }
       }
     },
@@ -10982,7 +10982,7 @@
         "other": {
           "name": "libsmi",
           "version": "0.4.8",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libsmi-0.4.8.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/libsmi-0.4.8.tar.gz"
         }
       }
     },
@@ -11262,7 +11262,7 @@
         "other": {
           "name": "libucil",
           "version": "0.9.10",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libucil-0.9.10.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/libucil-0.9.10.tar.gz"
         }
       }
     },
@@ -11272,7 +11272,7 @@
         "other": {
           "name": "libunicap",
           "version": "0.9.12",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/libunicap-0.9.12.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/libunicap-0.9.12.tar.gz"
         }
       }
     },
@@ -12332,7 +12332,7 @@
         "other": {
           "name": "lockdev",
           "version": "1.0.4",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
         }
       }
     },
@@ -12732,7 +12732,7 @@
         "other": {
           "name": "mailx",
           "version": "12.5",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/mailx-12.5.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mailx-12.5.tar.xz"
         }
       }
     },
@@ -13002,7 +13002,7 @@
         "other": {
           "name": "maven-surefire",
           "version": "3.0.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-surefire-3.0.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/maven-surefire-3.0.0.tar.gz"
         }
       }
     },
@@ -13092,7 +13092,7 @@
         "other": {
           "name": "meanwhile",
           "version": "1.1.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/meanwhile-1.1.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/meanwhile-1.1.0.tar.gz"
         }
       }
     },
@@ -13864,7 +13864,7 @@
         "other": {
           "name": "mythes-el",
           "version": "0.20070412",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/th_el.zip"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/th_el.zip"
         }
       }
     },
@@ -13934,7 +13934,7 @@
         "other": {
           "name": "mythes-mi",
           "version": "0.20080630",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/mythes-mi-0.1.20080630-beta.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mythes-mi-0.1.20080630-beta.tar.gz"
         }
       }
     },
@@ -13994,7 +13994,7 @@
         "other": {
           "name": "mythes-ru",
           "version": "0.20070613",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/thes_ru_RU_v2.zip"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/thes_ru_RU_v2.zip"
         }
       }
     },
@@ -14194,7 +14194,7 @@
         "other": {
           "name": "netpbm",
           "version": "10.90.00",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/netpbm-10.90.00.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/netpbm-10.90.00.tar.xz"
         }
       }
     },
@@ -14394,7 +14394,7 @@
         "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
         }
       }
     },
@@ -14554,7 +14554,7 @@
         "other": {
           "name": "numad",
           "version": "0.5+20150602.aec1497e2b",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/numad-0.5+20150602.aec1497e2b.tar.xz"
         }
       }
     },
@@ -14664,7 +14664,7 @@
         "other": {
           "name": "objectweb-anttask",
           "version": "1.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/ow_util_ant_tasks_1.2.zip"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ow_util_ant_tasks_1.2.zip"
         }
       }
     },
@@ -14674,7 +14674,7 @@
         "other": {
           "name": "objectweb-asm",
           "version": "7.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/objectweb-asm-7.2.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/objectweb-asm-7.2.tar.xz"
         }
       }
     },
@@ -15184,7 +15184,7 @@
         "other": {
           "name": "ocaml-xml-light",
           "version": "2.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-light-234.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xml-light-234.tar.gz"
         }
       }
     },
@@ -15515,7 +15515,7 @@
         "other": {
           "name": "openssl",
           "version": "1.1.1k",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/openssl-1.1.1k-hobbled.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/openssl-1.1.1k-hobbled.tar.xz"
         }
       }
     },
@@ -16415,7 +16415,7 @@
         "other": {
           "name": "perl-Class-Data-Inheritable",
           "version": "0.08",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.08-clean.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.08-clean.tar.gz"
         }
       }
     },
@@ -18295,7 +18295,7 @@
         "other": {
           "name": "perl-libnet",
           "version": "3.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/perl-libnet_repackaged-3.11.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perl-libnet_repackaged-3.11.tar.gz"
         }
       }
     },
@@ -20905,7 +20905,7 @@
         "other": {
           "name": "perl-XML-SAX",
           "version": "1.02",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/XML-SAX-1.02.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/XML-SAX-1.02.tar.gz"
         }
       }
     },
@@ -21245,7 +21245,7 @@
         "other": {
           "name": "plexus-component-api",
           "version": "1.0~alpha15",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha-15.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha-15.tar.xz"
         }
       }
     },
@@ -21665,7 +21665,7 @@
         "other": {
           "name": "psutils",
           "version": "1.23",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/psutils-1.23.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/psutils-1.23.tar.xz"
         }
       }
     },
@@ -21695,7 +21695,7 @@
         "other": {
           "name": "publicsuffix",
           "version": "20201026",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/publicsuffix-20201026.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/publicsuffix-20201026.tar.gz"
         }
       }
     },
@@ -22875,7 +22875,7 @@
         "other": {
           "name": "python-hwdata",
           "version": "2.3.7",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-hwdata-2.3.7.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/python-hwdata-2.3.7.tar.gz"
         }
       }
     },
@@ -24965,7 +24965,7 @@
         "other": {
           "name": "python-waitress",
           "version": "1.4.4",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-waitress-1.4.4-nodocs.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/python-waitress-1.4.4-nodocs.tar.gz"
         }
       }
     },
@@ -25856,7 +25856,7 @@
         "other": {
           "name": "rt-setup",
           "version": "2.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rt-setup-2.1.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rt-setup-2.1.tar.bz2"
         }
       }
     },
@@ -25876,7 +25876,7 @@
         "other": {
           "name": "rtctl",
           "version": "1.13",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rtctl-1.13.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rtctl-1.13.tar.bz2"
         }
       }
     },
@@ -25986,7 +25986,7 @@
         "other": {
           "name": "rubygem-aws-eventstream",
           "version": "1.2.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-eventstream-1.2.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-eventstream-1.2.0.tar.gz"
         }
       }
     },
@@ -25996,7 +25996,7 @@
         "other": {
           "name": "rubygem-aws-partitions",
           "version": "1.576.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-partitions-1.576.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-partitions-1.576.0.tar.gz"
         }
       }
     },
@@ -26006,7 +26006,7 @@
         "other": {
           "name": "rubygem-aws-sdk-core",
           "version": "3.130.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-core-3.130.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-sdk-core-3.130.1.tar.gz"
         }
       }
     },
@@ -26016,7 +26016,7 @@
         "other": {
           "name": "rubygem-aws-sdk-kms",
           "version": "1.55.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-kms-1.55.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-sdk-kms-1.55.0.tar.gz"
         }
       }
     },
@@ -26026,7 +26026,7 @@
         "other": {
           "name": "rubygem-aws-sdk-s3",
           "version": "1.113.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-s3-1.113.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-sdk-s3-1.113.0.tar.gz"
         }
       }
     },
@@ -26036,7 +26036,7 @@
         "other": {
           "name": "rubygem-aws-sdk-sqs",
           "version": "1.51.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-sqs-1.51.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-sdk-sqs-1.51.0.tar.gz"
         }
       }
     },
@@ -26046,7 +26046,7 @@
         "other": {
           "name": "rubygem-aws-sigv4",
           "version": "1.4.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sigv4-1.4.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/aws-sigv4-1.4.0.tar.gz"
         }
       }
     },
@@ -26536,7 +26536,7 @@
         "other": {
           "name": "rubygem-http_parser.rb",
           "version": "0.6.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/http_parser.rb-0.6.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/http_parser.rb-0.6.1.tar.gz"
         }
       }
     },
@@ -27386,7 +27386,7 @@
         "other": {
           "name": "sblim-cmpi-syslog",
           "version": "0.9.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sblim-cmpi-syslog-0.9.0.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sblim-cmpi-syslog-0.9.0.tar.bz2"
         }
       }
     },
@@ -27626,7 +27626,7 @@
         "other": {
           "name": "servletapi4",
           "version": "4.0.4",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-servletapi-4-src.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jakarta-servletapi-4-src.tar.gz"
         }
       }
     },
@@ -27636,7 +27636,7 @@
         "other": {
           "name": "servletapi5",
           "version": "5.0.18",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-servletapi-5-src.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jakarta-servletapi-5-src.tar.gz"
         }
       }
     },
@@ -27697,7 +27697,7 @@
         "other": {
           "name": "setuptool",
           "version": "1.19.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/setuptool-1.19.11.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/setuptool-1.19.11.tar.gz"
         }
       }
     },
@@ -27728,7 +27728,7 @@
         "other": {
           "name": "sgabios",
           "version": "0.20180715git",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgabios-20180715-git72f39d4.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sgabios-20180715-git72f39d4.tar.xz"
         }
       }
     },
@@ -27748,7 +27748,7 @@
         "other": {
           "name": "sgpio",
           "version": "1.2.0.10",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgpio-1.2-0.10-src.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sgpio-1.2-0.10-src.tar.gz"
         }
       }
     },
@@ -28128,7 +28128,7 @@
         "other": {
           "name": "splix",
           "version": "2.0.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/splix-2.0.1.20130902svn.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/splix-2.0.1.20130902svn.tar.bz2"
         }
       }
     },
@@ -28388,7 +28388,7 @@
         "other": {
           "name": "symlinks",
           "version": "1.7",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
         }
       }
     },
@@ -28498,7 +28498,7 @@
         "other": {
           "name": "t1lib",
           "version": "5.1.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/t1lib-5.1.2.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/t1lib-5.1.2.tar.gz"
         }
       }
     },
@@ -28978,7 +28978,7 @@
         "other": {
           "name": "ttmkfdir",
           "version": "3.0.9",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/ttmkfdir-3.0.9.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ttmkfdir-3.0.9.tar.bz2"
         }
       }
     },
@@ -29278,7 +29278,7 @@
         "other": {
           "name": "usbip",
           "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
         }
       }
     },
@@ -29528,7 +29528,7 @@
         "other": {
           "name": "virt-who",
           "version": "0.24.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
         }
       }
     },
@@ -30178,7 +30178,7 @@
         "other": {
           "name": "xhtml1-dtds",
           "version": "1.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xhtml1-dtds-20020801.tar.xz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xhtml1-dtds-20020801.tar.xz"
         }
       }
     },
@@ -30329,7 +30329,7 @@
         "other": {
           "name": "xml-commons-apis",
           "version": "1.4.01",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-commons-apis-1.4.01.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xml-commons-apis-1.4.01.tar.gz"
         }
       }
     },
@@ -30349,7 +30349,7 @@
         "other": {
           "name": "xmldb-api",
           "version": "0.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
         }
       }
     },
