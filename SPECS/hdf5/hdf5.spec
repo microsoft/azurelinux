@@ -36,6 +36,7 @@ Patch3:         hdf5-build-new.patch
 # Remove Fedora build flags from h5cc/h5c++/h5fc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5:         hdf5-wrappers-new.patch
+Patch6:         hdf5-turn-on-hl-option.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -158,6 +159,7 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
   --enable-hl \\\
   --enable-shared \\\
   --with-szlib \\\
+  --enable-hlgiftools \\\
 %{nil}
 # --enable-cxx and --enable-parallel flags are incompatible
 # --with-mpe=DIR Use MPE instrumentation [default=no]
@@ -174,6 +176,7 @@ ln -s ../configure .
 %configure \
   %{configure_opts} \
   --enable-cxx \
+  --enable-hlgiftools \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
