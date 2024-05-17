@@ -46,4 +46,4 @@ pip3 install mock wheel
 
 %changelog
 * Fri May 10 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.3.0-1
-- Initial CBL-import from pypi (license: BSD 3).
+- Original version for Azure Linux (license: BSD 3).
