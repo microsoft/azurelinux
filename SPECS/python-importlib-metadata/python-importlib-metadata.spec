@@ -1,7 +1,7 @@
 Summary:        Library to access the metadata for a Python package
 Name:           python-importlib-metadata
 Version:        6.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,7 +60,7 @@ Python versions.
 %pyproject_save_files importlib_metadata
 
 %check
-pip3 install pyfakefs more-itertools
+pip3 install pyfakefs more-itertools iniconfig
 rm -rf .pyproject-builddir
 # Ignored file uses pytest_perf not available in Mariner
 # test_find_local tries to install setuptools from PyPI
@@ -71,6 +71,9 @@ rm -rf .pyproject-builddir
 %doc README.rst
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 6.8.0-3
+- Add missing iniconfig dependency to check section
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 6.8.0-2
 - Add BR for python-setuptools_scm
 
