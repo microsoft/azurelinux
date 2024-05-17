@@ -10,7 +10,7 @@ set -e
 # - b) ACR name (e.g. azurelinepreview, acrafoimages, etc.)
 # - c) Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
 # - d) Image name (e.g. nodejs, postgres, cdi, etc.)
-# - e) Component name (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
+# - e) Component file name (e.g. nodejs.name, postgres.name, api.name, etc.)
 # - f) Package file name (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
 # - g) Dockerfile name (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
 # - h) Docker build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
@@ -38,10 +38,11 @@ set -e
 #   ~/azurelinux/.pipelines/containerSourceData
 #   ├── nodejs
 #   │   ├── distroless
-#   │   │   ├── holdback-nodejs18.pkg
-#   │   │   ├── nodejs18.pkg
+#   │   │   ├── holdback-nodejs.pkg
+#   │   │   ├── nodejs.pkg
 #   │   ├── Dockerfile-Nodejs
-#   │   ├── nodejs18.pkg
+#   │   ├── nodejs.pkg
+#   |   |── nodejs.name
 #   ├── configuration
 #   │   ├── acrRepoV2.json
 #   ├── scripts
@@ -62,7 +63,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
     b ) ACR=$OPTARG;;
     c ) REPOSITORY=$OPTARG;;
     d ) IMAGE=$OPTARG;;
-    e ) COMPONENT=$OPTARG;;
+    e ) COMPONENT_FILE=$OPTARG;;
     f ) PACKAGE_FILE=$OPTARG;;
     g ) DOCKERFILE=$OPTARG;;
     h ) DOCKER_BUILD_ARGS=$OPTARG;;
@@ -105,7 +106,7 @@ function print_inputs {
     echo "ACR                           -> $ACR"
     echo "REPOSITORY                    -> $REPOSITORY"
     echo "IMAGE                         -> $IMAGE"
-    echo "COMPONENT                     -> $COMPONENT"
+    echo "COMPONENT_FILE                -> $COMPONENT_FILE"
     echo "PACKAGE_FILE                  -> $PACKAGE_FILE"
     echo "DOCKERFILE                    -> $DOCKERFILE"
     echo "DOCKER_BUILD_ARGS             -> $DOCKER_BUILD_ARGS"
@@ -210,6 +211,20 @@ function initialization {
     echo "End of Life                   -> $END_OF_LIFE_1_YEAR"
 }
 
+function get_packages_to_install {
+    echo "+++ Get packages to install"
+    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
+    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
+    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
+}
+
+function get_component_name {
+    echo "+++ Get Component name"
+    componentFilePath="$CONTAINER_SRC_DIR/$IMAGE/$COMPONENT_FILE"
+    COMPONENT=$(cat "$componentFilePath")
+    echo "Component name                -> $COMPONENT"
+}
+
 function prepare_dockerfile {
     echo "+++ Prepare dockerfile"
     # Copy original dockerfile from Azure Linux repo.
@@ -228,13 +243,6 @@ function prepare_dockerfile {
     echo "------------------------------------"
     cat "$WORK_DIR/dockerfile"
     echo ""
-}
-
-function get_packages_to_install {
-    echo "+++ Get packages to install"
-    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
-    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
-    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
 }
 
 function prepare_docker_directory {
@@ -389,8 +397,9 @@ function distroless_container {
 print_inputs
 validate_inputs
 initialization
-prepare_dockerfile
 get_packages_to_install
+get_component_name
+prepare_dockerfile
 prepare_docker_directory
 docker_build
 set_image_tag
