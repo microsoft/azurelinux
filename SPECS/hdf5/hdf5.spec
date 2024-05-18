@@ -1,6 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 %define version_main %(echo %{version} | cut -d. -f-2)
-%global so_version 200
+%global so_version_1 310
+%global so_version_2 311
 %global with_mpich 0
 %global with_openmpi 0
 %if %{with_mpich}
@@ -160,6 +161,7 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
   --enable-shared \\\
   --with-szlib \\\
   --enable-hlgiftools \\\
+  --enable-mirror-vfd \\\
 %{nil}
 # --enable-cxx and --enable-parallel flags are incompatible
 # --with-mpe=DIR Use MPE instrumentation [default=no]
@@ -284,16 +286,18 @@ done
 
 %files
 %license COPYING
-%doc MANIFEST README.txt release_docs/RELEASE.txt
+%doc README.md release_docs/RELEASE.txt
 %doc release_docs/HISTORY*.txt
 %{_bindir}/gif2h5
 %{_bindir}/h52gif
 %{_bindir}/h5clear
 %{_bindir}/h5copy
 %{_bindir}/h5debug
+%{_bindir}/h5delete
 %{_bindir}/h5diff
 %{_bindir}/h5dump
 %{_bindir}/h5format_convert
+%{_bindir}/h5fuse
 %{_bindir}/h5import
 %{_bindir}/h5jam
 %{_bindir}/h5ls
@@ -307,12 +311,12 @@ done
 %{_bindir}/mirror_server
 %{_bindir}/mirror_server_stop
 %{_libdir}/hdf5/
-%{_libdir}/libhdf5.so.%{so_version}*
-%{_libdir}/libhdf5_cpp.so.%{so_version}*
-%{_libdir}/libhdf5_fortran.so.%{so_version}*
-%{_libdir}/libhdf5hl_fortran.so.%{so_version}*
-%{_libdir}/libhdf5_hl.so.%{so_version}*
-%{_libdir}/libhdf5_hl_cpp.so.%{so_version}*
+%{_libdir}/libhdf5.so.%{so_version_2}*
+%{_libdir}/libhdf5_cpp.so.%{so_version_1}*
+%{_libdir}/libhdf5_fortran.so.%{so_version_2}*
+%{_libdir}/libhdf5hl_fortran.so.%{so_version_1}*
+%{_libdir}/libhdf5_hl.so.%{so_version_1}*
+%{_libdir}/libhdf5_hl_cpp.so.%{so_version_1}*
 
 %files devel
 %{macrosdir}/macros.hdf5
@@ -321,6 +325,7 @@ done
 %{_bindir}/h5fc*
 %{_bindir}/h5redeploy
 %{_includedir}/*.h
+%{_includedir}/*.inc
 %{_libdir}/*.so
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
@@ -358,7 +363,7 @@ done
 %{_libdir}/mpich/bin/mirror_server_stop
 %{_libdir}/mpich/bin/ph5diff
 %{_libdir}/mpich/hdf5/
-%{_libdir}/mpich/lib/*.so.%{so_version}*
+%{_libdir}/mpich/lib/*.so.%{so_version_1}*
 
 %files mpich-devel
 %{_includedir}/mpich-%{_arch}
@@ -402,7 +407,7 @@ done
 %{_libdir}/openmpi/bin/mirror_server_stop
 %{_libdir}/openmpi/bin/ph5diff
 %{_libdir}/openmpi/hdf5/
-%{_libdir}/openmpi/lib/*.so.%{so_version}*
+%{_libdir}/openmpi/lib/*.so.%{so_version_1}*
 
 %files openmpi-devel
 %{_includedir}/openmpi-%{_arch}
