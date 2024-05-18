@@ -1,7 +1,7 @@
-diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
---- hdf5-1.10.7/bin/h5cc.in.wrappers	2020-10-07 20:24:29.127283333 -0600
-+++ hdf5-1.10.7/bin/h5cc.in	2020-10-07 20:27:05.289536904 -0600
-@@ -89,10 +89,10 @@ CLINKERBASE="@CC@"
+diff -ruN a/bin/h5cc.in b/bin/h5cc.in
+--- a/bin/h5cc.in	2024-05-15 18:32:01.952461165 -0700
++++ b/bin/h5cc.in	2024-05-16 18:45:29.808730781 -0700
+@@ -87,10 +87,10 @@
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
  # to the user's flags.
@@ -15,7 +15,7 @@ diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
  
  CC="${HDF5_CC:-$CCBASE}"
  CLINKER="${HDF5_CLINKER:-$CLINKERBASE}"
-@@ -105,7 +105,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
+@@ -103,7 +103,8 @@
  # available library is shared, it will be used by default.  The user can
  # override either default, although choosing an unavailable library will result
  # in link errors.
@@ -25,7 +25,7 @@ diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
  if test "${STATIC_AVAILABLE}" = "yes"; then
    USE_SHARED_LIB="${HDF5_USE_SHLIB:-no}"
  else
-@@ -385,7 +386,7 @@ if test "x$do_link" = "xyes"; then
+@@ -380,7 +381,7 @@
    # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
    # from the hdf5 build. The order of the flags is intended to give precedence
    # to the user's flags.
@@ -34,10 +34,10 @@ diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
    status=$?
  fi
  
-diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
---- hdf5-1.10.7/c++/src/h5c++.in.wrappers	2020-08-27 21:38:23.000000000 -0600
-+++ hdf5-1.10.7/c++/src/h5c++.in	2020-10-07 20:24:29.126283325 -0600
-@@ -87,10 +87,10 @@ CXXLINKERBASE="@CXX@"
+diff -ruN a/c++/src/h5c++.in b/c++/src/h5c++.in
+--- a/c++/src/h5c++.in	2024-05-15 18:32:01.984461136 -0700
++++ b/c++/src/h5c++.in	2024-05-16 18:47:24.748593382 -0700
+@@ -85,10 +85,10 @@
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
  # to the user's flags.
@@ -50,8 +50,8 @@ diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
 +H5BLD_LIBS=
  
  CXX="${HDF5_CXX:-$CXXBASE}"
- CXXLINKER="${HDF5_CLINKER:-$CXXLINKERBASE}"
-@@ -103,7 +103,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
+ CXXLINKER="${HDF5_CXXLINKER:-$CXXLINKERBASE}"
+@@ -101,7 +101,8 @@
  # available library is shared, it will be used by default.  The user can
  # override either default, although choosing an unavailable library will result
  # in link errors.
@@ -61,7 +61,7 @@ diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
  if test "${STATIC_AVAILABLE}" = "yes"; then
    USE_SHARED_LIB="${HDF5_USE_SHLIB:-no}"
  else
-@@ -385,7 +386,7 @@ if test "x$do_link" = "xyes"; then
+@@ -372,7 +373,7 @@
    # from the hdf5 build. The order of the flags is intended to give precedence
    # to the user's flags.
  
@@ -70,16 +70,15 @@ diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
  
    status=$?
  fi
-diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.in
---- hdf5-1.10.7/fortran/src/h5fc.in.wrappers	2020-08-27 21:38:23.000000000 -0600
-+++ hdf5-1.10.7/fortran/src/h5fc.in	2020-10-07 20:25:53.793962985 -0600
-@@ -83,11 +83,11 @@ FLINKERBASE="@FC@"
- # libraries in $link_args, followed by any external library paths and libraries
+diff -ruN a/fortran/src/h5fc.in b/fortran/src/h5fc.in
+--- a/fortran/src/h5fc.in	2024-05-15 18:32:02.016461108 -0700
++++ b/fortran/src/h5fc.in	2024-05-16 18:50:03.828406070 -0700
+@@ -83,10 +83,10 @@
  # from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in from the hdf5 build.
  # The order of the flags is intended to give precedence to the user's flags.
--H5BLD_FCFLAGS="@AM_FCFLAGS@ @FCFLAGS@"
-+H5BLD_FCFLAGS=
- F9XMODFLAG="@F9XMODFLAG@"
+ H5BLD_FCFLAGS="@AM_FCFLAGS@ @FCFLAGS@"
+-F9XMODFLAG="@F9XMODFLAG@"
++F9XMODFLAG=
  F9XSUFFIXFLAG="@F9XSUFFIXFLAG@"
 -H5BLD_LDFLAGS="@AM_LDFLAGS@ @LDFLAGS@"
 -H5BLD_LIBS="@LIBS@"
@@ -88,7 +87,7 @@ diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.i
  
  FC="${HDF5_FC:-$FCBASE}"
  FLINKER="${HDF5_FLINKER:-$FLINKERBASE}"
-@@ -99,7 +99,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
+@@ -98,7 +98,8 @@
  # available library is shared, it will be used by default.  The user can
  # override either default, although choosing an unavailable library will result
  # in link errors.
@@ -98,12 +97,3 @@ diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.i
  if test "${STATIC_AVAILABLE}" = "yes"; then
    USE_SHARED_LIB="${HDF5_USE_SHLIB:-no}"
  else
-@@ -363,7 +364,7 @@ if test "x$do_link" = "xyes"; then
-   # libraries in $link_args, followed by any external library paths and libraries
-   # from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in from the hdf5 build.
-   # The order of the flags is intended to give precedence to the user's flags.
--  $SHOW $FLINKER $FCFLAGS $H5BLD_FCFLAGS $F9XSUFFIXFLAG $LDFLAGS $fmodules $link_objs $LIBS $link_args $shared_link
-+  $SHOW $FLINKER $FCFLAGS $H5BLD_FCFLAGS $F9XSUFFIXFLAG $LDFLAGS $fmodules $link_objs $LIBS $link_args
-   status=$?
- fi
- 
