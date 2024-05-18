@@ -7,6 +7,7 @@ package logger
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -244,4 +245,30 @@ func setHookLogLevel(hook *writerHook, level string) (err error) {
 
 	hook.SetLevel(logLevel)
 	return
+}
+
+// FormatWarningBox formats a message into a box with a border. The box is automatically sized to fit the longest line.
+// Each line will be centered in the box.
+func FormatWarningBox(message []string) []string {
+	var (
+		corners    = []string{"╔", "╗", "╚", "╝"}
+		horizontal = "═"
+		vertical   = "║"
+	)
+	maxLineLength := 0
+	for _, line := range message {
+		if len(line) > maxLineLength {
+			maxLineLength = len(line)
+		}
+	}
+	// Count: 2 for corners, 2 for padding, longest string
+	lines := []string{corners[0] + strings.Repeat(horizontal, maxLineLength+2) + corners[1]}
+	for _, line := range message {
+		paddingL := (maxLineLength - len(line)) / 2
+		paddingR := maxLineLength - len(line) - paddingL
+		lines = append(lines, fmt.Sprintf("%s %s%s%s %s", vertical, strings.Repeat(" ", paddingL), line, strings.Repeat(" ", paddingR), vertical))
+
+	}
+	lines = append(lines, corners[2]+strings.Repeat(horizontal, maxLineLength+2)+corners[3])
+	return lines
 }
