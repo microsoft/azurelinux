@@ -144,7 +144,6 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
   --enable-hl \\\
   --enable-shared \\\
   --with-szlib \\\
-  --enable-hlgiftools \\\
   --enable-mirror-vfd \\\
 %{nil}
 # --enable-cxx and --enable-parallel flags are incompatible
