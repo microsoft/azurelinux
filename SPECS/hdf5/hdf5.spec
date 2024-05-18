@@ -18,12 +18,10 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-# Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
 Source0:        https://github.com/hdfgroup/hdf5/releases/download/hdf5_%{version}.2/hdf5-%{version}-2.tar.gz#/hdf5-%{version}.tar.gz
 Source1:        h5comp
 Patch0:         hdf5-build.patch
 Patch1:         hdf5-wrappers.patch
-# Patch6:         hdf5-turn-on-hl-option.patch
 
 # For patches/rpath
 BuildRequires:  automake
