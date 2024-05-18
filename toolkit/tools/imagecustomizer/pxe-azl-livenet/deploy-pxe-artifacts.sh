@@ -14,18 +14,28 @@ scriptDir=$(dirname "$scriptPath")
 sourceIsoPath=$1
 mount_dir=/mnt/$(basename $sourceIsoPath)
 
-tftpboot_dir=/var/lib/tftpboot
-http_dir=/etc/httpd/marineros
+# ---- constants ----
+
+# required arguments
+tftpbootLocalDir="/var/lib/tftpboot"
+httpLocalDir="/etc/httpd/marineros"
+httpRoot="http://192.168.0.1/marineros"
+isoRelativePath=liveos/azure-linux.iso
+# optional arguments
+hostScriptRelativePath=liveos/host-script.sh
+hostConfigRelativePath=liveos/host-config.cfg
+
+# ---- helper functions ----
 
 function clean_tftp_folder() {
-    rm -rf $tftpboot_dir/boot
-    rm -rf $tftpboot_dir/liveos
-    rm -f  $tftpboot_dir/bootx64.efi
-    rm -f  $tftpboot_dir/grubx64.efi
+    rm -rf $tftpbootLocalDir/boot
+    rm -rf $tftpbootLocalDir/liveos
+    rm -f  $tftpbootLocalDir/bootx64.efi
+    rm -f  $tftpbootLocalDir/grubx64.efi
 }
 
 function clean_http_folder() {
-    rm -rf $http_dir/liveos
+    rm -rf $httpLocalDir/liveos
 }
 
 function copy_file () {
@@ -38,6 +48,29 @@ function copy_file () {
 
 function createPxeGrubCfg() {
     local pxeGrubCfg=$1
+    local isoRelativePath=$2
+    local hostScriptRelativePath=$3
+    local hostConfigRelativePath=$4
+
+    if [[ -z $httpRoot ]]; then
+        echo "error: failed to create grub.cfg. An http root path must be specified."
+        exit 1
+    fi
+
+    if [[ -z $isoRelativePath ]]; then
+        echo "error: failed to create grub.cfg. An iso relative path must be specified."
+        exit 1
+    fi
+
+    rdRoot="root=live:$httpRoot/$isoRelativePath"
+
+    if [[ -n $hostScriptRelativePath ]]; then
+        rdHostScript="rd.host.script=live:$httpRoot/$hostScriptRelativePath"
+    fi
+
+    if [[ -n $hostConfigRelativePath ]]; then
+        rdHostConfig="rd.host.config=live:$httpRoot/$hostConfigRelativePath"
+    fi
 
     cat <<EOF > $pxeGrubCfg
 set timeout=0
@@ -46,7 +79,9 @@ set bootprefix=/boot
 menuentry "CBL-Mariner" {
         linux /boot/vmlinuz \\
                 ip=dhcp \\
-                root=live:http://192.168.0.1/marineros/liveos/azure-linux.iso \\
+                $rdRoot \\
+                $rdHostScript \\
+                $rdHostConfig \\
                 rd.auto=1 \\
                 console=tty0 console=ttyS0 \\
                 sysctl.kernel.unprivileged_bpf_disabled=1 \\
@@ -67,25 +102,80 @@ EOF
     chown root:root $pxeGrubCfg
 }
 
+function createPxeHostCfg() {
+    local pxeHostConfig=$1
+
+    cat <<EOF > $pxeHostConfig
+hostname=pxetestclient
+configserver=http://192.168.0.1
+EOF
+
+    chmod 644 $pxeHostConfig
+    chown root:root $pxeHostConfig
+}
+
+function createPxeHostScript() {
+    local pxeHostScript=$1
+
+    cat <<EOF > $pxeHostScript
+#!/bin/bash
+# set -x
+set -e    
+echo "executing pre-pivote user script with (\$1)" > /dev/kmsg
+
+filename=\$1
+if [[ -n "\$filename" ]]; then
+    while IFS='=' read -r key value; do
+    # Skip empty lines
+    [ -z "\$key" ] && continue
+
+    # Process the key and value
+    echo "Key: \$key" > /dev/kmsg
+    echo "Value: \$value" > /dev/kmsg
+    done < "\$filename"
+fi
+EOF
+
+    chmod 755 $pxeHostScript
+    chown root:root $pxeHostScript
+}
+
 function deploy_tftp_folder() {
-    copy_file $mount_dir/efi/boot/grubx64.efi $tftpboot_dir/grubx64.efi
-    copy_file $mount_dir/efi/boot/bootx64.efi $tftpboot_dir/bootx64.efi
+    local isoRelativePath=$1
+    local hostScriptRelativePath=$2
+    local hostConfigRelativePath=$3
 
-    mkdir -p $tftpboot_dir/boot
-    copy_file $mount_dir/boot/vmlinuz $tftpboot_dir/boot/vmlinuz
-    copy_file $mount_dir/boot/initrd.img $tftpboot_dir/boot/initrd.img
+    copy_file $mount_dir/efi/boot/grubx64.efi $tftpbootLocalDir/grubx64.efi
+    copy_file $mount_dir/efi/boot/bootx64.efi $tftpbootLocalDir/bootx64.efi
 
-    mkdir -p $tftpboot_dir/boot/grub2
-    copy_file $mount_dir/boot/grub2/efiboot.img $tftpboot_dir/boot/grub2/efiboot.img
-    # copy_file $mount_dir/boot/grub2/grub.cfg $tftpboot_dir/boot/grub2/grub.cfg
-    createPxeGrubCfg $tftpboot_dir/boot/grub2/grub.cfg
+    mkdir -p $tftpbootLocalDir/boot
+    copy_file $mount_dir/boot/vmlinuz $tftpbootLocalDir/boot/vmlinuz
+    copy_file $mount_dir/boot/initrd.img $tftpbootLocalDir/boot/initrd.img
+
+    mkdir -p $tftpbootLocalDir/boot/grub2
+    copy_file $mount_dir/boot/grub2/efiboot.img $tftpbootLocalDir/boot/grub2/efiboot.img
+    # copy_file $mount_dir/boot/grub2/grub.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+    createPxeGrubCfg \
+        $tftpbootLocalDir/boot/grub2/grub.cfg \
+        $isoRelativePath \
+        $hostScriptRelativePath \
+        $hostConfigRelativePath
 }
 
 function deploy_http_folder() {
-    mkdir -p $http_dir/liveos
-    chmod 755 $http_dir/liveos
-    # copy_file $mount_dir/liveos/rootfs.img $http_dir/liveos/rootfs.img
-    copy_file $sourceIsoPath $http_dir/liveos/azure-linux.iso
+    local isoRelativePath=$1
+    local hostScriptRelativePath=$2
+    local hostConfigRelativePath=$3
+    mkdir -p $httpLocalDir/liveos
+    chmod 755 $httpLocalDir/liveos
+    # copy_file $mount_dir/liveos/rootfs.img $httpLocalDir/liveos/rootfs.img
+    copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath
+    if [[ -n $hostScriptRelativePath ]]; then
+        createPxeHostScript $httpLocalDir/$hostScriptRelativePath
+    fi
+    if [[ -n $hostConfigRelativePath ]]; then
+        createPxeHostCfg $httpLocalDir/$hostConfigRelativePath
+    fi
 }
 
 function clean() {
@@ -98,8 +188,8 @@ function deploy() {
     sudo mkdir -p $mount_dir
     sudo mount $sourceIsoPath $mount_dir
 
-    deploy_tftp_folder
-    deploy_http_folder
+    deploy_http_folder $isoRelativePath $hostScriptRelativePath $hostConfigRelativePath
+    deploy_tftp_folder $isoRelativePath $hostScriptRelativePath $hostConfigRelativePath
     systemctl restart httpd
 
     sudo umount $mount_dir
@@ -110,3 +200,6 @@ function deploy() {
 
 clean
 deploy
+
+sudo find $tftpbootLocalDir
+sudo find $httpLocalDir

@@ -1,43 +1,109 @@
 #!/bin/bash
 
-set -x
+# set -x
 
 echo "executing liveos-artifacts-download.sh" > /dev/kmsg
 
-type getarg > /dev/null 2>&1 || . /usr/lib/dracut-lib.sh
-root=$(getarg root -d unknown)
+. /usr/lib/dracut-lib.sh
+root=$(getarg root -d "")
+hostConfig=$(getarg rd.host.config -d "")
+hostScript=$(getarg rd.host.script -d "")
+
+downloadedArtifactsDirs=/run/initramfs/downloaded-artifacts
 
 set -e
 
-case "$root" in
-    live:http://* | http://*)
-        # remove `live:` if it exists
-        rootUrl="${root#live:}"
-        ;;
-    live:https://* | https://*)
-        # remove `live:` if it exists
-        rootUrl="${root#live:}"
-        ;;
-esac
+function isSupportedProtocol() {
+    local kernelParamValue=$1
 
-[ -z "$rootUrl" ] && exit 0
+    case "$kernelParamValue" in
+        live:http://* | http://*)
+            # remove `live:` if it exists
+            urlValue="${kernelParamValue#live:}"
+            ;;
+    esac
 
-rootImageDir=/run/initramfs/downloaded-artifacts
-rootImageFile=${rootUrl##*/}
-rootImagePath=$rootImageDir/$rootImageFile
+    echo $urlValue
+}
+
+function downloadArtifact () {
+    local paramValueNoLive=$1
+
+    IFS=';'
+    read -ra valueParts <<< "$paramValueNoLive"
+    IFS=$' \t\n'
+
+    sourceUrl=${valueParts[0]}
+    targetDir=
+    targetPath=
+    arrayLength=${#valueParts[@]}
+    if (( arrayLength > 1 )); then
+        targetPath=${valueParts[1]}
+    else
+        targetPath=$downloadedArtifactsDirs/${sourceUrl##*/}
+    fi
+    targetDir="${targetPath%/*}"
+
+    mkdir -p $targetDir
+    httpRetCode=$(curl $sourceUrl -o $targetPath -w "%{http_code}\n")
+    # echo "curl returned ($httpRetCode)" > /dev/kmsg
+    if [ $httpRetCode -ne 200 ]; then
+        echo "error: failed to download $sourceUrl" > /dev/kmsg
+        exit 0
+    fi
+
+    echo $targetPath
+}
+
+rootfsImagePath=$downloadedArtifactsDirs/${rootNoLive##*/}
 
 # download
-mkdir -p $rootImageDir
-httpRetCode=$(curl $rootUrl -o $rootImagePath -w "%{http_code}\n")
-echo "curl returned ($httpRetCode)" > /dev/kmsg
-if [ $httpRetCode -ne 200 ]; then
-    echo "error: failed to download $rootUrl" > /dev/kmsg
-    sleep 2s
+
+isoUrl=$(isSupportedProtocol "$root")
+if [[ -z "$isoUrl" ]]; then
+    # this is not a live iso url, there is nothing for us to do.
+    echo "root is set to a non-live iso url ($root)" > /dev/kmsg
+    exit 0
+fi
+rootfsImagePath=$(downloadArtifact "$isoUrl")
+if [[ "$rootfsImagePath" == "error:"* ]]; then
+    echo "failed to download ($isoUrl)" > /dev/kmsg
     exit 1
 fi
 
-# create a loopback device
-rootDevice=$(losetup -f --show $rootImagePath)
+hostConfigUrl=$(isSupportedProtocol "$hostConfig")
+if [[ -n "$hostConfigUrl" ]]; then
+    hostConfigPath=$(downloadArtifact "$hostConfigUrl")
+    if [[ "$hostConfigPath" == "error:"* ]]; then
+        echo "failed to download ($hostConfigUrl)" > /dev/kmsg
+        exit 1
+    fi
+fi
+
+hostScriptUrl=$(isSupportedProtocol "$hostScript")
+if [[ -n "$hostScriptUrl" ]]; then
+    hostScriptPath=$(downloadArtifact "$hostScriptUrl")
+    if [[ "$hostScriptPath" == "error:"* ]]; then
+        echo "failed to download ($hostScriptUrl)" > /dev/kmsg
+        exit 1
+    fi
+fi
+
+echo "rootfsImagePath=$rootfsImagePath" > /dev/kmsg
+echo "hostConfigPath =$hostConfigPath" > /dev/kmsg
+echo "hostScriptPath =$hostScriptPath" > /dev/kmsg
+
+# invoke custom script
+if [[ -n "$hostScriptPath" ]]; then
+    echo "launching $hostScriptPath" > /dev/kmsg
+    chmod +x $hostScriptPath
+    $hostScriptPath $hostConfigPath
+fi
+
+echo "launching dmsquash-live-root" > /dev/kmsg
+
+# create a loopback device and prepare rootfs
+rootDevice=$(losetup -f --show $rootfsImagePath)
 
 # see: c:\temp\dracut\modules.d\98dracut-systemd\dracut-cmdline.sh
 # if ! root="$(getarg root=)"; then
