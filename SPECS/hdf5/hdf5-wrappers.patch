@@ -1,6 +1,6 @@
 diff -ruN a/bin/h5cc.in b/bin/h5cc.in
---- a/bin/h5cc.in	2024-05-15 18:32:01.952461165 -0700
-+++ b/bin/h5cc.in	2024-05-16 18:45:29.808730781 -0700
+--- a/bin/h5cc.in
++++ b/bin/h5cc.in
 @@ -87,10 +87,10 @@
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
@@ -35,8 +35,8 @@ diff -ruN a/bin/h5cc.in b/bin/h5cc.in
  fi
  
 diff -ruN a/c++/src/h5c++.in b/c++/src/h5c++.in
---- a/c++/src/h5c++.in	2024-05-15 18:32:01.984461136 -0700
-+++ b/c++/src/h5c++.in	2024-05-16 18:47:24.748593382 -0700
+--- a/c++/src/h5c++.in
++++ b/c++/src/h5c++.in
 @@ -85,10 +85,10 @@
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
@@ -71,8 +71,8 @@ diff -ruN a/c++/src/h5c++.in b/c++/src/h5c++.in
    status=$?
  fi
 diff -ruN a/fortran/src/h5fc.in b/fortran/src/h5fc.in
---- a/fortran/src/h5fc.in	2024-05-15 18:32:02.016461108 -0700
-+++ b/fortran/src/h5fc.in	2024-05-16 18:50:03.828406070 -0700
+--- a/fortran/src/h5fc.in
++++ b/fortran/src/h5fc.in
 @@ -83,10 +83,10 @@
  # from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in from the hdf5 build.
  # The order of the flags is intended to give precedence to the user's flags.
