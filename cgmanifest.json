@@ -9111,8 +9111,8 @@
         "type": "other",
         "other": {
           "name": "libdwarf",
-          "version": "20200114",
-          "downloadUrl": "http://www.prevanders.net/libdwarf-20200114.tar.gz"
+          "version": "0.9.0",
+          "downloadUrl": "https://www.prevanders.net/libdwarf-0.9.0.tar.xz"
         }
       }
     },
