@@ -29,6 +29,8 @@ Source1:        %{clh_name}-%{version}-vendor.tar.gz
 Source2:        config.toml
 %endif
 
+Conflicts: cloud-hypervisor
+
 BuildRequires:  binutils
 BuildRequires:  gcc
 BuildRequires:  git
@@ -84,17 +86,16 @@ cp %{SOURCE2} .cargo/config.toml
 popd
 
 %define ch cloud-hypervisor
-%define chcvm cloud-hypervisor-cvm
 
 %install
 rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
-install -D -m755  ./target/%{rust_def_target}/release/%{ch} %{buildroot}%{_bindir}/%{chcvm}
+install -D -m755  ./target/%{rust_def_target}/release/%{ch} %{buildroot}%{_bindir}
 
 %if 0%{?using_musl_libc}
-install -d %{buildroot}%{_libdir}/%{chcvm}/static
-install -D -m755 target/%{rust_musl_target}/release/%{ch} %{buildroot}%{_libdir}/%{chcvm}/static/%{chcvm}
-install -D -m755 target/%{rust_musl_target}/release/ch-remote %{buildroot}%{_libdir}/%{chcvm}/static/ch-remote-cvm
+install -d %{buildroot}%{_libdir}/%{ch}/static
+install -D -m755 target/%{rust_musl_target}/release/%{ch} %{buildroot}%{_libdir}/%{ch}/static
+install -D -m755 target/%{rust_musl_target}/release/ch-remote %{buildroot}%{_libdir}/%{ch}/static
 %endif
 
 
@@ -143,18 +144,19 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%caps(cap_net_admin=ep) %{_bindir}/%{chcvm}
+%caps(cap_net_admin=ep) %{_bindir}/%{ch}
 %if 0%{?using_musl_libc}
-%{_libdir}/%{chcvm}/static/ch-remote-cvm
-%caps(cap_net_admim=ep) %{_libdir}/%{chcvm}/static/%{chcvm}
+%{_libdir}/%{ch}/static/ch-remote
+%caps(cap_net_admim=ep) %{_libdir}/%{ch}/static/%{ch}
 %endif
 %license LICENSE-APACHE
 %license LICENSE-BSD-3-Clause
 
-
 %changelog
 * Wed May 15 2024 Saul Paredes <saulparedes@microsoft.com> - 38.0.72-1000
 - Upgrade to v38.0.72
+- Update install to match cloud-hypervisor install locations
+- Add conflicts with cloud-hypervisor
 
 * Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 32.0.314-2000
 - Upgrade to v32.0.314
