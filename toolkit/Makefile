@@ -121,7 +121,7 @@ SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
 # External source server
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 
 # Note on order of precedence: When a variable is passed from the commandline (i.e., make PACKAGE_URL_LIST="my list"), append
 # assignments do not take affect without using 'override'. This means that all of the following PACKAGE_URL_LIST values will
