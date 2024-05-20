@@ -55,6 +55,15 @@ def get_license_files(out_file: str) -> list[str]:
 def get_doc_files(out_file: str) -> list[str]:
     return query_rpm_url(out_file, ["-qd"])
 
+def get_all_files(out_file: str, filter_list: list[str]) -> list[str]:
+    all_files_and_dirs = query_rpm_url(out_file, ["-q", "--qf", "[%{FILEMODES:perms} %{FILENAMES}\n]"])
+    # Each line will be in the format "drwxr-xr-x /a/directory" or "-rw-r--r-- /a/directory/a_file", remove the
+    # directories and keep the files, then drop the permissions part of the string.
+    all_files = [file.split(' ', 1)[1] for file in all_files_and_dirs if file[0] != "d"]
+    filter_set = set(filter_list)
+    filtered_files = [file for file in all_files if file not in filter_set]
+    return filtered_files
+
 # get_files_for_url() returns a result object with the URL, license files, and doc files for a given URL.
 def get_files_for_url(url: str) -> dict:
     # Get a tempdir to hold the rpm in so we can query it
@@ -62,11 +71,16 @@ def get_files_for_url(url: str) -> dict:
         # Download the file to the tempdir
         out_file = os.path.join(tempdir, "pkg.rpm")
         urllib.request.urlretrieve(url, out_file)
+        license_files = get_license_files(out_file)
+        doc_files = get_doc_files(out_file)
+        all_other_files = get_all_files(out_file, license_files + doc_files)
         res = {
             "url": url,
             "pkg_name": get_name(out_file)[0],
-            "license_files": get_license_files(out_file),
-            "doc_files": get_doc_files(out_file)
+            "license_files": license_files,
+            "doc_files": doc_files,
+            "all_other_files": all_other_files
+
         }
     return res
 
@@ -93,6 +107,7 @@ jobs = debug_urls + other_urls
 num_processes = 4 * os.cpu_count()
 license_files=[]
 doc_files=[]
+all_other_files=[]
 with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
     results = [executor.submit(get_files_for_url, url) for url in jobs]
     total_processed = 0
@@ -101,6 +116,7 @@ with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as execut
         res = future.result()
         license_files.append((res["pkg_name"], res["license_files"]))
         doc_files.append((res["pkg_name"],res["doc_files"]))
+        all_other_files.append((res["pkg_name"],res["all_other_files"]))
         total_processed += 1
 
         # Estimated time remaining
@@ -117,5 +133,7 @@ with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as execut
 date = time.strftime('%Y%m%d')
 license_file_path=f"all_licenses_{date}.txt"
 doc_file_path=f"all_docs_{date}.txt"
+all_other_file_path=f"all_other_files_{date}.txt"
 write_to_file(license_files, license_file_path)
 write_to_file(doc_files, doc_file_path)
+write_to_file(all_other_files, all_other_file_path)
