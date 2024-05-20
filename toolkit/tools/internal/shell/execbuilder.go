@@ -278,13 +278,20 @@ func execBuilderReadPipe(pipe io.Reader, wg *sync.WaitGroup, logCallback LogCall
 			logCallback(line)
 		}
 
-		if logLevel <= logrus.TraceLevel && line != "" {
-			// Log the line.
-			logger.Log.Log(logLevel, line)
-		}
+		lineIsBlank := strings.TrimSpace(line) == ""
+		lastLine := err != nil
 
-		for _, linesOutputChan := range linesOutputChans {
-			channelDropAndPush(line, linesOutputChan)
+		// Most command-line tools will add a blank line at the of the stdout/stderr.
+		// We don't need such lines in our own logs.
+		if !lastLine || !lineIsBlank {
+			if logLevel <= logrus.TraceLevel {
+				// Log the line.
+				logger.Log.Log(logLevel, line)
+			}
+
+			for _, linesOutputChan := range linesOutputChans {
+				channelDropAndPush(line, linesOutputChan)
+			}
 		}
 
 		if outputResultChan != nil {
