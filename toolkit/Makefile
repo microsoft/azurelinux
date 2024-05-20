@@ -121,6 +121,8 @@ RPMS_DIR        ?= $(OUT_DIR)/RPMS
 SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
+PRECACHER_SNAPSHOT   ?= $(rpms_snapshot)
+
 # External source server
 SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 
