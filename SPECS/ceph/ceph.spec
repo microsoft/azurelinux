@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -15,6 +15,7 @@ Patch0:         CVE-2021-24032.patch
 Patch1:         CVE-2021-28361.patch
 Patch2:         CVE-2022-3650.patch
 Patch3:         CVE-2022-3854.patch
+Patch4:         CVE-2023-43040.patch
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -1809,6 +1810,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri May 17 2024 Henry Beberman <henry.beberman@microsoft.com> - 16.2.10-4
+- Patch CVE-2023-43040
+
 * Fri May 10 2024 Henry Beberman <henry.beberman@microsoft.com> - 16.2.10-3
 - Patch CVE-2021-24032, CVE-2021-28361, CVE-2022-3650, CVE-2022-3854
 - Explicitly disable seastar to ensure disputed uncompiled CVEs dont get enabled.
