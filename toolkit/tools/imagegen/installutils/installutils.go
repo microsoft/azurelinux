@@ -1321,7 +1321,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	return
 }
 
-func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
+func CallGrubMkconfig(installChroot safechroot.ChrootInterface) (err error) {
 	squashErrors := false
 
 	ReportActionf("Running grub2-mkconfig...")

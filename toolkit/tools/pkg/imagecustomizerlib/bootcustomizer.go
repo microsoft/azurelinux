@@ -23,7 +23,7 @@ type BootCustomizer struct {
 	isGrubMkconfig bool
 }
 
-func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) {
+func NewBootCustomizer(imageChroot safechroot.ChrootInterface) (*BootCustomizer, error) {
 	grubCfgContent, err := readGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return nil, err
@@ -154,9 +154,9 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 	return nil
 }
 
-func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
+func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
-		// Update /etc/defaukt/grub file.
+		// Update /etc/default/grub file.
 		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
@@ -169,7 +169,7 @@ func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
 		}
 	} else {
 		// Update grub.cfg file.
-		err := writeGrub2ConfigFile(b.grubCfgContent, imageChroot)
+		err := WriteGrub2ConfigFile(b.grubCfgContent, imageChroot)
 		if err != nil {
 			return err
 		}
