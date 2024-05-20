@@ -8632,7 +8632,7 @@
         "other": {
           "name": "libarrow",
           "version": "15.0.0",
-          "downloadUrl": "https://dist.apache.org/repos/dist/release/arrow/arrow-15.0.0/apache-arrow-15.0.0.tar.gz"
+          "downloadUrl": "https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz"
         }
       }
     },
