@@ -6,8 +6,10 @@
 package licensecheck
 
 import (
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 // licenseNamesFuzzy is a list of license names that should be matched in a case-insensitive sub-string search
@@ -58,4 +60,33 @@ func IsALicenseFile(pkgName, licenseFilePath string) bool {
 // IsASkippedLicenseFile checks if a file is a known non-license file.
 func IsASkippedLicenseFile(pkgName, licenseFilePath string) bool {
 	return checkFilePath(pkgName, licenseFilePath, licenseNamesSkip)
+}
+
+// checkFilePath checks if a file path matches any of the given names. Any leading common path is stripped before
+// matching (i.e. "/usr/share/licenses/<pkg>/file/path" -> "file/path"). The matching is a case-insensitive sub-string
+// search.
+func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []*regexp.Regexp) bool {
+	// For each path, strip the prefix plus package name if it exists
+	// i.e. "/usr/share/licenses/<pkg>/file/path" -> "file/path"
+	// Those paths would always match since they contain "license" in the name.
+	strippedPath := filepath.Clean(licenseFilePath)
+	pkgPrefix := filepath.Join(licensePrefix, pkgName)
+	if strings.HasPrefix(licenseFilePath, licensePrefix) {
+		strippedPath = strings.TrimPrefix(licenseFilePath, pkgPrefix)             // Remove the license + pkg prefix
+		strippedPath = strings.TrimPrefix(strippedPath, licensePrefix)            // Remove the license prefix
+		strippedPath = strings.TrimPrefix(strippedPath, string(os.PathSeparator)) // Remove the leading path separator if it exists
+
+		// Rebuild the path without the 1st component
+		if len(strippedPath) == 0 {
+			// It was just the license directory
+			return false
+		}
+	}
+
+	for _, name := range licenseFilesMatches {
+		if name.MatchString(strippedPath) {
+			return true
+		}
+	}
+	return false
 }
