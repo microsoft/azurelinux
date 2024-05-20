@@ -77,6 +77,13 @@ ENABLE_CPU_PROFILE              ?= n
 ENABLE_MEM_PROFILE              ?= n
 ENABLE_TRACE                    ?= n
 
+# License checking tool
+##help:var:LICENSE_CHECK_DIRS:"<rpm_dir_1> <rpm_dir_2"=Space separated list of directories to recursively validate with 'license-check'. Default is RPMS_DIR.
+LICENSE_CHECK_DIRS ?= $(RPMS_DIR)
+##help:var:LICENSE_CHECK_PEDANTIC:{y,n}=Treat all license warnings as errors
+LICENSE_CHECK_PEDANTIC ?= n
+LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
+
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
@@ -262,7 +269,11 @@ include $(SCRIPTS_DIR)/pkggen.mk
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:
-#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup, license-check, license-check-img, clean-license-check
+#  sodiff-check, sodiff-setup
+# Get build info with:
+#  build-summary, build-package-summary, fake-built-packages-list
+# Validate rpm licenses with:
+#  license-check, license-check-img, clean-license-check
 include $(SCRIPTS_DIR)/analysis.mk
 
 ##help:target:clean=Clean all built files.

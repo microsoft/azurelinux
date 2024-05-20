@@ -92,15 +92,10 @@ package-toolkit: $(SODIFF_REPO_FILE)
 
 ######## LICENSE CHECK ########
 
-##help:var:LICENSE_CHECK_DIRS:"<rpm_dir_1> <rpm_dir_2"=Space separated list of directories to recursively validate with 'license-check'. Default is RPMS_DIR.
-LICENSE_CHECK_DIRS ?= $(RPMS_DIR)
-LICENSE_CHECK_PEDANTIC ?= n
-license_check_build_dir = $(BUILD_DIR)/license_check_tool
-LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
-
-LICENSE_OUT_DIR ?= $(OUT_DIR)/license_check
-license_results_file_pkg = $(LICENSE_OUT_DIR)/license_check_results_pkg.json
-license_results_file_imge = $(LICENSE_OUT_DIR)/license_check_results_image_$(config_name).json
+license_check_build_dir   = $(BUILD_DIR)/license_check_tool
+license_out_dir           = $(OUT_DIR)/license_check
+license_results_file_pkg  = $(license_out_dir)/license_check_results_pkg.json
+license_results_file_imge = $(license_out_dir)/license_check_results_image_$(config_name).json
 
 .PHONY: license-check license-check-img clean-license-check
 
@@ -109,7 +104,7 @@ clean-license-check:
 	@echo Verifying no mountpoints present in $(license_check_build_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(license_check_build_dir)" && \
 	rm -rf $(license_check_build_dir) && \
-	rm -rf $(LICENSE_OUT_DIR)
+	rm -rf $(license_out_dir)
 
 # If we are using the default RPMS_DIR as LICENSE_CHECK_DIRS, we are responsible for building the rpms as needed.
 # Can set REBUILD_PACKAGES=n to skip rebuilding the rpms if they are already built.
@@ -117,7 +112,7 @@ ifeq ($(LICENSE_CHECK_DIRS),$(RPMS_DIR))
 license-check: $(LICENSE_CHECK_DIRS)
 endif
 
-##help:target:license-check=Validate all packages in the RPMS_DIR for license compliance. Set LICENSE_CHECK_DIRS to override source. Set REBUILD_PACKAGES=n to skip rebuilding the rpms.
+##help:target:license-check=Validate all packages in the RPMS_DIR for license compliance. Set LICENSE_CHECK_DIRS to override source.
 license-check: $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE)
 	$(go-licensecheck) \
 		$(foreach license_dir, $(LICENSE_CHECK_DIRS),--rpm-dirs="$(license_dir)" ) \
