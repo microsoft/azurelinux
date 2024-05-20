@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/randomization"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -40,7 +41,10 @@ func HashPassword(password string) (string, error) {
 
 	// Generate hashed password based on salt value provided.
 	// -6 option indicates to use the SHA256/SHA512 algorithm
-	stdout, _, err := shell.ExecuteWithStdin(password, "openssl", "passwd", "-6", "-salt", salt, "-stdin")
+	stdout, _, err := shell.NewExecBuilder("openssl", "passwd", "-6", "-salt", salt, "-stdin").
+		Stdin(password).
+		LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 	if err != nil {
 		return "", fmt.Errorf("failed to generate hashed password:\n%w", err)
 	}

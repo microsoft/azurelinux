@@ -629,7 +629,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 	}
 
 	initrdPathInChroot := "/initrd.img"
-	err = chroot.Run(func() error {
+	err = chroot.UnsafeRun(func() error {
 		dracutParams := []string{
 			initrdPathInChroot,
 			"--kver", b.artifacts.kernelVersion,

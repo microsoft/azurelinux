@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -329,14 +330,12 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 		)
 
 		// Find the entry with Major#, Minor#, ..., IOs which matches our disk
-		onStdout := func(args ...interface{}) {
-
+		onStdout := func(line string) {
 			// Bail early if we already found the entry
 			if foundEntry {
 				return
 			}
 
-			line := args[0].(string)
 			deviceStatsFields := strings.Fields(line)
 			if maj == deviceStatsFields[majIdx] && min == deviceStatsFields[minIdx] {
 				outstandingOps = deviceStatsFields[outstandingOpsIdx]
@@ -344,7 +343,11 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 			}
 		}
 
-		err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Error, true, "cat", "/proc/diskstats")
+		err = shell.NewExecBuilder("cat", "/proc/diskstats").
+			StdoutCallback(onStdout).
+			WarnLogLines(shell.DefaultWarnLogLines).
+			LogLevel(logrus.TraceLevel, logrus.ErrorLevel).
+			Execute()
 		if err != nil {
 			return
 		}

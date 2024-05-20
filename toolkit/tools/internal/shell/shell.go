@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 )
@@ -72,174 +73,38 @@ func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 
 // Execute runs the provided command.
 func Execute(program string, args ...string) (stdout, stderr string, err error) {
-	return ExecuteInDirectory("", program, args...)
-}
-
-// Execute runs the provided command in a specific working directory.
-func ExecuteInDirectory(workingDirectory, program string, args ...string) (stdout, stderr string, err error) {
-	var (
-		outBuf bytes.Buffer
-		errBuf bytes.Buffer
-	)
-
-	cmd := exec.Command(program, args...)
-	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
-
-	if workingDirectory != "" {
-		cmd.Dir = workingDirectory
-	}
-
-	err = trackAndStartProcess(cmd)
-	if err != nil {
-		return
-	}
-
-	defer untrackProcess(cmd)
-
-	err = cmd.Wait()
-	return outBuf.String(), errBuf.String(), err
+	return NewExecBuilder(program, args...).
+		LogLevel(logrus.TraceLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 }
 
 // ExecuteWithStdin - Run the command and use Stdin to pass input during execution
 func ExecuteWithStdin(input, program string, args ...string) (stdout, stderr string, err error) {
-	var (
-		outBuf bytes.Buffer
-		errBuf bytes.Buffer
-	)
-
-	cmd := exec.Command(program, args...)
-	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
-	cmd.Stdin = strings.NewReader(input)
-
-	err = trackAndStartProcess(cmd)
-	if err != nil {
-		return
-	}
-
-	defer untrackProcess(cmd)
-
-	err = cmd.Wait()
-	return outBuf.String(), errBuf.String(), err
+	return NewExecBuilder(program, args...).
+		LogLevel(logrus.TraceLevel, logrus.DebugLevel).
+		Stdin(input).
+		ExecuteCaptureOuput()
 }
 
 // ExecuteLive runs a command in the shell and logs it in real-time
 func ExecuteLive(squashErrors bool, program string, args ...string) (err error) {
-	var (
-		onStdout func(...interface{})
-		onStderr func(...interface{})
-	)
+	b := NewExecBuilder(program, args...).
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel)
 
-	onStdout = logger.Log.Debug
-	if squashErrors {
-		onStderr = logger.Log.Debug
-	} else {
-		onStderr = logger.Log.Warn
+	if !squashErrors {
+		b = b.StderrLogLevel(logrus.WarnLevel)
 	}
 
-	return ExecuteLiveWithCallback(onStdout, onStderr, false, program, args...)
+	return b.Execute()
 }
 
 // ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
 // In addition, if there is an error, the last x lines of stderr will be attached to the err object.
 func ExecuteLiveWithErr(stderrLines int, program string, args ...string) (err error) {
-	return ExecuteLiveWithErrAndCallbacks(stderrLines, logger.Log.Debug, logger.Log.Debug, program, args...)
-}
-
-// ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
-// In addition, if there is an error, the last x lines of stderr will be attached to the err object.
-func ExecuteLiveWithErrAndCallbacks(stderrLines int, onStdout, onStderr func(...interface{}), program string,
-	args ...string,
-) (err error) {
-	stderrChan := make(chan string, stderrLines)
-
-	err = ExecuteLiveWithCallbackAndChannels(onStdout, onStderr, nil, stderrChan, program, args...)
-	close(stderrChan)
-	if err != nil {
-		errLines := ""
-		for errLine := range stderrChan {
-			if errLines != "" {
-				errLines += "\n"
-			}
-			errLines += errLine
-		}
-
-		if errLines != "" {
-			err = fmt.Errorf("%s\n%w", errLines, err)
-		}
-		return
-	}
-	return nil
-}
-
-// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
-// If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
-// the buffer becomes full the oldest buffered output is discarded.
-func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
-	var outputChan chan string
-	const outputChanBufferSize = 1500
-
-	if printOutputOnError {
-		outputChan = make(chan string, outputChanBufferSize)
-	}
-
-	err = ExecuteLiveWithCallbackAndChannels(onStdout, onStderr, outputChan, outputChan, program, args...)
-	if err != nil {
-		return
-	}
-
-	// Optionally dump the output in the event of an error
-	if outputChan != nil {
-		close(outputChan)
-	}
-	if err != nil && printOutputOnError {
-		logger.Log.Errorf("Call to %s returned error, last %d lines of output:", program, outputChanBufferSize)
-		for line := range outputChan {
-			logger.Log.Warn(line)
-		}
-	}
-
-	return
-}
-
-func ExecuteLiveWithCallbackAndChannels(onStdout, onStderr func(...interface{}),
-	stdoutChannel, stderrChannel chan string,
-	program string, args ...string,
-) (err error) {
-	cmd := exec.Command(program, args...)
-
-	stdoutPipe, err := cmd.StdoutPipe()
-	if err != nil {
-		logger.Log.Error("ExecuteLive failed to start StdoutPipe ", err)
-		return
-	}
-	defer stdoutPipe.Close()
-
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		logger.Log.Error("ExecuteLive failed to start StderrPipe ", err)
-		return
-	}
-	defer stderrPipe.Close()
-
-	err = trackAndStartProcess(cmd)
-	if err != nil {
-		return
-	}
-
-	defer untrackProcess(cmd)
-
-	wg := new(sync.WaitGroup)
-	wg.Add(2)
-
-	go logger.StreamOutput(stdoutPipe, onStdout, wg, stdoutChannel)
-	go logger.StreamOutput(stderrPipe, onStderr, wg, stderrChannel)
-
-	wg.Wait()
-	err = cmd.Wait()
-
-	return
+	return NewExecBuilder(program, args...).
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+		ErrorStderrLines(stderrLines).
+		Execute()
 }
 
 // ExecuteAndLogToFile runs a command in the shell and redirects stdout to the given file
@@ -266,7 +131,6 @@ func ExecuteAndLogToFile(filepath string, command string, args ...string) {
 		logger.Log.Errorf("Command '%s' failed with: '%s'. Error: '%s'", command, errBuf.String(), err)
 		return
 	}
-	return
 }
 
 // MustExecuteLive executes the shell command.
@@ -283,7 +147,7 @@ func MustExecuteLive(command string, args ...string) {
 func trackAndStartProcess(cmd *exec.Cmd) (err error) {
 	logger.Log.Debugf("Executing: %v", cmd.Args)
 
-	if len(currentEnv) > 0 {
+	if cmd.Env == nil && len(currentEnv) > 0 {
 		cmd.Env = currentEnv
 	}
 

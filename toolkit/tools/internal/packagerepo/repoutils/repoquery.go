@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -199,7 +200,6 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
-		printErrorOutput = true
 	)
 	var queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--location"}
 
@@ -214,13 +214,16 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
 	finalArgList := append(queryCommonArgList, repoPathArg)
 
-	onStdout := func(args ...interface{}) {
-		line := args[0].(string)
+	onStdout := func(line string) {
 		packageURLs = append(packageURLs, line)
 	}
 
 	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, finalArgList...)
+	err = shell.NewExecBuilder(reqoqueryTool, finalArgList...).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		StdoutCallback(onStdout).
+		Execute()
 	if err != nil {
 		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return
@@ -234,20 +237,22 @@ func getPackageRepoUrlsFromRepoFiles() (packageURLs []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
-		printErrorOutput = true
 	)
 	// We have removed all other repo files from the chroot, so we can blindly enable all repos to get the full list of packages
 	var queryCommonArgList = []string{"-y", "-q", "--enablerepo=*", "-a", "--location"}
 
 	logger.Log.Info("Getting package data from repo files")
 
-	onStdout := func(args ...interface{}) {
-		line := args[0].(string)
+	onStdout := func(line string) {
 		packageURLs = append(packageURLs, line)
 	}
 
 	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, queryCommonArgList...)
+	err = shell.NewExecBuilder(reqoqueryTool, queryCommonArgList...).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		StdoutCallback(onStdout).
+		Execute()
 	if err != nil {
 		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return

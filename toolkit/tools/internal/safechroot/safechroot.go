@@ -763,14 +763,13 @@ func killGPGComponents(componentsToKill []string, availableComponents map[string
 
 // listGPGComponents will return a set of all GPG component.
 func listGPGComponents() (components map[string]bool, err error) {
-	stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
-
+	stdout, stderr, err := shell.NewExecBuilder("gpgconf", "--list-components").
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 	if err != nil {
 		err = fmt.Errorf("failed to list GPG components.\nerr:%w\nstderr: %s", err, stderr)
 		return
 	}
-
-	logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
 
 	components = make(map[string]bool)
 

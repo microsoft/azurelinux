@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
@@ -535,12 +536,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 	// and we don't want to list them twice.
 	foundPackages := map[string]bool{}
 	repoContents = &repocloner.RepoContents{}
-	onStdout := func(args ...interface{}) {
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
+	onStdout := func(line string) {
 		matches := tdnf.ListedPackageRegex.FindStringSubmatch(line)
 		if len(matches) != tdnf.ListMaxMatchLen {
 			return
@@ -575,7 +571,11 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			releaseverCliArg,
 		}
 
-		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
+		return shell.NewExecBuilder("tdnf", tdnfArgs...).
+			StdoutCallback(onStdout).
+			LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+			WarnLogLines(shell.DefaultWarnLogLines).
+			Execute()
 	})
 
 	return

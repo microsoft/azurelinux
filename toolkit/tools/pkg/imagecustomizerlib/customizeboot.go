@@ -647,7 +647,7 @@ func getGrub2ConfigFilePath(imageChroot *safechroot.Chroot) string {
 func regenerateInitrd(imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Regenerate initramfs file")
 
-	err := imageChroot.Run(func() error {
+	err := imageChroot.UnsafeRun(func() error {
 		// The 'mkinitrd' command was removed in Azure Linux 3.0 in favor of using 'dracut' directly.
 		mkinitrdExists, err := file.CommandExists("mkinitrd")
 		if err != nil {
