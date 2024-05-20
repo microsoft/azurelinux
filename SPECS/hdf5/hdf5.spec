@@ -409,7 +409,7 @@ done
 
 
 %changelog
-* Wed May 15 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
 - Upgrade to 1.14.4 - Fix critical CVEs
 
 * Thu Oct 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.1-13
