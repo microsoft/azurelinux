@@ -18,7 +18,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://github.com/hdfgroup/hdf5/releases/download/hdf5_%{version}.2/hdf5-%{version}-2.tar.gz#/hdf5-%{version}.tar.gz
+Source0:        https://github.com/hdfgroup/hdf5/releases/download/%{name}_%{version}.2/%{name}-%{version}-2.tar.gz
 Source1:        h5comp
 Patch0:         hdf5-build.patch
 Patch1:         hdf5-wrappers.patch
@@ -127,7 +127,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-2
 
 # Force shared by default for compiler wrappers (bug #1266645)
 sed -i -e '/^STATIC_AVAILABLE=/s/=.*/=no/' */*/h5[cf]*.in
