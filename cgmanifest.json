@@ -7381,8 +7381,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.14",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.14.tar.gz"
+          "version": "3.17",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.17.tar.gz"
         }
       }
     },
