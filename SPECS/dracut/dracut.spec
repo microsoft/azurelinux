@@ -213,11 +213,6 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{dracutlibdir}/skipcpio
 %{dracutlibdir}/%{name}-util
 %config(noreplace) %{_sysconfdir}/%{name}.conf
-%config %{_sysconfdir}/dracut.conf.d/00-hostonly.conf
-%config %{_sysconfdir}/dracut.conf.d/00-hyperv.conf
-%config %{_sysconfdir}/dracut.conf.d/00-virtio.conf
-%config %{_sysconfdir}/dracut.conf.d/00-vrf.conf
-%config %{_sysconfdir}/dracut.conf.d/00-xen.conf
 %dir %{_sysconfdir}/%{name}.conf.d
 %dir %{dracutlibdir}/%{name}.conf.d
 %dir %{_var}/opt/%{name}/log
