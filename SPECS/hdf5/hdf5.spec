@@ -150,6 +150,16 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
 
+# temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
+# See:
+# - https://github.com/HDFGroup/hdf5/pull/4495
+# - https://github.com/HDFGroup/hdf5/pull/4507
+%ifarch aarch64
+%global disable_float16 \\\
+  --disable-nonstandard-feature-float16 \\\
+%{nil}
+%endif
+
 #Serial build
 export CC=gcc
 export CXX=g++
@@ -162,13 +172,7 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
-%ifarch aarch64
-  # temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
-  # See:
-  # - https://github.com/HDFGroup/hdf5/pull/4495
-  # - https://github.com/HDFGroup/hdf5/pull/4507
-  --disable-nonstandard-feature-float16 \
-%endif
+  %{disable_float16} \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
