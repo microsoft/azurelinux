@@ -162,7 +162,13 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
+%ifarch aarch64
+  # temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
+  # See:
+  # - https://github.com/HDFGroup/hdf5/pull/4495
+  # - https://github.com/HDFGroup/hdf5/pull/4507
   --disable-nonstandard-feature-float16 \
+%endif
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh

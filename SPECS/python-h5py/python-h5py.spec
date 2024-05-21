@@ -24,7 +24,7 @@ Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{ver
 # in F-36
 Patch0:         h5py-3.7.0-ppc-float128.patch
 BuildRequires:  gcc
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel >= 1.14.4
 BuildRequires:  liblzf-devel
 BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
 BuildRequires:  python%{python3_pkgversion}-cached_property
@@ -41,7 +41,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 %package     -n python%{python3_pkgversion}-h5py
 %{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
 Summary:        %{summary}
-Requires:       hdf5
+Requires:       hdf5 >= 1.14.4
 Requires:       python%{python3_pkgversion}-cached_property
 Requires:       python%{python3_pkgversion}-numpy >= 1.7
 Requires:       python%{python3_pkgversion}-six
@@ -93,9 +93,9 @@ cd -
 
 %changelog
 * Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.7.0-5
-- Bumping release version so that the newer 1.14.4 hdf5 package is picked
-  during the build. The new 1.14.4 hdf5 generates shared objects with .310
-  and .311 suffixes (replacing the older .200 suffixed ones).
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
 
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
 - License verified

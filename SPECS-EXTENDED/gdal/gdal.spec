@@ -41,7 +41,7 @@ BuildRequires:  geos-devel
 BuildRequires:  giflib-devel
 BuildRequires:  gtest-devel
 BuildRequires:  hdf-devel
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel >= 1.14.4
 BuildRequires:  json-c-devel
 BuildRequires:  libdap-devel
 BuildRequires:  libgeotiff-devel
@@ -97,6 +97,7 @@ BuildRequires:  java-devel >= 1:1.6.0
 BuildRequires:  javapackages-local
 BuildRequires:  jpackage-utils
 %endif
+Requires:       hdf5 >= 1.14.4
 
 %description
 Geospatial Data Abstraction Library (GDAL/OGR) is a cross platform
@@ -315,10 +316,9 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
-* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-3
-- Bumping release version so that the newer 1.14.4 hdf5 package is picked
-  during the build. The new 1.14.4 hdf5 generates shared objects with .310
-  and .311 suffixes (replacing the older .200 suffixed ones).
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
 
 * Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
