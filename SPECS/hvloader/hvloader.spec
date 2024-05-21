@@ -38,6 +38,7 @@ option is the path to hypervisor loader binary.
 %setup -T -a 0 -a 1 -c "%{name}-%{version}"
 set -x
 ls -l
+mkdir MdeModulePkg
 mv %{name_github}-%{version} MdeModulePkg/Application
 
 %build
