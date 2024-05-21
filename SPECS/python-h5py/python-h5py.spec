@@ -13,7 +13,7 @@ simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
 Version:        3.7.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,6 +92,11 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.7.0-5
+- Bumping release version so that the newer 1.14.4 hdf5 package is picked
+  during the build. The new 1.14.4 hdf5 generates shared objects with .310
+  and .311 suffixes (replacing the older .200 suffixed ones).
+
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
