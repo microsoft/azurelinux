@@ -1,0 +1,13 @@
+{
+    "packages": [
+        "dhcp-client",
+        "grubby",
+        "hyperv-daemons",
+        "kexec-tools",
+        "netplan",
+        "openssh-server",
+        "python3",
+        "rsyslog",
+        "wireless-regdb"
+    ]
+}
