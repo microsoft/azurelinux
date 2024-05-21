@@ -44,6 +44,7 @@ ignore_no_source_tarball=" \
   kf \
   livepatching \
   lua-rpm-macros \
+  ocaml-srpm-macros \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \
@@ -52,7 +53,6 @@ ignore_no_source_tarball=" \
   sgx-backwards-compatibility \
   verity-read-only-root \
   web-assets \
-  ocaml-srpm-macros \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.

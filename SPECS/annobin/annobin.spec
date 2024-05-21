@@ -214,8 +214,6 @@ Installs an annobin plugin that can be used by Clang.
 %{!?llvm_plugin_dir:%global  llvm_plugin_dir  %{_libdir}/llvm/plugins}
 %{!?clang_plugin_dir:%global clang_plugin_dir %{_libdir}/clang/plugins}
 #---------------------------------------------------------------------------------
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 
 %prep
 if [ -z "%{gcc_vr}" ]; then
