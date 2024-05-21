@@ -21,6 +21,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -222,9 +223,7 @@ func main() {
 			"",
 			"Also consider using 'make containerized-rpmbuild' to debug package build issues",
 		}
-		for _, line := range logger.FormatMessageBox(message) {
-			logger.Log.Info(line)
-		}
+		logger.PrintMessageBox(logrus.InfoLevel, message)
 	}
 }
 

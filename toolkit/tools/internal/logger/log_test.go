@@ -11,6 +11,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestPadString(t *testing.T) {
+	tests := []struct {
+		name  string
+		s     string
+		width int
+		want  string
+	}{
+		{
+			name:  "empty string",
+			s:     "",
+			width: 10,
+			want:  "          ",
+		},
+		{
+			name:  "short string",
+			s:     "hello",
+			width: 10,
+			want:  "  hello   ",
+		},
+		{
+			name:  "equal string",
+			s:     "hello",
+			width: 5,
+			want:  "hello",
+		},
+		{
+			name:  "long string",
+			s:     "this is a long string",
+			width: 10,
+			want:  "this is a long string",
+		},
+		{
+			name:  "utf8 multirune",
+			s:     "世",
+			width: 10,
+			want:  "    世     ",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := messageBoxPadString(tt.s, tt.width)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+
+}
+
 func TestFormatWarningBox(t *testing.T) {
 	tests := []struct {
 		name    string
