@@ -162,6 +162,7 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
+  --disable-nonstandard-feature-float16 \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
