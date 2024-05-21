@@ -12,7 +12,7 @@
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
 Version:        4.9.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -398,6 +398,11 @@ done
 
 
 %changelog
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-5
+- Bumping release version so that the newer 1.14.4 hdf5 package is picked
+  during the build. The new 1.14.4 hdf5 generates shared objects with .310
+  and .311 suffixes (replacing the older .200 suffixed ones).
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 4.9.0-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

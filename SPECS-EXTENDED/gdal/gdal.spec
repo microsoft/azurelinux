@@ -15,7 +15,7 @@ Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
 Version:        3.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -315,6 +315,11 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-3
+- Bumping release version so that the newer 1.14.4 hdf5 package is picked
+  during the build. The new 1.14.4 hdf5 generates shared objects with .310
+  and .311 suffixes (replacing the older .200 suffixed ones).
+
 * Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
