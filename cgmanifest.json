@@ -4600,28 +4600,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.8",
-          "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.20.10",
-          "downloadUrl": "https://golang.org/dl/go1.20.10.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.21.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.9-1/go.20240403.5.src.tar.gz"
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.3-1/go1.22.3-20240507.3.src.tar.gz"
         }
       }
     },
