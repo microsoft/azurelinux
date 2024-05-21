@@ -265,7 +265,6 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch14 -p1 
 %patch15 -p1
 %patch16 -p1
-cat %{_builddir}/%{name}-%{version}/scheduler/cert.c
 %patch17 -p1
 
 # LSPP support.
