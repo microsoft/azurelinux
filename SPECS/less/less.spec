@@ -1,7 +1,7 @@
 Summary:        Text file viewer
 Name:           less
 Version:        643
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://www.greenwoodsoftware.com/less
 Source0:        https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
+Patch0:         CVE-2024-32487.patch
 
 %description
 The Less package contains a text file viewer
@@ -31,6 +32,9 @@ The Less package contains a text file viewer
 %{_mandir}/*/*
 
 %changelog
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 643-2
+- Patch CVE-2024-32487
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 643-1
 - Auto-upgrade to 643 - Azure Linux 3.0 - package upgrades
 
