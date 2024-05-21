@@ -1844,6 +1844,7 @@
                 "python-uritemplate",
                 "python-urwid",
                 "python-varlink",
+                "python-versioneer",
                 "python-virt-firmware",
                 "python-voluptuous",
                 "python-waitress",

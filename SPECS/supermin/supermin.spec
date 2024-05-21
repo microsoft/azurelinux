@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-4%{?dist}
 %endif
 
 %if 0%{?with_check}
@@ -132,6 +132,9 @@ make check || {
 * Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.3.4-1
 - Upgrade to version 5.3.4 to support building using ocaml 5.1.1
 - Fixed patch for the test suite
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 5.2.2-4
+- Update to build dep latest glibc-static version
 
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 5.2.2-3
 - update to build dep latest glibc-static version

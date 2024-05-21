@@ -110,6 +110,12 @@ compress-toolchain:
 	tar -cvp -f $(final_toolchain) -C $(toolchain_build_dir) built_rpms_all
 	$(if $(CACHE_DIR), cp $(raw_toolchain) $(final_toolchain) $(CACHE_DIR))
 
+# Creates a toolchain archive from the final toolchain rpms placed in ./build/toolchain_rpms, regardless of their source. This may be used with both locally built or downloaded toolchains.
+# The archive is placed in ./out/toolchain_final_extracted_rpms.tar.gz and may be used with TOOLCHAIN_ARCHIVE= to populate a toolchain during subsequent builds.
+compress-toolchain-final-rpms:
+	tar -I $(ARCHIVE_TOOL) -cvf $(OUT_DIR)/toolchain_final_extracted_rpms.tar.gz --transform='s`/*[^/]*/``' -C $(TOOLCHAIN_RPMS_DIR) .
+	echo "Created $(OUT_DIR)/toolchain_final_extracted_rpms.tar.gz"
+
 # After hydrating the toolchain run
 # "sudo touch build/toolchain/toolchain_from_container.tar.gz" (should really check for existence of files in toolchain_*.txt)
 # "sudo make toolchain REBUILD_TOOLCHAIN=y INCREMENTAL_TOOLCHAIN=y"

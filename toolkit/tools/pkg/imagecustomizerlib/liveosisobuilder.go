@@ -238,6 +238,11 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return err
 	}
 
+	grubMkconfigEnabled := isGrubMkconfigConfig(inputContentString)
+	if grubMkconfigEnabled {
+		return fmt.Errorf("grub-mkconfig enabled images not yet supported for ISO output")
+	}
+
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
 	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
 
@@ -624,7 +629,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 	}
 
 	initrdPathInChroot := "/initrd.img"
-	err = chroot.Run(func() error {
+	err = chroot.UnsafeRun(func() error {
 		dracutParams := []string{
 			initrdPathInChroot,
 			"--kver", b.artifacts.kernelVersion,
