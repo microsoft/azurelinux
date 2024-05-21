@@ -247,9 +247,9 @@ func setHookLogLevel(hook *writerHook, level string) (err error) {
 	return
 }
 
-// FormatWarningBox formats a message into a box with a border. The box is automatically sized to fit the longest line.
+// FormatMessageBox formats a message into a box with a border. The box is automatically sized to fit the longest line.
 // Each line will be centered in the box.
-func FormatWarningBox(message []string) []string {
+func FormatMessageBox(message []string) []string {
 	var (
 		corners    = []string{"╔", "╗", "╚", "╝"}
 		horizontal = "═"
