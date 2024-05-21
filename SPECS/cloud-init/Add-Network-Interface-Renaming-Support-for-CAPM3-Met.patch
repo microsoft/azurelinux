@@ -1,0 +1,470 @@
+From b2e6b0381f6cc23191053854ea7db5ac78c1ec82 Mon Sep 17 00:00:00 2001
+From: Vince Perri <viperri@microsoft.com>
+Date: Thu, 22 Dec 2022 15:17:32 +0000
+Subject: [PATCH] Add Network Interface Renaming Support for CAPM3
+ Metal3DataTemplates
+
+The CAPM3 Metal3DataTemplate specification doesn't allow the "name" attribute in
+networkData.links.ethernets, but the OpenStack cloud-init provider
+implementation uses this attribute to (re)name network interfaces. This means
+that when using CAPM3 Metal3DataTemplates, renaming network interfaces isn't
+possible.
+
+This patch fixes this by providing a means through which to rename network
+interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
+specification. This is a temporary fix until the "name" attribute is added to
+the specification.
+---
+ cloudinit/sources/helpers/openstack.py        | 11 +--
+ .../sources/helpers/test_openstack.py         |  8 +-
+ tests/unittests/sources/test_configdrive.py   | 84 ++++++++++---------
+ tests/unittests/test_net.py                   | 80 ++++++------------
+ 4 files changed, 79 insertions(+), 104 deletions(-)
+
+diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
+index d2260baa0..f995ce4b1 100644
+--- a/cloudinit/sources/helpers/openstack.py
++++ b/cloudinit/sources/helpers/openstack.py
+@@ -596,13 +596,14 @@ def convert_net_json(network_json=None, known_macs=None):
+         # present.  The 'id' in the spec is currently implemented as the host
+         # nic's name, meaning something like 'tap-adfasdffd'.  We do not want
+         # to name guest devices with such ugly names.
++        link_mac_addr = None
+         if "name" in link:
+             cfg["name"] = link["name"]
+-
+-        link_mac_addr = None
+-        if link.get("ethernet_mac_address"):
+-            link_mac_addr = link.get("ethernet_mac_address").lower()
+-            link_id_info[link["id"]] = link_mac_addr
++            if link.get("ethernet_mac_address"):
++                link_mac_addr = link.get("ethernet_mac_address").lower()
++                link_id_info[link["id"]] = link_mac_addr
++        elif "name" not in link:
++            cfg["name"] = link["id"]
+ 
+         curinfo = {
+             "name": cfg.get("name"),
+diff --git a/tests/unittests/sources/helpers/test_openstack.py b/tests/unittests/sources/helpers/test_openstack.py
+index ac8e2a354..143c12796 100644
+--- a/tests/unittests/sources/helpers/test_openstack.py
++++ b/tests/unittests/sources/helpers/test_openstack.py
+@@ -42,9 +42,9 @@ class TestConvertNetJson(test_helpers.CiTestCase):
+             "version": 1,
+             "config": [
+                 {
+-                    "mac_address": "fa:16:3e:9c:bf:3d",
++                    "mac_address": None,
+                     "mtu": None,
+-                    "name": "eth0",
++                    "name": "tapcd9f6d46-4a",
+                     "subnets": [{"type": "dhcp4"}],
+                     "type": "physical",
+                 },
+@@ -94,9 +94,9 @@ class TestConvertNetJson(test_helpers.CiTestCase):
+             "version": 1,
+             "config": [
+                 {
+-                    "mac_address": "fa:16:3e:9c:bf:3d",
++                    "mac_address": None,
+                     "mtu": None,
+-                    "name": "eth0",
++                    "name": "tapcd9f6d46-4a",
+                     "subnets": [
+                         {
+                             "type": "static",
+diff --git a/tests/unittests/sources/test_configdrive.py b/tests/unittests/sources/test_configdrive.py
+index 70da4812a..e0afa2936 100644
+--- a/tests/unittests/sources/test_configdrive.py
++++ b/tests/unittests/sources/test_configdrive.py
+@@ -731,16 +731,16 @@ class TestNetJson(CiTestCase):
+             "version": 1,
+             "config": [
+                 {
+-                    "mac_address": "fa:16:3e:69:b0:58",
++                    "mac_address": None,
+                     "mtu": None,
+-                    "name": "enp0s1",
++                    "name": "tap2ecc7709-b3",
+                     "subnets": [{"type": "ipv6_dhcpv6-stateless"}],
+                     "type": "physical",
+                 },
+                 {
+-                    "mac_address": "fa:16:3e:d4:57:ad",
++                    "mac_address": None,
+                     "mtu": None,
+-                    "name": "enp0s2",
++                    "name": "tap2f88d109-5b",
+                     "subnets": [{"type": "ipv6_dhcpv6-stateful"}],
+                     "type": "physical",
+                     "accept-ra": True,
+@@ -792,15 +792,15 @@ class TestNetJson(CiTestCase):
+                     {
+                         "subnets": [{"type": "dhcp4"}],
+                         "type": "physical",
+-                        "mac_address": "fa:16:3e:69:b0:58",
+-                        "name": "enp0s1",
++                        "mac_address": None,
++                        "name": "tap2ecc7709-b3",
+                         "mtu": None,
+                     },
+                     {
+                         "subnets": [{"type": "dhcp4"}],
+                         "type": "physical",
+-                        "mac_address": "fa:16:3e:d4:57:ad",
+-                        "name": "enp0s2",
++                        "mac_address": None,
++                        "name": "tap2f88d109-5b",
+                         "mtu": None,
+                     },
+                     {
+@@ -824,8 +824,8 @@ class TestNetJson(CiTestCase):
+                 "version": 1,
+                 "config": [
+                     {
+-                        "name": "foo3",
+-                        "mac_address": "fa:16:3e:ed:9a:59",
++                        "name": "tap1a81968a-79",
++                        "mac_address": None,
+                         "mtu": None,
+                         "type": "physical",
+                         "subnets": [
+@@ -877,7 +877,7 @@ class TestConvertNetworkData(CiTestCase):
+ 
+     def test_conversion_fills_names(self):
+         ncfg = openstack.convert_net_json(NETWORK_DATA, known_macs=KNOWN_MACS)
+-        expected = set(["nic0", "enp0s1", "enp0s2"])
++        expected = set(["nic0", "tap2ecc7709-b3", "tap2f88d109-5b"])
+         found = self._getnames_in_config(ncfg)
+         self.assertEqual(found, expected)
+ 
+@@ -890,18 +890,20 @@ class TestConvertNetworkData(CiTestCase):
+         get_interfaces_by_mac.return_value = macs
+ 
+         ncfg = openstack.convert_net_json(NETWORK_DATA)
+-        expected = set(["nic0", "ens1", "enp0s2"])
++        expected = set(["nic0", "tap2ecc7709-b3", "tap2f88d109-5b"])
+         found = self._getnames_in_config(ncfg)
+         self.assertEqual(found, expected)
+ 
+-    def test_convert_raises_value_error_on_missing_name(self):
+-        macs = {"aa:aa:aa:aa:aa:00": "ens1"}
+-        self.assertRaises(
+-            ValueError,
+-            openstack.convert_net_json,
+-            NETWORK_DATA,
+-            known_macs=macs,
+-        )
++    # Commenting this function out since we have modified the code to always add
++    # a name irrespective of it is present in the link info or not.
++    # def test_convert_raises_value_error_on_missing_name(self):
++    #     macs = {"aa:aa:aa:aa:aa:00": "ens1"}
++    #     self.assertRaises(
++    #         ValueError,
++    #         openstack.convert_net_json,
++    #         NETWORK_DATA,
++    #         known_macs=macs,
++    #     )
+ 
+     def test_conversion_with_route(self):
+         ncfg = openstack.convert_net_json(
+@@ -935,7 +937,7 @@ class TestConvertNetworkData(CiTestCase):
+         for i in ncfg["config"]:
+             if i.get("type") == "physical":
+                 physicals.add(i["name"])
+-        self.assertEqual(physicals, set(("foo1", "foo2")))
++        self.assertEqual(physicals, set(("tap77a0dc5b-72", "tap7d6b7bec-93")))
+ 
+     def test_bond_conversion(self):
+         # light testing of bond conversion and eni rendering of bond
+@@ -961,24 +963,26 @@ class TestConvertNetworkData(CiTestCase):
+             ]
+         )
+         self.assertEqual(
+-            sorted(["oeth0", "oeth1", "bond0", "bond0.602", "bond0.612"]),
++            sorted(["eth0", "eth1", "bond0", "bond0.602", "bond0.612"]),
+             interfaces,
+         )
+ 
+-        words = eni_rendering.split()
+-        # 'eth0' and 'eth1' are the ids. because their mac adresses
+-        # map to other names, we should not see them in the ENI
+-        self.assertNotIn("eth0", words)
+-        self.assertNotIn("eth1", words)
++        # Because we set the name to link["id"] if it is not encountered,
++        # we should see eth0 or eth1 in the eni rendering. Hence this check does not hold good.
++        # words = eni_rendering.split()
++        # self.assertNotIn("eth0", words)
++        # self.assertNotIn("eth1", words)
+ 
+-        # oeth0 and oeth1 are the interface names for eni.
+-        # bond0 will be generated for the bond. Each should be auto.
+-        self.assertIn("auto oeth0", eni_rendering)
+-        self.assertIn("auto oeth1", eni_rendering)
++        # We should be seeing eth0 and eth1 as the names for the physical interfaces
++        # as we have named them based on the link id and not on the known_macs.
++        self.assertIn("auto eth0", eni_rendering)
++        self.assertIn("auto eth1", eni_rendering)
+         self.assertIn("auto bond0", eni_rendering)
+-        # The bond should have the given mac address
+-        pos = eni_rendering.find("auto bond0")
+-        self.assertIn(BOND_MAC, eni_rendering[pos:])
++
++        # Since we are setting the mac address for all interfaces to none, we 
++        # are commenting the check down below.
++        # pos = eni_rendering.find("auto bond0")
++        # self.assertIn(BOND_MAC, eni_rendering[pos:])
+ 
+     def test_vlan(self):
+         # light testing of vlan config conversion and eni rendering
+@@ -994,9 +998,9 @@ class TestConvertNetworkData(CiTestCase):
+         ) as f:
+             eni_rendering = f.read()
+ 
+-        self.assertIn("iface enp0s1", eni_rendering)
++        self.assertIn("iface eth0", eni_rendering)
+         self.assertIn("address 10.0.1.5", eni_rendering)
+-        self.assertIn("auto enp0s1.602", eni_rendering)
++        self.assertIn("auto eth0.602", eni_rendering)
+ 
+     def test_mac_addrs_can_be_upper_case(self):
+         # input mac addresses on rackspace may be upper case
+@@ -1012,8 +1016,8 @@ class TestConvertNetworkData(CiTestCase):
+ 
+         expected = {
+             "nic0": "fa:16:3e:05:30:fe",
+-            "enp0s1": "fa:16:3e:69:b0:58",
+-            "enp0s2": "fa:16:3e:d4:57:ad",
++            "tap2ecc7709-b3": None,
++            "tap2f88d109-5b": None,
+         }
+         self.assertEqual(expected, config_name2mac)
+ 
+@@ -1031,8 +1035,8 @@ class TestConvertNetworkData(CiTestCase):
+ 
+         expected = {
+             "nic0": "fa:16:3e:05:30:fe",
+-            "enp0s1": "fa:16:3e:69:b0:58",
+-            "enp0s2": "fa:16:3e:d4:57:ad",
++            "tap2ecc7709-b3": None,
++            "tap2f88d109-5b": None,
+         }
+         self.assertEqual(expected, config_name2mac)
+ 
+diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
+index c5509536a..eb14c5db3 100644
+--- a/tests/unittests/test_net.py
++++ b/tests/unittests/test_net.py
+@@ -534,13 +534,12 @@ OS_SAMPLES = [
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+ BOOTPROTO=static
+ IPADDR=172.19.1.34
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ STARTMODE=auto
+ """.lstrip(),
+@@ -564,25 +563,20 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+-HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
+ NETMASK=255.255.252.0
+ NM_CONTROLLED=no
+@@ -610,12 +604,8 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/70-persistent-net.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+         "expected_network_manager": [
+@@ -623,23 +613,23 @@ dns = none
+                 "".join(
+                     [
+                         "etc/NetworkManager/system-connections",
+-                        "/cloud-init-eth0.nmconnection",
++                        "/cloud-init-tap1a81968a-79.nmconnection",
+                     ]
+                 ),
+                 """
+ # Generated by cloud-init. Changes will be lost.
+ 
+ [connection]
+-id=cloud-init eth0
+-uuid=1dd9a779-d327-56e1-8454-c65e2556c12c
++id=cloud-init tap1a81968a-79
++uuid=2e85b264-dffb-5635-9b6c-616838eb1130
+ autoconnect-priority=120
+ type=ethernet
++interface-name=tap1a81968a-79
+ 
+ [user]
+ org.freedesktop.NetworkManager.origin=cloud-init
+ 
+ [ethernet]
+-mac-address=FA:16:3E:ED:9A:59
+ 
+ [ipv4]
+ method=manual
+@@ -695,14 +685,13 @@ route1=0.0.0.0/0,172.19.3.254
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+ BOOTPROTO=static
+ IPADDR=172.19.1.34
+ IPADDR1=10.0.0.10
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ NETMASK1=255.255.255.0
+ STARTMODE=auto
+@@ -727,25 +716,20 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+-HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
+ IPADDR1=10.0.0.10
+ NETMASK=255.255.252.0
+@@ -775,12 +759,8 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/70-persistent-net.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+     },
+@@ -852,7 +832,7 @@ dns = none
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+@@ -861,7 +841,6 @@ IPADDR=172.19.1.34
+ IPADDR6=2001:DB8::10/64
+ IPADDR6_1=2001:DB9::10/64
+ IPADDR6_2=2001:DB10::10/64
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ STARTMODE=auto
+ """.lstrip(),
+@@ -885,25 +864,20 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+-HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
+ IPV6ADDR=2001:DB8::10/64
+ IPV6ADDR_SECONDARIES="2001:DB9::10/64 2001:DB10::10/64"
+@@ -937,12 +911,8 @@ dns = none
+             ),
+             (
+                 "etc/udev/rules.d/70-persistent-net.rules",
+-                "".join(
+-                    [
+-                        'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ',
+-                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
+-                    ]
+-                ),
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
+             ),
+         ],
+     },
+-- 
+2.34.1
