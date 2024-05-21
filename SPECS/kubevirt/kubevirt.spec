@@ -36,8 +36,8 @@ Patch3:         CVE-2023-44487.patch
 Patch4:         CVE-2024-21626.patch
 Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
 Patch6:         CVE-2022-41723.patch
-Patch7:         CVE-2023-45288.patch
-Patch8:         CVE-2024-24786.patch
+Patch7:         CVE-2024-24786.patch
+Patch8:         CVE-2023-45288.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
@@ -217,11 +217,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Fri May 17 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.59.0-18
-- Add patch for CVE-2024-24786
-
-* Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-17
+* Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-18
 - Fix for CVE-2023-45288
+
+* Fri May 17 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.59.0-17
+- Add patch for CVE-2024-24786
 
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-16
 - Bump release to rebuild against glibc 2.35-7
