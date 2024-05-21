@@ -21,13 +21,7 @@ func SplitTokensIntoLines(tokens []Token) []Line {
 
 		switch token.Type {
 		case NEWLINE, SEMICOLON:
-			if len(lineTokens) > 0 {
-				line := Line{
-					Tokens:   lineTokens,
-					EndToken: &token,
-				}
-				lines = append(lines, line)
-			}
+			lines = appendNewLine(lines, lineTokens, &token)
 			lineTokens = nil
 
 		default:
@@ -35,14 +29,20 @@ func SplitTokensIntoLines(tokens []Token) []Line {
 		}
 	}
 
-	if len(lineTokens) > 0 {
-		line := Line{
-			Tokens:   lineTokens,
-			EndToken: nil,
-		}
-		lines = append(lines, line)
+	lines = appendNewLine(lines, lineTokens, nil)
+	return lines
+}
+
+func appendNewLine(lines []Line, tokens []Token, endToken *Token) []Line {
+	if len(tokens) <= 0 {
+		return lines
 	}
 
+	line := Line{
+		Tokens:   tokens,
+		EndToken: endToken,
+	}
+	lines = append(lines, line)
 	return lines
 }
 
