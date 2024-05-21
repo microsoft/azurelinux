@@ -5,7 +5,7 @@
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
 Version:        32.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
