@@ -2,7 +2,7 @@
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -139,7 +139,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files libs -f cryptsetup.lang
 %license COPYING COPYING.LGPL
 %{_libdir}/libcryptsetup.so.*
-%{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
 %files ssh-token
