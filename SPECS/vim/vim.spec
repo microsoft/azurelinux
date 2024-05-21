@@ -26,15 +26,15 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       tcsh
 Conflicts:      toybox
 
+%description extra
+The vim extra package contains a extra files for powerful text editor.
+
 %package        rpm-macros
 Summary:        RPM macros for Vim text editor
 BuildArch:      noarch
 
 %description    rpm-macros
 The vim-rpm-macros package contains macros.vim needed to define RPM macros
-
-%description extra
-The vim extra package contains a extra files for powerful text editor.
 
 %prep
 %autosetup -p1
