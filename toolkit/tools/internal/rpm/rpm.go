@@ -339,28 +339,25 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 
 // QueryPackageContents queries an RPM for its file contents. The results are split into several categories:
 // - allFilesAndDirectories: all files and directories in the package
-// - files: all files in the package (ie above minus directories)
-// - directories: all directories in the package (ie above minus files, symlinks etc.)
+// - files: all files in the package (ie allFilesAndDirectories minus directories)
+// - directories: all directories in the package (ie allFilesAndDirectories minus files, symlinks etc.)
 // - documentFiles: all files marked as documentation (%doc)
 // - licenseFiles: all files marked as license (%license)
 func QueryPackageContents(packageFile string, defines map[string]string) (allFilesAndDirectories, files, directories, documentFiles, licenseFiles []string, err error) {
-	const (
-		allFilesQueryFormat = "[%{FILEMODES:perms} %{FILENAMES}\n]"
-	)
+	const allFilesQueryFormat = "[%{FILEMODES:perms} %{FILENAMES}\n]"
 	allFilesWithPerms, err := QueryPackage(packageFile, allFilesQueryFormat, defines)
 	if err != nil {
-		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package files:\n%w", err)
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) files:\n%w", packageFile, err)
 	}
 	// Parse the output of the query to separarate directories. Output will be of the form:
 	// 	drwxr-xr-x /a/directory
 	// 	-rw-r--r-- /a/directory/a_file
 	// Any line that starts with a 'd' is a directory, everything else is a file (or symlink etc.).
 	for _, fileLine := range allFilesWithPerms {
-		fileSplit := strings.SplitN(fileLine, " ", 2)
-		if len(fileSplit) != 2 {
-			return nil, nil, nil, nil, nil, fmt.Errorf("failed to parse file output: %s", fileLine)
+		perms, filePath, found := strings.Cut(fileLine, " ")
+		if !found {
+			return nil, nil, nil, nil, nil, fmt.Errorf("failed to parse package (%s) file contents (%s)", packageFile, fileLine)
 		}
-		perms, filePath := fileSplit[0], fileSplit[1]
 		if strings.HasPrefix(perms, "d") {
 			directories = append(directories, filePath)
 		} else {
@@ -372,12 +369,12 @@ func QueryPackageContents(packageFile string, defines map[string]string) (allFil
 	// rpm has dedicated tags for documentation and license files, so we can query them directly.
 	documentFiles, err = QueryPackage(packageFile, "", defines, "-d")
 	if err != nil {
-		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package documentation files:\n%w", err)
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) documentation files:\n%w", packageFile, err)
 	}
 
 	licenseFiles, err = QueryPackage(packageFile, "", defines, "-L")
 	if err != nil {
-		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package license files:\n%w", err)
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) license files:\n%w", packageFile, err)
 	}
 
 	return allFilesAndDirectories, files, directories, documentFiles, licenseFiles, nil
