@@ -59,10 +59,27 @@ func TestFormatWarningBox(t *testing.T) {
 				"╚════════════════════════╝",
 			},
 		},
+		{
+			name: "utf8 multirune",
+			message: []string{
+				"Hello",
+				"世",  // ~"world"
+				"世界", // "world"
+			},
+			// unicode characters can take up more than one character space, this is too complex to handle
+			// so we just accept the inconsistency
+			want: []string{
+				"╔═══════╗",
+				"║ Hello ║",
+				"║   世   ║",
+				"║  世界   ║",
+				"╚═══════╝",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			box := FormatWarningBox(tt.message)
+			box := FormatMessageBox(tt.message)
 			assert.Equal(t, tt.want, box)
 		})
 	}

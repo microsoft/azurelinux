@@ -1747,7 +1747,7 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 
 	// Hydrating the toolchain RPMs was required to resolve the cycles at one point. This is no longer the case, but
 	// we should leave a message here to avoid confusion.
-	for _, line := range logger.FormatWarningBox([]string{
+	for _, line := range logger.FormatMessageBox([]string{
 		"'copy-toolchain-rpms' should no longer be required to resolve cycles even when using online",
 		"toolchain rpms. If you see this message, there is likely a legitimate cycle in the dependency",
 		"graph.",

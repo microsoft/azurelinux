@@ -212,15 +212,18 @@ func main() {
 	}
 
 	if *noCleanup {
-		for _, line := range logger.FormatWarningBox([]string{
+		message := []string{
+			"ATTENTION!",
+			"",
 			"'--no-cleanup' requested. Build agent directories will not be removed automatically.",
 			"(" + *workDir + "/*)",
 			"Manual cleanup is required.",
 			"Use 'make clean-build-packages-workers' to remove build agent directories.",
 			"",
 			"Also consider using 'make containerized-rpmbuild' to debug package build issues",
-		}) {
-			logger.Log.Warn(line)
+		}
+		for _, line := range logger.FormatMessageBox(message) {
+			logger.Log.Info(line)
 		}
 	}
 }

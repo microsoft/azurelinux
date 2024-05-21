@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
 )
@@ -251,24 +252,28 @@ func setHookLogLevel(hook *writerHook, level string) (err error) {
 // Each line will be centered in the box.
 func FormatMessageBox(message []string) []string {
 	var (
-		corners    = []string{"╔", "╗", "╚", "╝"}
+		cornerTL   = "╔"
+		cornerTR   = "╗"
+		cornerBL   = "╚"
+		cornerBR   = "╝"
 		horizontal = "═"
 		vertical   = "║"
 	)
 	maxLineLength := 0
 	for _, line := range message {
-		if len(line) > maxLineLength {
-			maxLineLength = len(line)
+		len := utf8.RuneCountInString(line)
+		if len > maxLineLength {
+			maxLineLength = len
 		}
 	}
 	// Count: 2 for corners, 2 for padding, longest string
-	lines := []string{corners[0] + strings.Repeat(horizontal, maxLineLength+2) + corners[1]}
+	lines := []string{cornerTL + strings.Repeat(horizontal, maxLineLength+2) + cornerTR}
 	for _, line := range message {
-		paddingL := (maxLineLength - len(line)) / 2
-		paddingR := maxLineLength - len(line) - paddingL
+		paddingL := (maxLineLength - utf8.RuneCountInString(line)) / 2
+		paddingR := maxLineLength - utf8.RuneCountInString(line) - paddingL
 		lines = append(lines, fmt.Sprintf("%s %s%s%s %s", vertical, strings.Repeat(" ", paddingL), line, strings.Repeat(" ", paddingR), vertical))
 
 	}
-	lines = append(lines, corners[2]+strings.Repeat(horizontal, maxLineLength+2)+corners[3])
+	lines = append(lines, cornerBL+strings.Repeat(horizontal, maxLineLength+2)+cornerBR)
 	return lines
 }
