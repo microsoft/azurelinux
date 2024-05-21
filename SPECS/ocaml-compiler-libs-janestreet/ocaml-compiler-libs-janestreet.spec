@@ -37,8 +37,10 @@ signature files for developing applications that use
  
 %build
 %dune_build
+
 %install
 %dune_install
+
 %files -f .ofiles
 %doc README.org
 %license LICENSE.md
@@ -46,7 +48,7 @@ signature files for developing applications that use
 %files devel -f .ofiles-devel
 
 %changelog
-* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.12.4-2
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.12.4-2
 - Converted spec file to match with Fedora 41.
 - Rebuild for OCaml 5.1.1 and dune >= 2.8
 

@@ -130,7 +130,7 @@ ocaml pkg/pkg.ml test
 %endif
 
 %changelog
-* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> -  1.0.7-2
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> -  1.0.7-2
 - Converted spec file to match with Fedora 41.
 - Use ocaml 5.1.1 to build and update build process
 

@@ -64,10 +64,13 @@ signature files for developing applications that use
  
 %build
 %dune_build
+
 %install
 %dune_install
+
 %check
 %dune_check
+
 %files -f .ofiles
 %doc CHANGES.md HISTORY.md README.md
 %license LICENSE.md

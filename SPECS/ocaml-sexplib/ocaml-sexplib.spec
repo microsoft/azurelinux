@@ -1,10 +1,6 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
-
-%bcond_with vim
 
 %global srcname sexplib
 
@@ -12,9 +8,10 @@ Name:           ocaml-%{srcname}
 Version:        0.16.0
 Release:        1%{?dist}
 Summary:        Automated S-expression conversion
-
 # The project as a whole is MIT, but code in the src subdirectory is BSD.
 License:        MIT and BSD
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
@@ -23,9 +20,9 @@ BuildRequires:  ocaml-dune >= 2.0.0
 BuildRequires:  ocaml-num-devel
 BuildRequires:  ocaml-parsexp-devel >= 0.16
 BuildRequires:  ocaml-sexplib0-devel >= 0.16
-BuildRequires:  vim
+BuildRequires:  vim-rpm-macros
 
-%if %{with test}
+%if %{with_check}
 BuildRequires:  ocaml-base-devel
 BuildRequires:  ocaml-base-quickcheck-devel
 BuildRequires:  ocaml-core-kernel-devel
@@ -70,10 +67,8 @@ This package contains a vim syntax file for Sexplib.
 mkdir -p %{buildroot}%{vimfiles_root}/syntax
 cp -p vim/syntax/sexplib.vim %{buildroot}%{vimfiles_root}/syntax
 
-%if %{with test}
 %check
 %dune_check
-%endif
 
 %files -f .ofiles
 %doc CHANGES.md README.org

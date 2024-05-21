@@ -14,8 +14,9 @@ Name:           ocaml-pp
 Version:        1.2.0
 Release:        6%{?dist}
 Summary:        Pretty printing library for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-dune/pp
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/pp-%{version}.tar.gz
 

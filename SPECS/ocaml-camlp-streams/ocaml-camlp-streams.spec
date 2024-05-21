@@ -66,7 +66,7 @@ files for developing applications that use %{name}.
 %files devel -f .ofiles-devel
 
 %changelog
-* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 5.0.1-12
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.0.1-12
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 

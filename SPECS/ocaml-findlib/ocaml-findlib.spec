@@ -79,19 +79,19 @@ rm doc/guide-html/TIMESTAMP
 	
 %install
 # Grrr destdir grrrr
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man{1,5}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_mandir}/man{1,5}
 make install \
-     prefix=$RPM_BUILD_ROOT \
+     prefix=%{buildroot} \
      OCAMLFIND_BIN=%{_bindir} \
      OCAMLFIND_MAN=%{_mandir}
  
 # Remove spurious executable bits
-chmod 0644 $RPM_BUILD_ROOT%{_mandir}/man{1,5}/*
-chmod 0644 $RPM_BUILD_ROOT%{_libdir}/ocaml/findlib/*.{cma,cmi,ml,mli}
-chmod 0644 $RPM_BUILD_ROOT%{_libdir}/ocaml/findlib/{META,Makefile*}
+chmod 0644 %{buildroot}%{_mandir}/man{1,5}/*
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/*.{cma,cmi,ml,mli}
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/{META,Makefile*}
 %ifarch %{ocaml_native_compiler}
-chmod 0644 $RPM_BUILD_ROOT%{_libdir}/ocaml/findlib/*.{a,cmxa}
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/*.{a,cmxa}
 %endif
 
 %ocaml_files

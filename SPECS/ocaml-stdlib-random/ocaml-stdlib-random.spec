@@ -2,8 +2,9 @@ Name:           ocaml-stdlib-random
 Version:        1.2.0
 Release:        1%{?dist}
 Summary:        Versioned Random module from the OCaml standard library
-
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml/stdlib-random
 Source0:        %{url}/archive/%{version}/stdlib-random-%{version}.tar.gz
 

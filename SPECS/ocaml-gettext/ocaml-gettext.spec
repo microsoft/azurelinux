@@ -35,7 +35,7 @@ BuildRequires:  ocaml-cppo
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libxslt
 BuildRequires:  libxml2
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  ocaml-ounit-devel
 %endif
 %if %{with camomile}
@@ -111,10 +111,8 @@ sed -i '\@%{_bindir}@d;\@%{_mandir}@d' .ofiles-gettext
 cat .ofiles-gettext-stub >> .ofiles-gettext
 cat .ofiles-gettext-stub-devel >> .ofiles-gettext-devel
 
-%if %{with tests}
 %check
 %dune_check
-%endif
 
 %files -f .ofiles-gettext
 %license LICENSE.txt

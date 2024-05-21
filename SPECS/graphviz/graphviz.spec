@@ -517,7 +517,7 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
-* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.42.4-11
+* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.42.4-11
 - Rebuild with ocaml 5.1.1
 
 * Tue Feb 06 2024 Dan Streetman <ddstreet@ieee.org> - 2.42.4-10

@@ -5,8 +5,9 @@ Name:           ocaml-ppx-here
 Version:        0.16.0
 Release:        9%{?dist}
 Summary:        Expands [@here] into its location
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/ppx_here
 Source0:        %{url}/archive/v%{version}/ppx_here-%{version}.tar.gz
 

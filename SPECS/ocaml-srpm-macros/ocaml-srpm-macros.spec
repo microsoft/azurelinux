@@ -10,7 +10,7 @@
 Summary:        OCaml architecture macros
 Name:           ocaml-srpm-macros
 Version:        9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-or-later
 # NB. This package MUST NOT Require anything (except for dependencies
 # that RPM itself generates).
@@ -39,7 +39,7 @@ install -m 0644 %{SOURCE0} %{buildroot}%{_rpmmacrodir}/macros.ocaml-srpm
 %{_rpmmacrodir}/macros.ocaml-srpm
 
 %changelog
-* Tue May 14 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9-3
+* Tue May 14 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9-4
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 

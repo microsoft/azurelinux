@@ -1195,7 +1195,7 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
-* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.35.3-5
+* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.35.3-5
 - Upgraded ocaml dependency to 5.1.1
 
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.35.3-4

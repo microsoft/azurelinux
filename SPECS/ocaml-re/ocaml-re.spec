@@ -17,7 +17,7 @@ Patch0:         %{name}-remove-seq.patch
 BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune
  
-%if %{with test}
+%if %{with_check}
 BuildRequires:  ocaml-ounit-devel
 %endif
  
@@ -45,12 +45,12 @@ sed -i 's/oUnit/ounit2/' lib_test/fort_unit/dune
  
 %build
 %dune_build
+
 %install
 %dune_install
-%if %{with test}
+
 %check
 %dune_check
-%endif
  
 %files -f .ofiles
 %doc CHANGES.md
@@ -60,7 +60,7 @@ sed -i 's/oUnit/ounit2/' lib_test/fort_unit/dune
 %files devel -f .ofiles-devel
 
 %changelog
-* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.11.0-1
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.0-1
 - Converted spec file to match with Fedora 41.
 - Upgrade to 1.11.0
 - Use ocaml >= 5.1.1 to build

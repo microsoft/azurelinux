@@ -5,11 +5,11 @@ Name:           ocaml-ppx-let
 Version:        0.16.0
 Release:        9%{?dist}
 Summary:        Monadic let-bindings for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/ppx_let
 Source0:        %{url}/archive/v%{version}/ppx_let-%{version}.tar.gz
-
 BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-base-devel >= 0.16
 BuildRequires:  ocaml-dune >= 2.0.0

@@ -556,6 +556,10 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 
+# ocaml and other ocmal packages require ocaml-srpm-macros 
+build_rpm_in_chroot_no_install ocaml-srpm-macros
+chroot_and_install_rpms ocaml-srpm-macros ocaml-srpm-macros
+
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging
 

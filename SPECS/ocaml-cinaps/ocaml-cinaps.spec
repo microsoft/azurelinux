@@ -67,7 +67,7 @@ help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
 %files devel -f .ofiles-devel
 
 %changelog
-* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.15.1-4
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.15.1-4
 - Converted spec file to match with Fedora 41.
 - Rebuild with ocaml >= 5.1.1
 

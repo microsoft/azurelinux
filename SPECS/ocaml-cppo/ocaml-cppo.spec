@@ -71,7 +71,7 @@ at build time.  To use it, call ocamlbuild with the argument
 %{_libdir}/ocaml/cppo_ocamlbuild/
 
 %changelog
-* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.6.9-1
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.6.9-1
 - Converted spec file to match with Fedora 41.
 - Upgrade to 1.6.9
 

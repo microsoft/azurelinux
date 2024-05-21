@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
@@ -10,8 +8,9 @@ Name:           ocaml-%{srcname}
 Version:        0.16.0
 Release:        1%{?dist}
 Summary:        S-expression parsing library
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/parsexp
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
@@ -68,7 +67,7 @@ developing applications that use %{name}.
 %files devel -f .ofiles-devel
 
 %changelog
-* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.16.0-1
+* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-1
 - Converted spec file to match with Fedora 41.
 - Upgraded to version 0.16.0
 

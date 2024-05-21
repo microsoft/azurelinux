@@ -26,6 +26,9 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       tcsh
 Conflicts:      toybox
 
+%package        rpm-macros
+Summary:        RPM macros for Vim text editor
+
 %description extra
 The vim extra package contains a extra files for powerful text editor.
 
@@ -205,9 +208,15 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+
+%files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9.0.2190-3
+- Added vim-rpm-macros subpackage
+- Add macros.vim to the new subpackage
+
 * Thu Mar 21 2024 Andy Zaugg <azaugg@linkedin.com> - 9.0.2190-2
 - Tweek vimrc, remove double escape quit, remove vim bell, add ai and hlsearch and add :W for sudo write
 
@@ -219,7 +228,7 @@ fi
 - Remove patches that no longer apply in the new version.
 - Remove file listed twice.
 
-* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 9.0.1897-3
+* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9.0.1897-3
 - Patch CVE-2023-5441
 
 * Mon Oct 09 2023 Mitch Zhu <mitchzhu@microsoft.com> - 9.0.1897-2

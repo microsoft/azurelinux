@@ -309,21 +309,21 @@ make -j1 tests ||:
 
 %install
 %make_install
-perl -pi -e "s|^$RPM_BUILD_ROOT||" $RPM_BUILD_ROOT%{_libdir}/ocaml/ld.conf
+perl -pi -e "s|^%{buildroot}||" %{buildroot}%{_libdir}/ocaml/ld.conf
 
-echo %{version} > $RPM_BUILD_ROOT%{_libdir}/ocaml/fedora-ocaml-release
+echo %{version} > %{buildroot}%{_libdir}/ocaml/fedora-ocaml-release
 
 # Remove the installed documentation.  We will install it using %%doc
-rm -rf $RPM_BUILD_ROOT%{_docdir}/ocaml
+rm -rf %{buildroot}%{_docdir}/ocaml
 
-mkdir -p $RPM_BUILD_ROOT%{_rpmmacrodir}
-install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_rpmmacrodir}/macros.ocaml-rpm
+mkdir -p %{buildroot}%{_rpmmacrodir}
+install -m 0644 %{SOURCE1} %{buildroot}%{_rpmmacrodir}/macros.ocaml-rpm
 
-mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/azl
-install -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/azl
+mkdir -p %{buildroot}%{_rpmconfigdir}/azl
+install -m 0644 %{SOURCE2} %{buildroot}%{_rpmconfigdir}/azl
 
 # Link, rather than copy, identical binaries
-hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
+hardlink -t %{buildroot}%{_libdir}/ocaml/stublibs
 
 
 %files

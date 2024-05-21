@@ -250,7 +250,7 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
-* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.3.23-2
+* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.3.23-2
 - Rebuild with using ocaml 5.1.1
 - Add patches for Ruby and gettext. Imported from Fedora 41
 

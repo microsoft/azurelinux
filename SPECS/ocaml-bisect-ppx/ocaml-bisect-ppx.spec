@@ -112,7 +112,7 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{upname}/runtime/*.mli
 
 %changelog
-* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.6.3-4
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.3-4
 - Rebuild using ocaml 5.1.1
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.3-3
