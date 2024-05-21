@@ -844,6 +844,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-init",
+          "version": "0.1.1",
+          "downloadUrl": "https://github.com/Azure/azure-init/archive/refs/tags/v0.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-iot-sdk-c",
           "version": "2024.03.04",
           "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_03_2024.tar.gz"

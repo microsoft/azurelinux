@@ -1,5 +1,6 @@
 {
     "packages": [
+        "azure-init",
         "dhcp-client",
         "grubby",
         "hyperv-daemons",
