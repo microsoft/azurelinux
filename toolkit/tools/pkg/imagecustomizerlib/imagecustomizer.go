@@ -509,7 +509,6 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 }
 
 func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts) error {
-
 	if scripts == nil {
 		return nil
 	}
@@ -532,23 +531,27 @@ func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts)
 }
 
 func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) error {
-	// Ensure that install scripts sit under the config file's parent directory.
-	// This allows the install script to be run in the chroot environment by bind mounting the config directory.
-	if !filepath.IsLocal(script.Path) {
-		return fmt.Errorf("install script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
-	}
+	if script.Path != "" {
+		// Ensure that install scripts sit under the config file's parent directory.
+		// This allows the install script to be run in the chroot environment by bind mounting the config directory.
+		if !filepath.IsLocal(script.Path) {
+			return fmt.Errorf("script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
+		}
 
-	// Verify that the file exists.
-	fullPath := filepath.Join(baseConfigPath, script.Path)
+		// Verify that the file exists.
+		fullPath := filepath.Join(baseConfigPath, script.Path)
 
-	scriptStat, err := os.Stat(fullPath)
-	if err != nil {
-		return fmt.Errorf("couldn't read install script (%s):\n%w", script.Path, err)
-	}
+		if script.Interpreter == "" {
+			scriptStat, err := os.Stat(fullPath)
+			if err != nil {
+				return fmt.Errorf("couldn't read script (%s):\n%w", script.Path, err)
+			}
 
-	// Verify that the file has an executable bit set.
-	if scriptStat.Mode()&0111 == 0 {
-		return fmt.Errorf("install script (%s) does not have executable bit set", script.Path)
+			// Verify that the file has an executable bit set.
+			if scriptStat.Mode()&0o111 == 0 {
+				return fmt.Errorf("script (%s) does not have executable bit set", script.Path)
+			}
+		}
 	}
 
 	return nil
