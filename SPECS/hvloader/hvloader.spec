@@ -1,10 +1,10 @@
 %define  debug_package %{nil}
 %define  name_github   HvLoader
-%define  edk2_tag      edk2-stable202211
+%define  edk2_tag      edk2-stable202402
 Summary:        HvLoader.efi is an EFI application for loading an external hypervisor loader.
 Name:           hvloader
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,10 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
+* Tue May 19 2024 Juan Camposeco <juanartroc@microsoft.com> - 1.0.1-2
+- Update Edk2 to resolve CVE-2023-0286, CVE-2023-0215, CVE-2022-4450
+
+
 * Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 1.0.1-1
 - Add hvloader.spec
 - License verified
