@@ -102,13 +102,11 @@ ninja check-all
 %files devel
 %{_libdir}/*.a
 %{_libdir}/cmake/*
-%{_libdir}/LLVMgold.so
-%{_libdir}/bfd-plugins/LLVMgold.so
 %{_includedir}/*
 
 %changelog
 * Fri Apr 5 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 18.1.2-2
-- Added LLVMgold.so files to the main and devel packages
+- Added LLVMgold.so files to the main package
 
 * Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
 - Upgrade to version 18.1.2
