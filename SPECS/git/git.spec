@@ -6,8 +6,8 @@
 
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.42.0
-Release:        2%{?dist}
+Version:        2.42.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -172,6 +172,9 @@ fi
 %endif
 
 %changelog
+* Tue May 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.42.2-1
+- Auto-upgrade to 2.42.2 - Fix CVE-2024-32002, CVE-2024-32004, CVE-2024-32020, CVE-2024-32021, CVE-2024-32465
+
 * Mon Feb 05 2024 Dan Streetman <ddstreet@ieee.org> - 2.42.0-2
 - do not build git-svn
 
