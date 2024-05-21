@@ -89,6 +89,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-4
+- Bump release to build with new libuv to fix CVE-2024-24806
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.28.2-3
 - Sanitize license files
 
