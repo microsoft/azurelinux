@@ -57,6 +57,7 @@ rm -rf *.egg-info
 %changelog
 * Mon May 20 2024 Alberto David Perez Guevara <aperezguevaar@microsoft.com> - 3.1.2-1
 - Move package to SPEC folder and update package to versin 3.1.2-1
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
