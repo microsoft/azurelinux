@@ -42,7 +42,9 @@ mkdir MdeModulePkg
 mv %{name_github}-%{version} MdeModulePkg/Application
 
 %build
+set -x
 export EDK_TOOLS_PATH=$(pwd)/BaseTools
+ls -l
 source ./edksetup.sh
 make -C BaseTools
 sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/%{name_github}-%{version}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
@@ -58,7 +60,7 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
-* Tue May 19 2024 Juan Camposeco <juanartroc@microsoft.com> - 1.0.1-2
+* Tue May 21 2024 Juan Camposeco <juanartroc@microsoft.com> - 1.0.1-2
 - Update Edk2 to resolve CVE-2023-0286, CVE-2023-0215, CVE-2022-4450
 
 
