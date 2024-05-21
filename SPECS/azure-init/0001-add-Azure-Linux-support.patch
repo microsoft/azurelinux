@@ -1,0 +1,320 @@
+From 5a0ce4642b25aa7b50c8fb89d4f2209ee3b942c1 Mon Sep 17 00:00:00 2001
+From: Sean Dougherty <inbox@seandougherty.dev>
+Date: Thu, 16 May 2024 18:56:42 -0700
+Subject: [PATCH] add Azure Linux support
+
+---
+ Cargo.toml                 |  1 +
+ libazureinit/Cargo.toml    |  1 +
+ libazureinit/src/distro.rs | 80 ++++++++++++++++++++++++++++++++++++++
+ libazureinit/src/user.rs   | 18 ++++-----
+ src/main.rs                | 26 +++++++++++--
+ 5 files changed, 113 insertions(+), 13 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 8672b10..22f57e8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -10,6 +10,7 @@ description = "A reference implementation for provisioning Linux VMs on Azure."
+ 
+ [dependencies]
+ tokio = { version = "1", features = ["full"] }
++os-release = "0.1.0"
+ 
+ [dependencies.libazureinit]
+ path = "libazureinit"
+diff --git a/libazureinit/Cargo.toml b/libazureinit/Cargo.toml
+index 7fde3ff..6f4c644 100644
+--- a/libazureinit/Cargo.toml
++++ b/libazureinit/Cargo.toml
+@@ -18,6 +18,7 @@ xml-rs = "0.8.13"
+ serde_json = "1.0.96"
+ nix = "0.26.2"
+ libc = "0.2.146"
++os-release = "0.1.0"
+ 
+ [lib]
+ name = "libazureinit"
+diff --git a/libazureinit/src/distro.rs b/libazureinit/src/distro.rs
+index 1e5fb8a..eec20cb 100644
+--- a/libazureinit/src/distro.rs
++++ b/libazureinit/src/distro.rs
+@@ -17,6 +17,7 @@ pub trait Distribution {
+ pub enum Distributions {
+     Debian,
+     Ubuntu,
++    AzureLinux,
+ }
+ 
+ impl Distribution for Distributions {
+@@ -26,10 +27,78 @@ impl Distribution for Distributions {
+         password: &str,
+     ) -> Result<i32, String> {
+         match self {
++            Distributions::AzureLinux => {
++                let mut home_path = "/home/".to_string();
++                home_path.push_str(username);
++                println!("Creating user in AzureLinux: {}", username);
++                match Command::new("useradd")
++                    .arg(username)
++                    .arg("--comment")
++                    .arg(
++                      "Provisioning agent created this user based on username provided in IMDS",
++                    )
++                    .arg("-U")
++                    .arg("--groups")
++                    .arg("wheel,sudo")
++                    .arg("-d")
++                    .arg(home_path.clone())
++                    .arg("-m")
++                    .status(){
++                        Ok(_)=>(),
++                        Err(err) => return Err(err.to_string()),
++                    };
++
++                if password.is_empty() {
++                    match Command::new("passwd")
++                        .arg("-d")
++                        .arg(username)
++                        .status()
++                    {
++                        Ok(status_code) => {
++                            if !status_code.success() {
++                                return Err("Failed to create user".to_string());
++                            }
++                        }
++                        Err(err) => return Err(err.to_string()),
++                    };
++                    println!("User created without password")
++                } else {
++                    let input = format!("{}:{}", username, password);
++                    
++                    let mut output = Command::new("chpasswd")
++                        .stdin(Stdio::piped())
++                        .stdout(Stdio::null())
++                        .stderr(Stdio::inherit())
++                        .spawn()
++                        .expect("Failed to run chpasswd.");
++                    
++                    let mut stdin =
++                        output.stdin.as_ref().ok_or("Failed to open stdin")?;
++
++                        stdin.write_all(input.as_bytes()).map_err(|error| {
++                            format!("Failed to write to stdin: {}", error)
++                        })?;
++                        
++                        let status = output.wait().map_err(|error| {
++                        format!("Failed to wait for stdin command: {}", error)
++                    })?;
++
++                    if !status.success() {
++                        return Err(format!(
++                            "Chpasswd command failed with exit code {}",
++                            status.code().unwrap_or(-1)
++                        ));
++                    }
++                    println!("User created with password")
++                }
++                
++                Ok(0)
++            },
+             Distributions::Debian | Distributions::Ubuntu => {
+                 let mut home_path = "/home/".to_string();
+                 home_path.push_str(username);
+ 
++                println!("Creating user in Debian/Ubuntu: {}", username);
+                 match Command::new("useradd")
+                     .arg(username)
+                     .arg("--comment")
+@@ -94,6 +163,16 @@ impl Distribution for Distributions {
+     }
+     fn set_hostname(&self, hostname: &str) -> Result<i32, String> {
+         match self {
++            Distributions::AzureLinux => {
++                match Command::new("hostnamectl")
++                    .arg("set-hostname")
++                    .arg(hostname)
++                    .status()
++                {
++                    Ok(status_code) => Ok(status_code.code().unwrap_or(1)),
++                    Err(err) => Err(err.to_string()),
++                }
++            },
+             Distributions::Debian | Distributions::Ubuntu => {
+                 match Command::new("hostnamectl")
+                     .arg("set-hostname")
+@@ -112,6 +191,7 @@ impl From<&str> for Distributions {
+         match s {
+             "debian" => Distributions::Debian,
+             "ubuntu" => Distributions::Ubuntu,
++            "azurelinux" => Distributions::AzureLinux,
+             _ => panic!("Unknown distribution"),
+         }
+     }
+diff --git a/libazureinit/src/user.rs b/libazureinit/src/user.rs
+index 653e083..83b12ea 100644
+--- a/libazureinit/src/user.rs
++++ b/libazureinit/src/user.rs
+@@ -20,6 +20,7 @@ pub async fn set_ssh_keys(
+     let mut authorized_keys_path = file_path;
+     authorized_keys_path.push_str("/authorized_keys");
+ 
++    println!("authorized_keys_path: {:?}", authorized_keys_path);
+     let mut authorized_keys =
+         File::create(authorized_keys_path.clone()).unwrap();
+     for key in keys {
+@@ -30,17 +31,17 @@ pub async fn set_ssh_keys(
+     let mut new_permissions = permissions.clone();
+     new_permissions.set_mode(0o600);
+     fs::set_permissions(authorized_keys_path.clone(), new_permissions).unwrap();
+-
++    
+     let uid_username = CString::new(username.clone()).unwrap();
+     let uid_passwd = unsafe { libc::getpwnam(uid_username.as_ptr()) };
+     let uid = unsafe { (*uid_passwd).pw_uid };
+     let new_uid = Uid::from_raw(uid);
+-
++    
+     let gid_groupname = CString::new(username.clone()).unwrap();
+     let gid_group = unsafe { libc::getgrnam(gid_groupname.as_ptr()) };
+     let gid = unsafe { (*gid_group).gr_gid };
+     let new_gid = Gid::from_raw(gid);
+-
++    
+     let _set_ownership = nix::unistd::chown(
+         authorized_keys_path.as_str(),
+         Some(new_uid),
+@@ -54,27 +55,24 @@ pub async fn create_ssh_directory(
+ ) -> Result<(), Box<dyn std::error::Error>> {
+     let mut file_path = home_path.to_owned();
+     file_path.push_str("/.ssh");
+-
+     create_dir(file_path.clone())?;
+-
+     let uid_username = CString::new(username).unwrap();
+     let uid_passwd = unsafe { libc::getpwnam(uid_username.as_ptr()) };
+     let uid = unsafe { (*uid_passwd).pw_uid };
+     let new_uid = Uid::from_raw(uid);
+-
+     let gid_groupname = CString::new(username).unwrap();
+     let gid_group = unsafe { libc::getgrnam(gid_groupname.as_ptr()) };
+     let gid = unsafe { (*gid_group).gr_gid };
+     let new_gid = Gid::from_raw(gid);
+-
++    
+     let _set_ownership =
+-        nix::unistd::chown(file_path.as_str(), Some(new_uid), Some(new_gid));
+-
++    nix::unistd::chown(file_path.as_str(), Some(new_uid), Some(new_gid));
++    
+     let metadata = fs::metadata(&file_path).unwrap();
+     let permissions = metadata.permissions();
+     let mut new_permissions = permissions.clone();
+     new_permissions.set_mode(0o700);
+     fs::set_permissions(&file_path, new_permissions).unwrap();
+-
++    
+     Ok(())
+ }
+diff --git a/src/main.rs b/src/main.rs
+index e8b9c6c..57dd059 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -3,24 +3,30 @@
+ 
+ use libazureinit::distro::{Distribution, Distributions};
+ use libazureinit::{goalstate, imds, media, user};
++use os_release::OsRelease;
+ 
+ #[tokio::main]
+ async fn main() {
++    println!("Starting Provisioning...");
++    println!("Querying IMDS...");
+     let query_result = imds::query_imds().await;
+     let imds_body = match query_result {
+         Ok(imds_body) => imds_body,
+         Err(_err) => return,
+     };
+ 
++    println!("Getting provisioning details...");
+     let provision_with_password = imds::get_provision_with_password(&imds_body);
+     let disable_authentication = match provision_with_password {
+         Ok(disable_authentication) => disable_authentication,
+         Err(_err) => return,
+     };
+ 
++    println!("disable auth is set to: {}", disable_authentication);
+     let username;
+     let mut password = "".to_owned();
+ 
++    println!("Provisioning user...");
+     if !disable_authentication {
+         media::make_temp_directory().unwrap();
+ 
+@@ -47,18 +53,26 @@ async fn main() {
+             Ok(username) => username,
+             Err(_err) => return,
+         };
++        println!("Getting username... {}", username.as_str());
+     }
+ 
+     let mut file_path = "/home/".to_string();
+     file_path.push_str(username.as_str());
+ 
+-    Distributions::from("ubuntu")
++    let _os_release = match OsRelease::new() {
++        Ok(os_release) => os_release,
++        Err(_err) => return,
++    };
++    println!("Found OS: {}", _os_release.id.as_str());
++
++    Distributions::from(_os_release.id.as_str())
+         .create_user(username.as_str(), password.as_str())
+         .expect("Failed to create user");
+     let _create_directory =
+         user::create_ssh_directory(username.as_str(), &file_path).await;
+-
++    println!("User's SSH directory was successfully created");
+     let get_ssh_key_result = imds::get_ssh_keys(imds_body.clone());
++    println!("Getting SSH keys...");
+     let keys = match get_ssh_key_result {
+         Ok(keys) => keys,
+         Err(_err) => return,
+@@ -66,27 +80,33 @@ async fn main() {
+ 
+     file_path.push_str("/.ssh");
+ 
++    println!("Setting SSH keys...");
+     user::set_ssh_keys(keys, username.to_string(), file_path.clone()).await;
+ 
++    println!("Setting hostname...");
+     let get_hostname_result = imds::get_hostname(imds_body.clone());
+     let hostname = match get_hostname_result {
+         Ok(hostname) => hostname,
+         Err(_err) => return,
+     };
+ 
+-    Distributions::from("ubuntu")
++    println!("Setting hostname to: {}", hostname.as_str());
++    Distributions::from(_os_release.id.as_str())
+         .set_hostname(hostname.as_str())
+         .expect("Failed to set hostname");
+ 
++    println!("Getting goal state...");
+     let get_goalstate_result = goalstate::get_goalstate().await;
+     let vm_goalstate = match get_goalstate_result {
+         Ok(vm_goalstate) => vm_goalstate,
+         Err(_err) => return,
+     };
+ 
++    println!("Reporting health...");
+     let report_health_result = goalstate::report_health(vm_goalstate).await;
+     match report_health_result {
+         Ok(report_health) => report_health,
+         Err(_err) => return,
+     };
++    println!("Provisioning completed successfully.");
+ }
+-- 
+2.34.1
+
