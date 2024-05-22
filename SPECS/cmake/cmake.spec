@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.28.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
