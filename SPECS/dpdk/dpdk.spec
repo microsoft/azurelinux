@@ -30,7 +30,7 @@
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        21.11.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,6 +114,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
        -Ddrivers_install_subdir=dpdk-pmds \
        -Denable_docs=true \
        -Dmachine=default \
+       -Dkni=true \
 %if %{with examples}
        -Dexamples=all \
 %endif
@@ -179,6 +180,9 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Wed Aug 22 2024 Dinesh Kumar Ramasamy <dramasamy@microsoft.com> - 21.11.2-3
+- Enable KNI module in DPDK build
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
