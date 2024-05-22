@@ -60,29 +60,12 @@ func runUserScript(scriptIndex int, script imagecustomizerapi.Script, listName s
 	logger.Log.Infof("Running script (%s)", scriptLogName)
 
 	// Collect the process name and args.
+	scriptPath := ""
 	tempScriptFullPath := ""
-	process := ""
-	args := []string(nil)
 	if script.Path != "" {
-		scriptPath := filepath.Join(configDirMountPathInChroot, script.Path)
-
-		if script.Interpreter != "" {
-			process = script.Interpreter
-
-			args = []string{scriptPath}
-			args = append(args, script.Arguments...)
-		} else {
-			process = scriptPath
-
-			args = script.Arguments
-		}
+		scriptPath = filepath.Join(configDirMountPathInChroot, script.Path)
 	} else {
-		process = script.Interpreter
-		if process == "" {
-			process = "/bin/sh"
-		}
-
-		// Write the script to file.
+		// Write the script to a temporary file.
 		tempScriptFullPath, err = createTempScriptFile(script, listName, scriptLogName, imageChroot)
 		if err != nil {
 			return err
@@ -98,9 +81,16 @@ func runUserScript(scriptIndex int, script imagecustomizerapi.Script, listName s
 		// Ensure path is rooted.
 		tempScriptPath = filepath.Join("/", tempScriptPath)
 
-		args = []string{tempScriptPath}
-		args = append(args, script.Arguments...)
+		scriptPath = tempScriptPath
 	}
+
+	process := script.Interpreter
+	if process == "" {
+		process = "/bin/sh"
+	}
+
+	args := []string{scriptPath}
+	args = append(args, script.Arguments...)
 
 	envVars := []string(nil)
 	for key, value := range script.EnvironmentVariables {

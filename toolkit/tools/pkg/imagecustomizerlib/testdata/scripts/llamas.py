@@ -1,4 +1,4 @@
 import os
 
-print("elephants")
+print("llamas")
 print(f"Working dir: {os.getcwd()}")

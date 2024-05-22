@@ -898,11 +898,7 @@ The path of the script.
 This must be in the same directory or a sub-directory that the config file is located
 in.
 
-Mutually exclusive with `content`.
-
-If `interpreter` is not specified, then the script file is executed directly.
-Otherwise, the script file's path is passed as the first parameter to the `interpreter`
-program.
+Only one of `path` or `content` may be specified.
 
 Example:
 
@@ -914,13 +910,11 @@ scripts:
 
 ### content [string]
 
-The content's of the script to run.
+The contents of the script to run.
 
 The script is written to a temporary file under the customized OS's `/tmp` directory.
 
-If `interpreter` is not specified, then the script is run by `/bin/sh`.
-Otherwise, the temporary file's path is passed as the first parameter to the
-`interpreter` program.
+Only one of `path` or `content` may be specified.
 
 Example:
 
@@ -934,6 +928,8 @@ scripts:
 ### interpreter [string]
 
 The program to run the script with.
+
+If not specified, then the script is run by `/bin/sh`.
 
 Example:
 

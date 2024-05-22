@@ -9,10 +9,10 @@ import (
 
 type Script struct {
 	// Path is the path of the script file.
-	// Mutally exclusive with 'Content'.
+	// Mutually exclusive with 'Content'.
 	Path string `yaml:"path"`
 	// Content is the inline string content of the script to run.
-	// Mutally exclusive with 'Path'.
+	// Mutually exclusive with 'Path'.
 	Content string `yaml:"content"`
 	// Interpreter is the name or path of the process that will execute the script.
 	// When 'Content' is specified, the default value is '/bin/sh'.

@@ -535,22 +535,15 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 		// Ensure that install scripts sit under the config file's parent directory.
 		// This allows the install script to be run in the chroot environment by bind mounting the config directory.
 		if !filepath.IsLocal(script.Path) {
-			return fmt.Errorf("script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
+			return fmt.Errorf("script file (%s) is not under config directory (%s)", script.Path, baseConfigPath)
 		}
 
-		// Verify that the file exists.
 		fullPath := filepath.Join(baseConfigPath, script.Path)
 
-		if script.Interpreter == "" {
-			scriptStat, err := os.Stat(fullPath)
-			if err != nil {
-				return fmt.Errorf("couldn't read script (%s):\n%w", script.Path, err)
-			}
-
-			// Verify that the file has an executable bit set.
-			if scriptStat.Mode()&0o111 == 0 {
-				return fmt.Errorf("script (%s) does not have executable bit set", script.Path)
-			}
+		// Verify that the file exists.
+		_, err := os.Stat(fullPath)
+		if err != nil {
+			return fmt.Errorf("couldn't read script file (%s):\n%w", script.Path, err)
 		}
 	}
 

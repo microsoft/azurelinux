@@ -16,7 +16,5 @@ scripts:
     interpreter: python3
     name: raining
 
-  - path: scripts/a.py
-  
-  - path: scripts/b.py
+  - path: scripts/llamas.py
     interpreter: python3
