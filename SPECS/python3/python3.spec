@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -238,6 +238,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.12.0-4
+- Bump release to build with new expat to fix CVE-2024-28757
+
 * Thu Mar 21 2024 Chris Co <chrco@microsoft.com> - 3.12.0-3
 - Enable and fix tests in check section
 

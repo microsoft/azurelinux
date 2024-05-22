@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.bz2"
+          "version": "2.6.2",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.bz2"
         }
       }
     },
