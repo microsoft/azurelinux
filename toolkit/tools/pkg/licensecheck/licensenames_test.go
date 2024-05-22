@@ -10,9 +10,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/stretchr/testify/assert"
 )
+
+type testData struct {
+	UniqueFiles     int
+	UniquePackages  int
+	TestDataEntries []testDataEntry
+}
+
+type testDataEntry struct {
+	Pkg  string `json:"Pkg"`
+	Path string `json:"Path"`
+}
 
 func generateTestVariantStrings(pkgName, base string) []string {
 	upperCase := strings.ToUpper(base)
@@ -164,18 +175,17 @@ func TestLicenseDirDoesNotMatch(t *testing.T) {
 }
 
 func TestAgainstKnownLicenses(t *testing.T) {
-	// We store all the %license files from the distro in ./testdata/all_licenses_<date>.txt
+	// We store all the %license files from the distro in ./testdata/all_licenses_<date>.json
 	// See ./testdata/README.md for more information on how to generate this file
 
 	// This test will check that MOST of the known licenses are correctly identified as licenses. It is not
 	// exhaustive, but it should catch most common cases. This value can be increased as the quality of the
 	// packages improves.
-	const acceptablePercentage = 0.8
-	const delimiter = "`"
+	const acceptablePercentage = 0.98
 
 	// Find all data files in the testdata directory
 	testDataFile := ""
-	paths, err := filepath.Glob("./testdata/all_licenses_*.txt")
+	paths, err := filepath.Glob("./testdata/all_licenses_*.json")
 	if err != nil {
 		t.Fatalf("Failed to find test data file: %v", err)
 	}
@@ -189,43 +199,36 @@ func TestAgainstKnownLicenses(t *testing.T) {
 		t.Fatalf("Failed to find test data file")
 	}
 
-	test_data, err := file.ReadLines(testDataFile)
-
-	if err != nil || len(test_data) == 0 {
+	test_data := testData{}
+	err = jsonutils.ReadJSONFile(testDataFile, &test_data)
+	if err != nil || test_data.UniqueFiles == 0 {
 		t.Fatalf("failed to read input file: %v", err)
 	}
 
-	invalid_entires := []string{}
-
-	for _, line := range test_data {
-		splitParts := strings.SplitN(line, delimiter, 2)
-		if len(splitParts) != 2 {
-			t.Fatalf("Invalid line (%s)", line)
-		}
-		pkgName, licensePath := splitParts[0], splitParts[1]
-		if !IsALicenseFile(pkgName, licensePath) {
-			invalid_entires = append(invalid_entires, line)
+	invalid_entires := 0
+	for _, test := range test_data.TestDataEntries {
+		if !IsALicenseFile(test.Pkg, test.Path) {
+			invalid_entires++
 		}
 	}
 
-	invalidPercentage := float64(len(invalid_entires)) / float64(len(test_data))
+	invalidPercentage := float64(invalid_entires) / float64(test_data.UniqueFiles)
 	if invalidPercentage > 1.0-acceptablePercentage {
-		t.Errorf("Failed to identify %d out of %d known licenses (%.2f%%)", len(invalid_entires), len(test_data), invalidPercentage*100)
+		t.Errorf("Failed to identify %d out of %d known licenses (%.2f%%)", invalid_entires, test_data.UniqueFiles, invalidPercentage*100)
 	}
 }
 
 func TestAgainstKnownDocs(t *testing.T) {
-	// We store all the %doc files from the distro in ./testdata/all_docs_<date>.txt
+	// We store all the %doc files from the distro in ./testdata/all_docs_<date>.json
 	// See ./testdata/README.md for more information on how to generate this file
 
 	// This test will check that MOST of the known docs are correctly identified as not licenses. It is not
 	// exhaustive, but it should catch most common cases.
-	const acceptablePercentage = 0.95
-	const delimiter = "`"
+	const acceptablePercentage = 0.99
 
 	// Find all data files in the testdata directory
 	testDataFile := ""
-	paths, err := filepath.Glob("./testdata/all_docs_*.txt")
+	paths, err := filepath.Glob("./testdata/all_docs_*.json")
 	if err != nil {
 		t.Fatalf("Failed to find test data file: %v", err)
 	}
@@ -239,25 +242,21 @@ func TestAgainstKnownDocs(t *testing.T) {
 		t.Fatalf("Failed to find test data file")
 	}
 
-	test_data, err := file.ReadLines(testDataFile)
-	if err != nil || len(test_data) == 0 {
+	test_data := testData{}
+	err = jsonutils.ReadJSONFile(testDataFile, &test_data)
+	if err != nil || test_data.UniqueFiles == 0 {
 		t.Fatalf("failed to read input file: %v", err)
 	}
-	invalid_entires := []string{}
 
-	for _, line := range test_data {
-		splitParts := strings.SplitN(line, delimiter, 2)
-		if len(splitParts) != 2 {
-			t.Fatalf("Invalid line (%s)", line)
-		}
-		pkgName, licensePath := splitParts[0], splitParts[1]
-		if IsALicenseFile(pkgName, licensePath) {
-			invalid_entires = append(invalid_entires, line)
+	invalid_entires := 0
+	for _, test := range test_data.TestDataEntries {
+		if IsALicenseFile(test.Pkg, test.Path) {
+			invalid_entires++
 		}
 	}
 
-	invalidPercentage := float64(len(invalid_entires)) / float64(len(test_data))
+	invalidPercentage := float64(invalid_entires) / float64(test_data.UniqueFiles)
 	if invalidPercentage > 1.0-acceptablePercentage {
-		t.Errorf("Failed to skip %d out of %d known docs (%.2f%%)", len(invalid_entires), len(test_data), invalidPercentage*100)
+		t.Errorf("Failed to skip %d out of %d known docs (%.2f%%)", invalid_entires, test_data.UniqueFiles, invalidPercentage*100)
 	}
 }

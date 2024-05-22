@@ -4,6 +4,7 @@
 # Licensed under the MIT License.
 
 import concurrent.futures
+import json
 import os
 import random
 import tempfile
@@ -84,14 +85,40 @@ def get_files_for_url(url: str) -> dict:
         }
     return res
 
+# Corresponding go structs for the output of this script:
+
+# type testData struct {
+# 	UniqueFiles     int
+# 	UniquePackages  int
+# 	TestDataEntries []testDataEntry
+# }
+
+# type testDataEntry struct {
+# 	Pkg  string `json:"Pkg"`
+# 	Path string `json:"Path"`
+# }
+
 # Write the results to a file.
-def write_to_file(file_list: list[(str,str)], output_file: str):
+def write_to_file(file_list: list[(str,list[str])], output_file: str):
     print(f"Writing to {output_file}")
     file_list.sort()
+
+    testDataEntires = []
+    for pkg_name, files in file_list:
+        for file in files:
+            testDataEntires.append({
+                "Pkg": pkg_name,
+                "Path": file
+            })
+        # Count the unique packages
+    test_data = {
+        "UniqueFiles": len(testDataEntires),
+        "UniquePackages": len([pkg_name for pkg_name, files in file_list if files]), # Only packages with files are counted
+        "TestDataEntries": testDataEntires
+    }
+
     with open(output_file, "w") as f:
-        for pkg_name, full_path_list  in file_list:
-            for full_path in full_path_list:
-                f.write(f"{pkg_name}`{full_path}\n")
+        json.dump(test_data, f, indent=0)
 
 def main():
     # Put the debug info packages first since they tend to be really big,
@@ -130,11 +157,11 @@ def main():
             base_name = res["url"].split("/")[-1]
             print(f"~{remaining_time:.0f}s remaining ({total_processed}/{len(jobs)} ({percent_done:.2f}%))... {base_name} ")
 
-    # Write the results to 'all_licenses_<date>.txt' and 'all_docs_<date>.txt'
+    # Write the results to 'all_licenses_<date>.json' and 'all_docs_<date>.json'
     date = time.strftime('%Y%m%d')
-    license_file_path=f"all_licenses_{date}.txt"
-    doc_file_path=f"all_docs_{date}.txt"
-    all_other_file_path=f"all_other_files_{date}.txt"
+    license_file_path=f"all_licenses_{date}.json"
+    doc_file_path=f"all_docs_{date}.json"
+    all_other_file_path=f"all_other_files_{date}.json"
     write_to_file(license_files, license_file_path)
     write_to_file(doc_files, doc_file_path)
     write_to_file(all_other_files, all_other_file_path)

@@ -11,17 +11,17 @@ In a AzureLinux environment (specifically an environment with access the the pac
 
 ```bash
 cd ./testdata
-rm *.txt
+rm *.json
 tdnf -y install dnf-utils python3 ca-certificates
 ./generate_test_data.py
 ```
 
-This will query the available repos and generate two files: `all_licenses_<date>.txt`, `all_docs_<date>.txt`, and
-`all_other_files_<date>.txt` containing lists of all files that are either `%license` or `%doc` respectively, and all
+This will query the available repos and generate two files: `all_licenses_<date>.json`, `all_docs_<date>.json`, and
+`all_other_files_<date>.json` containing lists of all files that are either `%license` or `%doc` respectively, and all
 other files (but not directories).
 
-** Note: `all_other_files_*.txt` is marked to be ignored by git, it is a very large file and is less important to
-validate against than `all_docs_<date>.txt`.
+** Note: `all_other_files_*.json` is marked to be ignored by git, it is a very large file and is less important to
+validate against than `all_docs_<date>.json`.
 
 ## Quick validation of the test data
 
@@ -30,10 +30,13 @@ all "incorrect" findings.
 
 ```bash
 cd ./testdata
-find . -name 'all_other_files_*.txt' | grep -q . || echo "**** Generate test data first! ****"
-go run . --licenses ./all_licenses_*.txt --licenses-output ./_tmp_bad_licenses.txt --docs ./all_docs_*.txt --docs-output ./_tmp_bad_docs.txt --other-files ./all_other_files_*.txt --other-files-output ./_tmp_bad_other_files.txt --exception-file ../../../../resources/manifests/package/license_file_exceptions.json
-# Check ./_tmp_bad_licenses.txt, _tmp_bad_docs.txt, _tmp_bad_other_files.txt for any files that fail the classification
+find . -name 'all_other_files_*.json' | grep -q . || echo "**** Generate test data first! ****"
+go run . --licenses ./all_licenses_*.json --licenses-output ./_tmp_bad_licenses.json --docs ./all_docs_*.json --docs-output ./_tmp_bad_docs.json --other-files ./all_other_files_*.json --other-files-output ./_tmp_bad_other_files.json --exception-file ../../../../resources/manifests/package/license_file_exceptions.json
+# Check ./_tmp_bad_licenses.json, _tmp_bad_docs.json, _tmp_bad_other_files.json for any files that fail the classification
 ```
 
-The test expects `< 1%` fail rate, i.e. `< 56 / 5615` files. As of `2024-04-25` there are `19` false positives in the
-test set.
+As of 2024-05-22 the results are:
+
+- `1.9%` false negative (licenses)
+- `0.25%` false positive (docs)
+- `0.47%` false positive (all other files)
