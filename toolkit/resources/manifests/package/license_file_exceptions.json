@@ -22,7 +22,7 @@
         {
             "PackageName": "perl-doc",
             "IgnoredFilesRegexList": [
-                "^/usr/share/man/*"
+                "^/usr/share/man/.*"
             ]
         },
         {
