@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+const (
+	// With 5 attempts (4 retries) and a backoff factor of 2 seconds the total time spent retrying will be approximately:
+	// 1 + 4 + 8 + 16 = 31 seconds.
+	DefaultDownloadBackoffBase   = 2.0
+	DefaultDownloadRetryAttempts = 5
+	DefaultDownloadRetryDuration = time.Second
+)
+
 // calculateDelay calculates the delay for the given failure count, sleep duration, and backoff exponent base.
 // If the base is positive, it will calculate an exponential backoff.
 func calculateExpDelay(failCount int, sleep time.Duration, backoffExponentBase float64) time.Duration {
@@ -81,6 +89,14 @@ func RunWithLinearBackoff(function func() error, attempts int, sleep time.Durati
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateLinearDelay(failCount, sleep)
 	}, attempts, cancel)
+}
+
+// RunWithDefaultDownloadBackoff runs function up to 'DefaultDownloadRetryAttempts' times, waiting 'DefaultDownloadBackoffBase^(i-1)' seconds before
+// each i-th attempt. An optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
+//
+// The function is meant as a default for network download operations.
+func RunWithDefaultDownloadBackoff(function func() error, cancel <-chan struct{}) (wasCancelled bool, err error) {
+	return RunWithExpBackoff(function, DefaultDownloadRetryAttempts, DefaultDownloadRetryDuration, DefaultDownloadBackoffBase, cancel)
 }
 
 // RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExponentBase^(i-1) * sleep' duration before
