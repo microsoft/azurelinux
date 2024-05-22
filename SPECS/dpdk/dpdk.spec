@@ -114,7 +114,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
        -Ddrivers_install_subdir=dpdk-pmds \
        -Denable_docs=true \
        -Dmachine=default \
-       -Dkni=true \
+       -Denable_kmods=true \
 %if %{with examples}
        -Dexamples=all \
 %endif
