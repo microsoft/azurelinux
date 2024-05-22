@@ -99,7 +99,8 @@ How to fix:
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
 // Each call to this function will generate a new chroot environment and clean it up after the scan.
-func validateRpmDir(buildDirPath, workerTar, rpmDir, exceptionFile, distTag string, pedantic bool) (warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
+func validateRpmDir(buildDirPath, workerTar, rpmDir, exceptionFile, distTag string, pedantic bool,
+) (warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
 	logger.Log.Infof("Preparing license check environment for %s...", rpmDir)
 	licenseChecker, err := licensecheck.New(buildDirPath, workerTar, rpmDir, exceptionFile, distTag)
 	if err != nil {

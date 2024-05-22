@@ -343,7 +343,8 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 // - directories: all directories in the package (ie allFilesAndDirectories minus files, symlinks etc.)
 // - documentFiles: all files marked as documentation (%doc)
 // - licenseFiles: all files marked as license (%license)
-func QueryPackageContents(packageFile string, defines map[string]string) (allFilesAndDirectories, files, directories, documentFiles, licenseFiles []string, err error) {
+func QueryPackageContents(packageFile string, defines map[string]string,
+) (allFilesAndDirectories, files, directories, documentFiles, licenseFiles []string, err error) {
 	const allFilesQueryFormat = "[%{FILEMODES:perms} %{FILENAMES}\n]"
 	allFilesWithPerms, err := QueryPackage(packageFile, allFilesQueryFormat, defines)
 	if err != nil {
