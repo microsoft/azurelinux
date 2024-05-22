@@ -13,7 +13,7 @@ simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
 Version:        3.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,7 +26,7 @@ Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{ver
 Patch1:         Cython-3-support.patch
 
 BuildRequires:  gcc
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel >= 1.14.4
 BuildRequires:  liblzf-devel
 BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
 BuildRequires:  python%{python3_pkgversion}-devel >= 3.2
@@ -44,7 +44,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 %package     -n python%{python3_pkgversion}-h5py
 %{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
 Summary:        %{summary}
-Requires:       hdf5
+Requires:       hdf5 >= 1.14.4
 Requires:       python%{python3_pkgversion}-cached_property
 Requires:       python%{python3_pkgversion}-numpy >= 1.7
 Requires:       python%{python3_pkgversion}-six
@@ -95,12 +95,16 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.10.0-3
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
+
 * Mon Mar 25 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.10.0-2
 - Fix Cython 3 support
 
 * Wed Feb 21 2024 Yash Panchal <yashpanchal@microsoft.com> - 3.10.0-1
 - Update to 3.10.0
-
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
