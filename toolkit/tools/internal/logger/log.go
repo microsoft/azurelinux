@@ -6,7 +6,6 @@
 package logger
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"log"
@@ -14,7 +13,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
@@ -172,36 +170,6 @@ func WarningOnError(err interface{}, args ...interface{}) {
 			Log.Warningf(args[0].(string), args[1:]...)
 		}
 	}
-}
-
-// StreamOutput calls the provided logFunction on every line from the provided pipe
-// outputChan will contain the N most recent lines of output, based on the length of the channel
-func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.WaitGroup, outputChan chan string) {
-	for scanner := bufio.NewScanner(pipe); scanner.Scan(); {
-		line := scanner.Text()
-		logFunction(line)
-
-		Log.Tracef("StreamOutput:\t'%s'", line)
-
-		// Optionally buffer the output to print in the event of an error
-		if outputChan != nil {
-			// We are most interested in the most recent messages, if the channel is full drop the oldest entries
-			if len(outputChan) == cap(outputChan) {
-				select {
-				case <-outputChan:
-					// The buffer is full, discard the oldest value
-				default:
-				}
-			}
-			select {
-			case outputChan <- line:
-			default:
-				// In the event the buffer is full, drop the line. The block above should avoid this occuring however
-			}
-		}
-	}
-
-	wg.Done()
 }
 
 // ReplaceStderrWriter replaces the stderr writer and returns the old one

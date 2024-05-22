@@ -7,9 +7,9 @@ import (
 	"fmt"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -56,7 +56,10 @@ func copyPartitionFiles(sourceRoot, targetRoot string) error {
 	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always",
 		sourceRoot, targetRoot}
 
-	err := shell.ExecuteLiveWithErrAndCallbacks(1, func(...interface{}) {}, logger.Log.Debug, "cp", copyArgs...)
+	err := shell.NewExecBuilder("cp", copyArgs...).
+		LogLevel(logrus.TraceLevel, logrus.DebugLevel).
+		ErrorStderrLines(1).
+		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to copy files:\n%w", err)
 	}
