@@ -93,47 +93,51 @@ def write_to_file(file_list: list[(str,str)], output_file: str):
             for full_path in full_path_list:
                 f.write(f"{pkg_name}`{full_path}\n")
 
-# Put the debug info packages first since they tend to be really big,
-#     then the remaining URLs,
-# Randomize the lists to even out the load
-all_urls = get_all_rpms()
-debug_urls = [url for url in all_urls if "debuginfo" in url]
-other_urls = [url for url in all_urls if "debuginfo" not in url]
-random.shuffle(debug_urls)
-random.shuffle(other_urls)
-jobs = debug_urls + other_urls
+def main():
+    # Put the debug info packages first since they tend to be really big,
+    #     then the remaining URLs,
+    # Randomize the lists to even out the load
+    all_urls = get_all_rpms()
+    debug_urls = [url for url in all_urls if "debuginfo" in url]
+    other_urls = [url for url in all_urls if "debuginfo" not in url]
+    random.shuffle(debug_urls)
+    random.shuffle(other_urls)
+    jobs = debug_urls + other_urls
 
-# Queue each URL to be processed in parallel
-num_processes = 4 * os.cpu_count()
-license_files=[]
-doc_files=[]
-all_other_files=[]
-with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
-    results = [executor.submit(get_files_for_url, url) for url in jobs]
-    total_processed = 0
-    start_time = time.time()
-    for future in concurrent.futures.as_completed(results):
-        res = future.result()
-        license_files.append((res["pkg_name"], res["license_files"]))
-        doc_files.append((res["pkg_name"],res["doc_files"]))
-        all_other_files.append((res["pkg_name"],res["all_other_files"]))
-        total_processed += 1
+    # Queue each URL to be processed in parallel
+    num_processes = 4 * os.cpu_count()
+    license_files=[]
+    doc_files=[]
+    all_other_files=[]
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
+        results = [executor.submit(get_files_for_url, url) for url in jobs]
+        total_processed = 0
+        start_time = time.time()
+        for future in concurrent.futures.as_completed(results):
+            res = future.result()
+            license_files.append((res["pkg_name"], res["license_files"]))
+            doc_files.append((res["pkg_name"],res["doc_files"]))
+            all_other_files.append((res["pkg_name"],res["all_other_files"]))
+            total_processed += 1
 
-        # Estimated time remaining
-        elapsed_time = time.time() - start_time
-        time_per_file = elapsed_time / total_processed
-        remaining_files = len(jobs) - total_processed
-        remaining_time = time_per_file * remaining_files
+            # Estimated time remaining
+            elapsed_time = time.time() - start_time
+            time_per_file = elapsed_time / total_processed
+            remaining_files = len(jobs) - total_processed
+            remaining_time = time_per_file * remaining_files
 
-        percent_done = (total_processed / len(jobs)) * 100
-        base_name = res["url"].split("/")[-1]
-        print(f"~{remaining_time:.0f}s remaining ({total_processed}/{len(jobs)} ({percent_done:.2f}%))... {base_name} ")
+            percent_done = (total_processed / len(jobs)) * 100
+            base_name = res["url"].split("/")[-1]
+            print(f"~{remaining_time:.0f}s remaining ({total_processed}/{len(jobs)} ({percent_done:.2f}%))... {base_name} ")
 
-# Write the results to 'all_licenses_<date>.txt' and 'all_docs_<date>.txt'
-date = time.strftime('%Y%m%d')
-license_file_path=f"all_licenses_{date}.txt"
-doc_file_path=f"all_docs_{date}.txt"
-all_other_file_path=f"all_other_files_{date}.txt"
-write_to_file(license_files, license_file_path)
-write_to_file(doc_files, doc_file_path)
-write_to_file(all_other_files, all_other_file_path)
+    # Write the results to 'all_licenses_<date>.txt' and 'all_docs_<date>.txt'
+    date = time.strftime('%Y%m%d')
+    license_file_path=f"all_licenses_{date}.txt"
+    doc_file_path=f"all_docs_{date}.txt"
+    all_other_file_path=f"all_other_files_{date}.txt"
+    write_to_file(license_files, license_file_path)
+    write_to_file(doc_files, doc_file_path)
+    write_to_file(all_other_files, all_other_file_path)
+
+if __name__ == "__main__":
+    main()
