@@ -6,7 +6,7 @@
 Summary: Implementation of the JPEG-2000 standard, Part 1
 Name:    jasper
 Version: 4.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: JasPer-2.0
 Vendor:  Microsoft Corporation
@@ -15,13 +15,14 @@ URL:     http://www.ece.uvic.ca/~frodo/jasper/
 Source0: https://github.com/jasper-software/%{name}/archive/refs/tags/version-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # architecture related patches
+Patch0:   CVE-2024-31744.patch
 Patch100: jasper-2.0.2-test-ppc64-disable.patch
 Patch101: jasper-2.0.2-test-ppc64le-disable.patch
 Patch102: jasper-4.1.0-test-i686-disable.patch
 
 # autoreconf
 BuildRequires: cmake
-BuildRequires: freeglut-devel 
+BuildRequires: freeglut-devel
 BuildRequires: libGLU-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libXmu-devel libXi-devel
@@ -62,6 +63,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-version-%{version}
+%patch 0 -p1
 
 # Need to disable one test to be able to build it on ppc64 arch
 # At ppc64 this test just stuck (nothing happend - no exception or error)
@@ -129,6 +131,9 @@ make test -C builder
 
 
 %changelog
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.1-2
+- Patch CVE-2024-31744.
+
 * Tue Feb 13 2024 Vince Perri <viperri@microsoft.com> - 4.2.1-1
 - Upgrade to 4.2.1 based on Fedora 40.
 - License verified.
@@ -277,7 +282,7 @@ make test -C builder
 - CVE-2015-5221 - Use-after-free and double-free flaws (#1255714)
 - CVE-2016-1867 - out-of-bounds read in the jpc_pi_nextcprl() function (#1298138)
 - CVE-2016-1577 - double free vulnerability in jas_iccattrval_destroy (#1314468)
-- CVE-2016-2116 - memory leak in jas_iccprof_createfrombuf causing 
+- CVE-2016-2116 - memory leak in jas_iccprof_createfrombuf causing
 		  memory consumption (#1314473)
 
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.900.1-32
@@ -345,7 +350,7 @@ make test -C builder
 
 * Tue Oct 13 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.900.1-13
 - CVE-2008-3520 jasper: multiple integer overflows in jas_alloc calls (#461476)
-- CVE-2008-3522 jasper: possible buffer overflow in 
+- CVE-2008-3522 jasper: possible buffer overflow in
   jas_stream_printf() (#461478)
 
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.900.1-12
@@ -420,11 +425,11 @@ make test -C builder
 
 * Tue Oct 18 2005 Rex Dieter <rexdieter[AT]users.sf.net> 1.701.0-6
 - token %%check section
-- --enable-shared 
+- --enable-shared
 
 * Mon Oct 17 2005 Rex Dieter <rexdieter[AT]users.sf.net> 1.701.0-5
 - use %%{?dist}
-- BR: libGL-devel 
+- BR: libGL-devel
 
 * Thu Apr  7 2005 Michael Schwendt <mschwendt[AT]users.sf.net>
 - rebuilt
