@@ -88,10 +88,10 @@ elfutils-libelf-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-devel-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-devel-static-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-lang-0.189-2.azl3.aarch64.rpm
-expat-2.5.0-1.azl3.aarch64.rpm
-expat-debuginfo-2.5.0-1.azl3.aarch64.rpm
-expat-devel-2.5.0-1.azl3.aarch64.rpm
-expat-libs-2.5.0-1.azl3.aarch64.rpm
+expat-2.6.2-1.azl3.aarch64.rpm
+expat-debuginfo-2.6.2-1.azl3.aarch64.rpm
+expat-devel-2.6.2-1.azl3.aarch64.rpm
+expat-libs-2.6.2-1.azl3.aarch64.rpm
 file-5.45-1.azl3.aarch64.rpm
 file-debuginfo-5.45-1.azl3.aarch64.rpm
 file-devel-5.45-1.azl3.aarch64.rpm
