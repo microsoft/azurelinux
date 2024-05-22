@@ -15,7 +15,7 @@ Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
 Version:        3.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ BuildRequires:  geos-devel
 BuildRequires:  giflib-devel
 BuildRequires:  gtest-devel
 BuildRequires:  hdf-devel
-BuildRequires:  hdf5-devel >= 1.14.4
+BuildRequires:  hdf5-devel
 BuildRequires:  json-c-devel
 BuildRequires:  libdap-devel
 BuildRequires:  libgeotiff-devel
@@ -97,7 +97,7 @@ BuildRequires:  java-devel >= 1:1.6.0
 BuildRequires:  javapackages-local
 BuildRequires:  jpackage-utils
 %endif
-Requires:       hdf5 >= 1.14.4
+Requires:       hdf5
 
 %description
 Geospatial Data Abstraction Library (GDAL/OGR) is a cross platform
@@ -316,6 +316,10 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
+* Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-4
+  Remove the use of explicit hdf5 version from the build-time dependencies.
+
+* Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-3
 - Bumping the release version so that this package is re-built with the newer
   1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
   be used at run time.
