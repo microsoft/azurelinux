@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "cri-o-1.22.3-vendor.tar.gz": "506c8ec2611cfd87a4a1247055cb24d50213489cbb18706dc25b4d0a33bb7d0d",
+  "cri-o-1.22.3-vendor.tar.gz": "2a5500d54ee9a3c28637aba887fd5e6462973c7746649dbff45c3c821a8863d0",
   "cri-o-1.22.3.tar.gz": "52836549cfa27a688659576be9266f4837357a6fa162b1d0a05fa8da62c724b3",
   "cri-o-rpmlintrc": "851a8f7e0b91e011d19a123c2ec703590f3261bfc3fedc41f058dc7556de86cc",
   "crio.conf": "0b4d11a34542656ad1077fefefdbd0782c15ea521da914bfed0fc7bf84215f0e",
