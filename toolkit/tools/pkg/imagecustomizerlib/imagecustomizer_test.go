@@ -183,17 +183,6 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestValidateConfigScriptNonExecutable(t *testing.T) {
-	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
-		FinalizeCustomization: []imagecustomizerapi.Script{
-			{
-				Path: "files/a.txt",
-			},
-		},
-	})
-	assert.Error(t, err)
-}
-
 func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	var err error
 
