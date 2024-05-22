@@ -1,6 +1,7 @@
 # Test data for the license checker
 
-The `licensecheck` package uses a heuristic to identify license files, the input data to this tool comes from the packages currently in the distro.
+The `licensecheck` package uses a heuristic to identify license files, the input data to this tool comes from the
+packages currently in the distro.
 
 The test data is generated from all the files packaged into `/usr/share/licenses/<pkg>/*` and is gathered via `repoquery`.
 
@@ -15,13 +16,17 @@ tdnf -y install dnf-utils
 ./generate_test_data.py
 ```
 
-This will query the available repos and generate two files: `all_licenses_<date>.txt`, `all_docs_<date>.txt`, and `all_other_files_<date>.txt` containing lists of all files that are either `%license` or `%doc` respectively, and all other files (but not directories).
+This will query the available repos and generate two files: `all_licenses_<date>.txt`, `all_docs_<date>.txt`, and
+`all_other_files_<date>.txt` containing lists of all files that are either `%license` or `%doc` respectively, and all
+other files (but not directories).
 
-** Note: `all_other_files_*.txt` is marked to be ignored by git, it is a very large file and is less important to validate against than `all_docs_<date>.txt`.
+** Note: `all_other_files_*.txt` is marked to be ignored by git, it is a very large file and is less important to
+validate against than `all_docs_<date>.txt`.
 
 ## Quick validation of the test data
 
-This will read the files from above and report false positive/negative results, and generate a set of files containing all "incorrect" findings.
+This will read the files from above and report false positive/negative results, and generate a set of files containing
+all "incorrect" findings.
 
 ```bash
 cd ./testdata
@@ -30,4 +35,5 @@ go run . --licenses ./all_licenses_*.txt --licenses-output ./_tmp_bad_licenses.t
 # Check ./_tmp_bad_licenses.txt, _tmp_bad_docs.txt, _tmp_bad_other_files.txt for any files that fail the classification
 ```
 
-The test expects `< 1%` fail rate, i.e. `< 56 / 5615` files. As of `2024-04-25` there are `19` false positives in the test set.
+The test expects `< 1%` fail rate, i.e. `< 56 / 5615` files. As of `2024-04-25` there are `19` false positives in the
+test set.
