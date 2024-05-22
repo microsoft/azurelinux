@@ -15,7 +15,7 @@ Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
 Version:        3.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ BuildRequires:  geos-devel
 BuildRequires:  giflib-devel
 BuildRequires:  gtest-devel
 BuildRequires:  hdf-devel
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel >= 1.14.4
 BuildRequires:  json-c-devel
 BuildRequires:  libdap-devel
 BuildRequires:  libgeotiff-devel
@@ -97,6 +97,7 @@ BuildRequires:  java-devel >= 1:1.6.0
 BuildRequires:  javapackages-local
 BuildRequires:  jpackage-utils
 %endif
+Requires:       hdf5 >= 1.14.4
 
 %description
 Geospatial Data Abstraction Library (GDAL/OGR) is a cross platform
@@ -315,6 +316,10 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
+
 * Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
