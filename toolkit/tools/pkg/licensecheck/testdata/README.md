@@ -12,7 +12,7 @@ In a AzureLinux environment (specifically an environment with access the the pac
 ```bash
 cd ./testdata
 rm *.txt
-tdnf -y install dnf-utils
+tdnf -y install dnf-utils python3 ca-certificates
 ./generate_test_data.py
 ```
 
