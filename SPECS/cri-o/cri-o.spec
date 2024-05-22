@@ -215,8 +215,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
-* Thu May 09 2024 Henry Li <lihl@microsoft.com> - 1.22.3-1
-- Upgrade to 1.22.3 to resolve CVE-2022-0811
+* Thu May 21 2024 Henry Li <lihl@microsoft.com> - 1.22.3-1
+- Upgrade to 1.22.3 to resolve regressed CVE-2022-0811
+- Updated vendor source tar
 - Update patches for CVE-2022-1708, CVE-2021-3602, CVE-2021-44716,
   CVE-2022-27651, CVE-2022-29526, CVE-2023-44487, CVE-2024-21626 and CVE-2024-28180
 
