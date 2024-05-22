@@ -1,7 +1,7 @@
 Summary:        The Berkley DB database library for C
 Name:           libdb
 Version:        5.3.28
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,15 +60,12 @@ pushd build_unix
 make DESTDIR=%{buildroot} docdir=%{_docdir}/%{name}-%{version} install
 popd
 find %{buildroot} -type f -name "*.la" -delete -print
-install -v -d -m755 %{buildroot}/%{_datadir}/licenses/
-install -D -m755 LICENSE %{buildroot}/%{_datadir}/licenses/LICENSE
-install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 
 %files
 %defattr(-,root,root)
 %license LICENSE
+%doc README
 %{_libdir}/*.so
-%{_datadir}/licenses/*
 
 %files docs
 %defattr(-,root,root)
@@ -95,6 +92,9 @@ install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 %{_bindir}/db*_tuner
 
 %changelog
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 5.3.28-8
+- Sanitize license files
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 5.3.28-7
 - Align with CBL-Mariner 1.0 to address following CVEs:
 - Patch CVE-2019-2708
