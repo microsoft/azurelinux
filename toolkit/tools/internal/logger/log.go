@@ -6,12 +6,14 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
 )
@@ -212,4 +214,52 @@ func setHookLogLevel(hook *writerHook, level string) (err error) {
 
 	hook.SetLevel(logLevel)
 	return
+}
+
+// PrintMessageBox prints a message box to the log with the specified log level.
+func PrintMessageBox(level logrus.Level, message []string) {
+	for _, line := range FormatMessageBox(message) {
+		Log.Log(level, line)
+	}
+}
+
+// FormatMessageBox formats a message into a box with a border. The box is automatically sized to fit the longest line.
+// Each line will be centered in the box.
+func FormatMessageBox(message []string) []string {
+	maxLineLength := 0
+	for _, line := range message {
+		len := utf8.RuneCountInString(line)
+		if len > maxLineLength {
+			maxLineLength = len
+		}
+	}
+	lines := []string{messageBoxTopString(maxLineLength)}
+	for _, line := range message {
+		lines = append(lines, messageBoxMiddleString(line, maxLineLength))
+	}
+	lines = append(lines, messageBoxBottomString(maxLineLength))
+	return lines
+}
+
+func messageBoxTopString(width int) string {
+	return fmt.Sprintf("╔═%s═╗", strings.Repeat("═", width))
+}
+
+func messageBoxMiddleString(s string, width int) string {
+	return fmt.Sprintf("║ %s ║", messageBoxPadString(s, width))
+}
+
+func messageBoxBottomString(width int) string {
+	return fmt.Sprintf("╚═%s═╝", strings.Repeat("═", width))
+}
+
+func messageBoxPadString(s string, width int) string {
+	lineLen := utf8.RuneCountInString(s)
+	if lineLen >= width {
+		return s
+	}
+	padding := width - lineLen
+	paddingL := padding / 2
+	paddingR := padding - paddingL
+	return fmt.Sprintf("%s%s%s", strings.Repeat(" ", paddingL), s, strings.Repeat(" ", paddingR))
 }
