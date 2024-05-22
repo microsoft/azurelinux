@@ -67,9 +67,8 @@ for f in Copyright.txt cmcppdap/NOTICE cmcurl/COPYING cmlibrhash/COPYING cmlibuv
     mkdir -p ./Licenses/$dir_part
     mv %{buildroot}%{_prefix}/doc/%{name}-*/$f ./Licenses/$dir_part/$filename_part
     # If folder is now empty, remove it. Use realpath to handle dirname emitting '.' which rmdir doesn't like.
-    rmdir --ignore-fail-on-non-empty -p $(realpath %{buildroot}%{_prefix}/doc/%{name}-*/$dir_part)
 done
-
+find "%{buildroot}%{_prefix}/doc" -type d -empty -delete
 %check
 # Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
