@@ -398,9 +398,9 @@ done
 
 
 %changelog
-* Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-6
-  Remove the explicit version in build/runtime dependency on hdf5 to unblock
-  the arm64 build.
+* Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-6
+  Remove the use of the '_hdf5_version' and explicit hdf5 version from the
+  build-time dependencies.
 
 * Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-5
 - Bumping the release version so that this package is re-built with the newer

@@ -316,9 +316,8 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
-* Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-4
-  Remove the explicit version in build/runtime dependency on hdf5 to unblock
-  the arm64 build.
+* Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-4
+  Remove the use of explicit hdf5 version from the build-time dependencies.
 
 * Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-3
 - Bumping the release version so that this package is re-built with the newer
