@@ -13,7 +13,7 @@ simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
 Version:        3.7.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,7 @@ Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{ver
 # in F-36
 Patch0:         h5py-3.7.0-ppc-float128.patch
 BuildRequires:  gcc
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel >= 1.14.4
 BuildRequires:  liblzf-devel
 BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
 BuildRequires:  python%{python3_pkgversion}-cached_property
@@ -41,7 +41,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 %package     -n python%{python3_pkgversion}-h5py
 %{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
 Summary:        %{summary}
-Requires:       hdf5
+Requires:       hdf5 >= 1.14.4
 Requires:       python%{python3_pkgversion}-cached_property
 Requires:       python%{python3_pkgversion}-numpy >= 1.7
 Requires:       python%{python3_pkgversion}-six
@@ -92,6 +92,11 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 3.7.0-5
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
+
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).

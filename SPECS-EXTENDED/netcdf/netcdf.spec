@@ -12,7 +12,7 @@
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
 Version:        4.9.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,7 @@ BuildRequires:  curl-devel
 BuildRequires:  doxygen
 BuildRequires:  gawk
 BuildRequires:  hdf-static
-BuildRequires:  hdf5-devel
+BuildRequires:  hdf5-devel = %{_hdf5_version}
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
 BuildRequires:  libzstd-devel
@@ -77,7 +77,7 @@ NetCDF data is:
 Summary:        Development files for netcdf
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       curl-devel%{?_isa}
-Requires:       hdf5-devel%{?_isa}
+Requires:       hdf5-devel%{?_isa} >= 1.14.4
 Requires:       pkgconfig%{?_isa}
 
 %description devel
@@ -398,6 +398,10 @@ done
 
 
 %changelog
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 4.9.0-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

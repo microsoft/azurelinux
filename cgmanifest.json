@@ -5210,8 +5210,8 @@
         "type": "other",
         "other": {
           "name": "hdf5",
-          "version": "1.12.1",
-          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2"
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/hdfgroup/hdf5/releases/download/hdf5_1.14.4.2/hdf5-1.14.4-2.tar.gz"
         }
       }
     },
