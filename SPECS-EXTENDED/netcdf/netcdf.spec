@@ -12,7 +12,7 @@
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
 Version:        4.9.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -398,6 +398,15 @@ done
 
 
 %changelog
+* Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-6
+  Remove the use of the '_hdf5_version' and explicit hdf5 version from the
+  build-time dependencies.
+
+* Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-5
+- Bumping the release version so that this package is re-built with the newer
+  1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
+  be used at run time.
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 4.9.0-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
