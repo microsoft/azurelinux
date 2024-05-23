@@ -18,7 +18,7 @@ Patch1:         ocaml-fileutils-0.6.4-cmp.patch
 
 BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 1.11.0
-%if 0%{?fedora} || 0%{?rhel} <= 6
+%if 0%{?fedora} || 0%{?rhel} <= 6 || 0%{?azl}
 BuildRequires:  ocaml-ounit-devel >= 2.0.0
 %endif
 
@@ -50,7 +50,7 @@ developing applications that use %{name}.
 %dune_install
 
 # Do not run the tests (RHEL 7+ only) since they require ocaml-ounit.
-%if 0%{?fedora} || 0%{?rhel} <= 6
+%if 0%{?fedora} || 0%{?rhel} || %{?azl} <= 6
 %check
 %dune_check
 %endif
