@@ -12,7 +12,7 @@
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
 Version:        4.9.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,7 @@ BuildRequires:  curl-devel
 BuildRequires:  doxygen
 BuildRequires:  gawk
 BuildRequires:  hdf-static
-BuildRequires:  hdf5-devel = %{_hdf5_version}
+BuildRequires:  hdf5-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
 BuildRequires:  libzstd-devel
@@ -77,7 +77,7 @@ NetCDF data is:
 Summary:        Development files for netcdf
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       curl-devel%{?_isa}
-Requires:       hdf5-devel%{?_isa} >= 1.14.4
+Requires:       hdf5-devel%{?_isa}
 Requires:       pkgconfig%{?_isa}
 
 %description devel
@@ -398,6 +398,11 @@ done
 
 
 %changelog
+* Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-6
+  Remove the use of the '_hdf5_version' and explicit hdf5 version from the
+  build-time dependencies.
+
+* Tue May 21 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-5
 - Bumping the release version so that this package is re-built with the newer
   1.14.4 hdf5 libraries. This ensures that the matching 1.14.4 .so files Will
   be used at run time.
