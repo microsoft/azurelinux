@@ -151,26 +151,6 @@ func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, er
 	return
 }
 
-// SetMacroDir adds RPM_CONFIGDIR=$(newMacroDir) into the shell's environment for the duration of a program.
-// To restore the environment the caller can use shell.SetEnvironment() with the returned origenv.
-// On an empty string argument return success immediately and do not modify the environment.
-func SetMacroDir(newMacroDir string) (origenv []string, err error) {
-	origenv = shell.CurrentEnvironment()
-	if newMacroDir == "" {
-		return
-	}
-	exists, err := file.DirExists(newMacroDir)
-	if err != nil || exists == false {
-		err = fmt.Errorf("directory (%s) does not exist", newMacroDir)
-		return
-	}
-
-	env := append(shell.CurrentEnvironment(), fmt.Sprintf("RPM_CONFIGDIR=%s", newMacroDir))
-	shell.SetEnvironment(env)
-
-	return
-}
-
 func GetMacroDir() (macroDir string, err error) {
 	return getMacroDirWithFallback(false)
 }

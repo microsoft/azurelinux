@@ -72,7 +72,7 @@ func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 }
 
 // Gets the image's configured SELinux mode.
-func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
+func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMode, error) {
 	var err error
 	var args []grubConfigLinuxArg
 
@@ -91,6 +91,16 @@ func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecu
 
 	// Get the SELinux mode from the kernel command-line args.
 	selinuxMode, err := getSELinuxModeFromLinuxArgs(args)
+	if err != nil {
+		return imagecustomizerapi.SELinuxModeDefault, err
+	}
+
+	return selinuxMode, nil
+}
+
+func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
+	// Get the SELinux mode from the kernel command-line args.
+	selinuxMode, err := b.getSELinuxModeFromGrub()
 	if err != nil {
 		return imagecustomizerapi.SELinuxModeDefault, err
 	}
