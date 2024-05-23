@@ -188,11 +188,19 @@ os:
     - [postCustomization](#postcustomization-script)
       - [script type](#script-type)
         - [path](#script-path)
+        - [content](#content-string)
+        - [interpreter](#interpreter-string)
         - [args](#args-string)
+        - [environmentVariables](#environmentvariables-mapstring-string)
+        - [name](#script-name)
     - [finalizeCustomization](#finalizecustomization-script)
       - [script type](#script-type)
         - [path](#script-path)
+        - [content](#content-string)
+        - [interpreter](#interpreter-string)
         - [args](#args-string)
+        - [environmentVariables](#environmentvariables-mapstring-string)
+        - [name](#script-name)
 
 ## Top-level
 
@@ -890,6 +898,8 @@ The path of the script.
 This must be in the same directory or a sub-directory that the config file is located
 in.
 
+Only one of `path` or `content` may be specified.
+
 Example:
 
 ```yaml
@@ -898,7 +908,40 @@ scripts:
   - path: scripts/a.sh
 ```
 
-### args [string]
+### content [string]
+
+The contents of the script to run.
+
+The script is written to a temporary file under the customized OS's `/tmp` directory.
+
+Only one of `path` or `content` may be specified.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - content: |
+      echo "Hello, World"
+```
+
+### interpreter [string]
+
+The program to run the script with.
+
+If not specified, then the script is run by `/bin/sh`.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - content: |
+      print("Hello, World")
+    interpreter: python3
+```
+
+### args [string[]]
 
 Additional arguments to pass to the script.
 
@@ -908,7 +951,43 @@ Example:
 scripts:
   postCustomization:
   - path: scripts/a.sh
-    args: abc
+    args:
+    - abc
+```
+
+### environmentVariables [map\<string, string>]
+
+Additional environment variables to set on the program.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - content: |
+      echo "$a $b"
+    environmentVariables:
+      a: hello
+      b: world
+```
+
+<div id="script-name"></div>
+
+### name [string]
+
+The name of the script.
+
+This field is only used to refer to the script in the logs.
+It is particularly useful when `content` is used.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - content: |
+      echo "Hello, World"
+    name: greetings
 ```
 
 ## scripts type

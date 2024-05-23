@@ -2,5 +2,17 @@ scripts:
   postCustomization:
   - path: scripts/postcustomizationscript.sh
 
+  - content: |
+      echo "This is an postCustomization inline script"
+      echo "$1 $2"
+      echo "$fruit and $vegetable"
+      echo "Working dir: $(pwd)"
+    arguments:
+    - hello
+    - world
+    environmentVariables:
+      fruit: bananas
+      vegetable: carrots
+
   finalizeCustomization:
   - path: scripts/finalizecustomizationscript.sh

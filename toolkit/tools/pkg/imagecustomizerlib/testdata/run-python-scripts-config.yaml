@@ -1,0 +1,20 @@
+os:
+  packages:
+    install:
+    - python3
+
+scripts:
+  postCustomization:
+  - content: |
+      import os
+      import sys
+      print(f"{sys.argv[1]} and {sys.argv[2]}")
+      print(f"Working dir: {os.getcwd()}")
+    arguments:
+    - cats
+    - dogs
+    interpreter: python3
+    name: raining
+
+  - path: scripts/llamas.py
+    interpreter: python3

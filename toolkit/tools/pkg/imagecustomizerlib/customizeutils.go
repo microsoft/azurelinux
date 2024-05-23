@@ -17,11 +17,9 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
-	"golang.org/x/sys/unix"
 )
 
 const (
@@ -114,7 +112,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	if config.Scripts != nil {
-		err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
+		err = runUserScripts(baseConfigPath, config.Scripts.PostCustomization, "postCustomization", imageChroot)
 		if err != nil {
 			return err
 		}
@@ -131,7 +129,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	if config.Scripts != nil {
-		err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
+		err = runUserScripts(baseConfigPath, config.Scripts.FinalizeCustomization, "finalizeCustomization", imageChroot)
 		if err != nil {
 			return err
 		}
@@ -244,42 +242,6 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 			return err
 		}
 	}
-	return nil
-}
-
-func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imageChroot *safechroot.Chroot) error {
-	if len(scripts) <= 0 {
-		return nil
-	}
-
-	configDirMountPath := filepath.Join(imageChroot.RootDir(), configDirMountPathInChroot)
-
-	// Bind mount the config directory so that the scripts can access any required resources.
-	mount, err := safemount.NewMount(baseConfigPath, configDirMountPath, "", unix.MS_BIND|unix.MS_RDONLY, "", true)
-	if err != nil {
-		return err
-	}
-	defer mount.Close()
-
-	for _, script := range scripts {
-		scriptPathInChroot := filepath.Join(configDirMountPathInChroot, script.Path)
-		command := fmt.Sprintf("%s %s", scriptPathInChroot, script.Args)
-		logger.Log.Infof("Running script (%s)", script.Path)
-
-		// Run the script.
-		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, shell.ShellProgram, "-c", command)
-		})
-		if err != nil {
-			return fmt.Errorf("script (%s) failed:\n%w", script.Path, err)
-		}
-	}
-
-	err = mount.CleanClose()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
