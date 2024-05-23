@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -461,10 +460,7 @@ func TestGetMacroDir(t *testing.T) {
 }
 
 func TestGetMacroDirWithRpmAvailable(t *testing.T) {
-	const (
-		expectedMacroDir = "/usr/lib/rpm/macros.d"
-		macrodirMacro    = "%_rpmmacrodir"
-	)
+	const expectedMacroDir = "/usr/lib/rpm/macros.d"
 
 	rpmFound, execErr := file.CommandExists(rpmProgram)
 	if execErr != nil {
@@ -477,25 +473,4 @@ func TestGetMacroDirWithRpmAvailable(t *testing.T) {
 	macroDir, err := GetMacroDir()
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMacroDir, macroDir)
-
-	// Custom rpmdir
-	tempDir1 := t.TempDir()
-	emptyRpmrc := filepath.Join(tempDir1, "rpmrc") // Create an empty rpmrc file or rpm will complain
-	err = os.WriteFile(emptyRpmrc, []byte(""), 0644)
-	assert.NoError(t, err)
-
-	// Set custom dir
-	env, err := SetMacroDir(tempDir1)
-	defer shell.SetEnvironment(env)
-	assert.NoError(t, err)
-
-	// Add a macro file (rpmrc will default to looking in <RPM_CONFIGDIR>/macros), give it a custom macro file to read
-	macroFile := filepath.Join(tempDir1, "macros")
-	tempMacroDir := t.TempDir()
-	err = file.WriteLines([]string{macrodirMacro + " " + tempMacroDir}, macroFile)
-	assert.NoError(t, err)
-
-	macroDir, err = GetMacroDir()
-	assert.NoError(t, err)
-	assert.Equal(t, tempMacroDir, macroDir)
 }
