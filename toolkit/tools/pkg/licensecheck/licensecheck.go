@@ -77,14 +77,14 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 	err = newLicenseChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, rpmDirPath)
 	if err != nil {
 		newLicenseChecker.CleanUp()
-		err = fmt.Errorf("failed to initialize chroot. Error:\n%w", err)
+		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return nil, err
 	}
 
 	newLicenseChecker.licenseNames, err = LoadLicenseNames(nameFilePath)
 	if err != nil {
 		newLicenseChecker.CleanUp()
-		err = fmt.Errorf("failed to load license names. Error:\n%w", err)
+		err = fmt.Errorf("failed to load license names:\n%w", err)
 		return nil, err
 	}
 
@@ -92,7 +92,7 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 		newLicenseChecker.exceptions, err = LoadLicenseExceptions(exceptionFilePath)
 		if err != nil {
 			newLicenseChecker.CleanUp()
-			err = fmt.Errorf("failed to load license exceptions. Error:\n%w", err)
+			err = fmt.Errorf("failed to load license exceptions:\n%w", err)
 			return nil, err
 		}
 	}
@@ -105,7 +105,7 @@ func (l *LicenseChecker) CleanUp() error {
 	if l.simpleToolChroot != nil {
 		err := l.simpleToolChroot.CleanUp()
 		if err != nil {
-			return fmt.Errorf("failed to cleanup chroot. Error:\n%w", err)
+			return fmt.Errorf("failed to cleanup chroot:\n%w", err)
 		}
 		l.simpleToolChroot = nil
 	}
@@ -125,12 +125,12 @@ func (l *LicenseChecker) CheckLicenses() error {
 		return searchErr
 	})
 	if err != nil {
-		return fmt.Errorf("failed to search for licenses. Error:\n%w", err)
+		return fmt.Errorf("failed to scan for license issues:\n%w", err)
 	}
 
 	for _, result := range l.results {
 		if result.err != nil {
-			logger.Log.Errorf("Failed to search %s. Error: %v", result.RpmPath, result.err)
+			logger.Log.Errorf("Failed to scan (%s) for license issues: %v", result.RpmPath, result.err)
 		}
 	}
 
@@ -225,7 +225,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 	// Find all the rpms in the chroot
 	rpmsToSearchPaths, err := l.findRpmPaths()
 	if err != nil {
-		return nil, fmt.Errorf("failed to walk srpm directory. Error:\n%w", err)
+		return nil, fmt.Errorf("failed to walk srpm directory:\n%w", err)
 	}
 	if len(rpmsToSearchPaths) == 0 {
 		logger.Log.Warnf("No rpms found in %s", l.simpleToolChroot.ChrootRelativeMountDir())
@@ -246,7 +246,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 		result := <-resultsChannel
 		if result.err != nil {
 			// Signal the workers to stop if there is an error
-			err = fmt.Errorf("failed to search srpm. Error:\n%w", result.err)
+			err = fmt.Errorf("failed to search srpm:\n%w", result.err)
 			close(cancel)
 			return
 		}
@@ -280,7 +280,7 @@ func (s *LicenseChecker) findRpmPaths() (foundSrpmPaths []string, err error) {
 		return nil
 	})
 	if err != nil {
-		err = fmt.Errorf("failed to walk directory. Error:\n%w", err)
+		err = fmt.Errorf("failed to walk directory:\n%w", err)
 		return nil, err
 	}
 	return foundSrpmPaths, nil
@@ -304,7 +304,7 @@ func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel
 			searchResult, err := CheckRpmLicenses(rpmPath, l.distTag, l.licenseNames, l.exceptions)
 			logger.Log.Debugf("Finished searching (%s)", filepath.Base(rpmPath))
 			if err != nil {
-				logger.Log.Errorf("Worker failed with error: %v", err)
+				logger.Log.Errorf("License check worker failed with error: %v", err)
 				resultsChannel <- LicenseCheckResult{err: err}
 				return
 			}
@@ -321,15 +321,15 @@ func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, except
 
 	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageContents(rpmPath, defines)
 	if err != nil {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package contents. Error:\n%w", err)}, nil
+		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package contents:\n%w", err)}, nil
 	}
 
 	pkgNameLines, err := rpm.QueryPackage(rpmPath, "%{NAME}", defines)
 	if err != nil {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package. Error:\n%w", err)}, nil
+		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package:\n%w", err)}, nil
 	}
 	if len(pkgNameLines) != 1 {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package. Error: expected 1 package name, got %d", len(pkgNameLines))}, nil
+		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package, expected 1 package name, got %d", len(pkgNameLines))}, nil
 	}
 	pkgName := pkgNameLines[0]
 
