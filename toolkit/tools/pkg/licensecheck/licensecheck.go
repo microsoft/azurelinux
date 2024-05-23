@@ -289,13 +289,13 @@ func (s *LicenseChecker) findRpmPaths() (foundSrpmPaths []string, err error) {
 // queueWorkers queues up workers to search the RPMs in parallel. Each worker will wait on the jobSemaphore before starting.
 func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel chan LicenseCheckResult, cancel chan struct{}) {
 	for _, rpmPath := range rpmsToSearchPaths {
+		// Wait for the semaphore, or allow cancel before running
+		select {
+		case l.jobSemaphore <- struct{}{}:
+		case <-cancel:
+			return
+		}
 		go func(rpmPath string) {
-			// Wait for the semaphore, or allow cancel before running
-			select {
-			case l.jobSemaphore <- struct{}{}:
-			case <-cancel:
-				return
-			}
 			defer func() {
 				<-l.jobSemaphore
 			}()
