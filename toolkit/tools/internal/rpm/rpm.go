@@ -5,7 +5,6 @@ package rpm
 
 import (
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -172,17 +171,28 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	return
 }
 
-// Queries rpm for the current macro directory via --eval %_rpmmacrodir
 func GetMacroDir() (macroDir string, err error) {
+	return getMacroDirWithFallback(false)
+}
+
+// Queries rpm for the current macro directory via --eval %_rpmmacrodir
+func getMacroDirWithFallback(allowDefault bool) (macroDir string, err error) {
 	const (
 		macro         = "%_rpmmacrodir"
 		defaultRpmDir = "/usr/lib/rpm/macros.d"
 	)
 
 	// This should continue to work even if the rpm command is not available (ie unit tests).
-	_, err = exec.LookPath(rpmProgram)
+	rpmFound, err := file.CommandExists(rpmProgram)
 	if err != nil {
-		return defaultRpmDir, nil
+		return "", fmt.Errorf("failed to check if rpm is installed:\n%w", err)
+	}
+	if !rpmFound {
+		if allowDefault {
+			return defaultRpmDir, nil
+		} else {
+			return "", fmt.Errorf("rpm is not installed, can't query for macro directory")
+		}
 	}
 
 	lines, err := executeRpmCommand(rpmProgram, "--eval", macro)

@@ -6,7 +6,6 @@ package rpm
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -456,7 +455,7 @@ func TestOverrideLocaleDefines(t *testing.T) {
 
 func TestGetMacroDir(t *testing.T) {
 	const expectedMacroDir = "/usr/lib/rpm/macros.d"
-	macroDir, err := GetMacroDir()
+	macroDir, err := getMacroDirWithFallback(true)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMacroDir, macroDir)
 }
@@ -467,8 +466,11 @@ func TestGetMacroDirWithRpmAvailable(t *testing.T) {
 		macrodirMacro    = "%_rpmmacrodir"
 	)
 
-	_, execErr := exec.LookPath("rpm")
+	rpmFound, execErr := file.CommandExists(rpmProgram)
 	if execErr != nil {
+		t.Fatalf("failed to check if rpm is available: %v", execErr)
+	}
+	if !rpmFound {
 		t.Skip("rpm is not available")
 	}
 
