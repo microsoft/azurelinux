@@ -47,7 +47,7 @@ Requires:       python%{python3_pkgversion}-six
 
 %prep
 %setup -q -c -n %{name}-%{version}
-%patch0
+
 mv %{name}-%{version} serial
 cd serial
 %{__python3} api_gen.py
