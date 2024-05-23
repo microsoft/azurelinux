@@ -89,8 +89,8 @@ func TestAddMacroFileComments(t *testing.T) {
 			name:   "WithCustomComments",
 			macros: defaultMacrosInput,
 			customComments: []string{
-				"# Custom comment 1",
-				"# Custom comment 2",
+				"Custom comment 1",
+				"Custom comment 2",
 			},
 			expectError: false,
 			expectedContents: append(append(expectedHeader, []string{
@@ -108,7 +108,7 @@ func TestAddMacroFileComments(t *testing.T) {
 			},
 			expectError: false,
 			expectedContents: append(append(expectedHeader, []string{
-				"# Custom comment 1",
+				"# # Custom comment 1",
 				"# Custom comment 2",
 				"",
 			}...), defaultExpectedContents...),
@@ -128,25 +128,14 @@ func TestAddMacroFileComments(t *testing.T) {
 			expectedContents: append(expectedHeader, defaultExpectedContents...),
 		},
 		{
-			name:   "WithWhitespaceInCustomComments",
-			macros: defaultMacrosInput,
-			customComments: []string{
-				"  # Custom comment 1",
-				"  # Custom comment 2",
-			},
-			expectError: false,
+			name:           "WithEmptyStringCustomComments",
+			macros:         defaultMacrosInput,
+			customComments: []string{""},
+			expectError:    false,
 			expectedContents: append(append(expectedHeader, []string{
-				"  # Custom comment 1",
-				"  # Custom comment 2",
+				"",
 				"",
 			}...), defaultExpectedContents...),
-		},
-		{
-			name:             "WithEmptyStringCustomComments",
-			macros:           defaultMacrosInput,
-			customComments:   []string{""},
-			expectError:      false,
-			expectedContents: append(append(expectedHeader, []string{"", ""}...), defaultExpectedContents...),
 		},
 	}
 
@@ -379,18 +368,29 @@ func Test_formatComments(t *testing.T) {
 			expectedOutput: []string{
 				"# Comment1",
 				"",
-				"# Comment2",
+				"# # Comment2",
 			},
 		},
 		{
-			"CommentsWithLeadingWhitespace",
-			[]string{
+			name: "CommentsWithLeadingWhitespace",
+			comments: []string{
 				"  Comment1",
 				"  # Comment2",
 			},
-			[]string{
+			expectedOutput: []string{
 				"#   Comment1",
-				"  # Comment2",
+				"#   # Comment2",
+			},
+		},
+		{
+			name: "CommentsWithTrailingWhitespace",
+			comments: []string{
+				"Comment1  ",
+				"   ",
+			},
+			expectedOutput: []string{
+				"# Comment1",
+				"",
 			},
 		},
 	}

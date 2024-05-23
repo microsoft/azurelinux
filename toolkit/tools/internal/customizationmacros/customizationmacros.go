@@ -87,11 +87,11 @@ func AddCustomizationMacros(rootDir string, disableDocs, disableRpmLocales bool,
 // formatComments ensures that the comments are valid for a macro file: ie they are empty or start with '#'
 func formatComments(comments []string) (formattedComments []string) {
 	for _, comment := range comments {
-		strippedComment := strings.TrimSpace(comment)
-		if !strings.HasPrefix(strippedComment, "#") && comment != "" {
-			comment = "# " + comment
+		if strings.TrimSpace(comment) == "" {
+			formattedComments = append(formattedComments, "")
+		} else {
+			formattedComments = append(formattedComments, strings.TrimSpace("# "+comment))
 		}
-		formattedComments = append(formattedComments, comment)
 	}
 	return formattedComments
 }
@@ -100,7 +100,6 @@ func formatComments(comments []string) (formattedComments []string) {
 // is created in the default rpm macros directory. The macro file will include a default header, with additional comments
 // if desired. Each extra comment should start with a '#' character.
 func AddMacroFile(macroDir string, macros map[string]string, macroFileName string, extraComments []string) error {
-
 	if len(macros) == 0 {
 		return nil
 	}
