@@ -1,0 +1,33 @@
+From ef949448ec96e00d0beaba3cb3daee359ae77324 Mon Sep 17 00:00:00 2001
+From: Alberto Planas <aplanas@suse.com>
+Date: Thu, 4 Jan 2024 15:12:22 +0100
+Subject: [PATCH] Use .d path for PCRLOCK_KERNEL_*_PATH
+
+Fix the path for the generated.pcrlock files for the cmdline and initrd
+cases.  Without it the tool complains with:
+
+    Failed to parse component file /var/lib/pcrlock.d/720-kernel-initrd.pcrlock, ignoring: Is a directory
+
+Signed-off-by: Alberto Planas <aplanas@suse.com>
+---
+ src/pcrlock/pcrlock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/pcrlock/pcrlock.c b/src/pcrlock/pcrlock.c
+index 8841f4e76c..3e0cf07697 100644
+--- a/src/pcrlock/pcrlock.c
++++ b/src/pcrlock/pcrlock.c
+@@ -74,8 +74,8 @@ STATIC_DESTRUCTOR_REGISTER(arg_policy_path, freep);
+ #define PCRLOCK_FIRMWARE_CONFIG_LATE_PATH   "/var/lib/pcrlock.d/550-firmware-config-late.pcrlock.d/generated.pcrlock"
+ #define PCRLOCK_GPT_PATH                    "/var/lib/pcrlock.d/600-gpt.pcrlock.d/generated.pcrlock"
+ #define PCRLOCK_SECUREBOOT_AUTHORITY_PATH   "/var/lib/pcrlock.d/620-secureboot-authority.pcrlock.d/generated.pcrlock"
+-#define PCRLOCK_KERNEL_CMDLINE_PATH         "/var/lib/pcrlock.d/710-kernel-cmdline.pcrlock/generated.pcrlock"
+-#define PCRLOCK_KERNEL_INITRD_PATH          "/var/lib/pcrlock.d/720-kernel-initrd.pcrlock/generated.pcrlock"
++#define PCRLOCK_KERNEL_CMDLINE_PATH         "/var/lib/pcrlock.d/710-kernel-cmdline.pcrlock.d/generated.pcrlock"
++#define PCRLOCK_KERNEL_INITRD_PATH          "/var/lib/pcrlock.d/720-kernel-initrd.pcrlock.d/generated.pcrlock"
+ #define PCRLOCK_MACHINE_ID_PATH             "/var/lib/pcrlock.d/820-machine-id.pcrlock"
+ #define PCRLOCK_ROOT_FILE_SYSTEM_PATH       "/var/lib/pcrlock.d/830-root-file-system.pcrlock"
+ #define PCRLOCK_FILE_SYSTEM_PATH_PREFIX     "/var/lib/pcrlock.d/840-file-system-"
+-- 
+2.34.1
+

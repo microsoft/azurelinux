@@ -1,0 +1,26 @@
+From ab39d29606e5604bbf4adf50c45e78271d7482a0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Gabr=C3=ADel=20Arth=C3=BAr=20P=C3=A9tursson?=
+ <gabriel.petursson@marel.com>
+Date: Thu, 4 Jan 2024 12:42:04 +0000
+Subject: [PATCH] pcrlock: Print correct NV index when writing new policy
+
+---
+ src/pcrlock/pcrlock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pcrlock/pcrlock.c b/src/pcrlock/pcrlock.c
+index d1bab5f59f..05ee4f744c 100644
+--- a/src/pcrlock/pcrlock.c
++++ b/src/pcrlock/pcrlock.c
+@@ -4560,7 +4560,7 @@ static int verb_make_policy(int argc, char *argv[], void *userdata) {
+                         return r;
+         }
+ 
+-        log_info("Written new policy to '%s' and digest to TPM2 NV index 0x%" PRIu32 ".", path, nv_index);
++        log_info("Written new policy to '%s' and digest to TPM2 NV index 0x%x.", path, nv_index);
+ 
+         log_info("Overall time spent: %s", FORMAT_TIMESPAN(usec_sub_unsigned(now(CLOCK_MONOTONIC), start_usec), 1));
+ 
+-- 
+2.34.1
+
