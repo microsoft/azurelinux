@@ -236,7 +236,7 @@ cache_archive	= $(OUT_DIR)/cache.tar.gz
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms hydrate-srpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
 ##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
@@ -360,6 +360,6 @@ hydrate-rpms:
 ##help:target:hydrate-srpms=Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
 # Seed the SRPMs folder with the any missing files from the archive.
 hydrate-srpms:
-       $(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
-       @echo Unpacking SRPMs from $(PACKAGE_ARCHIVE) into $(SRPMS_DIR)
-       tar -xf $(PACKAGE_ARCHIVE) -C $(SRPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
+	@echo Unpacking SRPMs from $(PACKAGE_ARCHIVE) into $(SRPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(SRPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
