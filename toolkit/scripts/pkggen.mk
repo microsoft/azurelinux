@@ -356,3 +356,10 @@ hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
 	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
 	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+
+##help:target:hydrate-srpms=Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
+# Seed the SRPMs folder with the any missing files from the archive.
+hydrate-srpms:
+       $(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
+       @echo Unpacking SRPMs from $(PACKAGE_ARCHIVE) into $(SRPMS_DIR)
+       tar -xf $(PACKAGE_ARCHIVE) -C $(SRPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
