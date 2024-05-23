@@ -30,12 +30,17 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	dmVerityDracutDriver := "dm-verity"
 	err = addDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to add dracut modules for verity:\n%w", err)
 	}
 
 	err = updateFstabForVerity(buildDir, imageChroot)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to update fstab file for verity:\n%w", err)
+	}
+
+	err = prepareGrubConfigForVerity(imageChroot)
+	if err != nil {
+		return false, fmt.Errorf("failed to prepare grub config files for verity:\n%w", err)
 	}
 
 	return true, nil
@@ -88,7 +93,26 @@ func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error
 	return nil
 }
 
-func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
+func prepareGrubConfigForVerity(imageChroot *safechroot.Chroot) error {
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.PrepareForVerity()
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.WriteToFile(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
 	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string,
 	corruptionOption imagecustomizerapi.CorruptionOption, rootHash string, grubCfgFullPath string,
 ) error {
@@ -122,10 +146,10 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
+	// Note: If grub-mkconfig is being used, then we can't add the verity command-line args to /etc/default/grub and
+	// call grub-mkconfig, since this would create a catch-22 with the verity root partition hash.
+	// So, instead we just modify the /boot/grub2/grub.cfg file directly.
 	grubMkconfigEnabled := isGrubMkconfigConfig(grub2Config)
-	if grubMkconfigEnabled {
-		return fmt.Errorf("grub-mkconfig enabled images not yet supported for verity")
-	}
 
 	grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"rd.systemd.verity", "roothash",
 		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
@@ -133,9 +157,16 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return fmt.Errorf("failed to set verity kernel command line args:\n%w", err)
 	}
 
-	grub2Config, err = replaceSetCommandValue(grub2Config, "rootdevice", "/dev/mapper/root")
-	if err != nil {
-		return fmt.Errorf("failed to set verity root device:\n%w", err)
+	if grubMkconfigEnabled {
+		grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"root"}, []string{"root=/dev/mapper/root"})
+		if err != nil {
+			return fmt.Errorf("failed to set verity root command-line arg:\n%w", err)
+		}
+	} else {
+		grub2Config, err = replaceSetCommandValue(grub2Config, "rootdevice", "/dev/mapper/root")
+		if err != nil {
+			return fmt.Errorf("failed to set verity root device:\n%w", err)
+		}
 	}
 
 	err = file.Write(grub2Config, grubCfgFullPath)
