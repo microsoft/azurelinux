@@ -54,10 +54,8 @@ mkdir -p %{buildroot}%{_mandir}/man1
 help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
   %{buildroot}%{_mandir}/man1/cinaps.1
 
-%if %{with_check}
 %check
 %dune_check
-%endif
 
 %files -f .ofiles
 %doc README.org
