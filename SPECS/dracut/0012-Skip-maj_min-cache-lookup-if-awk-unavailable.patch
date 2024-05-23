@@ -1,0 +1,25 @@
+From 960aa4590db3714ee65fdee88cd66a63e5b0d112 Mon Sep 17 00:00:00 2001
+From: Daniel McIlvaney <damcilva@microsoft.com>
+Date: Thu, 23 May 2024 14:03:16 -0700
+Subject: [PATCH] Skip maj_min cache lookup if awk unavailable
+
+---
+ dracut-functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dracut-functions.sh b/dracut-functions.sh
+index 05d02c2..15083d0 100755
+--- a/dracut-functions.sh
++++ b/dracut-functions.sh
+@@ -243,7 +243,7 @@ get_maj_min() {
+     local _majmin
+     local _out
+ 
+-    if [[ $get_maj_min_cache_file ]]; then
++    if [[ $get_maj_min_cache_file ]] && awk -V > /dev/null 2>&1; then
+         _out="$(grep -m1 -oE "^$1 \S+$" "$get_maj_min_cache_file" | awk '{print $NF}')"
+     fi
+ 
+-- 
+2.33.8
+
