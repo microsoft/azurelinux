@@ -58,4 +58,20 @@ files for developing applications that use %{name}.
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-%autochangelog
+* Sat Mar 30 00:00:00 2024 Jerry James <loganjerry@gmail.com> - 1.2.0-1
+- Version 1.2.0
+
+* Thu Jan 25 00:00:00 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 00:00:00 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 00:00:00 2023 Richard W.M. Jones <rjones@redhat.com> - 1.1.0-3
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 00:00:00 2023 Richard W.M. Jones <rjones@redhat.com> - 1.1.0-2
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Wed Nov 22 00:00:00 2023 Jerry James <loganjerry@gmail.com> - 1.1.0-1
+- Initial RPM (rhbz#2242905)
