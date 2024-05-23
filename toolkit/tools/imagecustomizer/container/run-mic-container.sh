@@ -79,7 +79,7 @@ fi
 
 # ---- main ----
 
-containerFullPath=$containerRegistery/$containerName/$containerTag
+containerFullPath=$containerRegistery/$containerName:$containerTag
 
 inputImageDir=$(dirname $inputImage)
 inputConfigDdir=$(dirname $inputConfig)

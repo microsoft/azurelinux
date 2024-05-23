@@ -57,7 +57,7 @@ trap 'cleanUp' ERR
 micLocalFile=$enlistmentRoot/toolkit/tools/imagecustomizer/imagecustomizer
 micContainerFolder=/usr/bin
 
-containerFullPath=$containerRegistery/$containerName/$containerTag
+containerFullPath=$containerRegistery/$containerName:$containerTag
 dockerFile=$enlistmentRoot/toolkit/tools/imagecustomizer/container/Dockerfile.mic-container
 
 # stage those files that need to be in the container
