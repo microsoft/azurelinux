@@ -22733,8 +22733,8 @@
         "type": "other",
         "other": {
           "name": "python-jinja2",
-          "version": "3.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-3.1.2.tar.gz"
+          "version": "3.1.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ed/55/39036716d19cab0747a5020fc7e907f362fbf48c984b14e62127f7e68e5d/jinja2-3.1.4.tar.gz"
         }
       }
     },

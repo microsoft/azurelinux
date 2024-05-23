@@ -1,6 +1,6 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
-Version:        3.1.2
+Version:        3.1.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu May 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.4-1
+- Auto-upgrade to 3.1.4 - fix CVE-2024-34064 and CVE-2024-22195
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
 - Upgrade to version 3.1.2
 
