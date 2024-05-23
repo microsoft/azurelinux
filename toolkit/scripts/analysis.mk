@@ -113,10 +113,11 @@ license-check: $(LICENSE_CHECK_DIRS)
 endif
 
 ##help:target:license-check=Validate all packages in the RPMS_DIR for license compliance. Set LICENSE_CHECK_DIRS to override source.
-license-check: $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE)
+license-check: $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE)
 	$(go-licensecheck) \
 		$(foreach license_dir, $(LICENSE_CHECK_DIRS),--rpm-dirs="$(license_dir)" ) \
 		--exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
+		--name-file="$(LICENSE_CHECK_NAME_FILE)" \
 		--worker-tar="$(chroot_worker)" \
 		--build-dir="$(license_check_build_dir)" \
 		--dist-tag=$(DIST_TAG) \
@@ -124,10 +125,11 @@ license-check: $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FIL
 		--results-file="$(license_results_file_pkg)"
 
 ##help:target:license-check-img=Validate all packages needed for an image for license compliance. Must set CONFIG_FILE=<path_to_config>.
-license-check-img: $(go-licensecheck) $(chroot_worker) $(image_package_cache_summary) $(LICENSE_CHECK_EXCEPTION_FILE)
+license-check-img: $(go-licensecheck) $(chroot_worker) $(image_package_cache_summary) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE)
 	$(go-licensecheck) \
 		--rpm-dirs="$(local_and_external_rpm_cache)" \
 		--exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
+		--name-file="$(LICENSE_CHECK_NAME_FILE)" \
 		--worker-tar="$(chroot_worker)" \
 		--build-dir="$(license_check_build_dir)" \
 		--dist-tag=$(DIST_TAG) \

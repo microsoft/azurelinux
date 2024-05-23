@@ -21,6 +21,7 @@ var (
 	app = kingpin.New("licensecheck", "A tool for validating the license files of RPM packages.")
 
 	rpmDirs       = app.Flag("rpm-dirs", "Directories to recursively scan for RPMs to validate").Required().ExistingDirs()
+	nameFile      = app.Flag("name-file", "File containing license names to check for.").Required().ExistingFile()
 	exceptionFile = app.Flag("exception-file", "File containing license exceptions.").ExistingFile()
 	pedantic      = app.Flag("pedantic", "Enable pedantic mode, warnings are errors.").Bool()
 
@@ -42,7 +43,7 @@ func main() {
 	totalFailedPackages := 0
 	totalWarningPackages := 0
 	for _, rpmDir := range *rpmDirs {
-		errorResults, warningResults, err := validateRpmDir(*buildDirPath, *workerTar, rpmDir, *exceptionFile, *distTag, *pedantic)
+		errorResults, warningResults, err := validateRpmDir(*buildDirPath, *workerTar, rpmDir, *nameFile, *exceptionFile, *distTag, *pedantic)
 		if err != nil {
 			logger.Log.Fatalf("Failed to search RPM directory. Error: %v", err)
 		}
@@ -99,10 +100,10 @@ How to fix:
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
 // Each call to this function will generate a new chroot environment and clean it up after the scan.
-func validateRpmDir(buildDirPath, workerTar, rpmDir, exceptionFile, distTag string, pedantic bool,
+func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag string, pedantic bool,
 ) (warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
 	logger.Log.Infof("Preparing license check environment for %s...", rpmDir)
-	licenseChecker, err := licensecheck.New(buildDirPath, workerTar, rpmDir, exceptionFile, distTag)
+	licenseChecker, err := licensecheck.New(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to initialize RPM license checker:\n%v", err)
 	}

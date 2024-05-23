@@ -6,38 +6,22 @@
 package licensecheck
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 )
 
-// licenseNamesFuzzy is a list of license names that should be matched in a case-insensitive sub-string search
-var licenseNamesFuzzy = []*regexp.Regexp{
-	regexp.MustCompile(`(?i).*copying.*`),
-	regexp.MustCompile(`(?i).*license.*`),
-	regexp.MustCompile(`(?i).*licence.*`), // British spelling
-	regexp.MustCompile(`(?i).*licensing.*`),
-	regexp.MustCompile(`(?i).*notice.*`),
-	regexp.MustCompile(`(?i).*copyright.*`),
-	regexp.MustCompile(`(?i).*artistic.*`),
-	regexp.MustCompile(`(?i).*bsd.*`),
-	regexp.MustCompile(`(?i).*gpl.*`),
-	regexp.MustCompile(`(?i).*cc0.*`),
-	regexp.MustCompile(`(?i).*mit\.txt.*`),
-}
-
-// licenseNamesVerbatim is a list of license names that should be matched exactly
-var licenseNamesVerbatim = []*regexp.Regexp{
-	regexp.MustCompile(`^MIT$`),
-}
-
-// licenseNamesSkip is a list of files that may appear as a license file but generally aren't really licenses
-var licenseNamesSkip = []*regexp.Regexp{
-	regexp.MustCompile(`(?i).*AUTHORS.*`),
-	regexp.MustCompile(`(?i).*CONTRIBUTORS.*`),
-	regexp.MustCompile(`(?i).*README.*`),
-	regexp.MustCompile(`(?i).*CREDITS.*`),
+type LicenseNames struct {
+	FuzzyLicenseNamesRegexList       []string `json:"FuzzyLicenseNamesRegexList"`
+	compiledFuzzyLicenseNamesList    []*regexp.Regexp
+	VerbatimLicenseNamesRegexList    []string `json:"VerbatimLicenseNamesRegexList"`
+	compiledVerbatimLicenseNamesList []*regexp.Regexp
+	SkipLicenseNamesRegexList        []string `json:"SkipLicenseNamesRegexList"`
+	compiledSkipLicenseNamesList     []*regexp.Regexp
 }
 
 // IsALicenseFile makes a best effort guess if a file is a license file or not. This is a heuristic  and is NOT foolproof however.
@@ -45,21 +29,21 @@ var licenseNamesSkip = []*regexp.Regexp{
 // - /path/to/code/gpl/README.md ("gpl")
 // - /path/to/a/hash/CC05f4dcc3b5aa765d61d8327deb882cf ("cc0")
 // - /path/to/freebsd-parts/file.ext ("bds")
-func IsALicenseFile(pkgName, licenseFilePath string) bool {
+func (l *LicenseNames) IsALicenseFile(pkgName, licenseFilePath string) bool {
 	// Check if the file is in the list of explicit known license files
-	for _, name := range licenseNamesVerbatim {
+	for _, name := range l.compiledVerbatimLicenseNamesList {
 		baseName := filepath.Base(licenseFilePath)
 		if name.MatchString(baseName) {
 			return true
 		}
 	}
 
-	return checkFilePath(pkgName, licenseFilePath, licenseNamesFuzzy) && !IsASkippedLicenseFile(pkgName, licenseFilePath)
+	return checkFilePath(pkgName, licenseFilePath, l.compiledFuzzyLicenseNamesList) && !l.IsASkippedLicenseFile(pkgName, licenseFilePath)
 }
 
 // IsASkippedLicenseFile checks if a file is a known non-license file.
-func IsASkippedLicenseFile(pkgName, licenseFilePath string) bool {
-	return checkFilePath(pkgName, licenseFilePath, licenseNamesSkip)
+func (l *LicenseNames) IsASkippedLicenseFile(pkgName, licenseFilePath string) bool {
+	return checkFilePath(pkgName, licenseFilePath, l.compiledSkipLicenseNamesList)
 }
 
 // checkFilePath checks if a file path matches any of the given names. Any leading common path is stripped before
@@ -89,4 +73,39 @@ func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []*regex
 		}
 	}
 	return false
+}
+
+// LoadLicenseNames loads the license name regexes from the given .json file into a LicenseNames struct
+func LoadLicenseNames(file string) (LicenseNames, error) {
+	config := LicenseNames{}
+	err := jsonutils.ReadJSONFile(file, &config)
+	if err != nil {
+		return LicenseNames{}, fmt.Errorf("failed to read license names file:\n%w", err)
+	}
+
+	for i := range config.FuzzyLicenseNamesRegexList {
+		regex, err := regexp.Compile(config.FuzzyLicenseNamesRegexList[i])
+		if err != nil {
+			return LicenseNames{}, fmt.Errorf("failed to compile regex for license names (%s):\n%w", config.FuzzyLicenseNamesRegexList[i], err)
+		}
+		config.compiledFuzzyLicenseNamesList = append(config.compiledFuzzyLicenseNamesList, regex)
+	}
+
+	for i := range config.VerbatimLicenseNamesRegexList {
+		regex, err := regexp.Compile(config.VerbatimLicenseNamesRegexList[i])
+		if err != nil {
+			return LicenseNames{}, fmt.Errorf("failed to compile regex for license names (%s):\n%w", config.VerbatimLicenseNamesRegexList[i], err)
+		}
+		config.compiledVerbatimLicenseNamesList = append(config.compiledVerbatimLicenseNamesList, regex)
+	}
+
+	for i := range config.SkipLicenseNamesRegexList {
+		regex, err := regexp.Compile(config.SkipLicenseNamesRegexList[i])
+		if err != nil {
+			return LicenseNames{}, fmt.Errorf("failed to compile regex for license names (%s):\n%w", config.SkipLicenseNamesRegexList[i], err)
+		}
+		config.compiledSkipLicenseNamesList = append(config.compiledSkipLicenseNamesList, regex)
+	}
+
+	return config, nil
 }

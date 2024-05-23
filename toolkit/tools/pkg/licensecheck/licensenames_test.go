@@ -7,9 +7,11 @@ package licensecheck
 
 import (
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,6 +25,87 @@ type testData struct {
 type testDataEntry struct {
 	Pkg  string `json:"Pkg"`
 	Path string `json:"Path"`
+}
+
+func TestLoadLicenseNames(t *testing.T) {
+	file := "testdata/test_license_names.json"
+	expectedNames := LicenseNames{
+		FuzzyLicenseNamesRegexList: []string{
+			"(?i).*fuzzy.*",
+		},
+		compiledFuzzyLicenseNamesList: []*regexp.Regexp{
+			regexp.MustCompile("(?i).*fuzzy.*"),
+		},
+		VerbatimLicenseNamesRegexList: []string{
+			"^vErBaTiM$",
+		},
+		compiledVerbatimLicenseNamesList: []*regexp.Regexp{
+			regexp.MustCompile("^vErBaTiM$"),
+		},
+		SkipLicenseNamesRegexList: []string{
+			"(?i).*skip.*",
+		},
+		compiledSkipLicenseNamesList: []*regexp.Regexp{
+			regexp.MustCompile("(?i).*skip.*"),
+		},
+	}
+
+	names, err := LoadLicenseNames(file)
+
+	// Check if there was an error loading the license exceptions
+	if err != nil {
+		t.Errorf("Failed to load license names: %v", err)
+	}
+
+	// Check if the loaded exceptions match the expected exceptions
+	assert.Equal(t, expectedNames, names)
+}
+
+func TestNotPanicMissingNameFile(t *testing.T) {
+	tempPath := t.TempDir()
+	file := filepath.Join(tempPath, "missing_file.json")
+	assert.NotPanics(t, func() {
+		_, err := LoadLicenseNames(file)
+		assert.EqualError(t, err, "failed to read license names file:\nopen "+file+": no such file or directory")
+	})
+}
+
+func TestInvalidNameRegex(t *testing.T) {
+	const invalidRegex = `.*[`
+	testCases := []struct {
+		name        string
+		json        string
+		expectedErr string
+	}{
+		{
+			name:        "Invalid fuzzy regex",
+			json:        `{"FuzzyLicenseNamesRegexList": ["` + invalidRegex + `"], "VerbatimLicenseNamesRegexList": [], "SkipLicenseNamesRegexList": []}`,
+			expectedErr: "failed to compile regex for license names (.*[):\nerror parsing regexp: missing closing ]: `[`",
+		},
+		{
+			name:        "Invalid verbatim regex",
+			json:        `{"FuzzyLicenseNamesRegexList": [], "VerbatimLicenseNamesRegexList": ["` + invalidRegex + `"], "SkipLicenseNamesRegexList": []}`,
+			expectedErr: "failed to compile regex for license names (.*[):\nerror parsing regexp: missing closing ]: `[`",
+		},
+		{
+			name:        "Invalid skip regex",
+			json:        `{"FuzzyLicenseNamesRegexList": [], "VerbatimLicenseNamesRegexList": [], "SkipLicenseNamesRegexList": ["` + invalidRegex + `"]}`,
+			expectedErr: "failed to compile regex for license names (.*[):\nerror parsing regexp: missing closing ]: `[`",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tempPath := t.TempDir()
+			jsonFilePath := filepath.Join(tempPath, "invalid_regex.json")
+			err := file.Write(tc.json, jsonFilePath)
+			assert.NoError(t, err)
+			names, err := LoadLicenseNames(jsonFilePath)
+			assert.Error(t, err)
+			assert.EqualError(t, err, tc.expectedErr)
+			assert.Equal(t, LicenseNames{}, names)
+		})
+	}
 }
 
 func generateTestVariantStrings(pkgName, base string) []string {
@@ -60,6 +143,8 @@ func generateTestVariantStrings(pkgName, base string) []string {
 // Test common variations on license file names
 func TestIsALicenseFile_Common(t *testing.T) {
 	const pkgName = "pkg"
+	n := loadDefaultLicenseNames(t)
+
 	names := []string{
 		"copying",
 		"license",
@@ -77,8 +162,8 @@ func TestIsALicenseFile_Common(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			for _, tc := range testCases {
 				t.Run(tc, func(t *testing.T) {
-					assert.True(t, IsALicenseFile(pkgName, tc))
-					assert.False(t, IsASkippedLicenseFile(pkgName, tc))
+					assert.True(t, n.IsALicenseFile(pkgName, tc))
+					assert.False(t, n.IsASkippedLicenseFile(pkgName, tc))
 				})
 			}
 		})
@@ -87,6 +172,8 @@ func TestIsALicenseFile_Common(t *testing.T) {
 
 func TestIsASkippedLicenseFile(t *testing.T) {
 	const pkgName = "pkg"
+	n := loadDefaultLicenseNames(t)
+
 	testCases := []string{
 		"AUTHORS",
 		"CONTRIBUTORS",
@@ -98,13 +185,15 @@ func TestIsASkippedLicenseFile(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
-			assert.True(t, IsASkippedLicenseFile(pkgName, tc))
+			assert.True(t, n.IsASkippedLicenseFile(pkgName, tc))
 		})
 	}
 }
 
 func TestIsALicenseFile_Specific(t *testing.T) {
 	const pkgName = "pkg"
+	n := loadDefaultLicenseNames(t)
+
 	testCases := []struct {
 		file     string
 		expected bool
@@ -115,7 +204,7 @@ func TestIsALicenseFile_Specific(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.file, func(t *testing.T) {
-			res := IsALicenseFile(pkgName, tc.file)
+			res := n.IsALicenseFile(pkgName, tc.file)
 			assert.Equal(t, tc.expected, res)
 		})
 	}
@@ -126,6 +215,8 @@ func TestIsNotALicenseFile(t *testing.T) {
 		pkgName  = "pkg"
 		basePath = "/usr/share/licenses/"
 	)
+	n := loadDefaultLicenseNames(t)
+
 	testCases := []string{
 		filepath.Join(basePath, pkgName, "file"),
 		filepath.Join(basePath, pkgName, "README"),
@@ -137,13 +228,15 @@ func TestIsNotALicenseFile(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
-			assert.False(t, IsALicenseFile(pkgName, tc))
+			assert.False(t, n.IsALicenseFile(pkgName, tc))
 		})
 	}
 }
 
 func TestSubDirsMatch(t *testing.T) {
 	const pkgName = "pkg"
+	n := loadDefaultLicenseNames(t)
+
 	testCases := []string{
 		"/usr/share/licenses/pkg/COPYING",
 		"/usr/share/licenses/pkg/subdir/COPYING",
@@ -153,8 +246,8 @@ func TestSubDirsMatch(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
-			assert.True(t, IsALicenseFile(pkgName, tc))
-			assert.False(t, IsASkippedLicenseFile(pkgName, tc))
+			assert.True(t, n.IsALicenseFile(pkgName, tc))
+			assert.False(t, n.IsASkippedLicenseFile(pkgName, tc))
 		})
 	}
 }
@@ -162,6 +255,8 @@ func TestSubDirsMatch(t *testing.T) {
 // The license directory itself isn't a valid match.
 func TestLicenseDirDoesNotMatch(t *testing.T) {
 	const pkgName = "pkg"
+	n := loadDefaultLicenseNames(t)
+
 	testCases := []string{
 		"/usr/share/licenses/",
 		"/usr/share/licenses/pkg",
@@ -169,7 +264,7 @@ func TestLicenseDirDoesNotMatch(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
-			assert.False(t, IsALicenseFile(pkgName, tc))
+			assert.False(t, n.IsALicenseFile(pkgName, tc))
 		})
 	}
 }
@@ -182,6 +277,7 @@ func TestAgainstKnownLicenses(t *testing.T) {
 	// exhaustive, but it should catch most common cases. This value can be increased as the quality of the
 	// packages improves.
 	const acceptablePercentage = 0.98
+	n := loadDefaultLicenseNames(t)
 
 	// Find all data files in the testdata directory
 	testDataFile := ""
@@ -207,7 +303,7 @@ func TestAgainstKnownLicenses(t *testing.T) {
 
 	invalid_entires := 0
 	for _, test := range test_data.TestDataEntries {
-		if !IsALicenseFile(test.Pkg, test.Path) {
+		if !n.IsALicenseFile(test.Pkg, test.Path) {
 			invalid_entires++
 		}
 	}
@@ -225,6 +321,7 @@ func TestAgainstKnownDocs(t *testing.T) {
 	// This test will check that MOST of the known docs are correctly identified as not licenses. It is not
 	// exhaustive, but it should catch most common cases.
 	const acceptablePercentage = 0.99
+	n := loadDefaultLicenseNames(t)
 
 	// Find all data files in the testdata directory
 	testDataFile := ""
@@ -250,7 +347,7 @@ func TestAgainstKnownDocs(t *testing.T) {
 
 	invalid_entires := 0
 	for _, test := range test_data.TestDataEntries {
-		if IsALicenseFile(test.Pkg, test.Path) {
+		if n.IsALicenseFile(test.Pkg, test.Path) {
 			invalid_entires++
 		}
 	}

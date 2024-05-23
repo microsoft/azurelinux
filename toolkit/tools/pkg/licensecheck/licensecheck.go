@@ -53,6 +53,7 @@ const (
 type LicenseChecker struct {
 	simpleToolChroot *simpletoolchroot.SimpleToolChroot // The chroot to scan the RPMs in
 	distTag          string                             // The distribution tag to use when parsing RPMs
+	licenseNames     LicenseNames                       // The regexes used to match license files
 	exceptions       LicenseExceptions                  // Files that should be ignored
 	results          []LicenseCheckResult               // The results of the search
 	jobSemaphore     chan struct{}                      // Limit the number of parallel jobs
@@ -62,9 +63,11 @@ type LicenseChecker struct {
 // - buildDirPath: The path to create the chroot inside
 // - workerTarPath: The path to the worker tarball
 // - rpmDirPath: The path to the directory containing the RPMs
+// - nameFilePath: The path to the .json file containing license names
 // - exceptionFilePath: Optional, the path to the .json file containing license exceptions to ignore
 // - distTag: The distribution tag to use when parsing RPMs
-func New(buildDirPath, workerTarPath, rpmDirPath, exceptionFilePath, distTag string) (newLicenseChecker *LicenseChecker, err error) {
+func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePath, distTag string,
+) (newLicenseChecker *LicenseChecker, err error) {
 	newLicenseChecker = &LicenseChecker{
 		distTag:          distTag,
 		simpleToolChroot: &simpletoolchroot.SimpleToolChroot{},
@@ -75,6 +78,13 @@ func New(buildDirPath, workerTarPath, rpmDirPath, exceptionFilePath, distTag str
 	if err != nil {
 		newLicenseChecker.CleanUp()
 		err = fmt.Errorf("failed to initialize chroot. Error:\n%w", err)
+		return nil, err
+	}
+
+	newLicenseChecker.licenseNames, err = LoadLicenseNames(nameFilePath)
+	if err != nil {
+		newLicenseChecker.CleanUp()
+		err = fmt.Errorf("failed to load license names. Error:\n%w", err)
 		return nil, err
 	}
 
@@ -291,7 +301,7 @@ func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel
 			}()
 
 			logger.Log.Debugf("Searching (%s)", filepath.Base(rpmPath))
-			searchResult, err := CheckRpmLicenses(rpmPath, l.distTag, l.exceptions)
+			searchResult, err := CheckRpmLicenses(rpmPath, l.distTag, l.licenseNames, l.exceptions)
 			logger.Log.Debugf("Finished searching (%s)", filepath.Base(rpmPath))
 			if err != nil {
 				logger.Log.Errorf("Worker failed with error: %v", err)
@@ -306,7 +316,7 @@ func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel
 // CheckRpmLicenses checks the licenses of an RPM at the given path. It returns result struct holding all the license
 // issues found. This function will use the host's macros to query the RPM so it is expected to be called in a chroot.
 // - rpmPath: The path to the RPM to check relative to the chroot's root.
-func CheckRpmLicenses(rpmPath, distTag string, exceptions LicenseExceptions) (result LicenseCheckResult, err error) {
+func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, exceptions LicenseExceptions) (result LicenseCheckResult, err error) {
 	defines := rpm.DefaultDistroDefines(false, distTag)
 
 	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageContents(rpmPath, defines)
@@ -323,7 +333,7 @@ func CheckRpmLicenses(rpmPath, distTag string, exceptions LicenseExceptions) (re
 	}
 	pkgName := pkgNameLines[0]
 
-	badDocFiles, badOtherFiles, duplicatedDocs := interpretResults(pkgName, files, documentFiles, licenseFiles, exceptions)
+	badDocFiles, badOtherFiles, duplicatedDocs := interpretResults(pkgName, files, documentFiles, licenseFiles, licenseNames, exceptions)
 
 	result = LicenseCheckResult{
 		RpmPath:        rpmPath,
@@ -340,14 +350,14 @@ func CheckRpmLicenses(rpmPath, distTag string, exceptions LicenseExceptions) (re
 // - badDocFiles: %doc files that appear to be licenses, but are not at least also in the license files
 // - badOtherFiles: files that are misplaced in the licenses directory
 // - duplicatedDocs: %doc files that are also in the license files
-func interpretResults(pkgName string, files, documentFiles, licenseFiles []string, exceptions LicenseExceptions) (badDocFiles, badOtherFiles, duplicatedDocs []string) {
+func interpretResults(pkgName string, files, documentFiles, licenseFiles []string, licenseNames LicenseNames, exceptions LicenseExceptions) (badDocFiles, badOtherFiles, duplicatedDocs []string) {
 	badDocFiles = []string{}
 	badOtherFiles = []string{}
 	duplicatedDocs = []string{}
 
 	// Check the documentation files
 	for _, documentFile := range documentFiles {
-		if IsALicenseFile(pkgName, documentFile) && !exceptions.ShouldIgnoreFile(pkgName, documentFile) {
+		if licenseNames.IsALicenseFile(pkgName, documentFile) && !exceptions.ShouldIgnoreFile(pkgName, documentFile) {
 			if isDocumentInLicenseFiles(documentFile, licenseFiles) {
 				duplicatedDocs = append(duplicatedDocs, documentFile)
 			} else {

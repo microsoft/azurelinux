@@ -13,6 +13,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func loadDefaultLicenseNames(t *testing.T) LicenseNames {
+	const pathToDefaultNamesJson = "../../../resources/manifests/package/license_file_names.json"
+	t.Helper()
+
+	names, err := LoadLicenseNames(pathToDefaultNamesJson)
+	if err != nil {
+		t.Fatalf("Failed to load default license names: %v", err)
+	}
+	return names
+}
+
 func TestMain(m *testing.M) {
 	logger.InitStderrLog()
 	os.Exit(m.Run())
@@ -423,7 +434,7 @@ func TestParseCheckResults(t *testing.T) {
 		"/usr/share/docs/testpkg/licenses/duplicated",
 	}
 
-	badDocFiles, badOtherFiles, duplicatedDocs := interpretResults(pkgName, files, documentFiles, licenseFiles, exceptions)
+	badDocFiles, badOtherFiles, duplicatedDocs := interpretResults(pkgName, files, documentFiles, licenseFiles, loadDefaultLicenseNames(t), exceptions)
 
 	assert.Equal(t, expectedBadDocFiles, badDocFiles)
 	assert.Equal(t, expectedBadOtherFiles, badOtherFiles)

@@ -83,6 +83,7 @@ LICENSE_CHECK_DIRS ?= $(RPMS_DIR)
 ##help:var:LICENSE_CHECK_PEDANTIC:{y,n}=Treat all license warnings as errors
 LICENSE_CHECK_PEDANTIC ?= n
 LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
+LICENSE_CHECK_NAME_FILE      ?= $(MANIFESTS_DIR)/package/license_file_names.json
 
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
