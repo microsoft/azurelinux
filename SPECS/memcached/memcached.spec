@@ -36,8 +36,6 @@ BuildRequires:  libseccomp-devel
 %if %{with tls}
 BuildRequires:  openssl-devel
 %endif
-Requires(pre):  shadow-utils
-%{?systemd_requires}
 
 %description
 memcached is a high-performance, distributed memory object caching
@@ -51,6 +49,14 @@ Requires:       %{name} = %{version}-%{release}
 %description devel
 Install memcached-devel if you are developing C/C++ applications that require
 access to the memcached binary include files.
+
+%package        service
+Summary:        This package automatically runs scripts to set up memcached as a service.
+Requires(pre):  shadow-utils
+%{?systemd_requires}
+
+%description service
+Install memcached-service if you want to run memcached as a service automatically.
 
 %prep
 %autosetup -p1
@@ -89,20 +95,20 @@ install -Dp -m0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/sysconfig/%{name}
 %check
 %make_build test
 
-%pre
+%pre service
 getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 getent passwd %{username} >/dev/null || \
 useradd -r -g %{groupname} -d /run/memcached \
     -s /sbin/nologin -c "Memcached daemon" %{username}
 exit 0
 
-%post
+%post service
 %systemd_post memcached.service
 
-%preun
+%preun service
 %systemd_preun memcached.service
 
-%postun
+%postun service
 %systemd_postun_with_restart memcached.service
 
 %files
@@ -113,10 +119,12 @@ exit 0
 %{_bindir}/memcached
 %{_mandir}/man1/memcached-tool.1*
 %{_mandir}/man1/memcached.1*
-%{_unitdir}/memcached.service
 
 %files devel
 %{_includedir}/memcached/*
+
+%files service
+%{_unitdir}/memcached.service
 
 %changelog
 * Wed May 08 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.6.27-1
