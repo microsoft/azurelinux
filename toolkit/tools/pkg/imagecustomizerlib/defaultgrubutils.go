@@ -34,6 +34,7 @@ const (
 
 type defaultGrubFileVarAssign struct {
 	Token grub.Token
+	Line  grub.Line
 	Name  string
 	Value string
 }
@@ -53,13 +54,13 @@ func findDefaultGrubFileVarAssigns(defaultGrubFileContent string) ([]defaultGrub
 
 	lines := grub.SplitTokensIntoLines(grubTokens)
 	for _, line := range lines {
-		if len(line) != 1 {
+		if len(line.Tokens) != 1 {
 			// Normal variable assignments only have 1 value.
 			// Export variable assignments have 2 values. But we are ignoring those.
 			continue
 		}
 
-		argToken := line[0]
+		argToken := line.Tokens[0]
 
 		isVarAssign := len(argToken.SubWords) >= 1 &&
 			argToken.SubWords[0].Type == grub.KEYWORD_STRING &&
@@ -100,6 +101,7 @@ func findDefaultGrubFileVarAssigns(defaultGrubFileContent string) ([]defaultGrub
 
 		varAssign := defaultGrubFileVarAssign{
 			Token: argToken,
+			Line:  line,
 			Name:  name,
 			Value: value,
 		}
@@ -246,6 +248,74 @@ func replaceDefaultGrubFileVarAssign(defaultGrubFileContent string, varAssign de
 	// Rewrite the /etc/default/grub file.
 	defaultGrubFileContent = defaultGrubFileContent[:start] + cmdLineString + defaultGrubFileContent[end:]
 	return defaultGrubFileContent
+}
+
+func insertDefaultGrubFileVarAssign(defaultGrubFileContent string, insertAfterLine *grub.Line, varName string,
+	newValue string,
+) string {
+	// Figure out where to insert the new line.
+	insertAt := 0
+	newlineBefore := false
+	if insertAfterLine != nil {
+		if insertAfterLine.EndToken != nil {
+			insertAt = insertAfterLine.EndToken.Loc.End.Index
+			newlineBefore = insertAfterLine.EndToken.Type == grub.SEMICOLON
+		} else {
+			// EOF follows the last variable assignment.
+			insertAt = insertAfterLine.Tokens[len(insertAfterLine.Tokens)-1].Loc.End.Index
+			newlineBefore = true
+		}
+	}
+
+	// Create new variable assignment line string.
+	lineString := fmt.Sprintf("%s=%s", varName, grub.ForceQuoteString(newValue))
+
+	// Build new /etc/default/grub file contents.
+	builder := strings.Builder{}
+	builder.WriteString(defaultGrubFileContent[:insertAt])
+	if newlineBefore {
+		builder.WriteString("\n")
+	}
+	builder.WriteString(lineString)
+	builder.WriteString("\n")
+	builder.WriteString(defaultGrubFileContent[insertAt:])
+
+	defaultGrubFileContent = builder.String()
+	return defaultGrubFileContent
+}
+
+// Sets the value of a variable in the /etc/default/grub file, either replacing the existing variable value (if one
+// exists) or adding a new one.
+func updateDefaultGrubFileVariable(defaultGrubFileContent string, varName string, newValue string) (string, error) {
+	varAssigns, err := findDefaultGrubFileVarAssigns(defaultGrubFileContent)
+	if err != nil {
+		err = fmt.Errorf("failed to parse %s file:\n%w", installutils.GrubDefFile, err)
+		return "", err
+	}
+
+	found := false
+	existingVarAssign := defaultGrubFileVarAssign{}
+	for _, varAssign := range varAssigns {
+		if varAssign.Name == varName {
+			existingVarAssign = varAssign
+			found = true
+			break
+		}
+	}
+
+	if found {
+		defaultGrubFileContent = replaceDefaultGrubFileVarAssign(defaultGrubFileContent, existingVarAssign, newValue)
+	} else {
+		insertAfter := (*grub.Line)(nil)
+		if len(varAssigns) > 1 {
+			line := varAssigns[len(varAssigns)-1].Line
+			insertAfter = &line
+		}
+
+		defaultGrubFileContent = insertDefaultGrubFileVarAssign(defaultGrubFileContent, insertAfter, varName, newValue)
+	}
+
+	return defaultGrubFileContent, nil
 }
 
 // Checks if the image uses grub-mkconfig.

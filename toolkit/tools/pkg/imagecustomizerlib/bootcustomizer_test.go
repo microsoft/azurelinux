@@ -146,6 +146,33 @@ func TestBootCustomizerSELinuxMode30(t *testing.T) {
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 }
 
+func TestBootCustomizerVerity20(t *testing.T) {
+	b := createBootCustomizerFor20(t)
+
+	err := b.PrepareForVerity()
+	assert.NoError(t, err)
+
+	checkDiffs20(t, b, "", "")
+}
+
+func TestBootCustomizerVerity30(t *testing.T) {
+	b := createBootCustomizerFor30(t)
+
+	err := b.PrepareForVerity()
+	assert.NoError(t, err)
+
+	expectedDefaultGrubFileDiff := `6a7,8
+> GRUB_DISABLE_UUID="true"
+> GRUB_DISABLE_RECOVERY="true"
+`
+	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
+
+	// Do it again to make sure there aren't any changes.
+	err = b.PrepareForVerity()
+	assert.NoError(t, err)
+	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
+}
+
 func checkDiffs20(t *testing.T, b *BootCustomizer, expectedGrubCfgDiff string, expectedDefaultGrubFileDiff string) {
 	checkDiffs(t, b, filepath.Join(testDir, sampleGrubCfg20Path), filepath.Join(testDir, sampleDefaultGrub20Path),
 		expectedGrubCfgDiff, expectedDefaultGrubFileDiff)

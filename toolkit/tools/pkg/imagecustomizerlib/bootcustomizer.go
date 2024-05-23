@@ -44,6 +44,11 @@ func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) 
 	return b, nil
 }
 
+// Returns whether or not the OS uses grub-mkconfig.
+func (b *BootCustomizer) IsGrubMkconfigImage() bool {
+	return b.isGrubMkconfig
+}
+
 // Inserts new kernel command-line args into the grub config file.
 func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 	extraCommandLine = strings.TrimSpace(extraCommandLine)
@@ -149,6 +154,30 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 		}
 
 		b.grubCfgContent = grubCfgContent
+	}
+
+	return nil
+}
+
+// Makes changes to the /etc/default/grub file that are needed/useful for enabling verity.
+func (b *BootCustomizer) PrepareForVerity() error {
+	if b.isGrubMkconfig {
+		// Force root command-line arg to be referenced by /dev path instead of by UUID.
+		defaultGrubFileContent, err := updateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
+			"true")
+		if err != nil {
+			return err
+		}
+
+		// Disable recovery menu entry, to avoid having more than 1 linux command in the grub.cfg file.
+		// This will make it easier to modify the grub.cfg file to add the verity args.
+		defaultGrubFileContent, err = updateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DISABLE_RECOVERY",
+			"true")
+		if err != nil {
+			return err
+		}
+
+		b.defaultGrubFileContent = defaultGrubFileContent
 	}
 
 	return nil

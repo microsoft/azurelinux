@@ -357,7 +357,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	if ic.config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos)
+		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
 		if err != nil {
 			return err
 		}
@@ -669,7 +669,7 @@ func shrinkFilesystemsHelper(buildImageFile string) error {
 }
 
 func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+	buildImageFile string,
 ) error {
 	var err error
 
@@ -698,11 +698,13 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
+		config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
+		config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -748,7 +750,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfig(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
+	err = updateGrubConfigForVerity(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
 		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
 		rootHash, grubCfgFullPath)
 	if err != nil {

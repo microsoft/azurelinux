@@ -33,19 +33,19 @@ const (
 
 // Looks for a command with the provided name and ensures there is only 1 such command.
 // Returns the line of the found command.
-func findSingularGrubCommand(inputGrubCfgContent string, commandName string) ([]grub.Token, error) {
+func findSingularGrubCommand(inputGrubCfgContent string, commandName string) (grub.Line, error) {
 	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
 	if err != nil {
-		return nil, err
+		return grub.Line{}, err
 	}
 
 	grubLines := grub.SplitTokensIntoLines(grubTokens)
 	lines := grub.FindCommandAll(grubLines, commandName)
 	if len(lines) < 1 {
-		return nil, fmt.Errorf("failed to find the '%s' command in grub config", commandName)
+		return grub.Line{}, fmt.Errorf("failed to find the '%s' command in grub config", commandName)
 	}
 	if len(lines) > 1 {
-		return nil, fmt.Errorf("more than one '%s' command in grub config", commandName)
+		return grub.Line{}, fmt.Errorf("more than one '%s' command in grub config", commandName)
 	}
 
 	line := lines[0]
@@ -59,8 +59,8 @@ func replaceSearchCommand(inputGrubCfgContent string, searchCommand string) (out
 		return "", err
 	}
 
-	start := searchLine[0].Loc.Start.Index
-	end := searchLine[len(searchLine)-1].Loc.Start.Index
+	start := searchLine.Tokens[0].Loc.Start.Index
+	end := searchLine.Tokens[len(searchLine.Tokens)-1].Loc.Start.Index
 	outputGrubCfgContent = inputGrubCfgContent[:start] + searchCommand + inputGrubCfgContent[end:]
 
 	return outputGrubCfgContent, nil
@@ -96,14 +96,14 @@ func replaceToken(inputGrubCfgContent string, oldToken string, newToken string) 
 }
 
 // Find the linux command within the grub config file.
-func findLinuxLine(inputGrubCfgContent string) ([]grub.Token, error) {
+func findLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
 	linuxLine, err := findSingularGrubCommand(inputGrubCfgContent, "linux")
 	if err != nil {
-		return nil, err
+		return grub.Line{}, err
 	}
 
-	if len(linuxLine) < 2 {
-		return nil, fmt.Errorf("grub config 'linux' command is missing file path arg")
+	if len(linuxLine.Tokens) < 2 {
+		return grub.Line{}, fmt.Errorf("grub config 'linux' command is missing file path arg")
 	}
 
 	return linuxLine, nil
@@ -118,7 +118,7 @@ func setLinuxPath(inputGrubCfgContent string, linuxPath string) (outputGrubCfgCo
 		return "", "", err
 	}
 
-	linuxFilePathToken := linuxLine[1]
+	linuxFilePathToken := linuxLine.Tokens[1]
 	start := linuxFilePathToken.Loc.Start.Index
 	end := linuxFilePathToken.Loc.End.Index
 
@@ -137,11 +137,11 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 		return "", "", err
 	}
 
-	if len(line) < 2 {
+	if len(line.Tokens) < 2 {
 		return "", "", fmt.Errorf("grub config 'initrd' command is missing file path arg")
 	}
 
-	initrdFilePathToken := line[1]
+	initrdFilePathToken := line.Tokens[1]
 	start := initrdFilePathToken.Loc.Start.Index
 	end := initrdFilePathToken.Loc.End.Index
 
@@ -187,7 +187,7 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, err
 	}
 
 	// Skip the "linux" command and the kernel binary path arg.
-	argTokens := linuxLine[2:]
+	argTokens := linuxLine.Tokens[2:]
 
 	insertAt, err := findCommandLineInsertAt(argTokens)
 	if err != nil {
@@ -486,11 +486,11 @@ func replaceSetCommandValue(grub2Config string, varName string, newValue string)
 	// Search for all the set commands that set the variable.
 	setVarLines := [][]grub.Token(nil)
 	for _, line := range setLines {
-		if len(line) < 2 {
+		if len(line.Tokens) < 2 {
 			return "", fmt.Errorf("grub config has a set command that has zero args")
 		}
 
-		argToken := line[1]
+		argToken := line.Tokens[1]
 		argStringBuilder := strings.Builder{}
 
 		// Get the name of the variable being set.
@@ -516,7 +516,7 @@ func replaceSetCommandValue(grub2Config string, varName string, newValue string)
 
 		// Check if the name matches.
 		if name == varName {
-			setVarLines = append(setVarLines, line)
+			setVarLines = append(setVarLines, line.Tokens)
 		}
 	}
 
