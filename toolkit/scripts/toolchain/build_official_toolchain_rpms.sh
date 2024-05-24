@@ -390,6 +390,20 @@ chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
 chroot_and_install_rpms perl
 
+# perl-generators requires perl-Fedora-VSP
+# All perl packages need perl-generators to correctly
+# generate their run-time provides and requires.
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+chroot_and_install_rpms perl-generators
+
+# Rebuilding perl packages with perl-generators installed.
+# This only fixes the provides and requires - no need to re-install.
+build_rpm_in_chroot_no_install perl
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
@@ -420,12 +434,6 @@ chroot_and_install_rpms perl-Test-Warnings
 build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
-
-# perl-generators requires perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-Fedora-VSP
-chroot_and_install_rpms perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-generators
-chroot_and_install_rpms perl-generators
 
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre2
