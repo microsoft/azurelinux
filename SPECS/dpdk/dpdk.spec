@@ -180,7 +180,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
-* Wed Aug 22 2024 Dinesh Kumar Ramasamy <dramasamy@microsoft.com> - 21.11.2-3
+* Wed May 22 2024 Dinesh Kumar Ramasamy <dramasamy@microsoft.com> - 21.11.2-3
 - Enable KNI module in DPDK build
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
