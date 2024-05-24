@@ -42,12 +42,24 @@ const (
 	isoKernelPath = "/boot/vmlinuz"
 
 	// kernel arguments template
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
-	liveOSDir          = "liveos"
-	liveOSImage        = "rootfs.img"
+	kernelArgsDebugTemplateDebug = " rd.debug rd.live.debug=1 rd.retry=40 "
+	kernelArgsConsoleTemplate    = " console=tty0 console=ttyS0,115200n8 "
+	kernelArgsLiveOSTemplate     = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.overlayfs rd.live.overlay.nouserconfirmprompt "
+
+	liveOSDir   = "liveos"
+	liveOSImage = "rootfs.img"
+
+	// location on output iso where some of the input mic configuration will be
+	// saved for future iso-to-iso customizations.
+	savedConfigIsoDir = "azl-customizer-config"
+	// file holding the iso kernel parameters from the input mic configuration
+	// to be re-appended/merged with newer configures for future iso-to-iso
+	// customizations.
+	savedKernelArgsFileName = "iso-kernel-args.txt"
 
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
+hostonly="no"
 `
 	// the total size of a collection of files is multiplied by the
 	// expansionSafetyFactor to estimate a disk size sufficient to hold those
@@ -70,14 +82,15 @@ type IsoWorkingDirs struct {
 // `IsoArtifacts` holds the extracted/generated artifacts necessary to build
 // a LiveOS ISO image.
 type IsoArtifacts struct {
-	kernelVersion     string
-	bootx64EfiPath    string
-	grubx64EfiPath    string
-	grubCfgPath       string
-	vmlinuzPath       string
-	initrdImagePath   string
-	squashfsImagePath string
-	additionalFiles   map[string]string // local-build-path -> iso-media-path
+	kernelVersion           string
+	bootx64EfiPath          string
+	grubx64EfiPath          string
+	grubCfgPath             string
+	savedKernelArgsFilePath string
+	vmlinuzPath             string
+	initrdImagePath         string
+	squashfsImagePath       string
+	additionalFiles         map[string]string // local-build-path -> iso-media-path
 }
 
 type LiveOSIsoBuilder struct {
@@ -231,66 +244,109 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
-func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLine string) error {
+func mergeKernelParameters(savedConfigKernelArgsFilePath string, newKernelArgs string) (string, error) {
+	exists, err := file.PathExists(savedConfigKernelArgsFilePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to check if (%s) exists:\n%w", savedConfigKernelArgsFilePath, err)
+	}
+
+	if exists {
+		savedConfigKernelArgs, err := file.Read(savedConfigKernelArgsFilePath)
+		if err != nil {
+			return "", err
+		}
+		if savedConfigKernelArgs != "" {
+			newKernelArgs = savedConfigKernelArgs + " " + newKernelArgs
+		}
+	}
+
+	return newKernelArgs, nil
+}
+
+func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigKernelArgsFilePath string, grubCfgFileName string, extraCommandLine string) error {
 
 	inputContentString, err := file.Read(grubCfgFileName)
 	if err != nil {
 		return err
 	}
 
-	grubMkconfigEnabled := isGrubMkconfigConfig(inputContentString)
-	if grubMkconfigEnabled {
-		return fmt.Errorf("grub-mkconfig enabled images not yet supported for ISO output")
-	}
-
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
-	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
-
-	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
+	inputContentString, err = replaceSearchCommandAll(inputContentString, searchCommand)
 	if err != nil {
 		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, oldLinuxPath, err := setLinuxPath(inputContentString, isoKernelPath)
-	if err != nil {
-		return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+	grubMkconfigEnabled := isGrubMkconfigConfig(inputContentString)
+	if !grubMkconfigEnabled {
+		var oldLinuxPath string
+		inputContentString, oldLinuxPath, err = setLinuxPath(inputContentString, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+		}
+
+		inputContentString, err = replaceToken(inputContentString, oldLinuxPath, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update all the kernel file path occurances in the iso grub.cfg:\n%w", err)
+		}
+
+		var oldInitrdPath string
+		inputContentString, oldInitrdPath, err = setInitrdPath(inputContentString, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
+		}
+
+		inputContentString, err = replaceToken(inputContentString, oldInitrdPath, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
+		}
+	} else {
+		inputContentString, err = setLinuxPathAll(inputContentString, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+		}
+
+		inputContentString, err = setInitrdPathAll(inputContentString, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
+		}
 	}
 
-	inputContentString, err = replaceToken(inputContentString, oldLinuxPath, isoKernelPath)
-	if err != nil {
-		return fmt.Errorf("failed to update all the kernel file path occurances in the iso grub.cfg:\n%w", err)
-	}
-
-	inputContentString, oldInitrdPath, err := setInitrdPath(inputContentString, isoInitrdPath)
-	if err != nil {
-		return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
-	}
-
-	inputContentString, err = replaceToken(inputContentString, oldInitrdPath, isoInitrdPath)
-	if err != nil {
-		return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
-	}
-
-	inputContentString, _, err = replaceKernelCommandLineArgValue(inputContentString, "root", rootValue)
+	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	inputContentString, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue)
 	if err != nil {
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, err = updateSELinuxCommandLineHelper(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
+	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
 	if err != nil {
 		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
 
-	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+	mergedExtraCommandLine, err := mergeKernelParameters(savedConfigKernelArgsFilePath, extraCommandLine)
+	if err != nil {
+		return fmt.Errorf("failed to combine additional kernel command line parameters:\n%w", err)
+	}
 
-	inputContentString, err = appendKernelCommandLineArgs(inputContentString, liveosKernelArgs)
+	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
+	additionalKernelCommandline := " " + kernelArgsConsoleTemplate + " " + liveosKernelArgs + " " + mergedExtraCommandLine
+
+	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline)
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}
 
+	err = os.MkdirAll(filepath.Dir(savedConfigKernelArgsFilePath), os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory for (%s):\n%w", savedConfigKernelArgsFilePath, err)
+	}
+	err = os.WriteFile(savedConfigKernelArgsFilePath, []byte(mergedExtraCommandLine), 0o644)
+	if err != nil {
+		return fmt.Errorf("failed to write %s:\n%w", savedConfigKernelArgsFilePath, err)
+	}
+
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
-		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to write %s:\n%w", grubCfgFileName, err)
 	}
 
 	return nil
@@ -345,6 +401,7 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 	// that comes in the input full disk image.
 	//
 	exclusions = append(exclusions, regexp.MustCompile(`/boot/initrd\.img.*`))
+	exclusions = append(exclusions, regexp.MustCompile(`/boot/initramfs-.*\.img.*`))
 	//
 	// On full disk images (generated by Mariner toolkit), there are two
 	// grub.cfg files:
@@ -372,12 +429,17 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 
 	for _, sourcePath := range bootFolderFilePaths {
 
+		excluded := false
 		for _, exclusion := range exclusions {
 			match := exclusion.FindStringIndex(sourcePath)
 			if match != nil {
-				logger.Log.Debugf("Not copying %s. File is either unnecessary or will be re-generated.", sourcePath)
-				continue
+				excluded = true
+				break
 			}
+		}
+		if excluded {
+			logger.Log.Debugf("Not copying %s. File is either unnecessary or will be re-generated.", sourcePath)
+			continue
 		}
 
 		targetPath := strings.Replace(sourcePath, writeableRootfsDir, b.workingDirs.isoArtifactsDir, -1)
@@ -516,6 +578,7 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 //	- creates the squashfs.
 //
 // inputs:
+//   - inputIsoSavedKernelArgsFilePath:
 //   - writeableRootfsDir:
 //     A writeable folder where the rootfs content is.
 //   - isoMakerArtifactsStagingDir:
@@ -528,7 +591,7 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 // outputs
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
-func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerArtifactsStagingDir string, extraCommandLine string) error {
+func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputIsoSavedKernelArgsFilePath string, writeableRootfsDir string, isoMakerArtifactsStagingDir string, extraCommandLine string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -542,7 +605,15 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerA
 		return err
 	}
 
-	err = b.updateGrubCfg(b.artifacts.grubCfgPath, extraCommandLine)
+	if inputIsoSavedKernelArgsFilePath != "" {
+		// If there is an input iso, set the kernel args file to it so that it's merged later.
+		b.artifacts.savedKernelArgsFilePath = inputIsoSavedKernelArgsFilePath
+	} else {
+		// Otherwise, just create a new file under this iso's artifact dir.
+		b.artifacts.savedKernelArgsFilePath = filepath.Join(b.workingDirs.isoArtifactsDir, savedConfigIsoDir, savedKernelArgsFileName)
+	}
+
+	err = b.updateGrubCfg(b.artifacts.savedKernelArgsFilePath, b.artifacts.grubCfgPath, extraCommandLine)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -659,6 +730,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //	image (has boot and rootfs partitions).
 //
 // inputs:
+//   - 'inputIsoSavedKernelArgsFilePath':
 //   - 'rawImageFile':
 //     path to an existing raw full disk image (i.e. image with boot
 //     partition and a rootfs partition).
@@ -670,7 +742,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //     `LiveOSIsoBuilder.workingDirs.isoArtifactsDir` folder.
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
-func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string, extraCommandLine string) error {
+func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputIsoSavedKernelArgsFilePath string, rawImageFile string, extraCommandLine string) error {
 
 	logger.Log.Infof("Preparing iso artifacts")
 
@@ -688,7 +760,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string, ex
 	}
 
 	isoMakerArtifactsStagingDir := "/boot-staging"
-	err = b.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir, extraCommandLine)
+	err = b.prepareLiveOSDir(inputIsoSavedKernelArgsFilePath, writeableRootfsDir, isoMakerArtifactsStagingDir, extraCommandLine)
 	if err != nil {
 		return fmt.Errorf("failed to convert rootfs folder to a LiveOS folder:\n%w", err)
 	}
@@ -725,7 +797,6 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string, ex
 // ouptuts:
 //   - create a LiveOS ISO.
 func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) error {
-
 	baseDirPath := ""
 
 	// unattended install is where the ISO OS configures a persistent storage
@@ -769,6 +840,13 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 		}
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
+
+	// Add the iso config file
+	isoKernelArgsToCopy := safechroot.FileToCopy{
+		Src:  b.artifacts.savedKernelArgsFilePath,
+		Dest: filepath.Join("/", savedConfigIsoDir, savedKernelArgsFileName),
+	}
+	additionalIsoFiles = append(additionalIsoFiles, isoKernelArgsToCopy)
 
 	err := os.MkdirAll(isoOutputDir, os.ModePerm)
 	if err != nil {
@@ -912,7 +990,14 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		}
 	}()
 
-	err = isoBuilder.prepareArtifactsFromFullImage(rawImageFile, extraCommandLine)
+	// if there is an input iso, make sure to pick-up it's saved kernel args
+	// file.
+	inputIsoSavedKernelArgsFilePath := ""
+	if inputIsoArtifacts != nil {
+		inputIsoSavedKernelArgsFilePath = inputIsoArtifacts.artifacts.savedKernelArgsFilePath
+	}
+
+	err = isoBuilder.prepareArtifactsFromFullImage(inputIsoSavedKernelArgsFilePath, rawImageFile, extraCommandLine)
 	if err != nil {
 		return err
 	}
@@ -932,6 +1017,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 					break
 				}
 			}
+
 			if !found {
 				isoBuilder.artifacts.additionalFiles[inputSourceFile] = inputTargetFile
 			}
@@ -965,7 +1051,6 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 //   - creates a local folder with the same structure and contents as the provided
 //     iso image.
 func extractIsoImageContents(buildDir string, isoImageFile string, isoExpansionFolder string) (err error) {
-
 	mountDir, err := os.MkdirTemp(buildDir, "tmp-iso-mount-")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary mount folder for iso:\n%w", err)
@@ -1116,6 +1201,9 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 			isoBuilder.artifacts.initrdImagePath = isoFile
 			// initrd.img is passed as a parameter to isomaker.
 			scheduleAdditionalFile = false
+		case savedKernelArgsFileName:
+			isoBuilder.artifacts.savedKernelArgsFilePath = isoFile
+			scheduleAdditionalFile = false
 		}
 		if strings.HasPrefix(fileName, vmLinuzPrefix) {
 			isoBuilder.artifacts.vmlinuzPath = isoFile
@@ -1166,7 +1254,7 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		return fmt.Errorf("failed to convert iso configuration to isomaker configuration format:\n%w", err)
 	}
 
-	err = b.updateGrubCfg(b.artifacts.grubCfgPath, extraCommandLine)
+	err = b.updateGrubCfg(b.artifacts.savedKernelArgsFilePath, b.artifacts.grubCfgPath, extraCommandLine)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -1353,23 +1441,6 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 		if err != nil {
 			return fmt.Errorf("failed to copy squashfs contents to a writeable disk:\n%w", err)
 		}
-
-		// In a vhd(s)/qcow->iso flow, grub.cfg can be modified by the use
-		// under the mic's os node, and then again later by the iso node.
-		// However, the second modification does not make it back into the
-		// squashfs since such customization is specific to the iso (live os
-		// configuration). Now, when we are creating a writeable image from an
-		// iso, we need to take the grub.cfg that in the iso (not the one in
-		// the squashfs), since it will have all previous user modifications
-		// and also the one actually used for booting.
-		sourceGrubCfgPath := b.artifacts.grubCfgPath
-		targetGrubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
-
-		err = file.Copy(sourceGrubCfgPath, targetGrubCfgPath)
-		if err != nil {
-			return fmt.Errorf("failed to copy the input iso grub.cfg to the writeable image:\n%w", err)
-		}
-
 		return err
 	}
 
