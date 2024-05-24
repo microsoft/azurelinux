@@ -76,6 +76,6 @@ mv %{buildroot}%{_mandir}/man1/pscp.1 %{buildroot}%{_mandir}/man1/pscp.pssh.1
 
 %changelog
 * Mon May 20 2024 Alberto David Perez Guevara <aperezguevaar@microsoft.com> - 2.3.5-6
-- Initial Azure Linux import from the source project (license: BDS).
+- Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified
 
