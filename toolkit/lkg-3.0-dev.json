@@ -1,9 +1,0 @@
-{
-  "date": "2024-05-16",
-  "dailybuildid": "3.0.20240516",
-  "commit": "58532ace7bbfe1cfbcad292448ce9dec7719b56b",
-  "repo": {
-    "aarch64": "https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-3-0-20240516-aarch64",
-    "x86_64": "https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-3-0-20240516-x86-64"
-  }
-}
