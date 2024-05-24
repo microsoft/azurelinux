@@ -36,6 +36,7 @@ BuildRequires:  libseccomp-devel
 %if %{with tls}
 BuildRequires:  openssl-devel
 %endif
+Requires:       openssl-libs
 
 %description
 memcached is a high-performance, distributed memory object caching
