@@ -5130,8 +5130,8 @@
         "type": "other",
         "other": {
           "name": "h5py",
-          "version": "3.7.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+          "version": "3.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.10.0.tar.gz"
         }
       }
     },
