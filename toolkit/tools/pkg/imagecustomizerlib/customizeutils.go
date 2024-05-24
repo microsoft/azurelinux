@@ -17,11 +17,9 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
-	"golang.org/x/sys/unix"
 )
 
 const (
@@ -114,7 +112,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	if config.Scripts != nil {
-		err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
+		err = runUserScripts(baseConfigPath, config.Scripts.PostCustomization, "postCustomization", imageChroot)
 		if err != nil {
 			return err
 		}
@@ -131,7 +129,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	if config.Scripts != nil {
-		err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
+		err = runUserScripts(baseConfigPath, config.Scripts.FinalizeCustomization, "finalizeCustomization", imageChroot)
 		if err != nil {
 			return err
 		}
@@ -247,42 +245,6 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 	return nil
 }
 
-func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imageChroot *safechroot.Chroot) error {
-	if len(scripts) <= 0 {
-		return nil
-	}
-
-	configDirMountPath := filepath.Join(imageChroot.RootDir(), configDirMountPathInChroot)
-
-	// Bind mount the config directory so that the scripts can access any required resources.
-	mount, err := safemount.NewMount(baseConfigPath, configDirMountPath, "", unix.MS_BIND|unix.MS_RDONLY, "", true)
-	if err != nil {
-		return err
-	}
-	defer mount.Close()
-
-	for _, script := range scripts {
-		scriptPathInChroot := filepath.Join(configDirMountPathInChroot, script.Path)
-		command := fmt.Sprintf("%s %s", scriptPathInChroot, script.Args)
-		logger.Log.Infof("Running script (%s)", script.Path)
-
-		// Run the script.
-		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, shell.ShellProgram, "-c", command)
-		})
-		if err != nil {
-			return fmt.Errorf("script (%s) failed:\n%w", script.Path, err)
-		}
-	}
-
-	err = mount.CleanClose()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func AddOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	for _, user := range users {
 		err := addOrUpdateUser(user, baseConfigPath, imageChroot)
@@ -299,25 +261,34 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
 
-	password := user.Password
-	if user.PasswordPath != "" {
-		// Read password from file.
-		passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.PasswordPath)
+	hashedPassword := ""
+	if user.Password != nil {
+		passwordIsFile := user.Password.Type == imagecustomizerapi.PasswordTypePlainTextFile ||
+			user.Password.Type == imagecustomizerapi.PasswordTypeHashedFile
 
-		passwordFileContents, err := os.ReadFile(passwordFullPath)
-		if err != nil {
-			return fmt.Errorf("failed to read password file (%s): %w", passwordFullPath, err)
+		passwordIsHashed := user.Password.Type == imagecustomizerapi.PasswordTypeHashed ||
+			user.Password.Type == imagecustomizerapi.PasswordTypeHashedFile
+
+		password := user.Password.Value
+		if passwordIsFile {
+			// Read password from file.
+			passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.Password.Value)
+
+			passwordFileContents, err := os.ReadFile(passwordFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read password file (%s): %w", passwordFullPath, err)
+			}
+
+			password = string(passwordFileContents)
 		}
 
-		password = string(passwordFileContents)
-	}
-
-	// Hash the password.
-	hashedPassword := password
-	if !user.PasswordHashed {
-		hashedPassword, err = userutils.HashPassword(password)
-		if err != nil {
-			return err
+		hashedPassword = password
+		if !passwordIsHashed {
+			// Hash the password.
+			hashedPassword, err = userutils.HashPassword(password)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -436,7 +407,12 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 
 func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
 ) error {
-	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
+	bootCustomizer, err := NewBootCustomizer(imageConnection.Chroot())
+	if err != nil {
+		return err
+	}
+
+	currentSelinuxMode, err := bootCustomizer.GetSELinuxMode(imageConnection.Chroot())
 	if err != nil {
 		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
@@ -466,18 +442,58 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	return nil
 }
 
+// Inserts new kernel command-line args into the grub config file.
+func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
+	imageChroot *safechroot.Chroot,
+) error {
+	var err error
+
+	if kernelExtraArguments == "" {
+		// Nothing to do.
+		return nil
+	}
+
+	logger.Log.Infof("Setting KernelCommandLine.ExtraCommandLine")
+
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.AddKernelCommandLine(string(kernelExtraArguments))
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.WriteToFile(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
 	imageChroot *safechroot.Chroot,
 ) (imagecustomizerapi.SELinuxMode, error) {
 	var err error
 
-	// Resolve the default SELinux mode.
-	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
-		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
-		if err != nil {
-			return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
-		}
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
+	if err != nil {
+		return selinuxMode, err
 	}
+
+	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
+	if err != nil {
+		return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
+	}
+
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault || selinuxMode == currentSELinuxMode {
+		// Don't need to change the configured SELinux mode.
+		return currentSELinuxMode, nil
+	}
+
+	logger.Log.Infof("Configuring SELinux mode")
 
 	switch resetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
@@ -486,14 +502,19 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 
 	default:
 		// Update the SELinux kernel command-line args.
-		err := updateSELinuxCommandLine(selinuxMode, imageChroot)
+		err := bootCustomizer.UpdateSELinuxCommandLine(selinuxMode)
 		if err != nil {
-			return selinuxMode, fmt.Errorf("failed to update SELinux args in grub.cfg:\n%w", err)
+			return selinuxMode, err
+		}
+
+		err = bootCustomizer.WriteToFile(imageChroot)
+		if err != nil {
+			return selinuxMode, err
 		}
 	}
 
 	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
-		err = updateSELinuxMode(selinuxMode, imageChroot)
+		err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
 		if err != nil {
 			return selinuxMode, err
 		}
@@ -502,7 +523,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 	return selinuxMode, nil
 }
 
-func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
+func updateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
 		// SELinux is disabled in the kernel command line.
 		// So, no need to update the SELinux config file.

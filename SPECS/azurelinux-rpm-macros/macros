@@ -199,8 +199,12 @@ print(result)
 %_ld_as_needed          1
 %_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
 
+# If enabled, include frame pointer information
+# Use "%define _include_frame_pointers 1" to enable
+%_frame_pointers_cflags %{?_include_frame_pointers:-fno-omit-frame-pointer}
+
 %_legacy_common_support 1
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig
@@ -258,4 +262,4 @@ end
 
 # Azure Linux's sources storage URL.
 # NOTE: only allowed to be used for source URLs when original, upstream source cannot be found.
-%_distro_sources_url https://cblmarinerstorage.blob.core.windows.net/sources/core
+%_distro_sources_url https://azurelinuxsrcstorage.blob.core.windows.net/sources/core

@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 // ChrootAgentFlag is the build-agent option for ChrootAgent.
@@ -46,17 +46,16 @@ func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch 
 	logFile = filepath.Join(c.config.LogDir, logName)
 
 	var lastStdoutLine string
-	onStdout := func(args ...interface{}) {
-		if len(args) == 0 {
-			return
-		}
-
-		lastStdoutLine = strings.TrimSpace(args[0].(string))
-		logger.Log.Trace(lastStdoutLine)
+	onStdout := func(line string) {
+		lastStdoutLine = strings.TrimSpace(line)
 	}
 
 	args := serializeChrootBuildAgentConfig(c.config, basePackageName, inputFile, logFile, outArch, runCheck, dependencies)
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
+	err = shell.NewExecBuilder(c.config.Program, args...).
+		StdoutCallback(onStdout).
+		LogLevel(logrus.TraceLevel, logrus.TraceLevel).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		Execute()
 
 	if err == nil && lastStdoutLine != "" {
 		builtFiles = strings.Split(lastStdoutLine, delimiter)

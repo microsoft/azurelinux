@@ -363,12 +363,12 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
@@ -822,12 +822,13 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | EXTRA_BUILD_LAYERS            | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
-| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
+| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory (`./build/worker/chroot/<pkg>/*`) when it finishes. Note that `rpmbuild`'s `BUILD` directory will still be removed on a successful package build even when this is turned off. Consider `make containerized-rpmbuild SRPM_PACKLIST=<pkg>` for debugging build issues instead. The user must call `sudo make clean-build-packages-workers` to tidy any uncleaned build environments after a build.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
 | USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
 | MAX_CPU                       |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| BUILD_TOOLS_NONPROD           | n                                                                                                      | Enables non-production features in the go build tools.
 
 ---
 
@@ -872,6 +873,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RPMS_DIR                      | `$(OUT_DIR)`/RPMS                                                                                      | Directory to place RPMs in
 | SRPMS_DIR                     | `$(OUT_DIR)`/SRPMS                                                                                     | Directory to place SRPMs in
 | IMAGES_DIR                    | `$(OUT_DIR)`/images                                                                                    | Directory to place images in
+| PRECACHER_SNAPSHOT            | `$(OUT_DIR)`/rpms_snapshot.json                                                                        | Location of snapshot file for the pre-cacher
 
 ---
 

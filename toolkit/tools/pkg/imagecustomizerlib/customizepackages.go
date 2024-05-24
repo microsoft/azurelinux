@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -165,13 +166,7 @@ func installOrUpdatePackages(action string, allPackagesToAdd []string, imageChro
 
 func callTdnf(tnfArgs []string, tdnfMessagePrefix string, imageChroot *safechroot.Chroot) error {
 	seenTransactionErrorMessage := false
-	stdoutCallback := func(args ...interface{}) {
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
-
+	stdoutCallback := func(line string) {
 		if !seenTransactionErrorMessage {
 			// Check if this line marks the start of a transaction error message.
 			seenTransactionErrorMessage = tdnfTransactionError.MatchString(line)
@@ -182,11 +177,16 @@ func callTdnf(tnfArgs []string, tdnfMessagePrefix string, imageChroot *safechroo
 			logger.Log.Warn(line)
 		} else if strings.HasPrefix(line, tdnfMessagePrefix) {
 			logger.Log.Debug(line)
+		} else {
+			logger.Log.Trace(line)
 		}
 	}
 
-	return imageChroot.Run(func() error {
-		return shell.ExecuteLiveWithErrAndCallbacks(1, stdoutCallback, logger.Log.Debug, "tdnf",
-			tnfArgs...)
+	return imageChroot.UnsafeRun(func() error {
+		return shell.NewExecBuilder("tdnf", tnfArgs...).
+			StdoutCallback(stdoutCallback).
+			LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			Execute()
 	})
 }

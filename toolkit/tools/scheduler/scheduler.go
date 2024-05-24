@@ -21,6 +21,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -209,6 +210,20 @@ func main() {
 		} else {
 			logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
 		}
+	}
+
+	if *noCleanup {
+		message := []string{
+			"ATTENTION!",
+			"",
+			"'--no-cleanup' requested. Build agent directories will not be removed automatically.",
+			"(" + *workDir + "/*)",
+			"Manual cleanup is required.",
+			"Use 'make clean-build-packages-workers' to remove build agent directories.",
+			"",
+			"Also consider using 'make containerized-rpmbuild' to debug package build issues",
+		}
+		logger.PrintMessageBox(logrus.InfoLevel, message)
 	}
 }
 

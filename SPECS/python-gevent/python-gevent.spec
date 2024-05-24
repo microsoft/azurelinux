@@ -1,7 +1,7 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        23.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ nosetests
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 23.9.1-2
+- Bump release to build with new libuv to fix CVE-2024-24806
+
 * Mon Nov 27 2023 Tobias Brick <tobiasb@microsoft.com> - 23.9.1-1
 - Update to 23.9.1
 
