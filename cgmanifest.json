@@ -4560,8 +4560,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.8.2",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.2.tar.xz"
+          "version": "3.8.3",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.3.tar.xz"
         }
       }
     },
