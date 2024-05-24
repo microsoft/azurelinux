@@ -95,9 +95,9 @@ elfutils-libelf-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-devel-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-devel-static-0.189-2.azl3.aarch64.rpm
 elfutils-libelf-lang-0.189-2.azl3.aarch64.rpm
-expat-2.5.0-1.azl3.aarch64.rpm
-expat-devel-2.5.0-1.azl3.aarch64.rpm
-expat-libs-2.5.0-1.azl3.aarch64.rpm
+expat-2.6.2-1.azl3.aarch64.rpm
+expat-devel-2.6.2-1.azl3.aarch64.rpm
+expat-libs-2.6.2-1.azl3.aarch64.rpm
 libpipeline-1.5.7-1.azl3.aarch64.rpm
 libpipeline-devel-1.5.7-1.azl3.aarch64.rpm
 gdbm-1.23-1.azl3.aarch64.rpm
@@ -235,9 +235,9 @@ ca-certificates-base-3.0.0-6.azl3.noarch.rpm
 ca-certificates-3.0.0-6.azl3.noarch.rpm
 dwz-0.14-2.azl3.aarch64.rpm
 unzip-6.0-20.azl3.aarch64.rpm
-python3-3.12.0-3.azl3.aarch64.rpm
-python3-devel-3.12.0-3.azl3.aarch64.rpm
-python3-libs-3.12.0-3.azl3.aarch64.rpm
+python3-3.12.0-4.azl3.aarch64.rpm
+python3-devel-3.12.0-4.azl3.aarch64.rpm
+python3-libs-3.12.0-4.azl3.aarch64.rpm
 python3-setuptools-69.0.3-2.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm
