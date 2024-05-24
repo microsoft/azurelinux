@@ -3,7 +3,7 @@
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
 Version:        2.11.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  tar
 BuildRequires:  which
 BuildRequires:  python3-tf-nightly = 2.11.0
+BuildRequires:  python3-h5py
 ExclusiveArch:  x86_64
 
 %description
@@ -69,6 +70,9 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 
 %changelog
+* Fri May 24 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-3
+- Explicitly BR python3-h5py.
+
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-2
 - Remove bazel version.
 
