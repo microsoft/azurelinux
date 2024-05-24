@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.33.8
-Release:        2%{?dist}
+Version:        2.39.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -168,6 +168,9 @@ fi
 %endif
 
 %changelog
+* Tue May 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.39.4-1
+- Auto-upgrade to 2.39.4 - Fix CVE-2024-32002, CVE-2024-32004, CVE-2024-32020, CVE-2024-32021, CVE-2024-32465
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.33.8-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
