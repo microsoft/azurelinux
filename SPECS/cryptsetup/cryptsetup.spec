@@ -148,6 +148,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/cryptsetup-ssh
 
 %changelog
+* Fri May 24 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 2.4.3-6
+- Cherry picking a change to circumvent cryptsetup build error
+
 * Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 2.4.3-5
 - enable ssh-token
 
