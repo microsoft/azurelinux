@@ -110,7 +110,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 
 %changelog
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.11.2-7
-- Bump release to build with new heml to fix CVE-2024-26147
+- Bump release to build with new helm to fix CVE-2024-26147
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-6
 - Bump release to rebuild with go 1.20.10
