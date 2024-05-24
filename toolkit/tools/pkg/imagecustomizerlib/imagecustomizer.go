@@ -112,6 +112,10 @@ func createImageCustomizerParameters(buildDir string,
 	ic.enableShrinkFilesystems = enableShrinkFilesystems
 	ic.outputSplitPartitionsFormat = outputSplitPartitionsFormat
 
+	err = validateSplitPartitionsFormat(outputSplitPartitionsFormat)
+	if err != nil {
+		return nil, err
+	}
 	// intermediate writeable image
 	ic.rawImageFile = filepath.Join(buildDirAbs, BaseImageName)
 
@@ -421,6 +425,15 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 
 	default:
 		return "", fmt.Errorf("unsupported image format (supported: vhd, vhdx, raw, qcow2): %s", imageFormat)
+	}
+}
+
+func validateSplitPartitionsFormat(partitionFormat string) error {
+	switch partitionFormat {
+	case "", "raw", "raw-zst":
+		return nil
+	default:
+		return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 	}
 }
 
