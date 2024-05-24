@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,8 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch:          0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
+Patch0:         0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
+Patch1:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -143,6 +144,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu May 9 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 23.4.3-2
+- Add patch to add network interface renaming support for CAPM3 Met.
+
 * Mon Feb 26 2024 Dan Streetman <ddstreet@microsoft.com> - 23.4.3-1
 - update to 23.4.3
 - Use new 'azurelinux' cloud-init distro

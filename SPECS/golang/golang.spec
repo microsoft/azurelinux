@@ -1,8 +1,7 @@
-%global bootstrap_compiler_version 1.19.12-1
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
+%global ms_go_filename  go1.22.3-20240507.3.src.tar.gz
 %global ms_go_revision  1
-%global ms_go_buildid   20240403.5
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,18 +14,23 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.21.9
-Release:        2%{?dist}
+Version:        1.22.3
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/go.%{ms_go_buildid}.src.tar.gz
-# Same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/%{ms_go_filename}
+
+# bootstrap 00, same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source1:        https://github.com/microsoft/go/releases/download/v1.4.0-1/go1.4-bootstrap-20171003.tar.gz
-Source2:        https://github.com/microsoft/go/releases/download/%{bootstrap_compiler_version}/go.20230802.5.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+# bootstrap 01
+Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
+# bootstrap 02
+Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
+
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
 Provides:       msft-golang = %{version}-%{release}
@@ -35,43 +39,50 @@ Provides:       msft-golang = %{version}-%{release}
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 
 %prep
-# Setup go 1.4 bootstrap source
+# Setup bootstrap source
 tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < %{PATCH0}
+mv -v go go-bootstrap-00
 
-mv -v go go-bootstrap
+tar xf %{SOURCE2} --no-same-owner
+mv -v go go-bootstrap-01
+
+tar xf %{SOURCE3} --no-same-owner
+mv -v go go-bootstrap-02
 
 %setup -q -n go
 
 %build
-# (go >= 1.20 bootstraps with go >= 1.17)
-# This condition makes go compiler >= 1.20 build a 3 step process:
-# - Build the bootstrap compiler 1.4 (bootstrap bits in c)
-# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
-# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
-# PS: Since go compiles fairly quickly, the extra overhead is arounnd 2-3 minutes
+# go 1.4 bootstraps with C.
+# go 1.20 bootstraps with go >= 1.17.13
+# go >= 1.22 bootstraps with go >= 1.20.14
+#
+# These conditions make building the current go compiler from C a multistep
+# process. Approximately once a year, the bootstrap requirement is moved
+# forward, adding another step.
+#
+# PS: Since go compiles fairly quickly, the extra overhead is around 2-3 minutes
 #     on a reasonable machine.
 
-# Build go 1.4 bootstrap
-pushd %{_topdir}/BUILD/go-bootstrap/src
-CGO_ENABLED=0 ./make.bash
-popd
-mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
-export GOROOT=%{_libdir}/golang
+# Use prev bootstrap to compile next bootstrap.
+function go_bootstrap() {
+  local bootstrap=$1
+  local new_root=%{_topdir}/BUILD/go-bootstrap-${bootstrap}
+  (
+    cd ${new_root}/src
+    CGO_ENABLED=0 ./make.bash
+  )
+  # Nuke the older bootstrapper
+  rm -rf %{_libdir}/golang
+  # Install the new bootstrapper
+  mv -v $new_root %{_libdir}/golang
+  export GOROOT=%{_libdir}/golang
+  export GOROOT_BOOTSTRAP=%{_libdir}/golang
+}
 
-# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version} (bootstrap)
-export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version}
-tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version} --strip-components=1
-pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version}/src
-CGO_ENABLED=0 ./make.bash
-popd
-
-# Nuke the older go1.4 bootstrap
-rm -rf %{_libdir}/golang
-
-# Make go%{bootstrap_compiler_version} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version} %{_libdir}/golang
+go_bootstrap 00
+go_bootstrap 01
+go_bootstrap 02
 
 # Build current go version
 export GOHOSTOS=linux
@@ -82,9 +93,10 @@ export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
 rm -f  %{gopath}/src/runtime/*.c
-pushd src
-./make.bash --no-clean
-popd
+(
+  cd src
+  ./make.bash --no-clean
+)
 
 %install
 
@@ -141,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue May 07 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
+- Bump version to 1.22.3-1
+
 * Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2
 - Remove explicit Go env variable defaults
 

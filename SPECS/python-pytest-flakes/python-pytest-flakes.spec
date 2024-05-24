@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.5
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Pytest plugin to check source code with pyflakes
 
 License:        MIT
@@ -22,6 +22,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3dist(pytest) >= 2.8
 BuildRequires:  python3dist(pyflakes)
+%if 0%{?with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python3-%{srcname}
 Py.test plugin for efficiently checking python source with pyflakes.
@@ -49,6 +52,9 @@ rm -rf *.egg-info
 %{python3_sitelib}/__pycache__/pytest_flakes.*
 
 %changelog
+* Mon May 20 2024 Sam Meluch <sammeluch@microsoft.com> - 4.0.5-9
+- Add pip test dependency to fix package tests
+
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 4.0.5-8
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - license verified
