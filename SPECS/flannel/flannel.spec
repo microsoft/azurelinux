@@ -4,7 +4,7 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.14.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ Patch0:         CVE-2021-44716.patch
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-7%{?dist}
+BuildRequires:  glibc-static >= 2.35-8%{?dist}
 BuildRequires:  golang >= 1.18.5
 BuildRequires:  kernel-headers
 
@@ -49,6 +49,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.10.0-23
+- Bump release to rebuild against glibc 2.35-8
+
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.10.0-22
 - Bump release to rebuild against glibc 2.35-7
 
