@@ -1,5 +1,3 @@
-%global debug_package   %{nil}
-
 Summary:        Azure Linux compliance package to meet all sorts of compliance rules
 Name:           azl-compliance
 Version:        1.0.0
