@@ -55,5 +55,5 @@ cargo test --release --offline
 
 %changelog
 * Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.0-1
-- Initial CBL-Mariner import from Azure (license: BSD-3-Clause)
+- Original version for CBL-Mariner.
 - License verified
