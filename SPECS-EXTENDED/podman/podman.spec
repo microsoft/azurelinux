@@ -35,7 +35,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -50,7 +50,7 @@ BuildRequires:  go-md2man
 BuildRequires:  golang
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-4%{?dist}
+BuildRequires:  glibc-static >= 2.38-5%{?dist}
 BuildRequires:  git
 BuildRequires:  go-rpm-macros
 BuildRequires:  gpgme-devel
@@ -386,6 +386,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.1.1-24
+- update to build dep latest glibc-static version
+
 * Tue May 14 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-23
 - Cleaning up the invalid global 'with_check' macro.
 
