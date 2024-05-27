@@ -1,10 +1,11 @@
 %global debug_package %{nil}
 
 %define local_n_release 1
+%define local_srcui_release 1
 
 %define srcdir cassandra-%{name}-%{version}
-%define bower_components reaper-bower-components-%{version}.tar.gz
-%define srcui_node_modules reaper-srcui-node-modules-%{version}.tar.gz
+%define bower_components reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
+%define srcui_node_modules reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
 %define bower_cache reaper-bower-cache-%{version}.tar.gz
 %define maven_cache reaper-m2-cache-%{version}.tar.gz
 %define npm_cache reaper-npm-cache-%{version}.tar.gz
@@ -14,7 +15,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,10 +39,6 @@ Source5:        %{npm_cache}
 Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
 Source7:        %{local_n}
-Patch0:         CVE-2022-37601.patch
-Patch1:         CVE-2023-28155.patch
-Patch2:         CVE-2018-11694.patch
-Patch3:         CVE-2023-26159.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -111,10 +108,6 @@ tar xf %{SOURCE1}
 
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
-patch -p1 --input %{PATCH0}
-patch -p1 --input %{PATCH1}
-patch -p1 --input %{PATCH2}
-patch -p1 --input %{PATCH3}
 popd
 
 # Building using maven in offline mode.
@@ -185,6 +178,14 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
+- Repackage and update src UI node modules to 3.1.1-1
+- Address CVE-2024-4068 by upgrading the version of the npm module "braces" to 3.0.3
+- Remove patch for CVE-2023-28155 as request npm module upgraded to 2.88.2
+- Remove patch for CVE-2018-11694 as node-sass npm module upgraded to 4.14.1
+- Remove patch for CVE-2022-37601 as loader-utils npm module upgraded to 1.4.2
+- Remove patch for CVE-2023-26159 as follow-redirects npm module upgraded to 1.15.6
+
 * Thu Jan 11 2024 Henry Li <lihl@microsoft.com> - 3.1.1-8
 - Apply patch to resolve CVE-2023-26159
 
