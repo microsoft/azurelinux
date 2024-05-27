@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "Makefile.devel": "cd065e896d7eb11e238a05b9102359ea370ec75b27785a81935c985899ed2df6",
-  "booleans_targeted.conf": "bdefca5cc433e5fd372cd68105412db279673140f6477148744ea22c7395fec1",
+  "booleans_targeted.conf": "009f880c7179a007569dfdbf40ef64ae41671ad33cc2717eebbdaeb8ab431d12",
   "macros.selinux-policy": "027f5d27441a7262365c26076dc3b7ab1f1ac62026ae94514020e0607e53a73a",
   "modules_targeted.conf": "0a3444baa54aef35220e9954d1175da091155f240bf989caa7dfb9ef64302a76",
   "refpolicy-2.20221101.tar.bz2": "44f88e62c8efcef54d019b9ca077520d5993de580926bd7575788cfa78515396"

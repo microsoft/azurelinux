@@ -258,4 +258,4 @@ end
 
 # CBL-Mariner's sources storage URL.
 # NOTE: only allowed to be used for source URLs when original, upstream source cannot be found.
-%_mariner_sources_url https://cblmarinerstorage.blob.core.windows.net/sources/core
+%_mariner_sources_url https://azurelinuxsrcstorage.blob.core.windows.net/sources/core

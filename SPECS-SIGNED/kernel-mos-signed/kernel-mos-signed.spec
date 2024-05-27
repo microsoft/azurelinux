@@ -4,7 +4,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for MOS systems
 Name:           kernel-mos-signed-%{buildarch}
-Version:        5.15.148.2
+Version:        5.15.158.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -150,6 +150,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Wed May 08 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.158.1-1
+- Update to 5.15.158.1
+
 * Thu Feb 08 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.148.2-1
 - Upgrade to 5.15.148.2
 

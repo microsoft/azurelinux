@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        14.11
+Version:        14.12
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -191,6 +191,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Thu May 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.12-1
+- Auto-upgrade to 14.12 - CVE-2024-4317
+
 * Tue Feb 27 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 14.11-1
 - Update to version 14.11 to fix CVE-2024-0985
 - Added the 'docs' subpackage.
