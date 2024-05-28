@@ -14,7 +14,7 @@ License:        MIT and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/lilydjwg/%{pypi_name}
-Source0:        https://github.com/lilydjwg/pssh/archive/refs/tags/{name}-%{version}.tar.gz
+Source0:        https://github.com/lilydjwg/pssh/archive/refs/tags/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
