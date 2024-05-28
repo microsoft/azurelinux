@@ -27,6 +27,22 @@ Source1:        %{name}-%{version}-govendor-v1.tar.gz
 BuildRequires:  golang
 Requires:       moby-cli
 
+Patch10:        CVE-2024-24786.patch
+# Patch for CVE-2024-23650 (buildkit) must be redone if the package is updated and
+# the vendored code begins including any of the following modules:
+#    github.com/moby/buildkit/control (for control.go)
+#    github.com/moby/buildkit/exporter/containerimage (for writer.go)
+#    github.com/moby/buildkit/frontend/gateway (for gateway.go)
+#    github.com/moby/buildkit/solver/llbsolver (for bridge.go and solver.go)
+#    github.com/moby/buildkit/sourcepolicy (for matcher.go)
+#    github.com/moby/buildkit/util/tracing/transform (for attribute.go and span.go)
+Patch11:        CVE-2024-23650.patch
+
+# Patch for CVE-2023-2253 (distribution/distribution) must be redone if the package is updated and
+# the vendored code begins including any of the following modules:
+#    github.com/docker/distribution/configuration (for configuration.go)
+#    github.com/docker/distribution/catalog (for catalog.go)
+Patch12:        CVE-2023-2253.patch
 
 %description
 Compose is a tool for defining and running multi-container Docker applications.
