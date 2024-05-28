@@ -21372,6 +21372,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "pssh",
+          "version": "2.3.5",
+          "downloadUrl": "https://github.com/lilydjwg/pssh/archive/refs/tags/v2.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "psutils",
           "version": "1.23",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/psutils-1.23.tar.xz"
@@ -23575,16 +23585,6 @@
           "name": "python-productmd",
           "version": "1.30",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/productmd/productmd-1.30.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-pssh",
-          "version": "2.3.5",
-          "downloadUrl": "https://github.com/lilydjwg/pssh/archive/refs/tags/v2.3.5.tar.gz"
         }
       }
     },
