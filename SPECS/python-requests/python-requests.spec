@@ -52,7 +52,6 @@ perform the simplest of tasks.
 
 %prep
 %autosetup -p 1 -n requests-%{version}
-cat %{_builddir}/requests-%{version}/tests/test_requests.py
 
 %build
 %py3_build
