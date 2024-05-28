@@ -56,10 +56,8 @@ developing applications that use %{name}.
 %install
 %dune_install
 
-%if %{with_check}
 %check
 %dune_check
-%endif
 
 %files -f .ofiles
 %doc CHANGES.md README.org ROADMAP.md
