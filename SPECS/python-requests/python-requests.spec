@@ -73,7 +73,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mat 28 2024 Lanze Liu <lanzeliu@microsoft.com> - 2.27.1-7
+* Tue May 28 2024 Lanze Liu <lanzeliu@microsoft.com> - 2.27.1-7
 - Add patch for CVE-2024-35195
 
 * Mon Jun 12 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.27.1-6
