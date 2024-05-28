@@ -21,7 +21,7 @@ BuildArch:      noarch
 %description
 %{desc}
 
-%package -n     python3-%{pypi_name}
+%package -n     %{pypi_name}
 Summary:        %{sum}
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
@@ -30,7 +30,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 %{?python_provide:%python_provide python3-%{pypi_name}}
 
-%description -n python3-%{pypi_name}
+%description -n %{pypi_name}
 %{desc}
 
 %prep
