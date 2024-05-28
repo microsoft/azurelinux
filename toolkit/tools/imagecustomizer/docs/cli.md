@@ -91,6 +91,9 @@ RPM sources are specified in the order or priority from lowest to highest.
 If `--disable-base-image-rpm-repos` is not specified, then the in-built RPM repos are
 given the lowest priority.
 
+See, [Building custom packages](building-packages.md) for a guide on how to build your
+own packages for Azure Linux.
+
 ## --disable-base-image-rpm-repos
 
 Disable the base image's installed RPM repos as a source of RPMs during package
