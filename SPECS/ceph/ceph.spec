@@ -4,7 +4,7 @@
  
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        18.2.1
+Version:        18.2.2
 Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
@@ -2000,6 +2000,9 @@ exit 0
 
 
 %changelog
+* Thu May 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 18.2.2-1
+- Auto-upgrade to 18.2.2 - CVE patches
+
 * Tue Mar 26 2024 Himaja Kesari <himajakesari@microsoft.com> - 18.2.1-1
 - Updated to version 18.2.1.
 
