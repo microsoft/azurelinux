@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           moby-compose
 Version:        2.17.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Patch1:         patch-server.go-to-support-single-serverWorkerChannel.patch
 Patch2:         Change-server-stream-context-handling.patch
 Patch3:         prohibit-more-than-MaxConcurrentStreams-handlers.patch
 Patch4:         CVE-2023-45288.patch
+Patch5:         CVE-2023-48795.patch
 
 # Leverage the `generate_source_tarball.sh` to create the vendor sources
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
@@ -56,6 +57,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Tue May 28 2024 Bala <balakumaran.kannan@microsoft.com> - 2.17.3-4
+- Fix for CVE-2023-48795
+
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 2.17.3-3
 - Fix for CVE-2023-45288
 
