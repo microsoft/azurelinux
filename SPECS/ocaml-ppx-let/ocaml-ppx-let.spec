@@ -3,7 +3,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-ppx-let
 Version:        0.16.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Monadic let-bindings for OCaml
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -71,7 +71,7 @@ files for developing applications that use %{name}.
 %files devel -f .ofiles-devel
 
 %changelog
-* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-9
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-10
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 

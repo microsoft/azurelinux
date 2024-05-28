@@ -3,7 +3,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-ppx-here
 Version:        0.16.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Expands [@here] into its location
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -55,7 +55,7 @@ sed -e 's,dummy\.ml\.pp,dummy.pp.ml,g' \
 %files devel -f .ofiles-devel
 
 %changelog
-* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-9
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-10
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 

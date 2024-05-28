@@ -50,7 +50,7 @@ developing applications that use %{name}.
 %dune_install
 
 # Do not run the tests (RHEL 7+ only) since they require ocaml-ounit.
-%if 0%{?fedora} || 0%{?rhel} || %{?azl} <= 6
+%if 0%{?fedora} || 0%{?rhel} || 0%{?azl}
 %check
 %dune_check
 %endif
@@ -60,7 +60,6 @@ developing applications that use %{name}.
 
 %files devel -f .ofiles-devel
 %doc README.md CHANGES.md
-%license LICENSE.txt
 
 %changelog
 * Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.6.4-1

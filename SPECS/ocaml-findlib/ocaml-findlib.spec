@@ -98,11 +98,14 @@ chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/*.{a,cmxa}
 sed -i '/ocamlfind\.conf/d' .ofiles
 
 %files -f .ofiles
-%doc LICENSE doc/README
+%license LICENSE
+%doc doc/README
 %config(noreplace) %{_sysconfdir}/ocamlfind.conf
  
 %files devel -f .ofiles-devel
-%doc LICENSE doc/README doc/guide-html
+%doc LICENSE 
+%doc doc/README
+%doc doc/guide-html
 
 %changelog
 * Thu Apr 25 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.9.6-1

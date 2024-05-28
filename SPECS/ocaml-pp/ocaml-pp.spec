@@ -12,7 +12,7 @@
 
 Name:           ocaml-pp
 Version:        1.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Pretty printing library for OCaml
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -156,7 +156,7 @@ EOF
 %files devel -f .ofiles-devel
 
 %changelog
-* Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.0-6
+* Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.0-7
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
