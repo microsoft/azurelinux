@@ -89,7 +89,6 @@ ninja check-all
 %{_bindir}/*
 %{_libdir}/*.so
 %{_libdir}/*.so.*
-%{_libdir}/LLVMgold.so
 %{_libdir}/bfd-plugins/LLVMgold.so
 %dir %{_datadir}/opt-viewer
 %{_datadir}/opt-viewer/opt-diff.py
