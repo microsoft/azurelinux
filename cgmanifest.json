@@ -8351,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.29.1",
-          "downloadUrl": "https://dl.k8s.io/v1.29.1/kubernetes-src.tar.gz"
+          "version": "1.30.1",
+          "downloadUrl": "https://dl.k8s.io/v1.30.1/kubernetes-src.tar.gz"
         }
       }
     },
