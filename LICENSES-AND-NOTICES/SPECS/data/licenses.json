@@ -2188,6 +2188,7 @@
                 "application-gateway-kubernetes-ingress",
                 "asc",
                 "azcopy",
+                "azure-init",
                 "azure-iot-sdk-c",
                 "azure-nvme-utils",
                 "azure-storage-cpp",
