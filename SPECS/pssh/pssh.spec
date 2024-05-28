@@ -18,23 +18,24 @@ Source0:        https://github.com/lilydjwg/pssh/archive/refs/tags/v%{version}.t
 
 BuildArch:      noarch
 
-%description
-%{desc}
-
-%package -n     %{pypi_name}
-Summary:        %{sum}
 BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-%{?python_provide:%python_provide python3-%{pypi_name}}
 
-%description -n %{pypi_name}
-%{desc}
+
+%description
+This package provides various parallel tools based on ssh and scp.
+Parallell version includes:
+ o ssh : pssh
+ o scp : pscp
+ o nuke : pnuke
+ o rsync : prsync
+ o slurp : pslurp
 
 %prep
-%setup -q -n %{pypi_name}-%version
+%autosetup
 sed -i -e '1 d' psshlib/askpass_{client,server}.py
 
 %generate_buildrequires
