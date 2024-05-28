@@ -1,6 +1,6 @@
 Summary:        Azure Linux compliance package to meet all sorts of compliance rules
 Name:           azl-compliance
-Version:        1.0.0
+Version:        1.0.1
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -29,7 +29,6 @@ cargo build --release --offline
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/
-install -m 0644 ./LICENSE %{buildroot}%{_sysconfdir}/azl-compliance/
 mkdir -p %{buildroot}%{_bindir}
 install -m 0755 ./azl-compliance/target/release/azl-compliance %{buildroot}%{_bindir}/azl-compliance
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/fips
@@ -42,8 +41,8 @@ install -m 0644 azl-compliance-fips.json %{buildroot}%{_sysconfdir}/azl-complian
 install -m 0644 azl-compliance-fedramp.json %{buildroot}%{_sysconfdir}/azl-compliance/
 
 %files
+%license LICENSE
 %{_bindir}/azl-compliance
-%{_sysconfdir}/azl-compliance/LICENSE
 %{_sysconfdir}/azl-compliance/fips
 %{_sysconfdir}/azl-compliance/azl-compliance-fips.json
 %{_sysconfdir}/azl-compliance/fedramp
@@ -54,6 +53,6 @@ cd azl-compliance
 cargo test --release --offline
 
 %changelog
-* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.0-1
+* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.1-1
 - Original version for CBL-Mariner.
 - License verified
