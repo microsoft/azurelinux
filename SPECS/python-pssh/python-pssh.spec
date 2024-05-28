@@ -10,11 +10,11 @@ Version:        2.3.5
 Release:        1%{?dist}
 Summary:        %{sum}
 
-License:        BSD
+License:        MIT and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/lilydjwg/%{pypi_name}
-Source0:        https://github.com/lilydjwg/pssh/archive/refs/tags/v%{version}.tar.gz
+Source0:        https://github.com/lilydjwg/pssh/archive/refs/tags/{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -76,6 +76,6 @@ mv %{buildroot}%{_mandir}/man1/pscp.1 %{buildroot}%{_mandir}/man1/pscp.pssh.1
 
 %changelog
 * Mon May 20 2024 Alberto David Perez Guevara <aperezguevaar@microsoft.com> - 2.3.5-6
-- Initial Azure Linux import from the source project (license: same as "License" tag).
+- Initial Azure Linux import from Fedora 40 (License: MIT).
 - License verified
 
