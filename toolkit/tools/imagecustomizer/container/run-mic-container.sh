@@ -79,14 +79,13 @@ fi
 
 # ---- main ----
 
-containerFullPath=$containerRegistery/$containerName/$containerTag
+containerFullPath=$containerRegistery/$containerName:$containerTag
 
 inputImageDir=$(dirname $inputImage)
-inputConfigDdir=$(dirname $inputConfig)
+inputConfigDir=$(dirname $inputConfig)
 outputImageDir=$(dirname $outputImage)
 
-sudo rm -rf $outputImageDir
-sudo mkdir -p $outputImageDir
+mkdir -p $outputImageDir
 
 # setup input image within the container
 containerInputImageDir=/mic/input
@@ -107,9 +106,9 @@ containerOutputImage=$containerOutputDir/$(basename $outputImage)
 docker run --rm \
   --privileged=true \
    -v $inputImageDir:$containerInputImageDir:z \
-   -v $inputConfigDdir:$containerInputConfigDir:z \
+   -v $inputConfigDir:$containerInputConfigDir:z \
    -v $outputImageDir:$containerOutputDir:z \
-   -v /dev:/dev:z \
+   -v /dev:/dev \
    $containerFullPath \
    imagecustomizer \
       --image-file $containerInputImage \
