@@ -47,7 +47,7 @@
                 }
             ],
             "DisableDocs": true,
-            "DisableRpmLocales": true
+            "DisableRpmLocales": false
         }
     ]
 }

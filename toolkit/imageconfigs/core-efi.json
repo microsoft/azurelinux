@@ -54,7 +54,7 @@
             },
             "Hostname": "azurelinux",
             "DisableDocs": true,
-            "DisableRpmLocales": true
+            "DisableRpmLocales": false
         }
     ]
 }
