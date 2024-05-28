@@ -226,7 +226,7 @@ func TestCustomizeImageNopShrink(t *testing.T) {
 		return
 	}
 
-	// Confirm that there is almost 0 free space left, thuse preventing the shrink partition operation from doing
+	// Confirm that there is almost 0 free space left, thus preventing the shrink partition operation from doing
 	// anything.
 	rootfsFreeSpace := int64(rootfsStat.Bfree) * rootfsStat.Frsize
 	assert.LessOrEqual(t, rootfsFreeSpace, 32*diskutils.MiB, "check rootfs free space")
