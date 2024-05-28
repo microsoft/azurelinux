@@ -7141,8 +7141,8 @@
         "type": "other",
         "other": {
           "name": "ig",
-          "version": "0.25.0",
-          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.25.0.tar.gz"
+          "version": "0.26.0",
+          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.26.0.tar.gz"
         }
       }
     },
