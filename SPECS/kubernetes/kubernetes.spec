@@ -270,7 +270,7 @@ fi
 
 %changelog
 * Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.1-1
-- Auto-upgrade to 1.30.1 - none
+- Auto-upgrade to 1.30.1
 
 * Mon May 13 2024 Chris Co <chrco@microsoft.com> - 1.29.1-4
 - Update to build dep latest glibc-static version
