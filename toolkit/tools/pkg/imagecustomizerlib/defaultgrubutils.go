@@ -162,7 +162,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 	if varName == defaultGrubFileVarNameCmdlineLinuxDefault {
 		// GRUB_CMDLINE_LINUX_DEFAULT variable has the $kernelopts arg.
 		// Any args inserted should be inserted before $kernelopts.
-		insertAt, err = findCommandLineInsertAt(grubTokens)
+		insertAt, err = findCommandLineInsertAt(grubTokens, false /*forgiving*/)
 		if err != nil {
 			err = fmt.Errorf("failed to parse %s's value args:\n%w", varName, err)
 			return defaultGrubFileVarAssign{}, nil, 0, err

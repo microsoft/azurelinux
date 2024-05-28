@@ -244,12 +244,18 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
 	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
 
-	if !grubMkconfigEnabled {
-		inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
-		if err != nil {
-			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
-		}
+	logger.Log.Debugf("[1]{\n%s\n[1]\n}", inputContentString)
 
+	inputContentString, err = replaceSearchCommands(inputContentString, searchCommand)
+	if err != nil {
+		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
+	}
+
+	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
+	logger.Log.Debugf("[1]{\n%s\n[2]\n}", inputContentString)
+
+	if !grubMkconfigEnabled {
 		inputContentString, oldLinuxPath, err := setLinuxPath(inputContentString, isoKernelPath)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
@@ -280,40 +286,80 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 			return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 		}
 
-		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
-
 		inputContentString, err = appendKernelCommandLineArgs(inputContentString, liveosKernelArgs)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 		}
 	} else {
+		inputContentString, _, err = setLinuxPaths(inputContentString, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+		}
+		logger.Log.Debugf("[3]{\n%s\n[3]\n}", inputContentString)
+
+		inputContentString, _, err = setInitrdPaths(inputContentString, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
+		}
+		logger.Log.Debugf("[4]{\n%s\n[4]\n}", inputContentString)
+
+		inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue)
+		if err != nil {
+			return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
+		}
+		logger.Log.Debugf("[5]{\n%s\n[5]\n}", inputContentString)
+
+		inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
+		if err != nil {
+			return fmt.Errorf("failed to set SELinux mode:\n%w", err)
+		}
+
+		logger.Log.Debugf("[6]{\n%s\n[6]\n}", inputContentString)
+
+		inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, liveosKernelArgs)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
+		}
+
+		logger.Log.Debugf("[7]{\n%s\n[7]\n}", inputContentString)
+
+		argsToRemove := []string{"console"}
+		inputContentString, err = updateKernelCommandLineArgsAll(inputContentString, argsToRemove, nil)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
+		}
+
+		logger.Log.Debugf("[8]{\n%s\n[8]\n}", inputContentString)
+
 		// include the missing packages: tar, dm-setup, squashfs-tools
 		// update dracut config to turn off host_only
 		//
 		// - install new grub-mkconfig file
-		//   - find a file name liveisoCfg - /etc/grub.d/11_linux, 12_linux...
+		//   - find an unused file name liveisoCfg - /etc/grub.d/11_linux, 12_linux...
 		//   - copy /etc/grub.d/10_linux to $liveisoCfg
 		//   - apply patch to $liveisoCfg
 		//   - replace tokens: ${GRUB_LIVEISO_LABEL} and ${MENUENTRY_ID}
-		//   - takes care:
-		//     - search
-		//     - root
-		// - update kernel command line parameters
+		//     - this takes care of:
+		//       - search
+		//       - root
+		// - update kernel command line parameters according to iso configuration
 		//   - remove/disable selinux
 		//   - append liveos arguments
-		// - maybe
+		// - ensure the vmlinuz/initrd path match the iso layout
 		//   - ensure you can detect /boot/vmlinuz* and /boot/initrd* paths.
 		//   - copy out under vmlinuz and initrd.img
 		//   - replace tokens: ${GRUB_VMLINUZ_PATH} and ${GRUB_INITRD_PATH}
-		// - update default menu entry: /etc/default/grub -> GRUB_DEFAULT=${MENUENTRY_ID}
-		// - re-run grub-mkconfig -> grub.cfg
-		// - copy generated grub.cfg
+		// - update default menu entry id: /etc/default/grub -> GRUB_DEFAULT=${MENUENTRY_ID}
+		// - re-run grub-mkconfig to generate grub.cfg
+		// - copy generated grub.cfg to iso file system
 	}
 
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
 	}
+
+	// return fmt.Errorf("FAKE FAKE FAKE ERROR")
 
 	return nil
 }
