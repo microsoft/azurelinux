@@ -3,7 +3,7 @@
 
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        3.0.1
+Version:        3.0.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -40,7 +40,7 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %package -n python3-werkzeug-doc
 Summary:        Documentation for python3-werkzeug
 Requires:       python3-werkzeug = %{version}-%{release}
- 
+
 %description -n python3-werkzeug-doc
 Documentation and examples for python3-werkzeug.
 
