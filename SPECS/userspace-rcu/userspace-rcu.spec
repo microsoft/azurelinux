@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
 Version:        0.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,23 +39,28 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
+# Don't duplicate LICENSE file in the doc directory
+rm %{buildroot}%{_datadir}/doc/userspace-rcu/LICENSE
 
 %check
 make %{?_smp_mflags} check
 
 %files
+%license LICENSE
 %{_libdir}/*.so.*
 %{_includedir}/*
 %{_datadir}/*
 
 %files devel
 %defattr(-,root,root)
-%license LICENSE
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.so
 %{_includedir}/*
 
 %changelog
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.14.0-2
+- Sanitize license files
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-1
 - Auto-upgrade to 0.14.0 - Azure Linux 3.0 - package upgrades
 

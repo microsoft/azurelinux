@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -111,6 +111,9 @@ make cctest
 %{_docdir}/*
 
 %changelog
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 20.10.0-2
+- Bump release to build with new libuv to fix CVE-2024-24806
+
 * Wed Jan 31 2024 Saul Paredes <saulparedes@microsoft.com> - 20.10.0-1
 - Upgrade to nodejs to 20.10.0 and npm to 10.2.3
 
