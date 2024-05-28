@@ -3071,8 +3071,7 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist",
-                "python-pssh"
+                "python-nocaselist"
             ]
         },
         "Sysbench source": {
