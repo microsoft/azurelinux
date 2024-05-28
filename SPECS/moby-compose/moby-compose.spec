@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           moby-compose
 Version:        2.17.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,15 +19,7 @@ Patch2:         Change-server-stream-context-handling.patch
 Patch3:         prohibit-more-than-MaxConcurrentStreams-handlers.patch
 Patch4:         CVE-2023-45288.patch
 Patch5:         CVE-2023-48795.patch
-
-# Leverage the `generate_source_tarball.sh` to create the vendor sources
-# NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
-# After fixing any possible CVE for the vendored source, we must bump v1 -> v2
-Source1:        %{name}-%{version}-govendor-v1.tar.gz
-BuildRequires:  golang
-Requires:       moby-cli
-
-Patch10:        CVE-2024-24786.patch
+Patch6:         CVE-2024-24786.patch
 # Patch for CVE-2024-23650 (buildkit) must be redone if the package is updated and
 # the vendored code begins including any of the following modules:
 #    github.com/moby/buildkit/control (for control.go)
@@ -36,13 +28,20 @@ Patch10:        CVE-2024-24786.patch
 #    github.com/moby/buildkit/solver/llbsolver (for bridge.go and solver.go)
 #    github.com/moby/buildkit/sourcepolicy (for matcher.go)
 #    github.com/moby/buildkit/util/tracing/transform (for attribute.go and span.go)
-Patch11:        CVE-2024-23650.patch
-
+Patch7:         CVE-2024-23650.patch
 # Patch for CVE-2023-2253 (distribution/distribution) must be redone if the package is updated and
 # the vendored code begins including any of the following modules:
 #    github.com/docker/distribution/configuration (for configuration.go)
 #    github.com/docker/distribution/catalog (for catalog.go)
-Patch12:        CVE-2023-2253.patch
+Patch8:         CVE-2023-2253.patch
+
+
+# Leverage the `generate_source_tarball.sh` to create the vendor sources
+# NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
+# After fixing any possible CVE for the vendored source, we must bump v1 -> v2
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
+BuildRequires:  golang
+Requires:       moby-cli
 
 %description
 Compose is a tool for defining and running multi-container Docker applications.
@@ -73,6 +72,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Tue May 28 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 2.17.3-5
+- Fix for CVE-2024-24786, CVE-2024-23650, CVE-2023-2253
+
 * Tue May 28 2024 Bala <balakumaran.kannan@microsoft.com> - 2.17.3-4
 - Fix for CVE-2023-48795
 
