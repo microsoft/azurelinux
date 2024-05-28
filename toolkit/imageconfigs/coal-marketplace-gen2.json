@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 5000,
+            "MaxSize": 2000,
             "Artifacts": [
                 {
                     "Name": "coal-gen2",
@@ -57,7 +57,7 @@
             ],
             "PackageLists": [
                 "packagelists/core-packages-image.json",
-                "packagelists/marketplace-tools-packages.json",
+                "packagelists/coal-tools-packages.json",
                 "packagelists/azurecoal-packages.json"
             ],
             "AdditionalFiles": {
@@ -77,7 +77,15 @@
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=ttyS0"
             },
-            "Hostname": "azurelinux"
+            "Hostname": "azurelinux",
+            "Users": [
+                {
+                    "Name": "root",
+                    "Password": "$6$hello$VzbX6f6UgMunj1XtgMFCZvM2b1THJCVi4VD71fXBFBUzBNyhYBi0kFT37ouCN3AWZ5UmWFXX1qX7chVI2wcxL0",
+                    "PasswordHashed": true,
+                    "_comment": "This password was generated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>'. You may also use the json key 'SSHPubKeyPaths' to use an SSH key for login"
+                }
+            ]
         }
     ]
 }
