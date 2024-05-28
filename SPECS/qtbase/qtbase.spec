@@ -344,9 +344,9 @@ install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt_headerdir}/QtXcb/
 
 
 %check
-# verify Qt5.pc
+# verify Qt6.pc
 export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
-test "$(pkg-config --modversion Qt5)" = "%{version}"
+test "$(pkg-config --modversion Qt6)" = "%{version}"
 %if 0%{?tests}
 ## see tests/README for expected environment (running a plasma session essentially)
 ## we are not quite there yet
@@ -476,7 +476,7 @@ fi
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qtbase
 
-	
+
 %files devel
 %{_bindir}/androiddeployqt
 %{_bindir}/androiddeployqt6
