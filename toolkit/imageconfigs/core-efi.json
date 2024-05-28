@@ -45,17 +45,22 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/virt-guest-packages.json"
+                "packagelists/azurecoal-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
             },
             "Hostname": "azurelinux",
             "DisableRpmDocs": true,
-            "OverrideRpmLocales": "NONE"
+            "OverrideRpmLocales": "NONE",
+            "Users": [
+                {
+                    "Name": "root",
+                    "Password": "$6$hello$VzbX6f6UgMunj1XtgMFCZvM2b1THJCVi4VD71fXBFBUzBNyhYBi0kFT37ouCN3AWZ5UmWFXX1qX7chVI2wcxL0",
+                    "PasswordHashed": true,
+                    "_comment": "This password is 'world', it was generated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>'. You may also use the json key 'SSHPubKeyPaths' to use an SSH key for login"
+                }
+            ]
         }
     ]
 }
