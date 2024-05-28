@@ -1,6 +1,6 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
-Version:        3.8.2
+Version:        3.8.3
 Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
@@ -89,6 +89,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Fri May 24 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.3-1
+- Update to version 3.8.3 to fix CVE-2024-0553
+
 * Mon Jan 08 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.8.2-1
 - Update to version 3.8.2
 - Remove patch that has been incorporated into gnutls
