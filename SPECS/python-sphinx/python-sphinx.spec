@@ -11,7 +11,7 @@
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        4.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Unless otherwise noted, the license for code is BSD
 # sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
@@ -37,10 +37,27 @@ BuildRequires:  gettext
 BuildRequires:  graphviz
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
+BuildRequires:  python3-babel
 BuildRequires:  python3-docutils
+BuildRequires:  python3-html5lib
+BuildRequires:  python3-imagesize
+BuildRequires:  python3-importlib-metadata
+BuildRequires:  python3-jinja2
+BuildRequires:  python3-more-itertools
+BuildRequires:  python3-packaging
 BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
 BuildRequires:  python3-pytest
+BuildRequires:  python3-requests
 BuildRequires:  python3-six
+BuildRequires:  python3-snowballstemmer
+BuildRequires:  python3-sphinx-theme-alabaster
+BuildRequires:  python3-sphinxcontrib-applehelp
+BuildRequires:  python3-sphinxcontrib-devhelp
+BuildRequires:  python3-sphinxcontrib-htmlhelp
+BuildRequires:  python3-sphinxcontrib-jsmath
+BuildRequires:  python3-sphinxcontrib-qthelp
+BuildRequires:  python3-sphinxcontrib-serializinghtml
 BuildRequires:  python3-test
 BuildRequires:  texinfo
 
@@ -237,7 +254,7 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
   >> sphinx.lang
 
 %check
-pip3 install more-itertools
+pip3 install webencodings
 %pytest
 
 %files -n python%{python3_pkgversion}-sphinx -f sphinx.lang
@@ -252,6 +269,9 @@ pip3 install more-itertools
 %dir %{_datadir}/sphinx/locale/*
 
 %changelog
+* Tue May 14 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-3
+- Added test-time dependencies to unblock tests.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing epoch.
