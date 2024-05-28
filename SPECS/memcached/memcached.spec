@@ -54,6 +54,7 @@ access to the memcached binary include files.
 %package        service
 Summary:        This package automatically runs scripts to set up memcached as a service.
 Requires(pre):  shadow-utils
+Requires:       %{name} = %{version}-%{release}
 %{?systemd_requires}
 
 %description service
