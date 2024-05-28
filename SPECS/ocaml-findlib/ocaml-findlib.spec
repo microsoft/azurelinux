@@ -103,7 +103,6 @@ sed -i '/ocamlfind\.conf/d' .ofiles
 %config(noreplace) %{_sysconfdir}/ocamlfind.conf
  
 %files devel -f .ofiles-devel
-%doc LICENSE 
 %doc doc/README
 %doc doc/guide-html
 
