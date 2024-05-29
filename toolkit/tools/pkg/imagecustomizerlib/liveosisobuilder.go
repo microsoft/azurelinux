@@ -43,11 +43,11 @@ const (
 
 	// kernel arguments template
 	kernelArgsDebug    = " rd.debug rd.live.debug=1 rd.retry=40 "
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.overlayfs rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
-	dracutConfig = `add_dracutmodules+=" systemd-initrd dmsquash-live "
+	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
 hostonly="no"
 `
@@ -99,6 +99,7 @@ menuentry "Azure Linux" {
 		rd.live.dir=liveos \
 		rd.live.squashimg=rootfs.img \
 		rd.live.overlay=1 \
+		rd.live.overlay.overlayfs \
 		rd.live.overlay.nouserconfirmprompt \
 		apparmor=0 \
 		log_buf_len=1M \
