@@ -195,8 +195,8 @@
         "type": "other",
         "other": {
           "name": "annobin",
-          "version": "9.27",
-          "downloadUrl": "https://nickc.fedorapeople.org/annobin-9.27.tar.xz"
+          "version": "12.49",
+          "downloadUrl": "https://nickc.fedorapeople.org/annobin-12.49.tar.xz"
         }
       }
     },
@@ -14362,8 +14362,8 @@
         "type": "other",
         "other": {
           "name": "ocaml",
-          "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "version": "5.1.1",
+          "downloadUrl": "https://github.com/ocaml/ocaml/archive/5.1.1/ocaml-5.1.1.tar.gz"
         }
       }
     },
@@ -14402,8 +14402,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-base",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/janestreet/base/archive/v0.15.0/base-0.15.0.tar.gz"
+          "version": "0.16.3",
+          "downloadUrl": "https://github.com/janestreet/base/archive/v0.16.3/base-0.16.3.tar.gz"
         }
       }
     },
@@ -14441,6 +14441,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-camlp-streams",
+          "version": "5.0.1",
+          "downloadUrl": "https://github.com/ocaml/camlp-streams/archive/v5.0.1/camlp-streams-5.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-camlp5",
           "version": "8.00.02",
           "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel8.00.02.tar.gz"
@@ -14452,8 +14462,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-camomile",
-          "version": "1.0.2",
-          "downloadUrl": "https://github.com/yoriyuki/Camomile/archive/refs/tags/1.0.2.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/ocaml-community/Camomile/archive/refs/tags/v2.0.0.tar.gz"
         }
       }
     },
@@ -14492,8 +14502,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-cppo",
-          "version": "1.6.6",
-          "downloadUrl": "https://github.com/ocaml-community/cppo/archive/v1.6.6.tar.gz"
+          "version": "1.6.9",
+          "downloadUrl": "https://github.com/ocaml-community/cppo/archive/v1.6.9.tar.gz"
         }
       }
     },
@@ -14502,8 +14512,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-csexp",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/ocaml-dune/csexp/releases/download/1.3.2/csexp-1.3.2.tbz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/ocaml-dune/csexp/archive/refs/tags/1.5.2.tar.gz"
         }
       }
     },
@@ -14542,8 +14552,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-dune",
-          "version": "2.8.5",
-          "downloadUrl": "https://github.com/ocaml/dune/archive/2.8.5/dune-2.8.5.tar.gz"
+          "version": "3.15.2",
+          "downloadUrl": "https://github.com/ocaml/dune/archive/3.15.2/dune-3.15.2.tar.gz"
         }
       }
     },
@@ -14562,8 +14572,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-fileutils",
-          "version": "0.5.2",
-          "downloadUrl": "https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/0.5.2.tar.gz"
+          "version": "0.6.4",
+          "downloadUrl": "https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/v0.6.4.tar.gz"
         }
       }
     },
@@ -14572,8 +14582,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-findlib",
-          "version": "1.8.1",
-          "downloadUrl": "http://download.camlcity.org/download/findlib-1.8.1.tar.gz"
+          "version": "1.9.6",
+          "downloadUrl": "http://download.camlcity.org/download/findlib-1.9.6.tar.gz"
         }
       }
     },
@@ -14642,8 +14652,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-lwt",
-          "version": "5.4.1",
-          "downloadUrl": "https://github.com/ocsigen/lwt/archive/refs/tags/5.4.1.tar.gz"
+          "version": "5.7.0",
+          "downloadUrl": "https://github.com/ocsigen/lwt/archive/refs/tags/5.7.0.tar.gz"
         }
       }
     },
@@ -14682,8 +14692,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-num",
-          "version": "1.3",
-          "downloadUrl": "https://github.com/ocaml/num/archive/v1.3/ocaml-num-1.3.tar.gz"
+          "version": "1.5",
+          "downloadUrl": "https://github.com/ocaml/num/archive/v1.5/ocaml-num-1.5.tar.gz"
         }
       }
     },
@@ -14692,8 +14702,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ocamlbuild",
-          "version": "0.14.2",
-          "downloadUrl": "https://github.com/ocaml/ocamlbuild/archive/0.14.2.tar.gz"
+          "version": "0.14.3",
+          "downloadUrl": "https://github.com/ocaml/ocamlbuild/archive/0.14.3.tar.gz"
         }
       }
     },
@@ -14702,8 +14712,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ocplib-endian",
-          "version": "1.1",
-          "downloadUrl": "https://github.com/OCamlPro/ocplib-endian/archive/1.1/ocplib-endian-1.1.tar.gz"
+          "version": "1.2",
+          "downloadUrl": "https://github.com/OCamlPro/ocplib-endian/archive/1.2/ocplib-endian-1.2.tar.gz"
         }
       }
     },
@@ -14712,8 +14722,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ounit",
-          "version": "2.2.2",
-          "downloadUrl": "https://github.com/gildor478/ounit/releases/download/v2.2.2/ounit-v2.2.2.tbz"
+          "version": "2.2.7",
+          "downloadUrl": "https://github.com/gildor478/ounit/archive/refs/tags/v2.2.7.tar.gz"
         }
       }
     },
@@ -14722,8 +14732,18 @@
         "type": "other",
         "other": {
           "name": "ocaml-parsexp",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.15.0/parsexp-0.15.0.tar.gz"
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.16.0/parsexp-0.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-pp",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/ocaml-dune/pp/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
@@ -14741,9 +14761,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-ppx-here",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/janestreet/ppx_here/archive/v0.16.0/ppx_here-0.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-ppx-let",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/janestreet/ppx_let/archive/v0.16.0/ppx_let-0.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-ppxlib",
-          "version": "0.24.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.24.0/ppxlib-0.24.0.tbz"
+          "version": "0.31.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/archive/refs/tags/0.31.0.tar.gz"
         }
       }
     },
@@ -14752,8 +14792,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-re",
-          "version": "1.9.0",
-          "downloadUrl": "https://github.com/ocaml/ocaml-re/archive/1.9.0/ocaml-re-1.9.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/ocaml/ocaml-re/archive/1.11.0/ocaml-re-1.11.0.tar.gz"
         }
       }
     },
@@ -14762,8 +14802,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-react",
-          "version": "1.2.1",
-          "downloadUrl": "http://erratique.ch/software/react/releases/react-1.2.1.tbz"
+          "version": "1.2.2",
+          "downloadUrl": "https://erratique.ch/software/react/releases/react-1.2.2.tbz"
         }
       }
     },
@@ -14792,8 +14832,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.15.0/sexplib-0.15.0.tar.gz"
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.16.0/sexplib-0.16.0.tar.gz"
         }
       }
     },
@@ -14814,6 +14854,16 @@
           "name": "ocaml-stdio",
           "version": "0.15.0",
           "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-stdlib-random",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/ocaml/stdlib-random/archive/1.2.0/stdlib-random-1.2.0.tar.gz"
         }
       }
     },
@@ -28006,8 +28056,8 @@
         "type": "other",
         "other": {
           "name": "supermin",
-          "version": "5.2.2",
-          "downloadUrl": "https://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.2.tar.gz"
+          "version": "5.3.4",
+          "downloadUrl": "https://download.libguestfs.org/supermin/5.3-development/supermin-5.3.4.tar.gz"
         }
       }
     },

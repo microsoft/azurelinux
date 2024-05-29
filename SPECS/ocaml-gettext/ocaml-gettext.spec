@@ -1,36 +1,52 @@
-%global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-%global __ocaml_requires_opts -i Asttypes -i Parsetree
-%global __ocaml_provides_opts -i Pr_gettext
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
+# Optionally disable camomile dep on RHEL.
+%if !0%{?rhel}
+%bcond_without camomile
+%bcond_without tests
+%else
+%bcond_with    camomile
+%bcond_with    tests
+%endif
 
 Summary:        OCaml library for i18n
 Name:           ocaml-gettext
 Version:        0.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ocaml-gettext
-Source0:        https://github.com/gildor478/ocaml-gettext/releases/download/v%{version}/gettext-v%{version}.tbz
+Source0:        %{url}/releases/download/v%{version}/gettext-v%{version}.tbz
 
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  chrpath
-BuildRequires:  docbook-style-xsl
-BuildRequires:  libxml2
-BuildRequires:  libxslt
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-camomile-data
-BuildRequires:  ocaml-camomile-devel >= 0.8.6-3
-BuildRequires:  ocaml-compiler-libs
-BuildRequires:  ocaml-cppo
-BuildRequires:  ocaml-dune-devel
+# Updates for OCaml 5.  Based in part on
+# https://github.com/gildor478/ocaml-gettext/pull/24
+Patch0:         %{name}-ocaml5.patch
+# Adapt to changes in camomile 2.0
+# https://github.com/gildor478/ocaml-gettext/pull/27
+Patch1:         %{name}-camomile2.patch
+
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-fileutils-devel >= 0.4.4-4
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-dune >= 1.11.0
+BuildRequires:  ocaml-dune-configurator-devel
+BuildRequires:  ocaml-cppo
+BuildRequires:  docbook-style-xsl
+BuildRequires:  libxslt
+BuildRequires:  libxml2
+%if %{with_check}
 BuildRequires:  ocaml-ounit-devel
+%endif
+%if %{with camomile}
+BuildRequires:  ocaml-camomile-devel >= 0.8.6-3
+BuildRequires:  ocaml-camomile-data
+%endif
 
+%if %{with camomile}
 # ocaml-gettext program needs camomile data files
 Requires:       ocaml-camomile-data
+%endif
 
 %description
 Ocaml-gettext provides support for internationalization of Ocaml
@@ -45,19 +61,19 @@ Constraints :
 
 %package        devel
 Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-Requires:       %{name} = %{version}-%{release}
 # BZ 446919.
-Requires:       ocaml-fileutils-devel >= 0.4.0
+Requires:       ocaml-fileutils-devel%{?_isa} >= 0.4.0
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+%if %{with camomile}
 %package        camomile
 Summary:        Parts of %{name} which depend on Camomile
-
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    camomile
 The %{name}-camomile package contains the parts of %{name} which
@@ -65,95 +81,63 @@ depend on Camomile.
 
 %package        camomile-devel
 Summary:        Development files for %{name}-camomile
-
-Requires:       %{name}-camomile = %{version}-%{release}
-Requires:       %{name}-devel = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-camomile%{?_isa} = %{version}-%{release}
+Requires:       ocaml-camomile-devel%{?_isa}
 
 %description    camomile-devel
 The %{name}-camomile-devel package contains libraries and
 signature files for developing applications that use
 %{name}-camomile.
+%endif
 
 %prep
-%autosetup -n gettext-v%{version}
+%autosetup -n gettext-v%{version} -p1
 
-# Remove dependency on batteries.
-sed -i -e 's/batteries//' test/dune
-sed -i -e 's/batteries//' test/test-stub/dune
+%if %{without camomile}
+# Remove dependency on camomile.
+rm -f gettext-camomile.opam
+rm -r src/lib/gettext-camomile
+rm -r test/test-camomile
+sed -i -e 's/camomile//' `find -name dune`
+%endif
 
 %build
-make build
-
-#check
-# Tests require batteries, so they are disabled at present.
-# Under discussion with upstream.
+%dune_build
 
 %install
-mkdir -p %{buildroot}%{_libdir}/ocaml
-mkdir -p %{buildroot}%{_bindir}
-dune install --destdir=%{buildroot}
+%dune_install -s
+sed -i '\@%{_bindir}@d;\@%{_mandir}@d' .ofiles-gettext
+cat .ofiles-gettext-stub >> .ofiles-gettext
+cat .ofiles-gettext-stub-devel >> .ofiles-gettext-devel
 
-# Remove this, we will use our own rules for documentation.
-rm -rf %{buildroot}%{_prefix}/doc
+%check
+%dune_check
 
-%files
+%files -f .ofiles-gettext
 %license LICENSE.txt
-%{_libdir}/ocaml/gettext
-%{_libdir}/ocaml/gettext-stub
-%if %{opt}
-%exclude %{_libdir}/ocaml/gettext/*.cmxa
-%exclude %{_libdir}/ocaml/gettext/*/*.a
-%exclude %{_libdir}/ocaml/gettext/*/*.cmxa
-%exclude %{_libdir}/ocaml/gettext/*/*.cmx
-%exclude %{_libdir}/ocaml/gettext-stub/*.a
-%exclude %{_libdir}/ocaml/gettext-stub/*.cmxa
-%exclude %{_libdir}/ocaml/gettext-stub/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/gettext/*/*.ml
-%exclude %{_libdir}/ocaml/gettext/*/*.mli
-%exclude %{_libdir}/ocaml/gettext-stub/*.ml
-%{_libdir}/ocaml/stublibs/*.so
 
-%files devel
+%files devel -f .ofiles-gettext-devel
 %doc README.md CHANGES.md THANKS TODO.md
-%if %{opt}
-%{_libdir}/ocaml/gettext/*.cmxa
-%{_libdir}/ocaml/gettext/*/*.a
-%{_libdir}/ocaml/gettext/*/*.cmxa
-%{_libdir}/ocaml/gettext/*/*.cmx
-%{_libdir}/ocaml/gettext-stub/*.a
-%{_libdir}/ocaml/gettext-stub/*.cmxa
-%{_libdir}/ocaml/gettext-stub/*.cmx
-%endif
-%{_libdir}/ocaml/gettext/*/*.ml
-%{_libdir}/ocaml/gettext/*/*.mli
-%{_libdir}/ocaml/gettext-stub/*.ml
 %{_bindir}/ocaml-gettext
 %{_bindir}/ocaml-xgettext
 %{_mandir}/man1/ocaml-gettext.1*
 %{_mandir}/man1/ocaml-xgettext.1*
 %{_mandir}/man5/ocaml-gettext.5*
 
-%files camomile
+%if %{with camomile}
+%files camomile -f .ofiles-gettext-camomile
 %license LICENSE.txt
-%{_libdir}/ocaml/gettext-camomile
-%if %{opt}
-%exclude %{_libdir}/ocaml/gettext-camomile/*.a
-%exclude %{_libdir}/ocaml/gettext-camomile/*.cmxa
-%exclude %{_libdir}/ocaml/gettext-camomile/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/gettext-camomile/*.mli
 
-%files camomile-devel
+%files camomile-devel -f .ofiles-gettext-camomile-devel
 %doc README.md
-%if %{opt}
-%{_libdir}/ocaml/gettext-camomile/*.a
-%{_libdir}/ocaml/gettext-camomile/*.cmxa
-%{_libdir}/ocaml/gettext-camomile/*.cmx
 %endif
-%{_libdir}/ocaml/gettext-camomile/*.mli
 
 %changelog
+* Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.4.2-3
+- Converted spec file to match with Fedora 41.
+- Use ocaml 5.1.1 to build
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-2
 - Cleaning-up spec. License verified.
 

@@ -259,6 +259,7 @@ generate_pkggen_core () {
         grep "^gtk-doc-" $TmpPkgGen
         grep "^autoconf-" $TmpPkgGen
         grep "^automake-" $TmpPkgGen
+        grep "^ocaml-srpms-macros-" $TmpPkgGen
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
         grep "^debugedit-" $TmpPkgGen

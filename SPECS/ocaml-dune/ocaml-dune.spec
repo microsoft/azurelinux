@@ -7,8 +7,8 @@
 
 Summary:        A composable build system for OCaml
 Name:           ocaml-%{libname}
-Version:        2.8.5
-Release:        3%{?dist}
+Version:        3.15.2
+Release:        1%{?dist}
 # Dune itself is MIT.  Some bundled libraries have a different license:
 # ISC:
 # - vendor/cmdliner
@@ -22,34 +22,63 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://dune.build
 Source0:        https://github.com/ocaml/%{libname}/archive/%{version}/%{libname}-%{version}.tar.gz
+# When building without lwt, remove libraries that need it
+Patch0:         %{name}-no-lwt.patch
+# Temporary workaround for broken debuginfo (rhbz#2168932)
+# See https://github.com/ocaml/dune/issues/6929
+Patch1:         %{name}-debuginfo.patch
 
-BuildRequires:  %{py3_dist sphinx-rtd-theme}
-BuildRequires:  %{py3_dist sphinx}
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch:    %{ix86}
+
+BuildRequires:  emacs
 BuildRequires:  make
 BuildRequires:  ocaml >= 4.08
-BuildRequires:  ocaml-csexp-devel >= 1.3.0
-BuildRequires:  ocaml-findlib
+BuildRequires:  ocaml-compiler-libs
+# ocaml-pp is empty if built without dune. And both ocaml-pp and ocaml-csexp are a circular depenedency with ocaml-dune
+BuildRequires:  ocaml-pp-devel >= 1.2.0
+BuildRequires:  ocaml-csexp-devel >= 1.5.0
+BuildRequires:  ocaml-rpm-macros
 
-%if %{with emacs}
-BuildRequires:  emacs
-%endif
+# Dune has vendored deps to avoid dependency cycles.  Upstream deliberately
+# does not support unbundling these dependencies.
+# See https://github.com/ocaml/dune/issues/220
+Provides:       bundled(ocaml-0install-solver) = 2.18
+Provides:       bundled(ocaml-build-path-prefix-map) = 0.3
+Provides:       bundled(ocaml-cmdliner) = 1.2.0
+Provides:       bundled(ocaml-fiber) = 3.7.0
+Provides:       bundled(ocaml-fmt) = 0.8.10
+Provides:       bundled(ocaml-incremental-cycles) = 1e2030a5d5183d84561cde142eecca40e03db2a3
+Provides:       bundled(ocaml-inotify) = 2.3
+Provides:       bundled(ocaml-lwd) = 0.3
+Provides:       bundled(ocaml-notty) = 0.2.3
+Provides:       bundled(ocaml-opam) = 2.2.0~alpha2
+Provides:       bundled(ocaml-opam-0install) = 0.4.3
+Provides:       bundled(ocaml-opam-file-format) = 2.1.6
+Provides:       bundled(ocaml-re) = 1.11.0
+Provides:       bundled(ocaml-sha) = 1.15.4
+Provides:       bundled(ocaml-spawn) = 0.15.1
+Provides:       bundled(ocaml-uutf) = 1.0.3
 
-%if %{with menhir}
-# Required by tests.
-BuildRequires:  ocaml-menhir
-%endif
-
-# Dune has vendored deps (ugh):
-# I'm not clear on how to unbundle them.
-# It seems to be unsupported upstream; the bootstrap process for dune
-# doesn't seem to be able to detect libraries installed systemwide.
-# https://github.com/ocaml/dune/issues/220
-Provides:       bundled(ocaml-build-path-prefix-map) = 0.2
-Provides:       bundled(ocaml-opam-file-format) = 2.0.0
-Provides:       bundled(ocaml-cmdliner) = 1.0.4
-Provides:       bundled(ocaml-re) = 1.9.0
 Provides:       dune = %{version}-%{release}
-Provides:       jbuilder = %{version}-%{release}
+
+# This is needed for the dune-related RPM macros
+Requires:       ocaml-rpm-macros
+
+# The dune rules module requires Toploop
+Requires:       ocaml-compiler-libs%{?_isa}
+
+# Both packages install a binary named dune and an associated man page
+Conflicts:      wdune
+
+# This can be removed when F42 reaches EOL
+Obsoletes:      ocaml-fiber < 3.7.0
+Obsoletes:      ocaml-fiber-devel < 3.7.0
+Provides:       ocaml-fiber = %{version}-%{release}
+Provides:       ocaml-fiber-devel = %{version}-%{release}
+
+# Install documentation in the main package doc directory
+%global _docdir_fmt %{name}
 
 %description
 Dune is a build system designed for OCaml/Reason projects only. It focuses
@@ -62,168 +91,405 @@ adapted to the open source world. It has matured over a long time and is used
 daily by hundred of developers, which means that it is highly tested and
 productive.
 
-%package        devel
-Summary:        Development files for %{name}
-License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
-
-Requires:       %{name}%{?isa} = %{version}-%{release}
-Requires:       ocaml-csexp-devel%{?_isa}
-
-%description    devel
-The %{name}-devel package contains libraries and
-signature files for developing applications that use %{name}.
-
-%package        doc
-Summary:        HTML documentation for %{name}
-License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
-
-BuildArch:      noarch
-
-Requires:       %{name} = %{version}-%{release}
-
-%description    doc
-HTML documentation for dune, a composable build system for OCaml.
-
-%if %{with emacs}
 %package        emacs
 Summary:        Emacs support for %{name}
 License:        ISC
+Requires:       %{name} = %{version}-%{release}
+Requires:       emacs-filesystem >= %{?_emacs_version}%{!?_emacs_version:0}
 
 BuildArch:      noarch
-
-Requires:       %{name} = %{version}-%{release}
 
 %description    emacs
 The %{name}-devel package contains Emacs integration with the dune build
 system, a mode to edit dune files, and flymake support for dune files.
-%endif
+
+## Dune libraries
+
+%package        action-plugin
+Summary:        API for writing dynamic dune actions
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-glob%{?_isa} = %{version}-%{release}
+
+%description    action-plugin
+This experimental library provides an API for writing dynamic Dune
+actions.  Dynamic dune actions do not need to declare their dependencies
+upfront; they are instead discovered automatically during the execution
+of the action.
+
+%package        action-plugin-devel
+Summary:        Development files for %{name}-action-plugin
+License:        MIT
+Requires:       %{name}-action-plugin%{?_isa} = %{version}-%{release}
+Requires:       %{name}-glob-devel%{?_isa} = %{version}-%{release}
+
+%description    action-plugin-devel
+The ocaml-dune-action-plugin-devel package contains libraries and
+signature files for developing applications that use
+ocaml-dune-action-plugin.
+
+%package        build-info
+Summary:        Embed build information in an executable
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    build-info
+The build-info library allows access to information about how an
+executable was built, such as the version of the project at which it was
+built or the list of statically linked libraries with their versions.
+It supports reporting the version from a version control system during
+development to get a precise reference of when the executable was built.
+
+%package        build-info-devel
+Summary:        Development files for %{name}-build-info
+License:        MIT
+Requires:       %{name}-build-info%{?_isa} = %{version}-%{release}
+
+%description    build-info-devel
+The ocaml-dune-build-info-devel package contains libraries and signature
+files for developing applications that use ocaml-dune-build-info.
+
+%package        configurator
+Summary:        Helper library for gathering system configuration
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune%{?_isa} = %{version}-%{release}
+
+%description    configurator
+Dune-configurator is a small library that helps write OCaml scripts that
+test features available on the system, in order to generate config.h
+files for instance.  Among other things, dune-configurator allows one
+to:
+
+- test if a C program compiles
+- query pkg-config
+- import a #define from OCaml header files
+- generate a config.h file
+
+%package        configurator-devel
+Summary:        Development files for %{name}-configurator
+License:        MIT
+Requires:       %{name}-configurator%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune-devel%{?_isa} = %{version}-%{release}
+
+# This can be removed when F40 reaches EOL
+Obsoletes:      %{name}-devel < 2.9.1-4
+Provides:       %{name}-devel = %{version}-%{release}
+
+%description    configurator-devel
+The ocaml-dune-configurator-devel package contains libraries and
+signature files for developing applications that use
+ocaml-dune-configurator.
+
+%package        glob
+Summary:        Parser and interpreter for dune language globs
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-private-libs%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune%{?_isa} = %{version}-%{release}
+
+%description    glob
+Dune-glob provides a parser and interpreter for globs as understood by
+the dune language.
+
+%package        glob-devel
+Summary:        Development files for %{name}-glob
+License:        MIT
+Requires:       %{name}-glob%{?_isa} = %{version}-%{release}
+Requires:       %{name}-private-libs-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune-devel%{?_isa} = %{version}-%{release}
+
+%description    glob-devel
+The ocaml-dune-glob-devel package contains libraries and signature files
+for developing applications that use ocaml-dune-glob.
+
+%package        private-libs
+Summary:        Private dune libraries
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune%{?_isa} = %{version}-%{release}
+
+%description    private-libs
+This package contains code that is shared between various dune-xxx
+packages.  However, it is not meant for public consumption and provides
+no stability guarantee.
+
+%package        private-libs-devel
+Summary:        Development files for %{name}-private-libs
+License:        MIT
+Requires:       %{name}-private-libs%{?_isa} = %{version}-%{release}
+Requires:       ocaml-dyn-devel%{?_isa} = %{version}-%{release}
+
+%description    private-libs-devel
+The ocaml-dune-private-libs-devel package contains libraries and
+signature files for other dune packages.  Do not use.
+
+%package        rpc
+Summary:        Communicate with dune using rpc
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune%{?_isa} = %{version}-%{release}
+Requires:       ocaml-xdg%{?_isa} = %{version}-%{release}
+
+%description    rpc
+This package contains a library used to communicate with dune over rpc.
+
+%package        rpc-devel
+Summary:        Development files for %{name}-rpc
+License:        MIT
+Requires:       %{name}-rpc%{?_isa} = %{version}-%{release}
+Requires:       ocaml-stdune-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-xdg-devel%{?_isa} = %{version}-%{release}
+
+%description    rpc-devel
+The ocaml-dune-rpc-devel package contains libraries and signature files
+for developing applications that use ocaml-rpc.
+
+%package        site
+Summary:        Embed location information inside executables and libraries
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-private-libs%{?_isa} = %{version}-%{release}
+
+%description    site
+This library enables embedding location information inside executables
+and libraries.
+
+%package        site-devel
+Summary:        Development files for %{name}-site
+License:        MIT
+Requires:       %{name}-site%{?_isa} = %{version}-%{release}
+Requires:       %{name}-private-libs-devel%{?_isa} = %{version}-%{release}
+
+%description    site-devel
+The ocaml-dune-site-devel package contains libraries and signature files
+for developing applications that use ocaml-dune-site.
+
+%package     -n ocaml-chrome-trace
+Summary:        Chrome trace event generation library
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-chrome-trace
+Library to output trace data to a file in Chrome's trace_event format.
+This format is compatible with chrome trace viewer (chrome://tracing).
+The trace viewer is part of the catapult project.
+
+%package     -n ocaml-chrome-trace-devel
+Summary:        Development files for ocaml-chrome-trace
+License:        MIT
+Requires:       ocaml-chrome-trace%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-chrome-trace-devel
+The ocaml-dyn-devel package contains libraries and signature files for
+developing applications that use ocaml-dyn.
+
+%package     -n ocaml-dyn
+Summary:        Dynamic types
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-ordering%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-dyn
+This library supports dynamic types in OCaml.
+
+%package     -n ocaml-dyn-devel
+Summary:        Development files for ocaml-dyn
+License:        MIT
+Requires:       ocaml-dyn%{?_isa} = %{version}-%{release}
+Requires:       ocaml-ordering-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-pp-devel%{?_isa}
+
+%description -n ocaml-dyn-devel
+The ocaml-dyn-devel package contains libraries and signature files for
+developing applications that use ocaml-dyn.
+
+%package     -n ocaml-ocamlc-loc
+Summary:        Parse OCaml compiler output into structured form
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-dyn%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-ocamlc-loc
+Parse OCaml compiler output into structured form.
+
+%package     -n ocaml-ocamlc-loc-devel
+Summary:        Development files for ocaml-ocamlc-loc
+License:        MIT
+Requires:       ocaml-ocamlc-loc%{?_isa} = %{version}-%{release}
+Requires:       ocaml-dyn-devel%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-ocamlc-loc-devel
+The ocaml-ordering-devel package contains libraries and signature files
+for developing applications that use ocaml-ocamlc-loc.
+
+%package     -n ocaml-ordering
+Summary:        Element ordering
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-ordering
+Element ordering in OCaml.
+
+%package     -n ocaml-ordering-devel
+Summary:        Development files for ocaml-ordering
+License:        MIT
+Requires:       ocaml-ordering%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-ordering-devel
+The ocaml-ordering-devel package contains libraries and signature files
+for developing applications that use ocaml-ordering.
+
+%package     -n ocaml-stdune
+Summary:        Dune's unstable standard library
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-dyn%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-stdune
+This package contains Dune's unstable standard library.
+
+%package     -n ocaml-stdune-devel
+Summary:        Development files for ocaml-stdune
+License:        MIT
+Requires:       ocaml-stdune%{?_isa} = %{version}-%{release}
+Requires:       ocaml-dyn-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-csexp-devel%{?_isa}
+
+%description -n ocaml-stdune-devel
+The ocaml-stdune-devel package contains libraries and signature files
+for developing applications that use ocaml-stdune.
+
+%package     -n ocaml-xdg
+Summary:        XDG Base Directory Specification
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-xdg
+This package contains the XDG Base Directory Specification.
+
+%package     -n ocaml-xdg-devel
+Summary:        Development files for ocaml-xdg
+License:        MIT
+Requires:       ocaml-xdg%{?_isa} = %{version}-%{release}
+
+%description -n ocaml-xdg-devel
+The ocaml-xdg-devel package contains libraries and signature files for
+developing applications that use ocaml-xdg.
 
 %prep
-%autosetup -n %{libname}-%{version} -p1
-
+%autosetup -N -n dune-%{version}
+%autopatch 0 -p1
+rm -fr otherlibs/dune-rpc-lwt dune-rpc-lwt.opam
+%autopatch -m1 -p1
+ 
+# Allow use of Sphinx 6
+sed -i 's/, < 6//'g doc/requirements.txt
+ 
 %build
-./configure --libdir %{_libdir}/ocaml --mandir %{_mandir}
+./configure \
+  --bindir %{_bindir} \
+  --datadir %{_datadir} \
+  --docdir %{_prefix}/doc \
+  --etcdir %{_sysconfdir} \
+  --libdir %{ocamldir} \
+  --libexecdir %{ocamldir} \
+  --mandir %{_mandir} \
+  --sbindir %{_sbindir}
+ 
+%make_build release
 
-# This command fails, because ppx_bench, ppx_expect, and core_bench are missing.
-# However, it is only tests that fail, not the actual build, so ignore the
-# failures and continue.
-%make_build release || :
-./dune.exe build @install
-%make_build doc
-
-# Relink the stublibs.  See https://github.com/ocaml/dune/issues/2977.
-cd _build/default/src/stdune
-ocamlmklib -g -ldopt "%{build_ldflags}" -o stdune_stubs fcntl_stubs.o
-cd -
-cd _build/default/src/dune_filesystem_stubs
-ocamlmklib -g -ldopt "%{build_ldflags}" -o dune_filesystem_stubs_stubs \
-  $(ar t libdune_filesystem_stubs_stubs.a)
-cd -
+# We also want the libraries
+# Do not use the bundled csexp and pp when building them
+rm -fr vendor/{csexp,pp}
+./dune.exe build %{?_smp_mflags} --verbose --release @install
 
 %install
-# "make install" only installs the binary.  We want the libraries, too.
-./dune.exe install --destdir %{buildroot}
+%make_install
+# Install the libraries
+./dune.exe install --destdir=%{buildroot}
 
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
-%endif
+# We use %%doc below
+rm -fr %{buildroot}%{_prefix}/doc
 
-%if %{with emacs}
 # Byte compile the Emacs files
 cd %{buildroot}%{_emacs_sitelispdir}
-%_emacs_bytecompile dune.el dune-flymake.el
+%_emacs_bytecompile *.el
 cd -
-%else
-rm -rf %{buildroot}%{_datadir}/emacs
-%endif
 
-# Install documentation by way of pkgdocdir.
-rm -fr %{buildroot}%{_prefix}/doc
-mkdir -p %{buildroot}%{_pkgdocdir}/
-cp -ar README.md CHANGES.md MIGRATION.md doc/_build/* %{buildroot}%{_pkgdocdir}/
-
-%if %{with menhir}
-%check
-# These are the only tests we can run.  The others require components that
-# either depend on dune themselves or are not available at all.
-%{buildroot}%{_bindir}/dune runtest test/unit-tests
-%endif
+# Generate %%files lists
+%ocaml_files -s
 
 %files
 %license LICENSE.md
-%doc %{_pkgdocdir}/README.md
-%doc %{_pkgdocdir}/CHANGES.md
-%doc %{_pkgdocdir}/MIGRATION.md
+%doc CHANGES.md README.md
 %{_bindir}/dune
 %{_mandir}/man*/dune*
-%dir %{_pkgdocdir}/
-%dir %{_libdir}/ocaml/dune/
-%dir %{_libdir}/ocaml/dune-action-plugin/
-%dir %{_libdir}/ocaml/dune-build-info/
-%dir %{_libdir}/ocaml/dune-configurator/
-%dir %{_libdir}/ocaml/dune-glob/
-%dir %{_libdir}/ocaml/dune-private-libs/
-%dir %{_libdir}/ocaml/dune-private-libs/dune-lang/
-%dir %{_libdir}/ocaml/dune-private-libs/dune_re/
-%dir %{_libdir}/ocaml/dune-private-libs/ocaml-config/
-%dir %{_libdir}/ocaml/dune-private-libs/stdune/
-%dir %{_libdir}/ocaml/dune-site/
-%dir %{_libdir}/ocaml/dune-site/plugins/
-%{_libdir}/ocaml/dune*/META
-%{_libdir}/ocaml/dune*/*.cma
-%{_libdir}/ocaml/dune*/*.cmi
-%{_libdir}/ocaml/dune-configurator/.private/
-%{_libdir}/ocaml/dune-private-libs/*/*.cma
-%{_libdir}/ocaml/dune-private-libs/*/*.cmi
-%{_libdir}/ocaml/dune-site/*/*.cma
-%{_libdir}/ocaml/dune-site/*/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/dune*/*.cmxs
-%{_libdir}/ocaml/dune-private-libs/*/*.cmxs
-%{_libdir}/ocaml/dune-site/*/*.cmxs
-%{_libdir}/ocaml/stublibs/dllstdune_stubs.so
-%{_libdir}/ocaml/stublibs/dlldune_filesystem_stubs_stubs.so
-%endif
 
-%files devel
-%{_libdir}/ocaml/dune*/dune-package
-%{_libdir}/ocaml/dune*/opam
-%{_libdir}/ocaml/dune*/*.cmt
-%{_libdir}/ocaml/dune*/*.cmti
-%{_libdir}/ocaml/dune*/*.ml
-%{_libdir}/ocaml/dune*/*.mli
-%{_libdir}/ocaml/dune-private-libs/*/*.cmt
-%{_libdir}/ocaml/dune-private-libs/*/*.cmti
-%{_libdir}/ocaml/dune-private-libs/*/*.ml
-%{_libdir}/ocaml/dune-private-libs/*/*.mli
-%{_libdir}/ocaml/dune-site/*/*.cmt
-%{_libdir}/ocaml/dune-site/*/*.cmti
-%{_libdir}/ocaml/dune-site/*/*.ml
-%{_libdir}/ocaml/dune-site/*/*.mli
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/dune*/*.a
-%{_libdir}/ocaml/dune*/*.cmx
-%{_libdir}/ocaml/dune*/*.cmxa
-%{_libdir}/ocaml/dune-private-libs/*/*.a
-%{_libdir}/ocaml/dune-private-libs/*/*.cmx
-%{_libdir}/ocaml/dune-private-libs/*/*.cmxa
-%{_libdir}/ocaml/dune-site/*/*.a
-%{_libdir}/ocaml/dune-site/*/*.cmx
-%{_libdir}/ocaml/dune-site/*/*.cmxa
-%endif
-
-%files doc
-%exclude %{_pkgdocdir}/README.md
-%exclude %{_pkgdocdir}/CHANGES.md
-%doc %{_pkgdocdir}/*
-
-%if %{with emacs}
 %files emacs
 %{_emacs_sitelispdir}/dune*
-%endif
+
+%files action-plugin -f .ofiles-dune-action-plugin
+
+%files action-plugin-devel -f .ofiles-dune-action-plugin-devel
+
+%files build-info -f .ofiles-dune-build-info
+
+%files build-info-devel -f .ofiles-dune-build-info-devel
+
+%files configurator -f .ofiles-dune-configurator
+%dir %{ocamldir}/dune/
+%{ocamldir}/dune/META
+
+%files configurator-devel -f .ofiles-dune-configurator-devel
+%{ocamldir}/dune/dune-package
+%{ocamldir}/dune/opam
+
+%files glob -f .ofiles-dune-glob
+
+%files glob-devel -f .ofiles-dune-glob-devel
+
+%files private-libs -f .ofiles-dune-private-libs
+
+%files private-libs-devel -f .ofiles-dune-private-libs-devel
+
+%files rpc -f .ofiles-dune-rpc
+
+%files rpc-devel -f .ofiles-dune-rpc-devel
+
+%files site -f .ofiles-dune-site
+
+%files site-devel -f .ofiles-dune-site-devel
+
+%files -n ocaml-chrome-trace -f .ofiles-chrome-trace
+
+%files -n ocaml-chrome-trace-devel -f .ofiles-chrome-trace-devel
+
+%files -n ocaml-dyn -f .ofiles-dyn
+
+%files -n ocaml-dyn-devel -f .ofiles-dyn-devel
+
+%files -n ocaml-ocamlc-loc -f .ofiles-ocamlc-loc
+
+%files -n ocaml-ocamlc-loc-devel -f .ofiles-ocamlc-loc-devel
+
+%files -n ocaml-ordering -f .ofiles-ordering
+
+%files -n ocaml-ordering-devel -f .ofiles-ordering-devel
+
+%files -n ocaml-stdune -f .ofiles-stdune
+
+%files -n ocaml-stdune-devel -f .ofiles-stdune-devel
+
+%files -n ocaml-xdg -f .ofiles-xdg
+
+%files -n ocaml-xdg-devel -f .ofiles-xdg-devel
 
 %changelog
+* Fri Apr 26 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.15.2-1
+- Converted spec file to match with Fedora 41.
+- Upgrade to version 3.15.2
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.5-3
 - Cleaning-up spec. License verified.
 

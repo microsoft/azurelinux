@@ -1,0 +1,18 @@
+--- a/lib/dune	2022-04-27 12:13:14.000000000 -0600
++++ b/lib/dune	2022-04-28 07:55:56.663747337 -0600
+@@ -1,5 +1,4 @@
+ (library
+  (name re)
+  (synopsis "Pure OCaml regular expression library")
+- (libraries seq)
+  (public_name re))
+--- a/re.opam	2022-04-27 12:13:14.000000000 -0600
++++ b/re.opam	2022-04-28 07:55:56.663747337 -0600
+@@ -23,7 +23,6 @@ depends: [
+   "ocaml" {>= "4.03"}
+   "dune" {>= "2.0"}
+   "ounit" {with-test}
+-  "seq"
+ ]
+ 
+ synopsis: "RE is a regular expression library for OCaml"

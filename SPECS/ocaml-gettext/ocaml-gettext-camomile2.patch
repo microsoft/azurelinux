@@ -1,0 +1,11 @@
+--- ocaml-gettext-0.4.2/src/lib/gettext-camomile/gettextCamomile.ml.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/src/lib/gettext-camomile/gettextCamomile.ml	2023-06-22 13:41:46.930127479 -0600
+@@ -20,7 +20,7 @@
+ (*  USA                                                                   *)
+ (**************************************************************************)
+ 
+-open CamomileLibraryDefault.Camomile
++open Camomile
+ open GettextTypes
+ 
+ (** Error reported when something goes wrong during Camomile initialization.

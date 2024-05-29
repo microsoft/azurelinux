@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
@@ -7,18 +5,18 @@ Distribution:   Azure Linux
 %global srcname parsexp
 
 Name:           ocaml-%{srcname}
-Version:        0.15.0
+Version:        0.16.0
 Release:        1%{?dist}
 Summary:        S-expression parsing library
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/parsexp
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.08.0
-BuildRequires:  ocaml-base-devel >= 0.15
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
-BuildRequires:  ocaml-sexplib0-devel >= 0.15
+BuildRequires:  ocaml-sexplib0-devel >= 0.16
 
 %description
 This library provides generic parsers for parsing S-expressions from
@@ -44,57 +42,35 @@ parsexp_io.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       ocaml-base-devel%{?_isa}
+Requires:       ocaml-sexplib0-devel%{?_isa}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n parsexp-%{version}
 
 %build
-dune build %{?_smp_mflags}
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
-
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
-%endif
+%dune_install
 
 %check
-dune runtest
+%dune_check
 
-%files
+%files -f .ofiles
 %doc CHANGES.md README.org
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cma
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxs
-%endif
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.a
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmx
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmt
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmti
-%{_libdir}/ocaml/%{srcname}/*.ml
-%{_libdir}/ocaml/%{srcname}/*.mli
+%files devel -f .ofiles-devel
 
 %changelog
+* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-1
+- Converted spec file to match with Fedora 41.
+- Upgraded to version 0.16.0
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified

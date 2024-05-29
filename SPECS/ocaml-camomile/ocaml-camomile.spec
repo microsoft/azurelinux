@@ -3,22 +3,25 @@
 
 Summary:        Unicode library for OCaml
 Name:           ocaml-camomile
-Version:        1.0.2
-Release:        9%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 # Several files are MIT and UCD licensed, but the overall work is LGPLv2+
 # and the LGPL/GPL supercedes compatible licenses.
 # https://www.redhat.com/archives/fedora-legal-list/2008-March/msg00005.html
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/yoriyuki/Camomile
-Source0:        https://github.com/yoriyuki/Camomile/archive/refs/tags/%{version}.tar.gz#/camomile-%{version}.tar.gz
+URL:            https://github.com/ocaml-community/Camomile
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/camomile-%{version}.tar.gz
+# Fix a licensing issue in EO Unicode files.  Submitted but not
+# accepted upstream: https://github.com/yoriyuki/Camomile/pull/84
+Patch1:         0001-Camomile-locales-eo.txt-Fix-license-by-importing-dat.patch
 
-BuildRequires:  ocaml >= 3.12.1-12
-BuildRequires:  ocaml-cppo
-BuildRequires:  ocaml-dune
-BuildRequires:  ocaml-findlib-devel
-BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-camlp-streams-devel
+BuildRequires:  ocaml-dune >= 3.4
+BuildRequires:  ocaml-dune-site-devel
+BuildRequires:  ocaml-stdlib-random-devel
 
 # The base package requires the data files.  Note that it is possible
 # to install the data files on their own to support other packages
@@ -26,85 +29,81 @@ BuildRequires:  ocaml-ocamldoc
 # exactly this.
 Requires:       %{name}-data = %{version}-%{release}
 
+
 %description
 Camomile is a Unicode library for ocaml. Camomile provides Unicode
 character type, UTF-8, UTF-16, UTF-32 strings, conversion to/from
 about 200 encodings, collation and locale-sensitive case mappings, and
 more.
 
+
 %package        devel
 Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-camlp-streams-devel%{?_isa}
+Requires:       ocaml-dune-site-devel%{?_isa}
 
-Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %package        data
 Summary:        Data files for %{name}
+BuildArch:      noarch
+
 
 %description    data
 The %{name}-data package contains data files for developing
 applications that use %{name}.
 
+
 %prep
-%setup -q -n Camomile-%{version}
+%autosetup -p1 -n Camomile-%{version}
+
 
 %build
-# This avoids a stack overflow in the OCaml 4.05 compiler on POWER only.
+# This avoids a stack overflow in the OCaml compiler on POWER only.
+# Originally found with OCaml 4.05, still affecting 4.13.0.
+# https://github.com/yoriyuki/Camomile/issues/39
 %ifarch %{power64}
 ulimit -Hs 65536
 ulimit -Ss 65536
 %endif
-dune build --verbose --profile release
+%dune_build
 
 
 %install
-dune install \
-         --destdir=%{buildroot} \
-         --libdir=%{_libdir}/ocaml \
-         --verbose \
-         --profile release
+%dune_install
 
-# Remove /usr/doc because we will use %%doc rules instead.
-rm -rf %{buildroot}%{_prefix}/doc
+# The data files are in their own package
+sed -i '\@%{_datadir}@d' .ofiles
 
-# Install the *.mli files by hand.
-cp _build/install/default/lib/camomile/library/*.mli %{buildroot}%{_libdir}/ocaml/camomile/
 
 %check
-# Broken in 1.0.2.
-# https://github.com/yoriyuki/Camomile/issues/82
-#jbuilder runtest --profile release
+%dune_check
 
-%files
+
+%files -f .ofiles
 %doc README.md CHANGES.md
 %license LICENSE.md
-%{_libdir}/ocaml/camomile
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/camomile/*.a
-%exclude %{_libdir}/ocaml/camomile/*.cmxa
-%exclude %{_libdir}/ocaml/camomile/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/camomile/*.mli
-%ifarch %{ocaml_native_compiler}
-%endif
 
-%files devel
+
+%files devel -f .ofiles-devel
 %license LICENSE.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/camomile/*.a
-%{_libdir}/ocaml/camomile/*.cmxa
-%{_libdir}/ocaml/camomile/*.cmx
-%endif
-%{_libdir}/ocaml/camomile/*.mli
+
 
 %files data
 %license LICENSE.md
 %{_datadir}/camomile/
 
+
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0.0-1
+- Converted spec file to match with Fedora 41.
+- Upgraded to version 2.0.0
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-9
 - Cleaning-up spec. License verified.
 

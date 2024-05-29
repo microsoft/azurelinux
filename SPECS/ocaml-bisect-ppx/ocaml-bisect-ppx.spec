@@ -8,7 +8,7 @@
 Summary:        Code coverage for OCaml and Reason
 Name:           ocaml-%{srcname}
 Version:        2.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,10 +16,10 @@ URL:            https://aantron.github.io/bisect_ppx/
 Source0:        https://github.com/aantron/%{upname}/archive/%{version}/%{upname}-%{version}.tar.gz
 
 BuildRequires:  git-core
-BuildRequires:  ocaml >= 4.02.0
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-cmdliner-devel >= 1.0.0
 BuildRequires:  ocaml-dune >= 2.7.0
-BuildRequires:  ocaml-ppxlib-devel >= 0.21.0
+BuildRequires:  ocaml-ppxlib-devel >= 0.31.0
 
 Provides:       %{name}-doc = %{version}-%{release}
 
@@ -112,6 +112,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{upname}/runtime/*.mli
 
 %changelog
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.3-4
+- Rebuild using ocaml 5.1.1
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.3-3
 - Cleaning-up spec. License verified.
 

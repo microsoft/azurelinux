@@ -1,0 +1,160 @@
+From 6dbbc474d3df5cdfd21ed5e692b3a58136fffc42 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 7 Aug 2023 10:41:26 +0100
+Subject: [PATCH 2/3] ruby: Get rid of old Test::Unit compatibility
+ 
+Minitest is now required to run the Ruby unit tests.
+ 
+This compatibility was added back in commit 3f3bc6af07 ("ruby: tests:
+convert from Test::Unit to MiniTest (RHBZ#1090407)", 2014), but is
+broken by the change from MiniTest to Minitest.
+---
+ ruby/Makefile.am               |  3 +--
+ ruby/tests/tc_010_load.rb      |  3 ++-
+ ruby/tests/tc_021_close.rb     |  3 ++-
+ ruby/tests/tc_120_rlenvalue.rb |  3 ++-
+ ruby/tests/tc_130_special.rb   |  3 ++-
+ ruby/tests/tc_200_write.rb     |  3 ++-
+ ruby/tests/tc_210_setvalue.rb  |  3 ++-
+ ruby/tests/test_helper.rb      | 31 -------------------------------
+ 8 files changed, 13 insertions(+), 39 deletions(-)
+ delete mode 100644 ruby/tests/test_helper.rb
+ 
+diff --git a/ruby/Makefile.am b/ruby/Makefile.am
+index 0e9a868..7a5fe42 100644
+--- a/ruby/Makefile.am
++++ b/ruby/Makefile.am
+@@ -23,8 +23,7 @@ EXTRA_DIST = \
+ 	ext/hivex/_hivex.c \
+ 	lib/hivex.rb \
+ 	run-ruby-tests \
+-	tests/tc_*.rb \
+-	tests/test_helper.rb
++	tests/tc_*.rb
+ 
+ CLEANFILES = \
+ 	lib/*~ \
+diff --git a/ruby/tests/tc_010_load.rb b/ruby/tests/tc_010_load.rb
+index 58fac33..8efac36 100644
+--- a/ruby/tests/tc_010_load.rb
++++ b/ruby/tests/tc_010_load.rb
+@@ -15,7 +15,8 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestLoad < Minitest::Test
+   def test_load
+diff --git a/ruby/tests/tc_021_close.rb b/ruby/tests/tc_021_close.rb
+index bc8f79d..b3aaa10 100644
+--- a/ruby/tests/tc_021_close.rb
++++ b/ruby/tests/tc_021_close.rb
+@@ -15,7 +15,8 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestClose < Minitest::Test
+   def test_close
+diff --git a/ruby/tests/tc_120_rlenvalue.rb b/ruby/tests/tc_120_rlenvalue.rb
+index ee881bb..f40735d 100644
+--- a/ruby/tests/tc_120_rlenvalue.rb
++++ b/ruby/tests/tc_120_rlenvalue.rb
+@@ -21,7 +21,8 @@
+ # length and offset for this value cell should be 37 bytes, position
+ # 8712.
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestRLenValue < Minitest::Test
+   def test_RLenValue
+diff --git a/ruby/tests/tc_130_special.rb b/ruby/tests/tc_130_special.rb
+index 6179f51..49a635b 100644
+--- a/ruby/tests/tc_130_special.rb
++++ b/ruby/tests/tc_130_special.rb
+@@ -1,7 +1,8 @@
+ # -*- coding: utf-8 -*-
+ # -*- ruby -*-
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestRLenValue < Minitest::Test
+   def test_RLenValue
+diff --git a/ruby/tests/tc_200_write.rb b/ruby/tests/tc_200_write.rb
+index a713d77..4ce0586 100644
+--- a/ruby/tests/tc_200_write.rb
++++ b/ruby/tests/tc_200_write.rb
+@@ -15,7 +15,8 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestWrite < Minitest::Test
+   def test_write
+diff --git a/ruby/tests/tc_210_setvalue.rb b/ruby/tests/tc_210_setvalue.rb
+index 2ffd07b..c3624ef 100644
+--- a/ruby/tests/tc_210_setvalue.rb
++++ b/ruby/tests/tc_210_setvalue.rb
+@@ -15,7 +15,8 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+-require File::join(File::dirname(__FILE__), 'test_helper')
++require 'minitest/autorun'
++require 'hivex'
+ 
+ class TestSetValue < Minitest::Test
+   def test_set_value
+diff --git a/ruby/tests/test_helper.rb b/ruby/tests/test_helper.rb
+deleted file mode 100644
+index f939b94..0000000
+--- a/ruby/tests/test_helper.rb
++++ /dev/null
+@@ -1,31 +0,0 @@
+-# hivex Ruby bindings -*- ruby -*-
+-# Copyright (C) 2009-2014 Red Hat Inc.
+-#
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-
+-begin
+-  require 'minitest/autorun'
+-rescue LoadError
+-  require 'test/unit'
+-  MiniTest = Test
+-  module Test
+-    Assertions = Unit::Assertions
+-    module Assertions
+-      alias refute_nil assert_not_nil
+-    end
+-  end
+-end
+-
+-require 'hivex'
+-- 
+2.41.0
+ 

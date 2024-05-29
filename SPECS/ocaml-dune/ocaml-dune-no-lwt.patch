@@ -1,0 +1,31 @@
+--- dune-3.15.0/dune-file.orig	2024-04-03 03:29:40.000000000 -0600
++++ dune-3.15.0/dune-file	2024-04-05 08:48:56.083804773 -0600
+@@ -30,9 +30,6 @@
+  (copy dune-private-libs.opam.template ordering.opam.template))
+ 
+ (rule
+- (copy dune-private-libs.opam.template dune-rpc-lwt.opam.template))
+-
+-(rule
+  (copy dune-private-libs.opam.template fiber.opam.template))
+ 
+ (rule
+--- dune-3.15.0/dune-project.orig	2024-04-03 03:29:40.000000000 -0600
++++ dune-3.15.0/dune-project	2024-04-05 08:49:50.546090649 -0600
+@@ -149,16 +149,6 @@ understood by dune language."))
+  (description "Library to connect and control a running dune instance"))
+ 
+ (package
+- (name dune-rpc-lwt)
+- (synopsis "Communicate with dune using rpc and Lwt")
+- (depends
+-  (dune-rpc (= :version))
+-  (csexp (>= 1.5.0))
+-  (lwt (>= 5.6.0))
+-  base-unix)
+- (description "Specialization of dune-rpc to Lwt"))
+-
+-(package
+  (name dyn)
+  (synopsis "Dynamic type")
+  (depends
