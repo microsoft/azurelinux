@@ -619,7 +619,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 		// We run in a retry loop on errors deemed retriable.
 		ctx, cancelFunc := context.WithCancel(context.Background())
 		retryNum := 1
-		_, err = retry.RunWithDefaultDownloadBackoff(func() error {
+		_, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
 			downloadErr, retriable := tdnfDownload(finalArgs...)
 			if downloadErr != nil {
 				if retriable {
@@ -632,7 +632,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 			retryNum++
 			return downloadErr
-		}, ctx)
+		})
 
 		if err == nil {
 			preBuilt = r.reposArgsHaveOnlyLocalSources(reposArgs)

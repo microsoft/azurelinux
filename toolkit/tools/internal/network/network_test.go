@@ -108,7 +108,7 @@ func TestDownloadFile(t *testing.T) {
 				tt.args._ctx, cancelFunc = context.WithTimeout(context.Background(), cancelDelay)
 				defer cancelFunc()
 			} else {
-				tt.args._ctx = nil
+				tt.args._ctx = context.Background()
 			}
 
 			startTime := time.Now()
@@ -140,5 +140,14 @@ func TestDownloadFile(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestDownloadWithRetryNilContext(t *testing.T) {
+	dstDir := t.TempDir()
+	dstFile := filepath.Join(dstDir, "README.md")
+	_, err := DownloadFileWithRetry("https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil, nil)
+	if err == nil {
+		t.Errorf("DownloadFile() should have failed with nil context")
 	}
 }

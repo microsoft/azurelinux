@@ -6,6 +6,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"net/url"
@@ -96,7 +97,7 @@ func main() {
 		}
 	}
 
-	_, err = network.DownloadFileWithRetry(*srcUrl, *dstFile, caCerts, tlsCerts, nil)
+	_, err = network.DownloadFileWithRetry(*srcUrl, *dstFile, caCerts, tlsCerts, context.Background())
 	if err != nil {
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}

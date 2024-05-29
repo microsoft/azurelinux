@@ -60,14 +60,14 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
 func DownloadFileWithRetry(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, ctx context.Context) (wasCancelled bool, err error) {
 	if ctx == nil {
-		ctx = context.Background()
+		return false, fmt.Errorf("context is nil")
 	}
 	retryCtx, cancelFunc := context.WithCancel(ctx)
 	defer cancelFunc()
 
 	retryNum := 1
 	errorWas404 := false
-	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(func() error {
+	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(retryCtx, func() error {
 		netErr := DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
@@ -83,7 +83,7 @@ func DownloadFileWithRetry(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCe
 		}
 		retryNum++
 		return netErr
-	}, retryCtx)
+	})
 
 	// If the error was a 404, we should not consider the download as cancelled
 	if errorWas404 {
