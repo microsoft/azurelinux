@@ -7,7 +7,7 @@ This project includes psshlib which can be used within custm applications.
 
 Name:           %{pypi_name}
 Version:        2.3.5
-Release:        1%{?dist}
+Release:        6%{?dist}
 Summary:        %{sum}
 
 License:        BSD
