@@ -68,6 +68,19 @@ func findGrubCommand(inputGrubCfgContent string, commandName string) ([][]grub.T
 }
 
 // Finds the search command and replaces it.
+func replaceSearchCommand(inputGrubCfgContent string, searchCommand string) (outputGrubCfgContent string, err error) {
+	searchLine, err := findSingularGrubCommand(inputGrubCfgContent, "search")
+	if err != nil {
+		return "", err
+	}
+
+	start := searchLine[0].Loc.Start.Index
+	end := searchLine[len(searchLine)-1].Loc.Start.Index
+	outputGrubCfgContent = inputGrubCfgContent[:start] + searchCommand + inputGrubCfgContent[end:]
+
+	return outputGrubCfgContent, nil
+}
+
 func replaceSearchCommands(inputGrubCfgContent string, newSearchCommand string) (outputGrubCfgContent string, err error) {
 	searchLines, err := findGrubCommand(inputGrubCfgContent, "search")
 	if err != nil {
@@ -372,7 +385,9 @@ func findCommandLineInsertAt(argTokens []grub.Token, forgiving bool) (int, error
 	}
 
 	if len(insertAtTokens) < 1 {
+		// Could not find the grubKernelOpts
 		if forgiving && len(argTokens) > 0 {
+			// Try to insert at the very end as long as there are other tokens.
 			return argTokens[len(argTokens)-1].Loc.End.Index, nil
 		} else {
 			return 0, fmt.Errorf("failed to find $%s in linux command line", grubKernelOpts)

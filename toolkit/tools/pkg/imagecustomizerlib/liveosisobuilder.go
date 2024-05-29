@@ -43,7 +43,8 @@ const (
 
 	// kernel arguments template
 	// kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
-	kernelArgsTemplate = " rd.debug rd.live.debug=1 rd.retry=40 rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsDebug    = " rd.debug rd.live.debug=1 rd.retry=40 "
+	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
@@ -419,20 +420,19 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
 	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
 
-	logger.Log.Debugf("[1]{\n%s\n[1]\n}", inputContentString)
-
-	inputContentString, err = replaceSearchCommands(inputContentString, searchCommand)
-	if err != nil {
-		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
-	}
-
-	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
-
-	logger.Log.Debugf("[2]{\n%s\n[2]\n}", inputContentString)
-
-	grubMkconfigEnabled = false
-
 	if !grubMkconfigEnabled {
+
+		logger.Log.Debugf("[1a]{\n%s\n[1]\n}", inputContentString)
+
+		inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
+		if err != nil {
+			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
+		}
+
+		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
+		logger.Log.Debugf("[2a]{\n%s\n[2]\n}", inputContentString)
+
 		var oldLinuxPath string
 		inputContentString, oldLinuxPath, err = setLinuxPath(inputContentString, isoKernelPath)
 		if err != nil {
@@ -484,37 +484,48 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		logger.Log.Debugf("[9a]{\n%s\n[9a]\n}", inputContentString)
 
 	} else {
+		logger.Log.Debugf("[1b]{\n%s\n[1]\n}", inputContentString)
+
+		inputContentString, err = replaceSearchCommands(inputContentString, searchCommand)
+		if err != nil {
+			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
+		}
+
+		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
+		logger.Log.Debugf("[2b]{\n%s\n[2]\n}", inputContentString)
+
 		inputContentString, _, err = setLinuxPaths(inputContentString, isoKernelPath)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
 		}
-		logger.Log.Debugf("[3]{\n%s\n[3]\n}", inputContentString)
+		logger.Log.Debugf("[3b]{\n%s\n[3]\n}", inputContentString)
 
 		inputContentString, _, err = setInitrdPaths(inputContentString, isoInitrdPath)
 		if err != nil {
 			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
 		}
-		logger.Log.Debugf("[4]{\n%s\n[4]\n}", inputContentString)
+		logger.Log.Debugf("[4b]{\n%s\n[4]\n}", inputContentString)
 
 		inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue)
 		if err != nil {
 			return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 		}
-		logger.Log.Debugf("[5]{\n%s\n[5]\n}", inputContentString)
+		logger.Log.Debugf("[5b]{\n%s\n[5]\n}", inputContentString)
 
 		inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
 		if err != nil {
 			return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 		}
 
-		logger.Log.Debugf("[6]{\n%s\n[6]\n}", inputContentString)
+		logger.Log.Debugf("[6b]{\n%s\n[6]\n}", inputContentString)
 
 		inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, liveosKernelArgs)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 		}
 
-		logger.Log.Debugf("[7]{\n%s\n[7]\n}", inputContentString)
+		logger.Log.Debugf("[7b]{\n%s\n[7]\n}", inputContentString)
 
 		argsToRemove := []string{"console"}
 		inputContentString, err = updateKernelCommandLineArgsAll(inputContentString, argsToRemove, nil)
@@ -522,11 +533,11 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 		}
 
-		logger.Log.Debugf("[8]{\n%s\n[8]\n}", inputContentString)
+		logger.Log.Debugf("[8b]{\n%s\n[8]\n}", inputContentString)
 
 		inputContentString = grubContent20
 
-		logger.Log.Debugf("[9]{\n%s\n[9]\n}", inputContentString)
+		logger.Log.Debugf("[9b]{\n%s\n[9]\n}", inputContentString)
 		// include the missing packages: tar, dm-setup, squashfs-tools
 		// update dracut config to turn off host_only
 		//
