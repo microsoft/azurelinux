@@ -1,14 +1,10 @@
 %{?python_enable_dependency_generator}
 %global pypi_name pssh
-%global sum PSSH provides parallel version of OpenSSH and related tools
-%global desc PSSH provides parallel version of OpenSSH and related tools,\
-including pssh, pscp, prsync, pnuke and pslurp.\
-This project includes psshlib which can be used within custm applications.
 
 Name:           %{pypi_name}
 Version:        2.3.5
 Release:        6%{?dist}
-Summary:        %{sum}
+Summary:        PSSH provides parallel version of OpenSSH and related tools
 
 License:        BSD
 Vendor:         Microsoft Corporation
