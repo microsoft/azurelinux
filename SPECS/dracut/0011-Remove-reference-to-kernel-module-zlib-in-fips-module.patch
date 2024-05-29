@@ -1,0 +1,27 @@
+From 7cb87bb5b37b570b9316281864fe1619ea4eab70 Mon Sep 17 00:00:00 2001
+From: Cameron Baird <cameronbaird@microsoft.com>
+Date: Wed, 29 May 2024 22:16:41 +0000
+Subject: [PATCH] Remove reference to kernel module zlib in fips module
+
+Remove reference to kernel module zlib (deprecated in kernel v4.6+) since the 
+pedantic dracut behavior causes initramfs generation to fail otherwise.
+---
+ modules.d/01fips/module-setup.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules.d/01fips/module-setup.sh b/modules.d/01fips/module-setup.sh
+index a3e56020..48509077 100755
+--- a/modules.d/01fips/module-setup.sh
++++ b/modules.d/01fips/module-setup.sh
+@@ -30,7 +30,7 @@ installkernel() {
+         _fipsmodules+="ecb cbc ctr xts gcm ccm authenc hmac cmac ofb cts "
+ 
+         # Compression algs:
+-        _fipsmodules+="deflate lzo zlib "
++        _fipsmodules+="deflate lzo "
+ 
+         # PRNG algs:
+         _fipsmodules+="ansi_cprng "
+-- 
+2.34.1
+
