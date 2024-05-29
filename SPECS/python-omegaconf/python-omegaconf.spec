@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/omegaconf/
-Source0:        https://github.com/omry/omegaconf/archive/refs/tags/v%{version}.tar.gz
+Source0:        https://github.com/omry/omegaconf/archive/refs/tags/v%{version}.tar.gz#%{name}-%version.tar.gz
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
