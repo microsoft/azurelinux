@@ -446,7 +446,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 
 		logger.Log.Debugf("[4a]{\n%s\n[4a]\n}", inputContentString)
 
-		inputContentString, oldInitrdPath, err := setInitrdPath(inputContentString, isoInitrdPath)
+		var oldInitrdPath string
+		inputContentString, oldInitrdPath, err = setInitrdPath(inputContentString, isoInitrdPath)
 		if err != nil {
 			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
 		}
@@ -540,6 +541,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		logger.Log.Debugf("[9b]{\n%s\n[9]\n}", inputContentString)
 	}
 
+	logger.Log.Debugf("[10]{\n%s\n[10]\n}", inputContentString)
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
