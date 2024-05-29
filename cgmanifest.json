@@ -25954,8 +25954,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elasticsearch",
-          "version": "8.9.0",
-          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.9.0.tar.gz"
+          "version": "8.10.3",
+          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.10.0.tar.gz"
         }
       }
     },

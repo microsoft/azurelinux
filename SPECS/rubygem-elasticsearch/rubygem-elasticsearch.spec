@@ -2,7 +2,7 @@
 %global gem_name elasticsearch
 Summary:        Ruby integrations for Elasticsearch
 Name:           rubygem-%{gem_name}
-Version:        8.9.0
+Version:        8.10.3
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -37,6 +37,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.10.3-1
+- Auto-upgrade to 8.10.3 - CVE-2023-31419, CVE-2023-31417, CVE-2023-46673
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.9.0-1
 - Auto-upgrade to 8.9.0 - Azure Linux 3.0 - package upgrades
 
