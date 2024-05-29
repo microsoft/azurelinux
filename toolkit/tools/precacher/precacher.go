@@ -136,6 +136,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	results := make(chan downloadResult)
 	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
 
 	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
 	// Each worker is responsible for removing itself from the wait group once done.
@@ -258,7 +259,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	_, err = network.DownloadFileWithRetry(url, fullFilePath, nil, nil, ctx)
+	_, err = network.DownloadFileWithRetry(ctx, url, fullFilePath, nil, nil)
 	if err != nil {
 		return
 	}

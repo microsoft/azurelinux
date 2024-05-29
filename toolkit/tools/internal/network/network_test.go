@@ -112,7 +112,7 @@ func TestDownloadFile(t *testing.T) {
 			}
 
 			startTime := time.Now()
-			gotWasCancelled, err := DownloadFileWithRetry(tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts, tt.args._ctx)
+			gotWasCancelled, err := DownloadFileWithRetry(tt.args._ctx, tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts)
 			endTime := time.Now()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DownloadFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -146,7 +146,7 @@ func TestDownloadFile(t *testing.T) {
 func TestDownloadWithRetryNilContext(t *testing.T) {
 	dstDir := t.TempDir()
 	dstFile := filepath.Join(dstDir, "README.md")
-	_, err := DownloadFileWithRetry("https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil, nil)
+	_, err := DownloadFileWithRetry(nil, "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil)
 	if err == nil {
 		t.Errorf("DownloadFile() should have failed with nil context")
 	}

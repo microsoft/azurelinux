@@ -58,7 +58,7 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // externalCancel: An optional channel that can be used to cancel the download, pass nil if not needed.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
-func DownloadFileWithRetry(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, ctx context.Context) (wasCancelled bool, err error) {
+func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (wasCancelled bool, err error) {
 	if ctx == nil {
 		return false, fmt.Errorf("context is nil")
 	}

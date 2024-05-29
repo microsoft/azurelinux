@@ -97,7 +97,7 @@ func main() {
 		}
 	}
 
-	_, err = network.DownloadFileWithRetry(*srcUrl, *dstFile, caCerts, tlsCerts, context.Background())
+	_, err = network.DownloadFileWithRetry(context.Background(), *srcUrl, *dstFile, caCerts, tlsCerts)
 	if err != nil {
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}
