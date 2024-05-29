@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        17%{?dist}
+Release:        18%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -33,6 +33,7 @@ Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
 Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
 Patch:          0009-install-systemd-executor.patch
 Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
+Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -217,6 +218,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue May 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-18
+- Remove reference to zlib from dracut-fips module setup to address
+    pedantic initramfs regeneration behavior
+
 * Thu May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
 - Patch microcode output check based on CONFIG_MICROCODE_AMD/INTEL
 
