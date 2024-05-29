@@ -42,7 +42,6 @@ const (
 	isoKernelPath = "/boot/vmlinuz"
 
 	// kernel arguments template
-	// kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	kernelArgsDebug    = " rd.debug rd.live.debug=1 rd.retry=40 "
 	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
@@ -50,8 +49,9 @@ const (
 
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
-hostonly="no"
 `
+	// hostonly="no"
+
 	// the total size of a collection of files is multiplied by the
 	// expansionSafetyFactor to estimate a disk size sufficient to hold those
 	// files.
@@ -429,8 +429,6 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
 		}
 
-		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
-
 		logger.Log.Debugf("[2a]{\n%s\n[2]\n}", inputContentString)
 
 		var oldLinuxPath string
@@ -476,6 +474,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 
 		logger.Log.Debugf("[8a]{\n%s\n[8a]\n}", inputContentString)
 
+		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
 		inputContentString, err = appendKernelCommandLineArgs(inputContentString, liveosKernelArgs)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
@@ -490,8 +490,6 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		if err != nil {
 			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
 		}
-
-		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
 
 		logger.Log.Debugf("[2b]{\n%s\n[2]\n}", inputContentString)
 
@@ -520,6 +518,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 
 		logger.Log.Debugf("[6b]{\n%s\n[6]\n}", inputContentString)
 
+		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
 		inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, liveosKernelArgs)
 		if err != nil {
 			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
@@ -538,35 +538,12 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		inputContentString = grubContent20
 
 		logger.Log.Debugf("[9b]{\n%s\n[9]\n}", inputContentString)
-		// include the missing packages: tar, dm-setup, squashfs-tools
-		// update dracut config to turn off host_only
-		//
-		// - install new grub-mkconfig file
-		//   - find an unused file name liveisoCfg - /etc/grub.d/11_linux, 12_linux...
-		//   - copy /etc/grub.d/10_linux to $liveisoCfg
-		//   - apply patch to $liveisoCfg
-		//   - replace tokens: ${GRUB_LIVEISO_LABEL} and ${MENUENTRY_ID}
-		//     - this takes care of:
-		//       - search
-		//       - root
-		// - update kernel command line parameters according to iso configuration
-		//   - remove/disable selinux
-		//   - append liveos arguments
-		// - ensure the vmlinuz/initrd path match the iso layout
-		//   - ensure you can detect /boot/vmlinuz* and /boot/initrd* paths.
-		//   - copy out under vmlinuz and initrd.img
-		//   - replace tokens: ${GRUB_VMLINUZ_PATH} and ${GRUB_INITRD_PATH}
-		// - update default menu entry id: /etc/default/grub -> GRUB_DEFAULT=${MENUENTRY_ID}
-		// - re-run grub-mkconfig to generate grub.cfg
-		// - copy generated grub.cfg to iso file system
 	}
 
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
 	}
-
-	// return fmt.Errorf("FAKE FAKE FAKE ERROR")
 
 	return nil
 }
