@@ -1,26 +1,26 @@
-%ifarch %{ocaml_native_compiler}
-%global native_compiler 1
-%else
-%global native_compiler 0
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
 %endif
-
 Summary:        A regular expression library for OCaml
 Name:           ocaml-re
-Version:        1.9.0
-Release:        21%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocaml/ocaml-re
-Source0:        https://github.com/ocaml/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  ocaml
+# Fedora's OCaml is new enough that we don't need the seq compatibility library
+Patch0:         %{name}-remove-seq.patch
+ 
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune
-BuildRequires:  ocaml-findlib
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-seq-devel
-
+ 
+%if %{with_check}
+BuildRequires:  ocaml-ounit-devel
+%endif
+ 
 %description
 A pure OCaml regular expression library. Supports Perl-style regular
 expressions, Posix extended regular expressions, Emacs-style regular
@@ -28,63 +28,43 @@ expressions, and shell-style file globbing.  It is also possible to
 build regular expressions by combining simpler regular expressions.
 There is also a subset of the PCRE interface available in the Re.pcre
 library.
-
+ 
 %package        devel
 Summary:        Development files for %{name}
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-# https://bugzilla.redhat.com/show_bug.cgi?id=1792031
-Requires:       ocaml-seq-devel
-
+ 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
+ 
 %prep
-%setup -q -n ocaml-re-%{version}
-
+%autosetup -p1
+ 
+# Fix the ounit name
+sed -i 's/oUnit/ounit2/' lib_test/fort_unit/dune
+ 
 %build
-dune build -p re --verbose %{?_smp_mflags}
+%dune_build
 
 %install
+%dune_install
 
-# jbuilder/dune 1.0+ supports installing without opam-installer,
-# which means in theory we could do something like the below even for
-# "ocaml critical path" packages (e.g. dependencies of opam and opam-installer).
-
-# However... in this package it seems to stop RPM from finding debug info
-# correctly. I am not sure why. :(
-
-#export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-#mkdir -p $OCAMLFIND_DESTDIR
-#jbuilder install --destdir %{buildroot}
-#rm -r %{buildroot}/doc/re/
-
-# So use the "manual jbuilder install" technique instead.
-mkdir -p %{buildroot}%{_libdir}/ocaml
-cp -aLr _build/install/default/lib/* %{buildroot}%{_libdir}/ocaml/
-
-%files
+%check
+%dune_check
+ 
+%files -f .ofiles
 %doc CHANGES.md
 %doc README.md
 %license LICENSE.md
-%{_libdir}/ocaml/re
-%if %{native_compiler}
-%exclude %{_libdir}/ocaml/re/*.a
-%exclude %{_libdir}/ocaml/re/*.cmxa
-%exclude %{_libdir}/ocaml/re/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/re/*.mli
-
-%files devel
-%if %{native_compiler}
-%{_libdir}/ocaml/re/*.a
-%{_libdir}/ocaml/re/*.cmx
-%{_libdir}/ocaml/re/*.cmxa
-%endif
-%{_libdir}/ocaml/re/*.mli
+ 
+%files devel -f .ofiles-devel
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.0-1
+- Converted spec file to match with Fedora 41.
+- Upgrade to 1.11.0
+- Use ocaml >= 5.1.1 to build
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-21
 - Cleaning-up spec. License verified.
 

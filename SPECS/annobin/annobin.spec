@@ -1,62 +1,129 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
-Name:    annobin
-Summary: Binary annotation plugin for GCC
-Version: 9.27
-Release: 4%{?dist}
-License: GPLv3+
-URL:     https://fedoraproject.org/wiki/Toolchain/Watermark
 # Maintainer: nickc@redhat.com
-
-
-# # Do not build the annobin plugin with annotation enabled.
-# # This is because if we are bootstrapping a new build environment we can have
-# # a new version of gcc installed, but without a new of annobin installed.
-# # (i.e. we are building the new version of annobin to go with the new version
-# # of gcc).  If the *old* annobin plugin is used whilst building this new
-# # version, the old plugin will complain that version of gcc for which it
-# # was built is different from the version of gcc that is now being used, and
-# # then it will abort.
-#
-# Suppress this for BZ 1630550.
-# The problem should now only arise when rebasing to a new major version
-# of gcc, in which case the undefine below can be temporarily reinstated.
-#
-# %%undefine _annotated_build
-
-# Use "--without tests" to disable the testsuite.  The default is to run them.
-%bcond_without tests
-
-# Use "--without annocheck" to disable the installation of the annocheck program.
-%bcond_without annocheck
-
-# Use "--with debuginfod" to force support for debuginfod to be compiled into
-# the annocheck program.  By default the configure script will check for
-# availablilty at build time, but this might not match the run time situation.
-%bcond_with debuginfod
-
+# Web Page: https://sourceware.org/annobin/
+# Watermark Protocol: https://fedoraproject.org/wiki/Toolchain/Watermark
+#---------------------------------------------------------------------------------
 # Set this to zero to disable the requirement for a specific version of gcc.
 # This should only be needed if there is some kind of problem with the version
 # checking logic or when building on RHEL-7 or earlier.
-%global with_hard_gcc_version_requirement 1
-
-# Enable this if it is necessary to build annobin without using annobin.
-# This is useful for example if the annobin plugin fails because of a change
-# in the size of gcc's global_options structure.  In order to rebuild annobin
-# against the changed gcc it is necessary to disable annobin as otherwise
-# the configuration step of annobin's build will fail.
-%undefine _annotated_build
-
+#
+# Update: now that we have gcc version checking support in redhat-rpm-config
+# there is no longer a great need for a hard gcc version check here.  Not
+# enabling this check greatly simplifies the process of installing a new major
+# version of gcc into the buildroot.
+%global with_hard_gcc_version_requirement 0
 #---------------------------------------------------------------------------------
-Source:  https://nickc.fedorapeople.org/annobin-%{version}.tar.xz
+%global annobin_sources annobin-%{version}.tar.xz
 # For the latest sources use:  git clone git://sourceware.org/git/annobin.git
-
-# Insert patches here, if needed.
-# Patch01: annobin-xxx.patch
-
+# This is where a copy of the sources will be installed.
+%global annobin_source_dir %{_usrsrc}/annobin
+Summary:        Binary annotation plugin for GCC
+Name:           annobin
+Version:        12.49
+Release:        1%{?dist}
+License:        GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://sourceware.org/annobin/
+Source:         https://nickc.fedorapeople.org/%{annobin_sources}
+Requires:       %{name}-plugin-clang
+# Insert patches here, if needed.  Eg:
+# Patch01: annobin-plugin-default-string-notes.patch
+#---------------------------------------------------------------------------------
+# Make sure that the necessary sub-packages are built.
+Requires:       %{name}-plugin-gcc
+Requires:       %{name}-plugin-llvm
 #---------------------------------------------------------------------------------
 
+%description
+This package contains the tools needed to annotate binary files created by
+compilers, and also the tools needed to examine those annotations.
+
+One of the tools is a plugin for GCC that records information about the
+security options that were in effect when the binary was compiled.
+
+Note - the plugin is automatically enabled in gcc builds via flags
+provided by the redhat-rpm-macros package.
+
+One of the tools is a plugin for Clang that records information about the
+security options that were in effect when the binary was compiled.
+
+One of the tools is a plugin for LLVM that records information about the
+security options that were in effect when the binary was compiled.
+
+One of the tools is a security checker which analyses the notes present in
+annotated files and reports on any missing security options.
+
+#---------------------------------------------------------------------------
+
+# Now that we have sub-packages for all of the plugins and for annocheck,
+# there are no executables left to go into the "annobin" rpm.  But top-level
+# packages cannot have "BuildArch: noarch" if sub-packages do have
+# architecture requirements, and rpmlint generates an error if an
+# architecture specific rpm does not contain any binaries.  So instead all of
+# the documentation has been moved into an architecture neutral sub-package,
+# and there no longer is a top level annobin rpm at all.
+
+%package       docs
+Summary:        Documentation and shell scripts for use with annobin
+BuildRequires:  gawk
+BuildRequires:  make
+# The documentation uses pod2man...
+BuildRequires:  perl-interpreter
+BuildRequires:  perl-podlators
+BuildRequires:  sharutils
+BuildArch:      noarch
+
+%description docs
+Provides the documentation files and example shell scripts for use with annobin.
+
+#----------------------------------------------------------------------------
+%package       tests
+Summary:        Test scripts and binaries for checking the behaviour and output of the annobin plugin
+BuildRequires:  elfutils-devel
+BuildRequires:  make
+BuildRequires:  sharutils
+Requires:       %{name}-docs = %{version}-%{release}
+
+%description tests
+Provides a means to test the generation of annotated binaries and the parsing
+of the resulting files.
+
+#----------------------------------------------------------------------------
+
+%package       annocheck
+Summary:        A tool for checking the security hardening status of binaries
+BuildRequires:  elfutils
+BuildRequires:  elfutils-devel
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  rpm-devel
+Requires:       %{name}-docs = %{version}-%{release}
+Requires:       cpio
+Requires:       rpm
+
+%description annocheck
+Installs the annocheck program which uses the notes generated by annobin to
+check that the specified files were compiled with the correct security
+hardening options.
+
+%package libannocheck
+Summary:        A library for checking the security hardening status of binaries
+BuildRequires:  elfutils
+BuildRequires:  elfutils-devel
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  rpm-devel
+Requires:       %{name}-docs = %{version}-%{release}
+
+%description libannocheck
+Installs the libannocheck library which uses the notes generated by the
+annobin plugins to check that the specified files were compiled with the
+correct security hardening options.
+
+#----------------------------------------------------------------------------
+%package plugin-gcc
 # [Stolen from gcc-python-plugin]
 # GCC will only load plugins that were built against exactly that build of GCC
 # We thus need to embed the exact GCC version as a requirement within the
@@ -72,87 +139,80 @@ Source:  https://nickc.fedorapeople.org/annobin-%{version}.tar.xz
 #
 # So we instead query the version from gcc's output.
 #
-# gcc.spec has:
-#   Version: %%{gcc_version}
-#   Release: %%{gcc_release}%%{?dist}
-#   ...snip...
-#   echo 'Red Hat %%{version}-%%{gcc_release}' > gcc/DEV-PHASE
-#
 # So, given this output:
 #
-#   $ gcc --version
-#   gcc (GCC) 9.1.0
-#   Copyright (C) 2011 Free Software Foundation, Inc.
-#   This is free software; see the source for copying conditions.  There is NO
-#   warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# gcc (GCC) 13.2.0"
+# Copyright (C) 2023 Free Software Foundation, Inc."
+# This is free software; see the source for copying conditions.  There is NO"
+# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-# we can scrape out the "9.1.0" from the version line.
+# we can scrape out the "13.2.0" from the version line.
 #
 # The following implements the above:
-
-%global gcc_vr %(gcc --version | head -n 1 | cut -f3 -d" ")
-
+%global gcc_vr %(gcc --version | head -n 1 | sed -e 's|.*(GCC)||g')
 # We need the major version of gcc.
 %global gcc_major %(echo "%{gcc_vr}" | cut -f1 -d".")
 %global gcc_next  %(v="%{gcc_major}"; echo $((++v)))
-
 # Needed when building the srpm.
-%if 0%{?gcc_major}
-%else
+%if "0%{?gcc_major}" == "0"
 %global gcc_major 0
 %endif
-
-# This is a gcc plugin, hence gcc is required.
+# Information about the gcc plugin is recorded in this file.
+%global aver annobin-plugin-version-info
+Summary:        annobin gcc plugin
+BuildRequires:  gcc-c++
+BuildRequires:  gcc-plugin-devel
+Requires:       %{name}-docs = %{version}-%{release}
+Conflicts:      %{name} <= 9.60-1
+# For a gcc plugin gcc is required.
 %if %{with_hard_gcc_version_requirement}
 # BZ 1607430 - There is an exact requirement on the major version of gcc.
-Requires: (gcc >= %{gcc_major} with gcc < %{gcc_next})
+Requires:       (gcc >= %{gcc_major} with gcc < %{gcc_next})
 %else
-Requires: gcc
+Requires:       gcc
 %endif
 
-BuildRequires: gcc gcc-plugin-devel gcc-c++
-
-%description
-Provides a plugin for GCC that records extra information in the files
-that it compiles.
-
-Note - the plugin is automatically enabled in gcc builds via flags
-provided by the redhat-rpm-macros package.
+%description plugin-gcc
+Installs an annobin plugin that can be used by gcc.
 
 #---------------------------------------------------------------------------------
-%if %{with tests}
+%package plugin-llvm
+Summary:        annobin llvm plugin
+BuildRequires:  clang
+BuildRequires:  clang-devel
+BuildRequires:  compiler-rt
+BuildRequires:  llvm
+BuildRequires:  llvm-devel
+Requires:       %{name}-docs = %{version}-%{release}
+Requires:       llvm
+Conflicts:      %{name} <= 9.60-1
 
-%package tests
-Summary: Test scripts and binaries for checking the behaviour and output of the annobin plugin
-
-%description tests
-Provides a means to test the generation of annotated binaries and the parsing
-of the resulting files.
-
-%endif
-
-#---------------------------------------------------------------------------------
-%if %{with annocheck}
-
-%package annocheck
-Summary: A tool for checking the security hardening status of binaries
-
-BuildRequires: gcc elfutils elfutils-devel elfutils-libelf-devel rpm-devel binutils-devel
-%if %{with debuginfod}
-BuildRequires: elfutils-debuginfod-client-devel
-%endif
-
-%description annocheck
-Installs the annocheck program which uses the notes generated by annobin to
-check that the specified files were compiled with the correct security
-hardening options.
-
-%endif
+%description plugin-llvm
+Installs an annobin plugin that can be used by LLVM tools.
 
 #---------------------------------------------------------------------------------
+
+%package plugin-clang
+Summary:        annobin clang plugin
+BuildRequires:  clang
+BuildRequires:  clang-devel
+BuildRequires:  compiler-rt
+BuildRequires:  llvm
+BuildRequires:  llvm-devel
+Requires:       %{name}-docs = %{version}-%{release}
+Requires:       llvm
+Conflicts:      %{name} <= 9.60-1
+
+%description plugin-clang
+Installs an annobin plugin that can be used by Clang.
+
+#---------------------------------------------------------------------------------
+
+# Decide where the plugins will live.  Change if necessary.
 
 %global ANNOBIN_GCC_PLUGIN_DIR %(gcc --print-file-name=plugin)
-
+%{!?llvm_plugin_dir:%global  llvm_plugin_dir  %{_libdir}/llvm/plugins}
+%{!?clang_plugin_dir:%global clang_plugin_dir %{_libdir}/clang/plugins}
 #---------------------------------------------------------------------------------
 
 %prep
@@ -176,79 +236,128 @@ touch doc/annobin.info
 #---------------------------------------------------------------------------------
 
 %build
+CONFIG_ARGS="$CONFIG_ARGS --quiet --with-debuginfod --with-clang --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} --with-llvm"
 
-CONFIG_ARGS=
+export CFLAGS="$CFLAGS -DAARCH64_BRANCH_PROTECTION_SUPPORTED=1"
 
-%if %{with debuginfod}
-CONFIG_ARGS="$CONFIG_ARGS --with-debuginfod"
-%else
-CONFIG_ARGS="$CONFIG_ARGS --without-debuginfod"
+%{set_build_flags}
+
+export CFLAGS="$CFLAGS %{optflags} %{build_cflags}"
+export LDFLAGS="$LDFLAGS %{build_ldflags}"
+
+export PLUGIN_FORTIFY_OPTION="-D_FORTIFY_SOURCE=3"
+
+# Set target-specific security options to be used when building the
+# Clang and LLVM plugins.  FIXME: There should be a better way to do
+# this.
+%ifarch %{ix86} x86_64
+export CLANG_TARGET_OPTIONS="-fcf-protection"
 %endif
 
-%if %{without tests}
-CONFIG_ARGS="$CONFIG_ARGS --without-test"
+%ifarch aarch64
+export CLANG_TARGET_OPTIONS="-mbranch-protection=standard"
 %endif
 
-%configure --quiet --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} ${CONFIG_ARGS} || cat config.log
+CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" CXXFLAGS="$CFLAGS" %configure ${CONFIG_ARGS} || cat config.log
 
 %make_build
 
-# Rebuild the plugin, this time using the plugin itself!  This
+# Rebuild the plugin(s), this time using the plugin itself!  This
 # ensures that the plugin works, and that it contains annotations
-# of its own.  This could mean that we end up with a plugin with
-# double annotations in it.  (If the build system enables annotations
-# for plugins by default).  I have not tested this yet, but I think
-# that it should be OK.
+# of its own.
+
 cp gcc-plugin/.libs/annobin.so.0.0.0 %{_tmppath}/tmp_annobin.so
 make -C gcc-plugin clean
-BUILD_FLAGS="-fplugin=%{_tmppath}/tmp_annobin.so -fplugin-arg-tmp_annobin-rename"
-# If building on RHEL7, enable the next option as the .attach_to_group assembler pseudo op is not available in the assembler.
+BUILD_FLAGS="-fplugin=%{_tmppath}/tmp_annobin.so"
+
+OPTS="$(rpm --undefine=_annotated_build --eval '%{build_cflags} %{build_ldflags}')"
+
+# If building on systems with an assembler that does not support the
+# .attach_to_group pseudo op (eg RHEL-7) then enable the next line.
 # BUILD_FLAGS="$BUILD_FLAGS -fplugin-arg-tmp_annobin-no-attach"
-make -C gcc-plugin CXXFLAGS="%{optflags} $BUILD_FLAGS"
+
+make -C gcc-plugin CXXFLAGS="$OPTS $BUILD_FLAGS"
 rm %{_tmppath}/tmp_annobin.so
+
+cp clang-plugin/annobin-for-clang.so %{_tmppath}/tmp_annobin.so
+# To enable verbose more in the plugin append the following: ANNOBIN="verbose"
+make -C clang-plugin clean all CLANG_TARGET_OPTIONS="$CLANG_TARGET_OPTIONS $BUILD_FLAGS"
+
+cp llvm-plugin/annobin-for-llvm.so %{_tmppath}/tmp_annobin.so
+# To enable verbose more in the plugin append the following: ANNOBIN_VERBOSE="true"
+make -C llvm-plugin clean all CLANG_TARGET_OPTIONS="$CLANG_TARGET_OPTIONS $BUILD_FLAGS"
 
 #---------------------------------------------------------------------------------
 
 %install
-%make_install
-%{__rm} -f %{buildroot}%{_infodir}/dir
+
+# PLUGIN_INSTALL_DIR is used by the Clang and LLVM makefiles...
+%make_install PLUGIN_INSTALL_DIR=%{buildroot}/%{llvm_plugin_dir}
+
+# Move the clang plugin to a seperate directory.
+mkdir -p %{buildroot}/%{clang_plugin_dir}
+mv %{buildroot}/%{llvm_plugin_dir}/annobin-for-clang.so %{buildroot}/%{clang_plugin_dir}
+
+# Record the version of gcc that built this plugin.
+# Note - we cannot just store %%{gcc_vr} as sometimes the gcc rpm version changes
+# without the NVR being altered.  See BZ #2030671 for more discussion on this.
+mkdir -p                             %{buildroot}/%{ANNOBIN_GCC_PLUGIN_DIR}
+echo "%{gcc_vr}" > %{buildroot}/%{ANNOBIN_GCC_PLUGIN_DIR}/%{aver}
+
+rm -f %{buildroot}%{_infodir}/dir
 
 #---------------------------------------------------------------------------------
 
-%if %{with tests}
 %check
-# Change the following line to "make check || :" on RHEL7 or if you need to see the
-# test suite logs in order to diagnose a test failure.
-make check
-if [ -f tests/test-suite.log ]; then
-    cat tests/test-suite.log
-fi
-%endif
+make check || ( cat tests/test-suite.log; false )
 
 #---------------------------------------------------------------------------------
 
-%files
-%{ANNOBIN_GCC_PLUGIN_DIR}
+%files docs
 %license COPYING3 LICENSE
-%exclude %{_datadir}/doc/annobin-plugin/COPYING3
-%exclude %{_datadir}/doc/annobin-plugin/LICENSE
-%doc %{_datadir}/doc/annobin-plugin/annotation.proposal.txt
+%exclude %{_docdir}/annobin-plugin/COPYING3
+%exclude %{_docdir}/annobin-plugin/LICENSE
+%doc %{_docdir}/annobin-plugin/annotation.proposal.txt
 %{_infodir}/annobin.info*
 %{_mandir}/man1/annobin.1*
-%{_mandir}/man1/built-by.1*
-%{_mandir}/man1/check-abi.1*
-%{_mandir}/man1/hardened.1*
-%{_mandir}/man1/run-on-binaries-in.1*
+%exclude %{_mandir}/man1/built-by.1*
+%exclude %{_mandir}/man1/check-abi.1*
+%exclude %{_mandir}/man1/hardened.1*
+%exclude %{_mandir}/man1/run-on-binaries-in.1*
 
-%if %{with annocheck}
+%files plugin-llvm
+%dir %{llvm_plugin_dir}
+%{llvm_plugin_dir}/annobin-for-llvm.so
+
+%files plugin-clang
+%dir %{clang_plugin_dir}
+%{clang_plugin_dir}/annobin-for-clang.so
+
+%files plugin-gcc
+%dir %{ANNOBIN_GCC_PLUGIN_DIR}
+%{ANNOBIN_GCC_PLUGIN_DIR}/annobin.so
+%{ANNOBIN_GCC_PLUGIN_DIR}/annobin.so.0
+%{ANNOBIN_GCC_PLUGIN_DIR}/annobin.so.0.0.0
+%{ANNOBIN_GCC_PLUGIN_DIR}/%{aver}
+
 %files annocheck
 %{_bindir}/annocheck
 %{_mandir}/man1/annocheck.1*
-%endif
+
+%files libannocheck
+%{_includedir}/libannocheck.h
+%{_libdir}/libannocheck.*
+%{_libdir}/pkgconfig/libannocheck.pc
 
 #---------------------------------------------------------------------------------
 
 %changelog
+* Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 12.40-1
+- Promoted package from extended to core
+- Upgraded to 12.49
+- Imported and adopted the spec from Fedora 41 (License: MIT)
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.27-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

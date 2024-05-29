@@ -44,6 +44,7 @@ ignore_no_source_tarball=" \
   kf \
   livepatching \
   lua-rpm-macros \
+  ocaml-srpm-macros \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \

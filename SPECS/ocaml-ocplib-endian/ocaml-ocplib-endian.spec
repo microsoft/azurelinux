@@ -1,38 +1,47 @@
+	
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+ 
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
+%endif
+
 %global libname ocplib-endian
 %global debug_package %{nil}
 
 Summary:        Functions to read/write int16/32/64 from strings, bigarrays
 Name:           ocaml-ocplib-endian
-Version:        1.1
-Release:        8%{?dist}
+Version:        1.2
+Release:        1%{?dist}
 # License is LGPL 2.1 with standard OCaml exceptions
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/OCamlPro/ocplib-endian
-Source0:        https://github.com/OCamlPro/ocplib-endian/archive/%{version}/ocplib-endian-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/ocplib-endian-%{version}.tar.gz
+# Remove dependency on base-bytes
+Patch0:         remove-base-byte.patch
 
-BuildRequires:  ocaml >= 4.02.3
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-cppo >= 1.1.0
 BuildRequires:  ocaml-dune >= 1.0
 
 %description
-Optimised functions to read and write int16/32/64 from strings,
+Optimized functions to read and write int16/32/64 from strings,
 bytes and bigarrays, based on primitives added in version 4.01.
 
 The library implements three modules:
 
-EndianString works directly on strings, and provides submodules
-BigEndian and LittleEndian, with their unsafe counter-parts;
-EndianBytes works directly on bytes, and provides submodules
-BigEndian and LittleEndian, with their unsafe counter-parts;
-EndianBigstring works on bigstrings (Bigarrays of chars),
-and provides submodules BigEndian and LittleEndian, with their
-unsafe counter-parts;
+- EndianString works directly on strings, and provides submodules
+  BigEndian and LittleEndian, with their unsafe counterparts;
+- EndianBytes works directly on bytes, and provides submodules
+  BigEndian and LittleEndian, with their unsafe counterparts;
+- EndianBigstring works on bigstrings (Bigarrays of chars),
+  and provides submodules BigEndian and LittleEndian, with their
+  unsafe counterparts.
 
 %package        devel
 Summary:        Development files for %{name}
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
@@ -40,61 +49,29 @@ The %{name}-devel package contains libraries and
 signature files for developing applications that use %{name}.
 
 %prep
-%autosetup -n %{libname}-%{version}
+%autosetup -n ocplib-endian-%{version} -p1
 
 %build
-dune build %{?_smp_mflags}
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
+%dune_install
 
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
+%check
+%dune_check
 
-# We do not want the ml files
-find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
-
-# The tests currently fail, showing allocation of 54 words for all 3 tests.
-# The issue is known, but upstream's remedy does not work with OCaml 4.11.
-# See https://github.com/OCamlPro/ocplib-endian/issues/18
-#
-#%%check
-#dune runtest
-
-%files
+%files -f .ofiles
 %license COPYING.txt
 %doc README.md CHANGES.md
-%dir %{_libdir}/ocaml/%{libname}/
-%dir %{_libdir}/ocaml/%{libname}/bigstring/
-%{_libdir}/ocaml/%{libname}/META
-%{_libdir}/ocaml/%{libname}/*.cma
-%{_libdir}/ocaml/%{libname}/*.cmi
-%{_libdir}/ocaml/%{libname}/bigstring/*.cma
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{libname}/*.cmxs
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmxs
-%endif
 
-%files devel
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{libname}/*.a
-%{_libdir}/ocaml/%{libname}/*.cmxa
-%{_libdir}/ocaml/%{libname}/*.cmx
-%{_libdir}/ocaml/%{libname}/bigstring/*.a
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmxa
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmx
-%endif
-%{_libdir}/ocaml/%{libname}/*.mli
-%{_libdir}/ocaml/%{libname}/*.cmt
-%{_libdir}/ocaml/%{libname}/*.cmti
-%{_libdir}/ocaml/%{libname}/bigstring/*.mli
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmt
-%{_libdir}/ocaml/%{libname}/bigstring/*.cmti
-%{_libdir}/ocaml/%{libname}/dune-package
-%{_libdir}/ocaml/%{libname}/opam
+%files devel -f .ofiles-devel
 
 %changelog
+* Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2-1
+- Update to 1.2
+- Converted spec file to match with Fedora 41.
+- Use ocaml 5.1.1 to build
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-8
 - Cleaning-up spec. License verified.
 

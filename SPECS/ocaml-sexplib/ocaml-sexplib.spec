@@ -1,31 +1,34 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%bcond_with vim
-
 %global srcname sexplib
 
 Name:           ocaml-%{srcname}
-Version:        0.15.0
+Version:        0.16.0
 Release:        1%{?dist}
 Summary:        Automated S-expression conversion
-
 # The project as a whole is MIT, but code in the src subdirectory is BSD.
 License:        MIT and BSD
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.04.2
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
-BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-num-devel
-BuildRequires:  ocaml-parsexp-devel
-BuildRequires:  ocaml-sexplib0-devel
-%if %{with vim}
-BuildRequires:  vim-filesystem
+BuildRequires:  ocaml-parsexp-devel >= 0.16
+BuildRequires:  ocaml-sexplib0-devel >= 0.16
+BuildRequires:  vim-rpm-macros
+
+%if %{with_check}
+BuildRequires:  ocaml-base-devel
+BuildRequires:  ocaml-base-quickcheck-devel
+BuildRequires:  ocaml-core-kernel-devel
+BuildRequires:  ocaml-expect-test-helpers-core-devel
+BuildRequires:  ocaml-ppx-jane-devel
+BuildRequires:  ocaml-sexp-grammar-validation-devel
 %endif
 
 %description
@@ -37,94 +40,50 @@ Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       ocaml-num-devel%{?_isa}
 Requires:       ocaml-parsexp-devel%{?_isa}
+Requires:       ocaml-sexplib0-devel%{?_isa}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-%if %{with vim}
 %package        vim
 Summary:        Support for sexplib syntax in vim
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       vim-filesystem
+Requires:       vim
 
 %description    vim
 This package contains a vim syntax file for Sexplib.
-%endif
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n sexplib-%{version}
 
 %build
-dune build %{?_smp_mflags}
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
+%dune_install
 
-%if %{with vim}
 # Install the vim support
 mkdir -p %{buildroot}%{vimfiles_root}/syntax
 cp -p vim/syntax/sexplib.vim %{buildroot}%{vimfiles_root}/syntax
-%endif
 
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
+%check
+%dune_check
 
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
-%endif
-
-%files
+%files -f .ofiles
 %doc CHANGES.md README.org
 %license COPYRIGHT.txt LICENSE.md LICENSE-Tywith.txt THIRD-PARTY.txt
-%dir %{_libdir}/ocaml/%{srcname}/
-%dir %{_libdir}/ocaml/%{srcname}/num/
-%dir %{_libdir}/ocaml/%{srcname}/unix/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cma
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmi
-%{_libdir}/ocaml/%{srcname}/num/*.cma
-%{_libdir}/ocaml/%{srcname}/num/*.cmi
-%{_libdir}/ocaml/%{srcname}/unix/*.cma
-%{_libdir}/ocaml/%{srcname}/unix/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxs
-%{_libdir}/ocaml/%{srcname}/num/*.cmxs
-%{_libdir}/ocaml/%{srcname}/unix/*.cmxs
-%endif
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.a
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmx
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxa
-%{_libdir}/ocaml/%{srcname}/num/*.a
-%{_libdir}/ocaml/%{srcname}/num/*.cmx
-%{_libdir}/ocaml/%{srcname}/num/*.cmxa
-%{_libdir}/ocaml/%{srcname}/unix/*.a
-%{_libdir}/ocaml/%{srcname}/unix/*.cmx
-%{_libdir}/ocaml/%{srcname}/unix/*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmt
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmti
-%{_libdir}/ocaml/%{srcname}/*.ml
-%{_libdir}/ocaml/%{srcname}/*.mli
-%{_libdir}/ocaml/%{srcname}/num/*.cmt
-%{_libdir}/ocaml/%{srcname}/num/*.cmti
-%{_libdir}/ocaml/%{srcname}/num/*.ml
-%{_libdir}/ocaml/%{srcname}/num/*.mli
-%{_libdir}/ocaml/%{srcname}/unix/*.cmt
-%{_libdir}/ocaml/%{srcname}/unix/*.ml
+%files devel -f .ofiles-devel
 
-%if %{with vim}
 %files vim
 %{vimfiles_root}/syntax/sexplib.vim
-%endif
 
 %changelog
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-1
+- Converted spec file to match with Fedora 41.
+- Upgrade to 0.16.0
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified

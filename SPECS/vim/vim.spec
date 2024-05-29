@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2190
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        macros.vim
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -28,6 +29,13 @@ Conflicts:      toybox
 %description extra
 The vim extra package contains a extra files for powerful text editor.
 
+%package        rpm-macros
+Summary:        RPM macros for Vim text editor
+BuildArch:      noarch
+
+%description    rpm-macros
+The vim-rpm-macros package contains macros.vim needed to define RPM macros
+
 %prep
 %autosetup -p1
 echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
@@ -41,6 +49,10 @@ echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
 %make_install
 ln -sv vim %{buildroot}%{_bindir}/vi
 install -vdm 755 %{buildroot}%{_sysconfdir}
+	
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d/
+install -p -m644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/
+
 cat > %{buildroot}%{_sysconfdir}/vimrc << "EOF"
 " Begin %{_sysconfdir}/vimrc
 
@@ -201,7 +213,14 @@ fi
 %{_bindir}/vim
 %{_bindir}/vimdiff
 
+%files rpm-macros
+%{_rpmconfigdir}/macros.d/macros.vim
+
 %changelog
+* Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9.0.2190-3
+- Added vim-rpm-macros subpackage
+- Add macros.vim to the new subpackage
+
 * Thu Mar 21 2024 Andy Zaugg <azaugg@linkedin.com> - 9.0.2190-2
 - Tweek vimrc, remove double escape quit, remove vim bell, add ai and hlsearch and add :W for sudo write
 
@@ -213,7 +232,7 @@ fi
 - Remove patches that no longer apply in the new version.
 - Remove file listed twice.
 
-* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 9.0.1897-3
+* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9.0.1897-3
 - Patch CVE-2023-5441
 
 * Mon Oct 09 2023 Mitch Zhu <mitchzhu@microsoft.com> - 9.0.1897-2
