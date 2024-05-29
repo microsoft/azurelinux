@@ -95,6 +95,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 * Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.16.1-4
 - Bump release to build with new python-werkzeug to fix CVE-2024-34069
 
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.16.1-4
+- Bump release to build with new llvm to fix CVE-2024-31852
+
 * Mon Apr 29 2024 Riken Maharjan <rmaharjan@microsoft> - 2.16.1-3
 - Add tensorboard as runtime requirement
 
