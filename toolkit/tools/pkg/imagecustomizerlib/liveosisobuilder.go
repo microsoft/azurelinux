@@ -43,7 +43,7 @@ const (
 
 	// kernel arguments template
 	kernelArgsDebug    = " rd.debug rd.live.debug=1 rd.retry=40 "
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.overlayfs rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsTemplate = " console=tty0 console=ttyS0,115200n8 rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.overlayfs rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
@@ -179,28 +179,60 @@ fi
 
 ### BEGIN /etc/grub.d/10_linux ###
 menuentry 'AzureLinux GNU/Linux, with Linux 6.6.29.1-3.azl3' --class azurelinux --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-6.6.29.1-3.azl3-advanced-786b5cb3-65d6-4bee-8418-831adfa0e857' {
-	load_video
-	set gfxpayload=keep
-	insmod gzio
-	insmod part_gpt
-	insmod ext2
-	search --label CDROM --set root
-	echo	'Loading Linux 6.6.29.1-3.azl3 ...'
-	linux	/boot/vmlinuz root=live:LABEL=CDROM ro console=tty0 rd.auto=1 net.ifnames=0 lockdown=integrity log_buf_len=1M  rd.debug rd.live.debug=1 rd.retry=40 rd.shell rd.live.image rd.live.dir=liveos rd.live.squashimg=rootfs.img rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt  $kernelopts
-	echo	'Loading initial ramdisk ...'
-	initrd	/boot/initrd.img
+        load_video
+        set gfxpayload=keep
+        insmod gzio
+        insmod part_gpt
+        insmod ext2
+        search --label CDROM --set root
+        echo    'Loading Linux 6.6.29.1-3.azl3 ...'
+        linux   /boot/vmlinuz \
+		    root=live:LABEL=CDROM \
+            ro \
+			console=tty0 \
+			console=ttyS0,115200n8 \
+			rd.auto=1 \
+			net.ifnames=0 \
+			lockdown=integrity \
+			rd.info \
+			log_buf_len=1M \
+			rd.shell \
+			rd.live.image \
+			rd.live.dir=liveos \
+			rd.live.squashimg=rootfs.img \
+			rd.live.overlay=1 \
+			rd.live.overlay.overlayfs \
+			rd.live.overlay.nouserconfirmprompt \
+			$kernelopts
+        echo    'Loading initial ramdisk ...'
+        initrd  /boot/initrd.img
 }
 menuentry 'AzureLinux GNU/Linux, with Linux 6.6.29.1-3.azl3 (recovery mode)' --class azurelinux --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-6.6.29.1-3.azl3-recovery-786b5cb3-65d6-4bee-8418-831adfa0e857' {
-	load_video
-	set gfxpayload=keep
-	insmod gzio
-	insmod part_gpt
-	insmod ext2
-	search --label CDROM --set root
-	echo	'Loading Linux 6.6.29.1-3.azl3 ...'
-	linux	/boot/vmlinuz root=live:LABEL=CDROM ro console=tty0 single rd.auto=1 net.ifnames=0 lockdown=integrity rd.debug rd.live.debug=1 rd.retry=40 rd.shell rd.live.image rd.live.dir=liveos rd.live.squashimg=rootfs.img rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt     
-	echo	'Loading initial ramdisk ...'
-	initrd	/boot/initrd.img
+        load_video
+        set gfxpayload=keep
+        insmod gzio
+        insmod part_gpt
+        insmod ext2
+        search --label CDROM --set root
+        echo    'Loading Linux 6.6.29.1-3.azl3 ...'
+        linux   /boot/vmlinuz \
+		    root=live:LABEL=CDROM \
+			ro \
+			single \
+			console=tty0 \
+			console=ttyS0,115200n8 \
+			rd.auto=1 \
+			net.ifnames=0 \
+			lockdown=integrity \
+			rd.shell \
+			rd.live.image \
+			rd.live.dir=liveos \
+			rd.live.squashimg=rootfs.img \
+			rd.live.overlay=1 \
+			rd.live.overlay.overlayfs \
+			rd.live.overlay.nouserconfirmprompt
+        echo    'Loading initial ramdisk ...'
+        initrd  /boot/initrd.img
 }
 
 ### END /etc/grub.d/10_linux ###
@@ -527,17 +559,17 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 
 		logger.Log.Debugf("[7b]{\n%s\n[7]\n}", inputContentString)
 
-		argsToRemove := []string{"console"}
-		inputContentString, err = updateKernelCommandLineArgsAll(inputContentString, argsToRemove, nil)
-		if err != nil {
-			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
-		}
+		// argsToRemove := []string{"console"}
+		// inputContentString, err = updateKernelCommandLineArgsAll(inputContentString, argsToRemove, nil)
+		// if err != nil {
+		// 	return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
+		// }
 
-		logger.Log.Debugf("[8b]{\n%s\n[8]\n}", inputContentString)
+		// logger.Log.Debugf("[8b]{\n%s\n[8]\n}", inputContentString)
 
-		inputContentString = grubContent20
+		// inputContentString = grubContent30
 
-		logger.Log.Debugf("[9b]{\n%s\n[9]\n}", inputContentString)
+		// logger.Log.Debugf("[9b]{\n%s\n[9]\n}", inputContentString)
 	}
 
 	logger.Log.Debugf("[10]{\n%s\n[10]\n}", inputContentString)
