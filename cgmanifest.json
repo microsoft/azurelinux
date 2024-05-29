@@ -23352,6 +23352,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-omegaconf",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/omry/omegaconf/archive/refs/tags/v2.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-openstackdocstheme",
           "version": "1.29.0",
           "downloadUrl": "https://pypi.io/packages/source/o/openstackdocstheme/openstackdocstheme-1.29.0.tar.gz"

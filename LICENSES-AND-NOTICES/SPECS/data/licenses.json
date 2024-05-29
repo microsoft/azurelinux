@@ -2288,6 +2288,7 @@
                 "python-ml-dtypes",
                 "python-namex",
                 "python-nocasedict",
+                "python-omegaconf",
                 "python-opt-einsum",
                 "python-optree",
                 "python-pecan",
