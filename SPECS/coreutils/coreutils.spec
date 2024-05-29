@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        9.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
 Patch0:         coreutils-9.4-i18n-1.patch
+Patch1:         coreutils-9.4-uname-1.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
@@ -91,6 +92,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Wed May 29 2024 Rachel Menge <rachelmenge@microsoft.com> - 9.4-3
+- Add patch to support the -i and -p uname flags
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 9.4-2
 - fix serial-console.sh
 
