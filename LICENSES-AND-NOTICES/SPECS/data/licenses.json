@@ -1606,6 +1606,7 @@
                 "prometheus-node-exporter",
                 "ps_mem",
                 "psacct",
+                "pssh",
                 "psutils",
                 "ptlib",
                 "publicsuffix-list",
