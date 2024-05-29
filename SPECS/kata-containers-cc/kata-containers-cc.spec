@@ -114,11 +114,24 @@ KERNEL_VER=${header_dir#"linux-headers-"}
 KERNEL_MODULE_VER=${KERNEL_VER%%-*}
 popd
 
+echo "KERNEL_VER: ${KERNEL_VER}"
+echo "KERNEL_MODULE_VER: ${KERNEL_MODULE_VER}"
+
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
 make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
+
+echo "here1"
+
 popd
+
+echo "here2"
+
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
+
+echo "KERNEL_MODULES_DIR: ${KERNEL_MODULES_DIR}"
+
+ls ${KERNEL_MODULES_DIR} || true
 
 %install
 %define coco_path     /opt/confidential-containers
@@ -127,14 +140,20 @@ popd
 %define share_kata    %{coco_path}/share/kata-containers
 %define osbuilder     %{coco_path}/uvm
 
+echo "here3"
+
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/image-builder
 mkdir -p %{buildroot}%{osbuilder}/ci
 
+echo "here4"
+
 # kernel modules
 cp -aR %{KERNEL_MODULES_DIR} %{buildroot}%{osbuilder}
+
+echo "here5"
 
 # osbuilder
 pushd %{_builddir}/%{name}-%{version}
