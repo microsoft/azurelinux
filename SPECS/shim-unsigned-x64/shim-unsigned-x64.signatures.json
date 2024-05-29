@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "cbl-mariner-ca-20211013.der": "35478a4e9d9f5b8b04d417c4e2dbdfb32b6637a9d0293073aaafcdee8b506537",
-  "sbat.csv.in": "895ecdff532c9ed1cfbcd1e4d8fd9b29b87628394cc9c9101ec5be47f66e504d",
-  "shim-15.4.tar.bz2": "8344473dd10569588b8238a4656b8fab226714eea9f5363f8c410aa8a5090297"
- }
+  "Signatures": {
+    "cbl-mariner-ca-20211013.der": "35478a4e9d9f5b8b04d417c4e2dbdfb32b6637a9d0293073aaafcdee8b506537",
+    "sbat.csv.in": "895ecdff532c9ed1cfbcd1e4d8fd9b29b87628394cc9c9101ec5be47f66e504d",
+    "shim-15.8.tar.bz2": "a79f0a9b89f3681ab384865b1a46ab3f79d88b11b4ca59aa040ab03fffae80a9"
+  }
 }
