@@ -37,6 +37,7 @@ Parallell version includes:
 %prep
 %autosetup
 sed -i -e '1 d' psshlib/askpass_{client,server}.py
+sed -i 's/print \([^()]*\)/print (\1)/g' test/test.py
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -55,8 +56,9 @@ install -d %{buildroot}%{_mandir}/man1
 install -p -m 0644 man/man1/*.1  %{buildroot}%{_mandir}/man1
 mv %{buildroot}%{_mandir}/man1/pscp.1 %{buildroot}%{_mandir}/man1/pscp.pssh.1
 
-# No tests
-
+# No tests, test.py script requires setup for host and user to do ssh communication
+# %check
+# python3 test/test.py
 
 %files
 %license COPYING
