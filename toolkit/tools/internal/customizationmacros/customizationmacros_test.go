@@ -188,7 +188,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 	)
 	testCases := []struct {
 		name                string
-		disableDocs         bool
+		disableRpmDocs      bool
 		DisableRpmLocales   bool
 		OverrideRpmLocales  string
 		expectError         bool
@@ -198,8 +198,8 @@ func TestAddCustomizationMacros(t *testing.T) {
 		expectedLocaleFile  string
 	}{
 		{
-			name:              "DisableDocs",
-			disableDocs:       true,
+			name:              "DisableRpmDocs",
+			disableRpmDocs:    true,
 			DisableRpmLocales: false,
 			expectError:       false,
 			expectedDocMacro:  "%_excludedocs 1",
@@ -207,15 +207,15 @@ func TestAddCustomizationMacros(t *testing.T) {
 		},
 		{
 			name:                "DisableRpmLocales",
-			disableDocs:         false,
+			disableRpmDocs:      false,
 			DisableRpmLocales:   true,
 			expectError:         false,
 			expectedLocaleMacro: "%_install_langs NONE",
 			expectedLocaleFile:  localeFile,
 		},
 		{
-			name:                "DisableDocsAndLocales",
-			disableDocs:         true,
+			name:                "DisableRpmDocsAndLocales",
+			disableRpmDocs:      true,
 			DisableRpmLocales:   true,
 			expectError:         false,
 			expectedDocMacro:    "%_excludedocs 1",
@@ -225,13 +225,13 @@ func TestAddCustomizationMacros(t *testing.T) {
 		},
 		{
 			name:              "EnableDocsAndLocales",
-			disableDocs:       false,
+			disableRpmDocs:    false,
 			DisableRpmLocales: false,
 			expectError:       false,
 		},
 		{
 			name:                "OverrideRpmLocales",
-			disableDocs:         false,
+			disableRpmDocs:      false,
 			DisableRpmLocales:   false,
 			OverrideRpmLocales:  "en:de:fr",
 			expectError:         false,
@@ -240,7 +240,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 		},
 		{
 			name:               "DisableRpmLocalesAndOverrideRpmLocales",
-			disableDocs:        false,
+			disableRpmDocs:     false,
 			DisableRpmLocales:  true,
 			OverrideRpmLocales: "en_US",
 			expectError:        true,
@@ -250,7 +250,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			err := AddCustomizationMacros(tempDir, tc.disableDocs, tc.DisableRpmLocales, tc.OverrideRpmLocales)
+			err := AddCustomizationMacros(tempDir, tc.disableRpmDocs, tc.DisableRpmLocales, tc.OverrideRpmLocales)
 
 			if tc.expectError {
 				assert.Error(t, err)

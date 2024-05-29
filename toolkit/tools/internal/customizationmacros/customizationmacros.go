@@ -21,7 +21,7 @@ import (
 
 const (
 	// macro files to customize the installer and final images
-	disableDocsMacroFile         = "macros.installercustomizations_disable_docs"
+	disableRpmDocsMacroFile      = "macros.installercustomizations_disable_docs"
 	configureRpmLocalesMacroFile = "macros.installercustomizations_customize_locales"
 )
 
@@ -47,9 +47,9 @@ var (
 )
 
 // AddCustomizationMacros adds the currently defined image custimization macros to the specified root directory.
-// For each of disableDocs and disableRpmLocales a macro file is created with the corresponding macros defined in the
+// For each of disableRpmDocs and disableRpmLocales a macro file is created with the corresponding macros defined in the
 // default rpm macros directory.
-func AddCustomizationMacros(rootDir string, disableDocs, disableRpmLocales bool, overrideRpmLocales string) (err error) {
+func AddCustomizationMacros(rootDir string, disableRpmDocs, disableRpmLocales bool, overrideRpmLocales string) (err error) {
 	if overrideRpmLocales != "" && disableRpmLocales {
 		return fmt.Errorf("cannot set both DisableRpmLocales and OverrideRpmLocales")
 	}
@@ -60,9 +60,9 @@ func AddCustomizationMacros(rootDir string, disableDocs, disableRpmLocales bool,
 	}
 	fullMacroDirPath := filepath.Join(rootDir, macroDir)
 
-	if disableDocs {
+	if disableRpmDocs {
 		logger.Log.Debugf("Disabling documentation packages")
-		err = AddMacroFile(fullMacroDirPath, rpm.DisableDocumentationDefines(), disableDocsMacroFile, docComments)
+		err = AddMacroFile(fullMacroDirPath, rpm.DisableDocumentationDefines(), disableRpmDocsMacroFile, docComments)
 		if err != nil {
 			return fmt.Errorf("failed to add disable docs macro file:\n%w", err)
 		}

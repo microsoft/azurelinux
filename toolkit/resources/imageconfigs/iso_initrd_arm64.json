@@ -41,7 +41,7 @@
                     "StartupCommand": "/root/runliveinstaller"
                 }
             ],
-            "DisableDocs": true,
+            "DisableRpmDocs": true,
             "DisableRpmLocales": false
         }
     ]

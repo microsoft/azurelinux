@@ -53,8 +53,8 @@
                 "default": "kernel"
             },
             "Hostname": "azurelinux",
-            "DisableDocs": true,
-            "DisableRpmLocales": false
+            "DisableRpmDocs": true,
+            "DisableRpmLocales": true
         }
     ]
 }
