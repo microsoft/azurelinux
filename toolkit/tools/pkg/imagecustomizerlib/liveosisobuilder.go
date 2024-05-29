@@ -47,11 +47,10 @@ const (
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
-	dracutConfig = `add_dracutmodules+=" dmsquash-live "
+	dracutConfig = `add_dracutmodules+=" systemd-initrd dmsquash-live "
 add_drivers+=" overlay "
+hostonly="no"
 `
-	// hostonly="no"
-
 	// the total size of a collection of files is multiplied by the
 	// expansionSafetyFactor to estimate a disk size sufficient to hold those
 	// files.
@@ -60,10 +59,16 @@ add_drivers+=" overlay "
 	/*
 		console=tty0 \
 		console=ttyS0,115200n8 \
+		rd.debug \
+		rd.retry=40 \
+		rd.live.debug=1 \
+		intel_iommu=on \
+		iommu=pt \
+		lockdown=none \
 	*/
 
 	grubContent20 = `
-set timeout=5
+set timeout=10
 set bootprefix=/boot
 search --label CDROM --set root
 
@@ -78,22 +83,18 @@ if [ -f $bootprefix/grub2/grubenv ]; then
 	load_env -f $bootprefix/grub2/grubenv
 fi
 
-set rootdevice=PARTUUID=700a65e2-a039-4ef0-8e4d-5f1b6b5151dc
-
 menuentry "Azure Linux" {
 	linux /boot/vmlinuz \
-	    console=tty0 \
+		console=tty0 \
 		console=ttyS0,115200n8 \
-	    rd.auto=1 \
 		rd.debug \
-		rd.retry=40 \
+		rd.auto=1 \
 		root=live:LABEL=CDROM \
 		$mariner_cmdline \
 		lockdown=none \
 		sysctl.kernel.unprivileged_bpf_disabled=1 \
 		$systemd_cmdline \
 		rd.shell \
-		rd.live.debug=1 \
 		rd.live.image \
 		rd.live.dir=liveos \
 		rd.live.squashimg=rootfs.img \
@@ -101,9 +102,6 @@ menuentry "Azure Linux" {
 		rd.live.overlay.nouserconfirmprompt \
 		apparmor=0 \
 		log_buf_len=1M \
-		intel_iommu=on \
-		iommu=pt \
-		lockdown=none \
 		$kernelopts
 	initrd /boot/initrd.img
 }
