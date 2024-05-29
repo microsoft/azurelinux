@@ -34,7 +34,7 @@
 
 Name:         qtbase
 Summary:      Qt6 - QtBase components
-Version:      6.6.1
+Version:      6.6.2
 Release:      1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
@@ -344,9 +344,9 @@ install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt_headerdir}/QtXcb/
 
 
 %check
-# verify Qt5.pc
+# verify Qt6.pc
 export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
-test "$(pkg-config --modversion Qt5)" = "%{version}"
+test "$(pkg-config --modversion Qt6)" = "%{version}"
 %if 0%{?tests}
 ## see tests/README for expected environment (running a plasma session essentially)
 ## we are not quite there yet
@@ -476,7 +476,7 @@ fi
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qtbase
 
-	
+
 %files devel
 %{_bindir}/androiddeployqt
 %{_bindir}/androiddeployqt6
@@ -700,7 +700,10 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
-* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
+* Fri May 17 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 6.6.2-1
+- Upgrade to version 6.6.2 to fix CVE-2023-51714
+
+* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1-1
 - Upgrade to version 6.6.1 for Azure Linux 3.0
 
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
