@@ -7,15 +7,15 @@ It was born from lack of existing library to read/write natively from Python the
 Office Open XML format.
 
 Name:           python-%{pypi_name}
-Version:        2.6.2
-Release:        6%{?dist}
+Version:        3.1.2
+Release:        1%{?dist}
 Summary:        %{sum}
 
 License:        MIT and Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/%{pypi_name}
-Source0:        https://files.pythonhosted.org/packages/ba/06/b899c8867518df19e242d8cbc82d4ba210f5ffbeebb7704c695e687ab59c/openpyxl-2.6.2.tar.gz#/python-openpyxl-2.6.2.tar.gz
+Source0:        https://files.pythonhosted.org/packages/42/e8/af028681d493814ca9c2ff8106fc62a4a32e4e0ae14602c2a98fc7b741c8/openpyxl-3.1.2.tar.gz
 
 BuildArch:      noarch
 
@@ -55,6 +55,10 @@ rm -rf *.egg-info
 %{python3_sitelib}/%{pypi_name}/
 
 %changelog
+* Mon May 20 2024 Alberto David Perez Guevara <aperezguevaar@microsoft.com> - 3.1.2-1
+- Move package to SPEC folder and update package to versin 3.1.2-1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
