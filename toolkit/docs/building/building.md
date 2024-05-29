@@ -673,7 +673,7 @@ These are the useful build targets:
 | clean                            | Clean all built files.
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
-| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
+| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`. See `hydrate-srpms` target.
 | copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
@@ -686,6 +686,7 @@ These are the useful build targets:
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 | help                             | Display basic usage information for most commonly used build targets and variables.
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
+| hydrate-srpms                    | Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
 | image                            | Generate an image (see [Images](#images)).
 | initrd                           | Create the initrd for the ISO installer.
 | input-srpms                      | Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files.
