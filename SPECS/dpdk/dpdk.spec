@@ -3,7 +3,7 @@
 # Define variables for kernel version and source directory
 %global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
-%global moddestdir %{_libdir}/modules/%{KVERSION}/kernel/drivers/net
+%global moddestdir %{_libdir}/modules/%{KVERSION}/kernel/drivers/net/kni
 
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
@@ -140,7 +140,9 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 
 # Install the kernel modules to the specified directory
 mkdir -p %{buildroot}%{moddestdir}
-find %{_builddir}/dpdk-stable-%{version} -name rte_kni.ko -exec install -D -m 755 '{}' %{buildroot}%{moddestdir} \\;
+echo "find %{_builddir}/dpdk-stable-%{version} -name rte_kni.ko -exec install -D -m 755 '{}' %{buildroot}%{moddestdir} \;" > install_kni.sh
+chmod +x install_kni.sh
+./install_kni.sh
 
 %files
 # BSD
