@@ -1,6 +1,7 @@
 package retry
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -82,7 +83,7 @@ func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
 	startTime := time.Now()
 	cancelled, err := RunWithLinearBackoff(func() error {
 		return fmt.Errorf("test error")
-	}, attempts, defaultTestTime, nil)
+	}, attempts, defaultTestTime, context.Background())
 	endTime := time.Now()
 	assert.NotNil(t, err)
 	assert.False(t, cancelled)
@@ -151,15 +152,15 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 func TestCancelsEarlyWithSignalImmediately(t *testing.T) {
 	tries := 3
 	base := 2.0
-	cancelSignal := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal immediately
-	close(cancelSignal)
+	cancelFunc()
 
 	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, cancelSignal)
+	}, tries, defaultTestTime, base, ctx)
 
 	endTime := time.Now()
 	// Error should be nil since we never ran the function before cancelling.
@@ -175,18 +176,18 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 	tries := 3
 	base := 2.0
 	cancelTime := defaultTestTime * 2
-	cancelSignal := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal after the first delay (wait for the first failure before cancelling)
 	go func() {
 		time.Sleep(cancelTime)
-		close(cancelSignal)
+		cancelFunc()
 	}()
 
 	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, cancelSignal)
+	}, tries, defaultTestTime, base, ctx)
 
 	endTime := time.Now()
 	// Error should still be set since we ran the function at least once.

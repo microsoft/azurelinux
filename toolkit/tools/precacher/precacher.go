@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -19,7 +20,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
@@ -135,30 +135,30 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	wg := new(sync.WaitGroup)
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	results := make(chan downloadResult)
-	doneChannel := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
 	// Each worker is responsible for removing itself from the wait group once done.
 	for _, pkg := range rpmSnapshot.Repo {
 		wg.Add(1)
-		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore)
+		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore, ctx)
 	}
 
 	// Wait for all the workers to finish and signal the main thread when we are done
 	go func() {
 		wg.Wait()
-		close(doneChannel)
+		cancelFunc()
 	}()
 
 	// Monitor the results channel and update the progress counter accordingly. Return once the done channel is closed.
-	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results, doneChannel)
+	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results, ctx)
 
 	return
 }
 
 // monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
 // no more results are available we expect the done channel to be closed, at which point we will return.
-func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string, err error) {
+func monitorProgress(total int, results chan downloadResult, ctx context.Context) (downloadedPackages []string, err error) {
 	const progressIncrement = 10.0
 
 	downloaded := 0
@@ -186,7 +186,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
 				unavailable++
 			}
-		case <-doneChannel:
+		case <-ctx.Done():
 			// All workers are done, finish this iteration of the loop and then return
 			done = true
 		}
@@ -218,7 +218,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 // The caller is expected to have added to the provided wait group, while this function is
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
 // network operations semaphore to minimize the time spent holding it.
-func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
+func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}, ctx context.Context) {
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName, fileName := formatName(pkg)
 	fullFilePath := path.Join(outDir, fileName)
@@ -258,23 +258,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	cancel := make(chan struct{})
-	retryNum := 1
-	_, err = retry.RunWithDefaultDownloadBackoff(func() error {
-		netErr := network.DownloadFile(url, fullFilePath, nil, nil)
-		if netErr != nil {
-			// The precacher expects to get 404 errors when we're speculatively using the wrong URI; we don't want to retry,
-			// nor do we want to complain too loudly in that case.
-			if netErr.Error() == "invalid response: 404" {
-				close(cancel)
-			} else {
-				logger.Log.Warnf("Attempt %d to download (%s) failed. Error: %s", retryNum, url, netErr)
-			}
-		}
-		retryNum++
-		return netErr
-	}, cancel)
-
+	_, err = network.DownloadFileWithRetry(url, fullFilePath, nil, nil, ctx)
 	if err != nil {
 		return
 	}

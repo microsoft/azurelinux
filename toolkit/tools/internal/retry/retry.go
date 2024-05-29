@@ -4,6 +4,7 @@
 package retry
 
 import (
+	"context"
 	"math"
 	"time"
 )
@@ -40,13 +41,17 @@ func calculateLinearDelay(failCount int, sleep time.Duration) time.Duration {
 	return sleep * time.Duration(failCount)
 }
 
-// backoffSleep sleeps for the given duration, unless the cancel channel is triggered or closed first. The cancel channel
-// may be nil in which case the sleep will always complete.
-func backoffSleep(delay time.Duration, cancel <-chan struct{}) (cancelled bool) {
+// backoffSleep sleeps for the given duration, unless the context is cancelled. The context
+// may be nil in which case the background context will be used and the sleep will always complete.
+func backoffSleep(delay time.Duration, ctx context.Context) (cancelled bool) {
+	// Context is optional, if not provided, use a background context.
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	// Check if we were cancelled before we sleep to avoid a race condition with
 	// delay=0 and an immediate cancel.
 	select {
-	case <-cancel:
+	case <-ctx.Done():
 		cancelled = true
 		return
 	default:
@@ -54,7 +59,7 @@ func backoffSleep(delay time.Duration, cancel <-chan struct{}) (cancelled bool) 
 
 	select {
 	case <-time.After(delay):
-	case <-cancel:
+	case <-ctx.Done():
 		cancelled = true
 	}
 	return
@@ -63,10 +68,10 @@ func backoffSleep(delay time.Duration, cancel <-chan struct{}) (cancelled bool) 
 // runWithBackoffInternal runs function up to 'attempts' times, waiting delayCalc(failCount) before each i-th attempt.
 // delayCalc(0) is expected to return 0.
 // The function will return early if the cancel channel is closed.
-func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int, cancel <-chan struct{}) (wasCancelled bool, err error) {
+func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int, ctx context.Context) (wasCancelled bool, err error) {
 	for failures := 0; failures < attempts; failures++ {
 		delayTime := delayCalc(failures)
-		wasCancelled = backoffSleep(delayTime, cancel)
+		wasCancelled = backoffSleep(delayTime, ctx)
 		if wasCancelled {
 			break
 		}
@@ -84,25 +89,25 @@ func Run(function func() error, attempts int, sleep time.Duration) (err error) {
 }
 
 // RunWithLinearBackoff runs function up to 'attempts' times, waiting i * sleep duration before each i-th attempt. An
-// optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
-func RunWithLinearBackoff(function func() error, attempts int, sleep time.Duration, cancel <-chan struct{}) (wasCancelled bool, err error) {
+// optional context can be provided to cancel the retry loop immediately.
+func RunWithLinearBackoff(function func() error, attempts int, sleep time.Duration, ctx context.Context) (wasCancelled bool, err error) {
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateLinearDelay(failCount, sleep)
-	}, attempts, cancel)
+	}, attempts, ctx)
 }
 
 // RunWithDefaultDownloadBackoff runs function up to 'DefaultDownloadRetryAttempts' times, waiting 'DefaultDownloadBackoffBase^(i-1)' seconds before
-// each i-th attempt. An optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
+// each i-th attempt. An optional context can be provided to cancel the retry loop immediately.
 //
 // The function is meant as a default for network download operations.
-func RunWithDefaultDownloadBackoff(function func() error, cancel <-chan struct{}) (wasCancelled bool, err error) {
-	return RunWithExpBackoff(function, DefaultDownloadRetryAttempts, DefaultDownloadRetryDuration, DefaultDownloadBackoffBase, cancel)
+func RunWithDefaultDownloadBackoff(function func() error, ctx context.Context) (wasCancelled bool, err error) {
+	return RunWithExpBackoff(function, DefaultDownloadRetryAttempts, DefaultDownloadRetryDuration, DefaultDownloadBackoffBase, ctx)
 }
 
 // RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExponentBase^(i-1) * sleep' duration before
-// each i-th attempt. An optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
-func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64, cancel <-chan struct{}) (wasCancelled bool, err error) {
+// each i-th attempt. An optional context can be provided to cancel the retry loop immediately.
+func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64, ctx context.Context) (wasCancelled bool, err error) {
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateExpDelay(failCount, sleep, backoffExponentBase)
-	}, attempts, cancel)
+	}, attempts, ctx)
 }
