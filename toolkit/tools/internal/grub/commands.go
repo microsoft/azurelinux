@@ -3,10 +3,6 @@
 
 package grub
 
-import (
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-)
-
 type Command struct {
 	Name string
 	Args []Token
@@ -53,9 +49,6 @@ func FindCommandAll(lines [][]Token, command string) [][]Token {
 	commandLines := [][]Token(nil)
 
 	for _, line := range lines {
-		if len(line[0].SubWords) > 0 {
-			logger.Log.Debugf("---- keyword: %s", line[0].SubWords[0].Value)
-		}
 		if len(line) >= 1 && IsTokenKeyword(line[0], command) {
 			commandLines = append(commandLines, line)
 		}
