@@ -3,7 +3,7 @@
 # Define variables for kernel version and source directory
 %global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
-%global moddestdir %{_libdir}/modules/%{KVERSION}/kernel/drivers/net/kni
+%global moddestdir /lib/modules/%{KVERSION}/kernel/drivers/net/kni
 
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
@@ -156,6 +156,7 @@ chmod +x install_kni.sh
 %{_bindir}/dpdk-proc-info
 %{_libdir}/*.so.*
 %{pmddir}/*.so.*
+%{moddestdir}/rte_kni.ko
 
 %files devel
 #BSD
