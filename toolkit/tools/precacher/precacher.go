@@ -135,31 +135,29 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	wg := new(sync.WaitGroup)
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	results := make(chan downloadResult)
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
 
 	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
 	// Each worker is responsible for removing itself from the wait group once done.
 	for _, pkg := range rpmSnapshot.Repo {
 		wg.Add(1)
-		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore, ctx)
+		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore)
 	}
 
-	// Wait for all the workers to finish and signal the main thread when we are done
+	// Wait for all the workers to finish and signal the main thread when we are done by closing the results channel.
 	go func() {
 		wg.Wait()
-		cancelFunc()
+		close(results)
 	}()
 
-	// Monitor the results channel and update the progress counter accordingly. Return once the done channel is closed.
-	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results, ctx)
+	// Monitor the results channel and update the progress counter accordingly. Return once the results channel is closed.
+	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results)
 
 	return
 }
 
 // monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
 // no more results are available we expect the done channel to be closed, at which point we will return.
-func monitorProgress(total int, results chan downloadResult, ctx context.Context) (downloadedPackages []string, err error) {
+func monitorProgress(total int, results chan downloadResult) (downloadedPackages []string, err error) {
 	const progressIncrement = 10.0
 
 	downloaded := 0
@@ -170,8 +168,11 @@ func monitorProgress(total int, results chan downloadResult, ctx context.Context
 
 	for done := false; !done; {
 		// Wait for a result from a worker, or the done channel to be closed (which means all workers are done)
-		select {
-		case result := <-results:
+		result, ok := <-results
+		if !ok {
+			// All workers are done, finish this iteration of the loop and then return
+			done = true
+		} else {
 			switch result.resultType {
 			case downloadResultTypeSkipped:
 				logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", result.pkgName)
@@ -187,9 +188,6 @@ func monitorProgress(total int, results chan downloadResult, ctx context.Context
 				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
 				unavailable++
 			}
-		case <-ctx.Done():
-			// All workers are done, finish this iteration of the loop and then return
-			done = true
 		}
 
 		// Calculate the progress percentage and update the progress counter if needed (update every 'progressIncrement' percent)
@@ -219,7 +217,7 @@ func monitorProgress(total int, results chan downloadResult, ctx context.Context
 // The caller is expected to have added to the provided wait group, while this function is
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
 // network operations semaphore to minimize the time spent holding it.
-func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}, ctx context.Context) {
+func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName, fileName := formatName(pkg)
 	fullFilePath := path.Join(outDir, fileName)
@@ -259,7 +257,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	_, err = network.DownloadFileWithRetry(ctx, url, fullFilePath, nil, nil)
+	_, err = network.DownloadFileWithRetry(context.Background(), url, fullFilePath, nil, nil)
 	if err != nil {
 		return
 	}
