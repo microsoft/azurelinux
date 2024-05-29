@@ -33,6 +33,7 @@ Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
 Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
 Patch:          0009-install-systemd-executor.patch
 Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
+Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -131,10 +132,6 @@ mkdir -p %{buildroot}/boot/%{name} \
 
 install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
-
-# Remove reference to kernel module zlib (deprecated in kernel v4.6+) since the 
-# pedantic dracut behavior causes initramfs generation to fail otherwise.
-sed -i 's/zlib//g' %{buildroot}%{dracutlibdir}/modules.d/01fips/module-setup.sh
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
