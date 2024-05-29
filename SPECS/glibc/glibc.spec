@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,16 @@ Requires:       %{name} = %{version}-%{release}
 %description nscd
 Name Service Cache Daemon
 
+%package locales-all
+Summary:        Locale Data for Localized Programs
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-i18n = %{version}-%{release}
+Requires:       %{name}-lang = %{version}-%{release}
+
+%description locales-all
+Locale data for the internationalization features of glibc
+
 %prep
 %autosetup -p1
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
@@ -214,6 +224,18 @@ mkdir -p %{buildroot}%{_libdir}/locale
 I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
 mv %{buildroot}%{_libdir}/locale/en_US.utf8 %{buildroot}%{_libdir}/locale/en_US.UTF-8
 popd
+
+# Generate all locales
+pushd %{_builddir}/%{name}-build
+# Install all locales
+make %{?_smp_mflags} install_root=%{buildroot} localedata/install-locale-files
+
+# Keep en_US.UTF-8 which generated above and remove from here to avoid conflict
+rm -r %{buildroot}%{_libdir}/locale/en_US.utf8
+# To reduce footprint of localedata
+# hardlink identical locale files together
+hardlink -vc %{buildroot}%{_libdir}/locale
+popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
@@ -255,7 +277,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files
 %defattr(-,root,root)
 %license COPYING COPYING.LIB LICENSES
-%{_libdir}/locale/*
+%{_libdir}/locale/en_US.UTF-8
 %dir %{_sysconfdir}/ld.so.conf.d
 %config(noreplace) %{_sysconfdir}/nsswitch.conf
 %config(noreplace) %{_sysconfdir}/ld.so.conf
@@ -326,7 +348,15 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
+%files locales-all
+%defattr(-,root,root)
+%{_libdir}/locale/*
+%exclude %{_libdir}/locale/en_US.UTF-8
+
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.35-8
+- Generate and provide glibc all locales in a sub-package
+
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.35-7
 - Fixup CVE-2023-4806.patch and CVE-2023-5156.patch
 - Backport typo fix for nscd
