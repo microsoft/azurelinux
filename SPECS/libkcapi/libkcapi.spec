@@ -235,7 +235,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 /%{_lib}/%{name}.so.%{version}
 /%{_lib}/fipscheck/%{name}.so.%{vmajor}.hmac
 /%{_lib}/fipscheck/%{name}.so.%{version}.hmac
-
 %if %{with_sysctl_tweak}
 %{_sysctldir}/%{sysctl_prio}-%{name}-optmem_max.conf
 %endif
