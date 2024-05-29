@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        17%{?dist}
+Release:        18%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -132,6 +132,10 @@ mkdir -p %{buildroot}/boot/%{name} \
 install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
 
+# Remove reference to kernel module zlib (deprecated in kernel v4.6+) since the 
+# pedantic dracut behavior causes initramfs generation to fail otherwise.
+sed -i 's/zlib//g' %{buildroot}%{dracutlibdir}/modules.d/01fips/module-setup.sh
+
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
 
@@ -217,6 +221,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue May 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-18
+- Remove reference to zlib from dracut-fips module setup to address
+    pedantic initramfs regeneration behavior
+
 * Thu May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
 - Patch microcode output check based on CONFIG_MICROCODE_AMD/INTEL
 
