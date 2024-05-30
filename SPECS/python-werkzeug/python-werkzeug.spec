@@ -73,7 +73,7 @@ pip3 install markupsafe
 %endif
 
 %files -n python3-%{modname} -f %{pyproject_files}
-%license LICENSE.rst
+%license LICENSE.txt
 %doc CHANGES.rst README.md
 %files -n python3-werkzeug-doc
 
