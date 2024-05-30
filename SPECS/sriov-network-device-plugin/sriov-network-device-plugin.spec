@@ -1,12 +1,13 @@
 Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
 Version:        3.6.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin
 Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  golang
 Requires:       gawk
 Requires:       hwdata
@@ -34,6 +35,9 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}/ddptool-1.0.1.12.tar.gz
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 3.6.2-3
+- Fix for CVE-2023-45288
+
 * Thu Feb 08 2024 Muhammad Falak <mwani@microsoft.com> - 3.6.2-2
 - Bump release to rebuild with go 1.21.6
 

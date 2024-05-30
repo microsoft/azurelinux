@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,10 +28,11 @@ Source0:        https://github.com/hashicorp/terraform/archive/refs/tags/v%{vers
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-44487.patch
+Patch1:         CVE-2024-3817.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
-BuildRequires:  golang <= 1.18.8
+BuildRequires:  golang
 
 %description
 Terraform is an infrastructure as code deployment management tool
@@ -61,6 +62,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Mon Apr 22 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.2-14
+- Patch CVE-2024-3817 in vendored hashicorp/go-getter
+
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.2-13
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 

@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,8 @@ Patch38:        0038-systemd-Fix-run-systemd-shutdown-handling.patch
 Patch39:        0039-modutils-Temporary-fix-for-mkinitrd-dracut.patch
 Patch40:        0040-For-systemd-hostnamed-service-to-run.patch
 Patch41:        0041-docker-Silence-io.containerd.internal.v1.opt-opt-con.patch
+Patch42:        0042-getty-grant-checkpoint_restore.patch
+Patch43:        0043-cloudinit-Add-support-for-cloud-init-growpart.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -345,6 +347,12 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue May 14 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-7
+- Add fix for cloud-init growpart.
+
+* Tue Apr 23 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-6
+- Add getty fix for new check in kernel 6.7
+
 * Tue Oct 17 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-5
 - Silence noise in containerd io.containerd.internal.v1.opt plugin.
 

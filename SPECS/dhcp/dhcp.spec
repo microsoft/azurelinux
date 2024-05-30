@@ -1,11 +1,13 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.2
-Release:        6%{?dist}
+Version:        4.4.3
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
-Patch1:         CVE-2021-25217.patch
+Patch0:         CVE-2022-38177.patch
+Patch1:         CVE-2022-38178.patch
+Patch2:         CVE-2022-2795.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,7 +41,13 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%autosetup -p1
+%setup -q -n dhcp-%{version}
+
+# Extracting bundled 'bind' to allow some of the patches to modify it.
+tar -C bind -xf bind/bind.tar.gz
+ln -s bind/bind-9* bind_ln
+
+%autopatch -p1
 
 %build
 CFLAGS="$CFLAGS \
@@ -170,6 +178,12 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Tue Apr 30 2024 Elaine Zhao <elainezhao@microsoft.com> - 4.4.3-2
+- Fix CVE-2022-38177, CVE-2022-38178, CVE-2022-2795 for bundled bind
+
+* Tue Apr 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
+- Auto-upgrade to 4.4.3 - Fix for CVE-2022-2928 and CVE-2022-2929
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.4.2-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

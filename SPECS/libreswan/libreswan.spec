@@ -27,7 +27,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{vers
 Source3:        https://download.libreswan.org/cavs/ikev1_dsa.fax.bz2
 Source4:        https://download.libreswan.org/cavs/ikev1_psk.fax.bz2
 Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
+Patch0:         CVE-2024-3652.patch
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -194,6 +195,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Mon Apr 22 2024 Dan Streetman <ddstreet@microsoft.com> - 4.14-2
+- patch CVE-2024-3652
+
 * Mon Apr 01 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.14-1
 - Upgrade to 4.14 to fix CVE-2024-2357
 

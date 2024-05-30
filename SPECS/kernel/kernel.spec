@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.153.1
-Release:        2%{?dist}
+Version:        5.15.159.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,21 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.159.1-1
+- Auto-upgrade to 5.15.159.1
+
+* Fri May 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.158.1-1
+- Auto-upgrade to 5.15.158.1
+
+* Tue Apr 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.157.1-1
+- Auto-upgrade to 5.15.157.1
+
+* Wed Apr 24 2024 Sriram Nambakam <snambakam@microsoft.com> - 5.15.153.1-3
+- Remove CONFIG_NF_CONNTRACK_PROCFS
+- Remove CONFIG_TRACE_IRQFLAGS
+- Remove CONFIG_TRACE_IRQFLAGS_NMI
+- Remove CONFIG_IRQSOFF_TRACER
+
 * Tue Apr 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.153.1-2
 - Enable CONFIG_NFT_OBJREF module
 

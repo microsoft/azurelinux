@@ -1,7 +1,7 @@
 Name:          libdwarf
 Epoch:         1
 Version:       0.9.0
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Library to access the DWARF Debugging file format 
 
 License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
@@ -10,6 +10,7 @@ Distribution:   Mariner
 URL:           https://www.prevanders.net/dwarf.html
 Source0:       https://www.prevanders.net/%{name}-%{version}.tar.xz
 Patch0:        libdwarf_skip_test.patch
+Patch1:        CVE-2024-2002.patch
 
 BuildRequires: gcc make python3
 Provides:      %{name} = %{version}-%{release}
@@ -92,6 +93,9 @@ TZ=:America/Los_Angeles %__make check
 
 
 %changelog
+* Tue Apr 30 2024 Elaine Zhao <elainezhao@microsoft.com> - 1:0.9.0-3
+- Patch CVE-2024-2002
+
 * Fri Jan 19 2024 Sindhu Karri <lakarri@microsoft.com> - 1:0.9.0-2
 - Add Epoch to fix version ordering as date versioning had changed to normal versioning
 
