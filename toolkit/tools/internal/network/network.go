@@ -51,11 +51,11 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // channel is provided, the download will be cancelled if the externalCancel channel is closed. The function will return
 // true if the download was cancelled, and an error if the download failed. 404 errors are considered unrecoverable and
 // will not be retried.
+// ctx: The context to use for the download. Use context.Background() if no other context is available.
 // srcUrl: The URL to download from.
 // dstFile: The local file to save the download to.
 // caCerts: The CA certificates to use for the download.
 // tlsCerts: The TLS certificates to use for the download.
-// externalCancel: An optional channel that can be used to cancel the download, pass nil if not needed.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
 func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (wasCancelled bool, err error) {

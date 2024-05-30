@@ -231,7 +231,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, ctx, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch, tsRoot)
+		go readSpecWorker(ctx, requests, results, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch, tsRoot)
 	}
 
 	for _, specFile := range specFiles {
@@ -291,7 +291,7 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readSpecWorker is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available file handles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, ctx context.Context, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
+func readSpecWorker(ctx context.Context, requests <-chan string, results chan<- *parseResult, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
 	const (
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
