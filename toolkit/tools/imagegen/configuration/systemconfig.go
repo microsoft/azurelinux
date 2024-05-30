@@ -42,7 +42,6 @@ type SystemConfig struct {
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
 	EnableHidepid        bool                      `json:"EnableHidepid"`
 	DisableRpmDocs       bool                      `json:"DisableRpmDocs"`
-	DisableRpmLocales    bool                      `json:"DisableRpmLocales"`
 	OverrideRpmLocales   string                    `json:"OverrideRpmLocales"`
 }
 
@@ -192,9 +191,6 @@ func (s *SystemConfig) IsValid() (err error) {
 	//Validate Encryption
 
 	// Validate locales
-	if len(s.OverrideRpmLocales) > 0 && s.DisableRpmLocales {
-		return fmt.Errorf("invalid [OverrideRpmLocales]: cannot be set when [DisableRpmLocales] is true")
-	}
 
 	return
 }

@@ -60,9 +60,6 @@ const (
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
-
-	// DisableAllLocalesString is used to disable all locales when installing RPMs by setting %_install_langs to "NONE"
-	DisableAllLocalesString = "NONE"
 )
 
 const (
@@ -306,12 +303,6 @@ func DisableDocumentationDefines() map[string]string {
 	return map[string]string{
 		"_excludedocs": "1",
 	}
-}
-
-// DisableLocaleDefines sets the macro to disable locales when installing RPMs.
-// - defines: optional map of defines to update. If nil, a new map will be created.
-func DisableLocaleDefines() map[string]string {
-	return OverrideLocaleDefines(DisableAllLocalesString)
 }
 
 // OverrideLocaleDefines sets the macro to override the default locales when installing RPMs.

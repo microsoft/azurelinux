@@ -189,7 +189,6 @@ func TestAddCustomizationMacros(t *testing.T) {
 	testCases := []struct {
 		name                string
 		disableRpmDocs      bool
-		DisableRpmLocales   bool
 		OverrideRpmLocales  string
 		expectError         bool
 		expectedDocMacro    string
@@ -198,17 +197,16 @@ func TestAddCustomizationMacros(t *testing.T) {
 		expectedLocaleFile  string
 	}{
 		{
-			name:              "DisableRpmDocs",
-			disableRpmDocs:    true,
-			DisableRpmLocales: false,
-			expectError:       false,
-			expectedDocMacro:  "%_excludedocs 1",
-			expectedDocFile:   docFile,
+			name:             "DisableRpmDocs",
+			disableRpmDocs:   true,
+			expectError:      false,
+			expectedDocMacro: "%_excludedocs 1",
+			expectedDocFile:  docFile,
 		},
 		{
 			name:                "DisableRpmLocales",
 			disableRpmDocs:      false,
-			DisableRpmLocales:   true,
+			OverrideRpmLocales:  "NONE",
 			expectError:         false,
 			expectedLocaleMacro: "%_install_langs NONE",
 			expectedLocaleFile:  localeFile,
@@ -216,7 +214,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 		{
 			name:                "DisableRpmDocsAndLocales",
 			disableRpmDocs:      true,
-			DisableRpmLocales:   true,
+			OverrideRpmLocales:  "NONE",
 			expectError:         false,
 			expectedDocMacro:    "%_excludedocs 1",
 			expectedLocaleMacro: "%_install_langs NONE",
@@ -224,33 +222,25 @@ func TestAddCustomizationMacros(t *testing.T) {
 			expectedLocaleFile:  localeFile,
 		},
 		{
-			name:              "EnableDocsAndLocales",
-			disableRpmDocs:    false,
-			DisableRpmLocales: false,
-			expectError:       false,
+			name:               "EnableDocsAndLocales",
+			disableRpmDocs:     false,
+			OverrideRpmLocales: "",
+			expectError:        false,
 		},
 		{
 			name:                "OverrideRpmLocales",
 			disableRpmDocs:      false,
-			DisableRpmLocales:   false,
 			OverrideRpmLocales:  "en:de:fr",
 			expectError:         false,
 			expectedLocaleMacro: "%_install_langs en:de:fr",
 			expectedLocaleFile:  localeFile,
-		},
-		{
-			name:               "DisableRpmLocalesAndOverrideRpmLocales",
-			disableRpmDocs:     false,
-			DisableRpmLocales:  true,
-			OverrideRpmLocales: "en_US",
-			expectError:        true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			err := AddCustomizationMacros(tempDir, tc.disableRpmDocs, tc.DisableRpmLocales, tc.OverrideRpmLocales)
+			err := AddCustomizationMacros(tempDir, tc.disableRpmDocs, tc.OverrideRpmLocales)
 
 			if tc.expectError {
 				assert.Error(t, err)

@@ -428,22 +428,6 @@ func TestDisableDocumentationDefines(t *testing.T) {
 	assert.Equal(t, expectedDefines, result)
 }
 
-func TestDisableLocaleDefines(t *testing.T) {
-	expectedDefines := map[string]string{
-		"_install_langs": "NONE",
-	}
-	result := DisableLocaleDefines()
-	assert.Equal(t, expectedDefines, result)
-}
-
-func TestDisableLocaleDefinesNil(t *testing.T) {
-	expectedDefines := map[string]string{
-		"_install_langs": "NONE",
-	}
-	result := DisableLocaleDefines()
-	assert.Equal(t, expectedDefines, result)
-}
-
 func TestOverrideLocaleDefines(t *testing.T) {
 	expectedDefines := map[string]string{
 		"_install_langs": "ab:cd:ef",

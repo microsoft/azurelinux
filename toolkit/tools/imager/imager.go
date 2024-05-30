@@ -601,7 +601,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	// empty. So the macros must be defined here before we install packages.
 	logger.Log.Debugf("Adding setup environment customization macros if needed")
 	err = customizationmacros.AddCustomizationMacros(rootDir, systemConfig.DisableRpmDocs,
-		systemConfig.DisableRpmLocales, systemConfig.OverrideRpmLocales)
+		systemConfig.OverrideRpmLocales)
 	if err != nil {
 		err = fmt.Errorf("failed to add setup environment customization macros:\n%w", err)
 		return
@@ -625,7 +625,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	// Configure the final image with the customized macros so that rpm continues to behave the same way in the final image
 	logger.Log.Infof("Adding final image customization macros if needed")
 	err = customizationmacros.AddCustomizationMacros(installChroot.RootDir(), systemConfig.DisableRpmDocs,
-		systemConfig.DisableRpmLocales, systemConfig.OverrideRpmLocales)
+		systemConfig.OverrideRpmLocales)
 	if err != nil {
 		err = fmt.Errorf("failed to add final image customization macros:\n%w", err)
 		return

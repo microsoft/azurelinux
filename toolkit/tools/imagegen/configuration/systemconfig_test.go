@@ -383,13 +383,3 @@ func TestShouldFaiInvalidAdditionalFiles_SystemConfig(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "invalid [AdditionalFiles]: (a.txt): list is empty", err.Error())
 }
-
-func TestShouldFailOverrideAndDisableLocale_SystemConfig(t *testing.T) {
-	systemConfig := validSystemConfig
-	systemConfig.DisableRpmLocales = true
-	systemConfig.OverrideRpmLocales = "en_US.UTF-8"
-
-	err := systemConfig.IsValid()
-	assert.Error(t, err)
-	assert.Equal(t, "invalid [OverrideRpmLocales]: cannot be set when [DisableRpmLocales] is true", err.Error())
-}

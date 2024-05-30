@@ -200,23 +200,22 @@ For size constrained images it may be desirable to omit documentation and non-de
 
 ``` json
 "DisableRpmDocs": true,
-"DisableRpmLocales": true,
+"OverrideRpmLocales": "NONE",
 ```
 
-`Disable*` will configure the image to never install the associated components.
+`DisableRpmDocs` will configure the image to never install the documentation. Selecting `OverrideRpmLocales=NONE` will omit all locales from the image.
 
-The `Disable*` configurations are encoded into `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system.
+These customizations are encoded into `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system.
 
 #### Custom Locales
 
-A specific locale string may be set using:
+A specific locale string may also be set using:
 
 ``` json
 "OverrideRpmLocales": "en:fr:es"
 ```
 
 This may be any value compatible with the `%_install_langs` rpm macro.
-
 
 ### Customization Scripts
 The tools offer the option of executing arbitrary shell scripts during various points of the image generation process. There are three points that scripts can be executed: `PreInstall`, `PostInstall`, and `ImageFinalize`.
