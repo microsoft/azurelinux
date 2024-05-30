@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Text-Template
 Version:        1.61
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://metacpan.org/pod/Text::Template
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -43,6 +43,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.61-2
+- Release bump to regenerate package's requires and provides.
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.61-1
 - Auto-upgrade to 1.61 - Azure Linux 3.0 - package upgrades
 

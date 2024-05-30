@@ -2,7 +2,7 @@
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
 Version:        1.74
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -63,6 +63,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.74-2
+- Release bump to regenerate package's requires and provides.
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.74-1
 - Upgrade to version 1.74
 
