@@ -74,10 +74,13 @@ pip3 install markupsafe
 
 %files -n python3-%{modname} -f %{pyproject_files}
 %license LICENSE.rst
-%doc CHANGES.rst README.rst
+%doc CHANGES.rst README.md
 %files -n python3-werkzeug-doc
 
 %changelog
+* Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.3-1
+- Update to version 3.0.3 to fix CVE-2024-34069.
+
 * Thu Apr 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.1-1
 - Auto-upgrade to 3.0.1 - 3.0 package upgrade
 - Import build, install and check section from Fedora 40 (license: MIT).
