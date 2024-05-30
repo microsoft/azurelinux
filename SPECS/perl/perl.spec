@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        505%{?dist}
+Release:        506%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6838,6 +6838,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-506
+- Release bump to regenerate package's requires and provides.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-505
 - Updating naming for 3.0 version of Azure Linux.
 
