@@ -1,6 +1,7 @@
 {
     "packages": [
-        "systemd-boot-unsigned"
+        "systemd-boot-unsigned",
+        "kernel-uki"
     ],
     "_comment": ""
 }

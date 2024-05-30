@@ -2,7 +2,7 @@
   "Disks": [
       {
           "PartitionTableType": "gpt",
-          "MaxSize": 4096,
+          "MaxSize": 2048,
           "Artifacts": [
               {
                   "Name": "cvm",
@@ -21,15 +21,8 @@
                   "FsType": "fat32"
               },
               {
-                  "ID": "boot",
-                  "Start": 513,
-                  "End": 1013,
-                  "FsType": "ext4"
-              },
-              {
                   "ID": "rootfs",
-                  "Name": "rootfs",
-                  "Start": 1013,
+                  "Start": 513,
                   "End": 0,
                   "FsType": "ext4"
               }
@@ -43,12 +36,8 @@
           "PartitionSettings": [
               {
                   "ID": "efi",
-                  "MountPoint": "/boot/efi",
+                  "MountPoint": "/efi",
                   "MountOptions" : "umask=0077"
-              },
-              {
-                  "ID": "boot",
-                  "MountPoint": "/boot"
               },
               {
                   "ID": "rootfs",
@@ -56,19 +45,24 @@
               }
           ],
           "PackageLists": [
-              "packagelists/hyperv-packages.json",
-              "packagelists/core-packages-image.json",
+              "packagelists/base-image-packages.json",
               "packagelists/cloud-init-packages.json",
               "packagelists/cvm-packages.json"
-          ],
-          "PostInstallScripts": [
-              {
-                  "Path": "postinstallscripts/cvm.sh"
-              }
           ],
           "KernelOptions": {
               "default": "kernel"
           },
+          "AdditionalFiles": {
+              "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs"
+          },
+          "FinalizeImageScripts": [
+              {
+                  "Path": "postinstallscripts/cvm.sh"
+              },
+              {
+                  "Path": "scripts/cleanup.sh"
+              }
+          ],
           "Hostname": "azurelinux"
       }
   ]

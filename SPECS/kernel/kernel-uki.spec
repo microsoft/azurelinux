@@ -8,12 +8,12 @@
 # suffix, our kernel version does not.
 %define kernelver %{version}-%{release}
 
-%define cmdline console=ttyS0
+%define cmdline console=ttyS0 noxsaves
 
 Summary:        Linux Kernel
 Name:           kernel-uki
 Version:        6.6.29.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,7 +59,7 @@ install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
-* Tue May 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-3
+* Tue May 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Match kernel version and release
 
 * Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.22.1-2

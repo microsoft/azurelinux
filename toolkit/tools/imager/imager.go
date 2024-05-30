@@ -182,6 +182,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 	} else {
 		timestamp.StartEvent("creating raw disk", nil)
+		defer timestamp.StopEvent(nil)
 
 		diskConfig := disks[defaultDiskIndex]
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
@@ -214,7 +215,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 
 		logger.Log.Infof("Selected (%s) for the kernel", kernelPkg)
 		packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
-		timestamp.StopEvent(nil) // creating raw disk
 	}
 
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
