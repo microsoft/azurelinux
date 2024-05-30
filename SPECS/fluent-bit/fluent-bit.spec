@@ -49,8 +49,10 @@ Development files for %{name}
     -DFLB_OUT_TD=Off \
     -DFLB_OUT_ES=Off \
     -DFLB_SHARED_LIB=On \
+%if %{with_check}
     -DFLB_TESTS_RUNTIME=On \
-    -DFLB_TESTS_INTERNAL=Off \
+    -DFLB_TESTS_INTERNAL=On \
+%endif
     -DFLB_RELEASE=On \
     -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
@@ -61,6 +63,9 @@ Development files for %{name}
 
 %install
 %cmake_install
+
+%check
+%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
 
 %files
 %license LICENSE
