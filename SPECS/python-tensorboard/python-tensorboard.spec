@@ -14,7 +14,6 @@ Distribution:   Azure Linux
 URL:            https://github.com/tensorflow/tensorboard
 # This source also contains the dependencies required for building tensorboard
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 Patch0:         0000-Use-system-package.patch
 BuildRequires:  bazel
 BuildRequires:  build-essential
