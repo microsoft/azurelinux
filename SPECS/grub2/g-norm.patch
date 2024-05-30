@@ -1,0 +1,20 @@
+--- a/grub-core/normal/main.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/normal/main.c	2024-05-30 16:20:31.000000000 -0700
+@@ -263,6 +263,7 @@
+   grub_menu_t menu = 0;
+   const char *prefix;
+ 
++  grub_printf ("GJS: grub_normal_execute entered config %s, nested %d, batch %d\n", config, nested, batch);
+   if (! nested)
+     {
+       prefix = grub_env_get ("prefix");
+@@ -274,7 +275,9 @@
+ 
+   if (config)
+     {
++      grub_printf ("GJS: grub_normal_execute reading config %s, prefix %s\n", config, prefix);
+       menu = read_config_file (config);
++      grub_printf ("GJS: grub_normal_execute read menu %s\n", menu);
+ 
+       /* Ignore any error.  */
+       grub_errno = GRUB_ERR_NONE;
