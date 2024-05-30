@@ -25363,8 +25363,8 @@
         "type": "other",
         "other": {
           "name": "rasdaemon",
-          "version": "0.6.4",
-          "downloadUrl": "http://www.infradead.org/~mchehab/rasdaemon/rasdaemon-0.6.4.tar.bz2"
+          "version": "0.8.0",
+          "downloadUrl": "http://www.infradead.org/~mchehab/rasdaemon/rasdaemon-0.8.0.tar.bz2"
         }
       }
     },

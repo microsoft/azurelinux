@@ -1,22 +1,26 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:			rasdaemon
-Version:		0.6.4
-Release:		2%{?dist}
+Version:		0.8.0
+Release:		1%{?dist}
 Summary:		Utility to receive RAS error tracings
 License:		GPLv2
 URL:			http://git.infradead.org/users/mchehab/rasdaemon.git
 Source0:		http://www.infradead.org/~mchehab/rasdaemon/%{name}-%{version}.tar.bz2
 
 ExcludeArch:		s390 s390x
+BuildRequires:		make
 BuildRequires:		gcc
+BuildRequires:		autoconf automake libtool
 BuildRequires:		gettext-devel
 BuildRequires:		perl-generators
 BuildRequires:		sqlite-devel
 BuildRequires:		systemd
+BuildRequires:		libtraceevent-devel
 Provides:		bundled(kernel-event-lib)
 Requires:		hwdata
 Requires:		perl-DBD-SQLite
+Requires:		libtraceevent
 %ifarch %{ix86} x86_64
 Requires:		dmidecode
 %endif
@@ -37,34 +41,45 @@ an utility for reporting current error counts from the EDAC sysfs files.
 
 %prep
 %setup -q
+autoreconf -vfi
 
 %build
 %ifarch %{arm} aarch64
-%configure --enable-sqlite3 --enable-aer --enable-mce --enable-extlog --enable-devlink --enable-diskerror --enable-abrt-report --enable-non-standard --enable-arm --enable-hisi-ns-decode
+%configure --enable-sqlite3 --enable-aer --enable-non-standard --enable-arm \
+	   --enable-mce --enable-extlog --enable-devlink --enable-diskerror \
+	   --enable-memory-failure --enable-abrt-report --enable-hisi-ns-decode \
+	   --enable-memory-ce-pfa --enable-amp-ns-decode --enable-cpu-fault-isolation \
+	   --with-sysconfdefdir=%{_sysconfdir}/sysconfig
 %else
-%configure --enable-sqlite3 --enable-aer --enable-mce --enable-extlog --enable-devlink --enable-diskerror --enable-abrt-report
+%configure --enable-sqlite3 --enable-aer \
+	   --enable-mce --enable-extlog --enable-devlink --enable-diskerror \
+	   --enable-memory-failure --enable-abrt-report --enable-cpu-fault-isolation \
+	   --with-sysconfdefdir=%{_sysconfdir}/sysconfig
 %endif
 make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
-install -D -p -m 0644 misc/rasdaemon.service %{buildroot}/%{_unitdir}/rasdaemon.service
+install -D -p -m 0644 misc/rasdaemon.service %{buildroot}%{_unitdir}/rasdaemon.service
 install -D -p -m 0644 misc/ras-mc-ctl.service %{buildroot}%{_unitdir}/ras-mc-ctl.service
+install -D -p -m 0655 misc/rasdaemon.env %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 rm INSTALL %{buildroot}/usr/include/*.h
 
 %files
-%doc AUTHORS ChangeLog COPYING README TODO
+%doc AUTHORS ChangeLog COPYING README.md TODO
 %{_sbindir}/rasdaemon
 %{_sbindir}/ras-mc-ctl
 %{_mandir}/*/*
 %{_unitdir}/*.service
-%{_sharedstatedir}/rasdaemon
 %{_sysconfdir}/ras/dimm_labels.d
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
+* Wed May 22 2024 Chris Co <chrco@microsoft.com> - 0.8.0-1
+- Update to version 0.8.0. From Fedora 40. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.4-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
-
 
 * Thu Oct 10 2019 Mauro Carvalho Chehab <mchehab+samsung@kernel.org>  0.6.4-1
 - Bump to version 0.6.4 with some DB changes for hip08 and some fixes
@@ -169,4 +184,3 @@ rm INSTALL %{buildroot}/usr/include/*.h
 
 * Mon May 20 2013 Mauro Carvalho Chehab <mchehab@redhat.com> 0.3.0-1
 - Package created
-
