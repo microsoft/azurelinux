@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -21,8 +22,18 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
+const (
+	// Default upper bound on a single network operation, across all retries.
+	DefaultTimeout = time.Minute * 10
+	// Unlimited time, the maximum allowable value for a time.Duration.
+	NoTimeout = time.Duration(math.MaxInt64)
+)
+
 // ErrDownloadFileInvalidResponse404 is returned when the download response is 404.
 var ErrDownloadFileInvalidResponse404 = errors.New("invalid response: 404")
+
+// ErrDownloadFileInvalidTimeout is returned when the download timeout is invalid, i.e. less than 0.
+var ErrDownloadFileInvalidTimeout = errors.New("invalid timeout")
 
 // ErrDownloadFileOther is returned when the download error is anything other than 404.
 var ErrDownloadFileOther = errors.New("download error")
@@ -56,13 +67,20 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // dstFile: The local file to save the download to.
 // caCerts: The CA certificates to use for the download.
 // tlsCerts: The TLS certificates to use for the download.
+// timeout: The maximum duration for the download operation, use network.NoTimeout for no timeout, or network.DefaultTimeout for a default timeout.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
-func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (wasCancelled bool, err error) {
+func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (wasCancelled bool, err error) {
 	if ctx == nil {
 		return false, fmt.Errorf("context is nil")
 	}
-	retryCtx, cancelFunc := context.WithCancel(ctx)
+	if timeout == 0 {
+		timeout = NoTimeout
+	} else if timeout < 0 {
+		return false, fmt.Errorf("%w: %s", ErrDownloadFileInvalidTimeout, timeout)
+	}
+
+	retryCtx, cancelFunc := context.WithTimeout(ctx, timeout)
 	defer cancelFunc()
 
 	retryNum := 1
@@ -70,7 +88,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(retryCtx, func() error {
 		netErr := DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
-			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
+			// Check if the error is a 404, we should print a warning in that case so the user
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
 			if errors.Is(netErr, ErrDownloadFileInvalidResponse404) {
 				logger.Log.Warnf("Attempt %d/%d: Failed to download (%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, srcUrl, netErr)

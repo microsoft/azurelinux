@@ -257,7 +257,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	_, err = network.DownloadFileWithRetry(context.Background(), url, fullFilePath, nil, nil)
+	_, err = network.DownloadFileWithRetry(context.Background(), url, fullFilePath, nil, nil, network.DefaultTimeout)
 	if err != nil {
 		return
 	}

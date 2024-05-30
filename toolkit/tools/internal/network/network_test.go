@@ -25,11 +25,12 @@ func TestDownloadFile(t *testing.T) {
 	const cancelDelay = 2000 * time.Millisecond
 	const noCancelDelay = 500 * time.Millisecond
 	type args struct {
+		_ctx     context.Context // Build dynamically in test. Set via useCtx.
 		srcUrl   string
 		dstFile  string
 		caCerts  *x509.CertPool
 		tlsCerts []tls.Certificate
-		_ctx     context.Context // Build dynamically in test. Set via useCtx.
+		timeout  time.Duration
 	}
 	tests := []struct {
 		name             string
@@ -64,7 +65,7 @@ func TestDownloadFile(t *testing.T) {
 			useCtx:           true,
 			wantWasCancelled: false,
 			wantErr:          false,
-			expectedTime:     cancelDelay,
+			expectedTime:     noCancelDelay,
 		},
 		{
 			name: "TestDownload404",
@@ -98,6 +99,40 @@ func TestDownloadFile(t *testing.T) {
 			expectedErr:      ErrDownloadFileOther,
 			expectedTime:     cancelDelay + (100 * time.Millisecond), // Will retry for a long time, cancel after 2 seconds.
 		},
+		{
+			name: "TestDownloadWithBogusCertsTimeout",
+			args: args{
+				srcUrl:  "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
+				dstFile: "README.md",
+				caCerts: x509.NewCertPool(),
+				tlsCerts: []tls.Certificate{
+					{
+						Certificate: [][]byte{[]byte("bogus")},
+					},
+				},
+				timeout: cancelDelay,
+			},
+			useCtx:           false,
+			wantWasCancelled: true,
+			wantErr:          true,
+			expectedErr:      ErrDownloadFileOther,
+			expectedTime:     cancelDelay + (100 * time.Millisecond), // Will retry for a long time, cancel after 2 seconds.
+		},
+		{
+			name: "TestDownloadWithBadTimeout",
+			args: args{
+				srcUrl:   "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
+				dstFile:  "README.md",
+				caCerts:  nil,
+				tlsCerts: nil,
+				timeout:  -1,
+			},
+			useCtx:           false,
+			wantWasCancelled: false,
+			wantErr:          true,
+			expectedErr:      ErrDownloadFileInvalidTimeout,
+			expectedTime:     noCancelDelay,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -112,7 +147,7 @@ func TestDownloadFile(t *testing.T) {
 			}
 
 			startTime := time.Now()
-			gotWasCancelled, err := DownloadFileWithRetry(tt.args._ctx, tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts)
+			gotWasCancelled, err := DownloadFileWithRetry(tt.args._ctx, tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts, tt.args.timeout)
 			endTime := time.Now()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DownloadFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -146,7 +181,8 @@ func TestDownloadFile(t *testing.T) {
 func TestDownloadWithRetryNilContext(t *testing.T) {
 	dstDir := t.TempDir()
 	dstFile := filepath.Join(dstDir, "README.md")
-	_, err := DownloadFileWithRetry(nil, "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil)
+	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
+	_, err := DownloadFileWithRetry(nil, "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil, 0)
 	if err == nil {
 		t.Errorf("DownloadFile() should have failed with nil context")
 	}

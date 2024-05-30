@@ -18,7 +18,11 @@ const (
 	DefaultDownloadRetryDuration = time.Second
 )
 
-var ErrNilContext = fmt.Errorf("nil context")
+var (
+	ErrNilContext     = fmt.Errorf("retry nil context")
+	ErrRetryCancelled = fmt.Errorf("retry cancelled")
+	ErrCommandNotRun  = fmt.Errorf("retry command was not run")
+)
 
 // calculateDelay calculates the delay for the given failure count, sleep duration, and backoff exponent base.
 // If the base is positive, it will calculate an exponential backoff.
@@ -56,7 +60,8 @@ func backoffSleep(ctx context.Context, delay time.Duration) (cancelled bool, err
 	select {
 	case <-ctx.Done():
 		cancelled = true
-		return
+		err = ErrRetryCancelled
+		return cancelled, err
 	default:
 	}
 
@@ -64,23 +69,22 @@ func backoffSleep(ctx context.Context, delay time.Duration) (cancelled bool, err
 	case <-time.After(delay):
 	case <-ctx.Done():
 		cancelled = true
+		err = ErrRetryCancelled
 	}
-	return
+	return cancelled, err
 }
 
 // runWithBackoffInternal runs function up to 'attempts' times, waiting delayCalc(failCount) before each i-th attempt.
 // delayCalc(0) is expected to return 0.
 // The function will return early if the cancel channel is closed.
 func runWithBackoffInternal(ctx context.Context, function func() error, delayCalc func(failCount int) time.Duration, attempts int) (wasCancelled bool, err error) {
+	err = ErrCommandNotRun
 	for failures := 0; failures < attempts; failures++ {
 		delayTime := delayCalc(failures)
 		var sleepErr error
 		wasCancelled, sleepErr = backoffSleep(ctx, delayTime)
 		if sleepErr != nil {
-			return false, sleepErr
-		}
-		if wasCancelled {
-			break
+			return wasCancelled, fmt.Errorf("%w, last error:\n%w", sleepErr, err)
 		}
 		if err = function(); err == nil {
 			break
