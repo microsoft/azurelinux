@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -102,6 +102,8 @@ Patch0:         CVE-2023-36617.patch
 Patch1:         CVE-2024-27280.patch
 Patch2:         CVE-2024-27281.patch
 Patch3:         CVE-2024-27282.patch
+# Patch no longer needed if REXML gem is 3.2.7 or later. Now is 3.2.5
+Patch4:         CVE-2024-35176.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -404,6 +406,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Thu May 30 2024 Minghe Ren <mingheren@microsoft.com> - 3.1.4-6
+- Patch CVE-2024-35176
+
 * Thu May 16 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.1.4-5
 - Patch CVE-2024-27282
 
