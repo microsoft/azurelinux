@@ -4,6 +4,7 @@
 package safechroot
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -605,11 +606,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 			continue
 		}
 
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithExpBackoff(context.Background(), func() error {
 			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
-		}, totalAttempts, retryDuration, 2.0, nil)
+		}, totalAttempts, retryDuration, 2.0)
 
 		if err != nil {
 			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)

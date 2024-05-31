@@ -6,6 +6,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"net/url"
@@ -15,7 +16,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	"github.com/microsoft/azurelinux/toolkit/tools/pkg/downloader"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	"github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -96,7 +97,7 @@ func main() {
 		}
 	}
 
-	err = downloader.DownloadFile(*srcUrl, *dstFile, caCerts, tlsCerts)
+	_, err = network.DownloadFileWithRetry(context.Background(), *srcUrl, *dstFile, caCerts, tlsCerts, network.DefaultTimeout)
 	if err != nil {
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}
