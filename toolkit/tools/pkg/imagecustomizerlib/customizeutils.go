@@ -513,46 +513,40 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 		}
 	}
 
-	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
-		err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
-		if err != nil {
-			return selinuxMode, err
-		}
+	err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
+	if err != nil {
+		return selinuxMode, err
 	}
 
 	return selinuxMode, nil
 }
 
 func updateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
-	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
-		// SELinux is disabled in the kernel command line.
-		// So, no need to update the SELinux config file.
-		return nil
-	}
-
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err
 	}
 
-	// Ensure an SELinux policy has been installed.
-	// Typically, this is provided by the 'selinux-policy' package.
 	selinuxConfigFileFullPath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 	selinuxConfigFileExists, err := file.PathExists(selinuxConfigFileFullPath)
 	if err != nil {
 		return fmt.Errorf("failed to check if (%s) file exists:\n%w", installutils.SELinuxConfigFile, err)
 	}
 
-	if !selinuxConfigFileExists {
+	// Ensure an SELinux policy has been installed.
+	// Typically, this is provided by the 'selinux-policy' package.
+	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled && !selinuxConfigFileExists {
 		return fmt.Errorf("SELinux is enabled but the (%s) file is missing:\n"+
 			"please ensure an SELinux policy is installed:\n"+
 			"the '%s' package provides the default policy",
 			installutils.SELinuxConfigFile, configuration.SELinuxPolicyDefault)
 	}
 
-	err = installutils.SELinuxUpdateConfig(imagerSELinuxMode, imageChroot)
-	if err != nil {
-		return fmt.Errorf("failed to set SELinux mode in config file:\n%w", err)
+	if selinuxConfigFileExists {
+		err = installutils.SELinuxUpdateConfig(imagerSELinuxMode, imageChroot)
+		if err != nil {
+			return fmt.Errorf("failed to set SELinux mode in config file:\n%w", err)
+		}
 	}
 
 	return nil

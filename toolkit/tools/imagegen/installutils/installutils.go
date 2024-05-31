@@ -1812,6 +1812,8 @@ func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 		mode = SELinuxConfigEnforcing
 	case configuration.SELinuxPermissive:
 		mode = SELinuxConfigPermissive
+	case configuration.SELinuxOff:
+		mode = SELinuxConfigDisabled
 	}
 
 	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
