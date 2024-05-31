@@ -24564,7 +24564,7 @@
         "other": {
           "name": "python-tensorboard",
           "version": "2.16.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
         }
       }
     },
@@ -24923,8 +24923,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "3.0.1",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/3.0.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/3.0.3.tar.gz"
         }
       }
     },
