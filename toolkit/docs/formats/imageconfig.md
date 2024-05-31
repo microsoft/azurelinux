@@ -205,7 +205,7 @@ For size constrained images it may be desirable to omit documentation and non-de
 
 `DisableRpmDocs` will configure the image to never install the documentation. Selecting `OverrideRpmLocales=NONE` will omit all locales from the image.
 
-These customizations are encoded into `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system.
+These customizations are encoded into `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system. They set values for `%_excludedocs` and `%_install_langs` respectively.
 
 #### Custom Locales
 
