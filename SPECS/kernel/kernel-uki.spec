@@ -8,7 +8,7 @@
 # suffix, our kernel version does not.
 %define kernelver %{version}-%{release}
 
-%define cmdline console=ttyS0 noxsaves
+%define cmdline console=ttyS0
 
 Summary:        Linux Kernel
 Name:           kernel-uki
