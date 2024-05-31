@@ -864,6 +864,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azl-compliance",
+          "version": "1.0.1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-compliance-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-iot-sdk-c",
           "version": "2022.01.21",
           "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_01_2022_Ref01.tar.gz"
@@ -2247,8 +2257,8 @@
         "type": "other",
         "other": {
           "name": "cri-o",
-          "version": "1.21.7",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.7.tar.gz"
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.22.3.tar.gz"
         }
       }
     },
@@ -3688,8 +3698,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.2.2",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.2.tar.gz"
+          "version": "2.2.3",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.3.tar.gz"
         }
       }
     },
@@ -6540,8 +6550,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.1.tar.gz"
+          "version": "5.15.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.1.tar.gz"
+          "version": "5.15.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.1.tar.gz"
+          "version": "5.15.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.1.tar.gz"
+          "version": "5.15.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
         }
       }
     },
@@ -8161,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.1.tar.gz"
+          "version": "5.15.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
         }
       }
     },
