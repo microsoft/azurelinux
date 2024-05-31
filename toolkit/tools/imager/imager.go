@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/customizationmacros"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -596,6 +597,16 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	}
 	timestamp.StopEvent(nil) // install chroot packages
 
+	// Configure rpm install macros for the setup environment. We run 'rpm' from outside the install chroot since it starts
+	// empty. So the macros must be defined here before we install packages.
+	logger.Log.Debugf("Adding setup environment customization macros if needed")
+	err = customizationmacros.AddCustomizationMacros(rootDir, systemConfig.DisableRpmDocs,
+		systemConfig.OverrideRpmLocales)
+	if err != nil {
+		err = fmt.Errorf("failed to add setup environment customization macros:\n%w", err)
+		return
+	}
+
 	// Populate image contents
 	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, mountList, mountPointMap,
 		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot,
@@ -606,6 +617,19 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	}
 
 	err = installutils.AddImageIDFile(installChroot.RootDir(), *buildNumber)
+	if err != nil {
+		err = fmt.Errorf("failed to add image ID file:\n%w", err)
+		return
+	}
+
+	// Configure the final image with the customized macros so that rpm continues to behave the same way in the final image
+	logger.Log.Infof("Adding final image customization macros if needed")
+	err = customizationmacros.AddCustomizationMacros(installChroot.RootDir(), systemConfig.DisableRpmDocs,
+		systemConfig.OverrideRpmLocales)
+	if err != nil {
+		err = fmt.Errorf("failed to add final image customization macros:\n%w", err)
+		return
+	}
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !systemConfig.IsRootFS() {

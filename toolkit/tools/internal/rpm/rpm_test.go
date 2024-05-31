@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -417,4 +418,43 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDisableDocumentationDefines(t *testing.T) {
+	expectedDefines := map[string]string{
+		"_excludedocs": "1",
+	}
+	result := DisableDocumentationDefines()
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestOverrideLocaleDefines(t *testing.T) {
+	expectedDefines := map[string]string{
+		"_install_langs": "ab:cd:ef",
+	}
+	result := OverrideLocaleDefines("ab:cd:ef")
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestGetMacroDir(t *testing.T) {
+	const expectedMacroDir = "/usr/lib/rpm/macros.d"
+	macroDir, err := getMacroDirWithFallback(true)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMacroDir, macroDir)
+}
+
+func TestGetMacroDirWithRpmAvailable(t *testing.T) {
+	const expectedMacroDir = "/usr/lib/rpm/macros.d"
+
+	rpmFound, execErr := file.CommandExists(rpmProgram)
+	if execErr != nil {
+		t.Fatalf("failed to check if rpm is available: %v", execErr)
+	}
+	if !rpmFound {
+		t.Skip("rpm is not available")
+	}
+
+	macroDir, err := GetMacroDir()
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMacroDir, macroDir)
 }

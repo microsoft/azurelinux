@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
@@ -147,6 +148,40 @@ func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, er
 	return
 }
 
+func GetMacroDir() (macroDir string, err error) {
+	return getMacroDirWithFallback(false)
+}
+
+// Queries rpm for the current macro directory via --eval %_rpmmacrodir
+func getMacroDirWithFallback(allowDefault bool) (macroDir string, err error) {
+	const (
+		macro         = "%_rpmmacrodir"
+		defaultRpmDir = "/usr/lib/rpm/macros.d"
+	)
+
+	// This should continue to work even if the rpm command is not available (ie unit tests).
+	rpmFound, err := file.CommandExists(rpmProgram)
+	if err != nil {
+		return "", fmt.Errorf("failed to check if rpm is installed:\n%w", err)
+	}
+	if !rpmFound {
+		if allowDefault {
+			return defaultRpmDir, nil
+		} else {
+			return "", fmt.Errorf("rpm is not installed, can't query for macro directory")
+		}
+	}
+
+	lines, err := executeRpmCommand(rpmProgram, "--eval", macro)
+	if err != nil {
+		return "", fmt.Errorf("failed to get macro directory:\n%w", err)
+	}
+	if len(lines) != 1 {
+		return "", fmt.Errorf("unexpected output from 'rpm --eval %s': '%v'", macro, lines)
+	}
+	return lines[0], nil
+}
+
 // ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name
 func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
 	baseName := filepath.Base(rpmFilePath)
@@ -260,6 +295,23 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	defines[DistTagDefine] = distTag
 	defines[distNameAbreviation] = fmt.Sprintf("%d", distMajorVersion)
 	return defines
+}
+
+// DisableBuildRequiresDefines sets the macro to disable documentation files when installing RPMs.
+// - defines: optional map of defines to update. If nil, a new map will be created.
+func DisableDocumentationDefines() map[string]string {
+	return map[string]string{
+		"_excludedocs": "1",
+	}
+}
+
+// OverrideLocaleDefines sets the macro to override the default locales when installing RPMs.
+// - defines: optional map of defines to update. If nil, a new map will be created.
+// - overrideLocale: the locale string to set as the default. Should be of the form ""
+func OverrideLocaleDefines(overrideLocale string) map[string]string {
+	return map[string]string{
+		"_install_langs": overrideLocale,
+	}
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.

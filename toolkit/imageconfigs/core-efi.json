@@ -52,7 +52,8 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "azurelinux"
+            "Hostname": "azurelinux",
+            "DisableRpmDocs": true
         }
     ]
 }

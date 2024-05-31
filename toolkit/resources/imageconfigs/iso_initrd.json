@@ -45,7 +45,8 @@
                     "PasswordExpiresDays": 99999,
                     "StartupCommand": "/root/runliveinstaller"
                 }
-            ]
+            ],
+            "DisableRpmDocs": true
         }
     ]
 }
