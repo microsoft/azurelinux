@@ -76,28 +76,42 @@ cloud-init data files).
 If cloud-init data is to be placed directly within the iso file system:
 
 ```yaml
+scripts:
+  postCustomization:
+  - content: |
+      set -e
+      mkdir -p /var/lib/cloud/seed/
+      ln -s -T /run/initramfs/live/cloud-init-data /var/lib/cloud/seed/nocloud 
+
 iso:
   additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data
+
   kernelCommandLine:
-    ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
+    extraCommandLine: "ds=nocloud"
 ```
+
+Note: It is tempting to specify
+`extraCommandLine: "'ds=nocloud;seedfrom=file://run/initramfs/live/cloud-init-data'"`,
+instead of using a symbolic link.
+But cloud-init ignores the `network-config` file when you use `seedfrom`.
+See, cloud-init issue [#3307](https://github.com/canonical/cloud-init/issues/3307).
 
 #### Example 2
 
 If cloud-init data is to be placed within the LiveOS root file system:
 
 ```yaml
-iso:
-  kernelCommandLine:
-    extraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
 os:
+  kernelCommandLine:
+    extraCommandLine: "ds=nocloud"
+
   additionalFiles:
-    cloud-init-data/user-data: /cloud-init-data/user-data
-    cloud-init-data/network-config: /cloud-init-data/network-config
-    cloud-init-data/meta-data: /cloud-init-data/meta-data
+    cloud-init-data/user-data: /var/lib/cloud/seed/nocloud/user-data
+    cloud-init-data/network-config: /var/lib/cloud/seed/nocloud/network-config
+    cloud-init-data/meta-data: /var/lib/cloud/seed/nocloud/meta-data
 ```
 
 ## Input Image Layout Assumptions
