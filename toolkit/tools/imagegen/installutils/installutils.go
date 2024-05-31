@@ -64,10 +64,10 @@ const (
 	// SELinuxConfigEnforcing is the string value to set SELinux to enforcing in the /etc/selinux/config file.
 	SELinuxConfigEnforcing = "enforcing"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to permissive in the /etc/selinux/config file.
+	// SELinuxConfigPermissive is the string value to set SELinux to permissive in the /etc/selinux/config file.
 	SELinuxConfigPermissive = "permissive"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to disabled in the /etc/selinux/config file.
+	// SELinuxConfigDisabled is the string value to set SELinux to disabled in the /etc/selinux/config file.
 	SELinuxConfigDisabled = "disabled"
 
 	// GrubCfgFile is the filepath of the grub config file.
