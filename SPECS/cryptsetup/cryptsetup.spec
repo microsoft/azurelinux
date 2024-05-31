@@ -139,6 +139,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files libs -f cryptsetup.lang
 %license COPYING COPYING.LGPL
 %{_libdir}/libcryptsetup.so.*
+%exclude %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
 %files ssh-token
