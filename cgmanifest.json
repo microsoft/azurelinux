@@ -26916,7 +26916,7 @@
         "other": {
           "name": "rubygem-rexml",
           "version": "3.2.7",
-          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.7.tar.gz#/rexml-3.2.7.tar.gz"
+          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.7.tar.gz"
         }
       }
     },
