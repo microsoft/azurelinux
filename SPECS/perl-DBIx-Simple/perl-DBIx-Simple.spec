@@ -2,7 +2,7 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        6%{?dist}
+Release:        7%{?dist}
 # License not mentioned in any of the source files and CPAN web page explicitly says it's unknown.
 License:        Unknown
 Group:          Development/Libraries
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu May 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-7
+- Release bump to regenerate package's requires and provides.
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.37-6
 - Add BR on `perl(Test::More)` to fix ptest
 
