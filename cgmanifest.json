@@ -8062,7 +8062,7 @@
         "other": {
           "name": "kata-containers",
           "version": "3.2.0.azl2",
-          "downloadUrl": null
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8072,7 +8072,7 @@
         "other": {
           "name": "kata-containers-cc",
           "version": "3.2.0.azl2",
-          "downloadUrl": null
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
