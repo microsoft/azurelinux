@@ -1,0 +1,44 @@
+From 2344d33cea725076c794635de0a6ea1b2ac93069 Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Tue, 14 May 2024 14:03:44 +0200
+Subject: [PATCH] Fix HTTP query in web interface (fixes #954)
+
+We can use `?QUERY=` in URL for searching for destinations
+- allow it when checking whether the destination exists.
+---
+ scheduler/client.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/scheduler/client.c b/scheduler/client.c
+index 8d1c5cc5d..9994f6b5f 100644
+--- a/scheduler/client.c
++++ b/scheduler/client.c
+@@ -1105,7 +1105,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
+ 	      }
+ 	      else if (!strncmp(con->uri, "/classes", 8))
+ 	      {
+-	        if (strlen(con->uri) > 9 && !cupsdFindClass(con->uri + 9))
++	        if (strlen(con->uri) > 9 && con->uri[9] != '?' && !cupsdFindClass(con->uri + 9))
+ 	        {
+ 		  if (!cupsdSendError(con, HTTP_STATUS_NOT_FOUND, CUPSD_AUTH_NONE))
+ 		  {
+@@ -1125,14 +1125,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
+ 	      else if (!strncmp(con->uri, "/jobs", 5))
+ 	      {
+ 		cupsdSetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
+-                if (con->uri[5] && con->uri[6])
++		if (con->uri[5] && con->uri[6])
+ 		  cupsdSetString(&con->options, con->uri + 5);
+ 		else
+ 		  cupsdSetString(&con->options, NULL);
+ 	      }
+-              else if (!strncmp(con->uri, "/printers", 9))
++	      else if (!strncmp(con->uri, "/printers", 9))
+ 	      {
+-	        if (strlen(con->uri) > 10 && !cupsdFindPrinter(con->uri + 10))
++	        if (strlen(con->uri) > 10 && con->uri[10] != '?' && !cupsdFindPrinter(con->uri + 10))
+ 	        {
+ 		  if (!cupsdSendError(con, HTTP_STATUS_NOT_FOUND, CUPSD_AUTH_NONE))
+ 		  {
+-- 
+2.45.0

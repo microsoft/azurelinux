@@ -11,8 +11,8 @@
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
-Version:        2.3.3%{OP_VER}
-Release:        6%{?dist}
+Version:        2.4.8
+Release:        1%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,9 +23,6 @@ Source0:        https://github.com/OpenPrinting/cups/releases/download/v%{VERSIO
 Source1:        cupsprinter.png
 # cups_serverbin macro definition for use during builds
 Source2:        macros.cups
-# selinux and audit enablement for CUPS - needs work and CUPS upstream wants
-# to have these features implemented their way in the future
-Patch100:       cups-lspp.patch
 # PAM enablement, very old patch, not even git can track when or why
 # the patch was added.
 Patch1:         cups-system-auth.patch
@@ -60,10 +57,20 @@ Patch11:        cups-web-devices-timeout.patch
 Patch12:        cups-failover-backend.patch
 # add device id for dymo printer
 Patch13:        cups-dymo-deviceid.patch
+
+%if %{lspp}
+# selinux and audit enablement for CUPS - needs work and CUPS upstream wants
+# to have these features implemented their way in the future
+Patch100:       cups-lspp.patch
+%endif
+
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
 ##### breaks something.
+Patch1000:      0001-Fix-HTTP-query-in-web-interface-fixes-954.patch
+Patch1001:      cups-fix-cgigettext.patch
+
 BuildRequires:  automake
 # gcc and gcc-c++ is no longer in buildroot by default
 # gcc for most of files
@@ -258,7 +265,10 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch 13 -p1 -b .dymo-deviceid
 
 # UPSTREAM PATCHES
-
+# https://github.com/OpenPrinting/cups/pull/957
+%patch -P 1000 -p1 -b .web-query
+# https://github.com/OpenPrinting/cups/pull/961
+%patch -P 1001 -p1 -b .fix-cgigettext
 
 # LSPP support.
 %patch 100 -p1 -b .lspp
@@ -501,10 +511,13 @@ rm -f %{cups_serverbin}/backend/smb
 %{cups_serverbin}/daemon/cups-driverd
 %{cups_serverbin}/daemon/cups-exec
 %{cups_serverbin}/backend/*
-%{cups_serverbin}/cgi-bin
+%dir %{cups_serverbin}/cgi-bin
+%{cups_serverbin}/cgi-bin/*.cgi
 %{cups_serverbin}/filter/*
-%{cups_serverbin}/monitor
-%{cups_serverbin}/notifier
+%dir %{cups_serverbin}/monitor
+%{cups_serverbin}/monitor/*
+%dir %{cups_serverbin}/notifier
+%{cups_serverbin}/notifier/*
 %{_datadir}/cups/drv/sample.drv
 %{_datadir}/cups/examples
 %{_datadir}/cups/mime/mime.types
@@ -513,6 +526,8 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/cups/ppdc/*.h
 %dir %{_datadir}/cups/templates
 %{_datadir}/cups/templates/*.tmpl
+%dir %{_datadir}/cups/templates/da
+%{_datadir}/cups/templates/da/*.tmpl
 %dir %{_datadir}/cups/templates/de
 %{_datadir}/cups/templates/de/*.tmpl
 %dir %{_datadir}/cups/templates/es
@@ -536,18 +551,24 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/%{name}/www/index.html
 %{_datadir}/%{name}/www/help
 %{_datadir}/%{name}/www/robots.txt
+%{_datadir}/%{name}/www/da/index.html
 %{_datadir}/%{name}/www/de/index.html
 %{_datadir}/%{name}/www/es/index.html
+%{_datadir}/%{name}/www/fr/index.html
 %{_datadir}/%{name}/www/ja/index.html
 %{_datadir}/%{name}/www/ru/index.html
 %{_datadir}/%{name}/www/pt_BR/index.html
 %{_datadir}/%{name}/www/apple-touch-icon.png
+%dir %{_datadir}/%{name}/www/da
 %dir %{_datadir}/%{name}/www/de
 %dir %{_datadir}/%{name}/www/es
+%dir %{_datadir}/%{name}/www/fr
 %dir %{_datadir}/%{name}/www/ja
 %dir %{_datadir}/%{name}/www/pt_BR
 %dir %{_datadir}/%{name}/www/ru
 %{_datadir}/pixmaps/cupsprinter.png
+%ghost %dir %attr(0770,root,lp) %{_localstatedir}/cache/cups
+%ghost %dir %attr(0775,root,lp) %{_localstatedir}/cache/cups/rss
 %dir %attr(1770,root,lp) %{_localstatedir}/spool/cups/tmp
 %dir %attr(0710,root,lp) %{_localstatedir}/spool/cups
 %dir %attr(0755,lp,sys) %{_localstatedir}/log/cups
@@ -618,11 +639,13 @@ rm -f %{cups_serverbin}/backend/smb
 %dir %{_datadir}/cups/model
 %dir %{_datadir}/cups/ppdc
 %dir %{_datadir}/ppd
+%dir %attr(0755,root,lp) %{_sysconfdir}/cups
 
 %files devel
 %{_bindir}/cups-config
 %{_includedir}/cups
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/cups.pc
 %{_mandir}/man1/cups-config.1.gz
 %{_rpmconfigdir}/macros.d/macros.cups
 
@@ -637,6 +660,7 @@ rm -f %{cups_serverbin}/backend/smb
 %{_bindir}/ipptool
 %dir %{_datadir}/cups/ipptool
 %{_datadir}/cups/ipptool/*
+%{_mandir}/man1/ippfind.1.gz
 %{_mandir}/man1/ipptool.1.gz
 %{_mandir}/man5/ipptoolfile.5.gz
 
@@ -650,6 +674,12 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Thu May 30 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.4.8-1
+- Upgrading to 2.4.8 to address CVEs
+- Adding new files to %%files sections
+- Updated some patch files ('cups-failover-backend', 'cups-lspp', 'cups-no-export-ssllibs)
+- Added '0001-Fix-HTTP-query-in-web-interfaces-fixes-954.patch' and 'cups-fix-cgigettext.patch'
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
 - Updating naming for 3.0 version of Azure Linux.
 

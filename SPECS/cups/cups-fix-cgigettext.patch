@@ -1,0 +1,14 @@
+diff --git a/cgi-bin/var.c b/cgi-bin/var.c
+index 35bc3fb..529a40a 100644
+--- a/cgi-bin/var.c
++++ b/cgi-bin/var.c
+@@ -284,6 +284,8 @@ cgiGetTextfield(const char *name)	/* I - Name of form field */
+ 
+     if (i < form_count)
+       memmove(var, var + 1, (size_t)(form_count - i) * sizeof(_cgi_var_t));
++
++    value = NULL;
+   }
+ 
+   return (value);
+
