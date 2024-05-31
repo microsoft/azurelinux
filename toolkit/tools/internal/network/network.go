@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -25,8 +24,6 @@ import (
 const (
 	// Default upper bound on a single network operation, across all retries.
 	DefaultTimeout = time.Minute * 10
-	// Unlimited time, the maximum allowable value for a time.Duration.
-	NoTimeout = time.Duration(math.MaxInt64)
 )
 
 // ErrDownloadFileInvalidResponse404 is returned when the download response is 404.
@@ -67,20 +64,24 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // dstFile: The local file to save the download to.
 // caCerts: The CA certificates to use for the download.
 // tlsCerts: The TLS certificates to use for the download.
-// timeout: The maximum duration for the download operation, use network.NoTimeout for no timeout, or network.DefaultTimeout for a default timeout.
+// timeout: The maximum duration for the download operation, use 0 for no timeout, or network.DefaultTimeout for a default timeout.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
 func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (wasCancelled bool, err error) {
+	var (
+		retryCtx   context.Context
+		cancelFunc context.CancelFunc
+	)
 	if ctx == nil {
 		return false, fmt.Errorf("context is nil")
 	}
-	if timeout == 0 {
-		timeout = NoTimeout
-	} else if timeout < 0 {
+	if timeout < 0 {
 		return false, fmt.Errorf("%w: %s", ErrDownloadFileInvalidTimeout, timeout)
+	} else if timeout == 0 {
+		retryCtx, cancelFunc = context.WithCancel(ctx)
+	} else {
+		retryCtx, cancelFunc = context.WithTimeout(ctx, timeout)
 	}
-
-	retryCtx, cancelFunc := context.WithTimeout(ctx, timeout)
 	defer cancelFunc()
 
 	retryNum := 1
