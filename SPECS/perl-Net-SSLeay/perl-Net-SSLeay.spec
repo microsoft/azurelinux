@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -12,6 +12,7 @@ Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(English)
@@ -80,6 +81,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 1.92-4
+- Add BR on openssl
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.92-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
