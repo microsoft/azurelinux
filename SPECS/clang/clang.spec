@@ -5,7 +5,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        18.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -84,7 +84,7 @@ A set of extra tools built using Clang's tooling API.
 %package tools-extra-devel
 Summary: Development header files for clang tools
 Requires: %{name}-tools-extra = %{version}-%{release}
- 
+
 %description tools-extra-devel
 Development header files for clang tools.
 
@@ -94,7 +94,7 @@ Development header files for clang tools.
 %py3_shebang_fix \
     clang-tools-extra/clang-tidy/tool/ \
     clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
- 
+
 %py3_shebang_fix \
     clang/tools/clang-format/ \
     clang/tools/clang-format/git-clang-format \
@@ -240,8 +240,11 @@ make clang-check
 
 %files tools-extra-devel
 %{_includedir}/clang-tidy/
- 
+
 %changelog
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
+- Bump release to build with new llvm to fix CVE-2024-31852
+
 * Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
 - Upgrade to version 18.1.2
 

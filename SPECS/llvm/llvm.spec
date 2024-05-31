@@ -1,13 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+Patch0:         CVE-2024-31852.patch
 BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
@@ -31,7 +32,7 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%setup -q -n llvm-project-llvmorg-%{version}
+%autosetup -p1 -n llvm-project-llvmorg-%{version}
 
 %build
 # Disable symbol generation
@@ -104,6 +105,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-3
+- Patch CVE-2024-31852
+
 * Fri Apr 5 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 18.1.2-2
 - Added symlink for %{buildroot}%{_libdir}/bfd-plugins/ -> LLVMgold.so to the main package
 
@@ -116,7 +120,7 @@ ninja check-all
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
 - Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
   compile files for the specified targets.
- 
+
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
 
