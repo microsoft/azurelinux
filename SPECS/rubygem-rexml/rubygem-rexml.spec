@@ -10,7 +10,6 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ruby/rexml
 Source0:        https://github.com/ruby/rexml/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         CVE-2024-35176.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
