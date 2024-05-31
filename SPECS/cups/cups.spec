@@ -499,6 +499,9 @@ ln -sf %{_libexecdir}/samba/cups_backend_smb %{cups_serverbin}/backend/smb || :
 [ $2 = 0 ] || exit 0
 rm -f %{cups_serverbin}/backend/smb
 
+%check
+make check text
+
 %files -f %{name}.lang
 %doc README.md CREDITS.md CHANGES.md
 %{_bindir}/cupstestppd
