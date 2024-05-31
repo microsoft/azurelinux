@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.13.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
