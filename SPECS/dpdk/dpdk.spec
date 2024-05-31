@@ -1,4 +1,10 @@
 %define _unpackaged_files_terminate_build 0
+
+# Define variables for kernel version and source directory
+%global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global K_SRC %{_libdir}/modules/%{KVERSION}/build
+%global moddestdir /lib/modules/%{KVERSION}/kernel/drivers/net/kni
+
 # Add option to build without examples
 %define target %{machine_arch}-%{machine_tmpl}-linuxapp-gcc
 # machine_arch maps between rpm and dpdk arch name, often same as _target_cpu
@@ -27,10 +33,11 @@
 # Add option to build with examples, tools subpackages
 %bcond_with examples
 %bcond_without tools
+
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        21.11.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +54,7 @@ BuildRequires:  meson
 BuildRequires:  python3-pyelftools
 BuildRequires:  python3-sphinx
 BuildRequires:  zlib-devel
+BuildRequires:  kernel-devel
 #
 # The DPDK is designed to optimize througput of network traffic using, among
 # other techniques, carefully crafted assembly instructions.  As such it
@@ -114,6 +122,8 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
        -Ddrivers_install_subdir=dpdk-pmds \
        -Denable_docs=true \
        -Dmachine=default \
+       -Denable_kmods=true \
+       -Dkernel_dir=%{K_SRC} \
 %if %{with examples}
        -Dexamples=all \
 %endif
@@ -128,6 +138,12 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %install
 %meson_install
 
+# Install the kernel modules to the specified directory
+mkdir -p %{buildroot}%{moddestdir}
+echo "find %{_builddir}/dpdk-stable-%{version} -name rte_kni.ko -exec install -D -m 755 '{}' %{buildroot}%{moddestdir} \;" > install_kni.sh
+chmod +x install_kni.sh
+./install_kni.sh
+
 %files
 # BSD
 %doc README MAINTAINERS
@@ -140,6 +156,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %{_bindir}/dpdk-proc-info
 %{_libdir}/*.so.*
 %{pmddir}/*.so.*
+%{moddestdir}/rte_kni.ko
 
 %files devel
 #BSD
@@ -179,6 +196,11 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Wed May 22 2024 Dinesh Kumar Ramasamy <dramasamy@microsoft.com> - 21.11.2-3
+- Enable KNI module in DPDK build
+- Update spec file to set kernel source directory using KVERSION and K_SRC variables.
+- Ensure correct installation directory for kernel modules using moddestdir variable.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
