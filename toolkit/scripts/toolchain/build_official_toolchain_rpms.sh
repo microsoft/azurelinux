@@ -266,15 +266,28 @@ build_rpm_in_chroot_no_install () {
     rpmMacros=("${SHARED_RPM_MACROS[@]}" -D "_sourcedir $specDir")
     builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
-    # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
-    foundAllRPMs="false"
-    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
-        foundAllRPMs="true"
+    builtEarlier=false
+    if grep -qP "^$1\$" $TEMP_BUILT_SPECS_LIST; then
+        builtEarlier=true
+    fi
+
+    # If a package was built earlier and we try to build it again,
+    # it means the earlier builds happened while only a subset of its build-time dependencies were available.
+    # Later builds are expected to have more/all dependencies available, so we rebuild the package.
+    #
+    # If the incremental build skipped the first build, it means the final version of the package
+    # was present from the beginning, so we skip further build attempts as well.
+    skipBuild=false
+    if $builtEarlier; then
+        echo "Package '$1' was built earlier. Skipping incremental toolchain check and building again."
+    elif [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+        # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory.
+        skipBuild=true
         for rpm in $builtRpms; do
             rpmPath=$(find $CHROOT_RPMS_DIR -name "$rpm" -print -quit)
             if [ -z "$rpmPath" ]; then
                 echo "Did not find incremental toolchain rpm '$rpm' in '$CHROOT_RPMS_DIR', must rebuild."
-                foundAllRPMs="false"
+                skipBuild=false
                 break
             else
                 cp $rpmPath $FINISHED_RPM_DIR
@@ -282,7 +295,7 @@ build_rpm_in_chroot_no_install () {
         done
     fi
 
-    if [ "$foundAllRPMs" = "false" ]; then
+    if ! $skipBuild; then
         echo only building RPM $1 within the chroot
         srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
@@ -390,6 +403,20 @@ chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
 chroot_and_install_rpms perl
 
+# perl-generators requires perl-Fedora-VSP
+# All perl packages need perl-generators to correctly
+# generate their run-time provides and requires.
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+chroot_and_install_rpms perl-generators
+
+# Rebuilding perl packages with perl-generators installed.
+# This only fixes the provides and requires - no need to re-install.
+build_rpm_in_chroot_no_install perl
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
@@ -420,12 +447,6 @@ chroot_and_install_rpms perl-Test-Warnings
 build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
-
-# perl-generators requires perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-Fedora-VSP
-chroot_and_install_rpms perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-generators
-chroot_and_install_rpms perl-generators
 
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre2
@@ -555,6 +576,9 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+# ocaml and other ocmal packages require ocaml-srpm-macros 
+build_rpm_in_chroot_no_install ocaml-srpm-macros
 
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging

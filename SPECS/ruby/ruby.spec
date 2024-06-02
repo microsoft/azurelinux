@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.3.0-4
+- Bump release to build with new rubygem-rexml to fix CVE-2024-35176
+
 * Mon Apr 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-3
 - Change the 'gemspec_clear_signing' macro to delete gem.signature also.
 

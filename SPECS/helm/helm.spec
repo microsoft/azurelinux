@@ -2,12 +2,12 @@
 
 Name:          helm
 Version:       3.13.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
 Vendor:        Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:  Azure Linux
 Url:           https://helm.sh/
 Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -24,7 +24,8 @@ Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-BuildRequires: golang 
+Patch0:        CVE-2024-26147.patch
+BuildRequires: golang
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
@@ -54,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.13.2-2
+- Patch CVE-2024-26147.
+
 * Fri Nov 10 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.13.2-1
 - Upgrade to 3.13.2 - Azure Linux 3.0 - package upgrades
 

@@ -1,31 +1,38 @@
-%global __ocaml_requires_opts -i Asttypes -i Parsetree
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+ 
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
+%endif
 
 Summary:        Objective CAML package manager and build helper
 Name:           ocaml-findlib
-Version:        1.8.1
-Release:        16%{?dist}
+Version:        1.9.6
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
-Patch0:         bytes-lib-detection.patch
+Patch0:         ocaml-findlib-toolbox.patch
 
-BuildRequires:  gawk
+BuildRequires:  ocaml >= 4.02.0
+BuildRequires:  ocaml-ocamlbuild
+BuildRequires:  ocaml-compiler-libs
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-rpm-macros
 BuildRequires:  m4
 BuildRequires:  ncurses-devel
-BuildRequires:  ocaml >= 4.02.0
-#BuildRequires:  ocaml-num-devel
-BuildRequires:  ocaml-compiler-libs
-# BuildRequires:  ocaml-labltk-devel
-BuildRequires:  ocaml-ocamlbuild-devel
-BuildRequires:  ocaml-ocamldoc
-
+BuildRequires:  make
 Requires:       ocaml
 
+# Do not require ocaml-compiler-libs at runtime
+%global __ocaml_requires_opts -i Asttypes -i Build_path_prefix_map -i Cmi_format -i Env -i Ident -i Identifiable -i Load_path -i Location -i Longident -i Misc -i Outcometree -i Parsetree -i Path -i Primitive -i Shape -i Subst -i Topdirs -i Toploop -i Type_immediacy -i Types -i Warnings
+ 
+ 
 %description
 Objective CAML package manager and build helper.
-
+ 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
@@ -34,10 +41,25 @@ Requires:       %{name} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
+ 
 %prep
 %autosetup -p1 -n findlib-%{version}
-
-
+ 
+# Fix character encoding
+iconv -f ISO8859-1 -t UTF-8 doc/README > doc/README.utf8
+touch -r doc/README doc/README.utf8
+mv doc/README.utf8 doc/README
+ 
+# Fix the OCaml core man directory
+sed -i 's,/usr/local/man,%{_mandir},' configure
+ 
+# Configure bug?  dynlink_subdir is the empty string
+sed -i 's/\${dynlink_subdir}/dynlink/' configure
+ 
+# Build an executable that is not damaged by stripping
+sed -i 's/\(custom=\)-custom/\1-output-complete-exe/' configure
+ 
+ 
 %build
 ocamlc -version
 ocamlc -where
@@ -49,13 +71,12 @@ cat src/findlib/ocaml_args.ml
   -sitelib `ocamlc -where` \
   -mandir %{_mandir} \
   -with-toolbox
-make all
+%make_build all
 %ifarch %{ocaml_native_compiler}
-make opt
+%make_build opt
 %endif
 rm doc/guide-html/TIMESTAMP
-
-
+	
 %install
 # Grrr destdir grrrr
 mkdir -p %{buildroot}%{_bindir}
@@ -64,39 +85,32 @@ make install \
      prefix=%{buildroot} \
      OCAMLFIND_BIN=%{_bindir} \
      OCAMLFIND_MAN=%{_mandir}
+ 
+# Remove spurious executable bits
+chmod 0644 %{buildroot}%{_mandir}/man{1,5}/*
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/*.{cma,cmi,ml,mli}
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/{META,Makefile*}
+%ifarch %{ocaml_native_compiler}
+chmod 0644 %{buildroot}%{_libdir}/ocaml/findlib/*.{a,cmxa}
+%endif
 
+%ocaml_files
+sed -i '/ocamlfind\.conf/d' .ofiles
 
-%files
+%files -f .ofiles
 %license LICENSE
 %doc doc/README
 %config(noreplace) %{_sysconfdir}/ocamlfind.conf
-%{_bindir}/*
-%{_mandir}/man1/*
-%{_mandir}/man5/*
-%{_libdir}/ocaml/*/META
-%{_libdir}/ocaml/topfind
-%{_libdir}/ocaml/findlib
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/findlib/*.a
-%exclude %{_libdir}/ocaml/findlib/*.cmxa
-%endif
-%exclude %{_libdir}/ocaml/findlib/*.mli
-%exclude %{_libdir}/ocaml/findlib/Makefile.config
-%exclude %{_libdir}/ocaml/findlib/make_wizard
-%exclude %{_libdir}/ocaml/findlib/make_wizard.pattern
-# Had to disable this in OCaml 4.06, unclear why.
-#%%{_libdir}/ocaml/num-top
-
-%files devel
-%doc doc/README doc/guide-html
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/findlib/*.a
-%{_libdir}/ocaml/findlib/*.cmxa
-%endif
-%{_libdir}/ocaml/findlib/*.mli
-%{_libdir}/ocaml/findlib/Makefile.config
+ 
+%files devel -f .ofiles-devel
+%doc doc/README
+%doc doc/guide-html
 
 %changelog
+* Thu Apr 25 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.9.6-1
+- Converted spec file to match with Fedora 41.
+- Upgrading to version 1.9.6
+
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.1-16
 - Updating dependencies.
 

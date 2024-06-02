@@ -4,6 +4,7 @@
 package safechroot
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -605,11 +606,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 			continue
 		}
 
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithExpBackoff(context.Background(), func() error {
 			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
-		}, totalAttempts, retryDuration, 2.0, nil)
+		}, totalAttempts, retryDuration, 2.0)
 
 		if err != nil {
 			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)
@@ -763,14 +764,13 @@ func killGPGComponents(componentsToKill []string, availableComponents map[string
 
 // listGPGComponents will return a set of all GPG component.
 func listGPGComponents() (components map[string]bool, err error) {
-	stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
-
+	stdout, stderr, err := shell.NewExecBuilder("gpgconf", "--list-components").
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 	if err != nil {
 		err = fmt.Errorf("failed to list GPG components.\nerr:%w\nstderr: %s", err, stderr)
 		return
 	}
-
-	logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
 
 	components = make(map[string]bool)
 

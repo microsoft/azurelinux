@@ -1,6 +1,7 @@
 package retry
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -14,6 +15,8 @@ const (
 	// Tests won't run with perfect timing, so we need to allow for some fudge factor when we check maximum duration.
 	timingFudgeFactor = time.Millisecond * 100
 )
+
+var errTest = fmt.Errorf("test error")
 
 func TestZeroBase(t *testing.T) {
 	// Two failures, 0.0 multiplier, should be 0 second delay
@@ -80,11 +83,11 @@ func TestCalcDelayExpBase2(t *testing.T) {
 func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
 	attempts := 3
 	startTime := time.Now()
-	cancelled, err := RunWithLinearBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, attempts, defaultTestTime, nil)
+	cancelled, err := RunWithLinearBackoff(context.Background(), func() error {
+		return errTest
+	}, attempts, defaultTestTime)
 	endTime := time.Now()
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, errTest)
 	assert.False(t, cancelled)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
@@ -100,10 +103,10 @@ func TestTotalRunTimeWithFailuresDefaultRun(t *testing.T) {
 	// Ensure the default Run() method works the same way
 	startTime := time.Now()
 	err := Run(func() error {
-		return fmt.Errorf("test error")
+		return errTest
 	}, attempts, defaultTestTime)
 	endTime := time.Now()
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, errTest)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
 	idealTime := time.Millisecond * 300
@@ -117,11 +120,11 @@ func TestTotalRunTimeWithFailuresBase2(t *testing.T) {
 	tries := 3
 	base := 2.0
 	startTime := time.Now()
-	cancelled, err := RunWithExpBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, nil)
+	cancelled, err := RunWithExpBackoff(context.Background(), func() error {
+		return errTest
+	}, tries, defaultTestTime, base)
 	endTime := time.Now()
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, errTest)
 	assert.False(t, cancelled)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
@@ -136,9 +139,9 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 	tries := 3
 	base := 2.0
 	startTime := time.Now()
-	cancelled, err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(context.Background(), func() error {
 		return nil
-	}, tries, time.Second, base, nil)
+	}, tries, time.Second, base)
 	endTime := time.Now()
 	assert.Nil(t, err)
 	assert.False(t, cancelled)
@@ -151,19 +154,19 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 func TestCancelsEarlyWithSignalImmediately(t *testing.T) {
 	tries := 3
 	base := 2.0
-	cancelSignal := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal immediately
-	close(cancelSignal)
+	cancelFunc()
 
-	cancelled, err := RunWithExpBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, cancelSignal)
+	cancelled, err := RunWithExpBackoff(ctx, func() error {
+		return errTest
+	}, tries, defaultTestTime, base)
 
 	endTime := time.Now()
-	// Error should be nil since we never ran the function before cancelling.
-	assert.Nil(t, err)
+	assert.ErrorIs(t, err, ErrRetryCancelled)
+	assert.ErrorIs(t, err, ErrCommandNotRun)
 	assert.True(t, cancelled)
 	// Delays should be 0 seconds, <attempt>
 	// for a total of 0 seconds.
@@ -175,22 +178,23 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 	tries := 3
 	base := 2.0
 	cancelTime := defaultTestTime * 2
-	cancelSignal := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal after the first delay (wait for the first failure before cancelling)
 	go func() {
 		time.Sleep(cancelTime)
-		close(cancelSignal)
+		cancelFunc()
 	}()
 
-	cancelled, err := RunWithExpBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, cancelSignal)
+	cancelled, err := RunWithExpBackoff(ctx, func() error {
+		return errTest
+	}, tries, defaultTestTime, base)
 
 	endTime := time.Now()
 	// Error should still be set since we ran the function at least once.
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrRetryCancelled)
+	assert.ErrorIs(t, err, errTest)
 	assert.True(t, cancelled)
 
 	// Delay should be 0.2 seconds before the signal is received
@@ -204,11 +208,34 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 func TestNonCancelGivesCorrectError(t *testing.T) {
 	tries := 1
 	base := 2.0
-	cancelled, err := RunWithExpBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, nil)
+	cancelled, err := RunWithExpBackoff(context.Background(), func() error {
+		return errTest
+	}, tries, defaultTestTime, base)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "test error", err.Error())
+	assert.ErrorIs(t, err, errTest)
 	assert.False(t, cancelled)
+}
+
+func TestFailsOnNilCtx(t *testing.T) {
+	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
+	_, err := RunWithLinearBackoff(nil, func() error {
+		return nil
+	}, 1, time.Second)
+	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrNilContext)
+
+	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
+	_, err = RunWithDefaultDownloadBackoff(nil, func() error {
+		return nil
+	})
+	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrNilContext)
+
+	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
+	_, err = RunWithExpBackoff(nil, func() error {
+		return nil
+	}, 1, time.Second, 2.0)
+	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrNilContext)
 }

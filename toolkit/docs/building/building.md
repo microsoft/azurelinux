@@ -673,7 +673,7 @@ These are the useful build targets:
 | clean                            | Clean all built files.
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
-| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
+| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`. See `hydrate-srpms` target.
 | copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
@@ -686,6 +686,7 @@ These are the useful build targets:
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 | help                             | Display basic usage information for most commonly used build targets and variables.
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
+| hydrate-srpms                    | Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
 | image                            | Generate an image (see [Images](#images)).
 | initrd                           | Create the initrd for the ISO installer.
 | input-srpms                      | Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files.
@@ -822,7 +823,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | EXTRA_BUILD_LAYERS            | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
-| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
+| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory (`./build/worker/chroot/<pkg>/*`) when it finishes. Note that `rpmbuild`'s `BUILD` directory will still be removed on a successful package build even when this is turned off. Consider `make containerized-rpmbuild SRPM_PACKLIST=<pkg>` for debugging build issues instead. The user must call `sudo make clean-build-packages-workers` to tidy any uncleaned build environments after a build.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
@@ -873,6 +874,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RPMS_DIR                      | `$(OUT_DIR)`/RPMS                                                                                      | Directory to place RPMs in
 | SRPMS_DIR                     | `$(OUT_DIR)`/SRPMS                                                                                     | Directory to place SRPMs in
 | IMAGES_DIR                    | `$(OUT_DIR)`/images                                                                                    | Directory to place images in
+| PRECACHER_SNAPSHOT            | `$(OUT_DIR)`/rpms_snapshot.json                                                                        | Location of snapshot file for the pre-cacher
 
 ---
 
