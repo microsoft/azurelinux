@@ -8,7 +8,8 @@ Distribution:   Azure Linux
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
-Source1:       https://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz
+# '-2' version of the tarball contains fix for CVE-2022-37434
+Source1:       gdb-10.2-2.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 Patch0:        lzo_snappy_zstd.patch
 License:       GPLv3+
@@ -63,6 +64,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Mon Jun 03 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.4-2
+- Update  gdb-10.2-2.tar.gz to address CVE-2022-37434
+
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 8.0.4-1
 - Upgrade to 8.0.4
 
