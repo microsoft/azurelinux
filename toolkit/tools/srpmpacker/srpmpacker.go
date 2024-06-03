@@ -366,7 +366,6 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	requests := make(chan string, len(specFiles))
 	results := make(chan *specState, len(specFiles))
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
 
 	logger.Log.Infof("Calculating SPECs to repack")
 
@@ -399,10 +398,8 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Currently all functions that employ workers pool of size `workers` are serialized,
 	// resulting in `workers` being the upper capacity at any given time.
 	totalToRepack := 0
-	states = make([]*specState, len(specFiles))
-	for i := 0; i < len(specFiles); i++ {
-		result := <-results
-		states[i] = result
+	for result := range results {
+		states = append(states, result)
 
 		if result.err != nil {
 			logger.Log.Errorf("Failed to check (%s). Error: %s", result.specFile, result.err)
@@ -544,7 +541,6 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 	results := make(chan *packResult, len(specStates))
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; uint(i) < workers; i++ {

@@ -618,7 +618,6 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 		// We run in a retry loop on errors deemed retriable.
 		ctx, cancelFunc := context.WithCancel(context.Background())
-		defer cancelFunc()
 
 		retryNum := 1
 		_, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {

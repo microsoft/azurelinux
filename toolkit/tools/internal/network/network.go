@@ -82,7 +82,6 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 	} else {
 		retryCtx, cancelFunc = context.WithTimeout(ctx, timeout)
 	}
-	defer cancelFunc()
 
 	retryNum := 1
 	errorWas404 := false
@@ -118,7 +117,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
 func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
 	if ctx == nil {
-		return false, fmt.Errorf("context is nil")
+		return fmt.Errorf("context is nil")
 	}
 
 	logger.Log.Debugf("Downloading (%s) -> (%s)", url, dst)

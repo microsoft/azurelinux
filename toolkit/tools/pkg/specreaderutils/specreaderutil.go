@@ -226,7 +226,6 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 	results := make(chan *parseResult, len(specFiles))
 	requests := make(chan string, len(specFiles))
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
