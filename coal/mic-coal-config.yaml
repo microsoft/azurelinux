@@ -1,0 +1,6 @@
+os:
+  packages:
+    install:
+    - trident
+    - trident-provisioning
+    - trident-service
