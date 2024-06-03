@@ -120,6 +120,7 @@ make cctest
 %{_docdir}/*
 
 %files npm
+%defattr(-,root,root)
 %{_bindir}/npm
 %{_bindir}/npx
 %{_bindir}/corepack
