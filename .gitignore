@@ -388,3 +388,10 @@ MigrationBackup/
 
 # Output from the "download_spec_sources.sh" script
 downloaded_sources/
+
+
+coal/images/
+coal/rpms/
+coal/mic-build/
+coal/trident/
+coal/*.vhdx
