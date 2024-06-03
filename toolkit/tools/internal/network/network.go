@@ -87,7 +87,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 	retryNum := 1
 	errorWas404 := false
 	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(retryCtx, func() error {
-		netErr := DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
+		netErr := DownloadFile(retryCtx, srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error is a 404, we should print a warning in that case so the user
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
@@ -116,7 +116,11 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 }
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
-func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
+func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
+	if ctx == nil {
+		return false, fmt.Errorf("context is nil")
+	}
+
 	logger.Log.Debugf("Downloading (%s) -> (%s)", url, dst)
 
 	dstFile, err := os.Create(dst)
@@ -147,7 +151,12 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 		Transport: transport,
 	}
 
-	response, err := client.Get(url)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return fmt.Errorf("%w:\nfailed to create request:\n%w", ErrDownloadFileOther, err)
+	}
+
+	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("%w:\nrequest failed:\n%w", ErrDownloadFileOther, err)
 	}
