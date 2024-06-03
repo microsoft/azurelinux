@@ -13,6 +13,7 @@ BuildRequires:  libstdc++
 BuildRequires:  cmake
 BuildRequires:  unzip
 BuildRequires:  abseil-cpp-devel
+BuildRequires:  gtest-devel
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
 
