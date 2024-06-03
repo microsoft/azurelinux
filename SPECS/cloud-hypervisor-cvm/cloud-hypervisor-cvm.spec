@@ -138,10 +138,12 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSE-BSD-3-Clause
 
 %changelog
-* Wed May 15 2024 Saul Paredes <saulparedes@microsoft.com> - 38.0.72-1000
+* Wed May 15 2024 Saul Paredes <saulparedes@microsoft.com> - 38.0.72-1
+- Initial CBL-Mariner import from Azure
 - Upgrade to v38.0.72
 - Update install to match cloud-hypervisor install locations
 - Add conflicts with cloud-hypervisor
+- License verified.
 
 * Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 32.0.314-2000
 - Upgrade to v32.0.314
