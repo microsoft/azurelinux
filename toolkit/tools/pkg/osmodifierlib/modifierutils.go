@@ -5,10 +5,11 @@ package osmodifierlib
 
 import (
 	"fmt"
+
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 func doModifications(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
@@ -39,7 +40,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot safec
 		return err
 	}
 
-	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode()
+	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
 	if err != nil {
 		return fmt.Errorf("failed to get current SELinux mode:\n%w", err)
 	}

@@ -625,7 +625,7 @@ func readGrub2ConfigFile(imageChroot safechroot.ChrootInterface) (string, error)
 }
 
 // Writes the /boot/grub2/grub.cfg file.
-func WriteGrub2ConfigFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
+func writeGrub2ConfigFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing grub.cfg file")
 
 	grub2ConfigFilePath := getGrub2ConfigFilePath(imageChroot)
