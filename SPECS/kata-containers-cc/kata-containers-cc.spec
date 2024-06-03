@@ -291,8 +291,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %changelog
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
 - Auto-upgrade to 3.2.0.azl2
-
-* Mon May 20 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl1-2
 - Update cloud-hypervisor-snp symlink to also point to /usr/bin/cloud-hypervisor
 
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl1-1
