@@ -165,7 +165,7 @@ mkdir -p /opt/cni/bin
 %{_mandir}/man5/crio.conf.d.5*
 %{_mandir}/man8/crio*.8*
 # License
-%license LICENSE vendor/modules.txt
+%license LICENSE
 # Configs
 %dir %{_sysconfdir}/crio
 %dir %{_sysconfdir}/crio/crio.conf.d
