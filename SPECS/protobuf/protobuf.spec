@@ -66,6 +66,7 @@ This contains protobuf python3 libraries.
     -Dprotobuf_ABSL_PROVIDER=package \
     -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
+    -Dprotobuf_USE_EXTERNAL_GTEST=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
 %{cmake_build}
