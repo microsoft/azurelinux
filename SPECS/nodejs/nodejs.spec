@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,6 @@ Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
-Provides:       npm = %{npm_version}.%{version}-%{release}
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -48,6 +47,16 @@ Requires:       zlib-devel
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
 for developing applications that use nodejs.
+
+%package        npm
+Summary:        Node.js Package Manager
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+Provides:       npm = %{npm_version}.%{version}-%{release}
+
+%description npm
+npm is a package manager for node.js. You can use it to install and publish
+your node programs. It manages dependencies and does other cool stuff.
 
 %prep
 %autosetup -p1 -n node-v%{version}
@@ -101,8 +110,8 @@ make cctest
 %defattr(-,root,root)
 %license LICENSE
 %doc CHANGELOG.md LICENSE README.md
-%{_bindir}/*
-%{_libdir}/node_modules/*
+%{_bindir}/node
+%dir %{_prefix}/lib/node_modules
 %{_mandir}/man*/*
 
 %files devel
@@ -110,7 +119,17 @@ make cctest
 %{_includedir}/*
 %{_docdir}/*
 
+%files npm
+%defattr(-,root,root)
+%{_bindir}/npm
+%{_bindir}/npx
+%{_bindir}/corepack
+%{_prefix}/lib/node_modules/*
+
 %changelog
+* Mon Jun 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 20.10.0-3
+- Separate npm from node using Fedora 50 (LICENSE: MIT)
+
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 20.10.0-2
 - Bump release to build with new libuv to fix CVE-2024-24806
 
