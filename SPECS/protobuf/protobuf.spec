@@ -14,6 +14,7 @@ BuildRequires:  cmake
 BuildRequires:  unzip
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  gtest-devel
+BuildRequires:  gmock-devel
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
 
