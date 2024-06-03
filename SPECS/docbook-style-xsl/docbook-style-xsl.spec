@@ -1,13 +1,15 @@
 Summary:        Docbook-xsl-1.79.1
 Name:           docbook-style-xsl
 Version:        1.79.1
-Release:        13%{?dist}
-License:        ASL 2.0
+Release:        14%{?dist}
+License:        DMIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://www.docbook.org
 Source0:        http://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2
+# CVE-2022-34169: xalan 2.7.2 has security issue that is solved in 2.7.3
+Source1:        https://dlcdn.apache.org/xalan/xalan-j/binaries/xalan-j_2_7_3-bin.tar.gz
 BuildRequires:  libxml2
 BuildRequires:  zip
 Requires:       docbook-dtd-xml
@@ -24,6 +26,12 @@ allowing you to utilize transformations already written for that standard.
 
 %prep
 %setup -q -n docbook-xsl-%{version}
+# CVE-2022-34169: xalan 2.7.2 has security issue that is solved by 2.7.3,
+# so replace the embedded jar files in docbook-xsl release before continuing
+mkdir ./CVE-2022-34169
+tar -xf %{SOURCE1} -C ./CVE-2022-34169
+mv ./CVE-2022-34169/xalan-j_2_7_3/*.jar ./tools/lib/.
+rm -rf ./CVE-2022-34169
 
 %build
 zip -d tools/lib/jython.jar Lib/distutils/command/wininst-6.exe
@@ -102,6 +110,10 @@ fi
 %{_docdir}/*
 
 %changelog
+* Mon Jun 03 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.79.1-14
+- Fix CVE-2022-34169 by using newer release of xalan
+- License should be DMIT. License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
 - Added %%license line automatically
 
