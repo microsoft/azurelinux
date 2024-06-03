@@ -2150,6 +2150,7 @@
                 "application-gateway-kubernetes-ingress",
                 "asc",
                 "azcopy",
+                "azl-compliance",
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
                 "azurelinux-sysinfo",
