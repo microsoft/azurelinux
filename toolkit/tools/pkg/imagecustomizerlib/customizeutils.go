@@ -480,16 +480,17 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 
 	bootCustomizer, err := NewBootCustomizer(imageChroot)
 	if err != nil {
-		return selinuxMode, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
-	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
-	if err != nil {
-		return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
-	}
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
+		// No changes to the SELinux have been requested.
+		// So, return the current SELinux mode.
+		currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
+		if err != nil {
+			return imagecustomizerapi.SELinuxModeDefault, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
+		}
 
-	if selinuxMode == imagecustomizerapi.SELinuxModeDefault || selinuxMode == currentSELinuxMode {
-		// Don't need to change the configured SELinux mode.
 		return currentSELinuxMode, nil
 	}
 
@@ -504,55 +505,49 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 		// Update the SELinux kernel command-line args.
 		err := bootCustomizer.UpdateSELinuxCommandLine(selinuxMode)
 		if err != nil {
-			return selinuxMode, err
+			return imagecustomizerapi.SELinuxModeDefault, err
 		}
 
 		err = bootCustomizer.WriteToFile(imageChroot)
 		if err != nil {
-			return selinuxMode, err
+			return imagecustomizerapi.SELinuxModeDefault, err
 		}
 	}
 
-	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
-		err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
-		if err != nil {
-			return selinuxMode, err
-		}
+	err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
+	if err != nil {
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	return selinuxMode, nil
 }
 
 func updateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
-	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
-		// SELinux is disabled in the kernel command line.
-		// So, no need to update the SELinux config file.
-		return nil
-	}
-
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err
 	}
 
-	// Ensure an SELinux policy has been installed.
-	// Typically, this is provided by the 'selinux-policy' package.
 	selinuxConfigFileFullPath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 	selinuxConfigFileExists, err := file.PathExists(selinuxConfigFileFullPath)
 	if err != nil {
 		return fmt.Errorf("failed to check if (%s) file exists:\n%w", installutils.SELinuxConfigFile, err)
 	}
 
-	if !selinuxConfigFileExists {
+	// Ensure an SELinux policy has been installed.
+	// Typically, this is provided by the 'selinux-policy' package.
+	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled && !selinuxConfigFileExists {
 		return fmt.Errorf("SELinux is enabled but the (%s) file is missing:\n"+
 			"please ensure an SELinux policy is installed:\n"+
 			"the '%s' package provides the default policy",
 			installutils.SELinuxConfigFile, configuration.SELinuxPolicyDefault)
 	}
 
-	err = installutils.SELinuxUpdateConfig(imagerSELinuxMode, imageChroot)
-	if err != nil {
-		return fmt.Errorf("failed to set SELinux mode in config file:\n%w", err)
+	if selinuxConfigFileExists {
+		err = installutils.SELinuxUpdateConfig(imagerSELinuxMode, imageChroot)
+		if err != nil {
+			return fmt.Errorf("failed to set SELinux mode in config file:\n%w", err)
+		}
 	}
 
 	return nil
