@@ -14,8 +14,6 @@
 
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
-
-
 %define debug_package %{nil}
 %define project github.com/cri-o/cri-o
 #Compat macro for new _fillupdir macro introduced in Nov 2017
@@ -31,8 +29,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/cri-o/cri-o
-#Source0:       https://github.com/%{name}/%{name}/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -115,28 +112,12 @@ GO_BUILD="go build -mod vendor" make
 
 %install
 cd $HOME/go/src/%{project}
-
-# Binaries
-install -D -m 0755 bin/crio    %{buildroot}/%{_bindir}/crio
-install -D -m 0755 bin/crio-status    %{buildroot}/%{_bindir}/crio-status
-install -D -m 0755 bin/pinns    %{buildroot}/%{_bindir}/pinns
-install -d %{buildroot}/%{_libexecdir}/crio/bin
-# Completions
-install -D -m 0644 completions/bash/crio %{buildroot}/%{_datadir}/bash-completion/completions/crio
-install -D -m 0644 completions/zsh/_crio %{buildroot}%{_sysconfdir}/zsh_completion.d/_crio
-install -D -m 0644 completions/fish/crio.fish %{buildroot}/%{_datadir}/fish/completions/crio.fish
-install -D -m 0644 completions/bash/crio-status %{buildroot}/%{_datadir}/bash-completion/completions/crio-status
-install -D -m 0644 completions/zsh/_crio-status %{buildroot}%{_sysconfdir}/zsh_completion.d/_crio-status
-install -D -m 0644 completions/fish/crio-status.fish %{buildroot}/%{_datadir}/fish/completions/crio-status.fish
-# Manpages
-install -d %{buildroot}/%{_mandir}/man5
-install -d %{buildroot}/%{_mandir}/man8
-install -m 0644 docs/crio.conf.5 %{buildroot}/%{_mandir}/man5
-install -m 0644 docs/crio.8      %{buildroot}/%{_mandir}/man8
+install -dp %{buildroot}{%{_bindir},%{_libexecdir}/crio}
+install -p -m 755 bin/crio %{buildroot}%{_bindir}
 # Configs
 sed -e 's-@LIBEXECDIR@-%{_libexecdir}-g' -i %{SOURCE4}
 install -D -m 0644 %{SOURCE4}       %{buildroot}/%{_sysconfdir}/crio/crio.conf.d/00-default.conf
-install -D -m 0644 crio-umount.conf %{buildroot}/%{_datadir}/oci-umount/oci-umount.d/cri-umount.conf
+install -D -m 0644 crio-umount.conf %{buildroot}/%{_datadir}/oci-umount/oci-umount.d/crio-umount.conf
 install -D -m 0644 %{SOURCE3}       %{buildroot}%{_fillupdir}/sysconfig.crio
 # Systemd
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/crio.service
@@ -147,6 +128,13 @@ install -d -m 0755 %{buildroot}%{_sbindir}
 ln -sf service %{buildroot}%{_sbindir}/rccrio
 
 %fdupes %{buildroot}/%{_prefix}
+
+%make_install PREFIX=%{buildroot}%{_prefix} \
+            install.bin \
+            install.completions \
+            install.man \
+            install.config \
+            install.systemd
 
 %post
 %systemd_post crio.service
@@ -166,35 +154,31 @@ mkdir -p /opt/cni/bin
 %files
 # Binaries
 %{_bindir}/crio
-%{_bindir}/crio-status
 %{_bindir}/pinns
 %dir %{_libexecdir}/crio
-%dir %{_libexecdir}/crio/bin
 # Completions
-%{_datadir}/bash-completion/completions/crio
-%{_datadir}/bash-completion/completions/crio-status
-%{_sysconfdir}/zsh_completion.d
-%{_sysconfdir}/zsh_completion.d/_crio
-%{_sysconfdir}/zsh_completion.d/_crio-status
-%{_datadir}/fish
-%{_datadir}/fish/completions
-%{_datadir}/fish/completions/crio.fish
-%{_datadir}/fish/completions/crio-status.fish
+%{_datadir}/bash-completion/completions/crio*
+%{_datadir}/fish/completions/crio*.fish
+%{_datadir}/zsh/site-functions/_crio
 # Manpages
 %{_mandir}/man5/crio.conf.5*
-%{_mandir}/man8/crio.8*
+%{_mandir}/man5/crio.conf.d.5*
+%{_mandir}/man8/crio*.8*
 # License
-%license LICENSE
+%license LICENSE vendor/modules.txt
 # Configs
 %dir %{_sysconfdir}/crio
 %dir %{_sysconfdir}/crio/crio.conf.d
-%config %{_sysconfdir}/crio/crio.conf.d/00-default.conf
+%config(noreplace) %{_sysconfdir}/crio/crio.conf
+%config(noreplace) %{_sysconfdir}/crio/crio.conf.d/00-default.conf
+%config(noreplace) %{_sysconfdir}/crictl.yaml
 %dir %{_datadir}/oci-umount
 %dir %{_datadir}/oci-umount/oci-umount.d
-%{_datadir}/oci-umount/oci-umount.d/cri-umount.conf
+%{_datadir}/oci-umount/oci-umount.d/crio-umount.conf
 %{_fillupdir}/sysconfig.crio
 # Systemd
 %{_unitdir}/crio.service
+%{_unitdir}/crio-wipe.service
 %{_sbindir}/rccrio
 
 %files kubeadm-criconfig
