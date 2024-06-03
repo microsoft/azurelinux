@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,7 @@ Patch7:         CVE-2022-21698.patch
 Patch8:         CVE-2023-44487.patch
 Patch9:         CVE-2024-28180.patch
 Patch10:        CVE-2024-21626.patch
+Patch11:        CVE-2024-3154.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -215,6 +216,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon Jun 03 2024 Bala <balakumaran.kannan@microsoft.com> - 1.22.3-2
+- Patch CVE-2024-3154
+
 * Thu May 21 2024 Henry Li <lihl@microsoft.com> - 1.22.3-1
 - Upgrade to 1.22.3 to resolve regressed CVE-2022-0811
 - Updated vendor source tar
@@ -1788,4 +1792,4 @@ mkdir -p /opt/cni/bin
 - Add cri-o package: CRI-O is meant to provide an integration path between OCI
   conformant runtimes and the kubelet. Specifically, it implements the Kubelet
   Container Runtime Interface (CRI) using OCI conformant runtimes. The scope of
-  CRI-O is tied to the scope of the CRI.
+
