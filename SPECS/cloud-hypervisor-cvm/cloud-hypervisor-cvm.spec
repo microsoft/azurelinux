@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/microsoft/cloud-hypervisor
-Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v%{version}.tar.gz#/cloud-hypervisor-%{version}.tar.gz
+Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
@@ -20,7 +20,7 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
 # rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
-Source1:        cloud-hypervisor-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        config.toml
 %endif
 
