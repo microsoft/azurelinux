@@ -1,6 +1,7 @@
+%global gdb_version 10.2
 Name:          crash
 Version:       8.0.4
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -8,8 +9,8 @@ Distribution:   Azure Linux
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
-# '-2' version of the tarball contains fix for CVE-2022-37434
-Source1:       gdb-10.2-2.tar.gz
+# '-2' version of the tarball contains fix for CVE-2022-37434 which cannot be applied as a .patch because source1 is only untar'ed during crash make
+Source1:       gdb-%{gdb_version}-2.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 Patch0:        lzo_snappy_zstd.patch
 License:       GPLv3+
@@ -37,7 +38,8 @@ This package contains libraries and header files need for development.
 
 %prep
 %autosetup -n %{name}-%{version}
-cp %{SOURCE1} .
+# make expect the gdb tarball to be named with its version only, gdb-[version].tar.gz, e.g.: gdb-10.2.tar.gz
+cp %{SOURCE1} ./gdb-%{gdb_version}.tar.gz
 
 %build
 make RPMPKG=%{version}-%{release}
@@ -65,7 +67,7 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 
 %changelog
 * Mon Jun 03 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.4-2
-- Update  gdb-10.2-2.tar.gz to address CVE-2022-37434
+- Update gdb-10.2-2.tar.gz to address CVE-2022-37434
 
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 8.0.4-1
 - Upgrade to 8.0.4
