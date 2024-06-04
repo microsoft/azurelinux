@@ -1,9 +1,8 @@
 {
- "Signatures": {
-  "50_mariner_mshv.cfg": "12bf23f8857f893549933a20062ad2a69c3c654b87893e8dd3ce42f9329801c7",
-  "50_mariner_mshv_menuentry": "5a46bb273be0e829fec4e1f498b1a11b59ded6e14d42a19be7da860c3f4c35be",
-  "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
-  "config": "2227744a0089cceae344dec57d6ff0540e265056f3831e24805d9cad4571e825",
-  "kernel-mshv-5.15.126.mshv9.tar.gz": "3ed864ec26340e02b95696784f870eee53ad1e0ba1f30bd9545704bb45a5a2f2"
- }
+    "Signatures": {
+        "50_mariner_mshv.cfg": "0a5fcad1efb1fd37f910f675c5303210a2aeeef9e089d804510ce40ff9b26369",
+        "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
+        "config": "a83f8b5ccf093bae011d89575b410418e31f8705f6cf9ed291b0cfe1ea5896c9",
+        "kernel-mshv-5.15.157.mshv1.tar.gz": "8240745a0820ee383ebaf8750877c1189772dc0253cd0658deab199fb2140a4b"
+    }
 }
