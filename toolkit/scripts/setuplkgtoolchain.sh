@@ -6,14 +6,14 @@ set -e
 
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
 LKG_FILENAME="lkg-3.0-dev.json"
-PROCESSOR=$(uname -m)
+ARCHITECTURE=$(uname -m)
 
 trap cleanup EXIT
 
 usage() {
     echo "./setuplkgtoolchain.sh"
     echo " Syncs toolchain manifests to match LKG build"
-    echo " WARNING: can overwrite local changes to 'toolkit/resources/manifests/package/pkggen_core_${PROCESSOR}.txt' or 'toolchain_${PROCESSOR}.txt'"
+    echo " WARNING: can overwrite local changes to 'toolkit/resources/manifests/package/pkggen_core_${ARCHITECTURE}.txt' or 'toolchain_${ARCHITECTURE}.txt'"
     exit 1
 }
 
@@ -24,16 +24,16 @@ get_lkg() {
 }
 
 check_for_modified_manifests() {
-    if git status --porcelain | grep -qP "(pkggen_core|toolchain)_${PROCESSOR}.txt"; then
-        echo "Local modifications to 'pkggen_core_${PROCESSOR}.txt' or 'toolchain_${PROCESSOR}.txt' detected."
+    if git status --porcelain | grep -qP "(pkggen_core|toolchain)_${ARCHITECTURE}.txt"; then
+        echo "Local modifications to 'pkggen_core_${ARCHITECTURE}.txt' or 'toolchain_${ARCHITECTURE}.txt' detected."
         echo -e "\nNOTE: Changes to manifests were detected, and these will be overwritten. Hit Ctrl+C within 10 seconds to cancel...\n"
         sleep 10s
     fi
 }
 
 update_manifests() {
-    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/toolchain_${PROCESSOR}.txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/toolchain_${PROCESSOR}.txt
-    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_${PROCESSOR}.txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_${PROCESSOR}.txt
+    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/toolchain_${ARCHITECTURE}.txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/toolchain_${ARCHITECTURE}.txt
+    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_${ARCHITECTURE}.txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_${ARCHITECTURE}.txt
 }
 
 cleanup() {
