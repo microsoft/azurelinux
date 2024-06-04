@@ -7,8 +7,6 @@ function showUsage() {
     echo "usage:"
     echo
     echo "build-mic-container.sh \\"
-    echo "    -r <container-registry> \\"
-    echo "    -n <container-name> \\"
     echo "    -t <container-tag> \\"
     echo "    -i <input-image-path> \\"
     echo "    -c <input-config-path> \\"
@@ -20,8 +18,6 @@ function showUsage() {
 
 while getopts ":r:n:t:i:c:f:o:l:" OPTIONS; do
   case "${OPTIONS}" in
-    r ) containerRegistery=$OPTARG ;;
-    n ) containerName=$OPTARG ;;
     t ) containerTag=$OPTARG ;;
     i ) inputImage=$OPTARG ;;
     c ) inputConfig=$OPTARG ;;
@@ -30,18 +26,6 @@ while getopts ":r:n:t:i:c:f:o:l:" OPTIONS; do
     l ) logLevel=$OPTARG ;;
   esac
 done
-
-if [[ -z $containerRegistery ]]; then
-    echo "missing required argument '-r containerRegistry'"
-    showUsage
-    exit 1
-fi
-
-if [[ -z $containerName ]]; then
-    echo "missing required argument '-n containerName'"
-    showUsage
-    exit 1
-fi
 
 if [[ -z $containerTag ]]; then
     echo "missing required argument '-t containerTag'"
@@ -79,8 +63,6 @@ fi
 
 # ---- main ----
 
-containerFullPath=$containerRegistery/$containerName:$containerTag
-
 inputImageDir=$(dirname $inputImage)
 inputConfigDir=$(dirname $inputConfig)
 outputImageDir=$(dirname $outputImage)
@@ -109,7 +91,7 @@ docker run --rm \
    -v $inputConfigDir:$containerInputConfigDir:z \
    -v $outputImageDir:$containerOutputDir:z \
    -v /dev:/dev \
-   $containerFullPath \
+   "$containerTag" \
    imagecustomizer \
       --image-file $containerInputImage \
       --config-file $containerInputConfig \
