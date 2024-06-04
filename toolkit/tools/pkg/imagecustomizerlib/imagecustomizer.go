@@ -229,11 +229,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}()
 
-	err = updateConfig(imageCustomizerParameters)
-	if err != nil {
-		return err
-	}
-
 	// ensure build and output folders are created up front
 	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
 	if err != nil {
@@ -307,20 +302,6 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 
 		return nil, nil
 	}
-}
-
-func updateConfig(ic *ImageCustomizerParameters) error {
-	// If we are converting vhd(x)/qcow to an iso, we need to make sure that
-	// the following packages are pre-installed for dracut live-os to work
-	// correctly.
-	if !ic.inputIsIso && ic.outputIsIso {
-		if ic.config.OS == nil {
-			ic.config.OS = &imagecustomizerapi.OS{}
-		}
-		ic.config.OS.Packages.Install =
-			append(ic.config.OS.Packages.Install, "squashfs-tools", "tar", "device-mapper")
-	}
-	return nil
 }
 
 func customizeOSContents(ic *ImageCustomizerParameters) error {

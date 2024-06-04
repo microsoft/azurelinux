@@ -27,13 +27,15 @@ var (
 )
 
 const (
+	linuxCommand  = "linux"
+	initrdCommand = "initrd"
 	// The index of the SELinux mode value.
 	selinuxConfigModeRegexSELinuxMode = 1
 )
 
 // Looks for all occurences of a command with the provided name.
 // Returns the lines containing the command.
-func findGrubCommandAll(inputGrubCfgContent string, commandName string) ([]grub.Line, error) {
+func findGrubCommandAll(inputGrubCfgContent string, commandName string, allowMultiple bool) ([]grub.Line, error) {
 	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
 	if err != nil {
 		return nil, err
@@ -44,31 +46,18 @@ func findGrubCommandAll(inputGrubCfgContent string, commandName string) ([]grub.
 	if len(lines) < 1 {
 		return nil, fmt.Errorf("failed to find the '%s' command in grub config", commandName)
 	}
+	if !allowMultiple {
+		if len(lines) > 1 {
+			return nil, fmt.Errorf("more than one '%s' command in grub config", commandName)
+		}
+	}
 
 	return lines, nil
 }
 
-// Looks for a command with the provided name and ensures there is only 1 such command.
-// Returns the line of the found command.
-func findSingularGrubCommand(inputGrubCfgContent string, commandName string) (grub.Line, error) {
-	lines, err := findGrubCommandAll(inputGrubCfgContent, commandName)
-	if err != nil {
-		return grub.Line{}, err
-	}
-	if len(lines) < 1 {
-		return grub.Line{}, fmt.Errorf("failed to find the '%s' command in grub config", commandName)
-	}
-	if len(lines) > 1 {
-		return grub.Line{}, fmt.Errorf("more than one '%s' command in grub config", commandName)
-	}
-
-	line := lines[0]
-	return line, nil
-}
-
 // Finds all search command occurences and replaces them.
 func replaceSearchCommandAll(inputGrubCfgContent string, newSearchCommand string) (outputGrubCfgContent string, err error) {
-	lines, err := findGrubCommandAll(inputGrubCfgContent, "search")
+	lines, err := findGrubCommandAll(inputGrubCfgContent, "search", true /*allowMultiple*/)
 	if err != nil {
 		return "", err
 	}
@@ -76,7 +65,7 @@ func replaceSearchCommandAll(inputGrubCfgContent string, newSearchCommand string
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
+	for i := len(lines); i > 0; i-- {
 		line := lines[i-1]
 		start := line.Tokens[0].Loc.Start.Index
 		end := line.EndToken.Loc.Start.Index
@@ -115,160 +104,80 @@ func replaceToken(inputGrubCfgContent string, oldToken string, newToken string) 
 	return outputGrubCfgContent, nil
 }
 
-// Find all occurences of the linux command within the grub config file.
-func findLinuxLineAll(inputGrubCfgContent string) ([]grub.Line, error) {
-	lines, err := findGrubCommandAll(inputGrubCfgContent, "linux")
+// Find all occurences of the initrd or kernel command within the grub config file.
+func findLinuxOrInitrdLineAll(inputGrubCfgContent string, commandName string, allowMultiple bool) ([]grub.Line, error) {
+	lines, err := findGrubCommandAll(inputGrubCfgContent, commandName, allowMultiple)
 	if err != nil {
 		return nil, err
 	}
-	for i := 0; i < len(lines); i = i + 1 {
+	for i := 0; i < len(lines); i++ {
 		if len(lines[i].Tokens) < 2 {
-			return nil, fmt.Errorf("grub config 'linux' command is missing file path arg")
+			return nil, fmt.Errorf("grub config 'initrd' command is missing file path arg")
 		}
 	}
+
 	return lines, nil
 }
 
 // Find the linux command within the grub config file.
 func findLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
-	lines, err := findLinuxLineAll(inputGrubCfgContent)
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, false /*allowMultiple*/)
 	if err != nil {
 		return grub.Line{}, err
-	}
-	if len(lines) < 1 {
-		return grub.Line{}, fmt.Errorf("failed to find the 'linux' command in grub config")
-	}
-	if len(lines) > 1 {
-		return grub.Line{}, fmt.Errorf("more than one 'linux' command in grub config")
 	}
 	return lines[0], nil
 }
 
-// Find all occurences of the initrd command within the grub config file.
-func findInitrdLineAll(inputGrubCfgContent string) ([]grub.Line, error) {
-	initrdLines, err := findGrubCommandAll(inputGrubCfgContent, "initrd")
-	if err != nil {
-		return nil, err
-	}
-	for i := 0; i < len(initrdLines); i = i + 1 {
-		if len(initrdLines[i].Tokens) < 2 {
-			return nil, fmt.Errorf("grub config 'initrd' command is missing file path arg")
-		}
-	}
-
-	return initrdLines, nil
-}
-
-// Overrides the path of the kernel binary of the linux command within a grub config file.
-func setLinuxPath(inputGrubCfgContent string, linuxPath string) (outputGrubCfgContent string, oldKernelPath string, err error) {
-	quotedLinuxPath := grub.QuoteString(linuxPath)
-
-	linuxLine, err := findLinuxLine(inputGrubCfgContent)
-	if err != nil {
-		return "", "", err
-	}
-
-	linuxFilePathToken := linuxLine.Tokens[1]
-	start := linuxFilePathToken.Loc.Start.Index
-	end := linuxFilePathToken.Loc.End.Index
-
-	oldKernelPath = inputGrubCfgContent[start:end]
-	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedLinuxPath + inputGrubCfgContent[end:]
-
-	return outputGrubCfgContent, oldKernelPath, nil
-}
-
 // Overrides the path of the kernel binary of all the linux commands within a grub config file.
-func setLinuxPathAll(inputGrubCfgContent string, linuxPath string) (outputGrubCfgContent string, err error) {
-	quotedLinuxPath := grub.QuoteString(linuxPath)
+func setLinuxOrInitrdPathAll(inputGrubCfgContent string, commandName string, filePath string, allowMultiple bool) (outputGrubCfgContent string, oldFilePaths []string, err error) {
+	quotedFilePath := grub.QuoteString(filePath)
 
-	lines, err := findLinuxLineAll(inputGrubCfgContent)
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, commandName, allowMultiple)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	outputGrubCfgContent = inputGrubCfgContent
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
+	for i := len(lines); i > 0; i-- {
 		line := lines[i-1]
 		linuxFilePathToken := line.Tokens[1]
 		start := linuxFilePathToken.Loc.Start.Index
 		end := linuxFilePathToken.Loc.End.Index
 
-		outputGrubCfgContent = outputGrubCfgContent[:start] + quotedLinuxPath + outputGrubCfgContent[end:]
+		oldFilePaths = append(oldFilePaths, inputGrubCfgContent[start:end])
+		outputGrubCfgContent = outputGrubCfgContent[:start] + quotedFilePath + outputGrubCfgContent[end:]
 	}
 
-	return outputGrubCfgContent, nil
+	return outputGrubCfgContent, oldFilePaths, nil
+}
+
+// Overrides the path of the kernel binary of the linux command within a grub config file.
+func setLinuxPath(inputGrubCfgContent string, linuxPath string) (outputGrubCfgContent string, oldKernelPath string, err error) {
+	outputGrubCfgContent, oldKernelPaths, err := setLinuxOrInitrdPathAll(inputGrubCfgContent, linuxCommand, linuxPath, false /*allowMultiple*/)
+	if err != nil {
+		return "", "", err
+	}
+	return outputGrubCfgContent, oldKernelPaths[0], nil
 }
 
 // Overrides the path of the initramfs file of the initrd command within a grub config file.
 func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfgContent string, oldInitrdPath string, err error) {
-	quotedInitrdPath := grub.QuoteString(initrdPath)
-
-	line, err := findSingularGrubCommand(inputGrubCfgContent, "initrd")
+	outputGrubCfgContent, oldInitrdPaths, err := setLinuxOrInitrdPathAll(inputGrubCfgContent, initrdCommand, initrdPath, false /*allowMultiple*/)
 	if err != nil {
 		return "", "", err
 	}
-
-	if len(line.Tokens) < 2 {
-		return "", "", fmt.Errorf("grub config 'initrd' command is missing file path arg")
-	}
-
-	initrdFilePathToken := line.Tokens[1]
-	start := initrdFilePathToken.Loc.Start.Index
-	end := initrdFilePathToken.Loc.End.Index
-
-	oldInitrdPath = inputGrubCfgContent[start:end]
-	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedInitrdPath + inputGrubCfgContent[end:]
-
-	return outputGrubCfgContent, oldInitrdPath, nil
-}
-
-// Overrides the path of the initramfs file of all the initrd commands within a grub config file.
-func setInitrdPathAll(inputGrubCfgContent string, initrdPath string) (outputGrubCfgContent string, err error) {
-	quotedInitrdPath := grub.QuoteString(initrdPath)
-
-	lines, err := findInitrdLineAll(inputGrubCfgContent)
-	if err != nil {
-		return "", err
-	}
-
-	outputGrubCfgContent = inputGrubCfgContent
-	// loop from last to first so that the captured locations from
-	// findGrubCommandAll are not invalidated as reconstructing
-	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
-		line := lines[i-1]
-		initrdFilePathToken := line.Tokens[1]
-		start := initrdFilePathToken.Loc.Start.Index
-		end := initrdFilePathToken.Loc.End.Index
-
-		outputGrubCfgContent = outputGrubCfgContent[:start] + quotedInitrdPath + outputGrubCfgContent[end:]
-	}
-
-	return outputGrubCfgContent, nil
-}
-
-// Appends kernel command-line args to the linux command within a grub config file.
-func appendKernelCommandLineArgs(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
-	_, insertAt, err := getLinuxCommandLineArgs(inputGrubCfgContent)
-	if err != nil {
-		return "", err
-	}
-
-	// Insert args at the end of the line.
-	outputGrubCfgContent = inputGrubCfgContent[:insertAt] + extraCommandLine + " " + inputGrubCfgContent[insertAt:]
-	return outputGrubCfgContent, nil
+	return outputGrubCfgContent, oldInitrdPaths[0], nil
 }
 
 // Appends kernel command-line args to the linux command within a grub config file.
 // If $kernelopts is present, extraCommandLine is inserted before $kernelopts.
 // If $kernelopts is not present, extraCommandLine is appended at the end.
-func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
+func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine string, allowMultiple bool) (outputGrubCfgContent string, err error) {
 
-	lines, err := findLinuxLineAll(inputGrubCfgContent)
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, true /*allowMultiple*/)
 	if err != nil {
 		return "", err
 	}
@@ -277,7 +186,7 @@ func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
+	for i := len(lines); i > 0; i-- {
 		line := lines[i-1]
 
 		// Skip the "linux" command and the kernel binary path arg.
@@ -293,6 +202,11 @@ func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine
 	}
 
 	return outputGrubCfgContent, nil
+}
+
+// Appends kernel command-line args to the linux command within a grub config file.
+func appendKernelCommandLineArgs(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
+	return appendKernelCommandLineArgsAll(inputGrubCfgContent, extraCommandLine, false /*allow multiple*/)
 }
 
 type grubConfigLinuxArg struct {
@@ -313,13 +227,13 @@ type grubConfigLinuxArg struct {
 //   - insertAt: An index that represents an appropriate insert point for any new args.
 //     For Azure Linux 2.0 images, this points to the index of the $kernelopts token.
 func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, error) {
-	linuxLine, err := findLinuxLine(grub2Config)
+	linuxLine, err := findLinuxOrInitrdLineAll(grub2Config, linuxCommand, false /*allowMultiple*/)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Skip the "linux" command and the kernel binary path arg.
-	argTokens := linuxLine.Tokens[2:]
+	argTokens := linuxLine[0].Tokens[2:]
 
 	insertAt, err := findCommandLineInsertAt(argTokens, true /*requireKernelOpts*/)
 	if err != nil {
@@ -461,6 +375,50 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 	return lastArg.Value, nil
 }
 
+func replaceKernelCommandLineArgValueAll(inputGrubCfgContent string, name string, value string, allowMultiple bool,
+) (outputGrubCfgContent string, oldValues []string, err error) {
+	newArg := fmt.Sprintf("%s=%s", name, value)
+	quotedNewArg := grub.QuoteString(newArg)
+
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, allowMultiple)
+	if err != nil {
+		return "", nil, err
+	}
+
+	outputGrubCfgContent = inputGrubCfgContent
+	// loop from last to first so that the captured locations from
+	// findGrubCommandAll are not invalidated as reconstructing
+	// outputGrubCfgContent.
+	for i := len(lines); i > 0; i-- {
+		line := lines[i-1]
+
+		// Skip the "linux" command and the kernel binary path arg.
+		argTokens := line.Tokens[2:]
+
+		args, err := parseCommandLineArgs(argTokens)
+		if err != nil {
+			return "", nil, err
+		}
+
+		foundArgs := findMatchingCommandLineArgs(args, []string{name})
+		if len(foundArgs) < 1 {
+			return "", nil, fmt.Errorf("failed to find kernel arg (%s)", name)
+		}
+		if len(foundArgs) > 1 {
+			return "", nil, fmt.Errorf("too many instances of kernel arg found (%s)", name)
+		}
+
+		arg := foundArgs[0]
+		start := arg.Token.Loc.Start.Index
+		end := arg.Token.Loc.End.Index
+
+		oldValues = append(oldValues, inputGrubCfgContent[start:end])
+		outputGrubCfgContent = outputGrubCfgContent[:start] + quotedNewArg + outputGrubCfgContent[end:]
+	}
+
+	return outputGrubCfgContent, oldValues, nil
+}
+
 // Finds an existing kernel command-line arg and replaces its value.
 //
 // Params:
@@ -473,99 +431,15 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 // - oldValue: The previous value of the arg.
 func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, value string,
 ) (outputGrubCfgContent string, oldValue string, err error) {
-	newArg := fmt.Sprintf("%s=%s", name, value)
-	quotedNewArg := grub.QuoteString(newArg)
-
-	args, _, err := getLinuxCommandLineArgs(inputGrubCfgContent)
+	outputGrubCfgContent, oldValues, err := replaceKernelCommandLineArgValueAll(inputGrubCfgContent, name, value, false /*allowMultiple*/)
 	if err != nil {
 		return "", "", err
 	}
-
-	foundArgs := findMatchingCommandLineArgs(args, []string{name})
-	if len(foundArgs) < 1 {
-		return "", "", fmt.Errorf("failed to find kernel arg (%s)", name)
-	}
-	if len(foundArgs) > 1 {
-		return "", "", fmt.Errorf("too many instances of kernel arg found (%s)", name)
-	}
-
-	arg := foundArgs[0]
-	start := arg.Token.Loc.Start.Index
-	end := arg.Token.Loc.End.Index
-
-	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedNewArg + inputGrubCfgContent[end:]
-
-	return outputGrubCfgContent, oldValue, nil
+	return outputGrubCfgContent, oldValues[0], nil
 }
 
-func replaceKernelCommandLineArgValueAll(inputGrubCfgContent string, name string, value string,
-) (outputGrubCfgContent string, err error) {
-	newArg := fmt.Sprintf("%s=%s", name, value)
-	quotedNewArg := grub.QuoteString(newArg)
-
-	lines, err := findLinuxLineAll(inputGrubCfgContent)
-	if err != nil {
-		return "", err
-	}
-
-	outputGrubCfgContent = inputGrubCfgContent
-	// loop from last to first so that the captured locations from
-	// findGrubCommandAll are not invalidated as reconstructing
-	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
-		line := lines[i-1]
-
-		// Skip the "linux" command and the kernel binary path arg.
-		argTokens := line.Tokens[2:]
-
-		args, err := parseCommandLineArgs(argTokens)
-		if err != nil {
-			return "", err
-		}
-
-		foundArgs := findMatchingCommandLineArgs(args, []string{name})
-		if len(foundArgs) < 1 {
-			return "", fmt.Errorf("failed to find kernel arg (%s)", name)
-		}
-		if len(foundArgs) > 1 {
-			return "", fmt.Errorf("too many instances of kernel arg found (%s)", name)
-		}
-
-		arg := foundArgs[0]
-		start := arg.Token.Loc.Start.Index
-		end := arg.Token.Loc.End.Index
-
-		outputGrubCfgContent = outputGrubCfgContent[:start] + quotedNewArg + outputGrubCfgContent[end:]
-	}
-
-	return outputGrubCfgContent, nil
-}
-
-// Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
-//
-// Params:
-// - grub2Config: The string contents of the grub.cfg file.
-// - argsToRemove: A list of arg names to remove from the command-line args.
-// - newArgs: A list of new arg values to add to the command-line args.
-//
-// Output:
-// - grub2Config: The new string contents of the grub.cfg file.
-func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
-	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
-	if err != nil {
-		return "", err
-	}
-
-	grub2Config, err = updateKernelCommandLineArgsHelper(grub2Config, args, insertAtToken, argsToRemove, newArgs)
-	if err != nil {
-		return "", err
-	}
-
-	return grub2Config, nil
-}
-
-func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
-	lines, err := findLinuxLineAll(grub2Config)
+func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, newArgs []string, allowMultiple bool) (string, error) {
+	lines, err := findLinuxOrInitrdLineAll(grub2Config, linuxCommand, allowMultiple /*allowMultiple*/)
 	if err != nil {
 		return "", err
 	}
@@ -573,7 +447,7 @@ func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, n
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i = i - 1 {
+	for i := len(lines); i > 0; i-- {
 		line := lines[i-1]
 
 		// Skip the "linux" command and the kernel binary path arg.
@@ -595,6 +469,19 @@ func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, n
 		}
 	}
 	return grub2Config, nil
+}
+
+// Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
+//
+// Params:
+// - grub2Config: The string contents of the grub.cfg file.
+// - argsToRemove: A list of arg names to remove from the command-line args.
+// - newArgs: A list of new arg values to add to the command-line args.
+//
+// Output:
+// - grub2Config: The new string contents of the grub.cfg file.
+func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
+	return updateKernelCommandLineArgsAll(grub2Config, argsToRemove, newArgs, false /*allowMultiple*/)
 }
 
 func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, insertAt int,
@@ -694,7 +581,7 @@ func updateSELinuxCommandLineHelperAll(grub2Config string, selinuxMode imagecust
 		return "", err
 	}
 
-	grub2Config, err = updateKernelCommandLineArgsAll(grub2Config, selinuxArgNames, newSELinuxArgs)
+	grub2Config, err = updateKernelCommandLineArgsAll(grub2Config, selinuxArgNames, newSELinuxArgs, true /*allowMultiple*/)
 	if err != nil {
 		return "", err
 	}
