@@ -65,8 +65,8 @@ func replaceSearchCommandAll(inputGrubCfgContent string, newSearchCommand string
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i-- {
-		line := lines[i-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
 		start := line.Tokens[0].Loc.Start.Index
 		end := line.EndToken.Loc.Start.Index
 		outputGrubCfgContent = outputGrubCfgContent[:start] + newSearchCommand + outputGrubCfgContent[end:]
@@ -112,7 +112,7 @@ func findLinuxOrInitrdLineAll(inputGrubCfgContent string, commandName string, al
 	}
 	for i := 0; i < len(lines); i++ {
 		if len(lines[i].Tokens) < 2 {
-			return nil, fmt.Errorf("grub config 'initrd' command is missing file path arg")
+			return nil, fmt.Errorf("grub config '%s' command is missing file path arg", commandName)
 		}
 	}
 
@@ -141,8 +141,8 @@ func setLinuxOrInitrdPathAll(inputGrubCfgContent string, commandName string, fil
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i-- {
-		line := lines[i-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
 		linuxFilePathToken := line.Tokens[1]
 		start := linuxFilePathToken.Loc.Start.Index
 		end := linuxFilePathToken.Loc.End.Index
@@ -175,9 +175,9 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 // Appends kernel command-line args to the linux command within a grub config file.
 // If $kernelopts is present, extraCommandLine is inserted before $kernelopts.
 // If $kernelopts is not present, extraCommandLine is appended at the end.
-func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine string, allowMultiple bool) (outputGrubCfgContent string, err error) {
-
-	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, true /*allowMultiple*/)
+func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine string,
+	allowMultiple bool, requireKernelOpts bool) (outputGrubCfgContent string, err error) {
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, allowMultiple)
 	if err != nil {
 		return "", err
 	}
@@ -186,13 +186,13 @@ func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i-- {
-		line := lines[i-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
 
 		// Skip the "linux" command and the kernel binary path arg.
 		argTokens := line.Tokens[2:]
 
-		insertAt, err := findCommandLineInsertAt(argTokens, false /*requireKernelOpts*/)
+		insertAt, err := findCommandLineInsertAt(argTokens, requireKernelOpts)
 		if err != nil {
 			return "", err
 		}
@@ -206,7 +206,7 @@ func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine
 
 // Appends kernel command-line args to the linux command within a grub config file.
 func appendKernelCommandLineArgs(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
-	return appendKernelCommandLineArgsAll(inputGrubCfgContent, extraCommandLine, false /*allow multiple*/)
+	return appendKernelCommandLineArgsAll(inputGrubCfgContent, extraCommandLine, false /*allow multiple*/, true /*requireKernelOpts*/)
 }
 
 type grubConfigLinuxArg struct {
@@ -226,7 +226,7 @@ type grubConfigLinuxArg struct {
 //   - args: A list of kernel command-line arguments.
 //   - insertAt: An index that represents an appropriate insert point for any new args.
 //     For Azure Linux 2.0 images, this points to the index of the $kernelopts token.
-func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, error) {
+func getLinuxCommandLineArgs(grub2Config string, requireKernelOpts bool) ([]grubConfigLinuxArg, int, error) {
 	linuxLine, err := findLinuxOrInitrdLineAll(grub2Config, linuxCommand, false /*allowMultiple*/)
 	if err != nil {
 		return nil, 0, err
@@ -235,7 +235,7 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, err
 	// Skip the "linux" command and the kernel binary path arg.
 	argTokens := linuxLine[0].Tokens[2:]
 
-	insertAt, err := findCommandLineInsertAt(argTokens, true /*requireKernelOpts*/)
+	insertAt, err := findCommandLineInsertAt(argTokens, requireKernelOpts)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -389,8 +389,8 @@ func replaceKernelCommandLineArgValueAll(inputGrubCfgContent string, name string
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i-- {
-		line := lines[i-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
 
 		// Skip the "linux" command and the kernel binary path arg.
 		argTokens := line.Tokens[2:]
@@ -438,7 +438,8 @@ func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, v
 	return outputGrubCfgContent, oldValues[0], nil
 }
 
-func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, newArgs []string, allowMultiple bool) (string, error) {
+func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, newArgs []string,
+	allowMultiple bool, requireKernelOpts bool) (string, error) {
 	lines, err := findLinuxOrInitrdLineAll(grub2Config, linuxCommand, allowMultiple /*allowMultiple*/)
 	if err != nil {
 		return "", err
@@ -447,13 +448,13 @@ func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, n
 	// loop from last to first so that the captured locations from
 	// findGrubCommandAll are not invalidated as reconstructing
 	// outputGrubCfgContent.
-	for i := len(lines); i > 0; i-- {
-		line := lines[i-1]
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
 
 		// Skip the "linux" command and the kernel binary path arg.
 		argTokens := line.Tokens[2:]
 
-		insertAtToken, err := findCommandLineInsertAt(argTokens, false /*requireKernelOpts*/)
+		insertAtToken, err := findCommandLineInsertAt(argTokens, requireKernelOpts)
 		if err != nil {
 			return "", err
 		}
@@ -481,7 +482,7 @@ func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, n
 // Output:
 // - grub2Config: The new string contents of the grub.cfg file.
 func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
-	return updateKernelCommandLineArgsAll(grub2Config, argsToRemove, newArgs, false /*allowMultiple*/)
+	return updateKernelCommandLineArgsAll(grub2Config, argsToRemove, newArgs, false /*allowMultiple*/, true /*requireKernelOpts*/)
 }
 
 func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, insertAt int,
@@ -561,27 +562,13 @@ func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, er
 }
 
 // Update the SELinux kernel command-line args.
-func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
+func updateSELinuxCommandLineHelperAll(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode, allowMultiple bool, requireKernelOpts bool) (string, error) {
 	newSELinuxArgs, err := selinuxModeToArgs(selinuxMode)
 	if err != nil {
 		return "", err
 	}
 
-	grub2Config, err = updateKernelCommandLineArgs(grub2Config, selinuxArgNames, newSELinuxArgs)
-	if err != nil {
-		return "", err
-	}
-
-	return grub2Config, nil
-}
-
-func updateSELinuxCommandLineHelperAll(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
-	newSELinuxArgs, err := selinuxModeToArgs(selinuxMode)
-	if err != nil {
-		return "", err
-	}
-
-	grub2Config, err = updateKernelCommandLineArgsAll(grub2Config, selinuxArgNames, newSELinuxArgs, true /*allowMultiple*/)
+	grub2Config, err = updateKernelCommandLineArgsAll(grub2Config, selinuxArgNames, newSELinuxArgs, allowMultiple, requireKernelOpts)
 	if err != nil {
 		return "", err
 	}

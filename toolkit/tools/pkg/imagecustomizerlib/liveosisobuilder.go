@@ -315,7 +315,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigKernelArgsFilePath string, g
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
+	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled, true /*allowMultiple*/, false /*requireKernelOpts*/)
 	if err != nil {
 		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
@@ -326,9 +326,9 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigKernelArgsFilePath string, g
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
-	additionalKernelCommandline := " " + liveosKernelArgs + " " + mergedExtraCommandLine
+	additionalKernelCommandline := liveosKernelArgs + " " + mergedExtraCommandLine
 
-	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline, true /*allowMultiple*/)
+	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline, true /*allowMultiple*/, false /*requireKernelOpts*/)
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}
@@ -707,7 +707,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 	for _, requiredRpm := range requiredRpms {
 		logger.Log.Debugf("Checking if (%s) is installed", requiredRpm)
 		if !isPackageInstalled(chroot, requiredRpm) {
-			return fmt.Errorf("failed to find required package (%s). The following packages must be installed:%v", requiredRpm, requiredRpms)
+			return fmt.Errorf("package (%s) is not installed:\nthe following packages must be installed to generate an iso: %v", requiredRpm, requiredRpms)
 		}
 	}
 
