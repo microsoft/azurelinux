@@ -61,7 +61,7 @@ Patch37:        CVE-2023-3817.patch
 Patch38:        openssl-1.1.1-improve-safety-of-DH.patch
 Patch39:        openssl-1.1.1-add-null-checks-where-contentinfo-data-can-be-null.patch
 Patch40:        openssl-1.1.1-Fix-unconstrained-session-cache-growth-in-TLSv1.3.patch
-Patch41:        openssl-1.1.1-pkcs1-implicit-rejection.patch
+Patch41:        CVE-2023-50768.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
