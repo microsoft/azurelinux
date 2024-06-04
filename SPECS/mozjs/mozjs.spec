@@ -68,6 +68,12 @@ Patch21:        0001-Skip-failing-tests-on-ppc64-and-s390x.patch
 # AzLinux CVE patches
 Patch30:       CVE-2022-48285.patch
 
+# libvpx CVE patches created by finding commits included in v1.13.1 after v1.13.0
+# and modifying paths to match embedded mozjs paths
+Patch40:       CVE-2023-6349-0001-VP8-disallow-thread-count-changes.patch
+Patch41:       CVE-2023-6349-0002-vp9_alloccommon-clear-allocation-sizes-on-free.patch
+Patch42:       CVE-2023-6349-0003-Fix-bug-with-smaller-width-bigger-size.patch
+
 # AzLinux packages cargo and rustfmt in the rust package
 %if !0%{?azl}
 BuildRequires:  cargo
