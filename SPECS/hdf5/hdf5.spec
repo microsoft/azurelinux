@@ -130,7 +130,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -p1
+%autosetup -n %{name}-1.14.4-3 -p1
 
 # Force shared by default for compiler wrappers (bug #1266645)
 sed -i -e '/^STATIC_AVAILABLE=/s/=.*/=no/' */*/h5[cf]*.in
