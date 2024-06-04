@@ -11,13 +11,13 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
-Version:        1.14.3
+Version:        1.14.4.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
+Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.gz
 Source1:        h5comp
 
 Patch3:         hdf5-build.patch
@@ -25,10 +25,6 @@ Patch3:         hdf5-build.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
 Patch5:         hdf5-wrappers.patch
 
-# hdf5 contains a bug that prevents it from building with autoconf 2.71
-# Once this is fixed, this patch can be removed
-# https://github.com/HDFGroup/hdf5/issues/3872
-Patch10:         Fix-Werror-removal.patch
 # For patches/rpath
 # For patches/rpath
 BuildRequires:  automake
@@ -283,7 +279,7 @@ done
 %{_bindir}/h5diff
 %{_bindir}/h5dump
 %{_bindir}/h5format_convert
-%{_bindir}/h5fuse.sh
+%{_bindir}/h5fuse
 %{_bindir}/h5import
 %{_bindir}/h5jam
 %{_bindir}/h5ls
@@ -292,7 +288,6 @@ done
 %{_bindir}/h5repack
 %{_bindir}/h5repart
 %{_bindir}/h5stat
-%{_bindir}/h5tools_test_utils
 %{_bindir}/h5unjam
 %{_bindir}/h5watch
 %{_libdir}/hdf5/
@@ -310,6 +305,7 @@ done
 %{_bindir}/h5fc*
 %{_bindir}/h5redeploy
 %{_includedir}/*.h
+%{_includedir}/H5config_f.inc
 %{_libdir}/*.so
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
@@ -402,7 +398,7 @@ done
 
 
 %changelog
-* Thu Mar 26 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.14.3-1
+* Tue Mar 26 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.14.3-1
 - Update to 1.14.3
 - Add patch to fix build with autoconf 2.71
 
