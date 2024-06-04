@@ -179,7 +179,7 @@ fi
 
 %changelog
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
-- Repackage and update src UI node modules to 3.1.1-1
+- Repackage and update src/ui node modules and bower components to 3.1.1-1
 - Address CVE-2024-4068 by upgrading the version of the npm module "braces" to 3.0.3
 - Remove patch for CVE-2023-28155 as request npm module upgraded to 2.88.2
 - Remove patch for CVE-2018-11694 as node-sass npm module upgraded to 4.14.1
