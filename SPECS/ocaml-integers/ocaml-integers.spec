@@ -2,12 +2,12 @@
 
 Summary:        Various signed and unsigned integer types for OCaml
 Name:           ocaml-integers
-Version:        0.4.0
-Release:        3%{?dist}
+Version:        0.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/ocamllabs/%{name}
+URL:            https://github.com/ocamllabs/ocaml-integers
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.02

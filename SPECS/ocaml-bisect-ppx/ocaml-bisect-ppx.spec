@@ -7,8 +7,8 @@
 
 Summary:        Code coverage for OCaml and Reason
 Name:           ocaml-%{srcname}
-Version:        2.6.3
-Release:        4%{?dist}
+Version:        2.8.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

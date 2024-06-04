@@ -6,8 +6,8 @@
 
 Summary:        Non-blocking streaming Unicode codec for OCaml
 Name:           ocaml-%{srcname}
-Version:        1.0.2
-Release:        15%{?dist}
+Version:        1.0.3
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,7 @@ Source0:        https://github.com/dbuenzli/uutf/archive/v%{version}/%{srcname}-
 # The uchar package is a forward compatibility package for OCaml versions prior
 # to 4.03.  We have a later OCaml in Mariner; uchar is in the standard library.
 # Therefore, remove references to the compatibility package.
-Patch0:         %{name}-uchar.patch
+#Patch0:         %{name}-uchar.patch
 
 BuildRequires:  ocaml >= 4.01.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.6

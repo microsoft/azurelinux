@@ -6,8 +6,8 @@
 
 Summary:        Universally unique identifiers (UUIDs) for OCaml
 Name:           ocaml-%{srcname}
-Version:        0.9.7
-Release:        15%{?dist}
+Version:        0.9.8
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

@@ -8,12 +8,12 @@
 
 Summary:        Jane Street Standard I/O library for OCaml
 Name:           ocaml-%{srcname}
-Version:        0.15.0
-Release:        2%{?dist}
+Version:        0.17.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/janestreet/%{srcname}
+URL:            https://github.com/janestreet/stdio
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.04.2

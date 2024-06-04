@@ -6,8 +6,8 @@
 
 Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
-Version:        0.8.9
-Release:        4%{?dist}
+Version:        0.9.0
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,7 @@ Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%
 # We neither need nor want the stdlib-shims package.  It is a forward
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
-Patch0:         %{name}-stdlib-shims.patch
+#Patch0:         %{name}-stdlib-shims.patch
 
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.8

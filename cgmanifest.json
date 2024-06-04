@@ -14422,8 +14422,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-bisect-ppx",
-          "version": "2.6.3",
-          "downloadUrl": "https://github.com/aantron/bisect_ppx/archive/2.6.3/bisect_ppx-2.6.3.tar.gz"
+          "version": "2.8.3",
+          "downloadUrl": "https://github.com/aantron/bisect_ppx/archive/2.8.3/bisect_ppx-2.8.3.tar.gz"
         }
       }
     },
@@ -14592,8 +14592,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-fmt",
-          "version": "0.8.9",
-          "downloadUrl": "https://github.com/dbuenzli/fmt/archive/v0.8.9/fmt-0.8.9.tar.gz"
+          "version": "0.9.0",
+          "downloadUrl": "https://github.com/dbuenzli/fmt/archive/v0.9.0/fmt-0.9.0.tar.gz"
         }
       }
     },
@@ -14622,8 +14622,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-integers",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.4.0/ocaml-integers-0.4.0.tar.gz"
+          "version": "0.7.0",
+          "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.7.0/ocaml-integers-0.7.0.tar.gz"
         }
       }
     },
@@ -14664,16 +14664,6 @@
           "name": "ocaml-markup",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/aantron/markup.ml/archive/1.0.0/markup-1.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ocaml-migrate-parsetree",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/2.4.0/ocaml-migrate-parsetree-2.4.0.tbz"
         }
       }
     },
@@ -14852,8 +14842,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-stdio",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
+          "version": "0.17.0",
+          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.17.0/stdio-0.17.0.tar.gz"
         }
       }
     },
@@ -14892,8 +14882,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-uuidm",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/dbuenzli/uuidm/archive/v0.9.7/uuidm-0.9.7.tar.gz"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/dbuenzli/uuidm/archive/v0.9.8/uuidm-0.9.8.tar.gz"
         }
       }
     },
@@ -14902,8 +14892,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-uutf",
-          "version": "1.0.2",
-          "downloadUrl": "https://github.com/dbuenzli/uutf/archive/v1.0.2/uutf-1.0.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/dbuenzli/uutf/archive/v1.0.3/uutf-1.0.3.tar.gz"
         }
       }
     },
