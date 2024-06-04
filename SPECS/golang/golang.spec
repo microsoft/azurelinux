@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.3-20240507.3.src.tar.gz
+%global ms_go_filename  go1.22.4-20240604.2.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.22.3
+Version:        1.22.4
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jun 04 2024 Davis Goodin <dagood@microsoft.com> - 1.22.4-1
+- Bump version to 1.22.4-1
+
 * Tue May 07 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
 - Bump version to 1.22.3-1
 
