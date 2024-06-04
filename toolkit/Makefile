@@ -213,6 +213,7 @@ include $(SCRIPTS_DIR)/profile.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
+include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
