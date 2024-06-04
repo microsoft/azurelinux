@@ -23,11 +23,11 @@ done
 # Extra arguments for tdnf
 TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
 
-# TODO Remove once PMC is available for 3.0
+# TODO Remove when dailybuild is discontinued for 3.0
 if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
     repo_file_src="/azl_setup_dir/azl-3_repo"
     repo_name=$(awk -F'[][]' '/^\[/{print $2}' "${repo_file_src}")
-    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=${repo_name}")
+    TDNF_ARGS+=("--enablerepo=${repo_name}")
     mv "${repo_file_src}" /etc/yum.repos.d/azl-3.repo
 fi
 
