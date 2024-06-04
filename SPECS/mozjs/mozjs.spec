@@ -22,7 +22,7 @@
 
 Name:           mozjs
 Version:        102.15.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        SpiderMonkey JavaScript library
 
 Vendor:         Microsoft Corporation
@@ -68,8 +68,8 @@ Patch21:        0001-Skip-failing-tests-on-ppc64-and-s390x.patch
 # AzLinux CVE patches
 Patch30:       CVE-2022-48285.patch
 
-# libvpx CVE patches created by finding commits included in v1.13.1 after v1.13.0
-# and modifying paths to match embedded mozjs paths
+# libvpx CVE patches created by finding commits included in v1.13.1 after v1.13.0,
+# removing test code and modifying paths to match embedded mozjs paths
 Patch40:       CVE-2023-6349-0001-VP8-disallow-thread-count-changes.patch
 Patch41:       CVE-2023-6349-0002-vp9_alloccommon-clear-allocation-sizes-on-free.patch
 Patch42:       CVE-2023-6349-0003-Fix-bug-with-smaller-width-bigger-size.patch
@@ -270,6 +270,9 @@ $tests_ok
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+* Tue Jun 04 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 102.15.1-2
+- Fix CVE-2023-6349.
+
 * Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 102.15.1-1
 - Initial Azure Linux import from Fedora 39 (license: MIT).
 - License verified
