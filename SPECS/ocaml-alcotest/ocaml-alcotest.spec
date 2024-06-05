@@ -16,7 +16,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/mirage/alcotest
 Source0:        %{URL}/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 # We neither need nor want the stdlib-shims or ocaml-syntax-shims packages in
-# Fedora.  They are forward compatibility packages for older OCaml
+# Azure Linux.  They are forward compatibility packages for older OCaml
 # installations.  Patch them out instead.  Upstream does not want this patch
 # until stdlib-shims and ocaml-syntax-shims are obsolete.
 Patch0:         0001-Drop-the-stdlib-shims-subpackage.patch
