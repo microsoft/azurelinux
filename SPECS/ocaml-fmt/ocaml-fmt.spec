@@ -13,10 +13,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
-# We neither need nor want the stdlib-shims package.  It is a forward
-# compatibility package for older OCaml installations.  Patch it out instead.
-# Upstream does not want this patch until stdlib-shims is obsolete.
-#Patch0:         %{name}-stdlib-shims.patch
 
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.8
@@ -105,6 +101,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.9.0-1
+- Upgrade to version 0.9.0
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.9-4
 - Cleaning-up spec. License verified.
 

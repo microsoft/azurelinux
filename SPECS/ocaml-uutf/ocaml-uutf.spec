@@ -13,10 +13,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/uutf
 Source0:        https://github.com/dbuenzli/uutf/archive/v%{version}/%{srcname}-%{version}.tar.gz
-# The uchar package is a forward compatibility package for OCaml versions prior
-# to 4.03.  We have a later OCaml in Mariner; uchar is in the standard library.
-# Therefore, remove references to the compatibility package.
-#Patch0:         %{name}-uchar.patch
 
 BuildRequires:  ocaml >= 4.01.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.6
@@ -106,6 +102,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 1.0.3-1
+- Upgrade to version 1.0.3
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-15
 - Cleaning-up spec. License verified.
 

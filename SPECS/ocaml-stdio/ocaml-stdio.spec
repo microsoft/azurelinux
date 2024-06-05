@@ -13,7 +13,7 @@ Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/janestreet/stdio
+URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.04.2
@@ -107,6 +107,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %changelog
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.17.0-1
+- Upgrade to version 0.17.0
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
 - Cleaning-up spec. License verified.
 

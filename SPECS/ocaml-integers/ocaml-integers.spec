@@ -3,11 +3,11 @@
 Summary:        Various signed and unsigned integer types for OCaml
 Name:           ocaml-integers
 Version:        0.7.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/ocamllabs/ocaml-integers
+URL:            https://github.com/ocamllabs/%{name}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         ocaml-integers-stdlib-shims.patch
 
@@ -117,7 +117,7 @@ dune runtest
 %endif
 
 %changelog
-* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.4.0-4
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.7.0-1
 - Add ocaml-integers-stdlib-shims.patch
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-3
