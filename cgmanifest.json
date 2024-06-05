@@ -14532,8 +14532,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ctypes",
-          "version": "0.18.0",
-          "downloadUrl": "https://github.com/ocamllabs/ocaml-ctypes/archive/0.18.0/ocaml-ctypes-0.18.0.tar.gz"
+          "version": "0.21.1",
+          "downloadUrl": "https://github.com/ocamllabs/ocaml-ctypes/archive/0.21.1/ocaml-ctypes-0.21.1.tar.gz"
         }
       }
     },
@@ -14642,8 +14642,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-luv",
-          "version": "0.5.10",
-          "downloadUrl": "https://github.com/aantron/luv/releases/download/0.5.10/luv-0.5.10.tar.gz"
+          "version": "0.5.13",
+          "downloadUrl": "https://github.com/aantron/luv/releases/download/0.5.13/luv-0.5.13.tar.gz"
         }
       }
     },
