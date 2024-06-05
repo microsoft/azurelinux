@@ -8,12 +8,17 @@
 # suffix, our kernel version does not.
 %define kernelver %{version}-%{release}
 
-%define cmdline console=ttyS0
+# noxsaves: Azure CVM instances have trouble booting due to the hypervisor
+# not reporting an available CPU feature - shadow stack (X86_FEATURE_SHSTK).
+# We need to temporarily turn it off by disabling xsaves until the problem
+# is fixed on Azure. Since shadow stack depends on xsaves, disabling xsaves
+# ensures the feature bit for shadow stack is also turned off.
+%define cmdline console=ttyS0 noxsaves
 
 Summary:        Linux Kernel
 Name:           kernel-uki
-Version:        6.6.22.1
-Release:        2%{?dist}
+Version:        6.6.29.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,8 +64,6 @@ install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
-* Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.22.1-2
-- initial package
-- The following lines are here solely to satisfy tooling.
-- Initial CBL-Mariner import from Photon (license: Apache2).
-- License verified
+* Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-4
+- Original version for Azure Linux.
+- License verified.
