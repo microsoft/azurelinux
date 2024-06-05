@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.28.2
-Release:        2%{?dist}
+Release:        6%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
+Patch1:         CVE-2024-24806.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -60,6 +61,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{major_version}|" %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 
+# Collect all license files into one spot
+for f in Copyright.txt cmcppdap/NOTICE cmcurl/COPYING cmlibrhash/COPYING cmlibuv/LICENSE cmnghttp2/COPYING cmsys/Copyright.txt; do
+    filename_part=$(basename $f)
+    dir_part=$(dirname $f)
+    mkdir -p ./Licenses/$dir_part
+    mv %{buildroot}%{_prefix}/doc/%{name}-*/$f ./Licenses/$dir_part/$filename_part
+done
+find "%{buildroot}%{_prefix}/doc" -type d -empty -delete
+
 %check
 # Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
@@ -78,9 +88,20 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_datadir}/emacs/site-lisp/cmake-mode.el
 %{_datadir}/vim/vimfiles/*
 %{_libdir}/rpm/macros.d/macros.cmake
-%{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
+- fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
+
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-5
+- Bump release to build with new expat to fix CVE-2024-28757
+
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-4
+- Bump release to build with new libuv to fix CVE-2024-24806
+
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.28.2-3
+- Sanitize license files
+
 * Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.28.2-2
 - Fix JDK test issue
 

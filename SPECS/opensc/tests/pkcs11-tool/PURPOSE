@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/opensc/Sanity/pkcs11-tool
+Description: This is a sanity test for pkcs11-tool
+Author: Jakub Jelen <jjelen@redhat.com>

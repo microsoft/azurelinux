@@ -3,7 +3,7 @@
 
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        3.0.1
+Version:        3.0.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -40,7 +40,7 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %package -n python3-werkzeug-doc
 Summary:        Documentation for python3-werkzeug
 Requires:       python3-werkzeug = %{version}-%{release}
- 
+
 %description -n python3-werkzeug-doc
 Documentation and examples for python3-werkzeug.
 
@@ -73,11 +73,14 @@ pip3 install markupsafe
 %endif
 
 %files -n python3-%{modname} -f %{pyproject_files}
-%license LICENSE.rst
-%doc CHANGES.rst README.rst
+%license LICENSE.txt
+%doc CHANGES.rst README.md
 %files -n python3-werkzeug-doc
 
 %changelog
+* Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.3-1
+- Update to version 3.0.3 to fix CVE-2024-34069.
+
 * Thu Apr 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.1-1
 - Auto-upgrade to 3.0.1 - 3.0 package upgrade
 - Import build, install and check section from Fedora 40 (license: MIT).

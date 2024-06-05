@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.29.1
-Release:        3%{?dist}
+Version:        1.30.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-5%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -269,6 +269,15 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.1-1
+- Auto-upgrade to 1.30.1
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.29.1-5
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 1.29.1-4
+- Update to build dep latest glibc-static version
+
 * Mon Mar 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-3
 - Fix build break due to golang version upgrade
 

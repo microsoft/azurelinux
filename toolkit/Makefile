@@ -71,6 +71,7 @@ RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
 IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
 CACHED_PACKAGES_ARCHIVE              ?=
 USE_CCACHE                           ?= n
+BUILD_TOOLS_NONPROD                  ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
@@ -120,8 +121,10 @@ RPMS_DIR        ?= $(OUT_DIR)/RPMS
 SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
+PRECACHER_SNAPSHOT   ?= $(rpms_snapshot)
+
 # External source server
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 
 # Note on order of precedence: When a variable is passed from the commandline (i.e., make PACKAGE_URL_LIST="my list"), append
 # assignments do not take affect without using 'override'. This means that all of the following PACKAGE_URL_LIST values will
@@ -210,6 +213,7 @@ include $(SCRIPTS_DIR)/profile.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
+include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage

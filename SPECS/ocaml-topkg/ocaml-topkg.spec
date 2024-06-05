@@ -1,58 +1,96 @@
 %global srcname topkg
 
-# BOOTSTRAP NOTE: currently we do not build the optional topkg-care part.
-# It has dependencies which do not yet exist in Mariner, and which themselves
-# depend on the main part of this package.
+	
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+ 
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
+ 
+# The topkg-care part has dependencies that themselves depend on the main
+# package.  We do not build the care part for now.
+%bcond_with care
 
 Summary:        The transitory OCaml software packager
 Name:           ocaml-%{srcname}
 Version:        1.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/topkg/
 Source0:        https://github.com/dbuenzli/topkg/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.03.0
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-compiler-libs
 BuildRequires:  ocaml-findlib >= 1.6.1
 BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-result-devel
+BuildRequires:  ocaml-rpm-macros
 
-%description
+	
+%if %{with care}
+BuildRequires:  ocaml-bos-devel >= 0.1.5
+BuildRequires:  ocaml-cmdliner-devel >= 1.0.0
+BuildRequires:  ocaml-fmt-devel
+BuildRequires:  ocaml-logs-devel
+BuildRequires:  ocaml-webbrowser-devel
+BuildRequires:  ocaml-opam-format-devel >= 2.0.0
+%endif
+
+# This can be removed when F40 reaches EOL
+Obsoletes:      ocaml-topkg-doc < 1.0.5-4
+ 
+%global _desc %{expand:
 Topkg is a packager for distributing OCaml software.  It provides an
 API to describe the files a package installs in a given build
 configuration and to specify information about the package's
-distribution, creation and publication procedures.
-
+distribution, creation and publication procedures.}
+ 
+%description %_desc
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       ocaml-result-devel%{?_isa}
-
+ 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
-%package        doc
-Summary:        Documentation for %{name}
-BuildArch:      noarch
-
-%description    doc
-Documentation for %{name}.
-
+ 
+%if %{with care}
+%package        care
+Summary:        Command line tool for the transitory OCaml software packager
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-ocamlbuild%{?_isa}
+ 
+%description    care %_desc
+This package provides a command line tool which helps with various
+aspects of a package's life cycle: creating and linting a distribution,
+releasing it on the web, publishing its documentation, adding it to the
+OCaml opam repository, etc.
+ 
+%package        care-devel
+Summary:        Development files for %{name}-care
+Requires:       %{name}-care%{?_isa} = %{version}-%{release}
+Requires:       ocaml-bos-devel%{?_isa}
+Requires:       ocaml-cmdliner-devel%{?_isa}
+Requires:       ocaml-fmt-devel%{?_isa}
+Requires:       ocaml-logs-devel%{?_isa}
+Requires:       ocaml-opam-format-devel%{?_isa}
+Requires:       ocaml-webbrowser-devel%{?_isa}
+ 
+%description    care-devel
+The %{name}-care-devel package contains libraries and signature files
+for developing applications that use %{name}-care.
+%endif
+ 
 %prep
-%autosetup -n %{srcname}-%{version}
-
+%autosetup -n topkg-%{version} -p1
+ 
 # This package can replace "watermarks" in software that it builds.  However,
 # we are building from scratch, rather than using topkg to build itself, so we
 # have to do the job manually.
 for fil in $(find . -type f); do
-  sed -e 's,%%%%NAME%%%%,%{srcname},' \
+  sed -e 's,%%%%NAME%%%%,topkg,' \
       -e 's,%%%%PKG_DOC%%%%,%{url}doc/,' \
       -e 's,%%%%PKG_HOMEPAGE%%%%,%{url},' \
       -e 's,%%%%VERSION%%%%,v%{version},' \
@@ -61,74 +99,41 @@ for fil in $(find . -type f); do
   touch -r $fil.orig $fil
   rm $fil.orig
 done
-
+ 
 %build
 # Build the library and the tests
 ocaml pkg/pkg.ml build --pkg-name topkg --tests true
-
-# Build the command line tool
-%ifarch %{ocaml_native_compiler}
-ocamlbuild topkg.native
-%else
-ocamlbuild topkg.byte
+ 
+%if %{with care}
+# Build topkg-care
+ocaml pkg/pkg.ml build --pkg-name topkg-care --tests true
 %endif
-
-# Build the documentation.  It is meant to be built with odoc, but odoc
-# transitively depends on this package, so we do it manually for bootstrap
-# builds.  Once a non-bootstrap build is possible, use odoc instead.
-mkdir html
-ocamldoc -html -d html -I _build/src _build/src/*.{mli,ml}
-
+ 
 %install
-# Install the library
-mkdir -p %{buildroot}%{_libdir}/ocaml/topkg
-cp -p _build/topkg.opam %{buildroot}%{_libdir}/ocaml/topkg/opam
-cp -p _build/pkg/META %{buildroot}%{_libdir}/ocaml/topkg/META
-%ifarch %{ocaml_native_compiler}
-cp -a _build/src/*.{a,cma,cmi,cmt,cmti,cmx,cmxa,cmxs,mli} \
-  %{buildroot}%{_libdir}/ocaml/topkg
-%else
-cp -a _build/src/*.{cma,cmi,cmt,cmti,mli} %{buildroot}%{_libdir}/ocaml/topkg
-%endif
-
-# Install the command line tool
-mkdir -p %{buildroot}%{_bindir}
-%ifarch %{ocaml_native_compiler}
-cp -p _build/src/topkg.native %{buildroot}%{_bindir}/topkg
-%else
-cp -p _build/src/topkg.byte %{buildroot}%{_bindir}/topkg
-%endif
-
+%ocaml_install -s
+ 
+%if %{with care}
 %check
 ocaml pkg/pkg.ml test
-
-%files
+%endif
+ 
+%files -f .ofiles-topkg
 %doc CHANGES.md README.md
 %license LICENSE.md
-%{_bindir}/%{srcname}
-%dir %{_libdir}/ocaml/%{srcname}/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/%{srcname}.cma
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
+ 
+%files devel -f .ofiles-topkg-devel
+ 
+%if %{with care}
+%files care -f .ofiles-care
+ 
+%files care-devel -f .ofiles-care-devel
 %endif
-
-%files devel
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}.a
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmx
-%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmt
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmti
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
-
-%files doc
-%doc html/*
 
 %changelog
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> -  1.0.7-2
+- Converted spec file to match with Fedora 41.
+- Use ocaml 5.1.1 to build and update build process
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.7-1
 - Auto-upgrade to 1.0.7 - Azure Linux 3.0 - package upgrades
 

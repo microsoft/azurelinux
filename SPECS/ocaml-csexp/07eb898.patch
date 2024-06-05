@@ -1,0 +1,23 @@
+From 07eb8988452ad51a09d0ab7379d73a87674aba6e Mon Sep 17 00:00:00 2001
+From: Rudi Grinberg <me@rgrinberg.com>
+Date: Tue, 16 May 2023 11:42:17 +0100
+Subject: [PATCH] fix: typo in optimization annotation (#28)
+ 
+Signed-off-by: Rudi Grinberg <me@rgrinberg.com>
+---
+ src/csexp.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+diff --git a/src/csexp.ml b/src/csexp.ml
+index 78bfa2b..2b2270d 100644
+--- a/src/csexp.ml
++++ b/src/csexp.ml
+@@ -233,7 +233,7 @@ module Make (Sexp : Sexp) = struct
+       match Stack.add_token x stack with
+       | exception Parse_error msg -> Error (pos, msg)
+       | stack -> k s (pos + 1) len lexer stack)
+-    [@@inlined always]
++    [@@inline always]
+ 
+   let parse_string =
+     let rec loop s pos len lexer stack =

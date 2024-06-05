@@ -17,10 +17,12 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 const (
-	chrootRepoDir = "/etc/yum.repos.d/"
+	chrootRepoDir       = "/etc/yum.repos.d/"
+	dnfUtilsPackageName = "dnf-utils"
 )
 
 // GetAllRepoData returns a map of package names to URLs for all packages
@@ -32,7 +34,7 @@ func GetAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 	timestamp.StartEvent("pull available package data from repos", nil)
 	defer timestamp.StopEvent(nil)
 
-	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
+	queryChroot, err := createChroot(workerTar, buildDir, repoFiles, leaveChrootOnDisk)
 	if err != nil {
 		err = fmt.Errorf("failed to create chroot:\n%w", err)
 		return nil, err
@@ -58,11 +60,7 @@ func GetAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 	for _, repoFile := range repoFiles {
 		// Replace the existing repo file (if it exists) with the one that we want to query
 		logger.Log.Infof("Will query package data from %s", repoFile)
-		destFile := path.Join(chrootRepoDir, path.Base(repoFile))
-		chrootRepoFile := []safechroot.FileToCopy{
-			{Src: repoFile, Dest: destFile},
-		}
-		err = queryChroot.AddFiles(chrootRepoFile...)
+		err = copyRepoFile(repoFile, queryChroot)
 		if err != nil {
 			err = fmt.Errorf("failed to add files to chroot:\n%w", err)
 			return
@@ -102,11 +100,9 @@ func GetAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 
 // createChroot creates a network-enabled chroot to run repoquery in. The caller is expected to call Close() on the
 // returned chroot unless an error is returned, in which case the chroot will be closed by this function.
-func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChroot *safechroot.Chroot, err error) {
-	const (
-		dnfUtilsPackageName = "dnf-utils"
-		rootDir             = "/"
-	)
+// The created chroot will attempt to use any additional repos provided in repoFiles if the default repos fail to
+// install the repoquery package. Once complete ALL repos will be removed from the chroot.
+func createChroot(workerTar, chrootDir string, repoFiles []string, leaveChrootOnDisk bool) (queryChroot *safechroot.Chroot, err error) {
 	timestamp.StartEvent("creating repoquery chroot", nil)
 	defer timestamp.StopEvent(nil)
 	logger.Log.Info("Creating chroot for repoquery")
@@ -138,23 +134,65 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	}
 
 	// Install the repoquery package from upstream, then clean up any existing repos
+	// For preference we start with the default repos from the chroot, then add extra
+	// ones if that fails.
 	logger.Log.Infof("Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
-	err = queryChroot.Run(func() error {
-		_, chrootErr := installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
-		if chrootErr != nil {
-			chrootErr = fmt.Errorf("failed to install '%s':\n%w", dnfUtilsPackageName, err)
-			return chrootErr
-		}
-
-		// Remove all existing repos, we will be adding the repo files we want to query later
-		chrootErr = os.RemoveAll("/etc/yum.repos.d")
-		return chrootErr
-	})
+	err = installRepoQuery(queryChroot, nil)
+	if len(repoFiles) > 0 && err != nil {
+		logger.Log.Warnf("Failed to install '%s' package, trying with additional repos.", dnfUtilsPackageName)
+		logger.Log.Warnf("Initial error: %s", err.Error())
+		err = installRepoQuery(queryChroot, repoFiles)
+	}
 	if err != nil {
-		err = fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
+		err = fmt.Errorf("failed to install '%s' package:\n%w", dnfUtilsPackageName, err)
 		return
 	}
+
+	// Remove all existing repos, we will be adding the repo files we want to query later
+	err = queryChroot.Run(func() error {
+		return os.RemoveAll("/etc/yum.repos.d")
+	})
+	if err != nil {
+		return queryChroot, fmt.Errorf("failed to remove existing repos:\n%w", err)
+	}
+
 	return
+}
+
+func copyRepoFile(repoSrcPath string, chroot *safechroot.Chroot) (err error) {
+	destFile := path.Join(chrootRepoDir, path.Base(repoSrcPath))
+	chrootRepoFile := []safechroot.FileToCopy{
+		{Src: repoSrcPath, Dest: destFile},
+	}
+	err = chroot.AddFiles(chrootRepoFile...)
+	if err != nil {
+		return fmt.Errorf("failed to add files to chroot:\n%w", err)
+	}
+	return nil
+}
+
+func installRepoQuery(chroot *safechroot.Chroot, additionalRepos []string) (err error) {
+	const rootDir = "/"
+	// Add any additional repos to the chroot
+	for _, repoFile := range additionalRepos {
+		err = copyRepoFile(repoFile, chroot)
+		if err != nil {
+			return fmt.Errorf("failed to copy repo file to chroot:\n%w", err)
+		}
+	}
+
+	err = chroot.Run(func() error {
+		_, chrootErr := installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
+		if chrootErr != nil {
+			chrootErr = fmt.Errorf("failed to install '%s':\n%w", dnfUtilsPackageName, chrootErr)
+			return chrootErr
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
+	}
+	return nil
 }
 
 // getPackageRepoPathsFromUrl returns a list of packages available in the given repoUrl by running repoquery
@@ -162,7 +200,6 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
-		printErrorOutput = true
 	)
 	var queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--location"}
 
@@ -177,13 +214,16 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
 	finalArgList := append(queryCommonArgList, repoPathArg)
 
-	onStdout := func(args ...interface{}) {
-		line := args[0].(string)
+	onStdout := func(line string) {
 		packageURLs = append(packageURLs, line)
 	}
 
 	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, finalArgList...)
+	err = shell.NewExecBuilder(reqoqueryTool, finalArgList...).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		StdoutCallback(onStdout).
+		Execute()
 	if err != nil {
 		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return
@@ -197,20 +237,22 @@ func getPackageRepoUrlsFromRepoFiles() (packageURLs []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
-		printErrorOutput = true
 	)
 	// We have removed all other repo files from the chroot, so we can blindly enable all repos to get the full list of packages
 	var queryCommonArgList = []string{"-y", "-q", "--enablerepo=*", "-a", "--location"}
 
 	logger.Log.Info("Getting package data from repo files")
 
-	onStdout := func(args ...interface{}) {
-		line := args[0].(string)
+	onStdout := func(line string) {
 		packageURLs = append(packageURLs, line)
 	}
 
 	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, queryCommonArgList...)
+	err = shell.NewExecBuilder(reqoqueryTool, queryCommonArgList...).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		StdoutCallback(onStdout).
+		Execute()
 	if err != nil {
 		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return

@@ -1,18 +1,17 @@
-From f4a3020f202d67ad5682304e7710bfc14f1320eb Mon Sep 17 00:00:00 2001
+From 5f7c77a7412194dbbe3f0dc846f2a608130eb5b7 Mon Sep 17 00:00:00 2001
 From: Thomas Crain <thcrain@microsoft.com>
 Date: Wed, 19 Jan 2022 21:36:29 -0800
 Subject: [PATCH] Add Microsoft Azure Linux support to supermin
-
 ---
  src/ph_rpm.ml        | 18 +++++++++++++++++-
- tests/test-harder.sh | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 1 deletion(-)
+ tests/test-harder.sh | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+), 1 deletion(-)
 
 diff --git a/src/ph_rpm.ml b/src/ph_rpm.ml
-index 549bd9a..760c815 100644
+index 5061d32..389f445 100644
 --- a/src/ph_rpm.ml
 +++ b/src/ph_rpm.ml
-@@ -65,6 +65,12 @@ let ibm_powerkvm_detect () =
+@@ -67,6 +67,12 @@ let ibm_powerkvm_detect () =
        (stat "/etc/ibm_powerkvm-release").st_kind = S_REG
      with Unix_error _ -> false
  
@@ -25,7 +24,7 @@ index 549bd9a..760c815 100644
  let settings = ref no_settings
  let rpm_major, rpm_minor, rpm_arch = ref 0, ref 0, ref ""
  let zypper_major, zypper_minor, zypper_patch = ref 0, ref 0, ref 0
-@@ -450,6 +456,10 @@ and mageia_download_all_packages pkgs dir =
+@@ -462,6 +468,10 @@ and mageia_download_all_packages pkgs dir =
  
    rpm_unpack tdir dir
  
@@ -36,7 +35,7 @@ index 549bd9a..760c815 100644
  and download_all_packages_with_urpmi pkgs dir tdir =
    let rpms = List.map rpm_package_name (PackageSet.elements pkgs) in
  
-@@ -544,4 +554,10 @@ let () =
+@@ -576,4 +586,10 @@ let () =
      ph_detect = openmandriva_detect;
      ph_download_package = PHDownloadAllPackages openmandriva_download_all_packages;
    } in
@@ -49,7 +48,7 @@ index 549bd9a..760c815 100644
 +  } in
 +  register_package_handler "azurelinux" "rpm" azurelinux
 diff --git a/tests/test-harder.sh b/tests/test-harder.sh
-index aceef21..223cae9 100755
+index aceef21..a9ff641 100755
 --- a/tests/test-harder.sh
 +++ b/tests/test-harder.sh
 @@ -32,6 +32,7 @@ if [ -f /etc/os-release ]; then
@@ -69,16 +68,17 @@ index aceef21..223cae9 100755
  else
      exit 77
  fi
-@@ -67,6 +70,8 @@ case $distro in
+@@ -67,6 +70,9 @@ case $distro in
  	# installed.  (See commit fb40baade8e3441b73ce6fd10a32fbbfe49cc4da)
  	pkgs="augeas hivex rpm"
  	;;
 +	azurelinux)
 +	pkgs="augeas hivex tar"
++	;;
      redhat)
          # Choose tar because it has an epoch > 0 and is commonly
          # installed.  (See commit fb40baade8e3441b73ce6fd10a32fbbfe49cc4da)
-@@ -157,6 +162,33 @@ case $distro in
+@@ -157,6 +163,33 @@ case $distro in
  	    exit 1
  	fi
  	;;
@@ -113,5 +113,5 @@ index aceef21..223cae9 100755
  	if [ ! -x $d2/usr/bin/augtool ]; then
  	    echo "$0: $distro: augtool binary not installed in chroot"
 -- 
-2.25.1
+2.34.1
 

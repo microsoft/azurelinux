@@ -163,15 +163,15 @@ rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
 
-echo Zlib-1.3
-tar xf zlib-1.3.tar.xz
-pushd zlib-1.3
+echo Zlib-1.3.1
+tar xf zlib-1.3.1.tar.xz
+pushd zlib-1.3.1
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 rm -fv /usr/lib/libz.a
 popd
-rm -rf zlib-1.3
+rm -rf zlib-1.3.1
 touch /logs/status_zlib_complete
 
 echo Bzip2-1.0.8
@@ -574,9 +574,9 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-echo OpenSSL-3.1.4
-tar xf openssl-3.1.4.tar.gz
-pushd openssl-3.1.4
+echo OpenSSL-3.3.0
+tar xf openssl-3.3.0.tar.gz
+pushd openssl-3.3.0
 sslarch=
 ./config --prefix=/usr \
          --openssldir=/etc/pki/tls \
@@ -594,7 +594,7 @@ make all -j$(nproc)
 sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
-rm -rf openssl-3.1.4
+rm -rf openssl-3.3.0
 touch /logs/status_openssl_complete
 
 echo Elfutils-0.189

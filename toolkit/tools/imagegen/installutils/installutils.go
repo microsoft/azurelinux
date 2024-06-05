@@ -32,6 +32,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
 
@@ -41,12 +42,21 @@ const (
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice = "/dev/null"
 
+	// CmdlineSELinuxSecurityArg is the "security" arg needed for enabling SELinux.
+	CmdlineSELinuxSecurityArg = "security=selinux"
+
+	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for enabling SELinux.
+	CmdlineSELinuxEnabledArg = "selinux=1"
+
+	// CmdlineSELinuxEnforcingArg is the arg required for forcing SELinux to be in enforcing mode.
+	CmdlineSELinuxEnforcingArg = "enforcing=1"
+
 	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
-	CmdlineSELinuxSettings = "security=selinux selinux=1"
+	CmdlineSELinuxSettings = CmdlineSELinuxSecurityArg + " " + CmdlineSELinuxEnabledArg
 
 	// CmdlineSELinuxForceEnforcing is the kernel command-line args for enabling SELinux and force it to be in
 	// enforcing mode.
-	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " enforcing=1"
+	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " " + CmdlineSELinuxEnforcingArg
 
 	// SELinuxConfigFile is the file path of the SELinux config file.
 	SELinuxConfigFile = "/etc/selinux/config"
@@ -54,10 +64,10 @@ const (
 	// SELinuxConfigEnforcing is the string value to set SELinux to enforcing in the /etc/selinux/config file.
 	SELinuxConfigEnforcing = "enforcing"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to permissive in the /etc/selinux/config file.
+	// SELinuxConfigPermissive is the string value to set SELinux to permissive in the /etc/selinux/config file.
 	SELinuxConfigPermissive = "permissive"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to disabled in the /etc/selinux/config file.
+	// SELinuxConfigDisabled is the string value to set SELinux to disabled in the /etc/selinux/config file.
 	SELinuxConfigDisabled = "disabled"
 
 	// GrubCfgFile is the filepath of the grub config file.
@@ -627,15 +637,10 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 
 	packagesInstalled = currentPackagesInstalled
 
-	onStdout := func(args ...interface{}) {
+	onStdout := func(line string) {
 		const tdnfInstallPrefix = "Installing/Updating: "
 
 		// Only process lines that match tdnfInstallPrefix
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
 		if !strings.HasPrefix(line, tdnfInstallPrefix) {
 			return
 		}
@@ -664,9 +669,12 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 	}
 
 	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
-		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/",
-		releaseverCliArg)
+	err = shell.NewExecBuilder("tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck",
+		"--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/", releaseverCliArg).
+		StdoutCallback(onStdout).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		Execute()
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -1804,6 +1812,8 @@ func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 		mode = SELinuxConfigEnforcing
 	case configuration.SELinuxPermissive:
 		mode = SELinuxConfigPermissive
+	case configuration.SELinuxOff:
+		mode = SELinuxConfigDisabled
 	}
 
 	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
@@ -1815,7 +1825,6 @@ func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
-		squashErrors        = false
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
 	)
 	var listOfMountsToLabel []string
@@ -1875,17 +1884,17 @@ func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 			// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
 			files := 0
 			lastFile := ""
-			onStdout := func(args ...interface{}) {
-				if len(args) > 0 {
-					files++
-					lastFile = fmt.Sprintf("%v", args)
-				}
+			onStdout := func(line string) {
+				files++
+				lastFile = line
 				if (files % 1000) == 0 {
 					ReportActionf("SELinux: labelled %d files", files)
 				}
 			}
-			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
-				targetRootPath, fileContextPath, targetPath)
+			err := shell.NewExecBuilder("setfiles", "-m", "-v", "-r", targetRootPath, fileContextPath, targetPath).
+				StdoutCallback(onStdout).
+				LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+				Execute()
 			if err != nil {
 				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
 			}

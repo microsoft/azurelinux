@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -35,6 +36,9 @@ const (
 
 	BaseImageName                = "image.raw"
 	PartitionCustomizedImageName = "image2.raw"
+
+	diskFreeWarnThresholdBytes   = 500 * diskutils.MiB
+	diskFreeWarnThresholdPercent = 0.05
 )
 
 var (
@@ -108,6 +112,10 @@ func createImageCustomizerParameters(buildDir string,
 	ic.enableShrinkFilesystems = enableShrinkFilesystems
 	ic.outputSplitPartitionsFormat = outputSplitPartitionsFormat
 
+	err = validateSplitPartitionsFormat(outputSplitPartitionsFormat)
+	if err != nil {
+		return nil, err
+	}
 	// intermediate writeable image
 	ic.rawImageFile = filepath.Join(buildDirAbs, BaseImageName)
 
@@ -268,7 +276,6 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 	logger.Log.Infof("Converting input image to a writeable format")
 
 	if ic.inputIsIso {
-
 		inputIsoArtifacts, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
@@ -284,17 +291,17 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 				return nil, fmt.Errorf("failed to create writeable image:\n%w", err)
 			}
 		}
-		return inputIsoArtifacts, nil
 
+		return inputIsoArtifacts, nil
 	} else {
 		logger.Log.Infof("Creating raw base image: %s", ic.rawImageFile)
 		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 		}
-	}
 
-	return nil, nil
+		return nil, nil
+	}
 }
 
 func customizeOSContents(ic *ImageCustomizerParameters) error {
@@ -354,7 +361,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	if ic.config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos)
+		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
 		if err != nil {
 			return err
 		}
@@ -379,7 +386,6 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 }
 
 func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIsoArtifacts *LiveOSIsoBuilder) error {
-
 	logger.Log.Infof("Converting customized OS partitions into the final image")
 
 	// Create final output image file if requested.
@@ -391,8 +397,9 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
 		}
+
 	case ImageFormatIso:
-		if ic.customizeOSPartitions {
+		if ic.customizeOSPartitions || inputIsoArtifacts == nil {
 			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
@@ -418,6 +425,15 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 
 	default:
 		return "", fmt.Errorf("unsupported image format (supported: vhd, vhdx, raw, qcow2): %s", imageFormat)
+	}
+}
+
+func validateSplitPartitionsFormat(partitionFormat string) error {
+	switch partitionFormat {
+	case "", "raw", "raw-zst":
+		return nil
+	default:
+		return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 	}
 }
 
@@ -506,7 +522,6 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 }
 
 func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts) error {
-
 	if scripts == nil {
 		return nil
 	}
@@ -529,23 +544,20 @@ func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts)
 }
 
 func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) error {
-	// Ensure that install scripts sit under the config file's parent directory.
-	// This allows the install script to be run in the chroot environment by bind mounting the config directory.
-	if !filepath.IsLocal(script.Path) {
-		return fmt.Errorf("install script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
-	}
+	if script.Path != "" {
+		// Ensure that install scripts sit under the config file's parent directory.
+		// This allows the install script to be run in the chroot environment by bind mounting the config directory.
+		if !filepath.IsLocal(script.Path) {
+			return fmt.Errorf("script file (%s) is not under config directory (%s)", script.Path, baseConfigPath)
+		}
 
-	// Verify that the file exists.
-	fullPath := filepath.Join(baseConfigPath, script.Path)
+		fullPath := filepath.Join(baseConfigPath, script.Path)
 
-	scriptStat, err := os.Stat(fullPath)
-	if err != nil {
-		return fmt.Errorf("couldn't read install script (%s):\n%w", script.Path, err)
-	}
-
-	// Verify that the file has an executable bit set.
-	if scriptStat.Mode()&0111 == 0 {
-		return fmt.Errorf("install script (%s) does not have executable bit set", script.Path)
+		// Verify that the file exists.
+		_, err := os.Stat(fullPath)
+		if err != nil {
+			return fmt.Errorf("couldn't read script file (%s):\n%w", script.Path, err)
+		}
 	}
 
 	return nil
@@ -610,6 +622,11 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	// Do the actual customizations.
 	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
+
+	// Out of disk space errors can be difficult to diagnose.
+	// So, warn about any partitions with low free space.
+	warnOnLowFreeSpace(buildDir, imageConnection)
+
 	if err != nil {
 		return err
 	}
@@ -665,7 +682,7 @@ func shrinkFilesystemsHelper(buildImageFile string) error {
 }
 
 func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+	buildImageFile string,
 ) error {
 	var err error
 
@@ -694,11 +711,13 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
+		config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
+		config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -744,7 +763,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfig(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
+	err = updateGrubConfigForVerity(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
 		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
 		rootHash, grubCfgFullPath)
 	if err != nil {
@@ -787,4 +806,71 @@ func checkDmVerityEnabled(rawImageFile string) error {
 	}
 
 	return nil
+}
+
+func warnOnLowFreeSpace(buildDir string, imageConnection *ImageConnection) {
+	logger.Log.Debugf("Checking disk space")
+
+	imageChroot := imageConnection.Chroot()
+
+	// Check all of the customized OS's partitions.
+	for _, mountPoint := range getNonSpecialChrootMountPoints(imageConnection.Chroot()) {
+		fullPath := filepath.Join(imageChroot.RootDir(), mountPoint.GetTarget())
+		warnOnPathLowFreeSpace(fullPath, mountPoint.GetTarget())
+	}
+
+	// Check the partition that contains the build directory.
+	warnOnPathLowFreeSpace(buildDir, "host:"+buildDir)
+}
+
+func warnOnPathLowFreeSpace(path string, name string) {
+	var stat unix.Statfs_t
+	err := unix.Statfs(path, &stat)
+	if err != nil {
+		logger.Log.Warnf("Failed to read disk space usage (%s)", path)
+		return
+	}
+
+	totalBytes := stat.Frsize * int64(stat.Blocks)
+	freeBytes := stat.Frsize * int64(stat.Bfree)
+	usedBytes := totalBytes - freeBytes
+	percentUsed := float64(usedBytes) / float64(totalBytes)
+	percentFree := 1 - percentUsed
+
+	logger.Log.Debugf("Disk space %.f%% (%s) on (%s)", percentUsed*100,
+		humanReadableDiskSizeRatio(usedBytes, totalBytes), name)
+
+	if percentFree <= diskFreeWarnThresholdPercent && freeBytes <= diskFreeWarnThresholdBytes {
+		logger.Log.Warnf("Low free disk space %.f%% (%s) on (%s)", percentFree*100,
+			humanReadableDiskSize(freeBytes), name)
+	}
+}
+
+func humanReadableDiskSize(size int64) string {
+	unitSize, unitName := humanReadableUnitSizeAndName(size)
+	return fmt.Sprintf("%.f %s", float64(size)/float64(unitSize), unitName)
+}
+
+func humanReadableDiskSizeRatio(size int64, total int64) string {
+	unitSize, unitName := humanReadableUnitSizeAndName(total)
+	return fmt.Sprintf("%.f/%.f %s", float64(size)/float64(unitSize), float64(total)/float64(unitSize), unitName)
+}
+
+func humanReadableUnitSizeAndName(size int64) (int64, string) {
+	switch {
+	case size >= diskutils.TiB:
+		return diskutils.TiB, "TiB"
+
+	case size >= diskutils.GiB:
+		return diskutils.GiB, "GiB"
+
+	case size >= diskutils.MiB:
+		return diskutils.MiB, "MiB"
+
+	case size >= diskutils.KiB:
+		return diskutils.KiB, "KiB"
+
+	default:
+		return 1, "B"
+	}
 }

@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        10%{?dist}
+Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,15 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Fri May 24 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-13
+- Azure Linux 3.0 May Preview Release 2
+
+* Thu May 09 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-12
+- Azure Linux 3.0 May Preview Release 1
+
+* Tue May 07 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.0-11
+- Enable ephemeral-disk-warning.service in 90-default-target
+
 * Wed Apr 24 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-10
 - Azure Linux 3.0 April Preview Release 4
 
