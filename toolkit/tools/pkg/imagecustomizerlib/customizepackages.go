@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -12,6 +13,16 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
+)
+
+const (
+	tdnfInstallPrefix = "Installing/Updating: "
+	tdnfRemovePrefix  = "Removing: "
+)
+
+var (
+	tdnfTransactionError = regexp.MustCompile(`^Found \d+ problems$`)
 )
 
 func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.OS,
@@ -103,32 +114,13 @@ func removePackages(allPackagesToRemove []string, imageChroot *safechroot.Chroot
 	for _, packageName := range allPackagesToRemove {
 		tnfRemoveArgs[len(tnfRemoveArgs)-1] = packageName
 
-		err := imageChroot.Run(func() error {
-			return shell.ExecuteLiveWithCallback(tdnfRemoveStdoutFilter, logger.Log.Debug, false, "tdnf",
-				tnfRemoveArgs...)
-		})
+		err := callTdnf(tnfRemoveArgs, tdnfRemovePrefix, imageChroot)
 		if err != nil {
 			return fmt.Errorf("failed to remove package (%s):\n%w", packageName, err)
 		}
 	}
 
 	return nil
-}
-
-// Process the stdout of a `tdnf install -v` call and send the list of installed packages to the debug log.
-func tdnfRemoveStdoutFilter(args ...interface{}) {
-	const tdnfInstallPrefix = "Removing: "
-
-	if len(args) == 0 {
-		return
-	}
-
-	line := args[0].(string)
-	if !strings.HasPrefix(line, tdnfInstallPrefix) {
-		return
-	}
-
-	logger.Log.Debug(line)
 }
 
 func updateAllPackages(imageChroot *safechroot.Chroot) error {
@@ -139,10 +131,7 @@ func updateAllPackages(imageChroot *safechroot.Chroot) error {
 		"--setopt", fmt.Sprintf("reposdir=%s", rpmsMountParentDirInChroot),
 	}
 
-	err := imageChroot.Run(func() error {
-		return shell.ExecuteLiveWithCallback(tdnfInstallOrUpdateStdoutFilter, logger.Log.Debug, false, "tdnf",
-			tnfUpdateArgs...)
-	})
+	err := callTdnf(tnfUpdateArgs, tdnfInstallPrefix, imageChroot)
 	if err != nil {
 		return fmt.Errorf("failed to update packages:\n%w", err)
 	}
@@ -166,10 +155,7 @@ func installOrUpdatePackages(action string, allPackagesToAdd []string, imageChro
 	for _, packageName := range allPackagesToAdd {
 		tnfInstallArgs[len(tnfInstallArgs)-1] = packageName
 
-		err := imageChroot.Run(func() error {
-			return shell.ExecuteLiveWithCallback(tdnfInstallOrUpdateStdoutFilter, logger.Log.Debug, false, "tdnf",
-				tnfInstallArgs...)
-		})
+		err := callTdnf(tnfInstallArgs, tdnfInstallPrefix, imageChroot)
 		if err != nil {
 			return fmt.Errorf("failed to %s package (%s):\n%w", action, packageName, err)
 		}
@@ -178,18 +164,39 @@ func installOrUpdatePackages(action string, allPackagesToAdd []string, imageChro
 	return nil
 }
 
-// Process the stdout of a `tdnf install -v` call and send the list of installed packages to the debug log.
-func tdnfInstallOrUpdateStdoutFilter(args ...interface{}) {
-	const tdnfInstallPrefix = "Installing/Updating: "
+func callTdnf(tnfArgs []string, tdnfMessagePrefix string, imageChroot *safechroot.Chroot) error {
+	seenTransactionErrorMessage := false
+	stdoutCallback := func(line string) {
+		if !seenTransactionErrorMessage {
+			// Check if this line marks the start of a transaction error message.
+			seenTransactionErrorMessage = tdnfTransactionError.MatchString(line)
+		}
 
-	if len(args) == 0 {
-		return
+		if seenTransactionErrorMessage {
+			// Report all of the transaction error message (i.e. the remainder of stdout) to WARN.
+			logger.Log.Warn(line)
+		} else if strings.HasPrefix(line, tdnfMessagePrefix) {
+			logger.Log.Debug(line)
+		} else {
+			logger.Log.Trace(line)
+		}
 	}
 
-	line := args[0].(string)
-	if !strings.HasPrefix(line, tdnfInstallPrefix) {
-		return
-	}
+	return imageChroot.UnsafeRun(func() error {
+		return shell.NewExecBuilder("tdnf", tnfArgs...).
+			StdoutCallback(stdoutCallback).
+			LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			Execute()
+	})
+}
 
-	logger.Log.Debug(line)
+func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool {
+	err := imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLive(true /*squashErrors*/, "rpm", "-qi", packageName)
+	})
+	if err != nil {
+		return false
+	}
+	return true
 }

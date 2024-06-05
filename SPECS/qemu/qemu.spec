@@ -438,7 +438,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 5%{?dist}
+Release: 8%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -659,7 +659,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-3
+BuildRequires: glibc-static >= 2.38-5
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -2127,7 +2127,7 @@ install -D -p -m 0644 %{modprobe_kvm_conf} %{buildroot}%{_sysconfdir}/modprobe.d
 %endif
 
 # Copy some static data into place
-install -D -p -m 0644 -t %{buildroot}%{qemudocdir} README.rst COPYING COPYING.LIB LICENSE docs/interop/qmp-spec.rst
+install -D -p -m 0644 -t %{buildroot}%{qemudocdir} README.rst docs/interop/qmp-spec.rst
 install -D -p -m 0644 qemu.sasl %{buildroot}%{_sysconfdir}/sasl2/%{name}.conf
 
 install -m 0644 scripts/dump-guest-memory.py %{buildroot}%{_datadir}/%{name}
@@ -2523,7 +2523,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 %files -n qemu-guest-agent
-%doc COPYING README.rst
+%license COPYING COPYING.LIB LICENSE
+%doc README.rst
 %{_bindir}/qemu-ga
 %if ! %{azl}
 %{_mandir}/man8/qemu-ga.8*
@@ -3467,6 +3468,15 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.0-8
+- update to build dep latest glibc-static version
+
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 8.2.0-7
+- Sanitize license files
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 8.2.0-6
+- Update to build dep latest glibc-static version
+
 * Mon Apr 01 2024 Kanika Nema <kanikanema@microsoft.com> - 8.2.0-5
 - Disable eventfd based migration tests as they hang when run as part of check.
 - Diable TLS PSK tests as they fail.

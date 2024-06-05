@@ -1,6 +1,6 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
-Version:        5.9.11
+Version:        5.9.12
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.12-1
+- Auto-upgrade to 5.9.12 - address CVE-2023-41913
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.11-1
 - Auto-upgrade to 5.9.11 - Azure Linux 3.0 - package upgrades
 

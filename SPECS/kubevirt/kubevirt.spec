@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,7 +34,7 @@ Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-5%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -270,6 +270,12 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-3
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 1.2.0-2
+- Update to build dep latest glibc-static version
+
 * Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
 - Bump package version to 1.2.0 from 0.59.0
 - Referenced kubevirt.spec from https://code.opensuse.org/package/kubevirt/blob/master/f/kubevirt.spec

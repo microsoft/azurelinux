@@ -18,7 +18,7 @@ func TestCustomizeImageLiveCdIsoNoShimEfi(t *testing.T) {
 	outImageFilePath := filepath.Join(buildDir, "image.iso")
 
 	config := &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			Packages: imagecustomizerapi.Packages{
 				Remove: []string{
 					"shim",
@@ -40,7 +40,7 @@ func TestCustomizeImageLiveCdIsoNoGrubEfi(t *testing.T) {
 	outImageFilePath := filepath.Join(buildDir, "image.iso")
 
 	config := &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			Packages: imagecustomizerapi.Packages{
 				Remove: []string{
 					"grub2-efi-binary",

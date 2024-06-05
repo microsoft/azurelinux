@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "keda-2.4.0-vendor.tar.gz": "bf5f2e19aac2c178a868aa1b1245b11d5ed4a51b0713d1f41154987f062f986e",
-  "keda-2.4.0.tar.gz": "e3a44a7be2d80369fb490898fb3f5605170a2848c8f30c6c24eb68fb57cfd3e0"
+  "keda-2.14.0-vendor.tar.gz": "36e62d59b865b119070868c5d237e935bd633eacad31b1dc91e9bdcb3d5fd3cf",
+  "keda-2.14.0.tar.gz": "f99bf7540a70cf44d5450146737e62c5860276a14fadfa020ad05b6c1f1c8f8a"
  }
 }

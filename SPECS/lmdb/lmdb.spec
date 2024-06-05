@@ -1,7 +1,7 @@
 Summary:        Lightning memory-mapped database
 Name:           lmdb
 Version:        0.9.31
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,8 +43,6 @@ make prefix=%{_prefix} DESTDIR=%{buildroot} install
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mkdir -p %{buildroot}%{_defaultlicensedir}/%{name}
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
-install -m0644 COPYRIGHT %{buildroot}%{_docdir}/%{name}
-install -m0644 LICENSE %{buildroot}%{_defaultlicensedir}/%{name}
 install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
 
 %post
@@ -55,7 +53,6 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
     # First argument is 2 => Upgrade
 
 %files
-%license libraries/liblmdb/LICENSE
 %{_mandir}/*
 %{_bindir}/*
 
@@ -65,11 +62,14 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/pkgconfig/%{name}.pc
 
 %files libs
-%{_docdir}/%{name}/COPYRIGHT
-%{_defaultlicensedir}/%{name}/LICENSE
+%license libraries/liblmdb/COPYRIGHT
+%license libraries/liblmdb/LICENSE
 %{_libdir}/*.so
 
 %changelog
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.9.31-2
+- Sanitize license files
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.31-1
 - Auto-upgrade to 0.9.31 - Azure Linux 3.0 - package upgrades
 

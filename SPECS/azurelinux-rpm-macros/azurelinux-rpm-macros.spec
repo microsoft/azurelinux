@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,37 +21,35 @@ Source5:        macros.check
 Source6:        macros.openblas-srpm
 Source7:        macros.nodejs-srpm
 Source8:        macros.mono-srpm
-Source9:        macros.ocaml-srpm
-Source10:       macros.perl-srpm
-Source11:       gpgverify
-Source12:       macros.forge
-Source13:       common.lua
-Source14:       forge.lua
+Source9:        macros.perl-srpm
+Source10:       gpgverify
+Source11:       macros.forge
+Source12:       common.lua
+Source13:       forge.lua
 # macros.rust-srpm is taken from https://pagure.io/fedora-rust/rust2rpm
-Source15:       macros.rust-srpm
+Source14:       macros.rust-srpm
 # macros.fonts is taken from the "fontpackages-devel" package.
-Source16:       macros.fonts
-Source17:       macros.suse
-Source18:       gen-ld-script.sh
-Source19:       generate-package-note.py
-Source20:       verify-package-notes.sh
+Source15:       macros.fonts
+Source16:       macros.suse
+Source17:       gen-ld-script.sh
+Source18:       generate-package-note.py
+Source19:       verify-package-notes.sh
 ### The following files should eventually move to python-rpm-macros.spec
-Source21:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python
-Source22:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python3
-Source23:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python-srpm
-Source24:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-bytecompile
-Source25:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.pybytecompile
-Source26:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/compileall2.py
-Source27:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
-Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/clamp_source_mtime.py
-Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/pathfix.py
-Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-fix-pyc-reproducibility
-Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
-Source32:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
+Source20:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python
+Source21:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python3
+Source22:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python-srpm
+Source23:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-bytecompile
+Source24:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.pybytecompile
+Source25:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/compileall2.py
+Source26:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
+Source27:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/clamp_source_mtime.py
+Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/pathfix.py
+Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-fix-pyc-reproducibility
+Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
+Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
 ###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
-Provides:       ocaml-srpm-macros
 Provides:       perl-srpm-macros
 Provides:       python-srpm-macros
 Provides:       python-rpm-macros
@@ -122,7 +120,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.openblas-srpm
 %{_rpmconfigdir}/macros.d/macros.nodejs-srpm
 %{_rpmconfigdir}/macros.d/macros.mono-srpm
-%{_rpmconfigdir}/macros.d/macros.ocaml-srpm
 %{_rpmconfigdir}/macros.d/macros.perl-srpm
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.fonts
@@ -141,6 +138,15 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-5
+- Moved ocaml-srpm-macros into its own package.
+
+* Fri May 17 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0-4
+- Move src tarball location to AME
+
+* Fri May 11 2024 Chris Co <chrco@microsoft.com> - 3.0-3
+- Add macros to allow enabling frame pointers on x86_64 and aarch64
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-2
 - Update all python-related scripts from Fedora 40 version of python-rpm-macros
 - Sort python-related sources together

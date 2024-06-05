@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.4.2
+Version:        1.4.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -67,6 +67,10 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %changelog
+* Thu May 16 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.3-1
+- Additional bugfixes for TLS connections
+- Add variable length GCM IV support to the SymCrypt engine
+
 * Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.2-1
 - Support additional parameters in the SymCrypt provider required for TLS connections
 - Various bugfixes for TLS scenarios

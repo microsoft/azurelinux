@@ -22,7 +22,6 @@ RUN  cd /var && rm -rf run && ln -s ../run . \
 
 RUN cp /usr/share/kube-virt/virt-launcher/qemu.conf /etc/libvirt/
 RUN cp /usr/share/kube-virt/virt-launcher/virtqemud.conf /etc/libvirt/
-RUN cp /usr/share/kube-virt/virt-launcher/nsswitch.conf /etc/
 
 #simple smoke test
 RUN ls /usr/bin/virt-launcher

@@ -3,7 +3,7 @@
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
 Version:        18.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,6 +71,9 @@ cd build
 %{_libdir}/*.so.*
 
 %changelog
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
+- Bump release to build with new llvm to fix CVE-2024-31852
+
 * Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
 - Upgrade to version 18.1.2
 

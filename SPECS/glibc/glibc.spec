@@ -4,10 +4,13 @@
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
+# Enable frame pointers for package
+%define _include_frame_pointers 1
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -103,6 +106,16 @@ Requires:       %{name} = %{version}-%{release}
 
 %description nscd
 Name Service Cache Daemon
+
+%package locales-all
+Summary:        Locale Data for Localized Programs
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-i18n = %{version}-%{release}
+Requires:       %{name}-lang = %{version}-%{release}
+
+%description locales-all
+Locale data for the internationalization features of glibc
 
 %prep
 %autosetup -p1
@@ -202,13 +215,17 @@ cat > %{buildroot}%{_sysconfdir}/ld.so.conf <<- "EOF"
 EOF
 popd
 %find_lang %{name} --all-name
-pushd localedata
-# Generate out of locale-archive en_US.utf8 and C.utf8 locales
-mkdir -p %{buildroot}%{_libdir}/locale
-for L in C en_US; do
-  I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/${L} -c -f charmaps/UTF-8 ${L}.utf8
-done
+
+# Generate all locales
+pushd %{_builddir}/%{name}-build
+# Install locales
+make %{?_smp_mflags} install_root=%{buildroot} localedata/install-locale-files
+
+# To reduce footprint of localedata
+# hardlink identical locale files together
+hardlink -vc %{buildroot}%{_libdir}/locale
 popd
+
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
 # Fix a hard coded path to the executable loader in the ldd script
@@ -252,7 +269,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files
 %defattr(-,root,root)
 %license COPYING COPYING.LIB LICENSES
-%{_libdir}/locale/*
+%{_libdir}/locale/en_US.utf8
+%{_libdir}/locale/C.utf8
 %dir %{_sysconfdir}/ld.so.conf.d
 %config(noreplace) %{_sysconfdir}/nsswitch.conf
 %config(noreplace) %{_sysconfdir}/ld.so.conf
@@ -323,7 +341,19 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
+%files locales-all
+%defattr(-,root,root)
+%{_libdir}/locale/*
+%exclude %{_libdir}/locale/en_US.utf8
+%exclude %{_libdir}/locale/C.utf8
+
 %changelog
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.38-5
+- Generate and provide glibc all locales in a sub-package
+
+* Fri May 10 2024 Chris Co <chrco@microsoft.com> - 2.38-4
+- Enable frame pointers compiler flag
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 2.38-3
 - provide C.utf8 locale
 

@@ -1,27 +1,26 @@
 Summary:        OCaml library for common file and filename operations
 Name:           ocaml-fileutils
-Version:        0.5.2
-Release:        18%{?dist}
+Version:        0.6.4
+Release:        1%{?dist}
 License:        LGPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ocaml-fileutils
 # NOTE: the "_2" suffix was added to avoid conflicts with an older source tarball for the same version of the sources.
 #       Please remove it during a version update.
-Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}_2-%{version}.tar.gz
-# Set of files from previous sources location allowing us to drop dependency on "ocaml-oasis-devel", which is no longer available.
-# Previous sources used to be available under http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
-# Currently still available in Fedora's SRPMs.
-Source1:        %{name}-old-sources-build-files.tar.gz
-Patch1:         fileutils-0.5.2-fix-bytes.patch
-# Use ounit2.
-Patch2:         ocaml-fileutils-0.5.2-ounit2.patch
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fedora does not need the stdlib-shims or seq forward compatibility packages
+Patch0:         ocaml-fileutils-0.6.4-forward-compat.patch
+# Given two distinct files with identical contents, the cmp function evaluates
+# to "Some x", where x is the size of each file, instead of None.  This breaks
+# the ocaml-gettext tests, which expect None in that case.
+Patch1:         ocaml-fileutils-0.6.4-cmp.patch
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-ounit-devel
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-dune >= 1.11.0
+%if 0%{?fedora} || 0%{?rhel} <= 6 || 0%{?azl}
+BuildRequires:  ocaml-ounit-devel >= 2.0.0
+%endif
 
 %description
 This library is intended to provide a basic interface to the most
@@ -35,57 +34,39 @@ abstract filenames.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-%setup -q -T -a 1 -D
-%autopatch -p1
+%autosetup -n %{name}-%{version} -p1
 
 %build
-ocaml setup.ml -configure --prefix %{_prefix} --destdir %{buildroot} \
-	--enable-tests
-make
+%dune_build
 
 %install
-export DESTDIR=%{buildroot}
-export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
+%dune_install
 
-# Set htmldir to current directory, then copy the docs (in api/)
-# as a %doc rule.
-make htmldir=. install
-
+# Do not run the tests (RHEL 7+ only) since they require ocaml-ounit.
+%if 0%{?fedora} || 0%{?rhel} || 0%{?azl}
 %check
-make test
-
-%files
-%license COPYING.txt
-%{_libdir}/ocaml/fileutils
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/fileutils/*.a
-%exclude %{_libdir}/ocaml/fileutils/*.cmx
-%exclude %{_libdir}/ocaml/fileutils/*.cmxa
+%dune_check
 %endif
-%exclude %{_libdir}/ocaml/fileutils/*.ml
-%exclude %{_libdir}/ocaml/fileutils/*.mli
 
-%files devel
-%license COPYING.txt
-%doc AUTHORS.txt CHANGELOG.txt README.txt TODO.txt
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/fileutils/*.a
-%{_libdir}/ocaml/fileutils/*.cmx
-%{_libdir}/ocaml/fileutils/*.cmxa
-%endif
-%{_libdir}/ocaml/fileutils/*.ml
-%{_libdir}/ocaml/fileutils/*.mli
+%files -f .ofiles
+%license LICENSE.txt
+
+%files devel -f .ofiles-devel
+%doc README.md CHANGES.md
 
 %changelog
+* Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.6.4-1
+- Converted spec file to match with Fedora 41.
+- Upgrade to 0.6.4
+- Use ocaml 5.1.1 to build
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-18
 - Cleaning-up spec. License verified.
 

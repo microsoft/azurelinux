@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -19,7 +20,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
@@ -135,7 +135,6 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	wg := new(sync.WaitGroup)
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	results := make(chan downloadResult)
-	doneChannel := make(chan struct{})
 
 	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
 	// Each worker is responsible for removing itself from the wait group once done.
@@ -144,21 +143,21 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore)
 	}
 
-	// Wait for all the workers to finish and signal the main thread when we are done
+	// Wait for all the workers to finish and signal the main thread when we are done by closing the results channel.
 	go func() {
 		wg.Wait()
-		close(doneChannel)
+		close(results)
 	}()
 
-	// Monitor the results channel and update the progress counter accordingly. Return once the done channel is closed.
-	downloadedPackages = monitorProgress(len(rpmSnapshot.Repo), results, doneChannel)
+	// Monitor the results channel and update the progress counter accordingly. Return once the results channel is closed.
+	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results)
 
 	return
 }
 
 // monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
 // no more results are available we expect the done channel to be closed, at which point we will return.
-func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string) {
+func monitorProgress(total int, results chan downloadResult) (downloadedPackages []string, err error) {
 	const progressIncrement = 10.0
 
 	downloaded := 0
@@ -169,8 +168,11 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 
 	for done := false; !done; {
 		// Wait for a result from a worker, or the done channel to be closed (which means all workers are done)
-		select {
-		case result := <-results:
+		result, ok := <-results
+		if !ok {
+			// All workers are done, finish this iteration of the loop and then return
+			done = true
+		} else {
 			switch result.resultType {
 			case downloadResultTypeSkipped:
 				logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", result.pkgName)
@@ -186,9 +188,6 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
 				unavailable++
 			}
-		case <-doneChannel:
-			// All workers are done, finish this iteration of the loop and then return
-			done = true
 		}
 
 		// Calculate the progress percentage and update the progress counter if needed (update every 'progressIncrement' percent)
@@ -199,6 +198,11 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 			lastProgressUpdate = progressPercent
 		}
 	}
+
+	if failed > 0 {
+		err = fmt.Errorf("failed to download %d package(s) out of %d total", failed, total)
+	}
+
 	return
 }
 
@@ -214,15 +218,6 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
 // network operations semaphore to minimize the time spent holding it.
 func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
-	const (
-		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
-		// ~30 seconds.
-		downloadRetryAttempts = 5
-		failureBackoffBase    = 2.0
-		downloadRetryDuration = time.Second
-	)
-	var noCancel chan struct{} = nil
-
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName, fileName := formatName(pkg)
 	fullFilePath := path.Join(outDir, fileName)
@@ -262,13 +257,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	_, err = retry.RunWithExpBackoff(func() error {
-		err := network.DownloadFile(url, fullFilePath, nil, nil)
-		if err != nil {
-			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
-		}
-		return err
-	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, noCancel)
+	_, err = network.DownloadFileWithRetry(context.Background(), url, fullFilePath, nil, nil, network.DefaultTimeout)
 	if err != nil {
 		return
 	}

@@ -4,6 +4,7 @@
 package safechroot
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -66,7 +67,8 @@ type Chroot struct {
 	rootDir     string
 	mountPoints []*MountPoint
 
-	isExistingDir bool
+	isExistingDir        bool
+	includeDefaultMounts bool
 }
 
 // inChrootMutex guards against multiple Chroots entering their respective Chroots
@@ -298,6 +300,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 		// Assign to `c.mountPoints` now since `Initialize` will call `unmountAndRemove` if an error occurs.
 		c.mountPoints = allMountPoints
+		c.includeDefaultMounts = includeDefaultMounts
 
 		// Mount with the original unsorted order. Assumes the order of mounts is important.
 		err = c.createMountPoints()
@@ -603,11 +606,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 			continue
 		}
 
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithExpBackoff(context.Background(), func() error {
 			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
-		}, totalAttempts, retryDuration, 2.0, nil)
+		}, totalAttempts, retryDuration, 2.0)
 
 		if err != nil {
 			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)
@@ -720,6 +723,11 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 // E.g. when installing the azurelinux-repos-shared package, a GPG import occurs. This starts the gpg-agent process inside the chroot.
 // To be able to cleanly exit the setup chroot, we must stop it.
 func (c *Chroot) stopGPGComponents() (err error) {
+	if !c.includeDefaultMounts {
+		// gpgconf doesn't work if it doesn't have access to /proc.
+		return
+	}
+
 	_, err = exec.LookPath("gpgconf")
 	if err != nil {
 		logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
@@ -756,14 +764,13 @@ func killGPGComponents(componentsToKill []string, availableComponents map[string
 
 // listGPGComponents will return a set of all GPG component.
 func listGPGComponents() (components map[string]bool, err error) {
-	stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
-
+	stdout, stderr, err := shell.NewExecBuilder("gpgconf", "--list-components").
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 	if err != nil {
 		err = fmt.Errorf("failed to list GPG components.\nerr:%w\nstderr: %s", err, stderr)
 		return
 	}
-
-	logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
 
 	components = make(map[string]bool)
 

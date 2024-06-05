@@ -1,6 +1,6 @@
 Name:           python-rich
 Version:        13.7.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Render rich text and beautiful formatting in the terminal
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,7 +10,15 @@ Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
 
 BuildArch:      noarch
 
-Patch0:          3229.patch
+Patch0:         3229.patch
+# ptest warning patch for test_syntax causing failures, can be
+# removed when upgraded to a version containing the following:
+# https://github.com/Textualize/rich/commit/027a4727a5b8f8407109c01df5e24604352bbe50
+Patch1:         ptest-warning.patch
+# This patch modifies the tests to set the OLD_PYGMENTS version
+# to the current one in Azure Linux, 2.5.2. Once python-pygments
+# version is updated >= 2.14.0, this patch can be removed.
+Patch2:         0001-Skip-tests-for-mariner.patch
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-attrs
@@ -19,6 +27,10 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-poetry
 BuildRequires:  python3-setuptools
+%if 0%{?with_check}
+BuildRequires:  python3-markdown-it-py
+BuildRequires:  python3-packaging
+%endif
 
 %description
 Rich is a Python library for rich text and beautiful formatting in the terminal.
@@ -29,7 +41,7 @@ code, tracebacks, and more — out of the box.
 %package -n     python3-rich
 Summary:        %{summary}
 Requires:       python3-markdown-it-py
-Requires:       python3-Pygments
+Requires:       python3-pygments
 Requires:       python3-typing-extensions
 # This was previously misnamed, remove the obsolete in Fedora 38, EPEL 10
 Obsoletes:      python-rich < 10.16.1-2
@@ -51,6 +63,7 @@ code, tracebacks, and more — out of the box.
 
 %check
 # add below to make sure initial build will catch runtime import errors
+pip3 install iniconfig
 %pyproject_check_import
 %pytest -vv
 
@@ -59,7 +72,13 @@ code, tracebacks, and more — out of the box.
 %doc README.md
 
 %changelog
-* Mon Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 13.7.1-4 
+- Add missing iniconfig dependency to check section
+
+* Fri May 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-3
+- Fix pygments name in Requires.
+
+* Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 

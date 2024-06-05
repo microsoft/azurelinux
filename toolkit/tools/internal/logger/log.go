@@ -6,14 +6,14 @@
 package logger
 
 import (
-	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
+	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
 )
@@ -172,36 +172,6 @@ func WarningOnError(err interface{}, args ...interface{}) {
 	}
 }
 
-// StreamOutput calls the provided logFunction on every line from the provided pipe
-// outputChan will contain the N most recent lines of output, based on the length of the channel
-func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.WaitGroup, outputChan chan string) {
-	for scanner := bufio.NewScanner(pipe); scanner.Scan(); {
-		line := scanner.Text()
-		logFunction(line)
-
-		Log.Tracef("StreamOutput:\t'%s'", line)
-
-		// Optionally buffer the output to print in the event of an error
-		if outputChan != nil {
-			// We are most interested in the most recent messages, if the channel is full drop the oldest entries
-			if len(outputChan) == cap(outputChan) {
-				select {
-				case <-outputChan:
-					// The buffer is full, discard the oldest value
-				default:
-				}
-			}
-			select {
-			case outputChan <- line:
-			default:
-				// In the event the buffer is full, drop the line. The block above should avoid this occuring however
-			}
-		}
-	}
-
-	wg.Done()
-}
-
 // ReplaceStderrWriter replaces the stderr writer and returns the old one
 func ReplaceStderrWriter(newOut io.Writer) (oldOut io.Writer) {
 	return stderrHook.ReplaceWriter(newOut)
@@ -244,4 +214,52 @@ func setHookLogLevel(hook *writerHook, level string) (err error) {
 
 	hook.SetLevel(logLevel)
 	return
+}
+
+// PrintMessageBox prints a message box to the log with the specified log level.
+func PrintMessageBox(level logrus.Level, message []string) {
+	for _, line := range FormatMessageBox(message) {
+		Log.Log(level, line)
+	}
+}
+
+// FormatMessageBox formats a message into a box with a border. The box is automatically sized to fit the longest line.
+// Each line will be centered in the box.
+func FormatMessageBox(message []string) []string {
+	maxLineLength := 0
+	for _, line := range message {
+		len := utf8.RuneCountInString(line)
+		if len > maxLineLength {
+			maxLineLength = len
+		}
+	}
+	lines := []string{messageBoxTopString(maxLineLength)}
+	for _, line := range message {
+		lines = append(lines, messageBoxMiddleString(line, maxLineLength))
+	}
+	lines = append(lines, messageBoxBottomString(maxLineLength))
+	return lines
+}
+
+func messageBoxTopString(width int) string {
+	return fmt.Sprintf("╔═%s═╗", strings.Repeat("═", width))
+}
+
+func messageBoxMiddleString(s string, width int) string {
+	return fmt.Sprintf("║ %s ║", messageBoxPadString(s, width))
+}
+
+func messageBoxBottomString(width int) string {
+	return fmt.Sprintf("╚═%s═╝", strings.Repeat("═", width))
+}
+
+func messageBoxPadString(s string, width int) string {
+	lineLen := utf8.RuneCountInString(s)
+	if lineLen >= width {
+		return s
+	}
+	padding := width - lineLen
+	paddingL := padding / 2
+	paddingR := padding - paddingL
+	return fmt.Sprintf("%s%s%s", strings.Repeat(" ", paddingL), s, strings.Repeat(" ", paddingR))
 }

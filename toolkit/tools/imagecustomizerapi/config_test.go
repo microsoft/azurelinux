@@ -35,7 +35,7 @@ func TestConfigIsValid(t *testing.T) {
 				},
 			},
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -67,7 +67,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 				},
 			},
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -91,7 +91,7 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 				},
 			}},
 		},
-		OS: OS{
+		OS: &OS{
 			Hostname:            "test",
 			ResetBootLoaderType: "hard-reset",
 		},
@@ -127,7 +127,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 				},
 			},
 		},
-		OS: OS{
+		OS: &OS{
 			Hostname: "test",
 		},
 	}
@@ -152,7 +152,7 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 			},
 			BootType: "legacy",
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -169,7 +169,7 @@ func TestConfigIsValidZeroDisks(t *testing.T) {
 			BootType: BootTypeEfi,
 			Disks:    []Disk{},
 		},
-		OS: OS{
+		OS: &OS{
 			Hostname: "test",
 		},
 	}
@@ -181,7 +181,7 @@ func TestConfigIsValidZeroDisks(t *testing.T) {
 
 func TestConfigIsValidBadHostname(t *testing.T) {
 	config := &Config{
-		OS: OS{
+		OS: &OS{
 			Hostname: "test_",
 		},
 	}
@@ -200,7 +200,7 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 				MaxSize:            0,
 			}},
 		},
-		OS: OS{
+		OS: &OS{
 			Hostname: "test",
 		},
 	}
@@ -220,7 +220,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 			}},
 			BootType: "efi",
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -242,7 +242,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 			}},
 			BootType: "legacy",
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -279,7 +279,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				},
 			},
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
@@ -316,7 +316,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				},
 			},
 		},
-		OS: OS{
+		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 			KernelCommandLine: KernelCommandLine{

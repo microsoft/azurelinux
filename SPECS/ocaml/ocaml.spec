@@ -1,44 +1,129 @@
-%global __ocaml_requires_opts -c -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
-%global __ocaml_provides_opts -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
-%global majmin %(echo %{version} | cut -d. -f1-2)
-Summary:        OCaml compiler and programming environment
+# Don't add -Wl,-dT,<build dir>
+%undefine _package_note_flags
+
+# OCaml 5.1 broke building with LTO.  A file prims.c is generated with primitive
+# function declarations, all with "void" for their parameter list.  This does
+# not match the real definitions, leading to lots of -Wlto-type-mismatch
+# warnings.  These change the output of the tests, leading to many failed tests.
+%global _lto_cflags %{nil}
+
+# OCaml has a bytecode backend that works on anything with a C
+# compiler, and a native code backend available on a subset of
+# architectures.  A further subset of architectures support native
+# dynamic linking.
+
+%ifarch %{ocaml_native_compiler}
+%global native_compiler 1
+%else
+%global native_compiler 0
+%endif
+
+%ifarch %{ocaml_natdynlink}
+%global natdynlink 1
+%else
+%global natdynlink 0
+%endif
+
+# i686 support was dropped in OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
+# These are all the architectures that the tests run on.  The tests
+# take a long time to run, so don't run them on slow machines.
+%global test_arches aarch64 %{power64} riscv64 s390x x86_64
+# These are the architectures for which the tests must pass otherwise
+# the build will fail.
+#global test_arches_required aarch64 ppc64le x86_64
+%global test_arches_required NONE
+
+# Architectures where parallel builds fail.
+#global no_parallel_build_arches aarch64
+
+#global rcver +git
+%global rcver %{nil}
+
 Name:           ocaml
-Version:        4.13.1
-Release:        3%{?dist}
-License:        QPL and (LGPLv2+ with exceptions)
+Version:        5.1.1
+Release:        1%{?dist}
+Summary:        OCaml compiler and programming environment
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.ocaml.org
-Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{version}.tar.xz
-Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch
-Patch0002:      0002-configure-Allow-user-defined-C-compiler-flags.patch
-Patch0003:      0003-configure-Remove-incorrect-assumption-about-cross-co.patch
-Patch0004:      0004-remove-unused-var-in-alloc_aync_stubs.patch
-BuildRequires:  autoconf
-BuildRequires:  binutils-devel
-BuildRequires:  chrpath
-BuildRequires:  gawk
-BuildRequires:  gcc
-BuildRequires:  gdbm-devel
-BuildRequires:  git
+Source0:        https://github.com/ocaml/ocaml/archive/%{version}/%{name}-%{version}.tar.gz
+Source1:        macros.ocaml-rpm
+Source2:        ocaml_files.py
+
+# IMPORTANT NOTE:
+#
+# These patches are generated from unpacked sources stored in a
+# pagure.io git repository.  If you change the patches here, they will
+# be OVERWRITTEN by the next update.  Instead, request commit access
+# to the pagure project:
+#
+# https://pagure.io/fedora-ocaml
+#
+# Current branch: fedora-40-5.1.1
+#
+# ALTERNATIVELY add a patch to the end of the list (leaving the
+# existing patches unchanged) adding a comment to note that it should
+# be incorporated into the git repo at a later time.
+
+# Fedora-specific patches
+Patch:          0001-Don-t-add-rpaths-to-libraries.patch
+Patch:          0002-configure-Allow-user-defined-C-compiler-flags.patch
+
+# https://github.com/ocaml/ocaml/pull/11594
+Patch:          0003-Update-framepointers-tests-to-avoid-false-positive-w.patch
+
+# https://github.com/ocaml/ocaml/issues/12829
+# https://github.com/ocaml/ocaml/pull/12831
+Patch:          0004-Fix-s390x-stack-reallocation-code-in-PIC-mode.patch
+
 BuildRequires:  make
-BuildRequires:  ncurses-devel
+BuildRequires:  git
+BuildRequires:  gcc
+BuildRequires:  autoconf
+BuildRequires:  gawk
+BuildRequires:  hardlink
 BuildRequires:  perl-interpreter
 BuildRequires:  util-linux
-%if 0%{?with_check}
-BuildRequires:  diffutils
-%endif
-# ocamlopt runs gcc to link binaries.  Because Azure Linux includes
-# hardening flags automatically, azurelinux-rpm-macros is also required.
-Requires:       azurelinux-rpm-macros
+BuildRequires:  /usr/bin/annocheck
+BuildRequires:  pkgconfig(libzstd)
+
+# Documentation requirements
+BuildRequires:  asciidoc
+BuildRequires:  python3-pygments
+
+# ocamlopt runs gcc to link binaries.  Because Fedora includes
+# hardening flags automatically, redhat-rpm-config is also required.
+# Compressed marshaling requires libzstd-devel.
 Requires:       gcc
+Requires:       redhat-rpm-config
+Requires:       libzstd-devel
+
 # Because we pass -c flag to ocaml-find-requires (to avoid circular
 # dependencies) we also have to explicitly depend on the right version
 # of ocaml-runtime.
 Requires:       ocaml-runtime = %{version}-%{release}
-# Bundles an MD5 implementation in byterun/md5.{c,h}
+
+# Force ocaml-srpm-macros to be at the latest version, both for builds
+# and installs, since OCaml 5.1 has a different set of native code
+# generators than previous versions.
+BuildRequires:  ocaml-srpm-macros >= 9
+Requires:       ocaml-srpm-macros >= 9
+
+# Bundles an MD5 implementation in runtime/caml/md5.h and runtime/md5.c
 Provides:       bundled(md5-plumb)
+
 Provides:       ocaml(compiler) = %{version}
+
+%if %{native_compiler}
+%global __ocaml_requires_opts -c -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
+%else
+%global __ocaml_requires_opts -c -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte' -i Backend_intf -i Inlining_decision_intf -i Simplify_boxed_integer_ops_intf
+%endif
+%global __ocaml_provides_opts -f '%{buildroot}%{_bindir}/ocamlrun %{buildroot}%{_bindir}/ocamlobjinfo.byte'
+
 
 %description
 OCaml is a high-level, strongly-typed, functional and object-oriented
@@ -49,7 +134,12 @@ and an optimizing native-code compiler), an interactive toplevel system,
 parsing tools (Lex,Yacc), a replay debugger, a documentation generator,
 and a comprehensive library.
 
-%package        runtime
+
+%package runtime
+# LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception: the project as a whole
+# LicenseRef-Fedora-Public-Domain: the MD5 implementation in runtime/caml/md5.h
+#   and runtime/md5.c
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception AND LicenseRef-Fedora-Public-Domain
 Summary:        OCaml runtime environment
 Requires:       util-linux
 Provides:       ocaml(runtime) = %{version}
@@ -61,24 +151,32 @@ programming language from the ML family of languages.
 This package contains the runtime environment needed to run OCaml
 bytecode.
 
-%package        source
+
+%package source
 Summary:        Source code for OCaml libraries
 Requires:       ocaml = %{version}-%{release}
 
 %description source
 Source code for OCaml libraries.
 
-%package        ocamldoc
+
+%package ocamldoc
+# LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception: the project as a whole
+# LicenseRef-Fedora-Public-Domain: ocamldoc/ocamldoc.sty
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception AND LicenseRef-Fedora-Public-Domain
 Summary:        Documentation generator for OCaml
 Requires:       ocaml = %{version}-%{release}
-Provides:       ocamldoc = %{version}-%{release}
+Provides:       ocamldoc = %{version}
 
 %description ocamldoc
 Documentation generator for OCaml.
 
+
 %package        docs
 Summary:        Documentation for OCaml
+BuildArch:      noarch
 Requires:       ocaml = %{version}-%{release}
+
 
 %description docs
 OCaml is a high-level, strongly-typed, functional and object-oriented
@@ -86,9 +184,11 @@ programming language from the ML family of languages.
 
 This package contains man pages.
 
+
 %package        compiler-libs
 Summary:        Compiler libraries for OCaml
 Requires:       ocaml = %{version}-%{release}
+
 
 %description compiler-libs
 OCaml is a high-level, strongly-typed, functional and object-oriented
@@ -99,35 +199,113 @@ compilers, useful for the development of some OCaml applications.
 Note that this exposes internal details of the OCaml compiler which
 may not be portable between versions.
 
+
+%package        rpm-macros
+# LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception: the project as a whole
+# BSD-3-Clause: ocaml_files.py
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception AND BSD-3-Clause
+Summary:        RPM macros for building OCaml packages
+BuildArch:      noarch
+Requires:       ocaml = %{version}-%{release}
+Requires:       python3
+
+
+%description rpm-macros
+This package contains macros that are useful for building OCaml RPMs.
+
+
 %prep
-%autosetup -p1
+%autosetup -S git -n %{name}-%{version}%{rcver}
 # Patches touch configure.ac, so rebuild it:
 autoconf --force
 
+
 %build
+%ifnarch %{no_parallel_build_arches}
+make="%make_build"
+%else
+unset MAKEFLAGS
+make=make
+%endif
+
+# Set ocamlmklib default flags to include Fedora linker flags
+sed -i '/ld_opts/s|\[\]|["%{build_ldflags}"]|' tools/ocamlmklib.ml
+
+# Expose a dependency on the math library
+sed -i '/^EXTRACAMLFLAGS=/aLINKOPTS=-cclib -lm' otherlibs/unix/Makefile
+
+# Don't use %%configure macro because it sets --build, --host which
+# breaks some incorrect assumptions made by OCaml's configure.ac
+#
+# See also:
+# https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/2O4HBOK6PTQZAFAVIRDVMZGG2PYB2QHM/
+# https://github.com/ocaml/ocaml/issues/8647
+#
 # We set --libdir to the unusual directory because we want OCaml to
 # install its libraries and other files into a subdirectory.
 #
-# Force --host because of:
-# https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/2O4HBOK6PTQZAFAVIRDVMZGG2PYB2QHM/
-# (see also https://github.com/ocaml/ocaml/issues/8647)
-#
 # OC_CFLAGS/OC_LDFLAGS control what flags OCaml passes to the linker
 # when doing final linking of OCaml binaries.  Setting these is
-# necessary to ensure that generated binaries have Azure Linux hardening
+# necessary to ensure that generated binaries have Fedora hardening
 # features.
-%configure \
-    OC_CFLAGS="$CFLAGS" \
-    OC_LDFLAGS="$LDFLAGS" \
-%if 0%{?with_check}
-    --enable-ocamltest \
-%endif
+./configure \
+    --prefix=%{_prefix} \
+    --sysconfdir=%{_sysconfdir} \
+    --mandir=%{_mandir} \
     --libdir=%{_libdir}/ocaml \
-    --host=`./build-aux/config.guess`
+    --enable-flambda \
+%if %{native_compiler}
+    --enable-native-compiler \
+    --enable-native-toplevel \
+%else
+    --disable-native-compiler \
+    --disable-native-toplevel \
+%endif
+%ifarch x86_64
+%if 0%{?_include_frame_pointers}
+    --enable-frame-pointers \
+%endif
+%endif
+%ifarch %{test_arches}
+    --enable-ocamltest \
+%else
+    --disable-ocamltest \
+%endif
+    OC_CFLAGS='%{build_cflags}' \
+    OC_LDFLAGS='%{build_ldflags}' \
+    %{nil}
+$make world
+%if %{native_compiler}
+$make opt
+$make opt.opt
+%endif
 
-%make_build world
-%make_build opt
-%make_build opt.opt
+# Build the README and fix up references to other doc files
+asciidoc -d book README.adoc
+for fil in CONTRIBUTING.md HACKING.adoc INSTALL.adoc README.win32.adoc; do
+  sed -e "s,\"$fil\",\"https://github.com/ocaml/ocaml/blob/trunk/$fil\"," \
+      -i README.html
+done
+
+
+%check
+%ifarch %{ocaml_native_compiler}
+# For information only, compile a binary and dump the annocheck data
+# from it.  Useful so we know if hardening is being enabled, but don't
+# fail because not every hardening feature can be enabled here.
+echo 'print_endline "hello, world"' > hello.ml
+./ocamlopt.opt -verbose -I stdlib hello.ml -o hello ||:
+annocheck -v hello ||:
+%endif
+
+%ifarch %{test_arches}
+%ifarch %{test_arches_required}
+make -j1 tests
+%else
+make -j1 tests ||:
+%endif
+%endif
+
 
 %install
 %make_install
@@ -135,87 +313,94 @@ perl -pi -e "s|^%{buildroot}||" %{buildroot}%{_libdir}/ocaml/ld.conf
 
 echo %{version} > %{buildroot}%{_libdir}/ocaml/fedora-ocaml-release
 
-# Remove rpaths from stublibs .so files.
-chrpath --delete %{buildroot}%{_libdir}/ocaml/stublibs/*.so
+# Remove the installed documentation.  We will install it using %%doc
+rm -rf %{buildroot}%{_docdir}/ocaml
 
-find %{buildroot} -type f -name "*.la" -delete -print
+mkdir -p %{buildroot}%{_rpmmacrodir}
+install -m 0644 %{SOURCE1} %{buildroot}%{_rpmmacrodir}/macros.ocaml-rpm
 
-# Remove .cmt and .cmti files, for now.  We could package them later.
-# See also: http://www.ocamlpro.com/blog/2012/08/20/ocamlpro-and-4.00.0.html
-find %{buildroot} \( -name '*.cmt' -o -name '*.cmti' \) -a -delete -print
+mkdir -p %{buildroot}%{_rpmconfigdir}/azl
+install -m 0644 %{SOURCE2} %{buildroot}%{_rpmconfigdir}/azl
 
-%check
-cd testsuite
-make -j1 all
+# Link, rather than copy, identical binaries
+hardlink -t %{buildroot}%{_libdir}/ocaml/stublibs
+
 
 %files
 %license LICENSE
 %{_bindir}/ocaml
 
 %{_bindir}/ocamlcmt
+%{_bindir}/ocamlcp
 %{_bindir}/ocamldebug
+%{_bindir}/ocamlmklib
+%{_bindir}/ocamlmktop
+%{_bindir}/ocamlprof
 %{_bindir}/ocamlyacc
 
 # symlink to either .byte or .opt version
 %{_bindir}/ocamlc
-%{_bindir}/ocamlcp
 %{_bindir}/ocamldep
 %{_bindir}/ocamllex
-%{_bindir}/ocamlmklib
-%{_bindir}/ocamlmktop
 %{_bindir}/ocamlobjinfo
-%{_bindir}/ocamloptp
-%{_bindir}/ocamlprof
 
 # bytecode versions
 %{_bindir}/ocamlc.byte
-%{_bindir}/ocamlcp.byte
 %{_bindir}/ocamldep.byte
 %{_bindir}/ocamllex.byte
-%{_bindir}/ocamlmklib.byte
-%{_bindir}/ocamlmktop.byte
 %{_bindir}/ocamlobjinfo.byte
-%{_bindir}/ocamloptp.byte
-%{_bindir}/ocamlprof.byte
 
+%if %{native_compiler}
 # native code versions
 %{_bindir}/ocamlc.opt
-%{_bindir}/ocamlcp.opt
 %{_bindir}/ocamldep.opt
 %{_bindir}/ocamllex.opt
-%{_bindir}/ocamlmklib.opt
-%{_bindir}/ocamlmktop.opt
 %{_bindir}/ocamlobjinfo.opt
-%{_bindir}/ocamloptp.opt
-%{_bindir}/ocamlprof.opt
+%endif
+
+%if %{native_compiler}
+%{_bindir}/ocamlnat
 %{_bindir}/ocamlopt
 %{_bindir}/ocamlopt.byte
 %{_bindir}/ocamlopt.opt
+%{_bindir}/ocamloptp
+%endif
 
 %{_libdir}/ocaml/camlheader
 %{_libdir}/ocaml/camlheader_ur
 %{_libdir}/ocaml/expunge
-%{_libdir}/ocaml/eventlog_metadata
-%{_libdir}/ocaml/extract_crc
 %{_libdir}/ocaml/ld.conf
 %{_libdir}/ocaml/Makefile.config
+
 %{_libdir}/ocaml/*.a
-%{_libdir}/ocaml/*.cmxs
+%if %{native_compiler}
 %{_libdir}/ocaml/*.cmxa
 %{_libdir}/ocaml/*.cmx
 %{_libdir}/ocaml/*.o
 %{_libdir}/ocaml/libasmrun_shared.so
+%endif
 %{_libdir}/ocaml/*.mli
+%{_libdir}/ocaml/sys.ml.in
 %{_libdir}/ocaml/libcamlrun_shared.so
-%{_libdir}/ocaml/threads/*.mli
-%{_libdir}/ocaml/threads/*.a
-%{_libdir}/ocaml/threads/*.cmxa
-%{_libdir}/ocaml/threads/*.cmx
+
+%{_libdir}/ocaml/{dynlink,runtime_events,str,threads,unix}/*.mli
+%if %{native_compiler}
+%{_libdir}/ocaml/{dynlink,runtime_events,str,threads,unix}/*.a
+%{_libdir}/ocaml/{dynlink,runtime_events,str,threads,unix}/*.cmxa
+%{_libdir}/ocaml/{dynlink,profiling,runtime_events,str,threads,unix}/*.cmx
+%{_libdir}/ocaml/profiling/*.o
+%endif
+%if %{natdynlink}
+%{_libdir}/ocaml/{runtime_events,str,unix}/*.cmxs
+%endif
+
+# headers
 %{_libdir}/ocaml/caml
 
+
 %files runtime
+%doc README.html Changes
 %license LICENSE
-%doc README.adoc Changes
 %{_bindir}/ocamlrun
 %{_bindir}/ocamlrund
 %{_bindir}/ocamlruni
@@ -226,14 +411,39 @@ make -j1 all
 %{_libdir}/ocaml/camlheaderd
 %{_libdir}/ocaml/camlheaderi
 %{_libdir}/ocaml/stublibs
+%dir %{_libdir}/ocaml/dynlink
+%{_libdir}/ocaml/dynlink/META
+%{_libdir}/ocaml/dynlink/*.cmi
+%{_libdir}/ocaml/dynlink/*.cma
+%dir %{_libdir}/ocaml/profiling
+%{_libdir}/ocaml/profiling/*.cmo
+%{_libdir}/ocaml/profiling/*.cmi
+%dir %{_libdir}/ocaml/runtime_events
+%{_libdir}/ocaml/runtime_events/META
+%{_libdir}/ocaml/runtime_events/*.cmi
+%{_libdir}/ocaml/runtime_events/*.cma
+%{_libdir}/ocaml/stdlib
+%dir %{_libdir}/ocaml/str
+%{_libdir}/ocaml/str/META
+%{_libdir}/ocaml/str/*.cmi
+%{_libdir}/ocaml/str/*.cma
 %dir %{_libdir}/ocaml/threads
+%{_libdir}/ocaml/threads/META
 %{_libdir}/ocaml/threads/*.cmi
 %{_libdir}/ocaml/threads/*.cma
+%dir %{_libdir}/ocaml/unix
+%{_libdir}/ocaml/unix/META
+%{_libdir}/ocaml/unix/*.cmi
+%{_libdir}/ocaml/unix/*.cma
 %{_libdir}/ocaml/fedora-ocaml-release
+
 
 %files source
 %license LICENSE
 %{_libdir}/ocaml/*.ml
+%{_libdir}/ocaml/*.cmt*
+%{_libdir}/ocaml/*/*.cmt*
+
 
 %files ocamldoc
 %license LICENSE
@@ -241,23 +451,28 @@ make -j1 all
 %{_bindir}/ocamldoc*
 %{_libdir}/ocaml/ocamldoc
 
+
 %files docs
 %{_mandir}/man1/*
 %{_mandir}/man3/*
 
+
 %files compiler-libs
 %license LICENSE
-%dir %{_libdir}/ocaml/compiler-libs
-%{_libdir}/ocaml/compiler-libs/*.mli
-%{_libdir}/ocaml/compiler-libs/*.cmi
-%{_libdir}/ocaml/compiler-libs/*.cmo
-%{_libdir}/ocaml/compiler-libs/*.cma
-%{_libdir}/ocaml/compiler-libs/*.a
-%{_libdir}/ocaml/compiler-libs/*.cmxa
-%{_libdir}/ocaml/compiler-libs/*.cmx
-%{_libdir}/ocaml/compiler-libs/*.o
+%{_libdir}/ocaml/compiler-libs
+
+
+%files rpm-macros
+%{_rpmmacrodir}/macros.ocaml-rpm
+%{_rpmconfigdir}/azl/ocaml_files.py
+
 
 %changelog
+* Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
+- Upgraded ocaml to 5.1.1
+- Importing and adopting spec changes from Fedora (License: MIT).
+- Removed unused patch files and added new.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
 - Updating naming for 3.0 version of Azure Linux.
 

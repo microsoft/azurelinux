@@ -1,0 +1,24 @@
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 2a2827e..b7c3ed7 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -272,7 +272,7 @@ if HAVE_DWARFEXAMPLE
+   TESTS += test_debuglink-a.sh test_debuglink-b.sh
+ endif
+ endif
+-TESTS += test_dwarfdumpLinux.sh  test_dwarfdumpPE.sh test_dwarfdumpMacos.sh 
++TESTS += test_dwarfdumpLinux.sh
+ if HAVE_DWARFEXAMPLE
+ TESTS += test_jitreaderdiff.sh
+ endif
+@@ -297,8 +297,8 @@ test_debuglink-b.sh \
+ dummyexecutable \
+ dummyexecutable.debug \
+ dummysourceignore \
+-test_dwarfdumpLinux.sh  test_dwarfdumpMacos.sh \
+-test_dwarfdumpPE.sh  test_dwarfdumpsetup.sh \
++test_dwarfdumpLinux.sh \
++test_dwarfdumpsetup.sh \
+ test_dwarfdump.py \
+ test_dwarf_leb.c \
+ test_dwarf_tied.c \

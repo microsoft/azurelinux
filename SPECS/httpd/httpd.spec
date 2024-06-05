@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.58
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -153,6 +153,7 @@ Security (TLS) protocols.
             --enable-mpms-shared=all               \
             --enable-ssl                           \
             --exec-prefix=%{_prefix}               \
+            --includedir=%{_includedir}/httpd      \
             --libexecdir=%{_libdir}/httpd/modules  \
             --prefix=%{_sysconfdir}/httpd          \
             --sysconfdir=%{_confdir}/httpd/conf    \
@@ -274,6 +275,7 @@ fi
 %{_bindir}/apxs
 %{_bindir}/dbmmanage
 %{_mandir}/man1/apxs.1*
+%{_includedir}/httpd/*
 %{_includedir}/*
 %{_rpmconfigdir}/macros.d/macros.httpd
 
@@ -345,6 +347,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Thu May 09 2024 Andy Zaugg <azaugg@linkedin.com> - 2.4.58-3
+- Namespace httpd-devel include files into a httpd directory
+
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.4.58-2
 - Move from pcre to pcre2
 

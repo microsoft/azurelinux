@@ -363,12 +363,12 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
@@ -673,7 +673,7 @@ These are the useful build targets:
 | clean                            | Clean all built files.
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
-| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
+| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`. See `hydrate-srpms` target.
 | copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
@@ -686,6 +686,7 @@ These are the useful build targets:
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 | help                             | Display basic usage information for most commonly used build targets and variables.
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
+| hydrate-srpms                    | Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
 | image                            | Generate an image (see [Images](#images)).
 | initrd                           | Create the initrd for the ISO installer.
 | input-srpms                      | Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files.
@@ -805,29 +806,31 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 ### Misc Build
 
-| Variable                      | Default                                                                                                | Description
-|:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| LOG_LEVEL                     | info                                                                                                   | Console log level for go tools (`panic, fatal, error, warn, info, debug, trace`)
-| LOG_COLOR                     | auto                                                                                                   | Console log color for go tools (`always`, `auto`, `never`). `always` enables color in both logs and terminal output, `auto`(default option) enables color in terminal output, and `never` disables color in all.
-| STOP_ON_WARNING               | n                                                                                                      | Stop on non-fatal makefile failures (see `$(call print_warning, message)`)
-| STOP_ON_PKG_FAIL              | n                                                                                                      | Stop all package builds on any failure rather than try and continue.
-| SRPM_FILE_SIGNATURE_HANDLING  | enforce                                                                                                | Behavior when checking source file hashes from SPEC files. `update` will create a new entry in the signature file (`enforce, skip, update`)
-| ARCHIVE_TOOL                  | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
-| INCREMENTAL_TOOLCHAIN         | n                                                                                                      | Only build toolchain RPM packages if they are not already present
-| RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
-| ALLOW_TOOLCHAIN_REBUILDS      | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
-|  PACKAGE_BUILD_RETRIES        | 1                                                                                                      | Number of build retries for each package
-| CHECK_BUILD_RETRIES           | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
-| MAX_CASCADING_REBUILDS        |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
-| EXTRA_BUILD_LAYERS            | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
-| IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
-| CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
-| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
-| USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
-| NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
-| TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
-| USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
-| MAX_CPU                       |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| Variable                         | Default                                                                                                | Description
+|:---------------------------------|:-------------------------------------------------------------------------------------------------------|:---
+| LOG_LEVEL                        | info                                                                                                   | Console log level for go tools (`panic, fatal, error, warn, info, debug, trace`)
+| LOG_COLOR                        | auto                                                                                                   | Console log color for go tools (`always`, `auto`, `never`). `always` enables color in both logs and terminal output, `auto`(default option) enables color in terminal output, and `never` disables color in all.
+| STOP_ON_WARNING                  | n                                                                                                      | Stop on non-fatal makefile failures (see `$(call print_warning, message)`)
+| STOP_ON_PKG_FAIL                 | n                                                                                                      | Stop all package builds on any failure rather than try and continue.
+| SRPM_FILE_SIGNATURE_HANDLING     | enforce                                                                                                | Behavior when checking source file hashes from SPEC files. `update` will create a new entry in the signature file (`enforce, skip, update`)
+| ARCHIVE_TOOL                     | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
+| INCREMENTAL_TOOLCHAIN            | n                                                                                                      | Only build toolchain RPM packages if they are not already present
+| RUN_CHECK                        | n                                                                                                      | Run the %check sections when compiling packages
+| ALLOW_TOOLCHAIN_REBUILDS         | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
+|  PACKAGE_BUILD_RETRIES           | 1                                                                                                      | Number of build retries for each package
+| CHECK_BUILD_RETRIES              | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
+| MAX_CASCADING_REBUILDS           |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
+| EXTRA_BUILD_LAYERS               | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
+| IMAGE_TAG                        | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
+| CONCURRENT_PACKAGE_BUILDS        | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
+| CLEANUP_PACKAGE_BUILDS           | y                                                                                                      | Cleanup a package build's working directory (`./build/worker/chroot/<pkg>/*`) when it finishes. Note that `rpmbuild`'s `BUILD` directory will still be removed on a successful package build even when this is turned off. Consider `make containerized-rpmbuild SRPM_PACKLIST=<pkg>` for debugging build issues instead. The user must call `sudo make clean-build-packages-workers` to tidy any uncleaned build environments after a build.
+| USE_PACKAGE_BUILD_CACHE          | y                                                                                                      | Skip building a package if it and its dependencies are already built.
+| NUM_OF_ANALYTICS_RESULTS         | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
+| TARGET_ARCH                      |                                                                                                        | The architecture of the machine that will run the package binaries.
+| USE_CCACHE                       | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
+| MAX_CPU                          |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| BUILD_TOOLS_NONPROD              | n                                                                                                      | Enables non-production features in the go build tools.
+| IMAGE_CUSTOMIZER_VERSION_PREVIEW | -dev.\<date>.\<time>+\<commit-id>                                                                      | Overrides the prefix suffix of the Image Customizer version string.
 
 ---
 
@@ -872,6 +875,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RPMS_DIR                      | `$(OUT_DIR)`/RPMS                                                                                      | Directory to place RPMs in
 | SRPMS_DIR                     | `$(OUT_DIR)`/SRPMS                                                                                     | Directory to place SRPMs in
 | IMAGES_DIR                    | `$(OUT_DIR)`/images                                                                                    | Directory to place images in
+| PRECACHER_SNAPSHOT            | `$(OUT_DIR)`/rpms_snapshot.json                                                                        | Location of snapshot file for the pre-cacher
 
 ---
 
