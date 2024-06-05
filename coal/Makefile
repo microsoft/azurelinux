@@ -9,6 +9,7 @@ AZURE_INIT_DIR := $(realpath $(ROOT_DIR)/SPECS/azure-init)
 COAL_IMAGE_DIR := $(abspath $(COAL_DIR)/images)
 COAL_RPMS_DIR := $(abspath $(COAL_DIR)/rpms)
 OUT_DIR := $(abspath $(ROOT_DIR)/out)
+TOOLKIT_TRIDENT_RPM_DIR := $(abspath $(OUT_DIR)/RPMS/trident)
 
 MIC_BUILD_DIR := $(abspath $(COAL_DIR)/mic-build)
 
@@ -17,7 +18,7 @@ TOOLKIT_OUT_IMAGE_DIR := $(abspath $(OUT_DIR)/images/$(basename $(notdir $(COAL_
 
 # Toolkit Image Build Args
 BASE_BUILD_ARGS += QUICK_REBUILD_PACKAGES="y"
-BASE_BUILD_ARGS += SRPM_PACK_LIST="azure-init"
+BASE_BUILD_ARGS += SRPM_PACK_LIST="azure-init coal-trident-module"
 BASE_BUILD_ARGS += CONFIG_FILE="$(COAL_CONFIG_FILE)"
 
 ifneq ($(DAILY_BUILD_ID),)
@@ -41,12 +42,15 @@ clean-image-dir:
 	rm -rf $(MIC_BUILD_DIR)
 
 $(COAL_IMAGE_DIR):
-	mkdir $@
+	mkdir -p $@
 
 $(COAL_RPMS_DIR):
-	mkdir $@
+	mkdir -p $@
 
-trident-rpm: | $(COAL_RPMS_DIR)
+$(TOOLKIT_TRIDENT_RPM_DIR):
+	mkdir -p $@
+
+trident-rpm: | $(COAL_RPMS_DIR) $(TOOLKIT_TRIDENT_RPM_DIR)
 	az artifacts universal download \
 	--organization "https://dev.azure.com/mariner-org/" \
 	--project "2311650c-e79e-4301-b4d2-96543fdd84ff" \
@@ -55,9 +59,9 @@ trident-rpm: | $(COAL_RPMS_DIR)
 	--name "rpms-prerelease" \
 	--version "0.1.2024052933-v90df99a" \
 	--path $(COAL_RPMS_DIR)/
-	cd $(COAL_RPMS_DIR)
+	cp $(COAL_RPMS_DIR)/* $(TOOLKIT_TRIDENT_RPM_DIR)
 
-$(COAL_IMAGE_DIR)/base-image.vhdx: $(COAL_CONFIG_FILE) $(AZURE_INIT_DIR) | $(COAL_IMAGE_DIR)
+$(COAL_IMAGE_DIR)/base-image.vhdx: trident-rpm $(COAL_CONFIG_FILE) $(AZURE_INIT_DIR) | $(COAL_IMAGE_DIR)
 	echo "Running Make target: $@"
 	sudo $(MAKE) -C $(TOOLKIT_DIR) clean-imagegen
 	sudo $(MAKE) -C $(TOOLKIT_DIR) -j100 image $(BASE_BUILD_ARGS)
