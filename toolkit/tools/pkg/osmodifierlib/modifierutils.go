@@ -62,5 +62,10 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot safec
 		return err
 	}
 
+	err = imagecustomizerlib.UpdateSELinuxModeInConfigFile(selinuxMode, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
