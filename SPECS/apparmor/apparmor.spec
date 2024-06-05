@@ -1,7 +1,7 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        3.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://launchpad.net/apparmor
 Source0:        https://launchpad.net/apparmor/3.0/3.0.4/+download/%{name}-%{version}.tar.gz
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         CVE-2023-50471.patch
+Patch3:         CVE-2024-31755.patch
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 BuildRequires:  apr
@@ -354,6 +355,9 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Thu May 30 2024 Sumedh Sharma <sumsharma@microsoft.com> - 3.0.4-4
+- Add patch for CVE-2024-31755
+
 * Wed Dec 27 2023 Dallas Delaney <dadelan@microsoft.com> - 3.0.4-3
 - Add patch for CVE-2023-50471 and CVE-2023-50472
 
