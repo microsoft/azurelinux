@@ -80,7 +80,7 @@ func TestDownloadFile(t *testing.T) {
 			expectedTime:     noCancelDelay,
 		},
 		{
-			name: "TestDownloadWithCancel",
+			name: "TestDownloadWithContext",
 			args: args{
 				srcUrl:   validUrl,
 				dstFile:  validFile,
@@ -134,11 +134,9 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBadTimeout",
 			args: args{
-				srcUrl:   validUrl,
-				dstFile:  validFile,
-				caCerts:  nil,
-				tlsCerts: nil,
-				timeout:  -1,
+				srcUrl:  validUrl,
+				dstFile: validFile,
+				timeout: -1,
 			},
 			useCtx:           false,
 			wantWasCancelled: false,
