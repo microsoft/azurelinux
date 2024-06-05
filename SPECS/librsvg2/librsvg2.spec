@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
 chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
 
+# we install own docs
+rm -vrf %{buildroot}%{_docdir}
+
 %files
 %doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
