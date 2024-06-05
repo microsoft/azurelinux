@@ -398,7 +398,8 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Currently all functions that employ workers pool of size `workers` are serialized,
 	// resulting in `workers` being the upper capacity at any given time.
 	totalToRepack := 0
-	for result := range results {
+	for i := 0; i < len(specFiles); i++ {
+		result := <-results
 		states = append(states, result)
 
 		if result.err != nil {
