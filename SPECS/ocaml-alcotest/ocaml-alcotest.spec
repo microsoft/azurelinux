@@ -1,4 +1,3 @@
-%undefine _package_note_flags
 # BOOTSTRAP NOTE: We currently build only the base alcotest package.  We cannot
 # yet build the async and lwt subpackages, because of missing dependencies.
 # Some of those dependencies require the base alcotest package, either directly
