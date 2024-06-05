@@ -1,7 +1,7 @@
-diff --git a/java/examples/datasets/JavaDatasetExample.sh.in b/java/examples/datasets/JavaDatasetExample.sh.in
+diff --git a/HDF5Examples/JAVA/H5D/JavaDatasetExample.sh.in b/HDF5Examples/JAVA/H5D/JavaDatasetExample.sh.in
 index f29739a..fc9cddb 100644
---- a/java/examples/datasets/JavaDatasetExample.sh.in
-+++ b/java/examples/datasets/JavaDatasetExample.sh.in
+--- a/HDF5Examples/JAVA/H5D/JavaDatasetExample.sh.in
++++ b/HDF5Examples/JAVA/H5D/JavaDatasetExample.sh.in
 @@ -39,7 +39,7 @@ HDFLIB_HOME="$top_srcdir/java/lib"
  BLDDIR="."
  BLDLIBDIR="$BLDDIR/testlibs"
@@ -11,23 +11,23 @@ index f29739a..fc9cddb 100644
  TESTJARFILE=jar@PACKAGE_TARNAME@datasets.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
 
-diff --git a/java/examples/datasets/Makefile.am b/java/examples/datasets/Makefile.am
+diff --git a/HDF5Examples/JAVA/H5D/Makefile.am b/HDF5Examples/JAVA/H5D/Makefile.am
 index 41a914b..195201a 100644
---- a/java/examples/datasets/Makefile.am
-+++ b/java/examples/datasets/Makefile.am
+--- a/HDF5Examples/JAVA/H5D/Makefile.am
++++ b/HDF5Examples/JAVA/H5D/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
 
  pkgpath = examples/datasets
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$$CLASSPATH
 
  jarfile = jar$(PACKAGE_TARNAME)datasets.jar
-diff --git a/java/examples/datatypes/JavaDatatypeExample.sh.in b/java/examples/datatypes/JavaDatatypeExample.sh.in
+diff --git a/HDF5Examples/JAVA/H5T/JavaDatatypeExample.sh.in b/HDF5Examples/JAVA/H5T/JavaDatatypeExample.sh.in
 index e26d8c0..f6a9d87 100644
---- a/java/examples/datatypes/JavaDatatypeExample.sh.in
-+++ b/java/examples/datatypes/JavaDatatypeExample.sh.in
+--- a/HDF5Examples/JAVA/H5T/JavaDatatypeExample.sh.in
++++ b/HDF5Examples/JAVA/H5T/JavaDatatypeExample.sh.in
 @@ -36,7 +36,7 @@ HDFLIB_HOME="$top_srcdir/java/lib"
  BLDDIR="."
  BLDLIBDIR="$BLDDIR/testlibs"
@@ -37,23 +37,23 @@ index e26d8c0..f6a9d87 100644
  TESTJARFILE=jar@PACKAGE_TARNAME@datatypes.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
 
-diff --git a/java/examples/datatypes/Makefile.am b/java/examples/datatypes/Makefile.am
+diff --git a/HDF5Examples/JAVA/H5T/Makefile.am b/HDF5Examples/JAVA/H5T/Makefile.am
 index 90790f7..450edef 100644
---- a/java/examples/datatypes/Makefile.am
-+++ b/java/examples/datatypes/Makefile.am
+--- a/HDF5Examples/JAVA/H5T/Makefile.am
++++ b/HDF5Examples/JAVA/H5T/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
 
  pkgpath = examples/datatypes
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$$CLASSPATH
 
  jarfile = jar$(PACKAGE_TARNAME)datatypes.jar
-diff --git a/java/examples/groups/JavaGroupExample.sh.in b/java/examples/groups/JavaGroupExample.sh.in
+diff --git a/HDF5Examples/JAVA/H5G/JavaGroupExample.sh.in b/HDF5Examples/JAVA/H5G/JavaGroupExample.sh.in
 index 3b0e9d1..416c69f 100644
---- a/java/examples/groups/JavaGroupExample.sh.in
-+++ b/java/examples/groups/JavaGroupExample.sh.in
+--- a/HDF5Examples/JAVA/H5G/JavaGroupExample.sh.in
++++ b/HDF5Examples/JAVA/H5G/JavaGroupExample.sh.in
 @@ -37,7 +37,7 @@ BLDDIR="."
  BLDLIBDIR="$BLDDIR/testlibs"
  BLDITERDIR="./groups"
@@ -63,45 +63,19 @@ index 3b0e9d1..416c69f 100644
  TESTJARFILE=jar@PACKAGE_TARNAME@groups.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
  test -d $BLDITERDIR || mkdir -p $BLDITERDIR
-diff --git a/java/examples/groups/Makefile.am b/java/examples/groups/Makefile.am
+diff --git a/HDF5Examples/JAVA/H5G/Makefile.am b/HDF5Examples/JAVA/H5G/Makefile.am
 index bfde9ae..f48a5b9 100644
---- a/java/examples/groups/Makefile.am
-+++ b/java/examples/groups/Makefile.am
+--- a/HDF5Examples/JAVA/H5G/Makefile.am
++++ b/HDF5Examples/JAVA/H5G/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
 
  pkgpath = examples/groups
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$$CLASSPATH
 
  jarfile = jar$(PACKAGE_TARNAME)groups.jar
-diff --git a/java/examples/intro/JavaIntroExample.sh.in b/java/examples/intro/JavaIntroExample.sh.in
-index db741e5..d0ba65d 100644
---- a/java/examples/intro/JavaIntroExample.sh.in
-+++ b/java/examples/intro/JavaIntroExample.sh.in
-@@ -36,7 +36,7 @@ HDFLIB_HOME="$top_srcdir/java/lib"
- BLDDIR="."
- BLDLIBDIR="$BLDDIR/testlibs"
- HDFTEST_HOME="$top_srcdir/java/examples/intro"
--JARFILE=jar@PACKAGE_TARNAME@-@PACKAGE_VERSION@.jar
-+JARFILE=@PACKAGE_TARNAME@.jar
- TESTJARFILE=jar@PACKAGE_TARNAME@intro.jar
- test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
-
-diff --git a/java/examples/intro/Makefile.am b/java/examples/intro/Makefile.am
-index 7d1aeab..01a10c9 100644
---- a/java/examples/intro/Makefile.am
-+++ b/java/examples/intro/Makefile.am
-@@ -26,7 +26,7 @@ classes:
- 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
-
- pkgpath = examples/intro
--hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
-+hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
-
- jarfile = jar$(PACKAGE_TARNAME)intro.jar
 diff --git a/java/src/Makefile.am b/java/src/Makefile.am
 index 98630e6..fd8d057 100644
 --- a/java/src/Makefile.am
