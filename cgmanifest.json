@@ -14372,8 +14372,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-alcotest",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/mirage/alcotest/archive/1.3.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/mirage/alcotest/archive/1.5.0.tar.gz"
         }
       }
     },
@@ -14874,16 +14874,6 @@
           "name": "ocaml-tyxml",
           "version": "4.5.0",
           "downloadUrl": "https://github.com/ocsigen/tyxml/releases/download/4.5.0/tyxml-4.5.0.tbz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ocaml-uuidm",
-          "version": "0.9.8",
-          "downloadUrl": "https://github.com/dbuenzli/uuidm/archive/v0.9.8/uuidm-0.9.8.tar.gz"
         }
       }
     },

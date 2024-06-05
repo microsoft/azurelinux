@@ -16,36 +16,41 @@ diff --git a/alcotest.opam b/alcotest.opam
 index 756782f..3996bb0 100644
 --- a/alcotest.opam
 +++ b/alcotest.opam
-@@ -26,7 +26,6 @@ depends: [
-   "cmdliner"
-   "uuidm"
+@@ -25,9 +25,7 @@ depends: [
+   "astring"
+   "cmdliner" {>= "1.0.0"}
    "re"
 -  "stdlib-shims"
    "uutf"
+-  "ocaml-syntax-shims"
+   "odoc" {with-doc}
  ]
- build: [
+ conflicts: [
 diff --git a/dune-project b/dune-project
 index 9bccced..f634a31 100644
 --- a/dune-project
 +++ b/dune-project
-@@ -30,7 +30,6 @@ tests to run.
-   cmdliner
-   uuidm
+@@ -29,9 +29,7 @@ tests to run.
+   astring
+   (cmdliner (>= 1.0.0))
    re
 -  stdlib-shims
-   uutf))
- 
- (package
+-  uutf
+-  ocaml-syntax-shims)
++  uutf)
+  (conflicts
+   (result (< 1.5)) ;; Ensure `Result.result` = `Stdlib.result` when possible
+   ))
 diff --git a/src/alcotest-engine/dune b/src/alcotest-engine/dune
 index 9c05d0a..65b33e7 100644
 --- a/src/alcotest-engine/dune
 +++ b/src/alcotest-engine/dune
-@@ -1,4 +1,4 @@
- (library
-  (name alcotest_engine)
-  (public_name alcotest.engine)
-- (libraries fmt astring cmdliner fmt.cli uuidm re stdlib-shims uutf))
-+ (libraries fmt astring cmdliner fmt.cli uuidm re uutf))
+@@ -8,6 +8,5 @@
+   cmdliner
+   fmt.cli
+   re
+-  stdlib-shims
+   uutf)
+  (preprocess future_syntax))
 -- 
 2.26.2
-
