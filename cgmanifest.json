@@ -1816,6 +1816,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cloud-hypervisor-cvm",
+          "version": "38.0.72",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cloud-init",
           "version": "23.3",
           "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3.3/+download/cloud-init-23.3.tar.gz"
@@ -8061,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl1.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8071,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl1.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8191,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv9",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
+          "version": "5.15.157.mshv1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
         }
       }
     },
@@ -8211,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv16",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
+          "version": "6.1.58.mshv4",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
         }
       }
     },
