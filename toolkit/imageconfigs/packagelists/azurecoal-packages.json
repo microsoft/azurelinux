@@ -1,6 +1,7 @@
 {
     "packages": [
         "azure-init",
+        "coal-trident-module",
         "dhcp-client",
         "grubby",
         "hyperv-daemons",
