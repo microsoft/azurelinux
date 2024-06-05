@@ -13,8 +13,10 @@ BuildRequires:  libstdc++
 BuildRequires:  cmake
 BuildRequires:  unzip
 BuildRequires:  abseil-cpp-devel
+%if 0%{?with_check}
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
+%endif
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
 
@@ -64,11 +66,15 @@ This contains protobuf python3 libraries.
 
 %build
 %{cmake} \
-    -Dprotobuf_BUILD_TESTS=ON \
     -Dprotobuf_ABSL_PROVIDER=package \
     -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
+%if 0%{?with_check}
+    -Dprotobuf_BUILD_TESTS=ON \
     -Dprotobuf_USE_EXTERNAL_GTEST=ON \
+%else
+   -Dprotobuf_BUILD_TESTS=OFF \
+%endif
     -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
 %{cmake_build}
