@@ -99,6 +99,9 @@ BuildRequires:  pkgconfig(libusb-1.0)
 BuildRequires:  audit-libs-devel
 BuildRequires:  libselinux-devel
 %endif
+%if 0%{?with_check}
+BuildRequires:  sudo
+%endif
 Requires:       %{name}-client = %{version}-%{release}
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
@@ -500,7 +503,8 @@ ln -sf %{_libexecdir}/samba/cups_backend_smb %{cups_serverbin}/backend/smb || :
 rm -f %{cups_serverbin}/backend/smb
 
 %check
-make check text
+useradd -r test -G root -m
+sudo -u test make check text
 
 %files -f %{name}.lang
 %doc README.md CREDITS.md CHANGES.md
