@@ -732,7 +732,6 @@ func (c *Chroot) stopGPGComponents() (err error) {
 		if chrootErr != nil {
 			return chrootErr
 		}
-		
 		if !found {
 			logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
 			return nil
