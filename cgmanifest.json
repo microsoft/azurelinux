@@ -10622,7 +10622,7 @@
         "other": {
           "name": "libpng",
           "version": "1.6.39",
-          "downloadUrl": "https://sourceforge.net/projects/libpng/files/libpng16/1.6.39/libpng-1.6.39.tar.xz/download"
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.39.tar.xz"
         }
       }
     },
