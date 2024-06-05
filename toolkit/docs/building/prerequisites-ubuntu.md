@@ -18,6 +18,7 @@ sudo apt -y install \
     genisoimage \
     git \
     golang-1.20-go \
+    jq \
     make \
     parted \
     pigz \
