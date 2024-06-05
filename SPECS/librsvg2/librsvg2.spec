@@ -7,13 +7,19 @@
 
 Summary:        An SVG library based on cairo
 Name:           librsvg2
-Version:        2.50.3
-Release:        4%{?dist}
+Version:        2.58.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.58/librsvg-%{version}.tar.xz
+# use the below command to create the vendor tarball
+#   1. untar source0 and go to librsvg... folder
+#   2. cargo vendor 
+#   3. tar Jcvf [path to your vendor tarball]/librsvg-[version]-vendor.tar.xz vendor
+#      e.g. tar Jcvf ../librsvg-2.58.1-vendor.tar.xz vendor
+Source1:        librsvg-2.58.1-vendor.tar.xz
 BuildRequires:  cairo-devel >= %{cairo_version}
 BuildRequires:  cairo-gobject-devel >= %{cairo_version}
 BuildRequires:  chrpath
@@ -63,7 +69,21 @@ This package provides extra utilities based on the librsvg library.
 %prep
 %autosetup -n librsvg-%{version} -p1 -Sgit
 
+# Do vendor expansion here manually by
+# calling `tar xf` and setting up .cargo/config to use it.
+tar -xf %{SOURCE1} --no-same-owner
+mkdir -p .cargo
+
+cat >.cargo/config << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
 %build
+# Azl does not have gi-docgen, disable docs
 %configure --disable-static  \
            --disable-gtk-doc \
            --enable-introspection \
@@ -74,8 +94,6 @@ This package provides extra utilities based on the librsvg library.
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%find_lang librsvg
-
 # Remove lib64 rpaths
 chrpath --delete %{buildroot}%{_bindir}/rsvg-convert
 chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
@@ -83,8 +101,8 @@ chrpath --delete %{buildroot}%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader
 # we install own docs
 rm -vrf %{buildroot}%{_docdir}
 
-%files -f librsvg.lang
-%doc CONTRIBUTING.md README.md
+%files
+%doc code-of-conduct.md NEWS README.md
 %license COPYING.LIB
 %{_libdir}/librsvg-2.so.*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-svg.so
@@ -102,15 +120,14 @@ rm -vrf %{buildroot}%{_docdir}
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/librsvg-2.0.vapi
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/rsvg-2.0
 
 %files tools
 %{_bindir}/rsvg-convert
-%{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Tue Jun 04 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.58.1-1
+- Upgrade to 2.58.1
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.50.3-4
 - Bump package to rebuild with rust 1.72.0
 
