@@ -13,7 +13,8 @@ Source0:        %{url}/-/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         libglvnd-python3.patch
 Patch1:         0001-glx-Add-another-fallback-library-name.patch
 Patch2:         0002-Adding-a-separate-conditional-to-disable-running-GLX.patch
-Patch3:         CVE-2019-11834.patch          # this patch address both CVE-2019-11834 and CVE-2019-11835
+# this patch address both CVE-2019-11834 and CVE-2019-11835
+Patch3:         CVE-2019-11834.patch
 
 BuildRequires:  gcc
 BuildRequires:  libtool
