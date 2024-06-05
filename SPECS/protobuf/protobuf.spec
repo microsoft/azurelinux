@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
+Patch1:         CVE-2022-1941.patch
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  make
@@ -54,7 +55,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 This contains protobuf python3 libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure --disable-silent-rules
@@ -108,6 +109,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 3.17.3-3
+- add patch to fix CVE-2022-1941
+
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
