@@ -190,3 +190,13 @@ func callTdnf(tnfArgs []string, tdnfMessagePrefix string, imageChroot *safechroo
 			Execute()
 	})
 }
+
+func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool {
+	err := imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLive(true /*squashErrors*/, "rpm", "-qi", packageName)
+	})
+	if err != nil {
+		return false
+	}
+	return true
+}

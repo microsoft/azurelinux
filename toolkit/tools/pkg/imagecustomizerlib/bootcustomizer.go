@@ -88,7 +88,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 			return "", err
 		}
 	} else {
-		args, _, err = getLinuxCommandLineArgs(b.grubCfgContent)
+		args, _, err = getLinuxCommandLineArgs(b.grubCfgContent, true /*requireKernelOpts*/)
 		if err != nil {
 			return imagecustomizerapi.SELinuxModeDefault, err
 		}
