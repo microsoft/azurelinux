@@ -8,6 +8,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,8 +25,30 @@ func TestMain(m *testing.M) {
 }
 
 func TestDownloadFile(t *testing.T) {
-	const cancelDelay = 2000 * time.Millisecond
-	const noCancelDelay = 500 * time.Millisecond
+	const (
+		cancelDelay      = 1000 * time.Millisecond
+		noCancelDelay    = 100 * time.Millisecond
+		validFile        = "VALID.md"
+		doesNotExistFile = "DOESNOTEXIST.md"
+		bogusFile        = "BOGUS.md"
+	)
+	fileServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/"+validFile:
+			fmt.Fprintf(w, "Valid file")
+		case r.URL.Path == "/"+doesNotExistFile:
+			w.WriteHeader(http.StatusNotFound)
+		case r.URL.Path == "/"+bogusFile:
+			w.WriteHeader(http.StatusInternalServerError)
+		default:
+			t.Fatal("Unexpected URL")
+		}
+	}))
+	defer fileServer.Close()
+	validUrl := fmt.Sprintf("%s/%s", fileServer.URL, validFile)
+	doesNotExistUrl := fmt.Sprintf("%s/%s", fileServer.URL, doesNotExistFile)
+	bogusUrl := fmt.Sprintf("%s/%s", fileServer.URL, bogusFile)
+
 	type args struct {
 		_ctx     context.Context // Build dynamically in test. Set via useCtx.
 		srcUrl   string
@@ -44,8 +69,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadFile",
 			args: args{
-				srcUrl:   "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
-				dstFile:  "README.md",
+				srcUrl:   validUrl,
+				dstFile:  validFile,
 				caCerts:  nil,
 				tlsCerts: nil,
 			},
@@ -57,8 +82,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithCancel",
 			args: args{
-				srcUrl:   "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
-				dstFile:  "README.md",
+				srcUrl:   validUrl,
+				dstFile:  validFile,
 				caCerts:  nil,
 				tlsCerts: nil,
 			},
@@ -70,8 +95,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownload404",
 			args: args{
-				srcUrl:   "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/DOESNOTEXIST.md",
-				dstFile:  "DOESNOTEXIST.md",
+				srcUrl:   doesNotExistUrl,
+				dstFile:  doesNotExistFile,
 				caCerts:  nil,
 				tlsCerts: nil,
 			},
@@ -84,14 +109,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBogusCerts",
 			args: args{
-				srcUrl:  "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
-				dstFile: "README.md",
-				caCerts: x509.NewCertPool(),
-				tlsCerts: []tls.Certificate{
-					{
-						Certificate: [][]byte{[]byte("bogus")},
-					},
-				},
+				srcUrl:  bogusUrl,
+				dstFile: bogusFile,
 			},
 			useCtx:           true,
 			wantWasCancelled: true,
@@ -102,14 +121,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBogusCertsTimeout",
 			args: args{
-				srcUrl:  "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
-				dstFile: "README.md",
-				caCerts: x509.NewCertPool(),
-				tlsCerts: []tls.Certificate{
-					{
-						Certificate: [][]byte{[]byte("bogus")},
-					},
-				},
+				srcUrl:  bogusUrl,
+				dstFile: bogusFile,
 				timeout: cancelDelay,
 			},
 			useCtx:           false,
@@ -121,8 +134,8 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBadTimeout",
 			args: args{
-				srcUrl:   "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
-				dstFile:  "README.md",
+				srcUrl:   validUrl,
+				dstFile:  validFile,
 				caCerts:  nil,
 				tlsCerts: nil,
 				timeout:  -1,
