@@ -92,7 +92,7 @@ clean-go-tools:
 	rm -rf $(BUILD_DIR)/tools
 
 go_ldflags := 	-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION) \
-				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION) \
+				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(image_customizer_full_version) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroNameAbbreviation=$(DIST_NAME_ABRV) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_version_number)
 
