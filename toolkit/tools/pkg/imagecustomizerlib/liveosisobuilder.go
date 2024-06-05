@@ -315,7 +315,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigKernelArgsFilePath string, g
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled, true /*allowMultiple*/, false /*requireKernelOpts*/)
+	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled,
+		true /*allowMultiple*/, false /*requireKernelOpts*/)
 	if err != nil {
 		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
@@ -328,7 +329,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigKernelArgsFilePath string, g
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
 	additionalKernelCommandline := liveosKernelArgs + " " + mergedExtraCommandLine
 
-	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline, true /*allowMultiple*/, false /*requireKernelOpts*/)
+	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline,
+		true /*allowMultiple*/, false /*requireKernelOpts*/)
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}

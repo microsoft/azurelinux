@@ -197,8 +197,13 @@ func appendKernelCommandLineArgsAll(inputGrubCfgContent string, extraCommandLine
 			return "", err
 		}
 
-		// Insert args at the end of the line.
-		outputGrubCfgContent = outputGrubCfgContent[:insertAt] + extraCommandLine + " " + outputGrubCfgContent[insertAt:]
+		leadingSpace := " "
+		if requireKernelOpts {
+			// When requireKernelOpts is true, we are inserting right before
+			// kernelOpts, and there is already an empty space.
+			leadingSpace = ""
+		}
+		outputGrubCfgContent = outputGrubCfgContent[:insertAt] + leadingSpace + extraCommandLine + " " + outputGrubCfgContent[insertAt:]
 	}
 
 	return outputGrubCfgContent, nil
