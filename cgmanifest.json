@@ -10761,8 +10761,8 @@
         "type": "other",
         "other": {
           "name": "librsvg2",
-          "version": "2.50.3",
-          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.50/librsvg-2.50.3.tar.xz"
+          "version": "2.58.1",
+          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.58/librsvg-2.58.1.tar.xz"
         }
       }
     },
