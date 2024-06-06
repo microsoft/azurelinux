@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.45.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,7 @@ Source6:        promu-%{promu_version}.tar.gz
 Patch0:         02-Default_settings.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
+BuildRequires:  nodejs-npm
 BuildRequires:  systemd-rpm-macros
 Requires(pre):  %{_bindir}/systemd-sysusers
 
@@ -133,6 +134,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Thu Jun 06 2024 Andrew Phelps <anphel@microsoft.com> - 2.45.4-2
+- Add BR for nodejs-npm
+
 * Thu Mar 28 2024 Andrew Phelps <anphel@microsoft.com> - 2.45.4-1
 - Upgrade to version 2.45.4
 
