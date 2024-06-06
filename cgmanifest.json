@@ -25944,8 +25944,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-elastic-transport",
-          "version": "8.2.2",
-          "downloadUrl": "https://github.com/elastic/elastic-transport-ruby/archive/refs/tags/v8.2.2.tar.gz"
+          "version": "8.14.0",
+          "downloadUrl": "https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v8.14.0.tar.gz"
         }
       }
     },

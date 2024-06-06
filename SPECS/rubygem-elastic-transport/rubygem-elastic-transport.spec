@@ -2,7 +2,7 @@
 %global gem_name elastic-transport
 Summary:        Transport classes and utilities shared among Ruby Elastic client libraries
 Name:           rubygem-%{gem_name}
-Version:        8.2.2
+Version:        8.14.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.14.0-1
+- Auto-upgrade to 8.14.0 - rubygem-elasticsearch depends on this upgrade for CVE fixes
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2.2-1
 - Auto-upgrade to 8.2.2 - Azure Linux 3.0 - package upgrades
 
