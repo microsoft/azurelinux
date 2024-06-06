@@ -150,9 +150,9 @@ krb5-1.19.4-2.cm2.x86_64.rpm
 krb5-debuginfo-1.19.4-2.cm2.x86_64.rpm
 krb5-devel-1.19.4-2.cm2.x86_64.rpm
 krb5-lang-1.19.4-2.cm2.x86_64.rpm
-libarchive-3.6.1-2.cm2.x86_64.rpm
-libarchive-debuginfo-3.6.1-2.cm2.x86_64.rpm
-libarchive-devel-3.6.1-2.cm2.x86_64.rpm
+libarchive-3.6.1-3.cm2.x86_64.rpm
+libarchive-debuginfo-3.6.1-3.cm2.x86_64.rpm
+libarchive-devel-3.6.1-3.cm2.x86_64.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
