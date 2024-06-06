@@ -14212,8 +14212,8 @@
         "type": "other",
         "other": {
           "name": "ntopng",
-          "version": "6.0",
-          "downloadUrl": "https://github.com/ntop/ntopng/archive/6.0.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/5.2.1.tar.gz"
         }
       }
     },
