@@ -1,0 +1,7 @@
+{
+    "Signatures": {
+        "cloud-hypervisor-cvm-38.0.72-vendor.tar.gz": "6092868ed042c0397e4e96f2572a59d80491662b6c68fd210fe458a8f7d0d429",
+        "cloud-hypervisor-cvm-38.0.72.tar.gz": "e6d15d99c5d9ec4bede43ef8fac971d2cc0ae49a7eafffc6ca7e5b948ed4282a",
+        "config.toml": "74c28b7520c157109b8990b325fe8f13504e56561a9bac51499d4c6bf4a66e52"
+    }
+}
