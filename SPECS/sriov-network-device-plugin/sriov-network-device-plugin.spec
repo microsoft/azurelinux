@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin
 Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang
 Requires:       gawk
 Requires:       hwdata
@@ -17,6 +18,7 @@ resources in the form of SR-IOV virtual functions and PCI physical functions
 
 %prep
 %autosetup -p1
+tar -xf %{SOURCE1}
 
 %build
 go build -mod vendor -o ./build/sriovdp ./cmd/sriovdp/
