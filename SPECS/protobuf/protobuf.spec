@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        25.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,10 @@ BuildRequires:  libstdc++
 BuildRequires:  cmake
 BuildRequires:  unzip
 BuildRequires:  abseil-cpp-devel
+%if 0%{?with_check}
+BuildRequires:  gtest-devel
+BuildRequires:  gmock-devel
+%endif
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
 
@@ -62,10 +66,15 @@ This contains protobuf python3 libraries.
 
 %build
 %{cmake} \
-    -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_ABSL_PROVIDER=package \
     -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
+%if 0%{?with_check}
+    -Dprotobuf_BUILD_TESTS=ON \
+    -Dprotobuf_USE_EXTERNAL_GTEST=ON \
+%else
+   -Dprotobuf_BUILD_TESTS=OFF \
+%endif
     -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
 %{cmake_build}
@@ -84,6 +93,10 @@ export PROTOC="%{_builddir}/%{name}-%{version}/%{__cmake_builddir}/protoc"
 pushd python
 %{py3_install}
 popd
+
+%check
+# run C++ unit tests
+%ctest
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -109,6 +122,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jun 03 2024 Sindhu Karri <lakarri@microsoft.com> - 25.3-3
+- Enable ptest using system gtest package
+
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 25.3-2
 - Set new abseil-cpp version
 
