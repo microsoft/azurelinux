@@ -1,12 +1,13 @@
 Summary:        Scriptable database and system performance benchmark
 Name:           sysbench
 Version:        1.0.20
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Group:          Applications/System
 URL:            https://github.com/akopytov/sysbench/
 Source0:        https://github.com/akopytov/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         enable-python3.patch
+Patch1:         CVE-2019-19391.patch
 BuildRequires:  automake
 BuildRequires:  libaio-devel
 BuildRequires:  libtool
@@ -59,6 +60,9 @@ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
 %{_datadir}/%{name}
 
 %changelog
+* Thu Jun 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.20-3
+- Address CVE-2019-19391.
+
 * Wed Jul 27 2022 Sean Dougherty <sdougherty@microsoft.com> - 1.0.20-2
 - Added patch 'enable-python3' to fix issue with running tests on Python3.
 
