@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    38%{?dist}
+Release:    39%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -114,6 +114,7 @@ Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
 Patch1004: improve-safety-of-DH.patch
+Patch1005: CVE-2024-1298.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -699,6 +700,9 @@ $tests_ok
 
 
 %changelog
+* Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39.cm2
+- Apply CVE-2024-1298 patch
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 20230301gitf80f052277c8-38
 - Apply patch to vendored source
 
