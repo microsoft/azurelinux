@@ -12,7 +12,7 @@ Source1:        10-azure-kvp.cfg
 Patch0:         0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
 Patch1:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 # Patch no longer needed for cloud-init >= 24.1
-Patch2:         dhcp_support_dhclient-unknown-121.patch
+Patch2:         dhcp_support_dhclient-unknown_121.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
