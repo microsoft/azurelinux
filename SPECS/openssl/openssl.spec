@@ -373,7 +373,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 * Tue Jun 04 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-31
 - Only free the read buffers if we're not using them
 
-* Fri Apr 19 2024 Tobias Brick <tobaisb@microsoft.com> - 1.1.1k-30
+* Fri Apr 19 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-30
 - Fix unconstrained session cache growth in TLSv1.3
 
 * Wed Feb 14 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-29
