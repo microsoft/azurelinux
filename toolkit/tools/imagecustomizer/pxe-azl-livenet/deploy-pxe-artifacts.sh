@@ -201,5 +201,9 @@ function deploy() {
 clean
 deploy
 
+iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+
 sudo find $tftpbootLocalDir
 sudo find $httpLocalDir
