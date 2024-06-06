@@ -145,7 +145,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
-* Mon May 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
+* Fri May 31 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Bump release to match kernel
 
 * Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.29.1-3
