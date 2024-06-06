@@ -154,11 +154,11 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 func TestCancelsEarlyWithSignalImmediately(t *testing.T) {
 	tries := 3
 	base := 2.0
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	ctx, closeCtx := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal immediately
-	cancelFunc()
+	closeCtx()
 
 	cancelled, err := RunWithExpBackoff(ctx, func() error {
 		return errTest
@@ -178,13 +178,13 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 	tries := 3
 	base := 2.0
 	cancelTime := defaultTestTime * 2
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	ctx, closeCtx := context.WithCancel(context.Background())
 	startTime := time.Now()
 
 	// Send a signal after the first delay (wait for the first failure before cancelling)
 	go func() {
 		time.Sleep(cancelTime)
-		cancelFunc()
+		closeCtx()
 	}()
 
 	cancelled, err := RunWithExpBackoff(ctx, func() error {

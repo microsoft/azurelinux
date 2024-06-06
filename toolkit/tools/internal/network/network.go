@@ -68,25 +68,27 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
 func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (wasCancelled bool, err error) {
-	var (
-		retryCtx   context.Context
-		cancelFunc context.CancelFunc
-	)
+	var closeCtx context.CancelFunc
+
 	if ctx == nil {
 		return false, fmt.Errorf("context is nil")
 	}
+
 	if timeout < 0 {
 		return false, fmt.Errorf("%w: %s", ErrDownloadFileInvalidTimeout, timeout)
-	} else if timeout == 0 {
-		retryCtx, cancelFunc = context.WithCancel(ctx)
-	} else {
-		retryCtx, cancelFunc = context.WithTimeout(ctx, timeout)
 	}
+
+	if timeout == 0 {
+		ctx, closeCtx = context.WithCancel(ctx)
+	} else {
+		ctx, closeCtx = context.WithTimeout(ctx, timeout)
+	}
+	defer closeCtx()
 
 	retryNum := 1
 	errorWas404 := false
-	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(retryCtx, func() error {
-		netErr := DownloadFile(retryCtx, srcUrl, dstFile, caCerts, tlsCerts)
+	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
+		netErr := DownloadFile(ctx, srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error is a 404, we should print a warning in that case so the user
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
@@ -94,7 +96,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 				logger.Log.Warnf("Attempt %d/%d: Failed to download (%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, srcUrl, netErr)
 				logger.Log.Warnf("404 errors are likely unrecoverable, will not retry")
 				errorWas404 = true
-				cancelFunc()
+				closeCtx()
 			} else {
 				logger.Log.Infof("Attempt %d/%d: Failed to download (%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, srcUrl, netErr)
 			}

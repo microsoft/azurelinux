@@ -617,7 +617,8 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 		finalArgs := append(baseArgs, reposArgs...)
 
 		// We run in a retry loop on errors deemed retriable.
-		ctx, cancelFunc := context.WithCancel(context.Background())
+		ctx, closeCtx := context.WithCancel(context.Background())
+		defer closeCtx()
 
 		retryNum := 1
 		_, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
@@ -627,7 +628,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 					logger.Log.Debugf("Package cloning attempt %d/%d failed with a retriable error.", retryNum, retry.DefaultDownloadRetryAttempts)
 				} else {
 					logger.Log.Debugf("Package cloning attempt %d/%d failed with an unrecoverable error. Cancelling.", retryNum, retry.DefaultDownloadRetryAttempts)
-					cancelFunc()
+					closeCtx()
 				}
 			}
 

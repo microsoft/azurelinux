@@ -139,7 +139,9 @@ func TestDownloadFile(t *testing.T) {
 			dstDir := t.TempDir()
 			tt.args.dstFile = filepath.Join(dstDir, tt.args.dstFile)
 			if tt.useCtx {
-				tt.args._ctx, _ = context.WithTimeout(context.Background(), cancelDelay)
+				var closeCtx context.CancelFunc
+				tt.args._ctx, closeCtx = context.WithTimeout(context.Background(), cancelDelay)
+				defer closeCtx()
 			} else {
 				tt.args._ctx = context.Background()
 			}
