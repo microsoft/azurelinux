@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    38%{?dist}
+Release:    39%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -108,6 +108,7 @@ Patch0014: 0014-SecurityPkg-add-TIS-sanity-check-tpm2.patch
 Patch0015: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
 Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
+Patch0018: CVE-2024-1298.patch
 
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
@@ -699,6 +700,9 @@ $tests_ok
 
 
 %changelog
+* Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39
+- Apply CVE-2024-1298 patch
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 20230301gitf80f052277c8-38
 - Apply patch to vendored source
 
