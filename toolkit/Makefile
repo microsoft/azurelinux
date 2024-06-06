@@ -135,12 +135,6 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
-##help:var:PREVIEW_REPO=<path>=Path to the preview repo file to use if 'USE_PREVIEW_REPO=y' is set. If not set, the default preview repo file will be used.
-PREVIEW_REPO                    ?=
-preview_repo_primary_default    ?= $(toolkit_root)/repos/azurelinux-official-preview.repo
-# Intentionally not using $(SPECS) here to avoid issues with custom SPECS directories
-preview_repo_backup_default     ?= $(PROJECT_ROOT)/SPECS/azurelinux-repos/azurelinux-official-preview.repo
-
 ######## COMMON MAKEFILE UTILITIES ########
 
 # Misc function defines
@@ -169,43 +163,8 @@ ifneq ($(DAILY_BUILD_ID),)
    endif
 else
    ifeq ($(USE_PREVIEW_REPO),y)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/ms-oss/$(build_arch)
-      override SRPM_URL_LIST      += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/srpms
-      # Ensure we can find the preview repo file.
-      ifneq ($(PREVIEW_REPO),)
-         ifneq ($(wildcard $(PREVIEW_REPO)),)
-            override REPO_LIST += $(PREVIEW_REPO)
-         else
-            $(warning )
-            $(warning ######################### ERROR #########################)
-            $(warning 'USE_PREVIEW_REPO=y' and 'PREVIEW_REPO=<path>' are set but)
-            $(warning '$(PREVIEW_REPO)' is missing.)
-            $(warning ######################### ERROR #########################)
-            $(error )
-         endif
-      else
-      # Try default file packaged with the toolkit...
-         ifneq ($(wildcard $(preview_repo_primary_default)),)
-            override REPO_LIST += $(preview_repo_primary_default)
-         else
-            # ...and if that fails, try the backup file in the SPECS directory.
-            ifneq ($(wildcard $(preview_repo_backup_default)),)
-            $(warning Using fallback preview repo from SPECS directory)
-               override REPO_LIST += $(preview_repo_backup_default)
-            else
-               $(warning )
-               $(warning ######################### ERROR #########################)
-               $(warning 'USE_PREVIEW_REPO=y' is set but all of the following failed:)
-               $(warning - 'PREVIEW_REPO=<path>' is not set)
-               $(warning - default '$(preview_repo_primary_default)' is missing)
-               $(warning - backup  '$(preview_repo_backup_default)' is missing)
-               $(warning ######################### ERROR #########################)
-               $(error )
-            endif
-         endif
-      endif
+      # Configure the preview repo
+      include $(SCRIPTS_DIR)/preview.mk
    endif
 endif
 
