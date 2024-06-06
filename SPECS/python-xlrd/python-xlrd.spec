@@ -47,10 +47,10 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}/runxlrd.py* \
 %attr(755,root,root) %{_bindir}/*
 
 #%license LICENSE
-#%doc README.rst CHANGELOG.rst
-#%attr(755,root,root) %dir %{python3_other_sitelib}/xlrd
-#%{python3_other_sitelib}/xlrd/*
-#%{python3_other_sitelib}/xlrd-*egg-info
+%doc README.rst CHANGELOG.rst
+%attr(755,root,root) %dir %{python3_other_sitelib}/xlrd
+%{python3_other_sitelib}/xlrd/*
+%{python3_other_sitelib}/xlrd-*egg-info
 
 %changelog
 * Tue Jun 04 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.0.1-16
