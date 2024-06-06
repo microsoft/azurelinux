@@ -8980,16 +8980,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libdb",
-          "version": "5.3.28",
-          "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libdbi",
           "version": "0.9.0",
           "downloadUrl": "http://prdownloads.sourceforge.net/libdbi/libdbi-0.9.0.tar.gz"

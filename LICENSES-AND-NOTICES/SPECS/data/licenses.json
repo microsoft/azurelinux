@@ -2752,7 +2752,6 @@
                 "libcap",
                 "libcap-ng",
                 "libconfig",
-                "libdb",
                 "libdnet",
                 "libedit",
                 "libestr",
