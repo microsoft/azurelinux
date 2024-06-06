@@ -1853,6 +1853,7 @@
                 "python-whoosh",
                 "python-winrm",
                 "python-wrapt",
+                "python-xlrd",
                 "python-xmltodict",
                 "python-yubico",
                 "python-zipp",
