@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,12 @@ Patch23:        0023-systemd-tmpfiles-loadkeys-Read-var_t-symlinks.patch
 Patch24:        0024-systemd-tmpfiles-create-root-and-root-.ssh.patch
 Patch25:        0025-kernel-Exec-systemctl.patch
 Patch26:        0026-getty-grant-checkpoint_restore.patch
+Patch27:        0027-systemd-Add-basic-systemd-analyze-rules.patch
+Patch28:        0028-cloudinit-Add-support-for-cloud-init-growpart.patch
+Patch29:        0029-filesystem-systemd-memory.pressure-fixes.patch
+Patch30:        0030-init-Add-homectl-dbus-access.patch
+Patch31:        0031-Temporary-workaround-for-memory.pressure-labeling-is.patch
+Patch32:        0032-rpm-Fixes-from-various-post-scripts.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -210,10 +216,10 @@ rm -f %{buildroot}%{_sharedstatedir}/selinux/%{1}/active/*.linked \
 FILE_CONTEXT=%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts; \
 %{_sbindir}/selinuxenabled; \
 if [ $? = 0  -a "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT}.pre ]; then \
-     /sbin/fixfiles -C ${FILE_CONTEXT}.pre restore &> /dev/null > /dev/null; \
+     /sbin/fixfiles -C ${FILE_CONTEXT}.pre restore; \
      rm -f ${FILE_CONTEXT}.pre; \
 fi; \
-if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null;then \
+if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* ;then \
     continue; \
 fi;
 %define preInstall() \
@@ -235,7 +241,7 @@ if [ -e %{_sysconfdir}/selinux/%{2}/.rebuild ]; then \
 fi; \
 [ "${SELINUXTYPE}" == "%{2}" ] && selinuxenabled && load_policy; \
 if [ %{1} -eq 1 ]; then \
-   /sbin/restorecon -R /root %{_var}/log /run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null; \
+   /sbin/restorecon -R /root %{_var}/log /run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* ; \
 else \
 %relabel %{2} \
 fi;
@@ -298,7 +304,7 @@ SELINUXTYPE=%{policy_name}
 " > %{_sysconfdir}/selinux/config
 
      ln -sf ../selinux/config %{_sysconfdir}/sysconfig/selinux
-     restorecon %{_sysconfdir}/selinux/config 2> /dev/null || :
+     restorecon %{_sysconfdir}/selinux/config || :
 else
      . %{_sysconfdir}/selinux/config
 fi
@@ -328,11 +334,18 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue May 14 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
+- Fix systemd-analyze issues.
+- Add selinux-policy-modules to selinux.json package list since it has rules for cloud-init
+- Add fixes and new systemd access to memory.pressure
+- Remove redirections in %post to make it easier to debug issues
+
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-2
 - Add fixes from BVTs
 - Add new systemd pidfd uses
 - Add new pressure stall information in systemd
 - Fixes for systemd-tmpfiles and loadkeys
+
 * Tue Mar 12 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-1
 - Rebase to upstream release 2.20240226.
 
