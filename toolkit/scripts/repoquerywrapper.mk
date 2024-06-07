@@ -55,3 +55,4 @@ $(STATUS_FLAGS_DIR)/repoquerywrapper.flag: $(go-repoquerywrapper) $(chroot_worke
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/repoquerywrapper.jsonl && \
 	scripts/update-target-if-output-changed.sh $@ $(QUERY_OUTPUT_FILE)-old $(QUERY_OUTPUT_FILE)
+
