@@ -1,0 +1,12 @@
+{
+    "packages": [
+        "squashfs-tools",
+        "tar",
+        "device-mapper",
+        "openssh",
+        "vim",
+        "util-linux",
+        "grep",
+        "curl"    
+    ]
+}

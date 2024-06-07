@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+# set -x
 set -e
 
 if [ -z "$1" ]; then
@@ -73,8 +73,9 @@ function createPxeGrubCfg() {
     fi
 
     cat <<EOF > $pxeGrubCfg
-set timeout=0
+set timeout=10
 set bootprefix=/boot
+set debug=all
 
 menuentry "CBL-Mariner" {
         linux /boot/vmlinuz \\
@@ -92,6 +93,7 @@ menuentry "CBL-Mariner" {
                 rd.live.dir=liveos \\
                 rd.live.squashimg=rootfs.img \\
                 rd.live.overlay=1 \\
+                rd.live.overlay.overlayfs \\
                 rd.live.overlay.nouserconfirmprompt
 
         initrd /boot/initrd.img
@@ -153,7 +155,11 @@ function deploy_tftp_folder() {
     copy_file $mount_dir/boot/initrd.img $tftpbootLocalDir/boot/initrd.img
 
     mkdir -p $tftpbootLocalDir/boot/grub2
-    copy_file $mount_dir/boot/grub2/efiboot.img $tftpbootLocalDir/boot/grub2/efiboot.img
+    #
+    # this file is only needed for the iso
+    # copy_file $mount_dir/boot/grub2/efiboot.img $tftpbootLocalDir/boot/grub2/efiboot.img
+    #
+
     # copy_file $mount_dir/boot/grub2/grub.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
     createPxeGrubCfg \
         $tftpbootLocalDir/boot/grub2/grub.cfg \
@@ -205,5 +211,5 @@ iptables -P INPUT ACCEPT
 iptables -P OUTPUT ACCEPT
 iptables -P FORWARD ACCEPT
 
-sudo find $tftpbootLocalDir
-sudo find $httpLocalDir
+sudo find $tftpbootLocalDir -type f
+sudo find $httpLocalDir -type f
