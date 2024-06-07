@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 10.2.3
+%define npm_version 10.7.0
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        20.10.0
-Release:        3%{?dist}
+Version:        20.14.0
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,7 +13,7 @@ Group:          Applications/System
 URL:            https://github.com/nodejs/node
 # !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
 # !!!! because it contains patented algorithms.
-# !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
+# !!!  => use generate_source_tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
 BuildRequires:  brotli-devel
@@ -127,7 +127,10 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Mon Jun 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 20.10.0-3
+* Fri Jun 07 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.14.0-1
+- Upgrade to 20.14.0 to address CVEs
+
+* Thu Jun 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 20.10.0-3
 - Separate npm from node using Fedora 50 (LICENSE: MIT)
 
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 20.10.0-2
