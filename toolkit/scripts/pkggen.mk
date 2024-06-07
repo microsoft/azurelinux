@@ -120,7 +120,7 @@ endif
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
-$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFEST) $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(chroot_worker) $(depend_REPO_LIST)
+$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFEST) $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(chroot_worker) $(depend_REPO_LIST) $(REPO_LIST)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
