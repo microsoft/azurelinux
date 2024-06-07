@@ -153,7 +153,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.4-1
+* Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.4-1
 - Bump version to 1.22.4
 
 * Wed May 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-1
