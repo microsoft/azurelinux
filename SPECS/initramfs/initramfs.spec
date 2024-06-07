@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/dracut.conf.d
 install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid, dracut-hostonly, dracut-hyperv, dracut-overlayfs, dracut-virtio, dracut-vrf, dracut-xen
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -112,6 +112,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %{_sysconfdir}/dracut.conf.d/fscks.conf
 
 %changelog
+* Thu Mar 23 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-4
+- Flag all dracut driver list configs as watched pkgs for initramfs regen
+
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-3
 - Remove /var/lib/initramfs/kernel files.
 

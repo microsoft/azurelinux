@@ -47,7 +47,8 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json",
                 "packagelists/core-tools-packages.json",
-                "packagelists/selinux.json"
+                "packagelists/selinux.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "Hostname": "mariner",
             "KernelOptions": {
