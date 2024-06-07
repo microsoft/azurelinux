@@ -1792,4 +1792,4 @@ mkdir -p /opt/cni/bin
 - Add cri-o package: CRI-O is meant to provide an integration path between OCI
   conformant runtimes and the kubelet. Specifically, it implements the Kubelet
   Container Runtime Interface (CRI) using OCI conformant runtimes. The scope of
-
+  CRI-O is tied to the scope of the CRI.
