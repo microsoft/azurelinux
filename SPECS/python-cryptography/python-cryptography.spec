@@ -1,7 +1,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        3.3.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,11 +19,12 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 
 %package -n     python3-cryptography
 Summary:        python-cryptography
-BuildRequires:  openssl-devel >= 1.1.1k-31
+BuildRequires:  openssl-devel
 BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+Requires:       openssl-libs >= 1.1.1k-31
 Requires:       python3
 Requires:       python3-asn1crypto
 Requires:       python3-cffi
@@ -65,6 +66,9 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jun 07 2024 Juan Camposeco <juanarturoc@microsoft.com> - 3.3.2-7
+- Adding dependency on release version for OpenSSL to fix CVE-2023-50782
+
 * Mon Dec 18 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.3.2-6
 - Patch CVE-2023-49083
 
