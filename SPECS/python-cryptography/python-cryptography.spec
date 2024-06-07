@@ -24,6 +24,7 @@ BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+# OpenSSL 1.1.1k-31 is the first version containing a patch fixing CVE-2023-50782 in python-cryptography.
 Requires:       openssl-libs >= 1.1.1k-31
 Requires:       python3
 Requires:       python3-asn1crypto
