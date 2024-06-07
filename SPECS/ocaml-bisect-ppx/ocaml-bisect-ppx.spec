@@ -7,8 +7,8 @@
 
 Summary:        Code coverage for OCaml and Reason
 Name:           ocaml-%{srcname}
-Version:        2.6.3
-Release:        4%{?dist}
+Version:        2.8.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -112,6 +112,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{upname}/runtime/*.mli
 
 %changelog
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 2.8.3-1
+- Upgrade to version 2.8.3
+
 * Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.3-4
 - Rebuild using ocaml 5.1.1
 

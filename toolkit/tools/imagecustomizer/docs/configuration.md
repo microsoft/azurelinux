@@ -190,7 +190,7 @@ os:
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
     - [finalizeCustomization](#finalizecustomization-script)
@@ -198,7 +198,7 @@ os:
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
 
@@ -941,7 +941,7 @@ scripts:
     interpreter: python3
 ```
 
-### args [string[]]
+### arguments [string[]]
 
 Additional arguments to pass to the script.
 
@@ -951,7 +951,7 @@ Example:
 scripts:
   postCustomization:
   - path: scripts/a.sh
-    args:
+    arguments:
     - abc
 ```
 
