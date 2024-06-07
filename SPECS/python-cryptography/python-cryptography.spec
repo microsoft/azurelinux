@@ -19,7 +19,7 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 
 %package -n     python3-cryptography
 Summary:        python-cryptography
-BuildRequires:  openssl-devel
+BuildRequires:  openssl-devel >= 1.1.1k-31
 BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
