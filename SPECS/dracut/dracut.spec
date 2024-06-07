@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        19%{?dist}
+Release:        20%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -38,6 +38,7 @@ Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
 Patch:          0009-install-systemd-executor.patch
 Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
+Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -280,6 +281,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Fri Jun 7 2024 Daniel McIlvaney <damcilva@microsoft.com> - 059-20
+- Suppress missing awk errors on size-constrained images
+
 * Thu May 30 2024 Chris Gunn <chrisgun@microsoft.com> - 059-19
 - Split defaults into separate subpackages: hostonly, hyperv, virtio, vrf, and xen
 
@@ -287,7 +291,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 - Remove reference to zlib from dracut-fips module setup to address
     pedantic initramfs regeneration behavior
 
-* Thu May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
+* Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
 - Patch microcode output check based on CONFIG_MICROCODE_AMD/INTEL
 
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
@@ -387,7 +391,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 -   Remove toybox from requires.
 
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
--   Update version to 49. License verified. 
+-   Update version to 49. License verified.
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 048-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
