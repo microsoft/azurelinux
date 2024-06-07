@@ -555,14 +555,6 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		}
 	}
 
-	if partitionTableType == "gpt" && partition.TypeUUID != "" {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partition.TypeUUID)
-		if err != nil {
-			err = fmt.Errorf("failed to set partition type using parted:\n%v\n%w", stderr, err)
-			return "", err
-		}
-	}
-
 	// Update kernel partition table information
 	//
 	// There can be a timing issue where partition creation finishes but the
@@ -636,6 +628,14 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		if err != nil {
 			logger.Log.Warnf("Failed to set partition friendly name using parted: %v", stderr)
 			// Not-fatal
+		}
+
+		if partition.TypeUUID != "" {
+			_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, partition.TypeUUID)
+			if err != nil {
+				logger.Log.Warnf("failed to set partition type using parted: %v", stderr)
+				// Not-fatal
+			}
 		}
 	}
 

@@ -54,9 +54,6 @@
           "KernelOptions": {
               "default": "kernel"
           },
-          "AdditionalFiles": {
-              "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs"
-          },
           "FinalizeImageScripts": [
               {
                   "Path": "postinstallscripts/cvm.sh"
@@ -65,7 +62,8 @@
                   "Path": "scripts/cleanup.sh"
               }
           ],
-          "Hostname": "azurelinux"
+          "Hostname": "azurelinux",
+          "DisableRpmDocs": true
       }
   ]
 }
