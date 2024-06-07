@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for Azure
 Name:           kernel-azure-signed-%{buildarch}
-Version:        5.15.159.1
+Version:        5.15.158.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
