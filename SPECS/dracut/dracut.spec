@@ -38,7 +38,7 @@ Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
 Patch:          0009-install-systemd-executor.patch
 Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
-Patch:          0012-Skip-maj_min-cache-lookup-if-awk-unavailable.patch
+Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
