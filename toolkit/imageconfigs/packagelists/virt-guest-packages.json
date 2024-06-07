@@ -1,6 +1,7 @@
 {
     "packages": [
         "dracut-hyperv",
-        "hyperv-daemons"
+        "dracut-virtio",
+        "dracut-xen"
     ]
 }
