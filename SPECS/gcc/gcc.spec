@@ -526,7 +526,7 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
-* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-5
 - Revert change to baseline architecture for arm64
 
 * Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
