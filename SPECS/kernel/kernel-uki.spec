@@ -15,7 +15,7 @@
 # ensures the feature bit for shadow stack is also turned off.
 %define cmdline console=ttyS0 noxsaves
 
-Summary:        Linux Kernel
+Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.29.1
 Release:        4%{?dist}
