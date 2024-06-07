@@ -41,6 +41,7 @@ ignore_no_source_tarball=" \
   javapackages-tools-meta \
   kata-packages-uvm \
   kde-filesystem \
+  kernel-uki \
   kf \
   livepatching \
   lua-rpm-macros \
