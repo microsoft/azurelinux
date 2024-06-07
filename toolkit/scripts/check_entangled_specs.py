@@ -15,6 +15,7 @@ version_release_matching_groups = [
     frozenset([
         "SPECS-SIGNED/kernel-signed/kernel-signed.spec",
         "SPECS/kernel/kernel.spec",
+        "SPECS/kernel/kernel-uki.spec",
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
