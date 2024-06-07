@@ -346,7 +346,7 @@ case $(uname -m) in
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    GCC_CONFIG_WITH_ARCH="armv8.1-a"
+    GCC_CONFIG_WITH_ARCH=""
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
