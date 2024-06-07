@@ -1,0 +1,40 @@
+From 8eeda35d70f2564286896d9ea6b72d45e55e7877 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 29 Apr 2024 16:36:05 -0400
+Subject: [PATCH 28/29] cloudinit: Add support for cloud-init-growpart.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.te | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
+index 0c80a32ad..94f7eabd2 100644
+--- a/policy/modules/admin/cloudinit.te
++++ b/policy/modules/admin/cloudinit.te
+@@ -9,6 +9,13 @@ gen_require(`
+ # Declarations
+ #
+ 
++## <desc>
++## <p>
++## Enable support for the cloud-init-growpart module.
++## </p>
++## </desc>
++gen_tunable(cloudinit_growpart, false)
++
+ ## <desc>
+ ## <p>
+ ## Enable support for cloud-init to manage all non-security files.
+@@ -128,6 +135,8 @@ ssh_setattr_home_dirs(cloud_init_t)
+ # Read public keys
+ ssh_read_server_keys(cloud_init_t)
+ 
++storage_raw_read_fixed_disk_cond(cloud_init_t, cloudinit_growpart)
++
+ sysnet_run_ifconfig(cloud_init_t, system_r)
+ 
+ term_write_console(cloud_init_t)
+-- 
+2.44.0
+
