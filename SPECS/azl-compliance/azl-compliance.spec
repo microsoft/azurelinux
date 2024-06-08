@@ -1,6 +1,6 @@
 Summary:        Azure Linux compliance package to meet all sorts of compliance rules
 Name:           azl-compliance
-Version:        1.0.1
+Version:        1.0.2
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ cd azl-compliance
 cargo test --release --offline
 
 %changelog
+* Thu Jun 06 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.2-1
+- Update to version 1.0.2
+
 * Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.1-1
 - Original version for CBL-Mariner.
 - License verified
