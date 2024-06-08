@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.58
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,6 @@ BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
 BuildRequires:  expat-devel
-BuildRequires:  libdb-devel
 BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
@@ -46,7 +45,6 @@ BuildRequires:  pcre2-devel
 BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
-Requires:       libdb
 Requires:       lua
 Requires:       openldap
 Requires:       openssl
@@ -347,6 +345,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.58-4
+- Remove dependency on 'libdb'.
+
 * Thu May 09 2024 Andy Zaugg <azaugg@linkedin.com> - 2.4.58-3
 - Namespace httpd-devel include files into a httpd directory
 
