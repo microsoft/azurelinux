@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        490%{?dist}
+Release:        489%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6820,9 +6820,6 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
-* Thu May 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.34.1-490
-- Release bump to regenerate package's requires and provides.
-
 * Thu Apr 04 2024 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-489
 - Add patch for CVE-2023-47100
 

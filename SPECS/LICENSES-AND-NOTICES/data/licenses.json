@@ -2165,6 +2165,7 @@
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor",
+                "cloud-hypervisor-cvm",
                 "cmake-fedora",
                 "coredns",
                 "csi-driver-lvm",
