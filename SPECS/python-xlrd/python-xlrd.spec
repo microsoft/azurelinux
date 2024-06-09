@@ -1,7 +1,7 @@
 
 Name:           python-xlrd
 Version:        2.0.1
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        Library to extract data from Microsoft Excel (TM) spreadsheet files
 
 License:        BSD
@@ -46,13 +46,10 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}/runxlrd.py* \
 %{python3_sitelib}/xlrd-*egg-info
 %attr(755,root,root) %{_bindir}/*
 
-#%license LICENSE
-%doc README.rst CHANGELOG.rst
-%attr(755,root,root) %dir %{python3_other_sitelib}/xlrd
-%{python3_other_sitelib}/xlrd/*
-%{python3_other_sitelib}/xlrd-*egg-info
-
 %changelog
+* Fri Jun 08 2024 Andrew Phelps <anphel@microsoft.com> - 2.0.1-17
+- Remove duplicate files using python3_other_sitelib
+
 * Tue Jun 04 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.0.1-16
 - Initial Azure Linux import from Fedora 40 (license: MIT). 
 - License verified.
