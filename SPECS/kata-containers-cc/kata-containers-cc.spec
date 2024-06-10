@@ -71,6 +71,8 @@ mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
 
 pushd %{_builddir}/%{name}-%{version}
+install -D -m 0644 VERSION %{buildroot}%{osbuilder}/VERSION
+install -D -m 0644 utils.mk %{buildroot}%{osbuilder}/utils.mk
 install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
 
 install -D -m 0644 src/agent/Makefile %{buildroot}%{osbuilder}/src/agent/
@@ -81,15 +83,16 @@ install -D -m 0755 src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent 
 install -D -m 0644 src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0644 src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
 
-install -D -m 0644 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
+install -D -m 0755 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
 
-install -D -m 0644 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
+install -D -m 0755 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
 cp -aR tools/osbuilder/rootfs-builder/cbl-mariner %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
 
 install -D -m 0755 tools/osbuilder/image-builder/image_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
 
 cp -aR tools/osbuilder/igvm-builder %{buildroot}%{osbuilder}/tools/osbuilder
 
+install -D -m 0644 tools/osbuilder/node-builder/azure-linux/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/clean.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/common.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/uvm_build.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
@@ -124,6 +127,9 @@ popd
 #%doc README.md
 
 %files tools
+# VERSION and utils.mk are required by the Makefile in src/agent
+%{osbuilder}/VERSION
+%{osbuilder}/utils.mk
 %{osbuilder}/tools/osbuilder/Makefile
 
 %dir %{osbuilder}/src/agent
@@ -152,6 +158,7 @@ popd
 %{osbuilder}/tools/osbuilder/igvm-builder/*
 
 %dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh

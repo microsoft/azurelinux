@@ -45,11 +45,11 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
 
-%define kata_path     /usr
+%define kata_path     /opt/kata-containers
 %define osbuilder     %{kata_path}/uvm
-%define kata_bin      %{kata_path}/local/bin
+%define kata_bin      %{_prefix}/local/bin
 %define kata_shim_bin %{_prefix}/local/bin
-%define defaults_kata %{kata_path}/share/defaults/kata-containers
+%define defaults_kata %{_prefix}/share/defaults/kata-containers
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -60,10 +60,15 @@ mkdir -p %{buildroot}%{osbuilder}
 mkdir -p %{buildroot}%{osbuilder}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
+#TODO continue here - FOR BOTH CC AND VANILLA THIS SUB-FOLDER MUST BE POPULATED
+#ALSO /opt/kata-containers/uvm/src/agent/src/version.rs or version.rs.in must be present
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
 
 pushd %{_builddir}/%{name}-%{version}
+install -D -m 0644 VERSION %{buildroot}%{osbuilder}/VERSION
+install -D -m 0644 utils.mk %{buildroot}%{osbuilder}/utils.mk
 install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
 
 install -D -m 0644 src/agent/Makefile %{buildroot}%{osbuilder}/src/agent/
@@ -71,13 +76,14 @@ install -D -m 0644 src/agent/kata-containers.target %{buildroot}%{osbuilder}/src
 install -D -m 0644 src/agent/kata-agent.service.in %{buildroot}%{osbuilder}/src/agent/
 install -D -m 0755 src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
 
-install -D -m 0644 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
+install -D -m 0755 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
 
-install -D -m 0644 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
+install -D -m 0755 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
 cp -aR tools/osbuilder/rootfs-builder/cbl-mariner %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
 
 install -D -m 0755 tools/osbuilder/initrd-builder/initrd_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder/initrd_builder.sh
 
+install -D -m 0644 tools/osbuilder/node-builder/azure-linux/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/clean.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/common.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/uvm_build.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
@@ -97,6 +103,9 @@ popd
 #%doc README.md
 
 %files tools
+# VERSION and utils.mk are required by the Makefile in src/agent
+%{osbuilder}/VERSION
+%{osbuilder}/utils.mk
 %{osbuilder}/tools/osbuilder/Makefile
 
 %dir %{osbuilder}/src/agent
@@ -118,6 +127,7 @@ popd
 %{osbuilder}/tools/osbuilder/initrd-builder/initrd_builder.sh
 
 %dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
