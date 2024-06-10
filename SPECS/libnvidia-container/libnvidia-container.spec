@@ -1,4 +1,4 @@
-%define modprobe_version 495.44
+%define modprobe_version 550.54.14
 %define _major 1
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
