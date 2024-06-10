@@ -29,7 +29,7 @@ Patch3:         CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
-Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
+# Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext

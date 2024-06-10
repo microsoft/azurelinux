@@ -13,7 +13,7 @@ Source0:        https://github.com/flannel-io/%{name}/archive/refs/tags/v%{versi
 Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-5%{?dist}
+BuildRequires:  glibc-static >= 2.39-1%{?dist}
 BuildRequires:  golang >= 1.20
 BuildRequires:  kernel-headers
 
