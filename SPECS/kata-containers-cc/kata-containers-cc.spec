@@ -25,8 +25,7 @@ BuildRequires:  fuse-devel
 # kernel-uvm is used for testing in a debug configuration w/o SEV SNP enablement
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
-# Must match the version specified by the `assets.virtiofsd.version` field in
-# %{SOURCE0}/versions.yaml.
+# Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:  virtiofsd = 1.8.0
 
 %description
@@ -47,17 +46,20 @@ tar -xf %{SOURCE1}
 popd
 
 %build
-# kata shim/runtime
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package-confpods
 popd
 
+%define kata_path     /opt/confidential-containers
+%define osbuilder     %{kata_path}/uvm
+%define kata_bin      %{kata_path}/bin
+%define kata_shim_bin %{_prefix}/local/bin
+%define defaults_kata %{kata_path}/share/defaults/kata-containers
+
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build deploy-confpods-package
+START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-confpods-package
 popd
-
-%define osbuilder %{coco_path}/uvm
 
 mkdir -p %{buildroot}%{osbuilder}
 mkdir -p %{buildroot}%{osbuilder}/src/agent
@@ -71,10 +73,10 @@ mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
 pushd %{_builddir}/%{name}-%{version}
 install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
 
-install -D -m 0755 src/agent/kata-agent %{buildroot}%{osbuilder}/src/agent/
 install -D -m 0644 src/agent/Makefile %{buildroot}%{osbuilder}/src/agent/
 install -D -m 0644 src/agent/kata-containers.target %{buildroot}%{osbuilder}/src/agent/
-install -D -m 0644 src/agent/kata-agent.service %{buildroot}%{osbuilder}/src/agent/
+install -D -m 0644 src/agent/kata-agent.service.in %{buildroot}%{osbuilder}/src/agent/
+install -D -m 0755 src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
 
 install -D -m 0644 src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0644 src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
@@ -103,24 +105,19 @@ popd
 %systemd_post tardev-snapshotter.service
 
 %files
-%define coco_path     /opt/confidential-containers
-%define coco_bin      %{coco_path}/bin
-%define coco_shim_bin %{_prefix}/local/bin
-%define defaults_kata %{coco_path}/share/defaults/kata-containers
-
 %{_sbindir}/mount.tar
 %{_bindir}/kata-overlay
 %{_bindir}/tardev-snapshotter
 %{_unitdir}/tardev-snapshotter.service
 
-%{coco_bin}/kata-collect-data.sh
-%{coco_bin}/kata-monitor
-%{coco_bin}/kata-runtime
+%{kata_bin}/kata-collect-data.sh
+%{kata_bin}/kata-monitor
+%{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration-clh-snp.toml
 %{defaults_kata}/configuration-clh-snp-debug.toml
 
-%{coco_shim_bin}/containerd-shim-kata-cc-v2
+%{kata_shim_bin}/containerd-shim-kata-cc-v2
 
 #%license LICENSE
 #%doc CONTRIBUTING.md
@@ -130,10 +127,11 @@ popd
 %{osbuilder}/tools/osbuilder/Makefile
 
 %dir %{osbuilder}/src/agent
-%{osbuilder}/src/agent/kata-agent
 %{osbuilder}/src/agent/Makefile
 %{osbuilder}/src/agent/kata-containers.target
-%{osbuilder}/src/agent/kata-agent.service
+%{osbuilder}/src/agent/kata-agent.service.in
+%dir %{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release
+%{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
 
 %dir %{osbuilder}/src/kata-opa
 %{osbuilder}/src/kata-opa/allow-all.rego
@@ -184,7 +182,7 @@ popd
 -   Remove kernel-uvm-cvm modules/sources/files
 -   Remove instructions to build kernel-uvm-cvm related binaries
 
-*   Tue Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
+*   Wed Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
 -   Enforce a restrictive security policy
 
 *   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
@@ -219,7 +217,7 @@ popd
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Thu Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
