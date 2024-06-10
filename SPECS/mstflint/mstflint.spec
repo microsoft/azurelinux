@@ -1,6 +1,6 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
-Version:        4.26.0
+Version:        4.25.0
 Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
@@ -8,6 +8,8 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
+Patch4:         add-default-link-flags-for-shared-libraries.patch
+Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
@@ -45,6 +47,10 @@ rm -fr %{buildroot}%{_includedir}
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -type f -name '*.a' -delete
 
+# Mark these shared libs executable for find-debuginfo.sh to find them.
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Debuginfo/
+chmod +x %{buildroot}/%{_libdir}/mstflint/python_tools/*.so
+
 %files
 %license COPYING
 %doc README
@@ -56,9 +62,8 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
-* Thu Feb 15 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.21.0-4
-- Upgrade to 4.26.0 from Mellanox repository
-- Remove patches from Fedora
+* Thu Jun 10 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.25.0-1
+- Upgrade to 4.25.0 from Fedora 40
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
