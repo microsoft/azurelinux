@@ -1,7 +1,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
-Version:        4.21.0
-Release:        4%{?dist}
+Version:        4.25.0
+Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,9 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jun 10 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.25.0-1
+- Upgrade to 4.25.0 from Fedora 40
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
