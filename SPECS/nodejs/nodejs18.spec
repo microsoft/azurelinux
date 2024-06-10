@@ -1,12 +1,12 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 10.5.0
+%define npm_version 10.7.0
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        18.20.2
-Release:        2%{?dist}
+Version:        18.20.3
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
