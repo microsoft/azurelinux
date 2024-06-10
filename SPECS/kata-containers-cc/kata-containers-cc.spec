@@ -1,14 +1,3 @@
-%global virtiofsd_binary        virtiofsd-rs
-
-%global runtime_make_vars       DEFMEMSZ=256 \\\
-                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
-                                DEFSNPGUEST=true \\\
-                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"%{virtiofsd_binary}" \\\
-                                SKIP_GO_VERSION_CHECK=1
-
-%global agent_make_vars         LIBC=gnu \\\
-                                AGENT_POLICY=yes
-
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
@@ -20,20 +9,12 @@ Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      %{name}-%{version}-cargo.tar.gz
-Source2:      mariner-coco-build-uvm.sh
 
 ExclusiveArch: x86_64
 
 BuildRequires:  golang
-BuildRequires:  make
 BuildRequires:  protobuf-compiler
-BuildRequires:  dracut
-BuildRequires:  cargo
 BuildRequires:  rust
-BuildRequires:  git
-BuildRequires:  sudo
-BuildRequires:  perl-FindBin
-BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  clang
@@ -41,11 +22,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  cmake
 BuildRequires:  fuse-devel
 
-# needed to build the tarfs module, see next comment - we currently build the tarfs module for both kernels
-BuildRequires:  kernel-uvm-devel
-
-# kernel-uvm is required for allowing to test the kata-cc handler w/o SEV SNP but with the
-# policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy and snapshotter features
+# kernel-uvm is used for testing in a debug configuration w/o SEV SNP enablement
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
 # Must match the version specified by the `assets.virtiofsd.version` field in
@@ -57,18 +34,11 @@ The Kata Confidential Containers package ships the Kata components for Confident
 The package sources are based on a Microsoft fork of the kata-containers project and tailored to the use
 for Mariner-based AKS node images.
 
-# This subpackage is used to build the UVM and therefore has dependencies on the kernel-uvm(-cvm) binaries
 %package tools
 Summary:        Kata Confidential Containers tools package for building the UVM
-Requires:       cargo
-Requires:       qemu-img
-Requires:       parted
-Requires:       curl
-Requires:       veritysetup
-Requires:       kernel-uvm
 
 %description tools
-This package contains the the tooling and files required to build the UVM
+This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -77,157 +47,51 @@ tar -xf %{SOURCE1}
 popd
 
 %build
-export PATH=$PATH:"$(pwd)/go/bin"
-export GOPATH="$(pwd)/go"
-export OPENSSL_NO_VENDOR=1
-
 # kata shim/runtime
-pushd %{_builddir}/%{name}-%{version}/src/runtime
-%make_build %{runtime_make_vars}
+pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+%make_build package-confpods
 popd
-
-# agent
-pushd %{_builddir}/%{name}-%{version}/src/agent
-%make_build %{agent_make_vars}
-popd
-
-# tardev snapshotter
-pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter
-make
-chmod +x target/release/tardev-snapshotter
-popd
-
-# overlay
-pushd %{_builddir}/%{name}-%{version}/src/overlay
-cargo build --release
-popd
-
-# utarfs
-pushd %{_builddir}/%{name}-%{version}/src/utarfs
-cargo build --release
-popd
-
-# kernel modules
-pushd /usr/src/linux-headers*
-header_dir=$(basename $PWD)
-KERNEL_VER=${header_dir#"linux-headers-"}
-KERNEL_MODULE_VER=${KERNEL_VER%%-*}
-popd
-
-pushd %{_builddir}/%{name}-%{version}/src/tarfs
-make KDIR=/usr/src/linux-headers-${KERNEL_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
-popd
-%global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
 %install
-%define coco_path     /opt/confidential-containers
-%define coco_bin      %{coco_path}/bin
-%define defaults_kata %{coco_path}/share/defaults/kata-containers
-%define share_kata    %{coco_path}/share/kata-containers
-%define osbuilder     %{coco_path}/uvm
+pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+%make_build deploy-confpods-package
+popd
 
+%define osbuilder %{coco_path}/uvm
+
+mkdir -p %{buildroot}%{osbuilder}
+mkdir -p %{buildroot}%{osbuilder}/src/agent
+mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/image-builder
-mkdir -p %{buildroot}%{osbuilder}/ci
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
 
-# kernel modules
-cp -aR %{KERNEL_MODULES_DIR} %{buildroot}%{osbuilder}
-
-# osbuilder
 pushd %{_builddir}/%{name}-%{version}
-rm tools/osbuilder/.gitignore
-rm tools/osbuilder/rootfs-builder/.gitignore
+install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
 
-install -D -m 0755 %{SOURCE2}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
-install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
-install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
-install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
-install -D -m 0644 tools/osbuilder/Makefile  %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
+install -D -m 0755 src/agent/kata-agent %{buildroot}%{osbuilder}/src/agent/
+install -D -m 0644 src/agent/Makefile %{buildroot}%{osbuilder}/src/agent/
+install -D -m 0644 src/agent/kata-containers.target %{buildroot}%{osbuilder}/src/agent/
+install -D -m 0644 src/agent/kata-agent.service %{buildroot}%{osbuilder}/src/agent/
 
-sed -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
-cp -aR tools/osbuilder/rootfs-builder   %{buildroot}%{osbuilder}/tools/osbuilder
-cp -aR tools/osbuilder/initrd-builder   %{buildroot}%{osbuilder}/tools/osbuilder
-cp -aR tools/osbuilder/scripts          %{buildroot}%{osbuilder}/tools/osbuilder
+install -D -m 0644 src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
+install -D -m 0644 src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
+
+install -D -m 0644 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
+
+install -D -m 0644 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
+cp -aR tools/osbuilder/rootfs-builder/cbl-mariner %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
+
+install -D -m 0755 tools/osbuilder/image-builder/image_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
+
+cp -aR tools/osbuilder/igvm-builder %{buildroot}%{osbuilder}/tools/osbuilder
+
+install -D -m 0755 tools/osbuilder/node-builder/azure-linux/clean.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
+install -D -m 0755 tools/osbuilder/node-builder/azure-linux/common.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
+install -D -m 0755 tools/osbuilder/node-builder/azure-linux/uvm_build.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
 popd
-
-mkdir -p %{buildroot}%{coco_bin}
-mkdir -p %{buildroot}%{share_kata}
-mkdir -p %{buildroot}%{coco_path}/libexec
-mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
-
-# Note: our kata-containers config toml expects cloud-hypervisor and kernel under a certain path/name, so we align this through symlinks here
-ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor-snp
-
-# this is again for testing without SEV SNP
-ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
-
-ln -sf /usr/libexec/%{virtiofsd_binary} %{buildroot}/%{coco_path}/libexec/%{virtiofsd_binary}
-
-find %{buildroot}/etc
-
-# agent
-pushd %{_builddir}/%{name}-%{version}/src/agent
-mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
-cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
-cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
-install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
-install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
-install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
-popd
-
-# runtime/shim
-pushd %{_builddir}/%{name}-%{version}/src/runtime
-install -D -m 0755 containerd-shim-kata-v2 %{buildroot}/usr/local/bin/containerd-shim-kata-cc-v2
-install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
-install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
-install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
-
-# We deploy 3 configurations:
-# configuration-clh-snp: production Kata-CC - IGVM & image, confidential_guest=true, sev_snp_guest=true
-# configuration-clh-snp-debug: debug Kata-CC - kernel & image, confidential_guest=true, sev_snp_guest=false
-# configuration-clh (symlinked to by configuration.toml): vanilla Kata - kernel & initrd, confidential_guest=false, sev_snp_guest=false
-install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
-install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
-
-# Adapt configuration files:
-# - Change paths with locations specific to our distribution.
-sed --follow-symlinks -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh*.toml
-# - Set up configuration-clh-snp-debug. Note that kernel and image are already
-#   set through configuration-clh.toml.in.
-sed -i 's|-igvm.img|-igvm-debug.img|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#confidential_guest =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#enable_debug =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#debug_console_enabled =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i 's|shared_fs = "virtio-fs"|shared_fs = "none"|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-# - Set up configuration-clh.
-sed -i '/^#initrd =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
-sed -i '/^image =/s|^|#|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
-popd
-
-# tardev-snapshotter
-pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter/
-sed -i -e 's/containerd.service/kubelet.service/g' tardev-snapshotter.service
-install -m 0644 -D -t %{buildroot}%{_unitdir} tardev-snapshotter.service
-install -D -m 0755 target/release/tardev-snapshotter  %{buildroot}/usr/bin/tardev-snapshotter
-popd
-
-# overlay
-pushd %{_builddir}/%{name}-%{version}/src/overlay/
-install -D -m 0755 target/release/kata-overlay  %{buildroot}/usr/bin/kata-overlay
-popd
-
-# utarfs
-pushd %{_builddir}/%{name}-%{version}/src/utarfs/
-install -D -m 0755 target/release/utarfs  %{buildroot}/usr/sbin/mount.tar
-popd
-
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax.gpl.c        %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/nsdax.gpl.c
 
 %preun
 %systemd_preun tardev-snapshotter.service
@@ -239,53 +103,60 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %systemd_post tardev-snapshotter.service
 
 %files
-%{share_kata}/vmlinux.container
+%define coco_path     /opt/confidential-containers
+%define coco_bin      %{coco_path}/bin
+%define coco_shim_bin %{_prefix}/local/bin
+%define defaults_kata %{coco_path}/share/defaults/kata-containers
 
-%{coco_bin}/cloud-hypervisor
-%{coco_bin}/cloud-hypervisor-snp
+%{_sbindir}/mount.tar
+%{_bindir}/kata-overlay
+%{_bindir}/tardev-snapshotter
+%{_unitdir}/tardev-snapshotter.service
+
 %{coco_bin}/kata-collect-data.sh
 %{coco_bin}/kata-monitor
 %{coco_bin}/kata-runtime
 
-%{defaults_kata}/configuration*.toml
-%{coco_path}/libexec/%{virtiofsd_binary}
+%{defaults_kata}/configuration-clh-snp.toml
+%{defaults_kata}/configuration-clh-snp-debug.toml
 
-%{_bindir}/tardev-snapshotter
-%{_bindir}/kata-overlay
-%{_sbindir}/mount.tar
-%{_unitdir}/tardev-snapshotter.service
-%{_prefix}/local/bin/containerd-shim-kata-cc-v2
+%{coco_shim_bin}/containerd-shim-kata-cc-v2
 
-%license LICENSE
-%doc CONTRIBUTING.md
-%doc README.md
+#%license LICENSE
+#%doc CONTRIBUTING.md
+#%doc README.md
 
 %files tools
+%{osbuilder}/tools/osbuilder/Makefile
+
+%dir %{osbuilder}/src/agent
+%{osbuilder}/src/agent/kata-agent
+%{osbuilder}/src/agent/Makefile
+%{osbuilder}/src/agent/kata-containers.target
+%{osbuilder}/src/agent/kata-agent.service
+
 %dir %{osbuilder}/src/kata-opa
 %{osbuilder}/src/kata-opa/allow-all.rego
 %{osbuilder}/src/kata-opa/allow-set-policy.rego
 
-%{osbuilder}/mariner-coco-build-uvm.sh
-%{osbuilder}/kata-containers.target
-%{osbuilder}/kata-agent.service.in
-%{osbuilder}/kata-agent
-%{osbuilder}/ci/install_yq.sh
+%dir %{osbuilder}/tools/osbuilder/scripts
+%{osbuilder}/tools/osbuilder/scripts/lib.sh
 
-%{osbuilder}/VERSION
-%{osbuilder}/versions.yaml
+%dir %{osbuilder}/tools/osbuilder/rootfs-builder
+%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
+%dir %{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
+%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/*
 
-%dir %{osbuilder}/modules
-%dir %{osbuilder}/tools
-%{osbuilder}/modules/*
-%{osbuilder}/tools/*
+%dir %{osbuilder}/tools/osbuilder/image-builder
+%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
 
-# remove some scripts we don't use
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/alpine
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/centos
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/clearlinux
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/debian
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/template
-%exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
+%dir %{osbuilder}/tools/osbuilder/igvm-builder
+%{osbuilder}/tools/osbuilder/igvm-builder/*
+
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
 
 %changelog
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
