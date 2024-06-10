@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "glibc-2.38.tar.xz": "fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2",
-  "locale-gen.conf": "94182ce116a42e38ce783d2a867dca1eaf4d6a347d4bff9aac4d6e61cbbfc8f4",
-  "locale-gen.sh": "df7169cb9f126875e0a57a4700261e16e6eba2a98312d739f972377150ba9964"
- }
+  "Signatures": {
+    "locale-gen.conf": "94182ce116a42e38ce783d2a867dca1eaf4d6a347d4bff9aac4d6e61cbbfc8f4",
+    "locale-gen.sh": "df7169cb9f126875e0a57a4700261e16e6eba2a98312d739f972377150ba9964",
+    "glibc-2.39.tar.xz": "f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926"
+  }
 }

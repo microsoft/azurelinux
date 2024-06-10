@@ -4370,8 +4370,8 @@
         "type": "other",
         "other": {
           "name": "glibc",
-          "version": "2.38",
-          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.38.tar.xz"
+          "version": "2.39",
+          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.39.tar.xz"
         }
       }
     },

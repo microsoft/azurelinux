@@ -9,8 +9,8 @@
 
 Summary:        Main C library
 Name:           glibc
-Version:        2.38
-Release:        5%{?dist}
+Version:        2.39
+Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -348,6 +348,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Mon Jun 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.39-1
+- Auto-upgrade to 2.39 - CVE-2023-6246
+
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.38-5
 - Generate and provide glibc all locales in a sub-package
 
