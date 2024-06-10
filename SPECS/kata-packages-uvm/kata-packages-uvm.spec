@@ -55,12 +55,15 @@ Requires:       systemd-udev
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
+Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
+Requires:       kernel-uvm-devel
 # Uncomment and remove duplicates once msigvm is available
 #Requires:       msigvm
+Requires:       parted
 # Python dependencies for non-packaged IGVM tool
 Requires:       python3
 Requires:       python3-pip
@@ -72,10 +75,11 @@ Requires:       python3-cstruct
 Requires:       python3-devel
 Requires:       python3-libs
 Requires:       python3-setuptools
-Requires:       python3-pytest 
+Requires:       python3-pytest
 Requires:       python3-libclang
-Requires:       python3-tomli    
-Requires:       veritysetup 
+Requires:       python3-tomli
+Requires:       qemu-img
+Requires:       veritysetup
 
 %description    build
 

@@ -1,222 +1,116 @@
-%global with_debug 0
-# We want verbose builds
-%global _configure_disable_silent_rules 1
-# Shamelessly copied from CRI-O spec file.
-%if 0%{?with_debug}
-%global _find_debuginfo_dwz_opts %{nil}
-%global _dwz_low_mem_die_limit 0
-%else
 %global debug_package %{nil}
-%endif
-# https://github.com/rust-lang/rust/issues/47714
-%undefine _strict_symbol_defs_build
 
-%global katacache               %{_localstatedir}/cache
-%global katauvmdir              /opt/kata-containers/uvm
-%global katalocalstatecachedir  %{katacache}/kata-containers
-
-%global kataagentdir            %{katauvmdir}/agent
-%global kataosbuilderdir        %{katauvmdir}/tools/osbuilder
-%global kataconfigdir           /usr/share/defaults/kata-containers
-%global kataclhdir              /usr/share/cloud-hypervisor
-%global katainitrddir           /var/cache/kata-containers/osbuilder-images/kernel-uvm
-
-# DEFAULT_HYPERVISOR: makes configuration.toml link to configuration-clh.toml.
-%global runtime_make_vars       KERNELTYPE="compressed" \\\
-                                KERNELPARAMS="" \\\
-                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
-                                DEFSANDBOXCGROUPONLY=true \\\
-                                DEFSTATICRESOURCEMGMT_CLH=true \\\
-                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
-                                DEFMEMSZ=256 \\\
-                                SKIP_GO_VERSION_CHECK=y \\\
-                                DESTDIR=%{buildroot} \\\
-                                PREFIX=/usr \\\
-                                DEFAULT_HYPERVISOR=cloud-hypervisor
-
-%global agent_make_vars         LIBC=gnu \\\
-                                DESTDIR=%{buildroot}%{kataagentdir}
-
-Summary:        Kata Containers
 Name:           kata-containers
-Version:        3.2.0.azl2
-Release:        5%{?dist}
+Version:        3.2.0.azl3
+Release:        1%{?dist}
+Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        50-kata
-Source3:        mariner-build-uvm.sh
 
 BuildRequires:  golang
-BuildRequires:  git-core
-BuildRequires:  libselinux-devel
-BuildRequires:  libseccomp-devel
-BuildRequires:  make
-BuildRequires:  systemd
-BuildRequires:  gcc
 BuildRequires:  protobuf-compiler
-BuildRequires:  azurelinux-release
-BuildRequires:  dracut
-BuildRequires:  kernel
-BuildRequires:  busybox
-BuildRequires:  cargo
 BuildRequires:  rust
-BuildRequires:  device-mapper-devel
+BuildRequires:  libseccomp-devel
+BuildRequires:  openssl-devel
 BuildRequires:  clang
+BuildRequires:  device-mapper-devel
+BuildRequires:  cmake
 
-Requires:       busybox
-Requires:       kernel
-Requires:       libseccomp
-# Must match the version specified by the `assets.virtiofsd.version` field in
-# %{SOURCE0}/versions.yaml.
+Requires:       kernel-uvm
+# Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:       virtiofsd = 1.8.0
 
 %description
-Kata Containers is an open source project and community working to build a
-standard implementation of lightweight Virtual Machines (VMs) that feel and
-perform like containers, but provide the workload isolation and security
-advantages of VMs. https://katacontainers.io/.}
+The Kata Containers package ships the Kata components for Pod Sandboxing on AKS.
+The package sources are based on a Microsoft fork of the kata-containers project and tailored to the use
+for Mariner-based AKS node images.
 
 %package tools
-Summary:        Kata Tools package
-Requires:       cargo
-Requires:       curl
+Summary:        Kata Containers tools package for building the UVM
 
 %description tools
-This package contains the UVM osbuilder files
+This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
-
-cd %{_builddir}/%{name}-%{version}
+pushd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
+popd
 
-# Not using gobuild here in order to stick to how upstream builds
-# (This builds multiple binaries)
 %build
-export PATH=$PATH:"$(pwd)/go/bin"
-export GOPATH="$(pwd)/go"
-export OPENSSL_NO_VENDOR=1
-
-mkdir -p go/src/github.com/%{name}
-ln -s $(pwd)/../%{name}-%{version} go/src/github.com/%{name}/%{name}
-cd go/src/github.com/%{name}/%{name}
-
-pushd src/runtime
-%make_build %{runtime_make_vars}
+pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+OS_VERSION=3.0 %make_build package
 popd
 
-pushd src/agent
-%make_build %{agent_make_vars}
-touch kata-agent
-popd
+%define kata_path     /opt/kata-containers
+%define kata_bin      %{_prefix}/local/bin
+%define kata_shim_bin %{_prefix}/local/bin
+%define defaults_kata %{_prefix}/share/defaults/kata-containers
+%define tools_pkg     %{kata_path}/uvm
 
-pushd tools/osbuilder
-# Manually build nsdax tool
-gcc %{build_cflags} image-builder/nsdax.gpl.c -o nsdax
-popd
-
-# Not using gopkginstall here in order to stick to how upstream builds
 %install
-export GOPATH=$(pwd)/go
-export PATH=$PATH:$GOPATH/bin
-
-cd go/src/github.com/%{name}/%{name}
-
-install -m 0755 -D -t %{buildroot}%{katauvmdir} %{SOURCE3}
-install -m 0644 -D -t %{buildroot}%{katauvmdir} VERSION
-install -m 0644 -D -t %{buildroot}%{katauvmdir} versions.yaml
-install -D -m 0644 ci/install_yq.sh %{buildroot}%{katauvmdir}/ci/install_yq.sh
-sed --follow-symlinks -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
-
-pushd src/runtime
-%make_install %{runtime_make_vars}
-# Ensure sed doesn't replace the configuration.toml symlink by a regular file.
-sed --follow-symlinks -i -e "s|image = .*$|initrd = \"%{katainitrddir}/kata-containers-initrd.img\"|" %{buildroot}%{kataconfigdir}/configuration.toml
-sed --follow-symlinks -i -e "s|kernel = .*$|kernel = \"%{kataclhdir}/vmlinux.bin\"|" %{buildroot}%{kataconfigdir}/configuration.toml
+pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
+PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
-
-pushd src/agent
-%make_install %{agent_make_vars}
-popd
-
-pushd tools/osbuilder
-rm .gitignore
-rm rootfs-builder/.gitignore
-mkdir -p %{buildroot}%{katalocalstatecachedir}
-
-install -m 0755 -D -t %{buildroot}%{kataosbuilderdir} nsdax
-
-cp -aR rootfs-builder %{buildroot}%{kataosbuilderdir}
-cp -aR image-builder  %{buildroot}%{kataosbuilderdir}
-cp -aR initrd-builder %{buildroot}%{kataosbuilderdir}
-cp -aR scripts        %{buildroot}%{kataosbuilderdir}
-cp -aR dracut         %{buildroot}%{kataosbuilderdir}
-cp -aR Makefile       %{buildroot}%{kataosbuilderdir}
-
-rm -f %{buildroot}%{kataosbuilderdir}/image-builder/nsdax.gpl.c
-chmod +x %{buildroot}%{kataosbuilderdir}/scripts/lib.sh
-popd
-
-# Install the CRI-O config drop-in file
-install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE2}
-
-# Disable the image= option, so we use initrd= by default
-# The kernels kata-osbuilder creates are in /var/cache now, see rhbz#1792216
-
-# Make symlinks in /usr/local/bin to /usr/bin where kata expects to find binaries
-mkdir -p %{buildroot}%{_prefix}/local/bin
-ln -sf %{_bindir}/containerd-shim-kata-v2 %{buildroot}%{_prefix}/local/bin/containerd-shim-kata-v2
-ln -sf %{_bindir}/kata-monitor %{buildroot}%{_prefix}/local/bin/kata-monitor
-ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 
 %files
-# runtime
-%{_bindir}/containerd-shim-kata-v2
-%{_bindir}/kata-monitor
-%{_bindir}/kata-runtime
-%{_bindir}/kata-collect-data.sh
-%{_prefix}/local/bin/containerd-shim-kata-v2
-%{_prefix}/local/bin/kata-monitor
-%{_prefix}/local/bin/kata-runtime
-%dir %{_datadir}/defaults/kata-containers/
-%{_datadir}/defaults/kata-containers/configuration*.toml
-%{_datadir}/bash-completion/completions/kata-runtime
+%{kata_bin}/kata-collect-data.sh
+%{kata_bin}/kata-monitor
+%{kata_bin}/kata-runtime
+
+%{defaults_kata}/configuration.toml
+
+%{kata_shim_bin}/containerd-shim-kata-v2
+
 %license LICENSE
 %doc CONTRIBUTING.md
 %doc README.md
 
-# CRI-O drop-in file
-%{_sysconfdir}/crio/crio.conf.d/50-kata
-
 %files tools
-# osbuilddir
-%dir %{kataosbuilderdir}
-%dir %{katalocalstatecachedir}
-%{kataosbuilderdir}/*
+%dir %{kata_path}
+%dir %{tools_pkg}
+%dir %{tools_pkg}/tools
+%dir %{tools_pkg}/tools/osbuilder
+%{tools_pkg}/tools/osbuilder/Makefile
 
-# agent
-%dir %{kataagentdir}
-%{kataagentdir}/*
+%dir %{tools_pkg}/tools/osbuilder/scripts
+%{tools_pkg}/tools/osbuilder/scripts/lib.sh
 
-%dir %{katauvmdir}
-%{katauvmdir}/VERSION
-%{katauvmdir}/versions.yaml
-%{katauvmdir}/mariner-build-uvm.sh
-%{katauvmdir}/ci/install_yq.sh
+%dir %{tools_pkg}/tools/osbuilder/rootfs-builder
+%{tools_pkg}/tools/osbuilder/rootfs-builder/rootfs.sh
+%dir %{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner
+%{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
+%{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
 
-# Remove some scripts we don't use
-%exclude %{kataosbuilderdir}/rootfs-builder/alpine
-%exclude %{kataosbuilderdir}/rootfs-builder/centos
-%exclude %{kataosbuilderdir}/rootfs-builder/clearlinux
-%exclude %{kataosbuilderdir}/rootfs-builder/debian
-%exclude %{kataosbuilderdir}/rootfs-builder/template
-%exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
+%dir %{tools_pkg}/tools/osbuilder/image-builder
+%{tools_pkg}/tools/osbuilder/image-builder/image_builder.sh
+
+%dir %{tools_pkg}/tools/osbuilder/node-builder
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/Makefile
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/clean.sh
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/common.sh
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
+
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
+- Upgrade to 3.2.0.azl3 release, using build instructions from fork
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2.0.azl2-5
 - Add missing Distribution tag.
 
@@ -321,7 +215,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 * Tue Sep 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-4
 - Set DEFSANDBOXCGROUPONLY="false".
 
-* Wed Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
+* Fri Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
 - Add kernel config to match guest and host cgroup setup.
 - Add patch to expose devices from kata.
 
