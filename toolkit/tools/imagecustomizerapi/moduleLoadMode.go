@@ -24,6 +24,6 @@ func (loadmode ModuleLoadMode) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid module load mode value (%v), it can only be 'always', 'auto', 'disable', 'inherit' or ''", loadmode)
+		return fmt.Errorf("invalid module load mode value (%s):\nvalid values: 'always', 'auto', 'disable', 'inherit', or ''", loadmode)
 	}
 }

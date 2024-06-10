@@ -26,7 +26,7 @@ func (p *MountPoint) IsValid() error {
 	}
 
 	if p.Path == "" {
-		return fmt.Errorf("invalid path (%s): must not be empty", p.Path)
+		return fmt.Errorf("invalid path: must not be empty")
 	}
 
 	if !path.IsAbs(p.Path) {

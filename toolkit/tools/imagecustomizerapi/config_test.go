@@ -39,6 +39,8 @@ func TestConfigIsValid(t *testing.T) {
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
 		},
+		Scripts: &Scripts{},
+		Iso:     &Iso{},
 	}
 
 	err := config.IsValid()
@@ -99,7 +101,7 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "bootType")
+	assert.ErrorContains(t, err, "invalid bootType value ()")
 }
 
 func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
@@ -160,7 +162,7 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "multiple disks")
+	assert.ErrorContains(t, err, "multiple disks is not currently supported")
 }
 
 func TestConfigIsValidZeroDisks(t *testing.T) {
@@ -207,7 +209,8 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "maxSize")
+	assert.ErrorContains(t, err, "invalid disk at index 0")
+	assert.ErrorContains(t, err, "a disk's maxSize value (0) must be a positive non-zero number")
 }
 
 func TestConfigIsValidMissingEsp(t *testing.T) {
@@ -228,8 +231,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "esp")
-	assert.ErrorContains(t, err, "efi")
+	assert.ErrorContains(t, err, "'esp' partition must be provided for 'efi' boot type")
 }
 
 func TestConfigIsValidMissingBiosBoot(t *testing.T) {
@@ -250,8 +252,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "bios-grub")
-	assert.ErrorContains(t, err, "legacy")
+	assert.ErrorContains(t, err, "'bios-grub' partition must be provided for 'legacy' boot type")
 }
 
 func TestConfigIsValidInvalidMountPoint(t *testing.T) {
@@ -287,8 +288,9 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "mountPoint")
-	assert.ErrorContains(t, err, "absolute path")
+	assert.ErrorContains(t, err, "invalid fileSystems item at index 0")
+	assert.ErrorContains(t, err, "invalid mountPoint value")
+	assert.ErrorContains(t, err, "invalid path (boot/efi): must be an absolute path")
 }
 
 func TestConfigIsValidKernelCLI(t *testing.T) {
@@ -326,4 +328,32 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 	}
 	err := config.IsValid()
 	assert.NoError(t, err)
+}
+
+func TestConfigIsValidInvalidIso(t *testing.T) {
+	config := &Config{
+		Iso: &Iso{
+			AdditionalFiles: AdditionalFilesMap{
+				"": FileConfigList{},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid 'iso' field")
+	assert.ErrorContains(t, err, "invalid additionalFiles")
+}
+
+func TestConfigIsValidInvalidScripts(t *testing.T) {
+	config := &Config{
+		Scripts: &Scripts{
+			PostCustomization: []Script{
+				{
+					Path: "",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid postCustomization script at index 0")
+	assert.ErrorContains(t, err, "either path or content must have a value")
 }
