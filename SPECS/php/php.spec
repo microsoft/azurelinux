@@ -32,7 +32,7 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.28
+Version:        8.1.29
 Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -1516,6 +1516,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Jun 10 2024 Neha Agarwal <nehaagawral@microsoft.com> - 8.1.29-1
+- Upgrade to 8.1.29 to fix CVE-2024-4577, CVE-2024-5585 and CVE-2024-5458
+
 * Fri May 03 2024 Gary Swalling <gaswal@microsoft.com> - 8.1.28-1
 - Upgrade to 8.1.28 to fix CVE-2024-2756, CVE-2024-3096
 - Update BuildRequires, libpq is now provided by postgresql
