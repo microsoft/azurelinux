@@ -659,7 +659,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-5
+BuildRequires: glibc-static >= 2.39-1
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
