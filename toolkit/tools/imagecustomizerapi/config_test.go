@@ -162,7 +162,7 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "multiple disks is not currently supported")
+	assert.ErrorContains(t, err, "defining multiple disks is not currently supported")
 }
 
 func TestConfigIsValidZeroDisks(t *testing.T) {
