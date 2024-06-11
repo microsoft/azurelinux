@@ -57,29 +57,23 @@ START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 popd
 
 mkdir -p %{buildroot}%{osbuilder}
-mkdir -p %{buildroot}%{osbuilder}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
-#TODO continue here - FOR BOTH CC AND VANILLA THIS SUB-FOLDER MUST BE POPULATED
-#ALSO /opt/kata-containers/uvm/src/agent/src/version.rs or version.rs.in must be present
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder
 mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
+mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
 
 pushd %{_builddir}/%{name}-%{version}
-install -D -m 0644 VERSION %{buildroot}%{osbuilder}/VERSION
-install -D -m 0644 utils.mk %{buildroot}%{osbuilder}/utils.mk
 install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
-
-install -D -m 0644 src/agent/Makefile %{buildroot}%{osbuilder}/src/agent/
-install -D -m 0644 src/agent/kata-containers.target %{buildroot}%{osbuilder}/src/agent/
-install -D -m 0644 src/agent/kata-agent.service.in %{buildroot}%{osbuilder}/src/agent/
-install -D -m 0755 src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
 
 install -D -m 0755 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
 
 install -D -m 0755 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
-cp -aR tools/osbuilder/rootfs-builder/cbl-mariner %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
+
+install -D -m 0755 tools/osbuilder/rootfs-builder/cbl-mariner/config.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
+install -D -m 0755 tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
 
 install -D -m 0755 tools/osbuilder/initrd-builder/initrd_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/initrd-builder/initrd_builder.sh
 
@@ -87,6 +81,10 @@ install -D -m 0644 tools/osbuilder/node-builder/azure-linux/Makefile %{buildroot
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/clean.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/common.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 install -D -m 0755 tools/osbuilder/node-builder/azure-linux/uvm_build.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
+
+install -D -m 0755 tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
+install -D -m 0644 tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
+install -D -m 0644 tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 popd
 
 %files
@@ -103,17 +101,10 @@ popd
 #%doc README.md
 
 %files tools
-# VERSION and utils.mk are required by the Makefile in src/agent
-%{osbuilder}/VERSION
-%{osbuilder}/utils.mk
+%dir %{osbuilder}
+%dir %{osbuilder}/tools
+%dir %{osbuilder}/tools/osbuilder
 %{osbuilder}/tools/osbuilder/Makefile
-
-%dir %{osbuilder}/src/agent
-%{osbuilder}/src/agent/Makefile
-%{osbuilder}/src/agent/kata-containers.target
-%{osbuilder}/src/agent/kata-agent.service.in
-%dir %{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release
-%{osbuilder}/src/agent/target/x86_64-unknown-linux-gnu/release/kata-agent
 
 %dir %{osbuilder}/tools/osbuilder/scripts
 %{osbuilder}/tools/osbuilder/scripts/lib.sh
@@ -121,16 +112,28 @@ popd
 %dir %{osbuilder}/tools/osbuilder/rootfs-builder
 %{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
 %dir %{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
-%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/*
+%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
+%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
 
 %dir %{osbuilder}/tools/osbuilder/initrd-builder
 %{osbuilder}/tools/osbuilder/initrd-builder/initrd_builder.sh
 
+%dir %{osbuilder}/tools/osbuilder/node-builder
 %dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
 %{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
+
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd
+%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
+%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1

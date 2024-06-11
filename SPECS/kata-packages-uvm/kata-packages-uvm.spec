@@ -49,6 +49,7 @@ Requires:       device-mapper
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
+Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
