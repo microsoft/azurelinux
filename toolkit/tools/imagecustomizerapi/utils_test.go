@@ -4,11 +4,33 @@
 package imagecustomizerapi
 
 import (
+	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestUnmarshalYamlFile(t *testing.T) {
+	var config Config
+	err := UnmarshalYamlFile(filepath.Join(workingDir, "../pkg/imagecustomizerlib/testdata/nochange-config.yaml"),
+		&config)
+	assert.NoError(t, err)
+}
+
+func TestUnmarshalYamlFileDoesNotExist(t *testing.T) {
+	var config Config
+	err := UnmarshalYamlFile(filepath.Join(workingDir, "../pkg/imagecustomizerlib/testdata/no-such-file.yaml"),
+		&config)
+	assert.ErrorContains(t, err, "no such file or directory")
+}
+
+func TestUnmarshalYamlInvalidFile(t *testing.T) {
+	var config Config
+	err := UnmarshalYamlFile(filepath.Join(workingDir, "../pkg/imagecustomizerlib/testdata/lists/dracut-fips.yaml"),
+		&config)
+	assert.ErrorContains(t, err, "yaml: unmarshal errors")
+}
 
 func testValidYamlValue[DataType HasIsValid](t *testing.T, yamlString string, expectedValue DataType) {
 	value := makeValue[DataType]()

@@ -14,9 +14,7 @@ type Iso struct {
 }
 
 func (i *Iso) IsValid() error {
-	var err error
-
-	err = i.KernelCommandLine.IsValid()
+	err := i.KernelCommandLine.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid kernelCommandLine: %w", err)
 	}

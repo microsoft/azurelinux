@@ -16,6 +16,12 @@ func TestDiskSizeNum(t *testing.T) {
 	assert.ErrorContains(t, err, "must have a unit suffix (K, M, G, or T)")
 }
 
+func TestDiskSizeNumTooLarge(t *testing.T) {
+	var diskSize DiskSize
+	err := UnmarshalYaml([]byte("18446744073709551616M"), &diskSize)
+	assert.ErrorContains(t, err, "value out of range")
+}
+
 func TestDiskSizeKiB(t *testing.T) {
 	var diskSize DiskSize
 	err := UnmarshalYaml([]byte("1024K"), &diskSize)

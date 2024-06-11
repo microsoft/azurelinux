@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//
-
 package imagecustomizerapi
 
 import (
@@ -47,29 +45,29 @@ func (l *DirConfigList) IsValid() (err error) {
 func (d *DirConfig) IsValid() (err error) {
 	// Paths
 	if d.SourcePath == "" {
-		return fmt.Errorf("invalid [sourcePath] value: empty string")
+		return fmt.Errorf("invalid sourcePath value: empty string")
 	}
 	if d.DestinationPath == "" {
-		return fmt.Errorf("invalid [destinationPath] value: empty string")
+		return fmt.Errorf("invalid destinationPath value: empty string")
 	}
 
 	// Permissions
 	if d.NewDirPermissions != nil {
 		err = d.NewDirPermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [newDirPermissions] value:\n%w", err)
+			return fmt.Errorf("invalid newDirPermissions value:\n%w", err)
 		}
 	}
 	if d.MergedDirPermissions != nil {
 		err = d.MergedDirPermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [mergedDirPermissions] value:\n%w", err)
+			return fmt.Errorf("invalid mergedDirPermissions value:\n%w", err)
 		}
 	}
 	if d.ChildFilePermissions != nil {
 		err = d.ChildFilePermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [childFilePermissions] value:\n%w", err)
+			return fmt.Errorf("invalid childFilePermissions value:\n%w", err)
 		}
 	}
 

@@ -27,7 +27,7 @@ func (s *Storage) IsValid() error {
 		return fmt.Errorf("at least 1 disk must be specified")
 	}
 	if len(s.Disks) > 1 {
-		return fmt.Errorf("multiple disks is not currently supported")
+		return fmt.Errorf("defining multiple disks is not currently supported")
 	}
 
 	for i, disk := range s.Disks {

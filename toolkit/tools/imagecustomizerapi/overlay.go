@@ -18,13 +18,13 @@ type Overlay struct {
 func (o *Overlay) IsValid() error {
 	// Validate paths for UpperDir, WorkDir, and LowerDir
 	if err := validatePath(o.UpperDir); err != nil {
-		return fmt.Errorf("upperDir '%s': %w", o.UpperDir, err)
+		return fmt.Errorf("invalid upperDir (%s):\n%w", o.UpperDir, err)
 	}
 	if err := validatePath(o.WorkDir); err != nil {
-		return fmt.Errorf("workDir '%s': %w", o.WorkDir, err)
+		return fmt.Errorf("invalid workDir (%s):\n%w", o.WorkDir, err)
 	}
 	if err := validatePath(o.LowerDir); err != nil {
-		return fmt.Errorf("lowerDir '%s': %w", o.LowerDir, err)
+		return fmt.Errorf("invalid lowerDir (%s):\n%w", o.LowerDir, err)
 	}
 
 	// Check if UpperDir and WorkDir are identical
@@ -34,15 +34,15 @@ func (o *Overlay) IsValid() error {
 
 	// Check if UpperDir is a subdirectory of WorkDir or vice versa
 	if isSubDirString(o.UpperDir, o.WorkDir) {
-		return fmt.Errorf("upperDir '%s' should not be a subdirectory of workDir '%s'", o.UpperDir, o.WorkDir)
+		return fmt.Errorf("upperDir (%s) should not be a subdirectory of workDir (%s)", o.UpperDir, o.WorkDir)
 	}
 	if isSubDirString(o.WorkDir, o.UpperDir) {
-		return fmt.Errorf("workDir '%s' should not be a subdirectory of upperDir '%s'", o.WorkDir, o.UpperDir)
+		return fmt.Errorf("workDir (%s) should not be a subdirectory of upperDir (%s)", o.WorkDir, o.UpperDir)
 	}
 
 	if o.Partition != nil {
 		if err := o.Partition.IsValid(); err != nil {
-			return fmt.Errorf("invalid partition in upperDir '%s', workDir '%s', lowerDir '%s': %w", o.UpperDir, o.WorkDir, o.LowerDir, err)
+			return fmt.Errorf("invalid partition:\n%w", err)
 		}
 	}
 
@@ -57,7 +57,7 @@ func validatePath(path string) error {
 
 	// Check if the path contains spaces
 	if strings.Contains(path, " ") {
-		return fmt.Errorf("path '%s' contains spaces and is invalid", path)
+		return fmt.Errorf("path (%s) contains spaces and is invalid", path)
 	}
 
 	return nil
