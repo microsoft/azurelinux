@@ -2,8 +2,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        16.0.2
-Release:        9%{?dist}
+Version:        17.0.7
+Release:        1%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -26,8 +26,6 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-44487.patch
-Patch1:         CVE-2023-45288.patch
 BuildRequires: golang
 
 %description
@@ -105,6 +103,10 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Tue Jun 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 17.0.7-1
+- Bump version to 17.0.7 to address CVE-2024-32886
+- Remove patches already fixed in sources
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.0.2-9
 - Bump release to rebuild with go 1.21.11
 
