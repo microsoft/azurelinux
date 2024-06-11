@@ -4,7 +4,7 @@
 Summary:        HvLoader.efi is an EFI application for loading an external hypervisor loader.
 Name:           hvloader
 Version:        1.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Source0:        https://github.com/microsoft/HvLoader/archive/refs/tags/v%{versi
 # Instructions to generate edk2 submodules: https://github.com/tianocore/edk2/tree/edk2-stable202302?tab=readme-ov-file#submodules
 Source1:        https://github.com/tianocore/edk2/archive/refs/tags/%{edk2_tag}.tar.gz#/%{edk2_tag}-submodules.tar.gz
 Source2:        target-x86.txt
+Patch0:         CVE-2024-1298.patch
 BuildRequires:  bc
 BuildRequires:  gcc
 BuildRequires:  build-essential
@@ -37,6 +38,7 @@ option is the path to hypervisor loader binary.
 
 %prep
 %setup -T -a 0 -a 1 -c "%{name}-%{version}"
+%patch0 -p1
 set -x
 ls -l
 mv %{name_github}-%{version} MdeModulePkg/Application
@@ -58,6 +60,9 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
+* Fri Jul 12 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-3
+- Add patch to resolve CVE-2024-1298
+
 * Wed Jun 05 2024 Chris Co <chrco@microsoft.com> - 1.0.1-2
 - Update edk2_tag to edk2-stable202305
 
