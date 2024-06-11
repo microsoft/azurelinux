@@ -1,14 +1,14 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
 Version:        0.8.0
-Release:        1%{?dist}
+Release:        40%{?dist}
 URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        http://sourceforge.net/projects/atftp/files/latest/download/%{name}-%{version}.tar.gz
-
+Patch:          debug-pxe.patch
 BuildRequires:  systemd
 Requires:       systemd
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
