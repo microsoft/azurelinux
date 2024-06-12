@@ -161,7 +161,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch 0
+%patch0 -p1
 make mrproper
 
 cp %{config_source} .config
