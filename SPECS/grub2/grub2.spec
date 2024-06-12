@@ -6,10 +6,10 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        18%{?dist}
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
@@ -85,32 +85,13 @@ Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
 Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
 Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
 Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
-# Required to reach SBAT 3
-Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
-Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
-Patch:          sbat-3-0005-font-Fix-integer-overflow-in-ensure_comb_space.patch
-Patch:          sbat-3-0006-font-Fix-integer-overflow-in-BMP-index.patch
-Patch:          sbat-3-0007-font-Fix-integer-underflow-in-binary-search-of-char-.patch
-Patch:          sbat-3-0008-kern-efi-sb-Enforce-verification-of-font-files.patch
-Patch:          sbat-3-0009-fbutil-Fix-integer-overflow.patch
-Patch:          sbat-3-0011-font-Harden-grub_font_blit_glyph-and-grub_font_blit_.patch
-Patch:          sbat-3-0012-font-Assign-null_font-to-glyphs-in-ascii_font_glyph.patch
-Patch:          sbat-3-0013-normal-charset-Fix-an-integer-overflow-in-grub_unico.patch
-# Required to reach SBAT 4
-Patch:          sbat-4-0001-fs-ntfs-Fix-an-OOB-write-when-parsing-the-ATTRIBUTE_.patch
-Patch:          sbat-4-0002-fs-ntfs-Fix-an-OOB-read-when-reading-data-from-the-r.patch
-Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri.patch
-Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
-Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
-Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
+BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
 Requires:       device-mapper
-Requires:       systemd-udev
 Requires:       xz
-Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -119,6 +100,7 @@ Provides:       %{name}-common = %{version}-%{release}
 Provides:       %{name}-tools = %{version}-%{release}
 Provides:       %{name}-tools-efi = %{version}-%{release}
 Provides:       %{name}-tools-extra = %{version}-%{release}
+Provides:       %{name}-tools-minimal = %{version}-%{release}
 
 %description
 The GRUB package contains the GRand Unified Bootloader.
@@ -169,7 +151,6 @@ Unsigned GRUB UEFI image
 %package efi-binary
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
-Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -184,7 +165,6 @@ GRUB UEFI bootloader binaries
 %package efi-binary-noprefix
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
-Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
@@ -204,14 +184,6 @@ Group:          System Environment/Base
 %description configuration
 Directory for package-specific boot configurations
 to be persistently stored on AzureLinux
-
-%package tools-minimal
-Summary:        Minimal set of utilities to configure a grub-based system
-Group:          System Environment/Base
-Requires:       %{name}-configuration = %{version}-%{release}
-
-%description tools-minimal
-Minimal set of utilities to configure a grub-based system
 
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
@@ -358,37 +330,23 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %files
 %defattr(-,root,root)
 %license COPYING
+%dir %{_sysconfdir}/grub.d
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
+%config() %{_sysconfdir}/grub.d/00_header
+%config() %{_sysconfdir}/grub.d/10_linux
+%config() %{_sysconfdir}/grub.d/20_linux_xen
+%config() %{_sysconfdir}/grub.d/30_os-prober
+%config() %{_sysconfdir}/grub.d/30_uefi-firmware
+%config(noreplace) %{_sysconfdir}/grub.d/40_custom
+%config(noreplace) %{_sysconfdir}/grub.d/41_custom
+%{_sysconfdir}/grub.d/README
+/sbin/*
+%{_bindir}/*
+%{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-/sbin/grub2-bios-setup
-/sbin/grub2-install
-/sbin/grub2-macbless
-/sbin/grub2-ofpathname
-/sbin/grub2-reboot
-/sbin/grub2-set-default
-/sbin/grub2-sparc64-setup
-%{_bindir}/grub2-fstest
-%{_bindir}/grub2-glue-efi
-%{_bindir}/grub2-kbdcomp
-%{_bindir}/grub2-menulst2cfg
-%{_bindir}/grub2-mkimage
-%{_bindir}/grub2-mklayout
-%{_bindir}/grub2-mknetdir
-%{_bindir}/grub2-mkpasswd-pbkdf2
-%{_bindir}/grub2-mkrescue
-%{_bindir}/grub2-mkstandalone
-%{_bindir}/grub2-render-label
-%{_bindir}/grub2-syslinux2cfg
-
-%files tools-minimal
-%{_datarootdir}/grub/grub-mkconfig_lib
-/sbin/grub2-probe
-/sbin/grub2-mkconfig
-%{_bindir}/grub2-editenv
-%{_bindir}/grub2-script-check
-%{_bindir}/grub2-file
-%{_bindir}/grub2-mkrelpath
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
+%ghost %config(noreplace) /boot/%{name}/grub.cfg
 
 %ifarch x86_64
 %files pc
@@ -426,38 +384,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_rpmconfigdir}/macros.d/macros.grub2
 
 %files configuration
-%dir %{_sysconfdir}/grub.d
-%dir %{_sysconfdir}/default/grub.d
-%{_sysconfdir}/grub.d/README
-%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
-%ghost %config(noreplace) /boot/%{name}/grub.cfg
-%config() %{_sysconfdir}/grub.d/00_header
-%config() %{_sysconfdir}/grub.d/10_linux
-%config() %{_sysconfdir}/grub.d/20_linux_xen
-%config() %{_sysconfdir}/grub.d/30_os-prober
-%config() %{_sysconfdir}/grub.d/30_uefi-firmware
-%config(noreplace) %{_sysconfdir}/grub.d/40_custom
-%config(noreplace) %{_sysconfdir}/grub.d/41_custom
+%{_sysconfdir}/default/grub.d
 
 %changelog
-* Mon Apr 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-18
-- update grub to sbat 4
-
-* Tue Mar 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-17
-- Introduce grub2-tools-minimal subpackage
-
-* Wed Mar 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
-- Updated sbat.csv.in to reflect new distro name.
-
-* Tue Mar 05 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-15
-- Explicitly depend on systemd-udev for image install
-
-* Thu Jan 25 10:49:55 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.06-14
-- remove systemd-devel build dep
-
-* Mon Nov 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-13
-- Move /etc/grub.d to the configuration subpackage
-
 * Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
 - CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
   CVE-2022-28735 CVE-2022-28736 and increment SBAT level to 2
