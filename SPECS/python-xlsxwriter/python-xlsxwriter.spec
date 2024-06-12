@@ -7,8 +7,7 @@ Release:	2%{?dist}
 Summary:	Python module for writing files in the Excel 2007+ XLSX file format
 License:	BSD
 URL:		https://pypi.python.org/pypi/XlsxWriter
-Source0:	https://files.pythonhosted.org/packages/source/X/%{src_name}/%{src_name}-%{version}.tar.gz
-
+Source0:	https://github.com/jmcnamara/XlsxWriter/archive/refs/tags/RELEASE_3.2.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 %global common_desc\

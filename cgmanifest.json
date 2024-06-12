@@ -24974,7 +24974,7 @@
         "other": {
           "name": "python-xlsxwriter",
           "version": "3.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/X/xlsxwriter/xlsxwriter-3.2.0.tar.gz"
+          "downloadUrl": "https://github.com/jmcnamara/XlsxWriter/archive/refs/tags/RELEASE_3.2.0.tar.gz"
         }
       }
     },
