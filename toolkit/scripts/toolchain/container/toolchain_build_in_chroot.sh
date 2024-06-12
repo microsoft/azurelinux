@@ -342,11 +342,9 @@ tar xf gcc-13.2.0.tar.xz
 pushd gcc-13.2.0
 case $(uname -m) in
   x86_64)
-    GCC_CONFIG_WITH_ARCH="--with-arch=x86-64-v3"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    GCC_CONFIG_WITH_ARCH=""
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
@@ -361,7 +359,6 @@ LD=ld \
              --disable-bootstrap      \
              --disable-fixincludes    \
              --disable-libsanitizer   \
-             $GCC_CONFIG_WITH_ARCH    \
              --with-system-zlib       \
              --enable-languages=c,c++,fortran
 make -j$(nproc)
