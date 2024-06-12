@@ -42,7 +42,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Patch0:		0001-mstflint-kernel-4.25.patch
+Patch0:		    0001-mstflint-kernel-4.25.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -161,7 +161,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch0 -p1
+%patch 0
 make mrproper
 
 cp %{config_source} .config
