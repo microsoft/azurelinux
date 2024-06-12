@@ -14,7 +14,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        6.6.29.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,10 @@ done
 %endif
 
 %changelog
+* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-5
+- include i18n (kbd package) in UKI, to provide loadkeys binary so
+  systemd-vconsole-setup works
+
 * Fri May 31 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Bump release to match kernel
 
