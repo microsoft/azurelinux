@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
-Patch4:         add-default-link-flags-for-shared-libraries.patch
+# Patch4:         add-default-link-flags-for-shared-libraries.patch
 Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
