@@ -1,7 +1,7 @@
-From b2ece28d36200655e3c82fb201ce1919bbb6ce1a Mon Sep 17 00:00:00 2001
+From c42941e9e7a9ec456867d7c57535152a9180c46a Mon Sep 17 00:00:00 2001
 From: Juan Camposeco <juanarturoc@microsoft.com>
-Date: Tue, 11 Jun 2024 17:41:20 -0700
-Subject: [PATCH] mstflint kernel 4.25
+Date: Wed, 12 Jun 2024 11:36:01 -0700
+Subject: [PATCH] add mstflint kernel 4.28
 
 ---
  drivers/misc/Kconfig               |    1 +
@@ -10,9 +10,9 @@ Subject: [PATCH] mstflint kernel 4.25
  drivers/misc/mstflint/Makefile     |   93 ++
  drivers/misc/mstflint/mst.h        |  226 ++++
  drivers/misc/mstflint/mst_kernel.h |  127 ++
- drivers/misc/mstflint/mst_main.c   | 1762 ++++++++++++++++++++++++++++
+ drivers/misc/mstflint/mst_main.c   | 1766 ++++++++++++++++++++++++++++
  drivers/misc/mstflint/mst_vpd.c    |  164 +++
- 8 files changed, 2382 insertions(+)
+ 8 files changed, 2386 insertions(+)
  create mode 100644 drivers/misc/mstflint/Kconfig
  create mode 100644 drivers/misc/mstflint/Makefile
  create mode 100644 drivers/misc/mstflint/mst.h
@@ -523,10 +523,10 @@ index 0000000000000..7d12c9938ca1e
 +
 diff --git a/drivers/misc/mstflint/mst_main.c b/drivers/misc/mstflint/mst_main.c
 new file mode 100644
-index 0000000000000..698e51a6b2e7c
+index 0000000000000..b3ec3f7b11943
 --- /dev/null
 +++ b/drivers/misc/mstflint/mst_main.c
-@@ -0,0 +1,1762 @@
+@@ -0,0 +1,1766 @@
 +/*
 + * Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. ALL RIGHTS RESERVED.
 + *
@@ -2179,7 +2179,11 @@ index 0000000000000..698e51a6b2e7c
 +
 +    if (alloc_chrdev_region(&dev->my_dev, 0, 1, dev->name))
 +        mst_err("failed to allocate chrdev_region\n");
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
++    dev->cl = class_create(dev->name);
++#else
 +    dev->cl = class_create(THIS_MODULE, dev->name);
++#endif
 +    if (dev->cl == NULL)
 +    {
 +        pr_alert("Class creation failed\n");

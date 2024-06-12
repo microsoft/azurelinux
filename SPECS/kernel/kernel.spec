@@ -42,7 +42,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Patch0:		    0001-mstflint-kernel-4.25.patch
+Patch0:		0001-add-mstflint-kernel-4.28.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
