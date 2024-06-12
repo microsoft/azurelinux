@@ -18,7 +18,7 @@
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.29.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ BuildRequires:  system-release
 BuildRequires:  tpm2-tools
 BuildRequires:  cryptsetup
 BuildRequires:  device-mapper
+BuildRequires:  kbd
 
 %description
 The kernel-uki package contains the Linux kernel packaged as a Unified
@@ -64,6 +65,10 @@ install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-5
+- include i18n (kbd package) in UKI, to provide loadkeys binary so
+  systemd-vconsole-setup works
+
 * Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-4
 - Original version for Azure Linux.
 - License verified.
