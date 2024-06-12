@@ -24972,6 +24972,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-xlsxwriter",
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/X/xlsxwriter/xlsxwriter-3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-xmltodict",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/martinblech/xmltodict/archive/v0.12.0/xmltodict-0.12.0.tar.gz"
