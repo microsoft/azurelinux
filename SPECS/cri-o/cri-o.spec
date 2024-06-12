@@ -25,8 +25,8 @@
 Summary:        OCI-based implementation of Kubernetes Container Runtime Interface
 # Define macros for further referenced sources
 Name:           cri-o
-Version:        1.22.3
-Release:        3%{?dist}
+Version:        1.29.5
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -216,6 +216,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Wed Jun 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.5-1
+- Auto-upgrade to 1.29.5 - Fixing CVE-2023-49569
+
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-3
 - Bump release to rebuild with go 1.21.11
 
