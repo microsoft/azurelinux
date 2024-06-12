@@ -8,8 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
-# Patch4:         add-default-link-flags-for-shared-libraries.patch
-Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
+Patch0:         0001-update-tool-name-in-error-message.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
@@ -60,6 +59,7 @@ find %{buildroot} -type f -name '*.a' -delete
 %changelog
 * Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.28.0-1
 - Upgrade to 4.28.0
+- Update patches
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
