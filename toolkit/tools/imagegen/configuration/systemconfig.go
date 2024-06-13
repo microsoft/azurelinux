@@ -41,6 +41,8 @@ type SystemConfig struct {
 	PreserveTdnfCache    bool                      `json:"PreserveTdnfCache"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
 	EnableHidepid        bool                      `json:"EnableHidepid"`
+	DisableRpmDocs       bool                      `json:"DisableRpmDocs"`
+	OverrideRpmLocales   string                    `json:"OverrideRpmLocales"`
 }
 
 const (
@@ -187,6 +189,8 @@ func (s *SystemConfig) IsValid() (err error) {
 	}
 
 	//Validate Encryption
+
+	// Validate locales
 
 	return
 }

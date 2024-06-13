@@ -29,7 +29,7 @@ func TestIdentifiedPartitionIsValidValidPartLabel(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestIdentifiedPartitionIsValidInvalidPartLabel(t *testing.T) {
+func TestIdentifiedPartitionIsValidEmptyPartLabel(t *testing.T) {
 	invalidPartition := IdentifiedPartition{
 		IdType: "part-label",
 		Id:     "",
@@ -60,4 +60,28 @@ func TestIdentifiedPartitionIsValidInvalidPartUuidFormat(t *testing.T) {
 	err := incorrectUuidPartition.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid id format")
+}
+
+func TestIdentifiedPartitionIsValidInvalidIdType(t *testing.T) {
+	incorrectUuidPartition := IdentifiedPartition{
+		IdType: "cat",
+		Id:     "incorrect-uuid-format",
+	}
+
+	err := incorrectUuidPartition.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid idType")
+	assert.ErrorContains(t, err, "invalid idType value (cat)")
+}
+
+func TestIdentifiedPartitionIsValidInvalidPartLabel(t *testing.T) {
+	incorrectUuidPartition := IdentifiedPartition{
+		IdType: IdTypePartLabel,
+		Id:     "i ❤️ cats",
+	}
+
+	err := incorrectUuidPartition.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid id format for part-label")
+	assert.ErrorContains(t, err, "partition name (i ❤️ cats) contains a non-ASCII character (❤)")
 }

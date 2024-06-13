@@ -26,7 +26,7 @@ func (c *Config) IsValid() (err error) {
 	if c.Iso != nil {
 		err = c.Iso.IsValid()
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid 'iso' field:\n%w", err)
 		}
 	}
 
@@ -34,7 +34,7 @@ func (c *Config) IsValid() (err error) {
 	if c.OS != nil {
 		err = c.OS.IsValid()
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid 'os' field:\n%w", err)
 		}
 		hasResetBootLoader = c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
 	}

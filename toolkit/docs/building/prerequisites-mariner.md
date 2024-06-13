@@ -20,6 +20,7 @@ sudo tdnf -y install \
     genisoimage \
     git \
     golang \
+    jq \
     kernel-headers \
     make \
     moby-cli \

@@ -4,9 +4,9 @@
 package safechroot
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strings"
@@ -605,11 +605,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 			continue
 		}
 
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithExpBackoff(context.Background(), func() error {
 			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
-		}, totalAttempts, retryDuration, 2.0, nil)
+		}, totalAttempts, retryDuration, 2.0)
 
 		if err != nil {
 			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)
@@ -727,16 +727,19 @@ func (c *Chroot) stopGPGComponents() (err error) {
 		return
 	}
 
-	_, err = exec.LookPath("gpgconf")
-	if err != nil {
-		logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
-		return nil
-	}
-
 	err = c.UnsafeRun(func() (err error) {
-		components, err := listGPGComponents()
-		if err != nil {
-			return err
+		found, chrootErr := file.CommandExists("gpgconf")
+		if chrootErr != nil {
+			return chrootErr
+		}
+		if !found {
+			logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
+			return nil
+		}
+
+		components, chrootErr := listGPGComponents()
+		if chrootErr != nil {
+			return chrootErr
 		}
 		// List of components to kill. The names must be verbatim identical to the name tag that is used by `gpgconf`
 		componentsToKill := []string{"gpg-agent", "keyboxd"}

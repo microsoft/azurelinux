@@ -26,7 +26,7 @@ clean-precache:
 # it does, so add the phony target as a dependency to the flag file
 .PHONY: precache_always_run_phony
 pre-cache: $(STATUS_FLAGS_DIR)/precache.flag
-$(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(PRECACHER_SNAPSHOT) precache_always_run_phony
+$(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(PRECACHER_SNAPSHOT) $(depend_REPO_LIST) $(REPO_LIST) precache_always_run_phony
 	@if [ "$(DISABLE_UPSTREAM_REPOS)" = "y" ]; then \
 		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot precache RPMs"; \
 		exit 1; \

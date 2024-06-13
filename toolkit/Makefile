@@ -81,7 +81,6 @@ ENABLE_TRACE                    ?= n
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
-PREVIEW_REPO     ?= $(toolkit_root)/repos/azurelinux-official-preview.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 
 PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
@@ -164,19 +163,8 @@ ifneq ($(DAILY_BUILD_ID),)
    endif
 else
    ifeq ($(USE_PREVIEW_REPO),y)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/ms-oss/$(build_arch)
-      override SRPM_URL_LIST      += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/srpms
-      ifneq ($(wildcard $(PREVIEW_REPO)),)
-         override REPO_LIST += $(PREVIEW_REPO)
-      else
-         $(warning )
-         $(warning ######################### WARNING #########################)
-         $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
-         $(warning ######################### WARNING #########################)
-         $(warning )
-      endif
+      # Configure the preview repo
+      include $(SCRIPTS_DIR)/preview.mk
    endif
 endif
 
@@ -213,6 +201,7 @@ include $(SCRIPTS_DIR)/profile.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
+include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage

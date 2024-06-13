@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -256,10 +257,25 @@ func getImageFileType(filePath string) (string, error) {
 	case readByteCount >= 8 && bytes.Equal(firstBytes[:8], []byte("vhdxfile")):
 		return "vhdx", nil
 
+	case isZstFile(firstBytes):
+		return "zst", nil
+
 	// Check for the MBR signature (which exists even on GPT formatted drives).
 	case readByteCount >= 512 && bytes.Equal(firstBytes[510:512], []byte{0x55, 0xAA}):
 		return "raw", nil
 	}
 
 	return "", fmt.Errorf("unknown file type: %s", filePath)
+}
+
+func isZstFile(firstBytes []byte) bool {
+	if len(firstBytes) < 4 {
+		return false
+	}
+
+	magicNumber := binary.LittleEndian.Uint32(firstBytes[:4])
+
+	// 0xFD2FB528 is a zst frame.
+	// 0x184D2A50-0x184D2A5F are skippable ztd frames.
+	return magicNumber == 0xFD2FB528 || (magicNumber >= 0x184D2A50 && magicNumber <= 0x184D2A5F)
 }

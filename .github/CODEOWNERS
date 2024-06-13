@@ -96,3 +96,4 @@
 /toolkit/tools/osmodifier @microsoft/cbl-mariner-imagecustomizer
 /toolkit/tools/pkg/imagecustomizerlib/ @microsoft/cbl-mariner-imagecustomizer
 /toolkit/tools/pkg/osmodifierlib @microsoft/cbl-mariner-imagecustomizer
+/toolkit/scripts/build_tag_imagecustomizer.mk @microsoft/cbl-mariner-imagecustomizer

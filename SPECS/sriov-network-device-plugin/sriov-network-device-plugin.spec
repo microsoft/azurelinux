@@ -1,12 +1,13 @@
 Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
-Version:        3.5.1
-Release:        3%{?dist}
+Version:        3.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin
 Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang
 Requires:       gawk
 Requires:       hwdata
@@ -17,6 +18,7 @@ resources in the form of SR-IOV virtual functions and PCI physical functions
 
 %prep
 %autosetup -p1
+tar -xf %{SOURCE1}
 
 %build
 go build -mod vendor -o ./build/sriovdp ./cmd/sriovdp/
@@ -34,6 +36,9 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}/ddptool-1.0.1.12.tar.gz
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.0-1
+- Auto-upgrade to 3.7.0 - address CVE-2022-1996
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-3
 - Bump release to rebuild with go 1.20.10
 

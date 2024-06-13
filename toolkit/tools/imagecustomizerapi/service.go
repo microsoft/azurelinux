@@ -23,13 +23,13 @@ type Services struct {
 func (s *Services) IsValid() error {
 	for i, service := range s.Enable {
 		if err := serviceNameIsValid(service); err != nil {
-			return fmt.Errorf("invalid service (%s) in service.enable at index (%d): %w", service, i, err)
+			return fmt.Errorf("invalid service enable at index (%d):\n%w", i, err)
 		}
 	}
 
 	for i, service := range s.Disable {
 		if err := serviceNameIsValid(service); err != nil {
-			return fmt.Errorf("invalid service (%s) in service.disable at index (%d): %w", service, i, err)
+			return fmt.Errorf("invalid service disable at index (%d):\n%w", i, err)
 		}
 	}
 

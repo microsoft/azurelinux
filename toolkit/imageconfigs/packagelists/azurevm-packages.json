@@ -4,6 +4,7 @@
         "cloud-init-azure-kvp",
         "cloud-utils-growpart",
         "dhcp-client",
+        "dracut-hyperv",
         "grubby",
         "hyperv-daemons",
         "kexec-tools",
