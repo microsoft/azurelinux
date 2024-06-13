@@ -2,7 +2,7 @@
 Summary:        The Squid proxy caching server
 Name:           squid
 Version:        5.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 Epoch:          7
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -30,6 +30,8 @@ Patch204:       squid-3.5.9-include-guards.patch
 # revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
 # workaround for #1934919
 Patch205:       squid-5.0.5-symlink-lang-err.patch
+Patch206:    CVE-2024-23638.patch
+Patch207:    CVE-2024-23638-1.patch
 # required for SASL authentication
 BuildRequires:  cyrus-sasl-devel
 # ESI support requires Expat & libxml2
@@ -101,8 +103,8 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch203 -p1 -b .perlpath
 %patch204  -b .include-guards
 %patch205 -p1 -R -b .symlink-lang-err
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1679526
+%patch206 -p1\n
+%patch207 -p1\n# https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
 sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented|' src/squid.8.in
 
@@ -325,6 +327,9 @@ fi
 %{_sbindir}/usermod -a -G wbpriv squid >/dev/null 2>&1 || \
     chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
 %changelog
+* Thu Jun 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.7-6
+- Add patch for CVE-2024-23638
+
 * Thu Feb 09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths

@@ -1,0 +1,56 @@
+From 290ae202883ac28a48867079c2fb34c40efd382b Mon Sep 17 00:00:00 2001
+From: Alex Rousskov <rousskov@measurement-factory.com>
+Date: Sun, 12 Nov 2023 00:44:19 +0000
+Subject: [PATCH] Just close after a write(2) response sending error (#1582)
+
+    FATAL: assertion failed: Http1Server.cc:322: "rep"
+
+2015 commit 21cd322 started to continue ClientStream processing after
+socket write(2) failures. In most cases, the code still "worked". For
+example, initiateClose() would close the client-Squid connection, and
+connStateClosed() would be called before Store has a chance to deliver
+response body data requested by pullData() in writeComplete().
+
+However, that response body data could sometimes reach Server, and
+handleReply() would assert because startOfOutput() says that we have not
+written the headers, but ClientStream state (i.e. a nil `rep` parameter)
+says that we have. These assertion can be triggered by disabling
+initiateClose(), and they can probably be triggered by traffic as well.
+
+Now, after a Comm::Write() error, we terminateAll() client transactions
+on the failed connection[^1] and do not call afterClientWrite() that is
+not equipped to handle I/O errors and would continue ClientStream
+processing if called.
+
+This bug was discovered and detailed by Joshua Rogers at
+https://megamansec.github.io/Squid-Security-Audit/stream-assert.html
+where it was filed as "Implicit Assertion in Stream Handling".
+
+[^1]: We terminateAll() instead of potentially postponing closure with
+initiateClose() because the failed client-Squid connection most likely
+cannot be salvaged for, say, reading the remainder of the request body.
+---
+ src/servers/Server.cc | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/servers/Server.cc b/src/servers/Server.cc
+index e83ba013d58..3c4004cf511 100644
+--- a/src/servers/Server.cc
++++ b/src/servers/Server.cc
+@@ -204,8 +204,14 @@ Server::clientWriteDone(const CommIoCbParams &io)
+ 
+     Must(io.conn->fd == clientConnection->fd);
+ 
+-    if (io.flag && pipeline.front())
+-        pipeline.front()->initiateClose("write failure");
++    if (io.flag) {
++        debugs(33, 2, "bailing after a write failure: " << xstrerr(io.xerrno));
++        LogTagsErrors lte;
++        lte.timedout = io.xerrno == ETIMEDOUT;
++        lte.aborted = !lte.timedout; // intentionally true for zero io.xerrno
++        terminateAll(Error(ERR_WRITE_ERROR, SysErrorDetail::NewIfAny(io.xerrno)), lte);
++        return;
++    }
+ 
+     afterClientWrite(io.size); // update state
+     writeSomeData(); // maybe schedules another write
