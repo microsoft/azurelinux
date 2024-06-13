@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.55.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -202,8 +202,11 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
-* Thu Jun 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.55.0-18
+* Thu Jun 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.55.0-19
 - Address CVE-2024-3727 by patching vendored github.com/containers/image
+
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.0-18
+- Bump release to rebuild with go 1.21.11
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.55.0-17
 - Address CVE-2023-44487 by patching vendored golang.org/x/net

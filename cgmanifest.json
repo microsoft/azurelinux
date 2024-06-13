@@ -865,8 +865,8 @@
         "type": "other",
         "other": {
           "name": "azl-compliance",
-          "version": "1.0.1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-compliance-1.0.1.tar.gz"
+          "version": "1.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-compliance-1.0.2.tar.gz"
         }
       }
     },
@@ -1809,6 +1809,16 @@
           "name": "cloud-hypervisor",
           "version": "32.0",
           "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cloud-hypervisor-cvm",
+          "version": "38.0.72",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
         }
       }
     },
@@ -4630,8 +4640,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://golang.org/dl/go1.21.6.src.tar.gz"
+          "version": "1.21.11",
+          "downloadUrl": "https://golang.org/dl/go1.21.11.src.tar.gz"
         }
       }
     },
@@ -6550,8 +6560,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.159.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8061,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl1.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8071,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl1.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8141,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.159.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8151,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.159.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8161,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.159.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8171,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.159.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.159.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8181,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.158.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8191,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv9",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
+          "version": "5.15.157.mshv1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
         }
       }
     },
@@ -8211,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv16",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
+          "version": "6.1.58.mshv4",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
         }
       }
     },
@@ -10611,8 +10621,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.37",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
+          "version": "1.6.39",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.39.tar.xz"
         }
       }
     },
@@ -15574,8 +15584,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.17.5",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
+          "version": "2.17.9",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.9.tar.gz"
         }
       }
     },
