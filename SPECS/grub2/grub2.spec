@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -103,6 +103,10 @@ Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri
 Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
 Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
 Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
+# The Azure Linux team created this patch since the gcc version in use at the
+# time optimizes the code incorrectly, leading to network traffic getting
+# dropped in scenarios like PXE booting.
+Patch:          disable-checksum-code-optimization.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -440,6 +444,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Jun 12 2024 George Mileka <gmileka@microsoft.com> - 2.06-19
+- disable code optimization for ip checksum calculation
+
 * Mon Apr 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-18
 - update grub to sbat 4
 
