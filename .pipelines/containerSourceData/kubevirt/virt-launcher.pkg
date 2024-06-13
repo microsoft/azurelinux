@@ -1,5 +1,6 @@
 augeas
 ca-certificates
+edk2-ovmf
 iptables
 kubevirt-container-disk
 kubevirt-virt-launcher
@@ -14,4 +15,3 @@ qemu-tools
 socat
 tar
 xorriso
-edk2-ovmf
