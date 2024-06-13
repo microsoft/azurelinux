@@ -117,6 +117,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu Jun 13 2024 Nick Samson <nisamson@microsoft.com> - 18.20.3-1
+- Upgrade to 18.20.3-1 to fix CVE-2024-28863
+
 * Wed May 29 2024 Mitch Zhu <mitchzhu@microsoft.com> - 18.20.2-2
 - Patch CVE-2023-21100.
 - Remove unused patches.
