@@ -1,19 +1,19 @@
 Summary:        Manipulate netfilter connection tracking table and run High Availability
 Name:           conntrack-tools
-Version:        1.4.5
-Release:        8%{?dist}
+Version:        1.4.8
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://conntrack-tools.netfilter.org/
-Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
+Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.xz
 Source1:        conntrackd.service
 Source2:        conntrackd.conf
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libmnl-devel >= 1.0.3
-BuildRequires:  libnetfilter_conntrack-devel >= 1.0.7
+BuildRequires:  libnetfilter_conntrack-devel >= 1.0.9
 BuildRequires:  libnetfilter_cthelper-devel >= 1.0.0
 BuildRequires:  libnetfilter_cttimeout-devel >= 1.0.0
 BuildRequires:  libnetfilter_queue-devel >= 1.0.2
@@ -96,6 +96,11 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 %systemd_postun conntrackd.service
 
 %changelog
+* Wed Jun 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.4.8-1
+- Update to version 1.4.8
+- Updating source from tar.bz2 to tar.xz
+- Build requires libnetfilter_conntrack >= 1.0.9
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.5-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
@@ -213,7 +218,7 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 - Updated to 1.0.1
 - Added daemon using systemd and configuration file
 - Removed legacy spec requirements
-- Patch for: parse.c:240:34: error: 'NULL' undeclared 
+- Patch for: parse.c:240:34: error: 'NULL' undeclared
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
