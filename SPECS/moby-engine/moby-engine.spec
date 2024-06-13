@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -20,6 +20,8 @@ Patch1:  CVE-2024-23651.patch
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
 Patch2:  CVE-2024-23652.patch
+Patch3:  CVE-2023-45288.patch
+Patch4:  CVE-2023-44487.patch
 
 %{?systemd_requires}
 
@@ -125,6 +127,12 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Fri May 31 2024 Mitch Zhu <mitchzhu@microsoft.com> - 24.0.9-4
+- Fix for CVE-2023-44487
+
+* Fri May 03 2024 Chris Gunn <chrisgun@microsoft.com> - 24.0.9-3
+- Fix for CVE-2023-45288
+
 * Wed May 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-2
 - Symlink /usr/bin/docker-proxy to /usr/libexec/docker-proxy for back-compat
 
