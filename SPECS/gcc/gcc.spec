@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -329,11 +329,6 @@ LD=ld \
     --enable-plugin \
     --enable-shared \
     --enable-threads=posix \
-%ifarch x86_64
-    --with-arch=x86-64-v3 \
-%else
-    --with-arch=armv8.1-a \
-%endif
     --with-system-zlib
 
 popd
@@ -528,6 +523,12 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-6
+- Revert change to baseline architecture for x86-64-v3
+
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-5
+- Revert change to baseline architecture for arm64
+
 * Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
 - Set baseline architecture levels to `x86-64-v3` and `armv8.1-a`
 

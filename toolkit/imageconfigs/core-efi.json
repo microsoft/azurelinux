@@ -47,12 +47,14 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json"
+                "packagelists/cloud-init-packages.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "azurelinux"
+            "Hostname": "azurelinux",
+            "DisableRpmDocs": true
         }
     ]
 }

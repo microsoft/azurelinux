@@ -1,5 +1,6 @@
 {
     "packages": [
-        "qemu-guest-agent"
+        "qemu-guest-agent",
+        "dracut-virtio"
     ]
 }
