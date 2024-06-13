@@ -76,8 +76,7 @@ The vte-profile package contains a profile.d script for the VTE terminal
 emulator library.
 
 %prep
-%setup -q -n vte-%{version}
-%patch100 -p1 -b .cntnr-precmd-preexec-scroll
+%autosetup -p1 -n vte-%{version}
 %if 0%{?flatpak}
 # Install user units where systemd macros expect them
 sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
