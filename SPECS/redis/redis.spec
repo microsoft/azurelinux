@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        6.2.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  openssl-devel
 BuildRequires:  systemd
 BuildRequires:  tcl
 BuildRequires:  tcl-devel
@@ -27,7 +28,7 @@ Redis is an in-memory data structure store, used as database, cache and message 
 %autosetup -p1
 
 %build
-make %{?_smp_mflags}
+make BUILD_TLS=yes %{?_smp_mflags}
 
 %install
 install -vdm 755 %{buildroot}
@@ -83,6 +84,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Fri Apr 26 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 6.2.14-2
+- Build with BUILD_TLS=yes option.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.2.14-1
 - Auto-upgrade to 6.2.14 - Fixes CVE-2023-45145
 

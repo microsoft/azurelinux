@@ -205,8 +205,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.14.4",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.4.tar.gz"
+          "version": "2.14.12",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.12.tar.gz"
         }
       }
     },
@@ -855,8 +855,18 @@
         "type": "other",
         "other": {
           "name": "azcopy",
-          "version": "10.15.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
+          "version": "10.24.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "azl-compliance",
+          "version": "1.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-compliance-1.0.2.tar.gz"
         }
       }
     },
@@ -1757,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.105.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.2.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
         }
       }
     },
@@ -1799,6 +1809,16 @@
           "name": "cloud-hypervisor",
           "version": "32.0",
           "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cloud-hypervisor-cvm",
+          "version": "38.0.72",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
         }
       }
     },
@@ -2247,8 +2267,8 @@
         "type": "other",
         "other": {
           "name": "cri-o",
-          "version": "1.21.7",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.7.tar.gz"
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.22.3.tar.gz"
         }
       }
     },
@@ -2257,8 +2277,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.28.0",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.28.0.tar.gz"
+          "version": "1.29.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.29.0.tar.gz"
         }
       }
     },
@@ -3438,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "facter",
-          "version": "4.2.5",
-          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.5.gem"
+          "version": "4.2.13",
+          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.13.gem"
         }
       }
     },
@@ -5130,8 +5150,8 @@
         "type": "other",
         "other": {
           "name": "h5py",
-          "version": "3.7.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.7.0.tar.gz"
+          "version": "3.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/h5py/h5py-3.10.0.tar.gz"
         }
       }
     },
@@ -6540,8 +6560,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.153.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -7381,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.14",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.14.tar.gz"
+          "version": "3.17",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.17.tar.gz"
         }
       }
     },
@@ -8051,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8061,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8131,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.153.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8141,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.153.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8151,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.153.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8161,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.153.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8171,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.148.2.tar.gz"
+          "version": "5.15.158.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.158.2.tar.gz"
         }
       }
     },
@@ -8181,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv9",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
+          "version": "5.15.157.mshv1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
         }
       }
     },
@@ -8201,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv16",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
+          "version": "6.1.58.mshv4",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
         }
       }
     },
@@ -13653,8 +13673,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.2-1/go1.22.2-20240403.7.src.tar.gz"
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.3-1/go1.22.3-20240507.3.src.tar.gz"
         }
       }
     },
@@ -21104,8 +21124,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.28",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.28.tar.xz"
+          "version": "8.1.29",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.29.tar.xz"
         }
       }
     },
@@ -21464,8 +21484,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.11",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.11/postgresql-14.11.tar.bz2"
+          "version": "14.12",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.12/postgresql-14.12.tar.bz2"
         }
       }
     },
@@ -26905,8 +26925,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rexml",
-          "version": "3.2.5",
-          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.5.tar.gz"
+          "version": "3.2.7",
+          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.7.tar.gz"
         }
       }
     },
@@ -30880,8 +30900,8 @@
         "type": "other",
         "other": {
           "name": "zeromq",
-          "version": "4.3.4",
-          "downloadUrl": "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz"
+          "version": "4.3.5",
+          "downloadUrl": "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
         }
       }
     },
