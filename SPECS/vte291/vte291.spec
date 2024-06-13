@@ -11,7 +11,7 @@
 Summary:        Terminal emulator library
 Name:           vte291
 Version:        0.66.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version
 # https://bugzilla.redhat.com/show_bug.cgi?id=1103380
 # https://gitlab.gnome.org/GNOME/vte/-/issues/226
 Patch100:       vte291-cntnr-precmd-preexec-scroll.patch
+Patch101:       CVE-2024-37535.patch
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
 BuildRequires:  gobject-introspection-devel
@@ -119,6 +120,9 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+* Thu Jun 13 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.66.2-3
+- Patch CVE-2024-37535
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.66.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
