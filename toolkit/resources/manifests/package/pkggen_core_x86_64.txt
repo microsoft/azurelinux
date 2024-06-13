@@ -1,5 +1,5 @@
 filesystem-1.1-20.cm2.x86_64.rpm
-kernel-headers-5.15.153.1-2.cm2.noarch.rpm
+kernel-headers-5.15.158.2-1.cm2.noarch.rpm
 glibc-2.35-7.cm2.x86_64.rpm
 glibc-devel-2.35-7.cm2.x86_64.rpm
 glibc-i18n-2.35-7.cm2.x86_64.rpm
@@ -165,11 +165,11 @@ texinfo-6.8-1.cm2.x86_64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-openssl-1.1.1k-30.cm2.x86_64.rpm
-openssl-devel-1.1.1k-30.cm2.x86_64.rpm
-openssl-libs-1.1.1k-30.cm2.x86_64.rpm
-openssl-perl-1.1.1k-30.cm2.x86_64.rpm
-openssl-static-1.1.1k-30.cm2.x86_64.rpm
+openssl-1.1.1k-32.cm2.x86_64.rpm
+openssl-devel-1.1.1k-32.cm2.x86_64.rpm
+openssl-libs-1.1.1k-32.cm2.x86_64.rpm
+openssl-perl-1.1.1k-32.cm2.x86_64.rpm
+openssl-static-1.1.1k-32.cm2.x86_64.rpm
 libcap-2.60-2.cm2.x86_64.rpm
 libcap-devel-2.60-2.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
@@ -194,10 +194,10 @@ curl-8.5.0-2.cm2.x86_64.rpm
 curl-devel-8.5.0-2.cm2.x86_64.rpm
 curl-libs-8.5.0-2.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
-libxml2-2.10.4-2.cm2.x86_64.rpm
-libxml2-devel-2.10.4-2.cm2.x86_64.rpm
+libxml2-2.10.4-3.cm2.x86_64.rpm
+libxml2-devel-2.10.4-3.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
-docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
+docbook-style-xsl-1.79.1-14.cm2.noarch.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
 glib-2.71.0-2.cm2.x86_64.rpm
 libltdl-2.4.6-8.cm2.x86_64.rpm

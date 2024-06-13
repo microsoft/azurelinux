@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,7 @@ Patch13:        cups-dymo-deviceid.patch
 Patch14:        CVE-2023-4504.patch
 Patch15:        CVE-2023-32324.patch
 Patch16:        CVE-2023-34241.patch
+Patch17:        CVE-2022-26691.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -264,6 +265,7 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch14 -p1 
 %patch15 -p1
 %patch16 -p1
+%patch17 -p1
 
 # LSPP support.
 %patch100 -p1 -b .lspp
@@ -655,6 +657,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Tue May 21 2024 Lanze Liu <lanzeliu@microsoft.com> - 2.3.3op2-8
+- Add patch for CVE-2022-26691.
+
 * Fri Apr 12 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.3.3op2-7
 - Add patch for CVE-2023-32324.
 - Add patch for CVE-2023-34241.
