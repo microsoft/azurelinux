@@ -218,7 +218,7 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 - Updated to 1.0.1
 - Added daemon using systemd and configuration file
 - Removed legacy spec requirements
-- Patch for: parse.c:240:34: error: 'NULL' undeclared
+- Patch for: parse.c:240:34: error: 'NULL' undeclared 
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
