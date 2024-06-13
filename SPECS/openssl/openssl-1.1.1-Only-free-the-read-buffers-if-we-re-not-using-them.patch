@@ -1,0 +1,67 @@
+From f7a045f3143fc6da2ee66bf52d8df04829590dd4 Mon Sep 17 00:00:00 2001
+From: Watson Ladd <watsonbladd@gmail.com>
+Date: Wed, 24 Apr 2024 11:26:56 +0100
+Subject: [PATCH] Only free the read buffers if we're not using them
+
+If we're part way through processing a record, or the application has
+not released all the records then we should not free our buffer because
+they are still needed.
+
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+Reviewed-by: Neil Horman <nhorman@openssl.org>
+Reviewed-by: Matt Caswell <matt@openssl.org>
+---
+ ssl/record/rec_layer_s3.c | 9 +++++++++
+ ssl/record/record.h       | 1 +
+ ssl/ssl_lib.c             | 3 +++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/ssl/record/rec_layer_s3.c b/ssl/record/rec_layer_s3.c
+index 1db1712a0..525c3abf4 100644
+--- a/ssl/record/rec_layer_s3.c
++++ b/ssl/record/rec_layer_s3.c
+@@ -81,6 +81,15 @@ int RECORD_LAYER_read_pending(const RECORD_LAYER *rl)
+     return SSL3_BUFFER_get_left(&rl->rbuf) != 0;
+ }
+ 
++int RECORD_LAYER_data_present(const RECORD_LAYER *rl)
++{
++    if (rl->rstate == SSL_ST_READ_BODY)
++        return 1;
++    if (RECORD_LAYER_processed_read_pending(rl))
++        return 1;
++    return 0;
++}
++
+ /* Checks if we have decrypted unread record data pending */
+ int RECORD_LAYER_processed_read_pending(const RECORD_LAYER *rl)
+ {
+diff --git a/ssl/record/record.h b/ssl/record/record.h
+index af56206e0..513ab3988 100644
+--- a/ssl/record/record.h
++++ b/ssl/record/record.h
+@@ -197,6 +197,7 @@ void RECORD_LAYER_release(RECORD_LAYER *rl);
+ int RECORD_LAYER_read_pending(const RECORD_LAYER *rl);
+ int RECORD_LAYER_processed_read_pending(const RECORD_LAYER *rl);
+ int RECORD_LAYER_write_pending(const RECORD_LAYER *rl);
++int RECORD_LAYER_data_present(const RECORD_LAYER *rl);
+ void RECORD_LAYER_reset_read_sequence(RECORD_LAYER *rl);
+ void RECORD_LAYER_reset_write_sequence(RECORD_LAYER *rl);
+ int RECORD_LAYER_is_sslv2_record(RECORD_LAYER *rl);
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index c01ad8291..356d65cb6 100644
+--- a/ssl/ssl_lib.c
++++ b/ssl/ssl_lib.c
+@@ -5248,6 +5248,9 @@ int SSL_free_buffers(SSL *ssl)
+     if (RECORD_LAYER_read_pending(rl) || RECORD_LAYER_write_pending(rl))
+         return 0;
+ 
++    if (RECORD_LAYER_data_present(rl))
++        return 0;
++
+     RECORD_LAYER_release(rl);
+     return 1;
+ }
+-- 
+2.33.8
+
