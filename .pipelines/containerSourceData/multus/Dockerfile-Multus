@@ -11,6 +11,6 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN mkdir -p /usr/src/multus-cni/bin \ 
   && cp /usr/bin/multus /usr/src/multus-cni/bin/ \ 
-  && cp /usr/bin/multus_entrypoint /multus_entrypoint 
+  && cp /usr/bin/multus-entrypoint /multus-entrypoint 
 
-ENTRYPOINT [ "/multus_entrypoint" ]
+ENTRYPOINT [ "/multus-entrypoint" ]
