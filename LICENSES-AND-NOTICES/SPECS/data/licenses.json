@@ -1854,6 +1854,7 @@
                 "python-winrm",
                 "python-wrapt",
                 "python-xlrd",
+                "python-xlsxwriter",
                 "python-xmltodict",
                 "python-yubico",
                 "python-zipp",
