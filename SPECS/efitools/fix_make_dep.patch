@@ -1,0 +1,12 @@
+diff -urpN efitools-1.9.2/Make.rules b/Make.rules
+--- efitools-1.9.2/Make.rules	2019-01-08 17:13:13.000000000 -0500
++++ b/Make.rules	2024-06-14 12:07:24.222089038 -0400
+@@ -71,7 +71,7 @@ endif
+ %.hash: %.efi hash-to-efi-sig-list
+ 	./hash-to-efi-sig-list $< $@
+ 
+-%-blacklist.esl: %.crt cert-to-efi-hash-list
++%-blacklist.esl: %.crt cert-to-efi-sig-list
+ 	./cert-to-efi-sig-list $< $@
+ 
+ %-hash-blacklist.esl: %.crt cert-to-efi-hash-list
