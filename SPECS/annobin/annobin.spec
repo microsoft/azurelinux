@@ -19,13 +19,17 @@
 Summary:        Binary annotation plugin for GCC
 Name:           annobin
 Version:        12.49
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://sourceware.org/annobin/
 Source:         https://nickc.fedorapeople.org/%{annobin_sources}
 Requires:       %{name}-plugin-clang
+%if 0%{?with_check}
+Requires:       %{name}-tests
+%endif
+
 # Insert patches here, if needed.  Eg:
 # Patch01: annobin-plugin-default-string-notes.patch
 #---------------------------------------------------------------------------------
@@ -352,6 +356,9 @@ make check || ( cat tests/test-suite.log; false )
 #---------------------------------------------------------------------------------
 
 %changelog
+* Thu Jun 13 2024 Sam Meluch <sammeluch@microsoft.com> - 12.40-2
+- add tests package to test builds
+
 * Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 12.40-1
 - Promoted package from extended to core
 - Upgraded to 12.49
