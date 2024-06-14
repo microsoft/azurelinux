@@ -14,7 +14,14 @@ Source1:       %{name}-mktarball.sh
 # don't fetch ccan or run git from autogen.sh, already done by mktarball.sh
 Patch0:        %{name}-no-git.patch
 # add Fedora gnu-efi path and link statically against libefi.a/libgnuefi.a
-Patch1:        %{name}-gnuefi.patch
+
+# NOTE - gnu-efi Fedora packaging switched from 'x86_64' to 'x64'
+# naming, which required the following patch, but then appears to have
+# removed the patch for the naming change so it's back to 'x86_64',
+# which is what we currently have...so we don't need this patch, but
+# maybe we will if the naming gets changed back in the future...
+#Patch1:        %%{name}-gnuefi.patch
+
 # same as gnu-efi
 ExclusiveArch: x86_64 aarch64 %{arm} %{ix86}
 BuildRequires: make
