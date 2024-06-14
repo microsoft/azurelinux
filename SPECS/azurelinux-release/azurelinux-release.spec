@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ Source1:        90-default.preset
 Source2:        90-default-user.preset
 Source3:        99-default-disable.preset
 Source4:        15-azurelinux-default.conf
+
+Provides: azure-release-variant = %{version}-%{release}
 
 Provides:       system-release
 Provides:       system-release(%{version})
@@ -29,6 +31,48 @@ BuildRequires:  systemd-bootstrap-rpm-macros
 %description
 Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release related files
 and systemd preset files that determine which services are enabled by default.
+
+%package common
+Summary: Azure release files
+
+Requires:   azure-release-variant = %{version}-%{release}
+Suggests:   azure-release
+
+Requires:   azure-repos(%{version})
+Requires:   azure-release-identity = %{version}-%{release}
+
+%description common
+Release files common to all Azure Linux variants
+
+# baremetal variant
+%if %{with baremetal}
+%package baremetal
+Summary:        Azure Linux BareMetal default configurations
+
+RemovePathPostfixes: .baremetal
+Provides:       azure-release = %{version}-%{release}
+Provides:       azure-release-variant = %{version}-%{release}
+Provides:       system-release
+Provides:       system-release(%{version})
+Requires:       azure-release-common = %{version}-%{release}
+
+%description baremetal
+Provides base packages and files for a bare-metal host to boot with Azure Linux.
+
+# qemu-guest variant
+%if %{with qemu-guest}
+%package qemu-guest
+Summary:        Azure Linux QEMU guest default configurations
+
+RemovePathPostfixes: .qemu-guest
+Provides:       azure-release = %{version}-%{release}
+Provides:       azure-release-variant = %{version}-%{release}
+Provides:       system-release
+Provides:       system-release(%{version})
+Requires:       azure-release-common = %{version}-%{release}
+
+%description qemu-guest
+Provides base packages and files for a qemu-guest to boot with Azure Linux.
 
 %install
 install -d %{buildroot}%{_sysconfdir}
@@ -99,7 +143,7 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 # Default sysctl settings
 install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
-%files
+%files common
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
 %{_libdir}/lsb-release
@@ -117,7 +161,31 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_userpresetdir}/*.preset
 %{_sysctldir}/*.conf
 
+# baremetal variant definition
+%if %{with baremetal}
+echo "VARIANT=\"BareMetal Image\"" >> %{buildroot}%{_libdir}/os-release
+echo "VARIANT_ID=baremetal" >> %{buildroot}%{_libdir}/os-release
+
+Requires: dracut-megaraid
+Requires: selinux-policy
+Requires: selinux-policy-modules
+%endif
+
+# qemu-guest variant definition
+%if %{with qemu-guest}
+# baremetal
+echo "VARIANT=\"QEMU Guest Image\"" >> %{buildroot}%{_libdir}/os-release
+echo "VARIANT_ID=qemu-guest" >> %{buildroot}%{_libdir}/os-release
+
+# Packages for qemu-guest
+Requires: qemu-guest-agent
+Requires: dracut-virtio
+%endif
+
 %changelog
+* Wed Jun 13 2024 Roaa Sakr <romoh@microsoft.com> - 3.0-15
+- Variant definition for Azure Linux 3.0
+
 * Wed Jun 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-14
 - Azure Linux 3.0 June Preview Release 1
 
