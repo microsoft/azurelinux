@@ -35,11 +35,11 @@ and systemd preset files that determine which services are enabled by default.
 %package common
 Summary: Azure release files
 
-Requires:   azure-release-variant = %{version}-%{release}
+# Requires:   azure-release-variant = %{version}-%{release}
 Suggests:   azure-release
 
-Requires:   azure-repos(%{version})
-Requires:   azure-release-identity = %{version}-%{release}
+# Requires:   azure-repos(%{version})
+# Requires:   azure-release-identity = %{version}-%{release}
 
 %description common
 Release files common to all Azure Linux variants
