@@ -185,7 +185,7 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
 %if 0%{?with_check}
-pip3 install archspec iniconfig flask xprocess
+pip3 install archspec iniconfig flask pytest-xprocess
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
