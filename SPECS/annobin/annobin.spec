@@ -354,7 +354,8 @@ make check || ( cat tests/test-suite.log; false )
 
 %changelog
 * Thu Jun 13 2024 Sam Meluch <sammeluch@microsoft.com> - 12.40-2
-- add tests package to test builds
+- build package --without-debuginfod
+- fix package tests
 
 * Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 12.40-1
 - Promoted package from extended to core
