@@ -1,6 +1,6 @@
 Name:           efitools
 Version:        1.9.2
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Tools to manipulate EFI secure boot keys and signatures
 License:        GPLv2 and LGPLv2 and BSD
 
@@ -12,7 +12,7 @@ Patch1:         efitools-c99-1.patch
 Patch2:         efitools-c99-2.patch
 
 # same as gnu-efi
-ExclusiveArch:  %{efi}
+ExclusiveArch:  x86_64
 
 BuildRequires:  pkgconfig(openssl)
 
@@ -65,6 +65,9 @@ rm -v %{buildroot}%{_docdir}/%{name}/COPYING
 %{_bindir}/sign-efi-sig-list
 
 %changelog
+* Fri Jun 14 2024 Dan Streetman <ddstreet@microsoft.com> - 1.9.2-14
+- initial import from fedora 40
+
 * Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.2-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
