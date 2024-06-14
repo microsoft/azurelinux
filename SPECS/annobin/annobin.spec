@@ -26,7 +26,6 @@ Distribution:   Azure Linux
 URL:            https://sourceware.org/annobin/
 Source:         https://nickc.fedorapeople.org/%{annobin_sources}
 Requires:       %{name}-plugin-clang
-BuildRequires:  elfutils-devel
 
 # Insert patches here, if needed.  Eg:
 # Patch01: annobin-plugin-default-string-notes.patch
@@ -238,7 +237,7 @@ touch doc/annobin.info
 #---------------------------------------------------------------------------------
 
 %build
-CONFIG_ARGS="$CONFIG_ARGS --quiet --with-debuginfod --with-clang --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} --with-llvm"
+CONFIG_ARGS="$CONFIG_ARGS --quiet --without-debuginfod --with-clang --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} --with-llvm"
 
 export CFLAGS="$CFLAGS -DAARCH64_BRANCH_PROTECTION_SUPPORTED=1"
 
