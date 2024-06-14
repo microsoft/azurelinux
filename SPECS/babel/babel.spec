@@ -46,7 +46,7 @@ The functionality Babel provides for internationalization (I18n) and localizatio
 ln -sfv pybabel %{buildroot}/%{_bindir}/pybabel3
 
 %check
-pip3 install freezegun funcsigs pathlib2 utils
+pip3 install freezegun funcsigs pathlib2 utils iniconfig
 %pytest
 
 %files
