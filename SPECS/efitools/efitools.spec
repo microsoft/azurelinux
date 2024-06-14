@@ -10,6 +10,7 @@ URL:            https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.gi
 Source0:        %{url}/snapshot/%{name}-%{version}.tar.gz
 Patch1:         efitools-c99-1.patch
 Patch2:         efitools-c99-2.patch
+Patch3:         fix_make_dep.patch
 
 # same as gnu-efi
 ExclusiveArch:  x86_64
