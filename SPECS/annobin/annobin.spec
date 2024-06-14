@@ -237,7 +237,7 @@ touch doc/annobin.info
 #---------------------------------------------------------------------------------
 
 %build
-CONFIG_ARGS="$CONFIG_ARGS --quiet --without-debuginfod --with-clang --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} --with-llvm"
+CONFIG_ARGS="$CONFIG_ARGS --quiet --with-debuginfod --with-clang --with-gcc-plugin-dir=%{ANNOBIN_GCC_PLUGIN_DIR} --with-llvm"
 
 export CFLAGS="$CFLAGS -DAARCH64_BRANCH_PROTECTION_SUPPORTED=1"
 
@@ -310,7 +310,7 @@ rm -f %{buildroot}%{_infodir}/dir
 #---------------------------------------------------------------------------------
 
 %check
-make check || ( cat tests/test-suite.log; false )
+make check HAVE_DEBUGINFOD=false || ( cat tests/test-suite.log; false )
 
 #---------------------------------------------------------------------------------
 
