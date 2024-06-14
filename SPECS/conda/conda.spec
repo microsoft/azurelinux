@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
 Version:        24.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -30,6 +30,9 @@ BuildRequires:  python3-hatchling
 BuildRequires:  python3-pathspec
 BuildRequires:  python3-pip
 BuildRequires:  python3-pluggy
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
@@ -182,6 +185,7 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
 %if 0%{?with_check}
+pip3 install archspec
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
@@ -320,6 +324,9 @@ py.test-%{python3_version} -vv -m "not integration" \
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 24.1.2-2
+- Add pytest and pip install archspec to fix package tests
+
 * Mon Apr 22 2024 Andrew Phelps <anphel@microsoft.com> - 24.1.2-1
 - Upgrade to version 24.1.2 referencing Fedora 40 (license: MIT)
 
