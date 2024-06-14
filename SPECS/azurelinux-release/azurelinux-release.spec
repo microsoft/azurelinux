@@ -185,7 +185,7 @@ Requires: dracut-virtio
 %endif
 
 %changelog
-* Wed Jun 13 2024 Roaa Sakr <romoh@microsoft.com> - 3.0-15
+* Thu Jun 13 2024 Roaa Sakr <romoh@microsoft.com> - 3.0-15
 - Variant definition for Azure Linux 3.0
 
 * Wed Jun 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-14
