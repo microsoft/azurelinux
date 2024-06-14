@@ -58,6 +58,7 @@ Requires:       azure-release-common = %{version}-%{release}
 
 %description baremetal
 Provides base packages and files for a bare-metal host to boot with Azure Linux.
+%endif
 
 # qemu-guest variant
 %if %{with qemu-guest}
@@ -73,6 +74,7 @@ Requires:       azure-release-common = %{version}-%{release}
 
 %description qemu-guest
 Provides base packages and files for a qemu-guest to boot with Azure Linux.
+%endif
 
 %install
 install -d %{buildroot}%{_sysconfdir}
