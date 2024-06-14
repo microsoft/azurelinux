@@ -1,0 +1,24 @@
+Define _GNU_SOURCE for a declaration of strptime
+
+This is needed for compatibility with future C compilers which reject
+implicit function declarations by default.  Without _GNU_SOURCE (or a
+similar feature test macro), <time.h> does not declare the strptime
+function, and compilation can fail.
+
+Submitted upstream:
+
+  <https://lore.kernel.org/linux-efi/87fsdhllhk.fsf@oldenburg.str.redhat.com/>
+
+diff --git a/Make.rules b/Make.rules
+index 903a5a4..d4de1ef 100644
+--- a/Make.rules
++++ b/Make.rules
+@@ -14,7 +14,7 @@ else
+ $(error unknown architecture $(ARCH))
+ endif
+ INCDIR	   = -I$(TOPDIR)include/ -I/usr/include/efi -I/usr/include/efi/$(ARCH) -I/usr/include/efi/protocol
+-CPPFLAGS   = -DCONFIG_$(ARCH)
++CPPFLAGS   = -DCONFIG_$(ARCH) -D_GNU_SOURCE
+ CFLAGS	   = -O2 -g $(ARCH3264) -fpic -Wall -fshort-wchar -fno-strict-aliasing -fno-merge-constants -fno-stack-protector -ffreestanding -fno-stack-check
+ LDFLAGS	   = -nostdlib
+ CRTOBJ		= crt0-efi-$(ARCH).o
