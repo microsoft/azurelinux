@@ -26,9 +26,7 @@ Distribution:   Azure Linux
 URL:            https://sourceware.org/annobin/
 Source:         https://nickc.fedorapeople.org/%{annobin_sources}
 Requires:       %{name}-plugin-clang
-%if 0%{?with_check}
-Requires:       %{name}-tests
-%endif
+BuildRequires:  elfutils-devel
 
 # Insert patches here, if needed.  Eg:
 # Patch01: annobin-plugin-default-string-notes.patch
