@@ -12,7 +12,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +79,9 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Wed Jun 12 2024 George Mileka <gmileka@microsoft.com> - 2.06-19
+- disable code optimization for ip checksum calculation
+
 * Mon Apr 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-18
 - update grub to sbat 4
 
