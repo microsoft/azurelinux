@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://babel.pocoo.org
-Source0:        https://files.pythonhosted.org/packages/15/d2/9671b93d623300f0aef82cde40e25357f11330bdde91743891b22a555bed/%{babel}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/15/d2/9671b93d623300f0aef82cde40e25357f11330bdde91743891b22a555bed/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytz
@@ -36,7 +36,7 @@ The functionality Babel provides for internationalization (I18n) and localizatio
 2.A Python interface to the CLDR (Common Locale Data Repository), providing access to various locale display names, localized number and date formatting, etc.
 
 %prep
-%autosetup -n Babel-%{version}
+%autosetup -n babel-%{version}
 
 %build
 %py3_build
