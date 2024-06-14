@@ -32,6 +32,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Hotplug_detach_grace_period.patch
+Patch2:         Enabling-Virtqemud-by-default.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-6%{?dist}
@@ -274,6 +275,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %changelog
 * Thu Jun 13 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-4
 - Updating path of virt-launcher.cil
+- Enabling virtqemud-sock by default and removing it from node-labeller scripts.
 
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-3
 - update to build dep latest glibc-static version

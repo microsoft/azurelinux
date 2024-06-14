@@ -21,6 +21,6 @@ RUN cp /usr/share/kube-virt/virt-launcher/virtqemud.conf /etc/libvirt/
 #simple smoke test
 RUN ls /usr/bin/virt-launcher
 
-RUN systemctl enable --now virtqemud.socket
+RUN virtqemud -d
 
 ENTRYPOINT [ "/usr/bin/virt-launcher" ]
