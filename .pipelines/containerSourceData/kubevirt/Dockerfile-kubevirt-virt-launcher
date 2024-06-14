@@ -21,6 +21,6 @@ RUN cp /usr/share/kube-virt/virt-launcher/virtqemud.conf /etc/libvirt/
 #simple smoke test
 RUN ls /usr/bin/virt-launcher
 
-COPY bashrc /etc/bash.bashrc
+COPY virt-launcher-entrypoint.sh /usr/local/bin/
 
-RUN chmod a+rwx /etc/bash.bashrc
+ENTRYPOINT ["/usr/local/bin/virt-launcher-entrypoint.sh"]
