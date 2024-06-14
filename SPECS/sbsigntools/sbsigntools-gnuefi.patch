@@ -1,0 +1,69 @@
+diff -up sbsigntools-0.9.5/configure.ac.gnu-efi sbsigntools-0.9.5/configure.ac
+--- sbsigntools-0.9.5/configure.ac.gnu-efi	2023-05-05 12:56:50.000000000 +0200
++++ sbsigntools-0.9.5/configure.ac	2023-05-05 13:06:47.495361241 +0200
+@@ -67,19 +67,30 @@ PKG_CHECK_MODULES(uuid, uuid,
+     AC_MSG_ERROR([libuuid (from the uuid package) is required]))
+ 
+ dnl gnu-efi headers require extra include dirs
+-EFI_ARCH=$(uname -m | sed 's/i.86/ia32/;s/arm.*/arm/')
+-AM_CONDITIONAL(TEST_BINARY_FORMAT, [ test "$EFI_ARCH" = "arm" -o "$EFI_ARCH" = "aarch64" -o "$EFI_ARCH" = riscv64 ])
++EFI_ARCH=$(uname -m | sed -e 's/i.86/ia32/;s/arm.*/arm/' -e 's/x86_64/x64/' -e 's/aarch64/aa64/')
++AM_CONDITIONAL(TEST_BINARY_FORMAT, [ test "$EFI_ARCH" = "arm" -o "$EFI_ARCH" = "aa64" -o "$EFI_ARCH" = riscv64 ])
+ 
+ ##
+ # no consistent view of where gnu-efi should dump the efi stuff, so find it
+ ##
+-for path in /lib /lib64 /usr/lib /usr/lib64 /usr/lib32 /lib/efi /lib64/efi /usr/lib/efi /usr/lib64/efi /usr/lib/gnuefi /usr/lib64/gnuefi ; do
+-    if test -e $path/crt0-efi-$EFI_ARCH.o; then
++AC_MSG_CHECKING([gnu-efi crt path])
++for path in /lib /lib64 /usr/lib /usr/lib64 /usr/lib32 /lib/efi /lib64/efi /usr/lib/efi /usr/lib64/efi /usr/lib/gnuefi /usr/lib64/gnuefi /usr/lib/gnuefi/$EFI_ARCH ; do
++    if test -e $path/crt0.o; then
+        CRTPATH=$path
++       CRT=crt0.o
++       LDS=efi.lds
++       EFI_PATH=$path
++    elif test -e $path/crt0-efi-$EFI_ARCH.o; then
++       CRTPATH=$path
++       CRT=crt0-efi-${EFI_ARCH}.o
++       LDS=elf_${EFI_ARCH}_efi.lds
++       EFI_PATH=$libdir
+     fi
+ done
+ if test -z "$CRTPATH"; then
+    AC_MSG_ERROR([cannot find the gnu-efi crt path])
++else
++   AC_MSG_RESULT($CRTPATH)
+ fi
+ 
+ EFI_CPPFLAGS="-I/usr/include/efi -I/usr/include/efi/$EFI_ARCH \
+@@ -91,6 +102,9 @@ CPPFLAGS="$CPPFLAGS_save"
+ AC_SUBST(EFI_CPPFLAGS, $EFI_CPPFLAGS)
+ AC_SUBST(EFI_ARCH, $EFI_ARCH)
+ AC_SUBST(CRTPATH, $CRTPATH)
++AC_SUBST(CRT, $CRT)
++AC_SUBST(LDS, $LDS)
++AC_SUBST(EFI_PATH, $EFI_PATH)
+ 
+ AC_CONFIG_FILES([Makefile src/Makefile lib/ccan/Makefile]
+ 		[docs/Makefile tests/Makefile])
+diff -up sbsigntools-0.9.5/tests/Makefile.am.gnu-efi sbsigntools-0.9.5/tests/Makefile.am
+--- sbsigntools-0.9.5/tests/Makefile.am.gnu-efi	2023-05-05 12:56:50.000000000 +0200
++++ sbsigntools-0.9.5/tests/Makefile.am	2023-05-05 12:57:50.674915069 +0200
+@@ -18,7 +18,7 @@ if TEST_BINARY_FORMAT
+ EFILDFLAGS = --defsym=EFI_SUBSYSTEM=0x0a
+ FORMAT = -O binary
+ else
+-FORMAT = --target=efi-app-$(EFI_ARCH)
++FORMAT = --target=efi-app-$(EFI_ARCH:x64=x86_64)
+ endif
+ check_DATA = $(test_key) $(test_cert)
+ check_SCRIPTS = test-wrapper.sh
+@@ -31,7 +31,7 @@ check_SCRIPTS = test-wrapper.sh
+ 		$(FORMAT) $^ $@
+ 
+ .$(OBJEXT).elf:
+-	$(LD) $(EFILDFLAGS) -nostdlib -L /usr/lib -L /usr/lib64 -L $(CRTPATH) -shared -Bsymbolic $(CRTPATH)/crt0-efi-$(EFI_ARCH).o -T elf_$(EFI_ARCH)_efi.lds $< -o $@ -lefi -lgnuefi
++	$(LD) $(EFILDFLAGS) -nostdlib -L /usr/lib -L /usr/lib64 -L $(CRTPATH) -shared -Bsymbolic $(CRTPATH)/$(CRT) -T $(LDS) $< -o $@ $(EFI_PATH)/libefi.a $(EFI_PATH)/libgnuefi.a
+ 
+ AM_CFLAGS=-fpic -I/usr/include/efi -I/usr/include/efi/$(EFI_ARCH)
+ 
