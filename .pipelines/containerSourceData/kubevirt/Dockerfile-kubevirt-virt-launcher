@@ -7,11 +7,6 @@ FROM $BASE_IMAGE
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-# XXX Once edk2 is moved to SPECS this will not be needed
-RUN tdnf -y install azurelinux-repos-extended.noarch \
-  && tdnf -y install edk2-ovmf \
-  && tdnf clean all
-
 # Setup permissions and capabilities for non-root VMIs. KubeVirt sets
 # XDG_* directories to /var/run.
 RUN  cd /var && rm -rf run && ln -s ../run . \
