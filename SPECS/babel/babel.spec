@@ -1,7 +1,7 @@
 Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 Name:           babel
 Version:        2.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip
 BuildRequires:  python3-six
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pluggy
 %endif
 Requires:       python3
 Requires:       python3-pytz
@@ -44,8 +46,8 @@ The functionality Babel provides for internationalization (I18n) and localizatio
 ln -sfv pybabel %{buildroot}/%{_bindir}/pybabel3
 
 %check
-pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
-%{python3} setup.py test
+pip3 install freezegun funcsigs pathlib2 utils
+%pytest
 
 %files
 %defattr(-,root,root,-)
@@ -55,6 +57,9 @@ pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 2.12.1-2
+- fix package tests
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12.1-1
 - Auto-upgrade to 2.12.1 - Azure Linux 3.0 - package upgrades
 
