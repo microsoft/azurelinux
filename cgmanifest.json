@@ -3197,6 +3197,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "efitools",
+          "version": "1.9.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git/snapshot/efitools-1.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "efivar",
           "version": "39",
           "downloadUrl": "https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz"

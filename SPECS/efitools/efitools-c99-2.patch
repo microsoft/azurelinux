@@ -1,0 +1,21 @@
+Include <strings.h> for the strcasecmp function
+
+Otherwise, an implicit function declaration is the result, and the
+code may fail to compile with future compilers.
+
+Submitted upstream:
+
+  <https://lore.kernel.org/linux-efi/87pmcllll9.fsf@oldenburg.str.redhat.com/>
+
+diff --git a/efi-updatevar.c b/efi-updatevar.c
+index 4247105..033d938 100644
+--- a/efi-updatevar.c
++++ b/efi-updatevar.c
+@@ -11,6 +11,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <strings.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
