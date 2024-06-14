@@ -1,0 +1,21 @@
+Enabling virtqemud socket by default to allow virt-launcher pod 
+to work out of the box.
+
+This entails removing the command to start virtqemud from the
+node-labeller script and adding it to virt-launcher's dockerfile.
+---
+diff --git a/cmd/virt-launcher/node-labeller/node-labeller.sh b/cmd/virt-launcher/node-labeller/node-labeller.sh
+index 51b02546d3..0c6914003b 100755
+--- a/cmd/virt-launcher/node-labeller/node-labeller.sh
++++ b/cmd/virt-launcher/node-labeller/node-labeller.sh
+@@ -32,8 +32,6 @@ if [ -e /dev/sev ]; then
+   chmod o+rw /dev/sev
+ fi
+
+-virtqemud -d
+-
+ virsh domcapabilities --machine $MACHINE --arch $ARCH --virttype $VIRTTYPE > /var/lib/kubevirt-node-labeller/virsh_domcapabilities.xml
+
+ cp -r /usr/share/libvirt/cpu_map /var/lib/kubevirt-node-labeller
+-- 
+2.25.1
