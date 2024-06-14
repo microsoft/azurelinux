@@ -215,7 +215,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 # tests/core/test_solve.py libmamba - some depsolving differences - TODO
 # tests/core/test_prefix_graph.py libmamba - some depsolving differences - TODO
 # tests/trust/test_signature_verification.py requires conda_content_trust - not yet packaged
-py.test-%{python3_version} -vv -m "not integration" \
+%pytest -vv -m "not integration" \
     --deselect=tests/test_cli.py::TestJson::test_list \
     --deselect=tests/test_cli.py::test_run_returns_int \
     --deselect=tests/test_cli.py::test_run_returns_nonzero_errorlevel \
