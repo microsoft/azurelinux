@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.14.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -99,9 +99,6 @@ mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 chmod ug-s %{buildroot}/bin/passwd
 install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
 install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
-# Disable usergroups. Use "users" group by default (see /usr/sbin/useradd)
-# for all nonroot users.
-sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
@@ -184,6 +181,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libsubid.so
 
 %changelog
+* Mon Jun 10 2024 Tobias Brick <tobiasb@microsoft.com> - 4.14.3-2
+- Enable user groups for useradd
+
 * Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.3-1
 - Auto-upgrade to 4.14.3 - 3.0 Upgrade
 - Remove obsolete patches and fix configure command
