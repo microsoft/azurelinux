@@ -23,7 +23,7 @@ Requires:       libndp
 Headers and libraries for the libndp.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure --disable-static
