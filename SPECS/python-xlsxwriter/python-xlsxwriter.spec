@@ -3,9 +3,10 @@
 
 Name:		python-%{pypi_name}
 Version:	3.2.0
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Python module for writing files in the Excel 2007+ XLSX file format
 License:	BSD
+Vendor:         Microsoft Corporation
 URL:		https://pypi.python.org/pypi/XlsxWriter
 Source0:	https://github.com/jmcnamara/XlsxWriter/archive/refs/tags/RELEASE_3.2.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
@@ -48,7 +49,7 @@ BuildRequires:	python3-devel
 %{common_desc}
 
 %prep
-%setup -q -n %{src_name}-%{version}
+%setup -q -n %{src_name}-RELEASE_%{version}
 # Remove bundled egg-info
 rm -rf %{src_name}.egg-info
 
@@ -66,6 +67,9 @@ rm -rf %{src_name}.egg-info
 %{_bindir}/vba_extract.py
 
 %changelog
+* Fri Jun 14 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 3.2.0-3
+- Build step correction
+
 * Wed Jun 12 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 3.2.0-2
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.
