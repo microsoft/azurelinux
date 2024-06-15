@@ -185,7 +185,8 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
 %if 0%{?with_check}
-pip3 install archspec iniconfig flask pytest-xprocess menuinst zstandard conda-package-streaming flaky
+pip3 install archspec iniconfig flask pytest-xprocess zstandard conda-package-streaming flaky
+conda install menuinst
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
