@@ -1,13 +1,14 @@
 Summary:        Linux NTFS userspace driver
 Name:           ntfs-3g
 Version:        2022.10.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.tuxera.com/company/open-source/
 Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
+Patch1:         CVE-2023-52890.patch
 
 BuildRequires:  fuse-devel
 BuildRequires:  gnutls-devel
@@ -170,6 +171,9 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Mon Jun 17 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2022.10.3-2
+- Patch CVE-2023-52890
+
 * Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2022.10.3-1
 - Auto-upgrade to 2022.10.3 - CVE-2022-40284
 
