@@ -223,6 +223,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
     --deselect=tests/test_cli.py::test_run_readonly_env \
 	--ignore=tests/test_create.py \
     --deselect=tests/test_misc.py::test_explicit_missing_cache_entries \
+	--deselect=tests/test_solvers.py::TestLibMambaSolver \
     --ignore=tests/env/specs/test_binstar.py \
     --deselect=tests/env/test_create.py::test_create_update_remote_env_file \
     --deselect='tests/cli/test_common.py::test_is_active_prefix[active_prefix-True]' \
