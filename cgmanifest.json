@@ -1436,6 +1436,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "capnproto",
+          "version": "1.0.1",
+          "downloadUrl": "https://capnproto.org/capnproto-c++-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "capstone",
           "version": "4.0.2",
           "downloadUrl": "https://github.com/aquynh/capstone/archive/4.0.2.tar.gz"
@@ -25696,6 +25706,16 @@
           "name": "rpmlint",
           "version": "1.11",
           "downloadUrl": "https://github.com/rpm-software-management/rpmlint/archive/rpmlint-1.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rr",
+          "version": "5.8.0",
+          "downloadUrl": "https://github.com/rr-debugger/rr/archive/5.8.0/rr-5.8.0.tar.gz"
         }
       }
     },
