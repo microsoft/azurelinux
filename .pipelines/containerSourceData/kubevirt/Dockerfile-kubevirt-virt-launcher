@@ -12,10 +12,14 @@ FROM $BASE_IMAGE
 RUN  cd /var && rm -rf run && ln -s ../run . \
    && chown qemu:qemu /var/run \
    && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher-monitor \
-   && chmod 0777 /etc/libvirt
+   && chmod 0777 /etc/libvirt/* \
+   && chmod 0777 /var/run/libvirt/*
 
 RUN cp /usr/share/kube-virt/virt-launcher/qemu.conf /etc/libvirt/
 RUN cp /usr/share/kube-virt/virt-launcher/virtqemud.conf /etc/libvirt/
+
+RUN chmod 0777 /etc/libvirt/*
+RUN chmod 0777 /var/run/libvirt/*
 
 #simple smoke test
 RUN ls /usr/bin/virt-launcher
