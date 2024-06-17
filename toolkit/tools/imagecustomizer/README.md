@@ -46,7 +46,8 @@ Disadvantages:
 3. Install prerequisites: `qemu-img`, `rpm`, `dd`, `lsblk`, `losetup`, `sfdisk`,
    `udevadm`, `flock`, `blkid`, `openssl`, `sed`, `createrepo`, `mksquashfs`,
    `genisoimage`, `parted`, `mkfs`, `mkfs.ext4`, `mkfs.vfat`, `mkfs.xfs`, `fsck`,
-   `e2fsck`, `xfs_repair`, `resize2fs`, `zstd`, `veritysetup`.
+   `e2fsck`, `xfs_repair`, `resize2fs`, `tune2fs`, `xfs_admin`, `fatlabel`, `zstd`,
+   `veritysetup`.
 
    - For Ubuntu 22.04 images, run:
 

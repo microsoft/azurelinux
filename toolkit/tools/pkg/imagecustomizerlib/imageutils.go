@@ -119,7 +119,7 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 	return nil
 }
 
-func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []imagecustomizerapi.FileSystem,
+func configureDiskBootLoader(imageConnection *ImageConnection, rootMountIdType imagecustomizerapi.MountIdentifierType,
 	bootType imagecustomizerapi.BootType, selinuxConfig imagecustomizerapi.SELinux,
 	kernelCommandLine imagecustomizerapi.KernelCommandLine, currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) error {
@@ -133,7 +133,7 @@ func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []ima
 		return err
 	}
 
-	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
+	imagerRootMountIdType, err := mountIdentifierTypeToImager(rootMountIdType)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []ima
 	}
 
 	// Configure the boot loader.
-	err = installutils.ConfigureDiskBootloader(imagerBootType, false, false, imagerPartitionSettings,
+	err = installutils.ConfigureDiskBootloaderWithRootMountIdType(imagerBootType, false, false, imagerRootMountIdType,
 		imagerKernelCommandLine, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
 		mountPointMap, diskutils.EncryptedRootDevice{}, diskutils.VerityDevice{}, grubMkconfigEnabled,
 		!grubMkconfigEnabled)

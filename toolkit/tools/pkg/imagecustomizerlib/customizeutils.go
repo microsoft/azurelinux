@@ -379,6 +379,30 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 
 func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
 ) error {
+
+	switch config.OS.ResetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		err := hardResetBootLoader(baseConfigPath, config, imageConnection)
+		if err != nil {
+			return err
+		}
+
+	default:
+		// Append the kernel command-line args to the existing grub config.
+		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		if err != nil {
+			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+		}
+	}
+
+	return nil
+}
+
+func hardResetBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
+) error {
+	var err error
+	logger.Log.Infof("Hard reset bootloader config")
+
 	bootCustomizer, err := NewBootCustomizer(imageConnection.Chroot())
 	if err != nil {
 		return err
@@ -389,26 +413,40 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
 
-	switch config.OS.ResetBootLoaderType {
-	case imagecustomizerapi.ResetBootLoaderTypeHard:
-		logger.Log.Infof("Resetting bootloader config")
+	var rootMountIdType imagecustomizerapi.MountIdentifierType
+	var bootType imagecustomizerapi.BootType
+	if config.Storage != nil {
+		rootFileSystem, foundRootFileSystem := sliceutils.FindValueFunc(config.Storage.FileSystems,
+			func(fileSystem imagecustomizerapi.FileSystem) bool {
+				return fileSystem.MountPoint != nil &&
+					fileSystem.MountPoint.Path == "/"
+			},
+		)
+		if !foundRootFileSystem {
+			return fmt.Errorf("failed to find root filesystem (i.e. mount equal to '/')")
+		}
 
-		if config.Storage == nil {
-			return fmt.Errorf("failed to configure bootloader. Missing 'storage' configuration.")
-		}
-		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
-			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
+		rootMountIdType = rootFileSystem.MountPoint.IdType
+		bootType = config.Storage.BootType
+	} else {
+		rootMountIdType, err = findRootMountIdTypeFromFstabFile(imageConnection)
 		if err != nil {
-			return fmt.Errorf("failed to configure bootloader:\n%w", err)
+			return fmt.Errorf("failed to get image's root mount ID type:\n%w", err)
 		}
 
-	default:
-		// Append the kernel command-line args to the existing grub config.
-		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		bootType, err = getImageBootType(imageConnection)
 		if err != nil {
-			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+			return fmt.Errorf("failed to get image's boot type:\n%w", err)
 		}
+	}
+
+	logger.Log.Debugf("HELLO: %v, %v", rootMountIdType, bootType)
+
+	// Hard-reset the grub config.
+	err = configureDiskBootLoader(imageConnection, rootMountIdType, bootType, config.OS.SELinux,
+		config.OS.KernelCommandLine, currentSelinuxMode)
+	if err != nil {
+		return fmt.Errorf("failed to configure bootloader:\n%w", err)
 	}
 
 	return nil
