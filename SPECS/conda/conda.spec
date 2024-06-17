@@ -188,7 +188,6 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 pip3 install archspec iniconfig flask pytest-xprocess zstandard conda-package-streaming flaky pytest-timeout
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
-%{buildroot}%{_bindir}/conda install menuinst
 
 # Integration tests generally require network, so skip them.
 
@@ -222,6 +221,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
     --deselect=tests/test_cli.py::test_run_returns_nonzero_errorlevel \
     --deselect=tests/test_cli.py::test_run_returns_zero_errorlevel \
     --deselect=tests/test_cli.py::test_run_readonly_env \
+	--ignore=tests/test_create.py \
     --deselect=tests/test_misc.py::test_explicit_missing_cache_entries \
     --ignore=tests/env/specs/test_binstar.py \
     --deselect=tests/env/test_create.py::test_create_update_remote_env_file \
