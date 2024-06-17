@@ -17,6 +17,9 @@ set -e
 # - i) Repo prefix (e.g. public/cbl-mariner, unlisted/cbl-mariner, etc.)
 # - j) Publishing level (e.g. preview, development)
 # - k) Publish to ACR (e.g. true, false. If true, the script will push the container to ACR)
+# - l) Create SBOM (e.g. true, false. If true, the script will create SBOM for the container)
+# - m) SBOM tool path.
+# - n) Script to create SBOM for the container image.
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -27,6 +30,7 @@ set -e
 #   ~/CBL-Mariner/.pipelines/containerSourceData
 #   ├── scripts
 #   │   ├── BuildNvidiaContainer.sh
+#   |   |── BuildContainerCommonSteps.sh
 #   ├── Dockerfile-Nvidia-Setup
 #   ├── Dockerfile-Nvidia-Cleanup
 #   ├── marinerLocalRepo.repo
@@ -38,7 +42,7 @@ set -e
 #     -f OUTPUT -g ./rpms.tar.gz -h ~/CBL-Mariner/.pipelines/containerSourceData \
 #     -j development -k "false"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
@@ -51,6 +55,9 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:" OPTIONS; do
     i ) REPO_PREFIX=$OPTARG;;
     j ) PUBLISHING_LEVEL=$OPTARG;;
     k ) PUBLISH_TO_ACR=$OPTARG;;
+    l ) CREATE_SBOM=$OPTARG;;
+    m ) SBOM_TOOL_PATH=$OPTARG;;
+    n ) SBOM_SCRIPT=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -83,6 +90,9 @@ function print_inputs {
     echo "REPO_PREFIX                   -> $REPO_PREFIX"
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
+    echo "CREATE_SBOM                   -> $CREATE_SBOM"
+    echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
+    echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
 }
 
 function validate_inputs {
@@ -130,26 +140,26 @@ function validate_inputs {
         echo "Error - Publishing level cannot be empty."
         exit 1
     fi
+
+    if [[ "$CREATE_SBOM" =~ [Tt]rue ]]; then
+        if [[ -z "$SBOM_TOOL_PATH" ]] ; then
+            echo "Error - SBOM tool path cannot be empty."
+            exit 1
+        fi
+        if [[ ! -f "$SBOM_SCRIPT" ]]; then
+            echo "Error - SBOM script does not exist."
+            exit 1
+        fi
+    fi
 }
 
-function initialization {
-    echo "+++ Initialization"
-    if [ "$PUBLISHING_LEVEL" = "preview" ]; then
-        NVIDIA_IMAGE_NAME=${ACR}.azurecr.io/${REPO_PREFIX}/${REPOSITORY}
-    elif [ "$PUBLISHING_LEVEL" = "development" ]; then
-        NVIDIA_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
-    fi
+function get_component_name_and_version {
+    echo "+++ Get Component name and version"
+    COMPONENT="$IMAGE"
+    echo "Component name                -> $COMPONENT"
 
-    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # mcr.microsoft.com/cbl-mariner/base/core
-    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 2.0
-    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 2.0
-    END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
-
-    echo "Nvidia Image Name             -> $NVIDIA_IMAGE_NAME"
-    echo "Base ACR Container Name       -> $BASE_IMAGE_NAME"
-    echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
-    echo "Azure Linux Version           -> $AZURE_LINUX_VERSION"
-    echo "End of Life                   -> $END_OF_LIFE_1_YEAR"
+    COMPONENT_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE* |  rev | cut -d '.' -f 2- | rev)
+    echo "Component Version             -> $COMPONENT_VERSION"
 }
 
 function prepare_dockerfile {
@@ -204,13 +214,13 @@ function docker_build {
     
     echo "docker buildx build $DOCKER_BUILD_ARGS" \
     "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
-    "-t $NVIDIA_IMAGE_NAME --no-cache --progress=plain" \
+    "-t $CONTAINER_IMAGE_NAME --no-cache --progress=plain" \
     "-f $WORK_DIR/Dockerfile ."
 
     echo ""
     docker buildx build $DOCKER_BUILD_ARGS \
         --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
-        -t "$NVIDIA_IMAGE_NAME" --no-cache --progress=plain \
+        -t "$CONTAINER_IMAGE_NAME" --no-cache --progress=plain \
         -f "$WORK_DIR/Dockerfile" .
     popd > /dev/null
 }
@@ -219,7 +229,7 @@ function set_image_tag {
     echo "+++ Get version of the installed package in the container."
     local containerId
 
-    containerId=$(docker run --entrypoint /bin/sh -dt "$NVIDIA_IMAGE_NAME")
+    containerId=$(docker run --entrypoint /bin/sh -dt "$CONTAINER_IMAGE_NAME")
     echo "Container ID                  -> $containerId"
 
     # Fetch the ID and VERSION_ID from /etc/os-release file
@@ -229,53 +239,18 @@ function set_image_tag {
 
     # Rename the image to include package version, kernel version and OS tag
     # Example: azurelinuxpreview.azurecr.io/base/driver:550-5.15.153.1-1.cm2-mariner2.0
-    NVIDIA_IMAGE_NAME_FINAL="$NVIDIA_IMAGE_NAME:$DRIVER_BRANCH-$KERNEL_VERSION-$OS_TAG"
+    CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$DRIVER_BRANCH-$KERNEL_VERSION-$OS_TAG"
     docker rm -f "$containerId"
 }
 
-function finalize {
-    echo "+++ Finalize"
-    docker image tag "$NVIDIA_IMAGE_NAME" "$NVIDIA_IMAGE_NAME_FINAL"
-    docker rmi -f "$NVIDIA_IMAGE_NAME"
-    echo "+++ Save container image name to file PublishedContainers-$IMAGE.txt"
-    echo "$NVIDIA_IMAGE_NAME_FINAL" >> "$OUTPUT_DIR/PublishedContainers-$IMAGE.txt"
-}
-
-function oras_attach {
-    local image_name=$1
-    oras attach \
-        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
-        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
-        "$image_name"
-}
-
-function publish_to_acr {
-    CONTAINER_IMAGE=$1
-    if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
-        echo "+++ Skip publishing to ACR"
-        return
-    fi
-    local oras_access_token
-
-    echo "+++ az login into Azure ACR $ACR"
-    oras_access_token=$(az acr login --name "$ACR" --expose-token --output tsv --query accessToken)
-    oras login "$ACR.azurecr.io" \
-        --username "00000000-0000-0000-0000-000000000000" \
-        --password "$oras_access_token"
-
-    echo "+++ Publish container $CONTAINER_IMAGE"
-    docker image push "$CONTAINER_IMAGE"
-    oras_attach "$CONTAINER_IMAGE"
-}
-
-
+source "$CONTAINER_SRC_DIR/scripts/BuildContainerCommonSteps.sh"
 print_inputs
 validate_inputs
 initialization
 prepare_dockerfile
 prepare_docker_directory
+get_component_name_and_version
 docker_build
 set_image_tag
 finalize
-publish_to_acr "$NVIDIA_IMAGE_NAME_FINAL"
 
