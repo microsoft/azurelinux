@@ -23,8 +23,9 @@
 
 # DEFAULT_HYPERVISOR: makes configuration.toml link to configuration-clh.toml.
 %global runtime_make_vars       KERNELTYPE="compressed" \\\
-                                KERNELPARAMS="systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0" \\\
+                                KERNELPARAMS="" \\\
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
+                                DEFSANDBOXCGROUPONLY=true \\\
                                 DEFSTATICRESOURCEMGMT_CLH=true \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 DEFMEMSZ=256 \\\
@@ -39,7 +40,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -215,6 +216,10 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-2
+- Enable sandbox_cgroup_only configuration
+- Remove cgroupv1 kernel parameters
+
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
 - Auto-upgrade to 3.2.0.azl2
 
