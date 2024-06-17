@@ -8060,6 +8060,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "k3d",
+          "version": "5.6.3",
+          "downloadUrl": "https://github.com/k3d-io/k3d/archive/refs/tags/v5.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kata-containers",
           "version": "3.2.0.azl2",
           "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
