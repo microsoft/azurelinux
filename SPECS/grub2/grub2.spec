@@ -627,4 +627,4 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 - Updating grub to 2.02
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.00-1
-- Initial build.  First version 
+- Initial build.  First version
