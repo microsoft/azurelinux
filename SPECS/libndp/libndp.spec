@@ -1,13 +1,14 @@
 Summary:        Library for Neighbor Discovery Protocol
 Name:           libndp
 Version:        1.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.libndp.org/
 Source:         http://www.libndp.org/files/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-5564.patch
 
 %description
 This package contains a library which provides a wrapper
@@ -22,7 +23,7 @@ Requires:       libndp
 Headers and libraries for the libndp.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --disable-static
@@ -48,6 +49,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jun 14 2024 Nick Samson <nisamson@microsoft.com> - 1.8-2
+- Patch CVE-2024-5564
+
 * Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.8-1
 - Upgrade to version 1.8
 - Remove calling autogen, which does not exist in latest version
