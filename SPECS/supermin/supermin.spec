@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.38-5%{?dist}
+BuildRequires:  glibc-static >= 2.38-6%{?dist}
 %endif
 
 %if 0%{?with_check}
