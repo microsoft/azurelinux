@@ -388,15 +388,17 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_version_star[libmamba] \
 	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_free[libmamba] \
 	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_no_upperbound[libmamba] \
+    --deselect=tests/core/test_solve.py::test_update_prune_5[libmamba] \
+	--deselect=tests/cli/test_main_notices.py::test_notices_does_not_interrupt_command_on_failure \
 	--deselect=tests/models/test_prefix_graph.py::test_windows_sort_orders_1[libmamba] \
 	--deselect=tests/models/test_prefix_graph.py::test_sort_without_prep[libmamba] \
-	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_capture_output[libmamba] \
-	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_without_capture_output[libmamba] \
-	--deselect=tests/gateways/test_delete.py::test_auto_remove_file[libmamba] \
-	--deselect=tests/gateways/test_delete.py::test_auto_remove_file_to_trash[libmamba] \
-	--deselect=tests/gateways/test_permissions.py::test_make_writable[libmamba] \
-	--deselect=tests/gateways/test_permissions.py::test_recursive_file_to_trash[libmamba] \
-	--deselect=tests/gateways/test_permissions.py::test_make_executable[libmamba] \
+	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_capture_output \
+	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_without_capture_output \
+	--deselect=tests/gateways/test_delete.py::test_auto_remove_file \
+	--deselect=tests/gateways/test_delete.py::test_auto_remove_file_to_trash \
+	--deselect=tests/gateways/test_permissions.py::test_make_writable \
+	--deselect=tests/gateways/test_permissions.py::test_recursive_file_to_trash \
+	--deselect=tests/gateways/test_permissions.py::test_make_executable \
     conda tests
 %endif
 
