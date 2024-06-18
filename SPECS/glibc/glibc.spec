@@ -23,7 +23,7 @@ Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2
 
 Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
 Patch6:         CVE-2023-4911.patch
-# Patch7:         CVE-2023-5156.patch
+Patch7:         CVE-2023-5156.patch
 Patch8:         CVE-2023-6246-CVE-2023-6779-CVE-2023-6780.patch
 
 BuildRequires:  bison
