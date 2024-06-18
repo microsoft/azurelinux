@@ -1,4 +1,4 @@
-%global mstflintver %{Version}
+%global mstflintver %{version}
 
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
