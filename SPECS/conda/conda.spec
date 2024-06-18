@@ -393,10 +393,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 	--deselect=tests/models/test_prefix_graph.py::test_sort_without_prep[libmamba] \
 	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_capture_output \
 	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_without_capture_output \
-	--deselect=tests/gateways/disk/test_delete.py::test_auto_remove_file \
-	--deselect=tests/gateways/disk/test_delete.py::test_auto_remove_file_to_trash \
+	--deselect=tests/gateways/disk/test_delete.py::test_remove_file \
+	--deselect=tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
 	--deselect=tests/gateways/disk/test_permissions.py::test_make_writable \
-	--deselect=tests/gateways/disk/test_permissions.py::test_recursive_file_to_trash \
+	--deselect=tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
 	--deselect=tests/gateways/disk/test_permissions.py::test_make_executable \
     conda tests
 %endif
