@@ -67,6 +67,12 @@ sdkver_matching_groups = [
     ])
 ]
 
+mstflintver_matching_groups = [
+    frozenset([
+        "SPECS/mstflintver/mstflint.spec",
+        "SPECS/kernel/kernel.spec"
+    ])
+]
 
 def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) -> Set[FrozenSet]:
     """Returns spec sets which violate matching rules for given tags. """
@@ -77,22 +83,21 @@ def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) ->
         for spec_filename in group:
             parsed_spec = Spec.from_file(Path(base_path, spec_filename))
             for tag in tags:
-                variants[tag].add(getattr(
-                    parsed_spec, tag))
+                variants[tag].add(getattr(parsed_spec, tag))
 
         for tag in tags:
-            if len(variants[tag]) > 1:
-                err_groups.add(group)
+            if len(variants[tag]) > 1: err_groups.add(group)
     return err_groups
 
+
+def check_mstflintver_match_groups(base_path: str) -> Set[FrozenSet]:
+    return check_spec_tags(base_path, ['mstflintver'], mstflintver_matching_groups)
 
 def check_sdkver_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['sdkver'], sdkver_matching_groups)
 
-
 def check_version_release_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['epoch', 'version', 'release'], version_release_matching_groups)
-
 
 def check_version_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['epoch', 'version'], version_matching_groups)
@@ -100,13 +105,13 @@ def check_version_match_groups(base_path: str) -> Set[FrozenSet]:
 
 def check_matches(base_path: str):
     version_match_errors = check_version_match_groups(base_path)
-    version_release_match_errors = check_version_release_match_groups(
-        base_path)
+    version_release_match_errors = check_version_release_match_groups(base_path)
     sdkver_match_errors = check_sdkver_match_groups(base_path)
+    mstflintver_match_errors = check_mstflintver_match_groups(base_path)
 
     printer = pprint.PrettyPrinter()
 
-    if len(version_match_errors) or len(version_release_match_errors) or len(sdkver_match_errors):
+    if len(version_match_errors) or len(version_release_match_errors) or len(sdkver_match_errors) or len(mstflintver_match_errors):
         print('The current repository state violates a spec entanglement rule!')
 
         if len(version_match_errors):
@@ -126,7 +131,13 @@ def check_matches(base_path: str):
                 '\nPlease update the following sets of specs to have the same "sdkver" global variables:')
             for e in sdkver_match_errors:
                 printer.pprint(e)
-
+        
+        if len(mstflintver_match_errors):
+            print(
+                '\nPlease update the following sets of specs to have the same "mstflintver" global variables:')
+            for e in mstflintver_match_errors:
+                printer.pprint(e)
+                
         sys.exit(1)
 
 

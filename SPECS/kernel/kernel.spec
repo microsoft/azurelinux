@@ -1,5 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define mariner_version 3
 
@@ -42,7 +43,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Patch0:		0001-add-mstflint-kernel-4.28.patch
+Patch0:		    0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -407,7 +408,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
-- Add patch to enable mstflint kernel driver
+- Add patch to enable mstflint kernel driver 4.28.0-1
 
 * Fri May 31 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Enable CONFIG_AMD_MEM_ENCRYPT, CONFIG_SEV_GUEST
