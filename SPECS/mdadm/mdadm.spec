@@ -145,7 +145,7 @@ Patch198:    mdadm-2.5.2-static.patch
 Patch199:    disable-Werror.patch
 
 BuildRequires: make
-BuildRequires: glibc-static >= 2.38-5%{?dist}
+BuildRequires: glibc-static >= 2.38-6%{?dist}
 BuildRequires: systemd-rpm-macros 
 BuildRequires: binutils-devel 
 BuildRequires: gcc 

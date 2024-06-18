@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,10 @@ Patch3:         CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
+Patch6:         CVE-2023-4911.patch
+Patch7:         CVE-2023-5156.patch
+Patch8:         CVE-2023-6246-CVE-2023-6779-CVE-2023-6780.patch
+
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -348,6 +352,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Mon Jun 17 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.38-6
+- Address CVE-2023-4911, CVE-2023-5156, CVE-2023-6246, CVE-2023-6779, CVE-2023-6780
+
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.38-5
 - Generate and provide glibc all locales in a sub-package
 
