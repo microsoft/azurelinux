@@ -69,7 +69,7 @@ sdkver_matching_groups = [
 
 mstflintver_matching_groups = [
     frozenset([
-        "SPECS/mstflintver/mstflint.spec",
+        "SPECS/mstflint/mstflint.spec",
         "SPECS/kernel/kernel.spec"
     ])
 ]
