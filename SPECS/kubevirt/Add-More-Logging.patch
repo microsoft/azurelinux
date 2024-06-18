@@ -14,109 +14,109 @@ index 41c41c9e5..aa3cf4c91 100644
 --- a/cmd/virt-launcher/virt-launcher.go
 +++ b/cmd/virt-launcher/virt-launcher.go
 @@ -410,7 +410,10 @@ func main() {
-                panic(err)
-        }
-
-+       log.Log.V(2).Infof("going to start virtqemud")
-        l.StartVirtquemud(stopChan)
-+       log.Log.V(2).Infof("virtqemud started line is crossed")
+ 		panic(err)
+ 	}
+ 
++	log.Log.V(2).Infof("going to start virtqemud")
+ 	l.StartVirtquemud(stopChan)
++	log.Log.V(2).Infof("virtqemud started line is crossed")
 +
-        // only single domain should be present
-        domainName := api.VMINamespaceKeyFunc(vmi)
-
+ 	// only single domain should be present
+ 	domainName := api.VMINamespaceKeyFunc(vmi)
+ 
 @@ -482,6 +485,7 @@ func main() {
-        domain := waitForDomainUUID(*qemuTimeout, events, signalStopChan, domainManager)
-        if domain != nil {
-                var pidDir string
-+               log.Log.Infof("runWithNonRoot: %v", *runWithNonRoot)
-                if *runWithNonRoot {
-                        pidDir = "/run/libvirt/qemu/run"
-                } else {
+ 	domain := waitForDomainUUID(*qemuTimeout, events, signalStopChan, domainManager)
+ 	if domain != nil {
+ 		var pidDir string
++		log.Log.Infof("runWithNonRoot: %v", *runWithNonRoot)
+ 		if *runWithNonRoot {
+ 			pidDir = "/run/libvirt/qemu/run"
+ 		} else {
 diff --git a/pkg/virt-launcher/virtwrap/cli/libvirt.go b/pkg/virt-launcher/virtwrap/cli/libvirt.go
 index 7a535cff9..b1b0dcf78 100644
 --- a/pkg/virt-launcher/virtwrap/cli/libvirt.go
 +++ b/pkg/virt-launcher/virtwrap/cli/libvirt.go
 @@ -567,17 +567,22 @@ func NewConnectionWithTimeout(uri string, user string, pass string, checkInterva
-        var err error
-        var virConn *libvirt.Connect
-
-+       logger.V(1).Infof("NewConnectionWithTimeout - Line 570")
-        err = utilwait.PollImmediate(connectionInterval, connectionTimeout, func() (done bool, err error) {
-+               logger.V(1).Infof("NewConnectionWithTimeout - Line 572")
-                virConn, err = newConnection(uri, user, pass)
-                if err != nil {
-                        logger.V(1).Infof("Connecting to libvirt daemon failed: %v", err)
-                        return false, nil
-                }
-+               logger.V(1).Infof("NewConnectionWithTimeout - Line 578")
-                return true, nil
-        })
-+       logger.V(1).Infof("NewConnectionWithTimeout - Line 581")
-        if err != nil {
-                return nil, fmt.Errorf("cannot connect to libvirt daemon: %v", err)
-        }
-+       logger.V(1).Infof("NewConnectionWithTimeout - Line 585")
-        logger.V(1).Info("Connected to libvirt daemon")
-
-        lvConn := &LibvirtConnection{
+ 	var err error
+ 	var virConn *libvirt.Connect
+ 
++	logger.V(1).Infof("NewConnectionWithTimeout - Line 570")
+ 	err = utilwait.PollImmediate(connectionInterval, connectionTimeout, func() (done bool, err error) {
++		logger.V(1).Infof("NewConnectionWithTimeout - Line 572")
+ 		virConn, err = newConnection(uri, user, pass)
+ 		if err != nil {
+ 			logger.V(1).Infof("Connecting to libvirt daemon failed: %v", err)
+ 			return false, nil
+ 		}
++		logger.V(1).Infof("NewConnectionWithTimeout - Line 578")
+ 		return true, nil
+ 	})
++	logger.V(1).Infof("NewConnectionWithTimeout - Line 581")
+ 	if err != nil {
+ 		return nil, fmt.Errorf("cannot connect to libvirt daemon: %v", err)
+ 	}
++	logger.V(1).Infof("NewConnectionWithTimeout - Line 585")
+ 	logger.V(1).Info("Connected to libvirt daemon")
+ 
+ 	lvConn := &LibvirtConnection{
 diff --git a/pkg/virt-launcher/virtwrap/util/libvirt_helper.go b/pkg/virt-launcher/virtwrap/util/libvirt_helper.go
 index b342c034f..081311f1b 100644
 --- a/pkg/virt-launcher/virtwrap/util/libvirt_helper.go
 +++ b/pkg/virt-launcher/virtwrap/util/libvirt_helper.go
 @@ -219,19 +219,23 @@ func (l LibvirtWrapper) StartVirtquemud(stopChan chan struct{}) {
-                for {
-                        exitChan := make(chan struct{})
-                        args := []string{"-f", "/var/run/libvirt/virtqemud.conf"}
-+                       log.Log.Info("Inside StartVirtquemud - Line 222")
-                        cmd := exec.Command("/usr/sbin/virtqemud", args...)
-+                       log.Log.Info("Inside StartVirtquemud - Line 224")
-                        if l.user != 0 {
-                                cmd.SysProcAttr = &syscall.SysProcAttr{
-                                        AmbientCaps: []uintptr{unix.CAP_NET_BIND_SERVICE},
-                                }
-                        }
-
-+                       log.Log.Info("Inside StartVirtquemud - Line 231")
-                        // connect libvirt's stderr to our own stdout in order to see the logs in the container logs
-                        reader, err := cmd.StderrPipe()
-                        if err != nil {
-                                log.Log.Reason(err).Error("failed to start virtqemud")
-                                panic(err)
-                        }
-+                       log.Log.Info("Inside StartVirtquemud - Line 238")
-
-                        go func() {
-                                scanner := bufio.NewScanner(reader)
+ 		for {
+ 			exitChan := make(chan struct{})
+ 			args := []string{"-f", "/var/run/libvirt/virtqemud.conf"}
++			log.Log.Info("Inside StartVirtquemud - Line 222")
+ 			cmd := exec.Command("/usr/sbin/virtqemud", args...)
++			log.Log.Info("Inside StartVirtquemud - Line 224")
+ 			if l.user != 0 {
+ 				cmd.SysProcAttr = &syscall.SysProcAttr{
+ 					AmbientCaps: []uintptr{unix.CAP_NET_BIND_SERVICE},
+ 				}
+ 			}
+ 
++			log.Log.Info("Inside StartVirtquemud - Line 231")
+ 			// connect libvirt's stderr to our own stdout in order to see the logs in the container logs
+ 			reader, err := cmd.StderrPipe()
+ 			if err != nil {
+ 				log.Log.Reason(err).Error("failed to start virtqemud")
+ 				panic(err)
+ 			}
++			log.Log.Info("Inside StartVirtquemud - Line 238")
+ 
+ 			go func() {
+ 				scanner := bufio.NewScanner(reader)
 @@ -244,25 +248,29 @@ func (l LibvirtWrapper) StartVirtquemud(stopChan chan struct{}) {
-                                        log.Log.Reason(err).Error("failed to read libvirt logs")
-                                }
-                        }()
-+                       log.Log.Info("Inside StartVirtquemud - Line 252")
-
-                        err = cmd.Start()
-                        if err != nil {
-                                log.Log.Reason(err).Error("failed to start virtqemud")
-                                panic(err)
-                        }
-+                       log.Log.Info("Inside StartVirtquemud - Line 258")
-
-                        go func() {
-                                defer close(exitChan)
-                                cmd.Wait()
-                        }()
-
-+                       log.Log.Info("Inside StartVirtquemud - Line 265")
-                        select {
-                        case <-stopChan:
-                                cmd.Process.Kill()
-                                return
-                        case <-exitChan:
--                               log.Log.Errorf("virtqemud exited, restarting")
-+                               log.Log.Info("virtqemud exited, restarting")
-                        }
-+                       log.Log.Info("Inside StartVirtquemud - Sleeping for a second")
-
-                        // this sleep is to avoid consuming all resources in the
-                        // event of a virtqemud crash loop.
---
+ 					log.Log.Reason(err).Error("failed to read libvirt logs")
+ 				}
+ 			}()
++			log.Log.Info("Inside StartVirtquemud - Line 252")
+ 
+ 			err = cmd.Start()
+ 			if err != nil {
+ 				log.Log.Reason(err).Error("failed to start virtqemud")
+ 				panic(err)
+ 			}
++			log.Log.Info("Inside StartVirtquemud - Line 258")
+ 
+ 			go func() {
+ 				defer close(exitChan)
+ 				cmd.Wait()
+ 			}()
+ 
++			log.Log.Info("Inside StartVirtquemud - Line 265")
+ 			select {
+ 			case <-stopChan:
+ 				cmd.Process.Kill()
+ 				return
+ 			case <-exitChan:
+-				log.Log.Errorf("virtqemud exited, restarting")
++				log.Log.Info("virtqemud exited, restarting")
+ 			}
++			log.Log.Info("Inside StartVirtquemud - Sleeping for a second")
+ 
+ 			// this sleep is to avoid consuming all resources in the
+ 			// event of a virtqemud crash loop.
+-- 
 2.45.1
