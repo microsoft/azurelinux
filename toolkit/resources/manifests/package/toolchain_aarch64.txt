@@ -121,7 +121,7 @@ glib-debuginfo-2.78.1-4.azl3.aarch64.rpm
 glib-devel-2.78.1-4.azl3.aarch64.rpm
 glib-doc-2.78.1-4.azl3.noarch.rpm
 glib-schemas-2.78.1-4.azl3.aarch64.rpm
-glibc-2.38-5.azl3.aarch64.rpm
+glibc-2.38-6.azl3.aarch64.rpm
 glibc-debuginfo-2.38-5.azl3.aarch64.rpm
 glibc-devel-2.38-5.azl3.aarch64.rpm
 glibc-i18n-2.38-5.azl3.aarch64.rpm
