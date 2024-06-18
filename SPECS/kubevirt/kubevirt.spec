@@ -33,6 +33,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Hotplug_detach_grace_period.patch
 Patch2:         Enabling-Virtqemud-by-default.patch
+Patch3:         Add-More-Logging.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-6%{?dist}
