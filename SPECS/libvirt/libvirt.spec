@@ -1241,7 +1241,6 @@ chmod 600 $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/nwfilter/*.xml
     %if ! %{with_qemu}
 rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/libvirtd_qemu.aug
 rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/tests/test_libvirtd_qemu.aug
-rm -f $RPM_BUILD_ROOT%{_sysusersdir}/libvirt-qemu.conf
     %endif
 %find_lang %{name}
 
@@ -1988,7 +1987,6 @@ exit 0
 %{_bindir}/virt-qemu-run
 %{_mandir}/man1/virt-qemu-run.1*
 %{_mandir}/man8/virtqemud.8*
-%{_sysusersdir}/libvirt-qemu.conf
     %endif
 
     %if %{with_lxc}
