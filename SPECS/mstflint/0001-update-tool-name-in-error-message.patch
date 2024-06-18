@@ -1,4 +1,4 @@
-From 1d40d407ea8d8bce30de31e36d3c316298678d0e Mon Sep 17 00:00:00 2001
+From a61b93f3437347b3f9bbbb38236189eab2f6f73d Mon Sep 17 00:00:00 2001
 From: Juan Camposeco <juanarturoc@microsoft.com>
 Date: Wed, 12 Jun 2024 14:30:12 -0700
 Subject: [PATCH] update tool name in error message
