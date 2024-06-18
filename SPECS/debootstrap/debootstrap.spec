@@ -4,7 +4,7 @@
 
 Summary:        Debian GNU/Linux bootstrapper
 Name:           debootstrap
-Version:        1.0.128+nmu2
+Version:        1.0.134
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -56,6 +56,9 @@ install -p -m 0644 debootstrap.8 %{buildroot}%{_mandir}/man8
 %{_mandir}/man8/debootstrap.8*
 
 %changelog
+* Tue Jun 18 2024 Adeel Mujahid <adeelbm@outlook.com> - 1.0.134-1
+- Upgrade to version 1.0.134 to support RISC-V architecture
+
 * Tue Jun 06 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.0.128+nmu2-1
 - Upgrade to latest upstream version and promote to base repo
 - Remove requirement on dpkg- ar (from binutils) is sufficient to unpack debs

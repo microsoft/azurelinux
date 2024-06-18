@@ -2497,8 +2497,8 @@
         "type": "other",
         "other": {
           "name": "debootstrap",
-          "version": "1.0.128+nmu2",
-          "downloadUrl": "https://deb.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.128+nmu2.tar.gz"
+          "version": "1.0.134",
+          "downloadUrl": "https://deb.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.134.tar.gz"
         }
       }
     },
