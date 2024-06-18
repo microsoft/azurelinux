@@ -13813,8 +13813,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.35",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.35.tar.gz"
+          "version": "8.0.36",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
         }
       }
     },
