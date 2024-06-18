@@ -22833,8 +22833,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "4.21.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-4.21.1.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
         }
       }
     },
