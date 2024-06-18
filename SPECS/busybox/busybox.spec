@@ -12,7 +12,7 @@ Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
 Patch1:         CVE-2022-28391.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-static >= 2.38-5%{?dist}
+BuildRequires:  glibc-static >= 2.38-6%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 %if 0%{?with_check}
