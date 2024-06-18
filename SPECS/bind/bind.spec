@@ -347,7 +347,7 @@ fi
 # Fix permissions on existing device files on upgrade
 %define chroot_fix_devices() \
 if [ $1 -gt 1 ]; then \
-  for DEV in "%{1}/dev"/{null,random,zero}; do \
+  for DEV in "%{1}/dev"/{null,random,urandom,zero}; do \
     if [ -e "$DEV" -a "$(/bin/stat --printf="%{G} %{a}" "$DEV")" = "root 644" ]; \
     then \
       /bin/chmod 0664 "$DEV" \
