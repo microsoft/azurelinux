@@ -1,3 +1,5 @@
+%global mstflintver %{Version}
+
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.28.0
