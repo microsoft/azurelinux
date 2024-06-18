@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        5.2.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,8 @@ URL:            https://www.gnu.org/software/bash/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:        bash_completion
 Patch0:         bash-5.1.patch
+# Non-interactive shells beginning with argv[0][0] == '-' should run the startup files when not in posix mode.
+Patch1:         bash-2.03-profile.patch
 BuildRequires:  readline
 Requires:       readline
 Requires(post): /bin/cp
@@ -328,6 +330,10 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 17 2024 Daniel McIlvaney <damcilva@microsoft.com> - 5.2.15-2
+- When non-interactive shells are started with '-bash' load startup files. From
+  Fedora upstream: https://src.fedoraproject.org/rpms/bash/blob/f40/f/bash-2.03-profile.patch
+
 * Tue Nov 21 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.15-1
 - Upgrade to version 5.2.15
 
