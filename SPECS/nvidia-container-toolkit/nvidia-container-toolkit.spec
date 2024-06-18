@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.14.4
+Version:        1.15.0
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -65,12 +65,11 @@ install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 
-mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
-mkdir -p %{buildroot}%{_libexecdir}/oci/hooks.d
-mkdir -p %{buildroot}%{_datadir}/containers/oci/hooks.d
-
 %posttrans
 ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
+
+# Generate the default config; If this file already exists no changes are made.
+%{_bindir}/nvidia-ctk --quiet config --config-file=%{_sysconfdir}/nvidia-container-runtime/config.toml --in-place
 
 %postun
 rm -f %{_bindir}/nvidia-container-toolkit
@@ -85,6 +84,10 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Fri Jun 07 2024 Henry Li <lihl@microsoft.com> - 1.15.0-1
+- Upgrade to version 1.15.0
+- Generate config.toml file during %posttrans
+
 * Mon Feb 05 2024 Bala <balakumaran.kannan@microsoft.com> - 1.14.4-1
 - Upgrade to version 1.14.4
 - Remove config and oci hooks from files as they are handled in post-install from v1.14.0
