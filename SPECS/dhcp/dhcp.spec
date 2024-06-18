@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.3.P1
-Release:        2%{?dist}
+Version:        4.4.3-P1
+Release:        1%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
@@ -169,6 +169,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Tue Jun 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-P1-1
+- Auto-upgrade to 4.4.3-P1 - CVE-2022-2928, CVE-2022-2929
+
 * Thu Apr 04 2024 Sindhu <lakarri@microsoft.com> - 4.4.3.P1-2
 - Revert option for classless static route configuration in dhclient.conf
 

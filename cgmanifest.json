@@ -2588,7 +2588,7 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.3.P1",
+          "version": "4.4.3-P1",
           "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz"
         }
       }
