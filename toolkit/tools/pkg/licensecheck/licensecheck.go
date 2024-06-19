@@ -75,14 +75,17 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 
 	err = newLicenseChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, rpmDirPath)
 	if err != nil {
-		newLicenseChecker.CleanUp()
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return nil, err
 	}
+	defer func() {
+		if err != nil {
+			newLicenseChecker.CleanUp()
+		}
+	}()
 
 	newLicenseChecker.licenseNames, err = LoadLicenseNames(nameFilePath)
 	if err != nil {
-		newLicenseChecker.CleanUp()
 		err = fmt.Errorf("failed to load license names:\n%w", err)
 		return nil, err
 	}
@@ -90,7 +93,6 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 	if exceptionFilePath != "" {
 		newLicenseChecker.exceptions, err = LoadLicenseExceptions(exceptionFilePath)
 		if err != nil {
-			newLicenseChecker.CleanUp()
 			err = fmt.Errorf("failed to load license exceptions:\n%w", err)
 			return nil, err
 		}
