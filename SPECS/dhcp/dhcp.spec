@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.3
-Release:        3%{?dist}
+Version:        4.4.3-P1
+Release:        1%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -179,6 +179,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-P1-1
+- Auto-upgrade to 4.4.3-P1 - CVE-2022-2928, CVE-2022-2929
+
 * Wed May 29 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.3-3
 - Fix CVE-2023-2828
 
