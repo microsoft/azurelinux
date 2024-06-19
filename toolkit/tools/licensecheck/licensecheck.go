@@ -38,45 +38,37 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
 
-	// Run scans on each directory
+	results, numFailures, numWarnings := scanDirectories(*rpmDirs, *buildDirPath, *workerTar, *nameFile, *exceptionFile, *distTag, *pedantic)
+
+	if *resultFile != "" {
+		logger.Log.Infof("Writing results to file (%s)", *resultFile)
+		err := licensecheck.SaveLicenseCheckResults(*resultFile, results)
+		if err != nil {
+			logger.Log.Fatalf("Failed to write results to file:\n%v", err)
+		}
+	}
+
+	printSummary(numFailures, numWarnings)
+}
+
+func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, exceptionFile, distTag string, pedantic bool) (results []licensecheck.LicenseCheckResult, failed int, warnings int) {
 	totalResults := []licensecheck.LicenseCheckResult{}
 	totalFailedPackages := 0
 	totalWarningPackages := 0
-	for _, rpmDir := range *rpmDirs {
-		errorResults, warningResults, err := validateRpmDir(*buildDirPath, *workerTar, rpmDir, *nameFile, *exceptionFile, *distTag, *pedantic)
+	for _, rpmDir := range rpmDirs {
+		errorResults, warningResults, err := validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag, pedantic)
 		if err != nil {
-			logger.Log.Fatalf("Failed to search RPM directory. Error: %v", err)
+			logger.Log.Fatalf("Failed to search RPM directory:\n%v", err)
 		}
 		totalFailedPackages += len(errorResults)
 		totalWarningPackages += len(warningResults)
 		totalResults = append(totalResults, errorResults...)
 		totalResults = append(totalResults, warningResults...)
 	}
-
-	// Save results
-	if *resultFile != "" {
-		logger.Log.Infof("Writing results to file: %s", *resultFile)
-		err := licensecheck.SaveLicenseCheckResults(*resultFile, totalResults)
-		if err != nil {
-			logger.Log.Fatalf("Failed to write results to file. Error: %v", err)
-		}
-	}
-
-	// Print summary
-	if totalFailedPackages > 0 {
-		printExplanation()
-		logger.Log.Errorf("Found (%d) packages with license errors.", totalFailedPackages)
-		logger.Log.Warnf("Found (%d) packages with non-fatal license issues.", totalWarningPackages)
-		os.Exit(1)
-	} else if totalWarningPackages > 0 {
-		printExplanation()
-		logger.Log.Warnf("Found (%d) packages with non-fatal license issues", totalWarningPackages)
-	} else {
-		logger.Log.Infof("No license issues found")
-	}
+	return totalResults, totalFailedPackages, totalWarningPackages
 }
 
-func printExplanation() {
+func printSummary(numFailures, numWarnings int) {
 	const explanation = `
 Errors/warnings fall into three buckets:
 	1. 'bad %doc files': A %doc documentation file that the tool believes to be a license file.
@@ -95,23 +87,34 @@ How to fix:
 	- 'duplicated license files': If they are actually equivalent, remove the copy in the documentation.
 	- Query package contents with 'rpm -ql <package>.rpm' to see all files, 'rpm -qL <package>.rpm' to
 		see only the license files, and 'rpm -qd <package>.rpm' to see only the documentation files.`
-	logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
+
+	if numFailures > 0 {
+		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
+		logger.Log.Errorf("Found %d packages with license errors", numFailures)
+		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
+		os.Exit(1)
+	} else if numWarnings > 0 {
+		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
+		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
+	} else {
+		logger.Log.Infof("No license issues found")
+	}
 }
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
 // Each call to this function will generate a new chroot environment and clean it up after the scan.
 func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag string, pedantic bool,
 ) (warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
-	logger.Log.Infof("Preparing license check environment for %s...", rpmDir)
+	logger.Log.Infof("Preparing license check environment for (%s)", rpmDir)
 	licenseChecker, err := licensecheck.New(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to initialize RPM license checker:\n%v", err)
+		return nil, nil, fmt.Errorf("failed to initialize RPM license checker:\n%w", err)
 	}
 	defer func() {
 		cleanupErr := licenseChecker.CleanUp()
 		if cleanupErr != nil {
 			if err == nil {
-				err = cleanupErr
+				err = fmt.Errorf("failed to cleanup after RPM license checker:\n%w", cleanupErr)
 			} else {
 				// Append the cleanup error to the existing error
 				err = fmt.Errorf("%w\nfailed to cleanup after RPM license checker failed:\n%w", err, cleanupErr)
@@ -119,14 +122,14 @@ func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, di
 		}
 	}()
 
-	logger.Log.Infof("Scanning %s for license issues...", rpmDir)
+	logger.Log.Infof("Scanning (%s) for license issues", rpmDir)
 	err = licenseChecker.CheckLicenses()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to generate license scan:\n%w", err)
 	}
 
 	resultsString := licenseChecker.FormatResults(pedantic)
-	logger.Log.Infof("Search results for %s:\n%s", rpmDir, resultsString)
+	logger.Log.Infof("Search results for (%s):\n%s", rpmDir, resultsString)
 
 	_, warningResults, failedResults = licenseChecker.GetAllResults(pedantic)
 
