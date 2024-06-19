@@ -116,7 +116,7 @@ func (l *LicenseChecker) CleanUp() error {
 // CheckLicenses will scan all .rpm files in the chroot for bad licenses. The results can be accessed with FormatResults() or GetAllResults().
 func (l *LicenseChecker) CheckLicenses() error {
 	if l.simpleToolChroot == nil {
-		return fmt.Errorf("chroot has not been initialized")
+		return fmt.Errorf("license checker is not initialized, use New() to create a new license checker")
 	}
 
 	l.results = []LicenseCheckResult{}
@@ -127,12 +127,6 @@ func (l *LicenseChecker) CheckLicenses() error {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to scan for license issues:\n%w", err)
-	}
-
-	for _, result := range l.results {
-		if result.err != nil {
-			logger.Log.Errorf("Failed to scan (%s) for license issues: %v", result.RpmPath, result.err)
-		}
 	}
 
 	// Sort the results by RPM path
@@ -249,7 +243,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 			// Signal the workers to stop if there is an error
 			err = fmt.Errorf("failed to search srpm:\n%w", result.err)
 			close(cancel)
-			return
+			return nil, err
 		}
 		numProcessed++
 		percentProcessed := (numProcessed * 100) / len(rpmsToSearchPaths)
