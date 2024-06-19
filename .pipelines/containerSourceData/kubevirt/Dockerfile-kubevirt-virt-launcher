@@ -23,6 +23,4 @@ RUN chmod 0777 /etc/libvirt/*
 #simple smoke test
 RUN ls /usr/bin/virt-launcher
 
-COPY bashrc /etc/bash.bashrc
-
-RUN chmod a+rwx /etc/bash.bashrc
+ENTRYPOINT [ "/usr/bin/virt-launcher" ]

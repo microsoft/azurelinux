@@ -484,11 +484,8 @@ BuildRequires: libfdt-devel >= %{libfdt_version}
 %if %{have_pmem}
 BuildRequires: libpmem-devel
 %endif
-%if %{have_ui}
 # For VNC PNG support
 BuildRequires: libpng-devel
-%endif
-
 %if %{have_block_rbd}
 BuildRequires: librbd-devel
 %endif
@@ -571,10 +568,8 @@ BuildRequires: ncurses-devel
 BuildRequires: spice-protocol
 BuildRequires: spice-server-devel
 %endif
-%if %{have_ui}
 # VNC JPEG support
 BuildRequires: libjpeg-devel
-%endif
 %if %{with brltty}
 # Braille device support
 BuildRequires: brlapi-devel
@@ -638,10 +633,8 @@ BuildRequires: fuse3-devel
 %if %{have_sdl_image}
 BuildRequires: SDL2_image-devel
 %endif
-%if %{have_gvnc_devel}
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
-%endif
 %if %{with pipewire}
 # Used by pipewire audio backend
 BuildRequires: pipewire-devel
@@ -1940,11 +1933,9 @@ run_configure \
   --enable-vhost-user \
   --enable-vhost-user-blk-server \
   --enable-vhost-vdpa \
-%if %{have_ui}
   --enable-vnc \
   --enable-png \
   --enable-vnc-sasl \
-%endif
 %if %{enable_werror}
   --enable-werror \
 %endif
@@ -2019,9 +2010,7 @@ run_configure \
   --enable-virtfs \
   --enable-virtfs-proxy-helper \
   --enable-vpc \
-%if %{have_ui}
   --enable-vnc-jpeg \
-%endif
   --enable-vte \
   --enable-vvfat \
 %if %{have_xen}
