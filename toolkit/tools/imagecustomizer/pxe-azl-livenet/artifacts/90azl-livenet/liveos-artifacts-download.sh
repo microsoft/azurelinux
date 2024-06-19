@@ -2,7 +2,7 @@
 
 # set -x
 
-echo "executing liveos-artifacts-download.sh" > /dev/kmsg
+echo "executing liveos-artifacts-download.sh - v0.1" > /dev/kmsg
 
 . /usr/lib/dracut-lib.sh
 root=$(getarg root -d "")
@@ -55,7 +55,7 @@ function downloadArtifact () {
     echo $targetPath
 }
 
-rootfsImagePath=$downloadedArtifactsDirs/${rootNoLive##*/}
+#localIsoPath=$downloadedArtifactsDirs/${rootNoLive##*/}
 
 # download
 
@@ -65,8 +65,8 @@ if [[ -z "$isoUrl" ]]; then
     echo "root is set to a non-live iso url ($root)" > /dev/kmsg
     exit 0
 fi
-rootfsImagePath=$(downloadArtifact "$isoUrl")
-if [[ "$rootfsImagePath" == "error:"* ]]; then
+localIsoPath=$(downloadArtifact "$isoUrl")
+if [[ "$localIsoPath" == "error:"* ]]; then
     echo "failed to download ($isoUrl)" > /dev/kmsg
     exit 1
 fi
@@ -89,9 +89,9 @@ if [[ -n "$hostScriptUrl" ]]; then
     fi
 fi
 
-echo "rootfsImagePath=$rootfsImagePath" > /dev/kmsg
-echo "hostConfigPath =$hostConfigPath" > /dev/kmsg
-echo "hostScriptPath =$hostScriptPath" > /dev/kmsg
+echo "localIsoPath   : $localIsoPath" > /dev/kmsg
+echo "hostConfigPath : $hostConfigPath" > /dev/kmsg
+echo "hostScriptPath : $hostScriptPath" > /dev/kmsg
 
 # invoke custom script
 if [[ -n "$hostScriptPath" ]]; then
@@ -103,7 +103,7 @@ fi
 echo "launching dmsquash-live-root" > /dev/kmsg
 
 # create a loopback device and prepare rootfs
-rootDevice=$(losetup -f --show $rootfsImagePath)
+rootDevice=$(losetup -f --show $localIsoPath)
 
 # see: c:\temp\dracut\modules.d\98dracut-systemd\dracut-cmdline.sh
 # if ! root="$(getarg root=)"; then

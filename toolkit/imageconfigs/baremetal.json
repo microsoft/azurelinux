@@ -48,8 +48,7 @@
                 "packagelists/baremetal-packages.json",
                 "packagelists/base-image-packages.json",
                 "packagelists/cloud-init-packages.json",
-                "packagelists/selinux.json",
-                "packagelists/baremetal-mic-iso-base-packages.json"
+                "packagelists/selinux.json"
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0 rd.info log_buf_len=1M",
