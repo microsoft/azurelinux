@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3.P1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
