@@ -153,6 +153,16 @@ function validate_inputs {
     fi
 }
 
+function get_packages_to_install {
+    echo "+++ Get packages to install"
+    corePackagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/core.pkg"
+    nvidiaPackagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/nvidia.pkg"
+    CORE_PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$corePackagesFilePath")
+    NVIDIA_PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$nvidiaPackagesFilePath")
+    echo "Azure Linux Core Packages to install      -> $CORE_PACKAGES_TO_INSTALL"
+    echo "Azure Linux NVIDIA Packages to install    -> $NVIDIA_PACKAGES_TO_INSTALL"
+}
+
 function get_component_name_and_version {
     echo "+++ Get Component name and version"
     COMPONENT="$IMAGE"
@@ -160,6 +170,39 @@ function get_component_name_and_version {
 
     COMPONENT_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE* |  rev | cut -d '.' -f 2- | rev)
     echo "Component Version             -> $COMPONENT_VERSION"
+}
+
+function remove_tdnf_usage {
+    # Remove all usage of tdnf from the original Dockerfile since all tdnf operations will be
+    # performed within the steps specified in Dockerfile-Nvidia-Initial
+    
+    # Temporary file for intermediate processing
+    TEMP_FILE="$WORK_DIR/Dockerfile.modified"
+
+    # Flag to track if we are in a RUN command that contains tdnf
+    in_tdnf_block=false
+
+    # Process the Dockerfile line by line
+    while IFS= read -r line
+    do
+        # Check if the line contains a RUN command and tdnf
+        if [[ $line == RUN* ]] && [[ $line == *tdnf* ]]; then
+            in_tdnf_block=true
+        fi
+
+        # If we are not in a RUN tdnf command, write the line to the temp file
+        if ! $in_tdnf_block; then
+            echo "$line" >> $TEMP_FILE
+        fi
+
+        # If we are in a RUN tdnf command and the line does not end with a backslash, end the RUN tdnf command
+        if $in_tdnf_block && [[ $line != *\\ ]]; then
+            in_tdnf_block=false
+        fi
+    done < "$WORK_DIR/Dockerfile"
+
+    # Replace the original Dockerfile with the new file
+    mv $TEMP_FILE "$WORK_DIR/Dockerfile"
 }
 
 function prepare_dockerfile {
@@ -173,10 +216,9 @@ function prepare_dockerfile {
     sudo rm -rf "$SOURCE_DIR"
 
     # Update the copied dockerfile for later use in container build.
-    setupInstruction=$(cat "$CONTAINER_SRC_DIR/Dockerfile-Nvidia-Setup")
-    cleanupInstruction=$(cat "$CONTAINER_SRC_DIR/Dockerfile-Nvidia-Cleanup")
+    remove_tdnf_usage
+    setupInstruction=$(cat "$CONTAINER_SRC_DIR/Dockerfile-Nvidia-Initial")
     sed -E "s#^FROM.*#$setupInstruction#g" -i "$WORK_DIR/Dockerfile"
-    echo "$cleanupInstruction" | tee -a "$WORK_DIR/Dockerfile"
 
     echo " Output content of final dockerfile"
     echo "------------------------------------"
@@ -206,7 +248,6 @@ function prepare_docker_build_args {
 function docker_build {
     echo "+++ Build container"
     pushd "$WORK_DIR" > /dev/null
-    ls
     echo " docker build command"
     echo "----------------------"
     # 
@@ -214,12 +255,16 @@ function docker_build {
     
     echo "docker buildx build $DOCKER_BUILD_ARGS" \
     "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
+    "--build-arg CORE_RPMS_TO_INSTALL=$CORE_PACKAGES_TO_INSTALL" \
+    "--build-arg NVIDIA_RPMS_TO_INSTALL=$NVIDIA_PACKAGES_TO_INSTALL" \
     "-t $CONTAINER_IMAGE_NAME --no-cache --progress=plain" \
     "-f $WORK_DIR/Dockerfile ."
 
     echo ""
     docker buildx build $DOCKER_BUILD_ARGS \
         --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
+        --build-arg CORE_RPMS_TO_INSTALL="$CORE_PACKAGES_TO_INSTALL" \
+        --build-arg NVIDIA_RPMS_TO_INSTALL="$NVIDIA_PACKAGES_TO_INSTALL" \
         -t "$CONTAINER_IMAGE_NAME" --no-cache --progress=plain \
         -f "$WORK_DIR/Dockerfile" .
     popd > /dev/null
@@ -247,6 +292,7 @@ source "$CONTAINER_SRC_DIR/scripts/BuildContainerCommonSteps.sh"
 print_inputs
 validate_inputs
 initialization
+get_packages_to_install
 prepare_dockerfile
 prepare_docker_directory
 get_component_name_and_version

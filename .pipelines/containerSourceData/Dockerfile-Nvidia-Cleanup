@@ -1,6 +1,0 @@
-RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \
-    LOCAL_REPO_PATH="/localrepo"; \
-    tdnf clean all; \
-    rm -f /etc/yum.repos.d/local.repo; \
-    rm -rf /var/cache/tdnf; \
-    rm -rf ${LOCAL_REPO_PATH};
