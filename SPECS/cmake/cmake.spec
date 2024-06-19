@@ -10,16 +10,6 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
-# We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch1:         CVE-2022-43551.patch
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch5:         CVE-2023-35945.patch
-Patch6:         CVE-2023-38545.patch
-Patch7:         CVE-2023-38546.patch
-Patch8:         cve-2023-44487.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
