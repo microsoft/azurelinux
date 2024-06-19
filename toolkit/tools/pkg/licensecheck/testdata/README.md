@@ -31,7 +31,7 @@ all "incorrect" findings.
 ```bash
 cd ./testdata
 find . -name 'all_other_files_*.json' | grep -q . || echo "**** Generate test data first! ****"
-go run . --licenses ./all_licenses_*.json --licenses-output ./_tmp_bad_licenses.json --docs ./all_docs_*.json --docs-output ./_tmp_bad_docs.json --other-files ./all_other_files_*.json --other-files-output ./_tmp_bad_other_files.json --exception-file ../../../../resources/manifests/package/license_file_exceptions.json
+go run . --licenses ./all_licenses_*.json --licenses-output ./_tmp_bad_licenses.json --docs ./all_docs_*.json --docs-output ./_tmp_bad_docs.json --other-files ./all_other_files_*.json --other-files-output ./_tmp_bad_other_files.json --name-file ../../../../resources/manifests/package/license_file_names.json --exception-file ../../../../resources/manifests/package/license_file_exceptions.json
 # Check ./_tmp_bad_licenses.json, _tmp_bad_docs.json, _tmp_bad_other_files.json for any files that fail the classification
 ```
 
