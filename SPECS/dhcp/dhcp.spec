@@ -1,17 +1,13 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.3-P1
-Release:        1%{?dist}
+Version:        4.4.3.P1
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
-Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-38177.patch
-Patch1:         CVE-2022-38178.patch
-Patch2:         CVE-2022-2795.patch
-Patch3:         CVE-2023-2828.patch
+Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  systemd
 %description
 The ISC DHCP package contains both the client and server programs for DHCP. dhclient (the client) is used for connecting to a network which uses DHCP to assign network addresses. dhcpd (the server) is used for assigning network addresses on private networks
@@ -42,15 +38,9 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%setup -q -n dhcp-%{version}
+%autosetup -p1 -n dhcp-4.4.3-P1
 
-# Extracting bundled 'bind' to allow some of the patches to modify it.
-tar -C bind -xf bind/bind.tar.gz
-ln -s bind/bind-9* bind_ln
-
-%autopatch -p1
-
-%build
+%build -n dhcp-4.4.3-P1
 CFLAGS="$CFLAGS \
         -D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"' \
         -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"' \
@@ -181,6 +171,7 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %changelog
 * Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-P1-1
 - Auto-upgrade to 4.4.3-P1 - CVE-2022-2928, CVE-2022-2929
+- Updating spec to match 3.0
 
 * Wed May 29 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.3-3
 - Fix CVE-2023-2828
