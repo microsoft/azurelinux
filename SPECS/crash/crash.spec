@@ -47,9 +47,13 @@ cp %{SOURCE1} ./gdb-%{gdb_version}.tar.gz
 # After creating the "crash-target-arm64" binary, clean everything and rebuild for native target
 make RPMPKG=%{version}-%{release} target=ARM64
 cp -v crash crash-target-arm64
+rm -rf ./gdb-%{gdb_version}
 make clean
-%endif
+# Need to specify target=X86_64 here, since this parameter is "sticky" from the previous build
+make RPMPKG=%{version}-%{release} target=X86_64
+%else
 make RPMPKG=%{version}-%{release}
+%endif
 
 %install
 mkdir -p %{buildroot}%{_bindir}
