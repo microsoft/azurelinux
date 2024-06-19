@@ -1,6 +1,6 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.29.4
+Version:        1.31.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -74,6 +74,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Tue Jun 18 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.31.0-1
+- Auto-upgrade to 1.31.0 - Address CVEs
+
 * Thu Mar 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.4-1
 - Auto-upgrade to 1.29.4 - Azure Linux 3.0 Package Upgrades
 - Remove additional logging as it has been added upstream
