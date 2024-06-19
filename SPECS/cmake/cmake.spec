@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.28.2
-Release:        6%{?dist}
+Version:        3.29.6
+Release:        1%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,7 +11,6 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
-Patch1:         CVE-2024-24806.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -90,6 +89,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 - CVE-2023-46218
+
 * Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
 - fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
 
