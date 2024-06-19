@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,7 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
+Patch0:         CVE-2021-4238.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -84,7 +85,7 @@ Conflicts:      influxdb
 Go sources and other development files for InfluxDB
 
 %prep
-%autosetup -a 1
+%autosetup -p1 -a 1
 
 mkdir -pv static
 tar -xf %{SOURCE2} -C static/ --no-same-owner
@@ -144,6 +145,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Jun 19 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.3-3
+- Address CVE-2021-4238
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 2.7.3-2
 - Remove restriction on golang BR version
 
