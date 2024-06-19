@@ -9,14 +9,14 @@
         {
             "PackageName": "gcc",
             "IgnoredFilesRegexList": [
-                "^/usr/share/man/man7/gpl.7.gz$"
+                "^/usr/share/man/man7/gpl\\.7\\.gz$"
             ]
         },
         {
             "PackageName": "libdb-docs",
             "IgnoredFilesRegexList": [
-                "^/usr/share/doc/libdb-5.3.28/installation/build_unix_freebsd.html$",
-                "^/usr/share/doc/libdb-5.3.28/license/license_db.html$"
+                "^/usr/share/doc/libdb-[0-9\\.]+/installation/build_unix_freebsd\\.html$",
+                "^/usr/share/doc/libdb-[0-9\\.]+/license/license_db\\.html$"
             ]
         },
         {
@@ -28,7 +28,7 @@
         {
             "PackageName": "tar",
             "IgnoredFilesRegexList": [
-                "^/usr/share/doc/tar-1.35/tar.html/GNU-Free-Documentation-License.html$"
+                "^/usr/share/doc/tar-[0-9\\.]+/tar\\.html/GNU-Free-Documentation-License\\.html$"
             ]
         }
     ],
