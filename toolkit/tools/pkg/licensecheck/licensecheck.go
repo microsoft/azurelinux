@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -43,11 +44,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/simpletoolchroot"
 )
 
-const (
-	chrootName      = "license_chroot"
-	licensePrefix   = "/usr/share/licenses"
-	numParallelJobs = 20
-)
+const licensePrefix = "/usr/share/licenses"
 
 // LicenseChecker is a tool for searching RPMs for bad licenses
 type LicenseChecker struct {
@@ -68,10 +65,12 @@ type LicenseChecker struct {
 // - distTag: The distribution tag to use when parsing RPMs
 func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePath, distTag string,
 ) (newLicenseChecker *LicenseChecker, err error) {
+	const chrootName = "license_chroot"
+
 	newLicenseChecker = &LicenseChecker{
 		distTag:          distTag,
 		simpleToolChroot: &simpletoolchroot.SimpleToolChroot{},
-		jobSemaphore:     make(chan struct{}, numParallelJobs),
+		jobSemaphore:     make(chan struct{}, runtime.NumCPU()*2),
 	}
 
 	err = newLicenseChecker.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, rpmDirPath)
