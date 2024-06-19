@@ -633,8 +633,10 @@ BuildRequires: fuse3-devel
 %if %{have_sdl_image}
 BuildRequires: SDL2_image-devel
 %endif
+%if %{have_ui}
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
+%endif
 %if %{with pipewire}
 # Used by pipewire audio backend
 BuildRequires: pipewire-devel
