@@ -29,6 +29,7 @@ const (
 // kickstart-style unattended installation**)
 type Partition struct {
 	FsType    string          `json:"FsType"`
+	TypeUUID  string          `json:"TypeUUID"`
 	ID        string          `json:"ID"`
 	Name      string          `json:"Name"`
 	End       uint64          `json:"End"`

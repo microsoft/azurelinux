@@ -620,13 +620,21 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 
 	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
 
-	// Set partition friendly name (only for gpt)
+	// Set partition friendly name and partition type UUID (only for gpt)
 	if partitionTableType == "gpt" {
 		partitionName := partition.Name
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
 		if err != nil {
 			logger.Log.Warnf("Failed to set partition friendly name using parted: %v", stderr)
 			// Not-fatal
+		}
+
+		if partition.TypeUUID != "" {
+			_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, partition.TypeUUID)
+			if err != nil {
+				logger.Log.Warnf("failed to set partition type using parted: %v", stderr)
+				// Not-fatal
+			}
 		}
 	}
 
