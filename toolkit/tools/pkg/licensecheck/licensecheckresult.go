@@ -40,7 +40,7 @@ func SaveLicenseCheckResults(savePath string, resultsList []LicenseCheckResult) 
 		return fmt.Errorf("failed to create directory for results file. Error:\n%w", err)
 	}
 
-	sortedList := sortAndFilterResults(resultsList)
+	sortedList := SortAndFilterResults(resultsList)
 	err = jsonutils.WriteJSONFile(savePath, sortedList)
 	if err != nil {
 		return fmt.Errorf("failed to save license check results. Error:\n%w", err)
@@ -48,8 +48,8 @@ func SaveLicenseCheckResults(savePath string, resultsList []LicenseCheckResult) 
 	return nil
 }
 
-// sortAndFilterResults returns a copy of the list that is sorted and contains only warnings and errors.
-func sortAndFilterResults(results []LicenseCheckResult) (sortedList []LicenseCheckResult) {
+// SortAndFilterResults returns a copy of the list that is sorted and contains only warnings and errors.
+func SortAndFilterResults(results []LicenseCheckResult) (sortedList []LicenseCheckResult) {
 	sortedList = make([]LicenseCheckResult, len(results))
 	for i, result := range results {
 		if result.HasBadResult() || result.HasWarningResult() {

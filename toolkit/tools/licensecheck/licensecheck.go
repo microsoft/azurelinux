@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck/licensecheckformat"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -128,10 +129,13 @@ func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, di
 		return nil, nil, fmt.Errorf("failed to generate license scan:\n%w", err)
 	}
 
-	resultsString := licenseChecker.FormatResults(pedantic)
+	allResults, warningResults, failedResults := licenseChecker.GetResults()
+	if pedantic {
+		failedResults = append(failedResults, warningResults...)
+		warningResults = nil
+	}
+	resultsString := licensecheckformat.FormatResults(allResults, pedantic)
 	logger.Log.Infof("Search results for (%s):\n%s", rpmDir, resultsString)
-
-	_, warningResults, failedResults = licenseChecker.GetAllResults(pedantic)
 
 	return failedResults, warningResults, nil
 }
