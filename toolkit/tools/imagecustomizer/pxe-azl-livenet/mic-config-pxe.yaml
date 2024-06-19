@@ -1,8 +1,10 @@
 os:
-  users:
-  - name: test
-    password: testpassword
-    primaryGroup: sudo
+  packages:
+    install:
+    - squashfs-tools
+    - tar
+    - device-mapper
+    - curl
   additionalFiles:
     artifacts/90azl-livenet/liveos-artifacts-download.service:
       - path: /usr/lib/dracut/modules.d/90azl-livenet/liveos-artifacts-download.service
