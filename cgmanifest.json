@@ -13321,16 +13321,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mozjs",
-          "version": "102.15.1",
-          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/102.15.1esr/source/firefox-102.15.1esr.source.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mpage",
           "version": "2.5.7",
           "downloadUrl": "ftp://ftp.mesa.nl/pub/mpage/mpage-2.5.7.tgz"
