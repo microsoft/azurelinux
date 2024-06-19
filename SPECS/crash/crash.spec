@@ -1,11 +1,11 @@
 %global gdb_version 10.2
 Name:          crash
 Version:       8.0.4
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:  Azure Linux
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
@@ -42,11 +42,22 @@ This package contains libraries and header files need for development.
 cp %{SOURCE1} ./gdb-%{gdb_version}.tar.gz
 
 %build
+%ifarch x86_64
+# For x86_64 only, build a separate crash binary for target=ARM64
+# After creating the "crash-target-arm64" binary, clean everything and rebuild for native target
+make RPMPKG=%{version}-%{release} target=ARM64
+cp -v crash crash-target-arm64
+make clean
+%endif
 make RPMPKG=%{version}-%{release}
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 %make_install
+%ifarch x86_64
+cp -v crash-target-arm64 %{buildroot}%{_bindir}/crash-target-arm64
+%endif
+
 mkdir -p %{buildroot}%{_mandir}/man8
 install -pm 644 crash.8 %{buildroot}%{_mandir}/man8/crash.8
 mkdir -p %{buildroot}%{_includedir}/crash
@@ -57,6 +68,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %defattr(-,root,root)
 %license COPYING3
 %{_bindir}/crash
+%ifarch x86_64
+%{_bindir}/crash-target-arm64
+%endif
 %{_mandir}/man8/crash.8.gz
 %doc COPYING3 README
 
@@ -66,6 +80,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Tue Jun 18 2024 Andrew Phelps <anphel@microsoft.com> - 8.0.4-3
+- Add crash-target-arm64 binary to analyze aarch64 dumps on x86_64 machine
+
 * Mon Jun 03 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.4-2
 - Update gdb-10.2-2.tar.gz to address CVE-2022-37434
 
