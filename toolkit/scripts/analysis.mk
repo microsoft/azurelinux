@@ -97,7 +97,7 @@ license_out_dir           = $(OUT_DIR)/license_check
 license_results_file_pkg  = $(license_out_dir)/license_check_results_pkg.json
 license_results_file_imge = $(license_out_dir)/license_check_results_image_$(config_name).json
 
-.PHONY: license-check license-check-img clean-license-check
+.PHONY: license-check license-check-pkg license-check-img clean-license-check
 
 clean: clean-license-check
 clean-license-check:
@@ -106,32 +106,30 @@ clean-license-check:
 	rm -rf $(license_check_build_dir) && \
 	rm -rf $(license_out_dir)
 
-# If we are using the default RPMS_DIR as LICENSE_CHECK_DIRS, we are responsible for building the rpms as needed.
-# Can set REBUILD_PACKAGES=n to skip rebuilding the rpms if they are already built.
-ifeq ($(LICENSE_CHECK_DIRS),$(RPMS_DIR))
-license-check: $(LICENSE_CHECK_DIRS)
-endif
-
-##help:target:license-check=Validate all packages in the RPMS_DIR for license compliance. Set LICENSE_CHECK_DIRS to override source.
-license-check: $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE)
+license_check_common_deps = $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE)
+define licensecheck-command
 	$(go-licensecheck) \
-		$(foreach license_dir, $(LICENSE_CHECK_DIRS),--rpm-dirs="$(license_dir)" ) \
+		$(foreach license_dir, $(1),--rpm-dirs="$(license_dir)" ) \
 		--exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
 		--name-file="$(LICENSE_CHECK_NAME_FILE)" \
 		--worker-tar="$(chroot_worker)" \
 		--build-dir="$(license_check_build_dir)" \
 		--dist-tag=$(DIST_TAG) \
 		$(if $(filter y,$(LICENSE_CHECK_PEDANTIC)),--pedantic) \
-		--results-file="$(license_results_file_pkg)"
+		--results-file="$(license_results_file_pkg)" \
+		--log-file=$(LOGS_DIR)/licensecheck/license-check-$(2).log \
+		--log-level=$(LOG_LEVEL)
+endef
+
+##help:target:license-check=Validate all packages in any of LICENSE_CHECK_DIRS for license compliance.
+license-check: $(license_check_common_deps)
+	$(if $(LICENSE_CHECK_DIRS),,$(error Must set LICENSE_CHECK_DIRS=))
+	$(call licensecheck-command,$(LICENSE_CHECK_DIRS),manual)
+
+##help:target:license-check-pkg=Validate all packages in $(RPMS_DIR) for license compliance, building packages as needed.
+license-check-pkg: $(license_check_common_deps) $(RPMS_DIR)
+	$(call licensecheck-command,$(RPMS_DIR),pkg)
 
 ##help:target:license-check-img=Validate all packages needed for an image for license compliance. Must set CONFIG_FILE=<path_to_config>.
-license-check-img: $(go-licensecheck) $(chroot_worker) $(image_package_cache_summary) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE)
-	$(go-licensecheck) \
-		--rpm-dirs="$(local_and_external_rpm_cache)" \
-		--exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
-		--name-file="$(LICENSE_CHECK_NAME_FILE)" \
-		--worker-tar="$(chroot_worker)" \
-		--build-dir="$(license_check_build_dir)" \
-		--dist-tag=$(DIST_TAG) \
-		$(if $(filter y,$(LICENSE_CHECK_PEDANTIC)),--pedantic) \
-		--results-file="$(license_results_file_imge)"
+license-check-img: $(license_check_common_deps) $(image_package_cache_summary)
+	$(call licensecheck-command,$(image_package_cache_summary),image)
