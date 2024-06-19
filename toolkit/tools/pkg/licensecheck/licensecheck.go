@@ -319,7 +319,7 @@ func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel
 func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, exceptions LicenseExceptions) (result LicenseCheckResult, err error) {
 	defines := rpm.DefaultDistroDefines(false, distTag)
 
-	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageContents(rpmPath, defines)
+	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageFiles(rpmPath, defines)
 	if err != nil {
 		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package contents:\n%w", err)}, nil
 	}
