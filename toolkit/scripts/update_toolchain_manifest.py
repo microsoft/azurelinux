@@ -2,14 +2,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-from os.path import dirname
-
 import argparse
+import os
 import shlex
 import subprocess
 
 # Can't rely on Python's 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and may leave unexpanded macros.
 RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{{nil}}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .azl3' -D '__python3 python3' -D '_sourcedir {source_dir}' -D 'fillup_prereq fillup'"
+manifest_files = ["pkggen_core_x86_64.txt", "toolchain_x86_64.txt", "pkggen_core_aarch64.txt",  "toolchain_aarch64.txt"]
 
 class Entry:
     def __init__(self, name, version, release: str):
@@ -21,7 +21,7 @@ class Entry:
         return self.version+"-"+self.release
 
 def formatted_rpmspec_command(spec_path: str) -> str:
-    source_dir = dirname(spec_path)
+    source_dir = os.path.dirname(spec_path)
     return f"{RPMSPEC_COMMAND_COMMON.format(source_dir=source_dir)}"
 
 def read_spec_name(spec_path: str) -> str:
@@ -35,7 +35,7 @@ def read_spec_release(spec_path: str):
 
 def read_spec_tag(spec_path, tag: str) -> str:
     command = formatted_rpmspec_command(spec_path)
-    raw_output = subprocess.check_output(shlex.split(f"{command} --srpm --qf '%{{{tag}}}' -q {spec_path}"),
+    raw_output = subprocess.check_output(f"{command} --srpm --qf '%{{{tag}}}' -q {spec_path}", shell=True,
                                          stderr=subprocess.DEVNULL)
     return str(raw_output, encoding="utf-8", errors="strict")
 
@@ -74,21 +74,34 @@ def process_spec(spec_path: str) -> Entry:
 
     return Entry(name, version, release)
 
+def dir_type(path: str) -> str:
+    if(os.path.isdir(path)):
+        return path
+    else:
+        raise NotADirectoryError(path, "is not a valid directory")
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='''Tool for updating the 'toolchain_manifest*.json' with values from the input spec files.
-                    Usage: python3 update_toolchain_manifest.py <path_to_toolchain_manifest.txt> <path_to_spec> ...''')
-    parser.add_argument('manifest_file',
-                        type=argparse.FileType(),
-                        metavar='manifest_file',
-                        help='path to the "toolchain_manifest.json" file')
-    parser.add_argument('specs',
-                        metavar='spec_path',
+        description='''Tool for updating the toolchain and pkggen manifest files with values from the input spec files.
+                    Sample usage: python3 scripts/update_toolchain_manifest.py --manifest_dir resources/manifests/package/ --specs ../SPECS/sqlite/sqlite.spec''')
+    parser.add_argument('--manifest_dir',
+                        type=dir_type,
+                        required=True,
+                        metavar='',
+                        help='path to folder containing toolchain_.txt and pkggen_core_.txt files')
+    parser.add_argument('--specs',
+                        metavar='',
                         type=argparse.FileType('r'),
+                        required=True,
                         nargs='+',
                         help='path to spec file(s)')
     args = parser.parse_args()
+    manifest_dir = args.manifest_dir
+
+    if not manifest_dir.endswith("/"):
+        manifest_dir = manifest_dir+'/'
 
     for spec in args.specs:
         entry = process_spec(spec.name)
-        update_manifest(args.manifest_file.name, entry)
+        for manifest in manifest_files:
+            update_manifest(manifest_dir+manifest, entry)
