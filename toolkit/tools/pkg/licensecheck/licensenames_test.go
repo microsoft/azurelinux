@@ -66,7 +66,7 @@ func TestNotPanicMissingNameFile(t *testing.T) {
 	file := filepath.Join(tempPath, "missing_file.json")
 	assert.NotPanics(t, func() {
 		_, err := LoadLicenseNames(file)
-		assert.EqualError(t, err, "failed to read license names file:\nopen "+file+": no such file or directory")
+		assert.EqualError(t, err, "failed to read license names file ("+file+"):\nopen "+file+": no such file or directory")
 	})
 }
 

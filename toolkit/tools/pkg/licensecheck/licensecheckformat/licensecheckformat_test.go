@@ -30,7 +30,7 @@ func TestFormatResultsNonPedantic(t *testing.T) {
 					BadDocs: []string{"doc1"},
 				},
 			},
-			expected: "ERROR: 'package.rpm' has license errors:\n" +
+			expected: "ERROR: (package.rpm) has license errors:\n" +
 				"\tbad %doc files:\n" +
 				"\t\tdoc1\n",
 		},
@@ -48,18 +48,18 @@ func TestFormatResultsNonPedantic(t *testing.T) {
 					DuplicatedDocs: []string{"dupe3", "dupe4"},
 				},
 			},
-			expected: "WARN: 'another-package.rpm' has license warnings:\n" +
+			expected: "WARN: (another-package.rpm) has license warnings:\n" +
 				"\tduplicated license files:\n" +
 				"\t\tdupe3\n" +
 				"\t\tdupe4\n" +
-				"ERROR: 'package.rpm' has license errors:\n" +
+				"ERROR: (package.rpm) has license errors:\n" +
 				"\tbad %doc files:\n" +
 				"\t\tdoc1\n" +
 				"\t\tdoc2\n" +
 				"\tbad general file:\n" +
 				"\t\tfile1\n" +
 				"\t\tfile2\n" +
-				"WARN: 'package.rpm' has license warnings:\n" +
+				"WARN: (package.rpm) has license warnings:\n" +
 				"\tduplicated license files:\n" +
 				"\t\tdupe1\n" +
 				"\t\tdupe2\n",
@@ -72,7 +72,7 @@ func TestFormatResultsNonPedantic(t *testing.T) {
 					DuplicatedDocs: []string{"dupe1", "dupe2"},
 				},
 			},
-			expected: "WARN: 'package.rpm' has license warnings:\n" +
+			expected: "WARN: (package.rpm) has license warnings:\n" +
 				"\tduplicated license files:\n" +
 				"\t\tdupe1\n" +
 				"\t\tdupe2\n",
@@ -106,7 +106,7 @@ func TestFormatResultsPedantic(t *testing.T) {
 					BadDocs: []string{"doc1"},
 				},
 			},
-			expected: "ERROR: 'package.rpm' has license errors:\n" +
+			expected: "ERROR: (package.rpm) has license errors:\n" +
 				"\tbad %doc files:\n" +
 				"\t\tdoc1\n",
 		},
@@ -124,11 +124,11 @@ func TestFormatResultsPedantic(t *testing.T) {
 					DuplicatedDocs: []string{"dupe3", "dupe4"},
 				},
 			},
-			expected: "ERROR: 'another-package.rpm' has license errors:\n" +
+			expected: "ERROR: (another-package.rpm) has license errors:\n" +
 				"\tduplicated license files:\n" +
 				"\t\tdupe3\n" +
 				"\t\tdupe4\n" +
-				"ERROR: 'package.rpm' has license errors:\n" +
+				"ERROR: (package.rpm) has license errors:\n" +
 				"\tbad %doc files:\n" +
 				"\t\tdoc1\n" +
 				"\t\tdoc2\n" +
@@ -147,7 +147,7 @@ func TestFormatResultsPedantic(t *testing.T) {
 					DuplicatedDocs: []string{"dupe1", "dupe2"},
 				},
 			},
-			expected: "ERROR: 'package.rpm' has license errors:\n" +
+			expected: "ERROR: (package.rpm) has license errors:\n" +
 				"\tduplicated license files:\n" +
 				"\t\tdupe1\n" +
 				"\t\tdupe2\n",
