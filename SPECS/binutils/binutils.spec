@@ -21,7 +21,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,8 +36,12 @@ Patch2:         thin_archive_descriptor.patch
 Patch3:         CVE-2021-45078.patch
 Patch4:         CVE-2022-38533.patch
 Patch5:         CVE-2022-4285.patch
+Patch6:         CVE-2022-35206.patch
+Patch7:         CVE-2022-48063.patch
+Patch8:         CVE-2023-1972.patch
+Patch9:         CVE-2022-35205.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
-Patch6:         disable_gold_test.patch
+Patch10:         disable_gold_test.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -294,6 +298,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Wed Jun 19 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 2.37-9
+- Added patch to fix CVE-2022-35206
+- Added patch to fix CVE-2023-1972
+- Added patch to fix CVE-2022-48063
+- Added patch to fix CVE-2022-35205
+
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
 - Add the cross-compilation subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
