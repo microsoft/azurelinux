@@ -178,6 +178,11 @@ Distribution:   Azure Linux
 
 %define have_rutabaga_gfx 0
 
+%global have_ui 1
+%if 0%{?azl_no_ui}
+%global have_ui 0
+%endif
+
 # LTO still has issues with qemu on armv7hl and aarch64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1952483
 %global _lto_cflags %{nil}
@@ -260,9 +265,15 @@ Distribution:   Azure Linux
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
+%if %{have_ui}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
+%else
+%define requires_ui_sdl %{nil}
+%define requires_ui_egl_headless %{nil}
+%define requires_ui_opengl %{nil}
+%endif
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
@@ -607,8 +618,10 @@ BuildRequires: fuse3-devel
 %if %{have_sdl_image}
 BuildRequires: SDL2_image-devel
 %endif
+%if %{have_ui}
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
+%endif
 %if %{with pipewire}
 # Used by pipewire audio backend
 BuildRequires: pipewire-devel
@@ -912,6 +925,7 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description ui-curses
 This package provides the additional curses UI for QEMU.
 
+%if %{have_ui}
 %package  ui-gtk
 Summary: QEMU GTK UI driver
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -932,6 +946,7 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 Requires: %{name}-ui-opengl%{?_isa} = %{version}-%{release}
 %description ui-egl-headless
 This package provides the additional egl-headless UI for QEMU.
+%endif
 
 %if %{with brltty}
 %package  char-baum
@@ -2621,7 +2636,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/ui-sdl.so
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
-%endif
 
 %if %{with brltty}
 %files char-baum
