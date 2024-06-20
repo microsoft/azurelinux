@@ -49,7 +49,10 @@ func main() {
 		}
 	}
 
-	printSummary(numFailures, numWarnings)
+	err := printSummary(numFailures, numWarnings)
+	if err != nil {
+		logger.Log.Fatalf("License check has errors:\n%v", err)
+	}
 }
 
 func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, exceptionFile, distTag string, pedantic bool) (results []licensecheck.LicenseCheckResult, failed int, warnings int) {
@@ -69,7 +72,7 @@ func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, except
 	return totalResults, totalFailedPackages, totalWarningPackages
 }
 
-func printSummary(numFailures, numWarnings int) {
+func printSummary(numFailures, numWarnings int) (err error) {
 	const explanation = `
 Errors/warnings fall into three buckets:
 	1. 'bad %doc files': A %doc documentation file that the tool believes to be a license file.
@@ -93,13 +96,14 @@ How to fix:
 		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
 		logger.Log.Errorf("Found %d packages with license errors", numFailures)
 		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
-		os.Exit(1)
+		err = fmt.Errorf("found %d packages with license errors", numFailures)
 	} else if numWarnings > 0 {
 		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
 		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
 	} else {
 		logger.Log.Infof("No license issues found")
 	}
+	return err
 }
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
