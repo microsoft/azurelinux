@@ -81,7 +81,11 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 	}
 	defer func() {
 		if err != nil {
-			newLicenseChecker.CleanUp()
+			cleanupErr := newLicenseChecker.CleanUp()
+			if cleanupErr != nil {
+				// Append the cleanup error to the existing error
+				err = fmt.Errorf("%w\nfailed to cleanup after failing to create a new LicenseChecker:\n%w", err, cleanupErr)
+			}
 		}
 	}()
 
