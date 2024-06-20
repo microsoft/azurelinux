@@ -2639,6 +2639,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/ui-sdl.so
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
+%endif
 
 %if %{with brltty}
 %files char-baum
