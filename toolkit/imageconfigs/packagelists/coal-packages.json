@@ -1,8 +1,6 @@
 {
     "packages": [
-        "cloud-init",
-        "cloud-init-azure-kvp",
-        "cloud-utils-growpart",
+        "azure-init",
         "vim",
         "gnupg2",
         "dnf",
@@ -12,7 +10,6 @@
         "netplan",
         "openssh-server",
         "python3",
-        "WALinuxAgent",
         "shim",
         "grub2-efi-binary",
         "ca-certificates",
