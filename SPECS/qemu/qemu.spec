@@ -178,11 +178,6 @@ Distribution:   Azure Linux
 
 %define have_rutabaga_gfx 0
 
-%global have_ui 1
-%if 0%{?azl_no_ui}
-%global have_ui 0
-%endif
-
 # LTO still has issues with qemu on armv7hl and aarch64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1952483
 %global _lto_cflags %{nil}
@@ -263,33 +258,16 @@ Distribution:   Azure Linux
 %endif
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
-%if %{have_ui}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
-%else
-%define requires_ui_curses %{nil}
-%define requires_ui_gtk %{nil}
-%define requires_ui_sdl %{nil}
-%define requires_ui_egl_headless %{nil}
-%define requires_ui_opengl %{nil}
-%endif
-#check if needs to be enabled for azl
-%if %{have_ui}
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
-%else
-%define requires_device_display_virtio_gpu %{nil}
-%define requires_device_display_virtio_gpu_pci %{nil}
-%define requires_device_display_virtio_gpu_ccw %{nil}
-%define requires_device_display_virtio_vga %{nil}
-%define requires_device_display_virtio_vga_gl %{nil}
-%endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
@@ -513,9 +491,7 @@ BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(gbm)
 %endif
 # qemu-keymap
-%if %{have_ui}
 BuildRequires: pkgconfig(xkbcommon)
-%endif
 
 BuildRequires: python3-devel
 # Required for docs. Disable for AzLinux, to reduce python package dependencies
@@ -579,7 +555,6 @@ BuildRequires: brlapi-devel
 BuildRequires: glusterfs-api-devel
 %endif
 BuildRequires: gnutls-devel
-%if %{have_ui}
 # gtk related?
 BuildRequires: glib2-devel
 # GTK frontend
@@ -587,7 +562,6 @@ BuildRequires: gtk3-devel
 BuildRequires: vte291-devel
 # GTK translations
 BuildRequires: gettext
-%endif
 %if %{have_xen}
 # Xen support
 BuildRequires: xen-devel
@@ -633,10 +607,8 @@ BuildRequires: fuse3-devel
 %if %{have_sdl_image}
 BuildRequires: SDL2_image-devel
 %endif
-%if %{have_ui}
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
-%endif
 %if %{with pipewire}
 # Used by pipewire audio backend
 BuildRequires: pipewire-devel
@@ -934,7 +906,6 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the additional D-Bus UI for QEMU.
 %endif
 
-%if %{have_ui}
 %package  ui-curses
 Summary: QEMU curses UI driver
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -961,7 +932,6 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 Requires: %{name}-ui-opengl%{?_isa} = %{version}-%{release}
 %description ui-egl-headless
 This package provides the additional egl-headless UI for QEMU.
-%endif
 
 %if %{with brltty}
 %package  char-baum
@@ -971,13 +941,11 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the Baum chardev driver for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu
 Summary: QEMU virtio-gpu display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu
 This package provides the virtio-gpu display device for QEMU.
-%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-gl
@@ -995,13 +963,11 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the virtio-gpu-rutabaga display device for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu-pci
 Summary: QEMU virtio-gpu-pci display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu-pci
 This package provides the virtio-gpu-pci display device for QEMU.
-%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-pci-gl
@@ -1019,7 +985,6 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the virtio-gpu-pci-rutabaga display device for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu-ccw
 Summary: QEMU virtio-gpu-ccw display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -1037,7 +1002,6 @@ Summary: QEMU virtio-vga-gl display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-vga-gl
 This package provides the virtio-vga-gl display device for QEMU.
-%endif
 
 %if %{have_rutabaga_gfx}
 %package device-display-virtio-vga-rutabaga
@@ -1941,9 +1905,7 @@ run_configure \
 %if %{enable_werror}
   --enable-werror \
 %endif
-%if %{have_ui}
   --enable-xkbcommon \
-%endif
   \
   \
   --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
@@ -1963,9 +1925,7 @@ run_configure \
 %if %{have_block_gluster}
   --enable-glusterfs \
 %endif
-%if %{have_ui}
   --enable-gtk \
-%endif
   --enable-hv-balloon \
   --enable-libdaxctl \
   --enable-libdw \
@@ -2247,16 +2207,6 @@ rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-simpletrace.
 
 %endif
 
-%if !%{have_ui}
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu-pci.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga-gl.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
-rm -rf %{buildroot}%{_libdir}/%{name}/ui-curses.so
-# remove keymap files
-rm -rf %{buildroot}%{_datadir}/%{name}/keymaps/*
-%endif
 # Fedora specific stuff below
 # %find_lang %{name}
 
@@ -2542,9 +2492,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 %files tools
-%if %{have_ui}
 %{_bindir}/qemu-keymap
-%endif
 %{_bindir}/qemu-edid
 %{_bindir}/qemu-trace-stap
 %{_datadir}/%{name}/simpletrace.py*
@@ -2569,9 +2517,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/vhost-user/
 %{_datadir}/icons/*
-%if %{have_ui}
 %{_datadir}/%{name}/keymaps/
-%endif
 %{_datadir}/%{name}/linuxboot_dma.bin
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
 %if ! %{azl}
@@ -2666,7 +2612,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files ui-dbus
 %{_libdir}/%{name}/ui-dbus.so
 %endif
-%if %{have_ui}
 %files ui-curses
 %{_libdir}/%{name}/ui-curses.so
 %files ui-gtk
@@ -2674,7 +2619,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %if %{with sdl}
 %files ui-sdl
 %{_libdir}/%{name}/ui-sdl.so
-%endif
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
 %endif
@@ -2701,7 +2645,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/hw-display-virtio-gpu-pci-rutabaga.so
 %endif
 
-%if %{have_ui}
 %files device-display-virtio-gpu
 %{_libdir}/%{name}/hw-display-virtio-gpu.so
 %files device-display-virtio-gpu-pci
@@ -2712,7 +2655,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/hw-display-virtio-vga.so
 %files device-display-virtio-vga-gl
 %{_libdir}/%{name}/hw-display-virtio-vga-gl.so
-%endif
 
 %if %{have_rutabaga_gfx}
 %files device-display-virtio-vga-rutabaga
@@ -3461,6 +3403,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %changelog
 * Wed Jun 19 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 8.2.0-9
 - Enable vnc related packages/dependencies required for Kubevirt
+- Removing the have_ui flag to allow all ui dependencies to exist for Kubevirt.
 
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.0-8
 - update to build dep latest glibc-static version
