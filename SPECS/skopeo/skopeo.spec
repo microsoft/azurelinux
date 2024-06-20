@@ -48,7 +48,7 @@ make test-unit-local
 
 %changelog
 * Thu Jun 20 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-4
-- Fix Fix CVE-2024-3727 in github.com/containers/image
+- Fix CVE-2024-3727 in github.com/containers/image
 
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.14.2-3
 - Fix for CVE-2023-45288
