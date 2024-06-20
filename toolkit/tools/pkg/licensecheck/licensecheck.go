@@ -158,9 +158,14 @@ func (l *LicenseChecker) GetResults() (all, warnings, errors []LicenseCheckResul
 	return all, warnings, errors
 }
 
+type licenseCheckReturn struct {
+	finding LicenseCheckResult
+	err     error
+}
+
 // runLicenseCheckInChroot searches for bad licenses amongst the RPMs mounted into the chroot. This function is meant
 // to be called from inside the chroot's context.
-func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult, err error) {
+func (l *LicenseChecker) runLicenseCheckInChroot() (findings []LicenseCheckResult, err error) {
 	const searchReportIntervalPercent = 10 // Report progress to the user every 10%
 
 	// Find all the rpms in the chroot
@@ -176,6 +181,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 	// Scan each rpm in parallel
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
+	resultsChannel := make(chan licenseCheckReturn, len(rpmsToSearchPaths))
 	logger.Log.Infof("Queuing %d rpms for search", len(rpmsToSearchPaths))
 	l.queueWorkers(ctx, rpmsToSearchPaths, resultsChannel)
 	logger.Log.Infof("Searching rpms")
@@ -199,7 +205,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 			logger.Log.Infof("Checked %d/%d rpms (%d%%)", numProcessed, len(rpmsToSearchPaths), percentProcessed)
 			lastReportPercent = percentProcessed
 		}
-		results = append(results, result)
+		findings = append(findings, result.finding)
 	}
 	return
 }
@@ -230,7 +236,7 @@ func (l *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
 }
 
 // queueWorkers queues up workers to search the RPMs in parallel. Each worker will wait on the jobSemaphore before starting.
-func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []string, resultsChannel chan LicenseCheckResult) {
+func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []string, resultsChannel chan licenseCheckReturn) {
 	for _, rpmPath := range rpmsToSearchPaths {
 		// Wait for the semaphore, or allow cancel before running
 		select {
@@ -248,10 +254,10 @@ func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []s
 			logger.Log.Debugf("Finished searching (%s)", filepath.Base(rpmPath))
 			if err != nil {
 				logger.Log.Errorf("License check worker failed with error: %v", err)
-				resultsChannel <- LicenseCheckResult{err: err}
+				resultsChannel <- licenseCheckReturn{err: err}
 				return
 			}
-			resultsChannel <- searchResult
+			resultsChannel <- licenseCheckReturn{finding: searchResult, err: nil}
 		}(rpmPath)
 	}
 }
@@ -264,15 +270,15 @@ func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, except
 
 	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageFiles(rpmPath, defines)
 	if err != nil {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package contents:\n%w", err)}, nil
+		return LicenseCheckResult{}, fmt.Errorf("failed to query package contents:\n%w", err)
 	}
 
 	pkgNameLines, err := rpm.QueryPackage(rpmPath, "%{NAME}", defines)
 	if err != nil {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package:\n%w", err)}, nil
+		return LicenseCheckResult{}, fmt.Errorf("failed to query package:\n%w", err)
 	}
 	if len(pkgNameLines) != 1 {
-		return LicenseCheckResult{RpmPath: rpmPath, err: fmt.Errorf("failed to query package, expected 1 package name, got %d", len(pkgNameLines))}, nil
+		return LicenseCheckResult{}, fmt.Errorf("failed to query package, expected 1 package name, got %d", len(pkgNameLines))
 	}
 	pkgName := pkgNameLines[0]
 

@@ -19,7 +19,6 @@ type LicenseCheckResult struct {
 	BadDocs        []string `json:"BadDocs,omitempty"`
 	BadFiles       []string `json:"BadFiles,omitempty"`
 	DuplicatedDocs []string `json:"DuplicatedDocs,omitempty"`
-	err            error    `json:"-"`
 }
 
 // HasBadResult returns true if the result contains at least one bad document or file.
