@@ -36,6 +36,15 @@ The core analysis suite is a self-contained tool that can be used to investigate
 
 This package contains libraries and header files need for development.
 
+%ifarch x86_64
+%package target-arm64
+Summary:       Crash executable for analyzing arm64 crash dumps on x86_64 host machines
+Group:         Development/Libraries
+
+%description target-arm64
+This package contains the "crash-target-arm64" binary for analyzing arm64 crash dumps on x86_64 host machines.
+%endif
+
 %prep
 %autosetup -n %{name}-%{version}
 # make expect the gdb tarball to be named with its version only, gdb-[version].tar.gz, e.g.: gdb-10.2.tar.gz
@@ -72,9 +81,6 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %defattr(-,root,root)
 %license COPYING3
 %{_bindir}/crash
-%ifarch x86_64
-%{_bindir}/crash-target-arm64
-%endif
 %{_mandir}/man8/crash.8.gz
 %doc COPYING3 README
 
@@ -82,6 +88,12 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %defattr(-,root,root)
 %dir %{_includedir}/crash
 %{_includedir}/crash/*.h
+
+%ifarch x86_64
+%files target-arm64
+%defattr(-,root,root)
+%{_bindir}/crash-target-arm64
+%endif
 
 %changelog
 * Tue Jun 18 2024 Andrew Phelps <anphel@microsoft.com> - 8.0.4-3
