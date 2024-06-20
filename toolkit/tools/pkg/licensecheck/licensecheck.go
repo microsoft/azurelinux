@@ -279,7 +279,7 @@ func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, except
 		return LicenseCheckResult{}, fmt.Errorf("failed to query package:\n%w", err)
 	}
 	if len(pkgNameLines) != 1 {
-		return LicenseCheckResult{}, fmt.Errorf("failed to query package, expected 1 package name, got %d", len(pkgNameLines))
+		return LicenseCheckResult{}, fmt.Errorf("failed to query package:\nexpected 1 package name, got %d", len(pkgNameLines))
 	}
 	pkgName := pkgNameLines[0]
 
