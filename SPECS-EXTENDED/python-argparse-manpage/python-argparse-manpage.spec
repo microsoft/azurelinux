@@ -11,7 +11,7 @@ specify that by (a) the module name or corresponding python filename and \
 There is a limited support for (deprecated) optparse objects, too.
 
 
-Name:           argparse-manpage
+Name:           python-argparse-manpage
 Version:        1.5
 Release:        3%{?dist}
 Summary:        %{sum Python}
