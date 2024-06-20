@@ -2,16 +2,16 @@
 
 Summary:        A rust-based reference implementation for provisioning Linux VMs on Azure.
 Name:           azure-init
-Version:        0.1.1
-Release:        1%{?dist}
+Version:        f84e07b126fef8661e0c341329c57cb65d75fa92
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/Azure/azure-init
-Source0:        https://github.com/Azure/azure-init/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source0:        https://github.com/Azure/azure-init/archive/refs/tags/v%{version}.tar.gz#/%{name}-local.tar.gz
+Source1:        %{name}-local-vendor.tar.gz
 Source2:        cargo-config
-Patch0:         0001-add-Azure-Linux-support.patch
+# Patch0:         0001-add-Azure-Linux-support.patch
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  libudev-devel
@@ -67,6 +67,9 @@ systemctl enable azure-provisioning-agent
 %{_sysconfdir}/netplan/eth0.yaml
 
 %changelog
+* Thu Jun 20 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.1.1-2
+- Test Dongsu Park's PR86 in azure-init
+
 * Wed May 08 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.1.1-1
 - Initial introduction to Azure Linux (license: MIT)
 - License verified
