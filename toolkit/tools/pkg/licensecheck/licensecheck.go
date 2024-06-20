@@ -31,6 +31,7 @@ and should be cleaned up.
 package licensecheck
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -168,16 +169,16 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 		return nil, fmt.Errorf("failed to walk rpm directory:\n%w", err)
 	}
 	if len(rpmsToSearchPaths) == 0 {
-		logger.Log.Warnf("No rpms found in %s", l.simpleToolChroot.ChrootRelativeMountDir())
+		logger.Log.Warnf("No rpms found in (%s)", l.simpleToolChroot.ChrootRelativeMountDir())
 		return nil, nil
 	}
 
 	// Scan each rpm in parallel
-	resultsChannel := make(chan LicenseCheckResult, len(rpmsToSearchPaths))
-	cancel := make(chan struct{})
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
 	logger.Log.Infof("Queuing %d rpms for search", len(rpmsToSearchPaths))
-	l.queueWorkers(rpmsToSearchPaths, resultsChannel, cancel)
-	logger.Log.Infof("Searching rpms...")
+	l.queueWorkers(ctx, rpmsToSearchPaths, resultsChannel)
+	logger.Log.Infof("Searching rpms")
 
 	// Wait for all the workers to finish, updating the progress as results come in
 	numProcessed := 0
@@ -187,9 +188,11 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 		if result.err != nil {
 			// Signal the workers to stop if there is an error
 			err = fmt.Errorf("failed to search rpm for license issues:\n%w", result.err)
-			close(cancel)
+			cancelFunc()
 			return nil, err
 		}
+
+		// Report progress to the user every 10%
 		numProcessed++
 		percentProcessed := (numProcessed * 100) / len(rpmsToSearchPaths)
 		if percentProcessed-lastReportPercent >= searchReportIntervalPercent {
@@ -203,9 +206,9 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 
 // findRpmPaths walks the chroots's mount directory to find all *.rpm files. The paths are returned relative to the
 // chroot's root.
-func (s *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
+func (l *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
 	const rpmExtension = ".rpm"
-	err = filepath.Walk(s.simpleToolChroot.ChrootRelativeMountDir(), func(path string, info os.FileInfo, walkErr error) error {
+	err = filepath.Walk(l.simpleToolChroot.ChrootRelativeMountDir(), func(path string, info os.FileInfo, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -227,12 +230,12 @@ func (s *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
 }
 
 // queueWorkers queues up workers to search the RPMs in parallel. Each worker will wait on the jobSemaphore before starting.
-func (l *LicenseChecker) queueWorkers(rpmsToSearchPaths []string, resultsChannel chan LicenseCheckResult, cancel chan struct{}) {
+func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []string, resultsChannel chan LicenseCheckResult) {
 	for _, rpmPath := range rpmsToSearchPaths {
 		// Wait for the semaphore, or allow cancel before running
 		select {
 		case l.jobSemaphore <- struct{}{}:
-		case <-cancel:
+		case <-ctx.Done():
 			return
 		}
 		go func(rpmPath string) {
