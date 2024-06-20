@@ -41,6 +41,7 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
