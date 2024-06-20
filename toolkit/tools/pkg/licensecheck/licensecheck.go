@@ -183,7 +183,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (findings []LicenseCheckResul
 	defer cancelFunc()
 	resultsChannel := make(chan licenseCheckReturn, len(rpmsToSearchPaths))
 	logger.Log.Infof("Queuing %d rpms for search", len(rpmsToSearchPaths))
-	l.queueWorkers(ctx, rpmsToSearchPaths, resultsChannel)
+	go l.queueWorkers(ctx, rpmsToSearchPaths, resultsChannel)
 	logger.Log.Infof("Searching rpms")
 
 	// Wait for all the workers to finish, updating the progress as results come in
@@ -236,6 +236,7 @@ func (l *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
 }
 
 // queueWorkers queues up workers to search the RPMs in parallel. Each worker will wait on the jobSemaphore before starting.
+// This function will return once all workers have been queued.
 func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []string, resultsChannel chan licenseCheckReturn) {
 	for _, rpmPath := range rpmsToSearchPaths {
 		// Wait for the semaphore, or allow cancel before running
