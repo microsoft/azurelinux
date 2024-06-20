@@ -1,0 +1,11 @@
+[Match]
+Driver=hv_netvsc
+Name=eth0
+
+[Network]
+DHCP=ipv4
+LinkLocalAddressing=ipv6
+
+[DHCP]
+RouteMetric=100
+UseMTU=true
