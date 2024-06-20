@@ -2254,8 +2254,6 @@ rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga-gl.so
 rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga.so
 rm -rf %{buildroot}%{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
 rm -rf %{buildroot}%{_libdir}/%{name}/ui-curses.so
-# remove keymap files
-rm -rf %{buildroot}%{_datadir}/%{name}/keymaps/*
 %endif
 # Fedora specific stuff below
 # %find_lang %{name}
@@ -2542,9 +2540,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 %files tools
-%if %{have_ui}
 %{_bindir}/qemu-keymap
-%endif
 %{_bindir}/qemu-edid
 %{_bindir}/qemu-trace-stap
 %{_datadir}/%{name}/simpletrace.py*
@@ -2569,9 +2565,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/vhost-user/
 %{_datadir}/icons/*
-%if %{have_ui}
 %{_datadir}/%{name}/keymaps/
-%endif
 %{_datadir}/%{name}/linuxboot_dma.bin
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
 %if ! %{azl}
