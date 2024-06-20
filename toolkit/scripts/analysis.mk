@@ -132,4 +132,4 @@ license-check-pkg: $(license_check_common_deps) $(RPMS_DIR)
 
 ##help:target:license-check-img=Validate all packages needed for an image for license compliance. Must set CONFIG_FILE=<path_to_config>.
 license-check-img: $(license_check_common_deps) $(image_package_cache_summary)
-	$(call licensecheck-command,$(image_package_cache_summary),image)
+	$(call licensecheck-command,$(local_and_external_rpm_cache),image)
