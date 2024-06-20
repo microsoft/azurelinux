@@ -51,7 +51,7 @@ func LoadLicenseExceptions(file string) (LicenseExceptions, error) {
 	config := LicenseExceptions{}
 	err := jsonutils.ReadJSONFile(file, &config)
 	if err != nil {
-		return LicenseExceptions{}, fmt.Errorf("failed to read license exceptions file:\n%w", err)
+		return LicenseExceptions{}, fmt.Errorf("failed to read license exceptions file (%s):\n%w", file, err)
 	}
 
 	// Compile regexes for ignored files

@@ -80,7 +80,7 @@ func LoadLicenseNames(file string) (LicenseNames, error) {
 	config := LicenseNames{}
 	err := jsonutils.ReadJSONFile(file, &config)
 	if err != nil {
-		return LicenseNames{}, fmt.Errorf("failed to read license names file:\n%w", err)
+		return LicenseNames{}, fmt.Errorf("failed to read license names file (%s):\n%w", file, err)
 	}
 
 	for i := range config.FuzzyLicenseNamesRegexList {
