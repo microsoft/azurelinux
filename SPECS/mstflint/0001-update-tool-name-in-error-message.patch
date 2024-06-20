@@ -1,0 +1,25 @@
+From a61b93f3437347b3f9bbbb38236189eab2f6f73d Mon Sep 17 00:00:00 2001
+From: Juan Camposeco <juanarturoc@microsoft.com>
+Date: Wed, 12 Jun 2024 14:30:12 -0700
+Subject: [PATCH] update tool name in error message
+
+---
+ flint/subcommands.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/flint/subcommands.cpp b/flint/subcommands.cpp
+index c645c160..e24abf4f 100644
+--- a/flint/subcommands.cpp
++++ b/flint/subcommands.cpp
+@@ -5591,7 +5591,11 @@ FlintStatus SgSubCommand::sgFs2()
+     return FLINT_SUCCESS;
+ }
+ 
++#ifndef MST_UL
+ #define FW_RESET_MSG "To load new configuration run mlxfwreset or reboot machine"
++#else
++#define FW_RESET_MSG "To load new configuration run mstfwreset or reboot machine"
++#endif
+ 
+ FlintStatus SgSubCommand::sgFs3()
+ {
