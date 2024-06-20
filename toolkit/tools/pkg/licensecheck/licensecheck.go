@@ -160,12 +160,12 @@ func (l *LicenseChecker) GetResults() (all, warnings, errors []LicenseCheckResul
 // runLicenseCheckInChroot searches for bad licenses amongst the RPMs mounted into the chroot. This function is meant
 // to be called from inside the chroot's context.
 func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult, err error) {
-	const searchReportIntervalPercent = 10
+	const searchReportIntervalPercent = 10 // Report progress to the user every 10%
 
 	// Find all the rpms in the chroot
 	rpmsToSearchPaths, err := l.findRpmPaths()
 	if err != nil {
-		return nil, fmt.Errorf("failed to walk srpm directory:\n%w", err)
+		return nil, fmt.Errorf("failed to walk rpm directory:\n%w", err)
 	}
 	if len(rpmsToSearchPaths) == 0 {
 		logger.Log.Warnf("No rpms found in %s", l.simpleToolChroot.ChrootRelativeMountDir())
@@ -186,7 +186,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 		result := <-resultsChannel
 		if result.err != nil {
 			// Signal the workers to stop if there is an error
-			err = fmt.Errorf("failed to search srpm:\n%w", result.err)
+			err = fmt.Errorf("failed to search rpm for license issues:\n%w", result.err)
 			close(cancel)
 			return nil, err
 		}
@@ -203,7 +203,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (results []LicenseCheckResult
 
 // findRpmPaths walks the chroots's mount directory to find all *.rpm files. The paths are returned relative to the
 // chroot's root.
-func (s *LicenseChecker) findRpmPaths() (foundSrpmPaths []string, err error) {
+func (s *LicenseChecker) findRpmPaths() (foundRpmPaths []string, err error) {
 	const rpmExtension = ".rpm"
 	err = filepath.Walk(s.simpleToolChroot.ChrootRelativeMountDir(), func(path string, info os.FileInfo, walkErr error) error {
 		if walkErr != nil {
@@ -216,14 +216,14 @@ func (s *LicenseChecker) findRpmPaths() (foundSrpmPaths []string, err error) {
 			return nil
 		}
 
-		foundSrpmPaths = append(foundSrpmPaths, path)
+		foundRpmPaths = append(foundRpmPaths, path)
 		return nil
 	})
 	if err != nil {
 		err = fmt.Errorf("failed to walk directory:\n%w", err)
 		return nil, err
 	}
-	return foundSrpmPaths, nil
+	return foundRpmPaths, nil
 }
 
 // queueWorkers queues up workers to search the RPMs in parallel. Each worker will wait on the jobSemaphore before starting.
