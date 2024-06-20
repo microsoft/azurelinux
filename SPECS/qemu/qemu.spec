@@ -264,12 +264,13 @@ Distribution:   Azure Linux
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
-%define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %if %{have_ui}
+%define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
 %else
+%define requires_ui_gtk %{nil}
 %define requires_ui_sdl %{nil}
 %define requires_ui_egl_headless %{nil}
 %define requires_ui_opengl %{nil}
@@ -2629,8 +2630,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 %files ui-curses
 %{_libdir}/%{name}/ui-curses.so
+%if %{have_ui}
 %files ui-gtk
 %{_libdir}/%{name}/ui-gtk.so
+%endif
 %if %{with sdl}
 %files ui-sdl
 %{_libdir}/%{name}/ui-sdl.so
