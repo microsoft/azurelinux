@@ -47,9 +47,10 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/base-image-packages.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/cvm-packages.json"
+                "packagelists/marketplace-tools-packages.json",
+                "packagelists/azurevm-packages.json",
+                "packagelists/cvm-packages.json",
+                "packagelists/hyperv-packages.json"
             ],
             "AdditionalFiles": {
                 "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"

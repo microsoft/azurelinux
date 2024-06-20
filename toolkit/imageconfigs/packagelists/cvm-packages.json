@@ -1,8 +1,13 @@
 {
     "packages": [
+        "shim",
         "systemd-boot-unsigned",
         "kernel-uki",
-        "tpm2-tools"
+        "tpm2-tools",
+        "ca-certificates",
+        "cronie-anacron",
+        "logrotate",
+        "core-packages-base-image"
     ],
     "_comment": ""
 }
