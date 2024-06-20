@@ -26,7 +26,7 @@ func FormatResults(results []licensecheck.LicenseCheckResult, pedantic bool) str
 	if !pedantic {
 		for _, result := range filteredResults {
 			if result.HasWarningResult() && !result.HasBadResult() {
-				sb.WriteString(printWarning(result))
+				sb.WriteString(formatWarning(result))
 			}
 		}
 	}
@@ -34,11 +34,11 @@ func FormatResults(results []licensecheck.LicenseCheckResult, pedantic bool) str
 	// Now print the errors
 	for _, result := range filteredResults {
 		if result.HasBadResult() || (pedantic && result.HasWarningResult()) {
-			sb.WriteString(printError(result, pedantic))
+			sb.WriteString(formatError(result, pedantic))
 			if !pedantic && result.HasWarningResult() {
 				// If pedantic was set, the warning was already printed as an error.
 				// Otherwise print the warning now.
-				sb.WriteString(printWarning(result))
+				sb.WriteString(formatWarning(result))
 			}
 		}
 	}
@@ -46,16 +46,16 @@ func FormatResults(results []licensecheck.LicenseCheckResult, pedantic bool) str
 	return sb.String()
 }
 
-func printWarning(result licensecheck.LicenseCheckResult) string {
+func formatWarning(result licensecheck.LicenseCheckResult) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("WARN: '%s' has license warnings:\n", filepath.Base(result.RpmPath)))
+	sb.WriteString(fmt.Sprintf("WARN: (%s) has license warnings:\n", filepath.Base(result.RpmPath)))
 	sb.WriteString(fmt.Sprintf("\tduplicated license files:\n\t\t%s\n", strings.Join(result.DuplicatedDocs, "\n\t\t")))
 	return sb.String()
 }
 
-func printError(result licensecheck.LicenseCheckResult, pedantic bool) string {
+func formatError(result licensecheck.LicenseCheckResult, pedantic bool) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("ERROR: '%s' has license errors:\n", filepath.Base(result.RpmPath)))
+	sb.WriteString(fmt.Sprintf("ERROR: (%s) has license errors:\n", filepath.Base(result.RpmPath)))
 	if len(result.BadDocs) > 0 {
 		sb.WriteString(fmt.Sprintf("\tbad %%doc files:\n\t\t%s\n", strings.Join(result.BadDocs, "\n\t\t")))
 	}
