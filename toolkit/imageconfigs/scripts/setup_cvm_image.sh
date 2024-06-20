@@ -7,6 +7,9 @@ set -e
 EFIDIR="BOOT"
 KERNEL_VERSION=""
 
+# Image generation is done in a chroot environment, so running `uname -r`
+# will return the version of the host running kernel. This function works
+# under the assumption that exactly one kernel is installed in the end image.
 get_kernel_version() {
     kernel_modules_dir="/usr/lib/modules"
     KERNEL_VERSION="$(ls $kernel_modules_dir)"
@@ -17,8 +20,9 @@ cp -a /boot/efi/. /efi
 rm -rf /boot/efi
 ln -s ../efi /boot/efi
 
-# switching to systemd-boot
-# copy sd-boot EFI binary over the grub EFI binary
+# The shim has its default boot-loader filename built in as grubx64.efi.
+# To switch to systemd-boot, we overwrite that file location with the
+# sd-boot EFI binary as a workaround.
 cp /lib/systemd/boot/efi/systemd-bootx64.efi /efi/EFI/$EFIDIR/grubx64.efi
 
 # empty /etc/fstab file
