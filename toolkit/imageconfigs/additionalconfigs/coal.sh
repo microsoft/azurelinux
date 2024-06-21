@@ -8,6 +8,7 @@ mkdir -p /data/overlays/var/upper
 mkdir -p /data/overlays/var/work
 mkdir -p /data/overlays/root/upper
 mkdir -p /data/overlays/root/work
+mkdir -p /data/containerd
 
 # Make rootfs mount as read-only
 sed -i "s/\/ ext4 defaults/\/ ext4 defaults,ro/" /etc/fstab
@@ -18,6 +19,7 @@ echo "overlay /etc overlay x-initrd.mount,x-systemd.requires-mounts-for=/sysroot
 echo "overlay /home overlay x-initrd.mount,x-systemd.requires-mounts-for=/sysroot/data,lowerdir=/sysroot/home,upperdir=/sysroot/data/overlays/home/upper,workdir=/sysroot/data/overlays/home/work 0 0" >> /etc/fstab
 echo "overlay /var overlay x-initrd.mount,x-systemd.requires-mounts-for=/sysroot/data,lowerdir=/sysroot/var,upperdir=/sysroot/data/overlays/var/upper,workdir=/sysroot/data/overlays/var/work 0 0" >> /etc/fstab
 echo "overlay /root overlay x-initrd.mount,x-systemd.requires-mounts-for=/sysroot/data,lowerdir=/sysroot/root,upperdir=/sysroot/data/overlays/root/upper,workdir=/sysroot/data/overlays/root/work 0 0" >> /etc/fstab
+echo "/data/containerd /var/lib/containerd none bind 0 0" >> /etc/fstab
 
 # Enable initrd to break into a shell
 #sed -i "s/rd.shell=0 rd.emergency=reboot/rd.shell=1 rd.break=pre-pivot/" /boot/grub2/grub.cfg
