@@ -29,6 +29,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
@@ -494,13 +495,20 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
+	// imageconfigvalidator should have ensured that we intend to install shadow-utils, so we can go ahead and do that here.
 	if len(config.Users) > 0 || len(config.Groups) > 0 {
-		shadowUtilsInstalled := 0
-		shadowUtilsInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
+		if !sliceutils.ContainsValue(packagesToInstall, "shadow-utils") {
+			err = fmt.Errorf("shadow-utils package is required when setting users or groups")
+			return
+		}
+
+		packagesInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
 		if err != nil {
 			return
 		}
-		packagesInstalled += shadowUtilsInstalled
+
+		// Remove shadow-utils from the list of packages to install
+		packagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != "shadow-utils" })
 	}
 
 	hostname := config.Hostname
