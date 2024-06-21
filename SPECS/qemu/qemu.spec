@@ -1939,9 +1939,7 @@ run_configure \
 %if %{enable_werror}
   --enable-werror \
 %endif
-%if %{have_ui}
   --enable-xkbcommon \
-%endif
   \
   \
   --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
