@@ -1,5 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%global modname argparse-manpage
 
 %global sum()   Build manual page from %* ArgumentParser object
 %global desc \
@@ -11,33 +12,33 @@ specify that by (a) the module name or corresponding python filename and \
 There is a limited support for (deprecated) optparse objects, too.
 
 
-Name:           argparse-manpage
+Name:           python-%{modname}
 Version:        1.5
 Release:        3%{?dist}
 Summary:        %{sum Python}
 BuildArch:      noarch
 
 License:        ASL 2.0
-URL:            https://github.com/praiskup/%{name}
-Source0:        %pypi_source
+URL:            https://github.com/praiskup/%{modname}
+Source0:        %pypi_source argparse-manpage
 
 BuildRequires: python3-setuptools python3-devel
 %if 0%{?with_check}
 BuildRequires: python3-pip
 %endif
-Requires: python3-%{name} = %{version}-%{release}
+Requires: python3-%{modname} = %{version}-%{release}
 
 %description
 %desc
 
-%package -n     python3-%name
+%package -n     python3-%{modname}
 Summary:        %{sum Python 3}
 
-%description -n python3-%name
+%description -n python3-%{modname}
 %{desc}
 
 %prep
-%setup -q
+%setup -q -n %{modname}-%{version}
 
 %build
 %py3_build
@@ -59,7 +60,7 @@ pip3 install pytest==7.1.2 six==1.16.0
 %{_mandir}/man1/argparse-manpage.1.*
 %{python3_sitelib}/build_manpages/cli
 
-%files -n python3-%name
+%files -n python3-%{modname}
 %license LICENSE
 %{python3_sitelib}/build_manpages
 %{python3_sitelib}/argparse_manpage-%{version}*.egg-info
