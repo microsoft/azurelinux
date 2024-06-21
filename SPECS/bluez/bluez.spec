@@ -24,7 +24,7 @@ Patch6:         0002-Use-g_memdup2-everywhere.patch
 Patch7:         0001-hog-Fix-read-order-of-attributes-rediffed.patch
 Patch8:         0002-hog-Add-input-queue-while-uhid-device-has-not-been-c-rediffed.patch
 Patch9:         CVE-2022-3563.patch
-Patch10:         CVE-2023-50229.patch
+Patch10:        CVE-2023-50229.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 # For printing
