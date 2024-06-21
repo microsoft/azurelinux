@@ -15,7 +15,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ Source5:        %{npm_cache}
 Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
 Source7:        %{local_n}
+Patch0:         CVE-2024-37890.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -59,10 +60,6 @@ Cassandra reaper is an open source tool that aims to schedule and orchestrate re
 
 %prep
 %setup -q -n %{srcdir}
-
-%build
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
 
 pushd "$HOME"
 echo "Installing bower cache."
@@ -102,6 +99,7 @@ popd
 
 cd %{_builddir}/%{srcdir}
 echo "Installing src caches"
+
 pushd ./src/ui
 echo "Installing bower_components"
 tar xf %{SOURCE1}
@@ -109,6 +107,13 @@ tar xf %{SOURCE1}
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
 popd
+
+%autopatch -p1
+
+%build
+
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
 
 # Building using maven in offline mode.
 mvn -DskipTests package -o
@@ -178,6 +183,9 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Fri Jun 21 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 3.1.1-10
+- Patch CVE-2024-37890 in vendored copy of websockets library.
+
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
 - Repackage and update src/ui node modules and bower components to 3.1.1-1
 - Address CVE-2024-4068 by upgrading the version of the npm module "braces" to 3.0.3
