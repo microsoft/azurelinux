@@ -1,11 +1,5 @@
 %global pkgname   dirsrv
 
-%bcond bundle_jemalloc 0
-%if %{with bundle_jemalloc}
-%global jemalloc_name jemalloc
-%global jemalloc_ver 5.3.0
-%endif
-
 # This is used in certain builds to help us know if it has extra features.
 %global variant base
 %global prerel __VERSION_PREREL__%{nil}
@@ -172,9 +166,6 @@ Requires:         zlib-devel
 %{?systemd_requires}
 
 Source0:          %{name}-%{version}.tar.bz2
-%if %{with bundle_jemalloc}
-Source3:          https://github.com/jemalloc/%{jemalloc_name}/releases/download/%{jemalloc_ver}/%{jemalloc_name}-%{jemalloc_ver}.tar.bz2
-%endif
 
 %description
 389 Directory Server is an LDAPv3 compliant server.  The base package includes
@@ -275,10 +266,6 @@ This module contains tools and libraries for accessing, testing,
 %prep
 %setup -q -n %{name}-%{version}
 
-%if %{with bundle_jemalloc}
-%setup -q -n %{name}-%{version} -T -D -b 3
-%endif
-
 %build
 
 %if %{with clang}
@@ -304,34 +291,6 @@ UBSAN_FLAGS="--enable-ubsan --enable-debug"
 %endif
 
 RUST_FLAGS="--enable-rust --enable-rust-offline"
-
-%if %{with bundle_jemalloc}
-# Override page size, bz #1545539
-# 4K
-%ifarch %ix86 %arm x86_64 s390x
-%define lg_page --with-lg-page=12
-%endif
-
-# 64K
-%ifarch ppc64 ppc64le aarch64
-%define lg_page --with-lg-page=16
-%endif
-
-# Override huge page size on aarch64
-# 2M instead of 512M
-%ifarch aarch64
-%define lg_hugepage --with-lg-hugepage=21
-%endif
-
-# Build jemalloc
-pushd ../%{jemalloc_name}-%{jemalloc_ver}
-%configure \
-        --libdir=%{_libdir}/%{pkgname}/lib \
-        --bindir=%{_libdir}/%{pkgname}/bin \
-        --enable-prof %{lg_page} %{lg_hugepage}
-make %{?_smp_mflags}
-popd
-%endif
 
 # Rebuild the autotool artifacts now.
 autoreconf -fiv
@@ -409,14 +368,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{pkgname}/plugins/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{pkgname}/plugins/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/libsvrcore.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/libsvrcore.la
-
-%if %{with bundle_jemalloc}
-pushd ../%{jemalloc_name}-%{jemalloc_ver}
-make DESTDIR="$RPM_BUILD_ROOT" install_lib install_bin
-cp -pa COPYING ../%{name}-%{version}/COPYING.jemalloc
-cp -pa README ../%{name}-%{version}/README.jemalloc
-popd
-%endif
 
 
 %check
@@ -521,12 +472,7 @@ fi
 
 
 %files -f plugins.list
-%if %{with bundle_jemalloc}
-%doc LICENSE LICENSE.GPLv3+ LICENSE.openssl README.jemalloc
-%license COPYING.jemalloc
-%else
 %doc LICENSE LICENSE.GPLv3+ LICENSE.openssl
-%endif
 %dir %{_sysconfdir}/%{pkgname}
 %dir %{_sysconfdir}/%{pkgname}/schema
 %config(noreplace)%{_sysconfdir}/%{pkgname}/schema/*.ldif
@@ -572,16 +518,6 @@ fi
 %exclude %{_sbindir}/ldap-agent*
 %exclude %{_mandir}/man1/ldap-agent.1.gz
 %exclude %{_unitdir}/%{pkgname}-snmp.service
-%if %{with bundle_jemalloc}
-%{_libdir}/%{pkgname}/lib/
-%{_libdir}/%{pkgname}/bin/
-%exclude %{_libdir}/%{pkgname}/bin/jemalloc-config
-%exclude %{_libdir}/%{pkgname}/bin/jemalloc.sh
-%exclude %{_libdir}/%{pkgname}/lib/libjemalloc.a
-%exclude %{_libdir}/%{pkgname}/lib/libjemalloc.so
-%exclude %{_libdir}/%{pkgname}/lib/libjemalloc_pic.a
-%exclude %{_libdir}/%{pkgname}/lib/pkgconfig
-%endif
 
 %files devel
 %doc LICENSE LICENSE.GPLv3+ LICENSE.openssl
@@ -603,9 +539,6 @@ fi
 %{_libdir}/%{pkgname}/libns-dshttpd.so.*
 %{_libdir}/%{pkgname}/libldaputil.so.*
 %{_libdir}/%{pkgname}/librewriters.so*
-%if %{with bundle_jemalloc}
-%{_libdir}/%{pkgname}/lib/libjemalloc.so.2
-%endif
 
 %files snmp
 %doc LICENSE LICENSE.GPLv3+ LICENSE.openssl
@@ -633,5 +566,5 @@ fi
 
 %changelog
 * Mon Jun 17 2024 Andy Zaugg <azaugg@linkedin.com> - 3.1.0-1
-- Initial CBL-Mariner import from upstream Project (license: GPL3).
+- Initial CBL-Mariner import from 389-ds-base source (license: GPLv3+)
 - License verified
