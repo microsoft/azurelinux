@@ -58,25 +58,39 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	copy_2_filemode := os.FileMode(0o777)
 
+	// Copy a file.
 	err = copyAdditionalFiles(baseConfigPath, map[string]imagecustomizerapi.FileConfigList{
 		"files/a.txt": {
-			{Path: "/a_copy_1.txt"},
-			{Path: "/a_copy_2.txt", Permissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(copy_2_filemode))},
+			{Path: "/copy_1.txt"},
+			{Path: "/copy_2.txt", Permissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(copy_2_filemode))},
 		},
 	}, chroot)
 	assert.NoError(t, err)
 
-	orig_path := filepath.Join(baseConfigPath, "files/a.txt")
-	copy_1_path := filepath.Join(chroot.RootDir(), "a_copy_1.txt")
-	copy_2_path := filepath.Join(chroot.RootDir(), "a_copy_2.txt")
+	a_orig_path := filepath.Join(baseConfigPath, "files/a.txt")
+	copy_1_path := filepath.Join(chroot.RootDir(), "copy_1.txt")
+	copy_2_path := filepath.Join(chroot.RootDir(), "copy_2.txt")
 
 	// Make sure the file permissions are the expected values.
-	verifyFilePermissionsSame(t, orig_path, copy_1_path)
+	verifyFilePermissionsSame(t, a_orig_path, copy_1_path)
 	verifyFilePermissions(t, copy_2_filemode, copy_2_path)
 
 	// Make sure the files' contents are correct.
-	verifyFileContentsSame(t, orig_path, copy_1_path)
-	verifyFileContentsSame(t, orig_path, copy_2_path)
+	verifyFileContentsSame(t, a_orig_path, copy_1_path)
+	verifyFileContentsSame(t, a_orig_path, copy_2_path)
+
+	// Copy a different file to the same location.
+	err = copyAdditionalFiles(baseConfigPath, map[string]imagecustomizerapi.FileConfigList{
+		"files/b.txt": {
+			{Path: "/copy_1.txt"},
+		},
+	}, chroot)
+	assert.NoError(t, err)
+
+	b_orig_path := filepath.Join(baseConfigPath, "files/b.txt")
+
+	verifyFileContentsSame(t, b_orig_path, copy_1_path)
+	verifyFilePermissionsSame(t, b_orig_path, copy_1_path)
 }
 
 func TestCustomizeImageAdditionalFiles(t *testing.T) {
@@ -151,12 +165,12 @@ func TestCopyAdditionalDirs(t *testing.T) {
 	verifyFilePermissions(t, os.FileMode(0o750), filepath.Join(chroot.RootDir(), "/usr/local"))
 	verifyFilePermissions(t, os.FileMode(0o750), filepath.Join(chroot.RootDir(), "/usr"))
 
-	// Copy the directory but change up the file and directory permissions.
+	// Copy a different directory to the same location but change up the file and directory permissions.
 	err = copyAdditionalDirs(baseConfigPath,
 		imagecustomizerapi.DirConfigList{
 			{
-				SourcePath:           "dirs/a",
-				DestinationPath:      "/",
+				SourcePath:           "dirs/b",
+				DestinationPath:      "/usr/local",
 				ChildFilePermissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o750)),
 				MergedDirPermissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o755)),
 			},
@@ -164,13 +178,15 @@ func TestCopyAdditionalDirs(t *testing.T) {
 		chroot)
 	assert.NoError(t, err)
 
+	animalsFileOrigPath = filepath.Join(baseConfigPath, "dirs/b/bin/animals.sh")
+
 	// Verify file and directory contents and permissions.
 	verifyFileContentsSame(t, animalsFileOrigPath, animalsFileNewPath)
 	verifyFilePermissions(t, os.FileMode(0o750), animalsFileNewPath)
 
 	verifyFilePermissions(t, os.FileMode(0o755), filepath.Join(chroot.RootDir(), "/usr/local/bin"))
 	verifyFilePermissions(t, os.FileMode(0o755), filepath.Join(chroot.RootDir(), "/usr/local"))
-	verifyFilePermissions(t, os.FileMode(0o755), filepath.Join(chroot.RootDir(), "/usr"))
+	verifyFilePermissions(t, os.FileMode(0o750), filepath.Join(chroot.RootDir(), "/usr"))
 }
 
 func TestCustomizeImageAdditionalDirs(t *testing.T) {
