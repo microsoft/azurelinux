@@ -629,8 +629,14 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 			// Not-fatal
 		}
 
-		if partition.TypeUUID != "" {
-			_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, partition.TypeUUID)
+		if partition.TypeUUID != "" || partition.Type != "" {
+			var typeUUID string
+			if partition.TypeUUID != "" {
+				typeUUID = partition.TypeUUID
+			} else {
+				typeUUID = configuration.PartitionTypeNameToUUID[partition.Type]
+			}
+			_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, typeUUID)
 			if err != nil {
 				logger.Log.Warnf("failed to set partition type using parted: %v", stderr)
 				// Not-fatal

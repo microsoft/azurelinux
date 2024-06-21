@@ -29,6 +29,7 @@ const (
 // kickstart-style unattended installation**)
 type Partition struct {
 	FsType    string          `json:"FsType"`
+	Type      string          `json:"Type"`
 	TypeUUID  string          `json:"TypeUUID"`
 	ID        string          `json:"ID"`
 	Name      string          `json:"Name"`
@@ -75,6 +76,19 @@ func (p *Partition) IsValid() (err error) {
 		if err = f.IsValid(); err != nil {
 			return
 		}
+	}
+
+	if p.Type != "" && p.TypeUUID != "" {
+		err = fmt.Errorf("cannot set Type and TypeUUID at the same time")
+		return
+	}
+
+	if p.Type != "" {
+		if _, exists := PartitionTypeNameToUUID[p.Type]; !exists {
+			err = fmt.Errorf("unrecognized partition type (%s), consider setting TypeUUID parameter explicitly or add a new entry to partition type table", p.Type)
+			return
+		}
+
 	}
 
 	err = nameCheck(p.Name)

@@ -8,6 +8,5 @@
         "cronie-anacron",
         "logrotate",
         "core-packages-base-image"
-    ],
-    "_comment": ""
+    ]
 }
