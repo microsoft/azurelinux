@@ -19,6 +19,7 @@ BuildRequires:  expat-devel
 BuildRequires:  expat-libs
 BuildRequires:  libarchive
 BuildRequires:  libarchive-devel
+BuildRequires:  msopenjdk-11
 BuildRequires:  ncurses-devel
 BuildRequires:  xz
 BuildRequires:  xz-devel
@@ -27,6 +28,7 @@ BuildRequires:  zlib-devel
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
+Requires:       msopenjdk-11
 Requires:       ncurses
 Requires:       zlib
 Provides:       %{name}%{major_version} = %{version}-%{release}
