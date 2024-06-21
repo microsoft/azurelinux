@@ -1941,7 +1941,9 @@ run_configure \
 %if %{have_block_gluster}
   --enable-glusterfs \
 %endif
+%if %{have_ui}
   --enable-gtk \
+%endif
   --enable-hv-balloon \
   --enable-libdaxctl \
   --enable-libdw \
@@ -2220,6 +2222,10 @@ rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc-simpletrace.st
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64.stp
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-log.stp
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-simpletrace.stp
+
+%endif
+
+%if !%{have_ui}
 
 %endif
 
@@ -2633,10 +2639,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %if %{have_ui}
 %files ui-gtk
 %{_libdir}/%{name}/ui-gtk.so
-%endif
 %if %{with sdl}
 %files ui-sdl
 %{_libdir}/%{name}/ui-sdl.so
+%endif
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
 %endif
