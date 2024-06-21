@@ -19,7 +19,7 @@ BuildArch:      noarch
 
 License:        ASL 2.0
 URL:            https://github.com/praiskup/%{name}
-Source0:        %pypi_source
+Source0:        %pypi_source argparse-manpage
 
 BuildRequires: python3-setuptools python3-devel
 %if 0%{?with_check}
