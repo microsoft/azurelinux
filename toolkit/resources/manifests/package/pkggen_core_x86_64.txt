@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.29.1-5.azl3.noarch.rpm
+kernel-headers-6.6.29.1-6.azl3.noarch.rpm
 glibc-2.38-6.azl3.x86_64.rpm
 glibc-devel-2.38-6.azl3.x86_64.rpm
 glibc-i18n-2.38-6.azl3.x86_64.rpm
@@ -41,8 +41,8 @@ ncurses-libs-6.4-2.azl3.x86_64.rpm
 ncurses-term-6.4-2.azl3.x86_64.rpm
 readline-8.2-1.azl3.x86_64.rpm
 readline-devel-8.2-1.azl3.x86_64.rpm
-coreutils-9.4-2.azl3.x86_64.rpm
-coreutils-lang-9.4-2.azl3.x86_64.rpm
+coreutils-9.4-3.azl3.x86_64.rpm
+coreutils-lang-9.4-3.azl3.x86_64.rpm
 bash-5.2.15-2.azl3.x86_64.rpm
 bash-devel-5.2.15-2.azl3.x86_64.rpm
 bash-lang-5.2.15-2.azl3.x86_64.rpm

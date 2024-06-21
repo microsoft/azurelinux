@@ -1,5 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
+%global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define mariner_version 3
 
@@ -29,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.29.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +43,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
+Patch0:		    0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -160,6 +162,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
+%patch 0 -p1
 make mrproper
 
 cp %{config_source} .config
@@ -404,9 +407,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-5
+* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-6
 - include i18n (kbd package) in UKI, to provide loadkeys binary so
   systemd-vconsole-setup works
+
+* Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
+- Add patch to enable mstflint kernel driver 4.28.0-1
 
 * Fri May 31 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Enable CONFIG_AMD_MEM_ENCRYPT, CONFIG_SEV_GUEST
