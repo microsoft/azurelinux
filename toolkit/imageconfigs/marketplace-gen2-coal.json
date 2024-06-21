@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 6000,
+            "MaxSize": 1000,
             "Artifacts": [
                 {
                     "Name": "azurelinux-gen2",
@@ -27,21 +27,21 @@
                 {
                     "ID": "boot",
                     "Start": 65,
-                    "End": 565,
+                    "End": 166,
                     "FsType": "ext4"
                 },
                 {
                     "ID": "rootfs",
                     "Name": "rootfs",
-                    "Start": 565,
-                    "End": 4800,
+                    "Start": 166,
+                    "End": 767,
                     "FsType": "ext4"
                 },
                 {
                     "ID": "data",
                     "Name": "data",
-                    "Start": 4800,
-                    "End": 5000,
+                    "Start": 767,
+                    "End": 868,
                     "FsType": "ext4"
                 }
             ]
