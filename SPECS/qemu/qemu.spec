@@ -513,9 +513,7 @@ BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(gbm)
 %endif
 # qemu-keymap
-%if %{have_ui}
 BuildRequires: pkgconfig(xkbcommon)
-%endif
 
 BuildRequires: python3-devel
 # Required for docs. Disable for AzLinux, to reduce python package dependencies
