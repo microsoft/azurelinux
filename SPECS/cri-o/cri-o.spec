@@ -64,6 +64,7 @@ Patch8:         CVE-2023-44487.patch
 Patch9:         CVE-2024-28180.patch
 Patch10:        CVE-2024-21626.patch
 Patch11:        CVE-2024-3154.patch
+Patch12:        CVE-2024-3727.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -216,8 +217,13 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+<<<<<<< HEAD
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-3
 - Bump release to rebuild with go 1.21.11
+=======
+* Tue Jun 18 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 1.22.3-3
+- Patch CVE-2024-3727 in vendored github.com/containers/image.
+>>>>>>> 6e9a2a2a8 (Fix CVE-2024-3727 in cri-o by patching vendored github.com/containers/image (#9438))
 
 * Mon Jun 03 2024 Bala <balakumaran.kannan@microsoft.com> - 1.22.3-2
 - Patch CVE-2024-3154
