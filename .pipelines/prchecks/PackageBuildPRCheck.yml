@@ -42,8 +42,6 @@ variables:
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
-    featureFlags:
-      runOnHost: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
@@ -57,7 +55,7 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                  ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                 steps:
                   - template: .pipelines/templates/RawToolchainDownload.yml@self
@@ -74,13 +72,17 @@ extends:
                   # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
                   - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
 
+                  - script: echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
+                    name: "ToolchainArtifactName"
+                    displayName: "Set variable for published artifact name"
+
                   # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                   #    that the PR check pipeline does not have.
                   # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish toolchain artifacts"
@@ -94,15 +96,17 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
+                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
-                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      customToolchainArtifactName: $(toolchainArtifactName)
                       isCheckBuild: true
                       isQuickRebuildPackages: true
+                      isUseCCache: true
                       outputArtifactsFolder: $(ob_outputDirectory)
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
@@ -110,9 +114,13 @@ extends:
                       testSuiteName: "[${{ configuration.name }}] Package test"
                       testRerunList: "$(testListFromToolchain)"
 
+                  - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
+                    name: "RPMsArtifactName"
+                    displayName: "Set variable for published artifact name"
+
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
@@ -125,7 +133,9 @@ extends:
                   type: linux
                   isCustom: true
                   name: ${{ configuration.agentPool }}
+                variables:
+                  rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
                 steps:
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
-                      inputArtifactName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                      inputArtifactName: $(rpmsArtifactName)

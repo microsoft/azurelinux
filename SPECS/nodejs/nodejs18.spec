@@ -1,12 +1,12 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 9.8.1
+%define npm_version 10.5.0
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        18.18.2
-Release:        4%{?dist}
+Version:        18.20.2
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -16,9 +16,7 @@ URL:            https://github.com/nodejs/node
 # !!!! because it contains patented algorithms.
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Patch0:         disable-tlsv1-tlsv1-1.patch
-Patch1:         CVE-2023-42282.patch
-Patch2:         CVE-2024-24806.patch
+Patch0:         CVE-2023-21100.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -35,6 +33,8 @@ Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 
 Provides:       npm = %{npm_version}.%{version}-%{release}
+Provides:       nodejs
+Obsoletes:      nodejs < 18.0.0
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -117,6 +117,24 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed May 29 2024 Mitch Zhu <mitchzhu@microsoft.com> - 18.20.2-2
+- Patch CVE-2023-21100.
+- Remove unused patches.
+
+* Fri Apr 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 18.20.2-1
+- Auto-upgrade to 18.20.2 - address multiple CVEs.
+- Remove patches as the upgrade already has these changes.
+- Update npm version from deps/npm/package.json
+
+* Wed Apr 10 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 18.18.2-7
+- Patch CVE-2024-27983.
+
+* Wed Mar 27 2024 Jon Slobodzian <joslobo@microsoft.com> - 18.18.2-6
+- This change Obsoletes nodejs (nodejs16) which is end of life.
+
+* Wed Mar 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 18.18.2-5
+- Patch CVE-2024-22025
+
 * Tue Feb 27 2024 Suresh Thelkar <sthelkar@ieee.org> - 18.18.2-4
 - Patch CVE-2024-24806
 

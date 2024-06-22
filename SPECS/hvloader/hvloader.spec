@@ -1,17 +1,18 @@
 %define  debug_package %{nil}
 %define  name_github   HvLoader
-%define  edk2_tag      edk2-stable202211
+%define  edk2_tag      edk2-stable202305
 Summary:        HvLoader.efi is an EFI application for loading an external hypervisor loader.
 Name:           hvloader
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/microsoft/HvLoader
 Source0:        https://github.com/microsoft/HvLoader/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        https://github.com/tianocore/edk2/archive/refs/tags/%{edk2_tag}.tar.gz#/edk2-submodules-%{edk2_tag}.tar.gz
+# Instructions to generate edk2 submodules: https://github.com/tianocore/edk2/tree/edk2-stable202302?tab=readme-ov-file#submodules
+Source1:        https://github.com/tianocore/edk2/archive/refs/tags/%{edk2_tag}.tar.gz#/%{edk2_tag}-submodules.tar.gz
 Source2:        target-x86.txt
 BuildRequires:  bc
 BuildRequires:  gcc
@@ -57,6 +58,16 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
+* Fri May 31 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-3
+- Update edk2_tag to edk2-stable202305
+- Publish edk2-stable202305-submodules source 
+- Correct the resolution of openssl related CVEs (CVE-2023-0286, CVE-2023-0215, CVE-2022-4450, CVE-2022-4304) that were not successfully addressed in the previous update
+
+* Wed May 08 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-2
+- Update edk2_tag to edk2-stable202302
+- Publish edk2-stable202302-submodules source
+- Address openssl related CVEs (CVE-2023-0286, CVE-2023-0215, CVE-2022-4450, CVE-2022-4304)
+
 * Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 1.0.1-1
 - Add hvloader.spec
 - License verified

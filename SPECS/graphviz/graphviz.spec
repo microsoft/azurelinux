@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,7 @@ Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-
 Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
 Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
 Patch2:         CVE-2020-18032.patch
+Patch3:         CVE-2023-46045.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -250,9 +251,7 @@ Requires:       tcl >= 8.3
 Various tcl packages (extensions) for the graphviz tools.
 
 %prep
-%setup -q
-%patch0 -p1 -b .dotty-menu-fix
-%patch1 -p1 -b .coverity-scan-fixes
+%autosetup -p1
 
 # Attempt to fix rpmlint warnings about executable sources
 find -type f -regex '.*\.\(c\|h\)$' -exec chmod a-x {} ';'
@@ -518,6 +517,10 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Tue May 14 2024 Muhammad Falak <mwani@microsoft.com> - 2.42.4-10
+- Switch to autosetup to actually address CVE-2020-18032
+- Address CVE-2023-46045
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.42.4-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

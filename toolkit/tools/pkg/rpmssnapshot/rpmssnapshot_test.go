@@ -8,7 +8,7 @@ package rpmssnapshot
 import (
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/stretchr/testify/assert"
 )
 

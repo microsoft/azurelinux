@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        7%{?dist}
+Release:        9%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -129,9 +129,9 @@ install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 
-mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
@@ -155,6 +155,7 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
+%exclude %{dracutlibdir}/modules.d/20overlayfs
 %{_libdir}/dracut/dracut-init.sh
 %{_libdir}/dracut/dracut-util
 %{_datadir}/pkgconfig/dracut.pc
@@ -201,8 +202,8 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %defattr(-,root,root,0755)
 
 %files overlayfs
-%dir %{_libdir}/dracut/modules.d/20overlayfs
-%{_libdir}/dracut/modules.d/20overlayfs/*
+%dir %{dracutlibdir}/modules.d/20overlayfs
+%{dracutlibdir}/modules.d/20overlayfs/*
 
 %{_bindir}/dracut-catimages
 %dir /boot/dracut
@@ -210,6 +211,16 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Tue Apr 02 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-9
+- Cherry-picked Overlay Dracut Module changes from 3.0-dev to main.
+- PRs picked: #8332, #8481, #8597
+- PR #8332: Support multi-overlays and multi-volumes.
+- PR #8481: Remove set -ex from overlay script.
+- PR #8597: Optimization on overlay module resilient.
+
+* Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-8
+- Exclude overlayfs module from main dracut package
+
 * Mon Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
 - Add overlayfs sub-package.
 

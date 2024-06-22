@@ -1,16 +1,18 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.28.5
-Release:        3%{?dist}
+Version:        1.29.4
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarball.sh script to get the vendored sources.
+# Use the generate_source_tarbbal.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-48795.patch
+Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2024-28110.patch
+Patch2:         CVE-2024-27289.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -81,6 +83,24 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Fri May 24 2024 Henry Li <lihl@microsoft.com> - 1.29.4-4
+- Add patch to resolve CVE-2024-27289
+
+* Mon May 06 2024 Henry Li <lihl@microsoft.com> - 1.29.4-3
+- Re-add patch for CVE-2024-28110
+
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.29.4-2
+- Fix for CVE-2023-45288
+
+* Tue Apr 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.4-1
+- Auto-upgrade to 1.29.4 - CVE-2023-50658
+
+* Mon Mar 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28.5-5
+- Patching CVE-2024-27304 in vendor/github.com/jackc/pgproto3.
+
+* Wed Mar 13 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.28.5-4
+- Address CVE-2024-28110 by patching vendored github.com/cloudevents
+
 * Thu Feb 15 2024 Nan Liu <liunan@microsoft.com> - 1.28.5-3
 - Address CVE-2023-48795 by patching vendored golang.org/x/crypto
 

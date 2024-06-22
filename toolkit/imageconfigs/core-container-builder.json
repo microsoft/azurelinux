@@ -1,0 +1,21 @@
+{
+    "Disks": [
+        {
+            "Artifacts": [
+                {
+                    "Name": "core-container-builder",
+                    "Compression": "tar.gz"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "PackageLists": [
+                "packagelists/core-packages-container.json",
+                "packagelists/core-container-builder-packages.json"
+            ]
+        }
+    ]
+}

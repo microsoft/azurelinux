@@ -1,19 +1,13 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
-Version:        28.2
-Release:        6%{?dist}
+Version:        29.3
+Release:        1%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.gnu.org/software/emacs/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
-Patch0:         CVE-2022-45939.patch
-Patch1:         CVE-2022-48337.patch
-Patch2:         CVE-2022-48338.patch
-Patch3:         CVE-2022-48339.patch
-Patch4:         CVE-2023-27986.patch
-Patch5:         CVE-2023-28617.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -90,6 +84,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 29.3-1
+- Upgrade to 29.3 to fix CVE-2024-30202, CVE-2024-30204, CVE-2024-30205
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 28.2-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

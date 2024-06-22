@@ -2,6 +2,7 @@
     "Signatures": {
         "javapackages-bootstrap-1.5.0.tar.xz": "37518e10d629f6d7115bd78bed85977c7294f871c2438a57f7857f2c0e065c7c",
         "javapackages-bootstrap-PACKAGE-LICENSING": "3f440662012f41be31be13fb764c1f6a21d51f2efdcabf85ed35e9eb8c3b5714",
+        "guava.xml":"4fba5a37ddeabeb21925f2bf71182380734c89ee0000895df59fb32ff8e8669c",
         "ignore.upstream.patch.txt": "441bb5697fc5fb4089b1d43479dd443a8ce4405bec4d6b92c4152d4320ad3a80",
         "apache-pom.tar.xz": "cedc788ca41b99d04a6b058b1689e6eda8f33b9afd642e526a0998d7741f7614",
         "ant.tar.xz": "230ad9d99c5adfffd14abc3e094e8b7331cef0c061282ce0f13245a02458b604",
@@ -29,7 +30,7 @@
         "felix-parent-pom.tar.xz": "968678162e287991bfd478ba9d673f77a5bb0f5d44262ec769e639d34ab9edcf",
         "felix-utils.tar.xz": "ac0c7eee70cf651749e200683db3daf715aea889e8c399cff1e4b494e9409181",
         "fusesource-pom.tar.xz": "1616d0dc4f66ad29e27ce329484a5fadf36efb2faea1702bfde3dede7f612a1d",
-        "guava.tar.xz": "8d147ba92ea1793004dfd9ee77d8450f01364ce306196e671480a5743a2697e1",
+        "guava-32.1.3b.tar.xz": "a07fe04da57a82383b2f9b0da4eb99344fdd527d1df97777f1fe13d5baa170e6",
         "guice.tar.xz": "f8bc5d4061aae98fb8aaa246cf9b1183d6700201cd0d216993f43d23fde6d421",
         "hamcrest.tar.xz": "ea0aa53fbc46c84726dd9499a71cd4a4d6b8111aa059a3afd84925cbc94cb40e",
         "httpcomponents-client.tar.xz": "2fbf3c7e0077ef4fe3fac1fa77c05a4a88609ef46d86fabf8908ff958abcced1",

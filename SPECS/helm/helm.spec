@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.14.0
+Version:       3.14.2
 Release:       2%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
@@ -25,16 +25,16 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
+Patch0:        CVE-2023-45288.patch
 BuildRequires: golang
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -a 1
 
 %build
-tar -xf %{SOURCE1} --no-same-owner
 export VERSION=%{version}
 for cmd in cmd/* ; do
     go build -tags '' -ldflags '-w -s -X helm.sh/helm/v3/internal/version.version=v%{version} -X helm.sh/helm/v3/internal/version.metadata= -X helm.sh/helm/v3/internal/version.gitCommit= -X helm.sh/helm/v3/internal/version.gitTreeState=clean ' \
@@ -55,6 +55,12 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 3.14.2-2
+- Fix for CVE-2023-45288
+
+* Thu Mar 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.2-1
+- Auto-upgrade to 3.14.2 - CVE-2024-26147
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.0-2
 - Bump release to rebuild with go 1.21.6
 

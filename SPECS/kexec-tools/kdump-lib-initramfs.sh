@@ -7,7 +7,7 @@ CORE_COLLECTOR=""
 DEFAULT_CORE_COLLECTOR="makedumpfile -l --message-level 1 -d 31"
 DMESG_COLLECTOR="/sbin/vmcore-dmesg"
 FAILURE_ACTION="systemctl reboot -f"
-DATEDIR=`date +%Y-%m-%d-%T`
+DATEDIR=`date +%Y-%m-%d-%H:%M`
 HOST_IP='127.0.0.1'
 DUMP_INSTRUCTION=""
 SSH_KEY_LOCATION="/root/.ssh/kdump_id_rsa"
@@ -121,7 +121,7 @@ dump_fs()
     # Remove -F in makedumpfile case. We don't want a flat format dump here.
     [[ $CORE_COLLECTOR = *makedumpfile* ]] && CORE_COLLECTOR=`echo $CORE_COLLECTOR | sed -e "s/-F//g"`
 
-    local _dump_path=$(echo "$_mp/$KDUMP_PATH/$HOST_IP-$DATEDIR/" | tr -s /)
+    local _dump_path=$(echo "$_mp/$KDUMP_PATH/$DATEDIR/" | tr -s /)
 
     echo "kdump: saving to $_dump_path"
 

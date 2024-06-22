@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,8 +41,8 @@ Metapackage to install the set of packages inside a Kata containers UVM
 %package        coco
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
 Requires:       %{name} = %{version}-%{release}
+Requires:       cifs-utils
 Requires:       device-mapper
-Requires:       opa
 
 %description    coco
 
@@ -95,6 +95,12 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Fri May 03 2024 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-4
+- Remove opa
+
+* Thu Apr 11 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-3
+- Add cifs-utils to the list of dependencies
+
 * Tue Feb 06 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-2
 - Remove dependency on kernel-uvm-cvm
 

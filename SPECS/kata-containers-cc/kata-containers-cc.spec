@@ -1,6 +1,9 @@
+%global virtiofsd_binary        virtiofsd-rs
+
 %global runtime_make_vars       DEFMEMSZ=256 \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 DEFSNPGUEST=true \\\
+                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"%{virtiofsd_binary}" \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
@@ -9,7 +12,7 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl0
+Version:      3.2.0.azl2
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
@@ -45,7 +48,9 @@ BuildRequires:  kernel-uvm-devel
 # policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy and snapshotter features
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
-Requires:  qemu-virtiofsd
+# Must match the version specified by the `assets.virtiofsd.version` field in
+# %{SOURCE0}/versions.yaml.
+Requires:  virtiofsd = 1.8.0
 
 %description
 The Kata Confidential Containers package ships the Kata components for Confidential Containers on AKS.
@@ -60,7 +65,6 @@ Requires:       qemu-img
 Requires:       parted
 Requires:       curl
 Requires:       veritysetup
-Requires:       opa >= 0.50.2
 Requires:       kernel-uvm
 
 %description tools
@@ -154,15 +158,14 @@ mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 
-# for testing policy/snapshotter without SEV SNP we use CH (with kernel-uvm and initrd) instead of CH-CVM with IGVM
 # Note: our kata-containers config toml expects cloud-hypervisor and kernel under a certain path/name, so we align this through symlinks here
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/cloud-hypervisor-cvm           %{buildroot}%{coco_bin}/cloud-hypervisor-snp
+ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor-snp
 
 # this is again for testing without SEV SNP
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
 
-ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
+ln -sf /usr/libexec/%{virtiofsd_binary} %{buildroot}/%{coco_path}/libexec/%{virtiofsd_binary}
 
 find %{buildroot}/etc
 
@@ -171,7 +174,6 @@ pushd %{_builddir}/%{name}-%{version}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
 cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
 cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
-cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/kata-opa.service.in %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
 install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
@@ -246,7 +248,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{coco_bin}/kata-runtime
 
 %{defaults_kata}/configuration*.toml
-%{coco_path}/libexec/virtiofsd
+%{coco_path}/libexec/%{virtiofsd_binary}
 
 %{_bindir}/tardev-snapshotter
 %{_bindir}/kata-overlay
@@ -262,7 +264,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %dir %{osbuilder}/src/kata-opa
 %{osbuilder}/src/kata-opa/allow-all.rego
 %{osbuilder}/src/kata-opa/allow-set-policy.rego
-%{osbuilder}/src/kata-opa/kata-opa.service.in
 
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
@@ -287,6 +288,20 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
+- Auto-upgrade to 3.2.0.azl2
+- Update cloud-hypervisor-snp symlink to also point to /usr/bin/cloud-hypervisor
+
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl1-1
+- Auto-upgrade to 3.2.0.azl1
+- Remove opa
+
+*   Wed Mar 13 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-3
+-   Specify correct virtiofsd dependency
+
+*   Thu Feb 29 2024 Dallas Delaney <dadelan@microsoft.com> - 3.2.0.azl0-2
+-   Bump release to rebuild against kernel-uvm for LSG v2402.26.1
+
 *   Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
 -   Use Microsoft sources based on upstream Kata version 3.2.0.
 

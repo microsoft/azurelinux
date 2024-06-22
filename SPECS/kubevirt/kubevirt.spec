@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        14%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,9 +35,12 @@ Patch2:         Hotplug_detach_grace_period.patch
 Patch3:         CVE-2023-44487.patch
 Patch4:         CVE-2024-21626.patch
 Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
+Patch6:         CVE-2022-41723.patch
+Patch7:         CVE-2024-24786.patch
+Patch8:         CVE-2023-45288.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-6%{?dist}
+BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -214,6 +217,18 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-18
+- Fix for CVE-2023-45288
+
+* Fri May 17 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.59.0-17
+- Add patch for CVE-2024-24786
+
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-16
+- Bump release to rebuild against glibc 2.35-7
+
+* Wed Mar 13 2024 Archana Choudhary <archana1@microsoft.com> - 0.59.0-15
+- Add patch for CVE-2022-41723
+
 * Thu Feb 15 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-14
 - Add patch for render hp-volume- pod to respect blockdevices (IcM 467224770)
 

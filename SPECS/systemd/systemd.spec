@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        19%{?dist}
+Release:        21%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,8 +27,10 @@ Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
 Patch7:         serve-stale-0001-resolved-added-serve-stale-feature-implementation-of.patch
 Patch8:         serve-stale-0002-resolved-Initialize-until_valid-while-storing-negati.patch
-# Patch9 should be dropped for mariner 3
+# Patch9 and Patch10 should be dropped for mariner 3
 Patch9:         mariner-2-do-not-default-zstd-journal-files-for-backwards-compatibility.patch
+Patch10:        mariner-2-force-use-of-lz4-for-coredump.patch
+Patch11:        networkd-default-use-domains.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -287,6 +289,12 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Apr 08 2024 Henry Li <lihl@microsoft.com> - 250.3-21
+- Add patch to allow configurability of "UseDomains=" for networkd
+
+* Thu Mar 14 2024 Dan Streetman <ddstreet@microsoft.com> - 250.3-20
+- force use of lz4 for coredump
+
 * Thu Nov 02 2023 Chris Co <chrco@microsoft.com> - 250.3-19
 - Add zstd-libs as a requires to ensure libzstd.so.1 is present
 

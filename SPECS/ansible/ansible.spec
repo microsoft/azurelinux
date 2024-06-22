@@ -1,13 +1,14 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.14.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-0690.patch
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
@@ -28,7 +29,7 @@ BuildArch:      noarch
 Ansible is a radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 python3 setup.py build
@@ -47,6 +48,13 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Mon May 06 2024 Henry Li <lihl@microsoft.com> - 2.14.12-2
+- Revert version from 2.14.4 to 2.14.12
+- Add patch for CVE-2024-0690
+
+* Fri Mar 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.14.4-1
+- Auto-upgrade to 2.14.4 - fix CVE-2024-0690
+
 * Tue Dec 26 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.14.12-1
 - Update to v2.14.12 to fix CVE-2023-5764
 

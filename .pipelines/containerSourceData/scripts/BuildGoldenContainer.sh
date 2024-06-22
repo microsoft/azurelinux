@@ -10,7 +10,7 @@ set -e
 # - b) ACR name (e.g. azurelinepreview, acrafoimages, etc.)
 # - c) Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
 # - d) Image name (e.g. nodejs, postgres, cdi, etc.)
-# - e) Component name (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
+# - e) Component file name (e.g. nodejs.name, postgres.name, api.name, etc.)
 # - f) Package file name (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
 # - g) Dockerfile name (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
 # - h) Docker build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
@@ -27,6 +27,7 @@ set -e
 # - s) SBOM tool path.
 # - t) Script to create SBOM for the container image.
 # - u) Create Distroless container (e.g. true, false. If true, the script will also create a distroless container)
+# - v) Version extract command (e.g. 'busybox | head -1 | cut -c 10-15')
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -37,10 +38,11 @@ set -e
 #   ~/CBL-Mariner/.pipelines/containerSourceData
 #   ├── nodejs
 #   │   ├── distroless
-#   │   │   ├── holdback-nodejs18.pkg
-#   │   │   ├── nodejs18.pkg
+#   │   │   ├── holdback-nodejs.pkg
+#   │   │   ├── nodejs.pkg
 #   │   ├── Dockerfile-Nodejs
-#   │   ├── nodejs18.pkg
+#   │   ├── nodejs.pkg
+#   |   |── nodejs.name
 #   ├── configuration
 #   │   ├── acrRepoV2.json
 #   ├── scripts
@@ -55,13 +57,13 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false" -u "true"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
     c ) REPOSITORY=$OPTARG;;
     d ) IMAGE=$OPTARG;;
-    e ) COMPONENT=$OPTARG;;
+    e ) COMPONENT_FILE=$OPTARG;;
     f ) PACKAGE_FILE=$OPTARG;;
     g ) DOCKERFILE=$OPTARG;;
     h ) DOCKER_BUILD_ARGS=$OPTARG;;
@@ -78,6 +80,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
     s ) SBOM_TOOL_PATH=$OPTARG;;
     t ) SBOM_SCRIPT=$OPTARG;;
     u ) DISTROLESS=$OPTARG;;
+    v ) VERSION_EXTRACT_CMD=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -103,7 +106,7 @@ function print_inputs {
     echo "ACR                           -> $ACR"
     echo "REPOSITORY                    -> $REPOSITORY"
     echo "IMAGE                         -> $IMAGE"
-    echo "COMPONENT                     -> $COMPONENT"
+    echo "COMPONENT_FILE                -> $COMPONENT_FILE"
     echo "PACKAGE_FILE                  -> $PACKAGE_FILE"
     echo "DOCKERFILE                    -> $DOCKERFILE"
     echo "DOCKER_BUILD_ARGS             -> $DOCKER_BUILD_ARGS"
@@ -113,6 +116,7 @@ function print_inputs {
     echo "CONTAINER_SRC_DIR             -> $CONTAINER_SRC_DIR"
     echo "IS_HCI_IMAGE                  -> $IS_HCI_IMAGE"
     echo "USE_RPM_QA_CMD                -> $USE_RPM_QA_CMD"
+    echo "Version Extract Command       -> $VERSION_EXTRACT_CMD"
     echo "REPO_PREFIX                   -> $REPO_PREFIX"
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
@@ -201,12 +205,28 @@ function initialization {
     # the below value of DISTRO_IDENTIFIER in the image tag.
     # TODO: We may need to update this value for Azure Linux 3.0.
     DISTRO_IDENTIFIER="cm"
+    END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
 
     echo "Golden Image Name             -> $GOLDEN_IMAGE_NAME"
     echo "Base ACR Container Name       -> $BASE_IMAGE_NAME"
     echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
     echo "Azure Linux Version           -> $AZURE_LINUX_VERSION"
     echo "Distro Identifier             -> $DISTRO_IDENTIFIER"
+    echo "End of Life                   -> $END_OF_LIFE_1_YEAR"
+}
+
+function get_packages_to_install {
+    echo "+++ Get packages to install"
+    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
+    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
+    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
+}
+
+function get_component_name {
+    echo "+++ Get Component name"
+    componentFilePath="$CONTAINER_SRC_DIR/$IMAGE/$COMPONENT_FILE"
+    COMPONENT=$(cat "$componentFilePath")
+    echo "Component name                -> $COMPONENT"
 }
 
 function prepare_dockerfile {
@@ -227,13 +247,6 @@ function prepare_dockerfile {
     echo "------------------------------------"
     cat "$WORK_DIR/dockerfile"
     echo ""
-}
-
-function get_packages_to_install {
-    echo "+++ Get packages to install"
-    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
-    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
-    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
 }
 
 function prepare_docker_directory {
@@ -277,21 +290,26 @@ function set_image_tag {
     local containerId
     local installedPackage
 
-    containerId=$(docker run --entrypoint /bin/bash -dt "$GOLDEN_IMAGE_NAME")
+    containerId=$(docker run --entrypoint /bin/sh -dt "$GOLDEN_IMAGE_NAME")
 
     echo "Container ID                  -> $containerId"
 
-    if [[ $USE_RPM_QA_CMD =~ [Tt]rue ]] ; then
-        echo "Using rpm -qa command to get installed package."
-        installedPackage=$(docker exec "$containerId" rpm -qa | grep ^"$COMPONENT")
+    if [[ -n "$VERSION_EXTRACT_CMD" ]]; then
+        echo "Using custom version extract command."
+        COMPONENT_VERSION=$(docker exec "$containerId" sh -c "$VERSION_EXTRACT_CMD")
     else
-        echo "Using tdnf repoquery command to get installed package."
-        # exec as root as the default user for some containers is non-root
-        installedPackage=$(docker exec -u 0 "$containerId" tdnf repoquery --installed "$COMPONENT" | grep ^"$COMPONENT")
+        if [[ $USE_RPM_QA_CMD =~ [Tt]rue ]] ; then
+            echo "Using rpm -qa command to get installed package."
+            installedPackage=$(docker exec "$containerId" rpm -qa | grep ^"$COMPONENT")
+        else
+            echo "Using tdnf repoquery command to get installed package."
+            # exec as root as the default user for some containers is non-root
+            installedPackage=$(docker exec -u 0 "$containerId" tdnf repoquery --installed "$COMPONENT" | grep ^"$COMPONENT")
+        fi
+        echo "Full Installed Package:       -> $installedPackage"
+        COMPONENT_VERSION=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
     fi
 
-    echo "Full Installed Package:       -> $installedPackage"
-    COMPONENT_VERSION=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
     echo "Component Version             -> $COMPONENT_VERSION"
     docker rm -f "$containerId"
 
@@ -314,16 +332,31 @@ function finalize {
     echo "$GOLDEN_IMAGE_NAME_FINAL" >> "$OUTPUT_DIR/PublishedContainers-$IMAGE.txt"
 }
 
+function oras_attach {
+    local image_name=$1
+    oras attach \
+        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+        "$image_name"
+}
+
 function publish_to_acr {
     CONTAINER_IMAGE=$1
     if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
         echo "+++ Skip publishing to ACR"
         return
     fi
+    local oras_access_token
+
+    echo "+++ az login into Azure ACR $ACR"
+    oras_access_token=$(az acr login --name "$ACR" --expose-token --output tsv --query accessToken)
+    oras login "$ACR.azurecr.io" \
+        --username "00000000-0000-0000-0000-000000000000" \
+        --password "$oras_access_token"
+
     echo "+++ Publish container $CONTAINER_IMAGE"
-    echo "login into ACR: $ACR"
-    az acr login --name "$ACR"
     docker image push "$CONTAINER_IMAGE"
+    oras_attach "$CONTAINER_IMAGE"
 }
 
 function generate_image_sbom {
@@ -368,8 +401,9 @@ function distroless_container {
 print_inputs
 validate_inputs
 initialization
-prepare_dockerfile
 get_packages_to_install
+get_component_name
+prepare_dockerfile
 prepare_docker_directory
 docker_build
 set_image_tag

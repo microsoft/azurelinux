@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,10 +19,10 @@ Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
 Patch1: CVE-2023-44487.patch
 Patch2: fix_cc_tests_for_golang1.21.patch
+Patch4: CVE-2023-45288.patch
 
 %{?systemd_requires}
 
-BuildRequires: btrfs-progs-devel
 BuildRequires: git
 BuildRequires: golang >= 1.19.0
 BuildRequires: go-md2man
@@ -80,6 +80,12 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.7.7-4
+- Fix for CVE-2023-45288
+
+* Mon Apr 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.7.7-3
+- Drop obsolete btrfs-progs-devel build dependency
+
 * Wed Feb 21 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.7-2
 - Backport upstream patch for no-inlining seccomp and apparmor functions to fix tests.
 

@@ -50,7 +50,7 @@
 %global pstore_version          0.1.1
 %global psych_version           4.0.4
 %global racc_version            1.6.0
-%global rdoc_version            6.4.0
+%global rdoc_version            6.4.1.1
 %global readline_version        0.0.3
 %global readline_ext_version    0.1.4
 %global reline_version          0.3.1
@@ -62,7 +62,7 @@
 %global set_version             1.0.2
 %global shellwords_version      0.1.0
 %global singleton_version       0.1.1
-%global stringio_version        3.0.1
+%global stringio_version        3.0.1.1
 %global strscan_version         3.0.1
 %global syslog_version          0.1.0
 %global tempfile_version        0.1.2
@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.4
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,6 +99,11 @@ Source6:        rubygems.req
 Source7:        macros.rubygems
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 Patch0:         CVE-2023-36617.patch
+Patch1:         CVE-2024-27280.patch
+Patch2:         CVE-2024-27281.patch
+Patch3:         CVE-2024-27282.patch
+# Patch no longer needed if REXML gem is 3.2.7 or later. Now is 3.2.5
+Patch4:         CVE-2024-35176.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -401,6 +406,15 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Thu May 30 2024 Minghe Ren <mingheren@microsoft.com> - 3.1.4-6
+- Patch CVE-2024-35176
+
+* Thu May 16 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.1.4-5
+- Patch CVE-2024-27282
+
+* Fri Apr 12 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.4-4
+- Add patches for CVE-2024-27280 and CVE-2024-27281
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

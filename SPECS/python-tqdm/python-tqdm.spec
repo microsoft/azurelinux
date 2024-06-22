@@ -7,12 +7,13 @@ with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
 Version:        4.63.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/tqdm/tqdm
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Patch0:         CVE-2024-34062.patch
 BuildArch:      noarch
 
 %description %{_description}
@@ -30,7 +31,7 @@ BuildRequires:  python3-wheel
 Python 3 version.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version} -p1
 
 %build
 %py3_build
@@ -55,6 +56,9 @@ tox -e setup.py
 
 
 %changelog
+* Mon May 13 2024 Jonathan Behrens <jbehrens@microsoft.com> - 4.63.1-3
+- Patch CVE-2024-34062
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 4.63.1-2
 - Update version of tox used for package tests
 

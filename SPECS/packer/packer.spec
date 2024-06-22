@@ -1,13 +1,13 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.8.7
+Version:        1.10.1
 Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
-Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -27,8 +27,7 @@ Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-44487.patch
-
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -64,6 +63,12 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.10.1-2
+- Fix for CVE-2023-45288
+
+* Wed Apr 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.10.1-1
+- Bump version to address CVE-2023-49569
+
 * Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.7-2
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 

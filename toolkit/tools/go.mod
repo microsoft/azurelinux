@@ -1,4 +1,4 @@
-module github.com/microsoft/CBL-Mariner/toolkit/tools
+module github.com/microsoft/azurelinux/toolkit/tools
 
 go 1.20
 
@@ -10,6 +10,7 @@ require (
 	github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e
 	github.com/fatih/color v1.16.0
 	github.com/gdamore/tcell v1.4.0
+	github.com/google/uuid v1.3.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/juliangruber/go-intersect v1.1.0
 	github.com/klauspost/pgzip v1.2.5
@@ -35,7 +36,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.10.5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect

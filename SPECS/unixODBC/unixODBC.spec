@@ -1,13 +1,14 @@
 Summary:        ODBC driver manager
 Name:           unixODBC
 Version:        2.3.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.unixodbc.org/
 Source0:        http://www.unixodbc.org/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-1013.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -28,7 +29,7 @@ ODBC, you need to install this package.
 
 %prep
 
-%setup -q
+%autosetup -p1
 
 %build
 ./configure --prefix=%{_prefix}               \
@@ -72,6 +73,9 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %{_libdir}/pkgconfig
 
 %changelog
+* Mon Mar 25 2024 Adit Jha <aditjha@microsoft.com> - 2.3.9-3
+- Adding upstream patch to address CVE-2024-1013.
+
 * Thu May 26 2022 Evan Lee <evlee@microsoft.com> - 2.3.9-2
 - Require glibc-iconv as a runtime dependency for unixODBC.
 

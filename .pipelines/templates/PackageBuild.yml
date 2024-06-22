@@ -182,6 +182,10 @@ steps:
         delta_fetch_arg="DELTA_FETCH=n"
       fi
 
+      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
+      fi
+
       if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
       elif [[ ${{ parameters.isQuickRebuildPackages }} == "false" ]]; then
@@ -194,20 +198,19 @@ steps:
         run_check_arg="RUN_CHECK=n"
       fi
 
+      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      fi
+
       if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
         use_ccache_arg="USE_CCACHE=y"
       elif [[ ${{ parameters.isUseCCache }} == "false" ]]; then
         use_ccache_arg="USE_CCACHE=n"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
-        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
-      fi
-
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
-        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
@@ -215,6 +218,7 @@ steps:
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $delta_fetch_arg \
+        $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \

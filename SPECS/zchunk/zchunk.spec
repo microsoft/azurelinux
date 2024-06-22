@@ -1,7 +1,7 @@
 Summary:        Compressed file format
 Name:           zchunk
 Version:        1.1.16
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
 Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-46228.patch
+Patch1:         0000-Zstd-1.5.1-fix.patch
 BuildRequires:  curl-devel
 BuildRequires:  meson
 BuildRequires:  openssl-devel
@@ -88,6 +89,9 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
+* Wed May 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.1.16-4
+- Fix checksum error on Ptest caused by zstd 1.5.1
+
 * Mon Oct 23 2023 Jonathan Behrens <jbehrens@microsoft.com> - 1.1.16-3
 - Patch CVE-2023-46228
 
