@@ -9,6 +9,7 @@ Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2024-3727.patch
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  btrfs-progs-devel
@@ -46,8 +47,13 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+<<<<<<< HEAD
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-4
 - Bump release to rebuild with go 1.21.11
+=======
+* Thu Jun 20 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-4
+- Fix CVE-2024-3727 in github.com/containers/image
+>>>>>>> 2b8738bcb (Fix CVE-2024-3727 in skopeo (#9455))
 
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.14.2-3
 - Fix for CVE-2023-45288
