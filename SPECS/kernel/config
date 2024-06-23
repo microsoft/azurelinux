@@ -2206,6 +2206,7 @@ CONFIG_VMWARE_VMCI=m
 # CONFIG_MISC_RTSX_USB is not set
 # CONFIG_UACCE is not set
 # CONFIG_PVPANIC is not set
+CONFIG_MSTFLINT=m
 # CONFIG_GP_PCI1XXXX is not set
 # end of Misc devices
 
