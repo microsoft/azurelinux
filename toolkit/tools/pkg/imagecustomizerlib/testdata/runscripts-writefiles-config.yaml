@@ -1,0 +1,50 @@
+scripts:
+  postCustomization:
+  - content: |
+      set -eux
+      echo "Squirrel" | tee --append /log.txt
+      echo "Working dir: $(pwd)" | tee --append /log.txt
+      echo "Arg 1: $1" | tee --append /log.txt
+      echo "Arg 2: $2" | tee --append /log.txt
+      echo "ANIMAL_1: $ANIMAL_1" | tee --append /log.txt
+      echo "ANIMAL_2: $ANIMAL_2" | tee --append /log.txt
+      # Verify the state of the /etc/resolv.conf file.
+      stat /etc/resolv.conf 2>/dev/null && \
+        echo "resolv.conf exists" | tee --append /log.txt || \
+        echo "resolv.conf does not exist" | tee --append /log.txt
+    arguments:
+    - panda
+    - whale
+    environmentVariables:
+      ANIMAL_1: lion
+      ANIMAL_2: turtle
+    name: bash-script
+
+  - content: |
+      import os
+      import sys
+      with open("/log.txt", 'a') as fd:
+        fd.write(f"Hyena\n")
+        fd.write(f"Working dir: {os.getcwd()}\n")
+        fd.write(f"Arg 1: {sys.argv[1]}\n")
+        fd.write(f"ANIMAL_3: {os.environ['ANIMAL_3']}\n")
+    arguments:
+    - duck
+    environmentVariables:
+      ANIMAL_3: african wild dog
+    interpreter: python3
+    name: python-script
+
+  - path: scripts/kangaroo.sh
+  
+  - path: scripts/wombat.py
+    interpreter: python3
+
+  finalizeCustomization:
+  - content: |
+      set -eux
+      echo "Ferret" | tee --append /log.txt
+      # Verify the state of the /etc/resolv.conf file.
+      stat /etc/resolv.conf 2>/dev/null && \
+        echo "resolv.conf exists" | tee --append /log.txt || \
+        echo "resolv.conf does not exist" | tee --append /log.txt
