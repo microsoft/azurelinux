@@ -30,6 +30,9 @@ Requires:       lz4
 Requires:       procps-ng
 Requires:       readline
 Requires:       sed
+# Note: We currently only support using systemd for our init process, not the kata-agent. 
+# When we go to add support for AGENT_INIT=yes, can drop this.
+# https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10 
 Requires:       systemd
 Requires:       tar
 Requires:       tzdata
@@ -44,6 +47,7 @@ Summary:        Metapackage to install the set of packages inside a Kata confide
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
 Requires:       device-mapper
+# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
 Requires:       systemd-udev
 
 %description    coco
