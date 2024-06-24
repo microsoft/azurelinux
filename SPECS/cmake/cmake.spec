@@ -90,8 +90,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
-* Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.29.6-1
-- Auto-upgrade to 3.29.6 - CVE-2023-46218
+* Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
+- Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
 
 * Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
 - fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
