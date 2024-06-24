@@ -13,6 +13,7 @@ Source2:        azurelinux-sysinfo.service
 Source3:        sysinfo-selinuxpolicies.cil
 Requires:       systemd
 Requires:       python3-psutil
+Requires:       libselinux-utils
 
 %description
 Deploys a systemd service that gathers system information related to the device, operating system, cloud-init, boot 
@@ -61,6 +62,9 @@ if rpm -q selinux-policy &> /dev/null; then
 fi
 
 %changelog
+* Mon June 24 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-2
+- Add libselinux-utils as a requirement; needed for `getenforce`.
+
 * Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.
