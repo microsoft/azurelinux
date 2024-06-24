@@ -43,6 +43,34 @@ func TestUpdateHostname(t *testing.T) {
 	assert.Equal(t, expectedHostname, string(actualHostname))
 }
 
+func TestCustomizeImageHostname(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageHostname")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "hostname-config.yaml")
+	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
+
+	// Customize image.
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	// Connect to customized image.
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
+	// Ensure hostname was correctly set.
+	actualHostname, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "etc/hostname"))
+	assert.NoError(t, err)
+	assert.Equal(t, "testname", string(actualHostname))
+}
+
 func TestCopyAdditionalFiles(t *testing.T) {
 	if os.Geteuid() != 0 {
 		t.Skip("Test must be run as root because it uses a chroot")
