@@ -217,6 +217,10 @@ A specific locale string may also be set using:
 
 This may be any value compatible with the `%_install_langs` rpm macro.
 
+#### Restoring Documentation and Locales on an Installed System
+
+The `OverrideRpmLocales` and `DisableRpmDocs` settings are stored in `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system. The files selected for install are based on the `rpm` macros at the time of transaction, so to restore these files on an installed system remove the associated macro definition and run  `tdnf -y reinstall $(rpm -qa)`. This will reinstall all packages and apply the new settings.
+
 ### Customization Scripts
 The tools offer the option of executing arbitrary shell scripts during various points of the image generation process. There are three points that scripts can be executed: `PreInstall`, `PostInstall`, and `ImageFinalize`.
 
