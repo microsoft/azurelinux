@@ -24914,8 +24914,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.26.18",
-          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.18.tar.gz"
+          "version": "1.26.19",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.19.tar.gz"
         }
       }
     },
