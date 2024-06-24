@@ -43,11 +43,12 @@ BuildRequires:  golang >= 1.12
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
 export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
@@ -66,7 +67,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 * Mon Jun 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-2
 - Address CVE-2023-44487, CVE-2023-45288, CVE-2023-49295, CVE-2024-0874, CVE-2024-22189
 
-* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
+* Wed Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-10
