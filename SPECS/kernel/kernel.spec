@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.29.1
-Release:        5%{?dist}
+Version:        6.6.32.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.32.1-1
+- Auto-upgrade to 6.6.32.1
+
 * Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
 - Add patch to enable mstflint kernel driver 4.28.0-1
 
