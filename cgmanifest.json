@@ -8990,16 +8990,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libdbi-drivers",
-          "version": "0.9.0",
-          "downloadUrl": "http://prdownloads.sourceforge.net/libdbi-drivers/libdbi-drivers-0.9.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libdbusmenu",
           "version": "16.04.0",
           "downloadUrl": "https://launchpad.net/libdbusmenu/16.04/16.04.0/+download/libdbusmenu-16.04.0.tar.gz"
@@ -15935,16 +15925,6 @@
           "name": "perl-bareword-filehandles",
           "version": "0.007",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IL/ILMARI/bareword-filehandles-0.007.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-BDB",
-          "version": "1.92",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
         }
       }
     },
