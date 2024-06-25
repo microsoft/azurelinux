@@ -5,8 +5,10 @@ package imagecustomizerlib
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -315,18 +317,8 @@ func TestCustomizeImageSELinux(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Verify bootloader config.
-	grubCfgFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
-	grubCfgContents, err := file.Read(grubCfgFilePath)
-	assert.NoError(t, err, "read grub.cfg file")
-	assert.Regexp(t, "linux.* security=selinux ", grubCfgContents)
-	assert.Regexp(t, "linux.* selinux=1 ", grubCfgContents)
-	assert.Regexp(t, "linux.* enforcing=1 ", grubCfgContents)
-
-	// Verify SELinux config.
-	selinuxConfigPath := filepath.Join(imageConnection.Chroot().RootDir(), "/etc/selinux/config")
-	selinuxConfigContents, err := file.Read(selinuxConfigPath)
-	assert.NoError(t, err, "read SELinux config file")
-	assert.Regexp(t, "(?m)^SELINUX=enforcing$", selinuxConfigContents)
+	verifyKernelCommandLine(t, imageConnection, []string{"security=selinux", "selinux=1", "enforcing=1"}, []string{})
+	verifySELinuxConfigFile(t, imageConnection, "enforcing")
 
 	// Verify packages are installed.
 	ensureFilesExist(t, imageConnection, "/etc/selinux/targeted", "/var/lib/selinux/targeted/active/modules",
@@ -354,18 +346,8 @@ func TestCustomizeImageSELinux(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Verify bootloader config.
-	grubCfgFilePath = filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
-	grubCfgContents, err = file.Read(grubCfgFilePath)
-	assert.NoError(t, err, "read grub.cfg file")
-	assert.NotRegexp(t, "linux.* security=selinux ", grubCfgContents)
-	assert.NotRegexp(t, "linux.* selinux=1 ", grubCfgContents)
-	assert.NotRegexp(t, "linux.* enforcing=1 ", grubCfgContents)
-
-	// Verify SELinux config.
-	selinuxConfigPath = filepath.Join(imageConnection.Chroot().RootDir(), "/etc/selinux/config")
-	selinuxConfigContents, err = file.Read(selinuxConfigPath)
-	assert.NoError(t, err, "read SELinux config file")
-	assert.Regexp(t, "(?m)^SELINUX=disabled$", selinuxConfigContents)
+	verifyKernelCommandLine(t, imageConnection, []string{}, []string{"security=selinux", "selinux=1", "enforcing=1"})
+	verifySELinuxConfigFile(t, imageConnection, "disabled")
 
 	// Verify packages are still installed.
 	ensureFilesExist(t, imageConnection, "/etc/selinux/targeted", "/var/lib/selinux/targeted/active/modules",
@@ -393,18 +375,8 @@ func TestCustomizeImageSELinux(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Verify bootloader config.
-	grubCfgFilePath = filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
-	grubCfgContents, err = file.Read(grubCfgFilePath)
-	assert.NoError(t, err, "read grub.cfg file")
-	assert.Regexp(t, "linux.* security=selinux ", grubCfgContents)
-	assert.Regexp(t, "linux.* selinux=1 ", grubCfgContents)
-	assert.NotRegexp(t, "linux.* enforcing=1 ", grubCfgContents)
-
-	// Verify SELinux config.
-	selinuxConfigPath = filepath.Join(imageConnection.Chroot().RootDir(), "/etc/selinux/config")
-	selinuxConfigContents, err = file.Read(selinuxConfigPath)
-	assert.NoError(t, err, "read SELinux config file")
-	assert.Regexp(t, "(?m)^SELINUX=permissive$", selinuxConfigContents)
+	verifyKernelCommandLine(t, imageConnection, []string{"security=selinux", "selinux=1"}, []string{"enforcing=1"})
+	verifySELinuxConfigFile(t, imageConnection, "permissive")
 }
 
 func TestCustomizeImageSELinuxAndPartitions(t *testing.T) {
@@ -449,18 +421,8 @@ func TestCustomizeImageSELinuxAndPartitions(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Verify bootloader config.
-	grubCfgFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
-	grubCfgContents, err := file.Read(grubCfgFilePath)
-	assert.NoError(t, err, "read grub.cfg file")
-	assert.Regexp(t, "linux.* security=selinux ", grubCfgContents)
-	assert.Regexp(t, "linux.* selinux=1 ", grubCfgContents)
-	assert.NotRegexp(t, "linux.* enforcing=1 ", grubCfgContents)
-
-	// Verify SELinux config.
-	selinuxConfigPath := filepath.Join(imageConnection.Chroot().RootDir(), "/etc/selinux/config")
-	selinuxConfigContents, err := file.Read(selinuxConfigPath)
-	assert.NoError(t, err, "read SELinux config file")
-	assert.Regexp(t, "(?m)^SELINUX=enforcing$", selinuxConfigContents)
+	verifyKernelCommandLine(t, imageConnection, []string{"security=selinux", "selinux=1"}, []string{"enforcing=1"})
+	verifySELinuxConfigFile(t, imageConnection, "enforcing")
 
 	// Verify packages are installed.
 	ensureFilesExist(t, imageConnection, "/etc/selinux/targeted", "/var/lib/selinux/targeted/active/modules",
@@ -523,4 +485,29 @@ func ensureFilesExist(t *testing.T, imageConnection *ImageConnection, filePaths 
 		_, err := os.Stat(filepath.Join(imageConnection.chroot.RootDir(), filePath))
 		assert.NoErrorf(t, err, "check file exists (%s)", filePath)
 	}
+}
+
+func verifyKernelCommandLine(t *testing.T, imageConnection *ImageConnection, existsArgs []string,
+	notExistsArgs []string,
+) {
+	grubCfgFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
+	grubCfgContents, err := file.Read(grubCfgFilePath)
+	assert.NoError(t, err, "read grub.cfg file")
+
+	for _, existsArg := range existsArgs {
+		assert.Regexpf(t, fmt.Sprintf("linux.* %s ", regexp.QuoteMeta(existsArg)), grubCfgContents,
+			"ensure kernel command arg exists (%s)", existsArg)
+	}
+
+	for _, notExistsArg := range notExistsArgs {
+		assert.NotRegexpf(t, fmt.Sprintf("linux.* %s ", regexp.QuoteMeta(notExistsArg)), grubCfgContents,
+			"ensure kernel command arg not exists (%s)", notExistsArg)
+	}
+}
+
+func verifySELinuxConfigFile(t *testing.T, imageConnection *ImageConnection, mode string) {
+	selinuxConfigPath := filepath.Join(imageConnection.Chroot().RootDir(), "/etc/selinux/config")
+	selinuxConfigContents, err := file.Read(selinuxConfigPath)
+	assert.NoError(t, err, "read SELinux config file")
+	assert.Regexp(t, fmt.Sprintf("(?m)^SELINUX=%s$", regexp.QuoteMeta(mode)), selinuxConfigContents)
 }
