@@ -1,0 +1,48 @@
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4G
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: boot
+      start: 9M
+      end: 108M
+
+    - id: rootfs
+      start: 108M
+
+  bootType: efi
+
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  resetBootLoaderType: hard-reset
+
+  selinux:
+    mode: enforcing
+
+  packages:
+    install:
+    - selinux-policy
+    - selinux-policy-modules
+    - setools-console
+    - policycoreutils-python-utils
