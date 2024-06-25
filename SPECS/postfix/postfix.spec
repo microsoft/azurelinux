@@ -784,7 +784,7 @@ exit 0
 
 %changelog
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.0-2
-- Remove dependency on 'libdb'.
+- Remove dependency on 'libdb'. Using Fedora 40 (license: MIT) spec for guidance.
 
 * Mon Apr 15 2024 Betty Lakes <bettylakes@microsoft.com> - 3.9.0-1
 - Update to version 3.9.0
