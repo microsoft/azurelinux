@@ -55,11 +55,6 @@ color desert
 if (&term == "iterm") || (&term == "putty")
   set background=dark
 endif
-" Binds
-nmap <F2> :w<CR>
-imap <F2> <Esc>:w<CR>
-nmap <F10> :q!<CR>
-nmap <Esc><Esc> :q<CR>
 " Use 4 space characters instead of tab for python files
 au BufEnter,BufNew *.py set tabstop=4 shiftwidth=4 expandtab
 " Move the swap file location to protect against CVE-2017-1000382
