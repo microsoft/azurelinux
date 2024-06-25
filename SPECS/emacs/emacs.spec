@@ -1,7 +1,7 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
-Version:        29.3
-Release:        2%{?dist}
+Version:        29.4
+Release:        1%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -128,6 +128,9 @@ rm -f *-filelist {common,el}-*-files
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 29.4-1
+- Auto-upgrade to 29.4 - CVE
+
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 29.3-2
 - Added macros.emacs RPM macro file to be produced and provided by the package
 

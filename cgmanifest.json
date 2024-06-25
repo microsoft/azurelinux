@@ -3258,8 +3258,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "29.3",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
+          "version": "29.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.4.tar.xz"
         }
       }
     },
