@@ -160,9 +160,9 @@ krb5-1.21.2-1.azl3.aarch64.rpm
 krb5-debuginfo-1.21.2-1.azl3.aarch64.rpm
 krb5-devel-1.21.2-1.azl3.aarch64.rpm
 krb5-lang-1.21.2-1.azl3.aarch64.rpm
-libarchive-3.7.4-1.azl3.aarch64.rpm
-libarchive-debuginfo-3.7.4-1.azl3.aarch64.rpm
-libarchive-devel-3.7.4-1.azl3.aarch64.rpm
+libarchive-3.7.1-2.azl3.aarch64.rpm
+libarchive-debuginfo-3.7.1-2.azl3.aarch64.rpm
+libarchive-devel-3.7.1-2.azl3.aarch64.rpm
 libassuan-2.5.6-1.azl3.aarch64.rpm
 libassuan-debuginfo-2.5.6-1.azl3.aarch64.rpm
 libassuan-devel-2.5.6-1.azl3.aarch64.rpm
