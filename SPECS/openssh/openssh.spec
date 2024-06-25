@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,8 @@ Patch316:       CVE-2023-48795-0006-upstream-Remove-leftover-line.patch
 Patch317:       CVE-2023-48795-0007-upstream-Refactor-creation-of-KEX-proposal.patch
 Patch318:       CVE-2023-48795-0008-upstream-Limit-number-of-entries-in-SSH2_MSG_EXT_INF.patch
 Patch319:       CVE-2023-48795-0009-upstream-implement-strict-key-exchange-in-ssh-and-ss.patch
+# Patch for CVE-2023-28531 can be removed if openssh is upgraded to version 9.3p1 or greater
+Patch350:       CVE-2023-28531.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -128,6 +130,7 @@ popd
 %patch317 -p1 -b .cve-2023-48795-0007
 %patch318 -p1 -b .cve-2023-48795-0008
 %patch319 -p1 -b .cve-2023-48795-0009
+%patch350 -p1 -b .cve-2023-28531
 
 %build
 export CFLAGS="$CFLAGS -fpic"
@@ -284,6 +287,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Jun 25 2024 Sam Meluch <sammeluch@microsoft.com> - 8.9p1-5
+- Add patch for CVE-2023-28531
+
 * Mon Jan  8 15:23:58 EST 2024 Dan Streetman <ddstreet@ieee.org> - 8.9p1-4
 - Add patches for CVE-2023-48795
 
