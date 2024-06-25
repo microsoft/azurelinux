@@ -1,6 +1,6 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
-Version:        3.7.1
+Version:        3.7.4
 Release:        1%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
@@ -60,6 +60,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jun 25 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.7.4-1
+- Update to v3.7.4 to fix CVE-2024-26256 and CVE-2024-37407
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.1-1
 - Auto-upgrade to 3.7.1 - Azure Linux 3.0 - package upgrades
 

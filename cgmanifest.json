@@ -8641,8 +8641,8 @@
         "type": "other",
         "other": {
           "name": "libarchive",
-          "version": "3.7.1",
-          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz"
+          "version": "3.7.4",
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.4/libarchive-3.7.4.tar.gz"
         }
       }
     },
