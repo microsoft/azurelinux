@@ -534,16 +534,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "argparse-manpage",
-          "version": "1.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse-manpage/argparse-manpage-1.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "args4j",
           "version": "2.33",
           "downloadUrl": "https://github.com/kohsuke/args4j/archive/args4j-site-2.33.tar.gz"
@@ -895,8 +885,8 @@
         "type": "other",
         "other": {
           "name": "babel",
-          "version": "2.12.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ba/42/54426ba5d7aeebde9f4aaba9884596eb2fe02b413ad77d62ef0b0422e205/Babel-2.12.1.tar.gz"
+          "version": "2.15.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/15/d2/9671b93d623300f0aef82cde40e25357f11330bdde91743891b22a555bed/babel-2.15.0.tar.gz"
         }
       }
     },
@@ -1419,6 +1409,16 @@
           "name": "calamares",
           "version": "3.3.1",
           "downloadUrl": "https://github.com/calamares/calamares/releases/download/v3.3.1/calamares-3.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "capnproto",
+          "version": "1.0.1",
+          "downloadUrl": "https://capnproto.org/capnproto-c++-1.0.1.tar.gz"
         }
       }
     },
@@ -3248,8 +3248,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "29.3",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
+          "version": "29.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.4.tar.xz"
         }
       }
     },
@@ -4850,8 +4850,8 @@
         "type": "other",
         "other": {
           "name": "grub2",
-          "version": "2.06",
-          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06.tar.gz"
+          "version": "2.12",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.12.tar.gz"
         }
       }
     },
@@ -10301,8 +10301,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.14.4.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.15.0.tar.gz"
         }
       }
     },
@@ -13392,8 +13392,8 @@
         "type": "other",
         "other": {
           "name": "mstflint",
-          "version": "4.21.0",
-          "downloadUrl": "https://github.com/Mellanox/mstflint/releases/download/v4.21.0-1/mstflint-4.21.0-1.tar.gz"
+          "version": "4.28.0",
+          "downloadUrl": "https://github.com/Mellanox/mstflint/releases/download/v4.28.0-1/mstflint-4.28.0-1.tar.gz"
         }
       }
     },
@@ -13452,8 +13452,8 @@
         "type": "other",
         "other": {
           "name": "multus",
-          "version": "3.8",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
+          "version": "4.0.2",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v4.0.2.tar.gz"
         }
       }
     },
@@ -14072,8 +14072,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "20.10.0",
-          "downloadUrl": "https://nodejs.org/download/release/v20.10.0/node-v20.10.0.tar.xz"
+          "version": "20.14.0",
+          "downloadUrl": "https://nodejs.org/download/release/v20.14.0/node-v20.14.0.tar.xz"
         }
       }
     },
@@ -14262,8 +14262,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.14.4.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.15.0.tar.gz"
         }
       }
     },
@@ -14272,8 +14272,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-modprobe",
-          "version": "495.44",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/495.44.tar.gz"
+          "version": "550.54.14",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/550.54.14.tar.gz"
         }
       }
     },
@@ -20763,8 +20763,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.6",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.6.tar.xz"
+          "version": "8.3.8",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.8.tar.xz"
         }
       }
     },
@@ -21635,6 +21635,16 @@
           "name": "python-argcomplete",
           "version": "1.10.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argcomplete/argcomplete-1.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-argparse-manpage",
+          "version": "1.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse-manpage/argparse-manpage-1.5.tar.gz"
         }
       }
     },
@@ -22793,8 +22803,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "4.21.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-4.21.1.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
         }
       }
     },
@@ -24932,6 +24942,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-xlrd",
+          "version": "2.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a6/b3/19a2540d21dea5f908304375bd43f5ed7a4c28a370dc9122c565423e6b44/xlrd-2.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-xlsxwriter",
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/jmcnamara/XlsxWriter/archive/refs/tags/RELEASE_3.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-xmltodict",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/martinblech/xmltodict/archive/v0.12.0/xmltodict-0.12.0.tar.gz"
@@ -25636,6 +25666,16 @@
           "name": "rpmlint",
           "version": "1.11",
           "downloadUrl": "https://github.com/rpm-software-management/rpmlint/archive/rpmlint-1.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rr",
+          "version": "5.8.0",
+          "downloadUrl": "https://github.com/rr-debugger/rr/archive/5.8.0/rr-5.8.0.tar.gz"
         }
       }
     },
@@ -28356,8 +28396,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.29.4",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/refs/tags/v1.29.4.tar.gz"
+          "version": "1.31.0",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/refs/tags/v1.31.0.tar.gz"
         }
       }
     },

@@ -48,7 +48,8 @@
             "PackageLists": [
                 "packagelists/core-packages-image.json",
                 "packagelists/core-tools-packages.json",
-                "packagelists/hyperv-packages.json"
+                "packagelists/hyperv-packages.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

@@ -1,0 +1,45 @@
+From 0d251f8cb6cda2a65b4a709b93fb65c973bbc874 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 9 Apr 2024 09:41:52 -0400
+Subject: [PATCH 27/27] systemd: Add basic systemd-analyze rules.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/systemd.te | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index e45a797a6..a7f1bcf85 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -362,6 +362,27 @@ userdom_user_runtime_content(systemd_user_transient_unit_t)
+ type power_unit_t;
+ init_unit_file(power_unit_t)
+ 
++######################################
++#
++# Analyze local policy
++#
++
++files_get_etc_unit_status(systemd_analyze_t)
++
++init_stream_connect(systemd_analyze_t)
++init_get_all_units_status(systemd_analyze_t)
++init_service_status(systemd_analyze_t)
++init_get_system_status(systemd_analyze_t)
++
++kernel_read_kernel_sysctls(systemd_analyze_t)
++kernel_dontaudit_getattr_proc(systemd_analyze_t)
++
++miscfiles_read_localization(systemd_analyze_t)
++
++seutil_libselinux_linked(systemd_analyze_t)
++
++systemd_log_parse_environment(systemd_analyze_t)
++
+ ######################################
+ #
+ # Backlight local policy
+-- 
+2.44.0
+

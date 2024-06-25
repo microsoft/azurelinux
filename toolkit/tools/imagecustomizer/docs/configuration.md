@@ -66,8 +66,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
     grub config.
 
-22. if the output format is set to `iso`, copy additional iso media files.
-([iso](#iso-type))
+22. If the output format is set to `iso`, copy additional iso media files.
+    ([iso](#iso-type))
 
 ### /etc/resolv.conf
 
@@ -78,6 +78,10 @@ It is assumed there is a process that runs on boot that will write the
 For example, `systemd-resolved`.
 Hence, the `/etc/resolv.conf` file is simply deleted at the end instead of being
 restored to its original contents.
+
+If you want to explicitly set the `/etc/resolv.conf` file contents, you can do so within
+a [finalizeCustomization](#finalizecustomization-script) script, since those scripts run
+after the `/etc/resolv.conf` is deleted.
 
 ### Replacing packages
 
@@ -190,7 +194,7 @@ os:
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
     - [finalizeCustomization](#finalizecustomization-script)
@@ -198,7 +202,7 @@ os:
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
 
@@ -941,7 +945,7 @@ scripts:
     interpreter: python3
 ```
 
-### args [string[]]
+### arguments [string[]]
 
 Additional arguments to pass to the script.
 
@@ -951,7 +955,7 @@ Example:
 scripts:
   postCustomization:
   - path: scripts/a.sh
-    args:
+    arguments:
     - abc
 ```
 
@@ -1032,7 +1036,7 @@ These scripts are run under a chroot of the customized OS.
 Example:
 
 ```yaml
-os:
+scripts:
   finalizeCustomization:
   - path: scripts/b.sh
 ```

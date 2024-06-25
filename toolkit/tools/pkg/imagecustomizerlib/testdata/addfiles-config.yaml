@@ -1,3 +1,6 @@
 os:
   additionalFiles:
     files/a.txt: /a.txt
+    files/helloworld.sh:
+    - path: /usr/local/bin/helloworld.sh
+      permissions: 755

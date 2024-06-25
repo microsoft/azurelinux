@@ -56,14 +56,14 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-#Patch0:         CVE-2023-4039.patch
+Patch0:         CVE-2023-4039.patch
 Patch1:         0011-libsanitizer-Remove-crypt-and-crypt_r-interceptors.patch
 
 BuildRequires:  gmp-devel
@@ -329,11 +329,6 @@ LD=ld \
     --enable-plugin \
     --enable-shared \
     --enable-threads=posix \
-%ifarch x86_64
-    --with-arch=x86-64-v3 \
-%else
-    --with-arch=armv8.1-a \
-%endif
     --with-system-zlib
 
 popd
@@ -528,6 +523,15 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Fri Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-7
+- Re-enable CVE-2023-4039.patch and refresh against 13.2.0 source
+
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-6
+- Revert change to baseline architecture for x86-64-v3
+
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-5
+- Revert change to baseline architecture for arm64
+
 * Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
 - Set baseline architecture levels to `x86-64-v3` and `armv8.1-a`
 

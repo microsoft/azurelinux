@@ -35,7 +35,7 @@ func (s *OS) IsValid() error {
 
 	if s.Hostname != "" {
 		if !govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_") {
-			return fmt.Errorf("invalid hostname: %s", s.Hostname)
+			return fmt.Errorf("invalid hostname (%s)", s.Hostname)
 		}
 	}
 
@@ -46,23 +46,23 @@ func (s *OS) IsValid() error {
 
 	err = s.KernelCommandLine.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid kernelCommandLine: %w", err)
+		return fmt.Errorf("invalid kernelCommandLine:\n%w", err)
 	}
 
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid additionalFiles: %w", err)
+		return fmt.Errorf("invalid additionalFiles:\n%w", err)
 	}
 
 	err = s.AdditionalDirs.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid additionalDirs: %w", err)
+		return fmt.Errorf("invalid additionalDirs:\n%w", err)
 	}
 
 	for i, user := range s.Users {
 		err = user.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid users item at index %d: %w", i, err)
+			return fmt.Errorf("invalid users item at index %d:\n%w", i, err)
 		}
 	}
 
@@ -79,14 +79,14 @@ func (s *OS) IsValid() error {
 		moduleMap[module.Name] = i
 		err = module.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid Modules item at index %d:\n%w", i, err)
+			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
 		}
 	}
 
 	if s.Verity != nil {
 		err = s.Verity.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid verity: %w", err)
+			return fmt.Errorf("invalid verity:\n%w", err)
 		}
 	}
 
@@ -98,18 +98,18 @@ func (s *OS) IsValid() error {
 			// Validate the overlay itself
 			err := overlay.IsValid()
 			if err != nil {
-				return fmt.Errorf("invalid overlay (lowerDir: '%s') at index %d: %w", overlay.LowerDir, i, err)
+				return fmt.Errorf("invalid overlay at index %d:\n%w", i, err)
 			}
 
 			// Check for unique UpperDir
 			if _, exists := upperDirs[overlay.UpperDir]; exists {
-				return fmt.Errorf("duplicate upperDir '%s' found in overlay (lowerDir: '%s') at index %d", overlay.UpperDir, overlay.LowerDir, i)
+				return fmt.Errorf("duplicate upperDir (%s) found in overlay at index %d", overlay.UpperDir, i)
 			}
 			upperDirs[overlay.UpperDir] = true
 
 			// Check for unique WorkDir
 			if _, exists := workDirs[overlay.WorkDir]; exists {
-				return fmt.Errorf("duplicate workDir '%s' found in overlay (lowerDir: '%s') at index %d", overlay.WorkDir, overlay.LowerDir, i)
+				return fmt.Errorf("duplicate workDir (%s) found in overlay at index %d", overlay.WorkDir, i)
 			}
 			workDirs[overlay.WorkDir] = true
 		}

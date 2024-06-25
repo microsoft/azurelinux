@@ -1,0 +1,12 @@
+diff -ruN grub-2.06-ori/grub-core/net/ip.c grub-2.06/grub-core/net/ip.c
+--- grub-2.06-ori/grub-core/net/ip.c	2024-06-07 15:02:36.073464745 -0700
++++ grub-2.06/grub-core/net/ip.c	2024-06-12 19:02:51.293389116 -0700
+@@ -94,7 +94,7 @@
+ static struct reassemble *reassembles;
+ 
+ grub_uint16_t
+-grub_net_ip_chksum (void *ipv, grub_size_t len)
++__attribute__((optimize("O0"))) grub_net_ip_chksum (void *ipv, grub_size_t len)
+ {
+   grub_uint16_t *ip = (grub_uint16_t *) ipv;
+   grub_uint32_t sum = 0;
