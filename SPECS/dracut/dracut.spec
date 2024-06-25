@@ -11,9 +11,9 @@ License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://github.com/dracutdevs/dracut/wiki
+URL:            https://github.com/dracut-ng/dracut-ng/wiki
 
-Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/dracut-ng/dracut-ng/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
