@@ -70,7 +70,7 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 
 %changelog
 * Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.2-1
-- Auto-upgrade to 4.0.2 - none
+- Auto-upgrade to 4.0.2 - upgrade to 4.0.2
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8-13
 - Bump release to rebuild with go 1.20.10
