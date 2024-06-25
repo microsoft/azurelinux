@@ -541,9 +541,10 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Add machine-id
-	err = addMachineID(installChroot)
+	// Configure machine-id and other systemd state files
+	err = clearSystemdState(installChroot)
 	if err != nil {
+		err = fmt.Errorf("failed to clean systemd files:\n%w", err)
 		return
 	}
 
@@ -781,10 +782,27 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot, if it is
-// not already present (systemd package will include it if installed).
-func addMachineID(installChroot *safechroot.Chroot) (err error) {
-	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
+// clearSystemdState clears the systemd state files that should be unique to each instance of the image. This is
+// based on https://systemd.io/BUILDING_IMAGES/. Primarily, this function will ensure that /etc/machine-id is configured
+// correctly for first boot, and that random seed and credential files are removed if they exist.
+func clearSystemdState(installChroot *safechroot.Chroot) (err error) {
+	const (
+		machineIDFile           = "/etc/machine-id"
+		machineIDPresentContent = "uninitialized\n"
+		machineIDFilePerms      = 0444
+	)
+
+	// These state files are very unlikely to be present, but we should be thorough and check for them.
+	// See https://systemd.io/BUILDING_IMAGES/ for more information.
+	var otherFilesToRemove = []string{
+		"/var/lib/systemd/random-seed",
+		"/boot/efi/loader/random-seed",
+		"/var/lib/systemd/credential.secret",
+	}
+
+	// machine-id:
+
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#Initialization:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
 	// should be either missing or an empty file in the generic file system
@@ -794,23 +812,74 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// because it allows a temporary file to be bind-mounted over the real file,
 	// in case the image is used read-only
 
-	const (
-		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = 0444
-	)
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#First%20Boot%20Semantics:
+	//     etc/machine-id is used to decide whether a boot is the first one. The rules are as follows:
+	//     1. The kernel command argument systemd.condition-first-boot= may be used to override the autodetection logic,
+	//         see kernel-command-line(7).
+	//     2. Otherwise, if /etc/machine-id does not exist, this is a first boot. During early boot, systemd will write
+	//         "uninitialized\n" to this file and overmount a temporary file which contains the actual machine ID. Later
+	//         (after first-boot-complete.target has been reached), the real machine ID will be written to disk.
+	//     3. If /etc/machine-id contains the string "uninitialized", a boot is also considered the first boot. The same
+	//         mechanism as above applies.
+	//     4. If /etc/machine-id exists and is empty, a boot is not considered the first boot. systemd will still
+	//         bind-mount a file containing the actual machine-id over it and later try to commit it to disk (if /etc/ is
+	//         writable).
+	//     5. If /etc/machine-id already contains a valid machine-id, this is not a first boot.
+	//     If according to the above rules a first boot is detected, units with ConditionFirstBoot=yes will be run and
+	//     systemd will perform additional initialization steps, in particular presetting units.
 
-	ReportAction("Configuring machine id")
+	// However, the detailed guide for creating images (https://systemd.io/BUILDING_IMAGES/) suggests that the
+	// machine-id file should be "uninitialized\n" to trigger first-boot mode. This is because the machine-id file is
+	// used to determine if the image is being booted for the first time. If the file is empty, systemd will assume it
+	// is not the first boot and will not perform first-boot actions.
+	// (see https://www.freedesktop.org/software/systemd/man/latest/systemd-firstboot.html)
+
+	ReportAction("Clearing systemd state files for first boot")
 
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
 		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
 		return
 	}
-	if !exists {
-		err = installChroot.UnsafeRun(func() error {
-			return file.Create(machineIDFile, machineIDFilePerms)
-		})
+
+	// If the machine-id file exists, we can assume the 'systemd' package is installed (since it is responsible for
+	// providing the file). Setting it to "uninitialized\n" will trigger first-boot mode the next time the image is
+	// booted. If the file does not exist, just create an empty file for mounting purposes.
+	if exists {
+		ReportActionf("Setting machine-id file to 'uninitialized'")
+		err = file.Write(machineIDPresentContent, filepath.Join(installChroot.RootDir(), machineIDFile))
+		if err != nil {
+			err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
+			return err
+		}
+	} else {
+		ReportAction("Creating empty machine-id file")
+		err = file.Create(filepath.Join(installChroot.RootDir(), machineIDFile), machineIDFilePerms)
+		if err != nil {
+			err = fmt.Errorf("failed to create empty machine-id:\n%w", err)
+			return err
+		}
 	}
+
+	// These files should not be present in the image, but we should be thorough and double-check.
+	for _, filePath := range otherFilesToRemove {
+		fullPath := filepath.Join(installChroot.RootDir(), filePath)
+		exists, err = file.PathExists(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if systemd state file (%s) exists:\n%w", filePath, err)
+			return err
+		}
+
+		if exists {
+			ReportActionf("Removing systemd state file (%s)", filePath)
+			err = file.RemoveFileIfExists(fullPath)
+			if err != nil {
+				err = fmt.Errorf("failed to remove systemd state file (%s):\n%w", filePath, err)
+				return err
+			}
+		}
+	}
+
 	return
 }
 
