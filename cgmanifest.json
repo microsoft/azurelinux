@@ -1126,16 +1126,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "blobfuse2",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "blosc",
           "version": "1.21.4",
           "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
@@ -1357,8 +1347,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.25.0",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.25.0.tar.gz"
+          "version": "1.30.0",
+          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz"
         }
       }
     },
@@ -3477,16 +3467,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fapolicyd",
-          "version": "1.3.2",
-          "downloadUrl": "https://people.redhat.com/sgrubb/fapolicyd/fapolicyd-1.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fcgi",
           "version": "2.4.0",
           "downloadUrl": "https://src.fedoraproject.org/lookaside/extras/fcgi/fcgi-2.4.0.tar.gz/d15060a813b91383a9f3c66faf84867e/fcgi-2.4.0.tar.gz"
@@ -4372,16 +4352,6 @@
           "name": "glibmm",
           "version": "2.78.1",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.78/glibmm-2.78.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "glide",
-          "version": "0.13.3",
-          "downloadUrl": "https://github.com/Masterminds/glide/archive/v0.13.3.tar.gz"
         }
       }
     },
@@ -7533,16 +7503,6 @@
           "name": "isomd5sum",
           "version": "1.2.3",
           "downloadUrl": "https://github.com/rhinstaller/isomd5sum/archive/1.2.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "isorelax",
-          "version": "0.1",
-          "downloadUrl": "https://sourceforge.net/projects/iso-relax/files/package/2004_11_11/isorelax.20041111.zip"
         }
       }
     },
@@ -13304,16 +13264,6 @@
           "name": "mokutil",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/lcp/mokutil/archive/0.6.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "mozjs",
-          "version": "102.15.1",
-          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/102.15.1esr/source/firefox-102.15.1esr.source.tar.xz"
         }
       }
     },
@@ -29276,8 +29226,8 @@
         "type": "other",
         "other": {
           "name": "vitess",
-          "version": "17.0.2",
-          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v17.0.2.tar.gz"
+          "version": "19.0.4",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v19.0.4.tar.gz"
         }
       }
     },
