@@ -9,6 +9,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{name}-%{version}.tar.gz.asc
 # https://github.com/stefanberger.gpg
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
+Patch1:         0001-Export-RSA-private-key-primes-to-OpenSSL.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
