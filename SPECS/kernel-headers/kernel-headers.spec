@@ -1,3 +1,5 @@
+%define mariner_version 3
+
 # This package doesn't contain any binaries, thus no debuginfo package is needed.
 %global debug_package %{nil}
 
@@ -11,14 +13,14 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.158.2
-Release:        1%{?dist}
+Version:        6.6.29.1
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
 BuildArch:      noarch
@@ -39,7 +41,7 @@ cross-glibc package.
 %endif
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 
 %build
 make mrproper
@@ -73,78 +75,72 @@ done
 %endif
 
 %changelog
-* Fri Jun 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.158.2-1
-- Revert to 5.15.158.2
-
-* Wed May 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.159.1-1
-- Auto-upgrade to 5.15.159.1
-
-* Fri May 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.158.1-1
-- Auto-upgrade to 5.15.158.1
-
-* Tue Apr 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.157.1-1
-- Auto-upgrade to 5.15.157.1
-
-* Wed Apr 24 2024 Sriram Nambakam <snambakam@microsoft.com> - 5.15.153.1-3
+* Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
 - Bump release to match kernel
 
-* Tue Apr 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.153.1-2
+* Fri May 31 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-4
 - Bump release to match kernel
 
-* Wed Mar 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.153.1-1
-- Auto-upgrade to 5.15.153.1
-
-* Mon Mar 25 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.151.2-1
-- Upgrade to 5.15.151.2
-
-* Wed Mar 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.151.1-1
-- Auto-upgrade to 5.15.151.1
-
-* Sat Mar 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.150.1-1
-- Auto-upgrade to 5.15.150.1
-
-* Wed Feb 14 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.148.2-2
+* Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.29.1-3
 - Bump release to match kernel
 
-* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.2-1
-- Auto-upgrade to 5.15.148.2
-
-* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.1-1
-- Auto-upgrade to 5.15.148.1
-
-* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.147.1-1
-- Auto-upgrade to 5.15.147.1
-
-* Thu Jan 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.145.2-3
+* Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.29.1-2
 - Bump release to match kernel
 
-* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
+* Wed May 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.29.1-1
+- Auto-upgrade to 6.6.29.1
+
+* Mon Apr 29 2024 Sriram Nambakam <snambakam@microsoft.com> - 6.6.22.1-3
+- Bump release to match kernel
+
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
+- Bump release to match kernel
+
+* Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
+- Auto-upgrade to 6.6.22.1
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
+- remove unnecessary 10_kernel.cfg grub config file
+
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
+- Bump release to match kernel
+
+* Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
+- Bump release to match kernel
+
+* Thu Feb 22 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Bump release to match kernel
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Bump release to match kernel
+
+* Sat Jan 27 11:16:08 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- update to match kernel version
+
+* Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
+- Upgrade to 6.6.12.1
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.2.1-3
 - Add the 'kernel-cross-headers' subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
 
-* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
-- Update to 5.15.145.2
-
-* Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
-- Auto-upgrade to 5.15.139.1
-
-* Tue Nov 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.138.1-4
+* Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
 - Bump release to match kernel
 
-* Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+
+* Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
 - Bump release to match kernel
 
-* Wed Nov 22 2023 David Daney <daviddaney@microsoft.com> - 5.15.138.1-2
+* Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
 - Bump release to match kernel
 
-* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
-- Auto-upgrade to 5.15.138.1
-
-* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.137.1-2
-- Bump release to match kernel
-
-* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
-- Auto-upgrade to 5.15.137.1
+* Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
+- Upgrade to 6.1.58.1
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Bump release to match kernel
