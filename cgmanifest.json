@@ -1776,6 +1776,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cloud-hypervisor-cvm",
+          "version": "38.0.72",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cloud-init",
           "version": "23.4.3",
           "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/23.4.3.tar.gz"
@@ -1799,16 +1809,6 @@
           "name": "clucene",
           "version": "2.3.3.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/clucene-core-2.3.3.4-e8e3d20.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cloud-hypervisor-cvm",
-          "version": "38.0.72",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
         }
       }
     },
@@ -8963,6 +8963,16 @@
           "name": "libdazzle",
           "version": "3.36.0",
           "downloadUrl": "https://download.gnome.org/sources/libdazzle/3.36/libdazzle-3.36.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libdb",
+          "version": "5.3.28",
+          "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"
         }
       }
     },
@@ -23292,9 +23302,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-openpyxl",
-          "version": "3.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/42/e8/af028681d493814ca9c2ff8106fc62a4a32e4e0ae14602c2a98fc7b741c8/openpyxl-3.1.2.tar.gz"
+          "name": "python-omegaconf",
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/omry/omegaconf/archive/refs/tags/v2.3.0.tar.gz"
         }
       }
     },
@@ -23302,9 +23312,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-omegaconf",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/omry/omegaconf/archive/refs/tags/v2.3.0.tar.gz"
+          "name": "python-openpyxl",
+          "version": "3.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/42/e8/af028681d493814ca9c2ff8106fc62a4a32e4e0ae14602c2a98fc7b741c8/openpyxl-3.1.2.tar.gz"
         }
       }
     },
