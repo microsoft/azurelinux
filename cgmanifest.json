@@ -27293,16 +27293,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "sendmail",
-          "version": "8.15.2",
-          "downloadUrl": "ftp://ftp.sendmail.org/pub/sendmail/sendmail.8.15.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "serd",
           "version": "0.30.2",
           "downloadUrl": "https://download.drobilla.net/serd-0.30.2.tar.bz2"

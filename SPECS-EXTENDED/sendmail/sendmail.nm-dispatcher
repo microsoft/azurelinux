@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case "$2" in
-	up|down|vpn-up|vpn-down)
-		/bin/systemctl --no-block try-restart sendmail.service || :
-		;;
-esac
