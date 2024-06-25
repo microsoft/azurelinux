@@ -2194,7 +2194,6 @@
                 "azurelinux-rpm-macros",
                 "azurelinux-sysinfo",
                 "bazel",
-                "blobfuse2",
                 "bmon",
                 "bpftrace",
                 "ccache",
