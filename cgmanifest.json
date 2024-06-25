@@ -1368,7 +1368,7 @@
         "other": {
           "name": "c-ares",
           "version": "1.30.0",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.30.0.tar.gz"
+          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz"
         }
       }
     },

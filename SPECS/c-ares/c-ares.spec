@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://c-ares.haxx.se/
-Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
+Source0:        https://github.com/c-ares/c-ares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
