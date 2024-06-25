@@ -16,6 +16,10 @@ BuildRequires:	libutempter-devel
 BuildRequires:	zlib-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	openssl-devel
+BuildRequires:  glibc-devel
+BuildRequires:  binutils
+BuildRequires:  kernel-headers
+BuildRequires:  perl
 Requires:	openssh-clients
 Requires:	openssl
 Requires:	perl-IO-Socket-IP
