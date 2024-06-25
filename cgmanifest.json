@@ -7540,16 +7540,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "isorelax",
-          "version": "0.1",
-          "downloadUrl": "https://sourceforge.net/projects/iso-relax/files/package/2004_11_11/isorelax.20041111.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "itstool",
           "version": "2.0.7",
           "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.7.tar.bz2"
