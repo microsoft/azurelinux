@@ -620,14 +620,10 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 
 	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
 
-	// Set partition friendly name (only for gpt)
+	// Set partition friendly name and partition type UUID (only for gpt)
 	if partitionTableType == "gpt" {
-		partitionName := partition.Name
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
-		if err != nil {
-			logger.Log.Warnf("Failed to set partition friendly name using parted: %v", stderr)
-			// Not-fatal
-		}
+		setGptPartitionName(partition, timeoutInSeconds, diskDevPath, partitionNumberStr)
+		setGptPartitionType(partition, timeoutInSeconds, diskDevPath, partitionNumberStr)
 	}
 
 	// Set partition flags if necessary
@@ -666,6 +662,35 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
+	return
+}
+
+func setGptPartitionName(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
+	partitionName := partition.Name
+	_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
+	if err != nil {
+		logger.Log.Warnf("failed to set partition friendly name using parted: %v", stderr)
+		err = nil
+		// Not-fatal
+	}
+	return
+}
+
+func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
+	if partition.TypeUUID != "" || partition.Type != "" {
+		var typeUUID string
+		if partition.TypeUUID != "" {
+			typeUUID = partition.TypeUUID
+		} else {
+			typeUUID = configuration.PartitionTypeNameToUUID[partition.Type]
+		}
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, typeUUID)
+		if err != nil {
+			logger.Log.Warnf("failed to set partition type using parted: %v", stderr)
+			err = nil
+			// Not-fatal
+		}
+	}
 	return
 }
 
