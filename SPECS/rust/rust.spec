@@ -159,8 +159,12 @@ rm -rf %{buildroot}%{_bindir}/*.old
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%doc %{_docdir}/%{name}/html/*
-%doc %{_docdir}/%{name}/README.md
+%doc %{_docdir}/docs/html/*
+%doc %{_docdir}/rustc/README.md
+%doc %{_docdir}/cargo/*
+%doc %{_docdir}/clippy/*
+%doc %{_docdir}/rust-doc/*
+%doc %{_docdir}/rustfmt/*
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
