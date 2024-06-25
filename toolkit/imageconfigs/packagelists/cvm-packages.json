@@ -1,7 +1,7 @@
 {
     "packages": [
         "shim",
-        "systemd-boot-unsigned",
+        "systemd-boot",
         "kernel-uki",
         "tpm2-tools",
         "ca-certificates",
