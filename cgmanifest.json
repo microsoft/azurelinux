@@ -4389,16 +4389,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "glide",
-          "version": "0.13.3",
-          "downloadUrl": "https://github.com/Masterminds/glide/archive/v0.13.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "glm",
           "version": "0.9.9.6",
           "downloadUrl": "https://github.com/g-truc/glm/releases/download/0.9.9.6/glm-0.9.9.6.zip"
@@ -13324,16 +13314,6 @@
           "name": "mokutil",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/lcp/mokutil/archive/0.6.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "mozjs",
-          "version": "102.15.1",
-          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/102.15.1esr/source/firefox-102.15.1esr.source.tar.xz"
         }
       }
     },
