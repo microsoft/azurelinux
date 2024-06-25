@@ -61,7 +61,7 @@
 /SPECS/runc/* @microsoft/cbl-mariner-container-runtime
 /SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
 
-/SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
+/SPECS/cloud-hypervisor-cvm/* @microsoft/cbl-mariner-virtualization
 /SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
