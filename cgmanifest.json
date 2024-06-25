@@ -2608,8 +2608,8 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.3",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.3/dhcp-4.4.3.tar.gz"
+          "version": "4.4.3.P1",
+          "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz"
         }
       }
     },
@@ -4640,8 +4640,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://golang.org/dl/go1.21.6.src.tar.gz"
+          "version": "1.21.11",
+          "downloadUrl": "https://golang.org/dl/go1.21.11.src.tar.gz"
         }
       }
     },
@@ -7563,16 +7563,6 @@
           "name": "isomd5sum",
           "version": "1.2.3",
           "downloadUrl": "https://github.com/rhinstaller/isomd5sum/archive/1.2.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "isorelax",
-          "version": "0.1",
-          "downloadUrl": "https://sourceforge.net/projects/iso-relax/files/package/2004_11_11/isorelax.20041111.zip"
         }
       }
     },
@@ -10621,8 +10611,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.37",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
+          "version": "1.6.39",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.39.tar.xz"
         }
       }
     },
@@ -13673,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.3-1/go1.22.3-20240507.3.src.tar.gz"
+          "version": "1.22.4",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.4-1/go1.22.4-20240604.2.src.tar.gz"
         }
       }
     },
@@ -13813,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.35",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.35.tar.gz"
+          "version": "8.0.36",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
         }
       }
     },
@@ -14433,8 +14423,8 @@
         "type": "other",
         "other": {
           "name": "nodejs18",
-          "version": "18.20.2",
-          "downloadUrl": "https://nodejs.org/download/release/v18.20.2/node-v18.20.2.tar.xz"
+          "version": "18.20.3",
+          "downloadUrl": "https://nodejs.org/download/release/v18.20.3/node-v18.20.3.tar.xz"
         }
       }
     },
@@ -24914,8 +24904,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.26.18",
-          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.18.tar.gz"
+          "version": "1.26.19",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.19.tar.gz"
         }
       }
     },

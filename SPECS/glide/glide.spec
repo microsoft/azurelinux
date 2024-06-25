@@ -1,7 +1,7 @@
 Summary:        Vendor Package Management for Golang
 Name:           glide
 Version:        0.13.3
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 URL:            https://github.com/Masterminds/glide
 # Source0:      https://github.com/Masterminds/%{name}/archive/v%{version}.tar.gz
@@ -53,6 +53,9 @@ popd
 %{_bindir}/glide
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.13.3-26
+- Bump release to rebuild with go 1.21.11
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.13.3-25
 - Bump release to rebuild with go 1.21.6
 

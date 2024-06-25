@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.2
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -49,6 +49,9 @@ go test -mod=vendor ./...
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.2-17
+- Bump release to rebuild with go 1.21.11
+
 * Wed Feb 07 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.0.2-16
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 - Rework CVE-2023-21698.patch to apply without directory change

@@ -1,7 +1,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.10.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
+- Bump release to rebuild with go 1.21.11
+
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.10.1-2
 - Fix for CVE-2023-45288
 
