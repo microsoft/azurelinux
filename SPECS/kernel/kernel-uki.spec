@@ -59,10 +59,14 @@ ukify build \
       --output vmlinuz-uki.efi
 
 %install
-install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
+install -vdm 700 %{buildroot}/boot
+install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
+install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
+ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %files
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
+/boot/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
 * Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-6
