@@ -1,0 +1,25 @@
+From 42a694855f08404adb9aa7a04a27e32f1673aaa9 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Wed, 26 Jun 2024 09:02:00 +0530
+Subject: [PATCH] agent: allow dead_code to enable build with rust 1.79.0
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ src/agent/src/config.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/agent/src/config.rs b/src/agent/src/config.rs
+index 75c0a245c..fd1f3b7c1 100644
+--- a/src/agent/src/config.rs
++++ b/src/agent/src/config.rs
+@@ -51,6 +51,7 @@ const ERR_INVALID_CONTAINER_PIPE_SIZE_PARAM: &str = "unable to parse container p
+ const ERR_INVALID_CONTAINER_PIPE_SIZE_KEY: &str = "invalid container pipe size key name";
+ const ERR_INVALID_CONTAINER_PIPE_NEGATIVE: &str = "container pipe size should not be negative";
+ 
++#[allow(dead_code)]
+ #[derive(Debug)]
+ pub struct AgentConfig {
+     pub debug_console: bool,
+-- 
+2.40.1
+

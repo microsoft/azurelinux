@@ -39,7 +39,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -47,6 +47,7 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        50-kata
 Source3:        mariner-build-uvm.sh
+Patch0:         0001-agent-allow-dead_code-to-enable-build-with-rust-1.79.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -215,6 +216,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Jun 26 2024 Muhammad Falak <mwani@microsoft.com> - 3.2.0.azl2-3
+- Introduce patch to drop warnings to build with rust 1.79.0
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-2
 - Bump release to rebuild with go 1.21.11
 
