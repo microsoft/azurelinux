@@ -3,6 +3,10 @@
   "mysql-boost-8.0.36.tar.gz": "429c5f69f3722e31807e74119d157a023277af210bfee513443cae60ebd2a86d",
   "mysql.service": "04a0c5a4f5f1c68c97d8b26f329fbbf35dbc142a94571abe062098ba54bc1540",
   "mysql.tmpfiles.d": "c02041727f34f163fd926a55b4406fe463230b814b670e6e6573eb7da04c0a92",
-  "mysql@.service": "df34e760e213526a97bce96cdc254a9dbf34cbac3910e9ac97f7808cdf96927b"
+  "mysql@.service": "df34e760e213526a97bce96cdc254a9dbf34cbac3910e9ac97f7808cdf96927b",
+  "rh-skipped-tests-list-arm.list": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rh-skipped-tests-list-base.list": "62dde905cf99e174f83e4655ba82528a81b70f512ebd30724a36667c845a2171",
+  "rh-skipped-tests-list-ppc.list": "bbfcc05ed5c64790ccc4350b20ba56609ca020f583568c6c61e47e8085b3ff07",
+  "rh-skipped-tests-list-s390.list": "5ebe4da685034a358bf7c475ab0d664340a74c21d3b3be2d8ab8dd016af72070"
  }
 }

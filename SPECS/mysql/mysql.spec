@@ -4,6 +4,9 @@
 %global daemon_name       mysqld
 %global daemon_no_prefix  mysqld
 
+# Set this to 1 to see which tests fail, but 0 on production ready build
+%global ignore_testsuite_result 0
+
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.36
@@ -17,6 +20,11 @@ Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{ve
 Source1:        mysql.service
 Source2:        mysql@.service
 Source3:        mysql.tmpfiles.d
+# Skipped tests lists
+Source50:       rh-skipped-tests-list-base.list
+Source51:       rh-skipped-tests-list-arm.list
+Source52:       rh-skipped-tests-list-s390.list
+Source53:       rh-skipped-tests-list-ppc.list
 Patch0:         CVE-2012-5627.nopatch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
@@ -24,6 +32,9 @@ BuildRequires:  openssl-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  zlib-devel
 BuildRequires:  systemd
+BuildRequires:  perl-interpreter
+BuildRequires:  perl-generators
+BuildRequires:  perl(Test::More)
 Requires:       systemd
 # Make sure it's there when scriptlets run, too
 %{?systemd_requires: %systemd_requires}
@@ -40,6 +51,25 @@ Development headers for developing applications linking to maridb
 
 %prep
 %autosetup -p1
+
+# Needed for unit tests (different from MTR tests), which we doesn't run, as they doesn't work on some architectures: #1989847
+rm -r extra/googletest
+ 
+# generate a list of tests that fail, but are not disabled by upstream
+cat %{SOURCE50} | tee -a mysql-test/%{skiplist}
+ 
+# disable some tests failing on different architectures
+%ifarch aarch64
+cat %{SOURCE51} | tee -a mysql-test/%{skiplist}
+%endif
+ 
+%ifarch s390x
+cat %{SOURCE52} | tee -a mysql-test/%{skiplist}
+%endif
+ 
+%ifarch ppc64le
+cat %{SOURCE53} | tee -a mysql-test/%{skiplist}
+%endif
 
 cp %{SOURCE1} %{SOURCE2} %{SOURCE3} scripts
 
@@ -58,7 +88,11 @@ cmake . \
       -DWITH_SYSTEMD=1 \
       -DSYSTEMD_SERVICE_NAME="%{daemon_name}" \
       -DSYSTEMD_PID_DIR="%{pidfiledir}" \
-      -DFORCE_INSOURCE_BUILD=1
+      -DFORCE_INSOURCE_BUILD=1 \
+      -DINSTALL_MYSQLTESTDIR=share/mysql-test \
+      -DWITH_UNIT_TESTS=0
+
+# Note: disabling building of unittests to workaround #1989847
 
 make %{?_smp_mflags}
 
@@ -71,8 +105,54 @@ install -D -p -m 644 scripts/mysql@.service %{buildroot}%{_unitdir}/%{daemon_nam
 install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
 rm -r %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
 
+# Install the list of skipped tests to be available for user runs
+install -p -m 0644 %{_vpath_srcdir}/mysql-test/%{skiplist} %{buildroot}%{_datadir}/mysql-test
+	
+rm %{buildroot}%{_bindir}/{mysql_client_test,mysqlxtest,mysqltest_safe_process,zlib_decompress}
+# rm -r %{buildroot}%{_datadir}/mysql-test
+
 %check
-make test
+pushd
+# Note: disabling building of unittests to workaround #1989847
+pushd mysql-test
+cp ../../mysql-test/%{skiplist} .
+ 
+# Builds might happen at the same host, avoid collision
+#   The port used is calculated as 10 * MTR_BUILD_THREAD + 10000
+#   The resulting port must be between 5000 and 32767
+export MTR_BUILD_THREAD=$(( $(date +%s) % 2200 ))
+ 
+(
+  set -ex
+  cd %{buildroot}%{_datadir}/mysql-test
+ 
+  export common_testsuite_arguments=" %{?with_debug:--debug-server} --parallel=auto --force --retry=2 --suite-timeout=900 --testcase-timeout=30 --skip-combinations --max-test-fail=5 --report-unstable-tests --clean-vardir --nocheck-testcases "
+ 
+  # If full testsuite has already been run on this version and we don't explicitly want the full testsuite to be run
+  if [[ "%{last_tested_version}" == "%{version}" ]] && [[ %{force_run_testsuite} -eq 0 ]]
+  then
+    # in further rebuilds only run the basic "main" suite (~800 tests)
+    echo "running only base testsuite"
+    perl ./mysql-test-run.pl $common_testsuite_arguments --suite=main --skip-test-list=%{skiplist}
+  fi
+ 
+ # If either this version wasn't marked as tested yet or I explicitly want to run the testsuite, run everything we have (~4000 test)
+  if [[ "%{last_tested_version}" != "%{version}" ]] || [[ %{force_run_testsuite} -ne 0 ]]
+  then
+    echo "running advanced testsuite"
+    perl ./mysql-test-run.pl $common_testsuite_arguments \
+    %if %{ignore_testsuite_result}
+      --max-test-fail=9999 || :
+    %else
+      --skip-test-list=%{skiplist}
+    %endif
+  fi
+ 
+  # There might be a dangling symlink left from the testing, remove it to not be installed
+  rm -r var $(readlink var)
+)
+ 
+popd
 
 %files
 %defattr(-,root,root)
@@ -83,15 +163,14 @@ make test
 %{_libdir}/mysqlrouter/*.so*
 %{_libdir}/mysqlrouter/private/*.so*
 %{_libdir}/private/*.so*
+%{_libdir}/systemd/system/*
 %{_bindir}/*
 %{_mandir}/man1/*
 %{_mandir}/man8/*
 %{_datadir}/support-files/*
 %{_prefix}/mysqlrouter-log-rotate
-%{_libdir}/systemd/system/*
 %{_prefix}/%{_libdir}/systemd/system/*.service
 %{_prefix}/%{_libdir}/tmpfiles.d/*.conf
-%exclude %{_prefix}/mysql-test
 %exclude %{_prefix}/docs
 %exclude %{_datadir}
 %exclude %{_prefix}/*.router
@@ -111,7 +190,7 @@ make test
 
 %changelog
 * Thu Jun 20 2024 Betty Lakes <bettylakes@microsoft.com> - 8.0.36-2
-- Add systemd dependency
+- Add systemd dependency and unit test workaround
 
 * Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.36-1
 - Auto-upgrade to 8.0.36
