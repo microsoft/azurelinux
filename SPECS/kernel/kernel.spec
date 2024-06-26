@@ -58,6 +58,7 @@ BuildRequires:  glib-devel
 BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
+BuildRequires:  libbpf-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
