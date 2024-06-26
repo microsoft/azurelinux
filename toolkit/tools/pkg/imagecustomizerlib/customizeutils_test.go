@@ -482,16 +482,19 @@ func verifyFilePermissionsSame(t *testing.T, origPath string, newPath string) {
 
 func ensureFilesExist(t *testing.T, imageConnection *ImageConnection, filePaths ...string) {
 	for _, filePath := range filePaths {
-		_, err := os.Stat(filepath.Join(imageConnection.chroot.RootDir(), filePath))
+		// Note: Symbolic links might be broken as we are not checking under the chroot.
+		// Hence, the use of lstat instead of stat.
+		_, err := os.Lstat(filepath.Join(imageConnection.chroot.RootDir(), filePath))
 		assert.NoErrorf(t, err, "check file exists (%s)", filePath)
 	}
 }
 
 func ensureFilesNotExist(t *testing.T, imageConnection *ImageConnection, filePaths ...string) {
 	for _, filePath := range filePaths {
-		exists, err := file.PathExists(filepath.Join(imageConnection.chroot.RootDir(), filePath))
-		assert.NoErrorf(t, err, "check if file exists (%s)", filePath)
-		assert.Falsef(t, exists, "ensure file does not exist (%s)", filePath)
+		// Note: Symbolic links might be broken as we are not checking under the chroot.
+		// Hence, the use of lstat instead of stat.
+		_, err := os.Lstat(filepath.Join(imageConnection.chroot.RootDir(), filePath))
+		assert.ErrorIsf(t, err, os.ErrNotExist, "ensure file does not exist (%s)", filePath)
 	}
 }
 
