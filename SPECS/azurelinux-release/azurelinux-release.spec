@@ -39,7 +39,6 @@ Summary: Azure release files
 Suggests:   azure-release
 
 # Requires:   azure-repos(%{version})
-# Requires:   azure-release-identity = %{version}-%{release}
 
 %description common
 Release files common to all Azure Linux variants
@@ -165,8 +164,12 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
 # baremetal variant definition
 %if %{with baremetal}
-echo "VARIANT=\"BareMetal Image\"" >> %{buildroot}%{_libdir}/os-release
+echo "VARIANT=\"Bare Metal Image\"" >> %{buildroot}%{_libdir}/os-release
 echo "VARIANT_ID=baremetal" >> %{buildroot}%{_libdir}/os-release
+
+# SELinux is enforcing by default
+grep -q 'selinux=1' /etc/default/grub || sed -i 's/GRUB_CMDLINE_LINUX="/GRUB_CMDLINE_LINUX="security=selinux selinux=1 enforcing=1 /' /etc/default/grub
+sed -i 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/selinux/config
 
 Requires: dracut-megaraid
 Requires: selinux-policy
