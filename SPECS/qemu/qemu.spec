@@ -3427,7 +3427,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %changelog
 * Wed Jun 19 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 8.2.0-9
 - Enable vnc related packages/dependencies required for Kubevirt
-- Removing the have_ui flag to allow all ui dependencies to exist for Kubevirt.
+- Removing the have_ui flag to install virtio required components.
 
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.0-8
 - update to build dep latest glibc-static version
