@@ -2225,10 +2225,6 @@ rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-simpletrace.
 
 %endif
 
-%if !%{have_ui}
-
-%endif
-
 # Fedora specific stuff below
 # %find_lang %{name}
 
