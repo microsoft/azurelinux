@@ -4,19 +4,6 @@
 
 set -e
 
-# Add for debuggin purposes
-echo "ACR                           -> $ACR"
-echo "CONTAINER_IMAGE_NAME_FINAL    -> $CONTAINER_IMAGE_NAME_FINAL"
-echo "REPOSITORY                    -> $REPOSITORY"
-echo "REPO_PREFIX                   -> $REPO_PREFIX"
-echo "IMAGE                         -> $IMAGE"
-echo "OUTPUT_DIR                    -> $OUTPUT_DIR"
-echo "END_OF_LIFE_1_YEAR            -> $END_OF_LIFE_1_YEAR"
-echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
-echo "CREATE_SBOM                   -> $CREATE_SBOM"
-echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
-echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
-
 function initialization {
     echo "+++ Initialization"
     if [ "$PUBLISHING_LEVEL" = "preview" ]; then
