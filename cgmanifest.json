@@ -1867,8 +1867,8 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v1.1.2.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v1.2.2.tar.gz"
         }
       }
     },
