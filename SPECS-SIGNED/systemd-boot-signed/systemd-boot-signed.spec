@@ -2,9 +2,18 @@
 %ifarch x86_64
 %global buildarch x86_64
 %endif
+
+# Support for quick builds with rpmbuild --build-in-place.
+# See README.build-in-place
+%bcond inplace 0
 Summary:        Signed systemd-boot for %{buildarch} systems
 Name:           systemd-signed-%{buildarch}
+%if %{without inplace}
 Version:        255
+%else
+# determine the build information from local checkout
+Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
+%endif
 Release:        14%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
