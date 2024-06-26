@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.21.4
-Release:        10%{?dist}
+Version:        3.29.6
+Release:        1%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,16 +10,7 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
-# We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch1:         CVE-2022-43551.patch
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch5:         CVE-2023-35945.patch
-Patch6:         CVE-2023-38545.patch
-Patch7:         CVE-2023-38546.patch
-Patch8:         cve-2023-44487.patch
+Patch0:         0001-manually-recreating-patches.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -28,6 +19,7 @@ BuildRequires:  expat-devel
 BuildRequires:  expat-libs
 BuildRequires:  libarchive
 BuildRequires:  libarchive-devel
+BuildRequires:  msopenjdk-11
 BuildRequires:  ncurses-devel
 BuildRequires:  xz
 BuildRequires:  xz-devel
@@ -36,6 +28,7 @@ BuildRequires:  zlib-devel
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
+Requires:       msopenjdk-11
 Requires:       ncurses
 Requires:       zlib
 Provides:       %{name}%{major_version} = %{version}-%{release}
@@ -50,6 +43,7 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
@@ -85,6 +79,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 - CVE-2023-28320
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
 - Patch vendored nghttp2 for CVE-2023-44487
 
