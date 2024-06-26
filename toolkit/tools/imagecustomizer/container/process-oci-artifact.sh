@@ -11,9 +11,9 @@ if [[ $OCI_ARTIFACT_PATH != mcr.microsoft.com/*:* ]]; then
     exit 1
 fi
 
-ARTIFACT_DIR="/image/artifact"
+ARTIFACT_DIR="/oci/artifact"
 mkdir -p $ARTIFACT_DIR
-oras pull -a $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
+oras pull $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
 
 # Find the VHDX file matching the pattern 'core-*.vhdx'.
 VHDX_PATH=$(find $ARTIFACT_DIR -type f -name 'core-*.vhdx' -print -quit)
