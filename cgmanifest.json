@@ -1766,16 +1766,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cloud-hypervisor",
-          "version": "37.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v37.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cloud-init",
           "version": "23.4.3",
           "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/23.4.3.tar.gz"
@@ -2968,8 +2958,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "059",
-          "downloadUrl": "https://github.com/dracutdevs/dracut/archive/refs/tags/059.tar.gz"
+          "version": "102",
+          "downloadUrl": "https://github.com/dracut-ng/dracut-ng/archive/refs/tags/102.tar.gz"
         }
       }
     },
