@@ -1,6 +1,6 @@
 Name:           libtpms
 Version:        0.9.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD and TCGL
 
@@ -9,6 +9,7 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{name}-%{version}.tar.gz.asc
 # https://github.com/stefanberger.gpg
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
+Patch1:         0001-Export-RSA-private-key-primes-to-OpenSSL.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -35,7 +36,7 @@ Libtpms header files and documentation.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 NOCONFIGURE=1 ./autogen.sh
@@ -63,6 +64,9 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
+* Tue Jun 25 2024 Maxwell Moyer-McKee <bfjelds@microsoft.com> - 0.9.6-6
+- Add patch for compatibility with SymCrypt provider
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.9.6-5
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - license verified (TCG license in LICENSE file)
