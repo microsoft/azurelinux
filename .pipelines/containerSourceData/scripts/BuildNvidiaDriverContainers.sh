@@ -283,8 +283,8 @@ function set_image_tag {
     OS_TAG=$NAMESPACE$VERSION
 
     # Rename the image to include package version, kernel version and OS tag
-    # Example: azurelinuxpreview.azurecr.io/base/driver:550-5.15.153.1-1.cm2-mariner2.0
-    CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$DRIVER_BRANCH-$KERNEL_VERSION-$OS_TAG"
+    # Example: azurelinuxpreview.azurecr.io/base/driver:550-5.15.153.1-1.cm2-mariner2.0.2.0.20240618-amd64
+    CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$DRIVER_BRANCH-$KERNEL_VERSION-$OS_TAG.$BASE_IMAGE_TAG"
     docker rm -f "$containerId"
 }
 
