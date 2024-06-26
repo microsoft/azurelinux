@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,13 +47,11 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-<<<<<<< HEAD
-* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-4
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-5
 - Bump release to rebuild with go 1.21.11
-=======
+
 * Thu Jun 20 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-4
 - Fix CVE-2024-3727 in github.com/containers/image
->>>>>>> 2b8738bcb (Fix CVE-2024-3727 in skopeo (#9455))
 
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.14.2-3
 - Fix for CVE-2023-45288
