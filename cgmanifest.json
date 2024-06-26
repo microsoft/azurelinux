@@ -2958,8 +2958,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "059",
-          "downloadUrl": "https://github.com/dracutdevs/dracut/archive/refs/tags/059.tar.gz"
+          "version": "102",
+          "downloadUrl": "https://github.com/dracut-ng/dracut-ng/archive/refs/tags/102.tar.gz"
         }
       }
     },
