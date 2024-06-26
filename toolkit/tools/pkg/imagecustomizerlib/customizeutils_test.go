@@ -487,6 +487,14 @@ func ensureFilesExist(t *testing.T, imageConnection *ImageConnection, filePaths 
 	}
 }
 
+func ensureFilesNotExist(t *testing.T, imageConnection *ImageConnection, filePaths ...string) {
+	for _, filePath := range filePaths {
+		exists, err := file.PathExists(filepath.Join(imageConnection.chroot.RootDir(), filePath))
+		assert.NoErrorf(t, err, "check if file exists (%s)", filePath)
+		assert.Falsef(t, exists, "ensure file does not exist (%s)", filePath)
+	}
+}
+
 func verifyKernelCommandLine(t *testing.T, imageConnection *ImageConnection, existsArgs []string,
 	notExistsArgs []string,
 ) {
