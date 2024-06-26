@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -14,6 +14,8 @@ Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{vers
 Source1: docker.service
 Source2: docker.socket
 Source3: daemon.json
+
+Patch0:  CVE-2022-2879.patch
 
 %{?systemd_requires}
 
@@ -114,6 +116,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 25.0.3-3
+- Address CVE-2022-2879
+
 * Thu Mar 21 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-2
 - Add the in-tree version of docker proxy built from cmd/docker-proxy into /usr/libexec
 - Set userland-proxy-path explicitly by introducing /etc/docker/daemon.json
