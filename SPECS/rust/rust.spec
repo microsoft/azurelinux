@@ -163,7 +163,6 @@ rm -rf %{buildroot}%{_bindir}/*.old
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/clippy/*
-%doc %{_docdir}/rust-doc/*
 %doc %{_docdir}/rustfmt/*
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
