@@ -1,0 +1,46 @@
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+
+# golang toolkit
+
+  - package-ecosystem: "gomod"
+    target-branch: "main"
+    directory: "/toolkit"    
+    reviewers:
+      - microsoft/cbl-mariner-tooling
+      - microsoft/cbl-mariner-golang
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "gomod"
+    target-branch: "3.0-dev"
+    directory: "/toolkit"    
+    reviewers:
+      - microsoft/cbl-mariner-tooling
+      - microsoft/cbl-mariner-golang
+    schedule:
+      interval: "daily"
+
+
+# github-actions
+
+  - packge-ecosystem: "github-actions"
+    target-branch: "main"
+    directory: "/"
+    reviewers:
+      - microsoft/cbl-mariner-tooling
+    schedule:
+      interval: "daily"
+
+  - packge-ecosystem: "github-actions"
+    target-branch: "3.0-dev"
+    directory: "/"
+    reviewers:
+      - microsoft/cbl-mariner-tooling
+    schedule:
+      interval: "daily"
+
+    
+    
