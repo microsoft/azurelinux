@@ -30,10 +30,20 @@ ExclusiveArch:  x86_64
 This package contains the systemd-boot EFI binary signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
 
-%package -n     systemd-boot
+%package -n     systemd-boot-signed
 Summary:        UEFI boot manager (signed version)
 
-%description -n systemd-boot
+Provides: systemd-boot-signed-%{efi_arch} = %version-%release
+Provides: systemd-boot = %version-%release
+Provides: systemd-boot%{_isa} = %{version}-%{release}
+# A provides with just the version, no release or dist, used to build systemd-boot
+Provides: version(systemd-boot-signed) = %version
+Provides: version(systemd-boot-signed)%{_isa} = %version
+
+# self-obsoletes to install both packages after split of systemd-boot
+Obsoletes: systemd-udev < 252.2^
+
+%description -n systemd-boot-signed
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
 line. systemd-boot supports systems with UEFI firmware only.
@@ -61,7 +71,7 @@ cp -rp ./. %{buildroot}/
 popd
 
 %files -n systemd-boot
-/lib/systemd/boot/efi/systemd-bootx64.efi
+/usr/lib/systemd/boot/efi/*
 
 %changelog
 * Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-6

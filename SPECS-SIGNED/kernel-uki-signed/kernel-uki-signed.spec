@@ -60,6 +60,7 @@ cp -rp ./. %{buildroot}/
 popd
 
 %files -n kernel-uki
+/lib/modules/%{kernelver}/vmlinuz-uki.efi
 /boot/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
