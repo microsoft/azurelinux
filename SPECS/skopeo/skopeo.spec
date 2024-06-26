@@ -47,7 +47,7 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-5
+* Wed Jun 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-5
 - Bump release to rebuild with go 1.21.11
 
 * Thu Jun 20 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-4
