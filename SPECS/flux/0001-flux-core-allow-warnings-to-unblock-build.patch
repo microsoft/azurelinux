@@ -1,0 +1,23 @@
+From a353bad770ffc3189521926cd18d33087e6ccccc Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Wed, 26 Jun 2024 08:37:03 +0530
+Subject: [PATCH] flux-core: allow warnings to unblock build
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ libflux/flux-core/src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflux/flux-core/src/lib.rs b/libflux/flux-core/src/lib.rs
+index 733c5cb..5beb276 100644
+--- a/libflux/flux-core/src/lib.rs
++++ b/libflux/flux-core/src/lib.rs
+@@ -1,4 +1,4 @@
+-#![cfg_attr(feature = "strict", deny(warnings, missing_docs))]
++#![cfg_attr(feature = "strict", deny(missing_docs))]
+ #![allow(
+     clippy::needless_update, //
+     clippy::identity_op, // Warns on `1 * YEARS` which seems clearer than `YEARS`
+-- 
+2.40.1
+

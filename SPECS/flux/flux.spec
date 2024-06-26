@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.191.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
 Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+Patch3:         0001-flux-core-allow-warnings-to-unblock-build.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -72,6 +73,7 @@ programs using Influx data language.
 %prep
 %setup -q
 %patch2 -p1
+%patch3 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
@@ -139,6 +141,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Wed Jun 26 2024 Muhammad Falak <mwani@microsoft.com> - 0.191.0-4
+- Introduce patch to drop warnings to build with rust 1.79.0
+
 * Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.191.0-3
 - Introduce patch to drop warnings as build blocker
 
