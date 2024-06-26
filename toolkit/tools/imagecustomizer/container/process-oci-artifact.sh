@@ -4,13 +4,6 @@
 # The first argument is expected to be the OCI artifact path.
 OCI_ARTIFACT_PATH=$1
 
-# Validate that the OCI artifact path is from MCR.
-if [[ $OCI_ARTIFACT_PATH != mcr.microsoft.com/*:* ]]; then
-    echo "Error: Provided path '$OCI_ARTIFACT_PATH' is not a valid MCR OCI artifact path."
-    echo "Expected format: 'mcr.microsoft.com/path/to/oci/artifact:tag'"
-    exit 1
-fi
-
 ARTIFACT_DIR="/oci/artifact"
 mkdir -p $ARTIFACT_DIR
 oras pull $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
