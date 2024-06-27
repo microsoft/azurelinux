@@ -28086,8 +28086,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.4.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.1.tar.gz"
+          "version": "103.4.2",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.2.tar.gz"
         }
       }
     },
