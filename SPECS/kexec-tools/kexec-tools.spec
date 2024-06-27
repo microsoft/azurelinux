@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -331,6 +331,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Jun 04 2024 Chris Co <chrco@microsoft.com> - 2.0.27-6
+- Turn off force_no_rebuild and fix kdump initramfs image target path
+
 * Wed Apr 03 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.0.27-5
 - Exclude makedumpfile-R.pl script to avoid an implicit dependency on perl
 
