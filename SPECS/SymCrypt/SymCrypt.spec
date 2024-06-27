@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.4.1
-Release:        2%{?dist}
+Version:        103.4.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,6 +78,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Wed Jun 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.2-1
+- Update SymCrypt to v103.4.2 for FIPS certification
+
 * Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-2
 - Disable outline atomics in aarch64 builds
 
