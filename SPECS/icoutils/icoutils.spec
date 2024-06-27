@@ -1,7 +1,7 @@
 Summary:        Utility for extracting and converting Microsoft icon and cursor files
 Name:           icoutils
 Version:        0.32.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ make install DESTDIR=%{buildroot}
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 0.32.3-9
+- Dash Roll for sodiff findings
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32.3-8
 - Cleaning-up spec. License verified.
 
