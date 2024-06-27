@@ -8,8 +8,8 @@ ARTIFACT_DIR="/oci/artifact"
 mkdir -p $ARTIFACT_DIR
 oras pull $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
 
-# Find the VHDX file matching the pattern 'core-*.vhdx'.
-VHDX_PATH=$(find $ARTIFACT_DIR -type f -name 'core-*.vhdx' -print -quit)
+# Find the VHDX file matching the pattern 'image.vhdx'.
+VHDX_PATH=$(find $ARTIFACT_DIR -type f -name 'image.vhdx' -print -quit)
 
 # Check if the VHDX file exists and confirm it's an expected file from an OCI
 # artifact. This check acts as a validation of both the presence of the VHDX
