@@ -1,6 +1,6 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
-Version:        1.14.1
+Version:        1.14.4
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -8,6 +8,8 @@ Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-2879.patch
+
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  btrfs-progs-devel
@@ -24,7 +26,7 @@ Command line utility to inspect images and repositories directly on Docker
 registries without the need to pull them.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 tar --no-same-owner -xf %{SOURCE0}
@@ -46,6 +48,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Thu Jun 27 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.14.4-1
+- Upgrade to v1.14.4, address CVE-2022-2879
+
 * Tue Jan 30 2024 Henry Li <lihl@microsoft.com> - 1.14.1-1
 - Upgrade to v1.14.1
 
