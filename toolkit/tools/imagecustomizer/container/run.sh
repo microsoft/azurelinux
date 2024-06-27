@@ -27,7 +27,7 @@ mkdir -p $ARTIFACT_DIR
 # Pull the OCI artifact, and check if the pull was successful.
 oras pull $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to pull the base image artifact from $OCI_ARTIFACT_PATH"
+    echo "Error: Failed to fetch image with the provided version $version"
     exit 1
 fi
 
