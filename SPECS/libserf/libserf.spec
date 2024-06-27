@@ -1,7 +1,7 @@
 Summary:        A high performance C-based HTTP client library built upon the Apache Portable Runtime (APR) library
 Name:           libserf
 Version:        1.3.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://serf.apache.org/
 Group:          System Environment/Libraries
@@ -11,11 +11,9 @@ Source0:        https://www.apache.org/dist/serf/serf-%{version}.tar.bz2
 Requires:       openldap
 BuildRequires:  apr-devel
 BuildRequires:  apr-util-devel
-BuildRequires:  libdb-devel
 BuildRequires:  scons
 BuildRequires:  openssl-devel
 BuildRequires:  openldap
-Requires:       libdb
 
 %description
 The Apache Serf library is a C-based HTTP client library built upon the Apache
@@ -70,6 +68,9 @@ scons check
 
 
 %changelog
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.10-2
+- Remove dependency on 'libdb'.
+
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 1.3.10-1
 - Update to 1.3.10
 
