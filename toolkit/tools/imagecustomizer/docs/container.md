@@ -1,7 +1,7 @@
-# Using the Image Customizer Container
+# Using the Azure Linux Image Customizer Container
 
 The Image Customizer container is designed to simplify the process of
-customizing and configuring system images using the Mariner Image Customizer
+customizing and configuring system images using the Azure Linux Image Customizer
 (MIC) tool.
 
 ## Running the Container
@@ -22,7 +22,7 @@ see
 Pull the image:
 
 ```
-docker pull mcr.microsoft.com/azurelinux/imagecustomizer:<tag>
+docker pull mcr.microsoft.com/azurelinux/imagecustomizer:0.3.0
 ```
 
 You can use your own base image, for example:

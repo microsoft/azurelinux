@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # The first argument is expected to be a version tag like '2.0.20240615',
 # '2.0.latest', '3.0.20240615-rc', etc.
 VERSION_TAG=$1
@@ -21,14 +23,18 @@ OCI_ARTIFACT_PATH="mcr.microsoft.com/azurelinux/${MAJOR_VERSION}/image/minimal-o
 
 ARTIFACT_DIR="/oci/artifact"
 mkdir -p $ARTIFACT_DIR
+
+# Pull the OCI artifact, and check if the pull was successful.
 oras pull $OCI_ARTIFACT_PATH -o $ARTIFACT_DIR
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to pull the base image artifact from $OCI_ARTIFACT_PATH"
+    exit 1
+fi
 
 # Find the VHDX file matching the pattern 'image.vhdx'.
 VHDX_PATH=$(find $ARTIFACT_DIR -type f -name 'image.vhdx' -print -quit)
 
-# Check if the VHDX file exists and confirm it's an expected file from an OCI
-# artifact. This check acts as a validation of both the presence of the VHDX
-# file and the correct OCI artifact type.
+# Check if the VHDX base image file exists. 
 if [ ! -f $VHDX_PATH ]; then
     echo "Error: VHDX file not found at $VHDX_PATH"
     exit 1
