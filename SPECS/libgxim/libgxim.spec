@@ -1,7 +1,7 @@
 Summary:        GObject-based XIM protocol library
 Name:           libgxim
 Version:        0.5.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/gtk-doc/html/libgxim
 
 %changelog
+* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 0.5.0-21
+- Dash Roll for sodiff findings
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-20
 - License verified
 - Lint spec

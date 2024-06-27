@@ -3,7 +3,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -866,6 +866,9 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 5.12.0-10
+- Dash Roll for sodiff findings
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.0-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

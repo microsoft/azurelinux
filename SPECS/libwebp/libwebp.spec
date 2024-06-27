@@ -1,7 +1,7 @@
 Summary:        Library to encode and decode webP format images
 Name:           libwebp
 Version:        1.3.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 1.3.2-2
+- Dash Roll for sodiff findings
+
 * Thu Sep 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
 - Auto-upgrade to 1.3.2 - Upgrade to address CVE-2023-4863
 

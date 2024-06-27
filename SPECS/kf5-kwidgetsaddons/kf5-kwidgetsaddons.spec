@@ -3,7 +3,7 @@
 
 Name:           kf5-%{framework}
 Version:        5.61.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with various classes on top of QtWidgets
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
@@ -68,6 +68,9 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
+* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 5.61.0-4
+- Dash Roll for sodiff findings
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.

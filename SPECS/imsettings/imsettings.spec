@@ -2,7 +2,7 @@
 Summary:        Delivery framework for general Input Method configuration
 Name:           imsettings
 Version:        1.8.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -314,6 +314,9 @@ fi
 
 
 %changelog
+* Fri Jun 28 2024 Sam Meluch <sammeluch@microsoft.com> - 1.8.2-4
+- Dash Roll for sodiff findings
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.2-3
 - License verified
 - Lint spec
