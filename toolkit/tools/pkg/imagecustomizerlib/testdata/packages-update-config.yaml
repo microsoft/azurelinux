@@ -6,10 +6,10 @@ os:
     - which
 
     install:
-    - setools-console
+    - jq
 
     installLists:
-    - lists/dracut-fips.yaml
+    - lists/golang.yaml
 
     update:
-    - setools-console
+    - jq
