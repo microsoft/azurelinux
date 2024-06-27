@@ -2,5 +2,17 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
 RUN tdnf update -y && \
    tdnf install -y qemu-img rpm coreutils util-linux systemd openssl \
       sed createrepo_c squashfs-tools cdrkit parted e2fsprogs dosfstools \
-      xfsprogs zstd veritysetup
+      xfsprogs zstd veritysetup curl tar
+
+# Set environment variables for ORAS installation.
+ARG ARCH="amd64"
+ARG VERSION="1.1.0"
+
+# Install ORAS CLI tool.
+RUN curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_${ARCH}.tar.gz" && \
+    mkdir -p oras-install/ && \
+    tar -zxf oras_${VERSION}_linux_${ARCH}.tar.gz -C oras-install/ && \
+    sudo mv oras-install/oras /usr/local/bin/ && \
+    rm -rf oras_${VERSION}_linux_${ARCH}.tar.gz oras-install/
+
 COPY . /
