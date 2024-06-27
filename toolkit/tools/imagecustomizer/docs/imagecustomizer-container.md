@@ -2,9 +2,7 @@
 
 The Image Customizer container is designed to simplify the process of
 customizing and configuring system images using the Mariner Image Customizer
-(MIC) tool. This container can pull an OCI artifact that includes a VHDX file
-and then uses the MIC tool to customize the image based on provided
-configuration settings.
+(MIC) tool.
 
 ## Running the Container
 
@@ -35,20 +33,6 @@ docker run --rm --privileged=true \
    -v /dev:/dev \
    mcr.microsoft.com/azurelinux/imagecustomizer:0.3.0 \
    --image-file /baseimg.vhdx \
-   --config-file /config.yaml \
-   --output-image-format raw \
-   --output-image-file /image/customized.raw
-```
-
-Or you can also use our default minimal-os as the base image, for example:
-
-```
-docker run --rm --privileged=true \
-   -v ~/image:/image:z \
-   -v /dev:/dev \
-   mcr.microsoft.com/azurelinux/imagecustomizer:0.3.0 \
-   /process-oci-artifact.sh \
-   mcr.microsoft.com/azurelinux/image/minimal-os:latest \
    --config-file /config.yaml \
    --output-image-format raw \
    --output-image-file /image/customized.raw
