@@ -1,0 +1,745 @@
+commit 3df6492e1ef6f027629d81f0834636e791bdd4f3
+Author: Luboš Uhliarik <luhliari@redhat.com>
+Date:   Wed Oct 25 12:45:58 2023 +0200
+
+    Add lmdb support
+
+diff --git a/Makefile.in b/Makefile.in
+index 811ca1d..3be9864 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -39,6 +39,7 @@ LDADD_dbd_odbc = @LDADD_dbd_odbc@
+ LDADD_dbm_db = @LDADD_dbm_db@
+ LDADD_dbm_gdbm = @LDADD_dbm_gdbm@
+ LDADD_dbm_ndbm = @LDADD_dbm_ndbm@
++LDADD_dbm_lmdb = @LDADD_dbm_lmdb@
+ LDADD_ldap = @LDADD_ldap@
+ LDADD_crypto_openssl = @LDADD_crypto_openssl@
+ LDADD_crypto_nss = @LDADD_crypto_nss@
+diff --git a/build-outputs.mk b/build-outputs.mk
+index a8ae1c9..4aedd4a 100644
+--- a/build-outputs.mk
++++ b/build-outputs.mk
+@@ -145,6 +145,12 @@ MODULE_dbm_ndbm = dbm/apr_dbm_ndbm.la
+ dbm/apr_dbm_ndbm.la: dbm/apr_dbm_ndbm.lo
+ 	$(LINK_MODULE) -o $@ $(OBJECTS_dbm_ndbm) $(LDADD_dbm_ndbm)
+ 
++dbm/apr_dbm_lmdb.lo: dbm/apr_dbm_lmdb.c .make.dirs include/apr_dbm.h include/private/apr_dbm_private.h
++OBJECTS_dbm_lmdb = dbm/apr_dbm_lmdb.lo
++MODULE_dbm_lmdb = dbm/apr_dbm_lmdb.la
++dbm/apr_dbm_lmdb.la: dbm/apr_dbm_lmdb.lo
++	$(LINK_MODULE) -o $@ $(OBJECTS_dbm_lmdb) $(LDADD_dbm_lmdb)
++
+ BUILD_DIRS = buckets crypto dbd dbm dbm/sdbm encoding hooks ldap memcache misc redis strmatch uri xlate xml
+ 
+ .make.dirs: $(srcdir)/build-outputs.mk
+diff --git a/build.conf b/build.conf
+index 86e8c34..60e6084 100644
+--- a/build.conf
++++ b/build.conf
+@@ -41,7 +41,7 @@ headers = include/*.h include/private/*.h
+ modules =
+   ldap crypto_openssl crypto_nss crypto_commoncrypto dbd_pgsql
+   dbd_sqlite2 dbd_sqlite3 dbd_oracle dbd_mysql dbd_odbc
+-  dbm_db dbm_gdbm dbm_ndbm
++  dbm_db dbm_gdbm dbm_ndbm dbm_lmdb
+ 
+ # gen_uri_delim.c
+ 
+@@ -102,3 +102,6 @@ paths = ldap/apr_ldap_init.c
+         ldap/apr_ldap_rebind.c
+ target = ldap/apr_ldap.la
+ 
++[dbm_lmdb]
++paths = dbm/apr_dbm_lmdb.c
++target = dbm/apr_dbm_lmdb.la
+diff --git a/build/dbm.m4 b/build/dbm.m4
+index ffdbdbc..247fe18 100644
+--- a/build/dbm.m4
++++ b/build/dbm.m4
+@@ -498,11 +498,13 @@ dnl APU_CHECK_DBM: see what kind of DBM backend to use for apr_dbm.
+ dnl
+ AC_DEFUN([APU_CHECK_DBM], [
+   apu_use_sdbm=0
++  apu_use_lmdb=0
+   apu_use_ndbm=0
+   apu_use_gdbm=0
+   apu_use_db=0
+   dnl it's in our codebase
+   apu_have_sdbm=1
++  apu_have_lmdb=0
+   apu_have_gdbm=0
+   apu_have_ndbm=0
+   apu_have_db=0
+@@ -514,7 +516,7 @@ AC_DEFUN([APU_CHECK_DBM], [
+   # Although we search for all versions up to 6.9,
+   # we should only include existing versions in our
+   # help string.
+-  dbm_list="sdbm, gdbm, ndbm, db, db1, db185, db2, db3, db4"
++  dbm_list="sdbm, lmdb, gdbm, ndbm, db, db1, db185, db2, db3, db4"
+   db_max_version=48
+   db_min_version=41
+   db_version="$db_min_version"
+@@ -541,7 +543,7 @@ AC_DEFUN([APU_CHECK_DBM], [
+   done
+ 
+   AC_ARG_WITH(dbm, [APR_HELP_STRING([--with-dbm=DBM], [choose the DBM type to use.
+-      DBM={sdbm,gdbm,ndbm,db,db1,db185,db2,db3,db4,db4X,db5X,db6X} for some X=0,...,9])],
++      DBM={sdbm,lmdb,gdbm,ndbm,db,db1,db185,db2,db3,db4,db4X,db5X,db6X} for some X=0,...,9])],
+   [
+     if test "$withval" = "yes"; then
+       AC_MSG_ERROR([--with-dbm needs to specify a DBM type to use.
+@@ -552,6 +554,35 @@ AC_DEFUN([APU_CHECK_DBM], [
+     requested=default
+   ])
+ 
++  AC_ARG_WITH([lmdb], [APR_HELP_STRING([--with-lmdb=DIR], [enable LMDB support])],
++  [
++    apu_have_lmdb=0
++    if test "$withval" = "yes"; then
++      AC_CHECK_HEADER(lmdb.h, AC_CHECK_LIB(lmdb, mdb_dbi_open, [apu_have_lmdb=1]))
++    elif test "$withval" = "no"; then
++      apu_have_lmdb=0
++    else
++      saved_cppflags="$CPPFLAGS"
++      saved_ldflags="$LDFLAGS"
++      CPPFLAGS="$CPPFLAGS -I$withval/include"
++      LDFLAGS="$LDFLAGS -L$withval/lib "
++
++      AC_MSG_CHECKING(checking for lmdb in $withval)
++      AC_CHECK_HEADER(lmdb.h, AC_CHECK_LIB(lmdb, mdb_dbi_open, [apu_have_lmdb=1]))
++      if test "$apu_have_lmdb" != "0"; then
++        APR_ADDTO(LDFLAGS, [-L$withval/lib])
++        APR_ADDTO(INCLUDES, [-I$withval/include])
++      fi
++      CPPFLAGS="$saved_cppflags"
++      LDFLAGS="$saved_ldflags"
++    fi
++
++    if test "$requested" = "lmdb" -a "$apu_have_lmdb" = 0; then
++       AC_MSG_ERROR([LMDB requested, but not found])
++    fi
++  ])
++
++
+   dnl We don't pull in GDBM unless the user asks for it, since it's GPL
+   AC_ARG_WITH([gdbm], [APR_HELP_STRING([--with-gdbm=DIR], [enable GDBM support])],
+   [
+@@ -668,6 +699,7 @@ AC_DEFUN([APU_CHECK_DBM], [
+     fi
+ 
+     if test "$apu_want_db" != "0"; then
++      AC_MSG_NOTICE([checking for Berkeley DB $requested in $user_places])
+       APU_CHECK_DB($requested, $user_places)
+       if test "$apu_have_db" = "0"; then
+         AC_ERROR(Berkeley DB not found.)
+@@ -680,7 +712,7 @@ AC_DEFUN([APU_CHECK_DBM], [
+   fi
+ 
+   case "$requested" in
+-    sdbm | gdbm | ndbm | db)
++    lmdb | sdbm | gdbm | ndbm | db)
+       eval "apu_use_$requested=1"
+       apu_default_dbm=$requested
+       ;;
+@@ -709,11 +741,13 @@ AC_DEFUN([APU_CHECK_DBM], [
+   AC_MSG_CHECKING(for default DBM)
+   AC_MSG_RESULT($apu_default_dbm)
+ 
++  AC_SUBST(apu_use_lmdb)
+   AC_SUBST(apu_use_sdbm)
+   AC_SUBST(apu_use_gdbm)
+   AC_SUBST(apu_use_ndbm)
+   AC_SUBST(apu_use_db)
+ 
++  AC_SUBST(apu_have_lmdb)
+   AC_SUBST(apu_have_sdbm)
+   AC_SUBST(apu_have_gdbm)
+   AC_SUBST(apu_have_ndbm)
+@@ -738,8 +772,13 @@ AC_DEFUN([APU_CHECK_DBM], [
+     APR_ADDTO(LDADD_dbm_ndbm, [-l$apu_ndbm_lib])
+   fi
+ 
++  if test "$apu_have_lmdb" = "1"; then
++    APR_ADDTO(LDADD_dbm_lmdb, [-llmdb])
++  fi
++
+   AC_SUBST(LDADD_dbm_db)
+   AC_SUBST(LDADD_dbm_gdbm)
+   AC_SUBST(LDADD_dbm_ndbm)
++  AC_SUBST(LDADD_dbm_lmdb)
+ ])
+ 
+diff --git a/build/dso.m4 b/build/dso.m4
+index 2c5df6b..7ac6e03 100644
+--- a/build/dso.m4
++++ b/build/dso.m4
+@@ -60,6 +60,7 @@ yes
+      test $apu_have_db = 1 && objs="$objs dbm/apr_dbm_berkeleydb.lo"
+      test $apu_have_gdbm = 1 && objs="$objs dbm/apr_dbm_gdbm.lo"
+      test $apu_have_ndbm = 1 && objs="$objs dbm/apr_dbm_ndbm.lo"
++     test $apu_have_lmdb = 1 && objs="$objs dbm/apr_dbm_lmdb.lo"
+      test $apu_has_ldap = 1 && objs="$objs ldap/apr_ldap_init.lo"
+      test $apu_has_ldap = 1 && objs="$objs ldap/apr_ldap_option.lo"
+      test $apu_has_ldap = 1 && objs="$objs ldap/apr_ldap_rebind.lo"
+@@ -81,11 +82,11 @@ yes
+ 
+      APRUTIL_LIBS="$APRUTIL_LIBS $LDADD_crypto_openssl $LDADD_crypto_nss $LDADD_crypto_commoncrypto"
+      APRUTIL_LIBS="$APRUTIL_LIBS $LDADD_dbd_pgsql $LDADD_dbd_sqlite2 $LDADD_dbd_sqlite3 $LDADD_dbd_oracle $LDADD_dbd_mysql $LDADD_dbd_odbc"
+-     APRUTIL_LIBS="$APRUTIL_LIBS $LDADD_dbm_db $LDADD_dbm_gdbm $LDADD_dbm_ndbm"
++     APRUTIL_LIBS="$APRUTIL_LIBS $LDADD_dbm_db $LDADD_dbm_gdbm $LDADD_dbm_ndbm $LDADD_dbm_lmdb"
+      APRUTIL_LIBS="$APRUTIL_LIBS $LDADD_ldap"
+      APRUTIL_EXPORT_LIBS="$APRUTIL_EXPORT_LIBS $LDADD_crypto_openssl $LDADD_crypto_nss $LDADD_crypto_commoncrypto"
+      APRUTIL_EXPORT_LIBS="$APRUTIL_EXPORT_LIBS $LDADD_dbd_pgsql $LDADD_dbd_sqlite2 $LDADD_dbd_sqlite3 $LDADD_dbd_oracle $LDADD_dbd_mysql $LDADD_dbd_odbc"
+-     APRUTIL_EXPORT_LIBS="$APRUTIL_EXPORT_LIBS $LDADD_dbm_db $LDADD_dbm_gdbm $LDADD_dbm_ndbm"
++     APRUTIL_EXPORT_LIBS="$APRUTIL_EXPORT_LIBS $LDADD_dbm_db $LDADD_dbm_gdbm $LDADD_dbm_ndbm $LDADD_dbm_lmdb"
+      APRUTIL_EXPORT_LIBS="$APRUTIL_EXPORT_LIBS $LDADD_ldap"
+ 
+   else
+@@ -104,6 +105,7 @@ yes
+      test $apu_have_db = 1 && dsos="$dsos dbm/apr_dbm_db.la"
+      test $apu_have_gdbm = 1 && dsos="$dsos dbm/apr_dbm_gdbm.la"
+      test $apu_have_ndbm = 1 && dsos="$dsos dbm/apr_dbm_ndbm.la"
++     test $apu_have_lmdb = 1 && dsos="$dsos dbm/apr_dbm_lmdb.la"
+      test $apu_has_ldap = 1 && dsos="$dsos ldap/apr_ldap.la"
+ 
+      if test -n "$dsos"; then
+diff --git a/dbm/apr_dbm.c b/dbm/apr_dbm.c
+index 8b58f83..c846dd0 100644
+--- a/dbm/apr_dbm.c
++++ b/dbm/apr_dbm.c
+@@ -53,6 +53,9 @@
+ #elif APU_USE_SDBM
+ #define DBM_VTABLE apr_dbm_type_sdbm
+ #define DBM_NAME   "sdbm"
++#elif APU_USE_LMDB
++#define DBM_VTABLE apr_dbm_type_lmdb
++#define DBM_NAME   "lmdb"
+ #else /* Not in the USE_xDBM list above */
+ #error a DBM implementation was not specified
+ #endif
+@@ -85,6 +88,9 @@ static apr_status_t dbm_open_type(apr_dbm_type_t const* * vtable,
+     if (!strcasecmp(type, "default"))     *vtable = &DBM_VTABLE;
+ #if APU_HAVE_DB
+     else if (!strcasecmp(type, "db"))     *vtable = &apr_dbm_type_db;
++#endif
++#if APU_HAVE_LMDB
++    else if (!strcasecmp(type, "lmdb"))   *vtable = &apr_dbm_type_lmdb;
+ #endif
+     else if (*type && !strcasecmp(type + 1, "dbm")) {
+ #if APU_HAVE_GDBM
+@@ -112,6 +118,7 @@ static apr_status_t dbm_open_type(apr_dbm_type_t const* * vtable,
+ 
+     if (!strcasecmp(type, "default"))        type = DBM_NAME;
+     else if (!strcasecmp(type, "db"))        type = "db";
++    else if (!strcasecmp(type, "lmdb"))      type = "lmdb";
+     else if (*type && !strcasecmp(type + 1, "dbm")) {
+         if      (*type == 'G' || *type == 'g') type = "gdbm"; 
+         else if (*type == 'N' || *type == 'n') type = "ndbm"; 
+diff --git a/dbm/apr_dbm_lmdb.c b/dbm/apr_dbm_lmdb.c
+new file mode 100644
+index 0000000..fe76779
+--- /dev/null
++++ b/dbm/apr_dbm_lmdb.c
+@@ -0,0 +1,376 @@
++/* Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "apr_strings.h"
++#define APR_WANT_MEMFUNC
++#include "apr_want.h"
++#include <stdio.h>
++
++#if APR_HAVE_STDLIB_H
++#include <stdlib.h> /* for abort() */
++#endif
++
++#include "apu.h"
++
++#if APU_HAVE_LMDB
++
++#include <lmdb.h>
++
++#include "apr_dbm_private.h"
++
++typedef struct {
++    MDB_dbi dbi;
++    MDB_cursor *cursor;
++    MDB_txn *txn;
++    MDB_env *env;
++} real_file_t;
++
++
++#define APR_DBM_LMDBMODE_RO       MDB_RDONLY
++#define APR_DBM_LMDBMODE_RWCREATE MDB_CREATE
++#define APR_DBM_LMDBMODE_RW       (MDB_RDONLY + MDB_CREATE + 1)
++#define APR_DBM_LMDBMODE_RWTRUNC  (APR_DBM_LMDBMODE_RW + 1)
++
++/* --------------------------------------------------------------------------
++**
++** UTILITY FUNCTIONS
++*/
++
++/* Map a DB error to an apr_status_t */
++static apr_status_t db2s(int dberr)
++{
++    /* MDB_* error codes are negative, which are mapped to EGENERAL;
++     * positive error codes are errno which maps directly to
++     * apr_status_t. MDB_ codes could be mapped to some status code
++     * region. */
++    return dberr < 0 ? APR_EGENERAL : dberr;
++}
++
++/* Handle the return code of an mdb_* function (dberr), store the
++ * error string for access via apr_dbm_geterror(), return translated
++ * to an apr_status_t. */
++static apr_status_t set_error(apr_dbm_t *dbm, int dberr)
++{
++    if ((dbm->errcode = dberr) == MDB_SUCCESS) {
++        dbm->errmsg = NULL;
++    }
++    else {
++        dbm->errmsg = mdb_strerror(dberr);
++    }
++
++    return db2s(dberr);
++}
++
++
++/* --------------------------------------------------------------------------
++**
++** DEFINE THE VTABLE FUNCTIONS FOR LMDB
++**
++*/
++
++#define DEFAULT_ENV_FLAGS (MDB_NOSUBDIR|MDB_NOSYNC)
++
++static apr_status_t vt_lmdb_open(apr_dbm_t **pdb, const char *pathname,
++                                 apr_int32_t mode, apr_fileperms_t perm,
++                                 apr_pool_t *pool)
++{
++    real_file_t file;
++    int dbi_open_flags = 0;
++    int dbmode = 0;
++    int truncate = 0;
++
++    *pdb = NULL;
++    switch (mode) {
++    case APR_DBM_READONLY:
++        dbmode = APR_DBM_LMDBMODE_RO;
++        break;
++    case APR_DBM_READWRITE:
++        dbmode = APR_DBM_LMDBMODE_RW;
++        break;
++    case APR_DBM_RWCREATE:
++        dbi_open_flags = APR_DBM_LMDBMODE_RWCREATE;
++        break;
++    case APR_DBM_RWTRUNC:
++        truncate = APR_DBM_LMDBMODE_RWTRUNC;
++        break;
++    default:
++        return APR_EINVAL;
++    }
++
++    {
++        int dberr;
++        file.txn = NULL;
++        file.cursor = NULL;
++        file.env = NULL;
++
++        dberr = mdb_env_create(&file.env);
++        if (dberr == 0) {
++            /*   Default to 2GB map size which limits the total database
++             *   size to something reasonable. */
++            dberr = mdb_env_set_mapsize(file.env, INT32_MAX);
++        }
++
++        if (dberr == 0) {
++            dberr = mdb_env_open(file.env, pathname, dbmode | DEFAULT_ENV_FLAGS, apr_posix_perms2mode(perm));
++        }
++
++        if (dberr == 0) {
++            dberr = mdb_txn_begin(file.env, NULL, dbmode, &file.txn);
++        }
++
++        if (dberr == 0) {
++            dberr = mdb_dbi_open(file.txn, NULL, dbi_open_flags, &file.dbi);
++
++            /* if mode == APR_DBM_RWTRUNC, drop database */
++            if ((dberr == 0) && truncate) {
++                dberr = mdb_drop(file.txn, file.dbi, 0);
++                if (dberr != 0) {
++                    mdb_dbi_close(file.env, file.dbi);
++                }
++            }
++        }
++
++        if (dberr != 0) {
++            /* close the env handler */
++            if (file.env) 
++                mdb_env_close(file.env);
++
++            return db2s(dberr);
++        }
++    }
++
++    /* we have an open database... return it */
++    *pdb = apr_pcalloc(pool, sizeof(**pdb));
++    (*pdb)->pool = pool;
++    (*pdb)->type = &apr_dbm_type_lmdb;
++    (*pdb)->file = apr_pmemdup(pool, &file, sizeof(file));
++
++    /* ### register a cleanup to close the DBM? */
++
++    return APR_SUCCESS;
++}
++
++static void vt_lmdb_close(apr_dbm_t *dbm)
++{
++    real_file_t *f = dbm->file;
++
++    /* try to commit all transactions that haven't been commited yet on close */
++    if (f->txn) {
++       mdb_txn_commit(f->txn);
++       f->txn = NULL;
++       f->cursor = NULL;
++    }
++
++    if (f->cursor) {
++        mdb_cursor_close(f->cursor);
++        f->cursor = NULL;
++    }
++
++    mdb_dbi_close(f->env, f->dbi);
++    mdb_env_close(f->env);
++
++    f->env = NULL;
++    f->dbi = 0;
++}
++
++static apr_status_t vt_lmdb_fetch(apr_dbm_t *dbm, apr_datum_t key,
++                                  apr_datum_t * pvalue)
++{
++    real_file_t *f = dbm->file;
++    MDB_val ckey = { 0 };
++    MDB_val rd = { 0 };
++    int dberr;
++
++    ckey.mv_data = key.dptr;
++    ckey.mv_size = key.dsize;
++
++    dberr = mdb_get(f->txn, f->dbi, &(ckey), &(rd));
++
++    /* "not found" is not an error. return zero'd value. */
++    if (dberr == MDB_NOTFOUND) {
++        memset(&rd, 0, sizeof(rd));
++        dberr = 0;
++    }
++
++    pvalue->dptr = rd.mv_data;
++    pvalue->dsize = rd.mv_size;
++
++    /* store the error info into DBM, and return a status code. Also, note
++       that *pvalue should have been cleared on error. */
++    return set_error(dbm, dberr);
++}
++
++static apr_status_t vt_lmdb_store(apr_dbm_t *dbm, apr_datum_t key,
++                                  apr_datum_t value)
++{
++    real_file_t *f = dbm->file;
++    int rv;
++    MDB_val ckey = { 0 };
++    MDB_val cvalue = { 0 };
++
++    ckey.mv_data = key.dptr;
++    ckey.mv_size = key.dsize;
++
++    cvalue.mv_data = value.dptr;
++    cvalue.mv_size = value.dsize;
++
++    if ((rv = mdb_put(f->txn, f->dbi, &ckey, &cvalue, 0)) == 0) {
++        /* commit transaction */
++        if ((rv = mdb_txn_commit(f->txn)) == MDB_SUCCESS) {
++            f->cursor = NULL;
++            rv = mdb_txn_begin(f->env, NULL, 0, &f->txn);
++        }
++
++        /* if mdb_txn_commit OR mdb_txn_begin fails ... */
++        if (rv != MDB_SUCCESS) {
++            f->txn = NULL;
++        }
++    }
++
++    /* store any error info into DBM, and return a status code. */
++    return set_error(dbm, rv);
++}
++
++static apr_status_t vt_lmdb_del(apr_dbm_t *dbm, apr_datum_t key)
++{
++    real_file_t *f = dbm->file;
++    int rv;
++    MDB_val ckey = { 0 };
++
++    ckey.mv_data = key.dptr;
++    ckey.mv_size = key.dsize;
++
++    if ((rv = mdb_del(f->txn, f->dbi, &ckey, NULL)) == 0) {
++        /* commit transaction */
++        if ((rv = mdb_txn_commit(f->txn)) == MDB_SUCCESS) {
++            f->cursor = NULL;
++            rv = mdb_txn_begin(f->env, NULL, 0, &f->txn);
++        }
++
++        /* if mdb_txn_commit OR mdb_txn_begin fails ... */
++        if (rv != MDB_SUCCESS) {
++            f->txn = NULL;
++        }
++    }
++
++    /* store any error info into DBM, and return a status code. */
++    return set_error(dbm, rv);
++}
++
++static int vt_lmdb_exists(apr_dbm_t *dbm, apr_datum_t key)
++{
++    real_file_t *f = dbm->file;
++    MDB_val ckey = { 0 };   /* converted key */
++    MDB_val data = { 0 };
++    int dberr;
++
++    ckey.mv_data = key.dptr;
++    ckey.mv_size = key.dsize;
++
++    dberr = mdb_get(f->txn, f->dbi, &(ckey), &(data));
++
++    /* note: the result data is "loaned" to us; we don't need to free it */
++
++    /* DB returns DB_NOTFOUND if it doesn't exist. but we want to say
++       that *any* error means it doesn't exist. */
++    return dberr == 0;
++}
++
++static apr_status_t vt_lmdb_firstkey(apr_dbm_t *dbm, apr_datum_t * pkey)
++{
++    real_file_t *f = dbm->file;
++    MDB_val first, data;
++    int dberr;
++
++    if ((dberr = mdb_cursor_open(f->txn, f->dbi, &f->cursor)) == 0) {
++        dberr = mdb_cursor_get(f->cursor, &first, &data, MDB_FIRST);
++        if (dberr == MDB_NOTFOUND) {
++            memset(&first, 0, sizeof(first));
++            mdb_cursor_close(f->cursor);
++            f->cursor = NULL;
++            dberr = 0;
++        }
++    }
++    else {
++        /* clear first if mdb_cursor_open fails */
++        memset(&first, 0, sizeof(first));
++    }
++
++    pkey->dptr = first.mv_data;
++    pkey->dsize = first.mv_size;
++
++    /* store any error info into DBM, and return a status code. */
++    return set_error(dbm, dberr);
++}
++
++static apr_status_t vt_lmdb_nextkey(apr_dbm_t *dbm, apr_datum_t * pkey)
++{
++    real_file_t *f = dbm->file;
++    MDB_val ckey, data;
++    int dberr;
++
++    ckey.mv_data = pkey->dptr;
++    ckey.mv_size = pkey->dsize;
++
++    if (f->cursor == NULL) {
++        return APR_EINVAL;
++    }
++
++    dberr = mdb_cursor_get(f->cursor, &ckey, &data, MDB_NEXT);
++    if (dberr == MDB_NOTFOUND) {
++        mdb_cursor_close(f->cursor);
++        f->cursor = NULL;
++        dberr = 0;
++        ckey.mv_data = NULL;
++        ckey.mv_size = 0;
++    }
++
++    pkey->dptr = ckey.mv_data;
++    pkey->dsize = ckey.mv_size;
++
++    /* store any error info into DBM, and return a status code. */
++    return set_error(dbm, dberr);
++}
++
++static void vt_lmdb_freedatum(apr_dbm_t *dbm, apr_datum_t data)
++{
++    /* nothing to do */
++}
++
++static void vt_lmdb_usednames(apr_pool_t *pool, const char *pathname,
++                              const char **used1, const char **used2)
++{
++    *used1 = apr_pstrdup(pool, pathname);
++    *used2 = apr_pstrcat(pool, pathname, "-lock", NULL);
++}
++
++
++APU_MODULE_DECLARE_DATA const apr_dbm_type_t apr_dbm_type_lmdb = {
++    "lmdb",
++
++    vt_lmdb_open,
++    vt_lmdb_close,
++    vt_lmdb_fetch,
++    vt_lmdb_store,
++    vt_lmdb_del,
++    vt_lmdb_exists,
++    vt_lmdb_firstkey,
++    vt_lmdb_nextkey,
++    vt_lmdb_freedatum,
++    vt_lmdb_usednames
++};
++
++#endif /* APU_HAVE_LMDB */
+diff --git a/include/apr_dbm.h b/include/apr_dbm.h
+index ad1b4f3..fba0cdd 100644
+--- a/include/apr_dbm.h
++++ b/include/apr_dbm.h
+@@ -64,6 +64,7 @@ typedef struct
+  * @param type The type of the DBM (not all may be available at run time)
+  * <pre>
+  *  db   for Berkeley DB files
++ *  lmdb for LMDB files
+  *  gdbm for GDBM files
+  *  ndbm for NDBM files
+  *  sdbm for SDBM files (always available)
+diff --git a/include/apu.h.in b/include/apu.h.in
+index 184682d..cb89779 100644
+--- a/include/apu.h.in
++++ b/include/apu.h.in
+@@ -100,6 +100,7 @@
+  * we always have SDBM (it's in our codebase)
+  */
+ #define APU_HAVE_SDBM   @apu_have_sdbm@
++#define APU_HAVE_LMDB   @apu_have_lmdb@
+ #define APU_HAVE_GDBM   @apu_have_gdbm@
+ #define APU_HAVE_NDBM   @apu_have_ndbm@
+ #define APU_HAVE_DB     @apu_have_db@
+diff --git a/include/apu.hnw b/include/apu.hnw
+index 0bc3a2c..c902bae 100644
+--- a/include/apu.hnw
++++ b/include/apu.hnw
+@@ -86,6 +86,7 @@
+ #define APU_HAVE_SDBM           1
+ 
+ #ifndef APU_DSO_MODULE_BUILD
++#define APU_HAVE_LMDB           0
+ #define APU_HAVE_GDBM           0
+ #define APU_HAVE_NDBM           0
+ #define APU_HAVE_DB             0
+diff --git a/include/apu.hw b/include/apu.hw
+index 21fbedf..e86bdb4 100644
+--- a/include/apu.hw
++++ b/include/apu.hw
+@@ -108,6 +108,7 @@
+ #define APU_HAVE_SDBM           1
+ 
+ #ifndef APU_DSO_MODULE_BUILD
++#define APU_HAVE_LMDB           0
+ #define APU_HAVE_GDBM           0
+ #define APU_HAVE_NDBM           0
+ #define APU_HAVE_DB             0
+diff --git a/include/apu.hwc b/include/apu.hwc
+index 2c3fa00..6eebe0b 100644
+--- a/include/apu.hwc
++++ b/include/apu.hwc
+@@ -108,6 +108,7 @@
+ #define APU_HAVE_SDBM           1
+ 
+ #ifndef APU_DSO_MODULE_BUILD
++#define APU_HAVE_LMDB           0
+ #define APU_HAVE_GDBM           0
+ #define APU_HAVE_NDBM           0
+ #define APU_HAVE_DB             0
+diff --git a/include/private/apr_dbm_private.h b/include/private/apr_dbm_private.h
+index 020d3a6..e2032b4 100644
+--- a/include/private/apr_dbm_private.h
++++ b/include/private/apr_dbm_private.h
+@@ -112,6 +112,7 @@ struct apr_dbm_t
+ APU_MODULE_DECLARE_DATA extern const apr_dbm_type_t apr_dbm_type_sdbm;
+ APU_MODULE_DECLARE_DATA extern const apr_dbm_type_t apr_dbm_type_gdbm;
+ APU_MODULE_DECLARE_DATA extern const apr_dbm_type_t apr_dbm_type_ndbm;
++APU_MODULE_DECLARE_DATA extern const apr_dbm_type_t apr_dbm_type_lmdb;
+ APU_MODULE_DECLARE_DATA extern const apr_dbm_type_t apr_dbm_type_db;
+ 
+ #ifdef __cplusplus
+diff --git a/include/private/apu_select_dbm.h.in b/include/private/apu_select_dbm.h.in
+index b69aec0..b431c61 100644
+--- a/include/private/apu_select_dbm.h.in
++++ b/include/private/apu_select_dbm.h.in
+@@ -21,6 +21,7 @@
+ ** The following macros control what features APRUTIL will use
+ */
+ #define APU_USE_SDBM    @apu_use_sdbm@
++#define APU_USE_LMDB    @apu_use_lmdb@
+ #define APU_USE_NDBM    @apu_use_ndbm@
+ #define APU_USE_GDBM    @apu_use_gdbm@
+ #define APU_USE_DB      @apu_use_db@
+diff --git a/test/testdbm.c b/test/testdbm.c
+index 4f6becb..df679f4 100644
+--- a/test/testdbm.c
++++ b/test/testdbm.c
+@@ -153,6 +153,9 @@ static void test_dbm_traversal(abts_case *tc, apr_dbm_t *db, dbm_table_t *table)
+ 
+         rv = apr_dbm_nextkey(db, &key);
+         ABTS_INT_EQUAL(tc, APR_SUCCESS, rv);
++
++        /** avoid infinite loop */
++        if (rv != APR_SUCCESS) break;
+     } while (1);
+ 
+     for (i = 0; i < NUM_TABLE_ROWS; i++) {
+@@ -170,6 +173,7 @@ static void test_dbm(abts_case *tc, void *data)
+     dbm_table_t *table;
+     const char *type = data;
+     const char *file = apr_pstrcat(p, "data/test-", type, NULL);
++    const char *nofile = apr_pstrcat(p, "data/no-such-test-", type, NULL);
+ 
+     rv = apr_dbm_open_ex(&db, type, file, APR_DBM_RWCREATE, APR_OS_DEFAULT, p);
+     ABTS_INT_EQUAL(tc, APR_SUCCESS, rv);
+@@ -198,12 +202,18 @@ static void test_dbm(abts_case *tc, void *data)
+     test_dbm_fetch(tc, db, table);
+ 
+     apr_dbm_close(db);
++
++    rv = apr_dbm_open_ex(&db, type, nofile, APR_DBM_READONLY, APR_FPROT_OS_DEFAULT, p);
++    ABTS_TRUE(tc, rv != APR_SUCCESS);
+ }
+ 
+ abts_suite *testdbm(abts_suite *suite)
+ {
+     suite = ADD_SUITE(suite);
+ 
++#if APU_HAVE_LMDB
++    abts_run_test(suite, test_dbm, "lmdb");
++#endif
+ #if APU_HAVE_GDBM
+     abts_run_test(suite, test_dbm, "gdbm");
+ #endif
