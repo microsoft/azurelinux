@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for Azure
 Name:           kernel-azure-signed-%{buildarch}
-Version:        5.15.160.1
+Version:        5.15.161.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Thu Jun 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.161.2-1
+- Auto-upgrade to 5.15.161.2
+
 * Sat Jun 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.160.1-1
 - Auto-upgrade to 5.15.160.1
 
