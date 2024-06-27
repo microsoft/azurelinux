@@ -3,7 +3,7 @@
 Summary:        Icon theme caching utility
 Name:           gtk-update-icon-cache
 Version:        3.24.26
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,9 @@ applications, the overall memory consumption is reduced as well.
 %{_bindir}/gtk-update-icon-cache
 
 %changelog
+* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 3.24.26-2
+- Dash Roll for sodiff findings
+
 * Fri May 21 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.26-1
 - Original version for CBL-Mariner
 - License verified
