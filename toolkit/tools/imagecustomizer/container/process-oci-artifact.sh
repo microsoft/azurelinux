@@ -1,5 +1,4 @@
 #!/bin/bash
-# entrypoint.sh
 
 # The first argument is expected to be the OCI artifact path.
 OCI_ARTIFACT_PATH=$1
