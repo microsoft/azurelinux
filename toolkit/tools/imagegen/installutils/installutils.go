@@ -542,7 +542,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	// Configure machine-id and other systemd state files
-	err = clearSystemdState(installChroot)
+	err = clearSystemdState(installChroot, config.EnableSystemdFirstboot)
 	if err != nil {
 		err = fmt.Errorf("failed to clean systemd files:\n%w", err)
 		return
@@ -784,12 +784,15 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 
 // clearSystemdState clears the systemd state files that should be unique to each instance of the image. This is
 // based on https://systemd.io/BUILDING_IMAGES/. Primarily, this function will ensure that /etc/machine-id is configured
-// correctly for first boot, and that random seed and credential files are removed if they exist.
-func clearSystemdState(installChroot *safechroot.Chroot) (err error) {
+// correctly, and that random seed and credential files are removed if they exist.
+// - installChroot is the chroot to modify
+// - enableSystemdFirstboot will set the machine-id file to "uninitialized" if true, and "" if false
+func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot bool) (err error) {
 	const (
-		machineIDFile           = "/etc/machine-id"
-		machineIDPresentContent = "uninitialized\n"
-		machineIDFilePerms      = 0444
+		machineIDFile         = "/etc/machine-id"
+		machineIDFirstBootOn  = "uninitialized\n"
+		machineIDFirstbootOff = ""
+		machineIDFilePerms    = 0444
 	)
 
 	// These state files are very unlikely to be present, but we should be thorough and check for them.
@@ -800,18 +803,16 @@ func clearSystemdState(installChroot *safechroot.Chroot) (err error) {
 		"/var/lib/systemd/credential.secret",
 	}
 
-	// machine-id:
-
 	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#Initialization:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
 	// should be either missing or an empty file in the generic file system
 	// image (the difference between the two options is described under
-	//"First Boot Semantics" below). An ID will be generated during boot and
+	// "First Boot Semantics" below). An ID will be generated during boot and
 	// saved to this file if possible. Having an empty file in place is useful
 	// because it allows a temporary file to be bind-mounted over the real file,
 	// in case the image is used read-only
-
+	//
 	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#First%20Boot%20Semantics:
 	//     etc/machine-id is used to decide whether a boot is the first one. The rules are as follows:
 	//     1. The kernel command argument systemd.condition-first-boot= may be used to override the autodetection logic,
@@ -827,7 +828,7 @@ func clearSystemdState(installChroot *safechroot.Chroot) (err error) {
 	//     5. If /etc/machine-id already contains a valid machine-id, this is not a first boot.
 	//     If according to the above rules a first boot is detected, units with ConditionFirstBoot=yes will be run and
 	//     systemd will perform additional initialization steps, in particular presetting units.
-
+	//
 	// However, the detailed guide for creating images (https://systemd.io/BUILDING_IMAGES/) suggests that the
 	// machine-id file should be "uninitialized\n" to trigger first-boot mode. This is because the machine-id file is
 	// used to determine if the image is being booted for the first time. If the file is empty, systemd will assume it
@@ -836,29 +837,33 @@ func clearSystemdState(installChroot *safechroot.Chroot) (err error) {
 
 	ReportAction("Clearing systemd state files for first boot")
 
+	// The systemd package will create this file, but if its not installed, we need to create it.
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
 		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
 		return
 	}
-
-	// If the machine-id file exists, we can assume the 'systemd' package is installed (since it is responsible for
-	// providing the file). Setting it to "uninitialized\n" will trigger first-boot mode the next time the image is
-	// booted. If the file does not exist, just create an empty file for mounting purposes.
-	if exists {
-		ReportActionf("Setting machine-id file to 'uninitialized'")
-		err = file.Write(machineIDPresentContent, filepath.Join(installChroot.RootDir(), machineIDFile))
-		if err != nil {
-			err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
-			return err
-		}
-	} else {
-		ReportAction("Creating empty machine-id file")
+	if !exists {
+		logger.Log.Debug("Creating empty machine-id file")
 		err = file.Create(filepath.Join(installChroot.RootDir(), machineIDFile), machineIDFilePerms)
 		if err != nil {
 			err = fmt.Errorf("failed to create empty machine-id:\n%w", err)
 			return err
 		}
+	}
+
+	var machineIdContent string
+	if enableSystemdFirstboot {
+		ReportActionf("Enabling systemd firstboot")
+		machineIdContent = machineIDFirstBootOn
+	} else {
+		ReportActionf("Disabling systemd firstboot")
+		machineIdContent = machineIDFirstbootOff
+	}
+	err = file.Write(machineIdContent, filepath.Join(installChroot.RootDir(), machineIDFile))
+	if err != nil {
+		err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
+		return err
 	}
 
 	// These files should not be present in the image, but we should be thorough and double-check.
