@@ -104,7 +104,7 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
-* Thus Jun 27 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-2
+* Thu Jun 27 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-2
 - Address CVE-2017-14623
 
 * Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-1
