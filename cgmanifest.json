@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "conntrack-tools",
-          "version": "1.4.5",
-          "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
+          "version": "1.4.8",
+          "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.8.tar.xz"
         }
       }
     },
@@ -6560,8 +6560,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8171,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.158.2.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -10241,8 +10241,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_conntrack",
-          "version": "1.0.8",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.8.tar.bz2"
+          "version": "1.0.9",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.9.tar.bz2"
         }
       }
     },
@@ -21114,8 +21114,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.28",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.28.tar.xz"
+          "version": "8.1.29",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.29.tar.xz"
         }
       }
     },
@@ -29557,8 +29557,8 @@
         "type": "other",
         "other": {
           "name": "vitess",
-          "version": "16.0.2",
-          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v16.0.2.tar.gz"
+          "version": "17.0.7",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v17.0.7.tar.gz"
         }
       }
     },
