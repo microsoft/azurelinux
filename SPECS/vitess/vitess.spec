@@ -25,7 +25,8 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz 
+Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2017-14623.patch 
 BuildRequires: golang
 
 %description
@@ -39,7 +40,10 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
@@ -52,10 +56,6 @@ rm -rf go/trace/plugin_datadog.go
 mv go/README.md README-go.md
 
 %build
-
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-
 export VERSION=%{version}
 
 for cmd in $(find go/cmd/* -maxdepth 0 -type d); do
