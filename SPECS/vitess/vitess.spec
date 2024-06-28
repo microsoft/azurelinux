@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -104,6 +104,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Thus Jun 27 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-2
+- Address CVE-2017-14623
+
 * Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-1
 - Auto-upgrade to 17.0.2 - Azure Linux 3.0 - package upgrades
 
