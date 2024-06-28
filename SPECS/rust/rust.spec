@@ -42,6 +42,7 @@ Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 #Patch0:         CVE-2023-45853.patch
+Patch0:         fix-ui-test.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -120,8 +121,8 @@ USER=root SUDO_USER=root %make_build
 %check
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
-mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors
+#mkdir -p .github/workflows
+#./x.py run src/tools/expand-yaml-anchors
 
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
