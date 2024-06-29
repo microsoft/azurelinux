@@ -59,9 +59,13 @@ ukify build \
       --output vmlinuz-uki.efi
 
 %install
-install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
+install -vdm 700 %{buildroot}/boot
+install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
+install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
+ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %files
+/boot/vmlinuz-uki-%{kernelver}.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
