@@ -1,0 +1,189 @@
+From 91f27004a5c88589658e38d68e46d223da6b75ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Matu=C5=A1ka?= <martin@matuska.org>
+Date: Sun, 21 Apr 2024 05:23:22 +0200
+Subject: [PATCH] Update AppleDouble support for directories (#2108)
+
+This is a clone of the reverted pull request #2100. Due to the latest
+circumstances we should require a more deep review of each new PR.
+
+---------
+
+Co-authored-by: Justin Vreeland <j_vreeland@apple.com>
+---
+ libarchive/archive_read_support_format_zip.c  | 13 ++-
+ libarchive/archive_write_disk_posix.c         |  3 +-
+ libarchive/test/test_write_disk_appledouble.c | 84 +++++++++++++++++++
+ .../test_write_disk_appledouble_zip.zip.uu    | 27 ++++++
+ 4 files changed, 125 insertions(+), 2 deletions(-)
+ create mode 100644 libarchive/test/test_write_disk_appledouble_zip.zip.uu
+
+diff --git a/libarchive/archive_read_support_format_zip.c b/libarchive/archive_read_support_format_zip.c
+index 212bfff9fa..d7b6f082ee 100644
+--- a/libarchive/archive_read_support_format_zip.c
++++ b/libarchive/archive_read_support_format_zip.c
+@@ -4083,6 +4083,17 @@ slurp_central_directory(struct archive_read *a, struct archive_entry* entry,
+ 			} else {
+ 				/* Generate resource fork name to find its
+ 				 * resource file at zip->tree_rsrc. */
++
++				/* If this is an entry ending with slash,
++				 * make the resource for name slash-less
++				 * as the actual resource fork doesn't end with '/'.
++				 */
++				size_t tmp_length = filename_length;
++				if (name[tmp_length - 1] == '/') {
++					tmp_length--;
++					r = rsrc_basename(name, tmp_length);
++				}
++
+ 				archive_strcpy(&(zip_entry->rsrcname),
+ 				    "__MACOSX/");
+ 				archive_strncat(&(zip_entry->rsrcname),
+@@ -4090,7 +4101,7 @@ slurp_central_directory(struct archive_read *a, struct archive_entry* entry,
+ 				archive_strcat(&(zip_entry->rsrcname), "._");
+ 				archive_strncat(&(zip_entry->rsrcname),
+ 				    name + (r - name),
+-				    filename_length - (r - name));
++				    tmp_length - (r - name));
+ 				/* Register an entry to RB tree to sort it by
+ 				 * file offset. */
+ 				__archive_rb_tree_insert_node(&zip->tree,
+diff --git a/libarchive/archive_write_disk_posix.c b/libarchive/archive_write_disk_posix.c
+index 58265ee0dc..92db4ff05b 100644
+--- a/libarchive/archive_write_disk_posix.c
++++ b/libarchive/archive_write_disk_posix.c
+@@ -4427,7 +4427,8 @@ fixup_appledouble(struct archive_write_disk *a, const char *pathname)
+ #else
+ 		la_stat(datafork.s, &st) == -1 ||
+ #endif
+-	    (st.st_mode & AE_IFMT) != AE_IFREG)
++	    (((st.st_mode & AE_IFMT) != AE_IFREG) &&
++		((st.st_mode & AE_IFMT) != AE_IFDIR)))
+ 		goto skip_appledouble;
+
+ 	/*
+diff --git a/libarchive/test/test_write_disk_appledouble.c b/libarchive/test/test_write_disk_appledouble.c
+index 3265a94d2f..8de6c8b504 100644
+--- a/libarchive/test/test_write_disk_appledouble.c
++++ b/libarchive/test/test_write_disk_appledouble.c
+@@ -236,3 +236,87 @@ DEFINE_TEST(test_write_disk_appledouble)
+ 	assertEqualFile("hfscmp/file3", "nocmp/file3");
+ #endif
+ }
++
++/* Test writing apple doubles to disk from zip format */
++DEFINE_TEST(test_write_disk_appledouble_zip)
++{
++#if !defined(__APPLE__) || !defined(UF_COMPRESSED) || !defined(HAVE_SYS_XATTR_H)\
++	|| !defined(HAVE_ZLIB_H)
++	skipping("MacOS-specific AppleDouble test");
++#else
++	const char *refname = "test_write_disk_appledouble_zip.zip";
++	struct archive *ad, *a;
++	struct archive_entry *ae;
++	struct stat st;
++
++	extract_reference_file(refname);
++
++	/*
++	 * Extract an archive to disk.
++	 */
++	assert((ad = archive_write_disk_new()) != NULL);
++	assertEqualIntA(ad, ARCHIVE_OK,
++	    archive_write_disk_set_standard_lookup(ad));
++	assertEqualIntA(ad, ARCHIVE_OK,
++	    archive_write_disk_set_options(ad,
++		ARCHIVE_EXTRACT_TIME |
++		ARCHIVE_EXTRACT_SECURE_SYMLINKS |
++		ARCHIVE_EXTRACT_SECURE_NODOTDOT));
++
++	assert((a = archive_read_new()) != NULL);
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_support_filter_all(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_support_format_all(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_open_filename(a,
++	    refname, 512 * 20));
++
++	/* Skip The top level directory */
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualString("apple_double_dir/", archive_entry_pathname(ae));
++
++	/* Extract apple_double_test */
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualString("apple_double_dir/apple_double_dir_test/", archive_entry_pathname(ae));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_extract2(a, ae, ad));
++
++	/* Extract ._apple_double_dir_test which will be merged into apple_double_dir_test as metadata. */
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualString("apple_double_dir/._apple_double_dir_test", archive_entry_pathname(ae));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_extract2(a, ae, ad));
++
++	/* Extract test_file */
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualString("apple_double_dir/test_file", archive_entry_pathname(ae));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_extract2(a, ae, ad));
++
++	/* Extract ._test_file which will be merged into test_file as metadata. */
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_next_header(a, &ae));
++	assertEqualString("apple_double_dir/._test_file", archive_entry_pathname(ae));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_extract2(a, ae, ad));
++
++	assertEqualIntA(a, ARCHIVE_EOF, archive_read_next_header(a, &ae));
++	assertEqualIntA(a, ARCHIVE_OK, archive_read_close(a));
++	assertEqualInt(ARCHIVE_OK, archive_read_free(a));
++	assertEqualIntA(ad, ARCHIVE_OK, archive_write_free(ad));
++
++	/* Test test_file */
++	assertEqualInt(0, stat("apple_double_dir/test_file", &st));
++	assertFileSize("apple_double_dir/test_file", 5);
++	failure("'%s' should have Resource Fork", "test_file");
++	assertEqualInt(1, has_xattr("apple_double_dir/test_file", "com.apple.ResourceFork"));
++
++	/* Test apple_double_dir_test */
++	failure("'%s' should have quarantine xattr", "apple_double_dir_test");
++	assertEqualInt(1, has_xattr("apple_double_dir/apple_double_dir_test", "com.apple.quarantine"));
++
++	/* Test ._test_file. */
++	failure("'apple_double_dir/._test_file' should be merged and removed");
++	assertFileNotExists("apple_double_dir/._test_file");
++
++	/* Test ._apple_double_dir_test */
++	failure("'apple_double_dir/._._apple_double_dir_test' should be merged and removed");
++	assertFileNotExists("apple_double_dir/._apple_double_dir_test");
++
++	assertChdir("..");
++
++#endif
++}
+diff --git a/libarchive/test/test_write_disk_appledouble_zip.zip.uu b/libarchive/test/test_write_disk_appledouble_zip.zip.uu
+new file mode 100644
+index 0000000000..5ab67533d5
+--- /dev/null
++++ b/libarchive/test/test_write_disk_appledouble_zip.zip.uu
+@@ -0,0 +1,27 @@
++begin 644 test_write_disk_appledouble_zip.zip
++M4$L#!`H```````MM?%@````````````````1`!``87!P;&5?9&]U8FQE7V1I
++M<B]56`P`O=4%9K75!6;U`10`4$L#!`H```````MM?%@````````````````G
++M`!``87!P;&5?9&]U8FQE7V1I<B]A<'!L95]D;W5B;&5?9&ER7W1E<W0O55@,
++M`+W5!6:UU05F]0$4`%!+`P04``@`"``+;7Q8````````````````*``0`&%P
++M<&QE7V1O=6)L95]D:7(O+E]A<'!L95]D;W5B;&5?9&ER7W1E<W156`P`O=4%
++M9K75!6;U`10`8V`58V=@8F#P34Q6\`]6B%"``I`8`R<0&P%Q!1"#^*L8B`*.
++M(2%!4"9(QPP@%D)3PH@0%TW.S]5++"C(2=4K+$TL2LPKR<Q+92C4-S"P,+8V
++M@`)K:P8`4$L'"!2N=6M7````J@```%!+`P04``@`"`!93GQ8````````````
++M````&@`0`&%P<&QE7V1O=6)L95]D:7(O=&5S=%]F:6QE55@,`+'5!6;IGP5F
++M]0$4`"M)+2[A`@!02P<(QC6Y.P<````%````4$L#!!0`"``(`%E.?%@`````
++M```````````<`!``87!P;&5?9&]U8FQE7V1I<B\N7W1E<W1?9FEL9558#`"Q
++MU05FZ9\%9O4!%`!C8!5C9V!B8/!-3%;P#U:(4(`"D!@#)Q`;`;$;$(/X%4#,
++MQT`0.(:$!$&9%5",`8I2B_-+BY)3%=+RB[*Y`%!+!P@HPLP3/@```(8```!0
++M2P$"%0,*```````+;7Q8````````````````$0`,``````````!`[4$`````
++M87!P;&5?9&]U8FQE7V1I<B]56`@`O=4%9K75!6902P$"%0,*```````+;7Q8
++M````````````````)P`,``````````!`[4$_````87!P;&5?9&]U8FQE7V1I
++M<B]A<'!L95]D;W5B;&5?9&ER7W1E<W0O55@(`+W5!6:UU05F4$L!`A4#%``(
++M``@`"VU\6!2N=6M7````J@```"@`#```````````0*2!E````&%P<&QE7V1O
++M=6)L95]D:7(O+E]A<'!L95]D;W5B;&5?9&ER7W1E<W156`@`O=4%9K75!690
++M2P$"%0,4``@`"`!93GQ8QC6Y.P<````%````&@`,``````````!`I(%1`0``
++M87!P;&5?9&]U8FQE7V1I<B]T97-T7V9I;&556`@`L=4%9NF?!6902P$"%0,4
++M``@`"`!93GQ8*,+,$SX```"&````'``,``````````!`I(&P`0``87!P;&5?
++M9&]U8FQE7V1I<B\N7W1E<W1?9FEL9558"`"QU05FZ9\%9E!+!08`````!0`%
+++`+@!``!(`@``````
++`
++end

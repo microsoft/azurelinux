@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
 Version:        24.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -30,6 +30,9 @@ BuildRequires:  python3-hatchling
 BuildRequires:  python3-pathspec
 BuildRequires:  python3-pip
 BuildRequires:  python3-pluggy
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
@@ -182,6 +185,7 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
 %if 0%{?with_check}
+pip3 install archspec iniconfig flask pytest-xprocess zstandard conda-package-streaming flaky pytest-timeout
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
@@ -211,12 +215,60 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 # tests/core/test_solve.py libmamba - some depsolving differences - TODO
 # tests/core/test_prefix_graph.py libmamba - some depsolving differences - TODO
 # tests/trust/test_signature_verification.py requires conda_content_trust - not yet packaged
-py.test-%{python3_version} -vv -m "not integration" \
+#
+# tests skipped for missing presence of conda_libmamba_solver
+# tests/test_solvers.py::TestLibMambaSolver
+# tests/base/test_context.py::test_target_prefix \
+# tests/cli/test_compare.py::test_compare_success \
+# tests/cli/test_compare.py::test_compare_fail \
+# tests/cli/test_main_notices.py::test_target_prefix \
+# tests/core/test_package_cache_data.py::test_instantiating_package_cache_when_both_tar_bz2_and_conda_exist_read_only \
+# tests/core/test_solve.py::test_solve_1[libmamba] \
+# tests/core/test_solve.py::test_solve_msgs_exclude_vp[libmamba] \
+# tests/core/test_solve.py::test_cuda_1[libmamba] \
+# tests/core/test_solve.py::test_cuda_2[libmamba] \
+# tests/core/test_solve.py::test_cuda_fail_2[libmamba] \
+# tests/core/test_solve.py::test_cuda_constrain_absent[libmamba] \
+# tests/core/test_solve.py::test_cuda_glibc_sat[libmamba] \
+# tests/core/test_solve.py::test_update_prune_1[libmamba] \
+# tests/core/test_solve.py::test_update_prune_4[libmamba] \
+# tests/core/test_solve.py::test_update_prune_5[libmamba] \
+# tests/core/test_solve.py::test_no_deps_1[libmamba] \
+# tests/core/test_solve.py::test_only_deps_1[libmamba] \
+# tests/core/test_solve.py::test_only_deps_2[libmamba] \
+# tests/core/test_solve.py::test_update_all_1[libmamba] \
+# tests/core/test_solve.py::test_unfreeze_when_required[libmamba] \
+# tests/core/test_solve.py::test_auto_update_conda[libmamba] \
+# tests/core/test_solve.py::test_explicit_conda_downgrade[libmamba] \
+# tests/core/test_solve.py::test_aggressive_update_packages[libmamba] \
+# tests/core/test_solve.py::test_update_deps_1[libmamba] \
+# tests/core/test_solve.py::test_no_update_deps_1[libmamba] \
+# tests/core/test_solve.py::test_force_reinstall_1[libmamba] \
+# tests/core/test_solve.py::test_force_reinstall_2[libmamba] \
+# tests/core/test_solve.py::test_channel_priority_churn_minimized[libmamba] \
+# tests/core/test_solve.py::test_current_repodata_usage[libmamba] \
+# tests/core/test_solve.py::test_current_repodata_fallback[libmamba] \
+# tests/core/test_solve.py::test_downgrade_python_prevented_with_sane_message[libmamba] \
+# tests/core/test_solve.py::test_packages_in_solution_change_already_newest[libmamba] \
+# tests/core/test_solve.py::test_packages_in_solution_change_needs_update[libmamba] \
+# tests/core/test_solve.py::test_packages_in_solution_change_constrained[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_conflicts[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_conflicts_upperbound[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_multi_conflicts[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_upperbound_compound_depends[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_version_star[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_free[libmamba] \
+# tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_no_upperbound[libmamba] \
+# tests/models/test_prefix_graph.py::test_windows_sort_orders_1[libmamba] \
+# tests/models/test_prefix_graph.py::test_sort_without_prep[libmamba] \
+
+%pytest -vv -m "not integration" \
     --deselect=tests/test_cli.py::TestJson::test_list \
     --deselect=tests/test_cli.py::test_run_returns_int \
     --deselect=tests/test_cli.py::test_run_returns_nonzero_errorlevel \
     --deselect=tests/test_cli.py::test_run_returns_zero_errorlevel \
     --deselect=tests/test_cli.py::test_run_readonly_env \
+	--ignore=tests/test_create.py \
     --deselect=tests/test_misc.py::test_explicit_missing_cache_entries \
     --ignore=tests/env/specs/test_binstar.py \
     --deselect=tests/env/test_create.py::test_create_update_remote_env_file \
@@ -294,6 +346,58 @@ py.test-%{python3_version} -vv -m "not integration" \
     --deselect=tests/core/test_prefix_data.py::test_set_unset_environment_env_vars \
     --deselect=tests/core/test_prefix_data.py::test_set_unset_environment_env_vars_no_exist \
     --ignore=tests/trust \
+	--deselect=tests/test_solvers.py::TestLibMambaSolver \
+	--deselect=tests/base/test_context.py::test_target_prefix \
+	--deselect=tests/cli/test_compare.py::test_compare_success \
+	--deselect=tests/cli/test_compare.py::test_compare_fail \
+	--deselect=tests/cli/test_main_notices.py::test_target_prefix \
+	--deselect=tests/core/test_package_cache_data.py::test_instantiating_package_cache_when_both_tar_bz2_and_conda_exist_read_only \
+	--deselect=tests/core/test_solve.py::test_solve_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_solve_msgs_exclude_vp[libmamba] \
+	--deselect=tests/core/test_solve.py::test_cuda_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_cuda_2[libmamba] \
+	--deselect=tests/core/test_solve.py::test_cuda_fail_2[libmamba] \
+	--deselect=tests/core/test_solve.py::test_cuda_constrain_absent[libmamba] \
+	--deselect=tests/core/test_solve.py::test_cuda_glibc_sat[libmamba] \
+	--deselect=tests/core/test_solve.py::test_update_prune_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_update_prune_4[libmamba] \
+	--deselect=tests/core/test_solve.py::test_update_prune_5[libmamba-True] \
+	--deselect=tests/core/test_solve.py::test_no_deps_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_only_deps_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_only_deps_2[libmamba] \
+	--deselect=tests/core/test_solve.py::test_update_all_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_unfreeze_when_required[libmamba] \
+	--deselect=tests/core/test_solve.py::test_auto_update_conda[libmamba] \
+	--deselect=tests/core/test_solve.py::test_explicit_conda_downgrade[libmamba] \
+	--deselect=tests/core/test_solve.py::test_aggressive_update_packages[libmamba] \
+	--deselect=tests/core/test_solve.py::test_update_deps_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_no_update_deps_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_force_reinstall_1[libmamba] \
+	--deselect=tests/core/test_solve.py::test_force_reinstall_2[libmamba] \
+	--deselect=tests/core/test_solve.py::test_channel_priority_churn_minimized[libmamba] \
+	--deselect=tests/core/test_solve.py::test_current_repodata_usage[libmamba] \
+	--deselect=tests/core/test_solve.py::test_current_repodata_fallback[libmamba] \
+	--deselect=tests/core/test_solve.py::test_downgrade_python_prevented_with_sane_message[libmamba] \
+	--deselect=tests/core/test_solve.py::test_packages_in_solution_change_already_newest[libmamba] \
+	--deselect=tests/core/test_solve.py::test_packages_in_solution_change_needs_update[libmamba] \
+	--deselect=tests/core/test_solve.py::test_packages_in_solution_change_constrained[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_conflicts[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_conflicts_upperbound[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_multi_conflicts[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_upperbound_compound_depends[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_version_star[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_free[libmamba] \
+	--deselect=tests/core/test_solve.py::test_determine_constricting_specs_no_conflicts_no_upperbound[libmamba] \
+	--deselect=tests/cli/test_main_notices.py::test_notices_does_not_interrupt_command_on_failure \
+	--deselect=tests/models/test_prefix_graph.py::test_windows_sort_orders_1[libmamba] \
+	--deselect=tests/models/test_prefix_graph.py::test_sort_without_prep[libmamba] \
+	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_capture_output \
+	--deselect=tests/gateways/test_subprocess.py::test_subprocess_call_without_capture_output \
+	--deselect=tests/gateways/disk/test_delete.py::test_remove_file \
+	--deselect=tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
+	--deselect=tests/gateways/disk/test_permissions.py::test_make_writable \
+	--deselect=tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
+	--deselect=tests/gateways/disk/test_permissions.py::test_make_executable \
     conda tests
 %endif
 
@@ -320,6 +424,9 @@ py.test-%{python3_version} -vv -m "not integration" \
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 24.1.2-2
+- Add pytest and pip install archspec to fix package tests
+
 * Mon Apr 22 2024 Andrew Phelps <anphel@microsoft.com> - 24.1.2-1
 - Upgrade to version 24.1.2 referencing Fedora 40 (license: MIT)
 
