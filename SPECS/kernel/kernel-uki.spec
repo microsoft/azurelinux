@@ -65,8 +65,8 @@ install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
 ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %files
-/lib/modules/%{kernelver}/vmlinuz-uki.efi
 /boot/vmlinuz-uki-%{kernelver}.efi
+/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
 * Tue Jun 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1

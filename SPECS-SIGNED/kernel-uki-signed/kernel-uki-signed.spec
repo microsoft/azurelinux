@@ -2,6 +2,7 @@
 %ifarch x86_64
 %global buildarch x86_64
 %endif
+%define kernelver %{version}-%{release}
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
 Version:        6.6.35.1
@@ -23,8 +24,8 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        kernel-uki-%{version}-%{release}.%{buildarch}.rpm
-Source1:        vmlinuz-uki-%{version}-%{release}.efi
+Source0:        kernel-uki-%{kernelver}.%{buildarch}.rpm
+Source1:        vmlinuz-uki-%{kernelver}.efi
 ExclusiveArch:  x86_64
 
 %description
@@ -47,7 +48,7 @@ pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed kernel-uki binary
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp %{SOURCE1} ./boot/vmlinuz-uki-%{version}-%{release}.efi
+cp %{SOURCE1} ./boot/vmlinuz-uki-%{kernelver}.efi
 
 popd
 
@@ -60,8 +61,8 @@ cp -rp ./. %{buildroot}/
 popd
 
 %files -n kernel-uki
-/lib/modules/%{kernelver}/vmlinuz-uki.efi
 /boot/vmlinuz-uki-%{kernelver}.efi
+/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
 * Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-1

@@ -7,7 +7,7 @@
 # See README.build-in-place
 %bcond inplace 0
 Summary:        Signed systemd-boot for %{buildarch} systems
-Name:           systemd-signed-%{buildarch}
+Name:           systemd-boot-signed-%{buildarch}
 %if %{without inplace}
 Version:        255
 %else
@@ -63,11 +63,11 @@ This package contains the signed version that works with Secure Boot.
 
 %build
 mkdir rpm_contents
-push rpm_contents
+pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed systemd-boot binary
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp %{SOURCE1} ./lib/systemd/boot/efi/systemd-bootx64.efi
+cp %{SOURCE1} ./usr/lib/systemd/boot/efi/systemd-bootx64.efi
 
 popd
 
@@ -79,10 +79,13 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%files -n systemd-boot
+%files -n systemd-boot-signed
 /usr/lib/systemd/boot/efi/*
+/usr/share/man/man5/loader.conf.5.gz
+/usr/share/man/man7/sd-boot.7.gz
+/usr/share/man/man7/systemd-boot.7.gz
 
 %changelog
-* Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-6
+* Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-14
 - Original version for Azure Linux.
 - License verified.
