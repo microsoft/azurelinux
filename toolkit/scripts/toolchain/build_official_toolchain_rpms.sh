@@ -503,8 +503,9 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs cracklib
+# pam needs cracklib and curl
 chroot_and_install_rpms cracklib
+chroot_and_install_rpms curl
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml

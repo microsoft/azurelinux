@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,15 +11,6 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
-# We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch1:         CVE-2022-43551.patch
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch5:         CVE-2023-35945.patch
-Patch6:         CVE-2023-38545.patch
-Patch7:         CVE-2023-38546.patch
-Patch8:         cve-2023-44487.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -56,6 +47,7 @@ operating system and in a compiler-independent manner.
     --system-zlib \
     --system-libarchive \
     --system-bzip2 \
+    --system-curl \
     --parallel=$(nproc)
 %make_build
 
@@ -85,6 +77,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Wed Jun 26 2024 Andrew Phelps <anphel@microsoft.com> - 3.21.4-11
+- Build with system curl and remove patches for vendored curl source
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
 - Patch vendored nghttp2 for CVE-2023-44487
 
