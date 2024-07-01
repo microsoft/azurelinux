@@ -829,11 +829,10 @@ func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot 
 	//     If according to the above rules a first boot is detected, units with ConditionFirstBoot=yes will be run and
 	//     systemd will perform additional initialization steps, in particular presetting units.
 	//
-	// However, the detailed guide for creating images (https://systemd.io/BUILDING_IMAGES/) suggests that the
-	// machine-id file should be "uninitialized\n" to trigger first-boot mode. This is because the machine-id file is
-	// used to determine if the image is being booted for the first time. If the file is empty, systemd will assume it
-	// is not the first boot and will not perform first-boot actions.
-	// (see https://www.freedesktop.org/software/systemd/man/latest/systemd-firstboot.html)
+	// We will use option 4) by default since AZL has traditionally not used firstboot mechanisms. All configuration
+	// that systemd-firstboot would set should have already been configured by the imager tool. It is important to
+	// create an empty file so that read-only configurations will work as expected. If the user requests that firstboot
+	// be enabled we will set it to "uninitalized" as per option 3).
 
 	ReportAction("Clearing systemd state files for first boot")
 
