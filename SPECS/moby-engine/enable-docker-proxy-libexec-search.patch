@@ -1,0 +1,86 @@
+From f8c088be055b72e58005ef9e56cf4f4008bbc5dd Mon Sep 17 00:00:00 2001
+From: Brian Goff <cpuguy83@gmail.com>
+Date: Tue, 7 May 2024 21:55:36 +0000
+Subject: [PATCH] Lookup docker-proxy in libexec paths
+
+This allows distros to put docker-proxy under libexec paths as is done
+for docker-init.
+
+Also expands the lookup to to not require a `docker/` subdir in libexec
+subdir.
+Since it is a generic helper that may be used for something else in the
+future, this is only done for binaries with a `docker-`.
+
+Backported to moby 24.0.9 for AZL 2.0
+
+Signed-off-by: Brian Goff <cpuguy83@gmail.com>
+Signed-off-by: Henry Beberman <henry.beberman@microsoft.com>
+
+diff -Naur a/daemon/config/config_linux.go b/daemon/config/config_linux.go
+--- a/daemon/config/config_linux.go	2024-02-01 00:12:23.000000000 +0000
++++ b/daemon/config/config_linux.go	2024-06-25 18:18:00.929394951 +0000
+@@ -5,6 +5,7 @@
+ 	"net"
+ 	"os/exec"
+ 	"path/filepath"
++	"strings"
+ 
+ 	"github.com/containerd/cgroups/v3"
+ 	"github.com/docker/docker/api/types"
+@@ -118,14 +119,13 @@
+ 	return DefaultInitBinary
+ }
+ 
+-// LookupInitPath returns an absolute path to the "docker-init" binary by searching relevant "libexec" directories (per FHS 3.0 & 2.3) followed by PATH
+-func (conf *Config) LookupInitPath() (string, error) {
+-	binary := conf.GetInitPath()
++// lookupBinPath returns an absolute path to the provided binary by searching relevant "libexec" locations (per FHS 3.0 & 2.3) followed by PATH
++func lookupBinPath(binary string) (string, error) {
+ 	if filepath.IsAbs(binary) {
+ 		return binary, nil
+ 	}
+ 
+-	for _, dir := range []string{
++	lookupPaths := []string{
+ 		// FHS 3.0: "/usr/libexec includes internal binaries that are not intended to be executed directly by users or shell scripts. Applications may use a single subdirectory under /usr/libexec."
+ 		// https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html
+ 		"/usr/local/libexec/docker",
+@@ -135,7 +135,16 @@
+ 		// https://refspecs.linuxfoundation.org/FHS_2.3/fhs-2.3.html#USRLIBLIBRARIESFORPROGRAMMINGANDPA
+ 		"/usr/local/lib/docker",
+ 		"/usr/lib/docker",
+-	} {
++	}
++
++	// According to FHS 3.0, it is not necessary to have a subdir here (see note and reference above).
++	// If the binary has a `docker-` prefix, let's look it up without the dir prefix.
++	if strings.HasPrefix(binary, "docker-") {
++		lookupPaths = append(lookupPaths, "/usr/local/libexec")
++		lookupPaths = append(lookupPaths, "/usr/libexec")
++	}
++
++	for _, dir := range lookupPaths {
+ 		// exec.LookPath has a fast-path short-circuit for paths that contain "/" (skipping the PATH lookup) that then verifies whether the given path is likely to be an actual executable binary (so we invoke that instead of reimplementing the same checks)
+ 		if file, err := exec.LookPath(filepath.Join(dir, binary)); err == nil {
+ 			return file, nil
+@@ -146,6 +155,11 @@
+ 	return exec.LookPath(binary)
+ }
+ 
++// LookupInitPath returns an absolute path to the "docker-init" binary by searching relevant "libexec" directories (per FHS 3.0 & 2.3) followed by PATH
++func (conf *Config) LookupInitPath() (string, error) {
++	return lookupBinPath(conf.GetInitPath())
++}
++
+ // GetResolvConf returns the appropriate resolv.conf
+ // Check setupResolvConf on how this is selected
+ func (conf *Config) GetResolvConf() string {
+@@ -214,7 +228,7 @@
+ 
+ 		var err error
+ 		// use rootlesskit-docker-proxy for exposing the ports in RootlessKit netns to the initial namespace.
+-		cfg.BridgeConfig.UserlandProxyPath, err = exec.LookPath(rootless.RootlessKitDockerProxyBinary)
++		cfg.BridgeConfig.UserlandProxyPath, err = lookupBinPath(rootless.RootlessKitDockerProxyBinary)
+ 		if err != nil {
+ 			return errors.Wrapf(err, "running with RootlessKit, but %s not installed", rootless.RootlessKitDockerProxyBinary)
+ 		}
