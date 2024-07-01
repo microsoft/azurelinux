@@ -1,7 +1,7 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
@@ -33,6 +33,11 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 install -D -m 0644 misc/irqbalance.env %{buildroot}/etc/sysconfig/irqbalance
+
+# Define IRQBALANCE_ARGS in EnvironmentFile since it is referenced in the service unit file
+# and causes systemd to complain. 
+sed -i 's#\#IRQBALANCE_ARGS=#IRQBALANCE_ARGS=#' %{buildroot}/etc/sysconfig/irqbalance
+# Point the service unit file EnvironmentFile at the installed location for AzureLinux. 
 sed -i 's#/path/to/irqbalance.env#/etc/sysconfig/irqbalance#' misc/irqbalance.service
 install -D -m 0644 misc/irqbalance.service %{buildroot}%{_prefix}/lib/systemd/system/irqbalance.service
 
@@ -56,6 +61,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Mon Jul 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.9.3-2
+- Define IRQBALANCE_ARGS variable in EnvironmentFile for irqbalance.service
+    to squelch systemd warning. 
+
 * Wed Jan 03 2024 Muhammad Falak <mwani@microsoft.com> - 1.9.3-1
 - Drop un-needed patches
 - Bump version to 1.9.3
