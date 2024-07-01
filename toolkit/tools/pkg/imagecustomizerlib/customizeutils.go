@@ -315,7 +315,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 
 		// Add the user.
-		err = userutils.AddUser(user.Name, hashedPassword, uidStr, imageChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, uidStr, imageChroot.(*safechroot.Chroot))
 		if err != nil {
 			return err
 		}

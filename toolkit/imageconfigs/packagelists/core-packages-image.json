@@ -8,7 +8,8 @@
         "core-packages-base-image",
         "dracut-hostonly",
         "dracut-vrf",
-        "initramfs"
+        "initramfs",
+        "shadow-utils"
     ],
     "_comment": "Install 'initramfs' last to avoid unnecessary regeneration when other packages, such as 'kernel', are installed."
 }
