@@ -61,9 +61,6 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.55.0-1
 - Auto-upgrade to 0.55.0 - Azure Linux 3.0 - package upgrades
 
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-8
-- Bump release to rebuild with go 1.21.6
-
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-7
 - Bump release to rebuild with go 1.20.10
 
