@@ -50,9 +50,9 @@ Features include:
 %py3_install
 
 %check
-pip3 install nose
+pip3 install tox tox-current-env
 %python3 setup.py develop
-nosetests
+%tox
 
 %files -n python3-gevent
 %defattr(-,root,root,-)
@@ -62,6 +62,7 @@ nosetests
 %changelog
 * Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> -23.9.1-3
 - Patch to address CVE-2024-24806
+- Migrate tests to use tox
 
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 23.9.1-2
 - Bump release to build with new libuv to fix CVE-2024-24806
