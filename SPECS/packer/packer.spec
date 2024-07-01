@@ -1,7 +1,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.10.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2022-3064.patch
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -63,6 +64,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Mon Jul 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.1-4
+- Patched CVE-2022-3064.
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
 - Bump release to rebuild with go 1.21.11
 
