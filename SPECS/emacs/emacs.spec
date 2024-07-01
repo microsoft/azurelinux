@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.gnu.org/software/emacs/
-Source0:       https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
