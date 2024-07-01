@@ -873,6 +873,7 @@ func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot 
 			return err
 		}
 
+		// Do an explicit check for existence so we can log the file removal.
 		if exists {
 			ReportActionf("Removing systemd state file (%s)", filePath)
 			err = file.RemoveFileIfExists(fullPath)
