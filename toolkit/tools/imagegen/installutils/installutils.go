@@ -863,7 +863,8 @@ func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot 
 		return err
 	}
 
-	// These files should not be present in the image, but we should be thorough and double-check.
+	// These files should not be present in the image, but per https://systemd.io/BUILDING_IMAGES/ we should
+	// be thorough and double-check.
 	for _, filePath := range otherFilesToRemove {
 		fullPath := filepath.Join(installChroot.RootDir(), filePath)
 		exists, err = file.PathExists(fullPath)
