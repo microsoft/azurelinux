@@ -834,7 +834,7 @@ func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot 
 	// create an empty file so that read-only configurations will work as expected. If the user requests that firstboot
 	// be enabled we will set it to "uninitalized" as per option 3).
 
-	ReportAction("Clearing systemd state files for first boot")
+	ReportAction("Configuring systemd state files for first boot")
 
 	// The systemd package will create this file, but if its not installed, we need to create it.
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
