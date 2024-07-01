@@ -128,7 +128,7 @@ rm -f *-filelist {common,el}-*-files
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
-* Mon Jul 01 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> -29.4-1
+* Mon Jul 01 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 29.4-1
 - Upgrade to 29.4 to fix  CVE-2024-39331.
 
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 29.3-2
