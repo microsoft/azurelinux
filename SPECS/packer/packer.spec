@@ -1,13 +1,13 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.9.4
-Release:        1%{?dist}
+Version:        1.10.1
+Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
-Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -27,7 +27,7 @@ Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -38,12 +38,15 @@ BuildRequires:  glibc-devel
 Packer is a tool for building identical machine images for multiple platforms from a single source configuration.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
-go build -mod=vendor -v -a -o packer
+LD_FLAGS="-X github.com/hashicorp/packer/version.Version=%{version} -X github.com/hashicorp/packer/version.VersionPrerelease="
+go build -mod=vendor -v -a -o packer -ldflags="$LD_FLAGS"
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -60,8 +63,20 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
-- Auto-upgrade to 1.9.4 - Azure Linux 3.0 - package upgrades
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
+- Bump release to rebuild with go 1.21.11
+
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.10.1-2
+- Fix for CVE-2023-45288
+
+* Wed Apr 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.10.1-1
+- Bump version to address CVE-2023-49569
+
+* Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.7-2
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Wed Dec 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-1
+- Auto-upgrade to 1.8.7 - CVE-2023-45286
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-15
 - Bump release to rebuild with go 1.20.10
