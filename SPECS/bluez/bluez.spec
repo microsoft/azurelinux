@@ -1,7 +1,7 @@
 Summary:        Bluetooth utilities
 Name:           bluez
 Version:        5.63
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -190,7 +190,7 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %systemd_postun_with_restart bluetooth.service
 
 %post hid2hci
-/sbin/udevadm trigger --subsystem-match=usb
+/bin/udevadm trigger --subsystem-match=usb
 
 %post mesh
 %systemd_user_post bluetooth-mesh.service
@@ -273,6 +273,9 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Fri Jun 21 2024 Andy Zaugg <azaugg@linkedin.com> - 5.63-6
+- Fix udevadm path
+
 * Fri Jun 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 5.63-5
 - Patch CVE-2023-50229 and CVE-2023-50230
 
