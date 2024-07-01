@@ -851,15 +851,13 @@ func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot 
 		}
 	}
 
-	var machineIdContent string
 	if enableSystemdFirstboot {
 		ReportActionf("Enabling systemd firstboot")
-		machineIdContent = machineIDFirstBootOn
+		err = file.Write(machineIDFirstBootOn, filepath.Join(installChroot.RootDir(), machineIDFile))
 	} else {
 		ReportActionf("Disabling systemd firstboot")
-		machineIdContent = machineIDFirstbootOff
+		err = file.Write(machineIDFirstbootOff, filepath.Join(installChroot.RootDir(), machineIDFile))
 	}
-	err = file.Write(machineIdContent, filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
 		err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
 		return err
