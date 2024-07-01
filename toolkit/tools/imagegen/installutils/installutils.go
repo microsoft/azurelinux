@@ -45,6 +45,9 @@ const (
 	// CmdlineSELinuxSecurityArg is the "security" arg needed for enabling SELinux.
 	CmdlineSELinuxSecurityArg = "security=selinux"
 
+	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for disabling SELinux.
+	CmdlineSELinuxDisabledArg = "selinux=0"
+
 	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for enabling SELinux.
 	CmdlineSELinuxEnabledArg = "selinux=1"
 
@@ -2389,7 +2392,7 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
 		selinux = CmdlineSELinuxSettings
 	case configuration.SELinuxOff:
-		selinux = ""
+		selinux = CmdlineSELinuxDisabledArg
 	}
 
 	logger.Log.Debugf("Adding SELinuxConfiguration('%s') to '%s'", selinux, grubPath)
