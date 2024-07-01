@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "emacs-29.3.tar.xz": "c34c05d3ace666ed9c7f7a0faf070fea3217ff1910d004499bd5453233d742a0",
+    "emacs-29.4.tar.xz": "ba897946f94c36600a7e7bb3501d27aa4112d791bfe1445c61ed28550daca235",
     "default.el": "34da95d8d98a45a6277be3f296218fd1ff4761368251d0db9cc2a391b64db27d",
     "site-start.el": "c2789266d886fe7a7c1caa5a86a917cd38b3b5e729a86672fca610b82c4c0bc3"
   }
