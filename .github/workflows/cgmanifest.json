@@ -1,14 +1,15 @@
 {
-    "Registrations": [
+    "$schema": "https://json.schemastore.org/component-detection-manifest.json",
+    "version": 1,
+    "registrations": [
       {
-        "Component": {
-          "Type": "git",
-          "Git": {
-            "RepositoryUrl": "https://github.com/rpm-software-management/spec-cleaner",
-            "CommitHash": "f24cd83e5e2775b061696d4fd7fcf47f63514b50"
+        "component": {
+          "type": "git",
+          "git": {
+            "repositoryUrl": "https://github.com/rpm-software-management/spec-cleaner",
+            "commitHash": "f24cd83e5e2775b061696d4fd7fcf47f63514b50"
           }
         }
       }
-    ],
-    "Version": 1
-  }
+    ]
+}
