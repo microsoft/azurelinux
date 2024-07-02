@@ -76,11 +76,8 @@ go test -mod=vendor
 * Wed Apr 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.10.1-1
 - Bump version to address CVE-2023-49569
 
-* Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.7-2
-- Address CVE-2023-44487 by patching vendored golang.org/x/net
-
-* Wed Dec 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-1
-- Auto-upgrade to 1.8.7 - CVE-2023-45286
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
+- Auto-upgrade to 1.9.4 - Azure Linux 3.0 - package upgrades
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-15
 - Bump release to rebuild with go 1.20.10
