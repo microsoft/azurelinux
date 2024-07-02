@@ -52,7 +52,7 @@ Features include:
 %check
 pip3 install tox
 %python3 setup.py develop
-tox -e py%{python3_version_nodots}
+%python3 -m tox -e py%{python3_version_nodots}
 
 %files -n python3-gevent
 %defattr(-,root,root,-)
