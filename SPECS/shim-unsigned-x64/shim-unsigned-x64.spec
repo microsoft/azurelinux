@@ -1,23 +1,18 @@
 %global debug_package %{nil}
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-x64
-Version:        15.4
-Release:        2%{?dist}
+Version:        15.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rhboot/shim
 Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2
 Source1:        sbat.csv.in
-Source100:      cbl-mariner-ca-20211013.der
-Patch0:         Don-t-call-QueryVariableInfo-on-EFI-1.10-machines.patch
-Patch1:         Fix-handling-of-ignore_db-and-user_insecure_mode.patch
-Patch2:         Fix-a-broken-file-header-on-ia32.patch
-Patch3:         mok-allocate-MOK-config-table-as-BootServicesData.patch
-Patch4:         shim-another-attempt-to-fix-load-options-handling.patch
-Patch5:         Relax-the-check-for-import_mok_state.patch
+Source100:      db.x64.esl
 BuildRequires:  dos2unix
 BuildRequires:  vim-extra
+BuildRequires:  efivar-devel
 ExclusiveArch:  x86_64
 
 %description
@@ -34,15 +29,15 @@ sed -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.
 cat ./data/sbat.microsoft.csv
 
 %build
-cp %{SOURCE100} cert.der
-make shimx64.efi VENDOR_CERT_FILE=cert.der
+cp %{SOURCE100} db.esl
+make shimx64.efi VENDOR_DB_FILE=db.esl
 
 %install
 install -vdm 755 %{buildroot}%{_datadir}/%{name}
 install -vm 644 shimx64.efi %{buildroot}%{_datadir}/%{name}/shimx64.efi
 
 %check
-make VENDOR_CERT_FILE=cert.der test
+make VENDOR_DB_FILE=db.esl test
 
 %files
 %defattr(-,root,root)
@@ -50,6 +45,10 @@ make VENDOR_CERT_FILE=cert.der test
 %{_datadir}/%{name}/shimx64.efi
 
 %changelog
+* Mon Feb 12 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-1
+- Update to 15.8
+- Convert from single signing certificate to ESL containing both old and new signing certificates
+
 * Wed Jan 05 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update key
 - License verified
