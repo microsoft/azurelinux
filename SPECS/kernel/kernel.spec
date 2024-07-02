@@ -409,6 +409,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Mon Jul 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-3
 - disable KEXEC and LEGACY_TIOCSTI
+- enable SECONDARY_TRUSTED_KEYRING
 
 * Fri Jun 28 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-2
 - Enable LCOW boot and POD creation configs
