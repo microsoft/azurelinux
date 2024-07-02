@@ -1,0 +1,37 @@
+{
+    "_comment1": "This file is used to allow specific files to be omitted from the license check process.",
+    "_comment2": "Each PkgException entry is a {'PackageName' and 'IgnoredFilesRegexList'}",
+    "_comment3": "The 'PackageName' is the name of the (sub)package to which the exception applies.",
+    "_comment4": "The 'IgnoredFilesRegexList' is a list of regular expressions that match files to be omitted from the license check.",
+    "_comment5": "The 'GlobalExceptionsRegexList' is a list of regular expressions that match all packages.",
+
+    "PkgExceptions": [
+        {
+            "PackageName": "gcc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/man/man7/gpl\\.7\\.gz$"
+            ]
+        },
+        {
+            "PackageName": "libdb-docs",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/libdb-[0-9\\.]+/installation/build_unix_freebsd\\.html$",
+                "^/usr/share/doc/libdb-[0-9\\.]+/license/license_db\\.html$"
+            ]
+        },
+        {
+            "PackageName": "perl-doc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/man/.*"
+            ]
+        },
+        {
+            "PackageName": "tar",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/tar-[0-9\\.]+/tar\\.html/GNU-Free-Documentation-License\\.html$"
+            ]
+        }
+    ],
+    "GlobalExceptionsRegexList": [
+    ]
+}
