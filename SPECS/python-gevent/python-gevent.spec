@@ -24,6 +24,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-greenlet
+Requires:       python-zope-interface
 %if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  lsof
