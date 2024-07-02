@@ -66,14 +66,13 @@ the container is deleted. Because of this focus, CNI has a wide
 range of support and the specification is simple to implement.
 
 %prep
-%setup -q
+%autosetup -N
 cp %{SOURCE2} build.sh
-
-%build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
-%patch 0 -p1
+%autopatch -p1
 
+%build
 # go1.16+ default is GO111MODULE=on set to auto temporarily
 # until using upstream release with go.mod
 export GO111MODULE=auto
