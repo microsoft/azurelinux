@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,6 +51,7 @@ Patch29:        0029-filesystem-systemd-memory.pressure-fixes.patch
 Patch30:        0030-init-Add-homectl-dbus-access.patch
 Patch31:        0031-Temporary-workaround-for-memory.pressure-labeling-is.patch
 Patch32:        0032-rpm-Fixes-from-various-post-scripts.patch
+Patch33:        0033-cloud-init-and-kmod-fixes.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -334,6 +335,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon Jul 01 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-4
+- Add cloud-init and kmod fixes.
+
 * Tue May 14 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
 - Fix systemd-analyze issues.
 - Add selinux-policy-modules to selinux.json package list since it has rules for cloud-init
