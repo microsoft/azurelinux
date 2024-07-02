@@ -31,6 +31,7 @@ BuildRequires:  lsof
 BuildRequires:  openssl-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-greenlet
+BuildRequires:  python3-zope-interface
 %endif
 
 %description -n python3-gevent
