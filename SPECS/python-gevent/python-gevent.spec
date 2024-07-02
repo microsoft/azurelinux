@@ -18,6 +18,7 @@ Summary:        Coroutine-based network library
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-greenlet
@@ -43,26 +44,30 @@ Features include:
 %prep
 %autosetup -p 1 -n gevent-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files gevent
 
 %check
+# conflict with packaging dependency for other versions
 pip3 install tox
-%python3 setup.py develop
-%python3 -m tox -e py%{python3_version_nodots}
+%tox
 
-%files -n python3-gevent
+%files -n python3-gevent -f %{pyproject_files}
 %defattr(-,root,root,-)
 %license LICENSE
-%{python3_sitelib}/*
 
 %changelog
 * Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> -23.9.1-3
 - Patch to address CVE-2024-24806
 - Migrate tests to use tox
+- Migrate to pyproject build
 
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 23.9.1-2
 - Bump release to build with new libuv to fix CVE-2024-24806
