@@ -48,6 +48,7 @@ Source2:        build.sh
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source3:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2021-38561.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -71,6 +72,7 @@ cp %{SOURCE2} build.sh
 %build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
+%patch 0 -p1
 
 # go1.16+ default is GO111MODULE=on set to auto temporarily
 # until using upstream release with go.mod
