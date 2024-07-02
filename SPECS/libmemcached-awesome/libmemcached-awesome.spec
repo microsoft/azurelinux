@@ -131,6 +131,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_libdir}/cmake/%{name}
+%{_libdir}/libp9*
 %{_datadir}/aclocal/ax_libmemcached.m4
 %{_mandir}/man3/libmemcached*
 %{_mandir}/man3/libhashkit*
