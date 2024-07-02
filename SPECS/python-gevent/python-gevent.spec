@@ -60,7 +60,7 @@ Features include:
 
 %check
 # freeze packaging since we already have it available
-pip3 install packaging==23.2 tox tox-current-env zope.event==4.5.0
+pip3 install packaging==23.2 tox tox-current-env zope.event==4.5.0 dnspython
 %tox
 
 %files -n python3-gevent -f %{pyproject_files}
