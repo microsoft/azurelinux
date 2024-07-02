@@ -32,6 +32,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-greenlet
 BuildRequires:  python3-zope-interface
+BuildRequires:  python3-requests
 %endif
 
 %description -n python3-gevent
