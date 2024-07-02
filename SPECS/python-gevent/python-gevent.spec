@@ -50,9 +50,9 @@ Features include:
 %py3_install
 
 %check
-pip3 install tox tox-current-env
+pip3 install tox
 %python3 setup.py develop
-%tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-gevent
 %defattr(-,root,root,-)
