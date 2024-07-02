@@ -20,6 +20,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-greenlet
 %if 0%{?with_check}
@@ -27,7 +29,6 @@ BuildRequires:  curl-devel
 BuildRequires:  lsof
 BuildRequires:  openssl-devel
 BuildRequires:  python3-test
-BuildRequires:  python3-pip
 BuildRequires:  python3-greenlet
 %endif
 
@@ -55,7 +56,6 @@ Features include:
 %pyproject_save_files gevent
 
 %check
-# conflict with packaging dependency for other versions
 pip3 install tox
 %tox
 
