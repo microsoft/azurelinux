@@ -4,13 +4,13 @@ Poetry helps you declare, manage and install dependencies of Python
 projects, ensuring you have the right stack everywhere.}
 Summary:        Python dependency management and packaging made easy
 Name:           %{pypi_name}
-Version:        1.8.2
+Version:        1.8.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://poetry.eustace.io/
-Source0:        https://files.pythonhosted.org/packages/source/p/poetry/poetry-%{version}.tar.gz
+Source0:        https://github.com/python-poetry/poetry/archive/refs/tags/%{version}.tar.gz#/poetry-%{version}.tar.gz
 # relax some too-strict dependencies that are specified in setup.py:
 # - importlib-metadata (either removed or too old in fedora)
 # - keyring (too new in fedora, but should be compatible)
@@ -22,6 +22,18 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-poetry-core
 BuildRequires:  python3-fastjsonschema
 BuildRequires:  python3-lark
+
+%if 0%{with_check}
+BuildRequires:  %py3_dist execnet
+BuildRequires:  %py3_dist platformdirs
+BuildRequires:  %py3_dist poetry-core
+BuildRequires:  %py3_dist pytest
+BuildRequires:  %py3_dist pytest-mock
+BuildRequires:  %py3_dist pytest-xdist
+BuildRequires:  %py3_dist requests
+BuildRequires:  %py3_dist trove_classifiers
+%endif
+
 Requires:       python3-%{pypi_name} = %{version}-%{release}
 BuildArch:      noarch
 
@@ -51,6 +63,23 @@ Requires:       python3-lark
 %pyproject_save_files poetry
 
 
+%check
+# Freezing package versions to keep the tests stable.
+pip3 install build==1.2.1 \
+            cachecontrol==0.14.0 \
+            cachy==0.3.0 \
+            cleo==2.1.0 \
+            deepdiff==7.0.1 \
+            httpretty==1.1.4 \
+            iniconfig==2.0.0 \
+            installer==0.7.0 \
+            pkginfo==1.11.1 \
+            poetry_plugin_export==1.8.0 \
+            requests_toolbelt==1.0.0 \
+            tomlkit==0.12.5
+%pytest
+
+
 %files
 %license LICENSE
 %doc README.md
@@ -65,6 +94,9 @@ Requires:       python3-lark
 %{python3_sitelib}/%{pypi_name}-%{version}.dist-info/
 
 %changelog
+* Tue Jul 02 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.3-1
+- Upgrade to version 1.8.3 and enable ptests.
+
 * Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.8.2-1
 - Promoted to Core.
 - License verified.
