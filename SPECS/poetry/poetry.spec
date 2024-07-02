@@ -64,6 +64,9 @@ Requires:       python3-lark
 
 
 %check
+# Tests expect the "python" command to be available.
+ln -s python3 %{_bindir}/python
+
 # Freezing package versions to keep the tests stable.
 pip3 install build==1.2.1 \
             cachecontrol==0.14.0 \
