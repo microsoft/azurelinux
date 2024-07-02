@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,8 @@ Patch318:       CVE-2023-48795-0008-upstream-Limit-number-of-entries-in-SSH2_MSG
 Patch319:       CVE-2023-48795-0009-upstream-implement-strict-key-exchange-in-ssh-and-ss.patch
 # Patch for CVE-2023-28531 can be removed if openssh is upgraded to version 9.3p1 or greater
 Patch350:       CVE-2023-28531.patch
+# Patch for CVE-2024-6387 can be removed if openssh is upgraded to version 9.8p1 or greater
+Patch351:       CVE-2024-6387.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -131,6 +133,7 @@ popd
 %patch318 -p1 -b .cve-2023-48795-0008
 %patch319 -p1 -b .cve-2023-48795-0009
 %patch350 -p1 -b .cve-2023-28531
+%patch351 -p1 -b .cve-2024-6387
 
 %build
 export CFLAGS="$CFLAGS -fpic"
@@ -287,6 +290,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Jul 2 2024 Sean Dougherty <sdougherty@microsoft.com> - 8.9p1-6
+- Add patch for CVE-2024-6387 (a.k.a. "regresshion") using Debian's source as guidance.
+
 * Tue Jun 25 2024 Sam Meluch <sammeluch@microsoft.com> - 8.9p1-5
 - Add patch for CVE-2023-28531
 
