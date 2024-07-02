@@ -56,7 +56,8 @@ Features include:
 %pyproject_save_files gevent
 
 %check
-pip3 install tox
+# freeze packaging since we already have it available
+pip3 install packaging==23.2 tox
 %tox
 
 %files -n python3-gevent -f %{pyproject_files}
