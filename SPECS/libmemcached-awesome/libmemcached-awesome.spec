@@ -11,8 +11,8 @@
 %global libname libmemcached
 Summary:        Client library and command line tools for memcached server
 Name:           %{libname}-awesome
-Version:        1.1.1
-Release:        4%{?dist}
+Version:        1.1.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -131,6 +131,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_libdir}/cmake/%{name}
+%{_libdir}/libp9*
 %{_datadir}/aclocal/ax_libmemcached.m4
 %{_mandir}/man3/libmemcached*
 %{_mandir}/man3/libhashkit*
@@ -142,6 +143,9 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_mandir}/man1/mem*
 
 %changelog
+* Mon Jul 1 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.1.4-1
+- Upgrading to version v1.1.4 to address CVE-2023-27478
+
 * Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1-4
 - Adding python-devel to fix python-sphinx build issue
 
