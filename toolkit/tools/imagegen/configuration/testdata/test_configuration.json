@@ -236,9 +236,6 @@
                 "Password": "EncryptPassphrase123"
             },
             "RemoveRpmDb": false,
-            "ReadOnlyVerityRoot": {
-                "Enable": false
-            },
             "EnableHidepid": true
         },
         {
