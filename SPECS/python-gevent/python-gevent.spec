@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 Source0:        https://github.com/gevent/gevent/archive/%{version}.tar.gz#/gevent-%{version}.tar.gz
 Patch0:         CVE-2024-24806.patch
-Patch1:         skip-bad-tests.patch
+Patch1:         skip-irrelevant-tests.patch
 
 %description
 gevent is a coroutine-based Python networking library.
@@ -25,7 +25,8 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-greenlet
-Requires:       python-zope-interface
+Requires:       python3-zope-interface
+Requires:       python3-zope-event
 %if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  lsof
@@ -33,6 +34,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-greenlet
 BuildRequires:  python3-zope-interface
+BuildRequires:  python3-zope-event
 BuildRequires:  python3-requests
 %endif
 
@@ -61,7 +63,7 @@ Features include:
 
 %check
 # freeze packaging since we already have it available
-pip3 install packaging==23.2 tox tox-current-env zope.event==4.5.0 dnspython
+pip3 install packaging==23.2 tox tox-current-env dnspython
 %tox
 
 %files -n python3-gevent -f %{pyproject_files}
