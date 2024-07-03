@@ -51,5 +51,5 @@ pip3 install 'tox>=3.18,<4.0.0' zope.testrunner tox-current-env
 %{python3_sitelib}/*
 
 %changelog
-* Tue Jun 02 2024 Nick Samson <nisamson@microsoft.com> - 4.5.0-1
+* Tue Jul 02 2024 Nick Samson <nisamson@microsoft.com> - 4.5.0-1
 - zope.event package added for Azure Linux 3.0
