@@ -6,7 +6,7 @@
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
 Version:        6.6.35.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,6 @@ popd
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
-* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-1
+* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-2
 - Original version for Azure Linux.
 - License verified.
