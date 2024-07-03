@@ -6,25 +6,24 @@ Version:        10.0.8
 Release:        1%{?dist}
 License:        BSD-2-Clause AND ISC AND MIT
 Url:            http://roy.marples.name/projects/%{name}/
-Source0:        dhcpcd-10.0.8.tar.gz
+Source0:        https://github.com/NetworkConfiguration/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source1:        %{name}.service
 Source2:        %{name}@.service
 Source3:        systemd-sysusers.conf
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-BuildRequires:  gcc
 BuildRequires:  chrony
-BuildRequires:  systemd
-BuildRequires:  make
+BuildRequires:  gcc
 BuildRequires:  gnupg2
+BuildRequires:  make
+BuildRequires:  systemd
 BuildRequires:  ypbind
 
 %description
 The dhcpcd package provides a minimalistic network configuration daemon
 that supports IPv4 and IPv6 configuration including configuration discovery
 through NDP, DHCPv4 and DHCPv6 protocols.
-
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
