@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.4.3
-Release:        3%{?dist}
+Version:        24.2
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,10 +9,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
-Patch1:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
-# Patch no longer needed for cloud-init >= 24.1
-Patch2:         dhcp_support_dhclient_unknown_121.patch
+Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -33,7 +30,7 @@ BuildRequires:  python3-six
 BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
-Requires:       dhcp-client
+Requires:       dhcpcd
 Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
@@ -132,7 +129,6 @@ make check %{?_smp_mflags}
 %dir %{_sharedstatedir}/cloud
 %dir %{_sysconfdir}/cloud/templates
 %doc %{_sysconfdir}/cloud/cloud.cfg.d/README
-%doc %{_sysconfdir}/cloud/clean.d/README
 %config(noreplace) %{_sysconfdir}/cloud/templates/*
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/05_logging.cfg
@@ -146,7 +142,11 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed June 06 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.3-3
+* Wed Jul 03 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-1
+- Upgrade cloud-init to 24.2 to support dhcpcd and azurelinux
+- Remove patches we no longer needed after upgrade
+
+* Thu June 06 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.3-3
 - Add patch for cloud-init to support dhclient's unknown-121 option
 
 * Thu May 09 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 23.4.3-2
