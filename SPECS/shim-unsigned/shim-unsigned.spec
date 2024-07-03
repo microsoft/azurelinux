@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned
-Version:        15.4
-Release:        2%{?dist}
+Version:        15.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ install -D -m 0744 %{_datadir}/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/b
 %endif
 
 %changelog
+* Wed Jul 3 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 15.8-1
+- Updating version to 15.8 to address CVE-2023-40547.
+
 * Fri Apr 23 2021 Chris Co <chrco@microsoft.com> - 15.4-2
 - Enforce using aarch64 shim-15
 
