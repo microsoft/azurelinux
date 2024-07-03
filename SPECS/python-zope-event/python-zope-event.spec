@@ -23,6 +23,7 @@ BuildRequires:  python3-xml
 Requires:       python3
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-coverage
 %endif
 
 %description -n python3-zope-event
