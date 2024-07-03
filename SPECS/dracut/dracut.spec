@@ -3,37 +3,37 @@
 
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        059
-Release:        18%{?dist}
+Version:        102
+Release:        1%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://github.com/dracutdevs/dracut/wiki
+URL:            https://github.com/dracut-ng/dracut-ng/wiki
 
-Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/dracut-ng/dracut-ng/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
-Source6:        defaults.conf
+Source6:        00-hostonly.conf
+Source7:        00-hyperv.conf
+Source8:        00-virtio.conf
+Source9:        00-vrf.conf
+Source10:       00-xen.conf
 
-Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
-
 Patch:          0002-disable-xattr.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
-Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
-Patch:          0009-install-systemd-executor.patch
-Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
+Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -75,6 +75,20 @@ Requires:       nss
 This package requires everything which is needed to build an
 initramfs with dracut, which does an integrity check.
 
+%package hostonly
+Summary:        dracut configuration needed to build an initramfs with hostonly enabled
+Requires:       %{name} = %{version}-%{release}
+
+%description hostonly
+This package contains dracut configuration needed to build an initramfs with hostonly enabled
+
+%package hyperv
+Summary:        dracut configuration needed to build an initramfs with hyperv guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description hyperv
+This package contains dracut configuration needed to build an initramfs with hyperv guest drivers
+
 %package megaraid
 Summary:        dracut configuration needed to build an initramfs with MegaRAID driver support
 Requires:       %{name} = %{version}-%{release}
@@ -96,8 +110,29 @@ Requires:       %{name} = %{version}-%{release}
 %description overlayfs
 This package contains dracut module needed to build an initramfs with OverlayFS support.
 
+%package virtio
+Summary:        dracut configuration needed to build an initramfs with virtio guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description virtio
+This package contains dracut configuration needed to build an initramfs with virtio guest drivers
+
+%package vrf
+Summary:        dracut configuration needed to build an initramfs with the vrf driver
+Requires:       %{name} = %{version}-%{release}
+
+%description vrf
+This package contains dracut configuration needed to build an initramfs with the vrf driver
+
+%package xen
+Summary:        dracut configuration needed to build an initramfs with xen guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description xen
+This package contains dracut configuration needed to build an initramfs with xen guest drivers
+
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-ng-%{version}
 cp %{SOURCE1} .
 
 %build
@@ -134,7 +169,11 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 > %{buildroot}%{_sysconfdir}/system-fips
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
-install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
+install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-hostonly.conf
+install -m 0644 %{SOURCE7} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-hyperv.conf
+install -m 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-virtio.conf
+install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-vrf.conf
+install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-xen.conf
 
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
@@ -170,7 +209,6 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{dracutlibdir}/skipcpio
 %{dracutlibdir}/%{name}-util
 %config(noreplace) %{_sysconfdir}/%{name}.conf
-%config %{_sysconfdir}/dracut.conf.d/00-defaults.conf
 %dir %{_sysconfdir}/%{name}.conf.d
 %dir %{dracutlibdir}/%{name}.conf.d
 %dir %{_var}/opt/%{name}/log
@@ -201,6 +239,14 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{_sysconfdir}/dracut.conf.d/40-fips.conf
 %config(missingok) %{_sysconfdir}/system-fips
 
+%files hostonly
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-hostonly.conf
+
+%files hyperv
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-hyperv.conf
+
 %files megaraid
 %defattr(-,root,root,0755)
 %{_sysconfdir}/dracut.conf.d/50-megaraid.conf
@@ -212,17 +258,38 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{dracutlibdir}/modules.d/20overlayfs
 %{dracutlibdir}/modules.d/20overlayfs/*
 
+%files virtio
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-virtio.conf
+
+%files vrf
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-vrf.conf
+
+%files xen
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-xen.conf
+
 %{_bindir}/%{name}-catimages
 %dir /boot/%{name}
 %dir %{_sharedstatedir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Jun 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-1
+- Update to 102
+
+* Fri Jun 7 2024 Daniel McIlvaney <damcilva@microsoft.com> - 059-20
+- Suppress missing awk errors on size-constrained images
+
+* Thu May 30 2024 Chris Gunn <chrisgun@microsoft.com> - 059-19
+- Split defaults into separate subpackages: hostonly, hyperv, virtio, vrf, and xen
+
 * Tue May 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-18
 - Remove reference to zlib from dracut-fips module setup to address
     pedantic initramfs regeneration behavior
 
-* Thu May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
+* Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
 - Patch microcode output check based on CONFIG_MICROCODE_AMD/INTEL
 
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
@@ -322,7 +389,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 -   Remove toybox from requires.
 
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
--   Update version to 49. License verified. 
+-   Update version to 49. License verified.
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 048-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

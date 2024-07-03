@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "cmake-3.28.2.tar.gz": "1466f872dc1c226f373cf8fba4230ed216a8f108bd54b477b5ccdfd9ea2d124a",
-    "macros.cmake": "1b5f1916a2118b932b217c4c5c4d52e723b1cf4c9587fe7f8fa45b41abfa7c60"
+    "macros.cmake": "1b5f1916a2118b932b217c4c5c4d52e723b1cf4c9587fe7f8fa45b41abfa7c60",
+    "cmake-3.29.6.tar.gz": "1391313003b83d48e2ab115a8b525a557f78d8c1544618b48d1d90184a10f0af"
   }
 }

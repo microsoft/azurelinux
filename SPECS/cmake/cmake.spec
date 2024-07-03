@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.28.2
-Release:        6%{?dist}
+Version:        3.29.6
+Release:        1%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,8 +10,7 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
-Patch1:         CVE-2024-24806.patch
+Patch0:         0001-manually-recreating-patches.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -46,6 +45,7 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
@@ -90,6 +90,10 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
+- Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
+
 * Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
 - fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
 

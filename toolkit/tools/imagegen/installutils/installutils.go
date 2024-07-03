@@ -541,9 +541,10 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Add machine-id
-	err = addMachineID(installChroot)
+	// Configure machine-id and other systemd state files
+	err = clearSystemdState(installChroot, config.EnableSystemdFirstboot)
 	if err != nil {
+		err = fmt.Errorf("failed to clean systemd files:\n%w", err)
 		return
 	}
 
@@ -781,36 +782,108 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot, if it is
-// not already present (systemd package will include it if installed).
-func addMachineID(installChroot *safechroot.Chroot) (err error) {
-	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
+// clearSystemdState clears the systemd state files that should be unique to each instance of the image. This is
+// based on https://systemd.io/BUILDING_IMAGES/. Primarily, this function will ensure that /etc/machine-id is configured
+// correctly, and that random seed and credential files are removed if they exist.
+// - installChroot is the chroot to modify
+// - enableSystemdFirstboot will set the machine-id file to "uninitialized" if true, and "" if false
+func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot bool) (err error) {
+	const (
+		machineIDFile         = "/etc/machine-id"
+		machineIDFirstBootOn  = "uninitialized\n"
+		machineIDFirstbootOff = ""
+		machineIDFilePerms    = 0444
+	)
+
+	// These state files are very unlikely to be present, but we should be thorough and check for them.
+	// See https://systemd.io/BUILDING_IMAGES/ for more information.
+	var otherFilesToRemove = []string{
+		"/var/lib/systemd/random-seed",
+		"/boot/efi/loader/random-seed",
+		"/var/lib/systemd/credential.secret",
+	}
+
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#Initialization:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
 	// should be either missing or an empty file in the generic file system
 	// image (the difference between the two options is described under
-	//"First Boot Semantics" below). An ID will be generated during boot and
+	// "First Boot Semantics" below). An ID will be generated during boot and
 	// saved to this file if possible. Having an empty file in place is useful
 	// because it allows a temporary file to be bind-mounted over the real file,
 	// in case the image is used read-only
+	//
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#First%20Boot%20Semantics:
+	//     etc/machine-id is used to decide whether a boot is the first one. The rules are as follows:
+	//     1. The kernel command argument systemd.condition-first-boot= may be used to override the autodetection logic,
+	//         see kernel-command-line(7).
+	//     2. Otherwise, if /etc/machine-id does not exist, this is a first boot. During early boot, systemd will write
+	//         "uninitialized\n" to this file and overmount a temporary file which contains the actual machine ID. Later
+	//         (after first-boot-complete.target has been reached), the real machine ID will be written to disk.
+	//     3. If /etc/machine-id contains the string "uninitialized", a boot is also considered the first boot. The same
+	//         mechanism as above applies.
+	//     4. If /etc/machine-id exists and is empty, a boot is not considered the first boot. systemd will still
+	//         bind-mount a file containing the actual machine-id over it and later try to commit it to disk (if /etc/ is
+	//         writable).
+	//     5. If /etc/machine-id already contains a valid machine-id, this is not a first boot.
+	//     If according to the above rules a first boot is detected, units with ConditionFirstBoot=yes will be run and
+	//     systemd will perform additional initialization steps, in particular presetting units.
+	//
+	// We will use option 4) by default since AZL has traditionally not used firstboot mechanisms. All configuration
+	// that systemd-firstboot would set should have already been configured by the imager tool. It is important to
+	// create an empty file so that read-only configurations will work as expected. If the user requests that firstboot
+	// be enabled we will set it to "uninitalized" as per option 3).
 
-	const (
-		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = 0444
-	)
+	ReportAction("Configuring systemd state files for first boot")
 
-	ReportAction("Configuring machine id")
-
+	// The systemd package will create this file, but if its not installed, we need to create it.
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
 		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
 		return
 	}
 	if !exists {
-		err = installChroot.UnsafeRun(func() error {
-			return file.Create(machineIDFile, machineIDFilePerms)
-		})
+		logger.Log.Debug("Creating empty machine-id file")
+		err = file.Create(filepath.Join(installChroot.RootDir(), machineIDFile), machineIDFilePerms)
+		if err != nil {
+			err = fmt.Errorf("failed to create empty machine-id:\n%w", err)
+			return err
+		}
 	}
+
+	if enableSystemdFirstboot {
+		ReportAction("Enabling systemd firstboot")
+		err = file.Write(machineIDFirstBootOn, filepath.Join(installChroot.RootDir(), machineIDFile))
+	} else {
+		ReportAction("Disabling systemd firstboot")
+		err = file.Write(machineIDFirstbootOff, filepath.Join(installChroot.RootDir(), machineIDFile))
+	}
+	if err != nil {
+		err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
+		return err
+	}
+
+	// These files should not be present in the image, but per https://systemd.io/BUILDING_IMAGES/ we should
+	// be thorough and double-check.
+	for _, filePath := range otherFilesToRemove {
+		fullPath := filepath.Join(installChroot.RootDir(), filePath)
+		exists, err = file.PathExists(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if systemd state file (%s) exists:\n%w", filePath, err)
+			return err
+		}
+
+		// Do an explicit check for existence so we can log the file removal.
+		if exists {
+			ReportActionf("Removing systemd state file (%s)", filePath)
+			err = file.RemoveFileIfExists(fullPath)
+			if err != nil {
+				err = fmt.Errorf("failed to remove systemd state file (%s):\n%w", filePath, err)
+				return err
+			}
+		}
+	}
+
 	return
 }
 
@@ -2108,16 +2181,12 @@ func enableCryptoDisk() (err error) {
 func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
-		encryptCfgFilename = "grubEncrypt.cfg"
 		grubAssetDir       = "assets/efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
 	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
-	if encryptEnabled {
-		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
-	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
 	err = file.CopyResourceFile(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
 		bootDirectoryFileMode)
@@ -2141,13 +2210,11 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 		return
 	}
 
-	// Add in encrypted volume
-	if encryptEnabled {
-		err = setGrubCfgEncryptedVolume(grubFinalPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
-			return
-		}
+	// Add in encrypted volume mount command if needed
+	err = setGrubCfgEncryptedVolume(grubFinalPath, encryptEnabled)
+	if err != nil {
+		logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
+		return
 	}
 
 	return
@@ -2592,16 +2659,22 @@ func setGrubCfgBootPrefix(bootPrefix, grubPath string) (err error) {
 	return
 }
 
-func setGrubCfgEncryptedVolume(grubPath string) (err error) {
+func setGrubCfgEncryptedVolume(grubPath string, enableEncryptedVolume bool) (err error) {
 	const (
-		encryptedVolPattern = "{{.EncryptedVolume}}"
-		lvmPrefix           = "lvm/"
+		encryptedVolPattern = "{{.CryptoMountCommand}}"
+		cryptoMountCommand  = "cryptomount -a"
 	)
-	var cmdline configuration.KernelCommandLine
+	var (
+		cmdline         configuration.KernelCommandLine
+		encryptedVolArg = ""
+	)
 
-	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	logger.Log.Debugf("Adding EncryptedVolume('%s') to '%s'", encryptedVol, grubPath)
-	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
+	if enableEncryptedVolume {
+		encryptedVolArg = cryptoMountCommand
+	}
+
+	logger.Log.Debugf("Adding CryptoMountCommand('%s') to '%s'", encryptedVolArg, grubPath)
+	err = sed(encryptedVolPattern, encryptedVolArg, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
 		return

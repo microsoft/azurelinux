@@ -18,7 +18,7 @@ var uuidRegex = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F
 func (i *IdentifiedPartition) IsValid() error {
 	// Check if IdType is valid
 	if err := i.IdType.IsValid(); err != nil {
-		return fmt.Errorf("invalid IdType: %v", err)
+		return fmt.Errorf("invalid idType:\n%w", err)
 	}
 
 	// Check if Id is not empty
@@ -31,12 +31,12 @@ func (i *IdentifiedPartition) IsValid() error {
 	case IdTypePartLabel:
 		// Validate using isGPTNameValid function for IdTypePartLabel
 		if err := isGPTNameValid(i.Id); err != nil {
-			return fmt.Errorf("invalid id for idTypePartLabel: %v", err)
+			return fmt.Errorf("invalid id format for %s:\n%w", IdTypePartLabel, err)
 		}
 	case IdTypeUuid, IdTypePartUuid:
 		// UUID validation (standard format)
 		if !uuidRegex.MatchString(i.Id) {
-			return fmt.Errorf("invalid id format for %s: %s", i.IdType, i.Id)
+			return fmt.Errorf("invalid id format for %s (%s)", i.IdType, i.Id)
 		}
 	}
 

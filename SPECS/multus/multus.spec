@@ -18,8 +18,8 @@
 
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
-Version:        3.8
-Release:        13%{?dist}
+Version:        4.0.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,15 +54,14 @@ containers in a Kubernetes cluster.
 VERSION=%{version} COMMIT=%{commit} ./hack/build-go.sh
 
 %install
-install -D -m0755 bin/multus %{buildroot}%{_bindir}/multus
-install -D -m0755 images/entrypoint.sh %{buildroot}%{_bindir}/multus-entrypoint
-install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
+mkdir -p %{buildroot}%{_bindir}
+install -pm 0755 bin/* %{buildroot}%{_bindir}
+install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
 
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/multus
-%{_bindir}/multus-entrypoint
+%{_bindir}/*
 
 %files k8s-yaml
 %dir %{_datarootdir}/k8s-yaml
@@ -70,6 +69,9 @@ install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-y
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.2-1
+- Auto-upgrade to 4.0.2 - upgrade to 4.0.2
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8-13
 - Bump release to rebuild with go 1.20.10
 

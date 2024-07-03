@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        13%{?dist}
+Release:        15%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -468,20 +468,20 @@ This package provides ukify, a script that combines a kernel image, an initrd,
 with a command line, and possibly PCR measurements and other metadata, into a
 Unified Kernel Image (UKI).
 
-%package boot-unsigned
+%package boot
 Summary: UEFI boot manager (unsigned version)
 
-Provides: systemd-boot-unsigned-%{efi_arch} = %version-%release
+Provides: systemd-boot-%{efi_arch} = %version-%release
 Provides: systemd-boot = %version-%release
 Provides: systemd-boot%{_isa} = %version-%release
 # A provides with just the version, no release or dist, used to build systemd-boot
-Provides: version(systemd-boot-unsigned) = %version
-Provides: version(systemd-boot-unsigned)%{_isa} = %version
+Provides: version(systemd-boot) = %version
+Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes:      systemd-udev < 252.2^
 
-%description boot-unsigned
+%description boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
 line. systemd-boot supports systems with UEFI firmware only.
@@ -707,7 +707,12 @@ CONFIGURE_OPTS=(
         -Ddefault-dns-over-tls=no
         # https://bugzilla.redhat.com/show_bug.cgi?id=1867830
         -Ddefault-mdns=no
+%if 0%{?azl}
+        # By default, disable llmnr to prevent llmnr poisoning MitM attacks
+        -Ddefault-llmnr=no
+%else
         -Ddefault-llmnr=resolve
+%endif
         # https://bugzilla.redhat.com/show_bug.cgi?id=2028169
         -Dstatus-unit-format-default=combined
         # https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer
@@ -1161,7 +1166,7 @@ fi
 
 %if 0%{?want_bootloader}
 %files ukify -f .file-list-ukify
-%files boot-unsigned -f .file-list-boot
+%files boot -f .file-list-boot
 %endif
 
 %files container -f .file-list-container
@@ -1197,6 +1202,12 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-15
+- Rename systemd-boot-unsigned to systemd-boot
+
+* Thu Jun 13 2024 Chris Co <chrco@microsoft.com> - 255-14
+- Disable LLMNR by default to prevent LLMNR poisoning MitM attacks
+
 * Thu May 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 255-13
 - Supply 10-console-messages.conf sysctl to lower the default kernel messages to the console
 

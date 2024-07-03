@@ -14,7 +14,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.96.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,10 +27,8 @@ Source3:        nss.pc.in
 Source4:        nss-config.in
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
-BuildRequires:  libdb-devel
 Provides:       %{name}-softokn = %{version}-%{release}
 Requires:       nspr
-Requires:       libdb
 Requires:       nss-libs = %{version}-%{release}
 
 %description
@@ -217,6 +215,9 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.96.1-2
+- Remove dependency on 'libdb'.
+
 * Tue Feb 06 2024 Kanika Nema <kanikanema@microsoft.com> - 3.96.1-1
 - Upgrade to version 3.96.1
 

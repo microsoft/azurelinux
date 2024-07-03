@@ -1,6 +1,7 @@
 %global virtiofsd_binary        virtiofsd
 
 %global runtime_make_vars       DEFMEMSZ=256 \\\
+                                DEFSANDBOXCGROUPONLY=true \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 DEFSNPGUEST=true \\\
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"%{virtiofsd_binary}" \\\
@@ -12,8 +13,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl1
-Release:      1%{?dist}
+Version:      3.2.0.azl2
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -158,10 +159,9 @@ mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 
-# for testing policy/snapshotter without SEV SNP we use CH (with kernel-uvm and initrd) instead of CH-CVM with IGVM
 # Note: our kata-containers config toml expects cloud-hypervisor and kernel under a certain path/name, so we align this through symlinks here
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/cloud-hypervisor-cvm           %{buildroot}%{coco_bin}/cloud-hypervisor-snp
+ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor-snp
 
 # this is again for testing without SEV SNP
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
@@ -238,6 +238,10 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %post
 %systemd_post tardev-snapshotter.service
+if [ $1 -eq 1 ]; then # Package install
+	systemctl enable tardev-snapshotter.service > /dev/null 2>&1 || :
+	systemctl start tardev-snapshotter.service > /dev/null 2>&1 || :
+fi
 
 %files
 %{share_kata}/vmlinux.container
@@ -289,6 +293,16 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Tue Jul 02 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-3
+- Enable and start tardev-snapshotter.service after installation
+
+* Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-2
+- Enable sandbox_cgroup_only configuration
+
+* Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
+- Auto-upgrade to 3.2.0.azl2
+- Update cloud-hypervisor-snp symlink to also point to /usr/bin/cloud-hypervisor
+
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl1-1
 - Auto-upgrade to 3.2.0.azl1
 - Remove opa
