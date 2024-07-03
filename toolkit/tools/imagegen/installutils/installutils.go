@@ -2181,16 +2181,12 @@ func enableCryptoDisk() (err error) {
 func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
-		encryptCfgFilename = "grubEncrypt.cfg"
 		grubAssetDir       = "assets/efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
 	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
-	if encryptEnabled {
-		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
-	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
 	err = file.CopyResourceFile(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
 		bootDirectoryFileMode)
@@ -2214,13 +2210,11 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 		return
 	}
 
-	// Add in encrypted volume
-	if encryptEnabled {
-		err = setGrubCfgEncryptedVolume(grubFinalPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
-			return
-		}
+	// Add in encrypted volume mount command if needed
+	err = setGrubCfgEncryptedVolume(grubFinalPath, encryptEnabled)
+	if err != nil {
+		logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
+		return
 	}
 
 	return
@@ -2665,16 +2659,22 @@ func setGrubCfgBootPrefix(bootPrefix, grubPath string) (err error) {
 	return
 }
 
-func setGrubCfgEncryptedVolume(grubPath string) (err error) {
+func setGrubCfgEncryptedVolume(grubPath string, enableEncryptedVolume bool) (err error) {
 	const (
-		encryptedVolPattern = "{{.EncryptedVolume}}"
-		lvmPrefix           = "lvm/"
+		encryptedVolPattern = "{{.CryptoMountCommand}}"
+		cryptoMountCommand  = "cryptomount -a"
 	)
-	var cmdline configuration.KernelCommandLine
+	var (
+		cmdline         configuration.KernelCommandLine
+		encryptedVolArg = ""
+	)
 
-	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	logger.Log.Debugf("Adding EncryptedVolume('%s') to '%s'", encryptedVol, grubPath)
-	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
+	if enableEncryptedVolume {
+		encryptedVolArg = cryptoMountCommand
+	}
+
+	logger.Log.Debugf("Adding CryptoMountCommand('%s') to '%s'", encryptedVolArg, grubPath)
+	err = sed(encryptedVolPattern, encryptedVolArg, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
 		return
