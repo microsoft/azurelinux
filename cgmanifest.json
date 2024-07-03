@@ -27778,7 +27778,7 @@
         "other": {
           "name": "shim",
           "version": "15.8",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/signed-shim-15.8-1.tar.gz"
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },

@@ -8,9 +8,14 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rhboot/shim
-# This signed-shim tarball contains the shim binary signed with
-# the Microsoft UEFI CA key
-Source0:        signed-%{name}-%{version}-%{release_number}.tar.gz
+# The below source URL will point to the backing shim source code version used
+# to build the shim binary which has been signed with the MS UEFI CA. This is
+# needed for component governance.
+# The Source0 that gets used is actually the signed shim binary, whose filename
+# is annotated after the '#'. The signed shim binary is named with the following
+# schema to avoid name collisions:
+#   signed-shim<arch>-<version>-<release>.<dist tag>.efi
+Source0:        https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2#signed-shimx64-%{version}-%{release_number}.cm2.efi
 # Currently, the tarball only contains a UEFI CA signed x86_64 shim binary.
 # Upstream aarch64 shim 15.4 builds are in a bad state. They will break using
 # binutils versions before 2.35, and even after that they may give
@@ -31,7 +36,7 @@ under secure boot environments.
 
 %install
 install -d %{buildroot}/boot/efi/EFI/BOOT
-install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
+install -m644 %{SOURCE0} %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 
 %files
 %defattr(-,root,root)
