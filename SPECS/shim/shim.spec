@@ -2,8 +2,8 @@
 %define release_number %(echo "%{release}" | cut -d. -f1)
 Summary:        First stage UEFI bootloader
 Name:           shim
-Version:        15.4
-Release:        2%{?dist}
+Version:        15.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,9 @@ install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 /boot/efi/EFI/BOOT/bootx64.efi
 
 %changelog
+* Wed Jul 3 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 15.8-1
+- Updating version to 15.8 to address CVE-2023-40547.
+
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update signed shim binary to newer one associated with 15.4-2 unsigned build.
 - License verified
