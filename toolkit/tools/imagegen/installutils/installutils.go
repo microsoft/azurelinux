@@ -423,8 +423,10 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 }
 
 // orderPackageInstallList updates the order we will install packages if needed. Installing each package one at a time
-// can cause issues with ordering since we aren't doing a single transaction. Fixup any ordering issues here (ie, make
-// sure initramfs is always last so it doesn't keep regenerating).
+// can cause issues with ordering since we aren't doing a single transaction. For example, the initramfs regeneration is
+// done as a post transaction step and only needs to be done once after all other packages are installed. Since we are
+// not doing a single transaction it has an opportunity to trigger repeatedly. Moving it to the end of the list means it
+// will only trigger once.
 func orderPackageInstallList(packageList []string) []string {
 	const initramfsPackagePrefix = "initramfs"
 
