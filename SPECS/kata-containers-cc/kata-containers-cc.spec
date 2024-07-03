@@ -14,7 +14,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      2%{?dist}
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -238,6 +238,10 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %post
 %systemd_post tardev-snapshotter.service
+if [ $1 -eq 1 ]; then # Package install
+	systemctl enable tardev-snapshotter.service > /dev/null 2>&1 || :
+	systemctl start tardev-snapshotter.service > /dev/null 2>&1 || :
+fi
 
 %files
 %{share_kata}/vmlinux.container
@@ -289,6 +293,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Tue Jul 02 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-3
+- Enable and start tardev-snapshotter.service after installation
+
 * Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-2
 - Enable sandbox_cgroup_only configuration
 
