@@ -100,8 +100,6 @@ mkdir -p %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
 
-mkdir -p -m 755 %{buildroot}%{_sysconfdir}/docker
-
 %post
 if ! grep -q "^docker:" /etc/group; then
     groupadd --system docker
@@ -120,7 +118,6 @@ fi
 # docker-proxy symlink in bindir to fix back-compat
 %{_bindir}/docker-proxy
 %{_libexecdir}/docker-proxy
-%dir %{_sysconfdir}/docker
 %{_sysconfdir}/*
 %{_unitdir}/*
 
