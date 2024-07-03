@@ -63,7 +63,7 @@ Features include:
 
 %check
 # freeze packaging since we already have it available
-pip3 install packaging==23.2 tox tox-current-env dnspython
+pip3 install packaging==23.2 tox tox-current-env 
 %tox
 
 %files -n python3-gevent -f %{pyproject_files}
