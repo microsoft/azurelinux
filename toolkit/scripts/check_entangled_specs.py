@@ -14,9 +14,14 @@ import sys
 version_release_matching_groups = [
     frozenset([
         "SPECS-SIGNED/kernel-signed/kernel-signed.spec",
+        "SPECS-SIGNED/kernel-uki-signed/kernel-uki-signed.spec",
         "SPECS/kernel/kernel.spec",
         "SPECS/kernel/kernel-uki.spec",
         "SPECS/kernel-headers/kernel-headers.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/systemd-boot-signed/systemd-boot-signed.spec",
+        "SPECS/systemd/systemd.spec"
     ]),
     frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
