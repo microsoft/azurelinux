@@ -1398,6 +1398,9 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "groupadd", args...)
 		})
+		if err != nil {
+			return fmt.Errorf("failed to add group: %w", err)
+		}
 	}
 
 	return
