@@ -7,14 +7,14 @@
 # See README.build-in-place
 %bcond inplace 0
 Summary:        Signed systemd-boot for %{buildarch} systems
-Name:           systemd-boot-signed-%{buildarch}
+Name:           systemd-boot-%{buildarch}
 %if %{without inplace}
 Version:        255
 %else
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ URL:            https://systemd.io
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        systemd-boot-unsigned-%{version}-%{release}.%{buildarch}.rpm
+Source0:        systemd-boot-%{version}-%{release}.%{buildarch}.rpm
 Source1:        systemd-bootx64.efi
 ExclusiveArch:  x86_64
 
@@ -39,20 +39,20 @@ ExclusiveArch:  x86_64
 This package contains the systemd-boot EFI binary signed for secure boot. The package is
 specifically created for installing on %{buildarch} systems
 
-%package -n     systemd-boot-signed
+%package -n     systemd-boot
 Summary:        UEFI boot manager (signed version)
 
-Provides: systemd-boot-signed-%{efi_arch} = %version-%release
+Provides: systemd-boot-%{efi_arch} = %version-%release
 Provides: systemd-boot = %version-%release
 Provides: systemd-boot%{_isa} = %{version}-%{release}
 # A provides with just the version, no release or dist, used to build systemd-boot
-Provides: version(systemd-boot-signed) = %version
-Provides: version(systemd-boot-signed)%{_isa} = %version
+Provides: version(systemd-boot) = %version
+Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes: systemd-udev < 252.2^
 
-%description -n systemd-boot-signed
+%description -n systemd-boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
 line. systemd-boot supports systems with UEFI firmware only.
@@ -79,13 +79,13 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%files -n systemd-boot-signed
+%files -n systemd-boot
 /usr/lib/systemd/boot/efi/*
 /usr/share/man/man5/loader.conf.5.gz
 /usr/share/man/man7/sd-boot.7.gz
 /usr/share/man/man7/systemd-boot.7.gz
 
 %changelog
-* Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-14
+* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-15
 - Original version for Azure Linux.
 - License verified.

@@ -65,6 +65,6 @@ popd
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
-* Tue June 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-1
+* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-1
 - Original version for Azure Linux.
 - License verified.
