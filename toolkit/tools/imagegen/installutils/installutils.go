@@ -508,7 +508,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}
 
 		// Remove shadow-utils from the list of packages to install
-		packagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != "shadow-utils" })
+		packagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != shadowUtilsPkg })
 	}
 
 	hostname := config.Hostname
