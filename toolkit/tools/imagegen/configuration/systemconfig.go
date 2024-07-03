@@ -12,6 +12,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
@@ -64,6 +65,34 @@ func (s *SystemConfig) IsRootFS() bool {
 // corresponding to a mount point.
 func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
 	return FindMountpointPartitionSetting(s.PartitionSettings, mountPoint)
+}
+
+func (s *SystemConfig) validateUsersAndGroups() (err error) {
+	for _, user := range s.Users {
+		groupMatchFunc := func(groupName interface{}, groupObj interface{}) bool {
+			return groupName == groupObj.(Group).Name
+		}
+
+		if user.PrimaryGroup != "" {
+			if !sliceutils.Contains(s.Groups, user.PrimaryGroup, groupMatchFunc) {
+				// Unclear how to validate these while allowing users to be added to existing system groups. If we
+				// define a group in the config that already exists it will cause errors.
+				// Maybe we can scrape /etc/group and /etc/passwd from filesystem.sepc to validate these?
+				logger.Log.Warnf("Primary group (%s) for user (%s) not defined", user.PrimaryGroup, user.Name)
+			}
+		}
+
+		for _, group := range user.SecondaryGroups {
+			if !sliceutils.Contains(s.Groups, group, groupMatchFunc) {
+				// Unclear how to validate these while allowing users to be added to existing system groups. If we
+				// define a group in the config that already exists it will cause errors.
+				// Maybe we can scrape /etc/group and /etc/passwd from filesystem.sepc to validate these?
+				logger.Log.Warnf("secondary group (%s) for user (%s) not defined", group, user.Name)
+			}
+		}
+	}
+
+	return err
 }
 
 // IsValid returns an error if the SystemConfig is not valid
@@ -186,6 +215,11 @@ func (s *SystemConfig) IsValid() (err error) {
 		if err = b.IsValid(); err != nil {
 			return fmt.Errorf("invalid [User]: %w", err)
 		}
+	}
+	// Currently validateUsersAndGroups() is not able to return an error, it will only print warnings.
+	err = s.validateUsersAndGroups()
+	if err != nil {
+		return fmt.Errorf("invalid [Users]: %w", err)
 	}
 
 	//Validate Encryption

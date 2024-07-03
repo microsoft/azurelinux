@@ -85,11 +85,6 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 		return
 	}
 
-	err = validateUsersGroups(config)
-	if err != nil {
-		return
-	}
-
 	err = validateKickStartInstall(config)
 	return
 }
@@ -183,42 +178,6 @@ func validatePackages(config configuration.Config) (err error) {
 		if len(systemConfig.Users) > 0 || len(systemConfig.Groups) > 0 {
 			if !foundUserAddPackage {
 				return fmt.Errorf("%s: add users require '%s' package that is not included in the package lists", validateError, userAddPkgName)
-			}
-		}
-	}
-
-	return
-}
-
-// Function to check if a user belongs to groups that are defined
-func userBelongsToGroup(user configuration.User, groups map[string]bool) bool {
-	if !groups[user.PrimaryGroup] {
-		return false
-	}
-
-	for _, group := range user.SecondaryGroups {
-		if !groups[group] {
-			return false
-		}
-	}
-
-	return true
-}
-
-func validateUsersGroups(config configuration.Config) (err error) {
-	timestamp.StartEvent("validate users groups", nil)
-	defer timestamp.StopEvent(nil)
-
-	for _, systemConfig := range config.SystemConfigs {
-		// Create a map of valid group IDs for quick lookup
-		groupMap := make(map[string]bool)
-		for _, group := range systemConfig.Groups {
-			groupMap[group.GID] = true
-		}
-		// Check each user
-		for _, user := range systemConfig.Users {
-			if !userBelongsToGroup(user, groupMap) {
-				fmt.Errorf("User %s (UID: %s) does not belong to any valid group\n", user.Name, user.UID)
 			}
 		}
 	}
