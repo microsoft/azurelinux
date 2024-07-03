@@ -1,6 +1,6 @@
 %define pypi_name zope.event
 Summary:        Very basic event publishing system
-Name:           python-zope-interface
+Name:           python-zope-event
 Version:        4.5.0
 Release:        1%{?dist}
 License:        ZPLv2.1
