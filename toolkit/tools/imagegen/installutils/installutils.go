@@ -431,7 +431,7 @@ func orderPackageInstallList(packageList []string) []string {
 	initramfsPackages := []string{}
 	orderedPackageList := []string{}
 	for _, pkg := range packageList {
-		// search for initramfs, ignroing any version info at the end of the package name
+		// Search for initramfs, ignoring any version info at the end of the package name.
 		if strings.HasPrefix(pkg, initramfsPackagePrefix) {
 			initramfsPackages = append(initramfsPackages, pkg)
 		} else {
