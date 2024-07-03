@@ -9,9 +9,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/zopefoundation/zope.event
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description
 Very basic event publishing system for Python
@@ -32,6 +29,8 @@ BuildRequires:  python3-pip
 This package provides a simple event system on which application-specific event systems can be built. For example, a type-based event dispatching system that builds on zope.interface can be found in zope.component. A simpler system is distributed with this package and is described in Class-based event handlers.
 This package is intended to be independently reusable in any Python project. It is maintained by the Zope Toolkit project.
 For detailed documentation, please see http://docs.zope.org/zope.event
+
+%global debug_package %{nil}
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
