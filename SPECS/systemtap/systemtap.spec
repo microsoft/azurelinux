@@ -9,7 +9,7 @@
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
 Version:        5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,15 +32,15 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  shadow-utils
 BuildRequires:  sqlite-devel
-%if %with_boost
+%if 0%{?with_boost}
 BuildRequires:  boost-devel
 %endif
-%if %{with_crash}
+%if 0%{?with_crash}
 BuildRequires:  crash-devel
 BuildRequires:  zlib-devel
 Requires:       crash
 %endif
-%if %{with_rpm}
+%if 0%{?with_rpm}
 BuildRequires:  rpm-devel
 %endif
 Requires:       elfutils
@@ -106,29 +106,29 @@ Requires:       unzip
 SystemTap server is the server component of an instrumentation system for systems running Linux.
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i "s#"kernel"#"linux"#g" stap-prep
 sed -i "s#"devel"#"dev"#g" stap-prep
 
 %build
 %configure \
-%if %{with_crash}
+%if 0%{?with_crash}
 	--enable-crash \
 %else
 	--disable-crash \
 %endif
 	--disable-docs \
-%if %{with_sqlite}
+%if 0%{?with_sqlite}
 	--enable-sqlite \
 %else
 	--disable-sqlite \
 %endif
-%if %{with_rpm}
+%if 0%{?with_rpm}
 	--with-rpm \
 %else
 	--without-rpm \
 %endif
-%if %{with_pie}
+%if 0%{?with_pie}
 	--enable-pie \
 %else
 	--disable-pie \
@@ -139,11 +139,10 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 	--with-python3 \
 	--disable-silent-rules
 
-make
+%make_build
 
 %install
-[ %{buildroot} != / ] && rm -rf ""
-%makeinstall
+%make_install
 
 mv %{buildroot}%{_datadir}/systemtap/examples examples
 
@@ -153,7 +152,7 @@ chmod 755 %{buildroot}%{_bindir}/staprun
 
 install -c -m 755 stap-prep %{buildroot}%{_bindir}/stap-prep
 
-mkdir -p %{buildroot}%{_sysconfdir}//rc.d/init.d/
+mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d/
 install -m 755 initscript/systemtap %{buildroot}%{_sysconfdir}/rc.d/init.d/
 mkdir -p %{buildroot}%{_sysconfdir}/systemtap
 mkdir -p %{buildroot}%{_sysconfdir}/systemtap/conf.d
@@ -162,13 +161,11 @@ install -m 644 initscript/config.systemtap %{buildroot}%{_sysconfdir}/systemtap/
 mkdir -p %{buildroot}%{_localstatedir}/cache/systemtap
 mkdir -p %{buildroot}%{_localstatedir}/run/systemtap
 
-%if %{with_docs}
+%if 0%{?with_docs}
 mkdir docs.installed
 mv %{buildroot}%{_datadir}/systemtap/*.pdf docs.installed/
 mv %{buildroot}%{_datadir}/systemtap/tapsets docs.installed/
-%if %{with_publican}
 mv %{buildroot}%{_datadir}/systemtap/SystemTap_Beginners_Guide docs.installed/
-%endif
 %endif
 
 install -m 755 initscript/stap-server %{buildroot}%{_sysconfdir}/rc.d/init.d/
@@ -294,7 +291,6 @@ fi
 %{_mandir}/man7/warning::symbols.7stap*
 %{_mandir}/man7/stappaths.7*
 %{_mandir}/man8/stapsh.8*
-%{_mandir}/man8/systemtap.8*
 %{_mandir}/man8/stapbpf.8*
 %{_bindir}/dtrace
 
@@ -315,9 +311,10 @@ fi
 %files runtime
 %defattr(-,root,root)
 %attr(4111,root,root) %{_bindir}/staprun
+%{_libexecdir}/systemtap/stapio
 %{_libexecdir}/systemtap/stap-env
 %{_libexecdir}/systemtap/stap-authorize-cert
-%if %{with_crash}
+%if 0%{?with_crash}
 %{_libdir}/systemtap/staplog.so*
 %endif
 %{_mandir}/man8/staprun.8*
@@ -349,6 +346,10 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Mon Jun 24 2024 Andrew Phelps <anphel@microsoft.com> - 5.0-2
+- Add stapio
+- Cleanup spec
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 5.0-1
 - Upgrade to 5.0
 
