@@ -5,8 +5,8 @@ Name:           dhcpcd
 Version:        10.0.8
 Release:        1%{?dist}
 License:        BSD-2-Clause AND ISC AND MIT
-Url:            http://roy.marples.name/projects/%{name}/
-Source0:        https://github.com/NetworkConfiguration/%{name}/archive/refs/tags/v%{version}.tar.gz
+Url:            https://github.com/NetworkConfiguration/%{name}
+Source0:        https://github.com/NetworkConfiguration/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}.service
 Source2:        %{name}@.service
 Source3:        systemd-sysusers.conf
