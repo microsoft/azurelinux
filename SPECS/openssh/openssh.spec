@@ -1,4 +1,4 @@
-%global openssh_ver 9.7p1
+%global openssh_ver 9.8p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
@@ -226,6 +226,7 @@ fi
 /lib/systemd/system/sshd-keygen.service
 /lib/systemd/system/sshd.service
 %{_sbindir}/sshd
+%{_libexecdir}/sshd-session
 %{_libexecdir}/sftp-server
 %{_mandir}/man5/sshd_config.5.gz
 %{_mandir}/man8/sshd.8.gz
@@ -261,6 +262,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Jul 01 2024 Jon Slobodzian <joslobo@microsoft.com> - 9.8p1-1
+- Upgrade to version 9.8p1. This fixes CVE-2024-6387 (a regression to CVE-2006-5051) in OpenSSH's server.
+
 * Thu May 02 2024 Tobias Brick <tobiasb@microsoft.com> - 9.7p1-1
 - Upgrade to version 9.7p1
 

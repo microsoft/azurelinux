@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "openssh-9.7p1.tar.gz": "490426f766d82a2763fcacd8d83ea3d70798750c7bd2aff2e57dc5660f773ffd",
+  "openssh-9.8p1.tar.gz": "dd8bd002a379b5d499dfb050dd1fa9af8029e80461f4bb6c523c49973f5a39f3",
   "pam_ssh_agent_auth-0.10.3.tar.bz2": "3c53d358d6eaed1b211239df017c27c6f9970995d14102ae67bae16d4f47a763",
   "pam_ssh_agent-rmheaders": "468ed01777cae90b31244130d66dfcf7dad9d5cafd9746e6f155440d8c9b16d7",
   "sshd-keygen.service": "331515a4fb37951122ac8447111b126368386a49ac429f500fe3819ba25a70be",
