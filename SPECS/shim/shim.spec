@@ -14,8 +14,9 @@ URL:            https://github.com/rhboot/shim
 # The Source0 that gets used is actually the signed shim binary, whose filename
 # is annotated after the '#'. The signed shim binary is named with the following
 # schema to avoid name collisions:
-#   signed-shim<arch>-<version>-<release>.<dist tag>.efi
-Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2#/signed-shimx64-%{version}-%{release}.efi
+#   signed-shim-<arch>-<version>-<release>.<dist tag>.efi
+Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2#/signed-shim-%{_arch}-%{version}-%{release}.efi
+
 # Currently, the tarball only contains a UEFI CA signed x86_64 shim binary.
 # Upstream aarch64 shim 15.4 builds are in a bad state. They will break using
 # binutils versions before 2.35, and even after that they may give
