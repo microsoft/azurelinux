@@ -33,7 +33,6 @@ Initial UEFI bootloader that handles chaining to a trusted full bootloader
 under secure boot environments.
 
 %prep
-%autosetup -n signed-%{name}-%{version}-%{release_number}
 
 %install
 install -d %{buildroot}/boot/efi/EFI/BOOT
