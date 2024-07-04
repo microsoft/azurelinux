@@ -80,3 +80,4 @@ install -d %{buildroot}%{_sharedstatedir}/%{_name}
 * Tue Jun 25 2024 Minghe Ren <mingheren@microsoft.com> 10.0.8-1
 - Initial build
 - Initial import from Fedora 41 (license: MIT)
+- License verified
