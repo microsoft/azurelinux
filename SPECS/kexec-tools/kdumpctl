@@ -320,7 +320,7 @@ setup_initrd()
 		# with fadump aware initrd
 		backup_default_initrd
 	else
-		TARGET_INITRD="${KDUMP_BOOTDIR}/initramfs-${kdump_kver}".img
+		TARGET_INITRD="${KDUMP_BOOTDIR}/initramfs-${kdump_kver}kdump.img"
 
 		# check if a backup of default initrd exists. If yes,
 		# it signifies a switch from fadump mode. So, restore
