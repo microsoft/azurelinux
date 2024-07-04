@@ -24952,6 +24952,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-zope-event",
+          "version": "4.5.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.event/zope.event-4.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-zope-interface",
           "version": "6.1",
           "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-6.1.tar.gz"

@@ -2980,6 +2980,7 @@
                 "python-webob",
                 "python-websocket-client",
                 "python-werkzeug",
+                "python-zope-event",
                 "python-zope-interface",
                 "python3",
                 "pytz",
