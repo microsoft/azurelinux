@@ -146,7 +146,7 @@ make check %{?_smp_mflags}
 - Upgrade cloud-init to 24.2 to support dhcpcd and azurelinux
 - Remove patches we no longer needed after upgrade
 
-* Thu June 06 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.3-3
+* Thu Jun 06 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.3-3
 - Add patch for cloud-init to support dhclient's unknown-121 option
 
 * Thu May 09 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 23.4.3-2
