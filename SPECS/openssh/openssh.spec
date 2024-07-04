@@ -226,6 +226,7 @@ fi
 /lib/systemd/system/sshd-keygen.service
 /lib/systemd/system/sshd.service
 %{_sbindir}/sshd
+%{_libexecdir}/sshd-session
 %{_libexecdir}/sftp-server
 %{_mandir}/man5/sshd_config.5.gz
 %{_mandir}/man8/sshd.8.gz
