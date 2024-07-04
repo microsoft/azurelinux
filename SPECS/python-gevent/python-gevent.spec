@@ -71,7 +71,7 @@ pip3 install packaging==23.2 tox tox-current-env
 %license LICENSE
 
 %changelog
-* Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> -23.9.1-3
+* Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> - 23.9.1-3
 - Patch to address CVE-2024-24806
 - Migrate tests to use tox
 - Migrate to pyproject build
