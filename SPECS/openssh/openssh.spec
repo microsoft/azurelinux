@@ -1,4 +1,4 @@
-\%global openssh_ver 9.8p1
+%global openssh_ver 9.8p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
