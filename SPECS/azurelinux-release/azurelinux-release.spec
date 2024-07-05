@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,9 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Fri Jul 05 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-16
+- Azure Linux 3.0 July Preview Release 1
+
 * Thu Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-15
 - Azure Linux 3.0 June Preview Release 2
 
