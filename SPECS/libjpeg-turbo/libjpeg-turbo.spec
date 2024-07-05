@@ -1,6 +1,6 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
-Version:        3.0.0
+Version:        3.0.3
 Release:        1%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ popd
 %{_libdir}/cmake/%{name}/%{name}*.cmake
 
 %changelog
+* Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.3-1
+- Auto-upgrade to 3.0.3 - CVE-2022-48285
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-1
 - Auto-upgrade to 3.0.0 - Azure Linux 3.0 - package upgrades
 
