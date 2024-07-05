@@ -1,6 +1,6 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
-Version:        7.94
+Version:        7.95
 Release:        1%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.95-1
+- Auto-upgrade to 7.95 to fix CVE-2022-33099
+
 * Mon Jan 29 2024 Mitch Zhu <mitchzhu@microsoft.com> - 7.94-1
 - Upgrading to latest version for 3.0 release.
 - Remove zenmap as it's a GUI-based tool.
