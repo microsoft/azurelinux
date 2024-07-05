@@ -64,7 +64,7 @@ popd
 
 %changelog
 * Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.3-1
-- Auto-upgrade to 3.0.3 - CVE-2022-48285
+- Auto-upgrade to 3.0.3
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-1
 - Auto-upgrade to 3.0.0 - Azure Linux 3.0 - package upgrades
