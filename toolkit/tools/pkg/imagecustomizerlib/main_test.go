@@ -5,12 +5,15 @@ package imagecustomizerlib
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/stretchr/testify/assert"
 )
 
 type baseImageType string
@@ -78,4 +81,26 @@ func checkSkipForCustomizeImage(t *testing.T, baseImageType baseImageType) strin
 	}
 
 	return ""
+}
+
+func getDownloadedRpmsDir(t *testing.T, azureLinuxVersion string) string {
+	downloadedRpmsDir := filepath.Join(testDir, "testrpms/downloadedrpms", azureLinuxVersion)
+	dirExists, err := file.DirExists(downloadedRpmsDir)
+	if !assert.NoErrorf(t, err, "cannot access downloaded RPMs dir (%s)", downloadedRpmsDir) {
+		t.FailNow()
+	}
+	if !assert.True(t, dirExists) {
+		t.Logf("test requires offline RPMs")
+		t.Logf("please run toolkit/tools/pkg/imagecustomizerlib/testdata/testrpms/download-test-rpms.sh -t %s",
+			azureLinuxVersion)
+		t.FailNow()
+	}
+
+	return downloadedRpmsDir
+}
+
+func getDownloadedRpmsRepoFile(t *testing.T, azureLinuxVersion string) string {
+	dir := getDownloadedRpmsDir(t, azureLinuxVersion)
+	repoFile := filepath.Join(dir, "../", fmt.Sprintf("rpms-%s.repo", azureLinuxVersion))
+	return repoFile
 }

@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,10 @@ Requires:       lz4
 Requires:       procps-ng
 Requires:       readline
 Requires:       sed
+# Note: We currently only support using systemd for our init process, not the kata-agent. 
+# When we go to add support for AGENT_INIT=yes, can drop this.
+# https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10 
+Requires:       systemd
 Requires:       tar
 Requires:       tzdata
 Requires:       util-linux
@@ -43,6 +47,8 @@ Summary:        Metapackage to install the set of packages inside a Kata confide
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
 Requires:       device-mapper
+# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
+Requires:       systemd-udev
 
 %description    coco
 
@@ -95,6 +101,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Wed Jun 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-5
+- Add explicit systemd dependencies for UVM
+
 * Fri May 03 2024 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-4
 - Remove opa
 

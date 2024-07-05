@@ -17,8 +17,8 @@
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
-Version:        6.6.29.1
-Release:        5%{?dist}
+Version:        6.6.35.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,12 +30,13 @@ BuildRequires:  kernel = %{version}-%{release}
 BuildRequires:  systemd-ukify
 BuildRequires:  dracut
 BuildRequires:  binutils
-BuildRequires:  systemd-boot-unsigned
+BuildRequires:  systemd-boot
 BuildRequires:  systemd-udev
 BuildRequires:  system-release
 BuildRequires:  tpm2-tools
 BuildRequires:  cryptsetup
 BuildRequires:  device-mapper
+BuildRequires:  kbd
 
 %description
 The kernel-uki package contains the Linux kernel packaged as a Unified
@@ -58,12 +59,26 @@ ukify build \
       --output vmlinuz-uki.efi
 
 %install
-install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
+install -vdm 700 %{buildroot}/boot
+install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
+install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
+ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %files
+/boot/vmlinuz-uki-%{kernelver}.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Fri Jun 28 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-2
+- Bump release to match kernel
+
+* Tue Jun 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1
+- Auto-upgrade to 6.6.35.1
+
+* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-6
+- include i18n (kbd package) in UKI, to provide loadkeys binary so
+  systemd-vconsole-setup works
+
 * Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
 - Bump release to match kernel
 
