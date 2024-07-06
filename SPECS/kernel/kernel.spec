@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.35.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jul 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-3
+- disable KEXEC and LEGACY_TIOCSTI
+
 * Fri Jun 28 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-2
 - Enable LCOW boot and POD creation configs
 
