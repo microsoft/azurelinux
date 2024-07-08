@@ -1,12 +1,14 @@
 Summary:        Wayland protocols that adds functionality not available in the core protocol
 Name:           wayland-protocols
-Version:        1.33
+Version:        1.36
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wayland.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/wayland/%{name}/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
+BuildRequires:  gcc
+BuildRequires:  gcc-g++
 BuildRequires:  meson
 BuildRequires:  wayland-devel
 BuildArch:      noarch
@@ -45,6 +47,9 @@ wayland-protocols.
 %{_datadir}/%{name}/
 
 %changelog
+* Thu Jun 27 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.36-1
+- Upgrade to version 1.36
+
 * Thu Feb 08 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.33-1
 - Upgrade to version 1.33
 
