@@ -30,7 +30,7 @@ Linux FUSE kernel module, and implements the filesystem operations using
 the Azure Storage REST APIs.
 
 %prep
-%autosetup -n azure-storage-fuse-%{name}-%{blobfuse2_version} -a 1 -p1
+%autosetup -n azure-storage-fuse-%{name}-%{version} -a 1 -p1
 
 %build
 export GOPATH=%{our_gopath}
