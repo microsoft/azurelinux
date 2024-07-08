@@ -177,7 +177,7 @@ func validatePackages(config configuration.Config) (err error) {
 		}
 		if len(systemConfig.Users) > 0 || len(systemConfig.Groups) > 0 {
 			if !foundUserAddPackage {
-				return fmt.Errorf("%s: add users require '%s' package that is not included in the package lists", validateError, userAddPkgName)
+				return fmt.Errorf("%s: the '%s' package must be included in the package lists when the image is configured to add users or groups", validateError, userAddPkgName)
 			}
 		}
 	}

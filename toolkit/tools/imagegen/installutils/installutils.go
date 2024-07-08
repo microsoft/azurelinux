@@ -498,7 +498,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// imageconfigvalidator should have ensured that we intend to install shadow-utils, so we can go ahead and do that here.
 	if len(config.Users) > 0 || len(config.Groups) > 0 {
 		if !sliceutils.ContainsValue(packagesToInstall, "shadow-utils") {
-			err = fmt.Errorf("shadow-utils package is required when setting users or groups")
+			err = fmt.Errorf("shadow-utils package must be added to the image's package lists when setting users or groups")
 			return
 		}
 
@@ -1399,7 +1399,7 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 			return shell.ExecuteLive(squashErrors, "groupadd", args...)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to add group: %w", err)
+			return fmt.Errorf("failed to add group (%s):\n%w",  group.Name, err)
 		}
 	}
 

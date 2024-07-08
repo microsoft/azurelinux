@@ -68,16 +68,18 @@ func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partiti
 }
 
 func (s *SystemConfig) validateUsersAndGroups() (err error) {
+	groupMatchFunc := func(groupName interface{}, groupObj interface{}) bool {
+		return groupName == groupObj.(Group).Name
+	}
+
 	for _, user := range s.Users {
-		groupMatchFunc := func(groupName interface{}, groupObj interface{}) bool {
-			return groupName == groupObj.(Group).Name
-		}
 
 		if user.PrimaryGroup != "" {
 			if !sliceutils.Contains(s.Groups, user.PrimaryGroup, groupMatchFunc) {
-				// Unclear how to validate these while allowing users to be added to existing system groups. If we
-				// define a group in the config that already exists it will cause errors.
-				// Maybe we can scrape /etc/group and /etc/passwd from filesystem.sepc to validate these?
+				// Unclear how to validate that users and groups match together correctly while still allowing
+				// users to be added to existing system groups. If we define a group in the config that already
+				// exists it will cause errors, but we don't have insight into the default users/groups already in
+				// an image before we install the filesystem package.
 				logger.Log.Warnf("Primary group (%s) for user (%s) not defined", user.PrimaryGroup, user.Name)
 			}
 		}
