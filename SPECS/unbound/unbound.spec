@@ -1,6 +1,6 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.17.1
+Version:        1.19.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -96,6 +96,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Mon Jul 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.1-1
+- Auto-upgrade to 1.19.1 - CVE-2023-50387
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.17.1-1
 - Auto-upgrade to 1.17.1 - Azure Linux 3.0 - package upgrades
 
