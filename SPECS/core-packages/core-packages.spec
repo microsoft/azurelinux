@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        %{azl}.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,7 @@ Requires:       grep
 Requires:       gzip
 Requires:       azurelinux-release
 Requires:       azurelinux-repos-ms-non-oss-preview
+Requires:       azurelinux-repos-ms-oss-preview
 Requires:       azurelinux-repos-preview
 Requires:       ncurses-libs
 Requires:       openssl
@@ -90,6 +91,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Mon July 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0-5
+- Add azurelinux-repos-ms-oss-preview to the base container
+
 * Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.0-4
 - Add SymCrypt and SymCrypt-OpenSSL
 
