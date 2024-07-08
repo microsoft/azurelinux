@@ -1126,6 +1126,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blobfuse2",
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "blosc",
           "version": "1.21.4",
           "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
@@ -4260,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.42.0",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.42.0.tar.xz"
+          "version": "2.45.2",
+          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.45.2.tar.xz"
         }
       }
     },
@@ -13992,8 +14002,8 @@
         "type": "other",
         "other": {
           "name": "nmap",
-          "version": "7.94",
-          "downloadUrl": "https://nmap.org/dist/nmap-7.94.tar.bz2"
+          "version": "7.95",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.95.tar.bz2"
         }
       }
     },
@@ -15403,8 +15413,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.9.4",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.9.4.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.9.5.tar.gz"
         }
       }
     },
