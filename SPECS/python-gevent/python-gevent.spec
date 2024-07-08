@@ -1,13 +1,15 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        23.9.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 Source0:        https://github.com/gevent/gevent/archive/%{version}.tar.gz#/gevent-%{version}.tar.gz
+Patch0:         CVE-2024-24806.patch
+Patch1:         skip-irrelevant-tests.patch
 
 %description
 gevent is a coroutine-based Python networking library.
@@ -17,16 +19,23 @@ Summary:        Coroutine-based network library
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-greenlet
+Requires:       python3-zope-interface
+Requires:       python3-zope-event
 %if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  lsof
 BuildRequires:  openssl-devel
 BuildRequires:  python3-test
-BuildRequires:  python3-pip
 BuildRequires:  python3-greenlet
+BuildRequires:  python3-zope-interface
+BuildRequires:  python3-zope-event
+BuildRequires:  python3-requests
 %endif
 
 %description -n python3-gevent
@@ -42,23 +51,31 @@ Features include:
 %prep
 %autosetup -p 1 -n gevent-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files gevent
 
 %check
-pip3 install nose
-%python3 setup.py develop
-nosetests
+# freeze packaging since we already have it available
+pip3 install packaging==23.2 tox tox-current-env 
+%tox
 
-%files -n python3-gevent
+%files -n python3-gevent -f %{pyproject_files}
 %defattr(-,root,root,-)
 %license LICENSE
-%{python3_sitelib}/*
 
 %changelog
+* Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> - 23.9.1-3
+- Patch to address CVE-2024-24806
+- Migrate tests to use tox
+- Migrate to pyproject build
+
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 23.9.1-2
 - Bump release to build with new libuv to fix CVE-2024-24806
 
