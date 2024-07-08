@@ -80,7 +80,7 @@ func (s *SystemConfig) validateUsersAndGroups() (err error) {
 				// users to be added to existing system groups. If we define a group in the config that already
 				// exists it will cause errors, but we don't have insight into the default users/groups already in
 				// an image before we install the filesystem package.
-				logger.Log.Warnf("Primary group (%s) for user (%s) not defined", user.PrimaryGroup, user.Name)
+				logger.Log.Warnf("Primary group (%s) for user (%s) not defined in [SystemConfig.Groups], if this group is not present user creation may fail.", user.PrimaryGroup, user.Name)
 			}
 		}
 
@@ -89,7 +89,7 @@ func (s *SystemConfig) validateUsersAndGroups() (err error) {
 				// Unclear how to validate these while allowing users to be added to existing system groups. If we
 				// define a group in the config that already exists it will cause errors.
 				// Maybe we can scrape /etc/group and /etc/passwd from filesystem.sepc to validate these?
-				logger.Log.Warnf("secondary group (%s) for user (%s) not defined", group, user.Name)
+				logger.Log.Warnf("Secondary group (%s) for user (%s) not defined in [SystemConfig.Groups], if this group is not present user creation may fail.", group, user.Name)
 			}
 		}
 	}

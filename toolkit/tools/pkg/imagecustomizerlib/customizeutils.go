@@ -303,6 +303,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 			return fmt.Errorf("cannot set UID (%d) on a user (%s) that already exists", *user.UID, user.Name)
 		}
 
+		if user.HomeDirectory != "" {
+			return fmt.Errorf("cannot set home directory (%s) on a user (%s) that already exists",
+				user.HomeDirectory, user.Name)
+		}
+
 		// Update the user's password.
 		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
@@ -315,7 +320,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 
 		// Add the user.
-		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, uidStr, imageChroot.(*safechroot.Chroot))
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, uidStr, imageChroot)
 		if err != nil {
 			return err
 		}
@@ -329,8 +334,15 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 	}
 
-	// Set user's groups.
-	err = installutils.ConfigureUserGroupMembership(imageChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+	// Update an existing user's primary group. A new user's primary group will have already been set by AddUser().
+	if userExists {
+		err = installutils.ConfigureUserPrimaryGroupMembership(imageChroot, user.Name, user.PrimaryGroup)
+		if err != nil {
+			return err
+		}
+	}
+	// Set user's secondary groups.
+	err = installutils.ConfigureUserSecondaryGroupMembership(imageChroot, user.Name, user.SecondaryGroups)
 	if err != nil {
 		return err
 	}

@@ -335,7 +335,7 @@ func TestShouldFailMissingShadowUtilsPackageWithUsers(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: add users require 'shadow-utils' package that is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups", err.Error())
 
 			return
 		}

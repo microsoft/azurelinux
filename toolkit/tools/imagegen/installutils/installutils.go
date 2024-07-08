@@ -1399,7 +1399,7 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 			return shell.ExecuteLive(squashErrors, "groupadd", args...)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to add group (%s):\n%w",  group.Name, err)
+			return fmt.Errorf("failed to add group (%s):\n%w", group.Name, err)
 		}
 	}
 
@@ -1425,7 +1425,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			rootUserAdded = true
 		}
 
-		err = ConfigureUserGroupMembership(installChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+		// Primary group will have already been set when the user was created so we don't need to set it again
+		err = ConfigureUserSecondaryGroupMembership(installChroot, user.Name, user.SecondaryGroups)
 		if err != nil {
 			return
 		}
@@ -1608,12 +1609,10 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
-	secondaryGroups []string,
+func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 ) (err error) {
 	const squashErrors = false
 
-	// Update primary group
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
@@ -1624,7 +1623,13 @@ func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, user
 		}
 	}
 
-	// Update secondary groups
+	return
+}
+
+func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
+) (err error) {
+	const squashErrors = false
+
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {

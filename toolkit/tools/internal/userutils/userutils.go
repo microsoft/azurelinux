@@ -76,7 +76,7 @@ func UserExists(username string, installChroot safechroot.ChrootInterface) (bool
 	return userExists, nil
 }
 
-func AddUser(username string, homeDir string, primaryGroup string, hashedPassword string, uid string, installChroot *safechroot.Chroot) error {
+func AddUser(username string, homeDir string, primaryGroup string, hashedPassword string, uid string, installChroot safechroot.ChrootInterface) error {
 	var args = []string{username, "-m"}
 	if hashedPassword != "" {
 		args = append(args, "-p", hashedPassword)
