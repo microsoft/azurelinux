@@ -1,41 +1,22 @@
 %global debug_package %{nil}
 
 %define our_gopath %{_topdir}/.gopath
-%define blobfuse2_version 2.1.2
 %define blobfuse2_health_monitor bfusemon
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        %{blobfuse2_version}
-Release:        4%{?dist}
+Version:        2.1.2
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
-# Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version
-# string in spec files does not allow - 
-Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{blobfuse2_version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{version}.tar.gz -O %{name}-%{version}.tar.gz
-#   2. tar -xf %{name}-%{version}.tar.gz
-#   3. cd azure-storage-fuse-%{name}-%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %{name}-%{version}-vendor.tar.gz vendor
-#
-#   NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Leverage the `generate_source_tarball.sh` to create the vendor sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2023-44487.patch
 BuildRequires:  cmake
 BuildRequires:  fuse3-devel
 BuildRequires:  gcc
@@ -80,6 +61,10 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Mon Jul 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.2-5
+- Adding a patch for CVE-2023-44487.
+- Switched to building the vendor tarball with the generate_source_tarball.sh script.
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.2-4
 - Bump release to rebuild with go 1.21.11
 
