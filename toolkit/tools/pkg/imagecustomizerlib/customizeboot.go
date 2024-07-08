@@ -550,7 +550,7 @@ func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, er
 	newSELinuxArgs := []string(nil)
 	switch selinuxMode {
 	case imagecustomizerapi.SELinuxModeDisabled:
-		newSELinuxArgs = nil
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxDisabledArg}
 
 	case imagecustomizerapi.SELinuxModeForceEnforcing:
 		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
