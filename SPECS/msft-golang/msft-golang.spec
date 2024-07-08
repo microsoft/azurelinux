@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.4-20240604.2.src.tar.gz
+%global ms_go_filename  go1.22.5-20240702.3.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.22.4
+Version:        1.22.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Jul 04 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.5-1
+- Bump version to 1.22.4
+
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.4-1
 - Bump version to 1.22.4
 
