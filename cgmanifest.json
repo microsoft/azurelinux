@@ -1818,7 +1818,7 @@
         "other": {
           "name": "cloud-hypervisor-cvm",
           "version": "38.0.72.2",
-          "downloadUrl": "https://lsgvirtstorage.blob.core.windows.net/dom0-mariner-sources-public/cloud-hypervisor-38.0.72.2.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.2.tar.gz"
         }
       }
     },

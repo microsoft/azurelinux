@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/microsoft/cloud-hypervisor
-Source0:        https://lsgvirtstorage.blob.core.windows.net/dom0-mariner-sources-public/cloud-hypervisor-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
@@ -71,7 +71,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%setup -q -n cloud-hypervisor-%{version}
+%setup -q -n cloud-hypervisor-msft-v%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
