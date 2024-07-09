@@ -45,6 +45,9 @@ Source9:        https://github.com/containers/common/archive/refs/tags/v%{common
 Source10:       containers.conf
 #Note (mfrw): The patch for CVE-2022-2879 is to be applied twice as it applies to two vendored projects (podman & common).
 Patch0:         CVE-2022-2879.patch
+#Note (mfrw): The patch for CVE-2023-45288 is to be applied twice as it applies to two vendored projects (podman & common).
+Patch1:         CVE-2023-45288.patch
+
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -89,11 +92,13 @@ cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
 %patch 0 -p1
+%patch 1 -p1
 go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
 cd common-%{commonver}
 %patch 0 -p1
+%patch 1 -p1
 make docs
 cd ..
 
@@ -160,6 +165,8 @@ fi
 %changelog
 * Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
+- Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
+
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
 - Rearrange variables to be in alphabetical order, similar to signatures file.
