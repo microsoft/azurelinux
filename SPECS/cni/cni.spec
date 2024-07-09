@@ -70,7 +70,7 @@ range of support and the specification is simple to implement.
 cp %{SOURCE2} build.sh
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
-%autopatch -p1
+%patch 0 -p1 -d "vendor/golang.org/x/text"
 
 %build
 # go1.16+ default is GO111MODULE=on set to auto temporarily
