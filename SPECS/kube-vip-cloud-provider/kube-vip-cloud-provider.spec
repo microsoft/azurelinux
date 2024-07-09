@@ -1,6 +1,6 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
-Version:        0.0.7
+Version:        0.0.10
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
@@ -15,21 +15,22 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 # Adding the vendor folder and creating a tarball
 # How to re-build this file:
 # 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
-# 2. tar -xf %%{name}-%%{version}.tar.gz
-# 3. cd %%{name}-%%{version}
-# 4. go mod vendor
-# 5. tar -cf %%{name}-%%{version}-vendor.tar.gz vendor
+# 2. <repo-root>/toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz
 
 Source1: %{name}-%{version}-vendor.tar.gz
 
-BuildRequires: golang
+Patch1:        CVE-2023-47108.patch
+
+BuildRequires: golang >= 1.22
 
 %description
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups. 
 
 %prep
-%setup -q
-tar -xvf %{SOURCE1}
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build 
 go build -mod=vendor
@@ -42,6 +43,10 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Mon Jul 08 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.10-1
+- Upgrade to 0.0.10
+- Patch CVE-2023-47108
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.7-1
 - Auto-upgrade to 0.0.7 - Azure Linux 3.0 - package upgrades
 
