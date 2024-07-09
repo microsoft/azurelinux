@@ -66,7 +66,7 @@ the container is deleted. Because of this focus, CNI has a wide
 range of support and the specification is simple to implement.
 
 %prep
-%autosetup -n
+%autosetup -N
 cp %{SOURCE2} build.sh
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
