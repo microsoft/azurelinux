@@ -217,3 +217,44 @@ func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
 	}
 	assert.Fail(t, "Could not find "+targetPackage+" to test")
 }
+
+func TestShouldFailMissingShadowUtilsPackageWithUsers(t *testing.T) {
+	const (
+		configDirectory   = "../../imageconfigs/"
+		targetPackage     = "core-efi.json"
+		targetPackageList = "core-packages-image.json"
+	)
+	configFiles, err := os.ReadDir(configDirectory)
+	assert.NoError(t, err)
+
+	// Pick the core-efi config file, then add a user, then remove shadow-utils from the package list (via dropping core... its a bit hacky)
+	for _, file := range configFiles {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
+			configPath := filepath.Join(configDirectory, file.Name())
+
+			fmt.Println("Corrupting ", configPath)
+
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
+			for i, list := range config.SystemConfigs[0].PackageLists {
+				// Delete the packagelist from the config
+				if strings.Contains(list, targetPackageList) {
+					config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists[:i], config.SystemConfigs[0].PackageLists[i+1:]...)
+				}
+			}
+			assert.NoError(t, err)
+
+			config.SystemConfigs[0].Users = []configuration.User{
+				{
+					Name: "testuser",
+				},
+			}
+
+			err = ValidateConfiguration(config)
+			assert.Error(t, err)
+			assert.Equal(t, "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups", err.Error())
+
+			return
+		}
+	}
+	assert.Fail(t, "Could not find "+targetPackage+" to test")
+}

@@ -558,6 +558,7 @@ The table below are the keys for the users.
 |PrimaryGroup       |string             |
 |SecondaryGroups    |array of strings   |
 |StartupCommand     |string             |
+|HomeDirectory      |string             |
 
 An example usage for users "root" and "basicUser" would look like:
 
