@@ -22,7 +22,8 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz
-# Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
+# Building reaper from sources downloads artifacts related to maven/node/etc.
+# These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
 # NOTE: USE "reaper_build_caches.sh" TO RE-GENERATE BUILD CACHES.
@@ -45,12 +46,14 @@ Source7:        %{local_n}
 # 6.x version of "ws". Patch for this version taken from here:
 # https://github.com/websockets/ws/commit/eeb76d313e2a00dd5247ca3597bba7877d064a63
 Patch0:         CVE-2024-37890.patch
+Patch1:         CVE-2023-42282.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
+BuildRequires:  rsync
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  openssl-devel
 Requires:       msopenjdk-11
@@ -83,7 +86,11 @@ done
 # There is no way to remove node-sass dependency from builds, hence we need to install local node/npm and caches to be able to build reaper.
 # NOTE: This issue was also faced on Fedora Fc37 when trying to build reaper.
 # NOTE: node-sass seems to be deprecated, the spec and build process will be modified once reaper removes its dependencies as well.
-pushd %{_prefix}/local
+
+# Extracting to intermediate folder to apply patch.
+tmp_local_dir=tmp_local
+mkdir -p $tmp_local_dir/{bin,lib}
+pushd $tmp_local_dir
 echo "Installing node_modules"
 tar -C ./lib/ -xf %{SOURCE6}
 
@@ -101,6 +108,9 @@ ls -al
 popd
 
 %autopatch -p1
+
+rsync -azvhr $tmp_local_dir/ "%{_prefix}/local"
+rm -rf $tmp_local_dir
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
@@ -175,7 +185,7 @@ fi
 
 %changelog
 * Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-10
-- Patching CVE-2024-37890.
+- Patching CVE-2024-37890 and CVE-2023-42282.
 
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
 - Repackage and update src/ui node modules and bower components to 3.1.1-1
