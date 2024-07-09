@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,7 +61,6 @@ Requires(pre): coreutils sed zlib
 Requires: dracut
 Requires: ethtool
 Requires: awk
-Requires: dhcp-client
 Requires: squashfs-tools
 %{?grub2_configuration_requires}
 
@@ -331,6 +330,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 2.0.27-7
+- Remove requires on dhcp-client
+
 * Tue Jun 04 2024 Chris Co <chrco@microsoft.com> - 2.0.27-6
 - Turn off force_no_rebuild and fix kdump initramfs image target path
 
