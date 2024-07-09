@@ -6,9 +6,7 @@
 %define srcdir cassandra-%{name}-%{version}
 %define bower_components reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
 %define srcui_node_modules reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
-%define bower_cache reaper-bower-cache-%{version}.tar.gz
 %define maven_cache reaper-m2-cache-%{version}.tar.gz
-%define npm_cache reaper-npm-cache-%{version}.tar.gz
 %define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
 %define local_n reaper-local-n-%{version}-%{local_n_release}.tar.gz
 
@@ -30,12 +28,8 @@ Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/t
 Source1:        %{bower_components}
 # node_modules downloaded under src/ui
 Source2:        %{srcui_node_modules}
-# bower cache
-Source3:        %{bower_cache}
 # m2 cache
 Source4:        %{maven_cache}
-# npm cache
-Source5:        %{npm_cache}
 # node_modules downloaded to /usr/local/lib
 Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
@@ -74,10 +68,8 @@ for source in "%{SOURCE1}" "%{SOURCE2}"; do
     tar -C src/ui -xf "$source"
 done
 
-echo "Installing bower, m2, and npm caches."
-for source in "%{SOURCE3}" "%{SOURCE4}" "%{SOURCE5}"; do
-    tar -C "$HOME" -xf "$source"
-done
+echo "Installing the m2 cache."
+tar -C "$HOME" -xf "%{SOURCE4}"
 
 # Reaper build fails when trying to install node-sass@4.9.0/node-gyp@3.8.0 and build node native addons using mariner default node@16.14.2/npm@8.5.0.
 # ERROR:
