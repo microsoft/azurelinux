@@ -68,12 +68,12 @@ Cassandra reaper is an open source tool that aims to schedule and orchestrate re
 
 echo "Installing bower_components and npm_modules caches."
 for source in "%{SOURCE1}" "%{SOURCE2}"; do
-    tar -C src/ui xf "$source"
+    tar -C src/ui -xf "$source"
 done
 
 echo "Installing bower, m2, and npm caches."
 for source in "%{SOURCE3}" "%{SOURCE4}" "%{SOURCE5}"; do
-    tar -C "$HOME" xf "$source"
+    tar -C "$HOME" -xf "$source"
 done
 
 # Reaper build fails when trying to install node-sass@4.9.0/node-gyp@3.8.0 and build node native addons using mariner default node@16.14.2/npm@8.5.0.
@@ -85,10 +85,10 @@ done
 # NOTE: node-sass seems to be deprecated, the spec and build process will be modified once reaper removes its dependencies as well.
 pushd %{_prefix}/local
 echo "Installing node_modules"
-tar xf %{SOURCE6} -C ./lib/
+tar -C ./lib/ -xf %{SOURCE6}
 
 echo "Installing n version 14.18.0"
-tar xf %{SOURCE7}
+tar -xf %{SOURCE7}
 
 echo "Creating symlinks under local/bin"
 ln -sf ../lib/node_modules/bower/bin/bower bin/bower
