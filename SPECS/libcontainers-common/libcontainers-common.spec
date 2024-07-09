@@ -49,6 +49,8 @@ Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2023-45288.patch
 #Note (mfrw): The patch for CVE-2024-1753 only applies to podman.
 Patch2:         CVE-2024-1753.patch
+#Note (mfrw): The patch for CVE-2024-3727 is to be applied thrice as it applies to three vendored projects (podman, image & common).
+Patch3:         CVE-2024-3727.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -75,6 +77,8 @@ cd ..
 pwd
 # compile containers/image manpages
 cd image-%{imagever}
+# NOTE: Patch3 has to be applied as -p6
+%patch 3 -p6
 for md in docs/*.md
 do
 	go-md2man -in $md -out $md
@@ -96,12 +100,14 @@ cd podman-%{podmanver}
 %patch 0 -p1
 %patch 1 -p1
 %patch 2 -p1
+%patch 3 -p1
 go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
 cd common-%{commonver}
 %patch 0 -p1
 %patch 1 -p1
+%patch 3 -p1
 make docs
 cd ..
 
@@ -170,6 +176,7 @@ fi
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 - Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
 - Address CVE-2024-1753 by patching vendored github.com/containers/buildah
+- Address CVE-2024-3727 by patching vendored github.com/containers/image
 
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
