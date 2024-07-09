@@ -15,7 +15,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,12 @@ Source5:        %{npm_cache}
 Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
 Source7:        %{local_n}
+# Patches the src/ui/node_modules/ws/lib/websocket-server.js file, which comes
+# from the "reaper-srcui-node-modules*" tarball.
+# The src/ui/node_modules/ws/package.json file suggest we're on the
+# 6.x version of "ws". Patch for this version taken from here:
+# https://github.com/websockets/ws/commit/eeb76d313e2a00dd5247ca3597bba7877d064a63
+Patch0:         CVE-2024-37890.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -58,22 +64,17 @@ ExclusiveArch:  x86_64
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%setup -q -n %{srcdir}
+%autosetup -N -n %{srcdir}
 
-%build
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
+echo "Installing bower_components and npm_modules caches."
+for source in "%{SOURCE1}" "%{SOURCE2}"; do
+    tar -C src/ui xf "$source"
+done
 
-pushd "$HOME"
-echo "Installing bower cache."
-tar xf %{SOURCE3}
-
-echo "Installing m2 cache."
-tar xf %{SOURCE4}
-
-echo "Installing npm cache"
-tar xf %{SOURCE5}
-popd
+echo "Installing bower, m2, and npm caches."
+for source in "%{SOURCE3}" "%{SOURCE4}" "%{SOURCE5}"; do
+    tar -C "$HOME" xf "$source"
+done
 
 # Reaper build fails when trying to install node-sass@4.9.0/node-gyp@3.8.0 and build node native addons using mariner default node@16.14.2/npm@8.5.0.
 # ERROR:
@@ -90,25 +91,20 @@ echo "Installing n version 14.18.0"
 tar xf %{SOURCE7}
 
 echo "Creating symlinks under local/bin"
-cd ./bin
-ln -sf ../lib/node_modules/bower/bin/bower bower
-ln -sf ../lib/node_modules/npm/bin/npm-cli.js npm
-ln -sf ../lib/node_modules/npm/bin/npx-cli.js npx
+ln -sf ../lib/node_modules/bower/bin/bower bin/bower
+ln -sf ../lib/node_modules/npm/bin/npm-cli.js bin/npm
+ln -sf ../lib/node_modules/npm/bin/npx-cli.js bin/npx
 
-cp ../n/versions/node/14.18.0/bin/node .
+cp n/versions/node/14.18.0/bin/node bin
 
 ls -al
 popd
 
-cd %{_builddir}/%{srcdir}
-echo "Installing src caches"
-pushd ./src/ui
-echo "Installing bower_components"
-tar xf %{SOURCE1}
+%autopatch -p1
 
-echo "Installing npm_modules"
-tar fx %{SOURCE2}
-popd
+%build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
 
 # Building using maven in offline mode.
 mvn -DskipTests package -o
@@ -178,6 +174,9 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-10
+- Patching CVE-2024-37890.
+
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
 - Repackage and update src/ui node modules and bower components to 3.1.1-1
 - Address CVE-2024-4068 by upgrading the version of the npm module "braces" to 3.0.3
