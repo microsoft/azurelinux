@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
 Source0:        trident-module.conf
 Source1:        20trident/module-setup.sh
+Source2:        config.yaml
 Requires:       device-mapper
 Requires:       dracut
 Requires:       grep
@@ -35,11 +36,14 @@ install -D -m 0644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20trident/
 install -p -m 0755 %{SOURCE1} %{buildroot}%{_libdir}/dracut/modules.d/20trident/
 
+mkdir -p %{buildroot}%{_sysconfdir}/trident
+install -D -m 0755 %{SOURCE2} %{buildroot}%{_sysconfdir}/trident/
+
 %files
 %{_sysconfdir}/dracut.conf.d/trident-module.conf
 %dir %{_libdir}/dracut/modules.d/20trident
 %{_libdir}/dracut/modules.d/20trident/*
-
+%{_sysconfdir}/trident/config.yaml
 
 %changelog
 * Wed Jun 05 2024 Sean Dougherty <sdougherty@microsoft.com> - 1.0-1
