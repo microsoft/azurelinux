@@ -2,8 +2,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        17.0.2
-Release:        1%{?dist}
+Version:        19.0.4
+Release:        2%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -25,7 +25,8 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz 
+Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2017-14623.patch 
 BuildRequires: golang
 
 %description
@@ -39,7 +40,10 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
@@ -52,10 +56,6 @@ rm -rf go/trace/plugin_datadog.go
 mv go/README.md README-go.md
 
 %build
-
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-
 export VERSION=%{version}
 
 for cmd in $(find go/cmd/* -maxdepth 0 -type d); do
@@ -104,6 +104,12 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Thu Jun 27 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-2
+- Address CVE-2017-14623
+
+* Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 19.0.4-1
+- Auto-upgrade to 17.0.2 - Azure Linux 3.0 - package upgrades
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 17.0.2-1
 - Auto-upgrade to 17.0.2 - Azure Linux 3.0 - package upgrades
 

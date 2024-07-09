@@ -118,3 +118,22 @@ func TestShouldFailParsingInvalidJSON_Partition(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Partition]: json: cannot unmarshal string into Go struct field IntermediateTypePartition.End of type uint64", err.Error())
 }
+
+func TestShouldFailBothTypeAndTypeUUIDSpecified_Partition(t *testing.T) {
+	invalidPartition := validPartition
+	invalidPartition.Type = "linux"
+	invalidPartition.TypeUUID = "0fc63daf-8483-4772-8e79-3d69d8477de4"
+
+	err := invalidPartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "cannot set Type and TypeUUID at the same time", err.Error())
+}
+
+func TestShouldFailUnsupportedTypeName_Partition(t *testing.T) {
+	invalidPartition := validPartition
+	invalidPartition.Type = "linux-root-aarch64"
+
+	err := invalidPartition.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "unrecognized partition type (linux-root-aarch64), consider setting TypeUUID parameter explicitly or add a new entry to partition type table", err.Error())
+}

@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.29.1
-Release:        5%{?dist}
+Version:        6.6.35.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,22 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jul 05 2024 Gary Swalling <gaswal@microsoft.com> - 6.6.35.1-4
+- Enable SECONDARY_TRUSTED_KEYRING
+
+* Mon Jul 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-3
+- disable KEXEC and LEGACY_TIOCSTI
+
+* Fri Jun 28 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-2
+- Enable LCOW boot and POD creation configs
+
+* Tue Jun 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1
+- Auto-upgrade to 6.6.35.1
+
+* Wed Jun 12 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.29.1-6
+- include i18n (kbd package) in UKI, to provide loadkeys binary so
+  systemd-vconsole-setup works
+
 * Tue Jun 11 2024 Juan Camposeco <juanarturoc@microsoft.com> - 6.6.29.1-5
 - Add patch to enable mstflint kernel driver 4.28.0-1
 

@@ -1,14 +1,17 @@
 # Image configuration
 
-Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in (configuration.go)[../../tools/imagegen/configuration/configuration.go] and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
+Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in [configuration.go](../../tools/imagegen/configuration/configuration.go) and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
 
 ## Disks
+
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
+
 Required when building unattended ISO installer. This field defines the physical disk to which Azure Linux should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
+
 Artifact (non-ISO image building only) defines the name, type and optional compression of the output Azure Linux image.
 
 Sample Artifacts entry, creating a raw rootfs, compressed to .tar.gz format(note that this format does not support partitions, so there would be no "Partitions" entry):
@@ -22,6 +25,7 @@ Sample Artifacts entry, creating a raw rootfs, compressed to .tar.gz format(note
 ]
 
 ```
+
 Sample Artifacts entry, creating a vhdx disk image:
 
 ``` json
@@ -34,6 +38,7 @@ Sample Artifacts entry, creating a vhdx disk image:
 ```
 
 ### Partitions
+
 "Partitions" key holds an array of Partition entries.
 
 Partition defines the size, name and file system type for a partition.
@@ -64,12 +69,14 @@ Sample partitions entry, specifying a boot partition and a root partition:
         "ID": "rootfs",
         "Start": 9,
         "End": 0,
-        "FsType": "ext4"
+        "FsType": "ext4",
+        "Type": "linux-root-amd64"
     }
 ]
 ```
 
 #### Flags
+
 "Flags" key controls special handling for certain partitions.
 
 - `esp` indicates this is the UEFI esp partition
@@ -77,6 +84,24 @@ Sample partitions entry, specifying a boot partition and a root partition:
 - `bios_grub` indicates this is a bios grub boot partition
 - `boot` indicates this is a boot partition
 - `dmroot` indicates this partition will be used for a device mapper root device (i.e. `Encryption` or `ReadOnlyVerityRoot`)
+
+#### TypeUUID
+
+"TypeUUID" key sets the partition type UUID. The "Type" key can be used instead to set the partition type using a friendly name.
+
+- `linux`: "0fc63daf-8483-4772-8e79-3d69d8477de4",
+- `esp`: "c12a7328-f81f-11d2-ba4b-00a0c93ec93b",
+- `xbootldr`: "bc13c2ff-59e6-4262-a352-b275fd6f7172",
+- `linux-root-amd64`: "4f68bce3-e8cd-4db1-96e7-fbcaf984b709",
+- `linux-swap`: "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f",
+- `linux-home`: "933ac7e1-2eb4-4f13-b844-0e14e2aef915",
+- `linux-srv`: "3b8f8425-20e0-4f3b-907f-1a25a76f98e8",
+- `linux-var`: "4d21b016-b534-45c2-a9fb-5c16e091fd2d",
+- `linux-tmp`: "7ec6f557-3bc5-4aca-b293-16ef5df639d1",
+- `linux-lvm`: "e6d6d379-f507-44c2-a23c-238f2a3df928",
+- `linux-raid`: "a19d880f-05fc-4d3b-a006-743f0f84911e",
+- `linux-luks`: "ca7d7ccb-63ed-4c53-861c-1742536059cc",
+- `linux-dm-crypt`: "7ffec5c9-2d00-49b7-8941-3ea10a5586b7",
 
 ## SystemConfigs
 
@@ -113,6 +138,7 @@ A sample PartitionSettings entry, designating an EFI and a root partitions:
 A PartitionSetting may set a `MountIdentifier` to control how a partition is identified in the `fstab` file. The supported options are `uuid`, `partuuid`, and `partlabel`. If the `MountIdentifier` is omitted `partuuid` will be selected by default.
 
 `partlabel` may not be used with `mbr` disks, and requires the `Name` key in the corresponding `Partition` be populated. An example with the rootfs mounted via `PARTLABEL=my_rootfs`, but the boot mount using the default `PARTUUID=<PARTUUID>`:
+
 ``` json
 "Partitions": [
 
@@ -127,6 +153,7 @@ A PartitionSetting may set a `MountIdentifier` to control how a partition is ide
     }
 ]
 ```
+
 ``` json
 "PartitionSettings": [
     {
@@ -169,11 +196,17 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 }
 
 ```
+
 `RdiffBaseImage` represents the base image when `rdiff` algorithm is used.
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### EnableGrubMkconfig
+
 EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `true`.
+
+### EnableSystemdFirstboot
+
+EnableSystemdFirstboot is a optional boolean that controls whether the image will run the systemd-firstboot service on first boot. Setting to `true` will set `/etc/machine-id` to `"uninitialized"`, while setting to `false` will leave `/etc/machine-id` blank. See [https://www.freedesktop.org/software/systemd/man/latest/machine-id.html] for more information. By default firstboot is disabled.
 
 ### PackageLists
 
@@ -186,6 +219,7 @@ PackageLists **must not include kernel packages**! To provide a kernel, use Kern
 If any of the packages depends on a kernel, make sure that the required kernel is provided with KernelOptions.
 
 A sample PackageLists entry pointing to three files containing package lists:
+
 ``` json
 "PackageLists": [
     "packagelists/hyperv-packages.json",
@@ -222,6 +256,7 @@ This may be any value compatible with the `%_install_langs` rpm macro.
 The `OverrideRpmLocales` and `DisableRpmDocs` settings are stored in `/usr/lib/rpm/macros.d/macros.installercustomizations_*` files on the final system. The files selected for install are based on the `rpm` macros at the time of transaction, so to restore these files on an installed system remove the associated macro definition and run  `tdnf -y reinstall $(rpm -qa)`. This will reinstall all packages and apply the new settings.
 
 ### Customization Scripts
+
 The tools offer the option of executing arbitrary shell scripts during various points of the image generation process. There are three points that scripts can be executed: `PreInstall`, `PostInstall`, and `ImageFinalize`.
 
 >Installer starts -> `PreInstallScripts` -> Create Partitions -> Install Packages -> `PostInstallScripts` -> Configure Bootloader (if any) -> Calculate dm-verity hashes (if configured) -> `ImageFinalizeScripts`
@@ -229,6 +264,7 @@ The tools offer the option of executing arbitrary shell scripts during various p
 Each of the `PreInstallScripts`, `PostInstallScripts`, and `FinalizeImageScripts` entires are an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image. The file paths are relative to the image configuration file. Scripts may be passed without arguments if desired.
 
 All scripts follow the same format in the image config .json file:
+
 ``` json
 "PreInstallScripts | PostInstallScripts | FinalizeImageScripts":[
     {
@@ -302,6 +338,7 @@ Fields:
 The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Azure Linux tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
 
 A sample Networks entry pointing to one network configuration:
+
 ``` json
     "Networks":[
     {
@@ -364,6 +401,7 @@ KernelOptions is mandatory for all non-`rootfs` image types.
 KernelOptions may be included in `rootfs` images which expect a kernel, such as the initrd for an ISO, if desired.
 
 Currently there is only one key with an assigned meaning:
+
 - `default` key needs to be always provided. It designates a kernel that is used when no other scenario is applicable (i.e. by default).
 
 Keys starting with an underscore are ignored - they can be used for providing comments.
@@ -377,29 +415,37 @@ A sample KernelOptions specifying a default kernel:
 ```
 
 ### ReadOnlyVerityRoot
+
 "ReadOnlyVerityRoot" key controls making the root filesystem read-only using dm-verity.
 It will create a verity disk from the partition mounted at "/". The verity data is stored as
 part of the image's initramfs. More details can be found in [Misc: Read Only Roots](../how_it_works/5_misc.md#dm-verity-read-only-roots)
 
 #### Considerations
+
 Having a read-only root filesystem will change the behavior of the image in some fundamental ways. There are several areas that should be considered before enabling a read-only root:
 
 ##### Writable Data
+
 Any writable data which needs to be preserved will need to be stored into a separate writable partition. The `TmpfsOverlays` key will create throw-away writable partitions which are reset on every boot. The example configs create an overlay on `/var`, but the more refined the overlays are, the more secure they will be.
 
 ##### GPL Licensing
+
 If using a read-only root in conjunction with a verified boot flow that uses a signed initramfs, carefully consider the implications on GPLv3 code. The read-only nature of the filesystem means a user cannot replace GPLv3 components without re-signing a new initramfs.
 
 ##### Users
+
 Since users are controlled by files in `/etc`, these files are read-only when this is set. It is recommended to either use SSH key based login or pre-hash the password to avoid storing passwords in plain text in the config files (See [Users](#users)).
 
 ##### Separate `/boot` Partition
+
 Since the root partition's hash tree is stored as part of the initramfs, the initramfs cannot be stored on the same root partition (it would invalidate the measurements). To avoid this a separate `/boot` partition is needed to house the hash tree (via the initramfs).
 
 ##### ISO
+
 The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"Azure Linux Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
 
 The GUI installer does not currently support read-only roots.
+
 - `Enable`: Enable dm-verity on the root filesystem
 - `Name`: Custom name for the mounted root (default is `"verity_root_fs"`)
 - `ErrorCorrectionEnable`: Enable automatic error correction of modified blocks (default is `true`)
@@ -413,6 +459,7 @@ The GUI installer does not currently support read-only roots.
     `verity-read-only-root-debug-tools` package to create the required mount points.
 
 A sample ReadOnlyVerityRoot specifying a basic read-only root using default error correction. This configuration may be used for both normal images and ISO configurations:
+
 ``` json
 "ReadOnlyVerityRoot": {
     "Enable": true,
@@ -427,23 +474,29 @@ A sample ReadOnlyVerityRoot specifying a basic read-only root using default erro
 KernelCommandLine is an optional key which allows additional parameters to be passed to the kernel when it is launched from Grub.
 
 #### ImaPolicy
+
 ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enable, they may be any combination of `tcb`, `appraise_tcb`, `secure_boot`.
 
 #### EnableFIPS
+
 EnableFIPS is a optional boolean option that controls whether the image tools create the image with FIPS mode enabled or not. If EnableFIPS is specificed, only valid values are `true` and `false`.
 
 #### ExtraCommandLine
+
 ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../tools/internal/resources/assets/grub2/grub.cfg) and [/etc/default/grub](../../tools/internal/resources/assets/grub2/grub) for mkconfig-based images. Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 
 #### SELinux
+
 The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
 This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
 
 #### SELinuxPolicy
+
 An optional field to overwrite the SELinux policy package name. If not set, the default is `selinux-policy`.
 
 #### CGroup
+
 The version for CGroup in Azure Linux images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
 The `version_two` value will set the cgroupv2 to be used in Azure Linux by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
@@ -553,7 +606,8 @@ A sample image configuration, producing a VHDX disk image:
                     "ID": "rootfs",
                     "Start": 9,
                     "End": 0,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Type": "linux-root-amd64"
                 }
             ]
         }
