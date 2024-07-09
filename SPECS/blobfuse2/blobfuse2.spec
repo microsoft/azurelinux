@@ -5,8 +5,8 @@
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        2.1.0
-Release:        4%{?dist}
+Version:        2.1.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ URL:            https://github.com/Azure/azure-storage-fuse/
 Source0:        https://github.com/Azure/azure-storage-fuse/archive/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Leverage the `generate_source_tarball.sh` to create the vendor sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-44487.patch
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  cmake
 BuildRequires:  fuse3-devel
 BuildRequires:  gcc
@@ -60,6 +60,10 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.2-1
+- Update to version 2.1.2.
+- Port the CVE-2023-45288 patch from 2.0 version of Azure Linux.
+
 * Mon Jul 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-4
 - Adding a patch for CVE-2023-44487.
 - Switched to building the vendor tarball with the generate_source_tarball.sh script.
