@@ -17,9 +17,9 @@ imageCustomizerContainerTag=${1:-0.4.0}
 inputImageTag=${2:-3.0.20240624-rc}
 
 # configurations
-ihvArtifactsDir=$scriptDir/ihv-artifacts
+ihvArtifactsDir=$scriptDir/ihv-test-artifacts
 fixYumConfigFile=fix-yum-repo-paths.yaml
-ihvConfigFile=ihv-customizations.yaml
+ihvConfigFile=ihv-test-customizations.yaml
 
 # -----------------------------------------------------------------------------
 workDir=$(mktemp -d)
@@ -29,7 +29,7 @@ imageCustomizerContainerPath=mcr.microsoft.com/azurelinux/imagecustomizer
 buildDir=$workDir/build
 outDir=$workDir/output
 
-outputImagePrefix=ihv
+outputImagePrefix=ihv-test
 debugLevel=debug
 
 # -----------------------------------------------------------------------------
