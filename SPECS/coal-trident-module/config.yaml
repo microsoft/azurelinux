@@ -1,0 +1,125 @@
+trident:
+  disable: false
+  selfUpgrade: false
+  phonehome: null
+storage:
+  disks:
+  - id: os
+    device: /dev/disk/by-path/pci-0000:00:1f.2-ata-2.0
+    partitionTableType: gpt
+    partitions:
+    - id: esp
+      type: esp
+      size: 64M
+    - id: root-a
+      type: root
+      size: 8G
+    - id: root-b
+      type: root
+      size: 8G
+    - id: swap
+      type: swap
+      size: 2G
+    - id: trident
+      type: linux-generic
+      size: 128M
+    - id: enc-srv
+      type: linux-generic
+      size: 1G
+    - id: raid-a
+      type: linux-generic
+      size: 1G
+    - id: raid-b
+      type: linux-generic
+      size: 1G
+  encryption:
+    recoveryKeyUrl: file:///recovery.key
+    volumes:
+    - id: srv
+      deviceName: luks-srv
+      deviceId: enc-srv
+  raid:
+    software:
+    - id: some_raid
+      name: some_raid1
+      level: raid1
+      devices:
+      - raid-a
+      - raid-b
+  abUpdate:
+    volumePairs:
+    - id: root
+      volumeAId: root-a
+      volumeBId: root-b
+  filesystems:
+  - deviceId: esp
+    type: vfat
+    source:
+      type: esp-image
+      url: file:///trident_cdrom/data/esp.rawzst
+      sha256: e15853875ce26f8fb8090177821240a889e21ac0c5acee75c5a060401bbdf0ae
+      format: raw-zst
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: root
+    type: ext4
+    source:
+      type: image
+      url: file:///trident_cdrom/data/root.rawzst
+      sha256: c2ce64662fbe2fa0b30a878c11aac71cb9f1ef27f59a157362ccc0881df47293
+      format: raw-zst
+    mountPoint:
+      path: /
+      options: defaults
+  - deviceId: trident
+    type: ext4
+    mountPoint:
+      path: /var/lib/trident
+      options: defaults
+  - deviceId: swap
+    type: swap
+  - deviceId: srv
+    type: ext4
+    mountPoint:
+      path: /srv
+      options: defaults
+  - deviceId: some_raid
+    type: ext4
+    mountPoint:
+      path: /mnt/raid
+      options: defaults
+scripts:
+  postProvision:
+  - name: sample-provision-script
+    runOn:
+    - clean-install
+    - ab-update
+    content: ls $TARGET_ROOT
+    logFilePath: /var/log/sample-provision-script.log
+  postConfigure:
+  - name: sample-configure-script
+    runOn:
+    - all
+    content: /var/config-script.sh
+    logFilePath: /var/log/sample-configure-script.log
+    environmentVariables:
+      SAMPLE_VARIABLE: sample-variable-value
+os:
+  network:
+    version: 2
+    ethernets:
+      eths:
+        match:
+          name: enp*
+        dhcp4: true
+  selinux:
+    mode: null
+  users:
+  - name: my-custom-user
+    sshPublicKeys:
+    - <MY_PUBLIC_SSH_KEY>
+    sshMode: key-only
+  additionalFiles:
+  - destination: /var/config-script.sh
+    content: 'echo ''Running from newly deployed chroot: $SAMPLE_VARIABLE'''

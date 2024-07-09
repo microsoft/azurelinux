@@ -5,7 +5,7 @@
 check() {
     # Only include if requested by the dracut configuration files
     require_binaries trident || return 1
-    return 255
+    return 0
 }
 
 depends() {
@@ -15,4 +15,8 @@ depends() {
 
 install() {
     inst "trident"
+    echo "installing trident..."
+    echo "pwd is:"
+    pwd
+    echo "end of installing trident..."
 }
