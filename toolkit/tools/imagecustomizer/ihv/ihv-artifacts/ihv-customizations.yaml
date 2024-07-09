@@ -1,0 +1,23 @@
+os:
+  selinux:
+    mode: disabled
+  kernelCommandLine:
+    extraCommandLine: selinux=0 security=
+  users:
+  - name: testuser
+    sshPublicKeyPaths:
+    - id_rsa.pub
+    primaryGroup: sudo
+    secondaryGroups:
+    - sudo
+  packages:
+    install:
+    - squashfs-tools
+    - tar
+    - device-mapper
+scripts:
+  postCustomization:
+  - content: |
+      chown testuser:users /home/testuser/.ssh/authorized_keys
+      echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    name: "Setting up user access"
