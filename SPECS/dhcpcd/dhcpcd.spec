@@ -1,5 +1,3 @@
-%global debug_package   %{nil}
-
 Summary:        A minimalistic network configuration daemon with DHCPv4, rdisc and DHCPv6 support
 Name:           dhcpcd
 Version:        10.0.8
