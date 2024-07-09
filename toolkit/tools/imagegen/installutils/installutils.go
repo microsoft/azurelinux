@@ -485,13 +485,15 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
+	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` and
+	// `TdnfInstallPriorityPackage` invocations
 	packagesInstalled := 0
 
 	timestamp.StartEvent("installing packages", nil)
 	// Install filesystem package first
-	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
+	packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(filesystemPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
 	if err != nil {
+		err = fmt.Errorf("failed to install (%s) package in preparation for image creation:\n%w", filesystemPkg, err)
 		return
 	}
 
@@ -502,13 +504,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 			return
 		}
 
-		packagesInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
+		packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(shadowUtilsPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
 		if err != nil {
+			err = fmt.Errorf("failed to install (%s) package in preparation for modifying users/groups:\n%w", shadowUtilsPkg, err)
 			return
 		}
-
-		// Remove shadow-utils from the list of packages to install
-		packagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != shadowUtilsPkg })
 	}
 
 	hostname := config.Hostname
@@ -643,6 +643,23 @@ func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
 func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err error) {
 	packagesInstalled, err = TdnfInstallWithProgress(packageName, installRoot, 0, 0, false)
 	return
+}
+
+// TdnfInstallPriorityPackage installs a specific package, removing it from the list of packages to install in future
+// steps. This is useful for installing requirements for actual tooling operations that need to be installed before
+// other packages.
+func TdnfInstallPriorityPackage(priorityPackageName, installRoot string, packagesToInstall []string, currentPackagesInstalled, totalPackages int, reportProgress bool,
+) (packagesInstalled int, updatedPackagesToInstall []string, err error) {
+	packagesInstalled, err = TdnfInstallWithProgress(priorityPackageName, installRoot, currentPackagesInstalled, totalPackages, reportProgress)
+	if err != nil {
+		err = fmt.Errorf("failed to install priority package (%s):\n%w", priorityPackageName, err)
+		return packagesInstalled, packagesToInstall, err
+	}
+
+	// Remove the package from the list of packages to install if present
+	updatedPackagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != priorityPackageName })
+
+	return packagesInstalled, updatedPackagesToInstall, err
 }
 
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
