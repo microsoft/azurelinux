@@ -3,6 +3,7 @@
         "cloud-init",
         "cloud-init-azure-kvp",
         "cloud-utils-growpart",
+        "dhcpcd",
         "dhcp-client",
         "dracut-hyperv",
         "grubby",

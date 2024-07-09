@@ -163,6 +163,7 @@
                 "deltarpm",
                 "desktop-file-utils",
                 "device-mapper-persistent-data",
+                "dhcpcd",
                 "dietlibc",
                 "diffstat",
                 "ding-libs",
