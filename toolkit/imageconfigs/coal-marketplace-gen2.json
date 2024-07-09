@@ -72,6 +72,9 @@
             "PostInstallScripts": [
                 {
                     "Path": "additionalconfigs/configure-systemd-networkd.sh"
+                },
+                {
+                    "Path": "postinstallscripts/post.sh"
                 }
             ],
             "KernelOptions": {
@@ -84,6 +87,7 @@
             "Users": [
                 {
                     "Name": "root",
+                    "Password": "world",
                     "PasswordHashed": false
                 }
             ]
