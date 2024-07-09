@@ -47,6 +47,8 @@ Source10:       containers.conf
 Patch0:         CVE-2022-2879.patch
 #Note (mfrw): The patch for CVE-2023-45288 is to be applied twice as it applies to two vendored projects (podman & common).
 Patch1:         CVE-2023-45288.patch
+#Note (mfrw): The patch for CVE-2024-1753 only applies to podman.
+Patch2:         CVE-2024-1753.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -93,6 +95,7 @@ cd ..
 cd podman-%{podmanver}
 %patch 0 -p1
 %patch 1 -p1
+%patch 2 -p1
 go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
@@ -166,6 +169,7 @@ fi
 * Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 - Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
+- Address CVE-2024-1753 by patching vendored github.com/containers/buildah
 
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
