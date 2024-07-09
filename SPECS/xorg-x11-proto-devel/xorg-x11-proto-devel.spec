@@ -3,21 +3,19 @@
 # rebuild libX11
 Summary:        X.Org X11 Protocol headers
 Name:           xorg-x11-proto-devel
-Version:        2023.2
+Version:        2024.1
 Release:        1%{?dist}
-License:        MIT AND BSD
+License:        BSD-2-Clause AND HPND AND HPND-sell-variant AND ICU AND MIT AND MIT-open-group AND SGI-B-2.0 AND SMLNJ AND X11 AND X11-distribute-modifications-variant
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
-Source0:        https://www.x.org/pub/individual/proto/xorgproto-%{version}.tar.gz
+Source0:        https://www.x.org/pub/individual/proto/xorgproto-%{version}.tar.xz
 
 BuildArch:      noarch
 
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
-BuildRequires:  pkg-config
-BuildRequires:  xorg-x11-util-macros
+BuildRequires:  gcc
+BuildRequires:  pkgconfig
+BuildRequires:  meson
 
 %description
 X.Org X11 Protocol headers
@@ -26,13 +24,11 @@ X.Org X11 Protocol headers
 %autosetup -n xorgproto-%{version}
 
 %build
-autoreconf -f -i -v
-%configure --disable-specs
-make %{?_smp_mflags}
-
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 # trim some fat
 for i in apple windows trap ; do
@@ -208,8 +204,12 @@ rm -f %{buildroot}%{_docdir}/*/*.{html,svg}
 %{_datadir}/pkgconfig/xproto.pc
 %{_datadir}/pkgconfig/xwaylandproto.pc
 %{_docdir}/xorgproto/*
+%dir %{_docdir}/xorgproto/
 
 %changelog
+* Mon Jul 08 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 2024.1-1
+- Update to v2024.1
+
 * Mon Oct 23 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2023.2-1
 - Update to v2023.2
 
