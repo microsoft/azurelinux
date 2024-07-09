@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20240213
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,8 @@ Source7:        https://github.com/containers/podman/archive/refs/tags/v%{podman
 Source8:        default.yaml
 Source9:        https://github.com/containers/common/archive/refs/tags/v%{commonver}.tar.gz#/%{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
+#Note (mfrw): The patch for CVE-2022-2879 is to be applied twice as it applies to two vendored projects (podman & common).
+Patch0:         CVE-2022-2879.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -86,10 +88,12 @@ rename '.md' '.1' docs/*
 cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
+%patch 0 -p1
 go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
 cd common-%{commonver}
+%patch 0 -p1
 make docs
 cd ..
 
@@ -154,6 +158,8 @@ fi
 %license LICENSE
 
 %changelog
+* Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
+- Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
 - Rearrange variables to be in alphabetical order, similar to signatures file.
