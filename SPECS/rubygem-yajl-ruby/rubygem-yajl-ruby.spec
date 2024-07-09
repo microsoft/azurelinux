@@ -1,5 +1,7 @@
 %global debug_package %{nil}
 %global gem_name yajl-ruby
+# Versions 1.4.2 and 1.4.3 are not available as tags
+%global commit e8de283a6d64f0902740fd09e858fc3d7d803161
 Summary:        A streaming JSON parsing and encoding library for Ruby
 Name:           rubygem-yajl-ruby
 Version:        1.4.3
@@ -9,8 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/brianmario/yajl-ruby
-Source0:        https://github.com/brianmario/yajl-ruby/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         fix-file_list.patch
+Source0:        https://github.com/brianmario/yajl-ruby/archive/%{commit}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -19,7 +20,10 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 a C binding to the YAJL JSON parsing and generation library.
 
 %prep
-%autosetup -p1 -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{commit}
+# Gemspec uses git to find files
+git init .
+git add .
 
 %build
 gem build %{gem_name}
@@ -29,12 +33,14 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
+%license LICENSE
 %{gemdir}
 
 %changelog
-* Tue Jul 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.3-1
+* Tue Jul 09 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.4.3-1
 - Auto-upgrade to 1.4.3 - CVE-2022-24795
+- Use commit hash in source URL since newer tags are not available
+- Use git to find files in gemspec instead of patching
 
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
 - Auto-upgrade to 1.4.1 - Azure Linux 3.0 - package upgrades
