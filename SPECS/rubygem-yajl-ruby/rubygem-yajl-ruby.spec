@@ -2,7 +2,7 @@
 %global gem_name yajl-ruby
 Summary:        A streaming JSON parsing and encoding library for Ruby
 Name:           rubygem-yajl-ruby
-Version:        1.4.1
+Version:        1.4.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jul 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.3-1
+- Auto-upgrade to 1.4.3 - CVE-2022-24795
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
 - Auto-upgrade to 1.4.1 - Azure Linux 3.0 - package upgrades
 
