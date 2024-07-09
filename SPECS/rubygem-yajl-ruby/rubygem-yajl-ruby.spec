@@ -1,6 +1,7 @@
 %global debug_package %{nil}
 %global gem_name yajl-ruby
 # Versions 1.4.2 and 1.4.3 are not available as tags
+# Look to https://github.com/brianmario/yajl-ruby/blob/master/lib/yajl/version.rb to see when the version changes.
 %global commit e8de283a6d64f0902740fd09e858fc3d7d803161
 Summary:        A streaming JSON parsing and encoding library for Ruby
 Name:           rubygem-yajl-ruby
