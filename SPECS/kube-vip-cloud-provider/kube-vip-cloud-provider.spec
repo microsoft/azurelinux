@@ -27,10 +27,7 @@ BuildRequires: golang >= 1.22
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups. 
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -a 1 -p1
 
 %build 
 go build -mod=vendor
