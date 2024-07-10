@@ -63,7 +63,6 @@ Webhook component providing API validation, mutation and conversion functionalit
 %build
 
 LOCAL_BIN_DIR=$(realpath bin)
-# LOCAL_MOD_DIR=$(realpath vendor)
 go -C cmd/acmesolver build -mod=vendor -o "${LOCAL_BIN_DIR}"/acmesolver main.go
 go -C cmd/controller build -mod=vendor -o "${LOCAL_BIN_DIR}"/controller main.go
 go -C cmd/cainjector build -mod=vendor -o "${LOCAL_BIN_DIR}"/cainjector main.go
