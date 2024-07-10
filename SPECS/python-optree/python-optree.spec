@@ -2,7 +2,7 @@
 Summary:        Optimized PyTree Utilities
 Name:           python-optree
 Version:        0.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ BuildRequires:  cmake
 BuildRequires:  pybind11-devel
 BuildRequires:  python3-pybind11
 Requires:       python3
+Requires:       python3-typing-extensions
 
 %description -n python3-optree
 A PyTree is a recursive structure that can be an arbitrarily nested Python container (e.g., tuple, list, dict, OrderedDict, NamedTuple, etc.) or an opaque Python object.
@@ -42,6 +43,9 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 %{python3_sitelib}/*
 
 %changelog
+* Wed July 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-2
+- Add missing runtime dependency python3-typing-extensions.
+
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-1
 - Original version for Azure Linux.
 - License Verified.
