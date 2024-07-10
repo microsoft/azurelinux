@@ -140,6 +140,7 @@ Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
 Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
+Patch4:         Port-to-maven-3.8.1.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -299,6 +300,8 @@ popd
 pushd "downstream/plexus-archiver"
 %patch2 -p1 
 popd
+
+%patch4 -p1
 
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
