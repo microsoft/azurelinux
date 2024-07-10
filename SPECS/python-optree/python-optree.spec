@@ -18,6 +18,8 @@ Summary:        Optimized PyTree Utilities.
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  python3-typing-extensions
 BuildRequires:  pybind11-devel
 BuildRequires:  python3-pybind11
 Requires:       python3
@@ -45,6 +47,7 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 %changelog
 * Wed July 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-2
 - Add missing runtime dependency python3-typing-extensions.
+- Add missing build dependency gcc. 
 
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-1
 - Original version for Azure Linux.
