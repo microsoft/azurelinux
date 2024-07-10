@@ -18,7 +18,7 @@
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.35.1
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ BuildRequires:  kernel = %{version}-%{release}
 BuildRequires:  systemd-ukify
 BuildRequires:  dracut
 BuildRequires:  binutils
-BuildRequires:  systemd-boot-unsigned
+BuildRequires:  systemd-boot
 BuildRequires:  systemd-udev
 BuildRequires:  system-release
 BuildRequires:  tpm2-tools
@@ -59,12 +59,25 @@ ukify build \
       --output vmlinuz-uki.efi
 
 %install
-install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
+install -vdm 700 %{buildroot}/boot
+install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
+install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
+ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %files
+/boot/vmlinuz-uki-%{kernelver}.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Fri Jul 05 2024 Gary Swalling <gaswal@microsoft.com> - 6.6.35.1-4
+- Bump release to match kernel
+
+* Mon Jul 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-3
+- Bump release to match kernel
+
+* Fri Jun 28 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.35.1-2
+- Bump release to match kernel
+
 * Tue Jun 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1
 - Auto-upgrade to 6.6.35.1
 

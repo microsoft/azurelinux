@@ -204,6 +204,10 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 
 EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `true`.
 
+### EnableSystemdFirstboot
+
+EnableSystemdFirstboot is a optional boolean that controls whether the image will run the systemd-firstboot service on first boot. Setting to `true` will set `/etc/machine-id` to `"uninitialized"`, while setting to `false` will leave `/etc/machine-id` blank. See [https://www.freedesktop.org/software/systemd/man/latest/machine-id.html] for more information. By default firstboot is disabled.
+
 ### PackageLists
 
 PackageLists key consists of an array of relative paths to the package lists (JSON files).
@@ -554,6 +558,7 @@ The table below are the keys for the users.
 |PrimaryGroup       |string             |
 |SecondaryGroups    |array of strings   |
 |StartupCommand     |string             |
+|HomeDirectory      |string             |
 
 An example usage for users "root" and "basicUser" would look like:
 

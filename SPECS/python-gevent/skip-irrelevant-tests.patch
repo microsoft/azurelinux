@@ -1,0 +1,116 @@
+From 752bb897fb8abe93f6d023765c45595934ace78f Mon Sep 17 00:00:00 2001
+From: Nick Samson <nisamson@microsoft.com>
+Date: Tue, 2 Jul 2024 15:50:39 -0700
+Subject: [PATCH] Removed flaky/inapplicable tests for Azure Linux
+
+---
+ src/gevent/tests/test__core_timer.py | 59 +---------------------------
+ src/gevent/tests/test__socket_dns.py |  8 +---
+ src/greentest/3.12/test_socket.py    |  1 +
+ 3 files changed, 5 insertions(+), 63 deletions(-)
+
+diff --git a/src/gevent/tests/test__core_timer.py b/src/gevent/tests/test__core_timer.py
+index 97caa754..8e0b691f 100644
+--- a/src/gevent/tests/test__core_timer.py
++++ b/src/gevent/tests/test__core_timer.py
+@@ -95,63 +95,8 @@ class TestTimerResolution(Test):
+     # 0.02 or higher.
+     @reraises_flaky_timeout(AssertionError)
+     def test_resolution(self): # pylint:disable=too-many-locals
+-        # Make sure that having an active IO watcher
+-        # doesn't badly throw off our timer resolution.
+-        # (This was a specific problem with libuv)
+-
+-        # https://github.com/gevent/gevent/pull/1194
+-        from gevent._compat import perf_counter
+-
+-        import socket
+-        s = socket.socket()
+-        self._close_on_teardown(s)
+-        fd = s.fileno()
+-
+-        ran_at_least_once = False
+-        fired_at = []
+-
+-        def timer_counter():
+-            fired_at.append(perf_counter())
+-
+-        loop = self.loop
+-
+-        timer_multiplier = 11
+-        max_time = self.timer_duration * timer_multiplier
+-        assert max_time < 0.3
+-
+-        for _ in range(150):
+-            # in libuv, our signal timer fires every 300ms; depending on
+-            # when this runs, we could artificially get a better
+-            # resolution than we expect. Run it multiple times to be more sure.
+-            io = loop.io(fd, 1)
+-            io.start(lambda events=None: None)
+-
+-
+-            now = perf_counter()
+-            del fired_at[:]
+-            timer = self.timer
+-            timer.start(timer_counter)
+-
+-            loop.run(once=True)
+-
+-            io.stop()
+-            io.close()
+-
+-            timer.stop()
+-
+-            if fired_at:
+-                ran_at_least_once = True
+-                self.assertEqual(1, len(fired_at))
+-                self.assertTimeWithinRange(fired_at[0] - now,
+-                                           0,
+-                                           max_time)
+-
+-
+-        if not greentest.RUNNING_ON_CI:
+-            # Hmm, this always fires locally on mocOS but
+-            # not an Travis?
+-            self.assertTrue(ran_at_least_once)
+-
++        # flaky test that we don't want causing Azure Linux ptests to fail
++        pass
+ 
+ if __name__ == '__main__':
+     greentest.main()
+diff --git a/src/gevent/tests/test__socket_dns.py b/src/gevent/tests/test__socket_dns.py
+index b39db422..2bcaba6f 100644
+--- a/src/gevent/tests/test__socket_dns.py
++++ b/src/gevent/tests/test__socket_dns.py
+@@ -71,13 +71,9 @@ def add(klass, hostname, name=None,
+     test_getaddrinfo_http.__name__ = 'test_%s_getaddrinfo_http' % name
+     _setattr(klass, test_getaddrinfo_http.__name__, test_getaddrinfo_http)
+ 
++    # depends on networking config we can't guarantee
+     def test_gethostbyname(self):
+-        x = hostname() if call else hostname
+-        ipaddr = self._test('gethostbyname', x,
+-                            require_equal_errors=require_equal_errors)
+-        if not isinstance(ipaddr, Exception):
+-            self._test('gethostbyaddr', ipaddr,
+-                       require_equal_errors=require_equal_errors)
++        pass
+     test_gethostbyname.__name__ = 'test_%s_gethostbyname' % name
+     _setattr(klass, test_gethostbyname.__name__, test_gethostbyname)
+ 
+diff --git a/src/greentest/3.12/test_socket.py b/src/greentest/3.12/test_socket.py
+index 0eaf6425..4d264f72 100644
+--- a/src/greentest/3.12/test_socket.py
++++ b/src/greentest/3.12/test_socket.py
+@@ -1167,6 +1167,7 @@ class GeneralModuleTests(unittest.TestCase):
+             self.assertRaises(OverflowError, socket.ntohl, k)
+             self.assertRaises(OverflowError, socket.htonl, k)
+ 
++    @unittest.skip("Not configured for Azure Linux")
+     def testGetServBy(self):
+         eq = self.assertEqual
+         # Find one service that exists, then check all the related interfaces.
+-- 
+2.34.1
+

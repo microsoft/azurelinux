@@ -284,12 +284,12 @@ func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 		return
 	}
 
-	bytes := []byte(rawDiskOutput)
-
 	var blockDevices blockDevicesOutput
-	err = json.Unmarshal(bytes, &blockDevices)
-	if err != nil {
-		return
+	if rawDiskOutput != "" {
+		err = json.Unmarshal([]byte(rawDiskOutput), &blockDevices)
+		if err != nil {
+			return
+		}
 	}
 
 	if len(blockDevices.Devices) != 1 {
@@ -390,9 +390,11 @@ func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
 		}
 
 		var output loopbackListOutput
-		err = json.Unmarshal([]byte(stdout), &output)
-		if err != nil {
-			return fmt.Errorf("failed to parse loopback devices list JSON:\n%w", err)
+		if stdout != "" {
+			err = json.Unmarshal([]byte(stdout), &output)
+			if err != nil {
+				return fmt.Errorf("failed to parse loopback devices list JSON:\n%w", err)
+			}
 		}
 
 		found := false
@@ -766,7 +768,6 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 		virtualDiskMajorNumber   = "252,253,254"
 		blockExtendedMajorNumber = "259"
 	)
-	var blockDevices blockDevicesOutput
 
 	blockDeviceMajorNumbers := []string{scsiDiskMajorNumber, mmcBlockMajorNumber, virtualDiskMajorNumber, blockExtendedMajorNumber}
 	includeFilter := strings.Join(blockDeviceMajorNumbers, ",")
@@ -775,14 +776,17 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 		err = fmt.Errorf("%v\n%w", stderr, err)
 		return
 	}
-	if len(rawDiskOutput) == 0 {
-		err = fmt.Errorf("failed to find supported disks:\n%w", err)
-		return
+
+	var blockDevices blockDevicesOutput
+	if rawDiskOutput != "" {
+		err = json.Unmarshal([]byte(rawDiskOutput), &blockDevices)
+		if err != nil {
+			return
+		}
 	}
 
-	bytes := []byte(rawDiskOutput)
-	err = json.Unmarshal(bytes, &blockDevices)
-	if err != nil {
+	if len(blockDevices.Devices) <= 0 {
+		err = fmt.Errorf("failed to find supported disks:\n%w", err)
 		return
 	}
 
@@ -816,9 +820,11 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	}
 
 	var output partitionInfoOutput
-	err = json.Unmarshal([]byte(jsonString), &output)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON:\n%w", diskDevPath, err)
+	if jsonString != "" {
+		err = json.Unmarshal([]byte(jsonString), &output)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON:\n%w", diskDevPath, err)
+		}
 	}
 
 	return output.Devices, err
