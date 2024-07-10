@@ -76,6 +76,8 @@ os:
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
     files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
+    # Enable DHCP client on all of the physical NICs.
+    files/89-ethernet.network: /etc/systemd/network/89-ethernet.network
 
   services:
     enable:
@@ -92,3 +94,12 @@ scripts:
   postCustomization:
     # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
   - path: scripts/ssh-move-host-keys.sh
+
+  finalizeCustomization:
+  - content: |
+      set -eux
+
+      # Configure the /etc/resolv.conf file to use systemd-resolved.
+      # Typically, this file is created during first-boot. But this cannot happen when the filesystem is read-only.
+      ln -srT ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    name: Fix resolv.conf file
