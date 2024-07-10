@@ -90,9 +90,7 @@ tar -xf "${SRC_TARBALL}"
 cd "cert-manager-${PKG_VERSION}"
 
 # We need to individually vendor each cmd we will build
-cmd_directories=("cmd/acmesolver" "cmd/cainjector" "cmd/controller" "cmd/ctl" "cmd/webhook")
 vendor_directories=()
-
 
 echo "Get vendored modules for each command"
 for dir in cmd/*; do
