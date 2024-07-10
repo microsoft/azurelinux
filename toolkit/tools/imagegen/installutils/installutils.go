@@ -426,6 +426,28 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 	return
 }
 
+// orderPackageInstallList updates the order we will install packages if needed. Installing each package one at a time
+// can cause issues with ordering since we aren't doing a single transaction. For example, the initramfs regeneration is
+// done as a post transaction step and only needs to be done once after all other packages are installed. Since we are
+// not doing a single transaction it has an opportunity to trigger repeatedly. Moving it to the end of the list means it
+// will only trigger once.
+func orderPackageInstallList(packageList []string) []string {
+	const initramfsPackagePrefix = "initramfs"
+
+	initramfsPackages := []string{}
+	orderedPackageList := []string{}
+	for _, pkg := range packageList {
+		// Search for initramfs, ignoring any version info at the end of the package name.
+		if strings.HasPrefix(pkg, initramfsPackagePrefix) {
+			initramfsPackages = append(initramfsPackages, pkg)
+		} else {
+			orderedPackageList = append(orderedPackageList, pkg)
+		}
+	}
+	orderedPackageList = append(orderedPackageList, initramfsPackages...)
+	return orderedPackageList
+}
+
 // PopulateInstallRoot fills the installroot with packages and configures the image for boot
 // - installChroot is a pointer to the install Chroot object
 // - packagesToInstall is a slice of packages to install
@@ -473,6 +495,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 			}
 		}()
 	}
+
+	// Change the ordering if needed (ie make sure initramfs is last)
+	packagesToInstall = orderPackageInstallList(packagesToInstall)
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
