@@ -136,7 +136,7 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
 
-%ifarch %{ix86} x86_64 aarch64
+%ifarch %{ix86} x86_64
 %global want_bootloader 1
 %endif
 
@@ -480,7 +480,6 @@ Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes:      systemd-udev < 252.2^
-ExclusiveArch:  x86_64
 
 %description boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
