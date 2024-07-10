@@ -14,6 +14,7 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang
@@ -44,8 +45,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
-* Wed Jul 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.0-1
-- Auto-upgrade to 1.30.0 - CVE-2024-21626
+* Wed Jul 10 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.30.0-1
+- Auto-upgrade to 1.30.0 to CVE-2024-21626
+- Adding patch for CVE-2023-45288
 
 * Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.0-1
 - Auto-upgrade to 1.29.0 - 3.0 batch package upgrade
