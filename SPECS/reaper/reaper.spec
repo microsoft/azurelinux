@@ -34,6 +34,7 @@ Source7:        reaper-local-n-%{version}-%{local_n_release}.tar.gz
 # https://github.com/websockets/ws/commit/eeb76d313e2a00dd5247ca3597bba7877d064a63
 Patch0:         CVE-2024-37890.patch
 Patch1:         CVE-2023-42282.patch
+Patch2:         CVE-2017-18214.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -171,7 +172,7 @@ fi
 
 %changelog
 * Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-10
-- Patching CVE-2024-37890 and CVE-2023-42282.
+- Patching CVE-2024-37890, CVE-2023-42282, and CVE-2017-18214.
 
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
 - Repackage and update src/ui node modules and bower components to 3.1.1-1
