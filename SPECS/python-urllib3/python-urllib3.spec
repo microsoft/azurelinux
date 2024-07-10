@@ -1,6 +1,6 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        2.0.4
+Version:        2.0.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -11,6 +11,7 @@ Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{
 BuildArch:      noarch
 Patch0:         urllib3_test_recent_date.patch
 Patch1:         change-backend-to-flit_core.patch
+Patch2:         CVE-2024-37891.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -82,6 +83,10 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jul 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.7-1
+- Bump version to fix CVE-2023-43804 & CVE-2023-45803.
+- Add patch file to fix CVE-2024-37891.
+
 * Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 2.0.4-1
 - Upgrade to version 2.0.4
 - Add patch to change backend build system to python-flit-core
