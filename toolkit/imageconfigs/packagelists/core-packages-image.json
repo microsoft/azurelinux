@@ -10,5 +10,5 @@
         "dracut-vrf",
         "initramfs",
         "shadow-utils"
-    ],
+    ]
 }
