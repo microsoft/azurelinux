@@ -1,6 +1,5 @@
 {
     "packages": [
         "dracut-fips"
-    ],
-    "_comment": "Put dracut-fips before initramfs package to prevent extra initramfs generation"
+    ]
 }

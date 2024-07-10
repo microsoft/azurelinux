@@ -9,6 +9,5 @@
         "dracut-hostonly",
         "dracut-vrf",
         "initramfs"
-    ],
-    "_comment": "Install 'initramfs' last to avoid unnecessary regeneration when other packages, such as 'kernel', are installed."
+    ]
 }
