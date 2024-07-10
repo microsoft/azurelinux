@@ -3,13 +3,6 @@
 %define local_n_release 1
 %define local_srcui_release 1
 
-%define srcdir cassandra-%{name}-%{version}
-%define bower_components reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
-%define srcui_node_modules reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
-%define maven_cache reaper-m2-cache-%{version}.tar.gz
-%define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
-%define local_n reaper-local-n-%{version}-%{local_n_release}.tar.gz
-
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
@@ -25,15 +18,15 @@ Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/t
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
 # NOTE: USE "reaper_build_caches.sh" TO RE-GENERATE BUILD CACHES.
-Source1:        %{bower_components}
+Source1:        reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
 # node_modules downloaded under src/ui
-Source2:        %{srcui_node_modules}
+Source2:        reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
 # m2 cache
-Source4:        %{maven_cache}
+Source4:        reaper-m2-cache-%{version}.tar.gz
 # node_modules downloaded to /usr/local/lib
-Source6:        %{local_lib_node_modules}
+Source6:        reaper-local-lib-node-modules-%{version}.tar.gz
 # v14.18.0 node binary under /usr/local
-Source7:        %{local_n}
+Source7:        reaper-local-n-%{version}-%{local_n_release}.tar.gz
 # Patches the src/ui/node_modules/ws/lib/websocket-server.js file, which comes
 # from the "reaper-srcui-node-modules*" tarball.
 # The src/ui/node_modules/ws/package.json file suggest we're on the
@@ -61,7 +54,7 @@ ExclusiveArch:  x86_64
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%autosetup -N -n %{srcdir}
+%autosetup -N -n cassandra-%{name}-%{version}
 
 echo "Installing bower_components and npm_modules caches."
 for source in "%{SOURCE1}" "%{SOURCE2}"; do
@@ -120,7 +113,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
 mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_datadir}/licenses/%{name}
-cd %{_builddir}/%{srcdir}/src/packaging
+
+pushd src/packaging
 
 cp resource/cassandra-reaper.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/
 cp resource/cassandra-reaper*.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
@@ -137,7 +131,7 @@ cp debian/cassandra-%{name}.new.service %{buildroot}/%{_unitdir}/cassandra-%{nam
 chmod 0644 %{buildroot}/%{_unitdir}/cassandra-%{name}.service
 chmod 7555 %{buildroot}%{_sysconfdir}/init.d/cassandra-%{name}
 
-cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/%{name}
+popd
 
 %pre
 getent group reaper > /dev/null || groupadd -r reaper
