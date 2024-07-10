@@ -37,6 +37,7 @@ BuildRequires:  tpm2-tools
 BuildRequires:  cryptsetup
 BuildRequires:  device-mapper
 BuildRequires:  kbd
+ExclusiveArch:  x86_64
 
 %description
 The kernel-uki package contains the Linux kernel packaged as a Unified

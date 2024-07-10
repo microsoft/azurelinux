@@ -480,6 +480,7 @@ Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes:      systemd-udev < 252.2^
+ExclusiveArch:  x86_64
 
 %description boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
