@@ -1,13 +1,14 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-define-IRQBALANCE_ARGS-as-empty-string.patch
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
 Requires:       systemd
@@ -56,6 +57,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Mon Jul 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.9.3-2
+- Define IRQBALANCE_ARGS variable in EnvironmentFile for irqbalance.service
+    to squelch systemd warning. 
+
 * Wed Jan 03 2024 Muhammad Falak <mwani@microsoft.com> - 1.9.3-1
 - Drop un-needed patches
 - Bump version to 1.9.3
