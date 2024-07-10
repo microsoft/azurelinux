@@ -66,16 +66,16 @@ os:
     - vim
     - rpm-build
   additionalFiles:
-    10-eth0.network:
+    image-files/configs/10-eth0.network:
     - path: /etc/systemd/network/10-eth0.network
       permissions: "644"
-    00-configure-docker.sh:
+    image-files/scripts/00-configure-docker.sh:
     - path: /home/testuser/00-configure-docker.sh
       permissions: "755"
-    10-enlist.sh:
+    image-files/scripts/10-enlist.sh:
     - path: /home/testuser/10-enlist.sh
       permissions: "755"
-    20-build-pkg.sh:
+    image-files/scripts/20-build-pkg.sh:
     - path: /home/testuser/20-build-pkg.sh
       permissions: "755"
 scripts:
