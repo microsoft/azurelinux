@@ -30168,8 +30168,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-proto-devel",
-          "version": "2023.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2023.2.tar.gz"
+          "version": "2024.1",
+          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2024.1.tar.xz"
         }
       }
     },
