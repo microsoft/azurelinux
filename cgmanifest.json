@@ -4649,6 +4649,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "golang",
+          "version": "1.22.4",
+          "downloadUrl": "https://golang.org/dl/go1.22.4.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "golang-crypto",
           "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
           "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
