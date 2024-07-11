@@ -211,6 +211,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
 
+	err = checkVerityPrerequisities(config)
+	if err != nil {
+		return err
+	}
+
 	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
 		baseConfigPath, config,
 		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
@@ -604,6 +609,23 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 	config.Packages.RemoveLists = nil
 	config.Packages.InstallLists = nil
 	config.Packages.UpdateLists = nil
+
+	return nil
+}
+
+func checkVerityPrerequisities(config *imagecustomizerapi.Config) error {
+	if config == nil || config.OS == nil || config.OS.Verity == nil {
+		return nil
+	}
+
+	isNbdLoaded, err := isNbdLoaded()
+	if err != nil {
+		return fmt.Errorf("failed to check if NBD is loaded:\n%w", err)
+	}
+
+	if !isNbdLoaded {
+		return fmt.Errorf("verity requires nbd module to be loaded:\nplease run: modprobe nbd")
+	}
 
 	return nil
 }
