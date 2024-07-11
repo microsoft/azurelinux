@@ -6,7 +6,7 @@ Release:        2%{?dist}
 Summary:        EGL External Platform Interface headers
 License:        MIT
 URL:            https://github.com/NVIDIA
-Source0:        %url/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %url/%{name}/archive/%{version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
