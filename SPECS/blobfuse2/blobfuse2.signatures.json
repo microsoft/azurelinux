@@ -1,6 +1,6 @@
 {
     "Signatures": {
-     "blobfuse2-2.1.2.tar.gz": "4605015d99c7ffac37ae464aa1d23c11ecd6218122acb06f1c46ac7bdced908e",
-     "blobfuse2-2.1.2-vendor.tar.gz": "84229241b170316438aa408ae38216e01c54fffdbe50b59ae3b5ab1b4f7122c6"
+     "blobfuse2-2.3.0.tar.gz": "9e7c3b98c4967d45405a4b9450fb3e90e329ffefaef1ffa0e6cedfd66991881b",
+     "blobfuse2-2.3.0-vendor.tar.gz": "fea87a77eb3ee28883c1e24de6213c5db1288387b9f9162f4fc57cfdffe97ddb"
     }
 }
