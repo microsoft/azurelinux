@@ -20,5 +20,5 @@ cp ${SCRIPT_DIR}/agent/usr/lib/systemd/system/kata-agent.service   ${ROOTFS_DIR}
 
 # build initrd
 pushd ${OSBUILDER_DIR}
-sudo -E PATH=$PATH make DISTRO=cbl-mariner TARGET_ROOTFS=${ROOTFS_DIR} OS_VERSION=3.0 initrd
+sudo -E PATH=$PATH make DISTRO=cbl-mariner TARGET_ROOTFS=${ROOTFS_DIR} initrd
 popd

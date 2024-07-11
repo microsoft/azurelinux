@@ -43,5 +43,5 @@ sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/li
 # build image
 pushd ${OSBUILDER_DIR}
 mv rootfs-builder/rootfs-cbl-mariner cbl-mariner_rootfs
-sudo -E PATH=$PATH make DISTRO=cbl-mariner MEASURED_ROOTFS=yes DM_VERITY_FORMAT=kernelinit OS_VERSION=3.0 image
+sudo -E PATH=$PATH make DISTRO=cbl-mariner MEASURED_ROOTFS=yes DM_VERITY_FORMAT=kernelinit image
 popd
