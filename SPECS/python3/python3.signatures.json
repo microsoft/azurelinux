@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "Python-3.12.0.tar.xz": "795c34f44df45a0e9b9710c8c71c15c671871524cd412ca14def212e8ccb155d",
-  "pathfix.py": "7a2ff222346d3c95b08814e3372975823e099c17dddaa73a459a3d840e6e9c1b"
- }
+  "Signatures": {
+    "pathfix.py": "7a2ff222346d3c95b08814e3372975823e099c17dddaa73a459a3d840e6e9c1b",
+    "Python-3.12.2.tar.xz": "be28112dac813d2053545c14bf13a16401a21877f1a69eb6ea5d84c4a0f3d870"
+  }
 }
