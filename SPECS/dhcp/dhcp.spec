@@ -58,6 +58,7 @@ CFLAGS="$CFLAGS \
     --with-cli-pid-file=%{_localstatedir}/run/dhclient.pid \
     --with-cli6-pid-file=%{_localstatedir}/run/dhclient6.pid \
     --with-relay-pid-file=%{_localstatedir}/run/dhcrelay.pid \
+    --with-randomdev=/dev/urandom \
     --enable-log-pid \
     --enable-paranoia --enable-early-chroot
 
