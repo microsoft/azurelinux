@@ -10,7 +10,7 @@ on:
     branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
 env:
-  EXPECTED_GO_VERSION: "1.20"
+  EXPECTED_GO_VERSION: "1.21"
 
 jobs:
   build:
