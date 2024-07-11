@@ -141,7 +141,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Jul 08 202 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.4
+* Mon Jul 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.4
 - Bump version to 1.22.4
 
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.11-1
