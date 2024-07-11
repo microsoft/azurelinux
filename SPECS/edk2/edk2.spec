@@ -52,7 +52,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -115,6 +115,7 @@ Patch0013: 0013-UefiCpuPkg-MpInitLib-fix-apic-mode-for-cpu-hotplug.patch
 Patch0014: 0014-CryptoPkg-CrtLib-add-stat.h.patch
 Patch0015: 0015-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
 Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
+Patch1000: CVE-2022-3996.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -306,10 +307,15 @@ git config core.whitespace cr-at-eol
 git config am.keepcr true
 # -T is passed to %%setup to not re-extract the archive
 # -D is passed to %%setup to not delete the existing archive dir
-%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am
+%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am -N
+# -M Apply patches up to 999
+%autopatch -M 999
 
 cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
+# Need to patch CVE-2022-3996 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
+
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
 tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
@@ -733,6 +739,9 @@ done
 
 
 %changelog
+* Tue Jul 9 2024 Suresh Thelkar <sthelkar@microsoft.com> - 20240223gitedc6681206c1-2
+- Patch CVE-2022-3996 in bundled OpenSSL
+
 * Fri Mar 8 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
 - Bump version to edk2-stable202402
 
