@@ -45,7 +45,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
 %license LICENSE
-%doc README.rst
+%doc README.md
 %{python3_sitelib}/%{pkgname}
 %{python3_sitelib}/*.egg-info
 
