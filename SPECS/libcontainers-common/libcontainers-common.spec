@@ -67,10 +67,23 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 
 %prep
 %setup -q -T -D -b 0 -n image-%{imagever}
+# NOTE: Patch3 has to be applied as -p6
+%patch 3 -p6
+
 %setup -q -T -D -b 1 -n storage-%{storagever}
+
 %setup -q -T -D -b 7 -n podman-%{podmanver}
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+
 %setup -q -T -D -b 9 -n common-%{commonver}
 # copy the LICENSE file in the build root
+%patch 0 -p1
+%patch 1 -p1
+%patch 3 -p1
 cd ..
 cp %{SOURCE2} .
 
@@ -79,8 +92,6 @@ cd ..
 pwd
 # compile containers/image manpages
 cd image-%{imagever}
-# NOTE: Patch3 has to be applied as -p6
-patch -p6 < %{PATCH3}
 for md in docs/*.md
 do
 	go-md2man -in $md -out $md
@@ -99,18 +110,10 @@ rename '.md' '.1' docs/*
 cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
-patch -p1 < %{PATCH0}
-patch -p1 < %{PATCH1}
-patch -p1 < %{PATCH2}
-patch -p1 < %{PATCH3}
-patch -p1 < %{PATCH4}
 go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
 cd common-%{commonver}
-patch -p1 < %{PATCH0}
-patch -p1 < %{PATCH1}
-patch -p1 < %{PATCH3}
 make docs
 cd ..
 
@@ -181,7 +184,6 @@ fi
 - Address CVE-2024-1753 by patching vendored github.com/containers/buildah
 - Address CVE-2024-3727 by patching vendored github.com/containers/image
 - Address CVE-2024-37298 by patching vendored github.com/gorilla/schema
-- Use patch command instead of %patch macro in %build section
 
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
