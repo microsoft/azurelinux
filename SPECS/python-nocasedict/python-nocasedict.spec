@@ -2,7 +2,7 @@
 %define six_version 1.14.0
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
-Version:        2.0.1
+Version:        2.0.3
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
