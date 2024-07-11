@@ -42,6 +42,7 @@ install -p -m 0644 eglexternalplatform.pc %{buildroot}%{_datadir}/pkgconfig/
 %changelog
 * Wed Jul 10 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.1-2
 - Update Source0 with Fedora 41.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -3209,7 +3209,7 @@
         "other": {
           "name": "eglexternalplatform",
           "version": "1.1",
-          "downloadUrl": "https://github.com/NVIDIA/eglexternalplatform/archive/1.1/eglexternalplatform-1.1.tar.gz"
+          "downloadUrl": "https://github.com/NVIDIA/eglexternalplatform/archive/1.1/1.1.tar.gz"
         }
       }
     },
