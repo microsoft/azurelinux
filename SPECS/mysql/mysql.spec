@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.35
-Release:        4%{?dist}
+Version:        8.0.36
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Jun 18 2024 Archana Choudhary <archana1@microsoft.com> - 8.0.36-1
+- Upgrade to 8.0.36 to fix 10 CVEs
+
 * Fri Jan 26 2024 Andy Zaugg <azaugg@linkedin.com> - 8.0.35-4
 - Add shadow-utils dependency for rpm post and uninstall scripts
 
