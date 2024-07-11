@@ -16,7 +16,8 @@ sudo apt -y install \
     gawk \
     genisoimage \
     git \
-    golang-1.20-go \
+    golang-1.21-go \
+    jq \
     make \
     parted \
     pigz \
