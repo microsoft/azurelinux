@@ -25,11 +25,12 @@ const (
 	tmpParitionDirName = "tmppartition"
 
 	// supported input formats
-	ImageFormatVhd   = "vhd"
-	ImageFormatVhdx  = "vhdx"
-	ImageFormatQCow2 = "qcow2"
-	ImageFormatIso   = "iso"
-	ImageFormatRaw   = "raw"
+	ImageFormatVhd      = "vhd"
+	ImageFormatVhdFixed = "vhd-fixed"
+	ImageFormatVhdx     = "vhdx"
+	ImageFormatQCow2    = "qcow2"
+	ImageFormatIso      = "iso"
+	ImageFormatRaw      = "raw"
 
 	// qemu-specific formats
 	QemuFormatVpc = "vpc"
@@ -70,12 +71,11 @@ type ImageCustomizerParameters struct {
 	rawImageFile string
 
 	// output image
-	outputImageFormat     string
-	outputIsIso           bool
-	qemuOutputImageFormat string
-	outputImageFile       string
-	outputImageDir        string
-	outputImageBase       string
+	outputImageFormat string
+	outputIsIso       bool
+	outputImageFile   string
+	outputImageDir    string
+	outputImageBase   string
 }
 
 func createImageCustomizerParameters(buildDir string,
@@ -127,7 +127,7 @@ func createImageCustomizerParameters(buildDir string,
 	ic.outputImageDir = filepath.Dir(outputImageFile)
 
 	if ic.outputImageFormat != "" && !ic.outputIsIso {
-		ic.qemuOutputImageFormat, err = toQemuImageFormat(ic.outputImageFormat)
+		err = validateImageFormat(ic.outputImageFormat)
 		if err != nil {
 			return nil, err
 		}
@@ -390,10 +390,18 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 
 	// Create final output image file if requested.
 	switch ic.outputImageFormat {
-	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", ic.outputImageFile)
 
-		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", ic.qemuOutputImageFormat, ic.rawImageFile, ic.outputImageFile)
+		qemuImageFormat, qemuOptions := toQemuImageFormat(ic.outputImageFormat)
+
+		qemuImgArgs := []string{"convert", "-O", qemuImageFormat}
+		if qemuOptions != "" {
+			qemuImgArgs = append(qemuImgArgs, "-o", qemuOptions)
+		}
+		qemuImgArgs = append(qemuImgArgs, ic.rawImageFile, ic.outputImageFile)
+
+		err := shell.ExecuteLiveWithErr(1, "qemu-img", qemuImgArgs...)
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
 		}
@@ -415,16 +423,26 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 	return nil
 }
 
-func toQemuImageFormat(imageFormat string) (string, error) {
+func validateImageFormat(imageFormat string) error {
 	switch imageFormat {
-	case ImageFormatVhd:
-		return QemuFormatVpc, nil
-
-	case ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
-		return imageFormat, nil
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
+		return nil
 
 	default:
-		return "", fmt.Errorf("unsupported image format (supported: vhd, vhdx, raw, qcow2): %s", imageFormat)
+		return fmt.Errorf("unsupported image format (supported: vhd, vhd-fixed, vhdx, raw, qcow2): %s", imageFormat)
+	}
+}
+
+func toQemuImageFormat(imageFormat string) (string, string) {
+	switch imageFormat {
+	case ImageFormatVhd:
+		return QemuFormatVpc, ""
+
+	case ImageFormatVhdFixed:
+		return QemuFormatVpc, "subformat=fixed,force_size"
+
+	default:
+		return imageFormat, ""
 	}
 }
 
