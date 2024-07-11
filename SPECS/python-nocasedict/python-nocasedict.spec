@@ -50,6 +50,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.0.3-1
+- Upgrade to 2.0.3
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
 - Auto-upgrade to 2.0.1 - Azure Linux 3.0 - package upgrades
 
