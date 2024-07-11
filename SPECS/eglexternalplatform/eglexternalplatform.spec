@@ -1,18 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global commit 7c8f8e2218e46b1a4aa9538520919747f1184d86
-%global shortcommit0 %(c=%{commit}; echo ${c:0:7})
-%global debug_package %{nil}
-
 Name:           eglexternalplatform
 Version:        1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        EGL External Platform Interface headers
-
 License:        MIT
 URL:            https://github.com/NVIDIA
-Source0:        %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
-
+Source0:        %url/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -27,7 +21,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup
 
 %build
 
@@ -46,6 +40,9 @@ install -p -m 0644 eglexternalplatform.pc %{buildroot}%{_datadir}/pkgconfig/
 
 
 %changelog
+* Wed Jul 10 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.1-2
+- Update Source0 with Fedora 41.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
