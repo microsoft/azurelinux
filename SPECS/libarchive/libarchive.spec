@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Distribution:   Mariner
 URL:            https://www.libarchive.org/
 Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-36227.patch
+Patch1:         CVE-2024-26256.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -61,6 +62,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jun 06 2024 Nan Liu <liunan@microsoft.com> - 3.6.1-3
+- Patch CVE-2024-26256
+
 * Thu Dec 01 2022 Muhammad Falak <mwani@microsoft.com> - 3.6.1-2
 - Patch CVE-2022-36227
 
