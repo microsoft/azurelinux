@@ -11,7 +11,7 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.160.1
+Version:        5.15.162.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -73,6 +73,9 @@ done
 %endif
 
 %changelog
+* Thu Jul 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.162.1-1
+- Auto-upgrade to 5.15.162.1
+
 * Sat Jun 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.160.1-1
 - Auto-upgrade to 5.15.160.1
 
