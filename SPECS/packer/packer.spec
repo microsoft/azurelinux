@@ -71,6 +71,9 @@ go test -mod=vendor
 - Revert to version 1.9.5.
 - Added patches for CVE-2022-3064 and CVE-2023-49569.
 
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
+- Bump release to rebuild with go 1.21.11
+
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.10.1-2
 - Fix for CVE-2023-45288
 

@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-20
+- Bump release to rebuild with go 1.21.11
+
 * Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.0-19
 - Patch CVE-2021-44716
 
