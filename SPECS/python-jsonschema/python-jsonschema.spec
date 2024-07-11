@@ -1,7 +1,7 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
 Version:        2.6.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,7 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-%python3 setup test
+%python3 setup.py test
 
 %files -n python3-jsonschema
 %defattr(-,root,root)
@@ -47,6 +47,9 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 %{_bindir}/jsonschema3
 
 %changelog
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.6.0-7
+- directly call setup.py during ptest to fix test
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec
