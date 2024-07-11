@@ -1,0 +1,23 @@
+From 42115bda75d9c49156a2799bc178ea105daf5003 Mon Sep 17 00:00:00 2001
+From: Cameron Baird <cameronbaird@microsoft.com>
+Date: Wed, 10 Jul 2024 23:09:32 +0000
+Subject: [PATCH] define IRQBALANCE_ARGS as empty string to squelch systemd
+ warning
+
+---
+ misc/irqbalance.env | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/misc/irqbalance.env b/misc/irqbalance.env
+index 96acb39..84cb843 100644
+--- a/misc/irqbalance.env
++++ b/misc/irqbalance.env
+@@ -41,4 +41,4 @@
+ #    Append any args here to the irqbalance daemon as documented in the man
+ #    page.
+ #
+-#IRQBALANCE_ARGS=
++IRQBALANCE_ARGS=""
+-- 
+2.34.1
+
