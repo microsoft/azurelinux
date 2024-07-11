@@ -25243,8 +25243,8 @@
         "type": "other",
         "other": {
           "name": "R",
-          "version": "4.3.2",
-          "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.3.2.tar.gz"
+          "version": "4.4.1",
+          "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.4.1.tar.gz"
         }
       }
     },
