@@ -28586,8 +28586,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "5.5",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.5/tpm2-tools-5.5.tar.gz"
+          "version": "5.5.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.5.1/tpm2-tools-5.5.1.tar.gz"
         }
       }
     },
