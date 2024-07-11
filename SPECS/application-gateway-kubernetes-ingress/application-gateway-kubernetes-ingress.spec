@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,20 +23,24 @@ Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2022-41273.patch
 
 BuildRequires:  golang >= 1.13
 
 %description
-This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway 
-to act as the ingress for an AKS cluster. 
+This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway
+to act as the ingress for an AKS cluster.
 
 %prep
-%autosetup
+%autosetup -N
 
-%build
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1 -p1 -d vendor/golang.org/x/net
 
+%build
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
 
@@ -53,6 +57,10 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Thu Jul 11 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.7.2-2
+- Add patch for CVE-2022-21698, CVE-2022-41273
+- Move vendored tarball extraction into %prep and %changed from %autosetup to %setup
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.2-1
 - Auto-upgrade to 1.7.2 - Azure Linux 3.0 - package upgrades
 
