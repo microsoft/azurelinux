@@ -2644,7 +2644,6 @@
                 "dbus-glib",
                 "dejagnu",
                 "device-mapper-multipath",
-                "dhcp",
                 "dialog",
                 "diffutils",
                 "dkms",

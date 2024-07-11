@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,7 +65,7 @@ BuildRequires:  cpio
 BuildRequires:  createrepo_c
 BuildRequires:  cryptsetup
 BuildRequires:  curl
-BuildRequires:  dhclient
+BuildRequires:  dhcpcd
 BuildRequires:  diffutils
 BuildRequires:  dosfstools
 BuildRequires:  e2fsprogs
@@ -760,7 +760,7 @@ tdnf install --downloadonly -y \
     cpio \
     cryptsetup \
     curl \
-    dhclient \
+    dhcpcd \
     diffutils \
     dosfstools \
     e2fsprogs \
@@ -1144,6 +1144,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 1.52.0-6
+- Remove dhclient in favor of using dhcpcd
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.52.0-5
 - Remove dependency on 'libdb'.
 

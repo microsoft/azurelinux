@@ -2557,16 +2557,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dhcp",
-          "version": "4.4.3.P1",
-          "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dhcpcd",
           "version": "10.0.8",
           "downloadUrl": "https://github.com/NetworkConfiguration/dhcpcd/archive/refs/tags/v10.0.8.tar.gz"
