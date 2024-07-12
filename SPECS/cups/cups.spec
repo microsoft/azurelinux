@@ -6,8 +6,6 @@
 # but we use lib for compatibility with 3rd party drivers (at upstream request).
 %global cups_serverbin %{_libdir}/cups
 %global VERSION %{version}
-# Openprinting version
-%global OP_VER op2
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
@@ -657,6 +655,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Fri Jul 12 2024 Muhammad Falak <mwani@microsft.com> - 2.4.10-1
+- Upgrade version to 2.4.10
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
 - Updating naming for 3.0 version of Azure Linux.
 
