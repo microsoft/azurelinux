@@ -1,12 +1,33 @@
-From d677a41f5bfdf22279b883daf0d6d47dfd82400f Mon Sep 17 00:00:00 2001
+From c473a1b1be5fce8710b9ac188fb879dd5a6b15b4 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Fri, 12 Jul 2024 15:29:29 -0700
-Subject: [PATCH] remove py27, add py312 for tox testing
+Subject: [PATCH] remove py27, add py312 for tests, update webcolors import
 
 ---
- tox.ini | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ jsonschema/_format.py |  4 ++--
+ tox.ini               | 18 +++++++++---------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
+diff --git a/jsonschema/_format.py b/jsonschema/_format.py
+index caae127..32738a7 100644
+--- a/jsonschema/_format.py
++++ b/jsonschema/_format.py
+@@ -256,13 +256,13 @@ else:
+     def is_css21_color(instance):
+         if (
+             not isinstance(instance, str_types) or
+-            instance.lower() in webcolors.css21_names_to_hex
++            instance.lower() in webcolors.CSS21_NAMES_TO_HEX
+         ):
+             return True
+         return is_css_color_code(instance)
+ 
+     def is_css3_color(instance):
+-        if instance.lower() in webcolors.css3_names_to_hex:
++        if instance.lower() in webcolors.CSS3_NAMES_TO_HEX:
+             return True
+         return is_css_color_code(instance)
+ 
 diff --git a/tox.ini b/tox.ini
 index b8d5d90..1c5c1ac 100644
 --- a/tox.ini
