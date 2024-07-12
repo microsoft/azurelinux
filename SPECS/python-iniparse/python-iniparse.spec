@@ -1,13 +1,15 @@
 Summary:        Python Module for Accessing and Modifying Configuration Data in INI files
 Name:           python-iniparse
 Version:        0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT OR Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/candlepin/python-iniparse
 Source0:        https://files.pythonhosted.org/packages/4c/9a/02beaf11fc9ea7829d3a9041536934cd03990e09c359724f99ee6bd2b41b/iniparse-%{version}.tar.gz 
+Patch0:         python-3.11-test-compat.patch
+
 BuildArch:      noarch
 
 %description
@@ -51,6 +53,9 @@ mv %{buildroot}%{_docdir}/iniparse-%{version} %{buildroot}%{_docdir}/%{name}-%{v
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 0.5-2
+- add patch for ptests for python 3.11+ compat
+
 * Thu Mar 03 2022 Nick Samson <nisamson@microsoft.com> - 0.5-1
 - Updated to 0.5
 - Removed unnecessary compatibility patch
