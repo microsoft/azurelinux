@@ -8,7 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/optree/
-Source0:        https://files.pythonhosted.org/packages/source/o/optree/optree-%{version}.tar.gz
+Source0:        https://github.com/metaopt/optree/archive/refs/tags/v%{version}.tar.gz#/optree-%{version}.tar.gz
+BuildRequires:  python3-pip
 
 %description
 A PyTree is a recursive structure that can be an arbitrarily nested Python container (e.g., tuple, list, dict, OrderedDict, NamedTuple, etc.) or an opaque Python object.
@@ -17,11 +18,17 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 Summary:        Optimized PyTree Utilities.
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
+BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  python3-typing-extensions
-BuildRequires:  pybind11-devel
 BuildRequires:  python3-pybind11
+BuildRequires:  python3-Cython
+BuildRequires:  python3-libs
+BuildRequires:  ca-certificates
+BuildRequires:  python3-tensorflow
+BuildRequires:  python3-pytest
 Requires:       python3
 Requires:       python3-typing-extensions
 
@@ -33,10 +40,17 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 
 
 %build
-%py3_build
+python3 setup.py bdist_wheel
 
 %install
-%py3_install
+python3 -m pip install -I dist/optree-0.11.0-cp312-cp312-linux_x86_64.whl --root %{buildroot} --no-deps --no-index
+
+%check
+pip3 install pytest
+pip3 install -r requirements.txt
+pushd /
+python3 -c "import optree; optree.tree_map(lambda x: x , ())"
+popd
 
 
 %files -n python3-optree
