@@ -19,6 +19,7 @@ inputImageTag=${2:-3.0.20240624-rc}
 # configurations
 ihvArtifactsDir=$scriptDir/ihv-test-artifacts
 fixYumConfigFile=fix-yum-repo-paths.yaml
+setKernelLockdown=set-kernel-lockdown.yaml
 ihvConfigFile=ihv-test-customizations.yaml
 
 # -----------------------------------------------------------------------------
@@ -37,8 +38,8 @@ sudo rm -rf $workDir
 mkdir -p $buildDir
 mkdir -p $outDir
  
-intermediateOutputFormat=vhdx
-intermediateOutputImage=/output/$outputImagePrefix-$(date +'%Y%m%d-%H%M').$intermediateOutputFormat
+intermediateOutputFormat0=vhdx
+intermediateOutputImage0=/output/$outputImagePrefix-0-$(date +'%Y%m%d-%H%M').$intermediateOutputFormat0
 
 sudo docker run --rm \
     --privileged=true \
@@ -50,9 +51,12 @@ sudo docker run --rm \
     run.sh $inputImageTag \
         --config-file /ihv-artifacts/$fixYumConfigFile \
         --build-dir /build \
-        --output-image-format $intermediateOutputFormat \
-        --output-image-file $intermediateOutputImage \
+        --output-image-format $intermediateOutputFormat0 \
+        --output-image-file $intermediateOutputImage0 \
             --log-level $debugLevel
+
+sudo chown $USER:$USER $outDir/*
+ls -la $outDir
 
 finalOutputFormat=iso
 finalOutputImage=/output/$outputImagePrefix-$(date +'%Y%m%d-%H%M').$finalOutputFormat
@@ -65,7 +69,7 @@ sudo docker run --rm \
     -v /dev:/dev \
     $imageCustomizerContainerPath:$imageCustomizerContainerTag \
     imagecustomizer \
-        --image-file $intermediateOutputImage \
+        --image-file $intermediateOutputImage0 \
         --config-file /ihv-artifacts/$ihvConfigFile \
         --build-dir /build \
         --output-image-format $finalOutputFormat \

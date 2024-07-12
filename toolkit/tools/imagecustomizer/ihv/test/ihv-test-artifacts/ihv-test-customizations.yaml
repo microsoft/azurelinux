@@ -2,11 +2,12 @@ os:
   selinux:
     mode: disabled
   kernelCommandLine:
-    extraCommandLine: selinux=0 security=
+    extraCommandLine: abcdef ro rd.auto=1 net.ifnames=0 lockdown=none selinux=0 security= console=tty0 console=ttyS0 rd.info log_buf_len=1M
   users:
   - name: testuser
     sshPublicKeyPaths:
-    - id_rsa.pub
+    - image-files/keys/clients/id_rsa.pub
+    - image-files/keys/clients/id_rsa-kernel-dev-box.pub
     primaryGroup: sudo
     secondaryGroups:
     - sudo
@@ -15,9 +16,18 @@ os:
     - squashfs-tools
     - tar
     - device-mapper
+  additionalFiles:
+    image-files/configs/machine-id:
+    - path: /etc/machine-id
+      permissions: "444"
 scripts:
   postCustomization:
   - content: |
       chown testuser:users /home/testuser/.ssh/authorized_keys
       echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     name: "Setting up user access"
+  - content: |
+      echo "Updating kernel lockdown"
+      sed -i 's/lockdown=integrity/lockdown=none/g' /etc/default/grub
+      grub2-mkconfig -o /boot/grub2/grub.cfg
+    name: "set kernel lockdown"

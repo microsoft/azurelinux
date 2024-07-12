@@ -29,46 +29,53 @@ os:
   users:
   - name: testuser
     sshPublicKeyPaths:
-    - id_rsa.pub
+    - image-files/keys/clients/id_rsa.pub
+    - ../../test/ihv-test-artifacts/image-files/keys/self/id_rsa.pub
     primaryGroup: sudo
     secondaryGroups:
     - sudo
   packages:
     install:
+    # iso required packages
     - squashfs-tools
     - tar
     - device-mapper
-    - git
+    # kernel module development
     - build-essential
     - kernel-headers
+    - kernel-devel
+    - make
+    # azure linux package build
+    - git
     - golang
     - containerd
     - cri-tools
+    - moby-containerd
+    - moby-engine
+    - docker-buildx
+    - docker-cli
+    - rpm
+    - rpm-build
     - acl
-    - git
-    - make
     - tar
     - wget
     - curl
-    - rpm
     - qemu-img
-    - golang
     - genisoimage
     - python
     - bison
     - gawk
     - pigz
-    - moby-containerd
-    - moby-engine
-    - docker-buildx
-    - docker-cli
     - zstd
+    # utilities
     - vim
-    - rpm-build
   additionalFiles:
     image-files/configs/10-eth0.network:
     - path: /etc/systemd/network/10-eth0.network
       permissions: "644"
+    image-files/configs/machine-id:
+    - path: /etc/machine-id
+      permissions: "444"
     image-files/scripts/00-configure-docker.sh:
     - path: /home/testuser/00-configure-docker.sh
       permissions: "755"
