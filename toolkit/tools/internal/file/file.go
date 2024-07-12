@@ -197,7 +197,7 @@ func Write(data string, dst string) (err error) {
 }
 
 func WriteWithPerm(data string, dst string, perm os.FileMode) (err error) {
-	logger.Log.Debugf("Writing to (%s)", dst)
+	logger.Log.Debugf("Writing to (%s) with perm (%o)", dst, perm)
 
 	err = os.WriteFile(dst, []byte(data), perm)
 	return

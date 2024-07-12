@@ -4,16 +4,14 @@
 package imagecustomizerlib
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemd"
 )
 
 type resolvConfType int
@@ -27,11 +25,15 @@ const (
 type resolvConfInfo struct {
 	existingType resolvConfType
 	fileContents string
+	filePerms    os.FileMode
 	symlinkPath  string
 }
 
 const (
-	resolvConfPath        = "/etc/resolv.conf"
+	resolvConfPath = "/etc/resolv.conf"
+
+	// This is the value that systemd-resolved sets as the /etc/resolv.conf symlink path.
+	// It is unclear why systemd-resolved uses a relative path (../) instead of an absolute path (/).
 	resolvSystemdStubPath = "../run/systemd/resolve/stub-resolv.conf"
 )
 
@@ -64,6 +66,7 @@ func overrideResolvConf(imageChroot *safechroot.Chroot) (resolvConfInfo, error) 
 		}
 		existing.existingType = resolvConfTypeFile
 		existing.fileContents = fileContents
+		existing.filePerms = stat.Mode().Perm()
 	}
 
 	// Remove the existing resolv.conf file, if it exists.
@@ -83,37 +86,31 @@ func overrideResolvConf(imageChroot *safechroot.Chroot) (resolvConfInfo, error) 
 }
 
 func restoreResolvConf(existing resolvConfInfo, imageChroot *safechroot.Chroot) error {
+	logger.Log.Infof("Restoring resolv.conf")
+
 	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolvConfPath)
 
 	// Delete the overridden resolv.conf file.
 	err := os.RemoveAll(imageResolveConfPath)
 	if err != nil {
-		return fmt.Errorf("failed to delete overridden resolv.conf file: %w", err)
+		return fmt.Errorf("failed to delete overridden resolv.conf file:\n%w", err)
 	}
 
 	switch existing.existingType {
 	case resolvConfTypeNone:
 		// Check if systemd-resolved is enabled.
-		resolvedEnabled := true
-		err := imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(true, "systemctl", "is-enabled", "systemd-resolved.service")
-
-			var exitError *exec.ExitError
-			if errors.As(err, &exitError) && exitError.ExitCode() == 1 {
-				resolvedEnabled = false
-				return nil
-			}
-			return err
-		})
+		resolvedEnabled, err := systemd.IsServiceEnabled("systemd-resolved.service", imageChroot)
 		if err != nil {
-			return fmt.Errorf("failed to check if systemd-resolved service is enabled:\n%w", err)
+			return err
 		}
 
 		if resolvedEnabled {
+			logger.Log.Infof("Adding systemd-resolved resolv.conf symlink")
+
 			// The systemd-resolved.service is enabled.
 			// So, create the symlink for the resolv.conf file.
-			// While technically this symlink will be automatically created on first boot, doing it now is helpful for
-			// verity images where the root filesystem is readonly.
+			// While technically this symlink will be automatically created on first boot, doing
+			// it now is helpful for verity images where the root filesystem is readonly.
 			err := os.Symlink(resolvSystemdStubPath, imageResolveConfPath)
 			if err != nil {
 				return fmt.Errorf("failed to create resolv.conf symlink:\n%w", err)
@@ -121,13 +118,17 @@ func restoreResolvConf(existing resolvConfInfo, imageChroot *safechroot.Chroot) 
 		}
 
 	case resolvConfTypeFile:
+		logger.Log.Debugf("Restoring resolv.conf file")
+
 		// Restore the resolv.conf file.
-		err := file.WriteWithPerm(existing.fileContents, imageResolveConfPath, 0o644)
+		err := file.WriteWithPerm(existing.fileContents, imageResolveConfPath, existing.filePerms)
 		if err != nil {
 			return fmt.Errorf("failed to restore resolv.conf file:\n%w", err)
 		}
 
 	case resolvConfTypeSymlink:
+		logger.Log.Debugf("Restoring resolv.conf symlink")
+
 		// Restore the resolv.conf symlink.
 		err := os.Symlink(existing.symlinkPath, imageResolveConfPath)
 		if err != nil {
@@ -135,7 +136,7 @@ func restoreResolvConf(existing resolvConfInfo, imageChroot *safechroot.Chroot) 
 		}
 
 	default:
-		panic(fmt.Sprintf("unexpected imagecustomizerlib.resolvConfType: %#v", existing.existingType))
+		return fmt.Errorf("unknown resolvConfType value (%v)", existing.existingType)
 	}
 
 	return nil

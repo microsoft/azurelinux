@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCustomizeImageResolvConf(t *testing.T) {
+func TestCustomizeImageResolvConfDelete(t *testing.T) {
 	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
 
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConf")
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfDelete")
 	buildDir := filepath.Join(testTmpDir, "build")
 	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
@@ -48,10 +48,36 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 		return
 	}
 	assert.False(t, exists)
+}
+
+func TestCustomizeImageResolvConfRestoreFile(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfRestoreFile")
+	buildDir := filepath.Join(testTmpDir, "build")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	err := os.MkdirAll(testTmpDir, os.ModePerm)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = convertImageFile(baseImage, outImageFilePath, "raw")
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
 
 	// Create a resolv.conf file.
 	fakeResolvConfContents := "abcdef"
-	err = file.Write(fakeResolvConfContents, imageResolvConfPath)
+	fakeResolvConfPerms := os.FileMode(0o600)
+	imageResolvConfPath := filepath.Join(imageConnection.Chroot().RootDir(), resolvConfPath)
+	err = file.WriteWithPerm(fakeResolvConfContents, imageResolvConfPath, fakeResolvConfPerms)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -62,7 +88,7 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 	}
 
 	// Customize image.
-	config = imagecustomizerapi.Config{
+	config := imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{},
 	}
 
@@ -80,21 +106,47 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 
 	// Ensure resolv.conf file was restored.
 	imageResolvConfPath = filepath.Join(imageConnection.Chroot().RootDir(), resolvConfPath)
+	stat, err := os.Stat(imageResolvConfPath)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	assert.Equal(t, fakeResolvConfPerms, stat.Mode().Perm())
+
 	actualResolvConfContents, err := file.Read(imageResolvConfPath)
 	if !assert.NoError(t, err) {
 		return
 	}
 
 	assert.Equal(t, fakeResolvConfContents, actualResolvConfContents)
+}
 
-	// Delete resolv.conf file.
-	err = os.Remove(imageResolvConfPath)
+func TestCustomizeImageResolvConfRestoreSymlink(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfRestoreSymlink")
+	buildDir := filepath.Join(testTmpDir, "build")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	err := os.MkdirAll(testTmpDir, os.ModePerm)
 	if !assert.NoError(t, err) {
 		return
 	}
 
+	err = convertImageFile(baseImage, outImageFilePath, "raw")
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
 	// Create a resolv.conf symlink.
 	fakeResolvConfSymlinkPath := "../fake/resolv.conf"
+	imageResolvConfPath := filepath.Join(imageConnection.Chroot().RootDir(), resolvConfPath)
 	err = os.Symlink(fakeResolvConfSymlinkPath, imageResolvConfPath)
 	if !assert.NoError(t, err) {
 		return
@@ -106,6 +158,10 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 	}
 
 	// Customize image.
+	config := imagecustomizerapi.Config{
+		OS: &imagecustomizerapi.OS{},
+	}
+
 	err = CustomizeImage(buildDir, testDir, &config, outImageFilePath, nil, outImageFilePath, "raw", "",
 		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
@@ -126,20 +182,17 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 	}
 
 	assert.Equal(t, fakeResolvConfSymlinkPath, actualResolvConfSymlinkPath)
+}
 
-	// Delete resolv.conf file.
-	err = os.Remove(imageResolvConfPath)
-	if !assert.NoError(t, err) {
-		return
-	}
+func TestCustomizeImageResolvConfNewSymlink(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
 
-	err = imageConnection.CleanClose()
-	if !assert.NoError(t, err) {
-		return
-	}
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfNewSymlink")
+	buildDir := filepath.Join(testTmpDir, "build")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
 	// Customize image.
-	config = imagecustomizerapi.Config{
+	config := imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
 			Services: imagecustomizerapi.Services{
 				Enable: []string{"systemd-resolved"},
@@ -147,21 +200,21 @@ func TestCustomizeImageResolvConf(t *testing.T) {
 		},
 	}
 
-	err = CustomizeImage(buildDir, testDir, &config, outImageFilePath, nil, outImageFilePath, "raw", "",
+	err := CustomizeImage(buildDir, testDir, &config, baseImage, nil, outImageFilePath, "raw", "",
 		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	imageConnection, err = connectToCoreEfiImage(buildDir, outImageFilePath)
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
 	if !assert.NoError(t, err) {
 		return
 	}
 	defer imageConnection.Close()
 
 	// Ensure resolv.conf symlink was set to systemd-resolved.
-	imageResolvConfPath = filepath.Join(imageConnection.Chroot().RootDir(), resolvConfPath)
-	actualResolvConfSymlinkPath, err = os.Readlink(imageResolvConfPath)
+	imageResolvConfPath := filepath.Join(imageConnection.Chroot().RootDir(), resolvConfPath)
+	actualResolvConfSymlinkPath, err := os.Readlink(imageResolvConfPath)
 	if !assert.NoError(t, err) {
 		return
 	}

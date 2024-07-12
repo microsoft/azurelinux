@@ -398,17 +398,9 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", ic.outputImageFile)
 
-		qemuImageFormat, qemuOptions := toQemuImageFormat(ic.outputImageFormat)
-
-		qemuImgArgs := []string{"convert", "-O", qemuImageFormat}
-		if qemuOptions != "" {
-			qemuImgArgs = append(qemuImgArgs, "-o", qemuOptions)
-		}
-		qemuImgArgs = append(qemuImgArgs, ic.rawImageFile, ic.outputImageFile)
-
-		err := shell.ExecuteLiveWithErr(1, "qemu-img", qemuImgArgs...)
+		err := convertImageFile(ic.rawImageFile, ic.outputImageFile, ic.outputImageFormat)
 		if err != nil {
-			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
+			return err
 		}
 
 	case ImageFormatIso:
@@ -423,6 +415,23 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
 			}
 		}
+	}
+
+	return nil
+}
+
+func convertImageFile(inputPath string, outputPath string, format string) error {
+	qemuImageFormat, qemuOptions := toQemuImageFormat(format)
+
+	qemuImgArgs := []string{"convert", "-O", qemuImageFormat}
+	if qemuOptions != "" {
+		qemuImgArgs = append(qemuImgArgs, "-o", qemuOptions)
+	}
+	qemuImgArgs = append(qemuImgArgs, inputPath, outputPath)
+
+	err := shell.ExecuteLiveWithErr(1, "qemu-img", qemuImgArgs...)
+	if err != nil {
+		return fmt.Errorf("failed to convert image file to format: %s:\n%w", format, err)
 	}
 
 	return nil
