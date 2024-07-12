@@ -1,4 +1,6 @@
-%global bootstrap_compiler_version 1.19.12
+%global bootstrap_compiler_version_0 1.17.13
+%global bootstrap_compiler_version_1 1.21.6
+%global bootstrap_compiler_version_2 1.22.4
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -22,7 +24,9 @@ Group:          System Environment/Security
 URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
-Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
+Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.tar.gz
+Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
+Source4:        https://dl.google.com/go/go%{bootstrap_compiler_version_2}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -56,19 +60,44 @@ popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version} (bootstrap)
+# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version_0}
 export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version}
-tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version} --strip-components=1
-pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version}/src
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_0}
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_0} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_0}/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Nuke the older %{bootstrap_compiler_version_0}
+rm -rf %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_0} %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
+
+
+# Use go%{bootstrap_compiler_version_0} bootstrap to compile go%{bootstrap_compiler_version_1} (bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_1}
+tar xf %{SOURCE3} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_1}/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Nuke the older %{bootstrap_compiler_version_1}
+rm -rf %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
+
+# Use %{bootstrap_compiler_version_1} to compile %{bootstrap_compiler_version_2}
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}
+tar xf %{SOURCE4} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_2} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}/src
 CGO_ENABLED=0 ./make.bash
 popd
 
-# Nuke the older go1.4 bootstrap
+# Nuke the older %{bootstrap_compiler_version_1}
 rm -rf %{_libdir}/golang
 
-# Make go%{bootstrap_compiler_version} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go1.19.12 %{_libdir}/golang
+# Make go%{bootstrap_compiler_version_2} as the new bootstrapper
+mv -v %{_topdir}/BUILD/go1.22.4 %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
