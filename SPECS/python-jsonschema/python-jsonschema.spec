@@ -8,6 +8,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonschema
 Source0:        https://pypi.python.org/packages/source/j/jsonschema/jsonschema-%{version}.tar.gz
+Patch0:         tox-test.patch
 BuildArch:      noarch
 
 %description
@@ -23,6 +24,7 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-virtualenv
 %endif
 Requires:       python3
 
@@ -31,7 +33,7 @@ jsonschema is JSON Schema validator currently based on
 http://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %prep
-%autosetup -n jsonschema-%{version}
+%autosetup -p1 -n jsonschema-%{version}
 
 %build
 %py3_build
@@ -53,7 +55,7 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %changelog
 * Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.6.0-7
-- directly call setup.py during ptest to fix test
+- switch to tox test per README, massage test config to work with python3.12
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package

@@ -1,0 +1,62 @@
+From d677a41f5bfdf22279b883daf0d6d47dfd82400f Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Fri, 12 Jul 2024 15:29:29 -0700
+Subject: [PATCH] remove py27, add py312 for tox testing
+
+---
+ tox.ini | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tox.ini b/tox.ini
+index b8d5d90..1c5c1ac 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -1,22 +1,22 @@
+ [tox]
+-envlist = py{27,35,py}, docs, style
++envlist = py{35,312,py}, docs, style
+ 
+ 
+ [testenv]
+ setenv =
+     JSON_SCHEMA_TEST_SUITE = {toxinidir}/json
+ whitelist_externals =
+-    python2.7
++    python3.12
+     sh
+     virtualenv
+ commands =
+-    py{27,35,py,py3}: {envbindir}/green [] jsonschema
++    py{35,312,py,py3}: {envbindir}/green [] jsonschema
+ 
+     {envpython} -m doctest {toxinidir}/README.rst
+-    py{27,35}: {envbindir}/sphinx-build -b doctest {toxinidir}/docs {envtmpdir}/html
++    py{35,312}: {envbindir}/sphinx-build -b doctest {toxinidir}/docs {envtmpdir}/html
+ 
+     # Check to make sure that releases build and install properly
+-    virtualenv --quiet --python=python2.7 {envtmpdir}/venv
++    virtualenv --quiet --python=python3.12 {envtmpdir}/venv
+     {envtmpdir}/venv/bin/pip install --quiet wheel
+ 
+     {envtmpdir}/venv/bin/python {toxinidir}/setup.py --quiet bdist_wheel --dist-dir={envtmpdir}/wheel
+@@ -28,13 +28,13 @@ commands =
+ deps =
+     -e{toxinidir}[format]
+ 
+-    py{27,35,py,py3},coverage: green
++    py{35,312,py,py3},coverage: green
+     coverage: coverage
+ 
+-    py{27,py,py3},coverage: mock
++    py{py,py3},coverage: mock
+ 
+-    py{27,35}: lxml
+-    py{27,35,py}: sphinx
++    py{35,312}: lxml
++    py{35,312,py}: sphinx
+ 
+ 
+ [testenv:coverage]
+-- 
+2.34.1
+
