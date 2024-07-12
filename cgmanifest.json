@@ -1817,8 +1817,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor-cvm",
-          "version": "38.0.72",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
+          "version": "38.0.72.2",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.2.tar.gz"
         }
       }
     },
@@ -5400,8 +5400,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.59",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.59.tar.bz2"
+          "version": "2.4.61",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.61.tar.bz2"
         }
       }
     },
@@ -10051,8 +10051,8 @@
         "type": "other",
         "other": {
           "name": "libmemcached-awesome",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.1.tar.gz"
+          "version": "1.1.4",
+          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.4.tar.gz"
         }
       }
     },
