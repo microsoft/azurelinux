@@ -21213,8 +21213,8 @@
         "type": "other",
         "other": {
           "name": "prometheus-process-exporter",
-          "version": "0.7.10",
-          "downloadUrl": "https://github.com/ncabatoff/process-exporter/archive/refs/tags/v0.7.10.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/ncabatoff/process-exporter/archive/refs/tags/v0.8.2.tar.gz"
         }
       }
     },
