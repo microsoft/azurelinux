@@ -2,7 +2,7 @@
 %define six_version 1.14.0
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
-Version:        2.0.1
+Version:        2.0.3
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -45,11 +45,14 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
 %license LICENSE
-%doc README.rst
+%doc README.md
 %{python3_sitelib}/%{pkgname}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.0.3-1
+- Upgrade to 2.0.3
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
 - Auto-upgrade to 2.0.1 - Azure Linux 3.0 - package upgrades
 
