@@ -657,6 +657,7 @@ rm -f %{cups_serverbin}/backend/smb
 %changelog
 * Fri Jul 12 2024 Muhammad Falak <mwani@microsft.com> - 2.4.10-1
 - Upgrade version to 2.4.10
+- Refresh patches to apply cleanly
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
 - Updating naming for 3.0 version of Azure Linux.
