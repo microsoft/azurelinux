@@ -21,6 +21,9 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
+%if 0%{?with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       python3
 
 %description -n python3-jsonschema
