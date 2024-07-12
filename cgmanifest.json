@@ -2327,8 +2327,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.3.3op2",
-          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.3.3op2/cups-2.3.3op2-source.tar.gz"
+          "version": "2.4.10",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.10/cups-2.4.10-source.tar.gz"
         }
       }
     },
