@@ -45,8 +45,6 @@ python3 setup.py bdist_wheel
 python3 -m pip install -I dist/optree-0.11.0-cp312-cp312-linux_x86_64.whl --root %{buildroot} --no-deps --no-index
 
 %check
-pip3 install pytest
-pip3 install -r requirements.txt
 pushd /
 python3 -c "import optree; optree.tree_map(lambda x: x , ())"
 popd
