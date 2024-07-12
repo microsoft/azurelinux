@@ -1,26 +1,22 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
-Version:        5.5
+Version:        5.5.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tools
-
-Source0: https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires: curl-devel
-BuildRequires: openssl-devel
-BuildRequires: tpm2-tss-devel
-
+Source0:        https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  curl-devel
+BuildRequires:  openssl-devel
+BuildRequires:  tpm2-tss-devel
 %if 0%{?with_check}
 BuildRequires:  swtpm-tools
 %endif
-
-Requires: curl
-Requires: openssl
-Requires: tpm2-tss
+Requires:       curl
+Requires:       openssl
+Requires:       tpm2-tss
 
 %description
 The source repository for the TPM (Trusted Platform Module) 2 tools
@@ -57,6 +53,9 @@ make %{?_smp_mflags} check
 %{_datadir}/bash-completion/*
 
 %changelog
+* Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 5.5.1-1
+- Bump to 5.5.1 to address CVE-2024-29039 & CVE-2024-29038.
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 5.5-1
 - Updated to 5.5
 
