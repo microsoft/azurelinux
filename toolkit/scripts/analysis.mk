@@ -80,7 +80,6 @@ $(SODIFF_REPO_FILE):
 sodiff-setup:
 	mkdir -p /etc/pki/rpm-gpg
 	cp $(SPECS_DIR)/azurelinux-repos/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/
-	cp $(SPECS_DIR)/azurelinux-repos/MICROSOFT-METADATA-GPG-KEY /etc/pki/rpm-gpg/
 
 # sodiff-check: runs check in a mariner container. Each failed package will be listed in $(SODIFF_OUTPUT_FOLDER).
 .SILENT .PHONY: sodiff-check
