@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-37298.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       logrotate
@@ -29,8 +30,10 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -p1
-tar -xf %{SOURCE1}
+%autosetup -N
+# setup vendor before patching
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 go build -mod=vendor ./cmd/telegraf
@@ -74,6 +77,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.31.0-2
+- Add patch for CVE-2024-37298
+
 * Tue Jun 18 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.31.0-1
 - Auto-upgrade to 1.31.0 - Address CVEs
 
