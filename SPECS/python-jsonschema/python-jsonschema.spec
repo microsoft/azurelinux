@@ -24,7 +24,6 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
-BuildRequires:  python3-virtualenv
 %endif
 Requires:       python3
 
