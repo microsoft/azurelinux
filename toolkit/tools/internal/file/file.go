@@ -196,6 +196,13 @@ func Write(data string, dst string) (err error) {
 	return
 }
 
+func WriteWithPerm(data string, dst string, perm os.FileMode) (err error) {
+	logger.Log.Debugf("Writing to (%s)", dst)
+
+	err = os.WriteFile(dst, []byte(data), perm)
+	return
+}
+
 // WriteLines writes each string to the same file, separated by lineSeparator (e.g. "\n").
 func WriteLines(dataLines []string, destinationPath string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", destinationPath)
