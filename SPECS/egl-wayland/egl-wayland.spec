@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           egl-wayland
 Version:        1.1.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Wayland EGL External Platform library
 
 License:        MIT
@@ -67,6 +67,9 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_datadir}/wayland-eglstream/
 
 %changelog
+* Wed Jul 10 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.1.6-3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.6-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

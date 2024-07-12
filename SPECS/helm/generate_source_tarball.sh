@@ -77,7 +77,7 @@ trap cleanup EXIT
 
 pushd $tmpdir > /dev/null
 
-$NAME="helm"
+NAME="helm"
 NAME_VER="$NAME-$PKG_VERSION"
 VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
 

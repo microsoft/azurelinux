@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.13.2
-Release:       3%{?dist}
+Version:       3.15.2
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -24,8 +24,6 @@ Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-Patch0:        CVE-2024-26147.patch
-Patch1:        CVE-2024-25620.patch
 BuildRequires: golang
 
 %description
@@ -51,11 +49,14 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %doc ADOPTERS.md SECURITY.md code-of-conduct.md CONTRIBUTING.md README.md
 %{_bindir}/helm
 
-
 %check
 go test -v ./cmd/helm
 
 %changelog
+* Wed Jul 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 3.15.2-1
+- Bump package version to address CVE-2023-45288 & CVE-2023-44487
+- Remove patches fixed in sources
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.13.2-3
 - Patch CVE-2024-25620
 

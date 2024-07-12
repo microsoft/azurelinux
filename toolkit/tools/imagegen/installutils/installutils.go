@@ -29,6 +29,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
@@ -425,6 +426,28 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 	return
 }
 
+// orderPackageInstallList updates the order we will install packages if needed. Installing each package one at a time
+// can cause issues with ordering since we aren't doing a single transaction. For example, the initramfs regeneration is
+// done as a post transaction step and only needs to be done once after all other packages are installed. Since we are
+// not doing a single transaction it has an opportunity to trigger repeatedly. Moving it to the end of the list means it
+// will only trigger once.
+func orderPackageInstallList(packageList []string) []string {
+	const initramfsPackagePrefix = "initramfs"
+
+	initramfsPackages := []string{}
+	orderedPackageList := []string{}
+	for _, pkg := range packageList {
+		// Search for initramfs, ignoring any version info at the end of the package name.
+		if strings.HasPrefix(pkg, initramfsPackagePrefix) {
+			initramfsPackages = append(initramfsPackages, pkg)
+		} else {
+			orderedPackageList = append(orderedPackageList, pkg)
+		}
+	}
+	orderedPackageList = append(orderedPackageList, initramfsPackages...)
+	return orderedPackageList
+}
+
 // PopulateInstallRoot fills the installroot with packages and configures the image for boot
 // - installChroot is a pointer to the install Chroot object
 // - packagesToInstall is a slice of packages to install
@@ -445,7 +468,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	defer timestamp.StopEvent(nil)
 
 	const (
-		filesystemPkg = "filesystem"
+		filesystemPkg  = "filesystem"
+		shadowUtilsPkg = "shadow-utils"
 	)
 
 	ReportAction("Initializing RPM Database")
@@ -472,6 +496,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}()
 	}
 
+	// Change the ordering if needed (ie make sure initramfs is last)
+	packagesToInstall = orderPackageInstallList(packagesToInstall)
+
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
 	if err != nil {
@@ -486,14 +513,30 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
+	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` and
+	// `TdnfInstallPriorityPackage` invocations
 	packagesInstalled := 0
 
 	timestamp.StartEvent("installing packages", nil)
 	// Install filesystem package first
-	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
+	packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(filesystemPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
 	if err != nil {
+		err = fmt.Errorf("failed to install (%s) package in preparation for image creation:\n%w", filesystemPkg, err)
 		return
+	}
+
+	// imageconfigvalidator should have ensured that we intend to install shadow-utils, so we can go ahead and do that here.
+	if len(config.Users) > 0 || len(config.Groups) > 0 {
+		if !sliceutils.ContainsValue(packagesToInstall, "shadow-utils") {
+			err = fmt.Errorf("shadow-utils package must be added to the image's package lists when setting users or groups")
+			return
+		}
+
+		packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(shadowUtilsPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
+		if err != nil {
+			err = fmt.Errorf("failed to install (%s) package in preparation for modifying users/groups:\n%w", shadowUtilsPkg, err)
+			return
+		}
 	}
 
 	hostname := config.Hostname
@@ -503,6 +546,18 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
+	}
+
+	// Add groups
+	err = addGroups(installChroot, config.Groups)
+	if err != nil {
+		return
+	}
+
+	// Add users
+	err = addUsers(installChroot, config.Users)
+	if err != nil {
+		return
 	}
 
 	// Install packages one-by-one to avoid exhausting memory
@@ -530,18 +585,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
-
-		// Add groups
-		err = addGroups(installChroot, config.Groups)
-		if err != nil {
-			return
-		}
-	}
-
-	// Add users
-	err = addUsers(installChroot, config.Users)
-	if err != nil {
-		return
 	}
 
 	// Configure machine-id and other systemd state files
@@ -629,6 +672,23 @@ func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
 func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err error) {
 	packagesInstalled, err = TdnfInstallWithProgress(packageName, installRoot, 0, 0, false)
 	return
+}
+
+// TdnfInstallPriorityPackage installs a specific package, removing it from the list of packages to install in future
+// steps. This is useful for installing requirements for actual tooling operations that need to be installed before
+// other packages.
+func TdnfInstallPriorityPackage(priorityPackageName, installRoot string, packagesToInstall []string, currentPackagesInstalled, totalPackages int, reportProgress bool,
+) (packagesInstalled int, updatedPackagesToInstall []string, err error) {
+	packagesInstalled, err = TdnfInstallWithProgress(priorityPackageName, installRoot, currentPackagesInstalled, totalPackages, reportProgress)
+	if err != nil {
+		err = fmt.Errorf("failed to install priority package (%s):\n%w", priorityPackageName, err)
+		return packagesInstalled, packagesToInstall, err
+	}
+
+	// Remove the package from the list of packages to install if present
+	updatedPackagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != priorityPackageName })
+
+	return packagesInstalled, updatedPackagesToInstall, err
 }
 
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
@@ -1456,6 +1516,9 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "groupadd", args...)
 		})
+		if err != nil {
+			return fmt.Errorf("failed to add group (%s):\n%w", group.Name, err)
+		}
 	}
 
 	return
@@ -1480,7 +1543,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			rootUserAdded = true
 		}
 
-		err = ConfigureUserGroupMembership(installChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+		// Primary group will have already been set when the user was created so we don't need to set it again
+		err = ConfigureUserSecondaryGroupMembership(installChroot, user.Name, user.SecondaryGroups)
 		if err != nil {
 			return
 		}
@@ -1552,7 +1616,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, user.UID, installChroot)
 		if err != nil {
 			return
 		}
@@ -1663,12 +1727,10 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
-	secondaryGroups []string,
+func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 ) (err error) {
 	const squashErrors = false
 
-	// Update primary group
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
@@ -1679,7 +1741,13 @@ func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, user
 		}
 	}
 
-	// Update secondary groups
+	return
+}
+
+func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
+) (err error) {
+	const squashErrors = false
+
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
