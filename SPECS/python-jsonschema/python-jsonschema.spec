@@ -20,9 +20,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-xml
-%if 0%{?with_check}
 BuildRequires:  python3-wheel
-%endif
 Requires:       python3
 
 %description -n python3-jsonschema
@@ -40,7 +38,8 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-%python3 setup.py test
+pip install tox<4.0.0
+LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %files -n python3-jsonschema
 %defattr(-,root,root)
