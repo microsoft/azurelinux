@@ -27,7 +27,6 @@ BuildRequires:  python3-pybind11
 BuildRequires:  python3-Cython
 BuildRequires:  python3-libs
 BuildRequires:  ca-certificates
-BuildRequires:  python3-tensorflow
 BuildRequires:  python3-pytest
 Requires:       python3
 Requires:       python3-typing-extensions
