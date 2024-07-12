@@ -2,8 +2,8 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.58
-Release:        4%{?dist}
+Version:        2.4.61
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -345,6 +345,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Thu Jul 11 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.61-1
+- Upgrade to 2.4.61 to address CVE-2024-38473
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.58-4
 - Remove dependency on 'libdb'.
 
