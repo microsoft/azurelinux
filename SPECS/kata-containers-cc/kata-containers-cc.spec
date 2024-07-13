@@ -13,7 +13,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      2%{?dist}
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -116,7 +116,7 @@ popd
 
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} KVER=${KERNEL_MODULE_VER} install
 popd
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
@@ -288,6 +288,10 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Fri Jul 12 20204 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
+- Adapt make install target parameters to cope with upstream
+  fork Makefile changes
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-2
 - Bump release to rebuild with go 1.21.11
 
