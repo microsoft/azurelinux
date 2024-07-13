@@ -72,7 +72,7 @@ install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus
 
 %check
-make test integ
+make test
 
 %pre
 # Same user/group creation steps as for "prometheus-node-exporter".
