@@ -67,7 +67,7 @@ rm %{buildroot}%{_libdir}/*.la
 
 
 %changelog
-* Fri Jul 12 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 0.4.0-17
+* Fri Jul 12 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 0.3.9-17
 - Moved from SPECS-EXTENDED to SPECS.
 - License verified.
 
