@@ -12,8 +12,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl2
-Release:      3%{?dist}
+Version:      3.2.2.azl6
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -288,6 +288,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Sun Jul 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2.azl6-1
+- Auto-upgrade to 3.2.2.azl6
+
 * Fri Jul 12 20204 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
 - Adapt make install target parameters to cope with upstream
   fork Makefile changes
