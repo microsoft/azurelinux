@@ -1,13 +1,14 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
 Version:        2.6.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonschema
 Source0:        https://pypi.python.org/packages/source/j/jsonschema/jsonschema-%{version}.tar.gz
+Patch0:         tox-test.patch
 BuildArch:      noarch
 
 %description
@@ -20,6 +21,10 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-xml
+BuildRequires:  python3-wheel
+%if 0%{?with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       python3
 
 %description -n python3-jsonschema
@@ -27,7 +32,7 @@ jsonschema is JSON Schema validator currently based on
 http://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %prep
-%autosetup -n jsonschema-%{version}
+%autosetup -p1 -n jsonschema-%{version}
 
 %build
 %py3_build
@@ -37,7 +42,8 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-%python3 setup test
+pip3 install 'tox<4.0.0'
+LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %files -n python3-jsonschema
 %defattr(-,root,root)
@@ -47,6 +53,9 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 %{_bindir}/jsonschema3
 
 %changelog
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.6.0-7
+- switch to tox test per README, massage test config to work with python3.12
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec
