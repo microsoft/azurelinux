@@ -81,3 +81,4 @@ make test
 
 * Wed Feb 15 2023 Osama Esmail <osamaesmail@microsoft.com> - 0.10.0-1
 - Original version for CBL-Mariner
+- License verified.
