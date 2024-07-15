@@ -42,7 +42,7 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-pip3 install 'tox<4.0.0' 'webcolors<24.6.0'
+pip3 install 'tox<4.0.0'
 LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %files -n python3-jsonschema

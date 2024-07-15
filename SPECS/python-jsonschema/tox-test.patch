@@ -1,12 +1,13 @@
-From c473a1b1be5fce8710b9ac188fb879dd5a6b15b4 Mon Sep 17 00:00:00 2001
+From f7598efbd043c3e744fafe7a946068c3c74fa0df Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Fri, 12 Jul 2024 15:29:29 -0700
-Subject: [PATCH] remove py27, add py312 for tests, update webcolors import
+Subject: [PATCH] remove py27, add py212 for tests, update webcolors import,
+ require lower webcolors version
 
 ---
  jsonschema/_format.py |  4 ++--
- tox.ini               | 18 +++++++++---------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ tox.ini               | 19 ++++++++++---------
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/jsonschema/_format.py b/jsonschema/_format.py
 index caae127..32738a7 100644
@@ -29,7 +30,7 @@ index caae127..32738a7 100644
          return is_css_color_code(instance)
  
 diff --git a/tox.ini b/tox.ini
-index b8d5d90..1c5c1ac 100644
+index b8d5d90..ed0400f 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -1,22 +1,22 @@
@@ -60,7 +61,7 @@ index b8d5d90..1c5c1ac 100644
      {envtmpdir}/venv/bin/pip install --quiet wheel
  
      {envtmpdir}/venv/bin/python {toxinidir}/setup.py --quiet bdist_wheel --dist-dir={envtmpdir}/wheel
-@@ -28,13 +28,13 @@ commands =
+@@ -28,13 +28,14 @@ commands =
  deps =
      -e{toxinidir}[format]
  
@@ -75,6 +76,7 @@ index b8d5d90..1c5c1ac 100644
 -    py{27,35,py}: sphinx
 +    py{35,312}: lxml
 +    py{35,312,py}: sphinx
++	py{35,312,py}: webcolors<24.6.0
  
  
  [testenv:coverage]
