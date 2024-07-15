@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:                   delve
 Version:                1.5.0
-Release:                18%{?dist}
+Release:                19%{?dist}
 Summary:                A debugger for the Go programming language
 
 License:                MIT

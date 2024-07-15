@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
