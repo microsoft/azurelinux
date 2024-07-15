@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        17.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
