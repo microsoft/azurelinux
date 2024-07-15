@@ -288,7 +288,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Fri Jul 12 20204 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
+* Fri Jul 12 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
 - Adapt make install target parameters to cope with upstream
   fork Makefile changes
 
