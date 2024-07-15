@@ -39,7 +39,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.3.0-3
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.3.0-4
 - Bump release to rebuild with go 1.22.4
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-3
