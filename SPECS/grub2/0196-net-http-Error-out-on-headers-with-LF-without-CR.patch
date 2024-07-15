@@ -1,0 +1,50 @@
+From dc5cb8fe2f3aeae657d5c52870c6958178fcdd9e Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 8 Mar 2022 19:04:40 +1100
+Subject: [PATCH] net/http: Error out on headers with LF without CR
+
+In a similar vein to the previous patch, parse_line() would write
+a NUL byte past the end of the buffer if there was an HTTP header
+with a LF rather than a CRLF.
+
+RFC-2616 says:
+
+  Many HTTP/1.1 header field values consist of words separated by LWS
+  or special characters. These special characters MUST be in a quoted
+  string to be used within a parameter value (as defined in section 3.6).
+
+We don't support quoted sections or continuation lines, etc.
+
+If we see an LF that's not part of a CRLF, bail out.
+
+Fixes: CVE-2022-28734
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/http.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index 1db72fc..21064d3 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -68,7 +68,15 @@ parse_line (grub_file_t file, http_data_t data, char *ptr, grub_size_t len)
+   char *end = ptr + len;
+   while (end > ptr && *(end - 1) == '\r')
+     end--;
++
++  /* LF without CR. */
++  if (end == ptr + len)
++    {
++      data->errmsg = grub_strdup (_("invalid HTTP header - LF without CR"));
++      return GRUB_ERR_NONE;
++    }
+   *end = 0;
++
+   /* Trailing CRLF.  */
+   if (data->in_chunk_len == 1)
+     {
+-- 
+2.34.1
+

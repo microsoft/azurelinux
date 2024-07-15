@@ -1,0 +1,130 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <xnox@ubuntu.com>
+Date: Wed, 22 Jul 2020 11:31:43 +0100
+Subject: [PATCH] linuxefi: fail kernel validation without shim protocol.
+
+If certificates that signed grub are installed into db, grub can be
+booted directly. It will then boot any kernel without signature
+validation. The booted kernel will think it was booted in secureboot
+mode and will implement lockdown, yet it could have been tampered.
+
+This version of the patch skips calling verification, when booted
+without secureboot. And is indented with gnu ident.
+
+CVE-2020-15705
+
+Reported-by: Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>
+Signed-off-by: Dimitri John Ledkov <xnox@ubuntu.com>
+---
+ grub-core/loader/arm64/linux.c     | 13 +++++++++----
+ grub-core/loader/efi/chainloader.c |  1 +
+ grub-core/loader/efi/linux.c       |  1 +
+ grub-core/loader/i386/efi/linux.c  | 17 +++++++++++------
+ 4 files changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/grub-core/loader/arm64/linux.c b/grub-core/loader/arm64/linux.c
+index 70a0075ec5e..47f8cf0d84b 100644
+--- a/grub-core/loader/arm64/linux.c
++++ b/grub-core/loader/arm64/linux.c
+@@ -34,6 +34,7 @@
+ #include <grub/i18n.h>
+ #include <grub/lib/cmdline.h>
+ #include <grub/verify.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -363,11 +364,15 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 
+   grub_dprintf ("linux", "kernel @ %p\n", kernel_addr);
+ 
+-  rc = grub_linuxefi_secure_validate (kernel_addr, kernel_size);
+-  if (rc < 0)
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
+     {
+-      grub_error (GRUB_ERR_INVALID_COMMAND, N_("%s has invalid signature"), argv[0]);
+-      goto fail;
++      rc = grub_linuxefi_secure_validate (kernel_addr, kernel_size);
++      if (rc <= 0)
++	{
++	  grub_error (GRUB_ERR_INVALID_COMMAND,
++		      N_("%s has invalid signature"), argv[0]);
++	  goto fail;
++	}
+     }
+ 
+   pe = (void *)((unsigned long)kernel_addr + lh.hdr_offset);
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index ac8dfd40c61..d41e8ea14a8 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -1084,6 +1084,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 
+       return 0;
+     }
++  // -1 fall-through to fail
+ 
+ fail:
+   if (dev)
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index e8b9ecb17f6..9260731c107 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -33,6 +33,7 @@ struct grub_efi_shim_lock
+ };
+ typedef struct grub_efi_shim_lock grub_efi_shim_lock_t;
+ 
++// Returns 1 on success, -1 on error, 0 when not available
+ int
+ grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+ {
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index f992ceeef20..3cf0f9b330b 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -30,6 +30,7 @@
+ #include <grub/cpu/efi/memory.h>
+ #include <grub/tpm.h>
+ #include <grub/safemath.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -101,7 +102,7 @@ kernel_alloc(grub_efi_uintn_t size, const char * const errmsg)
+ 
+       pages = BYTES_TO_PAGES(size);
+       grub_dprintf ("linux", "Trying to allocate %lu pages from %p\n",
+-		    pages, (void *)max);
++		    (unsigned long)pages, (void *)(unsigned long)max);
+ 
+       prev_max = max;
+       addr = grub_efi_allocate_pages_real (max, pages,
+@@ -307,12 +308,15 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  rc = grub_linuxefi_secure_validate (kernel, filelen);
+-  if (rc < 0)
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
+     {
+-      grub_error (GRUB_ERR_INVALID_COMMAND, N_("%s has invalid signature"),
+-		  argv[0]);
+-      goto fail;
++      rc = grub_linuxefi_secure_validate (kernel, filelen);
++      if (rc <= 0)
++	{
++	  grub_error (GRUB_ERR_INVALID_COMMAND,
++		      N_("%s has invalid signature"), argv[0]);
++	  goto fail;
++	}
+     }
+ 
+   lh = (struct linux_i386_kernel_header *)kernel;
+@@ -386,6 +390,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 
+   setup_header_end_offset = *((grub_uint8_t *)kernel + 0x201);
+   grub_dprintf ("linux", "copying %lu bytes from %p to %p\n",
++		(unsigned long)
+ 		MIN((grub_size_t)0x202+setup_header_end_offset,
+ 		    sizeof (*params)) - 0x1f1,
+ 		(grub_uint8_t *)kernel + 0x1f1,

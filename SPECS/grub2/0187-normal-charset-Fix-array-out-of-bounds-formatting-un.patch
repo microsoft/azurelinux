@@ -1,0 +1,36 @@
+From b206688dbf759234a15049a321efb88d88f1edfa Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 13 Jul 2021 13:24:38 +1000
+Subject: [PATCH] normal/charset: Fix array out-of-bounds formatting unicode
+ for display
+
+In some cases attempting to display arbitrary binary strings leads
+to ASAN splats reading the widthspec array out of bounds.
+
+Check the index. If it would be out of bounds, return a width of 1.
+I don't know if that's strictly correct, but we're not really expecting
+great display of arbitrary binary data, and it's certainly not worse than
+an OOB read.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/normal/charset.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/normal/charset.c b/grub-core/normal/charset.c
+index 4dfcc31..7a5a7c1 100644
+--- a/grub-core/normal/charset.c
++++ b/grub-core/normal/charset.c
+@@ -395,6 +395,8 @@ grub_unicode_estimate_width (const struct grub_unicode_glyph *c)
+ {
+   if (grub_unicode_get_comb_type (c->base))
+     return 0;
++  if (((unsigned long) (c->base >> 3)) >= ARRAY_SIZE (widthspec))
++    return 1;
+   if (widthspec[c->base >> 3] & (1 << (c->base & 7)))
+     return 2;
+   else
+-- 
+2.34.1
+
