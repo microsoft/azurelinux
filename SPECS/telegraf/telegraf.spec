@@ -85,6 +85,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.29.4-8
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.4-7
 - Add patch for CVE-2024-37298
 

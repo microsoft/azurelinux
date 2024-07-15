@@ -66,6 +66,9 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.4.0-21
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-20
 - Bump release to rebuild with go 1.21.11
 

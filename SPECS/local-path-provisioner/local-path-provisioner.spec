@@ -34,6 +34,9 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 %{_bindir}/local-path-provisioner
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.0.21-18
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.21-17
 - Bump release to rebuild with go 1.21.11
 

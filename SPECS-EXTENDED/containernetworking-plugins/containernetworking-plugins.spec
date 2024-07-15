@@ -129,6 +129,9 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.1.1-16
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-15
 - Bump release to rebuild with go 1.21.11
 

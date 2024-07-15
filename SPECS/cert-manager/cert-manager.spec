@@ -114,6 +114,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.11.2-12
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-11
 - Bump release to rebuild with go 1.21.11
 

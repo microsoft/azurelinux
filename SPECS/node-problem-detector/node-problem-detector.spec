@@ -66,6 +66,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.8.17-5
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.17-4
 - Bump release to rebuild with go 1.21.11
 

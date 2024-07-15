@@ -63,6 +63,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.10.1-4
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
 - Bump release to rebuild with go 1.21.11
 

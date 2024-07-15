@@ -217,6 +217,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.3-5
+- Bump release to rebuild with go 1.22.4
+
 * Wed Jun 26 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-4
 - Bump release to rebuild with go 1.21.11
 

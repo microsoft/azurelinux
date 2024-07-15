@@ -92,6 +92,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.6.26-7
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.26-6
 - Bump release to rebuild with go 1.21.11
 

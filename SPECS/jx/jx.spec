@@ -71,6 +71,9 @@ make test && \
 %{_bindir}/jx
 
 %changelog
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.2.236-18
+- Bump release to rebuild with go 1.22.4
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-17
 - Bump release to rebuild with go 1.21.11
 
