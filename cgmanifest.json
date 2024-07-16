@@ -8970,6 +8970,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdecor",
+          "version": "0.2.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/libdecor/libdecor/-/releases/0.2.2/downloads/libdecor-0.2.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdeflate",
           "version": "1.9",
           "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/v1.9.tar.gz"
@@ -9083,6 +9093,16 @@
           "name": "libedit",
           "version": "3.1.20230828",
           "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20230828-3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libei",
+          "version": "1.2.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libei/-/archive/1.2.1/libei-1.2.1.tar.bz2"
         }
       }
     },
@@ -11603,6 +11623,16 @@
           "name": "libXcursor",
           "version": "1.2.1",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxcvt",
+          "version": "0.1.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxcvt-0.1.2.tar.xz"
         }
       }
     },
