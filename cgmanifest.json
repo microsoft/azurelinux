@@ -4630,28 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.21.11",
-          "downloadUrl": "https://golang.org/dl/go1.21.11.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.22.4",
-          "downloadUrl": "https://golang.org/dl/go1.22.4.src.tar.gz"
+          "version": "1.22.5",
+          "downloadUrl": "https://golang.org/dl/go1.22.5.src.tar.gz"
         }
       }
     },

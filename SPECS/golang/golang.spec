@@ -1,6 +1,6 @@
 %global bootstrap_compiler_version_0 1.17.13
 %global bootstrap_compiler_version_1 1.21.6
-%global bootstrap_compiler_version_2 1.22.4
+%global go_version_to_build 1.22.5
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -15,7 +15,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.22.4
+Version:        1.22.5
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -26,7 +26,7 @@ Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.tar.gz
 Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
-Source4:        https://dl.google.com/go/go%{bootstrap_compiler_version_2}.src.tar.gz
+Source4:        https://dl.google.com/go/go%{go_version_to_build}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -85,19 +85,19 @@ rm -rf %{_libdir}/golang
 mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use %{bootstrap_compiler_version_1} to compile %{bootstrap_compiler_version_2}
+# Use %{bootstrap_compiler_version_1} to compile %{go_version_to_build}
 export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}
-tar xf %{SOURCE4} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_2} --strip-components=1
-pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}/src
+mkdir -p %{_topdir}/BUILD/go%{go_version_to_build}
+tar xf %{SOURCE4} -C %{_topdir}/BUILD/go%{go_version_to_build} --strip-components=1
+pushd %{_topdir}/BUILD/go%{go_version_to_build}/src
 CGO_ENABLED=0 ./make.bash
 popd
 
 # Nuke the older %{bootstrap_compiler_version_1}
 rm -rf %{_libdir}/golang
 
-# Make go%{bootstrap_compiler_version_2} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go1.22.4 %{_libdir}/golang
+# Make go%{go_version_to_build} as the new bootstrapper
+mv -v %{_topdir}/BUILD/go%{go_version_to_build} %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
