@@ -14,7 +14,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      4%{?dist}
+Release:      5%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -293,6 +293,9 @@ fi
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-5
+- Call make clean with OS distro variable
+
 * Fri Jul 12 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-4
 - Adapt make install target parameters to cope with upstream
   fork Makefile changes
