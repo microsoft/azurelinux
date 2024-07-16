@@ -238,7 +238,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon Jul 15 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.12.0-6
+* Mon Jul 15 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.12.3-1
 - Upgrade to 3.12.3 to patch CVE-2024-0397, CVE-2023-6597
 - Clean up the earlier patches not needed anymore
 
