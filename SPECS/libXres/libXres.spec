@@ -7,7 +7,7 @@ Distribution:   Azure Linux
 Summary: X-Resource extension client library
 Name: libXres
 Version: 1.2.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: MIT
 URL: http://www.x.org
 
@@ -68,6 +68,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Jul 12 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.2.0-10
+- Moved from SPECS-EXTENDED to SPECS.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

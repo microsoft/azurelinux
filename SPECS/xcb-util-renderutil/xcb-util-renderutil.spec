@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		xcb-util-renderutil
 Version:	0.3.9
-Release:	16%{?dist}
+Release:	17%{?dist}
 Summary:	Convenience functions for the Render extension
 License:	MIT
 URL:		http://xcb.freedesktop.org
@@ -67,6 +67,10 @@ rm %{buildroot}%{_libdir}/*.la
 
 
 %changelog
+* Fri Jul 12 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 0.3.9-17
+- Moved from SPECS-EXTENDED to SPECS.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.9-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
