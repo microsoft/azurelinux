@@ -211,7 +211,6 @@ popd
 
 # tardev-snapshotter
 pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter/
-sed -i -e 's/containerd.service/kubelet.service/g' tardev-snapshotter.service
 install -m 0644 -D -t %{buildroot}%{_unitdir} tardev-snapshotter.service
 install -D -m 0755 target/release/tardev-snapshotter  %{buildroot}/usr/bin/tardev-snapshotter
 popd

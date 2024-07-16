@@ -7,7 +7,7 @@ set -o errexit
 [ -n "${DEBUG:-}" ] && set -o xtrace
 
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/rootfs-builder/rootfs-cbl-mariner
+readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/cbl-mariner_rootfs
 readonly OSBUILDER_DIR=${SCRIPT_DIR}/tools/osbuilder
 export AGENT_SOURCE_BIN=${SCRIPT_DIR}/kata-agent
 
