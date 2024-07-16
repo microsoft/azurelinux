@@ -2,7 +2,7 @@
 
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 readonly OSBUILDER_DIR=${SCRIPT_DIR}/tools/osbuilder
-readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/rootfs-builder/rootfs-cbl-mariner
+readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/cbl-mariner_rootfs
 readonly INITRD_DIR="/var/cache/kata-containers/osbuilder-images/kernel-uvm"
 
 export AGENT_SOURCE_BIN=${SCRIPT_DIR}/agent/usr/bin/kata-agent

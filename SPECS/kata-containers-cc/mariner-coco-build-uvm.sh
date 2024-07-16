@@ -7,7 +7,7 @@ set -o errexit
 [ -n "${DEBUG:-}" ] && set -o xtrace
 
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/rootfs-builder/rootfs-cbl-mariner
+readonly ROOTFS_DIR=${SCRIPT_DIR}/tools/osbuilder/cbl-mariner_rootfs
 readonly OSBUILDER_DIR=${SCRIPT_DIR}/tools/osbuilder
 export AGENT_SOURCE_BIN=${SCRIPT_DIR}/kata-agent
 
@@ -42,6 +42,5 @@ sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/li
 
 # build image
 pushd ${OSBUILDER_DIR}
-mv rootfs-builder/rootfs-cbl-mariner cbl-mariner_rootfs
 sudo -E PATH=$PATH make DISTRO=cbl-mariner MEASURED_ROOTFS=yes DM_VERITY_FORMAT=kernelinit image
 popd
