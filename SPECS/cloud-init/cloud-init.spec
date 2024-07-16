@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
+Patch1:         Change-binaries-install-location.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -125,7 +126,7 @@ make check %{?_smp_mflags}
 %license LICENSE
 %{python3_sitelib}/*
 %{_docdir}/cloud-init/*
-%{_libdir}/cloud-init/*
+%{_libexecdir}/cloud-init
 %dir %{_sharedstatedir}/cloud
 %dir %{_sysconfdir}/cloud/templates
 %doc %{_sysconfdir}/cloud/cloud.cfg.d/README
@@ -142,6 +143,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Jul 16 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-2
+- Add patch to change default cloud-init binaries install location
+
 * Wed Jul 03 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-1
 - Upgrade cloud-init to 24.2 to support dhcpcd and azurelinux
 - Remove patches we no longer needed after upgrade
