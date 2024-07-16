@@ -1,6 +1,6 @@
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
-Version:        2024.02.02
+Version:        2024.07.04
 Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ pip3 install iniconfig
 %doc README.rst
 
 %changelog
+* Tue Jul 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2024.07.04-1
+- Auto-upgrade to 2024.07.04 - Fix CVE-2024-39689
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2024.02.02-1
 - Upgrade to version 2024.02.02
 

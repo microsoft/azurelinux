@@ -21803,8 +21803,8 @@
         "type": "other",
         "other": {
           "name": "python-certifi",
-          "version": "2024.02.02",
-          "downloadUrl": "https://github.com/certifi/python-certifi/archive/2024.02.02/python-certifi-2024.02.02.tar.gz"
+          "version": "2024.07.04",
+          "downloadUrl": "https://github.com/certifi/python-certifi/archive/2024.07.04/python-certifi-2024.07.04.tar.gz"
         }
       }
     },
