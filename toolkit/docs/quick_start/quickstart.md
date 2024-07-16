@@ -1,14 +1,50 @@
 # Quick Start Guide
-  - [Install Prerequisites](#install-prerequisites)
-  - [Clone Azure Linux](#clone-azure-linux)
-  - [Build and Boot an Image](#build-and-boot-an-image)
+  - [Install from ISO](#install-from-bootable-iso) [Fastest]
+  - [Build and boot and Image](#build-and-boot-an-image)
+    - [Install Prerequisites](#install-prerequisites)
+    - [Clone Azure Linux](#clone-azure-linux)
     - [VHDX and VHD Images](#vhdx-and-vhd-images)
-    - [ISO Image](#iso-image)
+    - [Build ISO Image](#iso-image)
 
-## **Install Prerequisites**
+## **Install from Bootable ISO**
+The Azure Linux ISO may work in some bare-metal scenarios, but is generally intended for installation to a Virtual Machine.  From a Windows PC:
+
+First, download the [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64-iso)
+
+Then follow these instructions
+
+**Create VHD(X) Virtual Machine with Hyper-V**
+
+1. From Hyper-V Select _Action->New->Virtual Machine_.
+1. Provide a name for your VM and press _Next >_.
+1. Select _Generation 1_ (VHD) or _Generation 2_ (VHDX), then press _Next >_.
+1. Change Memory size if desired, then press _Next >_.
+1. Select a virtual switch, then press _Next >_.
+1. Select _Create a virtual hard disk_, choose a location for your VHD(X) and set your desired disk Size.  Then press _Next >_.
+1. Select _Install an operating system from a bootable image file_ and browse to your Azure Linux ISO.
+1. Press _Finish_.
+
+**[Gen2/VHDX Only] Fix Boot Options**
+
+1. Right click your virtual machine from Hyper-V Manager
+1. Select _Settings..._
+1. Select Security and under _Template:_ select _Microsoft UEFI Certificate Authority_.
+1. Select Firmware and adjust the boot order so DVD is first and Hard Drive is second.
+1. Select _Apply_ to apply all changes.
+
+**Boot ISO**
+1. Right click your VM and select _Connect..._.
+1. Select _Start_.
+1. Follow the Installer Prompts to Install your image
+1. When installation completes, select restart to reboot the machine. The installation ISO will be automatically ejected.
+1. When prompted sign in to your Azure Linux using the user name and password provisioned through the Installer.
+
+## **Build and Boot an Image**
+
+### **Install Prerequisites**
 Install prerequisites [here](../building/prerequisites.md).
 
-## **Clone Azure Linux**
+### **Clone Azure Linux**
 From a bash terminal window, clone the Azure Linux Repository and check-out a stable build.
 
 ```bash
@@ -17,12 +53,9 @@ git clone https://github.com/microsoft/azurelinux.git
 cd azurelinux
 
 # Sync to the latest stable build
-git checkout 2.0-stable
+git checkout 4.0-stable
 
 ```
-
-## **Build and Boot an Image**
-
 ### **VHDX and VHD images**
 
 The following builds a bootable, VHDX or VHD Azure Linux image from precompiled RPMs in the Azure Linux package repository at https://packages.microsoft.com/azurelinux/3.0/prod/.
@@ -36,11 +69,11 @@ cd toolkit
 
 # Build VHDX Image
 # Image is placed in ../out/images/core-efi
-sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-efi.json
+sudo make image -j8 REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-efi.json
 
 # Build VHD Image
 # Image is placed in ../out/images/core-legacy
-sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-legacy.json
+sudo make image -j8 REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-legacy.json
 ```
 
 **Build the cloud-init configuration image**
@@ -98,34 +131,8 @@ The following builds a bootable ISO image from precompiled RPMs in the Azure Lin
 cd toolkit
 
 # Image is placed in ../out/images/full
-sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
+sudo make iso -j8 REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
 ```
 **Copy ISO Image to Your VM Host Machine**
 
-Copy your binary image(s) to your VM Host Machine using your preferred technique.
-
-**Create VHD(X) Virtual Machine with Hyper-V**
-
-1. From Hyper-V Select _Action->New->Virtual Machine_.
-1. Provide a name for your VM and press _Next >_.
-1. Select _Generation 1_ (VHD) or _Generation 2_ (VHDX), then press _Next >_.
-1. Change Memory size if desired, then press _Next >_.
-1. Select a virtual switch, then press _Next >_.
-1. Select _Create a virtual hard disk_, choose a location for your VHD(X) and set your desired disk Size.  Then press _Next >_.
-1. Select _Install an operating system from a bootable image file_ and browse to your Azure Linux ISO.
-1. Press _Finish_.
-
-**[Gen2/VHDX Only] Fix Boot Options**
-
-1. Right click your virtual machine from Hyper-V Manager
-1. Select _Settings..._
-1. Select Security and under _Template:_ select _Microsoft UEFI Certificate Authority_.
-1. Select Firmware and adjust the boot order so DVD is first and Hard Drive is second.
-1. Select _Apply_ to apply all changes.
-
-**Boot ISO**
-1. Right click your VM and select _Connect..._.
-1. Select _Start_.
-1. Follow the Installer Prompts to Install your image
-1. When installation completes, select restart to reboot the machine. The installation ISO will be automatically ejected.
-1. When prompted sign in to your Azure Linux using the user name and password provisioned through the Installer.
+Copy your binary image(s) to your VM Host Machine using your preferred technique and then follow these instructions
