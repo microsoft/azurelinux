@@ -32,12 +32,7 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 
 
 %build
-
-export FFLAGS=$(echo $FFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
 export CXXFLAGS=$(echo $CXXFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
-export CFLAGS=$(echo $CFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
-export RPM_OPT_FLAGS=$(echo $RPM_OPT_FLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
-export FCFLAGS=$(echo $FCFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
 %py3_build
 
 %install
