@@ -249,3 +249,13 @@ func findFreeNBDDevice() (string, error) {
 
 	return "", fmt.Errorf("no free nbd devices available")
 }
+
+func isNbdLoaded() (bool, error) {
+	files, err := filepath.Glob("/sys/class/block/nbd*")
+	if err != nil {
+		return false, err
+	}
+
+	isNbdLoaded := len(files) > 0
+	return isNbdLoaded, nil
+}

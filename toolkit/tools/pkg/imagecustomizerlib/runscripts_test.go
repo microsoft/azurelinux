@@ -52,7 +52,7 @@ Wombat
 Working dir: /
 Found DNS address: True
 Ferret
-resolv.conf does not exist
+resolv.conf exists
 `
 
 	file_contents, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "/log.txt"))

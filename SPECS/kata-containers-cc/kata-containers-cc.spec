@@ -14,7 +14,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      3%{?dist}
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -117,7 +117,7 @@ popd
 
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} KVER=${KERNEL_MODULE_VER} install
 popd
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
@@ -293,6 +293,10 @@ fi
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Fri Jul 12 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-4
+- Adapt make install target parameters to cope with upstream
+  fork Makefile changes
+
 * Tue Jul 02 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-3
 - Enable and start tardev-snapshotter.service after installation
 

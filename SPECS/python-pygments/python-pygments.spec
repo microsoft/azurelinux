@@ -1,6 +1,6 @@
 Summary:        Pygments is a syntax highlighting package written in Python.
 Name:           python-pygments
-Version:        2.5.2
+Version:        2.7.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -57,6 +57,13 @@ it is usable as a command-line tool and as a library.
 %{_bindir}/*
 
 %changelog
+* Wed Jul 10 2024 Muhammad Falak <mwani@microsoft.com> - 2.7.4-1
+- Upgrade to version 2.7.4 to address CVEs
+- Drop un-needed patches
+
+* Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 2.5.2-2
+- Introduce patches to address CVE-2021-20270 & CVE-2021-27291
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.2-1
 - Auto-upgrade to 2.5.2 - Azure Linux 3.0 - package upgrades
 

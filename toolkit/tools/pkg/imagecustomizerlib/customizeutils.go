@@ -24,7 +24,6 @@ import (
 
 const (
 	configDirMountPathInChroot = "/_imageconfigs"
-	resolveConfPath            = "/etc/resolv.conf"
 	defaultFilePermissions     = 0o755
 )
 
@@ -37,7 +36,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 
 	buildTime := time.Now().Format("2006-01-02T15:04:05Z")
 
-	err = overrideResolvConf(imageChroot)
+	resolvConf, err := overrideResolvConf(imageChroot)
 	if err != nil {
 		return err
 	}
@@ -118,12 +117,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		}
 	}
 
-	err = selinuxSetFiles(selinuxMode, imageChroot)
+	err = restoreResolvConf(resolvConf, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = deleteResolvConf(imageChroot)
+	err = selinuxSetFiles(selinuxMode, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -136,45 +135,6 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	return nil
-}
-
-// Override the resolv.conf file, so that in-chroot processes can access the network.
-// For example, to install packages from packages.microsoft.com.
-func overrideResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Overriding resolv.conf file")
-
-	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
-
-	// Remove the existing resolv.conf file, if it exists.
-	// Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
-	// file. For example, systemd-resolved. So, it isn't neccessary to make a back-up of the existing file.
-	err := os.RemoveAll(imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to delete existing resolv.conf file: %w", err)
-	}
-
-	err = file.Copy(resolveConfPath, imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to override resolv.conf file with host's resolv.conf: %w", err)
-	}
-
-	return nil
-}
-
-// Delete the overridden resolv.conf file.
-// Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
-// file. For example, systemd-resolved.
-func deleteResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Deleting overridden resolv.conf file")
-
-	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
-
-	err := os.RemoveAll(imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to delete overridden resolv.conf file: %w", err)
-	}
-
-	return err
 }
 
 func UpdateHostname(hostname string, imageChroot safechroot.ChrootInterface) error {
@@ -303,6 +263,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 			return fmt.Errorf("cannot set UID (%d) on a user (%s) that already exists", *user.UID, user.Name)
 		}
 
+		if user.HomeDirectory != "" {
+			return fmt.Errorf("cannot set home directory (%s) on a user (%s) that already exists",
+				user.HomeDirectory, user.Name)
+		}
+
 		// Update the user's password.
 		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
@@ -315,7 +280,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 
 		// Add the user.
-		err = userutils.AddUser(user.Name, hashedPassword, uidStr, imageChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, uidStr, imageChroot)
 		if err != nil {
 			return err
 		}
@@ -329,8 +294,15 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 	}
 
-	// Set user's groups.
-	err = installutils.ConfigureUserGroupMembership(imageChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+	// Update an existing user's primary group. A new user's primary group will have already been set by AddUser().
+	if userExists {
+		err = installutils.ConfigureUserPrimaryGroupMembership(imageChroot, user.Name, user.PrimaryGroup)
+		if err != nil {
+			return err
+		}
+	}
+	// Set user's secondary groups.
+	err = installutils.ConfigureUserSecondaryGroupMembership(imageChroot, user.Name, user.SecondaryGroups)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@
 %endif
 Summary:        CRI tools
 Name:           cri-tools
-Version:        1.29.0
+Version:        1.30.1
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -44,6 +44,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Fri Jul 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.1-1
+- Auto-upgrade to 1.30.1 - Fix CVE-2023-45288, CVE-2024-21626 and CVE-2024-24786
+
 * Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.0-1
 - Auto-upgrade to 1.29.0 - 3.0 batch package upgrade
 

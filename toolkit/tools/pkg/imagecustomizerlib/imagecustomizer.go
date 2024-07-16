@@ -25,11 +25,12 @@ const (
 	tmpParitionDirName = "tmppartition"
 
 	// supported input formats
-	ImageFormatVhd   = "vhd"
-	ImageFormatVhdx  = "vhdx"
-	ImageFormatQCow2 = "qcow2"
-	ImageFormatIso   = "iso"
-	ImageFormatRaw   = "raw"
+	ImageFormatVhd      = "vhd"
+	ImageFormatVhdFixed = "vhd-fixed"
+	ImageFormatVhdx     = "vhdx"
+	ImageFormatQCow2    = "qcow2"
+	ImageFormatIso      = "iso"
+	ImageFormatRaw      = "raw"
 
 	// qemu-specific formats
 	QemuFormatVpc = "vpc"
@@ -70,12 +71,11 @@ type ImageCustomizerParameters struct {
 	rawImageFile string
 
 	// output image
-	outputImageFormat     string
-	outputIsIso           bool
-	qemuOutputImageFormat string
-	outputImageFile       string
-	outputImageDir        string
-	outputImageBase       string
+	outputImageFormat string
+	outputIsIso       bool
+	outputImageFile   string
+	outputImageDir    string
+	outputImageBase   string
 }
 
 func createImageCustomizerParameters(buildDir string,
@@ -127,7 +127,7 @@ func createImageCustomizerParameters(buildDir string,
 	ic.outputImageDir = filepath.Dir(outputImageFile)
 
 	if ic.outputImageFormat != "" && !ic.outputIsIso {
-		ic.qemuOutputImageFormat, err = toQemuImageFormat(ic.outputImageFormat)
+		err = validateImageFormat(ic.outputImageFormat)
 		if err != nil {
 			return nil, err
 		}
@@ -209,6 +209,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	err := validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return fmt.Errorf("invalid image config:\n%w", err)
+	}
+
+	err = checkVerityPrerequisities(config)
+	if err != nil {
+		return err
 	}
 
 	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
@@ -390,12 +395,12 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 
 	// Create final output image file if requested.
 	switch ic.outputImageFormat {
-	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", ic.outputImageFile)
 
-		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", ic.qemuOutputImageFormat, ic.rawImageFile, ic.outputImageFile)
+		err := convertImageFile(ic.rawImageFile, ic.outputImageFile, ic.outputImageFormat)
 		if err != nil {
-			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
+			return err
 		}
 
 	case ImageFormatIso:
@@ -415,16 +420,43 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 	return nil
 }
 
-func toQemuImageFormat(imageFormat string) (string, error) {
-	switch imageFormat {
-	case ImageFormatVhd:
-		return QemuFormatVpc, nil
+func convertImageFile(inputPath string, outputPath string, format string) error {
+	qemuImageFormat, qemuOptions := toQemuImageFormat(format)
 
-	case ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
-		return imageFormat, nil
+	qemuImgArgs := []string{"convert", "-O", qemuImageFormat}
+	if qemuOptions != "" {
+		qemuImgArgs = append(qemuImgArgs, "-o", qemuOptions)
+	}
+	qemuImgArgs = append(qemuImgArgs, inputPath, outputPath)
+
+	err := shell.ExecuteLiveWithErr(1, "qemu-img", qemuImgArgs...)
+	if err != nil {
+		return fmt.Errorf("failed to convert image file to format: %s:\n%w", format, err)
+	}
+
+	return nil
+}
+
+func validateImageFormat(imageFormat string) error {
+	switch imageFormat {
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
+		return nil
 
 	default:
-		return "", fmt.Errorf("unsupported image format (supported: vhd, vhdx, raw, qcow2): %s", imageFormat)
+		return fmt.Errorf("unsupported image format (supported: vhd, vhd-fixed, vhdx, raw, qcow2): %s", imageFormat)
+	}
+}
+
+func toQemuImageFormat(imageFormat string) (string, string) {
+	switch imageFormat {
+	case ImageFormatVhd:
+		return QemuFormatVpc, ""
+
+	case ImageFormatVhdFixed:
+		return QemuFormatVpc, "subformat=fixed,force_size"
+
+	default:
+		return imageFormat, ""
 	}
 }
 
@@ -604,6 +636,23 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 	config.Packages.RemoveLists = nil
 	config.Packages.InstallLists = nil
 	config.Packages.UpdateLists = nil
+
+	return nil
+}
+
+func checkVerityPrerequisities(config *imagecustomizerapi.Config) error {
+	if config == nil || config.OS == nil || config.OS.Verity == nil {
+		return nil
+	}
+
+	isNbdLoaded, err := isNbdLoaded()
+	if err != nil {
+		return fmt.Errorf("failed to check if NBD is loaded:\n%w", err)
+	}
+
+	if !isNbdLoaded {
+		return fmt.Errorf("verity requires nbd module to be loaded:\nplease run: modprobe nbd")
+	}
 
 	return nil
 }

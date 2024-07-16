@@ -31,10 +31,13 @@ The file path to write the final customized image to.
 
 The image format of the the final customized image.
 
-Options: vhd, vhdx, qcow2, raw, and iso.
+Options: vhd, vhd-fixed, vhdx, qcow2, raw, and iso.
 
 At least one of `--output-image-format` and `--output-split-partitions-format` is 
 required.
+
+The vhd-fixed option outputs a fixed size VHD image. This is the required format for
+VMs in Azure.
 
 When the output image format is set to iso, the generated image is a LiveOS
 iso image. For more details on this format, see: 
