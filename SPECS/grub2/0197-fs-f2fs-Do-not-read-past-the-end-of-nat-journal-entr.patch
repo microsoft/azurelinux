@@ -1,0 +1,74 @@
+From 10ed2f4a6a1ebcb3b631fdb7760dd9bba803ad0b Mon Sep 17 00:00:00 2001
+From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Date: Wed, 6 Apr 2022 18:03:37 +0530
+Subject: [PATCH] fs/f2fs: Do not read past the end of nat journal entries
+
+A corrupt f2fs file system could specify a nat journal entry count
+that is beyond the maximum NAT_JOURNAL_ENTRIES.
+
+Check if the specified nat journal entry count before accessing the
+array, and throw an error if it is too large.
+
+Signed-off-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/f2fs.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index 8a9992c..6370221 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -632,23 +632,27 @@ get_nat_journal (struct grub_f2fs_data *data)
+   return err;
+ }
+ 
+-static grub_uint32_t
+-get_blkaddr_from_nat_journal (struct grub_f2fs_data *data, grub_uint32_t nid)
++static grub_err_t
++get_blkaddr_from_nat_journal (struct grub_f2fs_data *data, grub_uint32_t nid,
++                              grub_uint32_t *blkaddr)
+ {
+   grub_uint16_t n = grub_le_to_cpu16 (data->nat_j.n_nats);
+-  grub_uint32_t blkaddr = 0;
+   grub_uint16_t i;
+ 
++  if (n >= NAT_JOURNAL_ENTRIES)
++    return grub_error (GRUB_ERR_BAD_FS,
++                       "invalid number of nat journal entries");
++
+   for (i = 0; i < n; i++)
+     {
+       if (grub_le_to_cpu32 (data->nat_j.entries[i].nid) == nid)
+         {
+-          blkaddr = grub_le_to_cpu32 (data->nat_j.entries[i].ne.block_addr);
++          *blkaddr = grub_le_to_cpu32 (data->nat_j.entries[i].ne.block_addr);
+           break;
+         }
+     }
+ 
+-  return blkaddr;
++  return GRUB_ERR_NONE;
+ }
+ 
+ static grub_uint32_t
+@@ -656,10 +660,13 @@ get_node_blkaddr (struct grub_f2fs_data *data, grub_uint32_t nid)
+ {
+   struct grub_f2fs_nat_block *nat_block;
+   grub_uint32_t seg_off, block_off, entry_off, block_addr;
+-  grub_uint32_t blkaddr;
++  grub_uint32_t blkaddr = 0;
+   grub_err_t err;
+ 
+-  blkaddr = get_blkaddr_from_nat_journal (data, nid);
++  err = get_blkaddr_from_nat_journal (data, nid, &blkaddr);
++  if (err != GRUB_ERR_NONE)
++    return 0;
++
+   if (blkaddr)
+     return blkaddr;
+ 
+-- 
+2.34.1
+

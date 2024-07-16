@@ -1,0 +1,74 @@
+From c2c71b193ba897f7b5d8e8ce176f38636323410e Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 20 Dec 2021 21:55:43 +1100
+Subject: [PATCH] net/dns: Don't read past the end of the string we're checking
+ against
+
+I don't really understand what's going on here but fuzzing found
+a bug where we read past the end of check_with. That's a C string,
+so use grub_strlen() to make sure we don't overread it.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/dns.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/net/dns.c b/grub-core/net/dns.c
+index 135faac..9d5597e 100644
+--- a/grub-core/net/dns.c
++++ b/grub-core/net/dns.c
+@@ -146,11 +146,18 @@ check_name_real (const grub_uint8_t *name_at, const grub_uint8_t *head,
+ 		 int *length, char *set)
+ {
+   const char *readable_ptr = check_with;
++  int readable_len;
+   const grub_uint8_t *ptr;
+   char *optr = set;
+   int bytes_processed = 0;
+   if (length)
+     *length = 0;
++
++  if (readable_ptr != NULL)
++    readable_len = grub_strlen (readable_ptr);
++  else
++    readable_len = 0;
++
+   for (ptr = name_at; ptr < tail && bytes_processed < tail - head + 2; )
+     {
+       /* End marker.  */
+@@ -172,13 +179,16 @@ check_name_real (const grub_uint8_t *name_at, const grub_uint8_t *head,
+ 	  ptr = head + (((ptr[0] & 0x3f) << 8) | ptr[1]);
+ 	  continue;
+ 	}
+-      if (readable_ptr && grub_memcmp (ptr + 1, readable_ptr, *ptr) != 0)
++      if (readable_ptr != NULL && (*ptr > readable_len || grub_memcmp (ptr + 1, readable_ptr, *ptr) != 0))
+ 	return 0;
+-      if (grub_memchr (ptr + 1, 0, *ptr) 
++      if (grub_memchr (ptr + 1, 0, *ptr)
+ 	  || grub_memchr (ptr + 1, '.', *ptr))
+ 	return 0;
+       if (readable_ptr)
+-	readable_ptr += *ptr;
++	{
++	  readable_ptr += *ptr;
++	  readable_len -= *ptr;
++	}
+       if (readable_ptr && *readable_ptr != '.' && *readable_ptr != 0)
+ 	return 0;
+       bytes_processed += *ptr + 1;
+@@ -192,7 +202,10 @@ check_name_real (const grub_uint8_t *name_at, const grub_uint8_t *head,
+       if (optr)
+ 	*optr++ = '.';
+       if (readable_ptr && *readable_ptr)
+-	readable_ptr++;
++	{
++	  readable_ptr++;
++	  readable_len--;
++	}
+       ptr += *ptr + 1;
+     }
+   return 0;
+-- 
+2.34.1
+

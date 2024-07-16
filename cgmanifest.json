@@ -1127,8 +1127,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.3.0.tar.gz"
         }
       }
     },
@@ -4820,8 +4820,8 @@
         "type": "other",
         "other": {
           "name": "grub2",
-          "version": "2.12",
-          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.12.tar.gz"
+          "version": "2.06",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06.tar.gz"
         }
       }
     },
@@ -8970,6 +8970,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libdecor",
+          "version": "0.2.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/libdecor/libdecor/-/releases/0.2.2/downloads/libdecor-0.2.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdeflate",
           "version": "1.9",
           "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/v1.9.tar.gz"
@@ -9083,6 +9093,16 @@
           "name": "libedit",
           "version": "3.1.20230828",
           "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20230828-3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libei",
+          "version": "1.2.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libei/-/archive/1.2.1/libei-1.2.1.tar.bz2"
         }
       }
     },
@@ -11603,6 +11623,16 @@
           "name": "libXcursor",
           "version": "1.2.1",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libxcvt",
+          "version": "0.1.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxcvt-0.1.2.tar.xz"
         }
       }
     },
@@ -21213,8 +21243,8 @@
         "type": "other",
         "other": {
           "name": "prometheus-process-exporter",
-          "version": "0.7.10",
-          "downloadUrl": "https://github.com/ncabatoff/process-exporter/archive/refs/tags/v0.7.10.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/ncabatoff/process-exporter/archive/refs/tags/v0.8.2.tar.gz"
         }
       }
     },
@@ -24993,8 +25023,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.12.0",
-          "downloadUrl": "https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz"
+          "version": "3.12.3",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tar.xz"
         }
       }
     },

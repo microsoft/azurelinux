@@ -1,0 +1,58 @@
+From 5b7c9f45b8901a09c77d52ce355f2d89a7fbf79f Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Thu, 16 Sep 2021 01:29:54 +1000
+Subject: [PATCH] net/dns: Fix double-free addresses on corrupt DNS response
+
+grub_net_dns_lookup() takes as inputs a pointer to an array of addresses
+("addresses") for the given name, and pointer to a number of addresses
+("naddresses"). grub_net_dns_lookup() is responsible for allocating
+"addresses", and the caller is responsible for freeing it if
+"naddresses" > 0.
+
+The DNS recv_hook will sometimes set and free the addresses array,
+for example if the packet is too short:
+
+      if (ptr + 10 >= nb->tail)
+	{
+	  if (!*data->naddresses)
+	    grub_free (*data->addresses);
+	  grub_netbuff_free (nb);
+	  return GRUB_ERR_NONE;
+	}
+
+Later on the nslookup command code unconditionally frees the "addresses"
+array. Normally this is fine: the array is either populated with valid
+data or is NULL. But in these sorts of error cases it is neither NULL
+nor valid and we get a double-free.
+
+Only free "addresses" if "naddresses" > 0.
+
+It looks like the other use of grub_net_dns_lookup() is not affected.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/dns.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/dns.c b/grub-core/net/dns.c
+index 906ec7d..135faac 100644
+--- a/grub-core/net/dns.c
++++ b/grub-core/net/dns.c
+@@ -667,9 +667,11 @@ grub_cmd_nslookup (struct grub_command *cmd __attribute__ ((unused)),
+       grub_net_addr_to_str (&addresses[i], buf);
+       grub_printf ("%s\n", buf);
+     }
+-  grub_free (addresses);
+   if (naddresses)
+-    return GRUB_ERR_NONE;
++    {
++      grub_free (addresses);
++      return GRUB_ERR_NONE;
++    }
+   return grub_error (GRUB_ERR_NET_NO_DOMAIN, N_("no DNS record found"));
+ }
+ 
+-- 
+2.34.1
+
