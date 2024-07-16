@@ -2,19 +2,18 @@
 
 | Release Branch | ISO Image | SHA-256 Checksum File | Checksum Signature |
 | -------------- | --------- | --------------------- | ------------------ |
-| 1.0            | <https://aka.ms/mariner-1.0-x86_64-iso> | <https://aka.ms/mariner-1.0-x86_64-iso-checksum> | <https://aka.ms/mariner-1.0-x86_64-iso-checksum-signature> |
-| 2.0            | <https://aka.ms/mariner-2.0-x86_64-iso> | <https://aka.ms/mariner-2.0-x86_64-iso-checksum> | <https://aka.ms/mariner-2.0-x86_64-iso-checksum-signature> |
+| 3.0            | <https://aka.ms/azurelinux-3.0-x86_64-iso> | <https://aka.ms/azurelinux-3.0-x86_64-iso-checksum> | <https://aka.ms/azurelinux-3.0-x86_64-iso-checksum-signature> |
 
 Once the ISO image, the checksum, and the checksum signature files are downloaded, it is strongly recommended that the integrity of the image is verified. This is a two-step process. First, ensure that the checksum file has not been tampered with by verifying the signature against Azure Linux's RPM signing public key. Second, check that the ISO image was not corrupted during the download. The following bash script shows the commands necessary to check both steps:
 
 ```bash
 # Assumption: we are in the directory containing the downloaded files
-# Replace "1.0" in these variables with the release branch being verified
-CHECKSUM_FILE="mariner-1.0-x86_64.iso.sha256"
-SIGNATURE_FILE="mariner-1.0-x86_64.iso.sha256.gpg"
+# Replace "3.0" in these variables with the release branch being verified
+CHECKSUM_FILE="azurelinux-3.0-x86_64-iso-checksum"
+SIGNATURE_FILE="azurelinux-3.0-x86_64-iso-checksum-signature"
 
 # Download the Azure Linux RPM signing public key
-wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/2.0/SPECS/azurelinux-repos/MICROSOFT-RPM-GPG-KEY
+wget https://raw.githubusercontent.com/microsoft/azurelinux/3.0/SPECS/azurelinux-repos/MICROSOFT-RPM-GPG-KEY
 
 # Import the RPM signing public key into the local GPG keystore
 gpg --import MICROSOFT-RPM-GPG-KEY
