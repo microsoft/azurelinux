@@ -53,7 +53,7 @@ git clone https://github.com/microsoft/azurelinux.git
 cd azurelinux
 
 # Sync to the latest stable build
-git checkout 4.0-stable
+git checkout 3.0-stable
 
 ```
 ### **VHDX and VHD images**
