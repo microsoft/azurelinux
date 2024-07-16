@@ -242,9 +242,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 - Upgrade to 3.12.3 to patch CVE-2024-0397, CVE-2023-6597
 - Clean up the earlier patches not needed anymore
 
-* Thu Jul 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.12.0-5
-- Patch CVE-2023-6597
-
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.12.0-4
 - Bump release to build with new expat to fix CVE-2024-28757
 
