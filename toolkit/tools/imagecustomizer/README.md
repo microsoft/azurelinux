@@ -112,6 +112,7 @@ Examples of commands to avoid:
 - `iptables`
 - `iptables-save`
 - `ip6tables-save`
+- `modprobe`
 - `sysctl`
 
 Instead, you should you make use of config files that set the runtime kernel settings
