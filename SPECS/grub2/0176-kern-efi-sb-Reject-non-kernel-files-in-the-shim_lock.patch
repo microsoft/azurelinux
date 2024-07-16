@@ -1,0 +1,103 @@
+From 24a8a8c1a2d6d8be7d34905d7806d0b82f392d1e Mon Sep 17 00:00:00 2001
+From: Julian Andres Klode <julian.klode@canonical.com>
+Date: Thu, 2 Dec 2021 15:03:53 +0100
+Subject: [PATCH] kern/efi/sb: Reject non-kernel files in the shim_lock
+ verifier
+
+We must not allow other verifiers to pass things like the GRUB modules.
+Instead of maintaining a blocklist, maintain an allowlist of things
+that we do not care about.
+
+This allowlist really should be made reusable, and shared by the
+lockdown verifier, but this is the minimal patch addressing
+security concerns where the TPM verifier was able to mark modules
+as verified (or the OpenPGP verifier for that matter), when it
+should not do so on shim-powered secure boot systems.
+
+Fixes: CVE-2022-28735
+
+Signed-off-by: Julian Andres Klode <julian.klode@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/efi/sb.c | 39 ++++++++++++++++++++++++++++++++++++---
+ include/grub/verify.h   |  1 +
+ 2 files changed, 37 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/kern/efi/sb.c b/grub-core/kern/efi/sb.c
+index c52ec62..89c4bb3 100644
+--- a/grub-core/kern/efi/sb.c
++++ b/grub-core/kern/efi/sb.c
+@@ -119,10 +119,11 @@ shim_lock_verifier_init (grub_file_t io __attribute__ ((unused)),
+ 			 void **context __attribute__ ((unused)),
+ 			 enum grub_verify_flags *flags)
+ {
+-  *flags = GRUB_VERIFY_FLAGS_SKIP_VERIFICATION;
++  *flags = GRUB_VERIFY_FLAGS_NONE;
+ 
+   switch (type & GRUB_FILE_TYPE_MASK)
+     {
++    /* Files we check. */
+     case GRUB_FILE_TYPE_LINUX_KERNEL:
+     case GRUB_FILE_TYPE_MULTIBOOT_KERNEL:
+     case GRUB_FILE_TYPE_BSD_KERNEL:
+@@ -130,11 +131,43 @@ shim_lock_verifier_init (grub_file_t io __attribute__ ((unused)),
+     case GRUB_FILE_TYPE_PLAN9_KERNEL:
+     case GRUB_FILE_TYPE_EFI_CHAINLOADED_IMAGE:
+       *flags = GRUB_VERIFY_FLAGS_SINGLE_CHUNK;
++      return GRUB_ERR_NONE;
+ 
+-      /* Fall through. */
++    /* Files that do not affect secureboot state. */
++    case GRUB_FILE_TYPE_NONE:
++    case GRUB_FILE_TYPE_LOOPBACK:
++    case GRUB_FILE_TYPE_LINUX_INITRD:
++    case GRUB_FILE_TYPE_OPENBSD_RAMDISK:
++    case GRUB_FILE_TYPE_XNU_RAMDISK:
++    case GRUB_FILE_TYPE_SIGNATURE:
++    case GRUB_FILE_TYPE_PUBLIC_KEY:
++    case GRUB_FILE_TYPE_PUBLIC_KEY_TRUST:
++    case GRUB_FILE_TYPE_PRINT_BLOCKLIST:
++    case GRUB_FILE_TYPE_TESTLOAD:
++    case GRUB_FILE_TYPE_GET_SIZE:
++    case GRUB_FILE_TYPE_FONT:
++    case GRUB_FILE_TYPE_ZFS_ENCRYPTION_KEY:
++    case GRUB_FILE_TYPE_CAT:
++    case GRUB_FILE_TYPE_HEXCAT:
++    case GRUB_FILE_TYPE_CMP:
++    case GRUB_FILE_TYPE_HASHLIST:
++    case GRUB_FILE_TYPE_TO_HASH:
++    case GRUB_FILE_TYPE_KEYBOARD_LAYOUT:
++    case GRUB_FILE_TYPE_PIXMAP:
++    case GRUB_FILE_TYPE_GRUB_MODULE_LIST:
++    case GRUB_FILE_TYPE_CONFIG:
++    case GRUB_FILE_TYPE_THEME:
++    case GRUB_FILE_TYPE_GETTEXT_CATALOG:
++    case GRUB_FILE_TYPE_FS_SEARCH:
++    case GRUB_FILE_TYPE_LOADENV:
++    case GRUB_FILE_TYPE_SAVEENV:
++    case GRUB_FILE_TYPE_VERIFY_SIGNATURE:
++      *flags = GRUB_VERIFY_FLAGS_SKIP_VERIFICATION;
++      return GRUB_ERR_NONE;
+ 
++    /* Other files. */
+     default:
+-      return GRUB_ERR_NONE;
++      return grub_error (GRUB_ERR_ACCESS_DENIED, N_("prohibited by secure boot policy"));
+     }
+ }
+ 
+diff --git a/include/grub/verify.h b/include/grub/verify.h
+index cd129c3..672ae16 100644
+--- a/include/grub/verify.h
++++ b/include/grub/verify.h
+@@ -24,6 +24,7 @@
+ 
+ enum grub_verify_flags
+   {
++    GRUB_VERIFY_FLAGS_NONE		= 0,
+     GRUB_VERIFY_FLAGS_SKIP_VERIFICATION	= 1,
+     GRUB_VERIFY_FLAGS_SINGLE_CHUNK	= 2,
+     /* Defer verification to another authority. */
+-- 
+2.34.1
+

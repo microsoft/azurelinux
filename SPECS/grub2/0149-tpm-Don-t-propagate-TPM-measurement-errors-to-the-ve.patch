@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Sat, 16 May 2020 11:33:18 +0200
+Subject: [PATCH] tpm: Don't propagate TPM measurement errors to the verifiers
+ layer
+
+Currently if the EFI firmware fails to do a TPM measurement for a file,
+the error will be propagated to the verifiers framework and so opening
+the file will not succeed.
+
+This mean that buggy firmwares will prevent the system to boot since the
+loader won't be able to open any file. But failing to do TPM measurements
+shouldn't be a fatal error and the system should still be able to boot.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grub-core/commands/tpm.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/commands/tpm.c b/grub-core/commands/tpm.c
+index 2052c36eaba..e287d042e6b 100644
+--- a/grub-core/commands/tpm.c
++++ b/grub-core/commands/tpm.c
+@@ -42,7 +42,8 @@ grub_tpm_verify_init (grub_file_t io,
+ static grub_err_t
+ grub_tpm_verify_write (void *context, void *buf, grub_size_t size)
+ {
+-  return grub_tpm_measure (buf, size, GRUB_BINARY_PCR, context);
++  grub_tpm_measure (buf, size, GRUB_BINARY_PCR, context);
++  return GRUB_ERR_NONE;
+ }
+ 
+ static grub_err_t
+@@ -50,7 +51,6 @@ grub_tpm_verify_string (char *str, enum grub_verify_string_type type)
+ {
+   const char *prefix = NULL;
+   char *description;
+-  grub_err_t status;
+ 
+   switch (type)
+     {
+@@ -66,15 +66,15 @@ grub_tpm_verify_string (char *str, enum grub_verify_string_type type)
+     }
+   description = grub_malloc (grub_strlen (str) + grub_strlen (prefix) + 1);
+   if (!description)
+-    return grub_errno;
++    return GRUB_ERR_NONE;
+   grub_memcpy (description, prefix, grub_strlen (prefix));
+   grub_memcpy (description + grub_strlen (prefix), str,
+ 	       grub_strlen (str) + 1);
+-  status =
+-    grub_tpm_measure ((unsigned char *) str, grub_strlen (str),
+-		      GRUB_STRING_PCR, description);
++
++  grub_tpm_measure ((unsigned char *) str, grub_strlen (str), GRUB_STRING_PCR,
++                    description);
+   grub_free (description);
+-  return status;
++  return GRUB_ERR_NONE;
+ }
+ 
+ struct grub_file_verifier grub_tpm_verifier = {

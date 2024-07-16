@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 11 Jul 2019 17:17:02 +0200
+Subject: [PATCH] Try to pick better locations for kernel and initrd
+
+- Don't limit allocations on 64-bit platforms to < 0x[37f]fffffff if
+  we're using the "large" code model ; use __UINTPTR_MAX__.
+- Get the comparison right to check the address we've allocated.
+- Fix the allocation for the command line as well.
+
+*But*, when we did this some systems started failing badly; coudln't
+parse partition tables, etc.  What's going on here is the disk controller
+is silently failing DMAs to addresses above 4GB, so we're trying to parse
+uninitialized (or HW zeroed) ram when looking for the partition table,
+etc.
+
+So to limit this, we make grub_malloc() pick addresses below 4GB on
+x86_64, but the direct EFI page allocation functions can get addresses
+above that.
+
+Additionally, we now try to locate kernel+initrd+cmdline+etc below
+0x7fffffff, and if they're too big to fit any memory window there, then
+we try a higher address.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/efi/mm.c           |  8 ++++----
+ grub-core/loader/i386/efi/linux.c | 24 +++++++++++++++++-------
+ include/grub/arm/efi/memory.h     |  1 +
+ include/grub/arm64/efi/memory.h   |  1 +
+ include/grub/i386/efi/memory.h    |  1 +
+ include/grub/ia64/efi/memory.h    |  1 +
+ include/grub/x86_64/efi/memory.h  |  4 +++-
+ 7 files changed, 28 insertions(+), 12 deletions(-)
+
+diff --git a/grub-core/kern/efi/mm.c b/grub-core/kern/efi/mm.c
+index e6abc923db2..83d7644222e 100644
+--- a/grub-core/kern/efi/mm.c
++++ b/grub-core/kern/efi/mm.c
+@@ -122,7 +122,7 @@ grub_efi_allocate_pages_max (grub_efi_physical_address_t max,
+   grub_efi_boot_services_t *b;
+   grub_efi_physical_address_t address = max;
+ 
+-  if (max > 0xffffffff)
++  if (max > GRUB_EFI_MAX_USABLE_ADDRESS)
+     return 0;
+ 
+   b = grub_efi_system_table->boot_services;
+@@ -476,7 +476,7 @@ filter_memory_map (grub_efi_memory_descriptor_t *memory_map,
+     {
+       if (desc->type == GRUB_EFI_CONVENTIONAL_MEMORY
+ #if 1
+-	  && desc->physical_start <= GRUB_EFI_MAX_USABLE_ADDRESS
++	  && desc->physical_start <= GRUB_EFI_MAX_ALLOCATION_ADDRESS
+ #endif
+ 	  && desc->physical_start + PAGES_TO_BYTES (desc->num_pages) > 0x100000
+ 	  && desc->num_pages != 0)
+@@ -494,9 +494,9 @@ filter_memory_map (grub_efi_memory_descriptor_t *memory_map,
+ #if 1
+ 	  if (BYTES_TO_PAGES (filtered_desc->physical_start)
+ 	      + filtered_desc->num_pages
+-	      > BYTES_TO_PAGES_DOWN (GRUB_EFI_MAX_USABLE_ADDRESS))
++	      > BYTES_TO_PAGES_DOWN (GRUB_EFI_MAX_ALLOCATION_ADDRESS))
+ 	    filtered_desc->num_pages
+-	      = (BYTES_TO_PAGES_DOWN (GRUB_EFI_MAX_USABLE_ADDRESS)
++	      = (BYTES_TO_PAGES_DOWN (GRUB_EFI_MAX_ALLOCATION_ADDRESS)
+ 		 - BYTES_TO_PAGES (filtered_desc->physical_start));
+ #endif
+ 
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 3017d0f3e52..33e981e76e7 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -27,6 +27,7 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/efi/efi.h>
+ #include <grub/efi/linux.h>
++#include <grub/cpu/efi/memory.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -106,7 +107,9 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+       size += ALIGN_UP (grub_file_size (files[i]), 4);
+     }
+ 
+-  initrd_mem = grub_efi_allocate_pages_max (0x3fffffff, BYTES_TO_PAGES(size));
++  initrd_mem = grub_efi_allocate_pages_max (GRUB_EFI_MAX_ALLOCATION_ADDRESS, BYTES_TO_PAGES(size));
++  if (!initrd_mem)
++    initrd_mem = grub_efi_allocate_pages_max (GRUB_EFI_MAX_USABLE_ADDRESS, BYTES_TO_PAGES(size));
+   if (!initrd_mem)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate initrd"));
+@@ -202,8 +205,11 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  params = grub_efi_allocate_pages_max (0x3fffffff,
++  params = grub_efi_allocate_pages_max (GRUB_EFI_MAX_ALLOCATION_ADDRESS,
+ 					BYTES_TO_PAGES(sizeof(*params)));
++  if (!params)
++    params = grub_efi_allocate_pages_max (GRUB_EFI_MAX_USABLE_ADDRESS,
++					  BYTES_TO_PAGES(sizeof(*params)));
+   if (! params)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, "cannot allocate kernel parameters");
+@@ -273,8 +279,11 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ #endif
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+-  linux_cmdline = grub_efi_allocate_pages_max(0x3fffffff,
+-					 BYTES_TO_PAGES(lh->cmdline_size + 1));
++  linux_cmdline = grub_efi_allocate_pages_max(GRUB_EFI_MAX_ALLOCATION_ADDRESS,
++					      BYTES_TO_PAGES(lh->cmdline_size + 1));
++  if (!linux_cmdline)
++    linux_cmdline = grub_efi_allocate_pages_max(GRUB_EFI_MAX_USABLE_ADDRESS,
++						BYTES_TO_PAGES(lh->cmdline_size + 1));
+   if (!linux_cmdline)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate cmdline"));
+@@ -301,11 +310,12 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 
+   kernel_mem = grub_efi_allocate_pages_max(lh->pref_address,
+ 					   BYTES_TO_PAGES(lh->init_size));
+-
+   if (!kernel_mem)
+-    kernel_mem = grub_efi_allocate_pages_max(0x3fffffff,
++    kernel_mem = grub_efi_allocate_pages_max(GRUB_EFI_MAX_ALLOCATION_ADDRESS,
++					     BYTES_TO_PAGES(lh->init_size));
++  if (!kernel_mem)
++    kernel_mem = grub_efi_allocate_pages_max(GRUB_EFI_MAX_USABLE_ADDRESS,
+ 					     BYTES_TO_PAGES(lh->init_size));
+-
+   if (!kernel_mem)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate kernel"));
+diff --git a/include/grub/arm/efi/memory.h b/include/grub/arm/efi/memory.h
+index 2c64918e3f7..a4c2ec83502 100644
+--- a/include/grub/arm/efi/memory.h
++++ b/include/grub/arm/efi/memory.h
+@@ -2,5 +2,6 @@
+ #include <grub/efi/memory.h>
+ 
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffff
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */
+diff --git a/include/grub/arm64/efi/memory.h b/include/grub/arm64/efi/memory.h
+index c6cb3241714..acb61dca44b 100644
+--- a/include/grub/arm64/efi/memory.h
++++ b/include/grub/arm64/efi/memory.h
+@@ -2,5 +2,6 @@
+ #include <grub/efi/memory.h>
+ 
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffffffffULL
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */
+diff --git a/include/grub/i386/efi/memory.h b/include/grub/i386/efi/memory.h
+index 2c64918e3f7..a4c2ec83502 100644
+--- a/include/grub/i386/efi/memory.h
++++ b/include/grub/i386/efi/memory.h
+@@ -2,5 +2,6 @@
+ #include <grub/efi/memory.h>
+ 
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffff
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */
+diff --git a/include/grub/ia64/efi/memory.h b/include/grub/ia64/efi/memory.h
+index 2c64918e3f7..a4c2ec83502 100644
+--- a/include/grub/ia64/efi/memory.h
++++ b/include/grub/ia64/efi/memory.h
+@@ -2,5 +2,6 @@
+ #include <grub/efi/memory.h>
+ 
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffff
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */
+diff --git a/include/grub/x86_64/efi/memory.h b/include/grub/x86_64/efi/memory.h
+index 46e9145a308..e81cfb32213 100644
+--- a/include/grub/x86_64/efi/memory.h
++++ b/include/grub/x86_64/efi/memory.h
+@@ -2,9 +2,11 @@
+ #include <grub/efi/memory.h>
+ 
+ #if defined (__code_model_large__)
+-#define GRUB_EFI_MAX_USABLE_ADDRESS 0xffffffff
++#define GRUB_EFI_MAX_USABLE_ADDRESS __UINTPTR_MAX__
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS 0x7fffffff
+ #else
+ #define GRUB_EFI_MAX_USABLE_ADDRESS 0x7fffffff
++#define GRUB_EFI_MAX_ALLOCATION_ADDRESS GRUB_EFI_MAX_USABLE_ADDRESS
+ #endif
+ 
+ #endif /* ! GRUB_MEMORY_CPU_HEADER */

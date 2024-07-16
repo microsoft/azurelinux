@@ -2,12 +2,11 @@
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
-%global gnulibversion 9f48fb992a3d7e96610c4ce8be969cff2d61a01b
-%undefine distro_module_ldflags
+%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.12
-Release:        1%{?dist}
+Version:        2.06
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +16,93 @@ Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{versi
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 Source3:        macros.grub2
+# Incorporate relevant patches from Fedora 34
+# EFI Secure Boot / Handover Protocol patches
+Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
+Patch0002:      0002-Rework-linux-command.patch
+Patch0003:      0003-Rework-linux16-command.patch
+Patch0004:      0004-Add-secureboot-support-on-efi-chainloader.patch
+Patch0005:      0005-Make-any-of-the-loaders-that-link-in-efi-mode-honor-.patch
+Patch0006:      0006-Handle-multi-arch-64-on-32-boot-in-linuxefi-loader.patch
+# Kernel cmdline fix
+Patch0017:      0017-Pass-x-hex-hex-straight-through-unmolested.patch
+# Nicer documentation. Also makes patch #166 apply cleanly
+Patch0037:      0037-Replace-a-lot-of-man-pages-with-slightly-nicer-ones.patch
+Patch0052:      0052-Make-our-info-pages-say-grub2-where-appropriate.patch
+# General fix
+Patch0069:      0069-Make-pmtimer-tsc-calibration-not-take-51-seconds-to-.patch
+# ARM64 build patch
+Patch0104:      0104-Rework-how-the-fdt-command-builds.patch
+# General fixes (> 4GB DMA, TPM measurements, etc)
+Patch0112:      0112-Try-to-pick-better-locations-for-kernel-and-initrd.patch
+Patch0115:      0115-x86-efi-Use-bounce-buffers-for-reading-to-addresses-.patch
+Patch0116:      0116-x86-efi-Re-arrange-grub_cmd_linux-a-little-bit.patch
+Patch0117:      0117-x86-efi-Make-our-own-allocator-for-kernel-stuff.patch
+Patch0118:      0118-x86-efi-Allow-initrd-params-cmdline-allocations-abov.patch
+Patch0148:      0148-efi-Set-image-base-address-before-jumping-to-the-PE-.patch
+Patch0149:      0149-tpm-Don-t-propagate-TPM-measurement-errors-to-the-ve.patch
+Patch0150:      0150-x86-efi-Reduce-maximum-bounce-buffer-size-to-16-MiB.patch
+Patch0156:      0156-efilinux-Fix-integer-overflows-in-grub_cmd_initrd.patch
+# CVE-2020-15705
+Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
+# Fix to prevent user from overwriting signed grub binary using grub2-install
+Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
+# CVE-2021-3981
+Patch0167:      0167-restore-umask-for-grub-config.patch 
+# Fix to reset the global errno to success upon success.
+Patch0170:      0170-fix-memory-alloc-errno-reset.patch
+Patch0171:      CVE-2022-2601.patch
+Patch0172:      CVE-2022-3775.patch
+# CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
+# CVE-2022-28735 CVE-2022-28736
+Patch0173:      0173-loader-efi-chainloader-Simplify-the-loader-state.patch
+Patch0174:      0174-commands-boot-Add-API-to-pass-context-to-loader.patch
+Patch0175:      0175-loader-efi-chainloader-Use-grub_loader_set_ex.patch
+Patch0176:      0176-kern-efi-sb-Reject-non-kernel-files-in-the-shim_lock.patch
+Patch0177:      0177-kern-file-Do-not-leak-device_name-on-error-in-grub_f.patch
+Patch0178:      0178-video-readers-png-Abort-sooner-if-a-read-operation-f.patch
+Patch0179:      0179-video-readers-png-Refuse-to-handle-multiple-image-he.patch
+Patch0180:      0180-video-readers-png-Drop-greyscale-support-to-fix-heap.patch
+Patch0181:      0181-video-readers-png-Avoid-heap-OOB-R-W-inserting-huff-.patch
+Patch0182:      0182-video-readers-png-Sanity-check-some-huffman-codes.patch
+Patch0183:      0183-video-readers-jpeg-Abort-sooner-if-a-read-operation-.patch
+Patch0184:      0184-video-readers-jpeg-Do-not-reallocate-a-given-huff-ta.patch
+Patch0185:      0185-video-readers-jpeg-Refuse-to-handle-multiple-start-o.patch
+Patch0186:      0186-video-readers-jpeg-Block-int-underflow-wild-pointer-.patch
+Patch0187:      0187-normal-charset-Fix-array-out-of-bounds-formatting-un.patch
+Patch0188:      0188-net-ip-Do-IP-fragment-maths-safely.patch
+Patch0189:      0189-net-netbuff-Block-overly-large-netbuff-allocs.patch
+Patch0190:      0190-net-dns-Fix-double-free-addresses-on-corrupt-DNS-res.patch
+Patch0191:      0191-net-dns-Don-t-read-past-the-end-of-the-string-we-re-.patch
+Patch0192:      0192-net-tftp-Prevent-a-UAF-and-double-free-from-a-failed.patch
+Patch0193:      0193-net-tftp-Avoid-a-trivial-UAF.patch
+Patch0194:      0194-net-http-Do-not-tear-down-socket-if-it-s-already-bee.patch
+Patch0195:      0195-net-http-Fix-OOB-write-for-split-http-headers.patch
+Patch0196:      0196-net-http-Error-out-on-headers-with-LF-without-CR.patch
+Patch0197:      0197-fs-f2fs-Do-not-read-past-the-end-of-nat-journal-entr.patch
+Patch0198:      0198-fs-f2fs-Do-not-read-past-the-end-of-nat-bitmap.patch
+Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
+Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
+Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
+Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
+# Required to reach SBAT 3
+Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
+Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
+Patch:          sbat-3-0005-font-Fix-integer-overflow-in-ensure_comb_space.patch
+Patch:          sbat-3-0006-font-Fix-integer-overflow-in-BMP-index.patch
+Patch:          sbat-3-0007-font-Fix-integer-underflow-in-binary-search-of-char-.patch
+Patch:          sbat-3-0008-kern-efi-sb-Enforce-verification-of-font-files.patch
+Patch:          sbat-3-0009-fbutil-Fix-integer-overflow.patch
+Patch:          sbat-3-0011-font-Harden-grub_font_blit_glyph-and-grub_font_blit_.patch
+Patch:          sbat-3-0012-font-Assign-null_font-to-glyphs-in-ascii_font_glyph.patch
+Patch:          sbat-3-0013-normal-charset-Fix-an-integer-overflow-in-grub_unico.patch
+# Required to reach SBAT 4
+Patch:          sbat-4-0001-fs-ntfs-Fix-an-OOB-write-when-parsing-the-ATTRIBUTE_.patch
+Patch:          sbat-4-0002-fs-ntfs-Fix-an-OOB-read-when-reading-data-from-the-r.patch
+Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri.patch
+Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
+Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
+Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 # The Azure Linux team created this patch since the gcc version in use at the
 # time optimizes the code incorrectly, leading to network traffic getting
 # dropped in scenarios like PXE booting.
@@ -132,16 +218,18 @@ Requires:       %{name}-configuration = %{version}-%{release}
 Minimal set of utilities to configure a grub-based system
 
 %prep
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
+export LDFLAGS
 
-%autosetup -p1 -n grub-%{version}
+%autosetup -p1 -n grub-2.06
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
 
 %build
-# Add linker option -d "assign space to common symbols", otherwise some symbols in grub's
-# kernel.img will be assigned to the SHN_COMMON section which is not supported by grub-mkimage
-LDFLAGS="-Wl,-d %{build_ldflags}"
+# Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
 export PYTHON=%{python3}
@@ -350,16 +438,12 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config() %{_sysconfdir}/grub.d/00_header
 %config() %{_sysconfdir}/grub.d/10_linux
 %config() %{_sysconfdir}/grub.d/20_linux_xen
-%config() %{_sysconfdir}/grub.d/25_bli
 %config() %{_sysconfdir}/grub.d/30_os-prober
 %config() %{_sysconfdir}/grub.d/30_uefi-firmware
 %config(noreplace) %{_sysconfdir}/grub.d/40_custom
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
-* Fri Jun 14 2024 Gary Swalling <gaswal@microsoft.com> - 2.12-1
-- Upgrade to 2.12 - fixes and features in latest full release
-
 * Wed Jun 12 2024 George Mileka <gmileka@microsoft.com> - 2.06-19
 - disable code optimization for ip checksum calculation
 

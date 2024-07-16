@@ -1,0 +1,258 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 12 Sep 2018 16:03:55 -0400
+Subject: [PATCH] x86-efi: Make our own allocator for kernel stuff
+
+This helps enable allocations above 4GB.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 167 +++++++++++++++++++++-----------------
+ 1 file changed, 94 insertions(+), 73 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 5f48fa55619..3e4f7ef39f4 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -47,6 +47,65 @@ static char *linux_cmdline;
+ 
+ #define BYTES_TO_PAGES(bytes)   (((bytes) + 0xfff) >> 12)
+ 
++struct allocation_choice {
++    grub_efi_physical_address_t addr;
++    grub_efi_allocate_type_t alloc_type;
++};
++
++static struct allocation_choice max_addresses[] =
++  {
++    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    { 0, 0 }
++  };
++
++static inline void
++kernel_free(void *addr, grub_efi_uintn_t size)
++{
++  if (addr && size)
++    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)addr,
++			 BYTES_TO_PAGES(size));
++}
++
++static void *
++kernel_alloc(grub_efi_uintn_t size, const char * const errmsg)
++{
++  void *addr = 0;
++  unsigned int i;
++  grub_efi_physical_address_t prev_max = 0;
++
++  for (i = 0; max_addresses[i].addr != 0 && addr == 0; i++)
++    {
++      grub_uint64_t max = max_addresses[i].addr;
++      grub_efi_uintn_t pages;
++
++      if (max == prev_max)
++	continue;
++
++      pages = BYTES_TO_PAGES(size);
++      grub_dprintf ("linux", "Trying to allocate %lu pages from %p\n",
++		    pages, (void *)max);
++
++      prev_max = max;
++      addr = grub_efi_allocate_pages_real (max, pages,
++					   max_addresses[i].alloc_type,
++					   GRUB_EFI_LOADER_DATA);
++      if (addr)
++	grub_dprintf ("linux", "Allocated at %p\n", addr);
++    }
++
++  while (grub_error_pop ())
++    {
++      ;
++    }
++
++  if (addr == NULL)
++    grub_error (GRUB_ERR_OUT_OF_MEMORY, "%s", errmsg);
++
++  return addr;
++}
++
+ static grub_err_t
+ grub_linuxefi_boot (void)
+ {
+@@ -62,19 +121,12 @@ grub_linuxefi_unload (void)
+ {
+   grub_dl_unref (my_mod);
+   loaded = 0;
+-  if (initrd_mem)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)initrd_mem,
+-			 BYTES_TO_PAGES(params->ramdisk_size));
+-  if (linux_cmdline)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)
+-			 linux_cmdline,
+-			 BYTES_TO_PAGES(params->cmdline_size + 1));
+-  if (kernel_mem)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)kernel_mem,
+-			 BYTES_TO_PAGES(kernel_size));
+-  if (params)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)params,
+-			 BYTES_TO_PAGES(16384));
++
++  kernel_free(initrd_mem, params->ramdisk_size);
++  kernel_free(linux_cmdline, params->cmdline_size + 1);
++  kernel_free(kernel_mem, kernel_size);
++  kernel_free(params, sizeof(*params));
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -150,19 +202,13 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+       size += ALIGN_UP (grub_file_size (files[i]), 4);
+     }
+ 
+-  initrd_mem = grub_efi_allocate_pages_max (GRUB_EFI_MAX_ALLOCATION_ADDRESS, BYTES_TO_PAGES(size));
+-  if (!initrd_mem)
+-    initrd_mem = grub_efi_allocate_pages_max (GRUB_EFI_MAX_USABLE_ADDRESS, BYTES_TO_PAGES(size));
+-  if (!initrd_mem)
+-    {
+-      grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate initrd"));
+-      goto fail;
+-    }
+-
+-  grub_dprintf ("linux", "initrd_mem = %lx\n", (unsigned long) initrd_mem);
++  initrd_mem = kernel_alloc(size, N_("can't allocate initrd"));
++  if (initrd_mem == NULL)
++    goto fail;
++  grub_dprintf ("linux", "initrd_mem = %p\n", initrd_mem);
+ 
+   params->ramdisk_size = size;
+-  params->ramdisk_image = (grub_uint32_t)(grub_addr_t) initrd_mem;
++  params->ramdisk_image = initrd_mem;
+ 
+   ptr = initrd_mem;
+ 
+@@ -221,7 +267,6 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   filelen = grub_file_size (file);
+ 
+   kernel = grub_malloc(filelen);
+-
+   if (!kernel)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("cannot allocate kernel buffer"));
+@@ -274,7 +319,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-#if defined(__x86_64__) || defined(__aarch64__)
++#if defined(__x86_64__)
+   grub_dprintf ("linux", "checking lh->xloadflags\n");
+   if (!(lh->xloadflags & LINUX_XLF_KERNEL_64))
+     {
+@@ -293,17 +338,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+ #endif
+ 
+-  params = grub_efi_allocate_pages_max (GRUB_EFI_MAX_ALLOCATION_ADDRESS,
+-					BYTES_TO_PAGES(sizeof(*params)));
++  params = kernel_alloc (sizeof(*params), "cannot allocate kernel parameters");
+   if (!params)
+-    params = grub_efi_allocate_pages_max (GRUB_EFI_MAX_USABLE_ADDRESS,
+-					  BYTES_TO_PAGES(sizeof(*params)));
+-  if (! params)
+-    {
+-      grub_error (GRUB_ERR_OUT_OF_MEMORY, "cannot allocate kernel parameters");
+-      goto fail;
+-    }
+-
++    goto fail;
+   grub_dprintf ("linux", "params = %p\n", params);
+ 
+   grub_memset (params, 0, sizeof(*params));
+@@ -322,19 +359,10 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("linux", "new lh is at %p\n", lh);
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+-  linux_cmdline = grub_efi_allocate_pages_max(GRUB_EFI_MAX_ALLOCATION_ADDRESS,
+-					      BYTES_TO_PAGES(lh->cmdline_size + 1));
++  linux_cmdline = kernel_alloc (lh->cmdline_size + 1, N_("can't allocate cmdline"));
+   if (!linux_cmdline)
+-    linux_cmdline = grub_efi_allocate_pages_max(GRUB_EFI_MAX_USABLE_ADDRESS,
+-						BYTES_TO_PAGES(lh->cmdline_size + 1));
+-  if (!linux_cmdline)
+-    {
+-      grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate cmdline"));
+-      goto fail;
+-    }
+-
+-  grub_dprintf ("linux", "linux_cmdline = %lx\n",
+-		(unsigned long)linux_cmdline);
++    goto fail;
++  grub_dprintf ("linux", "linux_cmdline = %p\n", linux_cmdline);
+ 
+   grub_memcpy (linux_cmdline, LINUX_IMAGE, sizeof (LINUX_IMAGE));
+   grub_create_loader_cmdline (argc, argv,
+@@ -343,27 +371,24 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 			      GRUB_VERIFY_KERNEL_CMDLINE);
+ 
+   grub_dprintf ("linux", "cmdline:%s\n", linux_cmdline);
+-  grub_dprintf ("linux", "setting lh->cmd_line_ptr\n");
+-  lh->cmd_line_ptr = (grub_uint32_t)(grub_addr_t)linux_cmdline;
++  grub_dprintf ("linux", "setting lh->cmd_line_ptr to 0x%08x\n",
++		linux_cmdline);
++  lh->cmd_line_ptr = linux_cmdline;
+ 
+   handover_offset = lh->handover_offset;
+-  grub_dprintf("linux", "handover_offset: %08x\n", handover_offset);
++  grub_dprintf("linux", "handover_offset: 0x%08x\n", handover_offset);
+ 
+   start = (lh->setup_sects + 1) * 512;
+ 
+-  kernel_mem = grub_efi_allocate_pages_max(lh->pref_address,
+-					   BYTES_TO_PAGES(lh->init_size));
+-  if (!kernel_mem)
+-    kernel_mem = grub_efi_allocate_pages_max(GRUB_EFI_MAX_ALLOCATION_ADDRESS,
+-					     BYTES_TO_PAGES(lh->init_size));
+-  if (!kernel_mem)
+-    kernel_mem = grub_efi_allocate_pages_max(GRUB_EFI_MAX_USABLE_ADDRESS,
+-					     BYTES_TO_PAGES(lh->init_size));
+-  if (!kernel_mem)
++  grub_dprintf ("linux", "lh->pref_address: %p\n", (void *)(grub_addr_t)lh->pref_address);
++  if (lh->pref_address < (grub_uint64_t)GRUB_EFI_MAX_ALLOCATION_ADDRESS)
+     {
+-      grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("can't allocate kernel"));
+-      goto fail;
++      max_addresses[0].addr = lh->pref_address;
++      max_addresses[0].alloc_type = GRUB_EFI_ALLOCATE_ADDRESS;
+     }
++  kernel_mem = kernel_alloc (lh->init_size, N_("can't allocate kernel"));
++  if (!kernel_mem)
++    goto fail;
+   grub_dprintf("linux", "kernel_mem = %p\n", kernel_mem);
+ 
+   grub_loader_set (grub_linuxefi_boot, grub_linuxefi_unload, 0);
+@@ -398,18 +423,14 @@ fail:
+       loaded = 0;
+     }
+ 
+-  if (linux_cmdline && lh && !loaded)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)
+-			 linux_cmdline,
+-			 BYTES_TO_PAGES(lh->cmdline_size + 1));
++  if (!loaded)
++    {
++      if (lh)
++	kernel_free (linux_cmdline, lh->cmdline_size + 1);
+ 
+-  if (kernel_mem && !loaded)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)kernel_mem,
+-			 BYTES_TO_PAGES(kernel_size));
+-
+-  if (params && !loaded)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)params,
+-			 BYTES_TO_PAGES(16384));
++      kernel_free (kernel_mem, kernel_size);
++      kernel_free (params, sizeof(*params));
++    }
+ 
+   return grub_errno;
+ }
