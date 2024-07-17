@@ -424,25 +424,6 @@ func replaceKernelCommandLineArgValueAll(inputGrubCfgContent string, name string
 	return outputGrubCfgContent, oldValues, nil
 }
 
-// Finds an existing kernel command-line arg and replaces its value.
-//
-// Params:
-// - inputGrubCfgContent: The string contents of the grub.cfg file.
-// - name: The name of the command-line arg to replace.
-// - value: The value to set the command-line arg to.
-//
-// Returns:
-// - outputGrubCfgContent: The new string contents of the grub.cfg file.
-// - oldValue: The previous value of the arg.
-func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, value string,
-) (outputGrubCfgContent string, oldValue string, err error) {
-	outputGrubCfgContent, oldValues, err := replaceKernelCommandLineArgValueAll(inputGrubCfgContent, name, value, false /*allowMultiple*/)
-	if err != nil {
-		return "", "", err
-	}
-	return outputGrubCfgContent, oldValues[0], nil
-}
-
 func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, newArgs []string,
 	allowMultiple bool, requireKernelOpts bool) (string, error) {
 	lines, err := findLinuxOrInitrdLineAll(grub2Config, linuxCommand, allowMultiple /*allowMultiple*/)

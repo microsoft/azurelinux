@@ -211,11 +211,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
 
-	err = checkVerityPrerequisities(config)
-	if err != nil {
-		return err
-	}
-
 	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
 		baseConfigPath, config,
 		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
@@ -640,23 +635,6 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 	return nil
 }
 
-func checkVerityPrerequisities(config *imagecustomizerapi.Config) error {
-	if config == nil || config.OS == nil || config.OS.Verity == nil {
-		return nil
-	}
-
-	isNbdLoaded, err := isNbdLoaded()
-	if err != nil {
-		return fmt.Errorf("failed to check if NBD is loaded:\n%w", err)
-	}
-
-	if !isNbdLoaded {
-		return fmt.Errorf("verity requires nbd module to be loaded:\nplease run: modprobe nbd")
-	}
-
-	return nil
-}
-
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
@@ -735,38 +713,25 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	// Connect the disk image to an NBD device using qemu-nbd
-	// Find a free NBD device
-	nbdDevice, err := findFreeNBDDevice()
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to find a free nbd device: %v", err)
+		return fmt.Errorf("failed to connect to image file to provision verity:\n%w", err)
 	}
+	defer loopback.Close()
 
-	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
-	}
-	defer func() {
-		// Disconnect the NBD device when the function returns
-		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
-		if err != nil {
-			return
-		}
-	}()
-
-	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
 	if err != nil {
 		return err
 	}
 
 	// Extract the partition block device path.
 	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
-		config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+		config.OS.Verity.DataPartition.Id, diskPartitions)
 	if err != nil {
 		return err
 	}
 	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
-		config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+		config.OS.Verity.HashPartition.Id, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -820,6 +785,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
 	if err != nil {
 		return err
 	}
