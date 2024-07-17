@@ -32,7 +32,11 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 
 
 %build
-# Remove -D_GLIBCXX_ASSERTIONS because optree throws std lib assertion errors.
+# Remove "-D_GLIBCXX_ASSERTIONS" because optree will otherwise crash
+# on an C++ std libs assertion error. This happens when one tries to
+# call 'map_tree' on an empty tuple (or possibly all empty collections).
+# We currently suspect an upstream bug, as 'map_tree' seems to work
+# fine when compiled without the "_GLIBCXX_ASSERTIONS" macro.
 export CXXFLAGS=$(echo $CXXFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
 %py3_build
 
