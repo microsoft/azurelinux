@@ -9,7 +9,7 @@
 ## **Install from Bootable ISO**
 The Azure Linux ISO may work in some bare-metal scenarios, but is generally intended for installation to a Virtual Machine.  From a Windows PC:
 
-First, download the [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64-iso)
+First, download the [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
 
 Then follow these instructions
 
