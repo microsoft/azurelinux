@@ -1,7 +1,7 @@
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 Version:        8.4.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ Source1:        cli-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-44487.patch
 Patch1:         CVE-2021-44716.patch
 
-BuildRequires:  golang >= 1.18.3
+BuildRequires:  golang
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -63,6 +63,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 8.4.0-18
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-17
 - Bump release to rebuild with go 1.21.11
 

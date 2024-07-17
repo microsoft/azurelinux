@@ -7,7 +7,7 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,7 +39,7 @@ Patch0:         CVE-2023-45288.patch
 BuildRequires:  cmake
 BuildRequires:  fuse3-devel
 BuildRequires:  gcc
-BuildRequires:  golang >= 1.16
+BuildRequires:  golang
 Requires:       fuse3
 
 %description
@@ -80,6 +80,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.1.2-5
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.2-4
 - Bump release to rebuild with go 1.21.11
 
