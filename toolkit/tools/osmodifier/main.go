@@ -48,6 +48,7 @@ func main() {
 
 func modifyImage() error {
 	if *configFile == "" {
+		// The config file is not needed when applying verity changes in grub.cfg to the default grub
 		err := osmodifierlib.ModifyOSWithoutConfigFile()
 		if err != nil {
 			return err

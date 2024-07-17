@@ -357,7 +357,6 @@ func writeDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInter
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
 
 	// Update grub.cfg file.
-	fmt.Println("xxxxxxxxxxxxxxxxxx",grub2ConfigFilePath)
 	err := file.Write(grub2Config, grub2ConfigFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to write grub file (%s):\n%w", installutils.GrubDefFile, err)

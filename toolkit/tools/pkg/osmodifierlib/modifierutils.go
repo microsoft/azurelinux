@@ -31,6 +31,8 @@ func doModifications(baseConfigPath string, osConfig *imagecustomizerapi.OS) err
 
 func doModificationsWithoutConfig() error {
 	var dummyChroot safechroot.ChrootInterface = &safechroot.DummyChroot{}
+
+	// Get verity changes in /boot/grub2/grub.cfg
 	verityParams, err := getVerityChanges(dummyChroot)
 	if err != nil {
 		fmt.Printf("Error getting verity changes: %v\n", err)
@@ -50,7 +52,7 @@ func doModificationsWithoutConfig() error {
 		fmt.Println("Successfully applied verity changes to default grub")
 	}
 
-	// Update /boot/grub2/grub.cfg file.
+	// Regenerate /boot/grub2/grub.cfg file
 	err = installutils.CallGrubMkconfig(dummyChroot)
 	if err != nil {
 		return fmt.Errorf("failed to generate grub.cfg via grub2-mkconfig:\n%w", err)
