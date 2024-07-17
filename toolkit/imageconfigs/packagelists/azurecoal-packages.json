@@ -2,7 +2,8 @@
     "packages": [
         "azure-init",
         "coal-trident-module",
-        "dhcp-client",
+        "dhcpcd",
+        "dracut-hyperv",
         "grubby",
         "hyperv-daemons",
         "kexec-tools",

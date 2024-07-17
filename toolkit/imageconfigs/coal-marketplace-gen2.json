@@ -62,7 +62,8 @@
             "PackageLists": [
                 "packagelists/core-packages-image.json",
                 "packagelists/coal-tools-packages.json",
-                "packagelists/azurecoal-packages.json"
+                "packagelists/azurecoal-packages.json",
+                "packagelists/hyperv-packages.json"
             ],
             "AdditionalFiles": {
                 "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
@@ -81,16 +82,9 @@
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=ttyS0 console=ttyS0=9800 rd.shell=1 rd.debug rd.break=pre-pivot audit=0"
+                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=1 rd.debug log_buf_len=1M rd.break=pre-pivot audit=0"
             },
-            "Hostname": "azurelinux",
-            "Users": [
-                {
-                    "Name": "root",
-                    "Password": "world",
-                    "PasswordHashed": false
-                }
-            ]
+            "Hostname": "azurelinux"
         }
     ]
 }

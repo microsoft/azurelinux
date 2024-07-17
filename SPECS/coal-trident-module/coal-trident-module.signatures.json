@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "config.yaml": "51be4baae4af286e9f8655bed65085314eba316a3fb155be90c778e194612b98",
-  "module-setup.sh": "e919a174d2584d343b9afeb6b73c74e635f52d63efb61b7634beda1f1e6adcc1",
+  "module-setup.sh": "a8d141ef0b56c2bd3aa429aacae0a1df2f832ea19efc073bff331354fc2561af",
   "trident-module.conf": "9c62c5b84bd97751f184bb521ce0e26dfb9ec7ab53df688685bbc595e790f465"
  }
 }

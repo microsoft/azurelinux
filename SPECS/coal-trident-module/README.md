@@ -1,0 +1,1 @@
+In order to appropriately build this package, you must copy trident rpms into the ./out/RPMS/ folder and the ./build/rpm_cache/cache folder.
