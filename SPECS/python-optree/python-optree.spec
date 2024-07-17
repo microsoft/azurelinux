@@ -32,6 +32,7 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 
 
 %build
+# Remove -D_GLIBCXX_ASSERTIONS because optree throws std lib assertion errors.
 export CXXFLAGS=$(echo $CXXFLAGS | sed 's/\(-Wp,-D_GLIBCXX_ASSERTIONS\)//g')
 %py3_build
 
