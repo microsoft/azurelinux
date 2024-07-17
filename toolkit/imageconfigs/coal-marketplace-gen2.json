@@ -62,7 +62,8 @@
             "PackageLists": [
                 "packagelists/core-packages-image.json",
                 "packagelists/coal-tools-packages.json",
-                "packagelists/azurecoal-packages.json"
+                "packagelists/azurecoal-packages.json",
+                "packagelists/hyperv-packages.json"
             ],
             "AdditionalFiles": {
                 "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
@@ -72,23 +73,18 @@
             "PostInstallScripts": [
                 {
                     "Path": "additionalconfigs/configure-systemd-networkd.sh"
+                },
+                {
+                    "Path": "postinstallscripts/post.sh"
                 }
             ],
             "KernelOptions": {
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=ttyS0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot audit=0"
+                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=1 rd.debug log_buf_len=1M rd.break=pre-pivot audit=0"
             },
-            "Hostname": "azurelinux",
-            "Users": [
-                {
-                    "Name": "root",
-                    "Password": "$6$hello$VzbX6f6UgMunj1XtgMFCZvM2b1THJCVi4VD71fXBFBUzBNyhYBi0kFT37ouCN3AWZ5UmWFXX1qX7chVI2wcxL0",
-                    "PasswordHashed": true,
-                    "_comment": "This password is 'world', it was generated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>'. You may also use the json key 'SSHPubKeyPaths' to use an SSH key for login"
-                }
-            ]
+            "Hostname": "azurelinux"
         }
     ]
 }

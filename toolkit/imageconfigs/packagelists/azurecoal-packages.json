@@ -1,7 +1,9 @@
 {
     "packages": [
         "azure-init",
-        "dhcp-client",
+        "coal-trident-module",
+        "dhcpcd",
+        "dracut-hyperv",
         "grubby",
         "hyperv-daemons",
         "kexec-tools",
