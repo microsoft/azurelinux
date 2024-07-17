@@ -286,7 +286,7 @@ func insertDefaultGrubFileVarAssign(defaultGrubFileContent string, insertAfterLi
 
 // Sets the value of a variable in the /etc/default/grub file, either replacing the existing variable value (if one
 // exists) or adding a new one.
-func updateDefaultGrubFileVariable(defaultGrubFileContent string, varName string, newValue string) (string, error) {
+func UpdateDefaultGrubFileVariable(defaultGrubFileContent string, varName string, newValue string) (string, error) {
 	varAssigns, err := findDefaultGrubFileVarAssigns(defaultGrubFileContent)
 	if err != nil {
 		err = fmt.Errorf("failed to parse %s file:\n%w", installutils.GrubDefFile, err)
@@ -320,7 +320,7 @@ func updateDefaultGrubFileVariable(defaultGrubFileContent string, varName string
 
 // Checks if the image uses grub-mkconfig.
 func isGrubMkconfigEnabled(imageChroot *safechroot.Chroot) (bool, error) {
-	grub2ConfigFile, err := readGrub2ConfigFile(imageChroot)
+	grub2ConfigFile, err := ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return false, err
 	}
@@ -336,7 +336,7 @@ func isGrubMkconfigConfig(grub2Config string) bool {
 }
 
 // Reads the string contents of the /etc/default/grub file.
-func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
+func readDefaultGrubFile(imageChroot safechroot.ChrootInterface) (string, error) {
 	logger.Log.Debugf("Reading %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
@@ -351,12 +351,13 @@ func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
 }
 
 // Writes the string contents of the /etc/default/grub file.
-func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) error {
+func writeDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
 
 	// Update grub.cfg file.
+	fmt.Println("xxxxxxxxxxxxxxxxxx",grub2ConfigFilePath)
 	err := file.Write(grub2Config, grub2ConfigFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to write grub file (%s):\n%w", installutils.GrubDefFile, err)
@@ -365,6 +366,6 @@ func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) er
 	return nil
 }
 
-func getDefaultGrubFilePath(imageChroot *safechroot.Chroot) string {
+func getDefaultGrubFilePath(imageChroot safechroot.ChrootInterface) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubDefFile)
 }

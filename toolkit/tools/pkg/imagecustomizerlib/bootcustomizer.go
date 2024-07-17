@@ -23,8 +23,8 @@ type BootCustomizer struct {
 	isGrubMkconfig bool
 }
 
-func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) {
-	grubCfgContent, err := readGrub2ConfigFile(imageChroot)
+func NewBootCustomizer(imageChroot safechroot.ChrootInterface) (*BootCustomizer, error) {
+	grubCfgContent, err := ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 func (b *BootCustomizer) PrepareForVerity() error {
 	if b.isGrubMkconfig {
 		// Force root command-line arg to be referenced by /dev path instead of by UUID.
-		defaultGrubFileContent, err := updateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
+		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
 			"true")
 		if err != nil {
 			return err
@@ -171,7 +171,7 @@ func (b *BootCustomizer) PrepareForVerity() error {
 
 		// Disable recovery menu entry, to avoid having more than 1 linux command in the grub.cfg file.
 		// This will make it easier to modify the grub.cfg file to add the verity args.
-		defaultGrubFileContent, err = updateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DISABLE_RECOVERY",
+		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DISABLE_RECOVERY",
 			"true")
 		if err != nil {
 			return err
@@ -183,14 +183,14 @@ func (b *BootCustomizer) PrepareForVerity() error {
 	return nil
 }
 
-func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
+func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
 		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
 		}
-
+		fmt.Println("HHHHHHHHHHHHHHH")
 		// Update /boot/grub2/grub.cfg file.
 		err = installutils.CallGrubMkconfig(imageChroot)
 		if err != nil {
@@ -204,5 +204,16 @@ func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
 		}
 	}
 
+	return nil
+}
+
+func (b *BootCustomizer)ApplyChangesToGrub(varName string, newValue string) error {
+	defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, varName, newValue)
+	if err != nil {
+		return fmt.Errorf("failed to update verity variables %s: %w", newValue, err)
+	}
+
+	b.defaultGrubFileContent = defaultGrubFileContent
+	
 	return nil
 }

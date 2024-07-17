@@ -1,0 +1,27 @@
+# os:
+  # resetBootLoaderType: hard-reset
+  # selinux:
+  #   mode: disabled
+
+  # kernelCommandLine:
+  #   extraCommandLine: "rd.info"
+
+  # packages:
+  #   install:
+  #   - openssh-server
+  #   - veritysetup
+  #   - vim
+verity:
+  dataPartition:
+    idType: part-label
+    id: root
+  hashPartition:
+    idType: part-label
+    id: root-hash
+
+users:
+- name: test
+  sshPublicKeys:
+    # Your SSH public key here.
+  secondaryGroups:
+  - sudo
