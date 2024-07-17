@@ -1,0 +1,413 @@
+From 8932242a65bae5504ba45134091767f215a441fa Mon Sep 17 00:00:00 2001
+From: Ksenija Stanojevic <ksenija.stanojevic@gmail.com>
+Date: Mon, 15 Jul 2024 18:48:19 -0700
+Subject: [PATCH 3/3] feat(azure): add support for azure-proxy-agent
+
+---
+ cloudinit/sources/DataSourceAzure.py  |  40 ++++
+ cloudinit/sources/azure/errors.py     |  19 +-
+ tests/unittests/sources/test_azure.py | 254 ++++++++++++++++++++++++++
+ 3 files changed, 312 insertions(+), 1 deletion(-)
+
+diff --git a/cloudinit/sources/DataSourceAzure.py b/cloudinit/sources/DataSourceAzure.py
+index dc2b79a3a..c2f74e173 100644
+--- a/cloudinit/sources/DataSourceAzure.py
++++ b/cloudinit/sources/DataSourceAzure.py
+@@ -483,6 +483,41 @@ class DataSourceAzure(sources.DataSource):
+             or self._ephemeral_dhcp_ctx.lease is None
+         )
+ 
++    def _check_azure_proxy_agent_status(self) -> None:
++        """Check if azure-proxy-agent is ready for communication with WS/IMDS.
++        If ProvisionGuestProxyAgent is true, query azure-proxy-agent status,
++        waiting up to 120 seconds for the proxy to negotiate with Wireserver
++        and configure an eBPF proxy.  Once azure-proxy-agent is ready,
++        it will exit with code 0 and cloud-init can then expect to be able to
++        communicate with these services.
++        Fail deployment if azure-proxy-agent is not found or otherwise returns
++        an error.
++        For more information, check out:
++        https://github.com/azure/guestproxyagent
++        """
++        try:
++            cmd = [
++                "azure-proxy-agent",
++                "--status",
++                "--wait",
++                "120",
++            ]
++            out, err = subp.subp(cmd)
++            report_diagnostic_event(
++                "Running azure-proxy-agent %s resulted"
++                "in stderr output: %s with stdout: %s" % (cmd, err, out),
++                logger_func=LOG.debug,
++            )
++        except subp.ProcessExecutionError as error:
++            if isinstance(error.reason, FileNotFoundError):
++                report_error = errors.ReportableErrorProxyAgentNotFound()
++                self._report_failure(report_error)
++            else:
++                reportable_error = (
++                    errors.ReportableErrorProxyAgentStatusFailure(error)
++                )
++                self._report_failure(reportable_error)
++
+     @azure_ds_telemetry_reporter
+     def crawl_metadata(self):
+         """Walk all instance metadata sources returning a dict on success.
+@@ -566,6 +601,11 @@ class DataSourceAzure(sources.DataSource):
+ 
+         imds_md = {}
+         if self._is_ephemeral_networking_up():
++            # check if azure-proxy-agent is enabled in the ovf-env.xml file.
++            # azure-proxy-agent feature is opt-in and disabled by default.
++            if cfg.get("ProvisionGuestProxyAgent"):
++                self._check_azure_proxy_agent_status()
++
+             imds_md = self.get_metadata_from_imds(report_failure=True)
+ 
+         if not imds_md and ovf_source is None:
+diff --git a/cloudinit/sources/azure/errors.py b/cloudinit/sources/azure/errors.py
+index 966725b00..b331cd686 100644
+--- a/cloudinit/sources/azure/errors.py
++++ b/cloudinit/sources/azure/errors.py
+@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
+ 
+ import requests
+ 
+-from cloudinit import version
++from cloudinit import subp, version
+ from cloudinit.sources.azure import identity
+ from cloudinit.url_helper import UrlError
+ 
+@@ -151,3 +151,20 @@ class ReportableErrorUnhandledException(ReportableError):
+ 
+         self.supporting_data["exception"] = repr(exception)
+         self.supporting_data["traceback_base64"] = trace_base64
++
++
++class ReportableErrorProxyAgentNotFound(ReportableError):
++    def __init__(self) -> None:
++        super().__init__(
++            "Unable to activate Azure Guest Proxy Agent."
++            "azure-proxy-agent not found"
++        )
++
++
++class ReportableErrorProxyAgentStatusFailure(ReportableError):
++    def __init__(self, exception: subp.ProcessExecutionError) -> None:
++        super().__init__("azure-proxy-agent status failure")
++
++        self.supporting_data["exit_code"] = exception.exit_code
++        self.supporting_data["stdout"] = exception.stdout
++        self.supporting_data["stderr"] = exception.stderr
+diff --git a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
+index 255991ec3..9b6672e1e 100644
+--- a/tests/unittests/sources/test_azure.py
++++ b/tests/unittests/sources/test_azure.py
+@@ -1,6 +1,7 @@
+ # This file is part of cloud-init. See LICENSE file for license information.
+ 
+ import copy
++import datetime
+ import json
+ import os
+ import stat
+@@ -48,6 +49,16 @@ def mock_wrapping_setup_ephemeral_networking(azure_ds):
+         yield m
+ 
+ 
++@pytest.fixture
++def mock_wrapping_report_failure(azure_ds):
++    with mock.patch.object(
++        azure_ds,
++        "_report_failure",
++        wraps=azure_ds._report_failure,
++    ) as m:
++        yield m
++
++
+ @pytest.fixture
+ def mock_azure_helper_readurl():
+     with mock.patch(
+@@ -253,6 +264,14 @@ def mock_subp_subp():
+         yield m
+ 
+ 
++@pytest.fixture
++def mock_timestamp():
++    timestamp = datetime.datetime.utcnow()
++    with mock.patch.object(errors, "datetime", autospec=True) as m:
++        m.utcnow.return_value = timestamp
++        yield timestamp
++
++
+ @pytest.fixture
+ def mock_util_ensure_dir():
+     with mock.patch(
+@@ -3672,6 +3691,91 @@ class TestProvisioning:
+         }
+ 
+     def test_no_pps(self):
++        ovf = construct_ovf_env(provision_guest_proxy_agent=False)
++        md, ud, cfg = dsaz.read_azure_ovf(ovf)
++        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
++        self.mock_readurl.side_effect = [
++            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
++        ]
++        self.mock_azure_get_metadata_from_fabric.return_value = []
++
++        self.azure_ds._check_and_get_data()
++
++        assert self.mock_subp_subp.mock_calls == []
++
++        assert self.mock_readurl.mock_calls == [
++            mock.call(
++                "http://169.254.169.254/metadata/instance?"
++                "api-version=2021-08-01&extended=true",
++                timeout=30,
++                headers_cb=imds.headers_cb,
++                exception_cb=mock.ANY,
++                infinite=True,
++                log_req_resp=True,
++            ),
++        ]
++
++        # Verify DHCP is setup once.
++        assert self.mock_wrapping_setup_ephemeral_networking.mock_calls == [
++            mock.call(timeout_minutes=20)
++        ]
++        assert self.mock_net_dhcp_maybe_perform_dhcp_discovery.mock_calls == [
++            mock.call(
++                self.azure_ds.distro,
++                None,
++                dsaz.dhcp_log_cb,
++            )
++        ]
++        assert self.azure_ds._wireserver_endpoint == "10.11.12.13"
++        assert self.azure_ds._is_ephemeral_networking_up() is False
++
++        # Verify DMI usage.
++        assert self.mock_dmi_read_dmi_data.mock_calls == [
++            mock.call("chassis-asset-tag"),
++            mock.call("system-uuid"),
++        ]
++        assert (
++            self.azure_ds.metadata["instance-id"]
++            == "50109936-ef07-47fe-ac82-890c853f60d5"
++        )
++
++        # Verify IMDS metadata.
++        assert self.azure_ds.metadata["imds"] == self.imds_md
++
++        # Verify reporting ready once.
++        assert self.mock_azure_get_metadata_from_fabric.mock_calls == [
++            mock.call(
++                endpoint="10.11.12.13",
++                distro=self.azure_ds.distro,
++                iso_dev="/dev/sr0",
++                pubkey_info=None,
++            )
++        ]
++
++        # Verify netlink.
++        assert self.mock_netlink.mock_calls == []
++
++        # Verify no reported_ready marker written.
++        assert self.wrapped_util_write_file.mock_calls == []
++        assert self.patched_reported_ready_marker_path.exists() is False
++
++        # Verify reports via KVP.
++        assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
++        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
++        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
++
++        # Verify dmesg reported via KVP.
++        assert len(self.mock_report_dmesg_to_kvp.mock_calls) == 1
++
++    def test_no_pps_gpa(self):
++        """test full provisioning scope when azure-proxy-agent
++        is enabled and running."""
++        self.mock_subp_subp.side_effect = [
++            subp.SubpResult("Guest Proxy Agent running", ""),
++        ]
++        ovf = construct_ovf_env(provision_guest_proxy_agent=True)
++        md, ud, cfg = dsaz.read_azure_ovf(ovf)
++        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
+         self.mock_readurl.side_effect = [
+             mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
+         ]
+@@ -3679,6 +3783,11 @@ class TestProvisioning:
+ 
+         self.azure_ds._check_and_get_data()
+ 
++        assert self.mock_subp_subp.mock_calls == [
++            mock.call(
++                ["azure-proxy-agent", "--status", "--wait", "120"],
++            ),
++        ]
+         assert self.mock_readurl.mock_calls == [
+             mock.call(
+                 "http://169.254.169.254/metadata/instance?"
+@@ -3736,6 +3845,93 @@ class TestProvisioning:
+ 
+         # Verify reports via KVP.
+         assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
++        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
++        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
++
++    def test_no_pps_gpa_fail(self):
++        """test full provisioning scope when azure-proxy-agent is enabled and
++        throwing an exception during provisioning."""
++        self.mock_subp_subp.side_effect = [
++            subp.ProcessExecutionError(
++                cmd=["failed", "azure-proxy-agent"],
++                stdout="test_stdout",
++                stderr="test_stderr",
++                exit_code=4,
++            ),
++        ]
++        ovf = construct_ovf_env(provision_guest_proxy_agent=True)
++        md, ud, cfg = dsaz.read_azure_ovf(ovf)
++        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
++        self.mock_readurl.side_effect = [
++            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
++        ]
++        self.mock_azure_get_metadata_from_fabric.return_value = []
++
++        self.azure_ds._check_and_get_data()
++
++        assert self.mock_subp_subp.mock_calls == [
++            mock.call(
++                ["azure-proxy-agent", "--status", "--wait", "120"],
++            ),
++        ]
++        assert self.mock_readurl.mock_calls == [
++            mock.call(
++                "http://169.254.169.254/metadata/instance?"
++                "api-version=2021-08-01&extended=true",
++                timeout=30,
++                headers={"Metadata": "true"},
++                exception_cb=mock.ANY,
++                infinite=True,
++                log_req_resp=True,
++            ),
++        ]
++
++        # Verify DHCP is setup once.
++        assert self.mock_wrapping_setup_ephemeral_networking.mock_calls == [
++            mock.call(timeout_minutes=20)
++        ]
++        assert self.mock_net_dhcp_maybe_perform_dhcp_discovery.mock_calls == [
++            mock.call(
++                self.azure_ds.distro,
++                None,
++                dsaz.dhcp_log_cb,
++            )
++        ]
++        assert self.azure_ds._wireserver_endpoint == "10.11.12.13"
++        assert self.azure_ds._is_ephemeral_networking_up() is False
++
++        # Verify DMI usage.
++        assert self.mock_dmi_read_dmi_data.mock_calls == [
++            mock.call("chassis-asset-tag"),
++            mock.call("system-uuid"),
++            mock.call("system-uuid"),
++        ]
++        assert (
++            self.azure_ds.metadata["instance-id"]
++            == "50109936-ef07-47fe-ac82-890c853f60d5"
++        )
++
++        # Verify IMDS metadata.
++        assert self.azure_ds.metadata["imds"] == self.imds_md
++
++        ### BACKPORT NOTE: 23.3 _will_ report ready later after failure.
++        ### In newer versions there will be no call to report ready after failure.
++        assert self.mock_azure_get_metadata_from_fabric.mock_calls == [
++            mock.call(
++                endpoint="10.11.12.13", iso_dev="/dev/sr0", pubkey_info=None
++            )
++        ]
++
++        # Verify netlink.
++        assert self.mock_netlink.mock_calls == []
++
++        # Verify no reported_ready marker written.
++        assert self.wrapped_util_write_file.mock_calls == []
++        assert self.patched_reported_ready_marker_path.exists() is False
++
++        # Verify reports via KVP.
++        assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 1
++        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 1
+         assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
+ 
+     def test_running_pps(self):
+@@ -4315,6 +4511,64 @@ class TestProvisioning:
+         assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
+ 
+ 
++class TestCheckAzureProxyAgent:
++    @pytest.fixture(autouse=True)
++    def proxy_setup(
++        self,
++        azure_ds,
++        mock_subp_subp,
++        caplog,
++        mock_wrapping_report_failure,
++        mock_timestamp,
++    ):
++        self.azure_ds = azure_ds
++        self.mock_subp_subp = mock_subp_subp
++        self.caplog = caplog
++        self.mock_wrapping_report_failure = mock_wrapping_report_failure
++        self.mock_timestamp = mock_timestamp
++
++    def test_check_azure_proxy_agent_status(self):
++        self.mock_subp_subp.side_effect = [
++            subp.SubpResult("Guest Proxy Agent running", ""),
++        ]
++        self.azure_ds._check_azure_proxy_agent_status()
++        assert "Running azure-proxy-agent" in self.caplog.text
++        assert self.mock_wrapping_report_failure.mock_calls == []
++
++    def test_check_azure_proxy_agent_status_notfound(self):
++        exception = subp.ProcessExecutionError(reason=FileNotFoundError())
++        self.mock_subp_subp.side_effect = [
++            exception,
++        ]
++        self.azure_ds._check_azure_proxy_agent_status()
++        assert "azure-proxy-agent not found" in self.caplog.text
++        assert self.mock_wrapping_report_failure.mock_calls == [
++            mock.call(
++                errors.ReportableErrorProxyAgentNotFound(),
++            ),
++        ]
++
++    def test_check_azure_proxy_agent_status_failure(self):
++        exception = subp.ProcessExecutionError(
++            cmd=["failed", "azure-proxy-agent"],
++            stdout="test_stdout",
++            stderr="test_stderr",
++            exit_code=4,
++        )
++        self.mock_subp_subp.side_effect = [
++            exception,
++        ]
++        self.azure_ds._check_azure_proxy_agent_status()
++        assert "azure-proxy-agent status failure" in self.caplog.text
++        assert self.mock_wrapping_report_failure.mock_calls == [
++            mock.call(
++                errors.ReportableErrorProxyAgentStatusFailure(
++                    exception=exception
++                ),
++            ),
++        ]
++
++
+ class TestGetMetadataFromImds:
+     @pytest.mark.parametrize("report_failure", [False, True])
+     @pytest.mark.parametrize(
+-- 
+2.34.1
+
