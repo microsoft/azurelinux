@@ -44,7 +44,6 @@ func ModifyOS(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
 }
 
 func ModifyOSWithoutConfigFile() error {
-	// The case when config file is not needed is when apply verity change in grub.cfg to default grub
 	err := doModificationsWithoutConfig()
 	if err != nil {
 		return err
