@@ -13,17 +13,15 @@ When security vulnerabilities arise, Azure Linux supports both a package-based u
 
 ## Getting Started with Azure Linux
 
+NOTE: Looking for CBL-Mariner 2.0 Source?  Click [here](https://github.com/microsoft/azurelinux/tree/2.0)
+
 ### Build
 
 Instructions for building Azure Linux 3.0 may be found here: [Toolkit Documentation](./toolkit/README.md).
 
-Looking for CBL-Mariner 2.0 Source?  Click [here](https://github.com/microsoft/azurelinux/tree/2.0)
-
 ### ISO
 
-You can try Azure Linux with the following ISO images:
-- [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64-iso)
-- [Mariner 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso).
+To try Azure Linux Download the ISO here: [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
 
 Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
 
