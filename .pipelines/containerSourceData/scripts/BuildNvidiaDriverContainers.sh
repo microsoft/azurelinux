@@ -31,9 +31,8 @@ set -e
 #   ├── scripts
 #   │   ├── BuildNvidiaContainer.sh
 #   |   |── BuildContainerCommonSteps.sh
-#   ├── Dockerfile-Nvidia-Setup
-#   ├── Dockerfile-Nvidia-Cleanup
-#   ├── marinerLocalRepo.repo
+#   ├── Dockerfile-Nvidia-Initial
+#   ├── azurelinuxlocal.repo
 
 # Example usage:
 # /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildNvidiaContainer.sh \
@@ -233,7 +232,7 @@ function prepare_docker_directory {
 
     # Copy files into docker context directory
     tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
-    cp -v "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$HOST_MOUNTED_DIR"/
+    cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
 }
 
 function prepare_docker_build_args {

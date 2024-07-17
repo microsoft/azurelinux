@@ -12,18 +12,10 @@ function initialization {
         CONTAINER_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
     fi
 
-    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # mcr.microsoft.com/cbl-mariner/base/core
-    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 2.0
-    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 2.0
-
-    # For Azure Linux 2.0, the distro identifier is "cm" 
-    # For future versions of Azure Linux, the distro identifer is "azl"
-    if [[ "$AZURE_LINUX_VERSION" == "2.0" ]]; then
-        DISTRO_IDENTIFIER="cm"
-    else
-        DISTRO_IDENTIFIER="azl"
-    fi
-    
+    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # # mcr.microsoft.com/azurelinux/base/core
+    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 3.0
+    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 3.0
+    DISTRO_IDENTIFIER="azl"
     END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
 
     echo "Container Image Name          -> $CONTAINER_IMAGE_NAME"

@@ -13,8 +13,8 @@ RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \\\
     mkdir -p $NVIDIA_RPM_DOWNLOAD_PATH; \\\
     tdnf install -y createrepo; \\\
     cp -r ${RPMS_PATH} ${LOCAL_REPO_PATH}; \\\
-    cat /dockerStage/marinerLocalRepo.repo >> /etc/yum.repos.d/local.repo; \\\
-    createrepo --database ${LOCAL_REPO_PATH} --workers 10; tdnf makecache; \\\
+    cat /dockerStage/azurelinuxlocal.repo >> /etc/yum.repos.d/local.repo; \\\
+    createrepo --compatibility --database ${LOCAL_REPO_PATH} --workers 10; tdnf makecache; \\\
     tdnf autoremove -y createrepo; \\\
     for rpm in "${CORE_RPMS_TO_INSTALL[@]}"; do \\\
        echo "RPM: $rpm"; \\\
