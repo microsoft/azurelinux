@@ -1,6 +1,5 @@
 %global bootstrap_compiler_version_0 1.17.13
 %global bootstrap_compiler_version_1 1.21.6
-%global go_version_to_build 1.22.5
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -26,7 +25,6 @@ Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.tar.gz
 Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
-Source4:        https://dl.google.com/go/go%{go_version_to_build}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -45,11 +43,13 @@ mv -v go go-bootstrap
 %setup -q -n go
 
 %build
-# (go >= 1.20 bootstraps with go >= 1.17)
-# This condition makes go compiler >= 1.20 build a 3 step process:
+# Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
+# And Go 1.20 requires the Go 1.17.
+# This condition makes go compiler >= 1.22 build a 4 step process:
 # - Build the bootstrap compiler 1.4 (bootstrap bits in c)
-# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
-# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
+# - Use the 1.4 compiler to build %{bootstrap_compiler_version_0}
+# - Use the %{bootstrap_compiler_version_0} compiler to build %{bootstrap_compiler_version_1}
+# - Use %{bootstrap_compiler_version_1} to build %{version}
 # PS: Since go compiles fairly quickly, the extra overhead is arounnd 2-3 minutes
 #     on a reasonable machine.
 
@@ -85,11 +85,11 @@ rm -rf %{_libdir}/golang
 mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use %{bootstrap_compiler_version_1} to compile %{go_version_to_build}
+# Use %{bootstrap_compiler_version_1} to compile %{version}
 export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{go_version_to_build}
-tar xf %{SOURCE4} -C %{_topdir}/BUILD/go%{go_version_to_build} --strip-components=1
-pushd %{_topdir}/BUILD/go%{go_version_to_build}/src
+mkdir -p %{_topdir}/BUILD/go%{version}
+tar xf %{SOURCE0} -C %{_topdir}/BUILD/go%{version} --strip-components=1
+pushd %{_topdir}/BUILD/go%{version}/src
 CGO_ENABLED=0 ./make.bash
 popd
 
@@ -97,7 +97,7 @@ popd
 rm -rf %{_libdir}/golang
 
 # Make go%{go_version_to_build} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go%{go_version_to_build} %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{version} %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
