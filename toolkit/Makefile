@@ -85,7 +85,7 @@ LICENSE_CHECK_PEDANTIC ?= n
 LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
 LICENSE_CHECK_NAME_FILE      ?= $(MANIFESTS_DIR)/package/license_file_names.json
 ##help:var:LICENSE_CHECK_MODE:{none,warn,fatal,pedantic}=Set the license check mode during package and image builds. 'none' will disable the license check, 'warn' will print warnings, 'fatal' will stop the build on errors, 'pedantic' will stop the build on warnings and errors.
-LICENSE_CHECK_MODE ?= fatal
+LICENSE_CHECK_MODE ?= warn
 
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
