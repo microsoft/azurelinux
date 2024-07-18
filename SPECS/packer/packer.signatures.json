@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "packer-1.10.1-vendor.tar.gz": "3779917f718602419626be865555b8b496efed91f65281505acb7569fb061d0e",
-  "packer-1.10.1.tar.gz": "104d1c6d3b73d521748613804f86f771d3e25c759691e9d5205cc881caf89f1a"
+  "packer-1.9.5-vendor.tar.gz": "356f442fec9bd414cc9fdf82ed829f92551509bfea11e7f4c79c6dd0e9a66a87",
+  "packer-1.9.5.tar.gz": "a6da3e455578f5373c5e333023a7be483e9c22f4235ccd599fe39d42df55f870"
  }
 }
