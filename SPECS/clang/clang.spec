@@ -5,7 +5,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,7 @@ Development header files for clang tools.
 
 %prep
 %setup -q -n %{clang_srcdir}
+grep -rli 'llvm/Option/OptParser.td' * | xargs -i@ sed -i 's|llvm/Option/OptParser.td|/usr/src/azl/BUILD/llvm-project-llvmorg-18.1.2/llvm/include/llvm/Option/OptParser.td|g' @
 
 %py3_shebang_fix \
     clang-tools-extra/clang-tidy/tool/ \
