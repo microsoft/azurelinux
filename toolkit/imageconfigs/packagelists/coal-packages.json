@@ -1,6 +1,7 @@
 {
     "packages": [
         "azure-init",
+        "shadow-utils",
         "vim",
         "gnupg2",
         "dnf",
