@@ -19,7 +19,7 @@ func TestFormatResultsNonPedantic(t *testing.T) {
 		{
 			name:     "No results",
 			results:  []licensecheck.LicenseCheckResult{},
-			expected: "",
+			expected: "No license issues found\n",
 		},
 		{
 			name: "Single result",
@@ -94,7 +94,7 @@ func TestFormatResultsPedantic(t *testing.T) {
 		{
 			name:     "No results",
 			results:  []licensecheck.LicenseCheckResult{},
-			expected: "",
+			expected: "No license issues found\n",
 		},
 		{
 			name: "Single result",
@@ -168,7 +168,7 @@ func TestFormatResultsWarnOnly(t *testing.T) {
 		{
 			name:     "No results",
 			results:  []licensecheck.LicenseCheckResult{},
-			expected: "",
+			expected: "No license issues found\n",
 		},
 		{
 			name: "Single result",
@@ -231,4 +231,12 @@ func TestFormatResultsWarnOnly(t *testing.T) {
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
+}
+
+func TestFormatResultsEmpty(t *testing.T) {
+	actual := FormatResults([]licensecheck.LicenseCheckResult{}, licensecheck.LicenseCheckModeDefault)
+	assert.Equal(t, "No license issues found\n", actual)
+
+	actual = FormatResults([]licensecheck.LicenseCheckResult{{RpmPath: "/path/to/package.rpm", PackageName: "pkg1"}}, licensecheck.LicenseCheckModeDefault)
+	assert.Equal(t, "No license issues found\n", actual)
 }

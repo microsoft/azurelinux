@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck/licensecheckformat"
@@ -30,8 +31,9 @@ var (
 	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
 	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
 
-	logFlags   = exe.SetupLogFlags(app)
-	resultFile = app.Flag("results-file", "The file to store the search result.").Default("").String()
+	logFlags    = exe.SetupLogFlags(app)
+	resultFile  = app.Flag("results-file", "The file to store the search result.").Default("").String()
+	summaryFile = app.Flag("summary-file", "File to save the license check summary to.").String()
 )
 
 func main() {
@@ -46,6 +48,8 @@ func main() {
 
 	results, numFailures, numWarnings := scanDirectories(*rpmDirs, *buildDirPath, *workerTar, *nameFile, *exceptionFile, *distTag, mode)
 
+	printSummary(numFailures, numWarnings)
+
 	if *resultFile != "" {
 		logger.Log.Infof("Writing results to file (%s)", *resultFile)
 		err := licensecheck.SaveLicenseCheckResults(*resultFile, results)
@@ -54,9 +58,20 @@ func main() {
 		}
 	}
 
-	err := printSummary(numFailures, numWarnings)
-	if err != nil {
-		logger.Log.Fatalf("License check has errors:\n%v", err)
+	if *summaryFile != "" {
+		logger.Log.Infof("Writing summary to file (%s)", *summaryFile)
+		resultsString := licensecheckformat.FormatResults(results, mode)
+		err := file.Write(resultsString, *summaryFile)
+		if err != nil {
+			logger.Log.Fatalf("Failed to write summary to file:\n%v", err)
+		}
+	}
+
+	if numFailures > 0 {
+		logger.Log.Fatal("License check failed")
+	}
+	if numWarnings > 0 {
+		logger.Log.Warn("License check completed with warnings")
 	}
 }
 
@@ -84,7 +99,7 @@ func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, except
 	return totalResults, totalFailedPackages, totalWarningPackages
 }
 
-func printSummary(numFailures, numWarnings int) (err error) {
+func printSummary(numFailures, numWarnings int) {
 	const explanation = `
 Errors/warnings fall into three buckets:
 	1. 'bad %doc files': A %doc documentation file that the tool believes to be a license file.
@@ -108,14 +123,12 @@ How to fix:
 		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
 		logger.Log.Errorf("Found %d packages with license errors", numFailures)
 		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
-		err = fmt.Errorf("found %d packages with license errors", numFailures)
 	} else if numWarnings > 0 {
 		logger.Log.Info(strings.ReplaceAll(explanation, "{{.exceptionFile}}", *exceptionFile))
 		logger.Log.Warnf("Found %d packages with non-fatal license issues", numWarnings)
 	} else {
 		logger.Log.Infof("No license issues found")
 	}
-	return err
 }
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.

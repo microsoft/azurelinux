@@ -22,6 +22,10 @@ func FormatResults(results []licensecheck.LicenseCheckResult, mode licensecheck.
 	var sb strings.Builder
 	_, warnings, errors := licensecheck.SortAndFilterResults(results, mode)
 
+	if len(warnings) == 0 && len(errors) == 0 {
+		return "No license issues found\n"
+	}
+
 	// Print warnings first, but only if they don't also have an error
 	for _, result := range warnings {
 		if result.HasWarningResult(mode) && !result.HasErrorResult(mode) {
