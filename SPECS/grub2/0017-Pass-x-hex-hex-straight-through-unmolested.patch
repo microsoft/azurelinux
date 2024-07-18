@@ -1,0 +1,173 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 1 Oct 2012 13:24:37 -0400
+Subject: [PATCH] Pass "\x[[:hex:]][[:hex:]]" straight through unmolested.
+
+Don't munge raw spaces when we're doing our cmdline escaping (#923374)
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/commands/wildcard.c | 16 +++++++++++++++-
+ grub-core/lib/cmdline.c       | 25 +++++++++++++++++++++++--
+ grub-core/script/execute.c    | 43 +++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 75 insertions(+), 9 deletions(-)
+
+diff --git a/grub-core/commands/wildcard.c b/grub-core/commands/wildcard.c
+index cc3290311f0..8f67a4be7f0 100644
+--- a/grub-core/commands/wildcard.c
++++ b/grub-core/commands/wildcard.c
+@@ -488,6 +488,12 @@ check_file (const char *dir, const char *basename)
+   return ctx.found;
+ }
+ 
++static int
++is_hex(char c)
++{
++  return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
++}
++
+ static void
+ unescape (char *out, const char *in, const char *end)
+ {
+@@ -496,7 +502,15 @@ unescape (char *out, const char *in, const char *end)
+ 
+   for (optr = out, iptr = in; iptr < end;)
+     {
+-      if (*iptr == '\\' && iptr + 1 < end)
++      if (*iptr == '\\' && iptr + 3 < end && iptr[1] == 'x' && is_hex(iptr[2]) && is_hex(iptr[3]))
++	{
++	  *optr++ = *iptr++;
++	  *optr++ = *iptr++;
++	  *optr++ = *iptr++;
++	  *optr++ = *iptr++;
++	  continue;
++	}
++      else if (*iptr == '\\' && iptr + 1 < end)
+ 	{
+ 	  *optr++ = iptr[1];
+ 	  iptr += 2;
+diff --git a/grub-core/lib/cmdline.c b/grub-core/lib/cmdline.c
+index ed0b149dca5..8e2294d8ff6 100644
+--- a/grub-core/lib/cmdline.c
++++ b/grub-core/lib/cmdline.c
+@@ -20,6 +20,12 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/misc.h>
+ 
++static int
++is_hex(char c)
++{
++  return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
++}
++
+ static unsigned int check_arg (char *c, int *has_space)
+ {
+   int space = 0;
+@@ -27,7 +33,13 @@ static unsigned int check_arg (char *c, int *has_space)
+ 
+   while (*c)
+     {
+-      if (*c == '\\' || *c == '\'' || *c == '"')
++      if (*c == '\\' && *(c+1) == 'x' && is_hex(*(c+2)) && is_hex(*(c+3)))
++	{
++	  size += 4;
++	  c += 4;
++	  continue;
++	}
++      else if (*c == '\\' || *c == '\'' || *c == '"')
+ 	size++;
+       else if (*c == ' ')
+ 	space = 1;
+@@ -86,7 +98,16 @@ grub_create_loader_cmdline (int argc, char *argv[], char *buf,
+ 
+       while (*c)
+ 	{
+-	  if (*c == '\\' || *c == '\'' || *c == '"')
++	  if (*c == '\\' && *(c+1) == 'x' &&
++		   is_hex(*(c+2)) && is_hex(*(c+3)))
++	    {
++	      *buf++ = *c++;
++	      *buf++ = *c++;
++	      *buf++ = *c++;
++	      *buf++ = *c++;
++	      continue;
++	    }
++	  else if (*c == '\\' || *c == '\'' || *c == '"')
+ 	    *buf++ = '\\';
+ 
+ 	  *buf++ = *c;
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index ad80399246a..0c6dd9c5201 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -56,6 +56,12 @@ static struct grub_script_scope *scope = 0;
+ /* Wildcard translator for GRUB script.  */
+ struct grub_script_wildcard_translator *grub_wildcard_translator;
+ 
++static int
++is_hex(char c)
++{
++  return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
++}
++
+ static char*
+ wildcard_escape (const char *s)
+ {
+@@ -72,7 +78,15 @@ wildcard_escape (const char *s)
+   i = 0;
+   while ((ch = *s++))
+     {
+-      if (ch == '*' || ch == '\\' || ch == '?')
++      if (ch == '\\' && s[0] == 'x' && is_hex(s[1]) && is_hex(s[2]))
++	{
++	  p[i++] = ch;
++	  p[i++] = *s++;
++	  p[i++] = *s++;
++	  p[i++] = *s++;
++	  continue;
++	}
++      else if (ch == '*' || ch == '\\' || ch == '?')
+ 	p[i++] = '\\';
+       p[i++] = ch;
+     }
+@@ -96,7 +110,14 @@ wildcard_unescape (const char *s)
+   i = 0;
+   while ((ch = *s++))
+     {
+-      if (ch == '\\')
++      if (ch == '\\' && s[0] == 'x' && is_hex(s[1]) && is_hex(s[2]))
++	{
++	  p[i++] = '\\';
++	  p[i++] = *s++;
++	  p[i++] = *s++;
++	  p[i++] = *s++;
++	}
++      else if (ch == '\\')
+ 	p[i++] = *s++;
+       else
+ 	p[i++] = ch;
+@@ -398,10 +419,20 @@ parse_string (const char *str,
+     switch (*ptr)
+       {
+       case '\\':
+-	escaped = !escaped;
+-	if (!escaped && put)
+-	  *(put++) = '\\';
+-	ptr++;
++	if (!escaped && put && *(ptr+1) == 'x' && is_hex(*(ptr+2)) && is_hex(*(ptr+3)))
++	  {
++	    *(put++) = *ptr++;
++	    *(put++) = *ptr++;
++	    *(put++) = *ptr++;
++	    *(put++) = *ptr++;
++	  }
++	else
++	  {
++	    escaped = !escaped;
++	    if (!escaped && put)
++	      *(put++) = '\\';
++	    ptr++;
++	  }
+ 	break;
+       case '$':
+ 	if (escaped)

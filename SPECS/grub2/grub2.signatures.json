@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "gnulib-9f48fb992a3d7e96610c4ce8be969cff2d61a01b.tar.gz": "00a25a5c3a18d9d7b0deb456344f7ab02f6f9ef8422fbe6174afafc546c8ee36",
-  "grub-2.12.tar.gz": "af4d58df3024988799225e94bc1cfaccdeaa9d5725b4ad5517f3b6cf2ee9ed78",
+  "gnulib-d271f868a8df9bbec29049d01e056481b7a1a263.tar.gz": "4e23415ae2977ffca15e07419ceff3e9334d0369eafc9e7ae2578f8dd9a4839c",
+  "grub-2.06.tar.gz": "660eaa2355a4045d8d0cdb5765169d1cad9912ec07873b86c9c6d55dbaa9dfca",
   "macros.grub2": "b03f6f713601214406971de53538dfc25136bf836f09a663eaffc4332a72c38b",
   "sbat.csv.in": "040bcd900845b53ef9124f70f8b40fbd169740681fdd519a688663a59a958cf1"
  }

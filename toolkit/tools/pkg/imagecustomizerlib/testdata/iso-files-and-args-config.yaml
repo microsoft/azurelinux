@@ -1,0 +1,13 @@
+iso:
+  additionalFiles:
+    files/a.txt: /a.txt
+
+  kernelCommandLine:
+    extraCommandLine: rd.info
+
+os:
+  packages:
+    install:
+    - squashfs-tools
+    - tar
+    - device-mapper
