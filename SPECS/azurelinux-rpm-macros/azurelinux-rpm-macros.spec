@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

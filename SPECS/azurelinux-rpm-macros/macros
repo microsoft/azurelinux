@@ -37,7 +37,32 @@
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
+ln -svf /usr/bin/clang /usr/bin/cc\
+ln -svf /usr/bin/clang++ /usr/bin/c++\
 %{nil}
+
+# GCC toolchain
+%__cc_gcc gcc
+%__cxx_gcc g++
+%__cpp_gcc gcc -E
+
+# Clang toolchain
+%__cc_clang clang
+%__cxx_clang clang++
+%__cpp_clang clang-cpp
+
+# Default to the clang toolchain
+%toolchain clang
+
+%__cc %{expand:%%{__cc_%{toolchain}}}
+%__cxx %{expand:%%{__cxx_%{toolchain}}}
+%__cpp %{expand:%%{__cpp_%{toolchain}}}
+
+# Compiler macros to use for invoking compilers in spec files for packages that
+# want to use the default compiler and don't care which compiler that is.
+%build_cc %{__cc}
+%build_cxx %{__cxx}
+%build_cpp %{__cpp}
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
@@ -51,7 +76,9 @@
 %{?ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
 %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
-%{?ccache_enabled:ccache --zero-stats} \
+%{?ccache_enabled:ccache --zero-stats}\
+export CC=clang\
+export CXX=clang++\
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -111,7 +138,8 @@
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?distro_module_ldflags :%{distro_module_ldflags }}
+# Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} -fuse-ld=lld -Wl,--build-id=sha1
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -172,7 +200,7 @@ print(result)
 %_binary_filedigest_algorithm 8
 
 %_hardening_cflags      -specs=/usr/lib/rpm/azl/default-hardened-cc1
-%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/azl/default-hardened-ld
+%_hardening_ldflags     -Wl,-z,now
 
 # Harden packages by default
 # https://fedorahosted.org/fesco/ticket/1384 (accepted on 2014-02-11)
@@ -204,7 +232,7 @@ print(result)
 %_frame_pointers_cflags %{?_include_frame_pointers:-fno-omit-frame-pointer}
 
 %_legacy_common_support 1
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

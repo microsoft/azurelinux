@@ -15,7 +15,6 @@ BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
-BuildRequires:  binutils-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
