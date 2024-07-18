@@ -1,7 +1,7 @@
 {
     "packages": [
         "azure-init",
-        "dhcp-client",
+        "dhcpcd",
         "grubby",
         "hyperv-daemons",
         "kexec-tools",

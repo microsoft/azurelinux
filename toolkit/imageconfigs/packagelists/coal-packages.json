@@ -5,7 +5,7 @@
         "vim",
         "gnupg2",
         "dnf",
-        "dhcp-client",
+        "dhcpcd",
         "grubby",
         "hyperv-daemons",
         "netplan",
