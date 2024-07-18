@@ -11,7 +11,7 @@ DEST=/etc/pki/ca-trust/extracted
 
 # Prevent p11-kit from reading user configuration files.
 export P11_KIT_NO_USER_CONFIG=1
-
+export SOURCE_DATE_EPOCH=1718214849
 # OpenSSL PEM bundle that includes trust flags
 # (BEGIN TRUSTED CERTIFICATE)
 /usr/bin/p11-kit extract --format=openssl-bundle --filter=certificates --overwrite --comment $DEST/openssl/ca-bundle.trust.crt
