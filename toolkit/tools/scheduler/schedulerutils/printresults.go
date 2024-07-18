@@ -20,11 +20,13 @@ import (
 
 // Data on normal package builds extracted from GraphBuildState for use in the build summary.
 type srpmBuildDataContainer struct {
-	failedSRPMs        map[string]*BuildResult
-	prebuiltSRPMs      map[string]bool
-	prebuiltDeltaSRPMs map[string]bool
-	builtSRPMs         map[string]bool
-	blockedSRPMs       map[string]*pkggraph.PkgNode
+	failedSRPMs         map[string]*BuildResult
+	failedLicenseSRPMs  map[string]bool
+	warningLicenseSRPMs map[string]bool
+	prebuiltSRPMs       map[string]bool
+	prebuiltDeltaSRPMs  map[string]bool
+	builtSRPMs          map[string]bool
+	blockedSRPMs        map[string]*pkggraph.PkgNode
 }
 
 // Data on package tests extracted from GraphBuildState for use in the build summary.
@@ -42,6 +44,12 @@ func PrintBuildResult(res *BuildResult) {
 	if res.Err != nil {
 		logger.Log.Errorf("Failed to build %s, error: %s, for details see: %s", baseSRPMName, res.Err, res.LogFile)
 		return
+	}
+
+	if res.HasLicenseErrors {
+		logger.Log.Errorf("'%s' has fatal license issues", baseSRPMName)
+	} else if res.HasLicenseWarnings {
+		logger.Log.Warnf("'%s' has non-fatal license issues", baseSRPMName)
 	}
 
 	switch res.Node.Type {
@@ -68,7 +76,17 @@ func PrintBuildResult(res *BuildResult) {
 	}
 }
 
-// RecordBuildSummary stores the summary in to a csv.
+func RecordLicenseSummary(licenseChecker *PackageLicenseChecker) {
+	if licenseChecker != nil {
+		err := licenseChecker.SaveResults()
+		if err != nil {
+			logger.Log.Warnf("Failed to save license check results: %s", err)
+		}
+	}
+}
+
+// RecordBuildSummary stores the summary in to a csv. License check failures are not included in the csv and are stored
+// in a dedicated file (since licensing issues do not actually affect the build process).
 func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, outputPath string) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
@@ -107,7 +125,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
-func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool) {
+func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool, licenseChecker *PackageLicenseChecker) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -195,6 +213,22 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
+	if len(srpmBuildData.warningLicenseSRPMs) != 0 {
+		logger.Log.Info(color.YellowString("SRPMs with non-fatal license issues, for details see: %s", licenseChecker.GetSummaryFile()))
+		keys := mapToSortedSlice(srpmBuildData.warningLicenseSRPMs)
+		for _, warningLicenseSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(warningLicenseSRPM))
+		}
+	}
+
+	if len(srpmBuildData.failedLicenseSRPMs) != 0 {
+		logger.Log.Info(color.RedString("SRPMs with fatal license issues, for details see: %s", licenseChecker.GetSummaryFile()))
+		keys := mapToSortedSlice(srpmBuildData.failedLicenseSRPMs)
+		for _, failedLicenseSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(failedLicenseSRPM))
+		}
+	}
+
 	if len(rpmConflicts) != 0 {
 		conflictsLogger(color.RedString("RPM conflicts with toolchain:"))
 		sort.Strings(rpmConflicts)
@@ -243,11 +277,13 @@ func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[st
 
 func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (srpmData srpmBuildDataContainer) {
 	srpmData = srpmBuildDataContainer{
-		failedSRPMs:        make(map[string]*BuildResult),
-		prebuiltSRPMs:      make(map[string]bool),
-		prebuiltDeltaSRPMs: make(map[string]bool),
-		builtSRPMs:         make(map[string]bool),
-		blockedSRPMs:       make(map[string]*pkggraph.PkgNode),
+		failedSRPMs:         make(map[string]*BuildResult),
+		failedLicenseSRPMs:  make(map[string]bool),
+		warningLicenseSRPMs: make(map[string]bool),
+		prebuiltSRPMs:       make(map[string]bool),
+		prebuiltDeltaSRPMs:  make(map[string]bool),
+		builtSRPMs:          make(map[string]bool),
+		blockedSRPMs:        make(map[string]*pkggraph.PkgNode),
 	}
 
 	for _, failure := range buildState.BuildFailures() {
@@ -257,6 +293,13 @@ func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (sr
 	}
 
 	for _, node := range pkgGraph.AllBuildNodes() {
+		if buildState.DidNodeHaveLicenseError(node) {
+			srpmData.failedLicenseSRPMs[node.SrpmPath] = true
+		}
+		if buildState.DidNodeHaveLicenseWarning(node) {
+			srpmData.warningLicenseSRPMs[node.SrpmPath] = true
+		}
+
 		// A node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
 		// that means it was built and we discard the delta rpm.
 		if buildState.IsNodeCached(node) {
@@ -375,6 +418,8 @@ func printSummary(srpmBuildData srpmBuildDataContainer, srpmTestData srpmTestDat
 	printErrorInfoByCondition(len(srpmTestData.blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(srpmTestData.blockedSRPMsTests)))
 	printErrorInfoByCondition(len(srpmBuildData.failedSRPMs) > 0, summaryLine("Number of failed SRPMs:", len(srpmBuildData.failedSRPMs)))
 	printErrorInfoByCondition(len(srpmTestData.failedSRPMsTests) > 0, summaryLine("Number of failed SRPMs tests:", len(srpmTestData.failedSRPMsTests)))
+	printErrorInfoByCondition(len(srpmBuildData.failedLicenseSRPMs) > 0, summaryLine("Number of SRPMs with license errors:", len(srpmBuildData.failedLicenseSRPMs)))
+	printWarningInfoByCondition(len(srpmBuildData.warningLicenseSRPMs) > 0, summaryLine("Number of SRPMs with license warnings:", len(srpmBuildData.warningLicenseSRPMs)))
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
@@ -405,7 +450,7 @@ func printWarningInfoByCondition(condition bool, format string, arg ...any) {
 
 // summaryLine returns padded and type-formatted string for build summary.
 func summaryLine(message string, count int) string {
-	return fmt.Sprintf("%-36s%d", message, count)
+	return fmt.Sprintf("%-39s%d", message, count)
 }
 
 // mapToSortedSlice converts a map[string]V to a sorted slice containing the map's keys.
