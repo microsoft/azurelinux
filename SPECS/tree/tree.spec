@@ -1,7 +1,7 @@
 Summary:        Recursive directory listing command.
 Name:           tree
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            http://mama.indstate.edu/users/ice/tree/
 Group:          Applications
@@ -14,12 +14,12 @@ Tree is a recursive directory listing command that produces a depth indented lis
 
 %prep
 %setup -q
+sed -i 's/CC=gcc/CC=clang/g' ./Makefile
 
 %build
 make %{?_smp_mflags}
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install BINDIR=%{buildroot}%{_bindir} \
              MANDIR=%{buildroot}%{_mandir}/man1
 

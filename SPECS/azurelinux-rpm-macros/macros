@@ -38,8 +38,8 @@
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
 %{?use_llvm_toolchain:ln -svf /usr/bin/clang /usr/bin/cc}\
-%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 %{nil}
+# %%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 
 # GCC toolchain
 %__cc_gcc gcc
@@ -51,19 +51,19 @@
 %__cxx_clang clang++
 %__cpp_clang clang-cpp
 
-## Default to the clang toolchain
-#%use_llvm_toolchain 1
+## Default to the clang or gnu/gcc toolchain
+# %%use_llvm_toolchain 1
 %toolchain %{?use_llvm_toolchain:clang}%{!?use_llvm_toolchain:gcc}
 
 %__cc %{expand:%%{__cc_%{toolchain}}}
-%__cxx %{expand:%%{__cxx_%{toolchain}}}
-%__cpp %{expand:%%{__cpp_%{toolchain}}}
+# %%__cxx %{expand:%%{__cxx_%{toolchain}}}
+# %%__cpp %{expand:%%{__cpp_%{toolchain}}}
 
 # Compiler macros to use for invoking compilers in spec files for packages that
 # want to use the default compiler and don't care which compiler that is.
 %build_cc %{__cc}
-%build_cxx %{__cxx}
-%build_cpp %{__cpp}
+# %%build_cxx %{__cxx}
+# %%build_cpp %{__cpp}
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
@@ -79,8 +79,8 @@
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
 %{?ccache_enabled:ccache --zero-stats}\
 %{?use_llvm_toolchain:export CC=clang}\
-%{?use_llvm_toolchain:export CXX=clang++}\
 %{nil}
+# %%{?use_llvm_toolchain:export CXX=clang++}\
 
 # use zstd compression for binary package payloads
 %_binary_payload w7T0.zstdio
@@ -140,7 +140,8 @@
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
 # Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}} %{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
+# %%{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}

@@ -259,5 +259,5 @@ libxcrypt-4.4.36-1.azl3.x86_64.rpm
 libxcrypt-devel-4.4.36-1.azl3.x86_64.rpm
 llvm-18.1.2-3.azl3.x86_64.rpm
 compiler-rt-18.1.2-3.azl3.x86_64.rpm
-clang-18.1.2-3.azl3.x86_64.rpm
 clang-libs-18.1.2-3.azl3.x86_64.rpm
+clang-18.1.2-3.azl3.x86_64.rpm
