@@ -3,14 +3,9 @@
 
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-<<<<<<< HEAD
-Version:        1.10.1
-Release:        4%{?dist}
-=======
 Epoch:          1
 Version:        1.9.5
-Release:        1%{?dist}
->>>>>>> fasttrack/2.0
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,7 +68,7 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.10.1-4
+* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.9.5-2
 - Bump release to rebuild with go 1.22.4
 
 * Mon Jul 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.9.5-1
