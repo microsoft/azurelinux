@@ -66,6 +66,7 @@ os:
     - vim
 
   verity:
+    corruptionOption: panic
     dataPartition:
       idType: part-label
       id: root

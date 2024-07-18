@@ -91,6 +91,7 @@ type mountPoint struct {
 	PartitionNum   int
 	Path           string
 	FileSystemType string
+	Flags          uintptr
 }
 
 func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) (*ImageConnection, error) {
@@ -105,14 +106,14 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 
 	mountPoints := []*safechroot.MountPoint(nil)
 	for _, mount := range mounts {
-		devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), mount.PartitionNum)
+		devPath := partitionDevPath(imageConnection, mount.PartitionNum)
 
 		var mountPoint *safechroot.MountPoint
 		if mount.Path == "/" {
-			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, 0,
+			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags,
 				"")
 		} else {
-			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, 0, "")
+			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags, "")
 		}
 
 		mountPoints = append(mountPoints, mountPoint)
@@ -125,6 +126,11 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 	}
 
 	return imageConnection, nil
+}
+
+func partitionDevPath(imageConnection *ImageConnection, partitionNum int) string {
+	devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), partitionNum)
+	return devPath
 }
 
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {

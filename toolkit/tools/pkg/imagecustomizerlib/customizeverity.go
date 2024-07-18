@@ -178,7 +178,7 @@ func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, da
 }
 
 // idToPartitionBlockDevicePath returns the block device path for a given idType and id.
-func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, nbdDevice string, diskPartitions []diskutils.PartitionInfo) (string, error) {
+func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, diskPartitions []diskutils.PartitionInfo) (string, error) {
 	// Iterate over each partition to find the matching id.
 	for _, partition := range diskPartitions {
 		switch idType {
@@ -230,32 +230,4 @@ func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.Corruptio
 	default:
 		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(corruptionOption))
 	}
-}
-
-// findFreeNBDDevice finds the first available NBD device.
-func findFreeNBDDevice() (string, error) {
-	files, err := filepath.Glob("/sys/class/block/nbd*")
-	if err != nil {
-		return "", err
-	}
-
-	for _, file := range files {
-		// Check if the pid file exists. If it does not exist, the device is likely free.
-		pidFile := filepath.Join(file, "pid")
-		if _, err := os.Stat(pidFile); os.IsNotExist(err) {
-			return "/dev/" + filepath.Base(file), nil
-		}
-	}
-
-	return "", fmt.Errorf("no free nbd devices available")
-}
-
-func isNbdLoaded() (bool, error) {
-	files, err := filepath.Glob("/sys/class/block/nbd*")
-	if err != nil {
-		return false, err
-	}
-
-	isNbdLoaded := len(files) > 0
-	return isNbdLoaded, nil
 }
