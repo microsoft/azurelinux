@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -863,6 +863,9 @@ export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
+if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
+    cat $HOME/.cache/libvirt/qemu/log/* && false
+fi
 %endif
 
 %install
@@ -1144,6 +1147,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Thu Jul 18 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-7
+- Return the tests
+
 * Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 1.52.0-6
 - Remove dhclient in favor of using dhcpcd
 
@@ -1163,6 +1169,9 @@ rm ocaml/html/.gitignore
 * Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
 - Update to 1.52.0
 - Move to pcre2
+
+* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-21
+- Update to build dep latest glibc-static version
 
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-20
 - Updated glibc-static buildrequires release
