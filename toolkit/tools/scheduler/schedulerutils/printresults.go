@@ -393,6 +393,16 @@ func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	}
 }
 
+// printWarningInfoByCondition prints warning or info level logs depending on the input condition.
+// If the condition is true, it prints a warning level log and an info level one otherwise.
+func printWarningInfoByCondition(condition bool, format string, arg ...any) {
+	if condition {
+		logger.Log.Warnf(color.YellowString(format, arg...))
+	} else {
+		logger.Log.Infof(color.GreenString(format, arg...))
+	}
+}
+
 // summaryLine returns padded and type-formatted string for build summary.
 func summaryLine(message string, count int) string {
 	return fmt.Sprintf("%-36s%d", message, count)
