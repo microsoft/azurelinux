@@ -81,7 +81,7 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 	}
 	defer func() {
 		if err != nil {
-			cleanupErr := newLicenseChecker.CleanUp()
+			cleanupErr := newLicenseChecker.Cleanup()
 			if cleanupErr != nil {
 				// Append the cleanup error to the existing error
 				err = fmt.Errorf("%w\nfailed to cleanup after failing to create a new LicenseChecker:\n%w", err, cleanupErr)
@@ -106,8 +106,8 @@ func New(buildDirPath, workerTarPath, rpmDirPath, nameFilePath, exceptionFilePat
 	return newLicenseChecker, err
 }
 
-// CleanUp tears down the chroot. If the chroot was created it will be cleaned up. Reset the struct to its initial state.
-func (l *LicenseChecker) CleanUp() error {
+// Cleanup tears down the chroot. If the chroot was created it will be cleaned up. Reset the struct to its initial state.
+func (l *LicenseChecker) Cleanup() error {
 	if l.simpleToolChroot != nil {
 		err := l.simpleToolChroot.CleanUp()
 		if err != nil {
@@ -118,48 +118,38 @@ func (l *LicenseChecker) CleanUp() error {
 	return nil
 }
 
-// CheckLicenses will scan all .rpm files in the chroot for bad licenses. The results can be accessed with FormatResults() or GetAllResults().
-func (l *LicenseChecker) CheckLicenses() error {
+// CheckLicenses will scan all .rpm files in the chroot for bad licenses. New unfiltered results will be returned but
+// also appended to the internal results list which can be accessed with GetResults().
+func (l *LicenseChecker) CheckLicenses(quiet bool) (latestResults []LicenseCheckResult, err error) {
 	if l.simpleToolChroot == nil {
-		return fmt.Errorf("license checker is not initialized, use New() to create a new license checker")
+		return nil, fmt.Errorf("license checker is not initialized, use New() to create a new license checker")
 	}
 
-	l.results = []LicenseCheckResult{}
-
-	err := l.simpleToolChroot.RunInChroot(func() (searchErr error) {
-		l.results, searchErr = l.runLicenseCheckInChroot()
+	err = l.simpleToolChroot.RunInChroot(func() (searchErr error) {
+		latestResults, searchErr = l.runLicenseCheckInChroot(quiet)
 		return searchErr
 	})
 	if err != nil {
-		return fmt.Errorf("failed to scan for license issues:\n%w", err)
+		return nil, fmt.Errorf("failed to scan for license issues:\n%w", err)
 	}
 
 	// Sort the results by RPM path
 	// This is done to ensure that the output is deterministic
-	sort.Slice(l.results, func(i, j int) bool {
-		return l.results[i].RpmPath < l.results[j].RpmPath
+	sort.Slice(latestResults, func(i, j int) bool {
+		return latestResults[i].RpmPath < latestResults[j].RpmPath
 	})
-	return nil
+	l.results = append(l.results, latestResults...)
+
+	return latestResults, nil
 }
 
-// GetResults returns the results of the search, split into:
+// GetResults returns the cumulative results of the search, split into:
 // - All results: Every scan result
 // - Any result that has at least one warning
 // - Any result that has at least one error
-func (l *LicenseChecker) GetResults() (all, warnings, errors []LicenseCheckResult) {
-	all = []LicenseCheckResult{}
-	warnings = []LicenseCheckResult{}
-	errors = []LicenseCheckResult{}
-	for _, result := range l.results {
-		all = append(all, result)
-		if result.HasBadResult() {
-			errors = append(errors, result)
-		}
-		if result.HasWarningResult() {
-			warnings = append(warnings, result)
-		}
-	}
-	return all, warnings, errors
+func (l *LicenseChecker) GetResults(mode LicenseCheckMode) (all, warnings, errors []LicenseCheckResult) {
+	_, warnings, errors = SortAndFilterResults(l.results, mode)
+	return l.results, warnings, errors
 }
 
 type licenseCheckReturn struct {
@@ -169,7 +159,7 @@ type licenseCheckReturn struct {
 
 // runLicenseCheckInChroot searches for bad licenses amongst the RPMs mounted into the chroot. This function is meant
 // to be called from inside the chroot's context.
-func (l *LicenseChecker) runLicenseCheckInChroot() (findings []LicenseCheckResult, err error) {
+func (l *LicenseChecker) runLicenseCheckInChroot(quiet bool) (findings []LicenseCheckResult, err error) {
 	const searchReportIntervalPercent = 10 // Report progress to the user every 10%
 
 	// Find all the rpms in the chroot
@@ -186,9 +176,13 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (findings []LicenseCheckResul
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	resultsChannel := make(chan licenseCheckReturn, len(rpmsToSearchPaths))
-	logger.Log.Infof("Queuing %d rpms for search", len(rpmsToSearchPaths))
+	if !quiet {
+		logger.Log.Infof("Queuing %d rpms for license check", len(rpmsToSearchPaths))
+	}
 	go l.queueWorkers(ctx, rpmsToSearchPaths, resultsChannel)
-	logger.Log.Infof("Searching rpms")
+	if !quiet {
+		logger.Log.Infof("Checking RPMs for license issues")
+	}
 
 	// Wait for all the workers to finish, updating the progress as results come in
 	numProcessed := 0
@@ -205,7 +199,7 @@ func (l *LicenseChecker) runLicenseCheckInChroot() (findings []LicenseCheckResul
 		// Report progress to the user every 10%
 		numProcessed++
 		percentProcessed := (numProcessed * 100) / len(rpmsToSearchPaths)
-		if percentProcessed-lastReportPercent >= searchReportIntervalPercent {
+		if percentProcessed-lastReportPercent >= searchReportIntervalPercent && !quiet {
 			logger.Log.Infof("Checked %d/%d rpms (%d%%)", numProcessed, len(rpmsToSearchPaths), percentProcessed)
 			lastReportPercent = percentProcessed
 		}

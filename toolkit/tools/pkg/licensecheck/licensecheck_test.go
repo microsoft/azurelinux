@@ -236,7 +236,7 @@ func TestGetResults(t *testing.T) {
 			checker := LicenseChecker{
 				results: tc.results,
 			}
-			all, warn, fail := checker.GetResults()
+			all, warn, fail := checker.GetResults(LicenseCheckModeDefault)
 			assert.Equal(t, tc.expected.all, all)
 			assert.Equal(t, tc.expected.warn, warn)
 			assert.Equal(t, tc.expected.fail, fail)

@@ -18,52 +18,62 @@ import (
 // - Packages with warnings only, sorted alphabetically
 // - Packages with errors (and possibly warnings), sorted alphabetically
 // If pedantic is true, warnings will be treated as errors.
-func FormatResults(results []licensecheck.LicenseCheckResult, pedantic bool) string {
+func FormatResults(results []licensecheck.LicenseCheckResult, mode licensecheck.LicenseCheckMode) string {
 	var sb strings.Builder
-	filteredResults := licensecheck.SortAndFilterResults(results)
+	_, warnings, errors := licensecheck.SortAndFilterResults(results, mode)
 
 	// Print warnings first, but only if they don't also have an error
-	if !pedantic {
-		for _, result := range filteredResults {
-			if result.HasWarningResult() && !result.HasBadResult() {
-				sb.WriteString(formatWarning(result))
-			}
+	for _, result := range warnings {
+		if result.HasWarningResult(mode) && !result.HasErrorResult(mode) {
+			sb.WriteString(formatResult(result, mode))
 		}
 	}
 
 	// Now print the errors
-	for _, result := range filteredResults {
-		if result.HasBadResult() || (pedantic && result.HasWarningResult()) {
-			sb.WriteString(formatError(result, pedantic))
-			if !pedantic && result.HasWarningResult() {
-				// If pedantic was set, the warning was already printed as an error.
-				// Otherwise print the warning now.
-				sb.WriteString(formatWarning(result))
-			}
+	for _, result := range errors {
+		sb.WriteString(formatResult(result, mode))
+	}
+
+	return sb.String()
+}
+
+func formatResult(result licensecheck.LicenseCheckResult, mode licensecheck.LicenseCheckMode) string {
+	badDocIsError := true
+	badFileIsError := true
+	dupIsError := false
+	if mode == licensecheck.LicenseCheckModePedantic {
+		dupIsError = true
+	} else if mode == licensecheck.LicenseCheckModeWarnOnly {
+		badDocIsError = false
+		badFileIsError = false
+	}
+
+	var sb strings.Builder
+	// Print errors first if they exist
+	if result.HasErrorResult(mode) {
+		sb.WriteString(fmt.Sprintf("ERROR: (%s) has license errors:\n", filepath.Base(result.RpmPath)))
+		if badDocIsError && len(result.BadDocs) > 0 {
+			sb.WriteString(fmt.Sprintf("\tbad %%doc files:\n\t\t%s\n", strings.Join(result.BadDocs, "\n\t\t")))
+		}
+		if badFileIsError && len(result.BadFiles) > 0 {
+			sb.WriteString(fmt.Sprintf("\tbad general file:\n\t\t%s\n", strings.Join(result.BadFiles, "\n\t\t")))
+		}
+		if dupIsError && len(result.DuplicatedDocs) > 0 {
+			sb.WriteString(fmt.Sprintf("\tduplicated license files:\n\t\t%s\n", strings.Join(result.DuplicatedDocs, "\n\t\t")))
 		}
 	}
-
-	return sb.String()
-}
-
-func formatWarning(result licensecheck.LicenseCheckResult) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("WARN: (%s) has license warnings:\n", filepath.Base(result.RpmPath)))
-	sb.WriteString(fmt.Sprintf("\tduplicated license files:\n\t\t%s\n", strings.Join(result.DuplicatedDocs, "\n\t\t")))
-	return sb.String()
-}
-
-func formatError(result licensecheck.LicenseCheckResult, pedantic bool) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("ERROR: (%s) has license errors:\n", filepath.Base(result.RpmPath)))
-	if len(result.BadDocs) > 0 {
-		sb.WriteString(fmt.Sprintf("\tbad %%doc files:\n\t\t%s\n", strings.Join(result.BadDocs, "\n\t\t")))
-	}
-	if len(result.BadFiles) > 0 {
-		sb.WriteString(fmt.Sprintf("\tbad general file:\n\t\t%s\n", strings.Join(result.BadFiles, "\n\t\t")))
-	}
-	if pedantic && len(result.DuplicatedDocs) > 0 {
-		sb.WriteString(fmt.Sprintf("\tduplicated license files:\n\t\t%s\n", strings.Join(result.DuplicatedDocs, "\n\t\t")))
+	// Now add warnings if they exist
+	if result.HasWarningResult(mode) {
+		sb.WriteString(fmt.Sprintf("WARN: (%s) has license warnings:\n", filepath.Base(result.RpmPath)))
+		if !badDocIsError && len(result.BadDocs) > 0 {
+			sb.WriteString(fmt.Sprintf("\tbad %%doc files:\n\t\t%s\n", strings.Join(result.BadDocs, "\n\t\t")))
+		}
+		if !badFileIsError && len(result.BadFiles) > 0 {
+			sb.WriteString(fmt.Sprintf("\tbad general file:\n\t\t%s\n", strings.Join(result.BadFiles, "\n\t\t")))
+		}
+		if !dupIsError && len(result.DuplicatedDocs) > 0 {
+			sb.WriteString(fmt.Sprintf("\tduplicated license files:\n\t\t%s\n", strings.Join(result.DuplicatedDocs, "\n\t\t")))
+		}
 	}
 	return sb.String()
 }

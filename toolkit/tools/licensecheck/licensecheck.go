@@ -24,7 +24,7 @@ var (
 	rpmDirs       = app.Flag("rpm-dirs", "Directories to recursively scan for RPMs to validate").Required().ExistingDirs()
 	nameFile      = app.Flag("name-file", "File containing license names to check for.").Required().ExistingFile()
 	exceptionFile = app.Flag("exception-file", "File containing license exceptions.").ExistingFile()
-	pedantic      = app.Flag("pedantic", "Enable pedantic mode, warnings are errors.").Bool()
+	mode          = app.Flag("mode", "Level of license validation to perform").Default(string(licensecheck.LicenseCheckModeDefault)).Enum(licensecheck.ValidLicenseCheckModeStrings()...)
 
 	buildDirPath = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
 	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
@@ -39,7 +39,12 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
 
-	results, numFailures, numWarnings := scanDirectories(*rpmDirs, *buildDirPath, *workerTar, *nameFile, *exceptionFile, *distTag, *pedantic)
+	mode := licensecheck.LicenseCheckMode(*mode)
+	if !licensecheck.IsValidLicenseCheckMode(mode) {
+		logger.Log.Fatalf("Invalid license check mode (%s)", mode)
+	}
+
+	results, numFailures, numWarnings := scanDirectories(*rpmDirs, *buildDirPath, *workerTar, *nameFile, *exceptionFile, *distTag, mode)
 
 	if *resultFile != "" {
 		logger.Log.Infof("Writing results to file (%s)", *resultFile)
@@ -55,19 +60,26 @@ func main() {
 	}
 }
 
-func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, exceptionFile, distTag string, pedantic bool) (results []licensecheck.LicenseCheckResult, failed int, warnings int) {
+func scanDirectories(rpmDirs []string, buildDirPath, workerTar, nameFile, exceptionFile, distTag string,
+	mode licensecheck.LicenseCheckMode,
+) (results []licensecheck.LicenseCheckResult, failed int, warnings int) {
+
+	if mode == licensecheck.LicenseCheckModeNone {
+		logger.Log.Infof("License check mode is set to (%s), skipping license check", mode)
+		return nil, 0, 0
+	}
+
 	totalResults := []licensecheck.LicenseCheckResult{}
 	totalFailedPackages := 0
 	totalWarningPackages := 0
 	for _, rpmDir := range rpmDirs {
-		errorResults, warningResults, err := validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag, pedantic)
+		allResults, errorResults, warningResults, err := validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag, mode)
 		if err != nil {
 			logger.Log.Fatalf("Failed to search RPM directory:\n%v", err)
 		}
 		totalFailedPackages += len(errorResults)
 		totalWarningPackages += len(warningResults)
-		totalResults = append(totalResults, errorResults...)
-		totalResults = append(totalResults, warningResults...)
+		totalResults = append(totalResults, allResults...)
 	}
 	return totalResults, totalFailedPackages, totalWarningPackages
 }
@@ -108,15 +120,17 @@ How to fix:
 
 // validateRpmDir scans the given directory for RPMs and validates their licenses. It will return all findings split into warnings and failures.
 // Each call to this function will generate a new chroot environment and clean it up after the scan.
-func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag string, pedantic bool,
-) (warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
+func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag string,
+	mode licensecheck.LicenseCheckMode,
+) (allResults, warningResults, failedResults []licensecheck.LicenseCheckResult, err error) {
+
 	logger.Log.Infof("Preparing license check environment for (%s)", rpmDir)
 	licenseChecker, err := licensecheck.New(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, distTag)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to initialize RPM license checker:\n%w", err)
+		return nil, nil, nil, fmt.Errorf("failed to initialize RPM license checker:\n%w", err)
 	}
 	defer func() {
-		cleanupErr := licenseChecker.CleanUp()
+		cleanupErr := licenseChecker.Cleanup()
 		if cleanupErr != nil {
 			if err == nil {
 				err = fmt.Errorf("failed to cleanup after RPM license checker:\n%w", cleanupErr)
@@ -128,18 +142,13 @@ func validateRpmDir(buildDirPath, workerTar, rpmDir, nameFile, exceptionFile, di
 	}()
 
 	logger.Log.Infof("Scanning (%s) for license issues", rpmDir)
-	err = licenseChecker.CheckLicenses()
+	_, err = licenseChecker.CheckLicenses(false)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to generate license scan:\n%w", err)
+		return nil, nil, nil, fmt.Errorf("failed to generate license scan:\n%w", err)
 	}
 
-	allResults, warningResults, failedResults := licenseChecker.GetResults()
-	if pedantic {
-		failedResults = append(failedResults, warningResults...)
-		warningResults = nil
-	}
-	resultsString := licensecheckformat.FormatResults(allResults, pedantic)
+	allResults, warningResults, failedResults = licenseChecker.GetResults(mode)
+	resultsString := licensecheckformat.FormatResults(allResults, mode)
 	logger.Log.Infof("Search results for (%s):\n%s", rpmDir, resultsString)
-
-	return failedResults, warningResults, nil
+	return allResults, failedResults, warningResults, nil
 }
