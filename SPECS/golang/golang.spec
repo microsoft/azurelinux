@@ -86,20 +86,6 @@ mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
 # Use %{bootstrap_compiler_version_1} to compile %{version}
-export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{version}
-tar xf %{SOURCE0} -C %{_topdir}/BUILD/go%{version} --strip-components=1
-pushd %{_topdir}/BUILD/go%{version}/src
-CGO_ENABLED=0 ./make.bash
-popd
-
-# Nuke the older %{bootstrap_compiler_version_1}
-rm -rf %{_libdir}/golang
-
-# Make go%{go_version_to_build} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go%{version} %{_libdir}/golang
-
-# Build current go version
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOROOT_BOOTSTRAP=%{goroot}
