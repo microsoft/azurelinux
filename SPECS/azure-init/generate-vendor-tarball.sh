@@ -8,8 +8,8 @@
 # SOURCE_URL="https://github.com/Azure/azure-init/archive/refs/tags/${SOURCE_VERSION_V}.tar.gz"
 
 # For generating tar of PRs and Forks
-FORK_OWNER="dongsupark"
-SOURCE_VERSION="f84e07b126fef8661e0c341329c57cb65d75fa92"
+FORK_OWNER="Azure"
+SOURCE_VERSION="7142bced859169553e8948497aa13df742aac1ff"
 SOURCE_URL="https://github.com/${FORK_OWNER}/azure-init/archive/${SOURCE_VERSION}.tar.gz"
 
 workdir=$(mktemp -d)

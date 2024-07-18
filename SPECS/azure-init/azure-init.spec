@@ -2,7 +2,7 @@
 
 Summary:        A rust-based reference implementation for provisioning Linux VMs on Azure.
 Name:           azure-init
-Version:        f84e07b126fef8661e0c341329c57cb65d75fa92
+Version:        7142bced859169553e8948497aa13df742aac1ff
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -34,7 +34,7 @@ cargo build --all
 mkdir -p %{buildroot}%{_sharedstatedir}/azure-init
 mkdir -p %{buildroot}%{_unitdir}
 install -m 0755 target/debug/azure-init %{buildroot}%{_sharedstatedir}/azure-init/azure-init
-install -m 0644 config/azure-provisioning-agent.service %{buildroot}%{_unitdir}/azure-provisioning-agent.service
+install -m 0644 config/azure-init.service %{buildroot}%{_unitdir}/azure-init.service
 mkdir -p %{buildroot}%{_sysconfdir}/netplan
 cat > %{buildroot}%{_sysconfdir}/netplan/eth0.yaml <<EOF
 network:
@@ -52,18 +52,18 @@ chmod 0644 %{buildroot}%{_sysconfdir}/netplan/eth0.yaml
 
 
 %post
-%systemd_post azure-provisioning-agent.service
-systemctl enable azure-provisioning-agent
+%systemd_post azure-init.service
+systemctl enable azure-init
 
 %preun
-%systemd_preun azure-provisioning-agent.service
+%systemd_preun azure-init.service
 
 %postun
-%systemd_postun azure-provisioning-agent.service
+%systemd_postun azure-init.service
 
 %files
 %{_sharedstatedir}/azure-init/azure-init
-%{_unitdir}/azure-provisioning-agent.service
+%{_unitdir}/azure-init.service
 %{_sysconfdir}/netplan/eth0.yaml
 
 %changelog
