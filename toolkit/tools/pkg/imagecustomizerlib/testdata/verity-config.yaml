@@ -44,7 +44,7 @@ storage:
       path: /
       
   - deviceId: verityhash
-    type: ext4
+    type: fat32
 
   - deviceId: var
     type: ext4
