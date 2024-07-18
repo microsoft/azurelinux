@@ -1,5 +1,5 @@
 diff --git a/cf/cf/submit.mc b/cf/cf/submit.mc
-index b9dfb16..cb325cc 100644
+index 6e2b360..45df0e6 100644
 --- a/cf/cf/submit.mc
 +++ b/cf/cf/submit.mc
 @@ -22,6 +22,8 @@ define(`__OSTYPE__',`')dnl dirty hack to keep proto.m4 from complaining
@@ -12,10 +12,10 @@ index b9dfb16..cb325cc 100644
  dnl define(`confDIRECT_SUBMISSION_MODIFIERS',`C')dnl
  FEATURE(`use_ct_file')dnl
 diff --git a/cf/m4/proto.m4 b/cf/m4/proto.m4
-index 5a5963b..0df3416 100644
+index 45eb58a..947f16f 100644
 --- a/cf/m4/proto.m4
 +++ b/cf/m4/proto.m4
-@@ -251,6 +251,9 @@ _OPTION(SevenBitInput, `confSEVEN_BIT_INPUT', `False')
+@@ -264,6 +264,9 @@ _OPTION(SevenBitInput, `confSEVEN_BIT_INPUT', `False')
  # 8-bit data handling
  _OPTION(EightBitMode, `confEIGHT_BIT_HANDLING', `pass8')
  
@@ -26,11 +26,11 @@ index 5a5963b..0df3416 100644
  _OPTION(AliasWait, `confALIAS_WAIT', `5m')
  
 diff --git a/sendmail/conf.c b/sendmail/conf.c
-index cbb9c76..1b55533 100644
+index c3b52df..663186e 100644
 --- a/sendmail/conf.c
 +++ b/sendmail/conf.c
-@@ -6430,6 +6430,10 @@ char	*FFRCompileOptions[] =
- #if _FFR_QF_PARANOIA
+@@ -6728,6 +6728,10 @@ char	*FFRCompileOptions[] =
+ 	/* Check to make sure key fields were read from qf */
  	"_FFR_QF_PARANOIA",
  #endif
 +#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
@@ -41,10 +41,10 @@ index cbb9c76..1b55533 100644
  	/* Allow QueueSortOrder per queue group. */
  /* XXX: Still need to actually use qgrp->qg_sortorder */
 diff --git a/sendmail/daemon.c b/sendmail/daemon.c
-index 4288365..86fe319 100644
+index f15a7d8..6b43f78 100644
 --- a/sendmail/daemon.c
 +++ b/sendmail/daemon.c
-@@ -104,6 +104,10 @@ static int	NDaemons = 0;			/* actual number of daemons */
+@@ -124,6 +124,10 @@ static int	NDaemons = 0;			/* actual number of daemons */
  
  static time_t	NextDiskSpaceCheck = 0;
  
@@ -55,7 +55,7 @@ index 4288365..86fe319 100644
  /*
  **  GETREQUESTS -- open mail IPC port and get requests.
  **
-@@ -1139,6 +1143,16 @@ opendaemonsocket(d, firsttime)
+@@ -1167,6 +1171,16 @@ opendaemonsocket(d, firsttime)
  			(void) setsockopt(d->d_socket, SOL_SOCKET,
  					  SO_KEEPALIVE, (char *)&on, sizeof(on));
  
@@ -72,7 +72,7 @@ index 4288365..86fe319 100644
  #ifdef SO_RCVBUF
  			if (d->d_tcprcvbufsize > 0)
  			{
-@@ -2571,6 +2585,16 @@ gothostent:
+@@ -2728,6 +2742,16 @@ gothostent:
  			return EX_TEMPFAIL;
  		}
  
@@ -90,21 +90,21 @@ index 4288365..86fe319 100644
  		if (ClientSettings[family].d_tcpsndbufsize > 0)
  		{
 diff --git a/sendmail/readcf.c b/sendmail/readcf.c
-index 2b0fbf7..86892f5 100644
+index 2767b57..5790172 100644
 --- a/sendmail/readcf.c
 +++ b/sendmail/readcf.c
-@@ -18,6 +18,7 @@ SM_RCSID("@(#)$Id: readcf.c,v 8.692 2013-11-22 20:51:56 ca Exp $")
+@@ -24,6 +24,7 @@ SM_RCSID("@(#)$Id: readcf.c,v 8.692 2013-11-22 20:51:56 ca Exp $")
  
  #if NETINET || NETINET6
  # include <arpa/inet.h>
 +# include <netinet/ip.h>
- #endif /* NETINET || NETINET6 */
+ #endif
  
  
-@@ -2888,8 +2889,8 @@ static struct optioninfo
+@@ -3137,8 +3138,8 @@ static struct optioninfo
  # define O_RCPTTHROTDELAY	0xe6
  	{ "BadRcptThrottleDelay",	O_RCPTTHROTDELAY,	OI_SAFE	},
- #endif /* _FFR_RCPTTHROTDELAY */
+ #endif
 -#if 0 && _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
 -# define O_INETQOS	0xe7	/* reserved for FFR_QOS */
 +#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
@@ -112,7 +112,7 @@ index 2b0fbf7..86892f5 100644
  	{ "InetQoS",			O_INETQOS,	OI_NONE },
  #endif
  #if STARTTLS && _FFR_FIPSMODE
-@@ -2914,6 +2915,77 @@ static struct optioninfo
+@@ -3213,6 +3214,77 @@ static struct optioninfo
  	{ NULL,				'\0',		OI_NONE	}
  };
  
@@ -190,9 +190,9 @@ index 2b0fbf7..86892f5 100644
  # define CANONIFY(val)
  
  # define SET_OPT_DEFAULT(opt, val)	opt = val
-@@ -4540,6 +4612,33 @@ setoption(opt, val, safe, sticky, e)
- 		UseCompressedIPv6Addresses = atobool(val);
+@@ -4949,6 +5021,33 @@ setoption(opt, val, safe, sticky, e)
  		break;
+ #endif
  
 +#ifdef O_INETQOS
 +	  case O_INETQOS:
@@ -225,22 +225,22 @@ index 2b0fbf7..86892f5 100644
  		if (tTd(37, 1))
  		{
 diff --git a/sendmail/sendmail.h b/sendmail/sendmail.h
-index b2d0211..3bcc2e2 100644
+index 9983354..8ebaf97 100644
 --- a/sendmail/sendmail.h
 +++ b/sendmail/sendmail.h
-@@ -2537,7 +2537,14 @@ EXTERN struct termescape	TermEscape;	/* terminal escape codes */
- EXTERN SOCKADDR	ConnectOnlyTo;	/* override connection address (for testing) */
+@@ -2698,6 +2698,15 @@ EXTERN SOCKADDR	ConnectOnlyTo;	/* override connection address (for testing) */
  EXTERN SOCKADDR RealHostAddr;	/* address of host we are talking to */
  extern const SM_EXC_TYPE_T EtypeQuickAbort; /* type of a QuickAbort exception */
--
+ 
 +#if _FFR_QOS
 +# if !defined(SOL_IP) && defined(IPPROTO_IP)
 +#  define SOL_IP IPPROTO_IP
 +# endif
 +# if defined(SOL_IP) && defined(IP_TOS)
-+EXTERN int	InetQoS;	/* QoS mapping */
++extern int	InetQoS;	/* QoS mapping */
 +# endif
 +#endif
- 
- EXTERN int ConnectionRateWindowSize;
- #if STARTTLS && USE_OPENSSL_ENGINE
++
+ #if _FFR_BLANKENV_MACV
+ EXTERN int Hacks;	/* bit field of run-time enabled "hacks" */
+ # define H_LOOKUP_MACRO_IN_BLANKENV	0x0001
