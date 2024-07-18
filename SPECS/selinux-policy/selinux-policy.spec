@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -335,6 +335,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Jul 16 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-5
+- Change unconfined to a separate module so it can be disabled.
+
 * Mon Jul 01 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-4
 - Add cloud-init and kmod fixes.
 
