@@ -8,6 +8,7 @@ package imagecustomizerapi
 import (
 	"fmt"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,10 +26,7 @@ type FileConfig struct {
 }
 
 var (
-	DefaultFileConfig = FileConfig{
-		Path:        "",
-		Permissions: nil,
-	}
+	fileConfigValidFields = []string{"path", "permissions"}
 )
 
 func (l *FileConfigList) IsValid() (err error) {
@@ -97,12 +95,21 @@ func (f *FileConfig) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	// Parse as a struct.
-	*f = DefaultFileConfig
+	*f = FileConfig{}
 
 	type IntermediateTypeFileConfig FileConfig
 	err = value.Decode((*IntermediateTypeFileConfig)(f))
 	if err != nil {
 		return fmt.Errorf("failed to parse fileConfig:\n%w", err)
+	}
+
+	// yaml.Node.Decode() doesn't respect the KnownFields() option.
+	// So, manually enforce this.
+	for i := 0; i < len(value.Content); i += 2 {
+		key := value.Content[i].Value
+		if !sliceutils.ContainsValue(fileConfigValidFields, key) {
+			return fmt.Errorf("line %d: field %s not found in type %s", value.Line, key, "FileConfig")
+		}
 	}
 
 	return nil
