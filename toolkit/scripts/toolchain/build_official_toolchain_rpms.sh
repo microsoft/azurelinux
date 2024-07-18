@@ -732,6 +732,15 @@ build_rpm_in_chroot_no_install azurelinux-repos
 # will fail.
 build_rpm_in_chroot_no_install audit
 
+# Build llvm toolchain components
+# llvm requires ninja-build and cmake (installed above)
+build_rpm_in_chroot_no_install llvm
+# clang, lld and compiler-rt require llvm
+chroot_and_install_rpms llvm llvm-devel
+build_rpm_in_chroot_no_install compiler-rt
+build_rpm_in_chroot_no_install clang
+build_rpm_in_chroot_no_install lld
+
 stop_record_timestamp "build packages"
 start_record_timestamp "finalize"
 

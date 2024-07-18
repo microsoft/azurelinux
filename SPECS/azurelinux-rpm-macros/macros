@@ -37,8 +37,8 @@
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
-ln -svf /usr/bin/clang /usr/bin/cc\
-ln -svf /usr/bin/clang++ /usr/bin/c++\
+%{?use_llvm_toolchain:ln -svf /usr/bin/clang /usr/bin/cc}\
+%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 %{nil}
 
 # GCC toolchain
@@ -51,8 +51,9 @@ ln -svf /usr/bin/clang++ /usr/bin/c++\
 %__cxx_clang clang++
 %__cpp_clang clang-cpp
 
-# Default to the clang toolchain
-%toolchain clang
+## Default to the clang toolchain
+#%use_llvm_toolchain 1
+%toolchain %{?use_llvm_toolchain:clang}%{!?use_llvm_toolchain:gcc}
 
 %__cc %{expand:%%{__cc_%{toolchain}}}
 %__cxx %{expand:%%{__cxx_%{toolchain}}}
@@ -77,8 +78,8 @@ ln -svf /usr/bin/clang++ /usr/bin/c++\
 %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
 %{?ccache_enabled:ccache --zero-stats}\
-export CC=clang\
-export CXX=clang++\
+%{?use_llvm_toolchain:export CC=clang}\
+%{?use_llvm_toolchain:export CXX=clang++}\
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -139,7 +140,7 @@ export CXX=clang++\
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
 # Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} -fuse-ld=lld -Wl,--build-id=sha1
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}} %{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -200,7 +201,7 @@ print(result)
 %_binary_filedigest_algorithm 8
 
 %_hardening_cflags      -specs=/usr/lib/rpm/azl/default-hardened-cc1
-%_hardening_ldflags     -Wl,-z,now
+%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/azl/default-hardened-ld
 
 # Harden packages by default
 # https://fedorahosted.org/fesco/ticket/1384 (accepted on 2014-02-11)
@@ -232,7 +233,8 @@ print(result)
 %_frame_pointers_cflags %{?_include_frame_pointers:-fno-omit-frame-pointer}
 
 %_legacy_common_support 1
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+# remove %{_hardened_cflags}
+%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

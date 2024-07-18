@@ -60,6 +60,9 @@ const (
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
+
+	// UseLLVMToolchainDefine enables building packages with llvm/clang toolchain instead of gnu/gcc
+	UseLLVMToolchainDefine = "use_llvm_toolchain"
 )
 
 const (

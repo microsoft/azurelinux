@@ -117,6 +117,9 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
+	logger.Log.Info("======== NOTE: using UseLLVMToolchainDefine =============")
+	defines[rpm.UseLLVMToolchainDefine] = "true"
+
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
