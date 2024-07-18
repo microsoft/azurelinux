@@ -45,16 +45,18 @@ type BuildRequest struct {
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
-	BuiltFiles     []string            // List of RPMs built by this node.
-	Err            error               // Error encountered during the build.
-	LogFile        string              // Path to the log file from the build.
-	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
-	CheckFailed    bool                // Indicator if the package test failed but the build itself was correct.
-	Ignored        bool                // Indicator if the build was ignored by user request.
-	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
-	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
-	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
+	AncillaryNodes     []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
+	BuiltFiles         []string            // List of RPMs built by this node.
+	Err                error               // Error encountered during the build.
+	LogFile            string              // Path to the log file from the build.
+	Node               *pkggraph.PkgNode   // The main node being analyzed for the build.
+	CheckFailed        bool                // Indicator if the package test failed but the build itself was correct.
+	Ignored            bool                // Indicator if the build was ignored by user request.
+	UsedCache          bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
+	WasDelta           bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
+	Freshness          uint                // The freshness of the node (used to determine if we can skip building future nodes).
+	HasLicenseWarnings bool                // Package has at least one license check warning
+	HasLicenseErrors   bool                // Package has at least one license check error
 }
 
 // selectNextBuildRequest selects a job based on priority:
