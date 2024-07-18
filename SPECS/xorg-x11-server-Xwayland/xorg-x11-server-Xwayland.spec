@@ -11,7 +11,7 @@ Distribution:  Azure Linux
 Summary:       Xwayland
 Name:          xorg-x11-server-Xwayland
 Version:       24.1.1
-Release:       2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
+Release:       2%{?dist}
  
 License:       MIT
 URL:           http://www.x.org
