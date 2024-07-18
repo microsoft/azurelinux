@@ -2129,6 +2129,7 @@
                 "xorg-x11-proto-devel",
                 "xorg-x11-server",
                 "xorg-x11-server-utils",
+		"xorg-x11-server-Xwayland",
                 "xorg-x11-util-macros",
                 "xorg-x11-utils",
                 "xorg-x11-xauth",

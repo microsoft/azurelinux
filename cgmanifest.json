@@ -30177,6 +30177,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-server-Xwayland",
+          "version": "24.1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-util-macros",
           "version": "1.20.0",
           "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.20.0.tar.xz"
