@@ -44,6 +44,7 @@ meta_user_data_tmp_dir               = $(IMAGEGEN_DIR)/meta-user-data_tmp
 image_package_cache_summary          = $(imggen_config_dir)/image_deps.json
 image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.json
 image_package_manifest               = $(imggen_config_dir)/image_pkg_manifest.json
+license_results_file_img             = $(imggen_config_dir)/license_check_results.json
 
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
