@@ -381,8 +381,8 @@ func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
 		return fmt.Errorf("internal error: loopback disk path must be absolute (%s)", diskPath)
 	}
 
-	delay := 100 * time.Millisecond
-	attempts := 8
+	delay := 120 * time.Millisecond
+	attempts := 10
 	for failures := 0; failures < attempts; failures++ {
 		stdout, _, err := shell.Execute("losetup", "--list", "--json", "--output", "NAME,BACK-FILE")
 		if err != nil {
