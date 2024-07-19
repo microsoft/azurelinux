@@ -10,12 +10,6 @@ ARG USER
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-# Workaround till proper binaries are built as part of the cdi rpm & renames are removed
-# https://github.com/microsoft/azurelinux/pull/5708/files#
-COPY cdi-containerimage-server /usr/bin/cdi-containerimage-server
-COPY cdi-image-size-detection /usr/bin/cdi-image-size-detection
-COPY cdi-source-update-poller /usr/bin/cdi-source-update-poller
-
 # workaround till binaries rename is merged
 RUN [ -f /usr/bin/virt-cdi-importer ] && mv -f /usr/bin/virt-cdi-importer /usr/bin/cdi-importer
 
