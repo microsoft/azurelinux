@@ -80,8 +80,6 @@ ENABLE_TRACE                    ?= n
 # License checking tool
 ##help:var:LICENSE_CHECK_DIRS:"<rpm_dir_1> <rpm_dir_2>"=Space separated list of directories to recursively validate with the manual 'license-check' target.
 LICENSE_CHECK_DIRS ?=
-##help:var:LICENSE_CHECK_PEDANTIC:{y,n}=Treat all license warnings as errors
-LICENSE_CHECK_PEDANTIC ?= n
 LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
 LICENSE_CHECK_NAME_FILE      ?= $(MANIFESTS_DIR)/package/license_file_names.json
 ##help:var:LICENSE_CHECK_MODE:{none,warn,fatal,pedantic}=Set the license check mode during package and image builds. 'none' will disable the license check, 'warn' will print warnings, 'fatal' will stop the build on errors, 'pedantic' will stop the build on warnings and errors.
