@@ -160,6 +160,8 @@ include $(SCRIPTS_DIR)/utils.mk
 ifneq ($(DAILY_BUILD_ID),)
    ifneq ($(DAILY_BUILD_REPO),)
       $(error DAILY_BUILD_ID and DAILY_BUILD_REPO are mutually exclusive.)
+   endif
+endif
 
 ifneq ($(DAILY_BUILD_ID),)
    $(warning Using Daily Build $(DAILY_BUILD_ID))
@@ -179,6 +181,7 @@ ifneq ($(DAILY_BUILD_ID),)
                                        https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
       override SRPM_URL_LIST      += https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
    endif
+endif
 
 ifeq ($(USE_PREVIEW_REPO),y)
    # Configure the preview repo
