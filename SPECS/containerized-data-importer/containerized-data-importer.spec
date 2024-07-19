@@ -132,7 +132,7 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/cdi-containerimage-server \
 	tools/cdi-image-size-detection \
 	tools/cdi-source-update-poller \
-	tools/csv-generator
+	tools/csv-generator \
 	%{nil}
 
 ./hack/build/build-manifests.sh
