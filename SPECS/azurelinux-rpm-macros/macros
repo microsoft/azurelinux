@@ -38,8 +38,8 @@
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
 %{?use_llvm_toolchain:ln -svf /usr/bin/clang /usr/bin/cc}\
+%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 %{nil}
-# %%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 
 # GCC toolchain
 %__cc_gcc gcc
@@ -56,14 +56,14 @@
 %toolchain %{?use_llvm_toolchain:clang}%{!?use_llvm_toolchain:gcc}
 
 %__cc %{expand:%%{__cc_%{toolchain}}}
-# %%__cxx %{expand:%%{__cxx_%{toolchain}}}
-# %%__cpp %{expand:%%{__cpp_%{toolchain}}}
+%__cxx %{expand:%%{__cxx_%{toolchain}}}
+%__cpp %{expand:%%{__cpp_%{toolchain}}}
 
 # Compiler macros to use for invoking compilers in spec files for packages that
 # want to use the default compiler and don't care which compiler that is.
 %build_cc %{__cc}
-# %%build_cxx %{__cxx}
-# %%build_cpp %{__cpp}
+%build_cxx %{__cxx}
+%build_cpp %{__cpp}
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
@@ -79,8 +79,8 @@
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
 %{?ccache_enabled:ccache --zero-stats}\
 %{?use_llvm_toolchain:export CC=clang}\
+%{?use_llvm_toolchain:export CXX=clang++}\
 %{nil}
-# %%{?use_llvm_toolchain:export CXX=clang++}\
 
 # use zstd compression for binary package payloads
 %_binary_payload w7T0.zstdio
