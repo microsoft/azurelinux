@@ -154,7 +154,7 @@ include $(SCRIPTS_DIR)/utils.mk
 # runtime.  The argument takes the form of a repo file supplied by the
 # Azure Linux Team's daily artifact feed.  The repo file may be provisioned
 # in a downstream image so that it has access to the repo at runtime.  The
-# DAILY_BUILD_REPO argument takes a patch to the daily-mariner.repo file.
+# DAILY_BUILD_REPO argument takes a path to the daily-mariner.repo file.
 # 
 # their pipelines on a daily basis. The repo file may be provisioned to their image \ 
 ifneq ($(DAILY_BUILD_ID),)
