@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
@@ -353,7 +354,12 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	// Shrink the filesystems.
 	if ic.enableShrinkFilesystems {
-		err = shrinkFilesystemsHelper(ic.rawImageFile)
+		verityHashPartitionId := (*imagecustomizerapi.IdentifiedPartition)(nil)
+		if ic.config.OS.Verity != nil {
+			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
+		}
+
+		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
@@ -687,7 +693,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string) error {
+func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -695,7 +701,7 @@ func shrinkFilesystemsHelper(buildImageFile string) error {
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath())
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition)
 	if err != nil {
 		return err
 	}
@@ -725,13 +731,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
-		config.OS.Verity.DataPartition.Id, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
-		config.OS.Verity.HashPartition.Id, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
