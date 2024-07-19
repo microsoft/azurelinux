@@ -103,7 +103,8 @@ This build has 64bit INTEGER support and a symbol name suffix.
 %setup -q
 
 %build
-%global optflags %{optflags} -frecursive --no-optimize-sibling-calls
+#  clang: error: unknown argument '--no-optimize-sibling-calls'; did you mean '-fno-optimize-sibling-calls'?"
+%global optflags %{optflags} -frecursive -fno-optimize-sibling-calls
 
 # shared normal
 %cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DLAPACKE=ON -DLAPACKE_WITH_TMG=ON -DCBLAS=ON

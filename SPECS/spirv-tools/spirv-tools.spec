@@ -11,7 +11,9 @@ Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/SPIRV-Tools
 Source0:        %url/archive/vulkan-sdk-%{sdkver}.tar.gz#/%{name}-sdk-%{sdkver}.tar.gz
 
-Patch0: fix-gcc12-build.patch
+# Remove to allow building with clang.
+# "/usr/src/azl/BUILD/SPIRV-Tools-vulkan-sdk-1.3.275.0/source/spirv_target_env.cpp:402:32: error: unknown warning group '-Wrestrict', ignored [-Werror,-Wunknown-warning-option]"
+#Patch0: fix-gcc12-build.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
@@ -174,4 +176,3 @@ popd
 
 * Thu Jul 13 2017 Leigh Scott <leigh123linux@googlemail.com> - 2016.7-0.1.20171023.git5834719
 - First build
-

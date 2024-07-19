@@ -32,6 +32,9 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 %setup -q
 %patch 0 -p1
 %patch 1 -p1
+# Fix clang build error:
+# "clang: error: unknown argument: '-fplan9-extensions'"
+sed -i 's/-fplan9-extensions//g' ./Makefile
 
 mkdir -p %{mod_probe_dir}
 tar -C %{mod_probe_dir} --strip-components=1 -xzf %{SOURCE1}

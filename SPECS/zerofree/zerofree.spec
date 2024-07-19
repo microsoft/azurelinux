@@ -11,7 +11,7 @@ Source1:        https://frippery.org/uml/sparsify.c
 Source2:        https://frippery.org/uml/index.html
 
 BuildRequires:  e2fsprogs-devel
-BuildRequires:  gcc
+BuildRequires:  clang
 
 %description
 zerofree is a utility to set unused filesystem inodes and blocks of an
@@ -31,8 +31,8 @@ cp -p %{SOURCE1} .
 cp -p %{SOURCE2} .
 
 %build
-make CC="gcc %{optflags}"
-gcc %{optflags} sparsify.c -o sparsify -lext2fs
+make CC="clang %{optflags}"
+clang %{optflags} sparsify.c -o sparsify -lext2fs
 
 %install
 install -D -p -m 755 zerofree %{buildroot}%{_sbindir}/zerofree
