@@ -1,7 +1,7 @@
 
 Name:           kpmcore
 Version:        3.3.0
-Release:        8%{?dist}
+Release:        7%{?dist}
 Summary:        Library for managing partitions by KDE programs
 License:        GPLv3+
 URL:            https://github.com/KDE/kpmcore
@@ -76,9 +76,6 @@ make install/fast -C %{_target_platform} DESTDIR=%{buildroot}
 
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.0-8
-- Dash Roll for sodiff findings
-
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.3.0-7
 - License verified.
 

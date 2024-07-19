@@ -2,7 +2,7 @@
 Summary:        Desktop Input Method configuration tool
 Name:           im-chooser
 Version:        1.7.3
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,9 +103,6 @@ rm -rf %{buildroot}%{_datadir}/applications/im-chooser-panel.desktop
 %endif
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 1.7.3-6
-- Dash Roll for sodiff findings
-
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.3-5
 - License verified
 

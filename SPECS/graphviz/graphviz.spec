@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        11%{?dist}
+Release:        10%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -517,9 +517,6 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 2.42.4-11
-- Dash Roll for sodiff findings
-
 * Tue May 14 2024 Muhammad Falak <mwani@microsoft.com> - 2.42.4-10
 - Switch to autosetup to actually address CVE-2020-18032
 - Address CVE-2023-46045

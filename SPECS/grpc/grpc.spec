@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        8%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -148,9 +148,6 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
-* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 1.42.0-8
-- Dash Roll for sodiff findings
-
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 1.42.0-7
 - Bump release to rebuild with updated version of Go.
 

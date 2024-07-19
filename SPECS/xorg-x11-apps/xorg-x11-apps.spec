@@ -20,7 +20,7 @@
 Summary:        X.Org X11 applications
 Name:           xorg-x11-apps
 Version:        7.7
-Release:        30%{?dist}
+Release:        29%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -150,9 +150,6 @@ rm -r %{buildroot}%{_mandir}/man1
 %{_datadir}/X11/x11perfcomp
 
 %changelog
-* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 7.7-30
-- Dash Roll for sodiff findings
-
 * Mon Jan 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.7-29
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.

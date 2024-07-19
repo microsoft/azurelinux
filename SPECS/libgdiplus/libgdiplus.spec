@@ -1,7 +1,7 @@
 Summary:        C-based implementation of the GDI+ API
 Name:           libgdiplus
 Version:        6.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,9 +61,6 @@ find %{buildroot} -type f -name '*.a' -delete -print
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 6.1-3
-- Dash Roll for sodiff findings
-
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1-2
 - Bumping release to re-build with newer 'libtiff' libraries.
 

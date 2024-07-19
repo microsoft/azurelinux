@@ -3,7 +3,7 @@
 Summary:        Desktop notification library
 Name:           libnotify
 Version:        0.7.9
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,9 +64,6 @@ development of programs using %{name}.
 %{_datadir}/gir-1.0/Notify-%{majmin}.gir
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 0.7.9-5
-- Dash Roll for sodiff findings
-
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
 - License verified
 - Lint spec

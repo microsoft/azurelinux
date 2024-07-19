@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk2
 Version:        2.24.32
-Release:        12%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -317,9 +317,6 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
 %doc tmpdocs/examples
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 2.24.32-12
-- Dash Roll for sodiff findings
-
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.24.32-11
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

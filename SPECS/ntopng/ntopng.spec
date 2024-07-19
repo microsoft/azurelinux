@@ -2,7 +2,7 @@
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        5.2.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,9 +62,6 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
-* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 5.2.1-3
-- Dash Roll for sodiff findings
-
 * Tue Apr 18 2023 Bala <balakumaran.kannan@microsoft.com> - 5.2.1-2
 - Patch CVE-2021-45985 on integrated lua source
 

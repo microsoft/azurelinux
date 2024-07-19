@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtTool components
 Name:         qt5-qttools
 Version:      5.12.5
-Release:      7%{?dist}
+Release:      6%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -391,9 +391,6 @@ fi
 
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 5.12.5-7
-- Dash Roll for sodiff findings
-
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
 - Update source download path
 - License verified.

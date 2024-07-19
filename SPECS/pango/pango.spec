@@ -1,7 +1,7 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
 Version:        1.45.5
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,9 +66,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 1.45.5-2
-- Dash Roll for sodiff findings
-
 * Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.45.5-1
 - Bump version to 1.45.5 to address CVE-2019-1010238
 

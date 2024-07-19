@@ -11,7 +11,7 @@
 Summary:        Terminal emulator library
 Name:           vte291
 Version:        0.66.2
-Release:        4%{?dist}
+Release:        3%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,9 +119,6 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 0.66.2-4
-- Dash Roll for sodiff findings
-
 * Thu Jun 13 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.66.2-3
 - Patch CVE-2024-37535
 

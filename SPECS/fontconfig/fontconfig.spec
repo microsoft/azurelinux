@@ -1,7 +1,7 @@
 Summary:        library for configuring and customizing font access.
 Name:           fontconfig
 Version:        2.13.95
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
 Group:          System Environment/Libraries
@@ -67,9 +67,6 @@ make -k check
 %{_mandir}/man3/*
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 2.13.95-2
-- Dash Roll for sodiff findings
-
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.13.95-1
 - Update to 2.13.91
 - License verified

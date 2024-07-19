@@ -1,7 +1,7 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
 Version:        3.4.0
-Release:        4%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,9 +77,6 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 %{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 3.4.0-3
-- Dash Roll for sodiff findings
-
 * Wed Feb 22 2023 Minghe Ren <mingheren@microsoft.com> - 3.4.0-3
 - Add patch for CVE-2023-25193 
 

@@ -3,7 +3,7 @@
 
 Name:           kf5-%{framework}
 Version:        5.61.0
-Release:        6%{?dist}
+Release:        5%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon for localization
 License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
@@ -90,9 +90,6 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
-* Thu Jun 27 2024 Sam Meluch <sammeluch@microsoft.com> - 5.61.0-6
-- Dash Roll for sodiff findings
-
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.61.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
