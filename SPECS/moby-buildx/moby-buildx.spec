@@ -5,7 +5,7 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        0.7.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
@@ -16,6 +16,7 @@ Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.t
 Patch0:         CVE-2022-21698.patch
 Patch1:         CVE-2023-44487.patch
 Patch2:         CVE-2021-44716.patch
+Patch3:         CVE-2021-43565.patch
 
 BuildRequires: bash
 BuildRequires: golang >= 1.17
@@ -46,6 +47,9 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Fri Jul 19 2024 Archana Choudhary <archana1@microsoft.com> - 0.7.1-20
+- Address CVE-2021-43565 by patching vendored golang.org/x/crypto
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-19
 - Bump release to rebuild with go 1.21.11
 
