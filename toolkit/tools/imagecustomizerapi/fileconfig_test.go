@@ -55,3 +55,11 @@ func TestParseFileConfigInvalidFilePermissions(t *testing.T) {
 	// Empty string.
 	testInvalidYamlValue[*FileConfigList](t, "{ \"path\": \"/b.txt\", \"permissions\": \"7777\" }")
 }
+
+func TestParseFileConfigValidStructBadField(t *testing.T) {
+	testInvalidYamlValue[*FileConfigList](t, "{ \"pat\": \"/b.txt\" }")
+}
+
+func TestParseFileConfigValidArrayStructBadField(t *testing.T) {
+	testInvalidYamlValue[*FileConfigList](t, "[ { \"pat\": \"/b.txt\" } ]")
+}
