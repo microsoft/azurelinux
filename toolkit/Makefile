@@ -198,6 +198,7 @@ ifneq ($(DAILY_BUILD_REPO),)
    $(warning )
    override PACKAGE_URL_LIST  += $(PACKAGE_ROOT)/built_rpms_all
    override SRPM_URL_LIST     += $(PACKAGE_ROOT)/SRPMS
+   override REPO_LIST         += $(DAILY_BUILD_REPO)
 endif
 
 CA_CERT     ?=
