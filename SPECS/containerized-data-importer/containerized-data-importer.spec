@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -129,6 +129,10 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
+  tools/cdi-containerimage-server \
+  tools/cdi-image-size-detection \
+	tools/cdi-source-update-poller \
+	tools/csv-generator
 	%{nil}
 
 ./hack/build/build-manifests.sh
@@ -150,6 +154,14 @@ install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/vir
 install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
 
 install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
+
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
+
+install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
+
+install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/cdi-source-update-poller
+
+install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/csv-generator
 
 # Install release manifests
 mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
@@ -176,11 +188,15 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-importer
+%{_bindir}/cdi-containerimage-server
+%{_bindir}/cdi-image-size-detection
+%{_bindir}/cdi-source-update-poller
 
 %files operator
 %license LICENSE
 %doc README.md
 %{_bindir}/virt-cdi-operator
+%{_bindir}/csv-generator
 
 %files uploadproxy
 %license LICENSE
@@ -201,6 +217,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Fri Jul 19 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-4
+- Building cdi tool binaries within package build
+
 * Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.57.0-3
 - Address CVE-2022-2879 by patching vendored github.com/vbatss/tar-split
 
