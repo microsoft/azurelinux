@@ -249,7 +249,7 @@ func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []s
 			}()
 
 			logger.Log.Debugf("Searching (%s)", filepath.Base(rpmPath))
-			searchResult, err := CheckRpmLicenses(rpmPath, l.distTag, l.licenseNames, l.exceptions)
+			searchResult, err := checkRpmLicenses(rpmPath, l.distTag, l.licenseNames, l.exceptions)
 			logger.Log.Debugf("Finished searching (%s)", filepath.Base(rpmPath))
 			if err != nil {
 				logger.Log.Errorf("License check worker failed with error: %v", err)
@@ -261,10 +261,10 @@ func (l *LicenseChecker) queueWorkers(ctx context.Context, rpmsToSearchPaths []s
 	}
 }
 
-// CheckRpmLicenses checks the licenses of an RPM at the given path. It returns result struct holding all the license
+// checkRpmLicenses checks the licenses of an RPM at the given path. It returns result struct holding all the license
 // issues found. This function will use the host's macros to query the RPM so it is expected to be called in a chroot.
 // - rpmPath: The path to the RPM to check relative to the chroot's root.
-func CheckRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, exceptions LicenseExceptions) (result LicenseCheckResult, err error) {
+func checkRpmLicenses(rpmPath, distTag string, licenseNames LicenseNames, exceptions LicenseExceptions) (result LicenseCheckResult, err error) {
 	defines := rpm.DefaultDistroDefines(false, distTag)
 
 	_, files, _, documentFiles, licenseFiles, err := rpm.QueryPackageFiles(rpmPath, defines)
