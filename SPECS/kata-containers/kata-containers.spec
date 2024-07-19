@@ -40,7 +40,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -216,6 +216,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Fri Jul 19 2024 Cameron Baird <cameronbaird@microsoft.com> 3.2.0.azl2-4
+- Explicitly set OS_VERSION=3.0 for invocations of rootfs builder
+
 * Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
 - Call make clean with OS distro variable
 
