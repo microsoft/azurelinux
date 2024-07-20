@@ -5,7 +5,7 @@
 Summary:        Xorg X11 libinput input driver
 Name:           xorg-x11-drv-libinput
 Version:        0.30.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ cp %{SOURCE1} %{buildroot}%{_datadir}/X11/xorg.conf.d/
 %{_includedir}/xorg/libinput-properties.h
 
 %changelog
+* Thu Jul 18 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 0.30.0-7
+- Moved to SPECS-EXTENDED.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.30.0-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

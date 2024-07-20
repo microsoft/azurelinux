@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -386,6 +386,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Thu Jul 18 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.20.10-6
+- Moved to SPECS-EXTENDED.
+
 * Mon Apr 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.20.10-5
 - Add patch 0001-render-Fix-build-with-gcc-12.patch from Fedora 41 (License: MIT)
 - Add patch 0001-hw-Rename-boolean-config-value-field-from-bool-to-bo.patch from Fedora 41 (License: MIT)
