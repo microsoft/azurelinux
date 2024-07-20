@@ -12,7 +12,7 @@ Python and does not require any external libraries.
 Summary:        A Python library for symbolic mathematics
 Name:           sympy
 Version:        1.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 # The project as a whole is BSD-3-Clause.
 # The files in sympy/parsing/latex are MIT.
 License:        BSD-3-Clause AND MIT
@@ -37,8 +37,6 @@ BuildRequires:  python3-mpmath
 BuildRequires:  python3-numpy-f2py
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-#Test
-BuildRequires:  xorg-x11-server-Xvfb
 
 %description %{_description}
 
@@ -135,18 +133,6 @@ chmod 0755 %{buildroot}%{python3_sitelib}/sympy/benchmarks/bench_symbench.py \
 # Try to get rid of pyc files, which aren't useful for documentation
 find examples/ -name '*.py[co]' -print -delete
 
-%check
-# Many tests assume they are running on an x86_64 machine.  Some assume that
-# native 64-bit integers are available.  Some assume that 80-bit floating point
-# numbers are available.  Some assume that certain operations always produce
-# numpy float64 values (but produce float32 values on some architectures).  I
-# used to try to keep the test suite working on all architectures, but it has
-# become too much of a burden.  Only run tests if we happen to build on x86_64.
-# We cannot use %%ifarch here because this is a noarch package.
-if [ "$(uname -m)" = "x86_64" ]; then
-  xvfb-run -d %{python3} bin/test -v
-fi
-
 %files -n python3-%{name} -f %{pyproject_files}
 %doc AUTHORS README.md
 %{_bindir}/isympy
@@ -156,6 +142,9 @@ fi
 %doc examples/*
 
 %changelog
+* Thu Jul 18 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.12-2
+- Remove dependency to xorg-x11-server-Xvfb
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12-1
 - Auto-upgrade to 1.12 - Azure Linux 3.0 - package upgrades
 
