@@ -156,7 +156,7 @@ include $(SCRIPTS_DIR)/utils.mk
 # in a downstream image so that it has access to the repo at runtime.  The
 # DAILY_BUILD_REPO argument takes a path to the daily-mariner.repo file.
 # 
-# their pipelines on a daily basis. The repo file may be provisioned to their image \ 
+# their pipelines on a daily basis. The repo file may be provisioned to their image
 ifneq ($(DAILY_BUILD_ID),)
    ifneq ($(DAILY_BUILD_REPO),)
       $(error DAILY_BUILD_ID and DAILY_BUILD_REPO are mutually exclusive.)
