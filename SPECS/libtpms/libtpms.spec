@@ -38,6 +38,8 @@ Libtpms header files and documentation.
 %autosetup
 
 %build
+#echo "tpm12/tpm_daa.c:1428:16: error: explicitly assigning value of variable of type 'TPM_SIZED_BUFFER *' (aka 'struct tdTPM_SIZED_BUFFER *') to itself [-Werror,-Wself-assign]"
+export CFLAGS="%{build_cflags} -Wno-error=self-assign"
 NOCONFIGURE=1 ./autogen.sh
 %configure --disable-static --with-tpm2 --with-openssl
 %make_build

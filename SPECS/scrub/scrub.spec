@@ -23,6 +23,8 @@ the file system is full, then scrubbed as in 2).
 %setup -q
 
 %build
+# "genrand.c:109:13: error: non-void function 'genrandraw' should return a value [-Wreturn-type]"
+export CFLAGS="%{build_cflags} -Wno-error=return-type"
 %configure
 make %{?_smp_mflags}
 
