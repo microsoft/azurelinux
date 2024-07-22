@@ -922,7 +922,7 @@ func checkEnvironmentVars() error {
 
 	if envHome != rootHome || envUser != rootUser {
 		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
-			"HOME should be set to '%s' and USER should be set to '%s'",
+			"HOME must be set to '%s' and USER must be set to '%s'",
 			rootHome, rootUser)
 	}
 
