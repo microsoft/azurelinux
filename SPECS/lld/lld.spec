@@ -41,15 +41,17 @@ Shared libraries for LLD.
 %build
 mkdir -p build
 cd build
-%cmake ..                                                         \
+%cmake \
        -G Ninja                                                   \
        -DCMAKE_BUILD_TYPE=Release                                 \
+       -DLLVM_ENABLE_PROJECTS=lld                                 \
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
+       -DBUILD_SHARED_LIBS:BOOL=off                               \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
-       -Wno-dev ../lld
+       -Wno-dev ../llvm
 
 %ninja_build
 
@@ -63,8 +65,14 @@ cd build
 
 %files devel
 %{_includedir}/lld/
+%exclude %{_includedir}/llvm-c/
+%exclude %{_includedir}/llvm/
 %{_libdir}/cmake/lld/*.cmake
+%exclude %{_libdir}/cmake/llvm/*.cmake
+%exclude %{_libdir}/cmake/llvm/llvm-driver-template.cpp.in
 %{_libdir}/*.so
+%exclude %{_libdir}/*.a
+%exclude %{_datadir}/opt-viewer/*
 
 %files libs
 %license LICENSE.TXT

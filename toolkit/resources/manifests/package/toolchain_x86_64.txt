@@ -254,6 +254,10 @@ libxcrypt-devel-4.4.36-1.azl3.x86_64.rpm
 libxslt-1.1.39-1.azl3.x86_64.rpm
 libxslt-debuginfo-1.1.39-1.azl3.x86_64.rpm
 libxslt-devel-1.1.39-1.azl3.x86_64.rpm
+lld-18.1.2-2.azl3.x86_64.rpm
+lld-debuginfo-18.1.2-2.azl3.x86_64.rpm
+lld-devel-18.1.2-2.azl3.x86_64.rpm
+lld-libs-18.1.2-2.azl3.x86_64.rpm
 llvm-18.1.2-3.azl3.x86_64.rpm
 llvm-debuginfo-18.1.2-3.azl3.x86_64.rpm
 llvm-devel-18.1.2-3.azl3.x86_64.rpm

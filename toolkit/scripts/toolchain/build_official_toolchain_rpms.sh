@@ -739,8 +739,7 @@ build_rpm_in_chroot_no_install llvm
 chroot_and_install_rpms llvm
 build_rpm_in_chroot_no_install compiler-rt
 build_rpm_in_chroot_no_install clang
-# TODO: lld does not yet build
-#build_rpm_in_chroot_no_install lld
+build_rpm_in_chroot_no_install lld
 
 stop_record_timestamp "build packages"
 start_record_timestamp "finalize"
