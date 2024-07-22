@@ -230,6 +230,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}()
 
+	err = checkEnvironmentVars()
+	if err != nil {
+		return err
+	}
+
 	// ensure build and output folders are created up front
 	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
 	if err != nil {
@@ -896,4 +901,30 @@ func humanReadableUnitSizeAndName(size int64) (int64, string) {
 	default:
 		return 1, "B"
 	}
+}
+
+func checkEnvironmentVars() error {
+	// Some commands, like tdnf (and gpg), require the USER and HOME environment variables to make sense in the OS they
+	// are running under. Since the image customization tool is pretty much always run under root/sudo, this will
+	// generally always be the case since root is always a valid user. However, this might not be true if the user
+	// decides to use `sudo -E` instead of just `sudo`. So, check for this to avoid the user running into confusing
+	// tdnf errors.
+	//
+	// In an ideal world, the USER, HOME, and PATH environment variables should be overridden whenever an external
+	// command is called under chroot. But such a change would be quite involved.
+	const (
+		rootHome = "/root"
+		rootUser = "root"
+	)
+
+	envHome := os.Getenv("HOME")
+	envUser := os.Getenv("USER")
+
+	if envHome != rootHome || envUser != rootUser {
+		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
+			"HOME should be set to '%s' and USER should be set to '%s'",
+			rootHome, rootUser)
+	}
+
+	return nil
 }
