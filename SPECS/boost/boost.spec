@@ -70,8 +70,14 @@ conventional methods such as command-line and configuration file.
 %autosetup -n %{name}_%{underscore_version}
 
 %build
+%if "0%{?use_llvm_toolchain}" == "0"
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
 ./b2 %{?_smp_mflags} stage threading=multi
+%else
+./bootstrap.sh --prefix=%{buildroot}%{_prefix} --with-toolset=clang
+./b2 %{?_smp_mflags} stage threading=multi toolset=clang
+%endif
+
 
 %install
 ./b2 install threading=multi
