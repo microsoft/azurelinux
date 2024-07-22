@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -61,7 +62,11 @@ func main() {
 	if *summaryFile != "" {
 		logger.Log.Infof("Writing summary to file (%s)", *summaryFile)
 		resultsString := licensecheckformat.FormatResults(results, mode)
-		err := file.Write(resultsString, *summaryFile)
+		err := os.MkdirAll(filepath.Dir(*summaryFile), os.ModePerm)
+		if err != nil {
+			logger.Log.Fatalf("failed to create directory for results file. Error:\n%v", err)
+		}
+		err = file.Write(resultsString, *summaryFile)
 		if err != nil {
 			logger.Log.Fatalf("Failed to write summary to file:\n%v", err)
 		}
