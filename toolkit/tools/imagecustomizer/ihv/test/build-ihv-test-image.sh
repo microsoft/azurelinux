@@ -74,6 +74,7 @@ sudo docker run --rm \
         --build-dir /build \
         --output-image-format $finalOutputFormat \
         --output-image-file $finalOutputImage \
+        --rpm-source /ihv-artifacts/rpm-repo \
         --log-level $debugLevel
 
 sudo chown $USER:$USER $outDir/*

@@ -16,6 +16,7 @@ os:
     - squashfs-tools
     - tar
     - device-mapper
+    - ihv-driver-pkg
   additionalFiles:
     image-files/configs/machine-id:
     - path: /etc/machine-id
