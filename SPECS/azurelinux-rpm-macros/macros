@@ -39,6 +39,7 @@
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
 %{?use_llvm_toolchain:ln -svf /usr/bin/clang /usr/bin/cc}\
 %{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
+%{?use_llvm_toolchain:ln -svf /usr/bin/ld.lld /usr/bin/ld}\
 %{nil}
 
 # GCC toolchain
@@ -141,7 +142,7 @@
 %build_fflags %{optflags} -I%{_fmoddir}
 # Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
 # %%{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}} %{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -235,7 +236,7 @@ print(result)
 
 %_legacy_common_support 1
 # remove %{_hardened_cflags}
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -pipe -Wall %{!?use_llvm_toolchain:-Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches} %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig
