@@ -2455,7 +2455,8 @@
         "OpenMamba": {
             "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
-                "bash-completion"
+                "bash-completion",
+                "cpufrequtils"
             ]
         },
         "OpenSUSE": {

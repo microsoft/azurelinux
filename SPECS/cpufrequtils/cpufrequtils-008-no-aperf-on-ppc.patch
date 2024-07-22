@@ -1,0 +1,45 @@
+--- cpufrequtils-008/Makefile	2011-02-10 13:04:49.235589962 +0100
++++ cpufrequtils-008/Makefile.new	2011-02-10 13:08:00.481589942 +0100
+@@ -118,7 +118,7 @@
+ CPPFLAGS += -DVERSION=\"$(VERSION)\" -DPACKAGE=\"$(PACKAGE)\" \
+ 		-DPACKAGE_BUGREPORT=\"$(PACKAGE_BUGREPORT)\" -D_GNU_SOURCE
+ 
+-UTIL_SRC = 	utils/info.c utils/set.c utils/aperf.c utils/cpuid.h
++UTIL_SRC = 	utils/info.c utils/set.c 
+ LIB_HEADERS = 	lib/cpufreq.h lib/interfaces.h
+ LIB_SRC = 	lib/cpufreq.c
+ LIB_OBJS = 	lib/cpufreq.o
+@@ -199,7 +199,7 @@
+ 	$(QUIET) $(CC) $(CFLAGS) $(LDFLAGS) -L. -o $@ utils/$@.o -lcpufreq
+ 	$(QUIET) $(STRIPCMD) $@
+ 
+-utils: cpufreq-info cpufreq-set cpufreq-aperf
++utils: cpufreq-info cpufreq-set 
+ 
+ po/$(PACKAGE).pot: $(UTIL_SRC)
+ 	@xgettext --default-domain=$(PACKAGE) --add-comments \
+@@ -229,7 +229,7 @@
+ clean:
+ 	-find . \( -not -type d \) -and \( -name '*~' -o -name '*.[oas]' \) -type f -print \
+ 	 | xargs rm -f
+-	-rm -f cpufreq-info cpufreq-set cpufreq-aperf
++	-rm -f cpufreq-info cpufreq-set 
+ 	-rm -f libcpufreq.so*
+ 	-rm -f build/ccdv
+ 	-rm -rf po/*.gmo po/*.pot
+@@ -246,7 +246,6 @@
+ 	$(INSTALL) -d $(DESTDIR)${bindir}
+ 	$(INSTALL_PROGRAM) cpufreq-set $(DESTDIR)${bindir}/cpufreq-set
+ 	$(INSTALL_PROGRAM) cpufreq-info $(DESTDIR)${bindir}/cpufreq-info
+-	$(INSTALL_PROGRAM) cpufreq-aperf $(DESTDIR)${bindir}/cpufreq-aperf
+ 
+ install-man:
+ 	$(INSTALL_DATA) -D man/cpufreq-set.1 $(DESTDIR)${mandir}/man1/cpufreq-set.1
+@@ -270,7 +269,6 @@
+ 	- rm -f $(DESTDIR)${includedir}/cpufreq.h
+ 	- rm -f $(DESTDIR)${bindir}/cpufreq-set
+ 	- rm -f $(DESTDIR)${bindir}/cpufreq-info
+-	- rm -f $(DESTDIR)${bindir}/cpufreq-aperf
+ 	- rm -f $(DESTDIR)${mandir}/man1/cpufreq-set.1
+ 	- rm -f $(DESTDIR)${mandir}/man1/cpufreq-info.1
+ 	- for HLANG in $(LANGUAGES); do \
