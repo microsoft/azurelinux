@@ -35,7 +35,7 @@ Provides:       python%{python3_majmin}dist(setuptools) = %{version}-%{release}
 %description -n python3-setuptools %{_description}
 
 %prep
-%autosetup -n setuptools-%{version}
+%autosetup -p1 -n setuptools-%{version}
 
 %build
 pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
