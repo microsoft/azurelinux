@@ -131,8 +131,8 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.0-14
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.0-14
+- Bump release to rebuild with go 1.22.5
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-13
 - Bump release to rebuild with go 1.21.11

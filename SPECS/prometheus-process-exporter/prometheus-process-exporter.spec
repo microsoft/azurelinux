@@ -102,8 +102,8 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.7.10-21
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.7.10-21
+- Bump release to rebuild with go 1.22.5
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.10-20
 - Bump release to rebuild with go 1.21.11

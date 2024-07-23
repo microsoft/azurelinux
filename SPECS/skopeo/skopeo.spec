@@ -47,8 +47,8 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.14.2-6
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.14.2-6
+- Bump release to rebuild with go 1.22.5
 
 * Wed Jun 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-5
 - Bump release to rebuild with go 1.21.11

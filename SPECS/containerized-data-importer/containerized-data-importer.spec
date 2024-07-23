@@ -202,8 +202,8 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.55.0-20
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.55.0-20
+- Bump release to rebuild with go 1.22.5
 
 * Thu Jun 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.55.0-19
 - Address CVE-2024-3727 by patching vendored github.com/containers/image

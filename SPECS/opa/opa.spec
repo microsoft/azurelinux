@@ -54,8 +54,8 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.63.0-4
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.63.0-4
+- Bump release to rebuild with go 1.22.5
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-3
 - Bump release to rebuild with go 1.21.11

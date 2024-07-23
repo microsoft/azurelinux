@@ -68,8 +68,8 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.9.5-2
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.9.5-2
+- Bump release to rebuild with go 1.22.5
 
 * Mon Jul 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.9.5-1
 - Revert to version 1.9.5.

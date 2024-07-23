@@ -49,8 +49,8 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
-* Mon July 22 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.7.1-21
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 22 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 0.7.1-21
+- Bump release to rebuild with go 1.22.5
 
 * Mon Jul 15 2024 Cameron Baird <cameronbaird@microsoft.com> - 0.7.1-20
 - Address CVE-2021-43565 by patching vendored golang.org/x/crypto/ssh

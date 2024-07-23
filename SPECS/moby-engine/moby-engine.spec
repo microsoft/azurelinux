@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -122,8 +122,8 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 24.0.9-6
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 24.0.9-7
+- Bump release to rebuild with go 1.22.5
 
 * Tue Jun 25 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-6
 - Backport upstream change to search /usr/libexec for docker-proxy without daemon.json

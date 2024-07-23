@@ -103,8 +103,8 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 17.0.7-2
-- Bump release to rebuild with go 1.22.4
+* Mon Jul 8 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 17.0.7-2
+- Bump release to rebuild with go 1.22.5
 
 * Tue Jun 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 17.0.7-1
 - Bump version to 17.0.7 to address CVE-2024-32886
