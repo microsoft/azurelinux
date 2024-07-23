@@ -1,6 +1,6 @@
 Summary:        Internationalized Domain Names in Applications (IDNA).
 Name:           python-idna
-Version:        3.6
+Version:        3.7
 Release:        1%{?dist}
 License:        BSD-like
 Vendor:         Microsoft Corporation
@@ -57,6 +57,9 @@ pip3 install iniconfig
 %doc README.rst
 
 %changelog
+* Tue Jul 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7-1
+- Auto-upgrade to 3.7 - CVE-2024-3651
+
 * Mon Feb 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.6-1
 - Auto-upgrade to 3.6 - Azure Linux 3.0 - package upgrades
 - Replacing a lot of macros with %%pyproject...
