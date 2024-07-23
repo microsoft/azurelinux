@@ -22,7 +22,7 @@ BuildRequires:  tzdata
 BuildRequires:  zlib-devel
 BuildRequires:	systemd-devel
 BuildRequires:	systemd-rpm-macros
-
+#BuildRequires:	openssl-libs
 %if 0%{?with_check}
 BuildRequires:  sudo
 %endif
