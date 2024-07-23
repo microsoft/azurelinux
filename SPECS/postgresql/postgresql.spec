@@ -35,7 +35,7 @@ Requires:       openssl
 Requires:       readline
 Requires:       tzdata
 Requires:       zlib
-Requires:	libcrypto.so.3()(64bit)
+Requires:	openssl-libs
 %description
 PostgreSQL is an object-relational database management system.
 
@@ -107,7 +107,6 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %ldconfig_scriptlets
 %pre
-#postgres -D /usr/local/pgsql/data >logfile 2>&1 &
 
 if ! getent group postgres >/dev/null; then
     /sbin/groupadd -r postgres
@@ -118,35 +117,23 @@ if ! getent passwd postgres >/dev/null; then
 fi
 
 %post
-# mkdir -p /var/log/postgresql
- #mkdir -p /var/run/postgresql
-#if [ $1 -eq 1 ] ; then
- #   chown postgres:postgres /var/log/%{name}
-  #  chown postgres:postgres /var/run/%{name}
-#fi
 
-# Define the data directory
 PGDATA="/usr/local/pgsql/data"
 PGRUN="/run/postgresql"
 
-# Create the data directory if it doesn't exist
 if [ ! -d "$PGDATA" ]; then
     mkdir -p "$PGDATA"
     chown postgres:postgres "$PGDATA"
     sudo -u postgres /usr/bin/initdb -D "$PGDATA"
 fi
 
-# Set the correct permissions
 chown -R postgres:postgres "$PGDATA"
-# Create the runtime directory if it doesn't exist
+
 if [ ! -d "$PGRUN" ]; then
     mkdir -p "$PGRUN"
     chown postgres:postgres "$PGRUN"
     chmod 700 "$PGRUN"
 fi
-# Enable and start the PostgreSQL service
-#systemctl enable postgresql.service
-#systemctl start postgresql.service
 
 %systemd_post %{name}.service
 
