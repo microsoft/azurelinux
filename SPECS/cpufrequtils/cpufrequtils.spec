@@ -4,6 +4,8 @@ Version:        008
 Release:        5%{?dist}
 Group:          System Environment/Base
 License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://mirrors.edge.kernel.org/pub/linux/utils/kernel/cpufreq/
 Source:         https://mirrors.edge.kernel.org/pub/linux/utils/kernel/cpufreq/%{name}-%{version}.tar.gz
 Patch0:         disable-gsic.patch
