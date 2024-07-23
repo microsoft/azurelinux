@@ -13,7 +13,8 @@
 # We need to temporarily turn it off by disabling xsaves until the problem
 # is fixed on Azure. Since shadow stack depends on xsaves, disabling xsaves
 # ensures the feature bit for shadow stack is also turned off.
-%define cmdline console=ttyS0 noxsaves
+#%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 rd.break=pre-pivot noxsaves
+%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 noxsaves
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
@@ -64,6 +65,7 @@ install -vdm 700 %{buildroot}/boot
 install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
 install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
 ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
+
 
 %files
 /boot/vmlinuz-uki-%{kernelver}.efi

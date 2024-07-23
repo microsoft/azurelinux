@@ -17,12 +17,12 @@
                         "boot"
                     ],
                     "Start": 1,
-                    "End": 9,
+                    "End": 109,
                     "FsType": "fat32"
                 },
                 {
                     "ID": "rootfs",
-                    "Start": 9,
+                    "Start": 109,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -45,7 +45,10 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/azurecoal-packages.json"
+                "packagelists/hyperv-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
