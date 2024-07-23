@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Patch0:         cgi3.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
 Patch1:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
+Patch2:         CVE-2024-0397.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
@@ -161,6 +162,7 @@ The test package contains all regression tests for Python as well as the modules
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -316,8 +318,11 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon Jul 22 2024 Sindhu Karri <lakarri@microsoft.com> - 3.9.19-2
+* Mon Jul 22 2024 Sindhu Karri <lakarri@microsoft.com> - 3.9.19-3
 - Patch for CVE-2024-6345
+
+* Tue Jul 23 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.9.19-2
+- Patch for CVE-2024-0397
 
 * Fri Mar 22 2024 Binu Philip <bphilip@microsoft.com> - 3.9.19-1
 - Upgrade to python 3.9.19 for CVE-2023-6597 and other security fixes
