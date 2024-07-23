@@ -607,7 +607,7 @@
                 "libdbi",
                 "libdbusmenu",
                 "libdc1394",
-		"libdecor",
+                "libdecor",
                 "libdeflate",
                 "libdmx",
                 "libdnf",
@@ -618,7 +618,7 @@
                 "libeasyfc",
                 "libecap",
                 "libecb",
-		"libei",
+                "libei",
                 "libell",
                 "libEMF",
                 "libeot",
@@ -804,7 +804,7 @@
                 "libXcomposite",
                 "libxcrypt",
                 "libXcursor",
-		"libxcvt",
+                "libxcvt",
                 "libXdamage",
                 "libXdmcp",
                 "libXext",
@@ -2455,8 +2455,7 @@
         "OpenMamba": {
             "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
-                "bash-completion",
-                "cpufrequtils"
+                "bash-completion"
             ]
         },
         "OpenSUSE": {
