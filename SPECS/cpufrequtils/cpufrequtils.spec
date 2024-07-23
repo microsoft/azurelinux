@@ -10,7 +10,7 @@ Patch0:         disable-gsic.patch
 Patch1:         cpufrequtils-multilib.patch
 Patch2:         cpufrequtils-008-aperf-32bit.patch
 Patch50:        cpufrequtils-008-no-aperf-on-ppc.patch
-BuildRequires:  libsysfs-devel
+BuildRequires:  sysfsutils
 BuildRequires:  gettext
 # pulls in automake and autoconf
 BuildRequires:  libtool
