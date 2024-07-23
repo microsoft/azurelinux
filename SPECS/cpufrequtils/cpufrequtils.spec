@@ -33,11 +33,11 @@ The cpufrequtils development files.
  
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1 -b .aperf-32bit
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1 -b .aperf-32bit
 %ifarch ppc ppc64
-%patch50 -p1 -b .no-aperf-on-ppc
+%patch 50 -p1 -b .no-aperf-on-ppc
 %endif
  
 %build
@@ -155,10 +155,10 @@ chmod -R a-s %{buildroot}
 * Tue Jul 11 2006 Karsten Hopp <karsten@redhat.de>
 - buildrequire libsysfs-devel
  
-* Wed Jul  9 2006 Dave Jones <davej@redhat.com>
+* Sun Jul 9 2006 Dave Jones <davej@redhat.com>
 - Rebuild against new libsysfs
  
-* Wed Jun  7 2006 Dave Jones <davej@redhat.com>
+* Wed Jun 7 2006 Dave Jones <davej@redhat.com>
 - Upstream -002 release.
  
 * Sat Feb 11 2006 Dave Jones <davej@redhat.com>
