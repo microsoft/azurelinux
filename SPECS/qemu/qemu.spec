@@ -36,9 +36,9 @@
 %global have_usbredir 1
 %global enable_werror 0
 %global have_edk2 0
-%ifarch %{ix86} x86_64 %{arm} aarch64
-%global have_edk2 1
-%endif
+# edk2 is built according to its spec: ExclusiveArch: x86_64 
+# ovmf is needed for supported arch though, introduce have_edk2_ovmf
+%global have_edk2_ovmf 1
 %global have_pmem 0
 %ifarch x86_64
 %global have_pmem 1
@@ -927,7 +927,7 @@ Requires:       %{name}-common = %{version}-%{release}
 Requires:       seabios-bin
 Requires:       seavgabios-bin
 Requires:       sgabios-bin
-%if %{have_edk2}
+%if %{have_edk2_ovmf}
 Requires:       edk2-ovmf
 %endif
 Requires:       %{name}-ipxe = %{version}-%{release}
