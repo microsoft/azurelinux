@@ -1,6 +1,6 @@
 Name:           sysfsutils
 Version:        2.1.0
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        Utilities for interfacing with sysfs
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %changelog
+* Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.1.0-30
+- Promoting package from SPECS-EXTENDED to SPECS
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified

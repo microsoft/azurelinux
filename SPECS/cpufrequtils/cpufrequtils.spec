@@ -94,9 +94,8 @@ chmod -R a-s %{buildroot}
 %{_includedir}/cpufreq.h
  
 %changelog
-
 * Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 008-5
-- Initial Azure Linux import from Fedora (replace_with_fedora_version)
+- Initial Azure Linux import from Fedora 16 (license: MIT).
 - License verified
 
 * Fri Feb 25 2011 Petr Sabata <psabata@redhat.com> - 008-5
