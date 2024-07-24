@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        16.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,7 @@ BuildRequires:  tzdata
 BuildRequires:  zlib-devel
 BuildRequires:	systemd-devel
 BuildRequires:	systemd-rpm-macros
-#BuildRequires:	openssl-libs
+
 %if 0%{?with_check}
 BuildRequires:  sudo
 %endif
@@ -227,6 +227,9 @@ fi
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed July 24 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.3-2
+- Added systemd service, installation path, %pre %post and %postun required for the service 
+ 
 * Mon May 20 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 16.3-1
 - Upgrade to version 16.3 to fix CVE-2024-4317
 
