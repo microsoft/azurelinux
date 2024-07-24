@@ -47,19 +47,22 @@ popd
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build package-confpods
+OS_VERSION=2.0 %make_build package-confpods
 popd
 
 %define kata_path     /opt/confidential-containers
-%define osbuilder     %{kata_path}/uvm
 %define kata_bin      %{kata_path}/bin
 %define kata_shim_bin %{_prefix}/local/bin
 %define defaults_kata %{kata_path}/share/defaults/kata-containers
+%define tools_pkg     %{kata_path}/uvm
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-confpods-package
+PREFIX=%{buildroot} %make_build deploy-confpods-package-tools
 popd
+
+###CONTINUE
 
 mkdir -p %{buildroot}%{osbuilder}
 mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
@@ -135,53 +138,53 @@ popd
 #%doc README.md
 
 %files tools
-%dir %{osbuilder}
-%dir %{osbuilder}/tools
-%dir %{osbuilder}/tools/osbuilder
-%{osbuilder}/tools/osbuilder/Makefile
+%dir %{tools_pkg}
+%dir %{tools_pkg}/tools
+%dir %{tools_pkg}/tools/osbuilder
+%{tools_pkg}/tools/osbuilder/Makefile
 
-%dir %{osbuilder}/src
-%dir %{osbuilder}/src/kata-opa
-%{osbuilder}/src/kata-opa/allow-all.rego
-%{osbuilder}/src/kata-opa/allow-set-policy.rego
-%dir %{osbuilder}/src/tarfs
-%{osbuilder}/src/tarfs/Makefile
-%{osbuilder}/src/tarfs/tarfs.c
+%dir %{tools_pkg}/src
+%dir %{tools_pkg}/src/kata-opa
+%{tools_pkg}/src/kata-opa/allow-all.rego
+%{tools_pkg}/src/kata-opa/allow-set-policy.rego
+%dir %{tools_pkg}/src/tarfs
+%{tools_pkg}/src/tarfs/Makefile
+%{tools_pkg}/src/tarfs/tarfs.c
 
-%dir %{osbuilder}/tools/osbuilder/scripts
-%{osbuilder}/tools/osbuilder/scripts/lib.sh
+%dir %{tools_pkg}/tools/osbuilder/scripts
+%{tools_pkg}/tools/osbuilder/scripts/lib.sh
 
-%dir %{osbuilder}/tools/osbuilder/rootfs-builder
-%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
-%dir %{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
-%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
-%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
+%dir %{tools_pkg}/tools/osbuilder/rootfs-builder
+%{tools_pkg}/tools/osbuilder/rootfs-builder/rootfs.sh
+%dir %{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner
+%{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
+%{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
 
-%dir %{osbuilder}/tools/osbuilder/image-builder
-%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
+%dir %{tools_pkg}/tools/osbuilder/image-builder
+%{tools_pkg}/tools/osbuilder/image-builder/image_builder.sh
 
-%dir %{osbuilder}/tools/osbuilder/igvm-builder
-%{osbuilder}/tools/osbuilder/igvm-builder/igvm_builder.sh
-%dir %{osbuilder}/tools/osbuilder/igvm-builder/azure-linux
-%{osbuilder}/tools/osbuilder/igvm-builder/azure-linux/config.sh
-%{osbuilder}/tools/osbuilder/igvm-builder/azure-linux/igvm_lib.sh
+%dir %{tools_pkg}/tools/osbuilder/igvm-builder
+%{tools_pkg}/tools/osbuilder/igvm-builder/igvm_builder.sh
+%dir %{tools_pkg}/tools/osbuilder/igvm-builder/azure-linux
+%{tools_pkg}/tools/osbuilder/igvm-builder/azure-linux/config.sh
+%{tools_pkg}/tools/osbuilder/igvm-builder/azure-linux/igvm_lib.sh
 
-%dir %{osbuilder}/tools/osbuilder/node-builder
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
+%dir %{tools_pkg}/tools/osbuilder/node-builder
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/Makefile
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/clean.sh
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/common.sh
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
 
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd
-%dir %{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
-%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd
+%dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
