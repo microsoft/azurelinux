@@ -36,6 +36,9 @@
 %global have_usbredir 1
 %global enable_werror 0
 %global have_edk2 0
+%ifarch %{ix86} x86_64 %{arm} aarch64
+%global have_edk2 1
+%endif
 %global have_pmem 0
 %ifarch x86_64
 %global have_pmem 1
