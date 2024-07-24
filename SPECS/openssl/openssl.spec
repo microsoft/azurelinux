@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,7 @@ Patch39:        openssl-1.1.1-add-null-checks-where-contentinfo-data-can-be-null
 Patch40:        openssl-1.1.1-Fix-unconstrained-session-cache-growth-in-TLSv1.3.patch
 Patch41:        openssl-1.1.1-pkcs1-implicit-rejection.patch
 Patch42:        openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
+Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failure.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -178,6 +179,7 @@ cp %{SOURCE4} test/
 %patch40 -p1
 %patch41 -p1
 %patch42 -p1
+%patch43 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -367,6 +369,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Tue Jul 16 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-33
+- Fix intermittent FIPS selftest failures in jitterentropy module
+
 * Tue Jun 04 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-32
 - Only free the read buffers if we're not using them
 
