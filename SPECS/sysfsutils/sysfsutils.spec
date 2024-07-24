@@ -77,6 +77,7 @@ find %{buildroot} -type f -name "*.la" -delete
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

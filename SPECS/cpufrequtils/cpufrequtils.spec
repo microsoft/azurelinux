@@ -96,7 +96,8 @@ chmod -R a-s %{buildroot}
 %changelog
 
 * Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 008-5
-- Onboarding package to azurelinux
+- Initial Azure Linux import from Fedora (replace_with_fedora_version)
+- License verified
 
 * Fri Feb 25 2011 Petr Sabata <psabata@redhat.com> - 008-5
 - Build with DEBUG=true to avoid stripping
