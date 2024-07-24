@@ -38,7 +38,7 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 %py3_install
 
 %check
-%python3 setup.py test
+%python3 setup.cfg test
 
 %files -n python3-idna
 %defattr(-,root,root,-)
