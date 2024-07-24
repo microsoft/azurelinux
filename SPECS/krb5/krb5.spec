@@ -3,8 +3,8 @@
 
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.19.4
-Release:        2%{?dist}
+Version:        1.21.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,6 +127,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed Jul 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.3-1
+- Auto-upgrade to 1.21.3 - CVE-2024-37371, CVE-2024-37370
+
 * Mon Aug 21 2023 Tobias Brick <tobiasb@microsoft.com> - 1.19.4-2
 - Add patch for CVE-2023-36054
 
