@@ -90,7 +90,6 @@ cd contrib && make %{?_smp_mflags}
 %install
 make install DESTDIR=%{buildroot}
 cd contrib && make install DESTDIR=%{buildroot}
-#mkdir -p /usr/local/pgsql/data
 install -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
 # For postgresql 10+, commands are renamed
@@ -227,7 +226,7 @@ fi
 %{_libdir}/libpgtypes.a
 
 %changelog
-* Wed July 24 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.3-2
+* Wed Jul 24 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.3-2
 - Added systemd service, installation path, %pre %post and %postun required for the service 
  
 * Mon May 20 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 16.3-1
