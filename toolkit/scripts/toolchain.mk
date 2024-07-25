@@ -65,6 +65,7 @@ clean-toolchain: clean-toolchain-rpms
 	rm -rf $(toolchain_logs_dir)
 	rm -rf $(toolchain_from_repos)
 	rm -rf $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
+	rm -rf $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag
 	rm -f $(SCRIPTS_DIR)/toolchain/container/toolchain-local-wget-list
 	rm -f $(SCRIPTS_DIR)/toolchain/container/texinfo-perl-fix.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/Awt_build_headless_only.patch
@@ -84,6 +85,13 @@ clean-toolchain-containers:
 clean-toolchain-rpms:
 	@for f in $(toolchain_out_rpms); do rm -vf $$f; done
 	rm -rvf $(TOOLCHAIN_RPMS_DIR)
+
+# We need to clear the toolchain if we are using a daily build. The filenames will all be the same, but the actual
+# .rpm files may be fundamentally different.
+$(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag
+	@echo "Daily build ID changed, sanitizing toolchain"
+	rm -rf $(TOOLCHAIN_RPMS_DIR)
+	touch $@
 
 copy-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done

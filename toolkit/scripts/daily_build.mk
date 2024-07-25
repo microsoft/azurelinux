@@ -76,3 +76,17 @@ ifneq ($(DAILY_BUILD_REPO),)
    override SRPM_URL_LIST     += $(PACKAGE_ROOT)/SRPMS
    override REPO_LIST         += $(DAILY_BUILD_REPO)
 endif
+
+# This does not use $(depend_DAILY_BUILD_ID) because that mechanism will not detect the conversion of "lkg" to a
+# specific daily build ID since utils.mk runs before daily_build.mk.
+.PHONY: daily_build_id_always_run_phony
+$(STATUS_FLAGS_DIR)/daily_build_id.flag: daily_build_id_always_run_phony
+	@if [ ! -f $@ ]; then \
+		echo "Initializing daily build ID sanitization"; \
+		touch $@; \
+	fi && \
+	if [ "$$(cat $@)" = "$(DAILY_BUILD_ID)" ]; then \
+		exit 0; \
+	fi && \
+	echo "#### Daily build ID changed ('$$(cat $@)' -> '$(DAILY_BUILD_ID)') ####" && \
+	echo $(DAILY_BUILD_ID) > $@
