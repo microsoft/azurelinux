@@ -1,14 +1,14 @@
 {
  "Signatures": {
-  "30-edk2-ovmf-4m-qcow2-x64-sb-enrolled.json": "827c542dee2906d261c92c19f390637c1e653165d6a920c45651edd68e7fffd0",
+  "30-edk2-ovmf-4m-qcow2-x64-sb-enrolled.json": "cdbb500dbfbf2f18f82585986e0240f219e3a47e3d9d65f247a3481d9ded2685",
   "30-edk2-ovmf-ia32-sb-enrolled.json": "8ce4600fd84968adca9d037df9531d34ce455ad566d4691d256d370acc86120d",
   "31-edk2-ovmf-2m-raw-x64-sb-enrolled.json": "e0237cf4909d129324953bd854caf79136065402a30d363f13e594fd0e493bcf",
-  "40-edk2-ovmf-4m-qcow2-x64-sb.json": "52ad30099a600dc9d03d60557a94e8c5459cd72124445109287ebf6971b879a1",
+  "40-edk2-ovmf-4m-qcow2-x64-sb.json": "566c544ce5e3b6b7052fdb87d69e90e9e10e0cde9a0f276c26e0106189c5a159",
   "40-edk2-ovmf-ia32-sb.json": "de562405d0f9a9400eb58239e10753455216196dface2631858bcf1a3c886ac7",
   "41-edk2-ovmf-2m-raw-x64-sb.json": "c9c505b6308af28f29c16b4108f7f295408f975a47c94fb7aef523cb2a999d8e",
   "50-edk2-aarch64-qcow2.json": "a62d1c8b3801a33d670863fd4824252f65b93b64af8e5fd8908e6e09d8d5db99",
   "50-edk2-arm-verbose.json": "8805fce3e313705b7b43be6f2601776871c35bac0914fa05c34d09c929044253",
-  "50-edk2-ovmf-4m-qcow2-x64-nosb.json": "a97c1339a837d106ccb25132a68cdeaf13f2b7cff3d4c7411ce4457e75b68278",
+  "50-edk2-ovmf-4m-qcow2-x64-nosb.json": "5758a4feb7b3763315365f3592efa099265b8db1dbb060e90dbb64223168624d",
   "50-edk2-ovmf-ia32-nosb.json": "b360162bd55df3b1cb4bfa8d0b7c2b46a7c7b492aabf6d0d57c3dbf3d8c7fd10",
   "50-edk2-ovmf-x64-microvm.json": "5136200cd26eff9387259b1ca0f352b64298283f990277ac7a1b7a94d87baa27",
   "51-edk2-aarch64-raw.json": "7523b4dc263748fc8bee26e763aa94463222a8d2e8b738fdbde0d2b263ad562d",
