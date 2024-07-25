@@ -3,48 +3,45 @@
 %define local_n_release 1
 %define local_srcui_release 1
 
-%define srcdir cassandra-%{name}-%{version}
-%define bower_components reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
-%define srcui_node_modules reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
-%define bower_cache reaper-bower-cache-%{version}.tar.gz
-%define maven_cache reaper-m2-cache-%{version}.tar.gz
-%define npm_cache reaper-npm-cache-%{version}.tar.gz
-%define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
-%define local_n reaper-local-n-%{version}-%{local_n_release}.tar.gz
-
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz
-# Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
+# Building reaper from sources downloads artifacts related to maven/node/etc.
+# These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
 # NOTE: USE "reaper_build_caches.sh" TO RE-GENERATE BUILD CACHES.
-Source1:        %{bower_components}
+Source1:        reaper-bower-components-%{version}-%{local_srcui_release}.tar.gz
 # node_modules downloaded under src/ui
-Source2:        %{srcui_node_modules}
-# bower cache
-Source3:        %{bower_cache}
+Source2:        reaper-srcui-node-modules-%{version}-%{local_srcui_release}.tar.gz
 # m2 cache
-Source4:        %{maven_cache}
-# npm cache
-Source5:        %{npm_cache}
+Source4:        reaper-m2-cache-%{version}.tar.gz
 # node_modules downloaded to /usr/local/lib
-Source6:        %{local_lib_node_modules}
+Source6:        reaper-local-lib-node-modules-%{version}.tar.gz
 # v14.18.0 node binary under /usr/local
-Source7:        %{local_n}
+Source7:        reaper-local-n-%{version}-%{local_n_release}.tar.gz
+# Patches the src/ui/node_modules/ws/lib/websocket-server.js file, which comes
+# from the "reaper-srcui-node-modules*" tarball.
+# The src/ui/node_modules/ws/package.json file suggest we're on the
+# 6.x version of "ws". Patch for this version taken from here:
+# https://github.com/websockets/ws/commit/eeb76d313e2a00dd5247ca3597bba7877d064a63
+Patch0:         CVE-2024-37890.patch
+Patch1:         CVE-2023-42282.patch
+Patch2:         CVE-2017-18214.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
 BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
+BuildRequires:  rsync
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  openssl-devel
 Requires:       msopenjdk-11
@@ -58,22 +55,15 @@ ExclusiveArch:  x86_64
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%setup -q -n %{srcdir}
+%autosetup -N -n cassandra-%{name}-%{version}
 
-%build
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
+echo "Installing bower_components and npm_modules caches."
+for source in "%{SOURCE1}" "%{SOURCE2}"; do
+    tar -C src/ui -xf "$source"
+done
 
-pushd "$HOME"
-echo "Installing bower cache."
-tar xf %{SOURCE3}
-
-echo "Installing m2 cache."
-tar xf %{SOURCE4}
-
-echo "Installing npm cache"
-tar xf %{SOURCE5}
-popd
+echo "Installing the m2 cache."
+tar -C "$HOME" -xf "%{SOURCE4}"
 
 # Reaper build fails when trying to install node-sass@4.9.0/node-gyp@3.8.0 and build node native addons using mariner default node@16.14.2/npm@8.5.0.
 # ERROR:
@@ -82,33 +72,35 @@ popd
 # There is no way to remove node-sass dependency from builds, hence we need to install local node/npm and caches to be able to build reaper.
 # NOTE: This issue was also faced on Fedora Fc37 when trying to build reaper.
 # NOTE: node-sass seems to be deprecated, the spec and build process will be modified once reaper removes its dependencies as well.
-pushd %{_prefix}/local
+
+# Extracting to intermediate folder to apply patch.
+tmp_local_dir=tmp_local
+mkdir -p $tmp_local_dir/{bin,lib}
+pushd $tmp_local_dir
 echo "Installing node_modules"
-tar xf %{SOURCE6} -C ./lib/
+tar -C ./lib/ -xf %{SOURCE6}
 
 echo "Installing n version 14.18.0"
-tar xf %{SOURCE7}
+tar -xf %{SOURCE7}
 
 echo "Creating symlinks under local/bin"
-cd ./bin
-ln -sf ../lib/node_modules/bower/bin/bower bower
-ln -sf ../lib/node_modules/npm/bin/npm-cli.js npm
-ln -sf ../lib/node_modules/npm/bin/npx-cli.js npx
+ln -sf ../lib/node_modules/bower/bin/bower bin/bower
+ln -sf ../lib/node_modules/npm/bin/npm-cli.js bin/npm
+ln -sf ../lib/node_modules/npm/bin/npx-cli.js bin/npx
 
-cp ../n/versions/node/14.18.0/bin/node .
+cp n/versions/node/14.18.0/bin/node bin
 
 ls -al
 popd
 
-cd %{_builddir}/%{srcdir}
-echo "Installing src caches"
-pushd ./src/ui
-echo "Installing bower_components"
-tar xf %{SOURCE1}
+%autopatch -p1
 
-echo "Installing npm_modules"
-tar fx %{SOURCE2}
-popd
+rsync -azvhr $tmp_local_dir/ "%{_prefix}/local"
+rm -rf $tmp_local_dir
+
+%build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
 
 # Building using maven in offline mode.
 mvn -DskipTests package -o
@@ -122,7 +114,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
 mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_datadir}/licenses/%{name}
-cd %{_builddir}/%{srcdir}/src/packaging
+
+pushd src/packaging
 
 cp resource/cassandra-reaper.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/
 cp resource/cassandra-reaper*.yaml %{buildroot}%{_sysconfdir}/cassandra-%{name}/configs
@@ -139,7 +132,7 @@ cp debian/cassandra-%{name}.new.service %{buildroot}/%{_unitdir}/cassandra-%{nam
 chmod 0644 %{buildroot}/%{_unitdir}/cassandra-%{name}.service
 chmod 7555 %{buildroot}%{_sysconfdir}/init.d/cassandra-%{name}
 
-cp %{_builddir}/%{srcdir}/LICENSE.txt %{buildroot}%{_datadir}/licenses/%{name}
+popd
 
 %pre
 getent group reaper > /dev/null || groupadd -r reaper
@@ -178,6 +171,9 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-10
+- Patching CVE-2024-37890, CVE-2023-42282, and CVE-2017-18214.
+
 * Thu May 23 2024 Archana Choudhary <archana1@microsoft.com> - 3.1.1-9
 - Repackage and update src/ui node modules and bower components to 3.1.1-1
 - Address CVE-2024-4068 by upgrading the version of the npm module "braces" to 3.0.3

@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.24.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +28,7 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        azure-storage-%{name}-%{version}-vendor.tar.gz
 
-BuildRequires:  golang >= 1.19
+BuildRequires:  golang
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -63,6 +63,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 10.24.0-3
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.24.0-2
 - Bump release to rebuild with go 1.21.11
 

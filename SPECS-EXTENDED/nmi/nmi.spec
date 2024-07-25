@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.17
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         modify-go-build-option.patch
 Patch1:         CVE-2023-45288.patch
-BuildRequires:  golang >= 1.15
+BuildRequires:  golang
 
 %description
 NMI is the resource that is used when your pods look to use their identity.
@@ -62,6 +62,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.8.17-4
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.17-3
 - Bump release to rebuild with go 1.21.11
 

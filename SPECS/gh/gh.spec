@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 # Available upstream in 2.16.0
 Patch0:         fix-relative-time-search-tests.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -72,6 +72,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-19
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-18
 - Bump release to rebuild with go 1.21.11
 
