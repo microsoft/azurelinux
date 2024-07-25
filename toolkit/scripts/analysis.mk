@@ -5,8 +5,11 @@
 #	- Generate list of built packages
 #	- Run check for ABI changes of built packages.
 #	- Run check for .so files version change of built packages.
+#	- Validate package licenses
 
 # Requires DNF on Azure Linux / yum and yum-utils on Ubuntu.
+
+######## SODIFF and BUILD SUMMARY ########
 
 # A folder with sodiff-related artifacts
 SODIFF_OUTPUT_FOLDER=$(BUILD_DIR)/sodiff
@@ -86,3 +89,55 @@ sodiff-check: $(BUILT_PACKAGES_FILE) | $(SODIFF_REPO_FILE)
 	<$(BUILT_PACKAGES_FILE) $(SODIFF_SCRIPT) $(RPMS_DIR)/ $(SODIFF_REPO_FILE) $(RELEASE_MAJOR_ID) $(SODIFF_OUTPUT_FOLDER)
 
 package-toolkit: $(SODIFF_REPO_FILE)
+
+######## LICENSE CHECK ########
+
+license_check_build_dir   = $(BUILD_DIR)/license_check_tool
+license_out_dir           = $(OUT_DIR)/license_check
+license_results_file_pkg  = $(license_out_dir)/license_check_results_pkg.json
+license_summary           = $(license_check_build_dir)/license_check_summary.txt
+
+.PHONY: license-check license-check-pkg license-check-img clean-license-check
+
+clean: clean-license-check
+clean-license-check:
+	@echo Verifying no mountpoints present in $(license_check_build_dir)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(license_check_build_dir)" && \
+	rm -rf $(license_check_build_dir) && \
+	rm -rf $(license_out_dir)
+
+license_check_common_deps = $(go-licensecheck) $(chroot_worker) $(LICENSE_CHECK_EXCEPTION_FILE) $(LICENSE_CHECK_NAME_FILE) $(depend_LICENSE_CHECK_MODE)
+# licensecheck-command: Helper function to run licensecheck with the given parameters.
+# $(1): List of directories to check for licenses.
+# $(2): (optional)Results .json file
+# $(3): (optional)Results summary .txt file
+# $(4): Log file
+
+define licensecheck-command
+	$(go-licensecheck) \
+		$(foreach license_dir, $(1),--rpm-dirs="$(license_dir)" ) \
+		--exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
+		--name-file="$(LICENSE_CHECK_NAME_FILE)" \
+		--worker-tar="$(chroot_worker)" \
+		--build-dir="$(license_check_build_dir)" \
+		--dist-tag=$(DIST_TAG) \
+		--mode="$(LICENSE_CHECK_MODE)" \
+		$(if $(2),--results-file="$(2)") \
+		$(if $(3),--summary-file="$(3)") \
+		--log-file=$(4) \
+		--log-level=$(LOG_LEVEL)
+endef
+
+##help:target:license-check=Validate all packages in any of LICENSE_CHECK_DIRS for license compliance.
+license-check: $(license_check_common_deps)
+	$(if $(LICENSE_CHECK_DIRS),,$(error Must set LICENSE_CHECK_DIRS=))
+	$(call licensecheck-command,$(LICENSE_CHECK_DIRS),$(license_results_file_pkg),$(license_summary),$(LOGS_DIR)/licensecheck/license-check-manual.log)
+
+##help:target:license-check-pkg=Validate all packages in $(RPMS_DIR) for license compliance, building packages as needed.
+license-check-pkg: $(license_check_common_deps) $(RPMS_DIR)
+	$(call licensecheck-command,$(RPMS_DIR),$(license_results_file_pkg),$(license_summary),$(LOGS_DIR)/licensecheck/license-check-pkg.log)
+
+##help:target:license-check-img=Validate all packages needed for an image for license compliance. Must set CONFIG_FILE=<path_to_config>.
+license-check-img: $(license_results_file_img)
+$(license_results_file_img): $(license_check_common_deps) $(image_package_cache_summary)
+	$(call licensecheck-command,$(local_and_external_rpm_cache),$(license_results_file_img),$(license_summary),$(LOGS_DIR)/licensecheck/license-check-img.log)
