@@ -353,7 +353,7 @@ The `REPO_LIST` variable supports multiple repo files, and they are prioritized 
 The Azure Linux base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
-Daily build packages are avialable via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg`, or `DAILY_BUILD_ID=V-v-YYYYMMDD`.
+Daily build packages are available via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg`, or `DAILY_BUILD_ID=V-v-YYYYMMDD`.
 
 ### Authentication
 
@@ -466,7 +466,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used. `DAILY_BUILD_ID=...` will
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will unconditionally append the distro's preview repos to what ever set of URLs is being used. `DAILY_BUILD_ID=...` will
 also augment the URL list.
 
 #### `SRPM_URL_LIST=...`
@@ -482,7 +482,7 @@ also augment the URL list.
 > - `mariner-ms-non-oss.repo` and `mariner-ms-non-oss-preview.repo` - Azure Linux repository containing Microsoft non open Source RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
 
-`DAILY_BUILD_ID` and `DAILY_BUILD_REPO` will automiatically augment the `REPO_LIST`.
+`DAILY_BUILD_ID` and `DAILY_BUILD_REPO` will automatically augment the `REPO_LIST`.
 
 #### Build Enable/Disable Flags
 

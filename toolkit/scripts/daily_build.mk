@@ -4,7 +4,7 @@
 # Contains:
 #	- Configuration for getting daily build packages
 
-# DAILY_BUILD_ID and DAILY_BUILD REPO while similar are mutually exclusive.
+# DAILY_BUILD_ID and DAILY_BUILD_REPO while similar are mutually exclusive.
 #
 # DAILY_BUILD_ID is points the build tools to the latest daily built
 # packages as part of a tight local workflow.  The DAILY_BUILD_ID argument
@@ -17,8 +17,6 @@
 # Azure Linux Team's daily artifact feed.  The repo file may be provisioned
 # in a downstream image so that it has access to the repo at runtime.  The
 # DAILY_BUILD_REPO argument takes a path to the daily-mariner.repo file.
-#
-# their pipelines on a daily basis. The repo file may be provisioned to their image
 
 ##help:var:DAILY_BUILD_ID:{'lkg',<build_id>}='lkg' will auto select latest daily build repo. An explicit ID of the form 'V-v-YYYYMMDD' where V-v is the Major-Minor branch is also supported.
 DAILY_BUILD_ID ?=
