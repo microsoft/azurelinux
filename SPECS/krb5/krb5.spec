@@ -12,7 +12,6 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 Source1:        krb5.conf
-Patch0:         CVE-2023-36054.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
