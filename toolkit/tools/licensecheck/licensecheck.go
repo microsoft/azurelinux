@@ -43,9 +43,6 @@ func main() {
 	logger.InitBestEffort(logFlags)
 
 	mode := licensecheck.LicenseCheckMode(*mode)
-	if !licensecheck.IsValidLicenseCheckMode(mode) {
-		logger.Log.Fatalf("Invalid license check mode (%s)", mode)
-	}
 
 	results, numFailures, numWarnings := scanDirectories(*rpmDirs, *buildDirPath, *workerTar, *nameFile, *exceptionFile, *distTag, mode)
 
