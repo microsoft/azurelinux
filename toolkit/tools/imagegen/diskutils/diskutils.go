@@ -554,7 +554,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		// Partition label.
 		if partition.Name == "" {
 			// Since parted is a scripting language, you have to specify "" to represent an empty string.
-			mkpartArgs = append(mkpartArgs, "\"\"")
+			mkpartArgs = append(mkpartArgs, `""`)
 		} else {
 			mkpartArgs = append(mkpartArgs, partition.Name)
 		}
