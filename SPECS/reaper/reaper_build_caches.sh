@@ -24,9 +24,7 @@ SOURCE_URL="https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/
 # Build cache names
 BOWER_COMPONENTS="reaper-bower-components-${VERSION}.tar.gz"
 SRC_UI_NODE_MODULES="reaper-srcui-node-modules-${VERSION}.tar.gz"
-BOWER_CACHE="reaper-bower-cache-${VERSION}.tar.gz"
 MAVEN_CACHE="reaper-m2-cache-${VERSION}.tar.gz"
-NPM_CACHE="reaper-npm-cache-${VERSION}.tar.gz"
 LOCAL_LIB_NODE_MODULES="reaper-local-lib-node-modules-${VERSION}.tar.gz"
 LOCAL_N="reaper-local-n-${VERSION}.tar.gz"
 
@@ -103,17 +101,10 @@ function buildReaperSources {
 function createCacheTars {
 	echo "Creating build caches."
 	pushd ${homeCacheDir}
-	echo "creating bower_cache tar..."
-	tar -cf ${BOWER_CACHE} .cache
-	mv ${BOWER_CACHE} ${reaperCacheDir}
 
 	echo "creating maven_cache tar..."
 	tar -cf ${MAVEN_CACHE} .m2
 	mv ${MAVEN_CACHE} ${reaperCacheDir}
-
-	echo "creating npm_cache tar..."
-	tar -cf ${NPM_CACHE} .npm
-	mv ${NPM_CACHE} ${reaperCacheDir}
 	popd
 
 	pushd ${tempDir}/cassandra-reaper-${VERSION}/src/ui
