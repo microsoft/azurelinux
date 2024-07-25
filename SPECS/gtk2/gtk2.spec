@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk2
 Version:        2.24.32
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,7 @@ Patch15:        window-dragging.patch
 # Backported from upstream:
 Patch20:        0001-calendar-Use-the-new-OB-format-if-supported.patch
 Patch21:        0001-Fix-compiler-warnings-with-GCC-8.1.patch
+Patch22:        CVE-2024-6655.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  cairo-devel
@@ -317,6 +318,9 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
 %doc tmpdocs/examples
 
 %changelog
+* Thu Jul 25 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.24.32-12
+- Fix CVE-2024-6655
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.24.32-11
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

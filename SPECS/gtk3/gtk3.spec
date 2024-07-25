@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk3
 Version:        3.24.28
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Source0:        https://download.gnome.org/sources/gtk+/3.24/gtk+-%{version}.tar
 # https://bugzilla.redhat.com/show_bug.cgi?id=1946133
 # https://gitlab.gnome.org/GNOME/gtk/-/merge_requests/3387
 Patch0:         3387.patch
+Patch1:         CVE-2024-6655.patch
 BuildRequires:  cairo-devel >= %{cairo_version}
 BuildRequires:  cairo-gobject-devel >= %{cairo_version}
 BuildRequires:  cups-devel
@@ -289,6 +290,9 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 %{_datadir}/installed-tests/
 
 %changelog
+* Thu Jul 25 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.24.28-10
+- Fix CVE-2024-6655
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.24.28-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
