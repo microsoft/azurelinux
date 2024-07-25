@@ -6,6 +6,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 1. If partitions were specified in the config, customize the disk partitions.
 
+   Otherwise, if the [resetpartitionsuuidstype](#resetpartitionsuuidstype-string) value
+   is specified, then the partitions' UUIDs are changed.
+
 2. Override the `/etc/resolv.conf` file with the version from the host OS.
 
 3. Update packages:
@@ -131,6 +134,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
+  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
@@ -257,6 +261,35 @@ os:
   resetBootLoaderType: hard-reset
 ```
 
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```
+
+### iso [[iso](#iso-type)]
+
+Specifies the configuration for the generated ISO media.
+
 ### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
@@ -267,6 +300,10 @@ Example:
 os:
   hostname: example-image
 ```
+
+### scripts [[scripts](#scripts-type)]
+
+Specifies custom scripts to run during the customization process.
 
 ## disk type
 
@@ -1000,6 +1037,8 @@ scripts:
 
 ## scripts type
 
+Specifies custom scripts to run during the customization process.
+
 Note: Script files must be in the same directory or a child directory of the directory
 that contains the config file.
 
@@ -1090,8 +1129,6 @@ Supported options:
 - `hard-reset`: Fully reset the boot-loader and its configuration.
   This includes removing any customized kernel command-line arguments that were added to
   base image.
-
-This field can only be specified if [Disks](#disks-disk) is also specified.
 
 ### hostname [string]
 

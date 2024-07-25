@@ -136,7 +136,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "os.resetBootLoaderType and storage must be specified together")
+	assert.ErrorContains(t, err, "os.resetBootLoaderType must be specified if storage is specified")
 }
 
 func TestConfigIsValidMultipleDisks(t *testing.T) {

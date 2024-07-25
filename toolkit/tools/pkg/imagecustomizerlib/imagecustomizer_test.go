@@ -22,6 +22,21 @@ const (
 	testImageRootDirName = "testimageroot"
 )
 
+var (
+	coreEfiMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+	}
+)
+
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
@@ -73,18 +88,7 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 }
 
 func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
-	return connectToImage(buildDir, imageFilePath, []mountPoint{
-		{
-			PartitionNum:   2,
-			Path:           "/",
-			FileSystemType: "ext4",
-		},
-		{
-			PartitionNum:   1,
-			Path:           "/boot/efi",
-			FileSystemType: "vfat",
-		},
-	})
+	return connectToImage(buildDir, imageFilePath, coreEfiMountPoints)
 }
 
 type mountPoint struct {
