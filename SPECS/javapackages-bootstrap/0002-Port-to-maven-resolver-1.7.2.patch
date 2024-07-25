@@ -1,0 +1,24 @@
+From b23d2957440cb4ff06a289b4864f782794b45f52 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 17 Dec 2021 13:05:49 +0100
+Subject: [PATCH] Port to maven-resolver 1.7.2
+
+---
+ .../org/apache/maven/repository/internal/MavenAetherModule.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/maven-resolver-provider/src/main/java/org/apache/maven/repository/internal/MavenAetherModule.java b/maven-resolver-provider/src/main/java/org/apache/maven/repository/internal/MavenAetherModule.java
+index 41e98aaea..d72e3c0f3 100644
+--- a/maven-resolver-provider/src/main/java/org/apache/maven/repository/internal/MavenAetherModule.java
++++ b/maven-resolver-provider/src/main/java/org/apache/maven/repository/internal/MavenAetherModule.java
+@@ -28,7 +28,7 @@
+ 
+ import org.apache.maven.model.building.DefaultModelBuilderFactory;
+ import org.apache.maven.model.building.ModelBuilder;
+-import org.eclipse.aether.impl.AetherModule;
++import org.eclipse.aether.impl.guice.AetherModule;
+ import org.eclipse.aether.impl.ArtifactDescriptorReader;
+ import org.eclipse.aether.impl.MetadataGeneratorFactory;
+ import org.eclipse.aether.impl.VersionRangeResolver;
+-- 
+2.31.1

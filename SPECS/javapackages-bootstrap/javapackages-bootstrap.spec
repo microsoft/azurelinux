@@ -87,7 +87,7 @@ Source1057:     maven-parent-pom.tar.xz
 Source1058:     maven-plugin-testing.tar.xz
 Source1059:     maven-plugin-tools.tar.xz
 Source1060:     maven-remote-resources-plugin.tar.xz
-Source1061:     maven-resolver.tar.xz
+Source1061:     maven-resolver-1.7.0.tar.xz
 Source1062:     maven-resources-plugin.tar.xz
 Source1063:     maven-resources.tar.xz
 Source1064:     maven-shared-incremental.tar.xz
@@ -141,6 +141,8 @@ Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
 Patch4:         Port-to-maven-3.8.1.patch
+Patch5:         0001-Maven-resolver-patch.patch
+Patch6:         0002-Port-to-maven-resolver-1.7.2.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -302,6 +304,11 @@ pushd "downstream/plexus-archiver"
 popd
 
 %patch4 -p1
+%patch5 -p1
+
+pushd "downstream/maven"
+%patch6 -p1
+popd
 
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
