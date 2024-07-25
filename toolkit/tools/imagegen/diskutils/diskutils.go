@@ -464,7 +464,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
 		// Insert an extended partition
 		if partType == extendedPartitionType {
-			err = createExtendedPartition(diskDevPath, partitionTableType.String(), disk.Partitions, partIDToFsTypeMap, partDevPathMap)
+			err = createExtendedPartition(diskDevPath, partitionTableType, disk.Partitions, partIDToFsTypeMap, partDevPathMap)
 			if err != nil {
 				return
 			}
@@ -474,7 +474,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			partitionNumber = partitionNumber + 1
 		}
 
-		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
+		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition, partType)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
@@ -510,7 +510,9 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 }
 
 // CreateSinglePartition creates a single partition based on the partition config
-func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition, partType string) (partDevPath string, err error) {
+func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTableType configuration.PartitionTableType,
+	partition configuration.Partition, partType string,
+) (partDevPath string, err error) {
 	const (
 		fillToEndOption  = "100%"
 		sFmt             = "%ds"
@@ -541,21 +543,37 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)
 	logger.Log.Debugf("Input partition end: %d, end sector: %d", partition.End, end)
 
-	fsType := partition.FsType
+	mkpartArgs := []string{"--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart"}
 
-	if end == 0 {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fillToEndOption)
-		if err != nil {
-			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
-			return "", err
-		}
-	} else {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fmt.Sprintf(sFmt, end))
-		if err != nil {
-			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
-			return "", err
+	switch partitionTableType {
+	case configuration.PartitionTableTypeMbr:
+		// Part type.
+		mkpartArgs = append(mkpartArgs, partType)
+
+	case configuration.PartitionTableTypeGpt:
+		// Partition label.
+		if partition.Name == "" {
+			// Since parted is a scripting language, you have to specify "" to represent an empty string.
+			mkpartArgs = append(mkpartArgs, "\"\"")
+		} else {
+			mkpartArgs = append(mkpartArgs, partition.Name)
 		}
 	}
+
+	mkpartArgs = append(mkpartArgs, partition.FsType, fmt.Sprintf(sFmt, start))
+
+	if end == 0 {
+		mkpartArgs = append(mkpartArgs, fillToEndOption)
+	} else {
+		mkpartArgs = append(mkpartArgs, fmt.Sprintf(sFmt, end))
+	}
+
+	_, stderr, err := shell.Execute("flock", mkpartArgs...)
+	if err != nil {
+		err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
+		return "", err
+	}
+
 	// Update kernel partition table information
 	//
 	// There can be a timing issue where partition creation finishes but the
@@ -579,7 +597,9 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 }
 
 // InitializeSinglePartition initializes a single partition based on the given partition configuration
-func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitionTableType string, partition configuration.Partition) (partDevPath string, err error) {
+func InitializeSinglePartition(diskDevPath string, partitionNumber int,
+	partitionTableType configuration.PartitionTableType, partition configuration.Partition,
+) (partDevPath string, err error) {
 	const (
 		retryDuration    = time.Second
 		timeoutInSeconds = "5"
@@ -623,8 +643,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
 
 	// Set partition friendly name and partition type UUID (only for gpt)
-	if partitionTableType == "gpt" {
-		setGptPartitionName(partition, timeoutInSeconds, diskDevPath, partitionNumberStr)
+	if partitionTableType == configuration.PartitionTableTypeGpt {
 		setGptPartitionType(partition, timeoutInSeconds, diskDevPath, partitionNumberStr)
 	}
 
@@ -664,17 +683,6 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
-	return
-}
-
-func setGptPartitionName(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
-	partitionName := partition.Name
-	_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "name", partitionNumberStr, partitionName)
-	if err != nil {
-		logger.Log.Warnf("failed to set partition friendly name using parted: %v", stderr)
-		err = nil
-		// Not-fatal
-	}
 	return
 }
 
@@ -830,7 +838,9 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	return output.Devices, err
 }
 
-func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {
+func createExtendedPartition(diskDevPath string, partitionTableType configuration.PartitionTableType,
+	partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string,
+) (err error) {
 	// Create a new partition object for extended partition
 	extendedPartition := configuration.Partition{}
 	extendedPartition.ID = extendedPartitionType
