@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,7 @@ Patch40:        openssl-1.1.1-Fix-unconstrained-session-cache-growth-in-TLSv1.3.
 Patch41:        openssl-1.1.1-pkcs1-implicit-rejection.patch
 Patch42:        openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failure.patch
+Patch44:        CVE-2024-5535.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -369,6 +370,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Jul 22 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-34
+- Patch CVE-2024-5535
+
 * Tue Jul 16 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-33
 - Fix intermittent FIPS selftest failures in jitterentropy module
 
