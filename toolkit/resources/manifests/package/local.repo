@@ -5,6 +5,7 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=1
 sslverify=0
+priority=1
 
 [local-repo]
 name=Local Build Repo (out/RPMS)
@@ -13,6 +14,7 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=1
 sslverify=0
+priority=2
 
 [upstream-cache-repo]
 name=Cache Repo for upstream RPMs (build/rpm_cache/cache)
@@ -21,3 +23,4 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=1
 sslverify=0
+priority=3
