@@ -8,7 +8,8 @@
 #
 # DAILY_BUILD_ID is points the build tools to the latest daily built
 # packages as part of a tight local workflow.  The DAILY_BUILD_ID argument
-# takes the form: V-v-YYYYMMDD where V-v is the Major-Minor branch
+# takes the form: V-v-YYYYMMDD where V-v is the Major-Minor branch or
+# may be 'lkg' which will auto-detect the latest valid build.
 #
 # DAILY_BUILD_REPO also points to the latest daily built packages.  However
 # this is intended for internal teams to access the packages at build time and
@@ -42,8 +43,6 @@ ifneq ($(DAILY_BUILD_ID),)
         ifneq ($(.SHELLSTATUS),0)
             $(error Failed to auto detect DAILY_BUILD_ID)
         endif
-
-        # We want to be able to auto update the manifest files if we are using lkg
     endif
 
     $(warning Using Daily Build $(DAILY_BUILD_ID))

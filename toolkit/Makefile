@@ -189,7 +189,6 @@ include $(SCRIPTS_DIR)/tools.mk
 include $(SCRIPTS_DIR)/preview.mk
 
 # Dynamically update toolchain and chroot manifests for some flows with:
-#   update-toolchain-manifests
 include $(SCRIPTS_DIR)/manifests.mk
 
 # Bootstrap the toolchain's compilers and other tools with:

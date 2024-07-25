@@ -3,6 +3,7 @@
 
 # Contains:
 #	- Create a preview repo file
+#	- Configuration for getting preview packages
 #	- Create a daily build repo file
 
 ######## REPO FILE MANAGEMENT/CREATION ########
