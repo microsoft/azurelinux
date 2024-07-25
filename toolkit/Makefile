@@ -186,6 +186,10 @@ include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 include $(SCRIPTS_DIR)/tools.mk
 
+# Dynamically update toolchain and chroot manifests for some flows with:
+#   update-toolchain-manifests
+include $(SCRIPTS_DIR)/manifests.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
