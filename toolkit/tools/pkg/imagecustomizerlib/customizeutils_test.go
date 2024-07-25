@@ -159,6 +159,21 @@ func TestCustomizeImageAdditionalFiles(t *testing.T) {
 	verifyFilePermissions(t, os.FileMode(0o755), helloworld_copy_path)
 }
 
+func TestCustomizeImageAdditionalFilesInfiniteFile(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageAdditionalFilesInfiniteFile")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "infinite-file-config.yaml")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	// Customize image.
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	assert.ErrorContains(t, err, "failed to copy (/dev/zero)")
+	assert.ErrorContains(t, err, "No space left on device")
+}
+
 func TestCopyAdditionalDirs(t *testing.T) {
 	if os.Geteuid() != 0 {
 		t.Skip("Test must be run as root because it uses a chroot")
@@ -247,6 +262,46 @@ func TestCustomizeImageAdditionalDirs(t *testing.T) {
 
 	// Verify file and directory contents and permissions.
 	verifyFileContentsSame(t, animalsFileOrigPath, animalsFileNewPath)
+}
+
+func TestCustomizeImageAdditionalDirsInfiniteFile(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageAdditionalDirsInfiniteFile")
+	buildDir := filepath.Join(testTmpDir, "build")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	// Make a directory that contains an infinite file.
+	srcDirPath := filepath.Join(testTmpDir, "a")
+	infiniteFilePath := filepath.Join(srcDirPath, "zero")
+
+	err := os.MkdirAll(srcDirPath, os.ModePerm)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = os.Symlink("/dev/zero", infiniteFilePath)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	config := imagecustomizerapi.Config{
+		OS: &imagecustomizerapi.OS{
+			AdditionalDirs: []imagecustomizerapi.DirConfig{
+				{
+					SourcePath:      srcDirPath,
+					DestinationPath: "/a",
+				},
+			},
+		},
+	}
+
+	// Customize image.
+	err = CustomizeImage(buildDir, testTmpDir, &config, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	assert.ErrorContains(t, err, "failed to copy directory")
+	assert.ErrorContains(t, err, "failed to copy file")
+	assert.ErrorContains(t, err, "No space left on device")
 }
 
 func TestAddCustomizerRelease(t *testing.T) {
