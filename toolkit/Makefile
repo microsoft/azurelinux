@@ -134,7 +134,6 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_
 PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/ms-oss/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
-DAILY_BUILD_REPO   ?=
 
 ######## COMMON MAKEFILE UTILITIES ########
 
@@ -185,6 +184,9 @@ include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 include $(SCRIPTS_DIR)/tools.mk
+
+# Based on daily build configuration, configure testing repos
+include $(SCRIPTS_DIR)/preview.mk
 
 # Dynamically update toolchain and chroot manifests for some flows with:
 #   update-toolchain-manifests

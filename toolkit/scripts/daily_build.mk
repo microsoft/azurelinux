@@ -18,6 +18,16 @@
 # DAILY_BUILD_REPO argument takes a path to the daily-mariner.repo file.
 #
 # their pipelines on a daily basis. The repo file may be provisioned to their image
+
+##help:var:DAILY_BUILD_ID:{'lkg',<build_id>}='lkg' will auto select latest daily build repo. An explicit ID of the form 'V-v-YYYYMMDD' where V-v is the Major-Minor branch is also supported.
+DAILY_BUILD_ID ?=
+##help:var:DAILY_BUILD_ID_UPDATE_MANIFESTS={y,n}=Update the toolchain manifests when using DAILY_BUILD_ID to match the daily build repo.
+DAILY_BUILD_ID_UPDATE_MANIFESTS ?= y
+##help:var:DAILY_BUILD_REPO={path to daily.repo}=Path to the daily build repo file to use.
+DAILY_BUILD_REPO ?=
+
+daily_lkg_workdir = $(BUILD_DIR)/daily_build_id
+
 ifneq ($(DAILY_BUILD_ID),)
    ifneq ($(DAILY_BUILD_REPO),)
       $(error DAILY_BUILD_ID and DAILY_BUILD_REPO are mutually exclusive.)
@@ -25,28 +35,33 @@ ifneq ($(DAILY_BUILD_ID),)
 endif
 
 ifneq ($(DAILY_BUILD_ID),)
-   $(warning Using Daily Build $(DAILY_BUILD_ID))
-   # Ensure build_arch is set
-   ifeq ($(build_arch),)
-      $(error build_arch must be set when using DAILY_BUILD_ID)
-   endif
-   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
-   ifeq ($(build_arch),x86_64)
-      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
-      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
-      override PACKAGE_URL_LIST   += https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64
-      override SRPM_URL_LIST      += https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/SRPMS
-   else
-      override PACKAGE_URL_LIST   += https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
-      override SRPM_URL_LIST      += https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
-   endif
-endif
+    ifeq ($(DAILY_BUILD_ID),lkg)
+        $(call create_folder,$(daily_lkg_workdir))
 
-ifeq ($(USE_PREVIEW_REPO),y)
-   # Configure the preview repo
-   include $(SCRIPTS_DIR)/preview.mk
+        override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(daily_lkg_workdir))
+        ifneq ($(.SHELLSTATUS),0)
+            $(error Failed to auto detect DAILY_BUILD_ID)
+        endif
+
+        # We want to be able to auto update the manifest files if we are using lkg
+    endif
+
+    $(warning Using Daily Build $(DAILY_BUILD_ID))
+    # Ensure build_arch is set
+    ifeq ($(build_arch),)
+       $(error build_arch must be set when using DAILY_BUILD_ID)
+    endif
+    # build_arch cannot be directly used because Azure storage do not support container names with '_' char
+    daily_build_repo_name := $(subst _,-,daily-repo-$(DAILY_BUILD_ID)-$(build_arch))
+    # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
+    # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
+    # The ordering is important, we want to always take the daily build versions of packages first since they are NOT
+    # the same files as the official packages and will fail checksum validation.
+    override PACKAGE_URL_LIST := https://mariner3dailydevrepo.blob.core.windows.net/$(daily_build_repo_name)/built_rpms_all \
+                                    https://mariner3dailydevrepo.blob.core.windows.net/$(daily_build_repo_name) \
+                                    $(PACKAGE_URL_LIST)
+    override SRPM_URL_LIST    := https://mariner3dailydevrepo.blob.core.windows.net/$(daily_build_repo_name)/SRPMS \
+                                    $(SRPM_URL_LIST)
 endif
 
 ifneq ($(DAILY_BUILD_REPO),)
