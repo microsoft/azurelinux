@@ -2,7 +2,11 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
+<<<<<<< HEAD
 Version:        2.4.59
+=======
+Version:        2.4.62
+>>>>>>> 4a611ad53 (Upgrade httpd to 2.4.62 to address CVE-2024-40725 (#9925))
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -345,6 +349,15 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.62-1
+- Upgrade to 2.4.62 to fix CVE-2024-40725
+
+* Thu Jul 11 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.61-1
+- Upgrade to 2.4.61 to address CVE-2024-38473
+
+>>>>>>> 4a611ad53 (Upgrade httpd to 2.4.62 to address CVE-2024-40725 (#9925))
 * Tue Apr 30 2024 Sindhu Karri <lakarri@microsoft.com> - 2.4.59-1
 - Upgrade to 2.4.59 to fix CVE-2024-27316, CVE-2023-38709 & CVE-2024-24795
 
