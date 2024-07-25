@@ -15784,8 +15784,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.10.1",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.10.1.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.9.5.tar.gz"
         }
       }
     },
