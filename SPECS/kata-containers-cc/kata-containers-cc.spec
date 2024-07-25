@@ -62,53 +62,6 @@ START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-confpods-package
 PREFIX=%{buildroot} %make_build deploy-confpods-package-tools
 popd
 
-###CONTINUE
-
-mkdir -p %{buildroot}%{osbuilder}
-mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
-mkdir -p %{buildroot}%{osbuilder}/src/tarfs
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/scripts
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/image-builder
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder/azure-linux
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
-mkdir -p %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
-
-pushd %{_builddir}/%{name}-%{version}
-install -D -m 0644 tools/osbuilder/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
-
-install -D -m 0644 src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/allow-all.rego
-install -D -m 0644 src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/allow-set-policy.rego
-
-install -D -m 0644 src/tarfs/Makefile %{buildroot}%{osbuilder}/src/tarfs/Makefile
-install -D -m 0644 src/tarfs/tarfs.c %{buildroot}%{osbuilder}/src/tarfs/tarfs.c
-
-install -D -m 0755 tools/osbuilder/scripts/lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/scripts/lib.sh
-
-install -D -m 0755 tools/osbuilder/rootfs-builder/rootfs.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/rootfs.sh
-
-install -D -m 0755 tools/osbuilder/rootfs-builder/cbl-mariner/config.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
-install -D -m 0755 tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
-
-install -D -m 0755 tools/osbuilder/image-builder/image_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
-
-install -D -m 0755 tools/osbuilder/igvm-builder/igvm_builder.sh %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder/igvm_builder.sh
-install -D -m 0755 tools/osbuilder/igvm-builder/azure-linux/config.sh %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder/azure-linux/config.sh
-install -D -m 0755 tools/osbuilder/igvm-builder/azure-linux/igvm_lib.sh %{buildroot}%{osbuilder}/tools/osbuilder/igvm-builder/azure-linux/igvm_lib.sh
-
-install -D -m 0644 tools/osbuilder/node-builder/azure-linux/Makefile %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/Makefile
-install -D -m 0755 tools/osbuilder/node-builder/azure-linux/clean.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/clean.sh
-install -D -m 0755 tools/osbuilder/node-builder/azure-linux/common.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/common.sh
-install -D -m 0755 tools/osbuilder/node-builder/azure-linux/uvm_build.sh %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
-
-install -D -m 0755 tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
-install -D -m 0644 tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target
-install -D -m 0644 tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service %{buildroot}%{osbuilder}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
-popd
-
 %preun
 %systemd_preun tardev-snapshotter.service
 
