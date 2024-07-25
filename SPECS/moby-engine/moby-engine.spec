@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -39,7 +39,7 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang >= 1.16.12
+BuildRequires: golang
 BuildRequires: git
 
 Requires: audit
@@ -122,6 +122,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-7
+- Drop requirement on a specific version of golang
+
 * Tue Jun 25 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-6
 - Backport upstream change to search /usr/libexec for docker-proxy without daemon.json
 
