@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
@@ -121,9 +122,9 @@ func (p *PackageLicenseChecker) CheckPkgLicenses(rpmPaths []string) (hasWarning,
 
 	// Copy the RPMs into the check directory
 	for _, rpmPath := range rpmPaths {
-		err = file.Copy(rpmPath, filepath.Join(p.rpmDirPath, filepath.Base(rpmPath)))
+		err = os.Link(rpmPath, filepath.Join(p.rpmDirPath, filepath.Base(rpmPath)))
 		if err != nil {
-			err = fmt.Errorf("failed to copy RPMs to check directory:\n%w", err)
+			err = fmt.Errorf("failed to link RPMs into check directory:\n%w", err)
 			return false, false, err
 		}
 	}
