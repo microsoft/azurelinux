@@ -28,12 +28,16 @@ ifeq ($(USE_PREVIEW_REPO),y)
 
     # Copy the preview repo file to the expected repo location, but only if we  have a target to copy from.
     ifeq ($(wildcard $(preview_repo_source)),)
-    $(preview_repo): ;
+
+$(preview_repo): ;
+
     else
-    $(preview_repo): $(preview_repo_source)
-    	@echo "Regenerating preview repo file from '$<' to '$@'"
-    	mkdir -p $(dir $@)
-    	cp $< $@
+
+$(preview_repo): $(preview_repo_source)
+	@echo "Regenerating preview repo file from '$<' to '$@'"
+	mkdir -p $(dir $@)
+	cp $< $@
+
     endif
 
     ######## VARIABLE CONFIGURATION ########
