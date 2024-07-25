@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.63.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -54,6 +54,9 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Thu Jul 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-4
+- Bump release to rebuild with go 1.22.5
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-3
 - Bump release to rebuild with go 1.21.11
 

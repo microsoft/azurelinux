@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu Jul 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.4-8
+- Bump release to rebuild with go 1.22.5
+
 * Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.4-7
 - Add patch for CVE-2024-37298
 
