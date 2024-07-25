@@ -10,7 +10,7 @@ User=postgres
 ExecStart=/usr/bin/postgres -D /usr/local/pgsql/data
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=mixed
-KillSignal=SIGINT
+KillSignal=SIGTERM
 TimeoutSec=infinity
 
 [Install]

@@ -123,10 +123,11 @@ PGRUN="/run/postgresql"
 if [ ! -d "$PGDATA" ]; then
     mkdir -p "$PGDATA"
     chown postgres:postgres "$PGDATA"
-    sudo -u postgres /usr/bin/initdb -D "$PGDATA"
+    su -c /usr/bin/initdb -D "$PGDATA" postgres
+    chown -R postgres:postgres "$PGDATA"
 fi
 
-chown -R postgres:postgres "$PGDATA"
+#chown -R postgres:postgres "$PGDATA"
 
 if [ ! -d "$PGRUN" ]; then
     mkdir -p "$PGRUN"
