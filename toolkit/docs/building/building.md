@@ -353,6 +353,8 @@ The `REPO_LIST` variable supports multiple repo files, and they are prioritized 
 The Azure Linux base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
+Daily build packages are avialable via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg`, or `DAILY_BUILD_ID=V-v-YYYYMMDD`.
+
 ### Authentication
 
 If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
@@ -464,7 +466,8 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used.
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used. `DAILY_BUILD_ID=...` will
+also augment the URL list.
 
 #### `SRPM_URL_LIST=...`
 
@@ -478,6 +481,8 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > - `azurelinux-preview.repo` - Azure Linux repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
 > - `mariner-ms-non-oss.repo` and `mariner-ms-non-oss-preview.repo` - Azure Linux repository containing Microsoft non open Source RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
+
+`DAILY_BUILD_ID` and `DAILY_BUILD_REPO` will automiatically augment the `REPO_LIST`.
 
 #### Build Enable/Disable Flags
 
@@ -560,6 +565,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `USE_PREVIEW_REPO=`**`y`**
 
 > Pull missing packages from the upstream preview repository in addition to the base repository. This will uncondinally append the preview repo sources to `PACKAGE_URL_LIST`, `SRPM_URL_LIST`, and `REPO_LIST`.
+
+#### `DAILY_BUILD_ID=...`
+
+##### `DAILY_BUILD_ID=`**`""`** *(default)*
+
+> Disable daily build sources.
+
+##### `DAILY_BUILD_ID=`**`lkg` | `V-v-YYYYMMDD`**
+
+> Use the daily build sources for the given date. `lkg` will use the last known good build.
 
 #### `DISABLE_UPSTREAM_REPOS=...`
 
@@ -664,6 +679,8 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > Normal build.
 
 ## All Build Targets
+
+**Help is available via `make help`**
 
 These are the useful build targets:
 | Target                           | Description
@@ -784,6 +801,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
+| DAILY_BUILD_ID                |                                                                                                        | `lkg` or `V-v-YYYYMMDD` to use the daily build resources for the given date.
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 | DISABLE_DEFAULT_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
 | CACHED_PACKAGES_ARCHIVE       |                                                                                                        | Use with `make hydrate-cached-rpms` to populate the external RPMs cache from an archive.
