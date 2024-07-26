@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.35.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jul 16 2024 Kelsey Steele <kelseysteele@microsoft.com> - 6.6.35.1-6
+- config_aarch64: Convert selected configs to modules
+
 * Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-5
 - Bump release to match kernel-uki
 
