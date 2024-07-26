@@ -1,13 +1,14 @@
 Summary:        Text editor
 Name:           nano
 Version:        6.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.nano-editor.org/
 Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
+Patch0:         CVE-2024-5742.patch
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
@@ -22,7 +23,8 @@ Requires:       %{name} = %{version}-%{release}
 Lang for nano
 
 %prep
-%setup -q
+%autosetup -p1
+
 
 %build
 %configure  --enable-utf8     \
@@ -52,6 +54,8 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Fri Jun 14 2024 Suresh Thelkar <sthelkar@microsoft.com> - 6.0-3
+- Backporting the patch for CVE-2024-5742
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
