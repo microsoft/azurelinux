@@ -119,7 +119,7 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
 %changelog
 * Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-17
-- Bump release for July 2024 Release
+- Azure Linux 3.0 August Release
 
 * Fri Jul 05 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-16
 - Azure Linux 3.0 July Preview Release 1
