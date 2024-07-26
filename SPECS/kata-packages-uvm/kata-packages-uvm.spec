@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,7 @@ Summary:        Metapackage to install the set of packages inside a Kata confide
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
 Requires:       device-mapper
+Requires:       e2fsprogs
 
 %description    coco
 
@@ -95,6 +96,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Thu Jul 25 2024 Aurelien Bombo <abombo@microsoft.com> - 1.0.0-5
+- Add e2fsprogs to the CoCo UVM
+
 * Fri May 03 2024 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-4
 - Remove opa
 
