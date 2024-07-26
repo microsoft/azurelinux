@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,13 +31,12 @@ Source1:        disks-images-provider.yaml
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
-Patch2:         Hotplug_detach_grace_period.patch
-Patch3:         CVE-2023-44487.patch
-Patch4:         CVE-2024-21626.patch
-Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
-Patch6:         CVE-2022-41723.patch
-Patch7:         CVE-2024-24786.patch
-Patch8:         CVE-2023-45288.patch
+Patch2:         CVE-2023-44487.patch
+Patch3:         CVE-2024-21626.patch
+Patch4:         Hp-volume-pod-should-respect-blockdevices.patch
+Patch5:         CVE-2022-41723.patch
+Patch6:         CVE-2024-24786.patch
+Patch7:         CVE-2023-45288.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
@@ -217,6 +216,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Jul 26 2024 Harshit Gupta <guptaharshit@microsoft.com> - 0.59.0-20
+- Remove Hotplug_detach_grace_period.patch
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-19
 - Bump release to rebuild with go 1.21.11
 
