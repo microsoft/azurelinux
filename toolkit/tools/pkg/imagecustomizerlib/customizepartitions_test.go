@@ -65,6 +65,14 @@ func TestCustomizeImagePartitions(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
+	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	if assert.NoError(t, err, "read partition table") {
+		assert.Equal(t, "", partitions[1].PartLabel)
+		assert.Equal(t, "", partitions[2].PartLabel)
+		assert.Equal(t, "rootfs", partitions[3].PartLabel)
+		assert.Equal(t, "", partitions[4].PartLabel)
+	}
+
 	// Check for key files/directories on the partitions.
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/usr/bin/bash"))
 	assert.NoError(t, err, "check for /usr/bin/bash")
@@ -72,7 +80,7 @@ func TestCustomizeImagePartitions(t *testing.T) {
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
 	assert.NoError(t, err, "check for /var/log")
 
-	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	partitions, err = diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
 	assert.NoError(t, err, "get disk partitions")
 
 	// Check that the fstab entries are correct.
