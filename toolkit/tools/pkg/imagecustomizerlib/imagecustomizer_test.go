@@ -88,7 +88,7 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 }
 
 func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
-	return connectToImage(buildDir, imageFilePath, coreEfiMountPoints)
+	return connectToImage(buildDir, imageFilePath, false, coreEfiMountPoints)
 }
 
 type mountPoint struct {
@@ -98,7 +98,8 @@ type mountPoint struct {
 	Flags          uintptr
 }
 
-func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) (*ImageConnection, error) {
+func connectToImage(buildDir string, imageFilePath string, includeDefaultMounts bool, mounts []mountPoint,
+) (*ImageConnection, error) {
 	imageConnection := NewImageConnection()
 	err := imageConnection.ConnectLoopback(imageFilePath)
 	if err != nil {
@@ -123,7 +124,7 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 		mountPoints = append(mountPoints, mountPoint)
 	}
 
-	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, false)
+	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
