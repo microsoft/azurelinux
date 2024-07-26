@@ -10360,16 +10360,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libomp",
-          "version": "10.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1/openmp-10.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libomxil-bellagio",
           "version": "0.9.3",
           "downloadUrl": "http://downloads.sourceforge.net/omxil/libomxil-bellagio-0.9.3.tar.gz"
