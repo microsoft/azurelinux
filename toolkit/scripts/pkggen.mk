@@ -65,6 +65,7 @@ clean-cache-worker:
 clean-cache: clean-cache-worker
 	rm -rf $(CACHED_RPMS_DIR)
 	rm -f $(validate-pkggen-config)
+	rm -f $(cached_file)
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
