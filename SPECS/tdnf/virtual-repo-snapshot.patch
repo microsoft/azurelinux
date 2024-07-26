@@ -1,0 +1,900 @@
+From 9d4b634ca7be64c4167c9f4361498e5fe42e664d Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Tue, 30 Apr 2024 13:56:44 -0700
+Subject: [PATCH] Add virtual repo snapshot feature to tdnf
+
+---
+ client/config.c                            |   5 +
+ client/prototypes.h                        |   3 +-
+ client/repo.c                              |  50 +-
+ common/config.h                            |   1 +
+ etc/bash_completion.d/tdnf-completion.bash |   2 +-
+ include/tdnferror.h                        |   9 +
+ include/tdnftypes.h                        |   2 +
+ solv/defines.h                             |  28 ++
+ solv/includes.h                            |   7 +-
+ solv/prototypes.h                          |   3 +-
+ solv/tdnfrepo.c                            | 534 ++++++++++++++++++++-
+ tools/cli/lib/help.c                       |   1 +
+ tools/cli/lib/parseargs.c                  |   1 +
+ 13 files changed, 628 insertions(+), 18 deletions(-)
+
+diff --git a/client/config.c b/client/config.c
+index 8ddcc7a..5126e45 100644
+--- a/client/config.c
++++ b/client/config.c
+@@ -85,6 +85,7 @@ TDNFReadConfig(
+     pConf->nInstallOnlyLimit = 1;
+     pConf->nCleanRequirementsOnRemove = 0;
+     pConf->nKeepCache = 0;
++    pConf->nRepoEpochTimeLimit = NULL;
+     pConf->nOpenMax = TDNF_DEFAULT_OPENMAX;
+ 
+     register_ini(NULL);
+@@ -122,6 +123,10 @@ TDNFReadConfig(
+         {
+             pConf->nInstallOnlyLimit = atoi(cn->value);
+         }
++        else if (strcmp(cn->name, TDNF_CONF_KEY_EPOCH_TIME_LIMIT) == 0)
++        {
++            pConf->nRepoEpochTimeLimit = atol(cn->value); //assumes your system's time_t is typedef long
++        }
+         else if (strcmp(cn->name, TDNF_CONF_KEY_CLEAN_REQ_ON_REMOVE) == 0)
+         {
+             pConf->nCleanRequirementsOnRemove = isTrue(cn->value);
+diff --git a/client/prototypes.h b/client/prototypes.h
+index bb7fba1..160eca7 100644
+--- a/client/prototypes.h
++++ b/client/prototypes.h
+@@ -586,7 +586,8 @@ uint32_t
+ TDNFInitRepoFromMetadata(
+     Repo *pRepo,
+     const char* pszRepoName,
+-    PTDNF_REPO_METADATA pRepoMD
++    PTDNF_REPO_METADATA pRepoMD,
++    time_t pnRepoEpochLimit
+     );
+ 
+ uint32_t
+diff --git a/client/repo.c b/client/repo.c
+index b6073e2..cc29780 100644
+--- a/client/repo.c
++++ b/client/repo.c
+@@ -36,6 +36,8 @@ TDNFInitRepo(
+     Pool* pPool = NULL;
+     int nUseMetaDataCache = 0;
+     PSOLV_REPO_INFO_INTERNAL pSolvRepoInfo = NULL;
++    PTDNF_CMD_OPT pSetOpt;
++    time_t pnRepoEpochTimeLimit = NULL;
+ 
+     if (!pTdnf || !pRepoData || !pSack || !pSack->pPool)
+     {
+@@ -43,6 +45,21 @@ TDNFInitRepo(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    // set local epoch limit if conf or cmd line opt is present
++    if (pTdnf->pConf->nRepoEpochTimeLimit != NULL) 
++    {
++        pnRepoEpochTimeLimit = pTdnf->pConf->nRepoEpochTimeLimit;
++    }
++
++    // take command line over config if both are present
++    for (pSetOpt = pTdnf->pArgs->pSetOpt; pSetOpt; pSetOpt = pSetOpt->pNext) 
++    {
++        if(strcmp(pSetOpt->pszOptName, "epochtimelimit") == 0)
++        {
++            pnRepoEpochTimeLimit = atol(pSetOpt->pszOptValue);
++        }
++    }
++
+     pPool = pSack->pPool;
+ 
+     dwError = TDNFGetCachePath(pTdnf, pRepoData,
+@@ -82,20 +99,27 @@ TDNFInitRepo(
+     pRepo->appdata = pSolvRepoInfo;
+ 
+     if (pRepoData->nHasMetaData) {
+-        dwError = SolvCalculateCookieForFile(pRepoMD->pszRepoMD, pSolvRepoInfo->cookie);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-        pSolvRepoInfo->nCookieSet = 1;
+-
+-        dwError = SolvUseMetaDataCache(pSack, pSolvRepoInfo, &nUseMetaDataCache);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-
+-        if (nUseMetaDataCache == 0) {
+-            dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD);
++        if (pnRepoEpochTimeLimit != NULL) {
++            dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD, pnRepoEpochTimeLimit);
++            BAIL_ON_TDNF_ERROR(dwError);
++        } else {
++            dwError = SolvCalculateCookieForFile(pRepoMD->pszRepoMD, pSolvRepoInfo->cookie);
+             BAIL_ON_TDNF_ERROR(dwError);
++            pSolvRepoInfo->nCookieSet = 1;
+ 
+-            dwError = SolvCreateMetaDataCache(pSack, pSolvRepoInfo);
++            dwError = SolvUseMetaDataCache(pSack, pSolvRepoInfo, &nUseMetaDataCache);
+             BAIL_ON_TDNF_ERROR(dwError);
++
++            //force load from repo if epoch time limit is present
++            if (nUseMetaDataCache == 0) {
++                dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD, NULL);
++                BAIL_ON_TDNF_ERROR(dwError);
++
++                dwError = SolvCreateMetaDataCache(pSack, pSolvRepoInfo);
++                BAIL_ON_TDNF_ERROR(dwError);
++            }
+         }
++        
+     } else {
+         dwError = SolvReadRpmsFromDirectory(pRepo, pRepoData->ppszBaseUrls[0]);
+         BAIL_ON_TDNF_ERROR(dwError);
+@@ -135,7 +159,8 @@ uint32_t
+ TDNFInitRepoFromMetadata(
+     Repo *pRepo,
+     const char* pszRepoName,
+-    PTDNF_REPO_METADATA pRepoMD
++    PTDNF_REPO_METADATA pRepoMD,
++    time_t pnRepoEpochLimit
+     )
+ {
+     uint32_t dwError = 0;
+@@ -152,7 +177,8 @@ TDNFInitRepoFromMetadata(
+                   pRepoMD->pszPrimary,
+                   pRepoMD->pszFileLists,
+                   pRepoMD->pszUpdateInfo,
+-                  pRepoMD->pszOther);
++                  pRepoMD->pszOther,
++                  pnRepoEpochLimit);
+ cleanup:
+     return dwError;
+ 
+diff --git a/common/config.h b/common/config.h
+index 222a448..1370c0d 100644
+--- a/common/config.h
++++ b/common/config.h
+@@ -19,6 +19,7 @@
+ //Conf file key names
+ #define TDNF_CONF_KEY_GPGCHECK            "gpgcheck"
+ #define TDNF_CONF_KEY_INSTALLONLY_LIMIT   "installonly_limit"
++#define TDNF_CONF_KEY_EPOCH_TIME_LIMIT    "epochtimelimit"
+ #define TDNF_CONF_KEY_CLEAN_REQ_ON_REMOVE "clean_requirements_on_remove"
+ #define TDNF_CONF_KEY_REPODIR             "repodir" // typo, keep for back compatibility
+ #define TDNF_CONF_KEY_REPOSDIR            "reposdir"
+diff --git a/etc/bash_completion.d/tdnf-completion.bash b/etc/bash_completion.d/tdnf-completion.bash
+index 4e48040..285add2 100644
+--- a/etc/bash_completion.d/tdnf-completion.bash
++++ b/etc/bash_completion.d/tdnf-completion.bash
+@@ -92,7 +92,7 @@ _tdnf()
+ {
+     local c=0 cur __opts __cmds
+     COMPREPLY=()
+-    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
++    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --epochtimelimit --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
+     __cmds="autoerase autoremove check check-local check-update clean distro-sync downgrade erase help history info install list makecache mark provides whatprovides reinstall remove repolist repoquery reposync search update update-to updateinfo upgrade upgrade-to"
+     cur="${COMP_WORDS[COMP_CWORD]}"
+     _tdnf__process_if_prev_is_option && return 0
+diff --git a/include/tdnferror.h b/include/tdnferror.h
+index c9349a0..c207264 100644
+--- a/include/tdnferror.h
++++ b/include/tdnferror.h
+@@ -187,6 +187,15 @@ extern "C" {
+ #define ERROR_TDNF_HISTORY_ERROR 1801
+ #define ERROR_TDNF_HISTORY_NODB 1802
+ 
++#define ERROR_TDNF_FILTER_BASE 1900
++// filter MEMORY
++#define ERROR_TDNF_FILTER_MEMORY        (ERROR_TDNF_FILTER_BASE + 1)
++// filter parsing error
++#define ERROR_TDNF_FILTER_PARSE         (ERROR_TDNF_FILTER_BASE + 2)
++// filter IO error
++#define ERROR_TDNF_FILTER_IO            (ERROR_TDNF_FILTER_BASE + 3)
++// filter general error
++# define ERROR_TDNF_FILTER_GENERAL      (ERROR_TDNF_FILTER_BASE + 4)
+ 
+ #define ERROR_TDNF_PLUGIN_BASE          2000
+ 
+diff --git a/include/tdnftypes.h b/include/tdnftypes.h
+index a806010..f54d271 100644
+--- a/include/tdnftypes.h
++++ b/include/tdnftypes.h
+@@ -9,6 +9,7 @@
+ #pragma once
+ 
+ #include <curl/curl.h>
++#include <time.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -256,6 +257,7 @@ typedef struct _TDNF_CONF
+     int nOpenMax;          //set max number of open files
+     int nCheckUpdateCompat;
+     int nDistroSyncReinstallChanged;
++    time_t nRepoEpochTimeLimit;
+     char* pszRepoDir;
+     char* pszCacheDir;
+     char* pszPersistDir;
+diff --git a/solv/defines.h b/solv/defines.h
+index 38f5ab1..0baf2c9 100644
+--- a/solv/defines.h
++++ b/solv/defines.h
+@@ -18,4 +18,32 @@
+         }                                                          \
+     } while(0)
+ 
++typedef struct {
++    // frequently changed values
++    char * pszElementBuffer;
++    int nBufferLen;
++    int nInPackage;
++    int nPrintPackage;
++    int nTimeFound;
++
++    // managed values
++    int nBufferMaxLen;
++    int nDepth;
++    int nPrevElement; // enum 0 -> start, 1 -> data, 2 -> end
++
++    //set and forget on creation
++    time_t nSearchTime;
++    FILE * pbOutfile;
++} TDNFFilterData;
++
++#define TDNF_MAX_FILTER_INPUT_THRESHOLD 10000000
++
++#define BAIL_ON_TDNF_XML_FILTER_ERROR(dwError) \
++    do {                                                           \
++        if (dwError)                                               \
++        {                                                          \
++            goto error;                                            \
++        }                                                          \
++    } while(0)
++
+ #endif /* __SOLV_DEFINES_H__ */
+diff --git a/solv/includes.h b/solv/includes.h
+index 2ab0c5c..e132dd6 100644
+--- a/solv/includes.h
++++ b/solv/includes.h
+@@ -10,7 +10,6 @@
+ #include <unistd.h>
+ #include <stdbool.h>
+ #include <sys/types.h>
+-#include <sys/stat.h>
+ #include <dirent.h>
+ 
+ // libsolv
+@@ -44,4 +43,10 @@
+ #include "../history/history.h"
+ #include "prototypes.h"
+ 
++#include <expat.h>
++#include <stdlib.h>
++#include <time.h>
++#include <string.h>
++#include <zlib.h>
++
+ #endif /* __SOLV_INCLUDES_H__ */
+diff --git a/solv/prototypes.h b/solv/prototypes.h
+index 2633b5e..2246caa 100644
+--- a/solv/prototypes.h
++++ b/solv/prototypes.h
+@@ -517,7 +517,8 @@ SolvReadYumRepo(
+     const char *pszPrimary,
+     const char *pszFilelists,
+     const char *pszUpdateinfo,
+-    const char *pszOther
++    const char *pszOther,
++    time_t pnRepoEpochLimit
+     );
+ 
+ uint32_t
+diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
+index c27b907..2410daf 100644
+--- a/solv/tdnfrepo.c
++++ b/solv/tdnfrepo.c
+@@ -9,6 +9,515 @@
+ 
+ #include "includes.h"
+ 
++// #### XML FILTER CODE ####
++void checkAndResizeBuffer(char ** pszCharBuffer, int * nBufferMaxLen, int nLengthToAdd) {
++    uint32_t dwError = 0;
++    int nBufferContentLen = strlen(*pszCharBuffer);
++    while (nBufferContentLen + nLengthToAdd >= *nBufferMaxLen)
++    {
++        *nBufferMaxLen *= 2;
++        char * pszTempCharBuffer = NULL;
++        pszTempCharBuffer = realloc(*pszCharBuffer, *nBufferMaxLen);
++        if (!pszTempCharBuffer)
++        {
++            dwError = ERROR_TDNF_FILTER_MEMORY;
++            BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++        }
++        //set expanded char buffer 
++        *pszCharBuffer = pszTempCharBuffer;
++    }
++cleanup:
++    return;
++error:
++    printf("error check and resize\n");
++    goto cleanup;
++}
++
++char * descEscapeCharLinter(char * desc) {
++    uint32_t dwError = 0;
++    char * amp = "&amp;";
++    char * gt = "&gt;";
++    char * lt = "&lt;";
++
++    int nDescLen = strlen(desc) * sizeof(char) + 1;
++    char * pszLintedDesc = malloc(nDescLen);
++    if (!pszLintedDesc)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    bzero(pszLintedDesc, nDescLen);
++    int nOffset = 0;
++    int nLintedSize = nDescLen;
++
++    for (int i = 0; i < nDescLen; i++)
++    {
++        char * pszCharToAdd = NULL;
++        int nAddStrlen = 1;
++        switch (desc[i])
++        {
++            case '&':
++                pszCharToAdd = amp;
++                break;
++            case '>':
++                pszCharToAdd = gt;
++                break;
++
++            case '<':
++                pszCharToAdd = lt;
++                break;
++        }
++
++        //resize buffer if needed
++        if (pszCharToAdd != NULL)
++        {
++            nAddStrlen = strlen(pszCharToAdd);
++        }
++        checkAndResizeBuffer(&pszLintedDesc, &nLintedSize, nAddStrlen);
++
++        // add linted char if needed
++        if (pszCharToAdd == NULL)
++        {
++            pszLintedDesc[i + nOffset] = desc[i];
++        }
++        else
++        {
++            strcat(pszLintedDesc, pszCharToAdd);
++            nOffset += strlen(pszCharToAdd) - 1;
++        }
++    }
++    
++cleanup:
++    return pszLintedDesc;
++error:
++    printf("error char linter\n");
++    goto cleanup;
++}
++
++int addElementStartToBuffer(char * pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
++    uint32_t dwError = 0;
++    int nTotalCharsWritten = 0;
++    char * pszLintedAttrVal = NULL;
++    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 1);
++    nTotalCharsWritten = sprintf(pszElementBuffer, "<%s", pszElementName);
++    for (int i = 0; ppszAttrs[i]; i += 2)
++    {
++        pszLintedAttrVal = descEscapeCharLinter((char *)ppszAttrs[i+1]);
++        if (!pszLintedAttrVal)
++        {
++            dwError = ERROR_TDNF_FILTER_MEMORY;
++            BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++        }
++        checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 4);
++        nTotalCharsWritten += sprintf(pszElementBuffer + nTotalCharsWritten, " %s=\"%s\"", ppszAttrs[i], pszLintedAttrVal);
++        free(pszLintedAttrVal);
++        pszLintedAttrVal = NULL;
++    }
++    nTotalCharsWritten += sprintf(pszElementBuffer + nTotalCharsWritten, ">");
++    
++cleanup:
++    if (pszLintedAttrVal)
++    {
++        free(pszLintedAttrVal);
++    }
++    return nTotalCharsWritten;
++error:
++    printf("error add element start to buffer\n");
++    goto cleanup;
++}
++
++int addElementEndToBuffer(char * pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
++    uint32_t dwError = 0;
++    int nTotalCharsWritten = 0;
++    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 3);
++    nTotalCharsWritten = sprintf(pszElementBuffer, "</%s>", pszElementName);
++    
++cleanup:
++    return nTotalCharsWritten;
++error:
++    printf("error add element end to buffer\n");
++    goto cleanup;
++}
++
++void printElementStartToFile(FILE * pbOutfile, const char * pszElementName, const char ** ppszAttrs) {
++    uint32_t dwError = 0;
++    int nStartElementBufferLength = 500;
++    char * pszStartElement = malloc(sizeof(char) * nStartElementBufferLength);
++
++    addElementStartToBuffer(pszStartElement, &nStartElementBufferLength, pszElementName, ppszAttrs);
++    fprintf(pbOutfile, "%s", pszStartElement);
++
++cleanup:
++    if (pszStartElement)
++    {
++        free(pszStartElement);
++    }
++    return;
++error:
++    printf("error print start to file\n");
++    goto cleanup;
++}
++
++void printElementEndToFile(FILE* pbOutfile, const char * pszElementName) {
++    uint32_t dwError = 0;
++    int nEndElementBufferLength = 500;
++    char * pszEndElement = malloc(sizeof(char) * nEndElementBufferLength);
++
++    addElementEndToBuffer(pszEndElement, &nEndElementBufferLength, pszElementName);
++    fprintf(pbOutfile, "%s", pszEndElement);
++
++cleanup:
++    if (pszEndElement)
++    {
++        free(pszEndElement);
++    }
++    return;
++error:
++    printf("error print end to file\n");
++    goto cleanup;
++}
++
++void TDNFFilterStartElement(void *userData, const char * name, const char ** attrs) {
++    uint32_t dwError = 0;
++    char * pszStartElementBuffer = NULL;
++    // load tracking data
++    TDNFFilterData * pTracking = (TDNFFilterData *)userData;
++    int nAddNewLineAfterStart = pTracking->nPrevElement == 0;
++    char szNewLineBuffer[5];
++    if (nAddNewLineAfterStart)
++    {
++        sprintf(szNewLineBuffer, "\n");
++    }
++    else
++    {
++        bzero(szNewLineBuffer, sizeof(szNewLineBuffer)); // don't assume memory zero'd
++    }
++
++    // increment depth
++    pTracking->nDepth += 1;
++    pTracking->nPrevElement = 0;
++
++    // new package to parse or currently parsing package info
++    if (strcmp(name, "package") == 0 || pTracking->nInPackage)
++    {
++        pTracking->nInPackage = 1;
++
++        // already found/checked time
++        if (pTracking->nTimeFound && pTracking->nPrintPackage)
++        {
++            fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++            printf("%s", szNewLineBuffer);
++            printElementStartToFile(pTracking->pbOutfile, name, attrs);
++        }
++        else
++        { // still checking for time
++            if (strcmp(name, "time") == 0)
++            {
++                // time found
++                // validate file epoch time
++                for (int i = 0; attrs[i]; i += 2)
++                {
++                    if (strcmp(attrs[i], "file") == 0)
++                    { 
++                        // file time is the time the package is published to the repo
++                        // when this is less than our search time, allow the package to be
++                        // printed to the temp repo file, otherwise the current package
++                        // can be discarded.
++                        long nCurrentPackageTime = atoi(attrs[i+1]);
++                        pTracking->nPrintPackage = (nCurrentPackageTime <= pTracking->nSearchTime);
++                        pTracking->nTimeFound = 1;
++                    }
++                }
++                if (pTracking->nPrintPackage)
++                {
++                    // print buffer when time is found
++                    fprintf(pTracking->pbOutfile, "%s", pTracking->pszElementBuffer);
++                    fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++
++                    // print time element
++                    printElementStartToFile(pTracking->pbOutfile, name, attrs);
++                }
++            }
++            else if (!pTracking->nTimeFound)
++            {
++                // if we haven't found a time yet, the element must be stored
++                // add to file buffer
++                int nStartElementBufferSize = 500;
++                pszStartElementBuffer = malloc(sizeof(char) * nStartElementBufferSize);
++                if (!pszStartElementBuffer)
++                {
++                    dwError = ERROR_TDNF_FILTER_MEMORY;
++                    BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++                }
++                int nLenToAdd = addElementStartToBuffer(pszStartElementBuffer, &nStartElementBufferSize, name, attrs);
++                strcat(pszStartElementBuffer, szNewLineBuffer);
++                nLenToAdd += strlen(szNewLineBuffer); //+1 if newLine character present
++
++                checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nLenToAdd);
++                strcat(pTracking->pszElementBuffer, pszStartElementBuffer);
++            }
++        }
++    }
++    else
++    { // not in a package or parsing a new package
++        fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++        // output line
++        printElementStartToFile(pTracking->pbOutfile, name, attrs);
++    }
++cleanup:
++    if (pszStartElementBuffer)
++    {
++        free(pszStartElementBuffer);
++    }
++    return;
++error:
++    printf("error filter start element\n");
++    goto cleanup;
++}
++
++void TDNFFilterEndElement(void * userData, const char * name) {
++    uint32_t dwError = 0;
++    char * pszElementBuffer = NULL;
++    // load tracking data
++    TDNFFilterData * pTracking = (TDNFFilterData *)userData;
++
++    // decrement depth
++    pTracking->nDepth -= 1;
++    pTracking->nPrevElement = 2;
++
++    if (!pTracking->nInPackage || pTracking->nPrintPackage)
++    {
++        // print end element to file
++        printElementEndToFile(pTracking->pbOutfile, name);
++
++    } 
++    else if (pTracking->nInPackage && !pTracking->nTimeFound)
++    {
++        int nEndElementBufferLen = 500;
++        pszElementBuffer = malloc(sizeof(char) * nEndElementBufferLen);
++        if (!pszElementBuffer)
++        {
++            dwError = ERROR_TDNF_FILTER_MEMORY;
++            BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++        }
++        // add end element to buffer
++        int nEndElementLen = addElementEndToBuffer(pszElementBuffer, &nEndElementBufferLen, name);
++
++        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nEndElementLen);
++        strcat(pTracking->pszElementBuffer, pszElementBuffer);
++
++    } // else do nothing
++
++    if (strcmp(name, "package") == 0)
++    { // on end package, reset tracking function
++        // reset userData
++        pTracking->nBufferLen = 0;
++        bzero(pTracking->pszElementBuffer, pTracking->nBufferMaxLen);
++        pTracking->nInPackage = 0;
++        pTracking->nPrintPackage = 0;
++        pTracking->nTimeFound = 0;
++    }
++cleanup:
++    if (pszElementBuffer)
++    {
++        free(pszElementBuffer);
++    }
++    return;
++error:
++    printf("error filter end element\n");
++    goto cleanup;
++}
++
++void TDNFFilterCharDataHandler(void * userData, const char * content, int length) {
++    uint32_t dwError = 0;
++    // load tracking data
++    TDNFFilterData * pTracking = (TDNFFilterData *)userData;
++    pTracking->nPrevElement = 1;
++
++    char * pszCharData = malloc((length + 1) * sizeof(char));
++    if (!pszCharData)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    bzero(pszCharData, (length + 1) * sizeof(char));
++    strncpy(pszCharData, content, length);
++    char * pszLintedCharData = descEscapeCharLinter(pszCharData);
++    if (!pszLintedCharData)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++
++    // check params 
++    if (!pTracking->nInPackage || pTracking->nPrintPackage)
++    {
++        // print to file
++        fprintf(pTracking->pbOutfile, "%s", pszLintedCharData);
++    }
++    else if (pTracking->nInPackage && !pTracking->nTimeFound)
++    {
++        // add to buffer
++        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), length);
++        strcat(pTracking->pszElementBuffer, pszLintedCharData);
++    } // else do nothing (skipped package)
++
++cleanup:
++    if (pszLintedCharData)
++    {
++        free(pszLintedCharData);
++    }
++    if (pszCharData)
++    {
++        free(pszCharData);
++    }
++    return;
++error:
++    printf("error filter char data\n");
++    goto cleanup;
++}
++
++char * TDNFFilterFile(const char * pszInFilePath, time_t nEpochTime) {
++    // vars
++    uint32_t dwError = 0;
++    TDNFFilterData * pData;
++    FILE * pbInFile;
++    FILE * pbOutFile;
++    XML_Parser pbParser;
++    char pszTimeExtension[100];
++    char * pszOutFilePath;
++
++    sprintf(pszTimeExtension, "-%ld.xml", nEpochTime);
++    int nOutFileLen = strlen(pszInFilePath) + strlen(pszTimeExtension);
++
++    pszOutFilePath = malloc(nOutFileLen * sizeof(char));
++    if (!pszOutFilePath)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    bzero(pszOutFilePath, nOutFileLen * sizeof(char));
++
++    // find total extension length
++    int nFileExtLen = 4; // len of ".xml"
++    char * pszFileExt = strrchr(pszInFilePath, '.');
++    if (strcmp(pszFileExt, ".xml") != 0)
++    {
++        nFileExtLen += strlen(pszFileExt);
++    }
++
++    strncpy(pszOutFilePath, pszInFilePath, strlen(pszInFilePath) - nFileExtLen); // remove extension to be added with the name
++    strcat(pszOutFilePath, pszTimeExtension);
++
++
++    // init vars, load files
++    pbInFile = solv_xfopen(pszInFilePath, "r");
++    if (!pbInFile)
++    {
++        dwError = ERROR_TDNF_FILTER_IO;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    pbOutFile = fopen(pszOutFilePath, "w");
++    if (!pbOutFile)
++    {
++        dwError = ERROR_TDNF_FILTER_IO;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++
++    pData = (TDNFFilterData *) malloc(sizeof(TDNFFilterData));
++    if (!pData)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    pData->nBufferMaxLen = 5000;
++    pData->pszElementBuffer = (char *)malloc(pData->nBufferMaxLen * sizeof(char));
++    if (!pData->pszElementBuffer)
++    {
++        dwError = ERROR_TDNF_FILTER_MEMORY;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++    bzero(pData->pszElementBuffer, pData->nBufferMaxLen);
++    pData->pbOutfile = pbOutFile;
++    pData->nSearchTime = nEpochTime;
++    pData->nDepth = 0;
++    pData->nBufferLen = 0;
++    pData->nInPackage = 0;
++    pData->nPrintPackage = 0;
++    pData->nTimeFound = 0;
++
++    //create parser
++    pbParser = XML_ParserCreate(NULL);
++    if (!pbParser)
++    {
++        dwError = ERROR_TDNF_FILTER_PARSE;
++        BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++    }
++
++    XML_SetUserData(pbParser, pData);
++    XML_SetElementHandler(pbParser, TDNFFilterStartElement, TDNFFilterEndElement);
++    XML_SetCharacterDataHandler(pbParser, TDNFFilterCharDataHandler);
++
++    //parse XML
++    fprintf(pbOutFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
++    int nInputEof;
++    do
++    {
++        void * pszXMLParseBuffer = XML_GetBuffer(pbParser, BUFSIZ);
++        if (!pszXMLParseBuffer)
++        {
++            fprintf(stderr, "Couldn't allocate memory for buffer\n");
++            dwError = ERROR_TDNF_FILTER_PARSE;
++            BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++        }
++
++        const size_t len = fread(pszXMLParseBuffer, 1, BUFSIZ - 1, pbInFile);
++        ((char *)pszXMLParseBuffer)[len] = '\0';
++
++        nInputEof = feof(pbInFile);
++
++        if (XML_ParseBuffer(pbParser, (int)len, nInputEof) == XML_STATUS_ERROR)
++        {
++            fprintf(stderr,
++                "Parse error at line %lu:\n%s\n",
++                XML_GetCurrentLineNumber(pbParser),
++                XML_ErrorString(XML_GetErrorCode(pbParser)));
++            dwError = ERROR_TDNF_FILTER_PARSE;
++            BAIL_ON_TDNF_XML_FILTER_ERROR(dwError);
++        }
++    } while (!nInputEof);
++
++cleanup:
++    if (pData)
++    {
++        if (pData->pszElementBuffer) {
++            free(pData->pszElementBuffer);
++        }
++        free(pData);
++    }
++
++    if (pbParser)
++    {
++        XML_ParserFree(pbParser);
++    }
++
++    if (pbOutFile)
++    {
++        fclose(pbOutFile);
++    }
++
++    if (pbInFile)
++    {
++        fclose(pbInFile);
++    }
++
++    return pszOutFilePath;
++error:
++    printf("error filter file\n");
++    goto cleanup;
++}
++// #### END XML FILTER CODE ####
++
+ uint32_t
+ SolvLoadRepomd(
+     Repo* pRepo,
+@@ -53,6 +562,7 @@ SolvLoadRepomdPrimary(
+ {
+     uint32_t dwError = 0;
+     FILE *fp = NULL;
++
+     if( !pRepo || IsNullOrEmptyString(pszPrimary))
+     {
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+@@ -75,6 +585,7 @@ cleanup:
+     {
+         fclose(fp);
+     }
++
+     return dwError;
+ 
+ error:
+@@ -195,10 +706,15 @@ SolvReadYumRepo(
+     const char *pszPrimary,
+     const char *pszFilelists,
+     const char *pszUpdateinfo,
+-    const char *pszOther
++    const char *pszOther,
++    time_t pnRepoEpochLimit
+     )
+ {
+     uint32_t dwError = 0;
++    // new vars for Filter
++    char * szPrimary = (char *) pszPrimary;
++    char * tempPrimaryRepoFile = NULL;
++    // end new vars
+     if(!pRepo || !pszRepoName || !pszRepomd || !pszPrimary)
+     {
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+@@ -209,7 +725,15 @@ SolvReadYumRepo(
+     BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+ 
+ 
+-    dwError = SolvLoadRepomdPrimary(pRepo, pszPrimary);
++    // Run filter if option present
++    if (pnRepoEpochLimit != NULL){
++        tempPrimaryRepoFile = TDNFFilterFile(pszPrimary, pnRepoEpochLimit); // hardcoded magic number (jan 1 2024 epoch time)
++        szPrimary = tempPrimaryRepoFile;
++    }
++    // End filter code
++
++    // Replace with call to shared variable
++    dwError = SolvLoadRepomdPrimary(pRepo, szPrimary);
+     BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+ 
+     if(pszFilelists)
+@@ -232,6 +756,12 @@ SolvReadYumRepo(
+ 
+ 
+ cleanup:
++    if(tempPrimaryRepoFile != NULL)
++    {
++        //printf("temp repo file path: %s\n", tempPrimaryRepoFile);
++        remove(tempPrimaryRepoFile);
++        free(tempPrimaryRepoFile);
++    }
+ 
+     return dwError;
+ 
+diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
+index bc4cf83..9c6407f 100644
+--- a/tools/cli/lib/help.c
++++ b/tools/cli/lib/help.c
+@@ -23,6 +23,7 @@ static const char *help_msg =
+  "           [--downloadonly]\n"
+  "           [--enablerepo=<repoid>]\n"
+  "           [--enableplugin=<plugin_name>]\n"
++ "           [--epochtimelimit=<epoch_time>]\n"
+  "           [--exclude [file1,file2,...]]\n"
+  "           [--installroot [path]]\n"
+  "           [--noautoremove]\n"
+diff --git a/tools/cli/lib/parseargs.c b/tools/cli/lib/parseargs.c
+index 0558611..0e3469d 100644
+--- a/tools/cli/lib/parseargs.c
++++ b/tools/cli/lib/parseargs.c
+@@ -44,6 +44,7 @@ static struct option pstOptions[] =
+     {"downloadonly",  no_argument, &_opt.nDownloadOnly, 1}, //--downloadonly
+     {"enableplugin",  required_argument, 0, 0},            //--enableplugin
+     {"enablerepo",    required_argument, 0, 0},            //--enablerepo
++    {"epochtimelimit",required_argument, 0, 0},            //--epochtimelimit
+     {"exclude",       required_argument, 0, 0},            //--exclude
+     {"help",          no_argument, 0, 'h'},                //-h --help
+     {"installroot",   required_argument, 0, 'i'},          //--installroot
+-- 
+2.34.1
+

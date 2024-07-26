@@ -5,7 +5,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,10 @@ Patch3:         tdnf-printf-fix.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/commit/5311b5ed0867a40ceb71b89358d70290bc2d0c51
 Patch4:         tdnf-sqlite-library.patch
+
+# Patch in vitual snapshot
+Patch5:			virtual-repo-snapshot.patch
+
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -215,6 +219,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Fri Jul 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-2
+- Add tdnf virtual repo snapshots
+
 * Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-1
 - Upgrade tdnf to version 3.5.6 for Azure Linux 3.0
 - Remove patches which are no longer needed
