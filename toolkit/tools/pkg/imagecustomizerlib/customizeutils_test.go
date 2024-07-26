@@ -272,6 +272,9 @@ func TestCustomizeImageAdditionalDirsInfiniteFile(t *testing.T) {
 	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
 	// Make a directory that contains an infinite file.
+	// Specifically, a file that symlinks to /dev/zero, which is a virtual file that contains
+	// infinite bytes of 0. This should cause the copy operation to run out of free space on
+	// the disk.
 	srcDirPath := filepath.Join(testTmpDir, "a")
 	infiniteFilePath := filepath.Join(srcDirPath, "zero")
 
