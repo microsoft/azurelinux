@@ -140,9 +140,7 @@ Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
 Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
-Patch4:         Port-to-maven-3.8.1.patch
-Patch5:         0001-Maven-resolver-patch.patch
-Patch6:         0002-Port-to-maven-resolver-1.7.2.patch
+Patch4:         CVE-2021-26291.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -204,7 +202,7 @@ Provides:       bundled(maven-parent) = 34
 Provides:       bundled(maven-plugin-testing) = 3.3.0
 Provides:       bundled(maven-plugin-tools) = 3.6.0
 Provides:       bundled(maven-remote-resources-plugin) = 1.7.0
-Provides:       bundled(maven-resolver) = 1.6.1
+Provides:       bundled(maven-resolver) = 1.7.0
 Provides:       bundled(maven-resources-plugin) = 3.2.0
 Provides:       bundled(maven-resources) = 1.4
 Provides:       bundled(maven-shared-incremental) = 1.1
@@ -304,11 +302,6 @@ pushd "downstream/plexus-archiver"
 popd
 
 %patch4 -p1
-%patch5 -p1
-
-pushd "downstream/maven"
-%patch6 -p1
-popd
 
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
@@ -395,7 +388,8 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 
 %changelog
 * Tue Jul 09 2024 Sindhu Karri <lakarri@microsoft.com> - 1.5.0-6
-- Update maven to 3.8.1 to fix CVE-2021-26291
+- Update maven to 3.8.1 and maven-resolver to 1.7.0 to fix CVE-2021-26291
+- Add the CVE-2021-26291.patch to enable these upgrades
 
 * Fri Mar 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-5
 - Update Guava to fix CVE-2023-2976 using Fedora 40 (License: MIT).
