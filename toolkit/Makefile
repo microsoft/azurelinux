@@ -151,30 +151,8 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## REMAINING BUILD FLAGS ########
 
-ifneq ($(DAILY_BUILD_ID),)
-   $(warning Using Daily Build $(DAILY_BUILD_ID))
-   # Ensure build_arch is set
-   ifeq ($(build_arch),)
-      $(error build_arch must be set when using DAILY_BUILD_ID)
-   endif
-   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
-   ifeq ($(build_arch),x86_64)
-      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
-      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/SRPMS
-   else
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
-   endif
-else
-   ifeq ($(USE_PREVIEW_REPO),y)
-      # Configure the preview repo
-      include $(SCRIPTS_DIR)/preview.mk
-   endif
-endif
+# Daily build ID and repo configuration
+include $(SCRIPTS_DIR)/daily_build.mk
 
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -214,6 +192,12 @@ include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 include $(SCRIPTS_DIR)/tools.mk
+
+# Based on daily build configuration, configure testing repos
+include $(SCRIPTS_DIR)/preview.mk
+
+# Dynamically update toolchain and chroot manifests for some flows with:
+include $(SCRIPTS_DIR)/manifests.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
