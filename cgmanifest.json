@@ -4130,8 +4130,8 @@
         "type": "other",
         "other": {
           "name": "gdb",
-          "version": "11.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
+          "version": "13.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-13.2.tar.xz"
         }
       }
     },

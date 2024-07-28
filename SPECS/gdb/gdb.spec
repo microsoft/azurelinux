@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
-Version:        11.2
-Release:        2%{?dist}
+Version:        13.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ BuildRequires:  python3-libs
 BuildRequires:  readline-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
+BuildRequires:  gmp-devel
 %if %{with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
@@ -71,6 +72,7 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
+
 %make_build check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
@@ -78,6 +80,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %license COPYING
 %exclude %{_datadir}/locale
 %exclude %{_includedir}/*.h
+%exclude %{_libdir}/libsframe.a
 %{_includedir}/gdb/*.h
 %{_libdir}/*.so
 %{_infodir}/*.gz
@@ -88,6 +91,9 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Wed Oct 23 2023 Andy Zaugg <azaugg@linkedin.com> - 13.2-1
+- Upgrade to gdb 13.2
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
