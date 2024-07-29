@@ -123,7 +123,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon July 8 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8.4
+* Mon July 29 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8.4
 - Patch CVE-2024-24790
 
 * Mon Jan 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-3

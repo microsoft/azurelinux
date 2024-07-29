@@ -156,8 +156,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Jul 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.4
-- Bump version to 1.22.4
+* Mon Jul 29 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.5
+- Bump version to 1.22.5 to address CVE-2024-24790
 
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.11-1
 - Bump version to 1.21.11 to address CVE-2024-24790
