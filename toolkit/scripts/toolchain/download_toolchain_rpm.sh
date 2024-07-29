@@ -7,7 +7,7 @@ set -e
 # Usage print
 function usage() {
     echo "Usage: $0 --downloader-tool <downloader_tool> --rpm-name <rpm_name> --dst <dst_file> --log-base <log_base>" \
-    "--url-list <url_list> [--cert <cert>] [--key <key>] [--enforce-signatures] [--allowable-gpg-keys <allowable_gpg_keys>]"
+    "--url-list <url_list> [--certificate <cert>] [--private-key <key>]"
 
     echo "-t|--downloader-tool: Path to our go downloader tool"
     echo "-r|--rpm-name: Name of the RPM to download"
