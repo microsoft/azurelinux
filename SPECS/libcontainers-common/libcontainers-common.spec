@@ -48,9 +48,9 @@ Source8:        default.yaml
 Source9:        %{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
 Patch0:         CVE-2021-44716.patch
-Patch1:         CVE-2021-43565.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch1:         CVE-2024-37298.patch
+Patch2:         CVE-2021-43565.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
