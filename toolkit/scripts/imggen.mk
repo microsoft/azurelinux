@@ -146,7 +146,7 @@ $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
 	@touch $@
 	@echo Finished updating $@
 
-$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(assets_files)
+$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(license_results_file_img) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(assets_files)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	mkdir -p $(imager_disk_output_dir) && \
 	rm -rf $(imager_disk_output_dir)/* && \
@@ -229,7 +229,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 
 # We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as
 # order-only-prerequisites to initrd_img
-iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary)
+iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary) $(license_results_file_img)
 # The initrd bundles these files into the image, we should rebuild it if they change
 initrd_bundled_files = $(go-liveinstaller) $(go-imager) $(assets_files) $(initrd_assets_files) $(imggen_local_repo)
 
