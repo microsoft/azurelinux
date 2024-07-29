@@ -13,7 +13,7 @@ toolkit_component_extra_files = \
 	$(toolkit_root)/.gitignore
 
 mariner_repos_dir = $(PROJECT_ROOT)/SPECS/azurelinux-repos
-mariner_repos_files = $(wildcard $(mariner_repos_dir)/*.repo)
+mariner_repos_files = $(wildcard $(mariner_repos_dir)/*.repo) $(wildcard $(mariner_repos_dir)/MICROSOFT-*-GPG-KEY)
 rpms_snapshot_name = rpms_snapshot.json
 specs_dir_name = $(notdir $(SPECS_DIR))
 toolkit_remove_archive = $(OUT_DIR)/toolkit-*.tar*

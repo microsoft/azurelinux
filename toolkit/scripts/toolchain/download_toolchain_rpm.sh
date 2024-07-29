@@ -7,7 +7,7 @@ set -e
 # Usage print
 function usage() {
     echo "Usage: $0 --downloader-tool <downloader_tool> --rpm-name <rpm_name> --dst <dst_file> --log-base <log_base>" \
-    "--url-list <url_list> [--certificate <cert>] [--private-key <key>]"
+    "--url-list <url_list> [--certificate <cert>] [--private-key <key>] [--enforce-signatures] [--allowable-gpg-keys <allowable_gpg_keys>]"
 
     echo "-t|--downloader-tool: Path to our go downloader tool"
     echo "-r|--rpm-name: Name of the RPM to download"
@@ -19,6 +19,8 @@ function usage() {
     echo "           until the RPM is successfully downloaded. Full URL will be <url>/<rpm_name>"
     echo "-c|--certificate: Optional path to a certificate file to use for the download"
     echo "-k|--private-key: Optional path to a private key file to use for the download"
+    echo "-K|--enforce-signatures: Optional flag to enforce RPM signatures"
+    echo "-g|--allowable-gpg-keys: Optional space separated list of GPG keys to allow for signature validation"
     exit 1
 }
 
@@ -31,6 +33,8 @@ hydrate=false
 url_list=""
 cert=""
 key=""
+enforce_signatures=false
+allowable_gpg_keys=""
 
 while (( "$#")); do
     case "$1" in
@@ -64,6 +68,14 @@ while (( "$#")); do
             ;;
         -k|--private-key)
             key=$2
+            shift 2
+            ;;
+        -K|--enforce-signatures)
+            enforce_signatures=true
+            shift
+            ;;
+        -g|--allowable-gpg-keys)
+            allowable_gpg_keys=$2
             shift 2
             ;;
         -h|--help)
@@ -104,6 +116,13 @@ if [ -n "$key" ]; then
     key="--private-key=$key"
 fi
 
+if $enforce_signatures; then
+    if [ -z "$allowable_gpg_keys" ]; then
+        echo "Must provide allowable GPG keys when enforcing signatures"
+        usage
+    fi
+fi
+
 function download() {
     # Ensure the destination directory exists
     dst_dir=$(dirname "$dst_file")
@@ -139,6 +158,29 @@ function download() {
     exit 1
 }
 
+function validate_signatures() {
+    work_dir=$(mktemp -d)
+
+    echo "Validating toolchain RPM: $rpm_name" | tee -a "$log_file"
+
+    for key in $allowable_gpg_keys; do
+        echo "Adding key ($key) to empty workdir at ($work_dir)" >> "$log_file"
+        rpmkeys --root "$work_dir" --import "$key" >> "$log_file"
+    done
+
+    if ! rpm --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
+        echo "Failed to validate toolchain package $rpm_name signature, aborting." | tee -a "$log_file"
+        rm -rf "$work_dir"
+        exit 1
+    fi
+
+    rm -rf "$work_dir"
+}
+
 mkdir -p "$(dirname "$log_file")"
 
 download
+
+if $enforce_signatures; then
+    validate_signatures
+fi
