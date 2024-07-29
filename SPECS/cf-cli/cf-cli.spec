@@ -1,5 +1,9 @@
+# NOTE(mfrw): Modify the CF_BUILD_SHA by running: `git rev-parse --short HEAD` on the release
+%global cf_build_sha efd1d03e7
+
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
+# Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.3
 Release:        2%{?dist}
 License:        Apache-2.0
@@ -45,7 +49,7 @@ tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No mod download use vednor cache locally
 sed -i 's/GOFLAGS := -mod=mod/GOFLAGS := -mod=vendor/' ./Makefile
-make build
+make build CF_BUILD_SHA=%{cf_build_sha}
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -62,6 +66,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 
 %changelog
 * Mon Jul 29 2024 Muhammad Falak <mwani@microsoft.com> - 8.7.3-2
+- Fix CF_BUILD_SHA to have correct build sha in the binary
 - Move Source1 un-taring in prep section
 - Address CVE-2023-39325
 
