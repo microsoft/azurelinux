@@ -168,7 +168,7 @@ function validate_signatures() {
         rpmkeys --root "$work_dir" --import "$key" >> "$log_file"
     done
 
-    if ! rpm --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
+    if ! rpmkeys --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
         echo "Failed to validate toolchain package $rpm_name signature, aborting." | tee -a "$log_file"
         rm -rf "$work_dir"
         exit 1
