@@ -23,7 +23,7 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        6.6.39.1
+Version:        6.6.35.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -414,9 +414,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.39.1-1
-- Auto-upgrade to 6.6.39.1
-
 * Tue Jul 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1
 - Auto-upgrade to 6.6.35.1
 
