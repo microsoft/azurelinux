@@ -370,7 +370,14 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+<<<<<<< HEAD
 * Mon Jul 22 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-34
+=======
+* Mon Jul 29 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-34
+- Bug fix for the Patch CVE-2024-5535
+
+* Mon Jul 22 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-33
+>>>>>>> 1d6d14d32 (Bug fix in patch CVE-2024-5535 in openssl (#9957))
 - Patch CVE-2024-5535
 
 * Tue Jul 16 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-33
