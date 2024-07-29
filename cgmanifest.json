@@ -5400,8 +5400,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.61",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.61.tar.bz2"
+          "version": "2.4.62",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
         }
       }
     },
@@ -22914,8 +22914,8 @@
         "type": "other",
         "other": {
           "name": "python-idna",
-          "version": "3.3",
-          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.3.tar.gz"
+          "version": "3.7",
+          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.7.tar.gz"
         }
       }
     },
