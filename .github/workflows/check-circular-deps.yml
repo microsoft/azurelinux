@@ -24,8 +24,6 @@ jobs:
           echo "Checking for circular dependency loops..."
           # Call this script to sync the toolchain manifests with the LKG daily build.
           ./toolkit/scripts/setuplkgtoolchain.sh
-          # Determine the LKG daily build ID.
-          LKG_BUILD_ID=$(wget -qO - https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json | jq -r ".dailybuildid" | tr '\.' '-')
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          sudo make -C toolkit -j$(nproc) graph REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
+          sudo make -C toolkit -j$(nproc) graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
