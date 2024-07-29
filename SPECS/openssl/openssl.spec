@@ -370,7 +370,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %changelog
 * Mon Jul 29 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-34
-- But fix for the Patch CVE-2024-5535
+- Bug fix for the Patch CVE-2024-5535
 
 * Mon Jul 22 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-33
 - Patch CVE-2024-5535
