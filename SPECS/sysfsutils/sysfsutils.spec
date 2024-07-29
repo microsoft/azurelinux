@@ -1,13 +1,13 @@
 Name:           sysfsutils
-Version:        2.1.0
-Release:        30%{?dist}
+Version:        2.1.1
+Release:        1%{?dist}
 Summary:        Utilities for interfacing with sysfs
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 
-Source0:        http://prdownloads.sourceforge.net/linux-diag/%{name}-%{version}.tar.gz
+Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz
 Patch0:         sysfsutils-2.0.0-redhatify.patch
 Patch1:         sysfsutils-2.0.0-class-dup.patch
 Patch2:         sysfsutils-2.1.0-get_link.patch

@@ -28146,8 +28146,8 @@
         "type": "other",
         "other": {
           "name": "sysfsutils",
-          "version": "2.1.0",
-          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/linux-ras/sysfsutils/archive/refs/tags/v2.1.1.tar.gz"
         }
       }
     },
