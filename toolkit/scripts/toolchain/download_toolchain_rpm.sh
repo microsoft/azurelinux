@@ -159,7 +159,13 @@ function download() {
 }
 
 function validate_signatures() {
-    work_dir=$(mktemp -d)
+    if [ -z "$work_dir" ]; then
+        work_dir=$(mktemp -d)
+        function cleanup() {
+            rm -rf "$work_dir"
+        }
+        trap cleanup EXIT
+    fi
 
     echo "Validating toolchain RPM: $rpm_name" | tee -a "$log_file"
 
@@ -170,11 +176,8 @@ function validate_signatures() {
 
     if ! rpmkeys --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
         echo "Failed to validate toolchain package $rpm_name signature, aborting." | tee -a "$log_file"
-        rm -rf "$work_dir"
         exit 1
     fi
-
-    rm -rf "$work_dir"
 }
 
 mkdir -p "$(dirname "$log_file")"
