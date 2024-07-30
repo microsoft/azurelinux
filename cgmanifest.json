@@ -2387,8 +2387,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "8.5.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-8.5.0.tar.gz"
+          "version": "8.8.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.8.0.tar.gz"
         }
       }
     },
@@ -8351,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.19.4",
-          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.4.tar.gz"
+          "version": "1.21.3",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
         }
       }
     },
@@ -10041,8 +10041,8 @@
         "type": "other",
         "other": {
           "name": "libmemcached-awesome",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.1.tar.gz"
+          "version": "1.1.4",
+          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.4.tar.gz"
         }
       }
     },
@@ -15784,8 +15784,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.10.1",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.10.1.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.9.5.tar.gz"
         }
       }
     },
