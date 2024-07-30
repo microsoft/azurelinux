@@ -14,6 +14,7 @@ USEPKGBLDCACHE=y
 
 helpFuncion () {
 	echo ""
+	echo "Build a package(s) for 3.0 locally:"
 	echo "-h  : Print detailed usage"
         echo "-s  : Spec Dir [Default SPECS] [Possible values: ../SPECS-EXTENDED, ../SPECS]"
         echo "-b  : DAILY_BUILD_ID of the format of 3-0-YYYYMMDD [Default 'lkg']"
