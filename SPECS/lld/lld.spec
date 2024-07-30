@@ -1,4 +1,5 @@
 %global lld_srcdir llvm-project-llvmorg-%{version}
+%global install_prefix /usr
 
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
@@ -37,27 +38,28 @@ Shared libraries for LLD.
 
 %prep
 %autosetup -n %{lld_srcdir}
+grep -rli 'llvm/Option/OptParser.td' * | xargs -i@ sed -i 's|llvm/Option/OptParser.td|/usr/src/azl/BUILD/llvm-project-llvmorg-18.1.2/llvm/include/llvm/Option/OptParser.td|g' @
 
 %build
 mkdir -p build
 cd build
-%cmake \
-       -G Ninja                                                   \
+cmake \
        -DCMAKE_BUILD_TYPE=Release                                 \
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
+       -DCMAKE_INSTALL_PREFIX=%{install_prefix}                   \
        -DBUILD_SHARED_LIBS:BOOL=ON                                \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
        -Wno-dev                                                   \
        ../lld
 
-%ninja_build
+%cmake_build
 
 %install
 cd build
-%ninja_install
+%cmake_install
 
 %files
 %license LICENSE.TXT
