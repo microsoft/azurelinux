@@ -74,7 +74,7 @@ fi
 
 if [ -z "$packageVar" ]
 then
-	echo "Package var needs to be set:";
+	echo "Package to build needs to be set:";
 	helpFuncion
 	exit 1
 fi
