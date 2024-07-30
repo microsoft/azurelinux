@@ -5390,13 +5390,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-<<<<<<< HEAD
-          "version": "2.4.59",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.59.tar.bz2"
-=======
           "version": "2.4.62",
           "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
->>>>>>> 4a611ad53 (Upgrade httpd to 2.4.62 to address CVE-2024-40725 (#9925))
         }
       }
     },
