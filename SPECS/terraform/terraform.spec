@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,7 +65,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
-* Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-16
+* Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-17
 - Patch CVE-2024-6257 in vendored hashicorp/go-getter
 
 * Mon Jul 29 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-16
