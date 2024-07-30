@@ -71,8 +71,9 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
+%patch 1 -p1
 # copy the LICENSE file in the build root
-%patch 1 -p1 -d ../podman-%{podmanver}
+%patch 2 -p1 -d ../podman-%{podmanver}
 cd ..
 cp %{SOURCE2} .
 
