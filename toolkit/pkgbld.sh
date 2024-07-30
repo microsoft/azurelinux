@@ -8,7 +8,7 @@
 TOBUILD=
 BID=lkg
 RC=n
-WCREFRESH=n
+WCREFRESH=y
 SDIR=../SPECS
 USEPKGBLDCACHE=y
 
@@ -19,7 +19,7 @@ helpFuncion () {
         echo "-b  : DAILY_BUILD_ID of the format of 3-0-YYYYMMDD [Default 'lkg']"
         echo "-c  : Run with check distabled/enabled [Default RUN_CHECK=n]"
         echo "-p  : Package to build/rebuild [Default all]"
-        echo "-r  : Refresh worker chroot [Default false]"
+        echo "-r  : Refresh worker chroot [Default true]"
         echo "-f  : Force a Rebuild"
         echo "-n  : Cleanup input-srpms expand-srpms"
         echo "-d  : Show the command to be executed."
@@ -44,7 +44,7 @@ do
 		b ) buildidVar="$OPTARG";;
 		c ) checkVar=y;;
 		p ) packageVar="$OPTARG";;
-		r ) refreshVar=y;;
+		r ) refreshVar=n;;
 		f ) forceVar=y;;
 		n ) nukeVar=y;;
 		d ) dryrunVar=y;;
@@ -87,7 +87,7 @@ fi
 
 if [ -n "$refreshVar" ]
 then
-	WCREFRESH=y
+	WCREFRESH=n
 fi
 
 if [ -n "$forceVar" ]
