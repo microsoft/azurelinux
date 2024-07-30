@@ -7,12 +7,12 @@
         "device": "flash",
         "mode" : "split",
         "executable": {
-            "filename": "/usr/share/edk2/ovmf/OVMF_CODE_4M.qcow2",
-            "format": "qcow2"
+            "filename": "/usr/share/edk2/ovmf/OVMF_CODE_4M.fd",
+            "format": "raw"
         },
         "nvram-template": {
-            "filename": "/usr/share/edk2/ovmf/OVMF_VARS_4M.qcow2",
-            "format": "qcow2"
+            "filename": "/usr/share/edk2/ovmf/OVMF_VARS_4M.fd",
+            "format": "raw"
         }
     },
     "targets": [

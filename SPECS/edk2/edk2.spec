@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    39%{?dist}
+Release:    40%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -386,11 +386,15 @@ virt-fw-vars --input   Fedora/ovmf-ia32/OVMF_VARS.fd \
 build_iso Fedora/ovmf
 build_iso Fedora/ovmf-ia32
 
-for raw in */ovmf/*_4M*.fd; do
-    qcow2="${raw%.fd}.qcow2"
-    qemu-img convert -f raw -O qcow2 -o cluster_size=4096 -S 4096 "$raw" "$qcow2"
-    rm -f "$raw"
-done
+# Fedora converts `*/ovmf/*_4M*.fd` into `*/ovmf/*_4M*.qcow2`, but this
+# doesn't work at runtime with libvirt/qemu.  So comment below logic for
+# Mariner.
+#
+# for raw in */ovmf/*_4M*.fd; do
+#     qcow2="${raw%.fd}.qcow2"
+#     qemu-img convert -f raw -O qcow2 -o cluster_size=4096 -S 4096 "$raw" "$qcow2"
+#     rm -f "$raw"
+# done
 
 # experimental stateless builds
 virt-fw-vars --input   Fedora/experimental/OVMF.stateless.fd \
@@ -398,14 +402,15 @@ virt-fw-vars --input   Fedora/experimental/OVMF.stateless.fd \
              --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
              --enroll-redhat --secure-boot
 
+# Fedora converts `*/ovmf/*_4M*.fd` into `*/ovmf/*_4M*.qcow2`, but this
+# doesn't work at runtime with libvirt/qemu.  Modify below to use `*_4M.fd`.
 for image in \
 	Fedora/ovmf/OVMF_CODE.secboot.fd \
-	Fedora/ovmf/OVMF_CODE_4M.secboot.qcow2 \
+	Fedora/ovmf/OVMF_CODE_4M.secboot.fd \
 	Fedora/experimental/OVMF.stateless.secboot.fd \
 ; do
 	pcr="${image}"
 	pcr="${pcr%.fd}"
-	pcr="${pcr%.qcow2}"
 	pcr="${pcr}.pcr"
 	python3 /usr/share/doc/python3-virt-firmware/experimental/measure.py \
 		--image "$image" \
@@ -573,10 +578,12 @@ $tests_ok
 %{_datadir}/qemu/firmware/60-edk2-ovmf-x64-inteltdx.json
 %{_datadir}/%{name}/ovmf/MICROVM.fd
 %{_datadir}/qemu/firmware/50-edk2-ovmf-x64-microvm.json
-%{_datadir}/%{name}/ovmf/OVMF_CODE_4M.qcow2
-%{_datadir}/%{name}/ovmf/OVMF_CODE_4M.secboot.qcow2
-%{_datadir}/%{name}/ovmf/OVMF_VARS_4M.qcow2
-%{_datadir}/%{name}/ovmf/OVMF_VARS_4M.secboot.qcow2
+# Fedora converts `*/ovmf/*_4M*.fd` into `*/ovmf/*_4M*.qcow2`, but this
+# doesn't work at runtime with libvirt/qemu.  Modify below to use `*_4M.fd`.
+%{_datadir}/%{name}/ovmf/OVMF_CODE_4M.fd
+%{_datadir}/%{name}/ovmf/OVMF_CODE_4M.secboot.fd
+%{_datadir}/%{name}/ovmf/OVMF_VARS_4M.fd
+%{_datadir}/%{name}/ovmf/OVMF_VARS_4M.secboot.fd
 %{_datadir}/%{name}/ovmf/*.pcr
 # endif build_ovmf
 %endif
@@ -700,6 +707,9 @@ $tests_ok
 
 
 %changelog
+* Thu Jul 25 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 20230301gitf80f052277c8-40
+- Fix to enable Mariner to host qemu UEFI guest
+
 * Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39
 - Apply CVE-2024-1298 patch
 

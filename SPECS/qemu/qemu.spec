@@ -36,6 +36,9 @@
 %global have_usbredir 1
 %global enable_werror 0
 %global have_edk2 0
+# edk2 is built according to its spec: ExclusiveArch: x86_64 
+# ovmf is needed for supported arch though, introduce have_edk2_ovmf
+%global have_edk2_ovmf 1
 %global have_pmem 0
 %ifarch x86_64
 %global have_pmem 1
@@ -217,7 +220,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -924,7 +927,7 @@ Requires:       %{name}-common = %{version}-%{release}
 Requires:       seabios-bin
 Requires:       seavgabios-bin
 Requires:       sgabios-bin
-%if %{have_edk2}
+%if %{have_edk2_ovmf}
 Requires:       edk2-ovmf
 %endif
 Requires:       %{name}-ipxe = %{version}-%{release}
@@ -2309,6 +2312,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Thu Jul 25 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 6.2.0-20
+- Ensure edk2 dependency
+
 * Mon Oct 30 2023 Jonathan Behrens <jbehrens@microsoft.com> - 6.2.0-19
 - Address CVE-2023-3354
 
