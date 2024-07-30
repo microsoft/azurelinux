@@ -28147,7 +28147,7 @@
         "other": {
           "name": "sysfsutils",
           "version": "2.1.1",
-          "downloadUrl": "https://github.com/linux-ras/sysfsutils/archive/refs/tags/v2.1.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sysfsutils-2.1.1.tar.gz"
         }
       }
     },
