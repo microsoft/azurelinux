@@ -17,7 +17,7 @@ helpFuncion () {
 	echo "-h  : Print detailed usage"
         echo "-s  : Spec Dir [Default SPECS] [Possible values: ../SPECS-EXTENDED, ../SPECS]"
         echo "-b  : DAILY_BUILD_ID of the format of 3-0-YYYYMMDD [Default 'lkg']"
-        echo "-c  : Run with check distabled/enabled [Default RUN_CHECK=n]"
+        echo "-c  : Run with check disabled/enabled [Default disabled]"
         echo "-p  : Package to build/rebuild [Default all]"
         echo "-r  : Refresh worker chroot [Default true]"
         echo "-f  : Force a Rebuild"
