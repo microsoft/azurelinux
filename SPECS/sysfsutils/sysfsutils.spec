@@ -8,8 +8,6 @@ URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 
 Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Patch0:         sysfsutils-2.0.0-redhatify.patch
-Patch2:         sysfsutils-aarch64.patch
 
 BuildRequires:  gcc
 
@@ -35,11 +33,6 @@ to build programs using the libsysfs API.
 
 %prep
 %setup -q
-%patch 0 -p1 -b .redhatify
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
 
 %build
 %configure --disable-static --libdir=/%{_lib}
