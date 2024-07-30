@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.39.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jul 30 2024 Chris Co <chrco@microsoft.com> - 6.6.39.1-2
+- Enable DMI_SYSFS as module
+- Enable EROFS_FS as module
+- Enable DM_VERITY_VERIFY_ROOTHASH_SIG_SECONDARY_KEYRING
+- Enable IMA_ARCH_POLICY
+- Enable INTEGRITY_MACHINE_KEYRING
+
 * Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.39.1-1
 - Auto-upgrade to 6.6.39.1
 
