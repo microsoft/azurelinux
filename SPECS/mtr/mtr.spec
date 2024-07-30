@@ -3,7 +3,7 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,6 +61,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 0.95-2
+- Promoting package from SPECS-EXTENDED to SPECS
+
 * Thu Jun 23 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.95-1
 - Upgrade version to 0.95 to fix build break
 - License verified

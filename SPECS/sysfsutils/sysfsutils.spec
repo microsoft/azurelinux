@@ -1,20 +1,16 @@
 Name:           sysfsutils
-Version:        2.1.0
-Release:        29%{?dist}
+Version:        2.1.1
+Release:        1%{?dist}
 Summary:        Utilities for interfacing with sysfs
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 
-Source0:        http://prdownloads.sourceforge.net/linux-diag/%{name}-%{version}.tar.gz
-Patch0:         sysfsutils-2.0.0-redhatify.patch
-Patch1:         sysfsutils-2.0.0-class-dup.patch
-Patch2:         sysfsutils-2.1.0-get_link.patch
-Patch3:         sysfsutils-2.1.0-manpages.patch
-Patch4:         sysfsutils-aarch64.patch
+Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  autoconf automake libtool libmount-devel openssl-devel
 
 %description
 This package's purpose is to provide a set of utilities for interfacing
@@ -38,13 +34,9 @@ to build programs using the libsysfs API.
 
 %prep
 %setup -q
-%patch 0 -p1 -b .redhatify
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
 
 %build
+autoreconf -i
 %configure --disable-static --libdir=/%{_lib}
 make %{?_smp_mflags}
 
@@ -58,9 +50,8 @@ find %{buildroot} -type f -name "*.la" -delete
 
 %files
 %license COPYING cmd/GPL
-%doc AUTHORS README NEWS CREDITS ChangeLog docs/libsysfs.txt
+%doc AUTHORS README CREDITS docs/libsysfs.txt
 %{_bindir}/systool
-%{_bindir}/get_module
 %{_mandir}/man1/systool.1.gz
 
 %files -n libsysfs
@@ -72,11 +63,19 @@ find %{buildroot} -type f -name "*.la" -delete
 %{_includedir}/sysfs/libsysfs.h
 %{_includedir}/sysfs/dlist.h
 /%{_lib}/libsysfs.so
+/%{_lib}/pkgconfig/libsysfs.pc
 
 
 %changelog
+* Tue Jul 30 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.1.1-1
+- Upgrading to 2.1.1 with new source
+
+* Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.1.0-30
+- Promoting package from SPECS-EXTENDED to SPECS
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -160,7 +159,7 @@ find %{buildroot} -type f -name "*.la" -delete
 * Thu Feb 14 2008 Jarod Wilson <jwilson@redhat.com> - 2.1.0-2
 - Bump and rebuild with gcc 4.3
 
-* Mon Sep 29 2007 Jarod Wilson <jwilson@redhat.com> - 2.1.0-1
+* Sat Sep 29 2007 Jarod Wilson <jwilson@redhat.com> - 2.1.0-1
 - Update to upstream release 2.1.0
 
 * Mon Sep 11 2006 Neil Horman <nhorman@redhat.com> - 2.0.0-6
@@ -213,7 +212,7 @@ find %{buildroot} -type f -name "*.la" -delete
 * Wed Sep 22 2004 Florian La Roche <Florian.LaRoche@redhat.de>
 - added /sbin/ldconfig calls to post/postun
 
-* Thu Sep 01 2004 AJ Lewis <alewis@redhat.com> 1.1.0-2
+* Wed Sep 01 2004 AJ Lewis <alewis@redhat.com> 1.1.0-2
 - Fix permissions on -devel files
 
 * Fri Aug 13 2004 AJ Lewis <alewis@redhat.com> 1.1.0-1.1

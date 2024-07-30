@@ -2156,6 +2156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cpufrequtils",
+          "version": "008",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/kernel/cpufreq/cpufrequtils-008.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cpuid",
           "version": "20200427",
           "downloadUrl": "http://www.etallen.com/cpuid/cpuid-20200427.src.tar.gz"
@@ -28126,8 +28136,8 @@
         "type": "other",
         "other": {
           "name": "sysfsutils",
-          "version": "2.1.0",
-          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/linux-ras/sysfsutils/archive/refs/tags/v2.1.1.tar.gz"
         }
       }
     },
