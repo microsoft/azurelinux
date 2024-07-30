@@ -318,11 +318,11 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon Jul 22 2024 Sindhu Karri <lakarri@microsoft.com> - 3.9.19-3
-- Patch for CVE-2024-6345
-
-* Tue Jul 23 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.9.19-2
+* Tue Jul 23 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.9.19-3
 - Patch for CVE-2024-0397
+
+* Mon Jul 22 2024 Sindhu Karri <lakarri@microsoft.com> - 3.9.19-2
+- Patch for CVE-2024-6345
 
 * Fri Mar 22 2024 Binu Philip <bphilip@microsoft.com> - 3.9.19-1
 - Upgrade to python 3.9.19 for CVE-2023-6597 and other security fixes
