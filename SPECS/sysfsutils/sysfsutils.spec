@@ -50,9 +50,8 @@ find %{buildroot} -type f -name "*.la" -delete
 
 %files
 %license COPYING cmd/GPL
-%doc AUTHORS README NEWS CREDITS ChangeLog docs/libsysfs.txt
+%doc AUTHORS README CREDITS docs/libsysfs.txt
 %{_bindir}/systool
-%{_bindir}/get_module
 %{_mandir}/man1/systool.1.gz
 
 %files -n libsysfs
