@@ -415,7 +415,7 @@ func TestCustomizeImageSELinuxAndPartitions(t *testing.T) {
 		},
 	}
 
-	imageConnection, err := connectToImage(buildDir, outImageFilePath, false, mountPoints)
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, false /*includeDefaultMounts*/, mountPoints)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -462,7 +462,7 @@ func TestCustomizeImageServicesEnableDisable(t *testing.T) {
 	}
 
 	// Connect to image.
-	imageConnection, err := connectToImage(buildDir, outImageFilePath, true, coreEfiMountPoints)
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, true /*includeDefaultMounts*/, coreEfiMountPoints)
 	if !assert.NoError(t, err) {
 		return
 	}

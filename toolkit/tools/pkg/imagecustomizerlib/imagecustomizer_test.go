@@ -88,7 +88,7 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 }
 
 func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
-	return connectToImage(buildDir, imageFilePath, false, coreEfiMountPoints)
+	return connectToImage(buildDir, imageFilePath, false /*includeDefaultMounts*/, coreEfiMountPoints)
 }
 
 type mountPoint struct {
