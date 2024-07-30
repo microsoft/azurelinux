@@ -10,6 +10,7 @@ License:        GPLv2
 Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  autoconf automake libtool libmount-devel openssl-devel
 
 %description
 This package's purpose is to provide a set of utilities for interfacing
@@ -35,6 +36,7 @@ to build programs using the libsysfs API.
 %setup -q
 
 %build
+autoreconf -i
 %configure --disable-static --libdir=/%{_lib}
 make %{?_smp_mflags}
 
