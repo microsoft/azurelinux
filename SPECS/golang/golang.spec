@@ -1,4 +1,5 @@
-%global bootstrap_compiler_version 1.19.12
+%global bootstrap_compiler_version_0 1.17.13
+%global bootstrap_compiler_version_1 1.21.6
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -13,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.21.11
+Version:        1.22.5
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -22,7 +23,8 @@ Group:          System Environment/Security
 URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
-Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
+Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.tar.gz
+Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -41,11 +43,13 @@ mv -v go go-bootstrap
 %setup -q -n go
 
 %build
-# (go >= 1.20 bootstraps with go >= 1.17)
-# This condition makes go compiler >= 1.20 build a 3 step process:
+# Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
+# And Go 1.20 requires the Go 1.17.
+# This condition makes go compiler >= 1.22 build a 4 step process:
 # - Build the bootstrap compiler 1.4 (bootstrap bits in c)
-# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
-# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
+# - Use the 1.4 compiler to build %{bootstrap_compiler_version_0}
+# - Use the %{bootstrap_compiler_version_0} compiler to build %{bootstrap_compiler_version_1}
+# - Use %{bootstrap_compiler_version_1} to build %{version}
 # PS: Since go compiles fairly quickly, the extra overhead is arounnd 2-3 minutes
 #     on a reasonable machine.
 
@@ -56,21 +60,32 @@ popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version} (bootstrap)
+# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version_0}
 export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version}
-tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version} --strip-components=1
-pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version}/src
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_0}
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_0} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_0}/src
 CGO_ENABLED=0 ./make.bash
 popd
-
-# Nuke the older go1.4 bootstrap
+# Nuke the older %{bootstrap_compiler_version_0}
 rm -rf %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_0} %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
 
-# Make go%{bootstrap_compiler_version} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go1.19.12 %{_libdir}/golang
 
-# Build current go version
+# Use go%{bootstrap_compiler_version_0} bootstrap to compile go%{bootstrap_compiler_version_1} (bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_1}
+tar xf %{SOURCE3} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_1}/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Nuke the older %{bootstrap_compiler_version_1}
+rm -rf %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
+
+# Use %{bootstrap_compiler_version_1} to compile %{version}
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOROOT_BOOTSTRAP=%{goroot}
@@ -141,6 +156,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Jul 29 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.5
+- Bump version to 1.22.5
+
 * Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.11-1
 - Bump version to 1.21.11 to address CVE-2024-24790
 
