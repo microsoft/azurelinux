@@ -3,7 +3,7 @@
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,7 +36,7 @@ programs that use the LLD infrastructure.
 Shared libraries for LLD.
 
 %prep
-%setup -q -n %{lld_srcdir}
+%autosetup -n %{lld_srcdir}
 
 %build
 mkdir -p build
@@ -44,14 +44,14 @@ cd build
 %cmake \
        -G Ninja                                                   \
        -DCMAKE_BUILD_TYPE=Release                                 \
-       -DLLVM_ENABLE_PROJECTS=lld                                 \
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
-       -DBUILD_SHARED_LIBS:BOOL=off                               \
+       -DBUILD_SHARED_LIBS:BOOL=ON                                \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
-       -Wno-dev ../llvm
+       -Wno-dev                                                   \
+       ../lld
 
 %ninja_build
 
@@ -61,22 +61,18 @@ cd build
 
 %files
 %license LICENSE.TXT
-%{_bindir}/*
+%{_bindir}/lld*
+%{_bindir}/ld.lld
+%{_bindir}/ld64.lld
+%{_bindir}/wasm-ld
 
 %files devel
 %{_includedir}/lld/
-%exclude %{_includedir}/llvm-c/
-%exclude %{_includedir}/llvm/
 %{_libdir}/cmake/lld/*.cmake
-%exclude %{_libdir}/cmake/llvm/*.cmake
-%exclude %{_libdir}/cmake/llvm/llvm-driver-template.cpp.in
-%{_libdir}/*.so
-%exclude %{_libdir}/*.a
-%exclude %{_datadir}/opt-viewer/*
+%{_libdir}/liblld*.so
 
 %files libs
-%license LICENSE.TXT
-%{_libdir}/*.so.*
+%{_libdir}/liblld*.so.*
 
 %changelog
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
