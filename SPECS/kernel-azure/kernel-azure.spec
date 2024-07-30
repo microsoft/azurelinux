@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.160.1
+Version:        5.15.162.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -420,6 +420,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Jul 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.162.2-1
+- Auto-upgrade to 5.15.162.2
+
+* Thu Jul 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.162.1-1
+- Auto-upgrade to 5.15.162.1
+
 * Sat Jun 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.160.1-1
 - Auto-upgrade to 5.15.160.1
 

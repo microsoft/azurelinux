@@ -1,7 +1,7 @@
 Summary:        The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 Name:           KeysInUse-OpenSSL
 Version:        0.3.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,7 @@ URL:            https://github.com/microsoft/KeysInUse-OpenSSL
 Source0:        https://github.com/microsoft/KeysInUse-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  golang >= 1.16.6
+BuildRequires:  golang
 BuildRequires:  make
 BuildRequires:  openssl-devel
 Requires:       openssl < 1.1.2
@@ -74,6 +74,9 @@ if [ -x %{_bindir}/keysinuseutil ]; then
 fi
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 0.3.4-6
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.4-5
 - Bump release to rebuild with go 1.21.11
 

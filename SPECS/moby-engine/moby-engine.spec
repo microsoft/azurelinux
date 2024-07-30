@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 5%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -13,7 +13,6 @@ Distribution: Mariner
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: docker.service
 Source2: docker.socket
-Source3: daemon.json
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
 Patch1:  CVE-2024-23651.patch
@@ -22,6 +21,8 @@ Patch1:  CVE-2024-23651.patch
 Patch2:  CVE-2024-23652.patch
 Patch3:  CVE-2023-45288.patch
 Patch4:  CVE-2023-44487.patch
+Patch5:  enable-docker-proxy-libexec-search.patch
+Patch6:  CVE-2024-41110.patch
 
 %{?systemd_requires}
 
@@ -39,7 +40,7 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang >= 1.16.12
+BuildRequires: golang
 BuildRequires: git
 
 Requires: audit
@@ -100,9 +101,6 @@ mkdir -p %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
 
-mkdir -p -m 755 %{buildroot}%{_sysconfdir}/docker
-install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/docker/daemon.json
-
 %post
 if ! grep -q "^docker:" /etc/group; then
     groupadd --system docker
@@ -121,12 +119,21 @@ fi
 # docker-proxy symlink in bindir to fix back-compat
 %{_bindir}/docker-proxy
 %{_libexecdir}/docker-proxy
-%dir %{_sysconfdir}/docker
-%config(noreplace) %{_sysconfdir}/docker/daemon.json
 %{_sysconfdir}/*
 %{_unitdir}/*
 
 %changelog
+<<<<<<< HEAD
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-7
+- Drop requirement on a specific version of golang
+=======
+* Mon Jul 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 24.0.9-7
+- Fix for CVE-2024-41110
+>>>>>>> dd2c6a30e (fix CVE-2024-41110 in moby-engine (#9951))
+
+* Tue Jun 25 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-6
+- Backport upstream change to search /usr/libexec for docker-proxy without daemon.json
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.9-5
 - Bump release to rebuild with go 1.21.11
 

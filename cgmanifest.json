@@ -1817,8 +1817,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor-cvm",
-          "version": "38.0.72",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.tar.gz"
+          "version": "38.0.72.2",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.2.tar.gz"
         }
       }
     },
@@ -2387,8 +2387,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "8.5.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-8.5.0.tar.gz"
+          "version": "8.8.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.8.0.tar.gz"
         }
       }
     },
@@ -3258,8 +3258,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "29.3",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
+          "version": "29.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.4.tar.xz"
         }
       }
     },
@@ -4610,16 +4610,6 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.13",
-          "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
           "version": "1.18.8",
           "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
         }
@@ -4630,18 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.21.11",
-          "downloadUrl": "https://golang.org/dl/go1.21.11.src.tar.gz"
+          "version": "1.22.5",
+          "downloadUrl": "https://golang.org/dl/go1.22.5.src.tar.gz"
         }
       }
     },
@@ -5400,8 +5380,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.59",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.59.tar.bz2"
+          "version": "2.4.62",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
         }
       }
     },
@@ -6560,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.160.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
+          "version": "5.15.162.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.2.tar.gz"
         }
       }
     },
@@ -8141,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.160.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
+          "version": "5.15.162.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.2.tar.gz"
         }
       }
     },
@@ -8151,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.160.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
+          "version": "5.15.162.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.2.tar.gz"
         }
       }
     },
@@ -8161,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.160.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
+          "version": "5.15.162.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.2.tar.gz"
         }
       }
     },
@@ -8171,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.160.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
+          "version": "5.15.162.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.2.tar.gz"
         }
       }
     },
@@ -8181,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.158.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.158.2.tar.gz"
+          "version": "5.15.161.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.161.1.tar.gz"
         }
       }
     },
@@ -8361,8 +8341,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.19.4",
-          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.4.tar.gz"
+          "version": "1.21.3",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
         }
       }
     },
@@ -10051,8 +10031,8 @@
         "type": "other",
         "other": {
           "name": "libmemcached-awesome",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.1.tar.gz"
+          "version": "1.1.4",
+          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.4.tar.gz"
         }
       }
     },
@@ -13663,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.4",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.4-1/go1.22.4-20240604.2.src.tar.gz"
+          "version": "1.22.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.5-1/go1.22.5-20240702.3.src.tar.gz"
         }
       }
     },
@@ -15794,8 +15774,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.10.1",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.10.1.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.9.5.tar.gz"
         }
       }
     },
@@ -22914,8 +22894,8 @@
         "type": "other",
         "other": {
           "name": "python-idna",
-          "version": "3.3",
-          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.3.tar.gz"
+          "version": "3.7",
+          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.7.tar.gz"
         }
       }
     },
@@ -27806,6 +27786,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "shim",
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "shim-unsigned-aarch64",
           "version": "15",
           "downloadUrl": "https://github.com/rhboot/shim/releases/download/15/shim-15.tar.bz2"
@@ -27817,8 +27807,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },

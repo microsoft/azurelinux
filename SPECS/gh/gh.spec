@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,8 +29,9 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 # Available upstream in 2.16.0
 Patch0:         fix-relative-time-search-tests.patch
+Patch1:         CVE-2021-43565.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -40,10 +41,12 @@ Requires:       git
 GitHub official command line tool.
 
 %prep
-%autosetup -p1 -n cli-%{version}
+%setup -q -n cli-%{version}
+%patch0 -p1
+tar --no-same-owner -xf %{SOURCE1}
+%patch1 -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No mod download use vednor cache locally
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor -modcacherw -ldflags=-linkmode=external"
@@ -72,6 +75,14 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+<<<<<<< HEAD
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-19
+- Drop requirement on a specific version of golang
+=======
+* Fri Jul 19 2024 Archana Choudhary <archana1@microsoft.com> - 2.13.0-19
+- Patch for CVE-2021-43565
+>>>>>>> 9b583d8ff (gh: patch CVE-2021-43565 (#9894))
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-18
 - Bump release to rebuild with go 1.21.11
 
