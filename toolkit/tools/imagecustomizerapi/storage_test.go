@@ -253,6 +253,45 @@ func TestStorageIsValidNoLabel(t *testing.T) {
 	assert.ErrorContains(t, err, "idType is set to (part-label) but partition (a) has no label set")
 }
 
+func TestStorageIsValidUniqueLabel(t *testing.T) {
+	storage := Storage{
+		BootType: BootTypeEfi,
+		Disks: []Disk{
+			{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            3 * diskutils.MiB,
+				Partitions: []Partition{
+					{
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
+						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
+						Type:  PartitionTypeESP,
+						Label: "a",
+					},
+					{
+						Id:    "b",
+						Start: 2 * diskutils.MiB,
+						Label: "b",
+					},
+				},
+			},
+		},
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "a",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/",
+				},
+			},
+		},
+	}
+
+	err := storage.IsValid()
+	assert.NoError(t, err)
+}
+
 func TestStorageIsValidDuplicateLabel(t *testing.T) {
 	storage := Storage{
 		BootType: BootTypeEfi,

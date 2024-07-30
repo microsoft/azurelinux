@@ -115,7 +115,7 @@ func (s *Storage) IsValid() error {
 			}
 
 			labelCount := partitionLabelCounts[partition.Label]
-			if labelCount > 0 {
+			if labelCount > 1 {
 				return fmt.Errorf("invalid fileSystem at index %d:\nmore than one partition has a label of (%s)", i,
 					partition.Label)
 			}
