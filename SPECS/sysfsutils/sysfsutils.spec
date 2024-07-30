@@ -62,8 +62,8 @@ find %{buildroot} -type f -name "*.la" -delete
 %dir %{_includedir}/sysfs
 %{_includedir}/sysfs/libsysfs.h
 %{_includedir}/sysfs/dlist.h
-/%{_lib}/libsysfs.so
-%{_libdir}/pkgconfig/libsysfs.pc   # Add this line
+%{_libdir}/libsysfs.so
+%{_libdir}/pkgconfig/libsysfs.pc
 
 
 %changelog
