@@ -4,7 +4,7 @@ audit-debuginfo-3.1.2-1.azl3.aarch64.rpm
 audit-devel-3.1.2-1.azl3.aarch64.rpm
 audit-libs-3.1.2-1.azl3.aarch64.rpm
 autoconf-2.72-1.azl3.noarch.rpm
-automake-1.16.5-1.azl3.noarch.rpm
+automake-1.16.5-2.azl3.noarch.rpm
 azurelinux-check-macros-3.0-5.azl3.noarch.rpm
 azurelinux-repos-3.0-2.azl3.noarch.rpm
 azurelinux-repos-debug-3.0-2.azl3.noarch.rpm
