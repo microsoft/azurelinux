@@ -105,8 +105,6 @@ if [ -n "$dryrunVar" ]
 then
 	echo "sudo make build-packages \ "
 	echo "     REBUILD_TOOLS=y \ "
-	echo "     SOURCE_URL="https://azurelinuxsrcstorage.blob.core.windows.net/sources/core" \ ";
-	echo "     PACKAGE_BUILD_LIST="${TOBUILD}" \ ";
 	echo "     PACKAGE_REBUILD_LIST="${TOBUILD}" \ ";
 	echo "     SRPM_PACK_LIST="${TOBUILD}" \ ";
 	echo "     RUN_CHECK=$RC \ ";
@@ -123,8 +121,6 @@ fi
 
 sudo make build-packages \
 	REBUILD_TOOLS=y \
-	SOURCE_URL="https://azurelinuxsrcstorage.blob.core.windows.net/sources/core" \
-	PACKAGE_BUILD_LIST="${TOBUILD}" \
 	PACKAGE_REBUILD_LIST="${TOBUILD}" \
 	SRPM_PACK_LIST="${TOBUILD}" \
 	RUN_CHECK=$RC \
