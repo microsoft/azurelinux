@@ -2,6 +2,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# Dev script to build packages for 3.0 locally. There is no compatibility warranty and it is subject to change.
+# For internal dev use only.
 
 TOBUILD=
 BID=lkg
