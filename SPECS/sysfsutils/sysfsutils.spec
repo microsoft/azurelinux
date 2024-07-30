@@ -7,7 +7,7 @@ Distribution:   Azure Linux
 URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 
-Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Patch0:         sysfsutils-2.0.0-redhatify.patch
 Patch1:         sysfsutils-2.0.0-class-dup.patch
 Patch2:         sysfsutils-2.1.0-get_link.patch
@@ -75,6 +75,9 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %changelog
+* Tue Jul 30 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.1.1-1
+- Upgrading to 2.1.1 with new source
+
 * Mon Jul 22 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.1.0-30
 - Promoting package from SPECS-EXTENDED to SPECS
 
