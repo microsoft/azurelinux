@@ -112,7 +112,8 @@ then
 	echo "     DAILY_BUILD_ID=$BID \ ";
 	echo "     REFRESH_WORKER_CHROOT=$WCREFRESH \ ";
 	echo "     USE_PACKAGE_BUILD_CACHE=$USEPKGBLDCACHE \ ";
-	echo "     SPECS_DIR=$SDIR";
+	echo "     SPECS_DIR=$SDIR \ ";
+	echo "     -j $(nproc)";
 	exit 0
 fi
 
@@ -129,4 +130,5 @@ sudo make build-packages \
 	REFRESH_WORKER_CHROOT=$WCREFRESH \
 	USE_PACKAGE_BUILD_CACHE=$USEPKGBLDCACHE \
 	REPO_LIST=$REPOLIST \
-	SPECS_DIR=$SDIR
+	SPECS_DIR=$SDIR \
+	-j $(nproc)
