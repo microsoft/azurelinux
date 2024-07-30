@@ -8,11 +8,8 @@ URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 
 Source0:        https://github.com/linux-ras/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         sysfsutils-2.0.0-redhatify.patch
-Patch1:         sysfsutils-2.0.0-class-dup.patch
-Patch2:         sysfsutils-2.1.0-get_link.patch
-Patch3:         sysfsutils-2.1.0-manpages.patch
-Patch4:         sysfsutils-aarch64.patch
+# Patch0:         sysfsutils-2.0.0-redhatify.patch
+Patch2:         sysfsutils-aarch64.patch
 
 BuildRequires:  gcc
 
@@ -167,7 +164,7 @@ find %{buildroot} -type f -name "*.la" -delete
 * Thu Feb 14 2008 Jarod Wilson <jwilson@redhat.com> - 2.1.0-2
 - Bump and rebuild with gcc 4.3
 
-* Mon Sep 29 2007 Jarod Wilson <jwilson@redhat.com> - 2.1.0-1
+* Sat Sep 29 2007 Jarod Wilson <jwilson@redhat.com> - 2.1.0-1
 - Update to upstream release 2.1.0
 
 * Mon Sep 11 2006 Neil Horman <nhorman@redhat.com> - 2.0.0-6
@@ -220,7 +217,7 @@ find %{buildroot} -type f -name "*.la" -delete
 * Wed Sep 22 2004 Florian La Roche <Florian.LaRoche@redhat.de>
 - added /sbin/ldconfig calls to post/postun
 
-* Thu Sep 01 2004 AJ Lewis <alewis@redhat.com> 1.1.0-2
+* Wed Sep 01 2004 AJ Lewis <alewis@redhat.com> 1.1.0-2
 - Fix permissions on -devel files
 
 * Fri Aug 13 2004 AJ Lewis <alewis@redhat.com> 1.1.0-1.1
