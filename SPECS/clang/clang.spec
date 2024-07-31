@@ -113,8 +113,8 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
-       -DLLVM_PARALLEL_LINK_JOBS=1             \
+cmake \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
        -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
        -DCMAKE_BUILD_TYPE=Release              \
        -DLLVM_ENABLE_EH=ON                     \
@@ -124,7 +124,8 @@ cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
        -DLLVM_INCLUDE_TESTS=OFF                \
        -DLLVM_EXTERNAL_CLANG_TOOLS_EXTRA_SOURCE_DIR=../clang-tools-extra \
        -DCLANG_RESOURCE_DIR=../lib/clang/%{maj_ver} \
-       -Wno-dev ../clang
+       -Wno-dev                                \
+       ../clang
 
 %make_build
 

@@ -1,5 +1,4 @@
 %global maj_ver 18
-
 %global compiler_rt_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        LLVM compiler support routines
@@ -45,7 +44,6 @@ cd build
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-
 %{_libdir}/clang/%{maj_ver}/bin/*
 %{_libdir}/clang/%{maj_ver}/include/*
 %{_libdir}/clang/%{maj_ver}/lib/*

@@ -1,3 +1,8 @@
+
+%global maj_ver 18
+%global min_ver 1
+%global patch_ver 2
+
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        18.1.2
@@ -40,12 +45,13 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake -G Ninja                              \
+cmake \
+      -G Ninja                              \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}     \
       -DLLVM_ENABLE_FFI=ON                  \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
-      -DLLVM_PARALLEL_LINK_JOBS=1           \
+      -DLLVM_PARALLEL_LINK_JOBS=%{?_smp_ncpus_max:%_smp_build_ncpus} \
       -DLLVM_PARALLEL_COMPILE_JOBS=%{?_smp_ncpus_max:%_smp_build_ncpus} \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
@@ -54,7 +60,8 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_BINUTILS_INCDIR=%{_includedir} \
-      -Wno-dev ../llvm
+      -Wno-dev                              \
+      ../llvm
 
 %ninja_build LLVM
 %ninja_build
@@ -85,21 +92,30 @@ ninja check-all
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-%{_bindir}/*
-%{_libdir}/*.so
-%{_libdir}/*.so.*
+%{_bindir}/bugpoint
+%{_bindir}/dsymutil
+%{_bindir}/llc
+%{_bindir}/lli
+%{_bindir}/llvm-*
+%{_bindir}/opt
+%{_bindir}/sancov
+%{_bindir}/sanstats
+%{_bindir}/verify-uselistorder
+%{_libdir}/LLVMgold.so
 %{_libdir}/bfd-plugins/LLVMgold.so
+%{_libdir}/libLLVM-%{maj_ver}.so
+%{_libdir}/libLLVM.so.%{maj_ver}.%{min_ver}
+%{_libdir}/libLTO.so*
+%{_libdir}/libRemarks.so*
 %dir %{_datadir}/opt-viewer
-%{_datadir}/opt-viewer/opt-diff.py
-%{_datadir}/opt-viewer/opt-stats.py
-%{_datadir}/opt-viewer/opt-viewer.py
-%{_datadir}/opt-viewer/optpmap.py
-%{_datadir}/opt-viewer/optrecord.py
-%{_datadir}/opt-viewer/style.css
+%{_datadir}/opt-viewer
 
 %files devel
 %{_libdir}/*.a
-%{_libdir}/cmake/*
+%{_libdir}/cmake/llvm
+%{_libdir}/libLLVM.so
+%{_includedir}/llvm
+%{_includedir}/llvm-c
 %{_includedir}/*
 
 %changelog

@@ -89,6 +89,9 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.AzureLinuxModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
+	logger.Log.Info("NOTE: Building with LLVM using UseLLVMToolchainDefine")
+	defines[rpm.UseLLVMToolchainDefine] = "true"
+
 	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
 		if *useCcache {
@@ -116,9 +119,6 @@ func main() {
 	if *maxCPU != "" {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
-
-	logger.Log.Info("======== NOTE: using UseLLVMToolchainDefine =============")
-	defines[rpm.UseLLVMToolchainDefine] = "true"
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)

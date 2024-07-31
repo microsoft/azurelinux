@@ -1,5 +1,4 @@
 %global lld_srcdir llvm-project-llvmorg-%{version}
-%global install_prefix /usr
 
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
@@ -18,6 +17,7 @@ BuildRequires:  llvm-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3
 Requires:       %{name}-libs = %{version}-%{release}
+Patch0:         0002-PATCH-lld-Import-compact_unwind_encoding.h-from-libu.patch
 
 %package devel
 Summary:        Libraries and header files for LLD
@@ -49,7 +49,7 @@ cmake \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
-       -DCMAKE_INSTALL_PREFIX=%{install_prefix}                   \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}                          \
        -DBUILD_SHARED_LIBS:BOOL=ON                                \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
        -Wno-dev                                                   \
