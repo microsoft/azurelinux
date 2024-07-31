@@ -479,10 +479,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/x86_64/msopenjdk-17-17.0.12-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/aarch64/msopenjdk-17-17.0.12-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
