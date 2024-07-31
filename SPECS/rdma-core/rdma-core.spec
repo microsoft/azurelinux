@@ -1,7 +1,7 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
 Version:        49.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -319,10 +319,10 @@ rm -f %{buildroot}/%{_sbindir}/srp_daemon.sh
 %postun -n librdmacm -p /sbin/ldconfig
 
 %post -n rdma-core
-if [ -x /sbin/udevadm ]; then
-/sbin/udevadm trigger --subsystem-match=infiniband --action=change || true
-/sbin/udevadm trigger --subsystem-match=net --action=change || true
-/sbin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
+if [ -x /bin/udevadm ]; then
+/bin/udevadm trigger --subsystem-match=infiniband --action=change || true
+/bin/udevadm trigger --subsystem-match=net --action=change || true
+/bin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
 fi
 
 %post -n ibacm
@@ -624,6 +624,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 20 2024 Andy Zaugg <azaugg@linkedin.com> - 49.1-2
+- Fix post scripts allowing udev to run after install
+
 * Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.1-1
 - Upgrade to version 49.1 for AzL 3.0 release
 - Disable pyverbs as it cannot build with Cython > 3, the default for AzL 3.0
