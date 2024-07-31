@@ -90,6 +90,50 @@ func TestCustomizeImagePartitions(t *testing.T) {
 		partitions[mountPoints[0].PartitionNum].PartUuid)
 }
 
+func TestCustomizeImagePartitionsLegacy(t *testing.T) {
+	var err error
+
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePartitionsLegacy")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "legacyboot-config.yaml")
+	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
+
+	// Customize image.
+	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	// Check output file type.
+	checkFileType(t, outImageFilePath, "raw")
+
+	mountPoints := []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+	}
+
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, mountPoints)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
+	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	assert.NoError(t, err, "get disk partitions")
+
+	// Check that the fstab entries are correct.
+	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
+	verifyBootGrubCfg(t, imageConnection, "",
+		partitions[mountPoints[0].PartitionNum].Uuid,
+		partitions[mountPoints[0].PartitionNum].PartUuid)
+}
+
 func TestCustomizeImageKernelCommandLine(t *testing.T) {
 	var err error
 
