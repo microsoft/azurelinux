@@ -311,7 +311,7 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
-* Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 2.1.28-7
+* Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 2.1.28-8
 - Update file listings to remove duplicate files
 
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.1.28-7
