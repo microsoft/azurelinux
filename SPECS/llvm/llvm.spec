@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        18.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,7 +53,6 @@ cmake -G Ninja                              \
       -DLLVM_BUILD_TESTS=ON                 \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
-      -DLLVM_ENABLE_RTTI=ON                 \
       -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev ../llvm
 

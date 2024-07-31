@@ -236,7 +236,7 @@ print(result)
 
 %_legacy_common_support 1
 # remove %{_hardened_cflags}
-%__global_compiler_flags        -O2 -g -pipe -Wall %{!?use_llvm_toolchain:-Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches} %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -pipe %{!?use_llvm_toolchain:-Wall} %{?use_llvm_toolchain:-w} %{!?use_llvm_toolchain:-Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches} %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig
