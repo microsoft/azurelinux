@@ -1,7 +1,7 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
 Version:        8.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,6 @@ BuildRequires:  gcc-c++
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gtk-doc
 BuildRequires:  make
-%global with_check 1
 %if 0%{?with_check}
 BuildRequires:  python3-devel
 %endif
@@ -58,24 +57,42 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 %defattr(-,root,root)
 %license COPYING
 %doc NEWS AUTHORS README
-%{_libdir}/*.so*
+%{_libdir}/libharfbuzz.so.0*
+%{_libdir}/libharfbuzz-cairo.so.*
+%{_libdir}/libharfbuzz-gobject.so.0*
+%{_libdir}/libharfbuzz-subset.so.0*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/HarfBuzz-0.0.typelib
-%{_bindir}/*
 
 %files devel
 %defattr(-,root,root)
 %doc %{_datadir}/gtk-doc
+%{_bindir}/hb-info
+%{_bindir}/hb-view
+%{_bindir}/hb-ot-shape-closure
+%{_bindir}/hb-shape
+%{_bindir}/hb-subset
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
-%{_libdir}/*.so
-%{_libdir}/pkgconfig/*.pc
-%{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
+%{_libdir}/libharfbuzz.so
+%{_libdir}/libharfbuzz-gobject.so
+%{_libdir}/libharfbuzz-cairo.so
+%{_libdir}/libharfbuzz-icu.so
+%{_libdir}/libharfbuzz-subset.so
+%{_libdir}/pkgconfig/harfbuzz.pc
+%{_libdir}/pkgconfig/harfbuzz-cairo.pc
+%{_libdir}/pkgconfig/harfbuzz-gobject.pc
+%{_libdir}/pkgconfig/harfbuzz-icu.pc
+%{_libdir}/pkgconfig/harfbuzz-subset.pc
+%{_libdir}/cmake/harfbuzz/
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/HarfBuzz-0.0.gir
 %{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
+* Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 8.3.0-2
+- Update file listings to remove duplicate files
+
 * Mon Jan 29 2024 Bala <balakumaran.kannan@microsoft.com> - 8.3.0-1
 - Update source to 8.3.0
 - Removed CVE-2023-25193 patch as it was merged to latest version
