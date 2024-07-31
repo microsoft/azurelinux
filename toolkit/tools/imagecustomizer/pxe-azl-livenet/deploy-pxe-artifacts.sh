@@ -84,6 +84,7 @@ menuentry "CBL-Mariner" {
                 $rdHostScript \\
                 $rdHostConfig \\
                 rd.auto=1 \\
+                selinux=0 security= \\
                 console=tty0 console=ttyS0 \\
                 sysctl.kernel.unprivileged_bpf_disabled=1 \\
                 rd.info \\
