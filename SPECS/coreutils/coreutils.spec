@@ -16,7 +16,6 @@ Patch2:         CVE-2024-0684.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
-Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 %if 0%{?with_check}
