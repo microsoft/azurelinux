@@ -1,6 +1,6 @@
 Summary:        Internationalized Domain Names in Applications (IDNA).
 Name:           python-idna
-Version:        3.3
+Version:        3.7
 Release:        1%{?dist}
 License:        BSD-like
 Vendor:         Microsoft Corporation
@@ -16,11 +16,15 @@ Support for the Internationalised Domain Names in Applications (IDNA) protocol a
 
 %package -n     python3-idna
 Summary:        Internationalized Domain Names in Applications (IDNA).
+BuildRequires:  python-flit-core
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-
+%if %{with_check}
+BuildRequires:  python3-pytest
+%endif
 %description -n python3-idna
 Support for the Internationalised Domain Names in Applications (IDNA) protocol as specified in RFC 5891. This is the latest version of the protocol and is sometimes referred to as “IDNA 2008”.
 
@@ -30,22 +34,32 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 
 %prep
 %autosetup -n idna-%{version}
+# Remove bundled egg-info
+rm -rf idna.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files idna
 
 %check
-%python3 setup.py test
+pip3 install iniconfig
+%pytest
 
-%files -n python3-idna
+%files -n python3-idna -f %pyproject_files
 %defattr(-,root,root,-)
 %license LICENSE.md
-%{python3_sitelib}/*
+%doc README.rst
 
 %changelog
+* Tue Jul 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7-1
+- Auto-upgrade to 3.7 - CVE-2024-3651
+
 * Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 3.3-1
 - Updated Source0 and license file.
 - Updated to 3.3.
