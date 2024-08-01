@@ -1,7 +1,7 @@
 Summary:	Programs for generating Makefiles
 Name:		automake
 Version:	1.16.5
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPLv2+
 URL:		https://www.gnu.org/software/automake/
 Group:		System Environment/Base
@@ -9,6 +9,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:	https://ftp.gnu.org/gnu/automake/%{name}-%{version}.tar.gz
 BuildRequires:	autoconf
+Requires:   perl(File::Compare)
+Requires:   perl(File::Copy)
+Requires:   perl(Thread::Queue)
+Requires:   perl(threads)
 BuildArch:      noarch
 
 %description
@@ -42,6 +46,9 @@ make %{?_smp_mflags} check
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 %changelog
+* Thu Aug 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.16.5-2
+- Add Missing Requires on `perl(File::Compare)` , `perl(File::Copy)` , `perl(Thread::Queue)` and `perl(threads)` 
+
 * Tue Nov 23 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.5-1
 - Upgrade to version 1.16.5
 - License verified
