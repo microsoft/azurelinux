@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
 Version:        2.72
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,6 @@ BuildRequires:  perl(File::Find)
 %endif
 Requires:       m4
 Requires:       perl-libs
-Requires:       perl(File::Compare)
 BuildArch:      noarch
 
 %description
@@ -50,9 +49,6 @@ make -k check %{?_smp_mflags}
 %{_datarootdir}/autoconf/*
 
 %changelog
-* Tue July 30 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.72-2
-- Add missing runtime Requires: perl(File::Compare)
-
 * Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.72-1
 - Auto-upgrade to 2.72 - Azure Linux 3.0 Upgrades
 
