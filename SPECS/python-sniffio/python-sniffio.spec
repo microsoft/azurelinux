@@ -1,15 +1,4 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-# what it's called on pypi
-%global srcname sniffio
-# what it's imported as
-%global libname sniffio
-# name of egg info directory
-%global eggname sniffio
-# package name fragment
-%global pkgname sniffio
+%global pypi_name sniffio
 
 %global _description \
 You're writing a library.  You've decided to be ambitious, and support multiple\
@@ -19,32 +8,34 @@ of clever code to run?  This is a tiny package whose only purpose is to let you\
 detect which async library your code is running under.
 
 Summary:        Sniff out which async library your code is running under
-Name:           python-%{pkgname}
-Version:        1.1.0
-Release:        11%{?dist}
+Name:           python-%{pypi_name}
+Version:        1.3.0
+Release:        1%{?dist}
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/sniffio
-Source0:        https://files.pythonhosted.org/packages/source/s/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
-
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description %{_description}
 
-%package -n python3-%{pkgname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
+BuildRequires:  python3-curio
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-curio
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pkgname}}
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+%endif
+Requires:       python3
 
-%description -n python3-%{pkgname} %{_description}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%autosetup -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+%autosetup -n %{pypi_name}-%{version}
+rm -rf %{pypi_name}.egg-info
 
 %build
 %py3_build
@@ -53,17 +44,24 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 %check
-pip3 install pytest
-py.test --verbose
+%{python3} -m pip install -r test-requirements.txt
+mkdir empty
+cd empty
+%pytest -W error -ra -v --pyargs sniffio --cov=sniffio --cov-config=../.coveragerc --verbose
 
-%files -n python3-%{pkgname}
+%files -n python3-%{pypi_name}
 %license LICENSE LICENSE.MIT LICENSE.APACHE2
 %doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Fri Apr 29 2022 Muhamamd Falak <mwani@microsoft.com> - 1.10-11
+* Wed Sep 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.0-1
+- Move from SPECS-EXTENDED to SPECS
+- Bump up version to 1.3.0
+- License verified
+
+* Fri Apr 29 2022 Muhamamd Falak <mwani@microsoft.com> - 1.1.0-11
 - Drop BR on pytest & pip install latest deps
 - Use `py.test` instead of `py.test-3` to enable ptest
 
