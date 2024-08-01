@@ -36,6 +36,9 @@ var (
 	}
 
 	partedVersionRegex = regexp.MustCompile(`^parted \(GNU parted\) (\d+)\.(\d+)`)
+
+	// The default partition name used when the version of `parted` is too old (<3.5).
+	LegacyDefaultParitionName = "primary"
 )
 
 type blockDevicesOutput struct {
@@ -461,7 +464,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 	usingExtendedPartition := (len(disk.Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
 
-	partedSupportsEmptyStringArgs, err := partedSupportsEmptyString()
+	partedSupportsEmptyStringArgs, err := PartedSupportsEmptyString()
 	if err != nil {
 		return
 	}
@@ -568,8 +571,9 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 			} else {
 				// This version of parted has no way to specify an empty partition name. :-(
 				// So, use ' ' instead.
-				logger.Log.Warnf("parted version <3.5 does not support empty partition names: using partition name ' ' instead")
-				mkpartArgs = append(mkpartArgs, `" "`)
+				logger.Log.Warnf("parted version <3.5 does not support empty partition names: using partition name '%s' instead",
+					LegacyDefaultParitionName)
+				mkpartArgs = append(mkpartArgs, LegacyDefaultParitionName)
 			}
 		} else {
 			mkpartArgs = append(mkpartArgs, partition.Name)
@@ -614,7 +618,7 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 // Returns if the version of 'parted' supports empty (quoted) string parameters.
 // Specifically, parted v3.5+.
-func partedSupportsEmptyString() (bool, error) {
+func PartedSupportsEmptyString() (bool, error) {
 	major, minor, err := getPartedVersion()
 	if err != nil {
 		return false, err

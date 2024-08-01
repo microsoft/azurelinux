@@ -65,12 +65,17 @@ func TestCustomizeImagePartitions(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
+	defaultPartitionName := diskutils.LegacyDefaultParitionName
+	if partedSupportsEmptyString, _ := diskutils.PartedSupportsEmptyString(); partedSupportsEmptyString {
+		defaultPartitionName = ""
+	}
+
 	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
 	if assert.NoError(t, err, "read partition table") {
-		assert.Equal(t, "", partitions[1].PartLabel)
-		assert.Equal(t, "", partitions[2].PartLabel)
+		assert.Equal(t, defaultPartitionName, partitions[1].PartLabel)
+		assert.Equal(t, defaultPartitionName, partitions[2].PartLabel)
 		assert.Equal(t, "rootfs", partitions[3].PartLabel)
-		assert.Equal(t, "", partitions[4].PartLabel)
+		assert.Equal(t, defaultPartitionName, partitions[4].PartLabel)
 	}
 
 	// Check for key files/directories on the partitions.
