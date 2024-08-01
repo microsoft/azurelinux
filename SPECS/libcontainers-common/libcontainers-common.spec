@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,7 @@ Source10:       containers.conf
 Patch0:         CVE-2021-44716.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch1:         CVE-2024-37298.patch
+Patch2:         CVE-2021-43565.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -70,7 +71,9 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
+
 # copy the LICENSE file in the build root
+%patch 2 -p1 -d ../podman-%{podmanver}
 cd ..
 cp %{SOURCE2} .
 
@@ -165,6 +168,9 @@ fi
 %license LICENSE
 
 %changelog
+* Mon Jul 29 2024 Archana Choudhary <archana1@microsoft.com> - 20210626-5
+- Patch CVE-2021-43565
+
 * Wed Jul 24 2024 Muhammad Falak <mwani@microsoft.com> - 20210526-4
 - Address CVE-2024-37298 by patching vendored github.com/gorilla/schema
 
