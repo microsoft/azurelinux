@@ -10,7 +10,7 @@ Distribution:   Azure Linux
 Source0:	https://ftp.gnu.org/gnu/automake/%{name}-%{version}.tar.gz
 BuildRequires:	autoconf
 Requires:   perl(File::Compare)
-Requires:   perl(File::Find)
+Requires:   perl(File::Copy)
 Requires:   perl(Thread::Queue)
 Requires:   perl(threads)
 BuildArch:      noarch
@@ -47,7 +47,7 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 %changelog
 * Thu Aug 1 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.16.5-3
-- Add perl(File::Compare) directly and remove autoconf as it causes dependency cycle
+- Add perl(File::Compare) and perl(File::Copy) directly and remove autoconf as it causes dependency cycle
 
 * Tue Jul 30 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.16.5-2
 - Add missing runtime Requires: perl(Thread::Queue), perl(threads) and autoconf
