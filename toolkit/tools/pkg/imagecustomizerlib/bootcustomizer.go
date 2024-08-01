@@ -17,7 +17,7 @@ type BootCustomizer struct {
 	grubCfgContent string
 
 	// The contents of the /etc/default/grub file.
-	defaultGrubFileContent string
+	DefaultGrubFileContent string
 
 	// Whether or not the image is using grub-mkconfig.
 	isGrubMkconfig bool
@@ -38,7 +38,7 @@ func NewBootCustomizer(imageChroot safechroot.ChrootInterface) (*BootCustomizer,
 
 	b := &BootCustomizer{
 		grubCfgContent:         grubCfgContent,
-		defaultGrubFileContent: defaultGrubFileContent,
+		DefaultGrubFileContent: defaultGrubFileContent,
 		isGrubMkconfig:         isGrubMkconfig,
 	}
 	return b, nil
@@ -57,12 +57,12 @@ func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 	}
 
 	if b.isGrubMkconfig {
-		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, extraCommandLine)
+		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.DefaultGrubFileContent, extraCommandLine)
 		if err != nil {
 			return err
 		}
 
-		b.defaultGrubFileContent = defaultGrubFileContent
+		b.DefaultGrubFileContent = defaultGrubFileContent
 	} else {
 		// Add the args directly to the /boot/grub2/grub.cfg file.
 		grubCfgContent, err := appendKernelCommandLineArgs(b.grubCfgContent, extraCommandLine)
@@ -83,7 +83,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 
 	// Get the SELinux kernel command-line args.
 	if b.isGrubMkconfig {
-		_, args, _, err = getDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
+		_, args, _, err = getDefaultGrubFileLinuxArgs(b.DefaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
 		if err != nil {
 			return "", err
 		}
@@ -140,13 +140,13 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 	argsToRemove []string, newArgs []string,
 ) error {
 	if b.isGrubMkconfig {
-		defaultGrubFileContent, err := updateDefaultGrubFileKernelCommandLineArgs(b.defaultGrubFileContent,
+		defaultGrubFileContent, err := updateDefaultGrubFileKernelCommandLineArgs(b.DefaultGrubFileContent,
 			defaultGrubFileVarName, argsToRemove, newArgs)
 		if err != nil {
 			return err
 		}
 
-		b.defaultGrubFileContent = defaultGrubFileContent
+		b.DefaultGrubFileContent = defaultGrubFileContent
 	} else {
 		grubCfgContent, err := updateKernelCommandLineArgs(b.grubCfgContent, argsToRemove, newArgs)
 		if err != nil {
@@ -163,7 +163,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 func (b *BootCustomizer) PrepareForVerity() error {
 	if b.isGrubMkconfig {
 		// Force root command-line arg to be referenced by /dev path instead of by UUID.
-		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
+		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.DefaultGrubFileContent, "GRUB_DISABLE_UUID",
 			"true")
 		if err != nil {
 			return err
@@ -177,7 +177,7 @@ func (b *BootCustomizer) PrepareForVerity() error {
 			return err
 		}
 
-		b.defaultGrubFileContent = defaultGrubFileContent
+		b.DefaultGrubFileContent = defaultGrubFileContent
 	}
 
 	return nil
@@ -186,7 +186,7 @@ func (b *BootCustomizer) PrepareForVerity() error {
 func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
-		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
+		err := WriteDefaultGrubFile(b.DefaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
 		}
@@ -206,13 +206,13 @@ func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) err
 	return nil
 }
 
-func (b *BootCustomizer)ApplyChangesToGrub(varName string, newValue string) error {
-	defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, varName, newValue)
+func (b *BootCustomizer) ApplyChangesToGrub(varName string, newValue string) error {
+	defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.DefaultGrubFileContent, varName, newValue)
 	if err != nil {
 		return fmt.Errorf("failed to update verity variables %s: %w", newValue, err)
 	}
 
-	b.defaultGrubFileContent = defaultGrubFileContent
-	
+	b.DefaultGrubFileContent = defaultGrubFileContent
+
 	return nil
 }

@@ -313,6 +313,7 @@ func UpdateDefaultGrubFileVariable(defaultGrubFileContent string, varName string
 		}
 
 		defaultGrubFileContent = insertDefaultGrubFileVarAssign(defaultGrubFileContent, insertAfter, varName, newValue)
+
 	}
 
 	return defaultGrubFileContent, nil
@@ -351,7 +352,7 @@ func readDefaultGrubFile(imageChroot safechroot.ChrootInterface) (string, error)
 }
 
 // Writes the string contents of the /etc/default/grub file.
-func writeDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
+func WriteDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)

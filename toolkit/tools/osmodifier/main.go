@@ -53,6 +53,7 @@ func modifyImage() error {
 		if err != nil {
 			return err
 		}
+		return nil
 	}
 
 	err := osmodifierlib.ModifyOSWithConfigFile(*configFile)
