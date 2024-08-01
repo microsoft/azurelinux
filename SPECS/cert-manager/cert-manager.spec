@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         iCVE-2024-6104.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -105,6 +106,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 1.12.12-2
+- Patch for CVE-2024-6104
+
 * Wed Jul 10 2024 Tobias Brick <tobiasb@microsoft.com> - 1.12.12-1
 - Upgrade to 1.12.12 to fix CVE-2024-26147 and CVE-2023-45142
 
