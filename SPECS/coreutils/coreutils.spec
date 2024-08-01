@@ -20,8 +20,8 @@ Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 %if 0%{?with_check}
-BuildRequires:  perl
-BuildRequires:  perl(File::Find)
+BuildRequires: perl-interpreter
+BuildRequires: perl(FileHandle)
 %endif
 
 %description
