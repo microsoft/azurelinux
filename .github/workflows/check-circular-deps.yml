@@ -22,8 +22,6 @@ jobs:
       - name: Check for circular dependencies
         run: |
           echo "Checking for circular dependency loops..."
-          # Call this script to sync the toolchain manifests with the LKG daily build.
-          ./toolkit/scripts/setuplkgtoolchain.sh
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
           sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
