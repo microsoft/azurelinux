@@ -26,4 +26,4 @@ jobs:
           ./toolkit/scripts/setuplkgtoolchain.sh
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          sudo make -C toolkit -j$(nproc) graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
+          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
