@@ -916,10 +916,10 @@ func checkEnvironmentVars() error {
 	envHome := os.Getenv("HOME")
 	envUser := os.Getenv("USER")
 
-	if envHome != rootHome || envUser != rootUser {
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
 		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
-			"HOME must be set to '%s' and USER must be set to '%s'",
-			rootHome, rootUser)
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
 	}
 
 	return nil
