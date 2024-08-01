@@ -16,12 +16,11 @@ Patch2:         CVE-2024-0684.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
-Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 %if 0%{?with_check}
-BuildRequires: perl-interpreter
-BuildRequires: perl(FileHandle)
+BuildRequires:  perl
+BuildRequires:  perl(File::Find)
 %endif
 
 %description
