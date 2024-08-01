@@ -13,7 +13,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         iCVE-2024-6104.patch
+Patch0:         CVE-2024-6104.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
