@@ -570,7 +570,7 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 				mkpartArgs = append(mkpartArgs, `""`)
 			} else {
 				// This version of parted has no way to specify an empty partition name. :-(
-				// So, use ' ' instead.
+				// So, use the legacy label of "primary" (which was used in Azure Linux 2.0) instead.
 				logger.Log.Warnf("parted version <3.5 does not support empty partition names: using partition name '%s' instead",
 					LegacyDefaultParitionName)
 				mkpartArgs = append(mkpartArgs, LegacyDefaultParitionName)
