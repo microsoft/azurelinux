@@ -13,7 +13,9 @@ Source0:        %url/archive/vulkan-sdk-%{sdkver}.tar.gz#/%{name}-sdk-%{sdkver}.
 
 # Remove to allow building with clang.
 # "/usr/src/azl/BUILD/SPIRV-Tools-vulkan-sdk-1.3.275.0/source/spirv_target_env.cpp:402:32: error: unknown warning group '-Wrestrict', ignored [-Werror,-Wunknown-warning-option]"
-#Patch0: fix-gcc12-build.patch
+%if "0%{?use_llvm_clang}" == "0"
+Patch0: fix-gcc12-build.patch
+%endif
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++

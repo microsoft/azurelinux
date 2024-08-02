@@ -22,7 +22,9 @@ The  purpose  of  xmlto is to convert an XML file to the desired format
 
 %build
 # "xmlif/xmlif.l:46:8: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]"
+%if "0%{?use_llvm_clang}" != "0"
 export CFLAGS="%{build_cflags} -Wno-error=implicit-int"
+%endif
 ./configure \
     --prefix=%{_prefix}
 

@@ -257,3 +257,10 @@ audit-3.1.2-1.azl3.aarch64.rpm
 audit-libs-3.1.2-1.azl3.aarch64.rpm
 libxcrypt-4.4.36-1.azl3.aarch64.rpm
 libxcrypt-devel-4.4.36-1.azl3.aarch64.rpm
+llvm-18.1.2-4.azl3.aarch64.rpm
+compiler-rt-18.1.2-3.azl3.aarch64.rpm
+clang-libs-18.1.2-3.azl3.aarch64.rpm
+clang-18.1.2-3.azl3.aarch64.rpm
+lld-devel-18.1.2-3.azl3.aarch64.rpm
+lld-libs-18.1.2-3.azl3.aarch64.rpm
+lld-18.1.2-3.azl3.aarch64.rpm

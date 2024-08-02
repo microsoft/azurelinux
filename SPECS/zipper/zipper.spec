@@ -56,7 +56,9 @@ find minizip -name '*.c' -exec chmod 0644 '{}' \;
 %build
 mkdir build && cd build
 # "/usr/src/azl/BUILD/zipper-1.0.3/minizip/aes/entropy.c:44:16: error: call to undeclared function 'read'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]"
+%if "0%{?use_llvm_clang}" != "0"
 export CFLAGS="%{build_cflags} -Wno-error=implicit-function-declaration"
+%endif
 export CXXFLAGS="%{optflags} -Wl,--as-needed"
 %cmake .. \
   -Wno-cpp \

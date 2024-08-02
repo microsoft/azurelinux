@@ -37,9 +37,9 @@
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
-%{?use_llvm_toolchain:ln -svf /usr/bin/clang /usr/bin/cc}\
-%{?use_llvm_toolchain:ln -svf /usr/bin/clang++ /usr/bin/c++}\
-%{?use_llvm_toolchain:ln -svf /usr/bin/ld.lld /usr/bin/ld}\
+%{?use_llvm_clang:ln -svf /usr/bin/clang /usr/bin/cc}\
+%{?use_llvm_clang:ln -svf /usr/bin/clang++ /usr/bin/c++}\
+%{?use_llvm_linker:ln -svf /usr/bin/ld.lld /usr/bin/ld}\
 %{nil}
 
 # GCC toolchain
@@ -53,8 +53,9 @@
 %__cpp_clang clang-cpp
 
 ## Default to the clang or gnu/gcc toolchain
-# %%use_llvm_toolchain 1
-%toolchain %{?use_llvm_toolchain:clang}%{!?use_llvm_toolchain:gcc}
+# %%use_llvm_clang 1
+# %%use_llvm_linker 1
+%toolchain %{?use_llvm_clang:clang}%{!?use_llvm_clang:gcc}
 
 %__cc %{expand:%%{__cc_%{toolchain}}}
 %__cxx %{expand:%%{__cxx_%{toolchain}}}
@@ -79,8 +80,8 @@
 %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
 %{?ccache_enabled:ccache --zero-stats}\
-%{?use_llvm_toolchain:export CC=clang}\
-%{?use_llvm_toolchain:export CXX=clang++}\
+%{?use_llvm_clang:export CC=clang}\
+%{?use_llvm_clang:export CXX=clang++}\
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -141,8 +142,7 @@
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
 # Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
-# %%{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_toolchain:%{_hardened_ldflags}} %{!?use_llvm_toolchain:%{?distro_module_ldflags:%{distro_module_ldflags}}} %{?use_llvm_toolchain:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{!?use_llvm_linker:%{_hardened_ldflags} %{?distro_module_ldflags:%{distro_module_ldflags}}} %{?use_llvm_linker:-fuse-ld=lld -Wl,--build-id=sha1 -latomic}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -236,7 +236,7 @@ print(result)
 
 %_legacy_common_support 1
 # remove %{_hardened_cflags}
-%__global_compiler_flags        -O2 -g -pipe %{!?use_llvm_toolchain:-Wall} %{?use_llvm_toolchain:-w} %{!?use_llvm_toolchain:-Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches} %{!?use_llvm_toolchain:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+%__global_compiler_flags        -O2 -g -pipe %{!?use_llvm_clang:-Wall} %{?use_llvm_clang:-w} %{!?use_llvm_clang:-Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches} %{!?use_llvm_clang:%{_hardened_cflags}} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

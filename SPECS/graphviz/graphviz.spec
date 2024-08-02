@@ -298,9 +298,15 @@ sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linu
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
+%if "0%{?use_llvm_clang}" == "0"
+%define COMPILER_NO_ERROR -Wno-error=incompatible-pointer-types
+%else
+%define COMPILER_NO_ERROR -Wno-error=incompatible-function-pointer-types
+%endif
+
 %make_build \
-    CFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE} -Wno-error=incompatible-function-pointer-types" \
-    CXXFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE} -Wno-error=incompatible-function-pointer-types"
+    CFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE} %{?COMPILER_NO_ERROR}" \
+    CXXFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE} %{?COMPILER_NO_ERROR}"
 
 %install
 make DESTDIR=%{buildroot} \

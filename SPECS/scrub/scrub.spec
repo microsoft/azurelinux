@@ -24,7 +24,9 @@ the file system is full, then scrubbed as in 2).
 
 %build
 # "genrand.c:109:13: error: non-void function 'genrandraw' should return a value [-Wreturn-type]"
+%if "0%{?use_llvm_clang}" != "0"
 export CFLAGS="%{build_cflags} -Wno-error=return-type"
+%endif
 %configure
 make %{?_smp_mflags}
 

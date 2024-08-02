@@ -14,7 +14,10 @@ Tree is a recursive directory listing command that produces a depth indented lis
 
 %prep
 %setup -q
+%if "0%{?use_llvm_clang}" != "0"
 sed -i 's/CC=gcc/CC=clang/g' ./Makefile
+%endif
+
 
 %build
 make %{?_smp_mflags}
