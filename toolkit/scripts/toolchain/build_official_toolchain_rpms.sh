@@ -357,7 +357,7 @@ wget -nv --server-response --no-clobber --timeout=30 $MSOPENJDK_URL --directory-
 MSOPENJDK_ACTUAL_HASH=$(sha256sum "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME" | awk '{print $1}')
 if [[ "$MSOPENJDK_EXPECTED_HASH" != "$MSOPENJDK_ACTUAL_HASH" ]]; then
     echo "Error, incorrect msopenjdk hash: '$MSOPENJDK_ACTUAL_HASH'. Expected hash: '$MSOPENJDK_EXPECTED_HASH'"
-    rm -vf $MSOPENJDK_FILENAME
+    rm -vf "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME"
     exit 1
 fi
 
