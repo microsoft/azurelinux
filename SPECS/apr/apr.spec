@@ -9,7 +9,9 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://dlcdn.apache.org/%{name}/%{name}-%{version}.tar.gz
+%if "0%{?use_llvm_clang}" != "0"
 BuildRequires:  clang
+%endif
 %if 0%{?with_check}
 # test_serv_by_name test requires /etc/services file from iana-etc package
 BuildRequires:  iana-etc
@@ -32,8 +34,7 @@ It contains the libraries and header files to create applications
 ./configure --prefix=%{_prefix} \
         --includedir=%{_includedir}/apr-%{aprver} \
         --with-installbuilddir=%{_libdir}/apr/build-%{aprver} \
-        --with-devrandom=/dev/urandom \
-        CC=clang CXX=clang++
+        --with-devrandom=/dev/urandom
 
 make %{?_smp_mflags}
 
