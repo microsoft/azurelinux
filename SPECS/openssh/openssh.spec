@@ -1,3 +1,13 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
 %global openssh_ver 9.7p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools

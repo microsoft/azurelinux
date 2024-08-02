@@ -1,3 +1,13 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
 # Maintainer: nickc@redhat.com
 # Web Page: https://sourceware.org/annobin/
 # Watermark Protocol: https://fedoraproject.org/wiki/Toolchain/Watermark

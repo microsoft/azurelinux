@@ -1,3 +1,13 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
 %global build_flags prefix=%{_prefix} lib_dir=%{_libdir} libexec_dir=%{_libexecdir}/%{name} etc_dir=%{_sysconfdir}/%{name}
 
 Name:           authbind
