@@ -248,7 +248,7 @@ newt-0.52.23-1.azl3.x86_64.rpm
 newt-lang-0.52.23-1.azl3.x86_64.rpm
 chkconfig-1.25-1.azl3.x86_64.rpm
 chkconfig-lang-1.25-1.azl3.x86_64.rpm
-msopenjdk-17-17.0.11-1.x86_64.rpm
+msopenjdk-17-17.0.12-1.x86_64.rpm
 pyproject-rpm-macros-1.12.0-2.azl3.noarch.rpm
 pyproject-srpm-macros-1.12.0-2.azl3.noarch.rpm
 python3-rpm-generators-14-11.azl3.noarch.rpm
