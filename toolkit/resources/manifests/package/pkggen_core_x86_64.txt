@@ -257,3 +257,5 @@ audit-3.1.2-1.azl3.x86_64.rpm
 audit-libs-3.1.2-1.azl3.x86_64.rpm
 libxcrypt-4.4.36-2.azl3.x86_64.rpm
 libxcrypt-devel-4.4.36-2.azl3.x86_64.rpm
+ccache-4.8.3-1.azl3.x86_64.rpm
+ccache-debuginfo-4.8.3-1.azl3.x86_64.rpm
