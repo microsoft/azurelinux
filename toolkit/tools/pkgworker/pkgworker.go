@@ -89,10 +89,10 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.AzureLinuxModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	logger.Log.Info("NOTE: Building with clang/llvm")
-	defines[rpm.UseLLVMClangDefine] = "true"
-	logger.Log.Info("NOTE: Linking with LLVM lld")
-	defines[rpm.UseLLVMLinkerDefine] = "true"
+	//logger.Log.Info("NOTE: Building with clang/llvm")
+	//defines[rpm.UseLLVMClangDefine] = "true"
+	//logger.Log.Info("NOTE: Linking with LLVM lld")
+	//defines[rpm.UseLLVMLinkerDefine] = "true"
 
 	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
