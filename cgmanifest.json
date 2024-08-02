@@ -2628,8 +2628,8 @@
         "type": "other",
         "other": {
           "name": "distribution-gpg-keys",
-          "version": "1.60",
-          "downloadUrl": "https://github.com/xsuchy/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.60-1.tar.gz"
+          "version": "1.104",
+          "downloadUrl": "https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.104-1.tar.gz"
         }
       }
     },
