@@ -53,7 +53,7 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
+patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \
@@ -86,7 +86,7 @@ rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-KERNEL_VERSION="6.6.29.1"
+KERNEL_VERSION="6.6.43.1"
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}

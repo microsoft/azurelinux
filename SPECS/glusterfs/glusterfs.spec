@@ -126,7 +126,7 @@
 Summary:        Distributed File System
 Name:           glusterfs
 Version:        11.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,6 +142,7 @@ Source8:        glusterfsd.init
 # whether USE_EVENTS is defined).  Without this patch, 
 # eventtypes.h is only included if USE_EVENTS is defined.
 Patch001:       include-eventtypes-always.patch
+Patch002:       CVE-2023-26253.patch
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -1298,6 +1299,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Jul 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.1-3
+- Patching CVE-2023-26253.
+
 * Thu Mar 06 2024  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-2
 - Add libgfapi0 as Requires for libgfapi-devel
 

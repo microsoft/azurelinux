@@ -78,6 +78,14 @@ ENABLE_CPU_PROFILE              ?= n
 ENABLE_MEM_PROFILE              ?= n
 ENABLE_TRACE                    ?= n
 
+# License checking tool
+##help:var:LICENSE_CHECK_DIRS:"<rpm_dir_1> <rpm_dir_2>"=Space separated list of directories to recursively validate with the manual 'license-check' target.
+LICENSE_CHECK_DIRS ?=
+LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
+LICENSE_CHECK_NAME_FILE      ?= $(MANIFESTS_DIR)/package/license_file_names.json
+##help:var:LICENSE_CHECK_MODE:{none,warn,fatal,pedantic}=Set the license check mode during package and image builds. 'none' will disable the license check, 'warn' will print warnings, 'fatal' will stop the build on errors, 'pedantic' will stop the build on warnings and errors.
+LICENSE_CHECK_MODE ?= none
+
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
@@ -143,30 +151,8 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## REMAINING BUILD FLAGS ########
 
-ifneq ($(DAILY_BUILD_ID),)
-   $(warning Using Daily Build $(DAILY_BUILD_ID))
-   # Ensure build_arch is set
-   ifeq ($(build_arch),)
-      $(error build_arch must be set when using DAILY_BUILD_ID)
-   endif
-   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
-   ifeq ($(build_arch),x86_64)
-      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
-      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/SRPMS
-   else
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
-   endif
-else
-   ifeq ($(USE_PREVIEW_REPO),y)
-      # Configure the preview repo
-      include $(SCRIPTS_DIR)/preview.mk
-   endif
-endif
+# Daily build ID and repo configuration
+include $(SCRIPTS_DIR)/daily_build.mk
 
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -206,6 +192,12 @@ include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 include $(SCRIPTS_DIR)/tools.mk
+
+# Based on daily build configuration, configure testing repos
+include $(SCRIPTS_DIR)/preview.mk
+
+# Dynamically update toolchain and chroot manifests for some flows with:
+include $(SCRIPTS_DIR)/manifests.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
@@ -254,7 +246,11 @@ include $(SCRIPTS_DIR)/pkggen.mk
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:
-#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup
+#  sodiff-check, sodiff-setup
+# Get build info with:
+#  build-summary, build-package-summary, fake-built-packages-list
+# Validate rpm licenses with:
+#  license-check, license-check-img, clean-license-check
 include $(SCRIPTS_DIR)/analysis.mk
 
 ##help:target:clean=Clean all built files.

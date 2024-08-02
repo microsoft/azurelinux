@@ -1,0 +1,73 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 2048,
+            "Artifacts": [
+                {
+                    "Name": "cvm",
+                    "Type": "vhd"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "efi",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 1,
+                    "End": 513,
+                    "FsType": "fat32",
+                    "Type": "esp"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 513,
+                    "End": 0,
+                    "FsType": "ext4",
+                    "Type": "linux-root-amd64"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "BootType": "efi",
+            "PartitionSettings": [
+                {
+                    "ID": "efi",
+                    "MountPoint": "/efi",
+                    "MountOptions": "umask=0077"
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/marketplace-tools-packages.json",
+                "packagelists/azurevm-packages.json",
+                "packagelists/cvm-packages.json",
+                "packagelists/hyperv-packages.json"
+            ],
+            "AdditionalFiles": {
+                "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"
+            },
+            "KernelOptions": {
+                "default": "kernel"
+            },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/setup_cvm_image.sh"
+                },
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
+            "Hostname": "azurelinux",
+            "DisableRpmDocs": true
+        }
+    ]
+}

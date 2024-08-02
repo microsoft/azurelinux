@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,7 +65,7 @@ BuildRequires:  cpio
 BuildRequires:  createrepo_c
 BuildRequires:  cryptsetup
 BuildRequires:  curl
-BuildRequires:  dhclient
+BuildRequires:  dhcpcd
 BuildRequires:  diffutils
 BuildRequires:  dosfstools
 BuildRequires:  e2fsprogs
@@ -82,7 +82,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static >= 2.38-5%{?dist}
+BuildRequires:  glibc-static >= 2.38-6%{?dist}
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gperf
 BuildRequires:  grep
@@ -100,7 +100,6 @@ BuildRequires:  libacl-devel
 BuildRequires:  libcap
 BuildRequires:  libcap-devel
 BuildRequires:  libconfig-devel
-BuildRequires:  libdb-utils
 BuildRequires:  libldm
 BuildRequires:  libldm-devel
 BuildRequires:  libselinux
@@ -239,7 +238,6 @@ Requires:       hivex >= 1.3.10
 Requires:       libacl
 Requires:       libcap
 # For core inspection API.
-Requires:       libdb-utils
 Requires:       libselinux
 Requires:       libvirt-daemon-driver-qemu
 Requires:       libvirt-daemon-driver-secret
@@ -762,7 +760,7 @@ tdnf install --downloadonly -y \
     cpio \
     cryptsetup \
     curl \
-    dhclient \
+    dhcpcd \
     diffutils \
     dosfstools \
     e2fsprogs \
@@ -865,6 +863,9 @@ export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
+if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
+    cat $HOME/.cache/libvirt/qemu/log/* && false
+fi
 %endif
 
 %install
@@ -1146,6 +1147,15 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Thu Jul 18 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-7
+- Return the tests
+
+* Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 1.52.0-6
+- Remove dhclient in favor of using dhcpcd
+
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.52.0-5
+- Remove dependency on 'libdb'.
+
 * Tue May 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.52.0-4
 - Use ocaml >= 5.1.1
 - Rebuild for new version of supermin
@@ -1159,6 +1169,9 @@ rm ocaml/html/.gitignore
 * Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
 - Update to 1.52.0
 - Move to pcre2
+
+* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-21
+- Update to build dep latest glibc-static version
 
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-20
 - Updated glibc-static buildrequires release

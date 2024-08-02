@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
@@ -25,11 +26,12 @@ const (
 	tmpParitionDirName = "tmppartition"
 
 	// supported input formats
-	ImageFormatVhd   = "vhd"
-	ImageFormatVhdx  = "vhdx"
-	ImageFormatQCow2 = "qcow2"
-	ImageFormatIso   = "iso"
-	ImageFormatRaw   = "raw"
+	ImageFormatVhd      = "vhd"
+	ImageFormatVhdFixed = "vhd-fixed"
+	ImageFormatVhdx     = "vhdx"
+	ImageFormatQCow2    = "qcow2"
+	ImageFormatIso      = "iso"
+	ImageFormatRaw      = "raw"
 
 	// qemu-specific formats
 	QemuFormatVpc = "vpc"
@@ -70,12 +72,11 @@ type ImageCustomizerParameters struct {
 	rawImageFile string
 
 	// output image
-	outputImageFormat     string
-	outputIsIso           bool
-	qemuOutputImageFormat string
-	outputImageFile       string
-	outputImageDir        string
-	outputImageBase       string
+	outputImageFormat string
+	outputIsIso       bool
+	outputImageFile   string
+	outputImageDir    string
+	outputImageBase   string
 }
 
 func createImageCustomizerParameters(buildDir string,
@@ -127,7 +128,7 @@ func createImageCustomizerParameters(buildDir string,
 	ic.outputImageDir = filepath.Dir(outputImageFile)
 
 	if ic.outputImageFormat != "" && !ic.outputIsIso {
-		ic.qemuOutputImageFormat, err = toQemuImageFormat(ic.outputImageFormat)
+		err = validateImageFormat(ic.outputImageFormat)
 		if err != nil {
 			return nil, err
 		}
@@ -228,6 +229,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			}
 		}
 	}()
+
+	err = checkEnvironmentVars()
+	if err != nil {
+		return err
+	}
 
 	// ensure build and output folders are created up front
 	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
@@ -353,7 +359,12 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	// Shrink the filesystems.
 	if ic.enableShrinkFilesystems {
-		err = shrinkFilesystemsHelper(ic.rawImageFile)
+		verityHashPartitionId := (*imagecustomizerapi.IdentifiedPartition)(nil)
+		if ic.config.OS.Verity != nil {
+			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
+		}
+
+		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
@@ -390,12 +401,12 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 
 	// Create final output image file if requested.
 	switch ic.outputImageFormat {
-	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", ic.outputImageFile)
 
-		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", ic.qemuOutputImageFormat, ic.rawImageFile, ic.outputImageFile)
+		err := convertImageFile(ic.rawImageFile, ic.outputImageFile, ic.outputImageFormat)
 		if err != nil {
-			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
+			return err
 		}
 
 	case ImageFormatIso:
@@ -415,16 +426,43 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 	return nil
 }
 
-func toQemuImageFormat(imageFormat string) (string, error) {
-	switch imageFormat {
-	case ImageFormatVhd:
-		return QemuFormatVpc, nil
+func convertImageFile(inputPath string, outputPath string, format string) error {
+	qemuImageFormat, qemuOptions := toQemuImageFormat(format)
 
-	case ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
-		return imageFormat, nil
+	qemuImgArgs := []string{"convert", "-O", qemuImageFormat}
+	if qemuOptions != "" {
+		qemuImgArgs = append(qemuImgArgs, "-o", qemuOptions)
+	}
+	qemuImgArgs = append(qemuImgArgs, inputPath, outputPath)
+
+	err := shell.ExecuteLiveWithErr(1, "qemu-img", qemuImgArgs...)
+	if err != nil {
+		return fmt.Errorf("failed to convert image file to format: %s:\n%w", format, err)
+	}
+
+	return nil
+}
+
+func validateImageFormat(imageFormat string) error {
+	switch imageFormat {
+	case ImageFormatVhd, ImageFormatVhdFixed, ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
+		return nil
 
 	default:
-		return "", fmt.Errorf("unsupported image format (supported: vhd, vhdx, raw, qcow2): %s", imageFormat)
+		return fmt.Errorf("unsupported image format (supported: vhd, vhd-fixed, vhdx, raw, qcow2): %s", imageFormat)
+	}
+}
+
+func toQemuImageFormat(imageFormat string) (string, string) {
+	switch imageFormat {
+	case ImageFormatVhd:
+		return QemuFormatVpc, ""
+
+	case ImageFormatVhdFixed:
+		return QemuFormatVpc, "subformat=fixed,force_size"
+
+	default:
+		return imageFormat, ""
 	}
 }
 
@@ -463,10 +501,6 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	}
 
 	return nil
-}
-
-func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Storage != nil
 }
 
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
@@ -660,7 +694,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string) error {
+func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -668,7 +702,7 @@ func shrinkFilesystemsHelper(buildImageFile string) error {
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath())
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition)
 	if err != nil {
 		return err
 	}
@@ -686,38 +720,23 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	// Connect the disk image to an NBD device using qemu-nbd
-	// Find a free NBD device
-	nbdDevice, err := findFreeNBDDevice()
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to find a free nbd device: %v", err)
+		return fmt.Errorf("failed to connect to image file to provision verity:\n%w", err)
 	}
+	defer loopback.Close()
 
-	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
-	}
-	defer func() {
-		// Disconnect the NBD device when the function returns
-		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
-		if err != nil {
-			return
-		}
-	}()
-
-	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
 	if err != nil {
 		return err
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
-		config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
-		config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -771,6 +790,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
 	if err != nil {
 		return err
 	}
@@ -873,4 +897,30 @@ func humanReadableUnitSizeAndName(size int64) (int64, string) {
 	default:
 		return 1, "B"
 	}
+}
+
+func checkEnvironmentVars() error {
+	// Some commands, like tdnf (and gpg), require the USER and HOME environment variables to make sense in the OS they
+	// are running under. Since the image customization tool is pretty much always run under root/sudo, this will
+	// generally always be the case since root is always a valid user. However, this might not be true if the user
+	// decides to use `sudo -E` instead of just `sudo`. So, check for this to avoid the user running into confusing
+	// tdnf errors.
+	//
+	// In an ideal world, the USER, HOME, and PATH environment variables should be overridden whenever an external
+	// command is called under chroot. But such a change would be quite involved.
+	const (
+		rootHome = "/root"
+		rootUser = "root"
+	)
+
+	envHome := os.Getenv("HOME")
+	envUser := os.Getenv("USER")
+
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
+		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
+	}
+
+	return nil
 }

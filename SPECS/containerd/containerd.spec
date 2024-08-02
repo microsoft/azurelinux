@@ -4,7 +4,7 @@
 Summary: Industry-standard container runtime
 Name: containerd
 Version: 1.7.13
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,6 +16,8 @@ Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
 Patch1:  fix_tests_for_golang1.21.patch
+Patch2:	 CVE-2023-44487.patch
+Patch3:  CVE-2023-47108.patch
 
 %{?systemd_requires}
 
@@ -85,6 +87,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Jun 26 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.13-3
+- Address CVE-2023-44487 and CVE-2023-47108
+
 * Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.13-2
 - Add OOMScoreAdjust -999 to containerd.service
 

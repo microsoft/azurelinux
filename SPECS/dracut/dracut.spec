@@ -3,17 +3,17 @@
 
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        059
-Release:        20%{?dist}
+Version:        102
+Release:        1%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://github.com/dracutdevs/dracut/wiki
+URL:            https://github.com/dracut-ng/dracut-ng/wiki
 
-Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/dracut-ng/dracut-ng/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
@@ -24,19 +24,14 @@ Source8:        00-virtio.conf
 Source9:        00-vrf.conf
 Source10:       00-xen.conf
 
-Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
-
 Patch:          0002-disable-xattr.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
-Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
-Patch:          0009-install-systemd-executor.patch
-Patch:          0010-fix-remove-microcode-check-based-on-CONFIG_MICROCODE_AMD-INTEL.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 
@@ -137,7 +132,7 @@ Requires:       %{name} = %{version}-%{release}
 This package contains dracut configuration needed to build an initramfs with xen guest drivers
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-ng-%{version}
 cp %{SOURCE1} .
 
 %build
@@ -281,6 +276,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Jun 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-1
+- Update to 102
+
 * Fri Jun 7 2024 Daniel McIlvaney <damcilva@microsoft.com> - 059-20
 - Suppress missing awk errors on size-constrained images
 

@@ -92,7 +92,7 @@ func TestBootCustomizerSELinuxMode20(t *testing.T) {
 	expectedGrubCfgDiff = `22c22
 < 	linux $bootprefix/$mariner_linux       rd.auto=1 root=$rootdevice $mariner_cmdline lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 $systemd_cmdline   $kernelopts
 ---
-> 	linux $bootprefix/$mariner_linux       rd.auto=1 root=$rootdevice $mariner_cmdline lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 $systemd_cmdline        $kernelopts
+> 	linux $bootprefix/$mariner_linux       rd.auto=1 root=$rootdevice $mariner_cmdline lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 $systemd_cmdline       selinux=0 $kernelopts
 `
 	checkDiffs20(t, b, expectedGrubCfgDiff, "")
 }
@@ -141,7 +141,7 @@ func TestBootCustomizerSELinuxMode30(t *testing.T) {
 	expectedDefaultGrubFileDiff = `5c5
 < GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity "
 ---
-> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity      "
+> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity     selinux=0 "
 `
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 }

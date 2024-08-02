@@ -1,0 +1,12 @@
+diff -ruN a/cloudinit/distros/azurelinux.py b/cloudinit/distros/azurelinux.py
+--- a/cloudinit/distros/azurelinux.py	2024-07-02 18:44:08.000000000 -0700
++++ b/cloudinit/distros/azurelinux.py	2024-07-17 14:08:22.209966025 -0700
+@@ -22,6 +22,8 @@
+ 
+ 
+ class Distro(rhel.Distro):
++    usr_lib_exec = "/usr/lib"
++	
+     def __init__(self, name, cfg, paths):
+         super().__init__(name, cfg, paths)
+         self.osfamily = "azurelinux"

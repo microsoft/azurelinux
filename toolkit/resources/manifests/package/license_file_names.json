@@ -1,0 +1,29 @@
+{
+    "_comment1": "This file lists the regexes used to match license files in packages.",
+    "_comment2": "FuzzyLicenseNamesRegexList is a list of license names that should be matched in a case-insensitive sub-string search",
+    "_comment3": "Any common license path prefixes are removed before matching (ie /usr/share/licenses/<pkg>/).",
+    "_comment4": "VerbatimLicenseNamesRegexList is a list of license names that should be matched exactly against the basename of a file",
+    "_comment5": "SkipLicenseNamesRegexList is a list of files that may appear as a license file but generally aren't really licenses",
+    "FuzzyLicenseNamesRegexList": [
+        "(?i).*copying.*",
+        "(?i).*license.*",
+        "(?i).*licence.*",
+        "(?i).*licensing.*",
+        "(?i).*notice.*",
+        "(?i).*copyright.*",
+        "(?i).*artistic.*",
+        "(?i).*bsd.*",
+        "(?i).*gpl.*",
+        "(?i).*cc0.*",
+        "(?i).*mit\\.txt.*"
+    ],
+    "VerbatimLicenseNamesRegexList": [
+        "^MIT$"
+    ],
+    "SkipLicenseNamesRegexList": [
+        "(?i).*AUTHORS.*",
+        "(?i).*CONTRIBUTORS.*",
+        "(?i).*README.*",
+        "(?i).*CREDITS.*"
+    ]
+}

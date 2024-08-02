@@ -8,9 +8,7 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"regexp"
-	"strconv"
 )
 
 // ReadOnlyVerityRoot controls DM-Verity read-only filesystems which will be mounted at startup
@@ -83,57 +81,9 @@ func GetDefaultReadOnlyVerityRoot() (defaultVal ReadOnlyVerityRoot) {
 
 // IsValid returns an error if the ReadOnlyVerityRoot is not valid
 func (v *ReadOnlyVerityRoot) IsValid() (err error) {
-	// The default disabled config does not generate a default name, only check if we have explicitly
-	// enabled the verity config
-	if v.Enable && len(v.Name) == 0 {
-		return fmt.Errorf("[Name] must not be blank")
+	if v.Enable {
+		return fmt.Errorf("verity root is deprecated and should not be used, use ImageCustomizer instead")
 	}
-
-	if v.ErrorCorrectionEnable {
-		if v.ErrorCorrectionEncodingRoots < minErrorCorrectionEncodingRoots || v.ErrorCorrectionEncodingRoots > maxErrorCorrectionEncodingRoots {
-			return fmt.Errorf("verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( %d <= N <= %d), currently %d", minErrorCorrectionEncodingRoots, maxErrorCorrectionEncodingRoots, v.ErrorCorrectionEncodingRoots)
-		}
-	}
-
-	if err = v.VerityErrorBehavior.IsValid(); err != nil {
-		return
-	}
-
-	for i, overlayA := range v.TmpfsOverlays {
-		for j, overlayB := range v.TmpfsOverlays {
-			if i == j {
-				continue
-			}
-
-			wildcardPattern := filepath.Join(overlayA, "*")
-			isNested, err := filepath.Match(wildcardPattern, overlayB)
-
-			if err != nil {
-				return fmt.Errorf("failed to check if [TmpfsOverlays] paths are nested (%s)(%s): %w", overlayA, overlayB, err)
-			}
-			if isNested {
-				return fmt.Errorf("failed to validate [TmpfsOverlays], overlays may not overlap each other (%s)(%s)", overlayA, overlayB)
-			}
-		}
-	}
-
-	if len(v.TmpfsOverlays) > 0 {
-		// Check tmpfs size
-		matches := tmpfsOverlaySizeRegex.FindStringSubmatch(v.TmpfsOverlaySize)
-		if len(matches) == 0 {
-			return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), must be of the form '1234, 1234<k,m,g>, 30%%", v.TmpfsOverlaySize)
-		}
-		if matches[2] == "%" {
-			percent, convertErr := strconv.Atoi(matches[1])
-			if convertErr != nil {
-				return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), could not convert percentage to integer: %w", v.TmpfsOverlaySize, convertErr)
-			}
-			if percent <= 0 || percent >= 100 {
-				return fmt.Errorf("failed to validate [TmpfsOverlaySize] (%s), invalid percentage (%d), should be in the range 0 < percentage < 100", v.TmpfsOverlaySize, percent)
-			}
-		}
-	}
-
 	return
 }
 

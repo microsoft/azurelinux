@@ -262,25 +262,3 @@ func TestDiskIsValidZeroSize(t *testing.T) {
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "maxSize")
 }
-
-func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
-	disk := &Disk{
-		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2 * diskutils.MiB,
-		Partitions: []Partition{
-			{
-				Id:    "a",
-				Start: 1 * diskutils.MiB,
-				End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
-			},
-			{
-				Id:    "a",
-				Start: 2 * diskutils.MiB,
-			},
-		},
-	}
-
-	err := disk.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate partition id")
-}

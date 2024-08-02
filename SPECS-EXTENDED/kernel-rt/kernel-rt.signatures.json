@@ -1,10 +1,10 @@
 {
- "Signatures": {
-  "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
-  "config": "16471af6cf0859a514c820dbd6fc4c2026499572990aa392065a94a749100228",
-  "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
-  "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
-  "kernel-6.6.7.1.tar.gz": "fb632cd452cb6c39ac100a974e987af3dd478a0a5073f6025997a221d199dffa",
-  "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
- }
+  "Signatures": {
+    "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
+    "config": "adc647ef0f073fcaac44d40f647b4a20192871ad3b7efadfa1470807a173f14e",
+    "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
+    "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
+    "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
+    "kernel-6.6.35.1.tar.gz": "4780b089873512567323e8128408451ae4d9a420d0789868cfcab521be7f1b4b"
+  }
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 type FileCopyBuilder struct {
@@ -48,8 +49,6 @@ func (b FileCopyBuilder) SetNoDereference() FileCopyBuilder {
 }
 
 func (b FileCopyBuilder) Run() (err error) {
-	const squashErrors = false
-
 	logger.Log.Debugf("Copying (%s) to (%s)", b.Src, b.Dst)
 
 	if b.NoDereference && b.ChangeFileMode {
@@ -86,7 +85,10 @@ func (b FileCopyBuilder) Run() (err error) {
 
 	args = append(args, "--preserve=mode", b.Src, b.Dst)
 
-	err = shell.ExecuteLive(squashErrors, "cp", args...)
+	err = shell.NewExecBuilder("cp", args...).
+		LogLevel(logrus.DebugLevel, logrus.WarnLevel).
+		ErrorStderrLines(1).
+		Execute()
 	if err != nil {
 		return
 	}

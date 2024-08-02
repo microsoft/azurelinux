@@ -11,7 +11,6 @@ FROM $BASE_IMAGE
 # XDG_* directories to /var/run.
 RUN  cd /var && rm -rf run && ln -s ../run . \
    && chown qemu:qemu /var/run \
-   && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher \
    && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher-monitor \
    && chmod 0755 /etc/libvirt
 

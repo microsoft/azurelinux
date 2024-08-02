@@ -76,16 +76,16 @@ popd
 rm -rf perl-5.38.0
 touch /logs/status_perl_complete
 
-echo Python-3.12.0
-tar xf Python-3.12.0.tar.xz
-pushd Python-3.12.0
+echo Python-3.12.3
+tar xf Python-3.12.3.tar.xz
+pushd Python-3.12.3
 ./configure --prefix=/usr   \
             --enable-shared \
             --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.0
+rm -rf Python-3.12.3
 touch /logs/status_python312_temp_complete
 
 echo Texinfo-7.0.3
@@ -348,7 +348,7 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
+patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 LD=ld \
@@ -652,16 +652,16 @@ popd
 rm -rf libffi-3.4.4
 touch /logs/status_libffi_complete
 
-echo Python-3.12.0
-tar xf Python-3.12.0.tar.xz
-pushd Python-3.12.0
+echo Python-3.12.3
+tar xf Python-3.12.3.tar.xz
+pushd Python-3.12.3
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.0
+rm -rf Python-3.12.3
 touch /logs/status_python312_complete
 
 echo Flit-Core-3.9.0

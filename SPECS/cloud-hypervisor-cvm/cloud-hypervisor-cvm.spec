@@ -4,7 +4,7 @@
 
 Name:           cloud-hypervisor-cvm
 Summary:        Cloud Hypervisor CVM is an open source Virtual Machine Monitor (VMM) that enables running SEV SNP enabled VMs on top of MSHV using the IGVM file format as payload.
-Version:        38.0.72
+Version:        38.0.72.2
 Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
@@ -20,11 +20,9 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
 # rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 %endif
-
-Conflicts: cloud-hypervisor
 
 BuildRequires:  binutils
 BuildRequires:  gcc
@@ -71,7 +69,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%setup -q -n cloud-hypervisor-%{version}
+%setup -q -n cloud-hypervisor-msft-v%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
@@ -138,6 +136,13 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Fri Jul 12 2024 Archana Choudhary <archana1@microsoft.com> - 38.0.72.2-1
+- Upgrade to v38.0.72.2
+- Fixes CVE-2023-45853, CVE-2018-25032, CVE-2023-5363, CVE-2023-5678, CVE-2023-6129, CVE-2023-6237, CVE-2024-0727, CVE-2024-4603
+
+* Tue Jun 25 2024 Chris Co <chrco@microsoft.com> - 38.0.72-2
+- Remove conflicts with cloud-hypervisor
+
 * Wed May 15 2024 Saul Paredes <saulparedes@microsoft.com> - 38.0.72-1
 - Initial CBL-Mariner import from Azure
 - Upgrade to v38.0.72

@@ -1,6 +1,6 @@
 Summary:        The eBPF tool and systems inspection framework for Kubernetes, containers and Linux hosts.
 Name:           ig
-Version:        0.29.0
+Version:        0.30.0
 Release:        1%{?dist}
 License:        Apache 2.0 and GPL 2.0 for eBPF code
 Vendor:         Microsoft Corporation
@@ -23,7 +23,7 @@ This package contains ig, the local CLI flavor of Inspektor Gadget.
 
 %build
 CGO_ENABLED=0 go build \
-		-ldflags "-X github.com/inspektor-gadget/inspektor-gadget/cmd/common.version=v%{version} \
+		-ldflags "-X github.com/inspektor-gadget/inspektor-gadget/internal/version.version=v%{version} \
 			-X github.com/inspektor-gadget/inspektor-gadget/cmd/common/image.builderImage=ghcr.io/inspektor-gadget/ebpf-builder:v%{version} \
 			-extldflags '-static'" \
 		-tags "netgo" \
@@ -64,6 +64,10 @@ fi
 %{_bindir}/ig
 
 %changelog
+* Mon Jul 01 2024 Francis Laniel <flaniel@linux.microsoft.com> - 0.30.0-1
+- Bump to version 0.30.0
+- Update how binary version is set while building
+
 * Fri May 31 2024 Francis Laniel <flaniel@linux.microsoft.com> - 0.29.0-1
 - Bump to version 0.29.0
 

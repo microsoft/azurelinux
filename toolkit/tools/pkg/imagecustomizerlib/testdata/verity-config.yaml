@@ -44,7 +44,7 @@ storage:
       path: /
       
   - deviceId: verityhash
-    type: ext4
+    type: fat32
 
   - deviceId: var
     type: ext4
@@ -66,6 +66,7 @@ os:
     - vim
 
   verity:
+    corruptionOption: panic
     dataPartition:
       idType: part-label
       id: root
@@ -76,6 +77,8 @@ os:
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
     files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
+    # Enable DHCP client on all of the physical NICs.
+    files/89-ethernet.network: /etc/systemd/network/89-ethernet.network
 
   services:
     enable:

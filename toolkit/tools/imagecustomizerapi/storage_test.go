@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -190,4 +191,143 @@ func TestStorageIsValidBadDeviceId(t *testing.T) {
 	err := value.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "no partition with matching ID (a)")
+}
+
+func TestStorageIsValidDuplicatePartitionId(t *testing.T) {
+	storage := Storage{
+		BootType: BootTypeEfi,
+		Disks: []Disk{
+			{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            3 * diskutils.MiB,
+				Partitions: []Partition{
+					{
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
+						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
+					},
+					{
+						Id:    "a",
+						Start: 2 * diskutils.MiB,
+					},
+				},
+			},
+		},
+	}
+
+	err := storage.IsValid()
+	assert.ErrorContains(t, err, "duplicate partition id")
+}
+
+func TestStorageIsValidNoLabel(t *testing.T) {
+	storage := Storage{
+		BootType: BootTypeEfi,
+		Disks: []Disk{
+			{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            3 * diskutils.MiB,
+				Partitions: []Partition{
+					{
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
+						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
+						Type:  PartitionTypeESP,
+					},
+				},
+			},
+		},
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "a",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/",
+				},
+			},
+		},
+	}
+
+	err := storage.IsValid()
+	assert.ErrorContains(t, err, "invalid fileSystem at index 0")
+	assert.ErrorContains(t, err, "idType is set to (part-label) but partition (a) has no label set")
+}
+
+func TestStorageIsValidUniqueLabel(t *testing.T) {
+	storage := Storage{
+		BootType: BootTypeEfi,
+		Disks: []Disk{
+			{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            3 * diskutils.MiB,
+				Partitions: []Partition{
+					{
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
+						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
+						Type:  PartitionTypeESP,
+						Label: "a",
+					},
+					{
+						Id:    "b",
+						Start: 2 * diskutils.MiB,
+						Label: "b",
+					},
+				},
+			},
+		},
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "a",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/",
+				},
+			},
+		},
+	}
+
+	err := storage.IsValid()
+	assert.NoError(t, err)
+}
+
+func TestStorageIsValidDuplicateLabel(t *testing.T) {
+	storage := Storage{
+		BootType: BootTypeEfi,
+		Disks: []Disk{
+			{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            3 * diskutils.MiB,
+				Partitions: []Partition{
+					{
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
+						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
+						Type:  PartitionTypeESP,
+						Label: "a",
+					},
+					{
+						Id:    "b",
+						Start: 2 * diskutils.MiB,
+						Label: "a",
+					},
+				},
+			},
+		},
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "a",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/",
+				},
+			},
+		},
+	}
+
+	err := storage.IsValid()
+	assert.ErrorContains(t, err, "invalid fileSystem at index 0")
+	assert.ErrorContains(t, err, "more than one partition has a label of (a)")
 }

@@ -19,12 +19,12 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemd"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 )
 
 const (
 	configDirMountPathInChroot = "/_imageconfigs"
-	resolveConfPath            = "/etc/resolv.conf"
 	defaultFilePermissions     = 0o755
 )
 
@@ -37,7 +37,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 
 	buildTime := time.Now().Format("2006-01-02T15:04:05Z")
 
-	err = overrideResolvConf(imageChroot)
+	resolvConf, err := overrideResolvConf(imageChroot)
 	if err != nil {
 		return err
 	}
@@ -118,12 +118,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		}
 	}
 
-	err = selinuxSetFiles(selinuxMode, imageChroot)
+	err = restoreResolvConf(resolvConf, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = deleteResolvConf(imageChroot)
+	err = selinuxSetFiles(selinuxMode, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -136,45 +136,6 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	return nil
-}
-
-// Override the resolv.conf file, so that in-chroot processes can access the network.
-// For example, to install packages from packages.microsoft.com.
-func overrideResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Overriding resolv.conf file")
-
-	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
-
-	// Remove the existing resolv.conf file, if it exists.
-	// Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
-	// file. For example, systemd-resolved. So, it isn't neccessary to make a back-up of the existing file.
-	err := os.RemoveAll(imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to delete existing resolv.conf file: %w", err)
-	}
-
-	err = file.Copy(resolveConfPath, imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to override resolv.conf file with host's resolv.conf: %w", err)
-	}
-
-	return nil
-}
-
-// Delete the overridden resolv.conf file.
-// Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
-// file. For example, systemd-resolved.
-func deleteResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Deleting overridden resolv.conf file")
-
-	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
-
-	err := os.RemoveAll(imageResolveConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to delete overridden resolv.conf file: %w", err)
-	}
-
-	return err
 }
 
 func UpdateHostname(hostname string, imageChroot safechroot.ChrootInterface) error {
@@ -218,7 +179,7 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
 	for _, dirConfigElement := range additionalDirs {
 		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
-		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
+		logger.Log.Infof("Copying %s to %s", absSourceDir, dirConfigElement.DestinationPath)
 
 		// Setting permissions values. They are set to a default value if they have not been specified.
 		newDirPermissionsValue := fs.FileMode(defaultFilePermissions)
@@ -239,7 +200,7 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 		}
 		err := imageChroot.AddDirs(dirToCopy)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to copy directory (%s) to (%s):\n%w", absSourceDir, dirConfigElement.DestinationPath, err)
 		}
 	}
 	return nil
@@ -303,6 +264,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 			return fmt.Errorf("cannot set UID (%d) on a user (%s) that already exists", *user.UID, user.Name)
 		}
 
+		if user.HomeDirectory != "" {
+			return fmt.Errorf("cannot set home directory (%s) on a user (%s) that already exists",
+				user.HomeDirectory, user.Name)
+		}
+
 		// Update the user's password.
 		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
@@ -315,7 +281,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 
 		// Add the user.
-		err = userutils.AddUser(user.Name, hashedPassword, uidStr, imageChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, uidStr, imageChroot)
 		if err != nil {
 			return err
 		}
@@ -329,8 +295,15 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		}
 	}
 
-	// Set user's groups.
-	err = installutils.ConfigureUserGroupMembership(imageChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+	// Update an existing user's primary group. A new user's primary group will have already been set by AddUser().
+	if userExists {
+		err = installutils.ConfigureUserPrimaryGroupMembership(imageChroot, user.Name, user.PrimaryGroup)
+		if err != nil {
+			return err
+		}
+	}
+	// Set user's secondary groups.
+	err = installutils.ConfigureUserSecondaryGroupMembership(imageChroot, user.Name, user.SecondaryGroups)
 	if err != nil {
 		return err
 	}
@@ -374,6 +347,13 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	for _, service := range services.Disable {
 		logger.Log.Infof("Disabling service (%s)", service)
 
+		// `systemctl disable` does not seem to fail when the service does not exist when running under chroot.
+		// So, use `systemctl is-enabled` to check if the service exists.
+		_, err := systemd.IsServiceEnabled(service, imageChroot)
+		if err != nil {
+			return fmt.Errorf("failed to disable service (%s):\n%w", service, err)
+		}
+
 		err = imageChroot.UnsafeRun(func() error {
 			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service)
 		})
@@ -407,6 +387,30 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 
 func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
 ) error {
+
+	switch config.OS.ResetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		err := hardResetBootLoader(baseConfigPath, config, imageConnection)
+		if err != nil {
+			return err
+		}
+
+	default:
+		// Append the kernel command-line args to the existing grub config.
+		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		if err != nil {
+			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+		}
+	}
+
+	return nil
+}
+
+func hardResetBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
+) error {
+	var err error
+	logger.Log.Infof("Hard reset bootloader config")
+
 	bootCustomizer, err := NewBootCustomizer(imageConnection.Chroot())
 	if err != nil {
 		return err
@@ -417,26 +421,40 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
 
-	switch config.OS.ResetBootLoaderType {
-	case imagecustomizerapi.ResetBootLoaderTypeHard:
-		logger.Log.Infof("Resetting bootloader config")
+	var rootMountIdType imagecustomizerapi.MountIdentifierType
+	var bootType imagecustomizerapi.BootType
+	if config.Storage != nil {
+		rootFileSystem, foundRootFileSystem := sliceutils.FindValueFunc(config.Storage.FileSystems,
+			func(fileSystem imagecustomizerapi.FileSystem) bool {
+				return fileSystem.MountPoint != nil &&
+					fileSystem.MountPoint.Path == "/"
+			},
+		)
+		if !foundRootFileSystem {
+			return fmt.Errorf("failed to find root filesystem (i.e. mount equal to '/')")
+		}
 
-		if config.Storage == nil {
-			return fmt.Errorf("failed to configure bootloader. Missing 'storage' configuration.")
-		}
-		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
-			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
+		rootMountIdType = rootFileSystem.MountPoint.IdType
+		bootType = config.Storage.BootType
+	} else {
+		rootMountIdType, err = findRootMountIdTypeFromFstabFile(imageConnection)
 		if err != nil {
-			return fmt.Errorf("failed to configure bootloader:\n%w", err)
+			return fmt.Errorf("failed to get image's root mount ID type:\n%w", err)
 		}
 
-	default:
-		// Append the kernel command-line args to the existing grub config.
-		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		bootType, err = getImageBootType(imageConnection)
 		if err != nil {
-			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+			return fmt.Errorf("failed to get image's boot type:\n%w", err)
 		}
+	}
+
+	logger.Log.Debugf("HELLO: %v, %v", rootMountIdType, bootType)
+
+	// Hard-reset the grub config.
+	err = configureDiskBootLoader(imageConnection, rootMountIdType, bootType, config.OS.SELinux,
+		config.OS.KernelCommandLine, currentSelinuxMode)
+	if err != nil {
+		return fmt.Errorf("failed to configure bootloader:\n%w", err)
 	}
 
 	return nil

@@ -6,12 +6,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func shrinkFilesystems(imageLoopDevice string) error {
+func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
 	logger.Log.Infof("Shrinking filesystems")
 
 	// Get partition info
@@ -28,17 +29,30 @@ func shrinkFilesystems(imageLoopDevice string) error {
 	}
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		if diskPartitions[partitionNum].Type != "part" {
+		diskPartition := diskPartitions[partitionNum]
+		if diskPartition.Type != "part" {
 			continue
 		}
 
-		partitionLoopDevice := diskPartitions[partitionNum].Path
+		partitionLoopDevice := diskPartition.Path
 
 		// Check if the filesystem type is supported
-		fstype := diskPartitions[partitionNum].FileSystemType
+		fstype := diskPartition.FileSystemType
 		if !supportedShrinkFsType(fstype) {
 			logger.Log.Infof("Shrinking partition (%s): unsupported filesystem type (%s)", partitionLoopDevice, fstype)
 			continue
+		}
+
+		if verityHashPartition != nil {
+			matches, err := partitionMatchesId(*verityHashPartition, diskPartition)
+			if err != nil {
+				return err
+			}
+
+			if matches {
+				logger.Log.Infof("Shrinking partition (%s): skipping verity hash partition", partitionLoopDevice)
+				continue
+			}
 		}
 
 		logger.Log.Infof("Shrinking partition (%s)", partitionLoopDevice)

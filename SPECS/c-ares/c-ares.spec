@@ -1,13 +1,13 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.25.0
+Version:        1.30.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://c-ares.haxx.se/
-Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
+Source0:        https://github.com/c-ares/c-ares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -120,6 +120,9 @@ fi
 %{_mandir}/man3/ares_*
 
 %changelog
+* Tue Jun 25 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.30.0-1
+- Upgrade to v1.30.0 to fix CVE-2024-25629
+
 * Wed Jan 24 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.25.0-1
 - Auto-upgrade to 1.25.0
 

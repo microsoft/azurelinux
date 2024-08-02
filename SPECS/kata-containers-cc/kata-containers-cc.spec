@@ -14,7 +14,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      2%{?dist}
+Release:      6%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -117,7 +117,7 @@ popd
 
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} KVER=${KERNEL_MODULE_VER} install
 popd
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
@@ -238,6 +238,10 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %post
 %systemd_post tardev-snapshotter.service
+if [ $1 -eq 1 ]; then # Package install
+	systemctl enable tardev-snapshotter.service > /dev/null 2>&1 || :
+	systemctl start tardev-snapshotter.service > /dev/null 2>&1 || :
+fi
 
 %files
 %{share_kata}/vmlinux.container
@@ -289,6 +293,19 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Fri Jul 19 2024 Cameron Baird <cameronbaird@microsoft.com> 3.2.0.azl2-6
+- Explicitly set OS_VERSION=3.0 for invocations of rootfs builder
+
+* Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-5
+- Call make clean with OS distro variable
+
+* Fri Jul 12 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-4
+- Adapt make install target parameters to cope with upstream
+  fork Makefile changes
+
+* Tue Jul 02 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-3
+- Enable and start tardev-snapshotter.service after installation
+
 * Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-2
 - Enable sandbox_cgroup_only configuration
 

@@ -114,13 +114,12 @@ func CopyDir(src, dst string, newDirPermissions, childFilePermissions fs.FileMod
 	}
 
 	if !isDstExist {
-		logger.Log.Infof("Creating destination directory on chroot (%s)", dst)
+		logger.Log.Debugf("Creating destination directory (%s)", dst)
 		// Create dst dir
 		err = os.MkdirAll(dst, newDirPermissions)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create directory (%s):\n%w", dst, err)
 		}
-
 	}
 
 	// Open the source directory
@@ -142,7 +141,7 @@ func CopyDir(src, dst string, newDirPermissions, childFilePermissions fs.FileMod
 		} else {
 			// If it's a file, copy it and set file permissions
 			if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(childFilePermissions).Run(); err != nil {
-				return err
+				return fmt.Errorf("failed to copy file (%s) to (%s):\n%w", srcPath, dstPath, err)
 			}
 		}
 	}
@@ -193,6 +192,13 @@ func Write(data string, dst string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", dst)
 
 	err = os.WriteFile(dst, []byte(data), 0o666)
+	return
+}
+
+func WriteWithPerm(data string, dst string, perm os.FileMode) (err error) {
+	logger.Log.Debugf("Writing to (%s) with perm (%o)", dst, perm)
+
+	err = os.WriteFile(dst, []byte(data), perm)
 	return
 }
 

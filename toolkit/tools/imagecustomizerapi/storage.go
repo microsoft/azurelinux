@@ -5,8 +5,6 @@ package imagecustomizerapi
 
 import (
 	"fmt"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Storage struct {
@@ -51,58 +49,76 @@ func (s *Storage) IsValid() error {
 		fileSystemSet[fileSystem.DeviceId] = fileSystem
 	}
 
-	// Ensure special partitions have the correct filesystem type.
-	for _, disk := range s.Disks {
-		for _, partition := range disk.Partitions {
+	partitionSet := make(map[string]Partition)
+	espPartitionExists := false
+	biosBootPartitionExists := false
+	partitionLabelCounts := make(map[string]int)
+
+	for i, disk := range s.Disks {
+		for j, partition := range disk.Partitions {
+			if _, existingName := partitionSet[partition.Id]; existingName {
+				return fmt.Errorf("invalid disk at index %d:\nduplicate partition id used (%s) at index %d", i,
+					partition.Id, j)
+			}
+
+			partitionSet[partition.Id] = partition
+
+			// Ensure special partitions have the correct filesystem type.
 			fileSystem, hasFileSystem := fileSystemSet[partition.Id]
 
 			if partition.IsESP() {
+				espPartitionExists = true
+
 				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
 					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
 				}
 			}
 
 			if partition.IsBiosBoot() {
+				biosBootPartitionExists = true
+
 				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
 					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
 				}
 			}
+
+			// Count the number of partitions that use each label.
+			partitionLabelCounts[partition.Label] += 1
 		}
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.
 	switch s.BootType {
 	case BootTypeEfi:
-		hasEsp := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
-			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return partition.IsESP()
-			})
-		})
-		if !hasEsp {
+		if !espPartitionExists {
 			return fmt.Errorf("'esp' partition must be provided for 'efi' boot type")
 		}
 
 	case BootTypeLegacy:
-		hasBiosBoot := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
-			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return partition.IsBiosBoot()
-			})
-		})
-		if !hasBiosBoot {
+		if !biosBootPartitionExists {
 			return fmt.Errorf("'bios-grub' partition must be provided for 'legacy' boot type")
 		}
 	}
 
 	// Ensure all the filesystems objects have an equivalent partition object.
 	for i, fileSystem := range s.FileSystems {
-		diskExists := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
-			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return partition.Id == fileSystem.DeviceId
-			})
-		})
-		if !diskExists {
+		partition, found := partitionSet[fileSystem.DeviceId]
+		if !found {
 			return fmt.Errorf("invalid fileSystem at index %d:\nno partition with matching ID (%s)", i,
 				fileSystem.DeviceId)
+		}
+
+		if fileSystem.MountPoint != nil && fileSystem.MountPoint.IdType == MountIdentifierTypePartLabel {
+			if partition.Label == "" {
+				return fmt.Errorf("invalid fileSystem at index %d:\nidType is set to (part-label) but partition (%s) has no label set",
+					i, partition.Id)
+			}
+
+			labelCount := partitionLabelCounts[partition.Label]
+			if labelCount > 1 {
+				return fmt.Errorf("invalid fileSystem at index %d:\nmore than one partition has a label of (%s)", i,
+					partition.Label)
+			}
 		}
 	}
 

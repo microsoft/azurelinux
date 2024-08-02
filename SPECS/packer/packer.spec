@@ -1,21 +1,25 @@
+%global debug_package %{nil}
+%define our_gopath %{_topdir}/.gopath
+
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.9.4
+Version:        1.9.5
 Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
-Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
 #   1. wget https://github.com/hashicorp/packer/archive/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2023-49569.patch.
+#   5. go mod vendor
+#   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
@@ -27,23 +31,26 @@ Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-
+Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2022-3064.patch
+Patch2:         CVE-2023-49569.patch
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
-%global debug_package %{nil}
-%define our_gopath %{_topdir}/.gopath
 
 %description
 Packer is a tool for building identical machine images for multiple platforms from a single source configuration.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
-go build -mod=vendor -v -a -o packer
+LD_FLAGS="-X github.com/hashicorp/packer/version.Version=%{version} -X github.com/hashicorp/packer/version.VersionPrerelease="
+go build -mod=vendor -v -a -o packer -ldflags="$LD_FLAGS"
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -60,6 +67,11 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Mon Jul 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5-1
+- Bump to version 1.9.5.
+- Patched CVE-2022-3064.
+- Ported patches from 2.0: CVE-2023-45288 and CVE-2023-49569.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
 - Auto-upgrade to 1.9.4 - Azure Linux 3.0 - package upgrades
 

@@ -22,6 +22,21 @@ const (
 	testImageRootDirName = "testimageroot"
 )
 
+var (
+	coreEfiMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+	}
+)
+
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
@@ -73,27 +88,18 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 }
 
 func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
-	return connectToImage(buildDir, imageFilePath, []mountPoint{
-		{
-			PartitionNum:   2,
-			Path:           "/",
-			FileSystemType: "ext4",
-		},
-		{
-			PartitionNum:   1,
-			Path:           "/boot/efi",
-			FileSystemType: "vfat",
-		},
-	})
+	return connectToImage(buildDir, imageFilePath, false /*includeDefaultMounts*/, coreEfiMountPoints)
 }
 
 type mountPoint struct {
 	PartitionNum   int
 	Path           string
 	FileSystemType string
+	Flags          uintptr
 }
 
-func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) (*ImageConnection, error) {
+func connectToImage(buildDir string, imageFilePath string, includeDefaultMounts bool, mounts []mountPoint,
+) (*ImageConnection, error) {
 	imageConnection := NewImageConnection()
 	err := imageConnection.ConnectLoopback(imageFilePath)
 	if err != nil {
@@ -105,26 +111,31 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 
 	mountPoints := []*safechroot.MountPoint(nil)
 	for _, mount := range mounts {
-		devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), mount.PartitionNum)
+		devPath := partitionDevPath(imageConnection, mount.PartitionNum)
 
 		var mountPoint *safechroot.MountPoint
 		if mount.Path == "/" {
-			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, 0,
+			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags,
 				"")
 		} else {
-			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, 0, "")
+			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags, "")
 		}
 
 		mountPoints = append(mountPoints, mountPoint)
 	}
 
-	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, false)
+	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
 	}
 
 	return imageConnection, nil
+}
+
+func partitionDevPath(imageConnection *ImageConnection, partitionNum int) string {
+	devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), partitionNum)
+	return devPath
 }
 
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {

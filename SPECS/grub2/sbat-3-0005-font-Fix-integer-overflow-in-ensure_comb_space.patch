@@ -1,0 +1,48 @@
+From 23843fe8947e4da955a05ad3d1858725bfcb56c8 Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Fri, 5 Aug 2022 02:27:05 +0800
+Subject: [PATCH 05/13] font: Fix integer overflow in ensure_comb_space()
+
+In fact it can't overflow at all because glyph_id->ncomb is only 8-bit
+wide. But let's keep safe if somebody changes the width of glyph_id->ncomb
+in the future. This patch also fixes the inconsistency between
+render_max_comb_glyphs and render_combining_glyphs when grub_malloc()
+returns NULL.
+
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/font/font.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/font/font.c b/grub-core/font/font.c
+index a8576ffec..9e3e0a94e 100644
+--- a/grub-core/font/font.c
++++ b/grub-core/font/font.c
+@@ -1468,14 +1468,18 @@ ensure_comb_space (const struct grub_unicode_glyph *glyph_id)
+   if (glyph_id->ncomb <= render_max_comb_glyphs)
+     return;
+ 
+-  render_max_comb_glyphs = 2 * glyph_id->ncomb;
+-  if (render_max_comb_glyphs < 8)
++  if (grub_mul (glyph_id->ncomb, 2, &render_max_comb_glyphs))
++    render_max_comb_glyphs = 0;
++  if (render_max_comb_glyphs > 0 && render_max_comb_glyphs < 8)
+     render_max_comb_glyphs = 8;
+   grub_free (render_combining_glyphs);
+-  render_combining_glyphs = grub_malloc (render_max_comb_glyphs
+-					 * sizeof (render_combining_glyphs[0]));
++  render_combining_glyphs = (render_max_comb_glyphs > 0) ?
++    grub_calloc (render_max_comb_glyphs, sizeof (render_combining_glyphs[0])) : NULL;
+   if (!render_combining_glyphs)
+-    grub_errno = 0;
++    {
++      render_max_comb_glyphs = 0;
++      grub_errno = GRUB_ERR_NONE;
++    }
+ }
+ 
+ int
+-- 
+2.34.1
+

@@ -55,10 +55,10 @@ endef
 ######## VARIABLE DEPENDENCY TRACKING ########
 
 # List of variables to watch for changes.
-watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR MAX_CASCADING_REBUILDS RUN_CHECK TEST_RUN_LIST TEST_RERUN_LIST TEST_IGNORE_LIST EXTRA_BUILD_LAYERS
+watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR MAX_CASCADING_REBUILDS RUN_CHECK TEST_RUN_LIST TEST_RERUN_LIST TEST_IGNORE_LIST EXTRA_BUILD_LAYERS LICENSE_CHECK_MODE
 # Current list: $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_REPO_LIST) $(depend_CONFIG_FILE) $(depend_STOP_ON_PKG_FAIL)
 #					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_MAX_CASCADING_REBUILDS) $(depend_RUN_CHECK) $(depend_TEST_RUN_LIST)
-#					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
+#					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(depend_LICENSE_CHECK_MODE)
 
 .PHONY: variable_depends_on_phony clean-variable_depends_on_phony setfacl_always_run_phony
 clean: clean-variable_depends_on_phony
@@ -73,9 +73,9 @@ clean-variable_depends_on_phony:
 # they will alway run. Each rule will check the currently stored value in the file and only
 # update it if needed.
 
-# Generate a target which watches a variable for changes so rebuilds can be 
-# triggered if needed. Uses one file per variable. If the value of the variable 
-# is not the same as recorded in the file, update the file to match. This will 
+# Generate a target which watches a variable for changes so rebuilds can be
+# triggered if needed. Uses one file per variable. If the value of the variable
+# is not the same as recorded in the file, update the file to match. This will
 # force a rebuild of any dependent targets.
 #
 # $1 - name of the variable to watch for changes

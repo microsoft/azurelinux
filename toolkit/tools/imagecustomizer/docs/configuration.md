@@ -6,6 +6,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 1. If partitions were specified in the config, customize the disk partitions.
 
+   Otherwise, if the [resetpartitionsuuidstype](#resetpartitionsuuidstype-string) value
+   is specified, then the partitions' UUIDs are changed.
+
 2. Override the `/etc/resolv.conf` file with the version from the host OS.
 
 3. Update packages:
@@ -54,9 +57,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 16. Run ([postCustomization](#postcustomization-script)) scripts.
 
-17. If SELinux is enabled, call `setfiles`.
+17. Restore the `/etc/resolv.conf` file.
 
-18. Delete `/etc/resolv.conf` file.
+18. If SELinux is enabled, call `setfiles`.
 
 19. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
 
@@ -66,18 +69,26 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
     grub config.
 
-22. if the output format is set to `iso`, copy additional iso media files.
-([iso](#iso-type))
+22. If the output format is set to `iso`, copy additional iso media files.
+    ([iso](#iso-type))
 
 ### /etc/resolv.conf
 
-The `/etc/resolv.conf` file is overridden so that the package installation and
-customization scripts can have access to the network.
-It is assumed there is a process that runs on boot that will write the
-`/etc/resolv.conf` file.
-For example, `systemd-resolved`.
-Hence, the `/etc/resolv.conf` file is simply deleted at the end instead of being
-restored to its original contents.
+The `/etc/resolv.conf` file is overridden during customization so that the package
+installation and customization scripts can have access to the network.
+
+Near the end of customization, the `/etc/resolv.conf` file is restored to its original
+state.
+
+However, if the `/etc/resolv.conf` did not exist in the base image and
+`systemd-resolved` service is enabled, then the `/etc/resolv.conf` file is symlinked to
+the `/run/systemd/resolve/stub-resolv.conf` file. (This would happen anyway during
+first-boot. But doing this during customization is useful for verity enabled images
+where the filesystem is readonly.)
+
+If you want to explicitly set the `/etc/resolv.conf` file contents, you can do so within
+a [finalizeCustomization](#finalizecustomization-script) script, since those scripts run
+after the `/etc/resolv.conf` is deleted.
 
 ### Replacing packages
 
@@ -123,6 +134,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
+  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
@@ -249,6 +261,35 @@ os:
   resetBootLoaderType: hard-reset
 ```
 
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```
+
+### iso [[iso](#iso-type)]
+
+Specifies the configuration for the generated ISO media.
+
 ### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
@@ -259,6 +300,10 @@ Example:
 os:
   hostname: example-image
 ```
+
+### scripts [[scripts](#scripts-type)]
+
+Specifies custom scripts to run during the customization process.
 
 ## disk type
 
@@ -992,6 +1037,8 @@ scripts:
 
 ## scripts type
 
+Specifies custom scripts to run during the customization process.
+
 Note: Script files must be in the same directory or a child directory of the directory
 that contains the config file.
 
@@ -1032,7 +1079,7 @@ These scripts are run under a chroot of the customized OS.
 Example:
 
 ```yaml
-os:
+scripts:
   finalizeCustomization:
   - path: scripts/b.sh
 ```
@@ -1082,8 +1129,6 @@ Supported options:
 - `hard-reset`: Fully reset the boot-loader and its configuration.
   This includes removing any customized kernel command-line arguments that were added to
   base image.
-
-This field can only be specified if [Disks](#disks-disk) is also specified.
 
 ### hostname [string]
 
