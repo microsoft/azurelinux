@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.9.0.4
-Release:        3%{?dist}
+Version:        2.11.1.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,14 @@ Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{versi
 Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
+# This patch adds azurelinux support into WALinuxAgent. The patch should be
+# removed in the next 2.12 update of WALinuxAgent.
+Patch0:         0001-add-azurelinux-support.patch
+# This patch modifies the version of the WALinuxAgent so it does not take any
+# 2.11 updates pushed live to the system through the normal agent upgrade
+# mechanism, which would end up removing azurelinux support. This patch
+# should also be removed in the next 2.12 update to this package.
+Patch1:         0002-fix-bump-version-to-2.11.8.8.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -38,7 +46,7 @@ VMs in the Windows Azure cloud. This package should be installed on Linux disk
 images that are built to run in the Windows Azure environment.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %pre -p /bin/sh
 
@@ -93,6 +101,11 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 2.11.1.4-1
+- Upgrade to version 2.11.1.4
+- Add patch for azurelinux support
+- Add patch to change reported version for targeting update
+
 * Tue Apr 02 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.9.0.4-3
 - Fix ephemeral-disk-warning script path from /usr/bin to /usr/sbin
 
