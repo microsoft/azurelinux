@@ -117,7 +117,7 @@ python3 setup.py check && python3 setup.py test
 - Fix installation path from /usr/lib/systemd to /lib/systemd and /usr/bin to /usr/sbin
 - Add /etc/logrotate.d/waagent.logrotate to %files section
 
-* Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
+* Thu Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
 - Add ephemeral-disk-warning.service
 
 * Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
