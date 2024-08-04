@@ -3,6 +3,6 @@
   "WALinuxAgent-2.11.1.4.tar.gz": "956f12e31b0903f304cc070ddcbe4c8130c10e7ccc2597061e6467e911bc085d",
   "ephemeral-disk-warning": "8b18fc001e5dfa43a1f559a074e334330e6fc4fe5b8c586eafc894800cc1c1ad",
   "ephemeral-disk-warning.conf": "128e531c029e04afdab591f44d2b0a69d5a4eb9dec8867282d0acb1ebded76d0",
-  "ephemeral-disk-warning.service": "f6c5787acd016896e3686b7161b20b95890dfe07d2116b316a5ba29ed0503e71"
+  "ephemeral-disk-warning.service": "46b96609266ba56d28b09e4562a1bb03d874b06b929a7930b4df3292d7fcd303"
  }
 }
