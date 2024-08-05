@@ -1,5 +1,14 @@
+From ed0b1ecb84c0de69e7327dae6b8feee6abba551c Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Mon, 5 Aug 2024 11:45:42 -0700
+Subject: [PATCH] Updating hotplugdetachmentGracePeriod patch with repeated lookups for disk detachment
+
+---
+ pkg/virt-launcher/virtwrap/manager.go | 146 +++++++++++++++++++++++---
+ 1 file changed, 134 insertions(+), 12 deletions(-)
+
 diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-index 63d8d43d2..0e608c4bb 100644
+index 63d8d43d29..fa97b75d7c 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
 @@ -97,6 +97,11 @@ const (
@@ -9,7 +18,7 @@ index 63d8d43d2..0e608c4bb 100644
 +// TODO: Make this configurable from the VMI object?
 +const hotplugDetachmentGracePeriod = 5 * time.Second
 +
-+const hotplugDetachmentVerbosity = 4
++const hotplugDetachmentVerbosity = 2
 +
  type contextStore struct {
  	ctx    context.Context
@@ -43,12 +52,15 @@ index 63d8d43d2..0e608c4bb 100644
  	domain := &api.Domain{}
  
  	c, err := l.generateConverterContext(vmi, allowEmulation, options, false)
-@@ -922,19 +929,94 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -922,19 +929,121 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		return nil, err
  	}
  
 +	// Get list of disks that should be detached
++	logger.V(hotplugDetachmentVerbosity).Infof("List of Old Device Disks: %+v", oldSpec.Devices.Disks)
++	logger.V(hotplugDetachmentVerbosity).Infof("List of New Device Disks: %+v", domain.Spec.Devices.Disks)
 +	detachedDisks := getDetachedDisks(vmi.Name, vmi.Namespace, oldSpec.Devices.Disks, domain.Spec.Devices.Disks)
++	logger.V(hotplugDetachmentVerbosity).Infof("List of disks to detached: %+v", detachedDisks)
 +	logger.V(hotplugDetachmentVerbosity).Infof("Hotplug detached disks: %+v", len(detachedDisks))
 +
 +	// Check list of detached disks against the list of detachment goroutines.  Cancel the goroutines
@@ -139,13 +151,37 @@ index 63d8d43d2..0e608c4bb 100644
 +				if err != nil {
 +					logger.Reason(err).Error("detaching device")
 +				}
++
++				// Check if the disk is still attached
++				for i := 0; i < 5; i++ {
++					dom, err = l.virConn.LookupDomainByName(domainName)
++					if err != nil {
++						logger.Reason(err).Error("getting domain after device detach")
++						return
++					}
++					// Check if the domain still has the detach disk name and detach disk target
++					xmlDesc, err := dom.GetXMLDesc(0)
++					if err != nil {
++						logger.Reason(err).Error("getting domain XML after device detach")
++						return
++					}
++
++					if strings.Contains(xmlDesc, detachDiskName) && strings.Contains(xmlDesc, detachDiskTargetDevice) {
++						logger.V(1).Infof("Disk %s with target %s is still present in the domain", detachDiskName, detachDiskTargetDevice)
++					} else {
++						logger.V(1).Infof("Disk %s with target %s has been successfully detached", detachDiskName, detachDiskTargetDevice)
++						dom.Free()
++						break
++					}
++					time.Sleep(1 * time.Second)
++				}
 +				dom.Free()
 +			}
 +		}(detachDiskKey, detachDisk.Alias.GetName(), detachDisk.Target.Device, domain.Spec.Name, detachBytes)
  	}
  	// Look up all the disks to attach
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
-@@ -945,7 +1027,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -945,7 +1054,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		if !allowAttach {
  			continue
  		}
@@ -165,7 +201,7 @@ index 63d8d43d2..0e608c4bb 100644
  		// set drivers cache mode
  		err = converter.SetDriverCacheMode(&attachDisk, l.directIOChecker)
  		if err != nil {
-@@ -1032,7 +1125,7 @@ func isHotplugDisk(disk api.Disk) bool {
+@@ -1032,7 +1152,7 @@ func isHotplugDisk(disk api.Disk) bool {
  	return strings.HasPrefix(getSourceFile(disk), v1.HotplugDiskDir)
  }
  
@@ -174,7 +210,7 @@ index 63d8d43d2..0e608c4bb 100644
  	newDiskMap := make(map[string]api.Disk)
  	for _, disk := range newDisks {
  		file := getSourceFile(disk)
-@@ -1040,14 +1133,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
+@@ -1040,14 +1160,16 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
  			newDiskMap[file] = disk
  		}
  	}
@@ -182,6 +218,7 @@ index 63d8d43d2..0e608c4bb 100644
 +	res := map[string]api.Disk{}
  	for _, oldDisk := range oldDisks {
  		if !isHotplugDisk(oldDisk) {
++			log.DefaultLogger().V(3).Infof("Not a hotplug disk: %v", oldDisk)
  			continue
  		}
  		if _, ok := newDiskMap[getSourceFile(oldDisk)]; !ok {
@@ -192,3 +229,6 @@ index 63d8d43d2..0e608c4bb 100644
  		}
  	}
  	return res
+-- 
+2.45.2
+
