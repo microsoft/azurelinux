@@ -468,11 +468,21 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				return
 			}
 
+			// Flag the result if we did case-insensitive lookup.
+			lookupIgnoredCase := tdnf.DidCaseInsensitiveMatchRegex.MatchString(stdout)
+
 			// MUST keep order of packages printed by TDNF.
 			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
 			// https://github.com/rpm-software-management/rpm/issues/2359
 			for _, matches := range tdnf.PackageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
 				packageName := matches[tdnf.PackageNameIndex]
+				if lookupIgnoredCase {
+					logger.Log.Warnf("'%s' was found by case-insensitive lookup of '%s', but this is not a valid (Build)Requires and will be ignored", packageName, pkgVer.Name)
+					// This is not a valid mapping of requires -> provides, so we skip it. This is not a fatal error since
+					// we may still find a valid mapping either in a subsequent repo lookup, or via a local build. If this
+					// is infact invalid, the package build will fail later with an unresolved dependency error.
+					return
+				}
 				packageNames = append(packageNames, packageName)
 				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 			}
