@@ -34,9 +34,9 @@ parse_kernel_cmdline_args() {
 
     VERITY_MOUNT="/mnt/verity_mnt"
     OVERLAY_MOUNT="/mnt/overlay_mnt"
-    OVERLAY_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
 
-    # Retrieve the verity root. It is expected to be predefined by the dracut cmdline module.
+    # Retrieve the verity root. It is expected to be predefined by the dracut
+    # cmdline module.
     [ -z "$root" ] && root=$(getarg root=)
     # Check if we're in a dm-verity environment and the root variable matches
     # the expected path. The path "/dev/mapper/root" is hardcoded here because
@@ -51,6 +51,11 @@ parse_kernel_cmdline_args() {
 
     # Retrieve the OverlayFS parameters.
     [ -z "${overlayfs}" ] && overlayfs=$(getarg rd.overlayfs=)
+
+    # Retrieve the optional OverlayFS mount options from the kernel cmdline.
+    overlayfs_mnt_option=$(getarg rd.overlayfs_mnt_option=)
+    # If the argument is not provided, fallback to default "ro".
+    [ -z "${overlayfs_mnt_option}" ] && overlayfs_mnt_option="rw,nodev,nosuid,nouser,noexec"
 }
 
 # Modified function to mount volatile or persistent volume.
@@ -63,7 +68,7 @@ mount_volatile_persistent_volume() {
     if [[ "${_volume}" == "volatile" ]]; then
         # Fallback to volatile overlay if no persistent volume is specified.
         echo "No overlayfs persistent volume specified. Creating a volatile overlay."
-        mount -t tmpfs tmpfs -o ${OVERLAY_MNT_OPTS} "${_overlay_mount}" || \
+        mount -t tmpfs tmpfs "${_overlay_mount}" || \
             die "Failed to create overlay tmpfs at ${_overlay_mount}"
     else
         # Check if the specified Overlay RAID volume is present in the system.
@@ -71,6 +76,11 @@ mount_volatile_persistent_volume() {
             # If the specified Overlay RAID volume is found, attempt to assemble it.
             mdadm --assemble "${_volume}" || \
                 die "Failed to assemble RAID volume."
+        fi
+
+        # Check if the specified persistent partition exists.
+        if [[ ! -e "${_volume}" ]]; then
+            die "Persistent volume ${_volume} does not exist."
         fi
 
         # Mount the specified persistent volume.
@@ -83,12 +93,13 @@ create_overlayfs() {
     local _lower=$1
     local _upper=$2
     local _work=$3
+    local _options=$4
 
     [ -d "$_lower" ] || die "Unable to create overlay as $_lower does not exist"
 
     mkdir -p "${_upper}" && \
     mkdir -p "${_work}" && \
-    mount -t overlay overlay -o ro,lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
+    mount -t overlay overlay -o ${_options},lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
         die "Failed to mount overlay in ${_lower}"
 }
 
@@ -121,6 +132,11 @@ mount_overlayfs() {
         if [[ "$volume" == "" ]]; then
             overlay_mount_with_cnt="${OVERLAY_MOUNT}/${cnt}"
             mount_volatile_persistent_volume "volatile" $overlay_mount_with_cnt
+
+            # For volatile overlays, if upper and work directories are not
+            # provided, use default values.
+            upper=${upper:-volatile_overlayfs_upperdir_${cnt}}
+            work=${work:-volatile_overlayfs_workdir_${cnt}}
         else
             if [[ -n "${volume_mount_map[$volume]}" ]]; then
                 # Volume already mounted, retrieve existing mount point from map.
@@ -131,11 +147,19 @@ mount_overlayfs() {
                 mount_volatile_persistent_volume $volume $overlay_mount_with_cnt
                 volume_mount_map[$volume]=$overlay_mount_with_cnt
             fi
+
+           # If 'ro' is in the mount options, use default values for upper and
+           # work directories.
+            if [[ "$overlayfs_mnt_option" == *"ro"* ]]; then
+                upper=${upper:-read_only_upperdir_${cnt}}
+                work=${work:-read_only_workdir_${cnt}}
+            fi
         fi
-        cnt=$((cnt + 1))
 
         echo "Creating OverlayFS with overlay: $overlay, upper: ${overlay_mount_with_cnt}/${upper}, work: ${overlay_mount_with_cnt}/${work}"
-        create_overlayfs "${VERITY_MOUNT}/${overlay}" "${overlay_mount_with_cnt}/${upper}" "${overlay_mount_with_cnt}/${work}"
+        create_overlayfs "${VERITY_MOUNT}/${overlay}" "${overlay_mount_with_cnt}/${upper}" "${overlay_mount_with_cnt}/${work}" "${overlayfs_mnt_option}"
+
+        cnt=$((cnt + 1))
     done
 
     echo "Done Verity Root Mounting and OverlayFS Mounting"
