@@ -1,14 +1,13 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
 Version:        %{azl}.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
-Source1:        MICROSOFT-METADATA-GPG-KEY
 Source2:        azurelinux-debuginfo.repo
 Source3:        azurelinux-debuginfo-preview.repo
 Source4:        azurelinux-extended.repo
@@ -148,15 +147,11 @@ export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
 install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
-install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
 
 %posttrans shared
-gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %preun shared
-# Remove the MICROSOFT-METADATA-GPG-KEY
-gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
 # Remove the MICROSOFT-RPM-GPG-KEY
 gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
@@ -211,9 +206,11 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files shared
 %dir %{_sysconfdir}/yum.repos.d
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
-%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
+- Remove MICROSOFT-METADATA-GPG-KEY
+
 * Wed Mar 20 2024 Jon Slobodzian <joslobo@microsoft.com> - 3.0-2
 - Fix the ms-oss and ms-non-oss .repo files to point to correct location.
 
