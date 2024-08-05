@@ -4630,18 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.21.11",
-          "downloadUrl": "https://golang.org/dl/go1.21.11.src.tar.gz"
+          "version": "1.22.5",
+          "downloadUrl": "https://golang.org/dl/go1.22.5.src.tar.gz"
         }
       }
     },
@@ -5400,8 +5390,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.61",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.61.tar.bz2"
+          "version": "2.4.62",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
         }
       }
     },
@@ -6560,8 +6550,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.162.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.1.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.162.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.1.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.162.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.1.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8161,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.162.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.1.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -8171,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.162.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.162.1.tar.gz"
+          "version": "5.15.160.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.160.1.tar.gz"
         }
       }
     },
@@ -22914,8 +22904,8 @@
         "type": "other",
         "other": {
           "name": "python-idna",
-          "version": "3.3",
-          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.3.tar.gz"
+          "version": "3.7",
+          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.7.tar.gz"
         }
       }
     },
