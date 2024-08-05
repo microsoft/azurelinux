@@ -19,7 +19,7 @@ function usage() {
     echo "           until the RPM is successfully downloaded. Full URL will be <url>/<rpm_name>"
     echo "-c|--certificate: Optional path to a certificate file to use for the download"
     echo "-k|--private-key: Optional path to a private key file to use for the download"
-    echo "-K|--enforce-signatures: Optional flag to enforce RPM signatures"
+    echo "-e|--enforce-signatures: Optional flag to enforce RPM signatures"
     echo "-g|--allowable-gpg-keys: Optional space separated list of GPG keys to allow for signature validation"
     exit 1
 }
@@ -70,7 +70,7 @@ while (( "$#")); do
             key=$2
             shift 2
             ;;
-        -K|--enforce-signatures)
+        -e|--enforce-signatures)
             enforce_signatures=true
             shift
             ;;
