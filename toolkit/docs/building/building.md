@@ -120,11 +120,11 @@ cd azurelinux/toolkit
 git checkout 3.0-stable
 ```
 
-**IMPORTANT:** The 3.0-stable tag always points to the latest known good build of Azure Linux of the 3.0 branch. A similar tag, 2.0-stable, exists for the 2.0 branch. Other branches are also buildable but not guaranteed to be stable.  The 2.0 and 3.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 3.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 3.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --all --tags_ before building.
+**IMPORTANT:** The `3.0-stable` tag always points to the latest known good build of Azure Linux of the 3.0 branch. A similar tag, `2.0-stable`, exists for the 2.0 branch. Other branches are also buildable but not guaranteed to be stable.  The 2.0 and 3.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The `3.0-stable` tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the `3.0-stable` tag is advanced.  To ensure you have the latest invoke _git fetch --all --tags_ before building.
 
-It is also possible to build an older version of Azure Linux from the 3.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the 3.0-stable label above.
+It is also possible to build an older version of Azure Linux from the 3.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the `3.0-stable` label above.
 
-Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 3.0 branch.
+Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 and 3.0 branches.
 
 **NOTE: All subsequent commands are assumed to be executed from inside the toolkit directory.**
 
