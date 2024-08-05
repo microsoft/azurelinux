@@ -10,6 +10,6 @@
 #
 # and should hold the value of the next (or current) official release, not the previous official
 # release.
-image_customizer_version ?= 0.5.0
+image_customizer_version ?= 0.6.0
 IMAGE_CUSTOMIZER_VERSION_PREVIEW ?= -dev.$(DATETIME_AS_VERSION)+$(GIT_COMMIT_ID)
 image_customizer_full_version := $(image_customizer_version)$(IMAGE_CUSTOMIZER_VERSION_PREVIEW)
