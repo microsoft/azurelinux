@@ -1,0 +1,93 @@
+storage:
+  bootType: efi
+  disks:
+  - partitionTableType: gpt
+    maxSize: 61440M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+    - id: rootfs
+      start: 9M
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+os:
+  resetBootLoaderType: hard-reset
+  selinux:
+    mode: disabled
+  kernelCommandLine:
+    extraCommandLine: ro rd.auto=1 net.ifnames=0 lockdown=integrity console=tty0 console=ttyS0 rd.info log_buf_len=1M selinux=0 security=
+  users:
+  - name: testuser
+    sshPublicKeyPaths:
+    - image-files/keys/clients/id_rsa.pub
+    - ../../test/ihv-test-artifacts/image-files/keys/self/id_rsa.pub
+    primaryGroup: sudo
+    secondaryGroups:
+    - sudo
+  packages:
+    install:
+    # iso required packages
+    - squashfs-tools
+    - tar
+    - device-mapper
+    # kernel module development
+    - build-essential
+    - kernel-headers
+    - kernel-devel
+    - make
+    # azure linux package build
+    - git
+    - golang
+    - containerd
+    - cri-tools
+    - moby-containerd
+    - moby-engine
+    - docker-buildx
+    - docker-cli
+    - rpm
+    - rpm-build
+    - acl
+    - tar
+    - wget
+    - curl
+    - qemu-img
+    - genisoimage
+    - python
+    - bison
+    - gawk
+    - pigz
+    - zstd
+    # utilities
+    - vim
+  additionalFiles:
+    image-files/configs/10-eth0.network:
+    - path: /etc/systemd/network/10-eth0.network
+      permissions: "644"
+    image-files/configs/machine-id:
+    - path: /etc/machine-id
+      permissions: "444"
+    image-files/scripts/00-configure-docker.sh:
+    - path: /home/testuser/00-configure-docker.sh
+      permissions: "755"
+    image-files/scripts/10-enlist.sh:
+    - path: /home/testuser/10-enlist.sh
+      permissions: "755"
+    image-files/scripts/20-build-pkg.sh:
+    - path: /home/testuser/20-build-pkg.sh
+      permissions: "755"
+scripts:
+  postCustomization:
+  - content: |
+      chown testuser:users /home/testuser/.ssh/authorized_keys
+      echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    name: "Setting up user access"
