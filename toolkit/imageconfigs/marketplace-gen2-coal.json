@@ -29,15 +29,9 @@
                     "ID": "rootfs",
                     "Name": "rootfs",
                     "Start": 1065,
-                    "End": 5800,
-                    "FsType": "ext4"
-                },
-                {
-                    "ID": "data",
-                    "Name": "data",
-                    "Start": 5800,
-                    "End": 6000,
-                    "FsType": "ext4"
+                    "End": 0,
+                    "FsType": "ext4",
+                    "Type": "linux-root-amd64"
                 }
             ]
         }
@@ -55,10 +49,6 @@
                 {
                     "ID": "rootfs",
                     "MountPoint": "/"
-                },
-                {
-                    "ID": "data",
-                    "MountPoint": "/data"
                 }
             ],
             "PackageLists": [
