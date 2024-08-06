@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        9.1
-Release:        2%{?dist}
+Version:        9.1.1
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -198,6 +198,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Aug 06 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.1-1
+- Bump version to 9.1.1 to fix CVE-2024-31950 & CVE-2024-31951
+
 * Wed Apr 24 2024 Tobias Brick <tobiasb@microsoft.com> - 9.1-2
 - Remove FIPS_mode patch
 

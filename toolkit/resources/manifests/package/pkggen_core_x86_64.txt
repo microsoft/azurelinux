@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.43.1-2.azl3.noarch.rpm
+kernel-headers-6.6.43.1-5.azl3.noarch.rpm
 glibc-2.38-6.azl3.x86_64.rpm
 glibc-devel-2.38-6.azl3.x86_64.rpm
 glibc-i18n-2.38-6.azl3.x86_64.rpm
@@ -223,8 +223,8 @@ pinentry-1.2.1-1.azl3.x86_64.rpm
 gnupg2-2.4.4-2.azl3.x86_64.rpm
 gnupg2-lang-2.4.4-2.azl3.x86_64.rpm
 gpgme-1.23.2-2.azl3.x86_64.rpm
-azurelinux-repos-shared-3.0-2.azl3.noarch.rpm
-azurelinux-repos-3.0-2.azl3.noarch.rpm
+azurelinux-repos-shared-3.0-3.azl3.noarch.rpm
+azurelinux-repos-3.0-3.azl3.noarch.rpm
 libffi-3.4.4-1.azl3.x86_64.rpm
 libffi-devel-3.4.4-1.azl3.x86_64.rpm
 libtasn1-4.19.0-1.azl3.x86_64.rpm
