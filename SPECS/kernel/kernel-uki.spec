@@ -15,7 +15,7 @@
 # ensures the feature bit for shadow stack is also turned off.
 
 #%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 rd.break=pre-pivot noxsaves
-%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 systemd.unit=emergency.target noxsaves
+%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 noxsaves
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
