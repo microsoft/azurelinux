@@ -27,7 +27,6 @@
                 },
                 {
                     "ID": "rootfs",
-                    "Name": "rootfs",
                     "Start": 1065,
                     "End": 0,
                     "FsType": "ext4",
@@ -62,11 +61,6 @@
                 "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules",
                 "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"
             },
-            "PostInstallScripts": [
-                {
-                    "Path": "additionalconfigs/configure-systemd-networkd.sh"
-                }
-            ],
             "KernelOptions": {
                 "default": "kernel"
             },
