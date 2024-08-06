@@ -327,7 +327,7 @@ func TestAddCustomizerRelease(t *testing.T) {
 	err = addCustomizerRelease(chroot, expectedVersion, expectedDate)
 	assert.NoError(t, err)
 
-	releaseFilePath := filepath.Join(chroot.RootDir(), "etc/mariner-customizer-release")
+	releaseFilePath := filepath.Join(chroot.RootDir(), "etc/image-customizer-release")
 
 	file, err := os.Open(releaseFilePath)
 	if err != nil {
