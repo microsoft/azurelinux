@@ -12,8 +12,8 @@ mkdir -p /data/overlays/root/upper
 mkdir -p /data/overlays/root/work
 mkdir -p /data/containerd
 
-# Make rootfs mount as read-only
-sed -i "s/\/ ext4 defaults/\/ ext4 defaults,ro/" /etc/fstab
+# # Make rootfs mount as read-only
+# sed -i "s/\/ ext4 defaults/\/ ext4 defaults,ro/" /etc/fstab
 
 # Ensure data partition is mounted in initrd along with overlay
 sed -i "s/data ext4 defaults/data ext4 defaults,x-initrd.mount,x-systemd.growfs/" /etc/fstab
