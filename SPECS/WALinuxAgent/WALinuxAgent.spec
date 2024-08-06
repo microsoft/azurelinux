@@ -19,6 +19,9 @@ Patch0:         0001-add-azurelinux-support.patch
 # mechanism, which would end up removing azurelinux support. This patch
 # should also be removed in the next 2.12 update to this package.
 Patch1:         0002-fix-bump-version-to-2.11.8.8.patch
+# This patch fixes a failure to assign IP address for infiband interfaces.
+# It should be removed in an upcoming release.
+Patch2:         fix-argument-to-goalstate.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
