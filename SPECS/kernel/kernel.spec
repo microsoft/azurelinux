@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.43.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Aug 06 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-5
+- Enable USB_TMC
+
 * Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-4
 - Enable MPTCP
 
