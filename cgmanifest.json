@@ -29356,8 +29356,8 @@
         "type": "other",
         "other": {
           "name": "WALinuxAgent",
-          "version": "2.9.0.4",
-          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.9.0.4.tar.gz"
+          "version": "2.11.1.4",
+          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.11.1.4.tar.gz"
         }
       }
     },

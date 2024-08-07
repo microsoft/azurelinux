@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.9.0.4
-Release:        3%{?dist}
+Version:        2.11.1.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,17 @@ Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{versi
 Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
+# This patch adds azurelinux support into WALinuxAgent. The patch should be
+# removed in the next 2.12 update of WALinuxAgent.
+Patch0:         0001-add-azurelinux-support.patch
+# This patch modifies the version of the WALinuxAgent so it does not take any
+# 2.11 updates pushed live to the system through the normal agent upgrade
+# mechanism, which would end up removing azurelinux support. This patch
+# should also be removed in the next 2.12 update to this package.
+Patch1:         0002-fix-bump-version-to-2.11.8.8.patch
+# This patch fixes a failure to assign IP address for infiband interfaces.
+# It should be removed in an upcoming release.
+Patch2:         fix-argument-to-goalstate.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -38,7 +49,7 @@ VMs in the Windows Azure cloud. This package should be installed on Linux disk
 images that are built to run in the Windows Azure environment.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %pre -p /bin/sh
 
@@ -55,13 +66,12 @@ install -vdm 755 %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/99-azure-product-uuid.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 # python refers to python2 version on CBL-Mariner hence update to use python3
-sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent
-sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent2.0
-sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}/lib/systemd/system/waagent.service
-sed -i 's,/usr/bin/waagent,/usr/sbin/waagent,' %{buildroot}/lib/systemd/system/waagent.service
-install -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/ephemeral-disk-warning.service
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
+sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}/%{_libdir}/systemd/system/waagent.service
+install -m 644 %{SOURCE1} %{buildroot}/%{_libdir}/systemd/system/ephemeral-disk-warning.service
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
-install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
+install -m 644 %{SOURCE3} %{buildroot}%{_bindir}/ephemeral-disk-warning
 
 %check
 python3 setup.py check && python3 setup.py test
@@ -77,13 +87,13 @@ python3 setup.py check && python3 setup.py test
 %systemd_postun_with_restart waagent.service
 
 %files
-/lib/systemd/system/*
+%{_libdir}/systemd/system/*
 %{_sysconfdir}/udev/rules.d/*
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
-%attr(0755,root,root) %{_sbindir}/waagent
-%attr(0755,root,root) %{_sbindir}/waagent2.0
-%attr(0755,root,root) %{_sbindir}/ephemeral-disk-warning
+%attr(0755,root,root) %{_bindir}/waagent
+%attr(0755,root,root) %{_bindir}/waagent2.0
+%attr(0755,root,root) %{_bindir}/ephemeral-disk-warning
 %config %{_sysconfdir}/waagent.conf
 %config %{_sysconfdir}/ephemeral-disk-warning.conf
 %{_sysconfdir}/logrotate.d/waagent.logrotate
@@ -93,6 +103,13 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 2.11.1.4-1
+- Upgrade to version 2.11.1.4
+- Add patch for azurelinux support
+- Add patch to change reported version for targeting update
+- Use /usr/bin and /usr/lib/systemd paths as defined in upstream MarinerOSUtil class
+- Remove sed to waagent.service file since waagent path should be /usr/bin/waagent
+
 * Tue Apr 02 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.9.0.4-3
 - Fix ephemeral-disk-warning script path from /usr/bin to /usr/sbin
 
@@ -104,7 +121,7 @@ python3 setup.py check && python3 setup.py test
 - Fix installation path from /usr/lib/systemd to /lib/systemd and /usr/bin to /usr/sbin
 - Add /etc/logrotate.d/waagent.logrotate to %files section
 
-* Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
+* Thu Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
 - Add ephemeral-disk-warning.service
 
 * Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
