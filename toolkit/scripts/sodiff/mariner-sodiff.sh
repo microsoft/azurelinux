@@ -1,12 +1,37 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-# Required binaries:
-# rpm and dnf
+sodiff_script_error=false
+while getopts "r:f:v:o:e:" opt; do
+    case $opt in
+        r) rpms_folder="$OPTARG";;
+        f) repo_file_path="$OPTARG";;
+        v) mariner_version="$OPTARG";;
+        o) sodiff_out_dir="$OPTARG";;
+        e) sodiff_script_error="$OPTARG";;
+    esac
+done
 
-rpms_folder="$1"
-repo_file_path="$2"
-mariner_version="$3"
-sodiff_out_dir="$4"
+if [[ -z "$rpms_folder" ]]; then
+    echo "INVALID ARGUMENT: RPMS_FOLDER is empty. It can be specified via the -r command line option."
+    exit 1
+fi
+
+if [[ -z "$repo_file_path" ]]; then
+    echo "INVALID ARGUMENT: REPO_FILE_PATH is empty. It can be specified via the -f command line option."
+    exit 1
+fi
+
+if [[ -z "$mariner_version" ]]; then
+    echo "INVALID ARGUMENT: MARINER_VERSION is empty. It can be specified via the -v command line option."
+    exit 1
+fi
+
+if [[ -z "$sodiff_out_dir" ]]; then
+    echo "INVALID ARGUMENT: SODIFF_OUT_DIR is empty. It can be specified via the -o command line option."
+    exit 1
+fi
 sodiff_log_file="${sodiff_out_dir}/sodiff.log"
 
 # Setup output dir
@@ -16,22 +41,26 @@ mkdir -p "$sodiff_out_dir"
 
 common_options="-c $repo_file_path --releasever $mariner_version"
 
-DNF_COMMAND=dnf
+dnf_command=dnf
 # Cache RPM metadata
->/dev/null dnf $common_options -y makecache
+>/dev/null $dnf_command $common_options -y makecache
 
 # Get packages from stdin
 pkgs=`cat`
+echo "$pkgs"
 
 for rpmpackage in $pkgs; do
+    package_debuginfo=$(echo "$rpmpackage" | rev | cut -f3 -d'-' | rev)
+    if [[ "$package_debuginfo" == "debuginfo" ]]; then
+        continue
+	fi
     package_path=$(find "$rpms_folder" -name "$rpmpackage" -type f)
     package_provides=`2>/dev/null rpm -qP "$package_path" | grep -E '[.]so[(.]' `
     echo "Processing ${rpmpackage}..."
     echo ".so's provided: $package_provides"
     for sofile in $package_provides; do
         # Query local metadata for provides
-        sos_found=$( 2>/dev/null $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
-        echo "Number of .so files found: $sos_found"
+        sos_found=$( 2>/dev/null $dnf_command repoquery $common_options --whatprovides $sofile | wc -l )
         if [ "$sos_found" -eq 0 ] ; then
             # SO file not found, meaning this might be a new .SO
             # or a new version of a preexisting .SO.
@@ -41,14 +70,13 @@ for rpmpackage in $pkgs; do
             sofile_no_ver=$(echo "$sofile" | sed -E 's/[.]so[(.].+/.so/')
 
             # check for generic .so in the repo
-            sos_found=$( 2>/dev/null $DNF_COMMAND repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
-            echo "Number of non-versioned .so files found: $sos_found"
+            sos_found=$( 2>/dev/null $dnf_command repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
             if ! [ "$sos_found" -eq 0 ] ; then
                 # Generic version of SO was found.
                 # This means it's a new version of a preexisting SO.
                 # Log which packages depend on this functionality
                 echo "Packages that require $sofile_no_ver:"
-                2>/dev/null $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' | tee "$sodiff_out_dir"/"require_${sofile}"
+                2>/dev/null $dnf_command repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' | tee "$sodiff_out_dir"/"require_${sofile}"
             fi
         fi
     done
@@ -58,7 +86,7 @@ done
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-rm "$sodiff_out_dir"/require*
+rm -f "$sodiff_out_dir"/require*
 touch "$sodiff_out_dir"/sodiff-summary.txt
 
 # Remove packages that have been dash-rolled already.
@@ -86,6 +114,9 @@ echo "######################"
 if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
+    if [[ "$sodiff_script_error" -eq "true" ]]; then
+        exit 1
+    fi 
 else
     echo "No Packages with Conflicting .so Files Found."
 fi

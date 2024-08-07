@@ -40,7 +40,7 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang >= 1.16.12
+BuildRequires: golang
 BuildRequires: git
 
 Requires: audit
@@ -123,8 +123,13 @@ fi
 %{_unitdir}/*
 
 %changelog
+<<<<<<< HEAD
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-7
+- Drop requirement on a specific version of golang
+=======
 * Mon Jul 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 24.0.9-7
 - Fix for CVE-2024-41110
+>>>>>>> dd2c6a30e (fix CVE-2024-41110 in moby-engine (#9951))
 
 * Tue Jun 25 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-6
 - Backport upstream change to search /usr/libexec for docker-proxy without daemon.json
