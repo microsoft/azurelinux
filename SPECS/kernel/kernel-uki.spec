@@ -18,7 +18,7 @@
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.43.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,6 +70,9 @@ ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/v
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Wed Aug 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-6
+- Rebuild UKI with new initrd
+
 * Tue Aug 06 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-5
 - Bump release to match kernel
 
