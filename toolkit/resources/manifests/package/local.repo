@@ -1,4 +1,5 @@
-# Start with the toolchain repo as highest priority...
+# We start with the toolchain packages even if they would overwrite
+# the local ones, to guarantee a stable, known build environment.
 [toolchain-repo]
 name=Local Toolchain Repo (build/toolchain_rpms/)
 baseurl=file:///toolchainrpms
@@ -8,7 +9,8 @@ skip_if_unavailable=1
 sslverify=0
 priority=1
 
-# Next highest should be existing locally built packages...
+# Afterwards, we prefer the local packages over upstream ones to allow
+# users to build with their own versions of these packages, if desired.
 [local-repo]
 name=Local Build Repo (out/RPMS)
 baseurl=file:///localrpms
@@ -18,7 +20,7 @@ skip_if_unavailable=1
 sslverify=0
 priority=2
 
-# Then packages we have already cached from upstream...
+# To satisfy all remaining dependencies, we use the upstream packages.
 [upstream-cache-repo]
 name=Cache Repo for upstream RPMs (build/rpm_cache/cache)
 baseurl=file:///upstream-cached-rpms
@@ -27,5 +29,3 @@ gpgcheck=0
 skip_if_unavailable=1
 sslverify=0
 priority=3
-
-# Unless disabled, finally fall back to the upstream repos for any missing packages.
