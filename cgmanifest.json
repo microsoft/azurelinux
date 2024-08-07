@@ -25754,8 +25754,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.0",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
+          "version": "3.3.3",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.3.tar.gz"
         }
       }
     },

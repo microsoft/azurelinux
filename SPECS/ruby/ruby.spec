@@ -87,8 +87,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.3.0
-Release:        4%{?dist}
+Version:        %{ruby_version}
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-0
+- Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
+
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.3.0-4
 - Bump release to build with new rubygem-rexml to fix CVE-2024-35176
 
