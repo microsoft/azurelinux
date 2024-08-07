@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.43.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Aug 07 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-7
+- Enable aarch64 kconfig tunings - DEVICE_PRIVATE, PCIE_EDR,
+  PREEMPT_DYNAMIC, DMABUF_HEAPS, DMABUF_HEAPS_SYSTEM, DMABUF_HEAPS_CMA,
+  ARM_CORESIGHT_PMU_ARCH_SYSTEM_PMU, SENSORS_ACPI_POWER 
+
 * Wed Aug 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-6
 - Rebuild UKI with new initrd
 
