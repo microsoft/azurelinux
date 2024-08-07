@@ -9,8 +9,8 @@ skip_if_unavailable=1
 sslverify=0
 priority=1
 
-# Afterwards, we prefer the local packages over upstream ones to allow
-# users to build with their own versions of these packages, if desired.
+# Afterwards, we prefer the local packages over the ones cached by the package
+# fetcher so users can build with their versions of these packages, if desired.
 [local-repo]
 name=Local Build Repo (out/RPMS)
 baseurl=file:///localrpms
@@ -20,7 +20,13 @@ skip_if_unavailable=1
 sslverify=0
 priority=2
 
-# To satisfy all remaining dependencies, we use the upstream packages.
+# To satisfy all remaining dependencies, we use the packages cached by
+# the package fetcher, which may come from a mix of sources.
+# The fetcher searches for the packages in the following order:
+#
+# 1. Toolchain packages - same as the first option in this file.
+# 2. Locally-built packages - same as the second option in this file.
+# 3. Other - official upstream repo and/or repos provided by the user.
 [upstream-cache-repo]
 name=Cache Repo for upstream RPMs (build/rpm_cache/cache)
 baseurl=file:///upstream-cached-rpms
