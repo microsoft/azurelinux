@@ -18,7 +18,7 @@ import (
 var (
 	app = kingpin.New("osmodifier", "Used to modify os")
 
-	configFile    = app.Flag("config-file", "Path of the os modification config file.").Required().String()
+	configFile    = app.Flag("config-file", "Path of the os modification config file.").String()
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
@@ -47,6 +47,15 @@ func main() {
 }
 
 func modifyImage() error {
+	if *configFile == "" {
+		// The config file is not needed when applying verity changes in grub.cfg to the default grub
+		err := osmodifierlib.ModifyOSWithoutConfigFile()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	err := osmodifierlib.ModifyOSWithConfigFile(*configFile)
 	if err != nil {
 		return err

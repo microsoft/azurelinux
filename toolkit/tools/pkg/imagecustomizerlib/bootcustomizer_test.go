@@ -187,7 +187,7 @@ func checkDiffs(t *testing.T, b *BootCustomizer, originalGrubCfgPath string, ori
 	expectedGrubCfgDiff string, expectedDefaultGrubFileDiff string,
 ) {
 	grubCfgDiff := calcDiff(t, originalGrubCfgPath, b.grubCfgContent)
-	defaultGrubFileDiff := calcDiff(t, originalDefaultGrubFilePath, b.defaultGrubFileContent)
+	defaultGrubFileDiff := calcDiff(t, originalDefaultGrubFilePath, b.DefaultGrubFileContent)
 
 	assert.Equal(t, expectedGrubCfgDiff, grubCfgDiff, "diff of grub.cfg file")
 	assert.Equal(t, expectedDefaultGrubFileDiff, defaultGrubFileDiff, "diff of /etc/default/grub file")
@@ -224,7 +224,7 @@ func createBootCustomizer(t *testing.T, sampleGrubCfgPath string, sampleDefaultG
 
 	b := &BootCustomizer{
 		grubCfgContent:         string(sampleGrubCfgContent),
-		defaultGrubFileContent: string(sampleDefaultGrubFileContent),
+		DefaultGrubFileContent: string(sampleDefaultGrubFileContent),
 		isGrubMkconfig:         isGrubMkconfig,
 	}
 	return b

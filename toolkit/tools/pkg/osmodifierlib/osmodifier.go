@@ -42,3 +42,12 @@ func ModifyOS(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
 
 	return nil
 }
+
+func ModifyOSWithoutConfigFile() error {
+	err := doModificationsWithoutConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
