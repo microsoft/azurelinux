@@ -1,4 +1,4 @@
-From d3268c617b7efb869ce513b5dc9e668638648f29 Mon Sep 17 00:00:00 2001
+From d456ba32f38bf4fa0df828daddcf870e9e759c5b Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Fri, 26 Jul 2024 11:47:24 -0700
 Subject: [PATCH] refactor and update tdnf filter
@@ -13,10 +13,10 @@ Subject: [PATCH] refactor and update tdnf filter
  include/tdnftypes.h                        |   2 +
  solv/defines.h                             |  28 +
  solv/prototypes.h                          |   3 +-
- solv/tdnfrepo.c                            | 610 +++++++++++++--------
+ solv/tdnfrepo.c                            | 622 +++++++++++++--------
  tools/cli/lib/help.c                       |   1 +
  tools/cli/lib/parseargs.c                  |   1 +
- 12 files changed, 463 insertions(+), 230 deletions(-)
+ 12 files changed, 475 insertions(+), 230 deletions(-)
 
 diff --git a/client/config.c b/client/config.c
 index 8ddcc7a..5126e45 100644
@@ -239,10 +239,10 @@ index 2633b5e..2246caa 100644
  
  uint32_t
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index 1d0efb2..00f4ae3 100644
+index 1d0efb2..589e9da 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
-@@ -10,319 +10,482 @@
+@@ -10,319 +10,494 @@
  #include "includes.h"
  
  // #### XML FILTER CODE ####
@@ -344,6 +344,7 @@ index 1d0efb2..00f4ae3 100644
 +        {
 +            nAddStrlen = strlen(pszCharToAdd);
 +        }
++        printf("resize lint \n");
 +        checkAndResizeBuffer(&pszLintedDesc, &nLintedSize, nAddStrlen);
 +
 +        // add linted char if needed
@@ -372,9 +373,12 @@ index 1d0efb2..00f4ae3 100644
 +void checkAndResizeBuffer(char ** pszCharBuffer, int * nBufferMaxLen, int nLengthToAdd) {
 +    uint32_t dwError = 0;
 +    int nBufferContentLen = strlen(*pszCharBuffer);
++    printf("content buffer len:%d\n", nBufferContentLen);
++    printf("buffer max len: %d\n", *nBufferMaxLen);
 +    while (nBufferContentLen + nLengthToAdd >= *nBufferMaxLen)
 +    {
 +        *nBufferMaxLen *= 2;
++        printf("    loop update buffer max len: %d\n", *nBufferMaxLen);
 +        *pszCharBuffer = realloc(*pszCharBuffer, *nBufferMaxLen);
 +        if (!*pszCharBuffer)
 +        {
@@ -397,11 +401,13 @@ index 1d0efb2..00f4ae3 100644
 +int addElementStartToBuffer(char * pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
 +    uint32_t dwError = 0;
 +    int nTotalCharsWritten = 0;
++    printf("resize add element start\n");
 +    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 1);
 +    nTotalCharsWritten = sprintf(pszElementBuffer, "<%s", pszElementName);
 +    for (int i = 0; ppszAttrs[i]; i += 2)
 +    {
 +        char * pszLintedAttrVal = descEscapeCharLinter((char *)ppszAttrs[i+1]);
++        printf("resize add element start loop\n");
 +        checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 4);
 +        nTotalCharsWritten += sprintf(pszElementBuffer + nTotalCharsWritten, " %s=\"%s\"", ppszAttrs[i], pszLintedAttrVal);
 +        free(pszLintedAttrVal);
@@ -423,6 +429,7 @@ index 1d0efb2..00f4ae3 100644
 +int addElementEndToBuffer(char * pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
 +    uint32_t dwError = 0;
 +    int nTotalCharsWritten = 0;
++    printf("resize add element end\n");
 +    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 3);
 +    nTotalCharsWritten = sprintf(pszElementBuffer, "</%s>", pszElementName);
 +    
@@ -449,6 +456,7 @@ index 1d0efb2..00f4ae3 100644
 +    {
 +        free(pszStartElement);
 +    }
++    return;
 +error:
 +    goto cleanup;
  }
@@ -470,6 +478,7 @@ index 1d0efb2..00f4ae3 100644
 +    {
 +        free(pszEndElement);
 +    }
++    return;
 +error:
 +    goto cleanup;
  }
@@ -582,6 +591,7 @@ index 1d0efb2..00f4ae3 100644
 +                strcat(pszStartElementBuffer, szNewLineBuffer);
 +                nLenToAdd += strlen(szNewLineBuffer); //+1 if newLine character present
 +
++                printf("resize filter start element buff\n");
 +                checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nLenToAdd);
 +                strcat(pTracking->pszElementBuffer, pszStartElementBuffer);
 +
@@ -641,6 +651,7 @@ index 1d0efb2..00f4ae3 100644
  
 -        checkAndResizeBuffer(tracking, tempLen);
 -        strcat(tracking->elementBuffer, tempBuffer);
++        printf("resize filter end element buff\n");
 +        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nEndElementLen);
 +        strcat(pTracking->pszElementBuffer, pszElementBuffer);
  
@@ -713,6 +724,7 @@ index 1d0efb2..00f4ae3 100644
 -        checkAndResizeBuffer(tracking, length);
 -        strcat(tracking->elementBuffer, tempBuff);
 -
++        printf("resize char data handle element buff\n");
 +        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), length);
 +        strcat(pTracking->pszElementBuffer, pszLintedCharData);
      } // else do nothing (skipped package)
@@ -889,7 +901,13 @@ index 1d0efb2..00f4ae3 100644
          }
 -    } while (!done);
 +    } while (!nInputEof);
-+
+ 
+-    // TODO: create cleanup and error tags for BAIL and formatting
+-    free(data->elementBuffer);
+-    free(data);
+-    XML_ParserFree(parser);
+-    fclose(outFile);
+-    gzclose(inFile);
 +cleanup:
 +    if (pData)
 +    {
@@ -898,7 +916,8 @@ index 1d0efb2..00f4ae3 100644
 +        }
 +        free(pData);
 +    }
-+
+ 
+-    return outFilePath;
 +    if (pbParser)
 +    {
 +        XML_ParserFree(pbParser);
@@ -908,26 +927,19 @@ index 1d0efb2..00f4ae3 100644
 +    {
 +        fclose(pbOutFile);
 +    }
- 
--    // TODO: create cleanup and error tags for BAIL and formatting
--    free(data->elementBuffer);
--    free(data);
--    XML_ParserFree(parser);
--    fclose(outFile);
--    gzclose(inFile);
++
 +    if (pbInFile)
 +    {
 +        fclose(pbInFile);
 +    }
- 
--    return outFilePath;
++
 +    return pszOutFilePath;
 +error:
 +    goto cleanup;
  }
  // #### END XML FILTER CODE ####
  
-@@ -370,11 +533,6 @@ SolvLoadRepomdPrimary(
+@@ -370,11 +545,6 @@ SolvLoadRepomdPrimary(
  {
      uint32_t dwError = 0;
      FILE *fp = NULL;
@@ -939,7 +951,7 @@ index 1d0efb2..00f4ae3 100644
  
      if( !pRepo || IsNullOrEmptyString(pszPrimary))
      {
-@@ -382,15 +540,7 @@ SolvLoadRepomdPrimary(
+@@ -382,15 +552,7 @@ SolvLoadRepomdPrimary(
          BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
      }
  
@@ -956,7 +968,7 @@ index 1d0efb2..00f4ae3 100644
      if (fp == NULL)
      {
          printf("fp null\n");
-@@ -409,11 +559,7 @@ cleanup:
+@@ -409,11 +571,7 @@ cleanup:
      {
          fclose(fp);
      }
@@ -969,7 +981,7 @@ index 1d0efb2..00f4ae3 100644
      return dwError;
  
  error:
-@@ -534,10 +680,15 @@ SolvReadYumRepo(
+@@ -534,10 +692,15 @@ SolvReadYumRepo(
      const char *pszPrimary,
      const char *pszFilelists,
      const char *pszUpdateinfo,
@@ -986,7 +998,7 @@ index 1d0efb2..00f4ae3 100644
      if(!pRepo || !pszRepoName || !pszRepomd || !pszPrimary)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -548,7 +699,15 @@ SolvReadYumRepo(
+@@ -548,7 +711,15 @@ SolvReadYumRepo(
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
  
@@ -1003,7 +1015,7 @@ index 1d0efb2..00f4ae3 100644
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
      printf("loaded primary\n");
  
-@@ -574,6 +733,11 @@ SolvReadYumRepo(
+@@ -574,6 +745,11 @@ SolvReadYumRepo(
  
  
  cleanup:
