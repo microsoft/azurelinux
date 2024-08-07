@@ -1,3 +1,17 @@
+# This repo file is used by both the package fetcher as well as
+# the package workers.
+#
+# For the fetcher, the repos' priority forces it to populate the cache
+# (last in the list) by searching the repositories in the order defined below.
+# The cache repo is empty during a clean build
+# but allows avoiding network re-downloads during subsequent builds.
+# Unless upstream repos are explcitly disabled, if a package is absent in
+# all local repos defined in this file, the fetcher will access the network
+# and search the official upstream repo and/or repos provided by the user.
+#
+# The package workers DO NOT access the network for the sake of satisfying
+# package dependencies. They realy on the local repos defined below.
+
 # We start with the toolchain packages even if they would overwrite
 # the local ones, to guarantee a stable, known build environment.
 [toolchain-repo]
@@ -20,13 +34,10 @@ skip_if_unavailable=1
 sslverify=0
 priority=2
 
-# To satisfy all remaining dependencies, we use the packages cached by
-# the package fetcher, which may come from a mix of sources.
-# The fetcher searches for the packages in the following order:
-#
-# 1. Toolchain packages - same as the first option in this file.
-# 2. Locally-built packages - same as the second option in this file.
-# 3. Other - official upstream repo and/or repos provided by the user.
+# To satisfy all remaining dependencies, during package builds
+# we use the packages cached earlier by the package fetcher.
+# The fetcher itself will use this cache to avoid re-downloading
+# a dependency it has cached during an earlier run.
 [upstream-cache-repo]
 name=Cache Repo for upstream RPMs (build/rpm_cache/cache)
 baseurl=file:///upstream-cached-rpms
