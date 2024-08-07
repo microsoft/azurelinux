@@ -10,7 +10,7 @@
 # and search the official upstream repo and/or repos provided by the user.
 #
 # The package workers DO NOT access the network for the sake of satisfying
-# package dependencies. They realy on the local repos defined below.
+# package dependencies. They rely on the local repos defined below.
 
 # We start with the toolchain packages even if they would overwrite
 # the local ones, to guarantee a stable, known build environment.
