@@ -29146,8 +29146,8 @@
         "type": "other",
         "other": {
           "name": "valgrind",
-          "version": "3.21.0",
-          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.21.0.tar.bz2"
+          "version": "3.22.0",
+          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2"
         }
       }
     },
