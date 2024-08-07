@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.5-1/go1.22.5-20240702.3.src.tar.gz"
+          "version": "1.22.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.6-1/go1.22.6-20240806.4.src.tar.gz"
         }
       }
     },
