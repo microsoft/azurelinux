@@ -1,0 +1,25 @@
+See issue: https://github.com/dracut-ng/dracut-ng/issues/492
+
+This reverts commit 2339acfaeee60d6bb26a1103db2e53bc8f9cb2d1
+
+Signed-off by: Thien Trung Vuong <tvuong@microsoft.com>
+---
+ modules.d/90crypt/parse-crypt.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules.d/90crypt/parse-crypt.sh b/modules.d/90crypt/parse-crypt.sh
+index 9567a4a9..e46e347a 100755
+--- a/modules.d/90crypt/parse-crypt.sh
++++ b/modules.d/90crypt/parse-crypt.sh
+@@ -174,7 +174,7 @@ else
+                 } >> "$hookdir/emergency/90-crypt.sh"
+             fi
+         done
+-    elif getargbool 1 rd.auto; then
++    elif getargbool 0 rd.auto; then
+         if [ -z "$DRACUT_SYSTEMD" ]; then
+             {
+                 printf -- 'ENV{ID_FS_TYPE}=="crypto_LUKS", RUN+="%s ' "$(command -v initqueue)"
+-- 
+2.42.0
+
