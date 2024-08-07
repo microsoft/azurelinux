@@ -1,4 +1,19 @@
-# Start with the toolchain repo as highest priority...
+# This repo file is used by both the package fetcher as well as
+# the package workers.
+#
+# For the fetcher, the repos' priority forces it to populate the cache
+# (last in the list) by searching the repositories in the order defined below.
+# The cache repo is empty during a clean build
+# but allows avoiding network re-downloads during subsequent builds.
+# Unless upstream repos are explcitly disabled, if a package is absent in
+# all local repos defined in this file, the fetcher will access the network
+# and search the official upstream repo and/or repos provided by the user.
+#
+# The package workers DO NOT access the network for the sake of satisfying
+# package dependencies. They rely on the local repos defined below.
+
+# We start with the toolchain packages even if they would overwrite
+# the local ones, to guarantee a stable, known build environment.
 [toolchain-repo]
 name=Local Toolchain Repo (build/toolchain_rpms/)
 baseurl=file:///toolchainrpms
@@ -8,7 +23,8 @@ skip_if_unavailable=1
 sslverify=0
 priority=1
 
-# Next highest should be existing locally built packages...
+# Afterwards, we prefer the local packages over the ones cached by the package
+# fetcher so users can build with their versions of these packages, if desired.
 [local-repo]
 name=Local Build Repo (out/RPMS)
 baseurl=file:///localrpms
@@ -18,7 +34,10 @@ skip_if_unavailable=1
 sslverify=0
 priority=2
 
-# Then packages we have already cached from upstream...
+# To satisfy all remaining dependencies, during package builds
+# we use the packages cached earlier by the package fetcher.
+# The fetcher itself will use this cache to avoid re-downloading
+# a dependency it has cached during an earlier run.
 [upstream-cache-repo]
 name=Cache Repo for upstream RPMs (build/rpm_cache/cache)
 baseurl=file:///upstream-cached-rpms
@@ -27,5 +46,3 @@ gpgcheck=0
 skip_if_unavailable=1
 sslverify=0
 priority=3
-
-# Unless disabled, finally fall back to the upstream repos for any missing packages.
