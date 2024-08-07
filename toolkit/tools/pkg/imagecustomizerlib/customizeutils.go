@@ -370,7 +370,7 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 
 	logger.Log.Infof("Creating image customizer release file")
 
-	customizerReleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	customizerReleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/image-customizer-release")
 	lines := []string{
 		fmt.Sprintf("%s=\"%s\"", "TOOL_VERSION", toolVersion),
 		fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", buildTime),
