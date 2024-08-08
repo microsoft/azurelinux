@@ -616,6 +616,18 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 }
 
+// Returns true if the version of 'parted' supports the 'type' session command.
+// Since v3.6
+func PartedSupportsTypeCommand() (bool, error) {
+	major, minor, err := getPartedVersion()
+	if err != nil {
+		return false, err
+	}
+
+	supports := major >= 4 || (major == 3 && minor >= 6)
+	return supports, nil
+}
+
 // Returns if the version of 'parted' supports empty (quoted) string parameters.
 // Specifically, parted v3.5+.
 func PartedSupportsEmptyString() (bool, error) {
@@ -738,6 +750,11 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 }
 
 func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
+	if supports, _ := PartedSupportsTypeCommand(); !supports {
+		logger.Log.Warn("parted version <3.6 does not support the 'type' session command - skipping this operation")
+		return
+	}
+
 	if partition.TypeUUID != "" || partition.Type != "" {
 		var typeUUID string
 		if partition.TypeUUID != "" {
