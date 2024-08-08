@@ -3148,8 +3148,8 @@
         "type": "other",
         "other": {
           "name": "edk2",
-          "version": "20240223gitedc6681206c1",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-edc6681206c1.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-edc6681206c1.tar.xz"
+          "version": "20240524git3e722403cd16",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-3e722403cd16.tar.xz/sha512/58550636ea26810a0184423765db24e43319a0cc5e38dfd5fbd7f09b5f6e1c2d2b9e1e33112a3b721e05c7f088dbfd8a2ddd4a73d833c3019a16101ef1d0342a/edk2-3e722403cd16.tar.xz"
         }
       }
     },

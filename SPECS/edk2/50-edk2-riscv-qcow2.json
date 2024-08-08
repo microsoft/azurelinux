@@ -1,5 +1,5 @@
 {
-    "description": "UEFI firmware for ARM64 virtual machines, verbose logs",
+    "description": "UEFI firmware for RISC-V virtual machines",
     "interface-types": [
         "uefi"
     ],
@@ -7,24 +7,25 @@
         "device": "flash",
         "mode" : "split",
         "executable": {
-            "filename": "/usr/share/edk2/aarch64/QEMU_EFI-pflash.qcow2",
+            "filename": "/usr/share/edk2/riscv/RISCV_VIRT_CODE.qcow2",
             "format": "qcow2"
         },
         "nvram-template": {
-            "filename": "/usr/share/edk2/aarch64/vars-template-pflash.qcow2",
+            "filename": "/usr/share/edk2/riscv/RISCV_VIRT_VARS.qcow2",
             "format": "qcow2"
         }
     },
     "targets": [
         {
-            "architecture": "aarch64",
+            "architecture": "riscv64",
             "machines": [
+                "virt",
                 "virt-*"
             ]
         }
     ],
     "features": [
-        "verbose-static"
+
     ],
     "tags": [
 
