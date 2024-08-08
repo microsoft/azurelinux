@@ -336,7 +336,7 @@ func isGrubMkconfigConfig(grub2Config string) bool {
 }
 
 // Reads the string contents of the /etc/default/grub file.
-func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
+func readDefaultGrubFile(imageChroot safechroot.ChrootInterface) (string, error) {
 	logger.Log.Debugf("Reading %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
@@ -351,7 +351,7 @@ func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
 }
 
 // Writes the string contents of the /etc/default/grub file.
-func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) error {
+func writeDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
@@ -365,6 +365,6 @@ func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) er
 	return nil
 }
 
-func getDefaultGrubFilePath(imageChroot *safechroot.Chroot) string {
+func getDefaultGrubFilePath(imageChroot safechroot.ChrootInterface) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubDefFile)
 }

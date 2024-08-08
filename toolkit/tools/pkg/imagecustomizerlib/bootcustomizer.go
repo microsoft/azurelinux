@@ -23,7 +23,7 @@ type BootCustomizer struct {
 	isGrubMkconfig bool
 }
 
-func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) {
+func NewBootCustomizer(imageChroot safechroot.ChrootInterface) (*BootCustomizer, error) {
 	grubCfgContent, err := readGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 	return selinuxMode, nil
 }
 
-func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
+func (b *BootCustomizer) GetSELinuxMode(imageChroot safechroot.ChrootInterface) (imagecustomizerapi.SELinuxMode, error) {
 	// Get the SELinux mode from the kernel command-line args.
 	selinuxMode, err := b.getSELinuxModeFromGrub()
 	if err != nil {
@@ -183,9 +183,9 @@ func (b *BootCustomizer) PrepareForVerity() error {
 	return nil
 }
 
-func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
+func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
-		// Update /etc/defaukt/grub file.
+		// Update /etc/default/grub file.
 		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
