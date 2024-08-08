@@ -4,14 +4,14 @@ Date: Mon, 5 Aug 2024 11:45:42 -0700
 Subject: [PATCH] Updating hotplugdetachmentGracePeriod patch with repeated lookups for disk detachment
 
 ---
- pkg/virt-launcher/virtwrap/manager.go | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ pkg/virt-launcher/virtwrap/manager.go | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-index 63d8d43d29..eab8e2e1f5 100644
+index 63d8d43d29..d46a707df0 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
-@@ -935,6 +935,33 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -935,6 +935,31 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  			logger.Reason(err).Error("detaching device")
  			return nil, err
  		}
@@ -19,24 +19,22 @@ index 63d8d43d29..eab8e2e1f5 100644
 +		// Check if the disk is still attached
 +		for i := 0; i < 5; i++ {
 +			logger.V(1).Infof("Loop count: %d, domain name: %s", i, detachDisk.Alias.GetName())
-+			dom, err = l.virConn.LookupDomainByName(domain.Spec.Name))
++			dom, err = l.virConn.LookupDomainByName(domain.Spec.Name)
 +			if err != nil {
 +				logger.Reason(err).Error("getting domain after device detach")
-+				return
 +			}
 +			// Check if the domain still has the detach disk name and detach disk target
 +			xmlDesc, err := dom.GetXMLDesc(0)
 +			if err != nil {
 +				logger.Reason(err).Error("getting domain XML after device detach")
-+				return
 +			}
 +
-+			logger.V(1).Infof("Checking if disk %s, target %s is still present in the domain", detachDiskName, detachDiskTargetDevice)
++			logger.V(1).Infof("Checking if disk %s, target %s is still present in the domain", detachDisk.Alias.GetName(), detachDisk.Target.Device)
 +			logger.V(1).Infof("Domain XML: %s", xmlDesc)
-+			if strings.Contains(xmlDesc, detachDiskName) && strings.Contains(xmlDesc, detachDiskTargetDevice) {
-+				logger.V(1).Infof("Disk %s with target %s is still present in the domain", detachDiskName, detachDiskTargetDevice)
++			if strings.Contains(xmlDesc, detachDisk.Alias.GetName()) && strings.Contains(xmlDesc, detachDisk.Target.Device) {
++				logger.V(1).Infof("Disk %s with target %s is still present in the domain", detachDisk.Alias.GetName(), detachDisk.Target.Device)
 +			} else {
-+				logger.V(1).Infof("Disk %s with target %s has been successfully detached", detachDiskName, detachDiskTargetDevice)
++				logger.V(1).Infof("Disk %s with target %s has been successfully detached", detachDisk.Alias.GetName(), detachDisk.Target.Device)
 +				dom.Free()
 +				break
 +			}
@@ -47,4 +45,3 @@ index 63d8d43d29..eab8e2e1f5 100644
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
 -- 
 2.45.2
-
