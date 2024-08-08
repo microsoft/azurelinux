@@ -264,3 +264,4 @@ clang-18.1.2-3.azl3.x86_64.rpm
 lld-devel-18.1.2-3.azl3.x86_64.rpm
 lld-libs-18.1.2-3.azl3.x86_64.rpm
 lld-18.1.2-3.azl3.x86_64.rpm
+libcxx-18.1.2-1.azl3.x86_64.rpm

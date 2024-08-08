@@ -740,6 +740,7 @@ chroot_and_install_rpms llvm
 build_rpm_in_chroot_no_install compiler-rt
 build_rpm_in_chroot_no_install clang
 build_rpm_in_chroot_no_install lld
+build_rpm_in_chroot_no_install libcxx
 
 stop_record_timestamp "build packages"
 start_record_timestamp "finalize"
