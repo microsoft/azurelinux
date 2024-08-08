@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,7 @@ Patch40:        0040-For-systemd-hostnamed-service-to-run.patch
 Patch41:        0041-docker-Silence-io.containerd.internal.v1.opt-opt-con.patch
 Patch42:        0042-getty-grant-checkpoint_restore.patch
 Patch43:        0043-cloudinit-Add-support-for-cloud-init-growpart.patch
+Patch44:        0044-fstools-Add-additional-perms-for-cloud-utils-growpar.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -347,6 +348,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Aug 06 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-8
+- Additional fixes for cloud-init-growpart.
+
 * Tue May 14 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-7
 - Add fix for cloud-init growpart.
 
