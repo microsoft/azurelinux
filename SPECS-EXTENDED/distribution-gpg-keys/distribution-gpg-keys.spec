@@ -1,14 +1,14 @@
 Summary:	GPG keys of various Linux distributions
 Name:		distribution-gpg-keys
-Version:	1.60
-Release:	2%{?dist}
+Version:	1.104
+Release:	1%{?dist}
 License:	CC0
-URL:		https://github.com/xsuchy/distribution-gpg-keys
+URL:		https://github.com/rpm-software-management/distribution-gpg-keys
 # Sources can be obtained by
-# git clone git://github.com/xsuchy/distribution-gpg-keys.git
+# git clone git://github.com/rpm-software-management/distribution-gpg-keys.git
 # cd distribution-gpg-keys
 # tito build --tgz
-Source0:	https://github.com/xsuchy/distribution-gpg-keys/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 %description
@@ -45,6 +45,10 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/copr
 
 %changelog
+* Fri Aug 02 2024 Devin Anderson <danderson@microsoft.com> - 1.104-1
+- Update to 1.104, a more recent version that includes the Azure Linux keys.
+- Use the official repository URI to download sources.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.60-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
