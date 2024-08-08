@@ -183,6 +183,13 @@ libcap-devel-2.69-1.azl3.aarch64.rpm
 libcap-ng-0.8.4-1.azl3.aarch64.rpm
 libcap-ng-debuginfo-0.8.4-1.azl3.aarch64.rpm
 libcap-ng-devel-0.8.4-1.azl3.aarch64.rpm
+libcxx-18.1.2-2.azl3.aarch64.rpm
+libcxx-debuginfo-18.1.2-2.azl3.aarch64.rpm
+libcxx-devel-18.1.2-2.azl3.aarch64.rpm
+libcxx-static-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-devel-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-static-18.1.2-2.azl3.aarch64.rpm
 libffi-3.4.4-1.azl3.aarch64.rpm
 libffi-debuginfo-3.4.4-1.azl3.aarch64.rpm
 libffi-devel-3.4.4-1.azl3.aarch64.rpm
@@ -255,6 +262,9 @@ lld-libs-18.1.2-3.azl3.aarch64.rpm
 llvm-18.1.2-4.azl3.aarch64.rpm
 llvm-debuginfo-18.1.2-4.azl3.aarch64.rpm
 llvm-devel-18.1.2-4.azl3.aarch64.rpm
+llvm-libunwind-18.1.2-2.azl3.aarch64.rpm
+llvm-libunwind-devel-18.1.2-2.azl3.aarch64.rpm
+llvm-libunwind-static-18.1.2-2.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
 lua-debuginfo-5.4.6-1.azl3.aarch64.rpm
 lua-devel-5.4.6-1.azl3.aarch64.rpm

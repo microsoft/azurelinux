@@ -264,3 +264,12 @@ clang-18.1.2-3.azl3.aarch64.rpm
 lld-devel-18.1.2-3.azl3.aarch64.rpm
 lld-libs-18.1.2-3.azl3.aarch64.rpm
 lld-18.1.2-3.azl3.aarch64.rpm
+libcxx-18.1.2-2.azl3.aarch64.rpm
+libcxx-devel-18.1.2-2.azl3.aarch64.rpm
+libcxx-static-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-devel-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-static-18.1.2-2.azl3.aarch64.rpm
+llvm-libunwind-18.1.2-2.azl3.aarch64.rpm
+llvm-libunwind-devel-18.1.2-2.azl3.aarch64.rpm
+llvm-libunwind-static-18.1.2-2.azl3.aarch64.rpm
