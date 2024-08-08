@@ -1,4 +1,4 @@
-Summary:        Rust reimplementation of GNU core utilities
+Summary:        Basic system utilities; reimplemented in Rust
 Name:	        rust-coreutils
 Version:	    0.0.26
 Release:        1%{?dist}
@@ -6,17 +6,16 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/uutils/coreutils
+Source0: 	    %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a automatically created tarball with no download link.
-Source0: 	    %{url}/archive/refs/tags/v%{version}.tar.gz#/0.0.26.tar.gz
-Source1:	    rust-coreutils-coreutils-vendored.tar.gz
+Source1:	    rust-coreutils-0.0.26-vendored.tar.gz
 Source2:        cargo_config.toml
 
-# Required build packages
+
 BuildRequires:  cargo
 BuildRequires:  gcc
 BuildRequires:  glibc
 Conflicts:  coreutils
-#FILL IN THE REST OF THE PACKAGES BELOW IF NEEDED. (Consult package docs)
 
 %description
 This package provides the reimplementation of the GNU core utilities in Rust.
@@ -32,8 +31,7 @@ cargo build --release --offline
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
-# mkdir -p %{buildroot}
-# make PREFIX=/usr install
+
 
 utilities=(
     "uniq" "nl" "echo" "shred" "od" "basename" "cat" "split" "md5sum" "shake256sum"
@@ -55,97 +53,95 @@ done
 popd
 
 
-# FILL IN FILES INCLUDED IN PKG (Ex: /usr/bin/{YOUR BINARY})
 %files
-/usr/bin/coreutils
-/usr/bin/b2sum
-/usr/bin/b3sum
-/usr/bin/base32
-/usr/bin/base64
-/usr/bin/basename
-/usr/bin/basenc
-/usr/bin/cat
-/usr/bin/cksum
-/usr/bin/comm
-/usr/bin/cp
-/usr/bin/csplit
-/usr/bin/cut
-/usr/bin/date
-/usr/bin/dd
-/usr/bin/df
-/usr/bin/dir
-/usr/bin/dircolors
-/usr/bin/dirname
-/usr/bin/du
-/usr/bin/echo
-/usr/bin/env
-/usr/bin/expand
-/usr/bin/expr
-/usr/bin/factor
-/usr/bin/false
-/usr/bin/fmt
-/usr/bin/fold
-/usr/bin/hashsum
-/usr/bin/head
-/usr/bin/join
-/usr/bin/link
-/usr/bin/ln
-/usr/bin/ls
-/usr/bin/md5sum
-/usr/bin/mkdir
-/usr/bin/mktemp
-/usr/bin/more
-/usr/bin/mv
-/usr/bin/nl
-/usr/bin/numfmt
-/usr/bin/od
-/usr/bin/paste
-/usr/bin/pr
-/usr/bin/printenv
-/usr/bin/printf
-/usr/bin/ptx
-/usr/bin/pwd
-/usr/bin/readlink
-/usr/bin/realpath
-/usr/bin/rm
-/usr/bin/rmdir
-/usr/bin/seq
-/usr/bin/sha1sum
-/usr/bin/sha224sum
-/usr/bin/sha256sum
-/usr/bin/sha3-224sum
-/usr/bin/sha3-256sum
-/usr/bin/sha3-384sum
-/usr/bin/sha3-512sum
-/usr/bin/sha384sum
-/usr/bin/sha3sum 
-/usr/bin/sha512sum
-/usr/bin/shake128sum
-/usr/bin/shake256sum
-/usr/bin/shred
-/usr/bin/shuf
-/usr/bin/sleep
-/usr/bin/sort
-/usr/bin/split
-/usr/bin/sum
-/usr/bin/tac
-/usr/bin/tail
-/usr/bin/tee
-/usr/bin/test
-/usr/bin/touch
-/usr/bin/tr
-/usr/bin/true
-/usr/bin/truncate
-/usr/bin/tsort
-/usr/bin/unexpand
-/usr/bin/uniq
-/usr/bin/unlink
-/usr/bin/vdir
-/usr/bin/wc
-/usr/bin/yes
+%{_bindir}/coreutils
+%{_bindir}/b2sum
+%{_bindir}/b3sum
+%{_bindir}/base32
+%{_bindir}/base64
+%{_bindir}/basename
+%{_bindir}/basenc
+%{_bindir}/cat
+%{_bindir}/cksum
+%{_bindir}/comm
+%{_bindir}/cp
+%{_bindir}/csplit
+%{_bindir}/cut
+%{_bindir}/date
+%{_bindir}/dd
+%{_bindir}/df
+%{_bindir}/dir
+%{_bindir}/dircolors
+%{_bindir}/dirname
+%{_bindir}/du
+%{_bindir}/echo
+%{_bindir}/env
+%{_bindir}/expand
+%{_bindir}/expr
+%{_bindir}/factor
+%{_bindir}/false
+%{_bindir}/fmt
+%{_bindir}/fold
+%{_bindir}/hashsum
+%{_bindir}/head
+%{_bindir}/join
+%{_bindir}/link
+%{_bindir}/ln
+%{_bindir}/ls
+%{_bindir}/md5sum
+%{_bindir}/mkdir
+%{_bindir}/mktemp
+%{_bindir}/more
+%{_bindir}/mv
+%{_bindir}/nl
+%{_bindir}/numfmt
+%{_bindir}/od
+%{_bindir}/paste
+%{_bindir}/pr
+%{_bindir}/printenv
+%{_bindir}/printf
+%{_bindir}/ptx
+%{_bindir}/pwd
+%{_bindir}/readlink
+%{_bindir}/realpath
+%{_bindir}/rm
+%{_bindir}/rmdir
+%{_bindir}/seq
+%{_bindir}/sha1sum
+%{_bindir}/sha224sum
+%{_bindir}/sha256sum
+%{_bindir}/sha3-224sum
+%{_bindir}/sha3-256sum
+%{_bindir}/sha3-384sum
+%{_bindir}/sha3-512sum
+%{_bindir}/sha384sum
+%{_bindir}/sha3sum 
+%{_bindir}/sha512sum
+%{_bindir}/shake128sum
+%{_bindir}/shake256sum
+%{_bindir}/shred
+%{_bindir}/shuf
+%{_bindir}/sleep
+%{_bindir}/sort
+%{_bindir}/split
+%{_bindir}/sum
+%{_bindir}/tac
+%{_bindir}/tail
+%{_bindir}/tee
+%{_bindir}/test
+%{_bindir}/touch
+%{_bindir}/tr
+%{_bindir}/true
+%{_bindir}/truncate
+%{_bindir}/tsort
+%{_bindir}/unexpand
+%{_bindir}/uniq
+%{_bindir}/unlink
+%{_bindir}/vdir
+%{_bindir}/wc
+%{_bindir}/yes
 
-# FILL IN INITAL COMMIT LOG
 %changelog 
-* Fri May 31 2024 Antonio Salinas ansalinas@microsoft.com - 0.0.26
-    - First Rust package reimplementation
+* Fri May 31 2024 Antonio Salinas t-ansalinas@microsoft.com - 0.0.26
+    - Intgrated Rust implementation of GNU coreutils.
 
