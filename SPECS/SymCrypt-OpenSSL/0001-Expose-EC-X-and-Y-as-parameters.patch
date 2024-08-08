@@ -1,0 +1,125 @@
+From d2b30fb769a62414f4fe0e6df9db1184d81fc356 Mon Sep 17 00:00:00 2001
+From: Maxwell Moyer-McKee <mamckee@microsoft.com>
+Date: Fri, 2 Aug 2024 21:20:31 +0000
+Subject: [PATCH 1/2] Expose EC X and Y as parameters
+
+---
+ .../src/keymgmt/p_scossl_ecc_keymgmt.c        | 88 +++++++++++++++++++
+ 1 file changed, 88 insertions(+)
+
+diff --git a/SymCryptProvider/src/keymgmt/p_scossl_ecc_keymgmt.c b/SymCryptProvider/src/keymgmt/p_scossl_ecc_keymgmt.c
+index b748565..e89d31e 100644
+--- a/SymCryptProvider/src/keymgmt/p_scossl_ecc_keymgmt.c
++++ b/SymCryptProvider/src/keymgmt/p_scossl_ecc_keymgmt.c
+@@ -46,6 +46,8 @@ static const OSSL_PARAM p_scossl_ecc_keymgmt_gettable_param_types[] = {
+     OSSL_PARAM_utf8_string(OSSL_PKEY_PARAM_EC_POINT_CONVERSION_FORMAT, NULL, 0),
+     OSSL_PARAM_BN(OSSL_PKEY_PARAM_PRIV_KEY, NULL, 0),
+     OSSL_PARAM_octet_string(OSSL_PKEY_PARAM_PUB_KEY, NULL, 0),
++    OSSL_PARAM_BN(OSSL_PKEY_PARAM_EC_PUB_X, NULL, 0),
++    OSSL_PARAM_BN(OSSL_PKEY_PARAM_EC_PUB_Y, NULL, 0),
+     OSSL_PARAM_END};
+ 
+ static const OSSL_PARAM p_scossl_ecc_keymgmt_settable_param_types[] = {
+@@ -461,6 +463,87 @@ cleanup:
+     return keyCtx;
+ }
+ 
++static SCOSSL_STATUS p_scossl_ecc_keymgmt_get_pubkey_point(_In_ SCOSSL_ECC_KEY_CTX *keyCtx, _Inout_ OSSL_PARAM params[])
++{
++    PBYTE pbPublicKey = NULL;
++    SIZE_T cbPublicKey;
++    BIGNUM *bnPubX = NULL;
++    BIGNUM *bnPubY = NULL;
++    SYMCRYPT_ERROR scError = SYMCRYPT_NO_ERROR;
++    SCOSSL_STATUS ret = SCOSSL_FAILURE;
++
++    OSSL_PARAM *paramPubX = OSSL_PARAM_locate(params, OSSL_PKEY_PARAM_EC_PUB_X);
++    OSSL_PARAM *paramPubY = OSSL_PARAM_locate(params, OSSL_PKEY_PARAM_EC_PUB_Y);
++
++    if (paramPubX == NULL &&
++        paramPubY == NULL)
++    {
++        return SCOSSL_SUCCESS;
++    }
++
++    cbPublicKey = SymCryptEckeySizeofPublicKey(keyCtx->key, SYMCRYPT_ECPOINT_FORMAT_XY);
++
++    if ((pbPublicKey = OPENSSL_malloc(cbPublicKey)) == NULL)
++    {
++        ERR_raise(ERR_LIB_PROV, ERR_R_MALLOC_FAILURE);
++        goto cleanup;
++    }
++
++    scError = SymCryptEckeyGetValue(
++        keyCtx->key,
++        NULL, 0,
++        pbPublicKey, cbPublicKey,
++        SYMCRYPT_NUMBER_FORMAT_MSB_FIRST,
++        SYMCRYPT_ECPOINT_FORMAT_XY,
++        0 );
++    if (scError != SYMCRYPT_NO_ERROR)
++    {
++        ERR_raise(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR);
++        goto cleanup;
++    }
++
++    if (paramPubX != NULL)
++    {
++        if ((bnPubX = BN_bin2bn(pbPublicKey, cbPublicKey/2, NULL)) == NULL)
++        {
++            ERR_raise(ERR_LIB_PROV, ERR_R_MALLOC_FAILURE);
++            goto cleanup;
++        }
++
++        if (!OSSL_PARAM_set_BN(paramPubX, bnPubX))
++        {
++            ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_SET_PARAMETER);
++            BN_free(bnPubX);
++            goto cleanup;
++        }
++    }
++
++    if (paramPubY != NULL)
++    {
++        if ((bnPubY = BN_bin2bn(pbPublicKey + (cbPublicKey/2), cbPublicKey/2, NULL)) == NULL)
++        {
++            ERR_raise(ERR_LIB_PROV, ERR_R_MALLOC_FAILURE);
++            goto cleanup;
++        }
++
++        if (!OSSL_PARAM_set_BN(paramPubY, bnPubY))
++        {
++            ERR_raise(ERR_LIB_PROV, PROV_R_FAILED_TO_SET_PARAMETER);
++            BN_free(bnPubY);
++            goto cleanup;
++        }
++    }
++
++    ret = SCOSSL_SUCCESS;
++
++cleanup:
++    OPENSSL_free(pbPublicKey);
++    BN_free(bnPubX);
++    BN_free(bnPubY);
++
++    return ret;
++}
++
+ static SCOSSL_STATUS p_scossl_ecc_keymgmt_get_params(_In_ SCOSSL_ECC_KEY_CTX *keyCtx, _Inout_ OSSL_PARAM params[])
+ {
+     PBYTE pbEncodedKey = NULL;
+@@ -571,6 +654,11 @@ static SCOSSL_STATUS p_scossl_ecc_keymgmt_get_params(_In_ SCOSSL_ECC_KEY_CTX *ke
+     // General ECDH only
+     if (!keyCtx->isX25519)
+     {
++        if (!p_scossl_ecc_keymgmt_get_pubkey_point(keyCtx, params))
++        {
++            goto cleanup;
++        }
++
+         if ((p = OSSL_PARAM_locate(params, OSSL_PKEY_PARAM_DEFAULT_DIGEST)) != NULL &&
+             !OSSL_PARAM_set_utf8_string(p, SCOSSL_ECC_DEFAULT_DIGEST))
+         {
+-- 
+2.34.1
+

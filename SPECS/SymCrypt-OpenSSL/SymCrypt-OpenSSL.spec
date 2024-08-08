@@ -1,7 +1,7 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
 Version:        1.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,9 @@ BuildRequires:  make
 Requires:       SymCrypt
 Requires:       openssl
 
+Patch0:         0001-Expose-EC-X-and-Y-as-parameters.patch
+Patch1:         0002-Make-AES-CFB-compatible-with-OpenSSL-stream-cipher-c.patch
+
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 
@@ -31,6 +34,8 @@ The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt
 
 %prep
 %setup -q
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 mkdir bin; cd bin
