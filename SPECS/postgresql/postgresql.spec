@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        16.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,7 +35,10 @@ Requires:       openssl
 Requires:       readline
 Requires:       tzdata
 Requires:       zlib
-Requires:	openssl-libs
+Requires:       openssl-libs
+Requires(pre):  shadow-utils
+Requires(post): shadow-utils
+Requires(postun): shadow-utils
 %description
 PostgreSQL is an object-relational database management system.
 
@@ -227,6 +230,9 @@ fi
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed Aug 07 Andrew Phelps <anphel@microsoft.com> - 16.3-3
+- Add requires for shadow-utils
+
 * Wed Jul 24 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.3-2
 - Added systemd service, installation path, %pre %post and %postun required for the service 
  
