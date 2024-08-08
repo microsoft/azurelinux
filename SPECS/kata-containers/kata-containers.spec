@@ -45,10 +45,11 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 OS_VERSION=2.0 %make_build package
 popd
 
+%define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
 %define kata_shim_bin %{_prefix}/local/bin
 %define defaults_kata %{_prefix}/share/defaults/kata-containers
-%define tools_pkg    /opt/kata-containers/uvm
+%define tools_pkg     %{kata_path}/uvm
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -70,6 +71,7 @@ popd
 #%doc README.md
 
 %files tools
+%dir %{kata_path}
 %dir %{tools_pkg}
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder

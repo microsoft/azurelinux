@@ -91,6 +91,7 @@ popd
 #%doc README.md
 
 %files tools
+%dir %{kata_path}
 %dir %{tools_pkg}
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
