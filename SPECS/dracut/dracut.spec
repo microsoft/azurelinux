@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        2%{?dist}
+Release:        3%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -23,13 +23,13 @@ Source7:        00-hyperv.conf
 Source8:        00-virtio.conf
 Source9:        00-vrf.conf
 Source10:       00-xen.conf
+Source11:       50-noxattr.conf
 
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
-Patch:          0002-disable-xattr.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
@@ -96,6 +96,13 @@ Requires:       %{name} = %{version}-%{release}
 
 %description megaraid
 This package contains dracut configuration needed to build an initramfs with MegaRAID driver support.
+
+%package noxattr
+Summary:        dracut configuration needed to disable preserving of xattr file metadata
+Requires:       %{name} = %{version}-%{release}
+
+%description noxattr
+This package contains dracut configuration needed to disable preserving of xattr file metadata.
 
 %package tools
 Summary:        dracut tools to build the local initramfs
@@ -175,6 +182,7 @@ install -m 0644 %{SOURCE7} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-hyperv.co
 install -m 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-virtio.conf
 install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-vrf.conf
 install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-xen.conf
+install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-noxattr.conf
 
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
@@ -252,6 +260,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %defattr(-,root,root,0755)
 %{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 
+%files noxattr
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/50-noxattr.conf
+
 %files tools
 %defattr(-,root,root,0755)
 
@@ -277,6 +289,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Thu Aug 08 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-3
+- Drop 0002-disable-xattr.patch
+- Introduce dracut-noxattr subpackage to expose this behavior as an option
+
 * Tue Aug 06 2024 Thien Trung Vuong <tvuong@microsoft.com> - 102-2
 - Add fix for initrd not showing prompt when root device is locked
 
