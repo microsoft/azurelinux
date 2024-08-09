@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -16,6 +16,7 @@ Source2: docker.socket
 Source3: daemon.json
 
 Patch0:  CVE-2022-2879.patch
+Patch1:  CVE-2024-41110.patch
 
 %{?systemd_requires}
 
@@ -116,6 +117,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Mon Jul 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 25.0.3-4
+- Address CVE-2024-41110
+
 * Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 25.0.3-3
 - Address CVE-2022-2879
 
