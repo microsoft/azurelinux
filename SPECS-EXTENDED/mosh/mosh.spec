@@ -49,7 +49,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 
 %files
-%doc README.md COPYING ChangeLog
+%doc README.md ChangeLog
+%license COPYING
 %{_bindir}/mosh
 %{_bindir}/mosh-client
 %{_bindir}/mosh-server
@@ -61,7 +62,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %changelog
 * Fri Apr 26 2024 Andy Zaugg <azaugg@linkedin.com> - 1.4.0-1
 - Update to mosh 1.4.0
-- Initial CBL-Mariner import from Fedora (license: GPL3).
+- Initial CBL-Mariner import from Fedora (license: MIT).
 - License verified
 
 * Sun Jul 12 2015 John Hood <cgull@glup.org> - 1.2.5-1
