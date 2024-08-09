@@ -39,12 +39,14 @@ Python 3 version.
 
 %prep
 %autosetup -p1
+
+# Replace the 'name' and 'version' in setup.py
+sed -i "s/name=\"{{PACKAGE}}\"/name=\"%{name}\"/" oss_setup.py
+sed -i "s/version=\"{{VERSION}}\"/version=\"%{version}\"/" oss_setup.py
+
 # Rename oss_setup.py to setup.py
 mv oss_setup.py setup.py
 
-# Replace the 'name' and 'version' in setup.py
-sed -i "s/name=\"unknown\"/name=\"%{name}\"/" setup.py
-sed -i "s/version=\"unknown\"/version=\"%{version}\"/" setup.py
 
 %build
 #%{py3_build}
