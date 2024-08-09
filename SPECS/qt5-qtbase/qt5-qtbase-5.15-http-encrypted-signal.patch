@@ -1,0 +1,105 @@
+From 09e22c6c3280d4187b1ed2d979ceea478b7bed75 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Tue, 11 Aug 2020 17:20:03 +0200
+Subject: [PATCH] QNAM: Don't error out if the server doesn't support any ALPN
+ we request
+
+If we ask for HTTP/2 or 1.1 and the server doesn't list either then we
+should still try to connect using HTTP/1(.1) just in case, to keep
+compatibility.
+
+Task-number: QTBUG-85902
+Change-Id: I6ff2e38ac9d767e482a19ee4c81d101be37d3fab
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+---
+From 62d85389a4a3ef22db80e721bf7c646a50874452 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Tue, 18 Aug 2020 12:10:16 +0200
+Subject: [PATCH] http: When falling back to http/1 use the socket's ssl config
+
+And not the ssl configuration we have on the reply since it's missing
+e.g. the newly received session ticket.
+
+Change-Id: Idfeb09012a847605a76d1fe4fb881c663d019b4a
+Reviewed-by: Peter Hartmann <peter@edelhirsch.io>
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+---
+From 95064c35826793c5d6a4edff9fa08ad308b047bb Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Tue, 20 Jul 2021 08:16:28 +0200
+Subject: [PATCH] H2: emit encrypted for at least the first reply, similar to
+ H1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes: QTBUG-95277
+Change-Id: I1fe01503376c0d6278e366d7bd31b412b7cc3a69
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit c23b7886348dc313ccec1a131850a7cce1b429de)
+---
+
+ src/network/access/qhttpnetworkconnectionchannel.cpp  | 22 +++++++++----------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
+
+diff --git a/src/network/access/qhttpnetworkconnectionchannel.cpp b/src/network/access/qhttpnetworkconnectionchannel.cpp
+index 1fac24ab..d078b194 100644
+--- a/src/network/access/qhttpnetworkconnectionchannel.cpp
++++ b/src/network/access/qhttpnetworkconnectionchannel.cpp
+@@ -1176,8 +1176,7 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
+         // after establishing a secure connection we immediately start sending
+         // HTTP/2 frames.
+         switch (sslSocket->sslConfiguration().nextProtocolNegotiationStatus()) {
+-        case QSslConfiguration::NextProtocolNegotiationNegotiated:
+-        case QSslConfiguration::NextProtocolNegotiationUnsupported: {
++        case QSslConfiguration::NextProtocolNegotiationNegotiated: {
+             QByteArray nextProtocol = sslSocket->sslConfiguration().nextNegotiatedProtocol();
+             if (nextProtocol == QSslConfiguration::NextProtocolHttp1_1) {
+                 // fall through to create a QHttpProtocolHandler
+@@ -1199,17 +1198,12 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
+             }
+         }
+             Q_FALLTHROUGH();
++        case QSslConfiguration::NextProtocolNegotiationUnsupported: // No agreement, try HTTP/1(.1)
+         case QSslConfiguration::NextProtocolNegotiationNone: {
+             protocolHandler.reset(new QHttpProtocolHandler(this));
+-            if (!sslConfiguration.data()) {
+-                // Our own auto-tests bypass the normal initialization (done by
+-                // QHttpThreadDelegate), this means in the past we'd have here
+-                // the default constructed QSslConfiguration without any protocols
+-                // to negotiate. Let's create it now:
+-                sslConfiguration.reset(new QSslConfiguration);
+-            }
+ 
+-            QList<QByteArray> protocols = sslConfiguration->allowedNextProtocols();
++            QSslConfiguration newConfiguration = sslSocket->sslConfiguration();
++            QList<QByteArray> protocols = newConfiguration.allowedNextProtocols();
+             const int nProtocols = protocols.size();
+             // Clear the protocol that we failed to negotiate, so we do not try
+             // it again on other channels that our connection can create/open.
+@@ -1219,10 +1213,10 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
+                 protocols.removeAll(QSslConfiguration::NextProtocolSpdy3_0);
+ 
+             if (nProtocols > protocols.size()) {
+-                sslConfiguration->setAllowedNextProtocols(protocols);
++                newConfiguration.setAllowedNextProtocols(protocols);
+                 const int channelCount = connection->d_func()->channelCount;
+                 for (int i = 0; i < channelCount; ++i)
+-                    connection->d_func()->channels[i].setSslConfiguration(*sslConfiguration);
++                    connection->d_func()->channels[i].setSslConfiguration(newConfiguration);
+             }
+ 
+             connection->setConnectionType(QHttpNetworkConnection::ConnectionTypeHTTP);
+@@ -1257,6 +1251,10 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
+         connection->connectionType() == QHttpNetworkConnection::ConnectionTypeHTTP2Direct) {
+         // we call setSpdyWasUsed(true) on the replies in the SPDY handler when the request is sent
+         if (spdyRequestsToSend.count() > 0) {
++            // Similar to HTTP/1.1 counterpart below:
++            const auto &pairs = spdyRequestsToSend.values(); // (request, reply)
++            const auto &pair = pairs.first();
++            emit pair.second->encrypted();
+             // In case our peer has sent us its settings (window size, max concurrent streams etc.)
+             // let's give _q_receiveReply a chance to read them first ('invokeMethod', QueuedConnection).
+             QMetaObject::invokeMethod(connection, "_q_startNextRequest", Qt::QueuedConnection);
+-- 
+2.25.1
