@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        8.5.3
-Release:        6%{?dist}
+Version:        8.5.5
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,11 +16,6 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
-Patch5:         CVE-2023-46752.patch
-Patch6:         CVE-2023-46753.patch
-Patch7:         CVE-2023-47235.patch
-Patch8:         CVE-2023-47234.patch
-Patch9:         CVE-2024-34088.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -202,6 +197,10 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Aug 06 2024 Sumedh Sharma <sumsharma@microsoft.com> - 8.5.5-1
+- Bump version to fix CVE-2024-31950 & CVE-2024-31951
+- Remove patches present in sources
+
 * Fri May 03 2024 Henry Beberman <henry.beberman@microsoft.com> - 8.5.3-6
 - Patch CVE-2024-34088
 - Remove CVE-2024-27913 patch since it's replaced by the CVE-2024-34088 patch
