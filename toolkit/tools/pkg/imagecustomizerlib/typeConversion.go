@@ -84,7 +84,7 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 		},
 	)
 	if !foundMountPoint {
-		return configuration.Partition{}, fmt.Errorf("failed to find mount point with ID (%s)", partition.Id)
+		return configuration.Partition{}, fmt.Errorf("failed to find filesystem entry with ID (%s)", partition.Id)
 	}
 
 	imagerStart := partition.Start / diskutils.MiB
