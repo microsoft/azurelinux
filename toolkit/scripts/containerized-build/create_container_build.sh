@@ -230,16 +230,6 @@ sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
 sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
-# TODO: Remove when PMC is available for 3.0
-if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
-    cp resources/azl-3_repo $tmp_dir/azl-3_repo
-    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/azl-3_repo
-    if [[ $(uname -m) == "x86_64" ]]; then
-        sed -i "s~<ARCH>~x86-64~" $tmp_dir/azl-3_repo
-    else
-        sed -i "s~<ARCH>~aarch64~" $tmp_dir/azl-3_repo
-    fi
-fi
 
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/azl.Dockerfile"
