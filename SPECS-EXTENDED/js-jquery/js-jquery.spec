@@ -88,6 +88,7 @@ ln -s %{version} %{installdir}/%{ver_x}.%{ver_y}
 %changelog
 * Fri Aug 9 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.5.0-4
 - Patch CVE-2019-20149 in kind-of package.
+- License verified
 
 * Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.5.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
