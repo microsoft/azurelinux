@@ -155,7 +155,7 @@ VALIDATE_TOOLCHAIN_GPG ?= y
 endif
 endif
 
-TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(wildcard $(SPECS_DIR)/azurelinux-repos/MICROSOFT-*-GPG-KEY)$(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(wildcard $(SPECS_DIR)/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
 
 ######## COMMON MAKEFILE UTILITIES ########
 
