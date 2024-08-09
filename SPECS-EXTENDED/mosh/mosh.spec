@@ -8,7 +8,7 @@ Distribution:   Mariner
 License:	GPLv3+
 Group:		Applications/Internet
 URL:		https://mosh.org/
-Source0:	https://github.com/downloads/keithw/mosh/mosh-%{version}.tar.gz
+Source0:  https://github.com/mobile-shell/mosh/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  perl-diagnostics
 BuildRequires:	protobuf-compiler
