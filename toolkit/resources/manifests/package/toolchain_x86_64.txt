@@ -267,9 +267,9 @@ newt-0.52.21-5.cm2.x86_64.rpm
 newt-debuginfo-0.52.21-5.cm2.x86_64.rpm
 newt-devel-0.52.21-5.cm2.x86_64.rpm
 newt-lang-0.52.21-5.cm2.x86_64.rpm
-nghttp2-1.57.0-1.cm2.x86_64.rpm
-nghttp2-debuginfo-1.57.0-1.cm2.x86_64.rpm
-nghttp2-devel-1.57.0-1.cm2.x86_64.rpm
+nghttp2-1.61.0-1.cm2.x86_64.rpm
+nghttp2-debuginfo-1.61.0-1.cm2.x86_64.rpm
+nghttp2-devel-1.61.0-1.cm2.x86_64.rpm
 ninja-build-1.10.2-2.cm2.x86_64.rpm
 ninja-build-debuginfo-1.10.2-2.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
