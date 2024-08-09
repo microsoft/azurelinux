@@ -31,6 +31,11 @@ var (
 	PackageLookupNameMatchRegex = regexp.MustCompile(`([^:\s]+(x86_64|aarch64|noarch))\s*:[^\n]*\nRepo\s+:\s+[^@]`)
 	PackageNameIndex            = 1
 
+	// Tdnf may opt to ignore case when doing a provides lookup. While this is useful for a user, it will give
+	// bad results when we're trying to match a package name to a package in the repo. This regex will match the
+	// message that indicates that case-insensitive matching is enabled.
+	DidCaseInsensitiveMatchRegex = regexp.MustCompile(`\[ignoring case for '.*'\]`)
+
 	// Every line containing a repo ID will be of the form:
 	//		[<repo_name>]
 	// For:
