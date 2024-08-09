@@ -39,6 +39,8 @@ Python 3 version.
 
 %prep
 %autosetup -p1
+# Rename oss_setup.py to setup.py
+mv oss_setup.py setup.py
 
 %build
 %{py3_build}
