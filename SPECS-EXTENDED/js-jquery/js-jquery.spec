@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           js-jquery
 Version:        3.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        JavaScript DOM manipulation, event handling, and AJAX library
 BuildArch:      noarch
 
@@ -18,6 +18,8 @@ Source1:        jquery_%{version}_node_modules.tar.gz
 
 # disable gzip-js during build
 Patch1:         %{name}-disable-gzip-js.patch
+# Patch for CVE-2019-20149 in kind-of package https://github.com/jonschlinkert/kind-of/pull/31
+Patch2:         CVE-2019-20149.patch
 
 
 BuildRequires:  web-assets-devel
@@ -83,6 +85,9 @@ ln -s %{version} %{installdir}/%{ver_x}.%{ver_y}
 
 
 %changelog
+* Fri Aug 9 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.5.0-4
+- Patch CVE-2019-20149 in kind-of package.
+
 * Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.5.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add explicit build-time dependency on nodejs-devel
