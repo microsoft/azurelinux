@@ -11061,8 +11061,8 @@
         "type": "other",
         "other": {
           "name": "libtdb",
-          "version": "1.4.3",
-          "downloadUrl": "http://samba.org/ftp/tdb/tdb-1.4.3.tar.gz"
+          "version": "1.4.8",
+          "downloadUrl": "https://samba.org/ftp/tdb/tdb-1.4.8.tar.gz"
         }
       }
     },
