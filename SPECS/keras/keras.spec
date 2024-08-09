@@ -40,28 +40,11 @@ Python 3 version.
 %prep
 %autosetup -p1
 
-
 %build
-tar -xf %{SOURCE1} -C /root/
-
-ln -s %{_bindir}/python3 %{_bindir}/python
-
-bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_package
-# ---------
-# steps to create the cache tar. network connection is required to create the cache.
-#----------------------------------
-# pushd /root
-# tar -czvf cacheroot.tar.gz .cache  #creating the cache using the /root/.cache directory
-# popd
-# mv /root/cacheroot.tar.gz /usr/
-
-./bazel-bin/keras/tools/pip_package/build_pip_package pyproject-wheeldir/
-# --------
-
+%{py3_build}
 
 %install
 %{pyproject_install}
-
 
 %files -n python3-keras
 %license LICENSE
@@ -69,7 +52,7 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 
 %changelog
-* Fri Aug 8 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.13.1-1
+* Fri Aug 9 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.13.1-1
 - Update keras package to version 2.13.1.
 - Fix for CVE-2024-3660
 
