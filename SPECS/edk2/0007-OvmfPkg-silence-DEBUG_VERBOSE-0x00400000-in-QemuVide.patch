@@ -1,4 +1,4 @@
-From 30281eef6f03c852019e0d5c07429904815cac4e Mon Sep 17 00:00:00 2001
+From 1db7854d3e618d42b429aefd7ac397478e5a1ef9 Mon Sep 17 00:00:00 2001
 From: Paolo Bonzini <pbonzini@redhat.com>
 Date: Tue, 21 Nov 2017 00:57:46 +0100
 Subject: [PATCH 07/17] OvmfPkg: silence DEBUG_VERBOSE (0x00400000) in
@@ -82,7 +82,7 @@ Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
  4 files changed, 32 insertions(+), 8 deletions(-)
 
 diff --git a/OvmfPkg/AmdSev/AmdSevX64.dsc b/OvmfPkg/AmdSev/AmdSevX64.dsc
-index 62d5b7d2c426..ce320efb735e 100644
+index 9bf06a17f3d2..f87c1eb00186 100644
 --- a/OvmfPkg/AmdSev/AmdSevX64.dsc
 +++ b/OvmfPkg/AmdSev/AmdSevX64.dsc
 @@ -691,8 +691,14 @@ [Components]
@@ -103,10 +103,10 @@ index 62d5b7d2c426..ce320efb735e 100644
  
    #
 diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index ae3b446ff277..7e07fbfd469e 100644
+index 63a1c0f393b5..d7184a248df2 100644
 --- a/OvmfPkg/OvmfPkgIa32.dsc
 +++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -828,8 +828,14 @@ [Components]
+@@ -829,8 +829,14 @@ [Components]
    MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
    MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
@@ -121,13 +121,13 @@ index ae3b446ff277..7e07fbfd469e 100644
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
    OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+   OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
  
-   #
 diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index 4a547f28c0c5..f28c71a7a8bf 100644
+index 73f69272a75e..47e580fede51 100644
 --- a/OvmfPkg/OvmfPkgIa32X64.dsc
 +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -842,8 +842,14 @@ [Components.X64]
+@@ -843,8 +843,14 @@ [Components.X64]
    MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
    MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
@@ -142,13 +142,13 @@ index 4a547f28c0c5..f28c71a7a8bf 100644
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
    OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+   OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
  
-   #
 diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index 68bd1f6dcb15..680bdb5f4c02 100644
+index 1d1f2651b9b3..d68b61e2e6b9 100644
 --- a/OvmfPkg/OvmfPkgX64.dsc
 +++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -910,8 +910,14 @@ [Components]
+@@ -911,8 +911,14 @@ [Components]
    MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
    MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
@@ -163,8 +163,8 @@ index 68bd1f6dcb15..680bdb5f4c02 100644
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
    OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+   OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
  
-   #
 -- 
-2.43.1
+2.45.0
 

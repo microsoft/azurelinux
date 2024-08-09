@@ -705,7 +705,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 		return fmt.Errorf("failed to initialize chroot object for %s:\n%w", rootfsSourceDir, err)
 	}
 
-	requiredRpms := []string{"squashfs-tools", "tar", "device-mapper"}
+	requiredRpms := []string{"squashfs-tools", "tar", "device-mapper", "curl"}
 	for _, requiredRpm := range requiredRpms {
 		logger.Log.Debugf("Checking if (%s) is installed", requiredRpm)
 		if !isPackageInstalled(chroot, requiredRpm) {

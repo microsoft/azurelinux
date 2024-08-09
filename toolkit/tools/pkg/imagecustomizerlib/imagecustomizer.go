@@ -503,10 +503,6 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	return nil
 }
 
-func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Storage != nil
-}
-
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
 	var aggregateErr error
 	for sourceFile := range additionalFiles {
@@ -658,7 +654,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
+	err = doOsCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
 
 	// Out of disk space errors can be difficult to diagnose.
@@ -920,10 +916,10 @@ func checkEnvironmentVars() error {
 	envHome := os.Getenv("HOME")
 	envUser := os.Getenv("USER")
 
-	if envHome != rootHome || envUser != rootUser {
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
 		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
-			"HOME must be set to '%s' and USER must be set to '%s'",
-			rootHome, rootUser)
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
 	}
 
 	return nil
