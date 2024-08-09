@@ -5,3 +5,16 @@ toolkit/docs/** linguist-documentation
 LICENSES-AND-NOTICES/** linguist-documentation
 LICENSES-AND-NOTICES/SPECS/** linguist-documentation
 LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md linguist-generated
+
+# set line endigs of the type of files
+*           text=auto
+*.txt       text
+*.sh        text eol=lf
+*.nopatch   text eol=lf
+*.patch     text eol=lf
+*.spec      text eol=lf
+*.go        text eol=lf
+*.py        text eol=lf
+*.md        text eol=lf
+*.mk        text eol=lf
+*.json      text eol=lf
