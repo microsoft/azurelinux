@@ -47,7 +47,7 @@ browsers. With a combination of versatility and extensibility, jQuery has
 changed the way that millions of people write JavaScript.
 
 %prep
-%setup -n jquery-%{version} -v
+%setup -n jquery-%{version}
 %patch1 -p1
 
 #remove precompiled stuff
