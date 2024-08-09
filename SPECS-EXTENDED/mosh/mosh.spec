@@ -62,7 +62,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %changelog
 * Fri Apr 26 2024 Andy Zaugg <azaugg@linkedin.com> - 1.4.0-1
 - Update to mosh 1.4.0
-- Initial CBL-Mariner import from mosh upstream (license: GPLv3).
+- Initial CBL-Mariner import from Mosh source (license: GPLv3).
 - License verified
 
 * Sun Jul 12 2015 John Hood <cgull@glup.org> - 1.2.5-1
