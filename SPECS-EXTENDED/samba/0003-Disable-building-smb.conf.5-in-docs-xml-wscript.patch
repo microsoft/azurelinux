@@ -1,0 +1,25 @@
+From c6d32a54404f4bd7c39eb056999fe61ddabd3413 Mon Sep 17 00:00:00 2001
+From: Sindhu Karri <lakarri@microsoft.com>
+Date: Fri, 9 Aug 2024 06:15:12 +0000
+Subject: [PATCH] Disable building smb.conf.5 in docs-xml wscript
+
+---
+ docs-xml/wscript_build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs-xml/wscript_build b/docs-xml/wscript_build
+index 40f5514..d0c1830 100644
+--- a/docs-xml/wscript_build
++++ b/docs-xml/wscript_build
+@@ -183,7 +183,7 @@ def SMBDOTCONF_MANPAGE(bld, target):
+ 
+ if ('XSLTPROC_MANPAGES' in bld.env and bld.env['XSLTPROC_MANPAGES']):
+ 
+-    SMBDOTCONF_MANPAGE(bld, 'manpages/smb.conf.5')
++#    SMBDOTCONF_MANPAGE(bld, 'manpages/smb.conf.5')
+     bld.SAMBAMANPAGES(manpages)
+ 
+     if bld.CONFIG_SET('WITH_PAM_MODULES') and bld.CONFIG_SET('HAVE_PAM_START'):
+-- 
+2.33.8
+

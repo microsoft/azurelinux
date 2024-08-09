@@ -8,10 +8,10 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define talloc_version 2.3.1
-%define tdb_version 1.4.3
-%define tevent_version 0.10.2
-%define ldb_version 2.1.4
+%define talloc_version 2.4.0
+%define tdb_version 1.4.8
+%define tevent_version 0.14.1
+%define ldb_version 2.7.2
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -47,7 +47,7 @@
 #endif rhel
 %endif
 
-%global libwbc_alternatives_version 0.15
+%global libwbc_alternatives_version 0.16
 %global libwbc_alternatives_suffix %nil
 %if 0%{?__isa_bits} == 64
 %global libwbc_alternatives_suffix -64
@@ -84,8 +84,8 @@
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
 Name:           samba
-Version:        4.12.5
-Release:        5%{?dist}
+Version:        4.18.3
+Release:        1%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -99,7 +99,7 @@ URL:            https://www.samba.org
 # This is a xz recompressed file of https://ftp.samba.org/pub/samba/samba-%%{version}%%{pre_release}.tar.gz
 Source0:        https://ftp.samba.org/pub/samba/stable/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
 Source1:        https://ftp.samba.org/pub/samba/stable/samba-%{version}%{pre_release}.tar.asc
-Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
+# Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
 
 # Red Hat specific replacement-files
 Source10:       samba.logrotate
@@ -109,6 +109,9 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
+
+# Patch0:         0002-Disable-building-manpages-in-wscript.patch
+Patch0:         0003-Disable-building-smb.conf.5-in-docs-xml-wscript.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -168,6 +171,7 @@ BuildRequires: libcmocka-devel
 BuildRequires: libnsl2-devel
 BuildRequires: libtirpc-devel
 BuildRequires: libuuid-devel
+BuildRequires: libxslt
 BuildRequires: lmdb
 %if %{with_winexe}
 BuildRequires: mingw32-gcc
@@ -796,7 +800,7 @@ and use CTDB instead.
 
 
 %prep
-xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
+# xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n samba-%{version}%{pre_release} -p1
 
 %build
@@ -966,9 +970,9 @@ install -m 0644 ctdb/config/ctdb.conf %{buildroot}%{_sysconfdir}/ctdb/ctdb.conf
 
 install -m 0644 %{SOURCE201} packaging/README.downgrade
 
-%if %with_clustering_support
-install -m 0644 ctdb/config/ctdb.service %{buildroot}%{_unitdir}
-%endif
+# %if %with_clustering_support
+# install -m 0644 ctdb/config/ctdb.service %{buildroot}%{_unitdir}
+# %endif
 
 # NetworkManager online/offline script
 install -d -m 0755 %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d/
@@ -1328,9 +1332,9 @@ fi
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool
 %{_bindir}/dumpmscat
-%{_bindir}/findsmb
+# %{_bindir}/findsmb
 %{_bindir}/mvxattr
-%{_bindir}/mdfind
+# %{_bindir}/mdfind
 %{_bindir}/nmblookup
 %{_bindir}/oLschema2ldif
 %{_bindir}/regdiff
@@ -3436,6 +3440,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 08 2024 Sindhu Karri <lakarri@microsoft.com> - 4.18.3-1
+- Upgrade samba to build with Python 3.12
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
 - Fix build issue for systemd/systemd-bootstrap confusion
 - License verified

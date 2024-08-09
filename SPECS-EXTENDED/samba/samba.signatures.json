@@ -1,10 +1,9 @@
 {
  "Signatures": {
   "README.downgrade": "6d35f69e43eb241e578e886bcc9f915d40c09687a1060ffec71112eed045058e",
-  "gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg": "8542aaa6de25e0905fbf68f0e8d8e3215812a4fb147c2fd02819ac92893e2690",
   "pam_winbind.conf": "afbb96ebf172dd2cc4e3c2ae13958ebadcb1d5b4c1d70e4e608014eeeae70347",
-  "samba-4.12.5.tar.asc": "8a7ec27ba3c51f9d5dd300cb2b772faf41d8fe27d1f1be02d96d89866c794960",
-  "samba-4.12.5.tar.xz": "fae2861fcaa76a955b1a3b21c8bbf16423dbbd93b7eadb58e94759a1a00ca3be",
+  "samba-4.18.3.tar.asc": "3980205420c6f3daf9ea052676ea49d55f4cc16648ac52cbc165e3f98423f973",
+  "samba-4.18.3.tar.xz": "26fceff620e2673c516ee209ceacd50377d146d1c1fbf7f8524b43da0614caad",
   "samba.logrotate": "f604fd7e23b83e87da346e11f8d34e9840f89ec62ebd77814cbd69884125d5b5",
   "samba.pamd": "adf2c510d4218ac0b3f72898cfe4097c0d1c9836da2b0237929af6bf4619ea84",
   "smb.conf.example": "5064e01653b98f8456fb749c4e24f454287a9266a3d19fb7c2b03c1d2f1a3f7c",
