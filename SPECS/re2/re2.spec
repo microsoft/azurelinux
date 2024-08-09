@@ -4,7 +4,7 @@
 Summary:        C++ fast alternative to backtracking RE engines
 Name:           re2
 Version:        %{shortver}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,7 +13,7 @@ Source0:        https://github.com/google/%{name}/archive/refs/tags/%{longver}.t
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  cmake
-BuildRequires:  abseil-cpp-devel
+BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 %if 0%{?with_check}
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
@@ -83,6 +83,9 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 %{_libdir}/cmake/re2/*.cmake
 
 %changelog
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 20240201-3
+- Bump release to rebuild with latest 'abseil-cpp'.
+
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 20240201-2
 - Bumping release to rebuild with latest 'abseil-cpp'.
 
