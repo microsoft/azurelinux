@@ -2,15 +2,14 @@
 %global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
-Version:        2.11.0
-Release:        3%{?dist}
+Version:        2.13.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
 BuildRequires:  bazel
 BuildRequires:  build-essential
 BuildRequires:  git
@@ -70,6 +69,10 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 
 %changelog
+* Fri Aug 8 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.13.1-1
+- Update keras package to version 2.13.1.
+- Fix for CVE-2024-3660
+
 * Fri May 24 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-3
 - Explicitly BR python3-h5py.
 
