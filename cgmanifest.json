@@ -9841,8 +9841,8 @@
         "type": "other",
         "other": {
           "name": "libldb",
-          "version": "2.1.4",
-          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.1.4.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.7.2.tar.gz"
         }
       }
     },
