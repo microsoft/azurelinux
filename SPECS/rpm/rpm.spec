@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,7 @@ Requires:       libarchive
 Requires:       libselinux
 Requires:       lua-libs
 Requires:       rpm-libs = %{version}-%{release}
+Requires:       selinux-policy
 
 %description
 RPM package manager
@@ -266,6 +267,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jul 08 2024 Andy Zaugg <azaugg@linkedin.com> - 4.18.2-2
+- Adding selinux-policy as a dependency, needed for selabel_open file_contexts
+
 * Fri Mar 22 2024 Sam Meluch <sammeluch@microsoft.com> - 4.18.2-1
 - Upgrade rpm to version 4.18.2
 
