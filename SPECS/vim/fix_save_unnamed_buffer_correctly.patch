@@ -1,8 +1,11 @@
-From 4b8d5ed092391d927b4bc6ac731c743ee2255886 Mon Sep 17 00:00:00 2001
-From: Sumynwa <sumedh.alok@gmail.com>
-Date: Fri, 9 Aug 2024 13:26:00 +0530
-Subject: [PATCH] fix
+From 3c8cfa2245104ce4cb2ad3f40783aa6da6f3adde Mon Sep 17 00:00:00 2001
+From: glepnir <glephunter@gmail.com>
+Date: Tue, 2 Apr 2024 15:40:38 +0800
+Subject: [PATCH] fix(dialog): save unamed buffer correctly
 
+Problem: when bufname is empty it can not save correctly
+
+Solution: set bufname before save.
 ---
  src/ex_cmds2.c | 23 ++++++++++++++++++++---
  1 file changed, 20 insertions(+), 3 deletions(-)
