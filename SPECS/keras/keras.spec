@@ -10,7 +10,6 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
 BuildRequires:  bazel
 BuildRequires:  build-essential
 BuildRequires:  git
