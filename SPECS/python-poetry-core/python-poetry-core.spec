@@ -7,7 +7,7 @@ projects.}
 Summary:        Poetry PEP 517 Build Backend
 Name:           python-poetry-core
 Version:        1.9.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 # SPDX
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -31,6 +31,10 @@ BuildArch:      noarch
 Summary:        %{summary}
 # Previous versions of poetry included poetry-core in it
 Conflicts:      python%{python3_version}dist(poetry) < 1.1
+
+Requires:       python3-fastjsonschema
+Requires:       python3-lark
+Requires:       python3-packaging
 
 %description -n python3-poetry-core %{_description}
 
@@ -56,6 +60,9 @@ rm -r src/poetry/core/_vendor
 %license LICENSE
 
 %changelog
+* Tue Aug 06 2024 Devin Anderson <danderson@microsoft.com> - 1.9.0-4
+- Declare missing runtime dependencies.
+
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.9.0-1
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License Verified
