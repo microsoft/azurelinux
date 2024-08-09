@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        2%{?dist}
+Release:        3%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -31,7 +31,6 @@ Source10:       00-xen.conf
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
 Patch:          0002-disable-xattr.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
-Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
@@ -277,6 +276,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Thu Aug 08 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-3
+- Drop 0007-feat-dracut.sh-support-multiple-config-dirs.patch
+
 * Tue Aug 06 2024 Thien Trung Vuong <tvuong@microsoft.com> - 102-2
 - Add fix for initrd not showing prompt when root device is locked
 
