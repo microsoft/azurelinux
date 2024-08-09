@@ -48,14 +48,14 @@ changed the way that millions of people write JavaScript.
 
 %prep
 %setup -n jquery-%{version}
-%patch1 -p1
+%patch 1 -p1
 
 #remove precompiled stuff
 rm -rf dist/*
 
 # Install the cached node modules
 tar xf %{SOURCE1}
-%patch2 -p1
+%patch 2 -p1
 
 %build
 ./node_modules/grunt-cli/bin/grunt -v 'build:*:*' uglify
