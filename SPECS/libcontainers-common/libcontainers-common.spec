@@ -53,6 +53,7 @@ Patch2:         CVE-2024-1753.patch
 Patch3:         CVE-2024-3727.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch4:         CVE-2024-37298.patch
+Patch5:         CVE-2024-6104.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -78,6 +79,7 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 2 -p1
 %patch 3 -p1
 %patch 4 -p1
+%patch 5 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1

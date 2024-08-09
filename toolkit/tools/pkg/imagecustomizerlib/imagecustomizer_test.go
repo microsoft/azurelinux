@@ -35,6 +35,14 @@ var (
 			FileSystemType: "vfat",
 		},
 	}
+
+	coreLegacyMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+	}
 )
 
 func TestCustomizeImageEmptyConfig(t *testing.T) {
