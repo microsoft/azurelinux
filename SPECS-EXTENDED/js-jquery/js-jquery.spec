@@ -47,14 +47,15 @@ browsers. With a combination of versatility and extensibility, jQuery has
 changed the way that millions of people write JavaScript.
 
 %prep
-%autosetup -n jquery-%{version} -v -p1
+%setup -n jquery-%{version} -v
+%patch1 -p1
 
 #remove precompiled stuff
 rm -rf dist/*
 
 # Install the cached node modules
 tar xf %{SOURCE1}
-
+%patch2 -p1
 
 %build
 ./node_modules/grunt-cli/bin/grunt -v 'build:*:*' uglify
