@@ -41,9 +41,13 @@ Python 3 version.
 %autosetup -p1
 # Rename oss_setup.py to setup.py
 mv oss_setup.py setup.py
+sed -i "s/^PACKAGE\s*=.*$/PACKAGE = '%{name}'/" setup.py
+sed -i "s/^VERSION\s*=.*$/VERSION = '%{version}'/" setup.py
+
 
 %build
 %{py3_build}
+#python3 pip_build.py
 
 %install
 %{pyproject_install}
