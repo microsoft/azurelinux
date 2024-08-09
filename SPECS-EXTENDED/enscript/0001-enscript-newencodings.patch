@@ -1556,7 +1556,7 @@ diff -up enscript-1.6.6/afm/tib.afm.newencodings enscript-1.6.6/afm/tib.afm
  Ascender 676
  Descender -205
 -StartCharMetrics 228
-+StartCharMetrics 229
++StartCharMetrics 229
  C 32 ; WX 250 ; N space ; B 0 0 0 0 ;
  C 33 ; WX 333 ; N exclam ; B 81 -13 251 691 ;
  C 34 ; WX 555 ; N quotedbl ; B 83 404 472 691 ;
@@ -1564,7 +1564,7 @@ diff -up enscript-1.6.6/afm/tib.afm.newencodings enscript-1.6.6/afm/tib.afm
  C -1 ; WX 300 ; N twosuperior ; B 0 275 300 688 ;
  C -1 ; WX 444 ; N eacute ; B 25 -14 426 713 ;
  C -1 ; WX 500 ; N otilde ; B 25 -14 476 674 ;
-+C -1 ; WX 944 ; N Euro ; B 14 0 921 676 ;
++C -1 ; WX 944 ; N Euro ; B 14 0 921 676 ;
  C -1 ; WX 722 ; N Aacute ; B 9 0 689 923 ;
  C -1 ; WX 500 ; N ocircumflex ; B 25 -14 476 704 ;
  C -1 ; WX 500 ; N yacute ; B 16 -205 480 713 ;
@@ -1573,7 +1573,7 @@ diff -up enscript-1.6.6/afm/tib.afm.newencodings enscript-1.6.6/afm/tib.afm
  EndKernPairs
  EndKernData
 -StartComposites 58
-+StartComposites 59
++StartComposites 59
  CC Aacute 2 ; PCC A 0 0 ; PCC acute 188 210 ;
  CC Acircumflex 2 ; PCC A 0 0 ; PCC circumflex 188 210 ;
  CC Adieresis 2 ; PCC A 0 0 ; PCC dieresis 188 210 ;
@@ -1581,7 +1581,7 @@ diff -up enscript-1.6.6/afm/tib.afm.newencodings enscript-1.6.6/afm/tib.afm
  CC odieresis 2 ; PCC o 0 0 ; PCC dieresis 84 0 ;
  CC ograve 2 ; PCC o 0 0 ; PCC grave 84 0 ;
  CC otilde 2 ; PCC o 0 0 ; PCC tilde 84 0 ;
-+CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
++CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
  CC scaron 2 ; PCC s 0 0 ; PCC caron 28 0 ;
  CC uacute 2 ; PCC u 0 0 ; PCC acute 105 0 ;
  CC ucircumflex 2 ; PCC u 0 0 ; PCC circumflex 105 0 ;
@@ -1599,7 +1599,7 @@ diff -up enscript-1.6.6/afm/tibi.afm.newencodings enscript-1.6.6/afm/tibi.afm
  Ascender 699
  Descender -205
 -StartCharMetrics 228
-+StartCharMetrics 229
++StartCharMetrics 229
  C 32 ; WX 250 ; N space ; B 0 0 0 0 ;
  C 33 ; WX 389 ; N exclam ; B 67 -13 370 684 ;
  C 34 ; WX 555 ; N quotedbl ; B 136 398 536 685 ;
@@ -1607,7 +1607,7 @@ diff -up enscript-1.6.6/afm/tibi.afm.newencodings enscript-1.6.6/afm/tibi.afm
  C -1 ; WX 300 ; N twosuperior ; B 2 274 313 683 ;
  C -1 ; WX 444 ; N eacute ; B 5 -13 435 697 ;
  C -1 ; WX 500 ; N otilde ; B -3 -13 491 655 ;
-+C -1 ; WX 889 ; N Euro ; B -29 -12 917 669 ;
++C -1 ; WX 889 ; N Euro ; B -29 -12 917 669 ;
  C -1 ; WX 667 ; N Aacute ; B -67 0 593 904 ;
  C -1 ; WX 500 ; N ocircumflex ; B -3 -13 451 690 ;
  C -1 ; WX 444 ; N yacute ; B -94 -205 435 697 ;
@@ -1616,7 +1616,7 @@ diff -up enscript-1.6.6/afm/tibi.afm.newencodings enscript-1.6.6/afm/tibi.afm
  EndKernPairs
  EndKernData
 -StartComposites 58
-+StartComposites 59
++StartComposites 59
  CC Aacute 2 ; PCC A 0 0 ; PCC acute 172 207 ;
  CC Acircumflex 2 ; PCC A 0 0 ; PCC circumflex 187 207 ;
  CC Adieresis 2 ; PCC A 0 0 ; PCC dieresis 167 207 ;
@@ -1624,7 +1624,7 @@ diff -up enscript-1.6.6/afm/tibi.afm.newencodings enscript-1.6.6/afm/tibi.afm
  CC odieresis 2 ; PCC o 0 0 ; PCC dieresis 69 0 ;
  CC ograve 2 ; PCC o 0 0 ; PCC grave 74 0 ;
  CC otilde 2 ; PCC o 0 0 ; PCC tilde 84 0 ;
-+CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
++CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
  CC scaron 2 ; PCC s 0 0 ; PCC caron 28 0 ;
  CC uacute 2 ; PCC u 0 0 ; PCC acute 112 0 ;
  CC ucircumflex 2 ; PCC u 0 0 ; PCC circumflex 112 0 ;
@@ -1642,7 +1642,7 @@ diff -up enscript-1.6.6/afm/tii.afm.newencodings enscript-1.6.6/afm/tii.afm
  Ascender 683
  Descender -205
 -StartCharMetrics 228
-+StartCharMetrics 229
++StartCharMetrics 229
  C 32 ; WX 250 ; N space ; B 0 0 0 0 ;
  C 33 ; WX 333 ; N exclam ; B 39 -11 302 667 ;
  C 34 ; WX 420 ; N quotedbl ; B 144 421 432 666 ;
@@ -1650,7 +1650,7 @@ diff -up enscript-1.6.6/afm/tii.afm.newencodings enscript-1.6.6/afm/tii.afm
  C -1 ; WX 300 ; N twosuperior ; B 33 271 324 676 ;
  C -1 ; WX 444 ; N eacute ; B 31 -11 459 664 ;
  C -1 ; WX 500 ; N otilde ; B 27 -11 496 624 ;
-+C -1 ; WX 833 ; N Euro ; B -18 0 873 653 ;
++C -1 ; WX 833 ; N Euro ; B -18 0 873 653 ;
  C -1 ; WX 611 ; N Aacute ; B -51 0 564 876 ;
  C -1 ; WX 500 ; N ocircumflex ; B 27 -11 468 661 ;
  C -1 ; WX 444 ; N yacute ; B -24 -206 459 664 ;
@@ -1659,7 +1659,7 @@ diff -up enscript-1.6.6/afm/tii.afm.newencodings enscript-1.6.6/afm/tii.afm
  EndKernPairs
  EndKernData
 -StartComposites 58
-+StartComposites 59
++StartComposites 59
  CC Aacute 2 ; PCC A 0 0 ; PCC acute 139 212 ;
  CC Acircumflex 2 ; PCC A 0 0 ; PCC circumflex 144 212 ;
  CC Adieresis 2 ; PCC A 0 0 ; PCC dieresis 139 212 ;
@@ -1667,7 +1667,7 @@ diff -up enscript-1.6.6/afm/tii.afm.newencodings enscript-1.6.6/afm/tii.afm
  CC odieresis 2 ; PCC o 0 0 ; PCC dieresis 84 0 ;
  CC ograve 2 ; PCC o 0 0 ; PCC grave 84 0 ;
  CC otilde 2 ; PCC o 0 0 ; PCC tilde 69 0 ;
-+CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
++CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
  CC scaron 2 ; PCC s 0 0 ; PCC caron 28 0 ;
  CC uacute 2 ; PCC u 0 0 ; PCC acute 74 0 ;
  CC ucircumflex 2 ; PCC u 0 0 ; PCC circumflex 74 0 ;
@@ -1685,7 +1685,7 @@ diff -up enscript-1.6.6/afm/tir.afm.newencodings enscript-1.6.6/afm/tir.afm
  Ascender 683
  Descender -217
 -StartCharMetrics 228
-+StartCharMetrics 229
++StartCharMetrics 229
  C 32 ; WX 250 ; N space ; B 0 0 0 0 ;
  C 33 ; WX 333 ; N exclam ; B 130 -9 238 676 ;
  C 34 ; WX 408 ; N quotedbl ; B 77 431 331 676 ;
@@ -1693,7 +1693,7 @@ diff -up enscript-1.6.6/afm/tir.afm.newencodings enscript-1.6.6/afm/tir.afm
  C -1 ; WX 300 ; N twosuperior ; B 1 270 296 676 ;
  C -1 ; WX 444 ; N eacute ; B 25 -10 424 678 ;
  C -1 ; WX 500 ; N otilde ; B 29 -10 470 638 ;
-+C -1 ; WX 889 ; N Euro ; B 12 0 863 662 ;
++C -1 ; WX 889 ; N Euro ; B 12 0 863 662 ;
  C -1 ; WX 722 ; N Aacute ; B 15 0 706 890 ;
  C -1 ; WX 500 ; N ocircumflex ; B 29 -10 470 674 ;
  C -1 ; WX 500 ; N yacute ; B 14 -218 475 678 ;
@@ -1702,7 +1702,7 @@ diff -up enscript-1.6.6/afm/tir.afm.newencodings enscript-1.6.6/afm/tir.afm
  EndKernPairs
  EndKernData
 -StartComposites 58
-+StartComposites 59
++StartComposites 59
  CC Aacute 2 ; PCC A 0 0 ; PCC acute 195 212 ;
  CC Acircumflex 2 ; PCC A 0 0 ; PCC circumflex 195 212 ;
  CC Adieresis 2 ; PCC A 0 0 ; PCC dieresis 195 212 ;
@@ -1710,7 +1710,7 @@ diff -up enscript-1.6.6/afm/tir.afm.newencodings enscript-1.6.6/afm/tir.afm
  CC odieresis 2 ; PCC o 0 0 ; PCC dieresis 84 0 ;
  CC ograve 2 ; PCC o 0 0 ; PCC grave 84 0 ;
  CC otilde 2 ; PCC o 0 0 ; PCC tilde 84 0 ;
-+CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
++CC Euro 2 ; PCC C 0 0 ; PCC equal 0 0 ;
  CC scaron 2 ; PCC s 0 0 ; PCC caron 28 0 ;
  CC uacute 2 ; PCC u 0 0 ; PCC acute 84 0 ;
  CC ucircumflex 2 ; PCC u 0 0 ; PCC circumflex 84 0 ;
