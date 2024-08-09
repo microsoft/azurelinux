@@ -11,6 +11,7 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "CentOS":                         r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
     "Ceph source":                    r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
     "Debian":                         r'\n-\s+Initial CBL-Mariner import from Debian source package \(license: MIT\)(\.|\n|$)',
+    "Mosh source":                    r'\n-\s+Initial CBL-Mariner import from Mosh source \(license: GPLv3\)(\.|\n|$)',
     "Netplan source":                 r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
     "Fedora":                         r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
     "Fedora (Copyright Remi Collet)": r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: CC-BY-SA\)(\.|\n|$)',
