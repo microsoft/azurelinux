@@ -41,8 +41,11 @@ ncurses-libs-6.4-2.azl3.aarch64.rpm
 ncurses-term-6.4-2.azl3.aarch64.rpm
 readline-8.2-1.azl3.aarch64.rpm
 readline-devel-8.2-1.azl3.aarch64.rpm
-coreutils-9.4-5.azl3.aarch64.rpm
-coreutils-lang-9.4-5.azl3.aarch64.rpm
+libattr-2.5.2-1.azl3.aarch64.rpm
+attr-2.5.2-1.azl3.aarch64.rpm
+libacl-2.3.1-2.azl3.aarch64.rpm
+coreutils-9.4-6.azl3.aarch64.rpm
+coreutils-lang-9.4-6.azl3.aarch64.rpm
 bash-5.2.15-2.azl3.aarch64.rpm
 bash-devel-5.2.15-2.azl3.aarch64.rpm
 bash-lang-5.2.15-2.azl3.aarch64.rpm
