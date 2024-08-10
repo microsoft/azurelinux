@@ -1,21 +1,21 @@
 Summary:        Basic system utilities; reimplemented in Rust
-Name:	        rust-coreutils
-Version:	    0.0.26
+Name:           rust-coreutils
+Version:        0.0.26
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/uutils/coreutils
-Source0: 	    %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a automatically created tarball with no download link.
-Source1:	    rust-coreutils-0.0.26-vendored.tar.gz
+Source1:        rust-coreutils-0.0.26-vendored.tar.gz
 Source2:        cargo_config.toml
 
 
 BuildRequires:  cargo
 BuildRequires:  gcc
 BuildRequires:  glibc
-Conflicts:  coreutils
+Conflicts:      coreutils
 
 %description
 This package provides the reimplementation of the GNU core utilities in Rust.
@@ -142,6 +142,7 @@ popd
 %{_bindir}/yes
 
 %changelog 
-* Fri May 31 2024 Antonio Salinas t-ansalinas@microsoft.com - 0.0.26
-    - Intgrated Rust implementation of GNU coreutils.
+* Fri May 31 2024 Antonio Salinas <t-ansalinas@microsoft.com> - 0.0.26-1
+- Intgrated Rust implementation of GNU coreutils.
+- Original version for Azure Linux (license: MIT)
 
