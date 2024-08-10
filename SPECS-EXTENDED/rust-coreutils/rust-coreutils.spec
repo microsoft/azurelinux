@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/uutils/coreutils
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a automatically created tarball with no download link.
 Source1:        rust-coreutils-0.0.26-vendored.tar.gz
 Source2:        cargo_config.toml

@@ -26963,6 +26963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rust-coreutils",
+          "version": "0.0.26",
+          "downloadUrl": "https://github.com/uutils/coreutils/archive/refs/tags/0.0.26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rust-packaging",
           "version": "14",
           "downloadUrl": "https://releases.pagure.org/fedora-rust/rust2rpm/rust2rpm-14.tar.xz"
