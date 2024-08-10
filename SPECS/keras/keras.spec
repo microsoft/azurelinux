@@ -45,11 +45,11 @@ sed -i "s/name=\"{{PACKAGE}}\"/name=\"%{name}\"/" oss_setup.py
 sed -i "s/version=\"{{VERSION}}\"/version=\"%{version}\"/" oss_setup.py
 
 # Rename oss_setup.py to setup.py
-mv oss_setup.py setup.py
+cp oss_setup.py setup.py
 
 %build
-#%{py3_build}
-python3 pip_build.py
+%{py3_build}
+#python3 pip_build.py
 
 %install
 %{pyproject_install}
