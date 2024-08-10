@@ -7,7 +7,6 @@ License:	GPL-2.0-or-later
 URL:		https://github.com/ColinIanKing/stress-ng
 Source0:	https://github.com/ColinIanKing/stress-ng/archive/V%{version}/%{name}-%{version}.tar.gz
 # darn is not supported in Power ISA < 3.0, while Fedora aims for Power ISA 2.07
-Patch0:     0_18_01-poewrpc-remove-darn.patch
 
 BuildRequires:	make
 BuildRequires:	gcc
@@ -55,6 +54,7 @@ install -pm 644 bash-completion/%{name} \
 
 %changelog
 * Sat Aug 10 2024 Chris Co <chrco@microsoft.com> - 0.18.02-2
+- Drop powerpc patch since Azure Linux does not support powerpc
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
