@@ -47,9 +47,6 @@ sed -i "s/version=\"{{VERSION}}\"/version=\"%{version}\"/" oss_setup.py
 # Rename oss_setup.py to setup.py
 mv oss_setup.py setup.py
 
-# Download and set up Bazel 5.4.0
-cd "/usr/bin" && curl -fLO https://releases.bazel.build/5.4.0/release/bazel-5.4.0-linux-x86_64 && chmod +x bazel-5.4.0-linux-x86_64
-
 %build
 #%{py3_build}
 python3 pip_build.py
