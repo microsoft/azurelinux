@@ -1,7 +1,7 @@
 Summary:        Basic system utilities; reimplemented in Rust
 Name:           rust-coreutils
 Version:        0.0.26
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,7 +142,9 @@ popd
 %{_bindir}/yes
 
 %changelog 
+* Sat Aug 10 2024 Chris Co <chrco@microsoft.com> - 0.0.26-2
+- Original version for Azure Linux (license: MIT)
+- License verified
+
 * Fri May 31 2024 Antonio Salinas <t-ansalinas@microsoft.com> - 0.0.26-1
 - Intgrated Rust implementation of GNU coreutils.
-- Original version for Azure Linux (license: MIT)
-
