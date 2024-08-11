@@ -37,7 +37,7 @@ Mosh is a remote terminal application that supports:
 
 
 %build
-%configure --disable-silent-rules
+%configure --disable-silent-rules CC=gcc CXX=g++
 %make_build
 
 
