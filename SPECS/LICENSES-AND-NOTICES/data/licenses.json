@@ -909,6 +909,7 @@
                 "mod_wsgi",
                 "mokutil",
                 "moreutils",
+                "mosh",
                 "mpage",
                 "mrtg",
                 "mstflint",
@@ -2425,12 +2426,6 @@
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"
-            ]
-        },
-        "Mosh source": {
-            "license": "[GPLv3](https://github.com/mobile-shell/mosh/blob/master/COPYING)",
-            "specs": [
-                "mosh"
             ]
         },
         "Netplan source": {
