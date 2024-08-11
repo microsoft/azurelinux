@@ -21384,8 +21384,8 @@
         "type": "other",
         "other": {
           "name": "poetry",
-          "version": "1.0.10",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/poetry/poetry-1.0.10.tar.gz"
+          "version": "1.8.3",
+          "downloadUrl": "https://github.com/python-poetry/poetry/archive/refs/tags/1.8.3.tar.gz"
         }
       }
     },
@@ -22633,6 +22633,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-fastjsonschema",
+          "version": "2.19.1",
+          "downloadUrl": "https://github.com/horejsek/python-fastjsonschema/archive/v2.19.1/python-fastjsonschema-2.19.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-fields",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/ionelmc/python-fields/archive/v5.0.0/python-fields-5.0.0.tar.gz"
@@ -23183,6 +23193,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-lark",
+          "version": "1.1.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/lark/lark-1.1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-lazy-object-proxy",
           "version": "1.4.3",
           "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.4.3/lazy-object-proxy-1.4.3.tar.gz"
@@ -23293,6 +23313,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-markdown-it-py",
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/executablebooks/markdown-it-py/archive/v3.0.0/markdown-it-py-3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-markupsafe",
           "version": "2.1.0",
           "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-2.1.0.tar.gz"
@@ -23306,6 +23336,16 @@
           "name": "python-mccabe",
           "version": "0.6.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-mdurl",
+          "version": "0.1.2",
+          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
         }
       }
     },
@@ -23716,6 +23756,16 @@
           "name": "python-podman-api",
           "version": "0.0.0",
           "downloadUrl": "https://github.com/containers/python-podman/archive/d4b8263bf08b72082cfb45e7367ebf4309facc54/python-podman-api-d4b8263.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-poetry-core",
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/python-poetry/poetry-core/archive/1.9.0/poetry-core-1.9.0.tar.gz"
         }
       }
     },
