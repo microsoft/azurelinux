@@ -23343,6 +23343,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ml-dtypes",
+          "version": "0.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/ml_dtypes/ml_dtypes-0.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mock",
           "version": "4.0.3",
           "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-4.0.3.tar.gz"
@@ -23416,6 +23426,16 @@
           "name": "python-mutagen",
           "version": "1.43.0",
           "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.43.0/mutagen-1.43.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-namex",
+          "version": "0.0.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/n/namex/namex-0.0.7.tar.gz"
         }
       }
     },
@@ -24256,6 +24276,16 @@
           "name": "python-rfc3986",
           "version": "1.2.0",
           "downloadUrl": "https://pypi.python.org/packages/source/r/rfc3986/rfc3986-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rich",
+          "version": "13.7.1",
+          "downloadUrl": "https://github.com/Textualize/rich/archive/v13.7.1/rich-13.7.1.tar.gz"
         }
       }
     },

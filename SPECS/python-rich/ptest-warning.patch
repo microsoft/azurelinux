@@ -1,0 +1,89 @@
+From eb357884ad7fc677854396e107a1652f3c8d4aa3 Mon Sep 17 00:00:00 2001
+From: Ofek Lev <ofekmeister@gmail.com>
+Date: Wed, 1 May 2024 09:18:57 -0400
+Subject: [PATCH] Fix warning in test suite
+
+---
+ docs/requirements.txt | 1 +
+ docs/source/conf.py   | 9 +++++++--
+ pyproject.toml        | 1 +
+ tests/test_syntax.py  | 8 ++++++--
+ 4 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/docs/requirements.txt b/docs/requirements.txt
+index 4e029845b..4b7b608ef 100644
+--- a/docs/requirements.txt
++++ b/docs/requirements.txt
+@@ -2,3 +2,4 @@ alabaster==0.7.12
+ Sphinx==5.1.1
+ sphinx-rtd-theme==1.0.0
+ sphinx-copybutton==0.5.1
++importlib-metadata; python_version < '3.8'
+diff --git a/docs/source/conf.py b/docs/source/conf.py
+index d1078d61e..451a13456 100644
+--- a/docs/source/conf.py
++++ b/docs/source/conf.py
+@@ -17,10 +17,15 @@
+ 
+ # -- Project information -----------------------------------------------------
+ 
++import sys
+ 
+-import pkg_resources
+ import sphinx_rtd_theme
+ 
++if sys.version_info >= (3, 8):
++    from importlib.metadata import Distribution
++else:
++    from importlib_metadata import Distribution
++
+ html_theme = "sphinx_rtd_theme"
+ 
+ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+@@ -30,7 +35,7 @@
+ author = "Will McGugan"
+ 
+ # The full version, including alpha/beta/rc tags
+-release = pkg_resources.get_distribution("rich").version
++release = Distribution.from_name("rich").version
+ 
+ 
+ # -- General configuration ---------------------------------------------------
+diff --git a/pyproject.toml b/pyproject.toml
+index 0e9a3b74e..e589ba9dc 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -44,6 +44,7 @@ pytest-cov = "^3.0.0"
+ attrs = "^21.4.0"
+ pre-commit = "^2.17.0"
+ asv = "^0.5.1"
++importlib-metadata = { version = "*", python = "<3.8" }
+ 
+ [build-system]
+ requires = ["poetry-core>=1.0.0"]
+diff --git a/tests/test_syntax.py b/tests/test_syntax.py
+index f3f0f41fe..37cc293eb 100644
+--- a/tests/test_syntax.py
++++ b/tests/test_syntax.py
+@@ -3,7 +3,6 @@
+ import sys
+ import tempfile
+ 
+-import pkg_resources
+ import pytest
+ from pygments.lexers import PythonLexer
+ 
+@@ -21,7 +20,12 @@
+ 
+ from .render import render
+ 
+-PYGMENTS_VERSION = pkg_resources.get_distribution("pygments").version
++if sys.version_info >= (3, 8):
++    from importlib.metadata import Distribution
++else:
++    from importlib_metadata import Distribution
++
++PYGMENTS_VERSION = Distribution.from_name("pygments").version
+ OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
+ 
+ CODE = '''\
