@@ -2284,6 +2284,7 @@
                 "python-logutils",
                 "python-nocasedict",
                 "python-opt-einsum",
+                "python-optree",
                 "python-pecan",
                 "python-pyrpm",
                 "python-remoto",
