@@ -2,10 +2,12 @@ Name:		mosh
 Version:	1.4.0
 Release:	6%{?dist}
 Summary:	Mobile shell that supports roaming and intelligent local echo
+Vendor:     Microsoft Corporation
+Distribution: Mariner
 
 License:	GPLv3+
 URL:		https://mosh.mit.edu/
-Source0:	https://mosh.mit.edu/mosh-%{version}.tar.gz
+Source0:	https://github.com/mobile-shell/mosh/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:	libutempter-devel
 BuildRequires:	ncurses-devel
@@ -20,7 +22,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  make
 Requires:	openssh-clients
 Requires:	openssl
-Requires:	perl(IO::Socket::IP)
+Requires:	perl-IO-Socket-IP
 
 %description
 Mosh is a remote terminal application that supports:
@@ -56,7 +58,7 @@ Mosh is a remote terminal application that supports:
 
 %changelog
 * Sun Aug 11 2024 Chris Co <chrco@microsoft.com> - 1.4.0-6
-- Initial Azure Linux import from Fedora 40 (license: MIT)
+- Initial CBL-Mariner import from Fedora 40 (license: MIT)
 - License verified
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-5
