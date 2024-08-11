@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "keras",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v2.11.0.tar.gz"
+          "version": "3.3.3",
+          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v3.3.3.tar.gz"
         }
       }
     },
@@ -21764,8 +21764,8 @@
         "type": "other",
         "other": {
           "name": "pybind11",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.6.2/pybind11-2.6.2.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.11.1/pybind11-2.11.1.tar.gz"
         }
       }
     },
@@ -23536,6 +23536,16 @@
           "name": "python-opt-einsum",
           "version": "3.3.0",
           "downloadUrl": "https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-optree",
+          "version": "0.11.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/o/optree/optree-0.11.0.tar.gz"
         }
       }
     },
