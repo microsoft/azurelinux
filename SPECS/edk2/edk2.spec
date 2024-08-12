@@ -119,7 +119,7 @@ Patch0013: 0013-UefiCpuPkg-MpInitLib-fix-apic-mode-for-cpu-hotplug.patch
 Patch0014: 0014-CryptoPkg-CrtLib-add-stat.h.patch
 Patch0015: 0015-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
 Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
-%if 0%{?fedora} >= 38 || 0%{?rhel} >= 10
+%if (0%{?fedora} >= 38 || 0%{?rhel} >= 10) && !%{?azl}
 Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 %endif
 Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
