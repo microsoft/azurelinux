@@ -8,6 +8,8 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
+%global libnetapi_so_version 1
+
 %define talloc_version 2.4.0
 %define tdb_version 1.4.8
 %define tevent_version 0.14.1
@@ -354,7 +356,8 @@ Summary: Tools for Samba servers
 # samba-tool needs python3-samba
 Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs python3-samba-dc also on non-dc build
-Requires: python3-%{name}-dc = %{samba_depver}
+# Removing it to see if build happens
+# # Requires: python3-%{name}-dc = %{samba_depver}
 Requires: libnetapi = %{samba_depver}
 %if %{with dc}
 # samba-tool needs mdb_copy and tdbackup for domain backup or upgrade provision
@@ -628,7 +631,7 @@ Requires: %{name}-libs = %{samba_depver}
 The python3-%{name}-test package contains the Python libraries used by the test suite of Samba.
 If you want to run full set of Samba tests, you need to install this package.
 
-%if %{with_dc}
+# %if %{with_dc}
 %package -n python3-samba-dc
 Summary: Samba Python libraries for Samba AD
 Requires: python3-%{name} = %{samba_depver}
@@ -636,7 +639,7 @@ Requires: python3-%{name} = %{samba_depver}
 %description -n python3-samba-dc
 The python3-%{name}-dc package contains the Python libraries needed by programs
 to manage Samba AD.
-%endif
+# %endif
 
 ### PIDL
 %package pidl
@@ -1048,7 +1051,6 @@ for i in \
     %{_libdir}/libdcerpc-server-core.so* \
     %{_mandir}/man8/samba.8 \
     %{_mandir}/man8/samba_downgrade_db.8 \
-    %{_mandir}/man8/samba-tool.8 \
     %{_mandir}/man8/samba-gpupdate.8 \
     %{_libdir}/samba/ldb/ildap.so \
     %{_libdir}/samba/ldb/ldbsamba_extensions.so \
@@ -1631,7 +1633,7 @@ fi
 %config(noreplace) %{_sysconfdir}/samba/lmhosts
 %config(noreplace) %{_sysconfdir}/sysconfig/samba
 %{_mandir}/man5/lmhosts.5*
-%{_mandir}/man5/smb.conf.5*
+# %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man7/samba.7*
 
@@ -1982,6 +1984,7 @@ fi
 %{_includedir}/samba-4.0/libsmbclient.h
 %{_libdir}/libsmbclient.so
 %{_libdir}/pkgconfig/smbclient.pc
+%{_mandir}/man7/libsmbclient.7*
 #endif with_libsmbclient
 %endif
 
@@ -2032,6 +2035,7 @@ fi
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/Template.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba4/NDR
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Server.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/ServerCompat.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Client.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Parser.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/TDR.pm
