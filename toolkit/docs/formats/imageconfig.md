@@ -567,7 +567,7 @@ An example usage for users "root" and "basicUser" would look like:
     {
         "Name": "root",
         "PasswordHashed": true,
-        "Password": "$6$salt$wOtvukzJqb0A06u2VivFf07FzmuSIt/VBzKtDMYbM88aJf3KzJHM.PDI6Uo5sKSRX1uzMktf71.eNyqRUZFim/",
+        "Password": "$6$<SALT>$<HASHED PASSWORD>",
         "_comment": "Generated with `openssl passwd -6 -salt <SALT> <PASSWORD>`",
     },
     {
