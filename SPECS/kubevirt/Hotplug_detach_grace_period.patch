@@ -4,14 +4,14 @@ Date: Mon, 5 Aug 2024 11:45:42 -0700
 Subject: [PATCH] Updating hotplugdetachmentGracePeriod patch with repeated lookups for disk detachment
 
 ---
- pkg/virt-launcher/virtwrap/manager.go | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ pkg/virt-launcher/virtwrap/manager.go | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-index 63d8d43d29..d46a707df0 100644
+index 63d8d43d29..9bfa2740fe 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
-@@ -935,6 +935,31 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -935,6 +935,30 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  			logger.Reason(err).Error("detaching device")
  			return nil, err
  		}
@@ -35,7 +35,6 @@ index 63d8d43d29..d46a707df0 100644
 +				logger.V(1).Infof("Disk %s with target %s is still present in the domain", detachDisk.Alias.GetName(), detachDisk.Target.Device)
 +			} else {
 +				logger.V(1).Infof("Disk %s with target %s has been successfully detached", detachDisk.Alias.GetName(), detachDisk.Target.Device)
-+				dom.Free()
 +				break
 +			}
 +			time.Sleep(1 * time.Second)
