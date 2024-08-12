@@ -31,7 +31,10 @@ func TestAddCustomizerRelease(t *testing.T) {
 
 	expectedVersion := "0.1.0"
 	expectedDate := time.Now().Format("2006-01-02T15:04:05Z")
-	err = addCustomizerRelease(chroot, expectedVersion, expectedDate)
+	_, expectedUuid, err := createUuid()
+	assert.NoError(t, err)
+
+	err = addCustomizerRelease(chroot, expectedVersion, expectedDate, expectedUuid)
 	assert.NoError(t, err)
 
 	releaseFilePath := filepath.Join(chroot.RootDir(), "etc/image-customizer-release")
@@ -57,4 +60,5 @@ func TestAddCustomizerRelease(t *testing.T) {
 
 	assert.Equal(t, expectedVersion, config["TOOL_VERSION"])
 	assert.Equal(t, expectedDate, config["BUILD_DATE"])
+	assert.Equal(t, expectedUuid, config["IMAGE_UUID"])
 }

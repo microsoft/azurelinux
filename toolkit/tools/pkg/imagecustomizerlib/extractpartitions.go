@@ -1,7 +1,6 @@
 package imagecustomizerlib
 
 import (
-	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -28,12 +27,12 @@ type outputPartitionMetadata struct {
 
 const (
 	SkippableFrameMagicNumber uint32 = 0x184D2A50
-	SkippableFramePayloadSize uint32 = 16
+	SkippableFramePayloadSize uint32 = UuidSize
 	SkippableFrameHeaderSize  int    = 8
 )
 
 // Extract all partitions of connected image into separate files with specified format.
-func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
+func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string, imageUuid [UuidSize]byte) error {
 
 	// Get partition info
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
@@ -43,12 +42,6 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 	// Stores the output partition metadata that will be written to JSON file
 	var partitionMetadataOutput []outputPartitionMetadata
-
-	// Create skippable frame metadata defined as a random 128-bit number
-	skippableFrameMetadata, err := createSkippableFrameMetadata()
-	if err != nil {
-		return err
-	}
 
 	// Extract partitions to files
 	for partitionNum := range diskPartitions {
@@ -81,7 +74,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 		case "raw":
 			// Do nothing for "raw" case
 		case "raw-zst":
-			partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
+			partitionFilepath, err = extractRawZstPartition(partitionFilepath, imageUuid, partitionFilename, outDir)
 			if err != nil {
 				return err
 			}
@@ -212,26 +205,6 @@ func createSkippableFrame(magicNumber uint32, frameSize uint32, skippableFrameMe
 	logger.Log.Infof("Skippable frame has been created with the following metadata: %d", skippableFrame[8:8+frameSize])
 
 	return skippableFrame
-}
-
-// Create user metadata that will be inserted into the skippable frame.
-func createSkippableFrameMetadata() (skippableFrameMetadata [SkippableFramePayloadSize]byte, err error) {
-	// Set the skippableFrameMetadata to be a random 128-Bit number
-	skippableFrameMetadata, err = generateRandom128BitNumber()
-	if err != nil {
-		return skippableFrameMetadata, err
-	}
-	return skippableFrameMetadata, nil
-}
-
-// Generates a Random 128-Bit number.
-func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
-	var randomBytes [SkippableFramePayloadSize]byte
-	_, err := rand.Read(randomBytes[:])
-	if err != nil {
-		return randomBytes, err
-	}
-	return randomBytes, nil
 }
 
 // Construct outputPartitionMetadata for given partition.
