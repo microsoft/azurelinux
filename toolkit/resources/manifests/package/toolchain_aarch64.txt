@@ -1,3 +1,4 @@
+acl-2.3.1-2.azl3.aarch64.rpm
 acl-debuginfo-2.3.1-2.azl3.aarch64.rpm
 asciidoc-10.2.0-2.azl3.noarch.rpm
 attr-2.5.2-1.azl3.aarch64.rpm
