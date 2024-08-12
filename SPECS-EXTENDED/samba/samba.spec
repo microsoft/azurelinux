@@ -349,6 +349,23 @@ Requires: libwbclient = %{samba_depver}
 The samba-common-tools package contains tools for Samba servers and
 SMB/CIFS clients.
 
+package tools
+Summary: Tools for Samba servers
+# samba-tool needs python3-samba
+Requires: python3-%{name} = %{samba_depver}
+# samba-tool needs python3-samba-dc also on non-dc build
+Requires: python3-%{name}-dc = %{samba_depver}
+%if %{with dc}
+# samba-tool needs mdb_copy and tdbackup for domain backup or upgrade provision
+Requires: lmdb
+Requires: tdb-tools
+Requires: python3-gpg
+%endif
+ 
+%description tools
+The samba-tools package contains tools for Samba servers
+and for GPO management on domain members.
+ 
 ### RPC
 %package dcerpc
 Summary: DCE RPC binaries
@@ -373,6 +390,7 @@ Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
+Requires: %{name}-tools = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
 # samba-tool needs mdb_copy
@@ -1623,6 +1641,10 @@ fi
 %{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/smbpasswd.8*
 
+%files tools
+%{_bindir}/samba-tool
+%{_mandir}/man8/samba-tool.8*
+
 ### RPC
 %files dcerpc
 %dir %{_libexecdir}/samba
@@ -1641,7 +1663,6 @@ fi
 %if %{with_dc}
 %files dc
 %{_unitdir}/samba.service
-%{_bindir}/samba-tool
 %{_sbindir}/samba
 %{_sbindir}/samba_dnsupdate
 %{_sbindir}/samba_downgrade_db
