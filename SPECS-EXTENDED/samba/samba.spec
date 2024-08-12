@@ -2114,7 +2114,6 @@ fi
 %{python3_sitearch}/samba/getopt.py
 # %{python3_sitearch}/samba/gpclass.py
 # %{python3_sitearch}/samba/gp_sec_ext.py
-%{python3_sitearch}/samba/gpo.*.so
 %{python3_sitearch}/samba/graph.py
 %{python3_sitearch}/samba/hostconfig.py
 %{python3_sitearch}/samba/idmap.py
