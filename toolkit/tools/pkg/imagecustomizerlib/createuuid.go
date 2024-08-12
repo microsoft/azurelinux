@@ -21,6 +21,7 @@ func createUuid() ([UuidSize]byte, string, error) {
 		return uuid, "", err
 	}
 	uuidStr := convertUuidToString(uuid)
+	logger.Log.Infof("Image UUID: %s", uuidStr)
 
 	return uuid, uuidStr, nil
 }
@@ -44,6 +45,5 @@ func convertUuidToString(uuid [UuidSize]byte) string {
 		uuid[10:16],
 	)
 
-	logger.Log.Infof("Image uuid created: %s", uuidStr)
 	return uuidStr
 }
