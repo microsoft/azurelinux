@@ -407,7 +407,7 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-0
+* Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-1
 - Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
 
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.3.0-4
