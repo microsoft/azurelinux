@@ -1,5 +1,10 @@
 #!/bin/bash
 set -xe
+
+
+
+# Extend base tooling, jon?
+
 # Setup the data partition
 mkdir /data/overlays
 mkdir -p /data/overlays/etc/upper
@@ -13,7 +18,7 @@ mkdir -p /data/overlays/root/work
 mkdir -p /data/containerd
 
 # # Make rootfs mount as read-only
-# sed -i "s/\/ ext4 defaults/\/ ext4 defaults,ro/" /etc/fstab
+sgdisk -A 2:set:60 /dev/sda
 
 # Ensure data partition is mounted in initrd along with overlay
 sed -i "s/data ext4 defaults/data ext4 defaults,x-initrd.mount,x-systemd.growfs/" /etc/fstab
@@ -59,6 +64,8 @@ mkdir -p /efi/EFI/Linux
 get_kernel_version
 echo "Kernel version = $KERNEL_VERSION"
 cp /lib/modules/$KERNEL_VERSION/vmlinuz-uki.efi /efi/EFI/Linux/vmlinuz-uki-$KERNEL_VERSION.efi
+
+
 
 # END UKI Logic
 

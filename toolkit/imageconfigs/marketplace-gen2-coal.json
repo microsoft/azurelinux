@@ -28,9 +28,17 @@
                 {
                     "ID": "rootfs",
                     "Start": 1065,
-                    "End": 0,
+                    "End": 3065,
                     "FsType": "ext4",
                     "Type": "linux-root-amd64"
+                },
+                {
+                    "ID": "data",
+                    "Name": "data",
+                    "Start": 3065,
+                    "End": 0,
+                    "FsType": "ext4",
+                    "Type": "linux"
                 }
             ]
         }
@@ -48,6 +56,10 @@
                 {
                     "ID": "rootfs",
                     "MountPoint": "/"
+                },
+                {
+                    "ID": "data",
+                    "MountPoint": "/data"
                 }
             ],
             "PackageLists": [
@@ -61,9 +73,11 @@
                 "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules",
                 "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"
             },
-            "KernelOptions": {
-                "default": "kernel"
-            },
+            "PostInstallScripts": [
+                {
+                    "Path": "additionalconfigs/configure-systemd-networkd.sh"
+                }
+            ],
             "FinalizeImageScripts": [
                 {
                     "Path": "additionalconfigs/coal.sh"
@@ -72,8 +86,17 @@
                     "Path": "scripts/cleanup.sh"
                 }
             ],
+            "KernelOptions": {
+                "default": "kernel"
+            },
             "Hostname": "azurelinux",
-            "DisableRpmDocs": true
+            "DisableRpmDocs": true,
+            "Users": [
+                {
+                    "Name": "root",
+                    "Password": "marinercoal"
+                }
+            ]
         }
     ]
 }
