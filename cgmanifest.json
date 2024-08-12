@@ -26974,8 +26974,8 @@
         "type": "other",
         "other": {
           "name": "samba",
-          "version": "4.12.5",
-          "downloadUrl": "https://ftp.samba.org/pub/samba/stable/samba-4.12.5.tar.gz"
+          "version": "4.18.3",
+          "downloadUrl": "https://ftp.samba.org/pub/samba/stable/samba-4.18.3.tar.gz"
         }
       }
     },

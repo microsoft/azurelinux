@@ -2,7 +2,6 @@
  "Signatures": {
   "README.downgrade": "6d35f69e43eb241e578e886bcc9f915d40c09687a1060ffec71112eed045058e",
   "pam_winbind.conf": "afbb96ebf172dd2cc4e3c2ae13958ebadcb1d5b4c1d70e4e608014eeeae70347",
-  "samba-4.18.3.tar.asc": "3980205420c6f3daf9ea052676ea49d55f4cc16648ac52cbc165e3f98423f973",
   "samba-4.18.3.tar.xz": "26fceff620e2673c516ee209ceacd50377d146d1c1fbf7f8524b43da0614caad",
   "samba.logrotate": "f604fd7e23b83e87da346e11f8d34e9840f89ec62ebd77814cbd69884125d5b5",
   "samba.pamd": "adf2c510d4218ac0b3f72898cfe4097c0d1c9836da2b0237929af6bf4619ea84",
