@@ -12,7 +12,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
-func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
+func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string, imageUuid string) error {
 	var err error
 
 	logger.Log.Infof("Creating image customizer release file")
@@ -21,9 +21,9 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 	lines := []string{
 		fmt.Sprintf("%s=\"%s\"", "TOOL_VERSION", toolVersion),
 		fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", buildTime),
+		fmt.Sprintf("%s=\"%s\"", "IMAGE_UUID", imageUuid),
 		"",
 	}
-
 	err = file.WriteLines(lines, customizerReleaseFilePath)
 	if err != nil {
 		return fmt.Errorf("error writing customizer release file (%s): %w", customizerReleaseFilePath, err)

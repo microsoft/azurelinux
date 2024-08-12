@@ -11,7 +11,7 @@ import (
 
 func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	imageConnection *ImageConnection, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-) error {
+	imageUuid string) error {
 	var err error
 
 	imageChroot := imageConnection.Chroot()
@@ -59,7 +59,7 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	err = addCustomizerRelease(imageChroot, ToolVersion, buildTime)
+	err = addCustomizerRelease(imageChroot, ToolVersion, buildTime, imageUuid)
 	if err != nil {
 		return err
 	}
