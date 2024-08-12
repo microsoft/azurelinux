@@ -21454,8 +21454,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.12",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.12/postgresql-14.12.tar.bz2"
+          "version": "14.13",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.13/postgresql-14.13.tar.bz2"
         }
       }
     },
