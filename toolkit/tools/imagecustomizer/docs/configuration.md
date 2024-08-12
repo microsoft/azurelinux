@@ -346,31 +346,73 @@ Specifies the configuration for the generated ISO media.
 
 Specifies the configuration for overlay filesystem.
 
-- `lowerDir`: This directory acts as the read-only layer in the overlay
-  filesystem. It contains the base files and directories which will be overlaid
-  by the upperDir. Changes to the overlay filesystem do not affect the contents
-  of lowerDir.
+- `lowerDir`: (Required)
 
-- `upperDir`: This directory is the writable layer of the overlay filesystem.
-  Any modifications, such as file additions, deletions, or changes, are made in
-  the upperDir. These changes are what make the overlay filesystem appear
-  different from the lowerDir alone.
+  This directory acts as the read-only layer in the overlay filesystem. It
+  contains the base files and directories which will be overlaid by the
+  upperDir. Changes to the overlay filesystem do not affect the contents of
+  lowerDir. 
+  
+  Example: `/etc`
 
-- `workDir`: This is a required directory used for preparing files before they
-  are merged into the upperDir. It needs to be on the same filesystem as the
-  upperDir and is used for temporary storage by the overlay filesystem to ensure
-  atomic operations. The workDir is not directly accessible to users.
+- `upperDir`: (Required)
 
-- `partition`: Optional field: If configured, a partition will be attached to
-  the current targeted overlay, making it persistent and ensuring that changes
-  are retained. If not configured, the overlay will be volatile.
+  This directory is the writable layer of the overlay filesystem. Any
+  modifications, such as file additions, deletions, or changes, are made in the
+  upperDir. These changes are what make the overlay filesystem appear different
+  from the lowerDir alone. 
+  
+  Example: `/var/overlays/etc/upper`
 
-  - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+- `workDir`: (Required)
 
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
+  This is a required directory used for preparing files before they are merged
+  into the upperDir. It needs to be on the same filesystem as the upperDir and
+  is used for temporary storage by the overlay filesystem to ensure atomic
+  operations. The workDir is not directly accessible to users. 
+  
+  Example: `/var/overlays/etc/work`
+
+- `mountPoint`: (Required)
+
+  The directory where the overlay filesystem will be mounted.
+
+  Example: `/var/mountpoint`
+
+- `isRootfsOverlay`: (Optional, Default: `false`)
+
+  A boolean flag indicating whether this overlay is part of the root filesystem.
+  If set to true, specific adjustments will be made, such as prefixing certain
+  paths with /sysroot will be added to fstab file.
+
+  Example: `true`
+
+- `mountDependency`: (Optional)
+
+  Specifies a directory that must be mounted before this overlay.
+
+  **Important**: If the directory specified in mountDependency needs to be
+  available during the initrd phase, you must ensure that this directory's mount
+  configuration in the fileSystems section includes the x-initrd.mount option.
+  For example:
+
+  ```
+  fileSystems:
+    - deviceId: var
+      type: ext4
+      mountPoint:
+        path: /var
+        options: defaults,x-initrd.mount
+  ```
+
+  Example: `/var`
+
+- `mountOptions`: (Optional)
+
+  A string of additional mount options that can be applied to the overlay mount.
+  Multiple options should be separated by commas.
+
+  Example: `noatime,nodiratime`
 
 Example:
 
@@ -378,17 +420,12 @@ Example:
 os:
   overlays:
     - lowerDir: /etc
-      upperDir: /upper_etc
-      workDir: /work_etc
-      partition:
-        idType: part-label
-        id: partition-etc
-    - lowerDir: /var/lib
-      upperDir: /upper_var_lib
-      workDir: /work_var_lib
-    - lowerDir: /var/log
-      upperDir: /upper_var_log
-      workDir: /work_var_log
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      mountPoint: /var/mountpoint
+      isRootfsOverlay: true
+      mountDependency: /var
+      mountOptions: "noatime,nodiratime"
 ```
 
 ## verity type

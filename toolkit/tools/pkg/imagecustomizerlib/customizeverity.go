@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
-func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot,
+func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot,
 ) (bool, error) {
 	var err error
 
@@ -33,12 +33,12 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
-	err = addDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
+	err = addDracutModuleAndDriver(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to add dracut modules for verity:\n%w", err)
 	}
 
-	err = updateFstabForVerity(buildDir, imageChroot)
+	err = updateFstabForVerity(imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to update fstab file for verity:\n%w", err)
 	}
@@ -51,7 +51,7 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	return true, nil
 }
 
-func addDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
+func addDracutModuleAndDriver(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
 	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
 
 	// Check if the dracut module configuration file already exists.
@@ -65,12 +65,57 @@ func addDracutModule(dracutModuleName string, dracutDriverName string, imageChro
 		if err != nil {
 			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
 		}
+	} else {
+		// If the file already exists, return an error.
+		return fmt.Errorf("dracut module config file (%s) already exists", dracutConfigFile)
 	}
 
 	return nil
 }
 
-func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error {
+func addDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) error {
+	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
+
+	// Check if the dracut module configuration file already exists.
+	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
+		lines := []string{
+			// Add white spaces on both sides for dracut config syntax.
+			"add_dracutmodules+=\" " + dracutModuleName + " \"",
+		}
+		err = file.WriteLines(lines, dracutConfigFile)
+		if err != nil {
+			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
+		}
+	} else {
+		// If the file already exists, return an error.
+		return fmt.Errorf("dracut module config file (%s) already exists", dracutConfigFile)
+	}
+
+	return nil
+}
+
+func addDracutDriver(dracutDriverName string, imageChroot *safechroot.Chroot) error {
+	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutDriverName+".conf")
+
+	// Check if the dracut driver configuration file already exists.
+	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
+		lines := []string{
+			// Add white spaces on both sides for dracut config syntax.
+			"add_drivers+=\" " + dracutDriverName + " \"",
+		}
+		err = file.WriteLines(lines, dracutConfigFile)
+		if err != nil {
+			return fmt.Errorf("failed to write to dracut driver config file (%s): %w", dracutConfigFile, err)
+		}
+	} else {
+		// If the file already exists, return an error.
+		return fmt.Errorf("dracut driver config file (%s) already exists", dracutConfigFile)
+	}
+
+	return nil
+}
+
+func updateFstabForVerity(imageChroot *safechroot.Chroot) error {
 	var err error
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
