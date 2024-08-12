@@ -349,12 +349,13 @@ Requires: libwbclient = %{samba_depver}
 The samba-common-tools package contains tools for Samba servers and
 SMB/CIFS clients.
 
-package tools
+%package tools
 Summary: Tools for Samba servers
 # samba-tool needs python3-samba
 Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs python3-samba-dc also on non-dc build
 Requires: python3-%{name}-dc = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 %if %{with dc}
 # samba-tool needs mdb_copy and tdbackup for domain backup or upgrade provision
 Requires: lmdb
@@ -452,6 +453,7 @@ name server related details of Samba AD.
 Summary: Developer tools for Samba libraries
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 
 Provides: samba4-devel = %{samba_depver}
 Obsoletes: samba4-devel < %{samba_depver}
@@ -524,6 +526,25 @@ Obsoletes: samba4-libs < %{samba_depver}
 %description libs
 The %{name}-libs package contains the libraries needed by programs that link
 against the SMB, RPC and other protocols provided by the Samba suite.
+
+### LIBNETAPI
+%package -n libnetapi
+Summary: The NETAPI library
+Requires(pre): %{name}-common = %{samba_depver}
+Requires: %{name}-common = %{samba_depver}
+Requires: %{name}-common-libs = %{samba_depver}
+Requires: %{name}-client-libs = %{samba_depver}
+
+%description -n libnetapi
+This contains the NETAPI library from the Samba suite.
+
+%package -n libnetapi-devel
+Summary: Developer tools for the NETAPI library
+Requires: libnetapi = %{samba_depver}
+
+%description -n libnetapi-devel
+The libnetapi-devel package contains the header files and libraries needed to
+develop programs that link against the NETAPI library in the Samba suite.
 
 ### LIBSMBCLIENT
 %if %with_libsmbclient
@@ -648,6 +669,7 @@ Requires: %{name}-test-libs = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 %endif
 Requires: %{name}-libs = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 %if %with_libsmbclient
 Requires: libsmbclient = %{samba_depver}
 %endif
@@ -1939,6 +1961,16 @@ fi
 %{_libdir}/samba/libREG-FULL-samba4.so
 %{_libdir}/samba/libRPC-SERVER-LOOP-samba4.so
 %{_libdir}/samba/libRPC-WORKER-samba4.so
+
+### LIBNETAPI
+%files -n libnetapi
+%{_libdir}/libnetapi.so.%{libnetapi_so_version}*
+ 
+### LIBNETAPI-DEVEL
+%files -n libnetapi-devel
+%{_includedir}/samba-4.0/netapi.h
+%{_libdir}/libnetapi.so
+%{_libdir}/pkgconfig/netapi.pc
 
 ### LIBSMBCLIENT
 %if %with_libsmbclient
