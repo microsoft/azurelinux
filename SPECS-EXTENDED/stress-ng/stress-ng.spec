@@ -14,9 +14,7 @@ BuildRequires:	kernel-headers
 BuildRequires:	keyutils-libs-devel
 BuildRequires:	libaio-devel
 BuildRequires:	libattr-devel
-%if %{undefined rhel}
 BuildRequires:	libbsd-devel
-%endif
 BuildRequires:	libcap-devel
 BuildRequires:	libgcrypt-devel
 BuildRequires:	lksctp-tools-devel
