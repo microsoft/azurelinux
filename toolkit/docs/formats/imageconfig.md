@@ -552,7 +552,7 @@ The table below are the keys for the users.
 |Name               |string             |Cannot be empty
 |UID                |string             |Must be in range 0-60000
 |PasswordHashed     |bool               |
-|Password           |string             |
+|Password           |string             |If 'PasswordHashed=true', use `openssl passwd ...` to generate the password hash
 |PasswordExpiresDays|number             |Must be in range 0-99999 or -1 for no expiration
 |SSHPubKeyPaths     |array of strings   |
 |PrimaryGroup       |string             |
@@ -566,7 +566,9 @@ An example usage for users "root" and "basicUser" would look like:
 "Users": [
     {
         "Name": "root",
-        "Password": "somePassword"
+        "PasswordHashed": true,
+        "Password": "$6$salt$wOtvukzJqb0A06u2VivFf07FzmuSIt/VBzKtDMYbM88aJf3KzJHM.PDI6Uo5sKSRX1uzMktf71.eNyqRUZFim/",
+        "_comment": "Generated with `openssl passwd -6 -salt <SALT> <PASSWORD>`",
     },
     {
         "Name": "basicUser",
