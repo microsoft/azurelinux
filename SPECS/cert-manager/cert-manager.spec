@@ -22,7 +22,11 @@ Source1:        %{name}-%{version}-govendor.tar.gz
 Patch0:         CVE-2023-48795.patch
 Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2024-26147.patch
+<<<<<<< HEAD
 Patch3:         CVE-2024-6104.patch
+=======
+Patch3:         CVE-2024-25620.patch
+>>>>>>> a615c6f46 (Fix for CVE 2024 25620 in cert-manager (#10063))
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -115,8 +119,13 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+<<<<<<< HEAD
 * Wed Jul 31 2023 Bala <balakumaran.kannan@microsoft.com> - 1.11.2-12
 - Patch for CVE-2024-6104
+=======
+* Wed Aug 07 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.11.2-12
+- Patch for CVE-2024-25620
+>>>>>>> a615c6f46 (Fix for CVE 2024 25620 in cert-manager (#10063))
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-11
 - Bump release to rebuild with go 1.21.11
