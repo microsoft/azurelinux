@@ -222,7 +222,7 @@ func TestStorageIsValidDuplicatePartitionId(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
@@ -288,7 +288,7 @@ func TestStorageIsValidUniqueLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
@@ -335,7 +335,7 @@ func TestStorageIsValidDuplicateLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
