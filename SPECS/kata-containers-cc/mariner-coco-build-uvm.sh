@@ -13,7 +13,7 @@ export AGENT_SOURCE_BIN=${SCRIPT_DIR}/kata-agent
 
 # build rootfs
 pushd ${OSBUILDER_DIR}
-sudo make clean
+sudo make DISTRO=cbl-mariner clean
 rm -rf ${ROOTFS_DIR}
 sudo -E PATH=$PATH AGENT_POLICY=yes CONF_GUEST=yes AGENT_POLICY_FILE=allow-set-policy.rego make -B DISTRO=cbl-mariner rootfs
 popd
