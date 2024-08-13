@@ -143,7 +143,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - %{azl}.0-6
+* Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-6
 - Move grub2-rpm-macros to the azurelinux-rpm-macros package
 
 * Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-5
