@@ -6,7 +6,7 @@ function showUsage() {
     echo
     echo "usage:"
     echo
-    echo "build-mic-container.sh \\"
+    echo "run-mic-container.sh \\"
     echo "    -t <container-tag> \\"
     echo "    -i <input-image-path> \\"
     echo "    -c <input-config-path> \\"
