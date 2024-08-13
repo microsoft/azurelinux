@@ -9841,8 +9841,8 @@
         "type": "other",
         "other": {
           "name": "libldb",
-          "version": "2.1.4",
-          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.1.4.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.7.2.tar.gz"
         }
       }
     },
@@ -25754,8 +25754,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.0",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
+          "version": "3.3.3",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.3.tar.gz"
         }
       }
     },
@@ -28626,8 +28626,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "4.0.1",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.1/tpm2-tss-4.0.1.tar.gz"
+          "version": "4.0.2",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.2/tpm2-tss-4.0.2.tar.gz"
         }
       }
     },
