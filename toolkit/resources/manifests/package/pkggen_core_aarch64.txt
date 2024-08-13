@@ -207,7 +207,7 @@ libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
 lua-libs-5.4.6-1.azl3.aarch64.rpm
 azurelinux-rpm-macros-3.0-6.azl3.noarch.rpm
-azurelinux-check-macros-3.0-5.azl3.noarch.rpm
+azurelinux-check-macros-3.0-6.azl3.noarch.rpm
 tdnf-3.5.6-1.azl3.aarch64.rpm
 tdnf-cli-libs-3.5.6-1.azl3.aarch64.rpm
 tdnf-devel-3.5.6-1.azl3.aarch64.rpm
