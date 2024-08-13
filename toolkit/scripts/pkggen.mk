@@ -32,12 +32,14 @@ cached_remote_rpms     = $(call shell_real_build_only, find $(remote_rpms_cache_
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
-specs_file        = $(PKGBUILD_DIR)/specs.json
-graph_file        = $(PKGBUILD_DIR)/graph.dot
-cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
-preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
-built_file        = $(PKGBUILD_DIR)/built_graph.dot
-output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
+specs_file               = $(PKGBUILD_DIR)/specs.json
+graph_file               = $(PKGBUILD_DIR)/graph.dot
+cached_file              = $(PKGBUILD_DIR)/cached_graph.dot
+preprocessed_file        = $(PKGBUILD_DIR)/preprocessed_graph.dot
+built_file               = $(PKGBUILD_DIR)/built_graph.dot
+output_csv_file          = $(PKGBUILD_DIR)/build_state.csv
+pkg_license_summary_file = $(PKGBUILD_DIR)/license_issues.txt
+pkg_license_results_file = $(PKGBUILD_DIR)/license_issues.json
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL) --log-color=$(LOG_COLOR)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
@@ -267,7 +269,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -297,6 +299,11 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--ignored-tests="$(TEST_IGNORE_LIST)" \
 		--tests="$(TEST_RUN_LIST)" \
 		--rerun-tests="$(TEST_RERUN_LIST)" \
+		--license-check-mode="$(LICENSE_CHECK_MODE)" \
+		--license-check-exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
+		--license-check-name-file="$(LICENSE_CHECK_NAME_FILE)" \
+		--license-results-file="$(pkg_license_results_file)" \
+		--license-summary-file="$(pkg_license_summary_file)" \
 		--image-config-file="$(CONFIG_FILE)" \
 		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \

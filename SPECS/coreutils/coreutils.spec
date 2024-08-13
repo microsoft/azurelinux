@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        9.4
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,10 +12,10 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Source1:        serial-console.sh
 Patch0:         coreutils-9.4-i18n-1.patch
 Patch1:         coreutils-9.4-uname-1.patch
+Patch2:         CVE-2024-0684.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
-Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 %if 0%{?with_check}
@@ -92,6 +92,13 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Thu Aug 1 2024 Riken Maharjan <rmaharjan@microsoft.com> - 9.4-5
+- Remove unecessary Requires on libselinux imported from Fedora 40 (License: MIT)
+- libselinux causes dependency cycle.
+
+* Tue Jul 23 2024 Muhammad Falak <mwani@microsoft.com> - 9.4-4
+- Address CVE-2024-0684
+
 * Mon Jun 17 2024 Andrew Phelps <anphel@microsoft.com> - 9.4-3
 - add coreutils-9.4-uname-1.patch
 

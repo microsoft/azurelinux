@@ -1,0 +1,23 @@
+From 8ac7e66b2773ba16a33abee41262ad0144c80cd3 Mon Sep 17 00:00:00 2001
+From: Norberto Arrieta <narrieta@users.noreply.github.com>
+Date: Wed, 28 Feb 2024 18:55:49 -0800
+Subject: [PATCH] Fix argument to GoalState.__init__ (#3073)
+
+Co-authored-by: narrieta <narrieta>
+---
+ azurelinuxagent/daemon/main.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/azurelinuxagent/daemon/main.py b/azurelinuxagent/daemon/main.py
+index 342daf4ac9..3a3923a8ff 100644
+--- a/azurelinuxagent/daemon/main.py
++++ b/azurelinuxagent/daemon/main.py
+@@ -160,7 +160,7 @@ def daemon(self, child_args=None):
+                 #   current values.
+                 protocol = self.protocol_util.get_protocol()
+ 
+-                goal_state = GoalState(protocol, goal_state_properties=GoalStateProperties.SharedConfig)
++                goal_state = GoalState(protocol.client, goal_state_properties=GoalStateProperties.SharedConfig)
+ 
+                 setup_rdma_device(nd_version, goal_state.shared_conf)
+             except Exception as e:
