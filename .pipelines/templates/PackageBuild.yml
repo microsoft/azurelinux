@@ -184,20 +184,14 @@ steps:
         check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
-        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
-      fi
-
-      if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
-        run_check_arg="RUN_CHECK=y"
-      elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
-        run_check_arg="RUN_CHECK=n"
-      fi
-
       if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
       elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
         delta_fetch_arg="DELTA_FETCH=n"
+      fi
+
+      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
       if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
@@ -206,14 +200,20 @@ steps:
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
       fi
 
+      if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
+        run_check_arg="RUN_CHECK=y"
+      elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
+        run_check_arg="RUN_CHECK=n"
+      fi
+
+      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      fi
+
       if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
         use_ccache_arg="USE_CCACHE=y"
       elif [[ ${{ parameters.isUseCCache }} == "false" ]]; then
         use_ccache_arg="USE_CCACHE=n"
-      fi
-
-      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
-        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \        
