@@ -107,6 +107,7 @@ extends:
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
+                      checkBuildRetries: 1
                       customToolchainArtifactName: $(toolchainArtifactName)
                       isCheckBuild: true
                       isQuickRebuildPackages: true

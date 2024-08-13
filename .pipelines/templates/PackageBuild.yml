@@ -6,6 +6,10 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: checkBuildRetries
+    type: number
+    default: 0
+
   - name: concurrentPackageBuilds
     type: number
     default: 12
@@ -19,10 +23,6 @@ parameters:
     default: "toolchain_built_rpms_all.tar.gz"
 
   - name: extraPackageRepos
-    type: string
-    default: ""
-
-  - name: testRerunList
     type: string
     default: ""
 
@@ -125,6 +125,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: testSuiteName
     type: string
     default: "Package test"
@@ -209,6 +213,7 @@ steps:
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+        CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }} \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
