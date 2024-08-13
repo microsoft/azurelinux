@@ -324,7 +324,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
-* Tue Aug 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - %{azl}.0.0-7
+* Tue Aug 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-7
 - Updating Microsoft trusted root CAs.
 
 * Mon Apr 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-6
