@@ -1,19 +1,19 @@
 {
-  "Signatures": {
-    "generate-rndc-key.sh": "da0964516a9abe4074e262a1d0b7f63e63b2150c4cc2dddaaca029010383c422",
-    "named-chroot.files": "5dbc7bd2a21836fb86cb740a2d4d72eb9f2b4f341996cd0c8ae9c39e95c0d76c",
-    "named.conf.sample": "1807f11df688de4eb8cdcc97bd1a8863d81b03b1f24af96f3639de40bc8e538a",
-    "named.empty": "44e2cc6e10328cd3604148763458978f547ee54c3ff46468944d535644fc6da1",
-    "named.localhost": "9a2aa18c87202a691cc641f0c7e027dff3a2bb30917990f1b04c237e667530c8",
-    "named.logrotate": "748dd5d967d309d69b44f5451e2ce9d982af1b62448182f38ff76e83e45a4d61",
-    "named.loopback": "58a0c65ef763372a1d85e63766194526bfe19f496a413db40d9febea777ba4c9",
-    "named.rfc1912.zones": "61d2e64b8523e7d83c7cf9908538bf74b2f8f6993d52d7ab9c56cad25c23a92a",
-    "named.root": "36bf9aa06206b6b82c58a55ab74920d8901938e4cf79b754b239bb0e5dc0951c",
-    "named.root.key": "2a91cc1a1c3dd805aa149d8df6d9849d5e2ac0ad2c2ed93ddaf0234358e8c383",
-    "named.rwtab": "6a4c84b6709211d09f2d71491d4c66d1d4c0115a9db247a5ed2a9db10e575735",
-    "named.sysconfig": "8f8eff846667b7811358e289e9fe594de17d0e47f2b8cebf7840ad8db7f34816",
-    "setup-named-chroot.sh": "786fbc88c7929fadf217cf2286f2eb03b6fba14843e5da40ad43c0022dd71c3a",
-    "setup-named-softhsm.sh": "3b243d9e48577acb95a08ae5dd7288c5eec4830bc02bd29b1f1724c497d12864",
-    "bind-9.16.48.tar.xz": "8d3814582348f90dead1ad410b1019094cd399d3d83930abebb2b3b1eb0b2bbb"
-  }
+ "Signatures": {
+  "bind-9.16.50.tar.xz": "816dbaa3c115019f30fcebd9e8ef8f7637f4adde91c79daa099b035255a15795",
+  "generate-rndc-key.sh": "da0964516a9abe4074e262a1d0b7f63e63b2150c4cc2dddaaca029010383c422",
+  "named-chroot.files": "5dbc7bd2a21836fb86cb740a2d4d72eb9f2b4f341996cd0c8ae9c39e95c0d76c",
+  "named.conf.sample": "1807f11df688de4eb8cdcc97bd1a8863d81b03b1f24af96f3639de40bc8e538a",
+  "named.empty": "44e2cc6e10328cd3604148763458978f547ee54c3ff46468944d535644fc6da1",
+  "named.localhost": "9a2aa18c87202a691cc641f0c7e027dff3a2bb30917990f1b04c237e667530c8",
+  "named.logrotate": "748dd5d967d309d69b44f5451e2ce9d982af1b62448182f38ff76e83e45a4d61",
+  "named.loopback": "58a0c65ef763372a1d85e63766194526bfe19f496a413db40d9febea777ba4c9",
+  "named.rfc1912.zones": "61d2e64b8523e7d83c7cf9908538bf74b2f8f6993d52d7ab9c56cad25c23a92a",
+  "named.root": "36bf9aa06206b6b82c58a55ab74920d8901938e4cf79b754b239bb0e5dc0951c",
+  "named.root.key": "2a91cc1a1c3dd805aa149d8df6d9849d5e2ac0ad2c2ed93ddaf0234358e8c383",
+  "named.rwtab": "6a4c84b6709211d09f2d71491d4c66d1d4c0115a9db247a5ed2a9db10e575735",
+  "named.sysconfig": "8f8eff846667b7811358e289e9fe594de17d0e47f2b8cebf7840ad8db7f34816",
+  "setup-named-chroot.sh": "786fbc88c7929fadf217cf2286f2eb03b6fba14843e5da40ad43c0022dd71c3a",
+  "setup-named-softhsm.sh": "3b243d9e48577acb95a08ae5dd7288c5eec4830bc02bd29b1f1724c497d12864"
+ }
 }
