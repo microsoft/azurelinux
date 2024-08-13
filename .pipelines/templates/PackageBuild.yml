@@ -180,7 +180,7 @@ steps:
         displayName: "Populate cache RPMs"
 
   - script: |
-      if [[ -n "${{ parameters.checkBuildRetries" }} ]]; then
+      if [[ -n "${{ parameters.checkBuildRetries }}" ]]; then
         check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
       fi
 
