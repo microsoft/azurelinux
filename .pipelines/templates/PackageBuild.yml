@@ -7,8 +7,8 @@ parameters:
     default: "$(Build.SourcesDirectory)"
 
   - name: checkBuildRetries
-    type: number
-    default: 0
+    type: string
+    default: ""
 
   - name: concurrentPackageBuilds
     type: number
@@ -180,20 +180,12 @@ steps:
         displayName: "Populate cache RPMs"
 
   - script: |
-      if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
-        delta_fetch_arg="DELTA_FETCH=y"
-      elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
-        delta_fetch_arg="DELTA_FETCH=n"
+      if [[ -n "${{ parameters.checkBuildRetries" }} ]]; then
+        check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
       fi
 
-      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
-        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
-      fi
-
-      if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
-        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
-      elif [[ ${{ parameters.isQuickRebuildPackages }} == "false" ]]; then
-        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
+      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
       fi
 
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
@@ -202,8 +194,16 @@ steps:
         run_check_arg="RUN_CHECK=n"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
-        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
+        delta_fetch_arg="DELTA_FETCH=y"
+      elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
+        delta_fetch_arg="DELTA_FETCH=n"
+      fi
+
+      if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
+        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
+      elif [[ ${{ parameters.isQuickRebuildPackages }} == "false" ]]; then
+        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
       fi
 
       if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
@@ -212,8 +212,11 @@ steps:
         use_ccache_arg="USE_CCACHE=n"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
-        CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }} \
+      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
+      fi
+
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \        
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
@@ -222,6 +225,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
+        $check_build_retries_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
