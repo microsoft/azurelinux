@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.35.1-5.azl3.noarch.rpm
+kernel-headers-6.6.43.1-6.azl3.noarch.rpm
 glibc-2.38-6.azl3.x86_64.rpm
 glibc-devel-2.38-6.azl3.x86_64.rpm
 glibc-i18n-2.38-6.azl3.x86_64.rpm
@@ -41,8 +41,8 @@ ncurses-libs-6.4-2.azl3.x86_64.rpm
 ncurses-term-6.4-2.azl3.x86_64.rpm
 readline-8.2-1.azl3.x86_64.rpm
 readline-devel-8.2-1.azl3.x86_64.rpm
-coreutils-9.4-3.azl3.x86_64.rpm
-coreutils-lang-9.4-3.azl3.x86_64.rpm
+coreutils-9.4-5.azl3.x86_64.rpm
+coreutils-lang-9.4-5.azl3.x86_64.rpm
 bash-5.2.15-2.azl3.x86_64.rpm
 bash-devel-5.2.15-2.azl3.x86_64.rpm
 bash-lang-5.2.15-2.azl3.x86_64.rpm
@@ -164,8 +164,8 @@ perl-vars-1.05-506.azl3.noarch.rpm
 perl-5.38.2-506.azl3.x86_64.rpm
 texinfo-7.0.3-1.azl3.x86_64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
-autoconf-2.72-1.azl3.noarch.rpm
-automake-1.16.5-1.azl3.noarch.rpm
+autoconf-2.72-2.azl3.noarch.rpm
+automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
 openssl-devel-3.3.0-2.azl3.x86_64.rpm
 openssl-libs-3.3.0-2.azl3.x86_64.rpm
@@ -189,8 +189,8 @@ libsolv-0.7.28-1.azl3.x86_64.rpm
 libsolv-devel-0.7.28-1.azl3.x86_64.rpm
 libssh2-1.11.0-1.azl3.x86_64.rpm
 libssh2-devel-1.11.0-1.azl3.x86_64.rpm
-krb5-1.21.2-1.azl3.x86_64.rpm
-nghttp2-1.59.0-1.azl3.x86_64.rpm
+krb5-1.21.3-1.azl3.x86_64.rpm
+nghttp2-1.61.0-1.azl3.x86_64.rpm
 curl-8.8.0-1.azl3.x86_64.rpm
 curl-devel-8.8.0-1.azl3.x86_64.rpm
 curl-libs-8.8.0-1.azl3.x86_64.rpm
@@ -223,8 +223,8 @@ pinentry-1.2.1-1.azl3.x86_64.rpm
 gnupg2-2.4.4-2.azl3.x86_64.rpm
 gnupg2-lang-2.4.4-2.azl3.x86_64.rpm
 gpgme-1.23.2-2.azl3.x86_64.rpm
-azurelinux-repos-shared-3.0-2.azl3.noarch.rpm
-azurelinux-repos-3.0-2.azl3.noarch.rpm
+azurelinux-repos-shared-3.0-3.azl3.noarch.rpm
+azurelinux-repos-3.0-3.azl3.noarch.rpm
 libffi-3.4.4-1.azl3.x86_64.rpm
 libffi-devel-3.4.4-1.azl3.x86_64.rpm
 libtasn1-4.19.0-1.azl3.x86_64.rpm
@@ -248,7 +248,7 @@ newt-0.52.23-1.azl3.x86_64.rpm
 newt-lang-0.52.23-1.azl3.x86_64.rpm
 chkconfig-1.25-1.azl3.x86_64.rpm
 chkconfig-lang-1.25-1.azl3.x86_64.rpm
-msopenjdk-17-17.0.11-1.x86_64.rpm
+msopenjdk-17-17.0.12-1.x86_64.rpm
 pyproject-rpm-macros-1.12.0-2.azl3.noarch.rpm
 pyproject-srpm-macros-1.12.0-2.azl3.noarch.rpm
 python3-rpm-generators-14-11.azl3.noarch.rpm
