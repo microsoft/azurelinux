@@ -13,6 +13,7 @@ storage:
       end: 108M
 
     - id: rootfs
+      label: rootfs
       start: 108M
       end: 2G
 

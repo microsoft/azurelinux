@@ -178,29 +178,45 @@ func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, da
 }
 
 // idToPartitionBlockDevicePath returns the block device path for a given idType and id.
-func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, nbdDevice string, diskPartitions []diskutils.PartitionInfo) (string, error) {
+func idToPartitionBlockDevicePath(partitionId imagecustomizerapi.IdentifiedPartition,
+	diskPartitions []diskutils.PartitionInfo,
+) (string, error) {
 	// Iterate over each partition to find the matching id.
 	for _, partition := range diskPartitions {
-		switch idType {
-		case imagecustomizerapi.IdTypePartLabel:
-			if partition.PartLabel == id {
-				return partition.Path, nil
-			}
-		case imagecustomizerapi.IdTypeUuid:
-			if partition.Uuid == id {
-				return partition.Path, nil
-			}
-		case imagecustomizerapi.IdTypePartUuid:
-			if partition.PartUuid == id {
-				return partition.Path, nil
-			}
-		default:
-			return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
+		matches, err := partitionMatchesId(partitionId, partition)
+		if err != nil {
+			return "", err
+		}
+
+		if matches {
+			return partition.Path, nil
 		}
 	}
 
 	// If no partition is found with the given id.
-	return "", fmt.Errorf("no partition found for %s: %s", idType, id)
+	return "", fmt.Errorf("no partition found for %s: %s", partitionId.IdType, partitionId.Id)
+}
+
+func partitionMatchesId(partitionId imagecustomizerapi.IdentifiedPartition, partition diskutils.PartitionInfo,
+) (bool, error) {
+	switch partitionId.IdType {
+	case imagecustomizerapi.IdTypePartLabel:
+		if partition.PartLabel == partitionId.Id {
+			return true, nil
+		}
+	case imagecustomizerapi.IdTypeUuid:
+		if partition.Uuid == partitionId.Id {
+			return true, nil
+		}
+	case imagecustomizerapi.IdTypePartUuid:
+		if partition.PartUuid == partitionId.Id {
+			return true, nil
+		}
+	default:
+		return true, fmt.Errorf("invalid idType provided (%s)", string(partitionId.IdType))
+	}
+
+	return false, nil
 }
 
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
@@ -230,32 +246,4 @@ func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.Corruptio
 	default:
 		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(corruptionOption))
 	}
-}
-
-// findFreeNBDDevice finds the first available NBD device.
-func findFreeNBDDevice() (string, error) {
-	files, err := filepath.Glob("/sys/class/block/nbd*")
-	if err != nil {
-		return "", err
-	}
-
-	for _, file := range files {
-		// Check if the pid file exists. If it does not exist, the device is likely free.
-		pidFile := filepath.Join(file, "pid")
-		if _, err := os.Stat(pidFile); os.IsNotExist(err) {
-			return "/dev/" + filepath.Base(file), nil
-		}
-	}
-
-	return "", fmt.Errorf("no free nbd devices available")
-}
-
-func isNbdLoaded() (bool, error) {
-	files, err := filepath.Glob("/sys/class/block/nbd*")
-	if err != nil {
-		return false, err
-	}
-
-	isNbdLoaded := len(files) > 0
-	return isNbdLoaded, nil
 }

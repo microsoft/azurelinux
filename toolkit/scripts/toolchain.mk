@@ -16,6 +16,7 @@ toolchain_local_temp = $(toolchain_build_dir)/extract_dir
 toolchain_from_repos = $(toolchain_build_dir)/repo_rpms
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
 toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
+toolchain_rehydrate_logs_dir = $(toolchain_logs_dir)/rehydrate
 toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
@@ -176,24 +177,19 @@ $(raw_toolchain): $(toolchain_files)
 # - ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = n: This flag explicitly disables partial toolchain rehydration from repos
 # In these cases, we just create empty files for each possible rehydrated RPM.
 ifeq ($(strip $(INCREMENTAL_TOOLCHAIN))$(strip $(REBUILD_TOOLCHAIN))$(strip $(ALLOW_TOOLCHAIN_DOWNLOAD_FAIL)),yyy)
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
-	@rpm_filename="$(notdir $@)" && \
-	rpm_dir="$(dir $@)" && \
-	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
-	mkdir -p $$rpm_dir && \
-	cd $$rpm_dir && \
-	for url in $(PACKAGE_URL_LIST); do \
-		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
-			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file 2>/dev/null && \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
-		touch $@ && \
-		break; \
-	done || { \
-		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee -a "$$log_file" && \
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh
+	@log_file="$(toolchain_rehydrate_logs_dir)/$(notdir $@).log" && \
+	rm -f "$$log_file" && \
+	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
+		--downloader-tool "$(go-downloader)" \
+		--rpm-name "$(notdir $@)" \
+		--dst "$@" \
+		--log-base "$$log_file" \
+		--hydrate \
+		--url-list "$(PACKAGE_URL_LIST)" \
+		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) || { \
+		echo "Could not find toolchain package in package repo to rehydrate with: $(notdir $@)." >> "$$log_file" && \
 		touch $@; \
 	}
 else
@@ -296,26 +292,24 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader)
-	@rpm_filename="$(notdir $@)" && \
-	rpm_dir="$(dir $@)" && \
-	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Downloading toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
-	mkdir -p $$rpm_dir && \
-	cd $$rpm_dir && \
-	for url in $(PACKAGE_URL_LIST); do \
-		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
-			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file 2>/dev/null && \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		touch $@ && \
-		break; \
-	done || { \
-		echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
-		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
-		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
-		$(call print_error,\nToolchain download failed. See above errors for more details.) \
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh
+	@log_file="$(toolchain_downloads_logs_dir)/$(notdir $@).log" && \
+	rm -f "$$log_file" && \
+	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
+		--downloader-tool "$(go-downloader)" \
+		--rpm-name "$(notdir $@)" \
+		--dst "$@" \
+		--log-base "$$log_file" \
+		--url-list "$(PACKAGE_URL_LIST)" \
+		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) || \
+	{ \
+		echo "No entries in PACKAGE_URL_LIST ($(PACKAGE_URL_LIST)) were able to provide the toolchain package: $(notdir $@)." >> "$$log_file" && \
+		echo -e "\nERROR: Failed to download toolchain package: "$(notdir $@)"." && \
+		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':" && \
+		tail -n $(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
+		rm -f "$@" && \
+		$(call print_error,Toolchain download failed. See above errors for more details.) ; \
 	}
 endif
 

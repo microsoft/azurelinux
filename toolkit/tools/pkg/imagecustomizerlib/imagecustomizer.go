@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
@@ -211,11 +212,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
 
-	err = checkVerityPrerequisities(config)
-	if err != nil {
-		return err
-	}
-
 	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
 		baseConfigPath, config,
 		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
@@ -233,6 +229,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			}
 		}
 	}()
+
+	err = checkEnvironmentVars()
+	if err != nil {
+		return err
+	}
 
 	// ensure build and output folders are created up front
 	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
@@ -349,16 +350,27 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 	ic.rawImageFile = newRawImageFile
 
+	// Create a uuid for the image
+	imageUuid, imageUuidStr, err := createUuid()
+	if err != nil {
+		return err
+	}
+
 	// Customize the raw image file.
 	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
-		partitionsCustomized)
+		partitionsCustomized, imageUuidStr)
 	if err != nil {
 		return err
 	}
 
 	// Shrink the filesystems.
 	if ic.enableShrinkFilesystems {
-		err = shrinkFilesystemsHelper(ic.rawImageFile)
+		verityHashPartitionId := (*imagecustomizerapi.IdentifiedPartition)(nil)
+		if ic.config.OS.Verity != nil {
+			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
+		}
+
+		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
@@ -381,7 +393,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if ic.outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat, imageUuid)
 		if err != nil {
 			return err
 		}
@@ -495,10 +507,6 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	}
 
 	return nil
-}
-
-func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Storage != nil
 }
 
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
@@ -640,26 +648,9 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 	return nil
 }
 
-func checkVerityPrerequisities(config *imagecustomizerapi.Config) error {
-	if config == nil || config.OS == nil || config.OS.Verity == nil {
-		return nil
-	}
-
-	isNbdLoaded, err := isNbdLoaded()
-	if err != nil {
-		return fmt.Errorf("failed to check if NBD is loaded:\n%w", err)
-	}
-
-	if !isNbdLoaded {
-		return fmt.Errorf("verity requires nbd module to be loaded:\nplease run: modprobe nbd")
-	}
-
-	return nil
-}
-
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-) error {
+	imageUuidStr string) error {
 	logger.Log.Debugf("Customizing OS")
 
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
@@ -669,8 +660,8 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
-		useBaseImageRpmRepos, partitionsCustomized)
+	err = doOsCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized, imageUuidStr)
 
 	// Out of disk space errors can be difficult to diagnose.
 	// So, warn about any partitions with low free space.
@@ -688,7 +679,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string) error {
+func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string, imageUuid [UuidSize]byte) error {
 	imageLoopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
 		return err
@@ -696,7 +687,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	defer imageLoopback.Close()
 
 	// Extract the partitions as files.
-	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat)
+	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat, imageUuid)
 	if err != nil {
 		return err
 	}
@@ -709,7 +700,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string) error {
+func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -717,7 +708,7 @@ func shrinkFilesystemsHelper(buildImageFile string) error {
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath())
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition)
 	if err != nil {
 		return err
 	}
@@ -735,38 +726,23 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	// Connect the disk image to an NBD device using qemu-nbd
-	// Find a free NBD device
-	nbdDevice, err := findFreeNBDDevice()
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to find a free nbd device: %v", err)
+		return fmt.Errorf("failed to connect to image file to provision verity:\n%w", err)
 	}
+	defer loopback.Close()
 
-	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
-	}
-	defer func() {
-		// Disconnect the NBD device when the function returns
-		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
-		if err != nil {
-			return
-		}
-	}()
-
-	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
 	if err != nil {
 		return err
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType,
-		config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType,
-		config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -820,6 +796,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
 	if err != nil {
 		return err
 	}
@@ -922,4 +903,30 @@ func humanReadableUnitSizeAndName(size int64) (int64, string) {
 	default:
 		return 1, "B"
 	}
+}
+
+func checkEnvironmentVars() error {
+	// Some commands, like tdnf (and gpg), require the USER and HOME environment variables to make sense in the OS they
+	// are running under. Since the image customization tool is pretty much always run under root/sudo, this will
+	// generally always be the case since root is always a valid user. However, this might not be true if the user
+	// decides to use `sudo -E` instead of just `sudo`. So, check for this to avoid the user running into confusing
+	// tdnf errors.
+	//
+	// In an ideal world, the USER, HOME, and PATH environment variables should be overridden whenever an external
+	// command is called under chroot. But such a change would be quite involved.
+	const (
+		rootHome = "/root"
+		rootUser = "root"
+	)
+
+	envHome := os.Getenv("HOME")
+	envUser := os.Getenv("USER")
+
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
+		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
+	}
+
+	return nil
 }

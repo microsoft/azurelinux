@@ -22,6 +22,10 @@ parameters:
         maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
         rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
 
 resources:
   repositories:
@@ -37,7 +41,7 @@ variables:
   - name: toolchainArtifactNameBase
     value: Toolchain
   - name: system.debug
-    value: 'true'
+    value: '${{ parameters.debug }}'
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates

@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.35.1
-Release:        5%{?dist}
+Version:        6.6.43.1
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,6 +145,36 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Sat Aug 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-7
+- Bump release to match kernel
+
+* Wed Aug 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-6
+- Bump release to match kernel
+
+* Tue Aug 06 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-5
+- Bump release to match kernel
+
+* Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-4
+- Bump release to match kernel
+
+* Thu Aug 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.43.1-3
+- Bump release to match kernel
+
+* Wed Jul 31 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-2
+- Bump release to match kernel
+
+* Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
+- Auto-upgrade to 6.6.43.1
+
+* Tue Jul 30 2024 Chris Co <chrco@microsoft.com> - 6.6.39.1-2
+- Bump release to match kernel
+
+* Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.39.1-1
+- Auto-upgrade to 6.6.39.1
+
+* Tue Jul 16 2024 Kelsey Steele <kelseysteele@microsoft.com> - 6.6.35.1-6
+- Bump release to match kernel
+
 * Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-5
 - Bump release to match kernel-uki
 
