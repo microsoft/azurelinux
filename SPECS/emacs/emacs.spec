@@ -1,6 +1,6 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
-Version:        29.3
+Version:        29.4
 Release:        1%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Mon Jul 01 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 29.4-1
+- Upgrade to 29.4 to fix  CVE-2024-39331.
+
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 29.3-1
 - Upgrade to 29.3 to fix CVE-2024-30202, CVE-2024-30204, CVE-2024-30205
 

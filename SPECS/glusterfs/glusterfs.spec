@@ -110,7 +110,7 @@
 Summary:        Distributed File System
 Name:           glusterfs
 Version:        7.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,7 @@ Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
 Source8:        glusterfsd.init
 Patch0001:      0001-rpc-rpc-lib-src-Makefile.am.patch
+Patch0002:      CVE-2023-26253.patch
 
 BuildRequires:  bison
 BuildRequires:  flex
@@ -554,8 +555,7 @@ functionality, and also few other scripts required for setup.
 This package provides the glusterfs thin-arbiter translator.
 
 %prep
-%setup -q -n %{name}-%{version}%{?dev}
-%patch0001 -p1
+%autosetup -n %{name}-%{version}%{?dev} -p1
 
 %build
 
@@ -1226,6 +1226,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Jul 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-6
+- Patching CVE-2023-26253.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 7.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

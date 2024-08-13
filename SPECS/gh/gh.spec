@@ -31,7 +31,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         fix-relative-time-search-tests.patch
 Patch1:         CVE-2021-43565.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -75,8 +75,13 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+<<<<<<< HEAD
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-19
+- Drop requirement on a specific version of golang
+=======
 * Fri Jul 19 2024 Archana Choudhary <archana1@microsoft.com> - 2.13.0-19
 - Patch for CVE-2021-43565
+>>>>>>> 9b583d8ff (gh: patch CVE-2021-43565 (#9894))
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-18
 - Bump release to rebuild with go 1.21.11
