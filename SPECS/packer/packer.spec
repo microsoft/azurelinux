@@ -35,7 +35,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2022-3064.patch
 Patch2:         CVE-2023-49569.patch
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
 
@@ -71,6 +71,9 @@ go test -mod=vendor
 * Mon Jul 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.9.5-1
 - Revert to version 1.9.5.
 - Added patches for CVE-2022-3064 and CVE-2023-49569.
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.10.1-4
+- Drop requirement on a specific version of golang
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-3
 - Bump release to rebuild with go 1.21.11

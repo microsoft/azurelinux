@@ -1,7 +1,7 @@
 Summary:        Open Container Image manipulation tool
 Name:           umoci
 Version:        0.4.7
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,7 @@ URL:            https://github.com/opencontainers/umoci
 Source0:        https://github.com/opencontainers/umoci/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
-BuildRequires:  golang >= 1.17.9
+BuildRequires:  golang
 
 %description
 umoci modifies Open Container images.
@@ -39,6 +39,9 @@ go test -mod=vendor
 %{_bindir}/umoci
 
 %changelog
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 0.4.7-16
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.7-15
 - Bump release to rebuild with go 1.21.11
 
