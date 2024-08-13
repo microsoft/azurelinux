@@ -2,15 +2,21 @@
 %define release_number %(echo "%{release}" | cut -d. -f1)
 Summary:        First stage UEFI bootloader
 Name:           shim
-Version:        15.4
-Release:        2%{?dist}
+Version:        15.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rhboot/shim
-# This signed-shim tarball contains the shim binary signed with
-# the Microsoft UEFI CA key
-Source0:        signed-%{name}-%{version}-%{release_number}.tar.gz
+# The below source URL will point to the backing shim source code version used
+# to build the shim binary which has been signed with the MS UEFI CA. This is
+# needed for component governance.
+# The Source0 that gets used is actually the signed shim binary, whose filename
+# is annotated after the '#'. The signed shim binary is named with the following
+# schema to avoid name collisions:
+#   signed-shim-<arch>-<version>-<release>.<dist tag>.efi
+Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2#/signed-shim-%{_arch}-%{version}-%{release}.efi
+
 # Currently, the tarball only contains a UEFI CA signed x86_64 shim binary.
 # Upstream aarch64 shim 15.4 builds are in a bad state. They will break using
 # binutils versions before 2.35, and even after that they may give
@@ -27,17 +33,19 @@ Initial UEFI bootloader that handles chaining to a trusted full bootloader
 under secure boot environments.
 
 %prep
-%autosetup -n signed-%{name}-%{version}-%{release_number}
 
 %install
 install -d %{buildroot}/boot/efi/EFI/BOOT
-install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
+install -m644 %{SOURCE0} %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 
 %files
 %defattr(-,root,root)
 /boot/efi/EFI/BOOT/bootx64.efi
 
 %changelog
+* Mon Jul 01 2024 Chris Co <chrco@microsoft.com> - 15.8-1
+- Update shim binary to newer version associated with the 15.8-1 unsigned build.
+
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update signed shim binary to newer one associated with 15.4-2 unsigned build.
 - License verified

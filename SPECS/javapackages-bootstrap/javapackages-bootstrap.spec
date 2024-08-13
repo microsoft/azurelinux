@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        6%{?dist}
+Release:        5%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -87,7 +87,7 @@ Source1057:     maven-parent-pom.tar.xz
 Source1058:     maven-plugin-testing.tar.xz
 Source1059:     maven-plugin-tools.tar.xz
 Source1060:     maven-remote-resources-plugin.tar.xz
-Source1061:     maven-resolver-1.7.0.tar.xz
+Source1061:     maven-resolver.tar.xz
 Source1062:     maven-resources-plugin.tar.xz
 Source1063:     maven-resources.tar.xz
 Source1064:     maven-shared-incremental.tar.xz
@@ -97,7 +97,7 @@ Source1067:     maven-source-plugin.tar.xz
 Source1068:     maven-surefire.tar.xz
 Source1069:     maven-verifier.tar.xz
 Source1070:     maven-wagon.tar.xz
-Source1071:     maven-3.8.1.tar.xz
+Source1071:     maven.tar.xz
 Source1072:     mockito.tar.xz
 Source1073:     modello.tar.xz
 Source1074:     mojo-parent-pom.tar.xz
@@ -140,7 +140,6 @@ Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
 Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
-Patch4:         CVE-2021-26291.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -202,7 +201,7 @@ Provides:       bundled(maven-parent) = 34
 Provides:       bundled(maven-plugin-testing) = 3.3.0
 Provides:       bundled(maven-plugin-tools) = 3.6.0
 Provides:       bundled(maven-remote-resources-plugin) = 1.7.0
-Provides:       bundled(maven-resolver) = 1.7.0
+Provides:       bundled(maven-resolver) = 1.6.1
 Provides:       bundled(maven-resources-plugin) = 3.2.0
 Provides:       bundled(maven-resources) = 1.4
 Provides:       bundled(maven-shared-incremental) = 1.1
@@ -212,7 +211,7 @@ Provides:       bundled(maven-source-plugin) = 3.2.1
 Provides:       bundled(maven-surefire) = 3.0.0~M3
 Provides:       bundled(maven-verifier) = 1.7.2
 Provides:       bundled(maven-wagon) = 3.4.2
-Provides:       bundled(maven) = 3.8.1
+Provides:       bundled(maven) = 3.6.3
 Provides:       bundled(mockito) = 3.7.13
 Provides:       bundled(modello) = 1.11
 Provides:       bundled(mojo-parent) = 60
@@ -301,8 +300,6 @@ pushd "downstream/plexus-archiver"
 %patch2 -p1 
 popd
 
-%patch4 -p1
-
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
 # edit version from guava.properties
@@ -387,10 +384,6 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
-* Tue Jul 09 2024 Sindhu Karri <lakarri@microsoft.com> - 1.5.0-6
-- Update maven to 3.8.1 and maven-resolver to 1.7.0 to fix CVE-2021-26291
-- Add the CVE-2021-26291.patch to enable these upgrades
-
 * Fri Mar 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-5
 - Update Guava to fix CVE-2023-2976 using Fedora 40 (License: MIT).
 
