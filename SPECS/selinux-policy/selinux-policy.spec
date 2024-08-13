@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -337,6 +337,11 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon Aug 13 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-7
+- Change policy composition so the base module only consits of policy modules
+  that must be in the base.  This will allow dowstream users to disable or
+  override the individual policy modules.
+
 * Thu Jul 18 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-6
 - Drop rules that are specific to AzureLinux testing systems.
 - Add fix for systemd-machine-id-setup CAP_DAC_OVERRIDE use.
