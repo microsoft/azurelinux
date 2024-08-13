@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        8.5.0
-Release:        2%{?dist}
+Version:        8.8.0
+Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Mon Jul 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-1
+- Bump version to 8.8.0 to address CVE-2024-2398
+
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 8.5.0-2
 - Release bump with no changes to force a rebuild and consume new libssh2 build
 
