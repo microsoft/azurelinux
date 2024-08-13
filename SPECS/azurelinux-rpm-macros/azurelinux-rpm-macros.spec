@@ -60,7 +60,7 @@ Provides:       rust-srpm-macros
 Obsoletes:      mariner-rpm-macros <= 2.0-25
 Provides:       mariner-rpm-macros = %{version}-%{release}
 
-Obsoletes:      grub2-rpm-macros <= 2.06
+Obsoletes:      grub2-rpm-macros <= 2.06-19%{?dist}
 Provides:       grub2-rpm-macros = %{version}-%{release}
 
 BuildArch:      noarch
