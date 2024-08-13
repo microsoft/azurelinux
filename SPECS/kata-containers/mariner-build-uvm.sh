@@ -7,11 +7,9 @@ readonly INITRD_DIR="/var/cache/kata-containers/osbuilder-images/kernel-uvm"
 
 export AGENT_SOURCE_BIN=${SCRIPT_DIR}/agent/usr/bin/kata-agent
 
-rm -rf ${ROOTFS_DIR}
-
 # build rootfs
 pushd ${OSBUILDER_DIR}
-sudo make clean
+sudo make DISTRO=cbl-mariner clean
 rm -rf ${ROOTFS_DIR}
 sudo -E PATH=$PATH make -B DISTRO=cbl-mariner rootfs
 popd
