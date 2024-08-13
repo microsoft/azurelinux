@@ -1,0 +1,68 @@
+ProcRenderAddGlyphs() adds the glyph to the glyphset using AddGlyph() and
+then frees it using FreeGlyph() to decrease the reference count, after
+AddGlyph() has increased it.
+
+AddGlyph() however may chose to reuse an existing glyph if it's already
+in the glyphSet, and free the glyph that was given, in which case the
+caller function, ProcRenderAddGlyphs() will call FreeGlyph() on an
+already freed glyph, as reported by ASan:
+
+  READ of size 4 thread T0
+    #0 in FreeGlyph xserver/render/glyph.c:252
+    #1 in ProcRenderAddGlyphs xserver/render/render.c:1174
+    #2 in Dispatch xserver/dix/dispatch.c:546
+    #3 in dix_main xserver/dix/main.c:271
+    #4 in main xserver/dix/stubmain.c:34
+    #5 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #6 in __libc_start_main_impl ../csu/libc-start.c:360
+    #7  (/usr/bin/Xwayland+0x44fe4)
+  Address is located 0 bytes inside of 64-byte region
+  freed by thread T0 here:
+    #0 in __interceptor_free libsanitizer/asan/asan_malloc_linux.cpp:52
+    #1 in _dixFreeObjectWithPrivates xserver/dix/privates.c:538
+    #2 in AddGlyph xserver/render/glyph.c:295
+    #3 in ProcRenderAddGlyphs xserver/render/render.c:1173
+    #4 in Dispatch xserver/dix/dispatch.c:546
+    #5 in dix_main xserver/dix/main.c:271
+    #6 in main xserver/dix/stubmain.c:34
+    #7 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+  previously allocated by thread T0 here:
+    #0 in __interceptor_malloc libsanitizer/asan/asan_malloc_linux.cpp:69
+    #1 in AllocateGlyph xserver/render/glyph.c:355
+    #2 in ProcRenderAddGlyphs xserver/render/render.c:1085
+    #3 in Dispatch xserver/dix/dispatch.c:546
+    #4 in dix_main xserver/dix/main.c:271
+    #5 in main xserver/dix/stubmain.c:34
+    #6 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+  SUMMARY: AddressSanitizer: heap-use-after-free xserver/render/glyph.c:252 in FreeGlyph
+
+To avoid that, make sure not to free the given glyph in AddGlyph().
+
+v2: Simplify the test using the boolean returned from AddGlyph() (Michel)
+v3: Simplify even more by not freeing the glyph in AddGlyph() (Peter)
+
+Fixes: bdca6c3d
+
+ - render: fix refcounting of glyphs during ProcRenderAddGlyphs
+Closes: https://gitlab.freedesktop.org/xorg/xserver/-/issues/1659
+Signed-off-by: default avatarOlivier Fourdan <ofourdan@redhat.com>
+Part-of: <https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/1476>
+---
+ render/glyph.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/render/glyph.c b/render/glyph.c
+index d5fc5f3..f5069d4 100644
+--- a/render/glyph.c
++++ b/render/glyph.c
+@@ -291,8 +291,6 @@ AddGlyph(GlyphSetPtr glyphSet, GlyphPtr glyph, Glyph id)
+     gr = FindGlyphRef(&globalGlyphs[glyphSet->fdepth], signature,
+                       TRUE, glyph->sha1);
+     if (gr->glyph && gr->glyph != DeletedGlyph && gr->glyph != glyph) {
+-        FreeGlyphPicture(glyph);
+-        dixFreeObjectWithPrivates(glyph, PRIVATE_GLYPH);
+         glyph = gr->glyph;
+     }
+     else if (gr->glyph != glyph) {
+-- 
+2.25.1
