@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -324,6 +324,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Tue Aug 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - %{azl}.0.0-7
+- Updating Microsoft trusted root CAs.
+
 * Mon Apr 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-6
 - Updating Microsoft trusted root CAs.
 
