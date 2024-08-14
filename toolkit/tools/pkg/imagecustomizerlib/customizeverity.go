@@ -261,9 +261,6 @@ func preparePkgDependenciesForVerity(imageChroot *safechroot.Chroot) error {
 	// Iterate over each required package and check if it's installed.
 	for _, pkg := range requiredPkgs {
 		installed := isPackageInstalled(imageChroot, pkg)
-		if err != nil {
-			return err
-		}
 		if !installed {
 			// If the package is not installed, add it to the list of packages to install.
 			pkgsToInstall = append(pkgsToInstall, pkg)
