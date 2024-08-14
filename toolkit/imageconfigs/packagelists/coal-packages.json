@@ -63,6 +63,7 @@
         "openssh-clients",
         "openssh-server",
         "openssl",
+        "parted",
         "pkg-config",
         "procps-ng",
         "python3",

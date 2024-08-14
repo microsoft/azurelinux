@@ -1,8 +1,6 @@
 #!/bin/bash
 set -xe
 
-
-
 # Extend base tooling, jon?
 
 # Setup the data partition
@@ -17,8 +15,6 @@ mkdir -p /data/overlays/root/upper
 mkdir -p /data/overlays/root/work
 mkdir -p /data/containerd
 
-# # Make rootfs mount as read-only
-sgdisk -A 2:set:60 /dev/sda
 
 # Ensure data partition is mounted in initrd along with overlay
 sed -i "s/data ext4 defaults/data ext4 defaults,x-initrd.mount,x-systemd.growfs/" /etc/fstab
@@ -56,16 +52,22 @@ ln -s ../efi /boot/efi
 # sd-boot EFI binary as a workaround.
 cp /lib/systemd/boot/efi/systemd-bootx64.efi /efi/EFI/$EFIDIR/grubx64.efi
 
+echo "fstab-before:"
+cat /etc/fstab
+
 # empty /etc/fstab file
-echo > /etc/fstab
+sed -i '/\/ ext4/d' /etc/fstab
+sed -i '/\/efi vfat/d' /etc/fstab
+# echo > /etc/fstab
+
+echo "fstab-after:"
+cat /etc/fstab
 
 # copy UKI into the ESP
 mkdir -p /efi/EFI/Linux
 get_kernel_version
 echo "Kernel version = $KERNEL_VERSION"
 cp /lib/modules/$KERNEL_VERSION/vmlinuz-uki.efi /efi/EFI/Linux/vmlinuz-uki-$KERNEL_VERSION.efi
-
-
 
 # END UKI Logic
 

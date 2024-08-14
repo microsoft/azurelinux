@@ -49,7 +49,7 @@ Kernel Image (UKI).
 %setup -c -T
 
 %build
-chpasswd root:marinercoal
+
 
 dracut --conf=%{SOURCE0} --confdir=$(mktemp -d) --logfile=$(mktemp) \
        --verbose \
