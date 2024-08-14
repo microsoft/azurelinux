@@ -11,3 +11,4 @@ os:
     - squashfs-tools
     - tar
     - device-mapper
+    - curl

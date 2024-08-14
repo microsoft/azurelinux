@@ -1,20 +1,17 @@
 # Verifying pre-built ISO image
 
-| Release Branch | ISO Image | SHA-256 Checksum File | Checksum Signature |
-| -------------- | --------- | --------------------- | ------------------ |
-| 1.0            | <https://aka.ms/mariner-1.0-x86_64-iso> | <https://aka.ms/mariner-1.0-x86_64-iso-checksum> | <https://aka.ms/mariner-1.0-x86_64-iso-checksum-signature> |
-| 2.0            | <https://aka.ms/mariner-2.0-x86_64-iso> | <https://aka.ms/mariner-2.0-x86_64-iso-checksum> | <https://aka.ms/mariner-2.0-x86_64-iso-checksum-signature> |
-
-Once the ISO image, the checksum, and the checksum signature files are downloaded, it is strongly recommended that the integrity of the image is verified. This is a two-step process. First, ensure that the checksum file has not been tampered with by verifying the signature against Azure Linux's RPM signing public key. Second, check that the ISO image was not corrupted during the download. The following bash script shows the commands necessary to check both steps:
+It is strongly recommended that the integrity of the image is verified after downloading it. This is a two-step process. First, ensure that the checksum file has not been tampered with by verifying the signature against Azure Linux's RPM signing public key. Second, check that the ISO image was not corrupted during the download. The following bash script shows the commands necessary to download the iso image and check the signature:
 
 ```bash
-# Assumption: we are in the directory containing the downloaded files
-# Replace "1.0" in these variables with the release branch being verified
-CHECKSUM_FILE="mariner-1.0-x86_64.iso.sha256"
-SIGNATURE_FILE="mariner-1.0-x86_64.iso.sha256.gpg"
+# Download the necessary files
+wget https://aka.ms/AzureLinux-3.0-x86_64.iso
+wget https://aka.ms/azurelinux-3.0-x86_64-iso-checksum
+wget https://aka.ms/azurelinux-3.0-x86_64-iso-checksum-signature
+wget https://raw.githubusercontent.com/microsoft/azurelinux/3.0/SPECS/azurelinux-repos/MICROSOFT-RPM-GPG-KEY
 
-# Download the Azure Linux RPM signing public key
-wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/2.0/SPECS/azurelinux-repos/MICROSOFT-RPM-GPG-KEY
+# Set Variables for the checksum and signature file names
+CHECKSUM_FILE="azurelinux-3.0-x86_64-iso-checksum"
+SIGNATURE_FILE="azurelinux-3.0-x86_64-iso-checksum-signature"
 
 # Import the RPM signing public key into the local GPG keystore
 gpg --import MICROSOFT-RPM-GPG-KEY
@@ -26,6 +23,6 @@ gpg --verify "$SIGNATURE_FILE" "$CHECKSUM_FILE"
 
 # Verify that the ISO image checksum matches the expected checksum
 # We need to fix the line endings on the signature file to get sha256sum to accept it
-dos2unix "$SIGNATURE_FILE"
+dos2unix "$CHECKSUM_FILE"
 sha256sum --check "$CHECKSUM_FILE"
 ```

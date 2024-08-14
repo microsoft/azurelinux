@@ -350,9 +350,15 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 	ic.rawImageFile = newRawImageFile
 
+	// Create a uuid for the image
+	imageUuid, imageUuidStr, err := createUuid()
+	if err != nil {
+		return err
+	}
+
 	// Customize the raw image file.
 	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
-		partitionsCustomized)
+		partitionsCustomized, imageUuidStr)
 	if err != nil {
 		return err
 	}
@@ -387,7 +393,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if ic.outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat, imageUuid)
 		if err != nil {
 			return err
 		}
@@ -644,7 +650,7 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-) error {
+	imageUuidStr string) error {
 	logger.Log.Debugf("Customizing OS")
 
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
@@ -654,8 +660,8 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
-		useBaseImageRpmRepos, partitionsCustomized)
+	err = doOsCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized, imageUuidStr)
 
 	// Out of disk space errors can be difficult to diagnose.
 	// So, warn about any partitions with low free space.
@@ -673,7 +679,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string) error {
+func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string, imageUuid [UuidSize]byte) error {
 	imageLoopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
 		return err
@@ -681,7 +687,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	defer imageLoopback.Close()
 
 	// Extract the partitions as files.
-	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat)
+	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat, imageUuid)
 	if err != nil {
 		return err
 	}
@@ -916,10 +922,10 @@ func checkEnvironmentVars() error {
 	envHome := os.Getenv("HOME")
 	envUser := os.Getenv("USER")
 
-	if envHome != rootHome || envUser != rootUser {
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
 		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
-			"HOME must be set to '%s' and USER must be set to '%s'",
-			rootHome, rootUser)
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
 	}
 
 	return nil

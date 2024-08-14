@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,9 @@ Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Patch0:         CVE-2023-45853.patch
+Patch1:         CVE-2024-32884.patch
+Patch2:         CVE-2024-31852.patch
+
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -169,6 +172,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Fri Aug 09 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.75.0-9
+- Patch CVE-2024-32884 and CVE-2024-31852
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.75.0-8
 - Bump release to build with new llvm to fix CVE-2024-31852
 

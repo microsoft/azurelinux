@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        9.4
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,10 +12,12 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Source1:        serial-console.sh
 Patch0:         coreutils-9.4-i18n-1.patch
 Patch1:         coreutils-9.4-uname-1.patch
+Patch2:         CVE-2024-0684.patch
+BuildRequires:  libacl-devel
+BuildRequires:  libattr-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
-Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
 %if 0%{?with_check}
@@ -71,8 +73,6 @@ sed -i 's/PET/-05/g' tests/misc/date-debug.sh
 sed -i 's/2>err\/merge-/2>\&1 > err\/merge-/g' tests/misc/sort-merge-fdlimit.sh
 sed -i 's/)\" = \"10x0/| head -n 1)\" = \"10x0/g' tests/split/r-chunk.sh
 sed  -i '/mb.sh/d' Makefile
-# remove capability test which incorrectly determines xattr support and then fails
-sed -i '/tests\/cp\/capability.sh/d' Makefile
 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 
 %post   -p /sbin/ldconfig
@@ -92,6 +92,16 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Thu Aug 8 2024 Chris Gunn <chrisgun@microsoft.com> - 9.4-6
+- Enable xattr and acl support.
+
+* Thu Aug 1 2024 Riken Maharjan <rmaharjan@microsoft.com> - 9.4-5
+- Remove unecessary Requires on libselinux imported from Fedora 40 (License: MIT)
+- libselinux causes dependency cycle.
+
+* Tue Jul 23 2024 Muhammad Falak <mwani@microsoft.com> - 9.4-4
+- Address CVE-2024-0684
+
 * Mon Jun 17 2024 Andrew Phelps <anphel@microsoft.com> - 9.4-3
 - add coreutils-9.4-uname-1.patch
 
