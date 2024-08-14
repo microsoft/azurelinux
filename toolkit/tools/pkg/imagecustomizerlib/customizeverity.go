@@ -25,6 +25,11 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 
 	logger.Log.Infof("Enable verity")
 
+	err = preparePkgDependenciesForVerity(imageChroot)
+	if err != nil {
+		return false, fmt.Errorf("failed to prepare package dependencies for verity:\n%w", err)
+	}
+
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
@@ -246,4 +251,33 @@ func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.Corruptio
 	default:
 		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(corruptionOption))
 	}
+}
+
+func preparePkgDependenciesForVerity(imageChroot *safechroot.Chroot) error {
+	var err error
+	requiredPkgs := []string{"lvm2"}
+	var pkgsToInstall []string
+
+	// Iterate over each required package and check if it's installed.
+	for _, pkg := range requiredPkgs {
+		installed := isPackageInstalled(imageChroot, pkg)
+		if err != nil {
+			return err
+		}
+		if !installed {
+			// If the package is not installed, add it to the list of packages to install.
+			pkgsToInstall = append(pkgsToInstall, pkg)
+		}
+	}
+
+	// If there are any packages to install, install them.
+	if len(pkgsToInstall) > 0 {
+		logger.Log.Infof("Installing packages: %v", pkgsToInstall)
+		err = installOrUpdatePackages("install", pkgsToInstall, imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
