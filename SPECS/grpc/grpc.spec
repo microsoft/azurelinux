@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,7 +10,7 @@ URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-submodules.tar.gz
 Patch0:         grpcio-cython3.patch
-BuildRequires:  abseil-cpp-devel
+BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 BuildRequires:  build-essential
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -22,7 +22,7 @@ BuildRequires:  protobuf-static
 BuildRequires:  re2-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
-Requires:       abseil-cpp
+Requires:       abseil-cpp >= 20240116.0-2
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
@@ -153,6 +153,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 1.62.0-3
+- Bump release to rebuild with latest 'abseil-cpp'.
+
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.62.0-2
 - Bump release to rebuild with latest 'abseil-cpp'.
 
