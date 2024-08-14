@@ -25,9 +25,9 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 
 	logger.Log.Infof("Enable verity")
 
-	err = preparePkgDependenciesForVerity(imageChroot)
+	err = validateVerityDependencies(imageChroot)
 	if err != nil {
-		return false, fmt.Errorf("failed to prepare package dependencies for verity:\n%w", err)
+		return false, fmt.Errorf("failed to validate package dependencies for verity:\n%w", err)
 	}
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
@@ -253,26 +253,14 @@ func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.Corruptio
 	}
 }
 
-func preparePkgDependenciesForVerity(imageChroot *safechroot.Chroot) error {
-	var err error
-	requiredPkgs := []string{"lvm2"}
-	var pkgsToInstall []string
+func validateVerityDependencies(imageChroot *safechroot.Chroot) error {
+	requiredRpms := []string{"lvm2"}
 
 	// Iterate over each required package and check if it's installed.
-	for _, pkg := range requiredPkgs {
-		installed := isPackageInstalled(imageChroot, pkg)
-		if !installed {
-			// If the package is not installed, add it to the list of packages to install.
-			pkgsToInstall = append(pkgsToInstall, pkg)
-		}
-	}
-
-	// If there are any packages to install, install them.
-	if len(pkgsToInstall) > 0 {
-		logger.Log.Infof("Installing packages: %v", pkgsToInstall)
-		err = installOrUpdatePackages("install", pkgsToInstall, imageChroot)
-		if err != nil {
-			return err
+	for _, pkg := range requiredRpms {
+		logger.Log.Debugf("Checking if package (%s) is installed", pkg)
+		if !isPackageInstalled(imageChroot, pkg) {
+			return fmt.Errorf("package (%s) is not installed:\nthe following packages must be installed to use Verity: %v", pkg, requiredRpms)
 		}
 	}
 
