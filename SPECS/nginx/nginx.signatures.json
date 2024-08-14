@@ -2,6 +2,6 @@
   "Signatures": {
     "nginx-njs-0.8.3.tar.gz": "5e1341ee8c1dfce420ea6456475dafa7d5f4b9aed310faca32597cf4d221cfe0",
     "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1",
-    "nginx-1.25.4.tar.gz": "760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9"
+    "nginx-1.26.1.tar.gz": "f9187468ff2eb159260bfd53867c25ff8e334726237acf227b9e870e53d3e36b"
   }
 }
