@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt38
+%global rt_version rt39
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
@@ -23,7 +23,7 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        6.6.43.1
+Version:        6.6.44.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -414,6 +414,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Aug 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.44.1-1
+- Auto-upgrade to 6.6.44.1
+
 * Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
 - Auto-upgrade to 6.6.43.1
 
