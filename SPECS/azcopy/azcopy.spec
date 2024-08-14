@@ -1,6 +1,6 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
-Version:        10.24.0
+Version:        10.25.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -61,6 +61,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Tue Aug 06 2024 Archana Choudhary <archana1@microsoft.com> - 10.25.1-1
+- Upgrade azcopy to latest 10.25.1 to fix multiple security issues  
+
 * Thu May 23 2024 Sudipta Pandit <sudpandit@microsoft.com> - 10.24.0-1
 - Upgrade azcopy to latest 10.24.0 to fix multiple security issues
 

@@ -32,18 +32,11 @@ func (d *Disk) IsValid() error {
 		return fmt.Errorf("a disk's maxSize value (%d) must be a positive non-zero number", d.MaxSize)
 	}
 
-	partitionIDSet := make(map[string]bool)
 	for i, partition := range d.Partitions {
 		err := partition.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
 		}
-
-		if _, existingName := partitionIDSet[partition.Id]; existingName {
-			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.Id, i)
-		}
-
-		partitionIDSet[partition.Id] = false // dummy value
 	}
 
 	// Check for overlapping partitions.

@@ -345,6 +345,22 @@ start_record_timestamp "build packages"
 start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
 
+# Download JDK rpm
+echo "Downloading MsOpenJDK rpm"
+MSOPENJDK_FILENAME="msopenjdk-17-17.0.12-1.$(uname -m).rpm"
+MSOPENJDK_URL="https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/$(uname -m)/$MSOPENJDK_FILENAME"
+case $(uname -m) in
+    x86_64)  MSOPENJDK_EXPECTED_HASH="08d46b64dc0202ad54be937bb5eab7d4c6a6f7f355a40afbeb295cb591dba126" ;;
+    aarch64) MSOPENJDK_EXPECTED_HASH="0532d42d5c010152c09e88971f9aecd84af54f935973bbf0f1eba2c1c6839726" ;;
+esac
+wget -nv --server-response --no-clobber --timeout=30 $MSOPENJDK_URL --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+MSOPENJDK_ACTUAL_HASH=$(sha256sum "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME" | awk '{print $1}')
+if [[ "$MSOPENJDK_EXPECTED_HASH" != "$MSOPENJDK_ACTUAL_HASH" ]]; then
+    echo "Error, incorrect msopenjdk hash: '$MSOPENJDK_ACTUAL_HASH'. Expected hash: '$MSOPENJDK_EXPECTED_HASH'"
+    rm -vf "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME"
+    exit 1
+fi
+
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-rpm-macros
@@ -475,17 +491,6 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
-echo Download JDK rpms
-case $(uname -m) in
-    x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-    aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-esac
-
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua lua
@@ -607,8 +612,15 @@ chroot_and_install_rpms libselinux
 # PCRE2 needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
 
-# coreutils and findutils require libselinux
-# for SELinux support.
+# attr requires gettext, libtool
+build_rpm_in_chroot_no_install attr
+
+# acl requires libattr
+chroot_and_install_rpms libattr
+build_rpm_in_chroot_no_install acl
+
+# coreutils and findutils require libselinux, libacl, libattr
+chroot_and_install_rpms libacl
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install findutils
 

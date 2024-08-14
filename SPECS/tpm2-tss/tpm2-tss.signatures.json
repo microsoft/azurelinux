@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "tpm2-tss-4.0.1.tar.gz": "532a70133910b6bd842289915b3f9423c0205c0ea009d65294ca18a74087c950",
-  "tpm2-tss.sysusers": "14c0854c73c51bbcd6764fdafa29401f8292f5eaa8abac23899209a63fe2ed4c"
+  "tpm2-tss-4.0.2.tar.gz": "e5f9b6055c29cb8d653ec7576853ff3863aa65dbd9cf4b3638ae8e8e7ce968ea"
  }
 }
