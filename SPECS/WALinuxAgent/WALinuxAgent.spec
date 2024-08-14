@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.11.1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{versi
 Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
+Source4:        module-setup.sh
 # This patch adds azurelinux support into WALinuxAgent. The patch should be
 # removed in the next 2.12 update of WALinuxAgent.
 Patch0:         0001-add-azurelinux-support.patch
@@ -73,6 +74,9 @@ install -m 644 %{SOURCE1} %{buildroot}/%{_libdir}/systemd/system/ephemeral-disk-
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
 install -m 644 %{SOURCE3} %{buildroot}%{_bindir}/ephemeral-disk-warning
 
+mkdir -p %{buildroot}%{_prefix}/lib/dracut/modules.d/97walinuxagent/
+install -m 755 %{SOURCE4} %{buildroot}%{_prefix}/lib/dracut/modules.d/97walinuxagent/module-setup.sh
+
 %check
 python3 setup.py check && python3 setup.py test
 
@@ -89,6 +93,8 @@ python3 setup.py check && python3 setup.py test
 %files
 %{_libdir}/systemd/system/*
 %{_sysconfdir}/udev/rules.d/*
+%dir %attr(0700, root, root) %{_prefix}/lib/dracut/modules.d/97walinuxagent
+%{_prefix}/lib/dracut/modules.d/97walinuxagent/module-setup.sh
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
 %attr(0755,root,root) %{_bindir}/waagent
@@ -103,6 +109,9 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Fri Aug 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.11.1.4-2
+- Package dracut setup script with WALinuxAgent
+
 * Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 2.11.1.4-1
 - Upgrade to version 2.11.1.4
 - Add patch for azurelinux support
