@@ -63,13 +63,17 @@ func (s *Storage) IsValid() error {
 
 			partitionSet[partition.Id] = partition
 
-			// Ensure special partitions have the correct filesystem type.
 			fileSystem, hasFileSystem := fileSystemSet[partition.Id]
+			if !hasFileSystem {
+				return fmt.Errorf("invalid disk at index %d:\npartition (%s) at index %d must have a corresponding filesystem entry",
+					i, partition.Id, j)
+			}
 
+			// Ensure special partitions have the correct filesystem type.
 			if partition.IsESP() {
 				espPartitionExists = true
 
-				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+				if fileSystem.Type != FileSystemTypeFat32 {
 					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
 				}
 			}
@@ -77,7 +81,7 @@ func (s *Storage) IsValid() error {
 			if partition.IsBiosBoot() {
 				biosBootPartitionExists = true
 
-				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+				if fileSystem.Type != FileSystemTypeFat32 {
 					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
 				}
 			}

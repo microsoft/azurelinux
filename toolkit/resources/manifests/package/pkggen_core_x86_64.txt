@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.43.1-5.azl3.noarch.rpm
+kernel-headers-6.6.43.1-7.azl3.noarch.rpm
 glibc-2.38-6.azl3.x86_64.rpm
 glibc-devel-2.38-6.azl3.x86_64.rpm
 glibc-i18n-2.38-6.azl3.x86_64.rpm
@@ -41,8 +41,11 @@ ncurses-libs-6.4-2.azl3.x86_64.rpm
 ncurses-term-6.4-2.azl3.x86_64.rpm
 readline-8.2-1.azl3.x86_64.rpm
 readline-devel-8.2-1.azl3.x86_64.rpm
-coreutils-9.4-5.azl3.x86_64.rpm
-coreutils-lang-9.4-5.azl3.x86_64.rpm
+libattr-2.5.2-1.azl3.x86_64.rpm
+attr-2.5.2-1.azl3.x86_64.rpm
+libacl-2.3.1-2.azl3.x86_64.rpm
+coreutils-9.4-6.azl3.x86_64.rpm
+coreutils-lang-9.4-6.azl3.x86_64.rpm
 bash-5.2.15-2.azl3.x86_64.rpm
 bash-devel-5.2.15-2.azl3.x86_64.rpm
 bash-lang-5.2.15-2.azl3.x86_64.rpm
@@ -167,6 +170,7 @@ gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
+openssl-3.3.0-2.azl3.x86_64.rpm
 openssl-devel-3.3.0-2.azl3.x86_64.rpm
 openssl-libs-3.3.0-2.azl3.x86_64.rpm
 openssl-perl-3.3.0-2.azl3.x86_64.rpm
@@ -190,7 +194,7 @@ libsolv-devel-0.7.28-1.azl3.x86_64.rpm
 libssh2-1.11.0-1.azl3.x86_64.rpm
 libssh2-devel-1.11.0-1.azl3.x86_64.rpm
 krb5-1.21.3-1.azl3.x86_64.rpm
-nghttp2-1.59.0-1.azl3.x86_64.rpm
+nghttp2-1.61.0-1.azl3.x86_64.rpm
 curl-8.8.0-1.azl3.x86_64.rpm
 curl-devel-8.8.0-1.azl3.x86_64.rpm
 curl-libs-8.8.0-1.azl3.x86_64.rpm
@@ -205,8 +209,8 @@ libltdl-2.4.7-1.azl3.x86_64.rpm
 libltdl-devel-2.4.7-1.azl3.x86_64.rpm
 lua-5.4.6-1.azl3.x86_64.rpm
 lua-libs-5.4.6-1.azl3.x86_64.rpm
-azurelinux-rpm-macros-3.0-5.azl3.noarch.rpm
-azurelinux-check-macros-3.0-5.azl3.noarch.rpm
+azurelinux-rpm-macros-3.0-6.azl3.noarch.rpm
+azurelinux-check-macros-3.0-6.azl3.noarch.rpm
 tdnf-3.5.6-1.azl3.x86_64.rpm
 tdnf-cli-libs-3.5.6-1.azl3.x86_64.rpm
 tdnf-devel-3.5.6-1.azl3.x86_64.rpm
@@ -230,10 +234,10 @@ libffi-devel-3.4.4-1.azl3.x86_64.rpm
 libtasn1-4.19.0-1.azl3.x86_64.rpm
 p11-kit-0.25.0-1.azl3.x86_64.rpm
 p11-kit-trust-0.25.0-1.azl3.x86_64.rpm
-ca-certificates-shared-3.0.0-6.azl3.noarch.rpm
-ca-certificates-tools-3.0.0-6.azl3.noarch.rpm
-ca-certificates-base-3.0.0-6.azl3.noarch.rpm
-ca-certificates-3.0.0-6.azl3.noarch.rpm
+ca-certificates-shared-3.0.0-7.azl3.noarch.rpm
+ca-certificates-tools-3.0.0-7.azl3.noarch.rpm
+ca-certificates-base-3.0.0-7.azl3.noarch.rpm
+ca-certificates-3.0.0-7.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 unzip-6.0-20.azl3.x86_64.rpm
 python3-3.12.3-1.azl3.x86_64.rpm

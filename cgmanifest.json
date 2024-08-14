@@ -835,8 +835,8 @@
         "type": "other",
         "other": {
           "name": "azcopy",
-          "version": "10.24.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.24.0.tar.gz"
+          "version": "10.25.1",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.25.1.tar.gz"
         }
       }
     },
@@ -3148,8 +3148,8 @@
         "type": "other",
         "other": {
           "name": "edk2",
-          "version": "20240223gitedc6681206c1",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-edc6681206c1.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-edc6681206c1.tar.xz"
+          "version": "20240524git3e722403cd16",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-3e722403cd16.tar.xz/sha512/58550636ea26810a0184423765db24e43319a0cc5e38dfd5fbd7f09b5f6e1c2d2b9e1e33112a3b721e05c7f088dbfd8a2ddd4a73d833c3019a16101ef1d0342a/edk2-3e722403cd16.tar.xz"
         }
       }
     },
@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.5-1/go1.22.5-20240702.3.src.tar.gz"
+          "version": "1.22.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.6-1/go1.22.6-20240806.4.src.tar.gz"
         }
       }
     },
@@ -7351,8 +7351,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.16",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.16.tar.gz"
+          "version": "3.17.1",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.17.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.35.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.35.1.tar.gz"
+          "version": "6.6.43.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.43.1.tar.gz"
         }
       }
     },
@@ -9841,8 +9841,8 @@
         "type": "other",
         "other": {
           "name": "libldb",
-          "version": "2.1.4",
-          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.1.4.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://www.samba.org/ftp/ldb/ldb-2.7.2.tar.gz"
         }
       }
     },
@@ -11061,8 +11061,8 @@
         "type": "other",
         "other": {
           "name": "libtdb",
-          "version": "1.4.3",
-          "downloadUrl": "http://samba.org/ftp/tdb/tdb-1.4.3.tar.gz"
+          "version": "1.4.8",
+          "downloadUrl": "https://samba.org/ftp/tdb/tdb-1.4.8.tar.gz"
         }
       }
     },
@@ -11081,8 +11081,8 @@
         "type": "other",
         "other": {
           "name": "libtevent",
-          "version": "0.10.2",
-          "downloadUrl": "http://samba.org/ftp/tevent/tevent-0.10.2.tar.gz"
+          "version": "0.14.1",
+          "downloadUrl": "https://samba.org/ftp/tevent/tevent-0.14.1.tar.gz"
         }
       }
     },
@@ -13952,8 +13952,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.59.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.59.0/nghttp2-1.59.0.tar.xz"
+          "version": "1.61.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.61.0/nghttp2-1.61.0.tar.xz"
         }
       }
     },
@@ -21113,8 +21113,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.3",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.3/postgresql-16.3.tar.bz2"
+          "version": "16.4",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.4/postgresql-16.4.tar.bz2"
         }
       }
     },
@@ -25754,8 +25754,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.0",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
+          "version": "3.3.3",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.3.tar.gz"
         }
       }
     },
@@ -27945,6 +27945,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "stress-ng",
+          "version": "0.18.02",
+          "downloadUrl": "https://github.com/ColinIanKing/stress-ng/archive/V0.18.02/stress-ng-0.18.02.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "strace",
           "version": "6.8",
           "downloadUrl": "https://strace.io/files/6.8/strace-6.8.tar.xz"
@@ -28616,8 +28626,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "4.0.1",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.1/tpm2-tss-4.0.1.tar.gz"
+          "version": "4.0.2",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.2/tpm2-tss-4.0.2.tar.gz"
         }
       }
     },

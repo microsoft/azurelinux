@@ -36,7 +36,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 9. Configure kernel modules. ([modules](#modules-module))
 
-10. Write the `/etc/mariner-customizer-release` file.
+10. Write the `/etc/image-customizer-release` file.
 
 11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.

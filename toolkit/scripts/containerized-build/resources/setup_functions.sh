@@ -12,25 +12,6 @@ IS_REPO_ENABLED=false
 
 # General setup
 
-## Azure Linux macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
-DEFINES=(-D "with_check 1")
-MACROS=()
-for macro_file in "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
-do
-  MACROS+=("--load=$macro_file")
-done
-
-# Extra arguments for tdnf
-TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
-
-# TODO Remove when dailybuild is discontinued for 3.0
-if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
-    repo_file_src="/azl_setup_dir/azl-3_repo"
-    repo_name=$(awk -F'[][]' '/^\[/{print $2}' "${repo_file_src}")
-    TDNF_ARGS+=("--enablerepo=${repo_name}")
-    mv "${repo_file_src}" /etc/yum.repos.d/azl-3.repo
-fi
-
 ## Create $SOURCES_DIR
 mkdir -p $SOURCES_DIR
 
@@ -38,6 +19,7 @@ mkdir -p $SOURCES_DIR
 rpm() {
     local args=("$@")
     command "$FUNCNAME" "${args[@]}"
+    local command_return=$?
     if [[ ${args} = *"i"* ]]; then
         for ((i = 0; i < ${#args[@]}; ++i)); do
             if [[ ${args[$i]} = *".src.rpm"* ]]; then
@@ -53,6 +35,7 @@ rpm() {
     rm -f $SPECS_DIR/*.spec
     rm -f $SOURCES_DIR/*.spec
     rm -f $SOURCES_DIR/*.signatures.json
+    return $command_return
 }
 
 # Installs srpm, pkg dependencies and builds pkg
@@ -77,14 +60,16 @@ show_help() {
     echo "******************************************************************************************"
 }
 
-# Refresh repo cache with newly built RPM, use Azure Linux specific DEFINES
+# Refresh repo cache with newly built RPM
 rpmbuild() {
     local args=("$@")
-    command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
+    command "$FUNCNAME" "${args[@]}"
+    local command_return=$?
     if [[ ${IS_REPO_ENABLED} = true ]] ; then
         refresh_local_repo
         tdnf makecache
     fi
+    return $command_return
 }
 
 # Refresh metadata for local RPMs' repo
@@ -178,17 +163,4 @@ install_dependencies() {
     done
 
     return $exit_code
-}
-
-# use Azure Linux specific DEFINES
-rpmspec() {
-    local args=("$@")
-    command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
-}
-
-# use proper tdnf arguments
-tdnf() {
-    local args=("$@")
-    command "$FUNCNAME" "${TDNF_ARGS[@]}" "${args[@]}"
-
 }
