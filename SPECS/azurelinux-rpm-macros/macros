@@ -40,32 +40,9 @@
 %{?use_llvm_clang:ln -svf /usr/bin/clang /usr/bin/cc}\
 %{?use_llvm_clang:ln -svf /usr/bin/clang++ /usr/bin/c++}\
 %{?use_llvm_linker:ln -svf /usr/bin/ld.lld /usr/bin/ld}\
+%{?use_llvm_clang:rm -vf /usr/bin/gcc}\
+%{?use_llvm_clang:rm -vf /usr/bin/g++}\
 %{nil}
-
-# GCC toolchain
-%__cc_gcc gcc
-%__cxx_gcc g++
-%__cpp_gcc gcc -E
-
-# Clang toolchain
-%__cc_clang clang
-%__cxx_clang clang++
-%__cpp_clang clang-cpp
-
-## Default to the clang or gnu/gcc toolchain
-# %%use_llvm_clang 1
-# %%use_llvm_linker 1
-%toolchain %{?use_llvm_clang:clang}%{!?use_llvm_clang:gcc}
-
-%__cc %{expand:%%{__cc_%{toolchain}}}
-%__cxx %{expand:%%{__cxx_%{toolchain}}}
-%__cpp %{expand:%%{__cpp_%{toolchain}}}
-
-# Compiler macros to use for invoking compilers in spec files for packages that
-# want to use the default compiler and don't care which compiler that is.
-%build_cc %{__cc}
-%build_cxx %{__cxx}
-%build_cpp %{__cpp}
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
