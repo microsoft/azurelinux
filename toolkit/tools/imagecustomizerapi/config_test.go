@@ -15,7 +15,7 @@ func TestConfigIsValid(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -52,7 +52,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "boot",
@@ -109,7 +109,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -260,7 +260,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -298,7 +298,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",

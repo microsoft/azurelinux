@@ -73,3 +73,23 @@ func TestDiskSizeBadFormat(t *testing.T) {
 	err := UnmarshalYaml([]byte("2M2"), &diskSize)
 	assert.ErrorContains(t, err, "has incorrect format")
 }
+
+func TestDiskSizeHumanReadableTiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.TiB).HumanReadable(), "1 TiB")
+}
+
+func TestDiskSizeHumanReadableGiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.GiB).HumanReadable(), "1 GiB")
+}
+
+func TestDiskSizeHumanReadableMiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.MiB).HumanReadable(), "1 MiB")
+}
+
+func TestDiskSizeHumanReadableKiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.KiB).HumanReadable(), "1 KiB")
+}
+
+func TestDiskSizeHumanReadableBytes(t *testing.T) {
+	assert.Equal(t, DiskSize(1).HumanReadable(), "1 bytes")
+}
