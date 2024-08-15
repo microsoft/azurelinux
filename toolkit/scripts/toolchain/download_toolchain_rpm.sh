@@ -135,9 +135,9 @@ if $enforce_signatures; then
         usage
         exit 1
     fi
-    for key in $allowable_gpg_keys; do
-        if [ ! -f "$key" ]; then
-            echo "GPG key file does not exist: $key"
+    for gpg_key in $allowable_gpg_keys; do
+        if [ ! -f "$gpg_key" ]; then
+            echo "GPG key file does not exist: $gpg_key"
             exit 1
         fi
     done
