@@ -55,7 +55,7 @@ cp "$runScriptPath" "${stagingBinDir}"
 
 touch ${containerStagingFolder}/.mariner-toolkit-ignore-dockerenv
 
-# download oras
+# Download oras
 ORAS_TAR="${buildDir}/oras_${ORAS_VERSION}_linux_${ARCH}.tar.gz"
 
 curl -L "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_${ARCH}.tar.gz" \
