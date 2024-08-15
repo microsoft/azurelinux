@@ -174,7 +174,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 		insertAt = len(argsString)
 	}
 
-	args, err := parseCommandLineArgs(grubTokens)
+	args, err := ParseCommandLineArgs(grubTokens)
 	if err != nil {
 		err = fmt.Errorf("failed to parse %s's value args:\n%w", varName, err)
 		return defaultGrubFileVarAssign{}, nil, 0, err
@@ -184,7 +184,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 }
 
 // Takes the string contents of /etc/default/grub file and inserts the provided command-line args.
-func addExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
+func AddExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
 	cmdLineVarAssign, _, insertAt, err := getDefaultGrubFileLinuxArgs(defaultGrubFileContent,
 		defaultGrubFileVarNameCmdlineLinuxDefault)
 	if err != nil {

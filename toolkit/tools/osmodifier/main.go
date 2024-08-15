@@ -22,6 +22,7 @@ var (
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	updateGrub    = app.Flag("update-grub", "Update default GRUB.").Bool()
 )
 
 func main() {
@@ -40,22 +41,23 @@ func main() {
 	timestamp.BeginTiming("osmodifier", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	err = modifyImage()
-	if err != nil {
-		log.Fatalf("os modification failed: %v", err)
+	// Check if the updateGrub flag is set
+	if *updateGrub {
+		err := osmodifierlib.ModifyDefaultGrub()
+		if err != nil {
+			log.Fatalf("update grub failed: %v", err)
+		}
+	}
+
+	if len(*configFile) > 0 {
+		err = modifyImage()
+		if err != nil {
+			log.Fatalf("OS modification failed: %v", err)
+		}
 	}
 }
 
 func modifyImage() error {
-	if *configFile == "" {
-		// The config file is not needed when applying verity changes in grub.cfg to the default grub
-		err := osmodifierlib.ModifyOSWithoutConfigFile()
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
 	err := osmodifierlib.ModifyOSWithConfigFile(*configFile)
 	if err != nil {
 		return err

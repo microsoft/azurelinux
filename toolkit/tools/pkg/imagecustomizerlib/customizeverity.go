@@ -46,7 +46,7 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	return true, nil
 }
 
-func addDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
+func addDracutModule(dracutModuleName string, dracutDriverName string, imageChroot safechroot.ChrootInterface) error {
 	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
 
 	// Check if the dracut module configuration file already exists.

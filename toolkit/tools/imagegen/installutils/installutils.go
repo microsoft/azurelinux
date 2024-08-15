@@ -1963,7 +1963,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot safechroot.ChrootInterface) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1984,7 +1984,7 @@ func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot safechroot.ChrootInterface, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"

@@ -43,8 +43,8 @@ func ModifyOS(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
 	return nil
 }
 
-func ModifyOSWithoutConfigFile() error {
-	err := doModificationsWithoutConfig()
+func ModifyDefaultGrub() error {
+	err := modifyDefaultGrub()
 	if err != nil {
 		return err
 	}

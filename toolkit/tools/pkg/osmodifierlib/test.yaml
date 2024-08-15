@@ -1,0 +1,5 @@
+selinux:
+  mode: enforcing
+
+kernelCommandLine:
+  extraCommandLine: root=/dev/mapper/root
