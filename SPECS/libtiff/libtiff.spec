@@ -9,7 +9,11 @@ Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
 Patch0:         CVE-2023-52356.patch
+<<<<<<< HEAD
 Patch1:         CVE-2023-6277.patch
+=======
+Patch1:         CVE-2024-7006.patch
+>>>>>>> 99483fc7e (Patch CVE-2024-7006 in libtiff (#10136))
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -62,8 +66,13 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
+<<<<<<< HEAD
 * Wed Aug 07 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.6.0-3
 - Add patch to resolve CVE-2023-6277
+=======
+* Tue Aug 13 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.6.0-3
+- Add patch for CVE-2024-7006
+>>>>>>> 99483fc7e (Patch CVE-2024-7006 in libtiff (#10136))
 
 * Thu Mar 7 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.0-2
 - Add patches for CVE-2023-52356
