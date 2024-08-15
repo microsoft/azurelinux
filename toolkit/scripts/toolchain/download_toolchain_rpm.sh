@@ -168,14 +168,14 @@ function download() {
 
             echo "SUCCESS" >> "$log_file"
             touch "$dst_file"
-            return
+            return 0
         else
             echo "Failed to download toolchain RPM: $rpm_name" >> "$attempt_log_file"
             echo "FAILURE" >> "$log_file"
         fi
     done
 
-    exit 1
+    return 1
 }
 
 function validate_signatures() {
@@ -188,14 +188,19 @@ function validate_signatures() {
 
     if ! rpmkeys --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
         echo "Failed to validate toolchain package $rpm_name signature, aborting." | tee -a "$log_file"
-        exit 1
+        return 1
     fi
+    return 0
 }
 
 mkdir -p "$(dirname "$log_file")"
 
-download
+if ! download; then
+    exit 1
+fi
 
 if $enforce_signatures; then
-    validate_signatures
+    if ! validate_signatures; then
+        exit 1
+    fi
 fi
