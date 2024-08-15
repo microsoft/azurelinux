@@ -4,6 +4,13 @@
 
 set -e
 
+# Create a temporary work directory for RPM signature validation
+work_dir=$(mktemp -d)
+function cleanup() {
+    rm -rf "$work_dir"
+}
+trap cleanup EXIT
+
 # Usage print
 function usage() {
     echo "Usage: $0 --downloader-tool <downloader_tool> --rpm-name <rpm_name> --dst <dst_file> --log-base <log_base>" \
@@ -172,14 +179,6 @@ function download() {
 }
 
 function validate_signatures() {
-    if [ -z "$work_dir" ]; then
-        work_dir=$(mktemp -d)
-        function cleanup() {
-            rm -rf "$work_dir"
-        }
-        trap cleanup EXIT
-    fi
-
     echo "Validating toolchain RPM: $rpm_name" | tee -a "$log_file"
 
     for key in $allowable_gpg_keys; do
