@@ -21,7 +21,6 @@ function usage() {
     echo "-k|--private-key: Optional path to a private key file to use for the download"
     echo "-e|--enforce-signatures: Optional flag to enforce RPM signatures"
     echo "-g|--allowable-gpg-keys: Optional space separated list of GPG keys to allow for signature validation"
-    exit 1
 }
 
 # Default values
@@ -80,32 +79,39 @@ while (( "$#")); do
             ;;
         -h|--help)
             usage
+            exit 0
             ;;
         *)
             echo "Unknown argument: $1"
             usage
+            exit 1
             ;;
     esac
 done
 
 if [ -z "$downloader_tool" ]; then
     usage
+    exit 1
 fi
 
 if [ -z "$rpm_name" ]; then
     usage
+    exit 1
 fi
 
 if [ -z "$dst_file" ]; then
     usage
+    exit 1
 fi
 
 if [ -z "$log_file" ]; then
     usage
+    exit 1
 fi
 
 if [ -z "$url_list" ]; then
     usage
+    exit 1
 fi
 
 if [ -n "$cert" ]; then
@@ -120,6 +126,7 @@ if $enforce_signatures; then
     if [ -z "$allowable_gpg_keys" ]; then
         echo "Must provide allowable GPG keys when enforcing signatures"
         usage
+        exit 1
     fi
 fi
 
