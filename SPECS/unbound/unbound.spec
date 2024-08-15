@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
 Version:        1.19.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
+Patch0:         CVE-2024-43168.patch
 BuildRequires:  expat-devel
 BuildRequires:  libevent-devel
 BuildRequires:  python3-devel
@@ -96,6 +97,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Thu Aug 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.19.1-2
+- Add patch to fix CVE-2024-43168
+
 * Mon Jul 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.1-1
 - Auto-upgrade to 1.19.1 - CVE-2023-50387
 
