@@ -128,6 +128,12 @@ if $enforce_signatures; then
         usage
         exit 1
     fi
+    for key in $allowable_gpg_keys; do
+        if [ ! -f "$key" ]; then
+            echo "GPG key file does not exist: $key"
+            exit 1
+        fi
+    done
 fi
 
 function download() {
