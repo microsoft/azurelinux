@@ -65,6 +65,8 @@ type RpmRepoCloner struct {
 	chrootCloneDir           string
 	defaultAzureLinuxRepoIDs []string
 	mountedCloneDir          string
+	repoSnapshotTime         string
+	repoSnapshotArgs         []string
 	repoIDCache              string
 	reposArgsList            [][]string
 	reposFlags               uint64
@@ -79,12 +81,12 @@ type RpmRepoCloner struct {
 //   - tlsCert is the path to the TLS certificate, "" if not needed
 //   - tlsKey is the path to the TLS key, "" if not needed
 //   - repoDefinitions is a list of repo files to use
-func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, repoDefinitions []string) (r *RpmRepoCloner, err error) {
+func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, repoDefinitions []string, posixTime string) (r *RpmRepoCloner, err error) {
 	timestamp.StartEvent("initialize and configure cloner", nil)
 	defer timestamp.StopEvent(nil) // initialize and configure cloner
 
 	r = &RpmRepoCloner{}
-	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions)
+	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions, posixTime)
 	if err != nil {
 		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
 		return
@@ -107,7 +109,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 //   - existingRpmsDir is the directory with prebuilt RPMs
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, repoDefinitions []string, posixTime string) (err error) {
 	const (
 		isExistingDir          = false
 		leaveChrootFilesOnDisk = false
@@ -208,6 +210,10 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	r.SetEnabledRepos(repoFlagClonerDefault)
+
+	if posixTime != "" {
+		r.SetRepoEpochTimeLimitArgs(posixTime)
+	}
 
 	return
 }
@@ -400,6 +406,10 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 		r.chrootCloneDir,
 	}
 
+	if r.GetRepoSnapshotTime() != "" {
+		constantArgs = append(constantArgs, r.GetRepoSnapshotArgs()...)
+	}
+
 	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
 	// Create a list of lists for each transaction. Each transaction will be cloned separately. Generally either all
@@ -453,7 +463,11 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		releaseverCliArg,
 	}
 
-	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	if r.GetRepoSnapshotTime() != "" {
+		baseArgs = append(baseArgs, r.GetRepoSnapshotArgs()...)
+	}
+
+	// Consider the built (toolchain, local) RPMs first, then the already cached, and finally all remote packages.
 	for _, reposArgs := range r.reposArgsList {
 		logger.Log.Debugf("Using repos args: %v", reposArgs)
 
@@ -681,6 +695,27 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	}
 
 	return
+}
+
+func (r *RpmRepoCloner) GetRepoSnapshotTime() string {
+	return r.repoSnapshotTime
+}
+
+func (r *RpmRepoCloner) GetRepoSnapshotArgs() []string {
+	return r.repoSnapshotArgs
+}
+
+func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
+	r.repoSnapshotTime = posixTime
+	r.repoSnapshotArgs = []string{}
+
+	if r.repoSnapshotTime == "" { // no args to add
+		return
+	}
+
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, fmt.Sprintf("--snapshottime=%s", r.repoSnapshotTime))
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, fmt.Sprintf("--excludesnapshot=%s", repoIDBuilt))
+
 }
 
 // GetEnabledRepos returns the repo flags that the cloner is allowed to use for its queries.

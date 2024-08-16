@@ -45,6 +45,7 @@ RUN_CHECK                            ?= n
 USE_PREVIEW_REPO                     ?= n
 DISABLE_UPSTREAM_REPOS               ?= n
 DISABLE_DEFAULT_REPOS                ?= n
+REPO_SNAPSHOT_TIME                   ?=
 TOOLCHAIN_CONTAINER_ARCHIVE          ?=
 TOOLCHAIN_ARCHIVE                    ?=
 TOOLCHAIN_SOURCES_ARCHIVE            ?=

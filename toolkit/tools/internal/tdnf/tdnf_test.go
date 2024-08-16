@@ -153,6 +153,7 @@ func TestInstallPackageRegex_DoesNotMatchInvalidLine(t *testing.T) {
 
 	assert.False(t, InstallPackageRegex.MatchString(line))
 }
+
 func TestPackageLookupNameMatchRegex_MatchesExternalRepo(t *testing.T) {
 	const line = "xz-devel-5.4.4-1.azl3.x86_64 : Header and development files for xz\nRepo : toolchain-repo"
 
@@ -241,4 +242,53 @@ func TestPackageLookupNameMatchRegex_FailsForOutputWithOnlyPluginLoaded(t *testi
 	const line = "Loaded plugin: tdnfrepogpgcheck"
 
 	assert.False(t, PackageProvidesRegex.MatchString(line))
+
+func Test_getRepoSnapshotCliArg(t *testing.T) {
+	type args struct {
+		posixTime string
+	}
+	tests := []struct {
+		name             string
+		args             args
+		wantRepoSnapshot string
+		wantErr          bool
+	}{
+		{name: "testEmpty", args: args{posixTime: ""}, wantRepoSnapshot: "", wantErr: true},
+		{name: "testIsNotNumeric", args: args{posixTime: "12345qwerty"}, wantRepoSnapshot: "", wantErr: true},
+		{name: "testNumeric", args: args{posixTime: "123456789"}, wantRepoSnapshot: "--snapshottime=123456789", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRepoSnapshot, err := getRepoSnapshotCliArg(tt.args.posixTime)
+			assert.Equal(t, tt.wantErr, err != nil)
+			assert.Equal(t, tt.wantRepoSnapshot, gotRepoSnapshot)
+		})
+	}
+}
+
+func Test_getRepoSnapshotExcludeCliArg(t *testing.T) {
+	type args struct {
+		excludeRepo string
+	}
+	tests := []struct {
+		name           string
+		args           args
+		wantExcludeArg string
+		wantErr        bool
+	}{
+		{name: "testEmpty", args: args{excludeRepo: ""}, wantExcludeArg: "", wantErr: true},
+		{name: "testRepo", args: args{excludeRepo: "local-repo"}, wantExcludeArg: "--excludesnapshot=local-repo", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotExcludeArg, err := getRepoSnapshotExcludeCliArg(tt.args.excludeRepo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getRepoSnapshotExcludeCliArg() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotExcludeArg != tt.wantExcludeArg {
+				t.Errorf("getRepoSnapshotExcludeCliArg() = %v, want %v", gotExcludeArg, tt.wantExcludeArg)
+			}
+		})
+	}
 }

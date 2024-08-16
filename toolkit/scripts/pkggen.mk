@@ -192,12 +192,16 @@ graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR
 $(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 endif
 
+ifneq ($(REPO_SNAPSHOT_TIME),)
+graphpkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
+endif
+
 ifeq ($(PRECACHE),y)
 # Use highly parallel downlader to fully hydrate the cache before trying to use the package manager to download packages
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS) $(depend_REPO_SNAPSHOT_TIME)
 	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \

@@ -42,6 +42,7 @@ var (
 	usePreviewRepo                = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
 	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
+	repoSnapshotTime              = app.Flag("repo-snapshot-time", "Repo time limit for tdnf virtual snapshot").String()
 
 	depGraph = pkggraph.NewPkgGraph()
 )
@@ -82,7 +83,7 @@ func main() {
 
 	var cloner *rpmrepocloner.RpmRepoCloner = nil
 	if *resolveCyclesFromUpstream {
-		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles, *repoSnapshotTime)
 		if err != nil {
 			logger.Log.Panic(err)
 		}

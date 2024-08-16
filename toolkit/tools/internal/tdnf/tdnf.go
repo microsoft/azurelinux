@@ -7,6 +7,7 @@ package tdnf
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 )
@@ -156,4 +157,35 @@ func getMajorVersionFromString(version string) (majorVersion string, err error) 
 		return
 	}
 	return
+}
+
+func getRepoSnapshotCliArg(posixTime string) (repoSnapshot string, err error) {
+	const (
+		errorFormatString = "cannot generate snapshot cli arg for: %s"
+	)
+	if posixTime == "" {
+		err = fmt.Errorf(errorFormatString, posixTime)
+		return "", err
+	}
+
+	_, err = strconv.Atoi(posixTime)
+	if err != nil {
+		err = fmt.Errorf(errorFormatString, posixTime)
+		return "", err
+	}
+
+	repoSnapshot = fmt.Sprintf("--snapshottime=%s", posixTime)
+
+	return repoSnapshot, nil
+}
+
+func getRepoSnapshotExcludeCliArg(excludeRepo string) (excludeArg string, err error) {
+	if excludeRepo == "" {
+		err = fmt.Errorf("exclude repo cannot be empty")
+		return "", err
+	}
+
+	excludeArg = fmt.Sprintf("--excludesnapshot=%s", excludeRepo)
+
+	return excludeArg, nil
 }

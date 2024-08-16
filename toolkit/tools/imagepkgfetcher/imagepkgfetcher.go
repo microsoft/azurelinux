@@ -38,6 +38,7 @@ var (
 	usePreviewRepo       = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
 	disableDefaultRepos  = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
+	repoSnapshotTime     = app.Flag("repo-snapshot-time", "Repo time limit for tdnf virtual snapshot").String()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -74,7 +75,7 @@ func main() {
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
 
-	cloner, err := rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+	cloner, err := rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles, *repoSnapshotTime)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}

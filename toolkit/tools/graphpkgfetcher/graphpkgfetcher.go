@@ -46,6 +46,7 @@ var (
 	disableDefaultRepos  = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
 	toolchainManifest    = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
+	repoSnapshotTime     = app.Flag("repo-snapshot-time", "Repo time limit for tdnf virtual snapshot").String()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -163,7 +164,7 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 
 func setupCloner() (cloner *rpmrepocloner.RpmRepoCloner, err error) {
 	// Create the worker environment
-	cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+	cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles, *repoSnapshotTime)
 	if err != nil {
 		err = fmt.Errorf("failed to setup new cloner:\n%w", err)
 		return
