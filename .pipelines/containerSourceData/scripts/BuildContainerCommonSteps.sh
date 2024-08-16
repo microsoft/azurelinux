@@ -34,7 +34,7 @@ function finalize {
     echo "$CONTAINER_IMAGE_NAME_FINAL" >> "$OUTPUT_DIR/PublishedContainers-$IMAGE.txt"
 
     # Publish the image to ACR
-    publish_to_acr
+    publish_to_acr "$CONTAINER_IMAGE_NAME_FINAL"
 
     # Generate SBOM
     generate_image_sbom
@@ -49,6 +49,8 @@ function oras_attach {
 }
 
 function publish_to_acr {
+    local container=$1
+
     if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
         echo "+++ Skip publishing to ACR"
         return
@@ -61,9 +63,9 @@ function publish_to_acr {
         --username "00000000-0000-0000-0000-000000000000" \
         --password "$oras_access_token"
 
-    echo "+++ Publish container $CONTAINER_IMAGE_NAME_FINAL"
-    docker image push "$CONTAINER_IMAGE_NAME_FINAL"
-    oras_attach "$CONTAINER_IMAGE_NAME_FINAL"
+    echo "+++ Publish container $container"
+    docker image push "$container"
+    oras_attach "$container"
 }
 
 function generate_image_sbom {
