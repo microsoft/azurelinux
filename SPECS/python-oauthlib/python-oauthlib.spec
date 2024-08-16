@@ -37,7 +37,7 @@ OAuthLib is a generic utility which implements the logic of OAuth without assumi
 %py3_install
 
 %check
-pip3 install mock wheel pyjwt
+pip3 install mock wheel pyjwt cryptography 
 %python3 setup.py test
 
 %files -n python3-oauthlib
