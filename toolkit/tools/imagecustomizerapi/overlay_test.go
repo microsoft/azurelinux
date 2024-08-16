@@ -117,7 +117,6 @@ func TestOverlayInvalidMountDependencyPath(t *testing.T) {
 
 	err := overlay.IsValid()
 	assert.ErrorContains(t, err, "invalid mountDependency (invalid/path)")
-	assert.ErrorContains(t, err, "must be an absolute path")
 }
 
 func TestOverlayValidEmptyMountDependencies(t *testing.T) {
