@@ -8,13 +8,13 @@ Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
-Patch:          CVE-2022-48303.patch
+Patch0:         CVE-2022-48303.patch
 
 %description
 Contains GNU archiving program
 
 %prep
-%setup -q
+%autosetup -p1
 %build
 FORCE_UNSAFE_CONFIGURE=1  ./configure \
     --prefix=%{_prefix} \
