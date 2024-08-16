@@ -1,7 +1,7 @@
 Summary:        An implementation of the OAuth request-signing logic
 Name:           python-oauthlib
 Version:        3.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,7 @@ OAuthLib is a generic utility which implements the logic of OAuth without assumi
 %py3_install
 
 %check
-pip3 install mock wheel
+pip3 install mock wheel pyjwt
 %python3 setup.py test
 
 %files -n python3-oauthlib
@@ -45,6 +45,9 @@ pip3 install mock wheel
 %{python3_sitelib}/*
 
 %changelog
+* Fri Aug 16 2024 Henry Li <rmaharjan@microsoft.com> - 3.2.2-2
+- Add missing %check package pyjwt
+
 * Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 3.2.2-1
 - Upgrade to version 3.2.2
 - Fix Source0
