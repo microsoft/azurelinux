@@ -24,10 +24,10 @@ azurelinux-repos-ms-oss-preview-3.0-3.azl3.noarch.rpm
 azurelinux-repos-preview-3.0-3.azl3.noarch.rpm
 azurelinux-repos-shared-3.0-3.azl3.noarch.rpm
 azurelinux-rpm-macros-3.0-6.azl3.noarch.rpm
-bash-5.2.15-2.azl3.x86_64.rpm
-bash-debuginfo-5.2.15-2.azl3.x86_64.rpm
-bash-devel-5.2.15-2.azl3.x86_64.rpm
-bash-lang-5.2.15-2.azl3.x86_64.rpm
+bash-5.2.15-3.azl3.x86_64.rpm
+bash-debuginfo-5.2.15-3.azl3.x86_64.rpm
+bash-devel-5.2.15-3.azl3.x86_64.rpm
+bash-lang-5.2.15-3.azl3.x86_64.rpm
 binutils-2.41-2.azl3.x86_64.rpm
 binutils-aarch64-linux-gnu-2.41-2.azl3.x86_64.rpm
 binutils-debuginfo-2.41-2.azl3.x86_64.rpm
