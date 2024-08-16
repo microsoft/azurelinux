@@ -64,6 +64,7 @@ Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
 Provides:       selinux-policy-base
 Provides:       selinux-policy-targeted
+Obsoletes:      selinux-policy-modules < 2.20240226-7
 BuildArch:      noarch
 
 %description
@@ -130,26 +131,14 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
 %exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
-%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
-
-%package modules
-Summary:        SELinux policy modules
-Requires:       selinux-policy = %{version}-%{release}
-Requires(pre):  selinux-policy = %{version}-%{release}
-
-%description modules
-Additional SELinux policy modules
-
-%files modules
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/disabled
 
 %package devel
 Summary:        SELinux policy devel
 Requires:       %{_bindir}/make
 Requires:       checkpolicy >= %{CHECKPOLICYVER}
 Requires:       m4
+Requires:       selinux-policy = %{version}-%{release}
 Requires(post): policycoreutils-devel >= %{POLICYCOREUTILSVER}
 
 %description devel
@@ -190,18 +179,12 @@ install -m0644 %{_sourcedir}/modules_%{1}.conf policy/modules.conf \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} conf \
 install -m0644 %{_sourcedir}/booleans_%{1}.conf policy/booleans.conf
 
-# After all the modules are inserted into the module store, the non-base
-# modules are disabled so the selinux-policy package only has the base module.
-# The selinux-policy-modules RPM then drops the disable flags using %exclude
-# in the %files section so the entire policy is enabled when the
-# selinux-policy-modules RPM is installed.
 %define installCmds() \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} base.pp \
 %make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} modules \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install-appconfig \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} SEMODULE="semodule -p %{buildroot} -X 100 " load \
-semodule -p %{buildroot} -l | grep -v base | xargs semodule -p %{buildroot} -d \
 mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
 touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
 install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
@@ -312,11 +295,6 @@ else
      . %{_sysconfdir}/selinux/config
 fi
 %postInstall $1 %{policy_name}
-exit 0
-
-%post modules
-%{_sbindir}/semodule -B -n -s %{policy_name}
-[ "${SELINUXTYPE}" == "%{policy_name}" ] && selinuxenabled && load_policy
 exit 0
 
 %postun

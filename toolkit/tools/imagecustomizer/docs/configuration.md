@@ -1424,8 +1424,7 @@ os:
     install:
     # Required packages for SELinux.
     - selinux-policy
-    - selinux-policy-modules
-    
+
     # Optional packages that contain useful SELinux utilities.
     - setools-console
     - policycoreutils-python-utils
