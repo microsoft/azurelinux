@@ -38,6 +38,13 @@ docker run --rm --privileged=true \
    --output-image-file /image/customized.raw
 ```
 
+Alternatively, you can use the [run.sh](https://github.com/microsoft/azurelinux/blob/3.0-dev/toolkit/tools/imagecustomizer/container/test-mic-container.sh)
+script on the container which runs `imagecustomizer` with a base image downloaded from MCR.
+
+Usage: ``` run.sh $version_tag ```
+
+For a complete usage example, refer to [test-mic-container.sh](https://github.com/microsoft/azurelinux/blob/3.0-dev/toolkit/tools/imagecustomizer/container/test-mic-container.sh).
+
 ### Check the Output
 
 After the container executes, check the output directory on your host for the
