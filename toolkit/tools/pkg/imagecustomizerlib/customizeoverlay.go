@@ -6,17 +6,18 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) (bool, error) {
+func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode, fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) (bool, error) {
 	var err error
 
 	if overlays == nil {
@@ -34,20 +35,20 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 
 	// Dereference the pointer to get the slice
 	overlaysDereference := *overlays
-	err = updateFstabForOverlays(imageChroot, overlaysDereference)
+	err = updateFstabForOverlays(overlaysDereference, fileSystems, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to update fstab file for overlays:\n%w", err)
 	}
 
 	// Create necessary directories for overlays
-	err = createOverlayDirectories(imageChroot, overlaysDereference)
+	err = createOverlayDirectories(overlaysDereference, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to create overlay directories:\n%w", err)
 	}
 
 	// Add equivalency rules for each overlay
 	for _, overlay := range overlaysDereference {
-		err = addEquivalencyRule(filepath.Join(imageChroot.RootDir(), overlay.UpperDir), filepath.Join(imageChroot.RootDir(), overlay.LowerDir))
+		err = addEquivalencyRule(selinuxMode, filepath.Join(imageChroot.RootDir(), overlay.UpperDir), filepath.Join(imageChroot.RootDir(), overlay.LowerDir), imageChroot)
 		if err != nil {
 			return false, fmt.Errorf("failed to add equivalency rule for overlay:\n%w", err)
 		}
@@ -56,47 +57,61 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 	return true, nil
 }
 
-func updateFstabForOverlays(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.Overlay) error {
+func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
+	fstabFile := filepath.Join(imageChroot.RootDir(), "etc/fstab")
 	fstabEntries, err := diskutils.ReadFstabFile(fstabFile)
 	if err != nil {
 		return fmt.Errorf("failed to read fstab file: %v", err)
 	}
 
 	var updatedEntries []diskutils.FstabEntry
-	for _, entry := range fstabEntries {
-		updatedEntries = append(updatedEntries, entry)
-	}
+	updatedEntries = append(updatedEntries, fstabEntries...)
 
 	for _, overlay := range overlays {
 		lowerDir := overlay.LowerDir
 		upperDir := overlay.UpperDir
 		workDir := overlay.WorkDir
-		mountDependency := overlay.MountDependency
+		mountDependencies := overlay.MountDependencies
+
+		// Validate that each mountDependency has the x-initrd.mount option in the corresponding file system entry.
+		for _, dep := range mountDependencies {
+			found := false
+			for _, fs := range fileSystems {
+				if fs.MountPoint != nil && fs.MountPoint.Path == dep {
+					found = true
+					if !strings.Contains(fs.MountPoint.Options, "x-initrd.mount") {
+						return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fileSystems", dep)
+					}
+					break
+				}
+			}
+			if !found {
+				return fmt.Errorf("mountDependency %s not found in fileSystems", dep)
+			}
+		}
 
 		if overlay.IsRootfsOverlay {
 			lowerDir = path.Join("/sysroot", overlay.LowerDir)
 			upperDir = path.Join("/sysroot", overlay.UpperDir)
 			workDir = path.Join("/sysroot", overlay.WorkDir)
-			if mountDependency != nil {
-				dep := path.Join("/sysroot", *mountDependency)
-				mountDependency = &dep
+			for i, dep := range mountDependencies {
+				mountDependencies[i] = path.Join("/sysroot", dep)
 			}
 		}
 
 		options := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", lowerDir, upperDir, workDir)
 
 		// Add any additional options if needed (e.g., x-initrd.mount, x-systemd.requires)
-		if mountDependency != nil {
-			options = fmt.Sprintf("%s,x-systemd.requires=%s", options, *mountDependency)
+		for _, dep := range mountDependencies {
+			options = fmt.Sprintf("%s,x-systemd.requires=%s", options, dep)
 		}
 		if overlay.IsRootfsOverlay {
 			options = fmt.Sprintf("%s,x-initrd.mount", options)
 		}
-		if overlay.MountOptions != nil && *overlay.MountOptions != "" {
-			options = fmt.Sprintf("%s,%s", options, *overlay.MountOptions)
+		if overlay.MountOptions != "" {
+			options = fmt.Sprintf("%s,%s", options, overlay.MountOptions)
 		}
 
 		// Create the FstabEntry based on the overlay.
@@ -120,7 +135,7 @@ func updateFstabForOverlays(imageChroot *safechroot.Chroot, overlays []imagecust
 	return nil
 }
 
-func createOverlayDirectories(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.Overlay) error {
+func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	for _, overlay := range overlays {
 		dirsToCreate := []string{
 			filepath.Join(imageChroot.RootDir(), overlay.MountPoint),
@@ -139,14 +154,33 @@ func createOverlayDirectories(imageChroot *safechroot.Chroot, overlays []imagecu
 	return nil
 }
 
-func addEquivalencyRule(upperDir string, lowerDir string) error {
-	// Construct the semanage command
-	cmd := exec.Command("semanage", "fcontext", "-a", "-e", upperDir, lowerDir)
+func addEquivalencyRule(selinuxMode imagecustomizerapi.SELinuxMode, upperDir string, lowerDir string, imageChroot *safechroot.Chroot) error {
+	var err error
 
-	// Execute the command
-	output, err := cmd.CombinedOutput()
+	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
+		// No need to add equivalency rule if SELinux is disabled.
+		return nil
+	}
+
+	// Additional check if the base image has SELinux enabled already.
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
 	if err != nil {
-		return fmt.Errorf("failed to add equivalency rule between %s and %s: %v\nOutput: %s", upperDir, lowerDir, err, string(output))
+		return fmt.Errorf("failed to initialize NewBootCustomizer:\n%w", err)
+	}
+	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
+	if err != nil {
+		return fmt.Errorf("failed to get current SELinux mode:\n%w", err)
+	}
+	if currentSELinuxMode == imagecustomizerapi.SELinuxModeDisabled {
+		// No need to add equivalency rule if base image has SELinux disabled.
+		return nil
+	}
+
+	err = imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", upperDir, lowerDir)
+	})
+	if err != nil {
+		return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", upperDir, lowerDir, err)
 	}
 
 	return nil

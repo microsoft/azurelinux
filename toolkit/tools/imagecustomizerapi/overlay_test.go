@@ -11,13 +11,13 @@ import (
 
 func TestOverlayValidConfiguration(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "/lower",
-		UpperDir: "/upper",
-		WorkDir:  "/work",
-		Partition: &IdentifiedPartition{
-			IdType: "part-uuid",
-			Id:     "123e4567-e89b-4d3a-a456-426614174000",
-		},
+		LowerDir:          "/lower",
+		UpperDir:          "/upper",
+		WorkDir:           "/work",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -26,9 +26,13 @@ func TestOverlayValidConfiguration(t *testing.T) {
 
 func TestOverlayInvalidEmptyLowerDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "",
-		UpperDir: "/upper",
-		WorkDir:  "/work",
+		LowerDir:          "",
+		UpperDir:          "/upper",
+		WorkDir:           "/work",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -38,9 +42,13 @@ func TestOverlayInvalidEmptyLowerDir(t *testing.T) {
 
 func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "/lower",
-		UpperDir: "/upper",
-		WorkDir:  " ",
+		LowerDir:          "/lower",
+		UpperDir:          "/upper",
+		WorkDir:           " ",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -50,9 +58,13 @@ func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 
 func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "/lower",
-		UpperDir: "/invalid/same",
-		WorkDir:  "/invalid/same",
+		LowerDir:          "/lower",
+		UpperDir:          "/invalid/same",
+		WorkDir:           "/invalid/same",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -62,9 +74,13 @@ func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 
 func TestOverlayInvalidWorkDirSubsUpperDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "/lower",
-		UpperDir: "/invalid",
-		WorkDir:  "/invalid/same",
+		LowerDir:          "/lower",
+		UpperDir:          "/invalid",
+		WorkDir:           "/invalid/same",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -74,9 +90,13 @@ func TestOverlayInvalidWorkDirSubsUpperDir(t *testing.T) {
 
 func TestOverlayInvalidUpperDirSubsWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir: "/lower",
-		UpperDir: "/invalid/same",
-		WorkDir:  "/invalid",
+		LowerDir:          "/lower",
+		UpperDir:          "/invalid/same",
+		WorkDir:           "/invalid",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
@@ -84,14 +104,48 @@ func TestOverlayInvalidUpperDirSubsWorkDir(t *testing.T) {
 	assert.ErrorContains(t, err, "workDir (/invalid) should not be a subdirectory of upperDir (/invalid/same)")
 }
 
-func TestOverlayInvalidPartition(t *testing.T) {
+func TestOverlayInvalidMountDependencyPath(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:  "/lower",
-		UpperDir:  "/upper",
-		WorkDir:   "/work",
-		Partition: &IdentifiedPartition{},
+		LowerDir:          "/lower",
+		UpperDir:          "/upper",
+		WorkDir:           "/work",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"invalid/path"},
+		MountOptions:      "noatime",
 	}
 
 	err := overlay.IsValid()
-	assert.ErrorContains(t, err, "invalid partition")
+	assert.ErrorContains(t, err, "invalid mountDependency (invalid/path)")
+	assert.ErrorContains(t, err, "must be an absolute path")
+}
+
+func TestOverlayValidEmptyMountDependencies(t *testing.T) {
+	overlay := Overlay{
+		LowerDir:          "/lower",
+		UpperDir:          "/upper",
+		WorkDir:           "/work",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{},
+		MountOptions:      "noatime",
+	}
+
+	err := overlay.IsValid()
+	assert.NoError(t, err)
+}
+
+func TestOverlayInvalidMountOptions(t *testing.T) {
+	overlay := Overlay{
+		LowerDir:          "/lower",
+		UpperDir:          "/upper",
+		WorkDir:           "/work",
+		MountPoint:        "/mnt",
+		IsRootfsOverlay:   false,
+		MountDependencies: []string{"/var"},
+		MountOptions:      "invalid option with spaces",
+	}
+
+	err := overlay.IsValid()
+	assert.ErrorContains(t, err, "mountOptions (invalid option with spaces) contains spaces and is invalid")
 }

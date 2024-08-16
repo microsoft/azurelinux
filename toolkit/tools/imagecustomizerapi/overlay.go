@@ -10,13 +10,13 @@ import (
 )
 
 type Overlay struct {
-	LowerDir        string  `yaml:"lowerDir"`
-	UpperDir        string  `yaml:"upperDir"`
-	WorkDir         string  `yaml:"workDir"`
-	MountPoint      string  `yaml:"mountPoint"`
-	IsRootfsOverlay bool    `yaml:"isRootfsOverlay"`
-	MountDependency *string `yaml:"mountDependency"`
-	MountOptions    *string `yaml:"mountOptions"`
+	LowerDir          string   `yaml:"lowerDir"`
+	UpperDir          string   `yaml:"upperDir"`
+	WorkDir           string   `yaml:"workDir"`
+	MountPoint        string   `yaml:"mountPoint"`
+	IsRootfsOverlay   bool     `yaml:"isRootfsOverlay"`
+	MountDependencies []string `yaml:"mountDependencies"`
+	MountOptions      string   `yaml:"mountOptions"`
 }
 
 func (o *Overlay) IsValid() error {
@@ -33,10 +33,14 @@ func (o *Overlay) IsValid() error {
 	if err := validatePath(o.MountPoint); err != nil {
 		return fmt.Errorf("invalid mountPoint (%s):\n%w", o.MountPoint, err)
 	}
-	if o.MountDependency != nil {
-		if err := validatePath(*o.MountDependency); err != nil {
-			return fmt.Errorf("invalid mountDependency (%s):\n%w", *o.MountDependency, err)
+	for _, dependency := range o.MountDependencies {
+		if err := validatePath(dependency); err != nil {
+			return fmt.Errorf("invalid mountDependencies (%s):\n%w", dependency, err)
 		}
+	}
+
+	if strings.Contains(o.MountOptions, " ") {
+		return fmt.Errorf("mountOptions (%s) contains spaces and is invalid", o.MountOptions)
 	}
 
 	// Check if UpperDir and WorkDir are identical
@@ -55,20 +59,20 @@ func (o *Overlay) IsValid() error {
 	return nil
 }
 
-func validatePath(p string) error {
+func validatePath(filePath string) error {
 	// Check if the path is empty.
-	if p == "" {
+	if filePath == "" {
 		return fmt.Errorf("path cannot be empty")
 	}
 
 	// Check if the path contains spaces.
-	if strings.Contains(p, " ") {
-		return fmt.Errorf("path (%s) contains spaces and is invalid", p)
+	if strings.Contains(filePath, " ") {
+		return fmt.Errorf("path (%s) contains spaces and is invalid", filePath)
 	}
 
 	// Check if the path is an absolute path.
-	if !path.IsAbs(p) {
-		return fmt.Errorf("invalid path (%s): must be an absolute path", p)
+	if !path.IsAbs(filePath) {
+		return fmt.Errorf("invalid path (%s): must be an absolute path", filePath)
 	}
 
 	return nil

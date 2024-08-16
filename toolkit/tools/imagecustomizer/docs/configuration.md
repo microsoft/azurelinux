@@ -346,85 +346,107 @@ Specifies the configuration for the generated ISO media.
 
 Specifies the configuration for overlay filesystem.
 
-- `lowerDir`: (Required)
+### `lowerDir`: (Required)
 
-  This directory acts as the read-only layer in the overlay filesystem. It
-  contains the base files and directories which will be overlaid by the
-  upperDir. Changes to the overlay filesystem do not affect the contents of
-  lowerDir. 
+This directory acts as the read-only layer in the overlay filesystem. It
+contains the base files and directories which will be overlaid by the upperDir.
+Changes to the overlay filesystem do not affect the contents of lowerDir.
   
-  Example: `/etc`
+Example: `/etc`
 
-- `upperDir`: (Required)
+### `upperDir`: (Required)
 
-  This directory is the writable layer of the overlay filesystem. Any
-  modifications, such as file additions, deletions, or changes, are made in the
-  upperDir. These changes are what make the overlay filesystem appear different
-  from the lowerDir alone. 
+This directory is the writable layer of the overlay filesystem. Any
+modifications, such as file additions, deletions, or changes, are made in the
+upperDir. These changes are what make the overlay filesystem appear different
+from the lowerDir alone. 
   
-  Example: `/var/overlays/etc/upper`
+Example: `/var/overlays/etc/upper`
 
-- `workDir`: (Required)
+### `workDir`: (Required)
 
-  This is a required directory used for preparing files before they are merged
-  into the upperDir. It needs to be on the same filesystem as the upperDir and
-  is used for temporary storage by the overlay filesystem to ensure atomic
-  operations. The workDir is not directly accessible to users. 
+This is a required directory used for preparing files before they are merged
+into the upperDir. It needs to be on the same filesystem as the upperDir and
+is used for temporary storage by the overlay filesystem to ensure atomic
+operations. The workDir is not directly accessible to users. 
   
-  Example: `/var/overlays/etc/work`
+Example: `/var/overlays/etc/work`
 
-- `mountPoint`: (Required)
+### `mountPoint`: (Required)
 
-  The directory where the overlay filesystem will be mounted.
+The directory where the combined view of the `upperDir` and `lowerDir` will be
+mounted. This is the location where users will see the merged contents of the
+overlay filesystem.
 
-  Example: `/var/mountpoint`
+Example: `/var/mountpoint`
 
-- `isRootfsOverlay`: (Optional, Default: `false`)
+### `isRootfsOverlay`: (Optional, Default: `false`)
 
-  A boolean flag indicating whether this overlay is part of the root filesystem.
-  If set to true, specific adjustments will be made, such as prefixing certain
-  paths with /sysroot will be added to fstab file.
+A boolean flag indicating whether this overlay is part of the root filesystem.
+If set to `true`, specific adjustments will be made, such as prefixing certain
+paths with `/sysroot`, and the overlay will be added to the fstab file with the
+`x-initrd.mount` option to ensure it is available during the initrd phase.
 
-  Example: `true`
+Example: `true`
 
-- `mountDependency`: (Optional)
+### `mountDependencies`: (Optional)
 
-  Specifies a directory that must be mounted before this overlay.
+Specifies a list of directories that must be mounted before this overlay. Each
+directory in the list should be mounted and available before the overlay
+filesystem is mounted.
 
-  **Important**: If the directory specified in mountDependency needs to be
-  available during the initrd phase, you must ensure that this directory's mount
-  configuration in the fileSystems section includes the x-initrd.mount option.
-  For example:
+Example: `/var`
 
-  ```
-  fileSystems:
-    - deviceId: var
-      type: ext4
-      mountPoint:
-        path: /var
-        options: defaults,x-initrd.mount
-  ```
-
-  Example: `/var`
-
-- `mountOptions`: (Optional)
-
-  A string of additional mount options that can be applied to the overlay mount.
-  Multiple options should be separated by commas.
-
-  Example: `noatime,nodiratime`
-
-Example:
+**Important**: If any directory specified in `mountDependencies` needs to be
+available during the initrd phase, you must ensure that this directory's mount
+configuration in the `fileSystems` section includes the `x-initrd.mount` option.
+For example:
 
 ```yaml
+fileSystems:
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+```
+
+### `mountOptions`: (Optional)
+
+A string of additional mount options that can be applied to the overlay mount.
+Multiple options should be separated by commas.
+
+Example: `noatime,nodiratime`
+
+Overlays Configuration Example:
+
+```yaml
+storage:
+  disks:
+  - ...
+    partitions:
+    - ...
+    - id: var
+      start: 2G
+
+  ...
+
+  fileSystems:
+  - ...
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+
 os:
   overlays:
     - lowerDir: /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
-      mountPoint: /var/mountpoint
+      mountPoint: /etc
       isRootfsOverlay: true
-      mountDependency: /var
+      mountDependencies: /var
       mountOptions: "noatime,nodiratime"
 ```
 
