@@ -12,7 +12,7 @@ Source1:        bash_completion
 Patch0:         bash-5.1.patch
 # Non-interactive shells beginning with argv[0][0] == '-' should run the startup files when not in posix mode.
 Patch1:         bash-2.03-profile.patch
-Patch2 :        bash-tty-tests.patch
+Patch2:         bash-tty-tests.patch
 BuildRequires:  readline
 Requires:       readline
 Requires(post): /bin/cp
