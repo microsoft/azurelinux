@@ -47,11 +47,9 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecus
 	}
 
 	// Add equivalency rules for each overlay
-	for _, overlay := range overlaysDereference {
-		err = addEquivalencyRule(selinuxMode, filepath.Join(imageChroot.RootDir(), overlay.UpperDir), filepath.Join(imageChroot.RootDir(), overlay.LowerDir), imageChroot)
-		if err != nil {
-			return false, fmt.Errorf("failed to add equivalency rule for overlay:\n%w", err)
-		}
+	err = addEquivalencyRules(selinuxMode, overlaysDereference, imageChroot)
+	if err != nil {
+		return false, fmt.Errorf("failed to add equivalency rules for overlays:\n%w", err)
 	}
 
 	return true, nil
@@ -154,11 +152,9 @@ func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot
 	return nil
 }
 
-func addEquivalencyRule(selinuxMode imagecustomizerapi.SELinuxMode, upperDir string, lowerDir string, imageChroot *safechroot.Chroot) error {
-	var err error
-
+func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode, overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
-		// No need to add equivalency rule if SELinux is disabled.
+		// No need to add equivalency rules if SELinux is disabled.
 		return nil
 	}
 
@@ -172,15 +168,17 @@ func addEquivalencyRule(selinuxMode imagecustomizerapi.SELinuxMode, upperDir str
 		return fmt.Errorf("failed to get current SELinux mode:\n%w", err)
 	}
 	if currentSELinuxMode == imagecustomizerapi.SELinuxModeDisabled {
-		// No need to add equivalency rule if base image has SELinux disabled.
+		// No need to add equivalency rules if base image has SELinux disabled.
 		return nil
 	}
 
-	err = imageChroot.UnsafeRun(func() error {
-		return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", upperDir, lowerDir)
-	})
-	if err != nil {
-		return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", upperDir, lowerDir, err)
+	for _, overlay := range overlays {
+		err = imageChroot.UnsafeRun(func() error {
+			return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", overlay.UpperDir, overlay.LowerDir)
+		})
+		if err != nil {
+			return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", overlay.UpperDir, overlay.LowerDir, err)
+		}
 	}
 
 	return nil
