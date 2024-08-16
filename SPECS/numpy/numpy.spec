@@ -38,6 +38,7 @@ BuildRequires:  gcc-gfortran
 BuildRequires:  lapack-devel
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
@@ -45,7 +46,10 @@ Provides:       numpy = %{version}-%{release}
 Provides:       numpy%{?_isa} = %{version}-%{release}
 %if 0%{?with_check}
 BuildRequires:  meson
+BuildRequires:  python3-hypothesis
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-typing-extensions
 %endif
 
 %description -n python3-numpy
@@ -99,10 +103,7 @@ EOF
 %build
 %set_build_flags
 
-env OPENBLAS=%{_libdir} \
-    BLAS=%{_libdir} \
-    LAPACK=%{_libdir} CFLAGS="%{optflags}" \
-    %{__python3} setup.py build
+%pyproject_wheel -Csetup-args=-Dblas=%{blaslib} -Csetup-args=-Dlapack=lapack
 
 %install
 mkdir docs
@@ -134,7 +135,8 @@ chrpath --delete %{buildroot}%{python3_sitearch}/%{name}/linalg/_umath_linalg.*.
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
 # Hypothesis 6.72.0 introduced a deprecation error for "Healthcheck.all()" which fails the test run
-pip install 'pytest==7.2' 'hypothesis<6.72.0' typing-extensions
+# pip install 'pytest==7.2' 'hypothesis<6.72.0' typing-extensions
+pip install iniconfig sortedcontainers
 
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
 # https://github.com/numpy/numpy/issues/21094
