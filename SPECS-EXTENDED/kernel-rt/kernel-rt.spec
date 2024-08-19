@@ -4,6 +4,7 @@
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
+%define short_name rt
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -24,7 +25,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.43.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +76,7 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 ExclusiveArch:  x86_64
+Conflicts:      kernel
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -144,17 +146,21 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package        python3-perf
 Summary:        Python 3 extension for perf tools
 Requires:       python3
+Requires:       %{name} = %{version}-%{release}
+Provides:       python3-perf-%{short_name}
 
-%description -n python3-perf
+%description    python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     bpftool
+%package        bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Requires:       %{name} = %{version}-%{release}
+Provides:       bpftool-%{short_name}
 
-%description -n bpftool
+%description    bpftool
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -406,14 +412,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
-%files -n python3-perf
+%files python3-perf
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files bpftool
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Aug 19 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.43.1-2
+- Rename bpftool and python3-perf to be kernel specific
+- Add new requires for bpftool and python3-perf for specfic kernel
+- Add kernel conflicts
+
 * Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
 - Auto-upgrade to 6.6.43.1
 
