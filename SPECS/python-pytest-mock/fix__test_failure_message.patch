@@ -1,0 +1,68 @@
+From 8480bb6d0500f933be039cfec65e04157e6ecffe Mon Sep 17 00:00:00 2001
+From: Bruno Oliveira <nicoddemus@gmail.com>
+Date: Tue, 19 Dec 2023 08:24:23 -0300
+Subject: [PATCH] Fix tests for Python 3.11 and 3.12
+
+Fixes #401.
+
+Modified by: damcilva@microsoft.com
+    Include cleanup from:
+        c596504e062be06475b03122c9c0cc732ae87840
+        b8522e73a85441cf4c02c39038a88ac0bab57504
+---
+ tests/test_pytest_mock.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tests/test_pytest_mock.py b/tests/test_pytest_mock.py
+index 3ee00da..7acb361 100644
+--- a/tests/test_pytest_mock.py
++++ b/tests/test_pytest_mock.py
+@@ -246,9 +246,8 @@ def __test_failure_message(self, mocker: MockerFixture, **kwargs: Any) -> None:
+             msg = "Expected call: {0}()\nNot called"
+         expected_message = msg.format(expected_name)
+         stub = mocker.stub(**kwargs)
+-        with pytest.raises(AssertionError) as exc_info:
++        with pytest.raises(AssertionError, match=re.escape(expected_message)):
+             stub.assert_called_with()
+-        assert str(exc_info.value) == expected_message
+
+     def test_failure_message_with_no_name(self, mocker: MagicMock) -> None:
+         self.__test_failure_message(mocker)
+
+From 6da5b0506d6378a8dbe5ae314d5134e6868aeabd Mon Sep 17 00:00:00 2001
+From: danigm <daniel.garcia@suse.com>
+Date: Wed, 20 Dec 2023 16:02:13 +0100
+Subject: [PATCH] Update expected message to match python 3.11.7 (#404)
+
+https://github.com/python/cpython/issues/111019
+
+Fixes #401.
+Closes #403.
+---
+ tests/test_pytest_mock.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_pytest_mock.py b/tests/test_pytest_mock.py
+index c185f2a..01534a4 100644
+--- a/tests/test_pytest_mock.py
++++ b/tests/test_pytest_mock.py
+@@ -25,6 +25,8 @@
+
+ # Python 3.8 changed the output formatting (bpo-35500), which has been ported to mock 3.0
+ NEW_FORMATTING = sys.version_info >= (3, 8)
++# Python 3.11.7 changed the output formatting, https://github.com/python/cpython/issues/111019
++NEWEST_FORMATTING = sys.version_info >= (3, 11, 7)
+
+ if sys.version_info[:2] >= (3, 8):
+     from unittest.mock import AsyncMock
+@@ -240,7 +242,9 @@ def test_repr_with_name(self, mocker: MockerFixture) -> None:
+
+     def __test_failure_message(self, mocker: MockerFixture, **kwargs: Any) -> None:
+         expected_name = kwargs.get("name") or "mock"
+-        if NEW_FORMATTING:
++        if NEWEST_FORMATTING:
++            msg = "expected call not found.\nExpected: {0}()\n  Actual: not called."
++        elif NEW_FORMATTING:
+             msg = "expected call not found.\nExpected: {0}()\nActual: not called."
+         else:
+             msg = "Expected call: {0}()\nNot called"
