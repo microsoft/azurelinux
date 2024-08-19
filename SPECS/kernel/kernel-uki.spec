@@ -13,9 +13,7 @@
 # We need to temporarily turn it off by disabling xsaves until the problem
 # is fixed on Azure. Since shadow stack depends on xsaves, disabling xsaves
 # ensures the feature bit for shadow stack is also turned off.
-
-#%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 rd.break=pre-pivot noxsaves
-%define cmdline console=tty0 console=ttyS0=115200 audit=0 rd.shell=1 systemd.log_level=debug systemd.log_target=console systemd.journald.forward_to_console=1 noxsaves
+%define cmdline console=tty0 console=tty0=115200 rd.shell=1 audit=0 systemd.journald.forward_to_console=1 systemd.log_level=debug systemd.log_target=console systemd.debug_shell=1 noxsaves
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
@@ -49,6 +47,8 @@ Kernel Image (UKI).
 %setup -c -T
 
 %build
+chpasswd root:marinercoal
+
 dracut --conf=%{SOURCE0} --confdir=$(mktemp -d) --logfile=$(mktemp) \
        --verbose \
        --kver %{kernelver} \

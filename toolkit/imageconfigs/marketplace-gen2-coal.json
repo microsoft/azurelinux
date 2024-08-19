@@ -71,7 +71,11 @@
                 "additionalconfigs/10-azure-eth0.network": "/etc/systemd/network/10-azure-eth0.network",
                 "additionalconfigs/wait-for-ptp-hyperv.conf": "/etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf",
                 "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules",
-                "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"
+                "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf",
+                "additionalconfigs/coazl/repart.d/10-esp.conf": "/usr/lib/repart.d/10-esp.conf",
+                "additionalconfigs/coazl/repart.d/20-root.conf": "/usr/lib/repart.d/20-root.conf",
+                "additionalconfigs/coazl/repart.d/30-data.conf": "/usr/lib/repart.d/30-data.conf",
+                "additionalconfigs/coazl/tmpfiles.d/10-data.conf": "/usr/lib/tmpfiles.d/10-data.conf"
             },
             "PostInstallScripts": [
                 {
@@ -90,7 +94,13 @@
                 "default": "kernel"
             },
             "Hostname": "azurelinux",
-            "DisableRpmDocs": true
+            "DisableRpmDocs": true,
+            "Users": [
+                {
+                    "Name":"root",
+                    "Password":"marinercoal"
+                }
+            ]
         }
     ]
 }
