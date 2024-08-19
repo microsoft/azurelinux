@@ -188,7 +188,7 @@ rpm-lang-4.18.2-1.azl3.x86_64.rpm
 rpm-libs-4.18.2-1.azl3.x86_64.rpm
 cpio-2.14-1.azl3.x86_64.rpm
 cpio-lang-2.14-1.azl3.x86_64.rpm
-e2fsprogs-libs-1.47.0-1.azl3.x86_64.rpm
+e2fsprogs-libs-1.47.0-2.azl3.x86_64.rpm
 libsolv-0.7.28-1.azl3.x86_64.rpm
 libsolv-devel-0.7.28-1.azl3.x86_64.rpm
 libssh2-1.11.0-1.azl3.x86_64.rpm
