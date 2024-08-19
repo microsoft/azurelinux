@@ -195,12 +195,8 @@ function validate_signatures() {
 
 mkdir -p "$(dirname "$log_file")"
 
-if ! download; then
-    exit 1
-fi
+download
 
 if $enforce_signatures; then
-    if ! validate_signatures; then
-        exit 1
-    fi
+    validate_signatures
 fi
