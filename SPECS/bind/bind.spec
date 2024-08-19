@@ -3,6 +3,9 @@
 %global        chroot_create_directories /dev /run/named %{_localstatedir}/{log,named,tmp} \\\
                                          %{_sysconfdir}/crypto-policies/back-ends %{_sysconfdir}/pki/dnssec-keys %{_sysconfdir}/named \\\
                                          %{_libdir}/bind %{_libdir}/named %{_datadir}/GeoIP
+%global upgrade_flag %{_var}/tmp/%{name}_upgrade_flag
+%{?!bind_uid:  %global bind_uid  25}
+%{?!bind_gid:  %global bind_gid  25}
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
 %{!?_export_dir:%global _export_dir /bind9-export/}
@@ -10,7 +13,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.48
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -384,42 +387,67 @@ popd
 rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
 %pre
-if ! getent group named >/dev/null; then
-    groupadd -r named
+if [ "$1" -eq 1 ]; then
+  if ! getent group named >/dev/null; then
+    /usr/sbin/groupadd -g %{bind_gid} -f -r named >/dev/null 2>&1 || :;
+  fi
+  if ! getent passwd named >/dev/null; then
+    /usr/sbin/useradd  -u %{bind_uid} -r -N -M -g named -s /sbin/nologin -d %{_sharedstatedir}/bind -c Named named >/dev/null 2>&1 || :;
+  fi
 fi
-if ! getent passwd named >/dev/null; then
-    useradd -g named -d %{_sharedstatedir}/bind\
-        -s /bin/false -M -r named
+:;
+
+%post
+%?ldconfig
+if [ "$1" -eq 2 ]; then
+  # Upgrade, use invalid shell
+  if getent passwd named | grep ':/bin/false$' >/dev/null; then
+    /sbin/usermod -s /sbin/nologin named
+  fi
+  touch %{upgrade_flag}
 fi
 
-%post -p /sbin/ldconfig
 %postun
-/sbin/ldconfig
-if getent passwd named >/dev/null; then
+%?ldconfig
+if [ "$1" -eq 0 ]; then
+  if getent passwd named >/dev/null; then
     userdel named
-fi
-if getent group named >/dev/null; then
+  fi
+  if getent group named >/dev/null; then
     groupdel named
+  fi
 fi
 
 # Fix permissions on existing device files on upgrade
 %define chroot_fix_devices() \
 if [ $1 -gt 1 ]; then \
   for DEV in "%{1}/dev"/{null,random,zero}; do \
-    if [ -e "$DEV" -a "$(/bin/stat --printf="%{G} %{a}" "$DEV")" = "root 644" ]; \
-    then \
-      /bin/chmod 0664 "$DEV" \
-      /bin/chgrp named "$DEV" \
+    if [ -e "$DEV" ]; then \
+      if [ "$(/bin/stat --printf="%G %a" "$DEV")" = "root 644" ]; then \
+        /bin/chmod 0664 "$DEV" \
+        /bin/chgrp named "$DEV" \
+      fi \
     fi \
   done \
 fi
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %ldconfig_scriptlets libs
 %ldconfig_scriptlets pkcs11-libs
 
+# TODO: This can be removed after ensuring the current %postun changes have been applied in at least one iteration.
+%posttrans
+if [ -f %{upgrade_flag} ]; then
+  rm -f %{upgrade_flag} 
+  if ! getent group named >/dev/null; then
+    /usr/sbin/groupadd -g %{bind_gid} -f -r named >/dev/null 2>&1 || :;
+  fi
+  if ! getent passwd named >/dev/null; then
+    /usr/sbin/useradd  -u %{bind_uid} -r -N -M -g named -s /sbin/nologin -d %{_sharedstatedir}/bind -c Named named >/dev/null 2>&1 || :;
+  fi
+fi
+
 %post chroot
 %chroot_fix_devices %{chroot_prefix}
+:;
 
 %posttrans chroot
 if [ -x %{_sbindir}/selinuxenabled ] && %{_sbindir}/selinuxenabled; then
@@ -613,6 +641,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Mon Aug 17 2024 Dmytro Chasovskykh - 9.16.48-2
+- To fix missing named user after upgrade
+
 * Wed Feb 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.48-1
 - Auto-upgrade to 9.16.48 - Fix CVE-2023-50387
 
