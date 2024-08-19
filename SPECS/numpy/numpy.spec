@@ -36,10 +36,12 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  lapack-devel
+BuildRequires:  ninja-build
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-pyproject-metadata
 Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
@@ -47,7 +49,6 @@ Provides:       numpy%{?_isa} = %{version}-%{release}
 %if 0%{?with_check}
 BuildRequires:  meson
 BuildRequires:  python3-hypothesis
-BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-typing-extensions
 %endif

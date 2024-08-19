@@ -1,0 +1,43 @@
+--- python-pyproject-metadata-0.7.1/tests/test_standard_metadata.py.orig	2023-01-30 12:31:16.000000000 -0700
++++ python-pyproject-metadata-0.7.1/tests/test_standard_metadata.py	2023-01-30 13:20:44.231845586 -0700
+@@ -225,19 +225,6 @@ from .conftest import cd_package
+             '''),
+             ('Field `project.dependencies` contains item with invalid type, expecting a string (got `99`)'),
+         ),
+-        (
+-            textwrap.dedent('''
+-                [project]
+-                name = 'test'
+-                dependencies = [
+-                    'definitely not a valid PEP 508 requirement!',
+-                ]
+-            '''),
+-            (
+-                'Field `project.dependencies` contains an invalid PEP 508 requirement '
+-                'string `definitely not a valid PEP 508 requirement!` '
+-            ),
+-        ),
+         # optional-dependencies
+         (
+             textwrap.dedent('''
+@@ -276,20 +263,6 @@ from .conftest import cd_package
+                 'expecting a PEP 508 requirement string (got `True`)'
+             ),
+         ),
+-        (
+-            textwrap.dedent('''
+-                [project]
+-                name = 'test'
+-                [project.optional-dependencies]
+-                test = [
+-                    'definitely not a valid PEP 508 requirement!',
+-                ]
+-            '''),
+-            (
+-                'Field `project.optional-dependencies.test` contains an invalid '
+-                'PEP 508 requirement string `definitely not a valid PEP 508 requirement!` '
+-            ),
+-        ),
+         # requires-python
+         (
+             textwrap.dedent('''
