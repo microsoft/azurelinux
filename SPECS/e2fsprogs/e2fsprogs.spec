@@ -63,6 +63,8 @@ rm -rf %{buildroot}%{_infodir}
 
 %check
 # This test is known to fail; remove it
+# See upstream issue: https://github.com/tytso/e2fsprogs/issues/134
+# See also LFS: https://www.linuxfromscratch.org/lfs/downloads/stable/LFS-BOOK-12.1-NOCHUNKS.html#ch-system-e2fsprogs
 rm -rvf tests/m_assume_storage_prezeroed
 
 # Multi-threaded runs are flaky.
