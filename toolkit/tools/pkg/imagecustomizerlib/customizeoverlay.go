@@ -17,7 +17,9 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode, fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) (bool, error) {
+func enableOverlays(
+	overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode,
+	fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) (bool, error) {
 	var err error
 
 	if overlays == nil {
@@ -55,7 +57,9 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecus
 	return true, nil
 }
 
-func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) error {
+func updateFstabForOverlays(
+	overlays []imagecustomizerapi.Overlay, fileSystems []imagecustomizerapi.FileSystem,
+	imageChroot *safechroot.Chroot) error {
 	var err error
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc/fstab")
@@ -161,7 +165,8 @@ func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot
 	return nil
 }
 
-func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode, overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
+func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
+	overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
