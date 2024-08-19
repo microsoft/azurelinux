@@ -34,14 +34,20 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 	needRpmsSources := len(config.Packages.Install) > 0 || len(config.Packages.Update) > 0 ||
 		config.Packages.UpdateExistingPackages
 
-	// Mount RPM sources.
 	var mounts *rpmSourcesMounts
 	if needRpmsSources {
+		// Mount RPM sources.
 		mounts, err = mountRpmSources(buildDir, imageChroot, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
 		defer mounts.close()
+
+		// Refresh metadata.
+		err = refreshTdnfMetadata(imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = removePackages(config.Packages.Remove, imageChroot)
@@ -76,6 +82,24 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
+	return nil
+}
+
+func refreshTdnfMetadata(imageChroot *safechroot.Chroot) error {
+	tdnfArgs := []string{
+		"-v", "check-update", "--refresh", "--nogpgcheck", "--assumeyes",
+		"--setopt", fmt.Sprintf("reposdir=%s", rpmsMountParentDirInChroot),
+	}
+
+	err := imageChroot.UnsafeRun(func() error {
+		return shell.NewExecBuilder("tdnf", tdnfArgs...).
+			LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			Execute()
+	})
+	if err != nil {
+		return fmt.Errorf("failed to refresh tdnf repo metadata:\n%w", err)
+	}
 	return nil
 }
 
@@ -127,7 +151,7 @@ func updateAllPackages(imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Updating base image packages")
 
 	tdnfUpdateArgs := []string{
-		"-v", "update", "--nogpgcheck", "--assumeyes",
+		"-v", "update", "--nogpgcheck", "--assumeyes", "--cacheonly",
 		"--setopt", fmt.Sprintf("reposdir=%s", rpmsMountParentDirInChroot),
 	}
 
@@ -144,7 +168,7 @@ func installOrUpdatePackages(action string, allPackagesToAdd []string, imageChro
 	// Note: When using `--repofromdir`, tdnf will not use any default repos and will only use the last
 	// `--repofromdir` specified.
 	tdnfInstallArgs := []string{
-		"-v", action, "--nogpgcheck", "--assumeyes",
+		"-v", action, "--nogpgcheck", "--assumeyes", "--cacheonly",
 		"--setopt", fmt.Sprintf("reposdir=%s", rpmsMountParentDirInChroot),
 		// Placeholder for package name.
 		"",
