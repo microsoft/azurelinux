@@ -81,11 +81,11 @@ docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-13.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 dwz-debuginfo-0.14-2.azl3.x86_64.rpm
-e2fsprogs-1.47.0-1.azl3.x86_64.rpm
-e2fsprogs-debuginfo-1.47.0-1.azl3.x86_64.rpm
-e2fsprogs-devel-1.47.0-1.azl3.x86_64.rpm
-e2fsprogs-lang-1.47.0-1.azl3.x86_64.rpm
-e2fsprogs-libs-1.47.0-1.azl3.x86_64.rpm
+e2fsprogs-1.47.0-2.azl3.x86_64.rpm
+e2fsprogs-debuginfo-1.47.0-2.azl3.x86_64.rpm
+e2fsprogs-devel-1.47.0-2.azl3.x86_64.rpm
+e2fsprogs-lang-1.47.0-2.azl3.x86_64.rpm
+e2fsprogs-libs-1.47.0-2.azl3.x86_64.rpm
 elfutils-0.189-3.azl3.x86_64.rpm
 elfutils-debuginfo-0.189-3.azl3.x86_64.rpm
 elfutils-default-yama-scope-0.189-3.azl3.noarch.rpm
