@@ -8,7 +8,7 @@
 %global source_directory 1.18-stable
 Name:           libnbd
 Version:        1.18.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        NBD client library in userspace
 License:        LGPL-2.0-or-later AND BSD-3-Clause
 URL:            https://gitlab.com/nbdkit/libnbd
@@ -24,6 +24,10 @@ Source2:       libguestfs.keyring
 # Maintainer script which helps with handling patches.
 Source3:        copy-patches.sh
 %endif
+
+Patch001:       CVE-2024-7383-1.patch
+Patch002:       CVE-2024-7383-2.patch
+Patch003:       CVE-2024-7383-3.patch
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool
@@ -329,6 +333,9 @@ skip_test tests/connect-tcp6
 
 
 %changelog
+* Mon Aug 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.18.3-2
+- Add patches to fix CVE-2024-7383
+
 * Wed Mar 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.18.3-1
 - Refresh from Fedora 39
 
