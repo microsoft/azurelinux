@@ -182,13 +182,13 @@ func TestOSIsValidOverlayDuplicateUpperDir(t *testing.T) {
 	os := OS{
 		Overlays: &[]Overlay{
 			{
-				LowerDir:   "/",
+				LowerDirs:  []string{"/"},
 				UpperDir:   "/upper_root",
 				WorkDir:    "/work_root",
 				MountPoint: "/mnt/root",
 			},
 			{
-				LowerDir:   "/var",
+				LowerDirs:  []string{"/var"},
 				UpperDir:   "/upper_root",
 				WorkDir:    "/work_var",
 				MountPoint: "/mnt/var",
@@ -204,13 +204,13 @@ func TestOSIsValidOverlayDuplicateWorkDir(t *testing.T) {
 	os := OS{
 		Overlays: &[]Overlay{
 			{
-				LowerDir:   "/",
+				LowerDirs:  []string{"/"},
 				UpperDir:   "/upper_root",
 				WorkDir:    "/work_root",
 				MountPoint: "/mnt/root",
 			},
 			{
-				LowerDir:   "/",
+				LowerDirs:  []string{"/"},
 				UpperDir:   "/upper_var",
 				WorkDir:    "/work_root",
 				MountPoint: "/mnt/var",

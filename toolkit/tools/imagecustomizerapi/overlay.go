@@ -10,7 +10,7 @@ import (
 )
 
 type Overlay struct {
-	LowerDir          string   `yaml:"lowerDir"`
+	LowerDirs         []string `yaml:"lowerDirs"`
 	UpperDir          string   `yaml:"upperDir"`
 	WorkDir           string   `yaml:"workDir"`
 	MountPoint        string   `yaml:"mountPoint"`
@@ -20,9 +20,11 @@ type Overlay struct {
 }
 
 func (o *Overlay) IsValid() error {
-	// Validate paths for UpperDir, WorkDir, and LowerDir
-	if err := validatePath(o.LowerDir); err != nil {
-		return fmt.Errorf("invalid lowerDir (%s):\n%w", o.LowerDir, err)
+	// Validate paths for LowerDirs, UpperDir, WorkDir, and MountPoint.
+	for _, lowerDir := range o.LowerDirs {
+		if err := validatePath(lowerDir); err != nil {
+			return fmt.Errorf("invalid lowerDir (%s):\n%w", lowerDir, err)
+		}
 	}
 	if err := validatePath(o.UpperDir); err != nil {
 		return fmt.Errorf("invalid upperDir (%s):\n%w", o.UpperDir, err)
@@ -43,12 +45,12 @@ func (o *Overlay) IsValid() error {
 		return fmt.Errorf("mountOptions (%s) contains spaces and is invalid", o.MountOptions)
 	}
 
-	// Check if UpperDir and WorkDir are identical
+	// Check if UpperDir and WorkDir are identical.
 	if o.UpperDir == o.WorkDir {
 		return fmt.Errorf("upperDir and workDir must be distinct, but both are '%s'", o.UpperDir)
 	}
 
-	// Check if UpperDir is a subdirectory of WorkDir or vice versa
+	// Check if UpperDir is a subdirectory of WorkDir or vice versa.
 	if isSubDirString(o.UpperDir, o.WorkDir) {
 		return fmt.Errorf("upperDir (%s) should not be a subdirectory of workDir (%s)", o.UpperDir, o.WorkDir)
 	}
@@ -79,10 +81,10 @@ func validatePath(filePath string) error {
 }
 
 func isSubDirString(dir1, dir2 string) bool {
-	// Ensure paths are cleaned and have consistent trailing slashes
+	// Ensure paths are cleaned and have consistent trailing slashes.
 	cleanDir1 := strings.TrimSuffix(dir1, "/") + "/"
 	cleanDir2 := strings.TrimSuffix(dir2, "/") + "/"
 
-	// Check if dir2 starts with dir1 (indicating a subdirectory)
+	// Check if dir2 starts with dir1 (indicating a subdirectory).
 	return cleanDir1 != cleanDir2 && strings.HasPrefix(cleanDir2, cleanDir1)
 }

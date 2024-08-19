@@ -68,30 +68,33 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, fileSystems [
 	updatedEntries = append(updatedEntries, fstabEntries...)
 
 	for _, overlay := range overlays {
-		lowerDir := overlay.LowerDir
+		lowerDirs := overlay.LowerDirs
 		upperDir := overlay.UpperDir
 		workDir := overlay.WorkDir
 		mountDependencies := overlay.MountDependencies
 
-		// Validate that each mountDependency has the x-initrd.mount option in the corresponding file system entry.
+		// Validate that each mountDependency has the x-initrd.mount option in
+		// the corresponding fstab entry.
 		for _, dep := range mountDependencies {
 			found := false
-			for _, fs := range fileSystems {
-				if fs.MountPoint != nil && fs.MountPoint.Path == dep {
+			for _, entry := range fstabEntries {
+				if entry.Target == dep {
 					found = true
-					if !strings.Contains(fs.MountPoint.Options, "x-initrd.mount") {
-						return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fileSystems", dep)
+					if !strings.Contains(entry.Options, "x-initrd.mount") {
+						return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fstab", dep)
 					}
 					break
 				}
 			}
 			if !found {
-				return fmt.Errorf("mountDependency %s not found in fileSystems", dep)
+				return fmt.Errorf("mountDependency %s not found in fstab", dep)
 			}
 		}
 
 		if overlay.IsRootfsOverlay {
-			lowerDir = path.Join("/sysroot", overlay.LowerDir)
+			for i, dir := range lowerDirs {
+				lowerDirs[i] = path.Join("/sysroot", dir)
+			}
 			upperDir = path.Join("/sysroot", overlay.UpperDir)
 			workDir = path.Join("/sysroot", overlay.WorkDir)
 			for i, dep := range mountDependencies {
@@ -99,9 +102,15 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, fileSystems [
 			}
 		}
 
-		options := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", lowerDir, upperDir, workDir)
+		// Multiple lower layers can be specified by joining directory names
+		// with a colon (":") as a separator, which is supported by the overlay
+		// filesystem in the mount command.
+		lowerDirOption := strings.Join(lowerDirs, ":")
 
-		// Add any additional options if needed (e.g., x-initrd.mount, x-systemd.requires)
+		options := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", lowerDirOption, upperDir, workDir)
+
+		// Add any additional options if needed (e.g., x-initrd.mount,
+		// x-systemd.requires)
 		for _, dep := range mountDependencies {
 			options = fmt.Sprintf("%s,x-systemd.requires=%s", options, dep)
 		}
@@ -153,31 +162,19 @@ func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot
 }
 
 func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode, overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
+	var err error
+
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
 		// No need to add equivalency rules if SELinux is disabled.
 		return nil
 	}
 
-	// Additional check if the base image has SELinux enabled already.
-	bootCustomizer, err := NewBootCustomizer(imageChroot)
-	if err != nil {
-		return fmt.Errorf("failed to initialize NewBootCustomizer:\n%w", err)
-	}
-	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
-	if err != nil {
-		return fmt.Errorf("failed to get current SELinux mode:\n%w", err)
-	}
-	if currentSELinuxMode == imagecustomizerapi.SELinuxModeDisabled {
-		// No need to add equivalency rules if base image has SELinux disabled.
-		return nil
-	}
-
 	for _, overlay := range overlays {
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", overlay.UpperDir, overlay.LowerDir)
+			return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", overlay.MountPoint, overlay.UpperDir)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", overlay.UpperDir, overlay.LowerDir, err)
+			return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", overlay.MountPoint, overlay.UpperDir, err)
 		}
 	}
 

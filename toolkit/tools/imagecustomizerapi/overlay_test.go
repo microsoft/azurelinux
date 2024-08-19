@@ -11,7 +11,7 @@ import (
 
 func TestOverlayValidConfiguration(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
@@ -26,7 +26,7 @@ func TestOverlayValidConfiguration(t *testing.T) {
 
 func TestOverlayInvalidEmptyLowerDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "",
+		LowerDirs:         []string{""},
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
@@ -42,7 +42,7 @@ func TestOverlayInvalidEmptyLowerDir(t *testing.T) {
 
 func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/upper",
 		WorkDir:           " ",
 		MountPoint:        "/mnt",
@@ -58,7 +58,7 @@ func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 
 func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/invalid/same",
 		WorkDir:           "/invalid/same",
 		MountPoint:        "/mnt",
@@ -74,7 +74,7 @@ func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 
 func TestOverlayInvalidWorkDirSubsUpperDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/invalid",
 		WorkDir:           "/invalid/same",
 		MountPoint:        "/mnt",
@@ -90,7 +90,7 @@ func TestOverlayInvalidWorkDirSubsUpperDir(t *testing.T) {
 
 func TestOverlayInvalidUpperDirSubsWorkDir(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/invalid/same",
 		WorkDir:           "/invalid",
 		MountPoint:        "/mnt",
@@ -106,7 +106,7 @@ func TestOverlayInvalidUpperDirSubsWorkDir(t *testing.T) {
 
 func TestOverlayInvalidMountDependencyPath(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
@@ -122,7 +122,7 @@ func TestOverlayInvalidMountDependencyPath(t *testing.T) {
 
 func TestOverlayValidEmptyMountDependencies(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
@@ -137,7 +137,7 @@ func TestOverlayValidEmptyMountDependencies(t *testing.T) {
 
 func TestOverlayInvalidMountOptions(t *testing.T) {
 	overlay := Overlay{
-		LowerDir:          "/lower",
+		LowerDirs:         []string{"/lower"},
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
