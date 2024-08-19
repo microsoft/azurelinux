@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -188,7 +188,7 @@ mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
 
 # virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}%{_datadir}/kube-virt/virt-handler/
+install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
 
 # Persistent reservation helper configuration files
 mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
@@ -269,6 +269,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Aug 30 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.2.0-7
+- Update installation path of virt_launcher.cil in virt-handler container.
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.2.0-6
 - Update to build dep latest glibc-static version
 
