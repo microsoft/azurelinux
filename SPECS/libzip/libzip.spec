@@ -1,7 +1,7 @@
 Summary:        C library for reading, creating, and modifying zip archives
 Name:           libzip
 Version:        1.10.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,8 @@ BuildRequires:  gcc
 BuildRequires:  openssl-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
+BuildRequires:  python3
+BuildRequires:  python3-pip
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
@@ -61,6 +63,10 @@ The %{name}-tools package provides command line tools split off %{name}:
 rm INSTALL.md
 
 %build
+# Always install nihtest, which is required for package tests. It needs to be detected at build-time to enable the regression tests
+pip3 install nihtest
+mkdir build
+cd build
 %cmake \
   -DENABLE_COMMONCRYPTO:BOOL=OFF \
   -DENABLE_GNUTLS:BOOL=OFF \
@@ -73,16 +79,17 @@ rm INSTALL.md
   -DBUILD_REGRESS:BOOL=ON \
   -DBUILD_EXAMPLES:BOOL=OFF \
   -DBUILD_DOC:BOOL=ON \
-  .
+  ..
 
 make %{?_smp_mflags}
 
 %install
+cd build
 make install DESTDIR=%{buildroot} INSTALL='install -p'
 
 %check
-make check
-
+cd build
+make test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -106,6 +113,10 @@ make check
 %{_libdir}/pkgconfig/libzip.pc
 
 %changelog
+* Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.10.1-2
+- Fix package tests
+- Switch to out-of-source build
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-1
 - Auto-upgrade to 1.10.1 - Azure Linux 3.0 - package upgrades
 
