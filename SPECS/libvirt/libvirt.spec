@@ -15,7 +15,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Virtualization/Libraries
 URL:            https://libvirt.org/
-Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
+Source0:        https://download.libvirt.org/%{name}-%{version}.tar.xz
 # CVE-2023-2700 is fixed by https://gitlab.com/libvirt/libvirt/-/commit/6425a311b8ad19d6f9c0b315bf1d722551ea3585
 Patch1:         CVE-2023-2700.patch
 Patch2:         CVE-2024-1441.patch
