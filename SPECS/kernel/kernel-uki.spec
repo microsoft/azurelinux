@@ -30,7 +30,7 @@ BuildRequires:  kernel = %{version}-%{release}
 BuildRequires:  systemd-ukify
 BuildRequires:  dracut
 BuildRequires:  binutils
-BuildRequires:  systemd-boot
+BuildRequires:  systemd-boot-unsigned
 BuildRequires:  systemd-udev
 BuildRequires:  system-release
 BuildRequires:  tpm2-tools
