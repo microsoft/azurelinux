@@ -517,8 +517,6 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     -Drpath=disabled \
     -Dsecdriver_apparmor=disabled \
     -Dstorage_iscsi_direct=disabled \
-    -Dstorage_sheepdog=disabled \
-    -Dstorage_vstorage=disabled \
     -Dstorage_zfs=disabled \
     -Dwireshark_dissector=disabled
 
