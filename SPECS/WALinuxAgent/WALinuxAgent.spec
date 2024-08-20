@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.11.1.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,9 @@ Patch1:         0002-fix-bump-version-to-2.11.8.8.patch
 # This patch fixes a failure to assign IP address for infiband interfaces.
 # It should be removed in an upcoming release.
 Patch2:         fix-argument-to-goalstate.patch
+# This patch adds azurelinux support into the setup.py. This patch should be
+# removed in the next 2.12 release/
+Patch3:         update-setup.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -109,6 +112,9 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Thu Aug 15 2024 Chris Co <chrco@microsoft.com> - 2.11.1.4-3
+- Add patch to update setup.py with azurelinux support
+
 * Fri Aug 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.11.1.4-2
 - Package dracut setup script with WALinuxAgent
 
