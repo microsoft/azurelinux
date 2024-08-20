@@ -1,6 +1,4 @@
-# By default, all files require a review by at least one member of the Azure Linux developers team.
 # See teams here: https://github.com/orgs/microsoft/teams?query=mariner
-* @microsoft/cbl-mariner-devs
 
 # Modification to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
@@ -65,16 +63,16 @@
 /SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
-/SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
+/SPECS/WALinuxAgent/* @microsoft/cbl-mariner-provisioning
 
 # Modifications to the toolkit requires reviews from the toolkit team
 /toolkit/ @microsoft/cbl-mariner-tooling
 
-# Docs to be reviewed by general Azure Linux devs
-/toolkit/docs/ @microsoft/cbl-mariner-devs
+# Doc changes require admin approval
+/toolkit/docs/ @microsoft/cbl-mariner-admins
 
-# Default image configurations to be reviewed by general Azure Linux devs
-/toolkit/imageconfigs/ @microsoft/cbl-mariner-devs
+# Default image configuration changes require admin approval
+/toolkit/imageconfigs/ @microsoft/cbl-mariner-admins
 
 # Package and toolchain manifests to be reviewed by toolchain team
 /toolkit/resources/manifests/package/pkggen_core_aarch64.txt @microsoft/cbl-mariner-toolchain
