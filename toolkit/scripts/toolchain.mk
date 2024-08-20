@@ -66,7 +66,7 @@ clean-toolchain: clean-toolchain-rpms
 	rm -rf $(toolchain_logs_dir)
 	rm -rf $(toolchain_from_repos)
 	rm -rf $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
-	rm -rf $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag
+	rm -rf $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag
 	rm -f $(SCRIPTS_DIR)/toolchain/container/toolchain-local-wget-list
 	rm -f $(SCRIPTS_DIR)/toolchain/container/texinfo-perl-fix.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/Awt_build_headless_only.patch
@@ -87,10 +87,10 @@ clean-toolchain-rpms:
 	@for f in $(toolchain_out_rpms); do rm -vf $$f; done
 	rm -rvf $(TOOLCHAIN_RPMS_DIR)
 
-# We need to clear the toolchain if we are using a daily build. The filenames will all be the same, but the actual
-# .rpm files may be fundamentally different.
-$(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag
-	@echo "Daily build ID changed, sanitizing toolchain"
+# We need to clear the toolchain if we are using a daily build, or we change validation state. The filenames will all be
+# the same, but the actual .rpm files may be fundamentally different.
+$(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag $(depend_VALIDATE_TOOLCHAIN_GPG)
+	@echo "Daily build ID or validation mode changed, sanitizing toolchain"
 	rm -rf $(TOOLCHAIN_RPMS_DIR)
 	touch $@
 
@@ -277,7 +277,7 @@ $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(t
 #	The .rpm doesn't exist
 #	The .rpm is older than the archive we are extracting it from
 #	The toolchain configuration has been changed (depend_TOOLCHAIN_ARCHIVE and depend_REBUILD_TOOLCHAIN)
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	tempFile=$(toolchain_local_temp)/$(notdir $@) && \
 	if [ ! -f $@ \
 			-o $(selected_toolchain_archive) -nt $@ \
@@ -292,7 +292,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/daily_build_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh $(TOOLCHAIN_GPG_VALIDATION_KEYS)
 	@log_file="$(toolchain_downloads_logs_dir)/$(notdir $@).log" && \
 	rm -f "$$log_file" && \
 	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
@@ -302,7 +302,9 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/daily_build_auto_cl
 		--log-base "$$log_file" \
 		--url-list "$(PACKAGE_URL_LIST)" \
 		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
-		$(if $(TLS_KEY),--private-key $(TLS_KEY)) || \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) \
+		$(if $(filter y,$(VALIDATE_TOOLCHAIN_GPG)),--enforce-signatures,) \
+		--allowable-gpg-keys "$(TOOLCHAIN_GPG_VALIDATION_KEYS)" || \
 	{ \
 		echo "No entries in PACKAGE_URL_LIST ($(PACKAGE_URL_LIST)) were able to provide the toolchain package: $(notdir $@)." >> "$$log_file" && \
 		echo -e "\nERROR: Failed to download toolchain package: "$(notdir $@)"." && \
