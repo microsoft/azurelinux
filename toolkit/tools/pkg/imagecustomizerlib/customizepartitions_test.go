@@ -79,7 +79,7 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage 
 		defaultPartitionName = ""
 	}
 
-	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
 	if assert.NoError(t, err, "read partition table") {
 		assert.Equal(t, defaultPartitionName, partitions[1].PartLabel)
 		assert.Equal(t, defaultPartitionName, partitions[2].PartLabel)
@@ -94,7 +94,7 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage 
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
 	assert.NoError(t, err, "check for /var/log")
 
-	partitions, err = diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	partitions, err = getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
 	assert.NoError(t, err, "get disk partitions")
 
 	// Check that the fstab entries are correct.
@@ -139,7 +139,7 @@ func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, baseIma
 	}
 	defer imageConnection.Close()
 
-	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
 	assert.NoError(t, err, "get disk partitions")
 
 	// Check that the fstab entries are correct.
@@ -204,7 +204,7 @@ func TestCustomizeImageNewUUIDs(t *testing.T) {
 	}
 	defer baseImageLoopback.Close()
 
-	baseImagePartitions, err := diskutils.GetDiskPartitions(baseImageLoopback.DevicePath())
+	baseImagePartitions, err := getDiskPartitionsMap(baseImageLoopback.DevicePath())
 	if !assert.NoError(t, err, "get base image partitions") {
 		return
 	}
@@ -229,24 +229,24 @@ func TestCustomizeImageNewUUIDs(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
-	newImagePartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	newImagePartitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
 	if !assert.NoError(t, err, "get customized image partitions") {
 		return
 	}
 
 	// Ensure the partition UUIDs have been changed.
 	if assert.Equal(t, len(baseImagePartitions), len(newImagePartitions)) {
-		for i := range baseImagePartitions {
-			baseImagePartition := baseImagePartitions[i]
-			newImagePartition := newImagePartitions[i]
+		for partitionNum := range baseImagePartitions {
+			baseImagePartition := baseImagePartitions[partitionNum]
+			newImagePartition := newImagePartitions[partitionNum]
 
 			if baseImagePartition.Type != "part" {
 				continue
 			}
 
-			assert.Equalf(t, baseImagePartition.FileSystemType, newImagePartition.FileSystemType, "[%d] filesystem type didn't change", i)
-			assert.NotEqualf(t, baseImagePartition.PartUuid, newImagePartition.PartUuid, "[%d] partition UUID did change", i)
-			assert.NotEqual(t, baseImagePartition.Uuid, newImagePartition.Uuid, "[%d] filesystem UUID did change", i)
+			assert.Equalf(t, baseImagePartition.FileSystemType, newImagePartition.FileSystemType, "[%d] filesystem type didn't change", partitionNum)
+			assert.NotEqualf(t, baseImagePartition.PartUuid, newImagePartition.PartUuid, "[%d] partition UUID did change", partitionNum)
+			assert.NotEqual(t, baseImagePartition.Uuid, newImagePartition.Uuid, "[%d] filesystem UUID did change", partitionNum)
 		}
 	}
 
@@ -258,7 +258,7 @@ func TestCustomizeImageNewUUIDs(t *testing.T) {
 }
 
 func verifyFstabEntries(t *testing.T, imageConnection *ImageConnection, mountPoints []mountPoint,
-	partitions []diskutils.PartitionInfo,
+	partitions map[int]diskutils.PartitionInfo,
 ) {
 	fstabPath := filepath.Join(imageConnection.Chroot().RootDir(), "/etc/fstab")
 	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
@@ -317,4 +317,27 @@ func verifyBootGrubCfg(t *testing.T, imageConnection *ImageConnection, extraComm
 	if extraCommandLineArgs != "" {
 		assert.Regexp(t, fmt.Sprintf("linux.* %s ", regexp.QuoteMeta(extraCommandLineArgs)), grubCfgContents)
 	}
+}
+
+func getDiskPartitionsMap(devicePath string) (map[int]diskutils.PartitionInfo, error) {
+	partitions, err := diskutils.GetDiskPartitions(devicePath)
+	if err != nil {
+		return nil, err
+	}
+
+	partitionsMap := make(map[int]diskutils.PartitionInfo)
+	for _, partition := range partitions {
+		if partition.Type != "part" {
+			continue
+		}
+
+		num, err := getPartitionNum(partition.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		partitionsMap[num] = partition
+	}
+
+	return partitionsMap, nil
 }

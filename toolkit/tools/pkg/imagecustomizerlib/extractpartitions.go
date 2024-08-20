@@ -44,17 +44,20 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	var partitionMetadataOutput []outputPartitionMetadata
 
 	// Extract partitions to files
-	for partitionNum := range diskPartitions {
-		partition := diskPartitions[partitionNum]
+	for _, partition := range diskPartitions {
 		if partition.Type != "part" {
 			continue
 		}
 
+		partitionNum, err := getPartitionNum(partition.Path)
+		if err != nil {
+			return err
+		}
+
 		partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
 		rawFilename := partitionFilename + ".raw"
-		partitionLoopDevice := partition.Path
 
-		partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		partitionFilepath, err := copyBlockDeviceToFile(outDir, partition.Path, rawFilename)
 		if err != nil {
 			return err
 		}

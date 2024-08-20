@@ -12,6 +12,17 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
+var (
+	// Parsing output of: fdisk --list <device>
+	//
+	// Example:
+	//   Device     Start     End Sectors Size Type
+	//   /dev/vda1   2048   18431   16384   8M EFI System
+	//   /dev/vda2  18432 8386559 8368128   4G Linux filesystem
+	fdiskPartitionsTableHeaderRegexp = regexp.MustCompile(`(?m)^Device[\t ]+Start[\t ]+`)
+	fdiskPartitionsTableEntryRegexp  = regexp.MustCompile(`^([0-9A-Za-z-_/]+)[\t ]+(\d+)[\t ]+`)
+)
+
 func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
 	logger.Log.Infof("Shrinking filesystems")
 
@@ -22,14 +33,13 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 	}
 
 	// Get the start sectors of all partitions
-	matchStarts, err := getStartSectors(imageLoopDevice, len(diskPartitions)-1)
+	startSectors, err := getStartSectors(imageLoopDevice, len(diskPartitions)-1)
 	// Number of partitions is len(diskPartitions)-1 as diskPartitions[0] refers to the loop device for the image itself
 	if err != nil {
 		return err
 	}
 
-	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		diskPartition := diskPartitions[partitionNum]
+	for _, diskPartition := range diskPartitions {
 		if diskPartition.Type != "part" {
 			continue
 		}
@@ -57,8 +67,18 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 
 		logger.Log.Infof("Shrinking partition (%s)", partitionLoopDevice)
 
+		startSector, foundStartSector := startSectors[partitionLoopDevice]
+		if !foundStartSector {
+			return fmt.Errorf("failed to find start sector for partition (%s)", partitionLoopDevice)
+		}
+
+		partitionNumber, err := getPartitionNum(partitionLoopDevice)
+		if err != nil {
+			return err
+		}
+
 		// Check the file system with e2fsck
-		err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
+		err = shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
 		if err != nil {
 			return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
 		}
@@ -70,7 +90,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Find the new partition end value
-		end, err := getNewPartitionEndInSectors(stdout, stderr, matchStarts[partitionNum-1][1], imageLoopDevice)
+		end, err := getNewPartitionEndInSectors(stdout, stderr, startSector, imageLoopDevice)
 		if err != nil {
 			return fmt.Errorf("failed to calculate new partition end:\n%w", err)
 		}
@@ -82,7 +102,8 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Resize the partition with parted resizepart
-		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty", imageLoopDevice, "resizepart", strconv.Itoa(partitionNum), end)
+		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty",
+			imageLoopDevice, "resizepart", strconv.Itoa(partitionNumber), end)
 		if err != nil {
 			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
 		}
@@ -97,23 +118,47 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 }
 
 // Get the start sectors of all partitions.
-func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts [][]string, err error) {
-	stdout, stderr, err := shell.Execute("sudo", "fdisk", "-l", imageLoopDevice)
+// Ideally, we would use 'lsblk --output START' here. But that is only available in util-linux v2.38+.
+func getStartSectors(imageLoopDevice string, partitionCount int) (partitionStarts map[string]int, err error) {
+	stdout, stderr, err := shell.Execute("sudo", "fdisk", "--list", imageLoopDevice)
 	if err != nil {
 		return nil, fmt.Errorf("fdisk failed to list partitions:\n%v", stderr)
 	}
 
-	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
-	reStarts, err := regexp.Compile(`(?m:^` + imageLoopDevice + `p\d+ *(\d+).*?)`)
-	if err != nil {
-		return nil, fmt.Errorf("failed to compile regex:\n%w", err)
+	headerIndex := fdiskPartitionsTableHeaderRegexp.FindStringIndex(stdout)
+	if headerIndex == nil {
+		return nil, fmt.Errorf("failed to find partition table header in fdisk output")
 	}
-	matchStarts = reStarts.FindAllStringSubmatch(stdout, -1)
-	if len(matchStarts) < partitionCount {
+
+	partitionTable := stdout[headerIndex[0]:]
+	partitionTableLines := strings.Split(partitionTable, "\n")
+
+	// Remove header row and final empty line.
+	partitionTableLines = partitionTableLines[1 : len(partitionTableLines)-1]
+
+	partitionStarts = make(map[string]int)
+	for _, line := range partitionTableLines {
+		entry := fdiskPartitionsTableEntryRegexp.FindStringSubmatch(line)
+		if entry == nil {
+			return nil, fmt.Errorf("failed to parse fdisk partition table line (%s)", line)
+		}
+
+		path := entry[1]
+		startStr := entry[2]
+
+		start, err := strconv.Atoi(startStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert start sector (%s) to int:\n%w", startStr, err)
+		}
+
+		partitionStarts[path] = start
+	}
+
+	if len(partitionStarts) < partitionCount {
 		return nil, fmt.Errorf("could not find all partition starts")
 	}
 
-	return matchStarts, nil
+	return partitionStarts, nil
 }
 
 // Get the filesystem size in sectors.
@@ -178,7 +223,7 @@ func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, 
 
 // Get the new partition end in sectors.
 // Returns an empty string if the resize was a no-op.
-func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string, startSector string,
+func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string, startSector int,
 	imageLoopDevice string,
 ) (endInSectors string, err error) {
 	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsStdout, resize2fsStderr, imageLoopDevice)
@@ -191,13 +236,8 @@ func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string,
 		return "", nil
 	}
 
-	// Convert start sector string to int
-	start, err := strconv.Atoi(startSector)
-	if err != nil {
-		return "", fmt.Errorf("failed to convert start sector to int:\n%w", err)
-	}
 	// Calculate the new end
-	end := start + filesystemSizeInSectors
+	end := startSector + filesystemSizeInSectors
 	// Convert to a string with sectors unit appended
 	endInSectors = strconv.Itoa(end) + "s"
 	return endInSectors, nil
