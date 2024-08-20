@@ -112,8 +112,7 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 
-# Patch0:         0002-Disable-building-manpages-in-wscript.patch
-Patch0:         0003-Disable-building-smb.conf.5-in-docs-xml-wscript.patch
+Patch0:         0001-Disable-building-smb.conf.5-in-docs-xml-wscript.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -943,6 +942,9 @@ export python_LDFLAGS="$(echo %{__global_ldflags} | sed -e 's/-Wl,-z,defs//g')"
         --systemd-smb-extra=%{_systemd_extra} \
         --systemd-nmb-extra=%{_systemd_extra} \
         --systemd-winbind-extra=%{_systemd_extra} \
+%if %{with clustering}
+        --systemd-ctdb-extra=%{_systemd_extra} \
+%endif
         --systemd-samba-extra=%{_systemd_extra}
 
 %make_build
@@ -2063,9 +2065,6 @@ fi
 %{python3_sitearch}/samba/__pycache__/dnsresolver.*.pyc
 %{python3_sitearch}/samba/__pycache__/drs_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
-# %{python3_sitearch}/samba/__pycache__/gpclass.*.pyc
-# %{python3_sitearch}/samba/__pycache__/gp_ext_loader.*.pyc
-# %{python3_sitearch}/samba/__pycache__/gp_sec_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/graph.*.pyc
 %{python3_sitearch}/samba/__pycache__/hostconfig.*.pyc
 %{python3_sitearch}/samba/__pycache__/idmap.*.pyc
@@ -2148,8 +2147,6 @@ fi
 %{python3_sitearch}/samba/dsdb_dns.*.so
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
-# %{python3_sitearch}/samba/gpclass.py
-# %{python3_sitearch}/samba/gp_sec_ext.py
 %{python3_sitearch}/samba/graph.py
 %{python3_sitearch}/samba/hostconfig.py
 %{python3_sitearch}/samba/idmap.py
@@ -2168,7 +2165,6 @@ fi
 %{python3_sitearch}/samba/emulate/__init__.py
 %{python3_sitearch}/samba/emulate/traffic.py
 %{python3_sitearch}/samba/emulate/traffic_packets.py
-# %{python3_sitearch}/samba/gp_ext_loader.py
 %dir %{python3_sitearch}/samba/gp
 %dir %{python3_sitearch}/samba/gp/__pycache__
 %{python3_sitearch}/samba/gp/__pycache__/gpclass.*.pyc
@@ -2330,10 +2326,6 @@ fi
 %{python3_sitearch}/samba/subunit/__pycache__/run.*.pyc
 %{python3_sitearch}/samba/subunit/run.py
 %{python3_sitearch}/samba/tdb_util.py
-# %dir %{python3_sitearch}/samba/third_party
-# %{python3_sitearch}/samba/third_party/__init__.py
-# %dir %{python3_sitearch}/samba/third_party/__pycache__
-# %{python3_sitearch}/samba/third_party/__pycache__/__init__.*.pyc
 %{python3_sitearch}/samba/upgrade.py
 %{python3_sitearch}/samba/upgradehelpers.py
 %{python3_sitearch}/samba/werror.*.so
