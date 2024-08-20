@@ -55,7 +55,7 @@ func verifyOverlays(t *testing.T, rootPath string) {
 			"upperdir=/var/overlays/media/upper,workdir=/var/overlays/media/work 0 0")
 
 	// Verify that overlays are correctly mounted using the mount command.
-	mountOutput, err := shell.Execute("mount")
+	mountOutput, _, err := shell.Execute("mount")
 	if !assert.NoError(t, err) {
 		return
 	}
