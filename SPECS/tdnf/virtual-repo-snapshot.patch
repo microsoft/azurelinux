@@ -1,4 +1,4 @@
-From b987e0a0a96f46f8400054569e7eee6861ded3d0 Mon Sep 17 00:00:00 2001
+From eb53e76bfb5b04a981c6c4e9218ca1db9c9d2222 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
@@ -14,10 +14,10 @@ Subject: [PATCH] Add virtual repo snapshot feature to tdnf
  solv/defines.h                             |  28 +
  solv/includes.h                            |   6 +-
  solv/prototypes.h                          |   3 +-
- solv/tdnfrepo.c                            | 653 ++++++++++++++++++++-
+ solv/tdnfrepo.c                            | 656 ++++++++++++++++++++-
  tools/cli/lib/help.c                       |   1 +
  tools/cli/lib/parseargs.c                  |   1 +
- 13 files changed, 747 insertions(+), 17 deletions(-)
+ 13 files changed, 750 insertions(+), 17 deletions(-)
 
 diff --git a/client/config.c b/client/config.c
 index 8ddcc7a..3d7b8d9 100644
@@ -57,7 +57,7 @@ index bb7fba1..da1d374 100644
  
  uint32_t
 diff --git a/client/repo.c b/client/repo.c
-index b6073e2..1f0da1d 100644
+index b6073e2..0c1958b 100644
 --- a/client/repo.c
 +++ b/client/repo.c
 @@ -36,6 +36,8 @@ TDNFInitRepo(
@@ -74,7 +74,7 @@ index b6073e2..1f0da1d 100644
      }
  
 +    // set local epoch limit if conf or cmd line opt is present
-+    if (pTdnf->pConf->pszRepoEpochTimeLimit != NULL) 
++    if (pTdnf->pConf != NULL && pTdnf->pConf->pszRepoEpochTimeLimit != NULL) 
 +    {
 +        pszRepoEpochTimeLimit = pTdnf->pConf->pszRepoEpochTimeLimit;
 +    }
@@ -288,10 +288,10 @@ index 2633b5e..45f8793 100644
  
  uint32_t
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index c27b907..1faaf9d 100644
+index c27b907..17ea8bc 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
-@@ -9,6 +9,634 @@
+@@ -9,6 +9,639 @@
  
  #include "includes.h"
  
@@ -299,6 +299,11 @@ index c27b907..1faaf9d 100644
 +uint32_t 
 +checkAndResizeBuffer(char ** ppszCharBuffer, int * pnBufferMaxLen, int nLengthToAdd) {
 +    uint32_t dwError = 0;
++    if (*pnBufferMaxLen <= 0 || nLengthToAdd < 0) {
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++
 +    int nBufferContentLen = strlen(*ppszCharBuffer);
 +    while (nBufferContentLen + nLengthToAdd >= *pnBufferMaxLen)
 +    {
@@ -322,9 +327,9 @@ index c27b907..1faaf9d 100644
 +uint32_t
 +xmlEscapeCharLinter(const char * pszStringToEscape, char ** ppszDestStr) {
 +    uint32_t dwError = 0;
-+    char * amp = "&amp;";
-+    char * gt = "&gt;";
-+    char * lt = "&lt;";
++    const char * amp = "&amp;";
++    const char * gt = "&gt;";
++    const char * lt = "&lt;";
 +
 +    int nDescLen = (strlen(pszStringToEscape) + 1); // add one for null char
 +    char * pszLintedStr = malloc(nDescLen * sizeof(char));
@@ -374,7 +379,7 @@ index c27b907..1faaf9d 100644
 +        else
 +        {
 +            strcat(pszLintedStr, pszCharToAdd);
-+            nOffset += nAddStrlen - 1;
++            nOffset += nAddStrlen - 1; // minus 1 to account for the original space used by the character
 +        }
 +    }
 +
@@ -926,23 +931,7 @@ index c27b907..1faaf9d 100644
  uint32_t
  SolvLoadRepomd(
      Repo* pRepo,
-@@ -53,6 +681,7 @@ SolvLoadRepomdPrimary(
- {
-     uint32_t dwError = 0;
-     FILE *fp = NULL;
-+
-     if( !pRepo || IsNullOrEmptyString(pszPrimary))
-     {
-         dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -75,6 +704,7 @@ cleanup:
-     {
-         fclose(fp);
-     }
-+
-     return dwError;
- 
- error:
-@@ -195,10 +825,14 @@ SolvReadYumRepo(
+@@ -195,10 +828,14 @@ SolvReadYumRepo(
      const char *pszPrimary,
      const char *pszFilelists,
      const char *pszUpdateinfo,
@@ -958,7 +947,7 @@ index c27b907..1faaf9d 100644
      if(!pRepo || !pszRepoName || !pszRepomd || !pszPrimary)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -209,6 +843,18 @@ SolvReadYumRepo(
+@@ -209,6 +846,18 @@ SolvReadYumRepo(
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
  
@@ -977,7 +966,7 @@ index c27b907..1faaf9d 100644
      dwError = SolvLoadRepomdPrimary(pRepo, pszPrimary);
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
-@@ -232,6 +878,11 @@ SolvReadYumRepo(
+@@ -232,6 +881,11 @@ SolvReadYumRepo(
  
  
  cleanup:
