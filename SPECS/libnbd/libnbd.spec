@@ -25,9 +25,7 @@ Source2:       libguestfs.keyring
 Source3:        copy-patches.sh
 %endif
 
-Patch001:       CVE-2024-7383-1.patch
-Patch002:       CVE-2024-7383-2.patch
-Patch003:       CVE-2024-7383-3.patch
+Patch001:       CVE-2024-7383.patch
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool
