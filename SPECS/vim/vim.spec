@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2190
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source1:        macros.vim
 Patch0:         CVE-2024-41957.patch
 Patch1:         fix_save_unnamed_buffer_correctly.patch
 Patch2:         CVE-2024-41965.patch
+Patch3:         CVE-2024-43374.patch
 
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
@@ -221,6 +222,9 @@ fi
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Tue Aug 20 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 9.0.2190-5
+- Add patch to resolve CVE-2024-43374
+
 * Fri Aug 09 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2190-4
 - Add patch to resolve CVE-2024-41957 & CVE-2024-41965
 
