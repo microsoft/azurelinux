@@ -26,29 +26,33 @@ func doModifications(baseConfigPath string, osConfig *imagecustomizerapi.OS) err
 		return err
 	}
 
-	_, err = imagecustomizerlib.EnableOverlays(osConfig.Overlays, dummyChroot)
-	if err != nil {
-		return err
+	if osConfig.Overlays != nil {
+		_, err = imagecustomizerlib.EnableOverlays(osConfig.Overlays, dummyChroot)
+		if err != nil {
+			return err
+		}
 	}
 
-	bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
-	if err != nil {
-		return err
-	}
+	if osConfig.KernelCommandLine.ExtraCommandLine != "" || osConfig.SELinux.Mode != "" {
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
+		}
 
-	err = handleSELinux(osConfig.SELinux.Mode, bootCustomizer, dummyChroot)
-	if err != nil {
-		return err
-	}
+		err = handleSELinux(osConfig.SELinux.Mode, bootCustomizer, dummyChroot)
+		if err != nil {
+			return err
+		}
 
-	err = updateRootDevice(osConfig.KernelCommandLine.ExtraCommandLine, bootCustomizer)
-	if err != nil {
-		return err
-	}
+		err = updateRootDevice(osConfig.KernelCommandLine.ExtraCommandLine, bootCustomizer)
+		if err != nil {
+			return err
+		}
 
-	err = bootCustomizer.WriteToFile(dummyChroot)
-	if err != nil {
-		return err
+		err = bootCustomizer.WriteToFile(dummyChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -115,8 +119,7 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) (string
 			strings.Contains(arg.Name, "verity_root_hash") ||
 			strings.Contains(arg.Name, "verity_root_options") ||
 			strings.Contains(arg.Name, "selinux") ||
-			strings.Contains(arg.Name, "enforcing") ||
-			strings.Contains(arg.Name, "verity_root_options") {
+			strings.Contains(arg.Name, "enforcing") {
 			if arg.Value != "" {
 				verityAndOverlayValues = append(verityAndOverlayValues, arg.Name+"="+arg.Value)
 			}
@@ -163,17 +166,19 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, bootCustomizer *i
 		return nil
 	}
 
-	logger.Log.Infof("Setting file SELinux labels")
+	// No need to set SELinux labels here as in trident there is reset labels at the end
 	return nil
 }
 
 func updateRootDevice(kernelExtraArguments imagecustomizerapi.KernelExtraArguments, bootCustomizer *imagecustomizerlib.BootCustomizer) error {
 	// Function to extract the root value from kernelCommandLine.extraCommandLine
-	re := regexp.MustCompile(`root=[^\s]+`)
-	rootDeviceValue := re.FindString(string(kernelExtraArguments))
-	if rootDeviceValue == "" {
+	re := regexp.MustCompile(`root=([^\s]+)`)
+	matches := re.FindStringSubmatch(string(kernelExtraArguments))
+	if len(matches) < 2 {
 		return fmt.Errorf("no root device found in extraCommandLine")
 	}
+
+	rootDeviceValue := matches[1]
 
 	err := bootCustomizer.ApplyChangesToGrub("GRUB_DEVICE", rootDeviceValue)
 	if err != nil {
