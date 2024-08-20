@@ -129,7 +129,7 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
-* Thu Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.1-2
+* Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.1-2
 - Fix CVE-2024-7347
 
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.25.4-1
