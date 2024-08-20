@@ -1,0 +1,3 @@
+%__bogusgenerators_provides %{?bogus_generators_provides:echo "%{bogus_generators_provides}"}
+%__bogusgenerators_requires	%{?bogus_generators_requires:echo "%{bogus_generators_requires}"}
+%__bogusgenerators_path	^.*$
