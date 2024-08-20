@@ -143,7 +143,7 @@
 %build_fflags %{optflags} -I%{_fmoddir}
 # Change linker flags for LLVM's lld linker. Also enable sha1 build IDs to prevent "debugedit: Cannot handle 8-byte build ID"
 %_gnu_linker_flags   %{_hardened_ldflags} %{?distro_module_ldflags:%{distro_module_ldflags}}
-%_llvm_linker_flags  -fuse-ld=lld -Wl,--build-id=sha1 -latomic
+%_llvm_linker_flags  -Wl,--build-id=sha1 -latomic
 %build_ldflags       -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{?use_llvm_linker:%{_llvm_linker_flags}} %{!?use_llvm_linker:%{_gnu_linker_flags}}
 
 # Deprecated names.  For backwards compatibility only.
