@@ -11,9 +11,7 @@ URL:            https://gitlab.com/nbdkit/libnbd
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-5215.patch
 
-Patch001:       CVE-2024-7383-1.patch
-Patch002:       CVE-2024-7383-2.patch
-Patch003:       CVE-2024-7383-3.patch
+Patch001:       CVE-2024-7383.patch
 
 # For the core library.
 BuildRequires:  gcc
