@@ -147,7 +147,7 @@ exit 0
 %{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 
 %changelog
-* Thu Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-12
+* Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-12
 - Fix CVE-2024-7347
 
 * Thu Oct 05 2023 Dan Streetman <ddstreet@ieee.org> - 1.22.1-11
