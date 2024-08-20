@@ -6,7 +6,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Source7:        reaper-local-n-%{version}-%{local_n_release}.tar.gz
 Patch0:         CVE-2024-37890.patch
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2017-18214.patch
+Patch3:         DER-signature-decoding-correction.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -171,6 +172,10 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.1.1-11
+- Introduce DER-signature-decoding-correction.patch to address CVE-2024-42459,
+- CVE-2024-42460, CVE-2024-42461
+
 * Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-10
 - Patching CVE-2024-37890, CVE-2023-42282, and CVE-2017-18214.
 
