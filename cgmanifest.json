@@ -26654,8 +26654,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rexml",
-          "version": "3.2.8",
-          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.8.tar.gz"
+          "version": "3.3.4",
+          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.3.4.tar.gz"
         }
       }
     },
