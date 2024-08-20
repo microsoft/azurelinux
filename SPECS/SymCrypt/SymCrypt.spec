@@ -1,8 +1,18 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        103.4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +55,8 @@ A core cryptographic library written by Microsoft
 # Create a symbolic link as if jitterentropy-library has been pulled in as git submodule
 rm -rf 3rdparty/jitterentropy-library
 ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
+
+ln -svf /usr/bin/ld.bfd /usr/bin/ld
 
 %build
 SYMCRYPT_BRANCH=main \
