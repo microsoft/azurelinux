@@ -780,10 +780,6 @@ exit 0
 %{_unitdir}/virtlockd.service
 %{_unitdir}/virtlockd.socket
 %{_unitdir}/virtlockd-admin.socket
-%config(noreplace) %{_sysconfdir}/sysconfig/libvirtd
-%config(noreplace) %{_sysconfdir}/sysconfig/virtlogd
-%config(noreplace) %{_sysconfdir}/sysconfig/virtlockd
-%config(noreplace) %{_sysconfdir}/sysconfig/virtproxyd
 %config(noreplace) %{_sysconfdir}/libvirt/libvirtd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtproxyd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtlogd.conf
