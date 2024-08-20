@@ -7,7 +7,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,8 @@ Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
 Source3:        https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/%{opentelemetry_cpp_contrib_git_commit}.tar.gz#/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}.tar.gz
 Patch0:         CVE-2023-44487.patch
+Patch1:         CVE-2024-7347.1.patch
+Patch2:         CVE-2024-7347.2.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -145,6 +147,9 @@ exit 0
 %{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 
 %changelog
+* Thu Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-12
+- Fix CVE-2024-7347
+
 * Thu Oct 05 2023 Dan Streetman <ddstreet@ieee.org> - 1.22.1-11
 - Fix CVE-2023-44487
 
