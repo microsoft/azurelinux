@@ -27,18 +27,13 @@ echo "/data/containerd /var/lib/containerd none bind 0 0" >> /etc/fstab
 
 # UKI logic
 EFIDIR="BOOT"
-KERNEL_VERSION=""
-
-mkdir -p /etc/repart.d
-echo -e "[Partition]\nType=esp" > /etc/repart.d/10-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/11-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/12-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/13-coal.conf
-
 # Image generation is done in a chroot environment, so running `uname -r`
 # will return the version of the host running kernel. This function works
 # under the assumption that exactly one kernel is installed in the end image.
-get_kernel_version() {
-    kernel_modules_dir="/usr/lib/modules"
-    KERNEL_VERSION="$(ls $kernel_modules_dir)"
-}
+KERNEL_VERSION="$(ls $/usr/lib/modules)"
+
+mkdir -p /etc/repart.d
+echo -e "[Partition]\nType=esp" > /etc/repart.d/10-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/11-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/12-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/13-coal.conf
 
 # symlink /boot/efi to ../efi
 cp -a /boot/efi/. /efi
@@ -50,16 +45,8 @@ ln -s ../efi /boot/efi
 # sd-boot EFI binary as a workaround.
 cp /lib/systemd/boot/efi/systemd-bootx64.efi /efi/EFI/$EFIDIR/grubx64.efi
 
-echo "fstab-before:"
-cat /etc/fstab
-
 # empty /etc/fstab file
-# sed -i '/\/ ext4/d' /etc/fstab
-# sed -i '/\/efi vfat/d' /etc/fstab
 echo > /etc/fstab
-
-# echo "fstab-after:"
-# cat /etc/fstab
 
 # copy UKI into the ESP
 mkdir -p /efi/EFI/Linux
@@ -80,5 +67,3 @@ cp /lib/modules/$KERNEL_VERSION/vmlinuz-uki.efi /efi/EFI/Linux/vmlinuz-uki-$KERN
 # No longer needed now that we generate kernel-uki
 # Regenerate initrd with locale in it
 # dracut --force --regenerate-all --include /usr/lib/locale /usr/lib/locale
-
-# bootctl install --esp-path --boot-path --root
