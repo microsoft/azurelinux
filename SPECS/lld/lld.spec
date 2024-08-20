@@ -10,7 +10,6 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://lld.llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
-BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  file
 BuildRequires:  llvm-devel
