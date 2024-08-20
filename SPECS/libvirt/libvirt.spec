@@ -1075,7 +1075,7 @@ exit 0
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 7.10.0-6
 - Release bump with no changes to force a rebuild and consume new libssh2 build
 
-* Wed May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
+* Thu May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
 
 * Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.10.0-4
