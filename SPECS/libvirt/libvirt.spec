@@ -755,7 +755,6 @@ exit 0
 %{_datadir}/systemtap/tapset/libvirt_qemu_probes*.stp
 
 %{_unitdir}/libvirt-guests.service
-%config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
 %attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
 
 %files daemon
