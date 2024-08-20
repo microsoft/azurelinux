@@ -1635,7 +1635,6 @@ fi
 %config(noreplace) %{_sysconfdir}/samba/lmhosts
 %config(noreplace) %{_sysconfdir}/sysconfig/samba
 %{_mandir}/man5/lmhosts.5*
-# %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man7/samba.7*
 
@@ -3867,6 +3866,7 @@ fi
 %changelog
 * Thu Aug 08 2024 Sindhu Karri <lakarri@microsoft.com> - 4.18.3-1
 - Upgrade samba to build with Python 3.12
+- Add patch 0001-Disable-building-smb.conf.5-in-docs-xml-wscript.patch to fix build
 
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
 - Fix build issue for systemd/systemd-bootstrap confusion
