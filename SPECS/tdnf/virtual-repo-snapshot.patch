@@ -1,4 +1,4 @@
-From ff00bf6a8ef23cd67bc6661d1e9e27fcb0d5b4ba Mon Sep 17 00:00:00 2001
+From b987e0a0a96f46f8400054569e7eee6861ded3d0 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
@@ -11,13 +11,13 @@ Subject: [PATCH] Add virtual repo snapshot feature to tdnf
  etc/bash_completion.d/tdnf-completion.bash |   2 +-
  include/tdnferror.h                        |   9 +
  include/tdnftypes.h                        |   2 +
- solv/defines.h                             |  28 ++
+ solv/defines.h                             |  28 +
  solv/includes.h                            |   6 +-
  solv/prototypes.h                          |   3 +-
- solv/tdnfrepo.c                            | 541 ++++++++++++++++++++-
+ solv/tdnfrepo.c                            | 653 ++++++++++++++++++++-
  tools/cli/lib/help.c                       |   1 +
  tools/cli/lib/parseargs.c                  |   1 +
- 13 files changed, 635 insertions(+), 17 deletions(-)
+ 13 files changed, 747 insertions(+), 17 deletions(-)
 
 diff --git a/client/config.c b/client/config.c
 index 8ddcc7a..3d7b8d9 100644
@@ -274,7 +274,7 @@ index 2ab0c5c..1e39ecb 100644
 +
  #endif /* __SOLV_INCLUDES_H__ */
 diff --git a/solv/prototypes.h b/solv/prototypes.h
-index 2633b5e..0f5df8d 100644
+index 2633b5e..45f8793 100644
 --- a/solv/prototypes.h
 +++ b/solv/prototypes.h
 @@ -517,7 +517,8 @@ SolvReadYumRepo(
@@ -283,55 +283,57 @@ index 2633b5e..0f5df8d 100644
      const char *pszUpdateinfo,
 -    const char *pszOther
 +    const char *pszOther,
-+    char * pszRepoEpochLimit
++    const char * pszRepoEpochLimit
      );
  
  uint32_t
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index c27b907..aef6c61 100644
+index c27b907..1faaf9d 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
-@@ -9,6 +9,522 @@
+@@ -9,6 +9,634 @@
  
  #include "includes.h"
  
 +// #### XML FILTER CODE ####
-+void checkAndResizeBuffer(char ** pszCharBuffer, int * nBufferMaxLen, int nLengthToAdd) {
++uint32_t 
++checkAndResizeBuffer(char ** ppszCharBuffer, int * pnBufferMaxLen, int nLengthToAdd) {
 +    uint32_t dwError = 0;
-+    int nBufferContentLen = strlen(*pszCharBuffer);
-+    while (nBufferContentLen + nLengthToAdd >= *nBufferMaxLen)
++    int nBufferContentLen = strlen(*ppszCharBuffer);
++    while (nBufferContentLen + nLengthToAdd >= *pnBufferMaxLen)
 +    {
-+        *nBufferMaxLen *= 2;
++        *pnBufferMaxLen *= 2;
 +        char * pszTempCharBuffer = NULL;
-+        pszTempCharBuffer = realloc(*pszCharBuffer, *nBufferMaxLen);
++        pszTempCharBuffer = realloc(*ppszCharBuffer, *pnBufferMaxLen);
 +        if (!pszTempCharBuffer)
 +        {
 +            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
 +        //set expanded char buffer 
-+        *pszCharBuffer = pszTempCharBuffer;
++        *ppszCharBuffer = pszTempCharBuffer;
 +    }
 +cleanup:
-+    return;
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+char * descEscapeCharLinter(char * desc) {
++uint32_t
++xmlEscapeCharLinter(const char * pszStringToEscape, char ** ppszDestStr) {
 +    uint32_t dwError = 0;
 +    char * amp = "&amp;";
 +    char * gt = "&gt;";
 +    char * lt = "&lt;";
 +
-+    int nDescLen = strlen(desc) * sizeof(char) + 1;
-+    char * pszLintedDesc = malloc(nDescLen);
-+    if (!pszLintedDesc)
++    int nDescLen = (strlen(pszStringToEscape) + 1); // add one for null char
++    char * pszLintedStr = malloc(nDescLen * sizeof(char));
++    if (!pszLintedStr)
 +    {
 +        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
-+    bzero(pszLintedDesc, nDescLen);
++    bzero(pszLintedStr, nDescLen * sizeof(char));
 +    int nOffset = 0;
 +    int nLintedSize = nDescLen;
 +
@@ -339,7 +341,7 @@ index c27b907..aef6c61 100644
 +    {
 +        char * pszCharToAdd = NULL;
 +        int nAddStrlen = 1;
-+        switch (desc[i])
++        switch (pszStringToEscape[i])
 +        {
 +            case '&':
 +                pszCharToAdd = amp;
@@ -358,75 +360,121 @@ index c27b907..aef6c61 100644
 +        {
 +            nAddStrlen = strlen(pszCharToAdd);
 +        }
-+        checkAndResizeBuffer(&pszLintedDesc, &nLintedSize, nAddStrlen);
++        dwError = checkAndResizeBuffer(&pszLintedStr, &nLintedSize, nAddStrlen);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +
 +        // add linted char if needed
 +        if (pszCharToAdd == NULL)
 +        {
-+            pszLintedDesc[i + nOffset] = desc[i];
++            pszLintedStr[i + nOffset] = pszStringToEscape[i];
 +        }
 +        else
 +        {
-+            strcat(pszLintedDesc, pszCharToAdd);
-+            nOffset += strlen(pszCharToAdd) - 1;
++            strcat(pszLintedStr, pszCharToAdd);
++            nOffset += nAddStrlen - 1;
 +        }
 +    }
++
++    // set Dest to linted string
++    *ppszDestStr = pszLintedStr;
 +    
 +cleanup:
-+    return pszLintedDesc;
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+int addElementStartToBuffer(char * pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
++uint32_t 
++addElementStartToBuffer(char * pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
 +    uint32_t dwError = 0;
-+    int nTotalCharsWritten = 0;
++    
 +    char * pszLintedAttrVal = NULL;
-+    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 1);
-+    nTotalCharsWritten = sprintf(pszElementBuffer, "<%s", pszElementName);
++    char * pszTempBuffer = NULL;
++    dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 1);
++    if (dwError)
++    {
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++    sprintf(pszElementBuffer, "<%s", pszElementName);
 +    for (int i = 0; ppszAttrs[i]; i += 2)
 +    {
-+        pszLintedAttrVal = descEscapeCharLinter((char *)ppszAttrs[i+1]);
-+        if (!pszLintedAttrVal)
++        dwError = xmlEscapeCharLinter((char *)ppszAttrs[i+1], &pszLintedAttrVal);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
++        int nTempBufferLen = strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 4;
++        dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, nTempBufferLen);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
++        pszTempBuffer = malloc(sizeof(char) * (nTempBufferLen + 1));
++        if (!pszTempBuffer)
 +        {
 +            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
-+        checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 4);
-+        nTotalCharsWritten += sprintf(pszElementBuffer + nTotalCharsWritten, " %s=\"%s\"", ppszAttrs[i], pszLintedAttrVal);
++        sprintf(pszTempBuffer, " %s=\"%s\"", ppszAttrs[i], pszLintedAttrVal);
++        strcat(pszElementBuffer, pszTempBuffer);
++        
++        // free temp variables
++        free(pszTempBuffer);
++        pszTempBuffer = NULL;
 +        free(pszLintedAttrVal);
 +        pszLintedAttrVal = NULL;
 +    }
-+    nTotalCharsWritten += sprintf(pszElementBuffer + nTotalCharsWritten, ">");
++    strcat(pszElementBuffer, ">");
 +    
 +cleanup:
 +    if (pszLintedAttrVal)
 +    {
 +        free(pszLintedAttrVal);
 +    }
-+    return nTotalCharsWritten;
++    if (pszTempBuffer)
++    {
++        free(pszTempBuffer);
++    }
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+int addElementEndToBuffer(char * pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
++uint32_t 
++addElementEndToBuffer(char * pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
 +    uint32_t dwError = 0;
-+    int nTotalCharsWritten = 0;
-+    checkAndResizeBuffer(&pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 3);
-+    nTotalCharsWritten = sprintf(pszElementBuffer, "</%s>", pszElementName);
++    dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 3);
++    if (dwError)
++    {
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++    sprintf(pszElementBuffer, "</%s>", pszElementName);
 +    
 +cleanup:
-+    return nTotalCharsWritten;
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+void printElementStartToFile(FILE * pbOutfile, const char * pszElementName, const char ** ppszAttrs) {
++uint32_t 
++printElementStartToFile(FILE * pbOutfile, const char * pszElementName, const char ** ppszAttrs) {
 +    uint32_t dwError = 0;
 +    int nStartElementBufferLength = 500;
 +    char * pszStartElement = malloc(sizeof(char) * nStartElementBufferLength);
++    if (!pszStartElement)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +
-+    addElementStartToBuffer(pszStartElement, &nStartElementBufferLength, pszElementName, ppszAttrs);
++    dwError = addElementStartToBuffer(pszStartElement, &nStartElementBufferLength, pszElementName, ppszAttrs);
++    if (dwError)
++    {
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +    fprintf(pbOutfile, "%s", pszStartElement);
 +
 +cleanup:
@@ -434,17 +482,27 @@ index c27b907..aef6c61 100644
 +    {
 +        free(pszStartElement);
 +    }
-+    return;
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+void printElementEndToFile(FILE* pbOutfile, const char * pszElementName) {
++uint32_t 
++printElementEndToFile(FILE* pbOutfile, const char * pszElementName) {
 +    uint32_t dwError = 0;
 +    int nEndElementBufferLength = 500;
 +    char * pszEndElement = malloc(sizeof(char) * nEndElementBufferLength);
++    if (!pszEndElement)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +
-+    addElementEndToBuffer(pszEndElement, &nEndElementBufferLength, pszElementName);
++    dwError = addElementEndToBuffer(pszEndElement, &nEndElementBufferLength, pszElementName);
++    if (dwError)
++    {
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +    fprintf(pbOutfile, "%s", pszEndElement);
 +
 +cleanup:
@@ -452,18 +510,19 @@ index c27b907..aef6c61 100644
 +    {
 +        free(pszEndElement);
 +    }
-+    return;
++    return dwError;
 +error:
 +    goto cleanup;
 +}
 +
-+void TDNFFilterStartElement(void *userData, const char * name, const char ** attrs) {
++void 
++TDNFFilterStartElement(void *userData, const char * name, const char ** attrs) {
 +    uint32_t dwError = 0;
 +    char * pszStartElementBuffer = NULL;
 +    // load tracking data
 +    TDNFFilterData * pTracking = (TDNFFilterData *)userData;
 +    int nAddNewLineAfterStart = pTracking->nPrevElement == 0;
-+    char szNewLineBuffer[5];
++    char szNewLineBuffer[2];
 +    if (nAddNewLineAfterStart)
 +    {
 +        sprintf(szNewLineBuffer, "\n");
@@ -486,8 +545,11 @@ index c27b907..aef6c61 100644
 +        if (pTracking->nTimeFound && pTracking->nPrintPackage)
 +        {
 +            fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
-+            printf("%s", szNewLineBuffer);
-+            printElementStartToFile(pTracking->pbOutfile, name, attrs);
++            dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
++            if (dwError)
++            {
++                BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++            }
 +        }
 +        else
 +        { // still checking for time
@@ -503,7 +565,14 @@ index c27b907..aef6c61 100644
 +                        // when this is less than our search time, allow the package to be
 +                        // printed to the temp repo file, otherwise the current package
 +                        // can be discarded.
-+                        long nCurrentPackageTime = atoi(attrs[i+1]);
++                        errno = 0;
++                        char * pszEpochEnd = NULL;
++                        long nCurrentPackageTime = strtoll(attrs[i+1], pszEpochEnd, 10);
++                        if (errno || pszEpochEnd == attrs[i+1])
++                        {
++                            dwError = ERROR_TDNF_TIME_FILTER_PARSE;
++                            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                        }
 +                        pTracking->nPrintPackage = (nCurrentPackageTime <= pTracking->nSearchTime);
 +                        pTracking->nTimeFound = 1;
 +                    }
@@ -515,7 +584,11 @@ index c27b907..aef6c61 100644
 +                    fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
 +
 +                    // print time element
-+                    printElementStartToFile(pTracking->pbOutfile, name, attrs);
++                    dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
++                    if (dwError)
++                    {
++                        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                    }
 +                }
 +            }
 +            else if (!pTracking->nTimeFound)
@@ -529,11 +602,27 @@ index c27b907..aef6c61 100644
 +                    dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +                }
-+                int nLenToAdd = addElementStartToBuffer(pszStartElementBuffer, &nStartElementBufferSize, name, attrs);
-+                strcat(pszStartElementBuffer, szNewLineBuffer);
++
++                dwError = addElementStartToBuffer(pszStartElementBuffer, &nStartElementBufferSize, name, attrs);
++                if (dwError)
++                {
++                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                }
++                int nLenToAdd = strlen(pszStartElementBuffer);
 +                nLenToAdd += strlen(szNewLineBuffer); //+1 if newLine character present
 +
-+                checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nLenToAdd);
++                dwError = checkAndResizeBuffer(&pszStartElementBuffer, &nStartElementBufferSize, strlen(szNewLineBuffer));
++                if (dwError)
++                {
++                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                }
++                strcat(pszStartElementBuffer, szNewLineBuffer);
++                
++                dwError = checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nLenToAdd);
++                if (dwError)
++                {
++                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                }
 +                strcat(pTracking->pszElementBuffer, pszStartElementBuffer);
 +            }
 +        }
@@ -542,7 +631,11 @@ index c27b907..aef6c61 100644
 +    { // not in a package or parsing a new package
 +        fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
 +        // output line
-+        printElementStartToFile(pTracking->pbOutfile, name, attrs);
++        dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +    }
 +cleanup:
 +    if (pszStartElementBuffer)
@@ -551,10 +644,12 @@ index c27b907..aef6c61 100644
 +    }
 +    return;
 +error:
++    pr_err("An error occurred during start element parsing with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
-+void TDNFFilterEndElement(void * userData, const char * name) {
++void 
++TDNFFilterEndElement(void * userData, const char * name) {
 +    uint32_t dwError = 0;
 +    char * pszElementBuffer = NULL;
 +    // load tracking data
@@ -567,7 +662,11 @@ index c27b907..aef6c61 100644
 +    if (!pTracking->nInPackage || pTracking->nPrintPackage)
 +    {
 +        // print end element to file
-+        printElementEndToFile(pTracking->pbOutfile, name);
++        dwError = printElementEndToFile(pTracking->pbOutfile, name);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +
 +    } 
 +    else if (pTracking->nInPackage && !pTracking->nTimeFound)
@@ -580,9 +679,18 @@ index c27b907..aef6c61 100644
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
 +        // add end element to buffer
-+        int nEndElementLen = addElementEndToBuffer(pszElementBuffer, &nEndElementBufferLen, name);
++        dwError = addElementEndToBuffer(pszElementBuffer, &nEndElementBufferLen, name);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
++        int nEndElementLen = strlen(pszElementBuffer);
 +
-+        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nEndElementLen);
++        dwError = checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), nEndElementLen);
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +        strcat(pTracking->pszElementBuffer, pszElementBuffer);
 +
 +    } // else do nothing
@@ -603,10 +711,12 @@ index c27b907..aef6c61 100644
 +    }
 +    return;
 +error:
++    pr_err("An error occurred during end element parsing with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
-+void TDNFFilterCharDataHandler(void * userData, const char * content, int length) {
++void 
++TDNFFilterCharDataHandler(void * userData, const char * content, int length) {
 +    uint32_t dwError = 0;
 +    // load tracking data
 +    TDNFFilterData * pTracking = (TDNFFilterData *)userData;
@@ -620,10 +730,10 @@ index c27b907..aef6c61 100644
 +    }
 +    bzero(pszCharData, (length + 1) * sizeof(char));
 +    strncpy(pszCharData, content, length);
-+    char * pszLintedCharData = descEscapeCharLinter(pszCharData);
-+    if (!pszLintedCharData)
++    char * pszLintedCharData = NULL;
++    dwError = xmlEscapeCharLinter(pszCharData, &pszLintedCharData);
++    if (dwError)
 +    {
-+        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
@@ -636,7 +746,11 @@ index c27b907..aef6c61 100644
 +    else if (pTracking->nInPackage && !pTracking->nTimeFound)
 +    {
 +        // add to buffer
-+        checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), length);
++        dwError = checkAndResizeBuffer(&(pTracking->pszElementBuffer), &(pTracking->nBufferMaxLen), strlen(pszLintedCharData));
++        if (dwError)
++        {
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +        strcat(pTracking->pszElementBuffer, pszLintedCharData);
 +    } // else do nothing (skipped package)
 +
@@ -651,39 +765,49 @@ index c27b907..aef6c61 100644
 +    }
 +    return;
 +error:
++    pr_err("An error occurred during char data handling with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
 +char * 
-+TDNFFilterFile(const char * pszInFilePath, char * pszEpochTime) {
++TDNFFilterFile(const char * pszInFilePath, const char * pszEpochTime) {
 +    // vars
 +    uint32_t dwError = 0;
-+    TDNFFilterData * pData = NULL;
-+    FILE * pbInFile = NULL;
-+    FILE * pbOutFile = NULL;
-+    XML_Parser bParser;
-+    bzero(&bParser, sizeof(XML_Parser));
-+    char pszTimeExtension[100];
-+    char * pszOutFilePath = NULL;
++    TDNFFilterData pData;
++    bzero(&pData, sizeof(TDNFFilterData));
 +    time_t nEpochTime;
 +    bzero(&nEpochTime, sizeof(time_t));
++    XML_Parser bParser;
++    bzero(&bParser, sizeof(XML_Parser));
++    FILE * pbInFile = NULL;
++    FILE * pbOutFile = NULL;
++    char pszTimeExtension[100];
++    char * pszOutFilePath = NULL;
++
++    // convert epoch string to time for use by the parser and the temp file name
++    errno = 0;
 +    char * pszEpochEnd = NULL;
 +    nEpochTime = strtoll(pszEpochTime, &pszEpochEnd, 10);
-+    
-+    if (nEpochTime == 0 && strcmp(pszEpochTime, "0") != 0) {
-+        printf("Error converting --epochtimelimit: %s\n", pszEpochTime);
-+        dwError = ERROR_TDNF_TIME_FILTER_PARSE;
-+        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
-+    }
-+    if (pszEpochEnd != NULL && strcmp(pszEpochEnd, "") != 0) {
-+        printf("The time provided to --epochtimelimit is misformatted: \'%s\' should be an epoch time\n", pszEpochTime);
++    if (errno || pszEpochEnd == pszEpochTime)
++    {
 +        dwError = ERROR_TDNF_TIME_FILTER_PARSE;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    sprintf(pszTimeExtension, "-%ld.xml", nEpochTime);
-+    int nOutFileLen = strlen(pszInFilePath) + strlen(pszTimeExtension);
++    //create output file ending
++    sprintf(pszTimeExtension, "-%lld.xml", nEpochTime);
 +
++    // find total extension length
++    int nInFileExtLen = 4; // len of ".xml"
++    char * pszFileExt = strrchr(pszInFilePath, '.');
++    if (strcmp(pszFileExt, ".xml") != 0)
++    {
++        nInFileExtLen += strlen(pszFileExt);
++    }
++
++    // calculate outfile length and allocate
++    int nInFileLen = strlen(pszInFilePath);
++    int nOutFileLen = (nInFileLen - nInFileExtLen) + strlen(pszTimeExtension) + 1;
 +    pszOutFilePath = malloc(nOutFileLen * sizeof(char));
 +    if (!pszOutFilePath)
 +    {
@@ -692,17 +816,9 @@ index c27b907..aef6c61 100644
 +    }
 +    bzero(pszOutFilePath, nOutFileLen * sizeof(char));
 +
-+    // find total extension length
-+    int nFileExtLen = 4; // len of ".xml"
-+    char * pszFileExt = strrchr(pszInFilePath, '.');
-+    if (strcmp(pszFileExt, ".xml") != 0)
-+    {
-+        nFileExtLen += strlen(pszFileExt);
-+    }
-+
-+    strncpy(pszOutFilePath, pszInFilePath, strlen(pszInFilePath) - nFileExtLen); // remove extension to be added with the name
++    // use infile path + timestamp as new output file
++    strncpy(pszOutFilePath, pszInFilePath, nInFileLen - nInFileExtLen); // remove extension to be added with the name
 +    strcat(pszOutFilePath, pszTimeExtension);
-+
 +
 +    // init vars, load files
 +    pbInFile = solv_xfopen(pszInFilePath, "r");
@@ -718,27 +834,21 @@ index c27b907..aef6c61 100644
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    pData = (TDNFFilterData *) malloc(sizeof(TDNFFilterData));
-+    if (!pData)
++    pData.nBufferMaxLen = 5000; // arbitrary number, 5000 is likely sufficient in most scenarios but is resized if required
++    pData.pszElementBuffer = (char *)malloc(pData.nBufferMaxLen * sizeof(char));
++    if (!pData.pszElementBuffer)
 +    {
 +        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
-+    pData->nBufferMaxLen = 5000;
-+    pData->pszElementBuffer = (char *)malloc(pData->nBufferMaxLen * sizeof(char));
-+    if (!pData->pszElementBuffer)
-+    {
-+        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
-+        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
-+    }
-+    bzero(pData->pszElementBuffer, pData->nBufferMaxLen);
-+    pData->pbOutfile = pbOutFile;
-+    pData->nSearchTime = nEpochTime;
-+    pData->nDepth = 0;
-+    pData->nBufferLen = 0;
-+    pData->nInPackage = 0;
-+    pData->nPrintPackage = 0;
-+    pData->nTimeFound = 0;
++    bzero(pData.pszElementBuffer, pData.nBufferMaxLen);
++    pData.pbOutfile = pbOutFile;
++    pData.nSearchTime = nEpochTime;
++    pData.nDepth = 0;
++    pData.nBufferLen = 0;
++    pData.nInPackage = 0;
++    pData.nPrintPackage = 0;
++    pData.nTimeFound = 0;
 +
 +    //create parser
 +    bParser = XML_ParserCreate(NULL);
@@ -748,7 +858,7 @@ index c27b907..aef6c61 100644
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    XML_SetUserData(bParser, pData);
++    XML_SetUserData(bParser, &pData);
 +    XML_SetElementHandler(bParser, TDNFFilterStartElement, TDNFFilterEndElement);
 +    XML_SetCharacterDataHandler(bParser, TDNFFilterCharDataHandler);
 +
@@ -761,12 +871,17 @@ index c27b907..aef6c61 100644
 +        if (!pszXMLParseBuffer)
 +        {
 +            fprintf(stderr, "Couldn't allocate memory for buffer\n");
-+            dwError = ERROR_TDNF_TIME_FILTER_PARSE;
++            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
 +
 +        const size_t len = fread(pszXMLParseBuffer, 1, BUFSIZ - 1, pbInFile);
 +        ((char *)pszXMLParseBuffer)[len] = '\0';
++        if (ferror(pbInFile))
++        {
++            dwError = ERROR_TDNF_TIME_FILTER_PARSE;
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +
 +        nInputEof = feof(pbInFile);
 +
@@ -782,12 +897,8 @@ index c27b907..aef6c61 100644
 +    } while (!nInputEof);
 +
 +cleanup:
-+    if (pData)
-+    {
-+        if (pData->pszElementBuffer) {
-+            free(pData->pszElementBuffer);
-+        }
-+        free(pData);
++    if (pData.pszElementBuffer) {
++        free(pData.pszElementBuffer);
 +    }
 +
 +    if (bParser)
@@ -807,6 +918,7 @@ index c27b907..aef6c61 100644
 +
 +    return pszOutFilePath;
 +error:
++    pr_err("An error occurred during epoch time filtering with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +// #### END XML FILTER CODE ####
@@ -814,7 +926,7 @@ index c27b907..aef6c61 100644
  uint32_t
  SolvLoadRepomd(
      Repo* pRepo,
-@@ -53,6 +569,7 @@ SolvLoadRepomdPrimary(
+@@ -53,6 +681,7 @@ SolvLoadRepomdPrimary(
  {
      uint32_t dwError = 0;
      FILE *fp = NULL;
@@ -822,7 +934,7 @@ index c27b907..aef6c61 100644
      if( !pRepo || IsNullOrEmptyString(pszPrimary))
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -75,6 +592,7 @@ cleanup:
+@@ -75,6 +704,7 @@ cleanup:
      {
          fclose(fp);
      }
@@ -830,13 +942,13 @@ index c27b907..aef6c61 100644
      return dwError;
  
  error:
-@@ -195,10 +713,14 @@ SolvReadYumRepo(
+@@ -195,10 +825,14 @@ SolvReadYumRepo(
      const char *pszPrimary,
      const char *pszFilelists,
      const char *pszUpdateinfo,
 -    const char *pszOther
 +    const char *pszOther,
-+    char * pszRepoEpochLimit
++    const char * pszRepoEpochLimit
      )
  {
      uint32_t dwError = 0;
@@ -846,7 +958,7 @@ index c27b907..aef6c61 100644
      if(!pRepo || !pszRepoName || !pszRepomd || !pszPrimary)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -209,6 +731,18 @@ SolvReadYumRepo(
+@@ -209,6 +843,18 @@ SolvReadYumRepo(
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
  
@@ -865,7 +977,7 @@ index c27b907..aef6c61 100644
      dwError = SolvLoadRepomdPrimary(pRepo, pszPrimary);
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
-@@ -232,6 +766,11 @@ SolvReadYumRepo(
+@@ -232,6 +878,11 @@ SolvReadYumRepo(
  
  
  cleanup:

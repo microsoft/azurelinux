@@ -27,7 +27,7 @@ Patch3:         tdnf-printf-fix.patch
 Patch4:         tdnf-sqlite-library.patch
 
 # Patch in vitual snapshot
-Patch5:			virtual-repo-snapshot.patch
+Patch5:	        virtual-repo-snapshot.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
