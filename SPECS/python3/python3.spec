@@ -26,7 +26,7 @@ Patch2:         CVE-2024-0397.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
-Patch1001:      CVE-2024-7592.patch
+Patch1002:      CVE-2024-7592.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
