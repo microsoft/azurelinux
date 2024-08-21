@@ -1,4 +1,4 @@
-From 97169458a5f7e829d1600aff717248f998425683 Mon Sep 17 00:00:00 2001
+From 4b586087b542ccb231c9c2b37411a3a104333b16 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
@@ -43,7 +43,7 @@ index 8ddcc7a..805fff1 100644
          {
              pConf->nCleanRequirementsOnRemove = isTrue(cn->value);
 diff --git a/client/prototypes.h b/client/prototypes.h
-index bb7fba1..da1d374 100644
+index bb7fba1..cb8a8d3 100644
 --- a/client/prototypes.h
 +++ b/client/prototypes.h
 @@ -586,7 +586,8 @@ uint32_t
@@ -52,12 +52,12 @@ index bb7fba1..da1d374 100644
      const char* pszRepoName,
 -    PTDNF_REPO_METADATA pRepoMD
 +    PTDNF_REPO_METADATA pRepoMD,
-+    char * pszRepoEpochLimit
++    char * pszSnapshotTime
      );
  
  uint32_t
 diff --git a/client/repo.c b/client/repo.c
-index b6073e2..e32123b 100644
+index b6073e2..0331796 100644
 --- a/client/repo.c
 +++ b/client/repo.c
 @@ -36,6 +36,8 @@ TDNFInitRepo(
@@ -73,7 +73,7 @@ index b6073e2..e32123b 100644
          BAIL_ON_TDNF_ERROR(dwError);
      }
  
-+    // set local epoch limit if conf or cmd line opt is present
++    // set local POSIX limit if conf or cmd line opt is present
 +    if (pTdnf->pConf != NULL && pTdnf->pConf->pszSnapshotTime!= NULL) 
 +    {
 +        pszSnapshotTime = pTdnf->pConf->pszSnapshotTime;
@@ -116,7 +116,7 @@ index b6073e2..e32123b 100644
 +            dwError = SolvUseMetaDataCache(pSack, pSolvRepoInfo, &nUseMetaDataCache);
              BAIL_ON_TDNF_ERROR(dwError);
 +
-+            //force load from repo if epoch time limit is present
++            //force load from repo if POSIX time limit is present
 +            if (nUseMetaDataCache == 0) {
 +                dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD, NULL);
 +                BAIL_ON_TDNF_ERROR(dwError);
@@ -135,7 +135,7 @@ index b6073e2..e32123b 100644
      const char* pszRepoName,
 -    PTDNF_REPO_METADATA pRepoMD
 +    PTDNF_REPO_METADATA pRepoMD,
-+    char * pszRepoEpochLimit
++    char * pszSnapshotTime
      )
  {
      uint32_t dwError = 0;
@@ -145,7 +145,7 @@ index b6073e2..e32123b 100644
                    pRepoMD->pszUpdateInfo,
 -                  pRepoMD->pszOther);
 +                  pRepoMD->pszOther,
-+                  pszRepoEpochLimit);
++                  pszSnapshotTime);
  cleanup:
      return dwError;
  
@@ -289,7 +289,7 @@ index 2633b5e..3db0b6b 100644
  
  uint32_t
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index c27b907..b9ae8de 100644
+index c27b907..fec3ba7 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
 @@ -9,6 +9,766 @@
@@ -662,7 +662,7 @@ index c27b907..b9ae8de 100644
 +            if (strcmp(name, "time") == 0)
 +            {
 +                // time found
-+                // validate file epoch time
++                // validate file POSIX time
 +                for (int i = 0; attrs[i]; i += 2)
 +                {
 +                    if (strcmp(attrs[i], "file") == 0)
@@ -672,9 +672,9 @@ index c27b907..b9ae8de 100644
 +                        // printed to the temp repo file, otherwise the current package
 +                        // can be discarded.
 +                        errno = 0;
-+                        char * pszEpochEnd = NULL;
-+                        long nCurrentPackageTime = strtoll(attrs[i+1], pszEpochEnd, 10);
-+                        if (errno || pszEpochEnd == attrs[i+1])
++                        char * pszSnapshotTimeEnd = NULL;
++                        long nCurrentPackageTime = strtoll(attrs[i+1], pszSnapshotTimeEnd, 10);
++                        if (errno || pszSnapshotTimeEnd == attrs[i+1])
 +                        {
 +                            dwError = ERROR_TDNF_TIME_FILTER_PARSE;
 +                            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
@@ -912,11 +912,11 @@ index c27b907..b9ae8de 100644
 +    char pszTimeExtension[100];
 +    char * pszOutFilePath = NULL;
 +
-+    // convert epoch string to time for use by the parser and the temp file name
++    // convert snapshot string to time for use by the parser and the temp file name
 +    errno = 0;
-+    char * pszEpochEnd = NULL;
-+    nSnapshotTime = strtoll(pszSnapshotTime, &pszEpochEnd, 10);
-+    if (errno || pszEpochEnd == pszSnapshotTime)
++    char * pszSnapshotTimeEnd = NULL;
++    nSnapshotTime = strtoll(pszSnapshotTime, &pszSnapshotTimeEnd, 10);
++    if (errno || pszSnapshotTimeEnd == pszSnapshotTime)
 +    {
 +        dwError = ERROR_TDNF_TIME_FILTER_PARSE;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
@@ -1051,10 +1051,10 @@ index c27b907..b9ae8de 100644
 +
 +    return pszOutFilePath;
 +error:
-+    pr_err("An error occurred during epoch time filtering with the following code: %u\n", dwError);
++    pr_err("An error occurred during snapshot filtering with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
-+// #### END XML FILTER CODE ####
++// #### END XML SNAPSHOT FILTER CODE ####
 +
  uint32_t
  SolvLoadRepomd(
@@ -1065,7 +1065,7 @@ index c27b907..b9ae8de 100644
      const char *pszUpdateinfo,
 -    const char *pszOther
 +    const char *pszOther,
-+    const char *pszRepoEpochLimit
++    const char *pszSnapshotTime
      )
  {
      uint32_t dwError = 0;
@@ -1080,8 +1080,8 @@ index c27b907..b9ae8de 100644
  
  
 +    // Run filter if option present
-+    if (pszRepoEpochLimit != NULL){
-+        tempPrimaryRepoFile = TDNFFilterFile(pszPrimary, pszRepoEpochLimit);
++    if (pszSnapshotTime != NULL){
++        tempPrimaryRepoFile = TDNFFilterFile(pszPrimary, pszSnapshotTime);
 +        if (tempPrimaryRepoFile == NULL)
 +        {
 +            dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
@@ -1107,14 +1107,14 @@ index c27b907..b9ae8de 100644
      return dwError;
  
 diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
-index bc4cf83..7505e5c 100644
+index bc4cf83..86c34e7 100644
 --- a/tools/cli/lib/help.c
 +++ b/tools/cli/lib/help.c
 @@ -23,6 +23,7 @@ static const char *help_msg =
   "           [--downloadonly]\n"
   "           [--enablerepo=<repoid>]\n"
   "           [--enableplugin=<plugin_name>]\n"
-+ "           [--snapshottime=<epoch_time>]\n"
++ "           [--snapshottime=<POSIX_time>]\n"
   "           [--exclude [file1,file2,...]]\n"
   "           [--installroot [path]]\n"
   "           [--noautoremove]\n"
