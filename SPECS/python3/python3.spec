@@ -23,10 +23,10 @@ Patch0:         cgi3.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
 Patch1:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch2:         CVE-2024-0397.patch
+Patch3:         CVE-2024-7592.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
-Patch1002:      CVE-2024-7592.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -164,6 +164,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
