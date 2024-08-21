@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.36.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,7 @@ Patch2:         CVE-2021-42380.patch
 Patch3:         CVE-2023-42363.patch
 Patch4:         CVE-2023-42365.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-static >= 2.38-6%{?dist}
+BuildRequires:  glibc-static >= 2.38-7%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 %if 0%{?with_check}
@@ -103,6 +103,9 @@ SKIP_KNOWN_BUGS=1 ./runtest
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.36.1-7
+- Bump to rebuild with updated glibc
+
 * Wed Aug 12 2024 Muhammad Falak <mwani@microsoft.com> - 1.36.1-6
 - Address CVE-2021-42380, CVE-2023-42363, CVE-2023-42364 & CVE-2023-42365
 
