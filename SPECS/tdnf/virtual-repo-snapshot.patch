@@ -1,4 +1,4 @@
-From decdbe7e5f1e018943954d70404cdf1404ac37e5 Mon Sep 17 00:00:00 2001
+From bed541b7ceafaf75f67911ef64e231569b8eec84 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
@@ -275,7 +275,7 @@ index 2ab0c5c..1e39ecb 100644
 +
  #endif /* __SOLV_INCLUDES_H__ */
 diff --git a/solv/prototypes.h b/solv/prototypes.h
-index 2633b5e..3db0b6b 100644
+index 2633b5e..6ac68fd 100644
 --- a/solv/prototypes.h
 +++ b/solv/prototypes.h
 @@ -517,7 +517,8 @@ SolvReadYumRepo(
@@ -284,7 +284,7 @@ index 2633b5e..3db0b6b 100644
      const char *pszUpdateinfo,
 -    const char *pszOther
 +    const char *pszOther,
-+    const char *pszRepoEpochLimit
++    const char *pszSnapshotTime
      );
  
  uint32_t
