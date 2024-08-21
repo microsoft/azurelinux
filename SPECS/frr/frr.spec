@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        9.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
+Patch5:         CVE-2024-44070.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -198,6 +199,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 9.1.1-2
+- Fix CVE-2024-44070
+
 * Tue Aug 06 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.1-1
 - Bump version to 9.1.1 to fix CVE-2024-31950 & CVE-2024-31951
 
