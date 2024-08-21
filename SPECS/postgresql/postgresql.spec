@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
-Source1:        %{name}.service
+
 # Common libraries needed
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
@@ -20,8 +20,6 @@ BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
-BuildRequires:	systemd-devel
-BuildRequires:	systemd-rpm-macros
 
 %if 0%{?with_check}
 BuildRequires:  sudo
@@ -35,10 +33,7 @@ Requires:       openssl
 Requires:       readline
 Requires:       tzdata
 Requires:       zlib
-Requires:       openssl-libs
-Requires(pre):  shadow-utils
-Requires(post): shadow-utils
-Requires(postun): shadow-utils
+
 %description
 PostgreSQL is an object-relational database management system.
 
@@ -76,7 +71,6 @@ developing applications that use postgresql.
 %build
 sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h &&
 ./configure \
-    --with-systemd \
     --enable-thread-safety \
     --prefix=%{_prefix} \
     --with-ldap \
@@ -93,7 +87,6 @@ cd contrib && make %{?_smp_mflags}
 %install
 make install DESTDIR=%{buildroot}
 cd contrib && make install DESTDIR=%{buildroot}
-install -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
 # For postgresql 10+, commands are renamed
 # Ref: https://wiki.postgresql.org/wiki/New_in_postgres_10
@@ -108,60 +101,10 @@ chown -Rv nobody .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %ldconfig_scriptlets
-%pre
-
-if ! getent group postgres >/dev/null; then
-    /sbin/groupadd -r postgres
-fi
-
-if ! getent passwd postgres >/dev/null; then
-    /sbin/useradd -g postgres postgres
-fi
-
-%post
-
-PGDATA="/usr/local/pgsql/data"
-PGRUN="/run/postgresql"
-
-if [ ! -d "$PGDATA" ]; then
-    mkdir -p "$PGDATA"
-    chown postgres:postgres "$PGDATA"
-    su -c /usr/bin/initdb -D "$PGDATA" postgres
-    chown -R postgres:postgres "$PGDATA"
-fi
-
-#chown -R postgres:postgres "$PGDATA"
-
-if [ ! -d "$PGRUN" ]; then
-    mkdir -p "$PGRUN"
-    chown postgres:postgres "$PGRUN"
-    chmod 700 "$PGRUN"
-fi
-
-%systemd_post %{name}.service
-
-%preun
-#%systemd_preun %{name}.service
-
-%postun
-if [ $1 -eq 0 ] ; then
-    if getent passwd postgres >/dev/null; then
-        /sbin/userdel postgres
-    fi
-    if getent group %{name} >/dev/null; then
-        /sbin/groupdel postgres
-    fi
-    rm -rf /var/log/%{name}
-    rm -rf /var/run/%{name}
-fi
-
-%systemd_postun_with_restart %{name}.service
 
 %files
 %defattr(-,root,root)
 %license COPYRIGHT
-%{_unitdir}/%{name}.service
-
 %{_bindir}/initdb
 %{_bindir}/oid2name
 %{_bindir}/pg_amcheck
@@ -232,12 +175,6 @@ fi
 %changelog
 * Mon Aug 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.4-1
 - Auto-upgrade to 16.4 - CVE-2024-7348
-
-* Wed Aug 07 Andrew Phelps <anphel@microsoft.com> - 16.3-3
-- Add requires for shadow-utils
-
-* Wed Jul 24 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.3-2
-- Added systemd service, installation path, %pre %post and %postun required for the service 
  
 * Mon May 20 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 16.3-1
 - Upgrade to version 16.3 to fix CVE-2024-4317
