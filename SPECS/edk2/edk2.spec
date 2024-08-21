@@ -39,6 +39,9 @@ ExclusiveArch: x86_64
 
 %define DBXDATE        20230509
 
+%define HVLOADER_VER    1.0.1
+%define HVLOADER_COMMIT 286f1c642ed624af2c7840fbca7923497891fe68
+
 %define build_ovmf 1
 %define build_aarch64 0
 %define build_riscv64 0
@@ -52,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -67,7 +70,9 @@ Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
 Source3: softfloat-%{softfloat_version}.tar.xz
 Source4: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
 Source5: jansson-2.13.1.tar.bz2
-Source6: README.experimental
+Source6: hvloader-%{HVLOADER_COMMIT}.tar.gz
+Source7: README.experimental
+Source8: hvloader-target.txt
 
 # json description files
 Source10: 50-edk2-aarch64-qcow2.json
@@ -305,6 +310,18 @@ This package provides tools that are needed to build EFI executables
 and ROMs using the GNU tools.  You do not need to install this package;
 you probably want to install edk2-tools only.
 
+%package hvloader
+Summary:        Loader binary for loading type 1 hypervisors under Linux.
+Requires:       python3
+
+%description hvloader
+HvLoader.efi is an EFI application for loading an external hypervisor loader.
+
+HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and 
+calls it's entry point passing HvLoader.efi ImageHandle. This way the 
+hypervisor loader binary has access to HvLoader.efi's command line options,
+and use those as configuration parameters. The first HvLoader.efi command line
+option is the path to hypervisor loader binary.
 
 
 %prep
@@ -330,6 +347,11 @@ tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatL
 tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
 mkdir -p RedfishPkg/Library/JsonLib/jansson
 tar -xf %{SOURCE5} --strip-components=1 --directory RedfishPkg/Library/JsonLib/jansson
+
+# extract hvloader source into place
+tar -xf %{SOURCE6} --directory MdeModulePkg/Application
+sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
+
 # include paths pointing to unused submodules
 mkdir -p MdePkg/Library/MipiSysTLib/mipisyst/library/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include
@@ -341,7 +363,7 @@ mkdir -p SecurityPkg/DeviceSecurity/SpdmLib/libspdm/include
 chmod -Rf a+rX,u+w,g-w,o-w .
 
 cp -a -- \
-   %{SOURCE6} \
+   %{SOURCE7} \
    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
    %{SOURCE20} \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
@@ -475,6 +497,11 @@ for raw in */riscv/*.raw; do
 done
 %endif
 
+source ./edksetup.sh
+make -C BaseTools
+cp %{SOURCE8} Conf/target.txt
+build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf
+
 %install
 
 cp -a OvmfPkg/License.txt License.OvmfPkg.txt
@@ -572,6 +599,9 @@ done
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Python_Appendix/#manual-bytecompilation
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
+
+mkdir -p %{buildroot}/boot/efi
+cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader/OUTPUT/HvLoader.efi %{buildroot}/boot/efi
 
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
@@ -749,7 +779,13 @@ done
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
 
+%files hvloader
+/boot/efi/HvLoader.efi
+
 %changelog
+* Wed Aug 21 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-2
+- Introduce edk2-hvloader subpackage
+
 * Tue Jul 30 2024 Betty Lakes <bettylakes@microsoft.com> - 20240524git3e722403cd16-1
 - Upgrade to 20240524git3e722403cd16 to fix CVE-2023-45236, CVE-2023-45237
 

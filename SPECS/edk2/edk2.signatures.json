@@ -28,6 +28,8 @@
   "edk2-build.py": "b4be60833465d372662ac4f1f89f40b9c65d59fb17f7716059f980503069ddb7",
   "edk2-build.rhel-9": "477723037cadf03fa15756de563995cc556ccf84d9a4ba059ea37c97c3a0e3e7",
   "edk2-platforms-a912d9fcf7d1.tar.xz": "dc2c8a0eb131ccba28f52c83d14617cae049ddd466f98a8cd229215051b9754a",
+  "hvloader-286f1c642ed624af2c7840fbca7923497891fe68.tar.gz": "4e0a15cfab98a89a0a93f747df876ea3ee5366c3ffbd158c28e296bf52c7dfba",
+  "hvloader-target.txt": "fcf4f427d3b80e67296be2a1d17ec124d65f673d4f6ea37d238f8d3fc1ddc4b8",
   "jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
   "openssl-rhel-db0287935122edceb91dcda8dfb53b4090734e22.tar.xz": "9fcc5b49513d6ae21c7ddc3d1bbb1f8973cfbe76f2392d10106a8cd435e3eb47",
   "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8",
