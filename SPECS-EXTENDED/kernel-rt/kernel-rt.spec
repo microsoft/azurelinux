@@ -145,7 +145,7 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package        python3-perf-%{short_name}
+%package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
 Requires:       python3
 Requires:       %{name} = %{version}-%{release}
@@ -154,7 +154,7 @@ Provides:       python3-perf-%{short_name}
 %description    python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package        bpftool-%{short_name}
+%package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 Requires:       %{name} = %{version}-%{release}
 Provides:       bpftool-%{short_name}
