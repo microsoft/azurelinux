@@ -28,9 +28,17 @@ func AddOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, im
 }
 
 func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
-	var err error
+	// Check if the user already exists.
+	userExists, err := userutils.UserExists(user.Name, imageChroot)
+	if err != nil {
+		return err
+	}
 
-	logger.Log.Infof("Adding/updating user (%s)", user.Name)
+	if userExists {
+		logger.Log.Infof("Updating user (%s)", user.Name)
+	} else {
+		logger.Log.Infof("Adding user (%s)", user.Name)
+	}
 
 	hashedPassword := ""
 	if user.Password != nil {
@@ -61,12 +69,6 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 				return err
 			}
 		}
-	}
-
-	// Check if the user already exists.
-	userExists, err := userutils.UserExists(user.Name, imageChroot)
-	if err != nil {
-		return err
 	}
 
 	if userExists {

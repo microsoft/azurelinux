@@ -1722,7 +1722,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 
 				if passwordChanged == "" {
 					// Set to the number of days since epoch
-					fields[passwordChangedField] = fmt.Sprintf("%d", int64(time.Since(time.Unix(0, 0)).Hours()/24))
+					fields[passwordChangedField] = fmt.Sprintf("%d", DaysSinceUnixEpoch())
 				}
 				passwordAge, err = strconv.ParseInt(fields[passwordChangedField], 10, 64)
 				if err != nil {
@@ -1745,17 +1745,19 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
+func DaysSinceUnixEpoch() int64 {
+	return int64(time.Since(time.Unix(0, 0)).Hours() / 24)
+}
+
 func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 ) (err error) {
-	const squashErrors = false
-
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) primary group (%s):\n%w", username, primaryGroup, err)
 		}
 	}
 
@@ -1764,16 +1766,13 @@ func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterfac
 
 func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
 ) (err error) {
-	const squashErrors = false
-
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-a", "-G", allGroups, username)
 		})
-
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) secondary groups:\n%w", username, err)
 		}
 	}
 
