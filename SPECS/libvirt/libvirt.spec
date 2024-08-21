@@ -846,7 +846,6 @@ exit 0
 %ghost %{_sysconfdir}/libvirt/nwfilter/*.xml
 
 %files daemon-driver-interface
-%config(noreplace) %{_sysconfdir}/sysconfig/virtinterfaced
 %config(noreplace) %{_sysconfdir}/libvirt/virtinterfaced.conf
 %{_datadir}/augeas/lenses/virtinterfaced.aug
 %{_datadir}/augeas/lenses/tests/test_virtinterfaced.aug
