@@ -741,6 +741,7 @@ exit 0
 %files client
 %{_mandir}/man1/virsh.1*
 %{_mandir}/man1/virt-xml-validate.1*
+%{_mandir}/man1/virt-pki-query-dn.1*
 %{_mandir}/man1/virt-pki-validate.1*
 %{_mandir}/man1/virt-host-validate.1*
 %{_bindir}/virsh
@@ -906,6 +907,7 @@ exit 0
 
 %files daemon-driver-qemu
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
+%config(noreplace) %{_prefix}/lib/sysctl.d/60-qemu-postcopy-migration.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
 %{_unitdir}/virtqemud.service
@@ -980,6 +982,9 @@ exit 0
 
 %files daemon-driver-storage-scsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_scsi.so
+
+%files daemon-driver-storage-vstorage
+%{_libdir}/%{name}/storage-backend/libvirt_storage_backend_vstorage.so
 
 %files daemon-kvm
 
