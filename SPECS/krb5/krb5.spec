@@ -4,7 +4,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.21.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,8 +12,10 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 Source1:        krb5.conf
+Source2:        krb5kdc.service
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
+BuildRequires:  systemd-rpm-macros
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{version}-%{release}
@@ -62,6 +64,8 @@ autoconf &&
 make %{?_smp_mflags}
 
 %install
+mkdir -p %{buildroot}%{_unitdir}/
+cp %{SOURCE2} %{buildroot}%{_unitdir}/
 cd src
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
@@ -112,6 +116,7 @@ make check
 %{_mandir}/man8/*
 %{_datarootdir}/man/man5/.k5identity.5.gz
 %{_datarootdir}/man/man5/.k5login.5.gz
+%{_unitdir}/%{name}*.service
 
 %files devel
 %defattr(-,root,root)
@@ -125,6 +130,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed Aug 21 2024 Andy Zaugg <azaugg@linkedin.com> - 1.21.3-2
+- Adding systemd unit file for krb5kdc service
+
 * Wed Jul 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.3-1
 - Auto-upgrade to 1.21.3 - CVE-2024-37371, CVE-2024-37370
 

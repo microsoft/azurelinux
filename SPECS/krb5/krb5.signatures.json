@@ -1,6 +1,7 @@
 {
   "Signatures": {
     "krb5.conf": "54ce761ea22e55923f4b10b5a8ed306f98c579217b4253163437c33eec243720",
-    "krb5-1.21.3.tar.gz": "b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35"
+    "krb5-1.21.3.tar.gz": "b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35",
+    "krb5kdc.service": "5309bda6d5acb03b8fd1285c9c15aab49a756abbfce80ea378e86cf31723425e"
   }
 }
