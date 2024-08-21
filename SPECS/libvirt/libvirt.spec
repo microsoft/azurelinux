@@ -832,6 +832,8 @@ exit 0
 %{_mandir}/man8/virtlogd.8*
 %{_mandir}/man8/virtlockd.8*
 %{_mandir}/man8/virtproxyd.8*
+%{_mandir}/man8/virt-ssh-helper.8*
+%{_mandir}/man8/libvirt-guests.8*
 %{_mandir}/man7/virkey*.7*
 
 %files daemon-config-network
