@@ -1,28 +1,28 @@
-Name:		mosh
-Version:	1.4.0
-Release:	6%{?dist}
-Summary:	Mobile shell that supports roaming and intelligent local echo
-Vendor:     Microsoft Corporation
-Distribution: Mariner
+Name:           mosh
+Version:        1.4.0
+Release:        6%{?dist}
+Summary:        Mobile shell that supports roaming and intelligent local echo
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
-License:	GPLv3+
-URL:		https://mosh.mit.edu/
-Source0:	https://github.com/mobile-shell/mosh/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+License:        GPLv3+
+URL:            https://mosh.mit.edu/
+Source0:        https://github.com/mobile-shell/mosh/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:	libutempter-devel
-BuildRequires:	ncurses-devel
-BuildRequires:	openssl-devel
-BuildRequires:	perl-diagnostics
-BuildRequires:	perl-generators
-BuildRequires:	protobuf-compiler
-BuildRequires:	protobuf-devel
-BuildRequires:	zlib-devel
+BuildRequires:  libutempter-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  openssl-devel
+BuildRequires:  perl-diagnostics
+BuildRequires:  perl-generators
+BuildRequires:  protobuf-compiler
+BuildRequires:  protobuf-devel
+BuildRequires:  zlib-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
-Requires:	openssh-clients
-Requires:	openssl
-Requires:	perl-IO-Socket-IP
+Requires:       openssh-clients
+Requires:       openssl
+Requires:       perl-IO-Socket-IP
 
 %description
 Mosh is a remote terminal application that supports:
