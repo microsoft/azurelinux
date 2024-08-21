@@ -28,6 +28,7 @@ URL:            https://github.com/intel/multus-cni
 Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %define commit efdc0a5c7d1ea4bb236d638403420448b48782b3
 Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2023-3978.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 
@@ -73,6 +74,9 @@ install -D -m0644 deployments/multus-daemonset.yml %{buildroot}%{_datadir}/k8s-y
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Wed Aug 21 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.0.2-5
+- Add patch to resolve CVE-2023-3978
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.2-4
 - Bump release to rebuild with go 1.21.11
 
