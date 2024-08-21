@@ -858,7 +858,6 @@ exit 0
 %{_mandir}/man8/virtinterfaced.8*
 
 %files daemon-driver-network
-%config(noreplace) %{_sysconfdir}/sysconfig/virtnetworkd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnetworkd.conf
 %{_datadir}/augeas/lenses/virtnetworkd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnetworkd.aug
@@ -878,7 +877,6 @@ exit 0
 %{_mandir}/man8/virtnetworkd.8*
 
 %files daemon-driver-nodedev
-%config(noreplace) %{_sysconfdir}/sysconfig/virtnodedevd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnodedevd.conf
 %{_datadir}/augeas/lenses/virtnodedevd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnodedevd.aug
@@ -891,7 +889,6 @@ exit 0
 %{_mandir}/man8/virtnodedevd.8*
 
 %files daemon-driver-nwfilter
-%config(noreplace) %{_sysconfdir}/sysconfig/virtnwfilterd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnwfilterd.conf
 %{_datadir}/augeas/lenses/virtnwfilterd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnwfilterd.aug
