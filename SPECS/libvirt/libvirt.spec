@@ -1012,6 +1012,12 @@ exit 0
 %doc AUTHORS.rst NEWS.rst README.rst
 %doc libvirt-docs/*
 
+%files client-qemu
+%{_mandir}/man1/virt-qemu-qmp-proxy.1*
+%{_mandir}/man1/virt-qemu-sev-validate.1*
+%{_bindir}/virt-qemu-qmp-proxy
+%{_bindir}/virt-qemu-sev-validate
+
 %files libs -f %{name}.lang
 %license COPYING COPYING.LESSER
 %config(noreplace) %{_sysconfdir}/libvirt/libvirt.conf
