@@ -151,7 +151,7 @@ Requires:       python3
 Requires:       %{name} = %{version}-%{release}
 Provides:       python3-perf-%{short_name}
 
-%description    python3-perf
+%description -n python3-perf-%{short_name}
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
 %package -n     bpftool-%{short_name}
@@ -159,7 +159,7 @@ Summary:        Inspection and simple manipulation of eBPF programs and maps
 Requires:       %{name} = %{version}-%{release}
 Provides:       bpftool-%{short_name}
 
-%description    bpftool
+%description -n bpftool-%{short_name}
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -411,10 +411,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
-%files python3-perf
+%files -n python3-perf-%{short_name}
 %{python3_sitearch}/*
 
-%files bpftool
+%files -n bpftool-%{short_name}
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
@@ -422,7 +422,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Mon Aug 19 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.43.1-2
 - Rename bpftool and python3-perf to be kernel specific
 - Add new requires for bpftool and python3-perf for specfic kernel
-- Add kernel conflicts
 
 * Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
 - Auto-upgrade to 6.6.43.1
