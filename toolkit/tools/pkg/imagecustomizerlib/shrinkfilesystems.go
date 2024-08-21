@@ -34,9 +34,8 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 
 	// Get the start sectors of all partitions
 	startSectors, err := getStartSectors(imageLoopDevice, len(diskPartitions)-1)
-	// Number of partitions is len(diskPartitions)-1 as diskPartitions[0] refers to the loop device for the image itself
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get partitions start sectors:\n%w", err)
 	}
 
 	for _, diskPartition := range diskPartitions {
