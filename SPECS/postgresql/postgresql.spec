@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.4
-Release:        1%{?dist}
+Version:        16.3
+Release:        3%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -230,9 +230,6 @@ fi
 %{_libdir}/libpgtypes.a
 
 %changelog
-* Mon Aug 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.4-1
-- Auto-upgrade to 16.4 - CVE-2024-7348
-
 * Wed Aug 07 Andrew Phelps <anphel@microsoft.com> - 16.3-3
 - Add requires for shadow-utils
 
