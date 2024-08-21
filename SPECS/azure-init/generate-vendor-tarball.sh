@@ -9,7 +9,7 @@
 
 # For generating tar of PRs and Forks
 FORK_OWNER="Azure"
-SOURCE_VERSION="7142bced859169553e8948497aa13df742aac1ff"
+SOURCE_VERSION="632bc446611d275a2bdeb23107e9e38d89d17042"
 SOURCE_URL="https://github.com/${FORK_OWNER}/azure-init/archive/${SOURCE_VERSION}.tar.gz"
 
 workdir=$(mktemp -d)

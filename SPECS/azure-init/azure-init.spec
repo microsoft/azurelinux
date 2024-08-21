@@ -1,8 +1,7 @@
 %global rustflags '-Clink-arg=-Wl,-z,relro,-z,now'
-
 Summary:        A rust-based reference implementation for provisioning Linux VMs on Azure.
 Name:           azure-init
-Version:        7142bced859169553e8948497aa13df742aac1ff
+Version:        632bc446611d275a2bdeb23107e9e38d89d17042
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -21,6 +20,8 @@ Requires:       systemd
 %description
 An open-source lightweight rust-based replacement for cloud-init, maintained by Microsoft's Cloud Provisioning team 
 
+%define defaultusergroups 'wheel,sudo'
+
 %prep
 %autosetup -p1
 tar -xf %{SOURCE1}
@@ -29,6 +30,8 @@ cp %{SOURCE2} .cargo/config
 
 %build
 cargo build --all
+
+sed -i 's@ExecStart=/var/lib/azure-init/azure-init@ExecStart=/var/lib/azure-init/azure-init --groups=%{defaultusergroups}@g' config/azure-init.service
 
 %install
 mkdir -p %{buildroot}%{_sharedstatedir}/azure-init
@@ -68,7 +71,7 @@ systemctl enable azure-init
 
 %changelog
 * Thu Jun 20 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.1.1-2
-- Test Dongsu Park's PR86 in azure-init
+- Test latest commit of azure-init (632bc44)
 
 * Wed May 08 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.1.1-1
 - Initial introduction to Azure Linux (license: MIT)
