@@ -1,4 +1,4 @@
-From eb53e76bfb5b04a981c6c4e9218ca1db9c9d2222 Mon Sep 17 00:00:00 2001
+From 9b23e28bc85fbc4edfec23a7af1d4796ef2c3df2 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
@@ -11,13 +11,13 @@ Subject: [PATCH] Add virtual repo snapshot feature to tdnf
  etc/bash_completion.d/tdnf-completion.bash |   2 +-
  include/tdnferror.h                        |   9 +
  include/tdnftypes.h                        |   2 +
- solv/defines.h                             |  28 +
+ solv/defines.h                             |  29 +
  solv/includes.h                            |   6 +-
  solv/prototypes.h                          |   3 +-
- solv/tdnfrepo.c                            | 656 ++++++++++++++++++++-
+ solv/tdnfrepo.c                            | 744 ++++++++++++++++++++-
  tools/cli/lib/help.c                       |   1 +
  tools/cli/lib/parseargs.c                  |   1 +
- 13 files changed, 750 insertions(+), 17 deletions(-)
+ 13 files changed, 839 insertions(+), 17 deletions(-)
 
 diff --git a/client/config.c b/client/config.c
 index 8ddcc7a..3d7b8d9 100644
@@ -215,10 +215,10 @@ index a806010..e638427 100644
      char* pszPersistDir;
      char* pszProxy;
 diff --git a/solv/defines.h b/solv/defines.h
-index 38f5ab1..ebc7bd0 100644
+index 38f5ab1..ddb3355 100644
 --- a/solv/defines.h
 +++ b/solv/defines.h
-@@ -18,4 +18,32 @@
+@@ -18,4 +18,33 @@
          }                                                          \
      } while(0)
  
@@ -240,7 +240,8 @@ index 38f5ab1..ebc7bd0 100644
 +    FILE * pbOutfile;
 +} TDNFFilterData;
 +
-+#define TDNF_MAX_FILTER_INPUT_THRESHOLD 10000000
++#define TDNF_MAX_FILTER_INPUT_THRESHOLD 500000000
++#define TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE 16000
 +
 +#define BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError) \
 +    do {                                                           \
@@ -274,7 +275,7 @@ index 2ab0c5c..1e39ecb 100644
 +
  #endif /* __SOLV_INCLUDES_H__ */
 diff --git a/solv/prototypes.h b/solv/prototypes.h
-index 2633b5e..45f8793 100644
+index 2633b5e..3db0b6b 100644
 --- a/solv/prototypes.h
 +++ b/solv/prototypes.h
 @@ -517,7 +517,8 @@ SolvReadYumRepo(
@@ -283,15 +284,15 @@ index 2633b5e..45f8793 100644
      const char *pszUpdateinfo,
 -    const char *pszOther
 +    const char *pszOther,
-+    const char * pszRepoEpochLimit
++    const char *pszRepoEpochLimit
      );
  
  uint32_t
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index c27b907..17ea8bc 100644
+index c27b907..4f88f91 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
-@@ -9,6 +9,639 @@
+@@ -9,6 +9,727 @@
  
  #include "includes.h"
  
@@ -299,17 +300,28 @@ index c27b907..17ea8bc 100644
 +uint32_t 
 +checkAndResizeBuffer(char ** ppszCharBuffer, int * pnBufferMaxLen, int nLengthToAdd) {
 +    uint32_t dwError = 0;
-+    if (*pnBufferMaxLen <= 0 || nLengthToAdd < 0) {
++    char * pszTempCharBuffer = NULL;
++    if (ppszCharBuffer == NULL || *ppszCharBuffer == NULL || pnBufferMaxLen == NULL || *pnBufferMaxLen <= 0 || nLengthToAdd < 0) {
 +        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
++    int nTempMaxLen = *pnBufferMaxLen;
 +    int nBufferContentLen = strlen(*ppszCharBuffer);
-+    while (nBufferContentLen + nLengthToAdd >= *pnBufferMaxLen)
++    while (nBufferContentLen + nLengthToAdd + 1 >= nTempMaxLen)
 +    {
-+        *pnBufferMaxLen *= 2;
-+        char * pszTempCharBuffer = NULL;
-+        pszTempCharBuffer = realloc(*ppszCharBuffer, *pnBufferMaxLen);
++        nTempMaxLen *= 2;
++    }
++    if (nTempMaxLen >= TDNF_MAX_FILTER_INPUT_THRESHOLD)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++
++    // only realloc if the size changed
++    if (nTempMaxLen != *pnBufferMaxLen)
++    {
++        pszTempCharBuffer = realloc(*ppszCharBuffer, nTempMaxLen);
 +        if (!pszTempCharBuffer)
 +        {
 +            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
@@ -317,10 +329,13 @@ index c27b907..17ea8bc 100644
 +        }
 +        //set expanded char buffer 
 +        *ppszCharBuffer = pszTempCharBuffer;
++        *pnBufferMaxLen = nTempMaxLen;
 +    }
++
 +cleanup:
 +    return dwError;
 +error:
++    pr_err("An error occurred during buffer resizing with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
@@ -330,6 +345,12 @@ index c27b907..17ea8bc 100644
 +    const char * amp = "&amp;";
 +    const char * gt = "&gt;";
 +    const char * lt = "&lt;";
++
++    if (pszStringToEscape == NULL || ppszDestStr == NULL)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +
 +    int nDescLen = (strlen(pszStringToEscape) + 1); // add one for null char
 +    char * pszLintedStr = malloc(nDescLen * sizeof(char));
@@ -354,7 +375,6 @@ index c27b907..17ea8bc 100644
 +            case '>':
 +                pszCharToAdd = gt;
 +                break;
-+
 +            case '<':
 +                pszCharToAdd = lt;
 +                break;
@@ -389,42 +409,58 @@ index c27b907..17ea8bc 100644
 +cleanup:
 +    return dwError;
 +error:
++    pr_err("An error occurred during escape character linting with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
++//change to use char **, allocate within the function
++
 +uint32_t 
-+addElementStartToBuffer(char * pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
++addElementStartToBuffer(char ** pszElementBuffer, int * nElementBufferMax, const char * pszElementName, const char ** ppszAttrs) {
 +    uint32_t dwError = 0;
++
++    if (pszElementBuffer == NULL || nElementBufferMax == NULL || *nElementBufferMax < 0)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++
++    // set default buffer max length
++    if (*nElementBufferMax == 0)
++    {
++        *nElementBufferMax = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++    }
++    *pszElementBuffer = malloc(*nElementBufferMax * sizeof(char));
 +    
 +    char * pszLintedAttrVal = NULL;
 +    char * pszTempBuffer = NULL;
-+    dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 1);
++    dwError = checkAndResizeBuffer(pszElementBuffer, nElementBufferMax, strlen(pszElementName) + 2);
 +    if (dwError)
 +    {
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
-+    sprintf(pszElementBuffer, "<%s", pszElementName);
++    sprintf(*pszElementBuffer, "<%s", pszElementName);
 +    for (int i = 0; ppszAttrs[i]; i += 2)
 +    {
-+        dwError = xmlEscapeCharLinter((char *)ppszAttrs[i+1], &pszLintedAttrVal);
++        dwError = xmlEscapeCharLinter(ppszAttrs[i+1], &pszLintedAttrVal);
 +        if (dwError)
 +        {
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
-+        int nTempBufferLen = strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 4;
-+        dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMax, nTempBufferLen);
++        int nTempBufferLen = strlen(pszLintedAttrVal) + strlen(ppszAttrs[i]) + 5;
++        dwError = checkAndResizeBuffer(pszElementBuffer, nElementBufferMax, nTempBufferLen);
 +        if (dwError)
 +        {
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
-+        pszTempBuffer = malloc(sizeof(char) * (nTempBufferLen + 1));
++        pszTempBuffer = malloc(sizeof(char) * nTempBufferLen);
 +        if (!pszTempBuffer)
 +        {
 +            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
 +        sprintf(pszTempBuffer, " %s=\"%s\"", ppszAttrs[i], pszLintedAttrVal);
-+        strcat(pszElementBuffer, pszTempBuffer);
++        strcat(*pszElementBuffer, pszTempBuffer);
 +        
 +        // free temp variables
 +        free(pszTempBuffer);
@@ -432,7 +468,7 @@ index c27b907..17ea8bc 100644
 +        free(pszLintedAttrVal);
 +        pszLintedAttrVal = NULL;
 +    }
-+    strcat(pszElementBuffer, ">");
++    strcat(*pszElementBuffer, ">");
 +    
 +cleanup:
 +    if (pszLintedAttrVal)
@@ -445,42 +481,64 @@ index c27b907..17ea8bc 100644
 +    }
 +    return dwError;
 +error:
++    pr_err("An error occurred during start element generation with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
 +uint32_t 
-+addElementEndToBuffer(char * pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
++addElementEndToBuffer(char ** pszElementBuffer, int * nElementBufferMaxLen, const char * pszElementName) {
 +    uint32_t dwError = 0;
-+    dwError = checkAndResizeBuffer(&pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 3);
++    if (pszElementBuffer == NULL || nElementBufferMaxLen == NULL || *nElementBufferMaxLen < 0)
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
++
++    if (*nElementBufferMaxLen == 0 )
++    {
++        *nElementBufferMaxLen = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++    }
++    *pszElementBuffer = malloc(*nElementBufferMaxLen * sizeof(char));
++    
++    dwError = checkAndResizeBuffer(pszElementBuffer, nElementBufferMaxLen, strlen(pszElementName) + 4);
 +    if (dwError)
 +    {
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
-+    sprintf(pszElementBuffer, "</%s>", pszElementName);
++    sprintf(*pszElementBuffer, "</%s>", pszElementName);
 +    
 +cleanup:
 +    return dwError;
 +error:
++    pr_err("An error occurred during end element generation with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
++
++// error trap fprintf
 +
 +uint32_t 
 +printElementStartToFile(FILE * pbOutfile, const char * pszElementName, const char ** ppszAttrs) {
 +    uint32_t dwError = 0;
-+    int nStartElementBufferLength = 500;
-+    char * pszStartElement = malloc(sizeof(char) * nStartElementBufferLength);
-+    if (!pszStartElement)
++    if (pbOutfile == NULL)
 +    {
-+        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    dwError = addElementStartToBuffer(pszStartElement, &nStartElementBufferLength, pszElementName, ppszAttrs);
++    int nStartElementBufferLength = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++    char * pszStartElement = NULL;
++
++    dwError = addElementStartToBuffer(&pszStartElement, &nStartElementBufferLength, pszElementName, ppszAttrs);
 +    if (dwError)
 +    {
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +    fprintf(pbOutfile, "%s", pszStartElement);
++    if (ferror(pbOutfile))
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_IO;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +
 +cleanup:
 +    if (pszStartElement)
@@ -489,26 +547,33 @@ index c27b907..17ea8bc 100644
 +    }
 +    return dwError;
 +error:
++    pr_err("An error occurred during start element printing with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
 +uint32_t 
-+printElementEndToFile(FILE* pbOutfile, const char * pszElementName) {
++printElementEndToFile(FILE * pbOutfile, const char * pszElementName) {
 +    uint32_t dwError = 0;
-+    int nEndElementBufferLength = 500;
-+    char * pszEndElement = malloc(sizeof(char) * nEndElementBufferLength);
-+    if (!pszEndElement)
++    if (pbOutfile == NULL)
 +    {
-+        dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
++        dwError = ERROR_TDNF_TIME_FILTER_GENERAL;
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    dwError = addElementEndToBuffer(pszEndElement, &nEndElementBufferLength, pszElementName);
++    int nEndElementBufferLength = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++    char * pszEndElement = NULL;
++
++    dwError = addElementEndToBuffer(&pszEndElement, &nEndElementBufferLength, pszElementName);
 +    if (dwError)
 +    {
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +    fprintf(pbOutfile, "%s", pszEndElement);
++    if (ferror(pbOutfile))
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_IO;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +
 +cleanup:
 +    if (pszEndElement)
@@ -517,6 +582,7 @@ index c27b907..17ea8bc 100644
 +    }
 +    return dwError;
 +error:
++    pr_err("An error occurred during end element printing with the following code: %u\n", dwError);
 +    goto cleanup;
 +}
 +
@@ -550,6 +616,12 @@ index c27b907..17ea8bc 100644
 +        if (pTracking->nTimeFound && pTracking->nPrintPackage)
 +        {
 +            fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++            if (ferror(pTracking->pbOutfile))
++            {
++                dwError = ERROR_TDNF_TIME_FILTER_IO;
++                BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++            }
++
 +            dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
 +            if (dwError)
 +            {
@@ -586,7 +658,18 @@ index c27b907..17ea8bc 100644
 +                {
 +                    // print buffer when time is found
 +                    fprintf(pTracking->pbOutfile, "%s", pTracking->pszElementBuffer);
++                    if (ferror(pTracking->pbOutfile))
++                    {
++                        dwError = ERROR_TDNF_TIME_FILTER_IO;
++                        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                    }
++
 +                    fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++                    if (ferror(pTracking->pbOutfile))
++                    {
++                        dwError = ERROR_TDNF_TIME_FILTER_IO;
++                        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++                    }
 +
 +                    // print time element
 +                    dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
@@ -600,21 +683,16 @@ index c27b907..17ea8bc 100644
 +            {
 +                // if we haven't found a time yet, the element must be stored
 +                // add to file buffer
-+                int nStartElementBufferSize = 500;
-+                pszStartElementBuffer = malloc(sizeof(char) * nStartElementBufferSize);
-+                if (!pszStartElementBuffer)
-+                {
-+                    dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
-+                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
-+                }
++                int nStartElementBufferSize = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++                pszStartElementBuffer = NULL;
 +
-+                dwError = addElementStartToBuffer(pszStartElementBuffer, &nStartElementBufferSize, name, attrs);
++                dwError = addElementStartToBuffer(&pszStartElementBuffer, &nStartElementBufferSize, name, attrs);
 +                if (dwError)
 +                {
 +                    BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +                }
 +                int nLenToAdd = strlen(pszStartElementBuffer);
-+                nLenToAdd += strlen(szNewLineBuffer); //+1 if newLine character present
++                nLenToAdd += strlen(szNewLineBuffer); // +1 if newLine character present
 +
 +                dwError = checkAndResizeBuffer(&pszStartElementBuffer, &nStartElementBufferSize, strlen(szNewLineBuffer));
 +                if (dwError)
@@ -635,6 +713,11 @@ index c27b907..17ea8bc 100644
 +    else
 +    { // not in a package or parsing a new package
 +        fprintf(pTracking->pbOutfile, "%s", szNewLineBuffer);
++        if (ferror(pTracking->pbOutfile))
++        {
++            dwError = ERROR_TDNF_TIME_FILTER_IO;
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +        // output line
 +        dwError = printElementStartToFile(pTracking->pbOutfile, name, attrs);
 +        if (dwError)
@@ -676,15 +759,11 @@ index c27b907..17ea8bc 100644
 +    } 
 +    else if (pTracking->nInPackage && !pTracking->nTimeFound)
 +    {
-+        int nEndElementBufferLen = 500;
-+        pszElementBuffer = malloc(sizeof(char) * nEndElementBufferLen);
-+        if (!pszElementBuffer)
-+        {
-+            dwError = ERROR_TDNF_TIME_FILTER_MEMORY;
-+            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
-+        }
++        int nEndElementBufferLen = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
++        pszElementBuffer = NULL;
++
 +        // add end element to buffer
-+        dwError = addElementEndToBuffer(pszElementBuffer, &nEndElementBufferLen, name);
++        dwError = addElementEndToBuffer(&pszElementBuffer, &nEndElementBufferLen, name);
 +        if (dwError)
 +        {
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
@@ -747,6 +826,11 @@ index c27b907..17ea8bc 100644
 +    {
 +        // print to file
 +        fprintf(pTracking->pbOutfile, "%s", pszLintedCharData);
++        if (ferror(pTracking->pbOutfile))
++        {
++            dwError = ERROR_TDNF_TIME_FILTER_IO;
++            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++        }
 +    }
 +    else if (pTracking->nInPackage && !pTracking->nTimeFound)
 +    {
@@ -839,7 +923,7 @@ index c27b907..17ea8bc 100644
 +        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +    }
 +
-+    pData.nBufferMaxLen = 5000; // arbitrary number, 5000 is likely sufficient in most scenarios but is resized if required
++    pData.nBufferMaxLen = TDNF_DEFAULT_TIME_FILTER_BUFF_SIZE;
 +    pData.pszElementBuffer = (char *)malloc(pData.nBufferMaxLen * sizeof(char));
 +    if (!pData.pszElementBuffer)
 +    {
@@ -869,6 +953,11 @@ index c27b907..17ea8bc 100644
 +
 +    //parse XML
 +    fprintf(pbOutFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
++    if (ferror(pbOutFile))
++    {
++        dwError = ERROR_TDNF_TIME_FILTER_IO;
++        BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
++    }
 +    int nInputEof;
 +    do
 +    {
@@ -884,7 +973,7 @@ index c27b907..17ea8bc 100644
 +        ((char *)pszXMLParseBuffer)[len] = '\0';
 +        if (ferror(pbInFile))
 +        {
-+            dwError = ERROR_TDNF_TIME_FILTER_PARSE;
++            dwError = ERROR_TDNF_TIME_FILTER_IO;
 +            BAIL_ON_TDNF_TIME_FILTER_ERROR(dwError);
 +        }
 +
@@ -931,7 +1020,7 @@ index c27b907..17ea8bc 100644
  uint32_t
  SolvLoadRepomd(
      Repo* pRepo,
-@@ -195,10 +828,14 @@ SolvReadYumRepo(
+@@ -195,10 +916,14 @@ SolvReadYumRepo(
      const char *pszPrimary,
      const char *pszFilelists,
      const char *pszUpdateinfo,
@@ -947,7 +1036,7 @@ index c27b907..17ea8bc 100644
      if(!pRepo || !pszRepoName || !pszRepomd || !pszPrimary)
      {
          dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -209,6 +846,18 @@ SolvReadYumRepo(
+@@ -209,6 +934,18 @@ SolvReadYumRepo(
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
  
@@ -966,7 +1055,7 @@ index c27b907..17ea8bc 100644
      dwError = SolvLoadRepomdPrimary(pRepo, pszPrimary);
      BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
  
-@@ -232,6 +881,11 @@ SolvReadYumRepo(
+@@ -232,6 +969,11 @@ SolvReadYumRepo(
  
  
  cleanup:
