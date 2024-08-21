@@ -145,6 +145,8 @@
 %_gnu_linker_flags   %{_hardened_ldflags} %{?distro_module_ldflags:%{distro_module_ldflags}}
 %_llvm_linker_flags  -Wl,--build-id=sha1 -latomic
 %build_ldflags       -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{?use_llvm_linker:%{_llvm_linker_flags}} %{!?use_llvm_linker:%{_gnu_linker_flags}}
+%build_ldflags_gnu   -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_gnu_linker_flags}
+%build_ldflags_llvm  -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_llvm_linker_flags}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -241,6 +243,8 @@ print(result)
 %_gnu_compiler_flags            -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags}
 %_llvm_compiler_flags           -w -stdlib=libc++
 %__global_compiler_flags        -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{?use_llvm_clang:%{_llvm_compiler_flags}} %{!?use_llvm_clang:%{_gnu_compiler_flags}}
+%__global_compiler_flags_gnu    -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{_gnu_compiler_flags}
+%__global_compiler_flags_llvm   -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{_llvm_compiler_flags}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

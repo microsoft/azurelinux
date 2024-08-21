@@ -1,3 +1,14 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
+
 %define debug_package %{nil}
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
@@ -141,7 +152,8 @@ mv gnulib-%{gnulibversion} gnulib
 %build
 # Add linker option -d "assign space to common symbols", otherwise some symbols in grub's
 # kernel.img will be assigned to the SHN_COMMON section which is not supported by grub-mkimage
-LDFLAGS="-Wl,-d %{build_ldflags}"
+#LDFLAGS="-Wl,-d %{build_ldflags}"
+LDFLAGS=" -Wl,-d %{build_ldflags_gnu}"
 export LDFLAGS
 
 export PYTHON=%{python3}
@@ -150,7 +162,8 @@ export PYTHON=%{python3}
 mkdir build-for-pc
 pushd build-for-pc
 # Modify the default CFLAGS to support the i386 build
-CFLAGS="`echo " %{build_cflags} "          | \
+#CFLAGS="`echo " %{build_cflags} "          | \
+CFLAGS="`echo " %{__global_compiler_flags_gnu} " | \
         sed 's/-fcf-protection//'          | \
         sed 's/-fstack-protector-strong//' | \
         sed 's/-m64//'                     | \
@@ -178,7 +191,8 @@ popd
 %endif
 
 # Disable stack-protector and PIE spec to fix compilation
-CFLAGS="`echo " %{build_cflags} "              | \
+#CFLAGS="`echo " %{build_cflags} "              | \
+CFLAGS="`echo " %{__global_compiler_flags_gnu} " | \
          sed 's/-specs.*cc1//'                 | \
          sed 's/-fstack-protector-strong//'`"
 export CFLAGS
