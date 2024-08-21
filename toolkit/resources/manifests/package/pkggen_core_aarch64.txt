@@ -170,11 +170,11 @@ gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
-openssl-3.3.0-2.azl3.aarch64.rpm
-openssl-devel-3.3.0-2.azl3.aarch64.rpm
-openssl-libs-3.3.0-2.azl3.aarch64.rpm
-openssl-perl-3.3.0-2.azl3.aarch64.rpm
-openssl-static-3.3.0-2.azl3.aarch64.rpm
+openssl-3.3.0-3.azl3.aarch64.rpm
+openssl-devel-3.3.0-3.azl3.aarch64.rpm
+openssl-libs-3.3.0-3.azl3.aarch64.rpm
+openssl-perl-3.3.0-3.azl3.aarch64.rpm
+openssl-static-3.3.0-3.azl3.aarch64.rpm
 libcap-2.69-1.azl3.aarch64.rpm
 libcap-devel-2.69-1.azl3.aarch64.rpm
 debugedit-5.0-2.azl3.aarch64.rpm
