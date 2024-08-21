@@ -903,7 +903,6 @@ exit 0
 %{_mandir}/man8/virtnwfilterd.8*
 
 %files daemon-driver-qemu
-%config(noreplace) %{_sysconfdir}/sysconfig/virtqemud
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
@@ -930,7 +929,6 @@ exit 0
 %{_mandir}/man8/virtqemud.8*
 
 %files daemon-driver-secret
-%config(noreplace) %{_sysconfdir}/sysconfig/virtsecretd
 %config(noreplace) %{_sysconfdir}/libvirt/virtsecretd.conf
 %{_datadir}/augeas/lenses/virtsecretd.aug
 %{_datadir}/augeas/lenses/tests/test_virtsecretd.aug
@@ -945,7 +943,6 @@ exit 0
 %files daemon-driver-storage
 
 %files daemon-driver-storage-core
-%config(noreplace) %{_sysconfdir}/sysconfig/virtstoraged
 %config(noreplace) %{_sysconfdir}/libvirt/virtstoraged.conf
 %{_datadir}/augeas/lenses/virtstoraged.aug
 %{_datadir}/augeas/lenses/tests/test_virtstoraged.aug
@@ -985,7 +982,6 @@ exit 0
 %files daemon-kvm
 
 %files daemon-driver-vbox
-%config(noreplace) %{_sysconfdir}/sysconfig/virtvboxd
 %config(noreplace) %{_sysconfdir}/libvirt/virtvboxd.conf
 %{_datadir}/augeas/lenses/virtvboxd.aug
 %{_datadir}/augeas/lenses/tests/test_virtvboxd.aug
