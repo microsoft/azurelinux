@@ -412,3 +412,18 @@ func getImageBootTypeHelper(diskPartitions []diskutils.PartitionInfo) (imagecust
 			systemBootPartition.PartitionTypeUuid)
 	}
 }
+
+func getNonSpecialChrootMountPoints(imageChroot *safechroot.Chroot) []*safechroot.MountPoint {
+	return sliceutils.FindMatches(imageChroot.GetMountPoints(),
+		func(mountPoint *safechroot.MountPoint) bool {
+			switch mountPoint.GetTarget() {
+			case "/dev", "/proc", "/sys", "/run", "/dev/pts":
+				// Skip special directories.
+				return false
+
+			default:
+				return true
+			}
+		},
+	)
+}

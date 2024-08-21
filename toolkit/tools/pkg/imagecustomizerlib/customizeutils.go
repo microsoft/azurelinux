@@ -94,7 +94,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	overlayUpdated, err := EnableOverlays(config.OS.Overlays, imageChroot)
+	overlayUpdated, err := enableOverlays(config.OS.Overlays, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -532,7 +532,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 		}
 	}
 
-	err = UpdateSELinuxModeInConfigFile(selinuxMode, imageChroot)
+	err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
 	if err != nil {
 		return imagecustomizerapi.SELinuxModeDefault, err
 	}
@@ -540,7 +540,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 	return selinuxMode, nil
 }
 
-func UpdateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot safechroot.ChrootInterface) error {
+func updateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err

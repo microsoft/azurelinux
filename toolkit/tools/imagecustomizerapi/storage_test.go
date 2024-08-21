@@ -75,6 +75,29 @@ func TestStorageIsValidUnsupportedFileSystem(t *testing.T) {
 	assert.ErrorContains(t, err, "invalid fileSystemType value (ntfs)")
 }
 
+func TestStorageIsValidMissingFileSystemEntry(t *testing.T) {
+	storage := Storage{
+		Disks: []Disk{{
+			PartitionTableType: PartitionTableTypeGpt,
+			MaxSize:            2 * diskutils.GiB,
+			Partitions: []Partition{
+				{
+					Id:    "esp",
+					Start: 1 * diskutils.MiB,
+					End:   nil,
+					Type:  PartitionTypeESP,
+				},
+			},
+		}},
+		BootType: BootTypeEfi,
+	}
+
+	err := storage.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid disk at index 0")
+	assert.ErrorContains(t, err, "partition (esp) at index 0 must have a corresponding filesystem entry")
+}
+
 func TestStorageIsValidBadEspFsType(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
@@ -199,7 +222,7 @@ func TestStorageIsValidDuplicatePartitionId(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
@@ -211,6 +234,12 @@ func TestStorageIsValidDuplicatePartitionId(t *testing.T) {
 						Start: 2 * diskutils.MiB,
 					},
 				},
+			},
+		},
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "a",
+				Type:     "ext4",
 			},
 		},
 	}
@@ -259,7 +288,7 @@ func TestStorageIsValidUniqueLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
@@ -285,6 +314,14 @@ func TestStorageIsValidUniqueLabel(t *testing.T) {
 					Path:   "/",
 				},
 			},
+			{
+				DeviceId: "b",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/b",
+				},
+			},
 		},
 	}
 
@@ -298,7 +335,7 @@ func TestStorageIsValidDuplicateLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            4 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "a",
@@ -322,6 +359,14 @@ func TestStorageIsValidDuplicateLabel(t *testing.T) {
 				MountPoint: &MountPoint{
 					IdType: MountIdentifierTypePartLabel,
 					Path:   "/",
+				},
+			},
+			{
+				DeviceId: "b",
+				Type:     FileSystemTypeFat32,
+				MountPoint: &MountPoint{
+					IdType: MountIdentifierTypePartLabel,
+					Path:   "/b",
 				},
 			},
 		},

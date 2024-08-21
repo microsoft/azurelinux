@@ -28,11 +28,11 @@ Distribution:   Azure Linux
 ExclusiveArch: x86_64
 
 # edk2-stable202402
-%define GITDATE        20240223
-%define GITCOMMIT      edc6681206c1
+%define GITDATE        20240524
+%define GITCOMMIT      3e722403cd16
 %define TOOLCHAIN      GCC
  
-%define PLATFORMS_COMMIT b5fa396700e7
+%define PLATFORMS_COMMIT a912d9fcf7d1
  
 %define OPENSSL_VER    3.0.7
 %define OPENSSL_COMMIT db0287935122edceb91dcda8dfb53b4090734e22
@@ -52,7 +52,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -61,7 +61,7 @@ URL:        http://www.tianocore.org
 # COMMIT=bb1bba3d7767
 # git archive --format=tar --prefix=edk2-$COMMIT/ $COMMIT \
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
-Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-%{GITCOMMIT}.tar.xz
+Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/58550636ea26810a0184423765db24e43319a0cc5e38dfd5fbd7f09b5f6e1c2d2b9e1e33112a3b721e05c7f088dbfd8a2ddd4a73d833c3019a16101ef1d0342a/edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
 Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
 Source3: softfloat-%{softfloat_version}.tar.xz
@@ -90,11 +90,15 @@ Source45: 50-edk2-ovmf-4m-qcow2-x64-nosb.json
 Source46: 51-edk2-ovmf-2m-raw-x64-nosb.json
 Source47: 60-edk2-ovmf-x64-amdsev.json
 Source48: 60-edk2-ovmf-x64-inteltdx.json
+Source50: 50-edk2-riscv-qcow2.json
+
+Source60: 50-edk2-loongarch64.json
 
 # https://gitlab.com/kraxel/edk2-build-config
 Source80: edk2-build.py
 Source81: edk2-build.fedora
 Source82: edk2-build.fedora.platforms
+Source83: edk2-build.rhel-9
 
 Source90: DBXUpdate-%{DBXDATE}.x64.bin
 Source91: DBXUpdate-%{DBXDATE}.ia32.bin
@@ -115,6 +119,11 @@ Patch0013: 0013-UefiCpuPkg-MpInitLib-fix-apic-mode-for-cpu-hotplug.patch
 Patch0014: 0014-CryptoPkg-CrtLib-add-stat.h.patch
 Patch0015: 0015-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
 Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
+%if (0%{?fedora} >= 38 || 0%{?rhel} >= 10) && !0%{?azl}
+Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
+%endif
+Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
+Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
 Patch1000: CVE-2022-3996.patch
 
 # python3-devel and libuuid-devel are required for building tools.
@@ -326,6 +335,7 @@ mkdir -p MdePkg/Library/MipiSysTLib/mipisyst/library/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include/mbedtls
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/library
+mkdir -p SecurityPkg/DeviceSecurity/SpdmLib/libspdm/include
 
 # Done by %setup, but we do not use it for the auxiliary tarballs
 chmod -Rf a+rX,u+w,g-w,o-w .
@@ -337,7 +347,9 @@ cp -a -- \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
    %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} \
    %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48} \
-   %{SOURCE80} %{SOURCE81} %{SOURCE82} \
+   %{SOURCE50} \
+   %{SOURCE60} \
+   %{SOURCE80} %{SOURCE81} %{SOURCE82} %{SOURCE83} \
    %{SOURCE90} %{SOURCE91} \
    .
 
@@ -737,8 +749,10 @@ done
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
 
-
 %changelog
+* Tue Jul 30 2024 Betty Lakes <bettylakes@microsoft.com> - 20240524git3e722403cd16-1
+- Upgrade to 20240524git3e722403cd16 to fix CVE-2023-45236, CVE-2023-45237
+
 * Tue Jul 9 2024 Suresh Thelkar <sthelkar@microsoft.com> - 20240223gitedc6681206c1-2
 - Patch CVE-2022-3996 in bundled OpenSSL
 

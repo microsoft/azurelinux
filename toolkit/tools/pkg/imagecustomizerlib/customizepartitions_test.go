@@ -18,13 +18,22 @@ import (
 )
 
 func TestCustomizeImagePartitions(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitions", baseImage)
+}
+
+func TestCustomizeImagePartitionsLegacyToEfi(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreLegacy)
+	testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitionsLegacyToEfi", baseImage)
+}
+
+func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage string) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
+	testTmpDir := filepath.Join(tmpDir, testName)
+	buildDir := filepath.Join(testTmpDir, "build")
 	configFile := filepath.Join(testDir, "partitions-config.yaml")
-	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
 	// Customize image.
 	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
@@ -95,15 +104,23 @@ func TestCustomizeImagePartitions(t *testing.T) {
 		partitions[mountPoints[0].PartitionNum].PartUuid)
 }
 
+func TestCustomizeImagePartitionsEfiToLegacy(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsEfiToLegacy", baseImage)
+}
+
 func TestCustomizeImagePartitionsLegacy(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreLegacy)
+	testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsLegacy", baseImage)
+}
+
+func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, baseImage string) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePartitionsLegacy")
+	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
 	configFile := filepath.Join(testDir, "legacyboot-config.yaml")
-	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
+	outImageFilePath := filepath.Join(buildDir, "image.raw")
 
 	// Customize image.
 	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
@@ -115,15 +132,8 @@ func TestCustomizeImagePartitionsLegacy(t *testing.T) {
 	// Check output file type.
 	checkFileType(t, outImageFilePath, "raw")
 
-	mountPoints := []mountPoint{
-		{
-			PartitionNum:   2,
-			Path:           "/",
-			FileSystemType: "ext4",
-		},
-	}
-
-	imageConnection, err := connectToImage(buildDir, outImageFilePath, false /*includeDefaultMounts*/, mountPoints)
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, false, /*includeDefaultMounts*/
+		coreLegacyMountPoints)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -133,10 +143,10 @@ func TestCustomizeImagePartitionsLegacy(t *testing.T) {
 	assert.NoError(t, err, "get disk partitions")
 
 	// Check that the fstab entries are correct.
-	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
+	verifyFstabEntries(t, imageConnection, coreLegacyMountPoints, partitions)
 	verifyBootGrubCfg(t, imageConnection, "",
-		partitions[mountPoints[0].PartitionNum].Uuid,
-		partitions[mountPoints[0].PartitionNum].PartUuid)
+		partitions[coreLegacyMountPoints[0].PartitionNum].Uuid,
+		partitions[coreLegacyMountPoints[0].PartitionNum].PartUuid)
 }
 
 func TestCustomizeImageKernelCommandLine(t *testing.T) {
@@ -144,7 +154,7 @@ func TestCustomizeImageKernelCommandLine(t *testing.T) {
 
 	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
 
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
+	buildDir := filepath.Join(tmpDir, "TestCustomizeImageKernelCommandLine")
 	configFile := filepath.Join(testDir, "extracommandline-config.yaml")
 	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
 
@@ -171,7 +181,7 @@ func TestCustomizeImageKernelCommandLine(t *testing.T) {
 func TestCustomizeImageNewUUIDs(t *testing.T) {
 	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
 
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageNewUUIDs")
 	buildDir := filepath.Join(testTmpDir, "build")
 	configFile := filepath.Join(testDir, "newpartitionsuuids-config.yaml")
 	tempRawBaseImage := filepath.Join(testTmpDir, "baseImage.raw")

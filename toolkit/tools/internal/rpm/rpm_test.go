@@ -458,3 +458,39 @@ func TestGetMacroDirWithRpmAvailable(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMacroDir, macroDir)
 }
+
+func TestConflictingPackageRegex(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputLine      string
+		expectedMatch  bool
+		expectedOutput string
+	}{
+		{
+			name:           "perl with epoch",
+			inputLine:      "D: ========== +++ perl-4:5.34.1-489.cm2 x86_64-linux 0x0",
+			expectedMatch:  true,
+			expectedOutput: "perl-5.34.1-489.cm2.x86_64",
+		},
+		{
+			name:           "systemd no epoch",
+			inputLine:      "D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0",
+			expectedMatch:  true,
+			expectedOutput: "systemd-devel-239-42.cm2.x86_64",
+		},
+		{
+			name:           "non-matching line",
+			inputLine:      "D: ========== tsorting packages (order, #predecessors, #succesors, depth)",
+			expectedMatch:  false,
+			expectedOutput: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			match, actualOut := extractCompetingPackageInfoFromLine(tt.inputLine)
+			assert.Equal(t, tt.expectedMatch, match)
+			assert.Equal(t, tt.expectedOutput, actualOut)
+		})
+	}
+}

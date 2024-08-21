@@ -64,8 +64,9 @@ const (
 
 const (
 	installedRPMRegexRPMIndex        = 1
-	installedRPMRegexArchIndex       = 2
-	installedRPMRegexExpectedMatches = 3
+	installedRPMRegexVersionIndex    = 2
+	installedRPMRegexArchIndex       = 3
+	installedRPMRegexExpectedMatches = 4
 
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
@@ -84,12 +85,12 @@ var (
 
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
-	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
+	//	D: ========== +++ [name]-([epoch]:)[version]-[release].[distribution] [architecture]-linux [hex_value]
 	//
 	// Example:
 	//
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
-	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+)-([^-]+-[^-]+) (\S+)-linux.*$`)
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
@@ -510,15 +511,29 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	splitStdout := strings.Split(stderr, "\n")
 	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
-		matches := installedRPMRegex.FindStringSubmatch(line)
-		if len(matches) == installedRPMRegexExpectedMatches {
-			rpmName := fmt.Sprintf("%s.%s", matches[installedRPMRegexRPMIndex], matches[installedRPMRegexArchIndex])
+		if match, rpmName := extractCompetingPackageInfoFromLine(line); match {
 			uniqueResolvedRPMs[rpmName] = true
 		}
 	}
 
 	resolvedRPMs = sliceutils.SetToSlice(uniqueResolvedRPMs)
 	return
+}
+
+func extractCompetingPackageInfoFromLine(line string) (match bool, pkgName string) {
+	matches := installedRPMRegex.FindStringSubmatch(line)
+	if len(matches) == installedRPMRegexExpectedMatches {
+		pkgName := matches[installedRPMRegexRPMIndex]
+		version := matches[installedRPMRegexVersionIndex]
+		arch := matches[installedRPMRegexArchIndex]
+		// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
+		if strings.Contains(version, ":") {
+			version = strings.Split(version, ":")[1]
+		}
+
+		return true, fmt.Sprintf("%s-%s.%s", pkgName, version, arch)
+	}
+	return false, ""
 }
 
 // SpecExclusiveArchIsCompatible verifies the "ExclusiveArch" tag is compatible with the current machine's architecture.

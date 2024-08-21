@@ -19,11 +19,13 @@ import (
 type baseImageType string
 
 const (
-	baseImageTypeCoreEfi baseImageType = "core-efi"
+	baseImageTypeCoreEfi    baseImageType = "core-efi"
+	baseImageTypeCoreLegacy baseImageType = "core-legacy"
 )
 
 var (
-	baseImageCoreEfi = flag.String("base-image-core-efi", "", "A core-efi image to use as a base image.")
+	baseImageCoreEfi    = flag.String("base-image-core-efi", "", "A core-efi image to use as a base image.")
+	baseImageCoreLegacy = flag.String("base-image-core-legacy", "", "A core-legacy image to use as a base image.")
 )
 
 var (
@@ -78,6 +80,12 @@ func checkSkipForCustomizeImage(t *testing.T, baseImageType baseImageType) strin
 			t.Skip("--base-image-core-efi is required for this test")
 		}
 		return *baseImageCoreEfi
+
+	case baseImageTypeCoreLegacy:
+		if baseImageCoreLegacy == nil || *baseImageCoreLegacy == "" {
+			t.Skip("--base-image-core-legacy is required for this test")
+		}
+		return *baseImageCoreLegacy
 	}
 
 	return ""
