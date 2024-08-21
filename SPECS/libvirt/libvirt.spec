@@ -983,7 +983,6 @@ exit 0
 %files daemon-driver-storage-scsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_scsi.so
 
-%files daemon-driver-storage-vstorage
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_vstorage.so
 
 %files daemon-kvm
