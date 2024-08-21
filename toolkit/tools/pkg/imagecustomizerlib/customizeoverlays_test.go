@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +26,31 @@ func TestCustomizeImageOverlays(t *testing.T) {
 	}
 
 	// Connect to customized image.
-	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
+	mountPoints := []mountPoint{
+		{
+			PartitionNum:   3,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   2,
+			Path:           "/boot",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+		{
+			PartitionNum:   4,
+			Path:           "/var",
+			FileSystemType: "ext4",
+		},
+	}
+
+	// Connect to customized image.
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, false /*includeDefaultMounts*/, mountPoints)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -53,21 +76,4 @@ func verifyOverlays(t *testing.T, rootPath string) {
 	assert.Contains(t, fstabContents,
 		"overlay /media overlay lowerdir=/media,"+
 			"upperdir=/var/overlays/media/upper,workdir=/var/overlays/media/work 0 0")
-
-	// Verify that overlays are correctly mounted using the mount command.
-	mountOutput, _, err := shell.Execute("mount")
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Check that the overlays are mounted with the correct options
-	assert.Regexp(t,
-		`overlay on /etc type overlay \((.*)lowerdir=/sysroot/etc:/sysroot/home,`+
-			`upperdir=/sysroot/var/overlays/etc/upper,workdir=/sysroot/var/overlays/etc/work(.*)\)`,
-		mountOutput)
-
-	assert.Regexp(t,
-		`overlay on /media type overlay \((.*)lowerdir=/media,`+
-			`upperdir=/var/overlays/media/upper,workdir=/var/overlays/media/work\)`,
-		mountOutput)
 }

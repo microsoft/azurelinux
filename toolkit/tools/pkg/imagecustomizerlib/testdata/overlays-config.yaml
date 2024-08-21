@@ -57,6 +57,11 @@ os:
 
   overlays:
     - lowerDirs:
+      - /media
+      upperDir: /var/overlays/media/upper
+      workDir: /var/overlays/media/work
+      mountPoint: /media
+    - lowerDirs:
       - /etc
       - /home
       upperDir: /var/overlays/etc/upper
@@ -65,8 +70,3 @@ os:
       isRootfsOverlay: true
       mountDependencies: 
       - /var
-    - lowerDirs:
-      - /media
-      upperDir: /var/overlays/media/upper
-      workDir: /var/overlays/media/work
-      mountPoint: /media
