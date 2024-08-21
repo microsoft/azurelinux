@@ -116,6 +116,10 @@ autoreconf
 popd
 
 %build
+
+export CFLAGS="-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/azl/default-hardened-cc1    -fcommon -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection"
+export LDFLAGS="-Wl,-z,relro -Wl,--as-needed  -Wl,-z,now -specs=/usr/lib/rpm/azl/default-hardened-ld"
+
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
 export CFLAGS="$CFLAGS -fvisibility=hidden -fpic"
 SAVE_LDFLAGS="$LDFLAGS"
