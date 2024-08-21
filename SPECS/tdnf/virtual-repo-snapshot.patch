@@ -1,4 +1,4 @@
-From 4b586087b542ccb231c9c2b37411a3a104333b16 Mon Sep 17 00:00:00 2001
+From decdbe7e5f1e018943954d70404cdf1404ac37e5 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
