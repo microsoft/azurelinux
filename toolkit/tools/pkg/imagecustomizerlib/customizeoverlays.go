@@ -17,9 +17,9 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableOverlays(
-	overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode,
-	fileSystems []imagecustomizerapi.FileSystem, imageChroot *safechroot.Chroot) (bool, error) {
+func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode,
+	imageChroot *safechroot.Chroot,
+) (bool, error) {
 	var err error
 
 	if overlays == nil {
@@ -37,7 +37,7 @@ func enableOverlays(
 
 	// Dereference the pointer to get the slice
 	overlaysDereference := *overlays
-	err = updateFstabForOverlays(overlaysDereference, fileSystems, imageChroot)
+	err = updateFstabForOverlays(overlaysDereference, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to update fstab file for overlays:\n%w", err)
 	}
@@ -57,9 +57,8 @@ func enableOverlays(
 	return true, nil
 }
 
-func updateFstabForOverlays(
-	overlays []imagecustomizerapi.Overlay, fileSystems []imagecustomizerapi.FileSystem,
-	imageChroot *safechroot.Chroot) error {
+func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot,
+) error {
 	var err error
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc/fstab")
@@ -84,7 +83,16 @@ func updateFstabForOverlays(
 			for _, entry := range fstabEntries {
 				if entry.Target == dep {
 					found = true
-					if !strings.Contains(entry.Options, "x-initrd.mount") {
+					// Split the options by comma and check if x-initrd.mount is present
+					options := strings.Split(entry.Options, ",")
+					optionFound := false
+					for _, option := range options {
+						if option == "x-initrd.mount" {
+							optionFound = true
+							break
+						}
+					}
+					if !optionFound {
 						return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fstab", dep)
 					}
 					break
@@ -166,7 +174,8 @@ func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot
 }
 
 func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
-	overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
+	overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot,
+) error {
 	var err error
 
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
