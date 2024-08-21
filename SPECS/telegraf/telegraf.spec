@@ -1,20 +1,21 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarbbal.sh script to get the vendored sources.
+# Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2024-28110.patch
 Patch2:         CVE-2024-27289.patch
 Patch3:         CVE-2024-35255.patch
 Patch4:         CVE-2024-37298.patch
+Patch5:         CVE-2024-24786.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -85,6 +86,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Wed Aug 21 2024 Muhammad Falak <mwani@microsoft.com> - 1.29.4-8
+- Address CVE-2024-24786
+
 * Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.4-7
 - Add patch for CVE-2024-37298
 
