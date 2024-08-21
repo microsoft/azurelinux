@@ -100,7 +100,7 @@ update_manifest() {
 
         echo "Manifests are different, updating ${basename}"
         mv "${BUILD_TEMP_MANIFEST_FILENAME}" "${filepath}"
-        chown "$CALLING_USER:$CALLING_USER" "${filepath}"
+        chown "$CALLING_USER:" "${filepath}"
     else
         echo "Manifests are the same, not updating ${basename}"
     fi
