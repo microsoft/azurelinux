@@ -45,7 +45,9 @@ defined in POSIX 1003.1e draft standard 17.
 %build
 %configure
 
-%make_build LIBTOOL="libtool --tag=CC"
+# "Remove bizarre 12 year old libtool invocation workaround that prevented hardened cflags working"
+# https://src.fedoraproject.org/rpms/acl/c/fbf63493d32a88f764b1e8ece890e3a4da18c50a
+%make_build
 
 %install
 %make_install

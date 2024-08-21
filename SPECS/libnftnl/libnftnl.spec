@@ -26,6 +26,9 @@ Development files for %{name}
 %autosetup -p1
 
 %build
+# Fix for error:
+# "ld: error: version script assignment of 'LIBNFTNL_11' to symbol 'nftnl_chain_parse' failed: symbol not defined"
+LDFLAGS="${LDFLAGS} -Wl,--undefined-version"
 ./configure \
          --prefix=%{_prefix} \
          --disable-static \

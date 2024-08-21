@@ -24,6 +24,11 @@ Development files for jansson
 %setup -q
 
 %build
+# Switch back to binutils linker due to error:
+# "ld: error: unknown argument '--default-symver'"
+ln -svf /usr/bin/ld.bfd /usr/bin/ld
+export LDFLAGS="-Wl,-z,relro -Wl,--as-needed  -Wl,-z,now -specs=/usr/lib/rpm/azl/default-hardened-ld"
+
 ./configure \
     --prefix=%{_prefix} \
     --disable-static
