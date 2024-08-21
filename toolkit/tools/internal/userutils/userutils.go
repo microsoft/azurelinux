@@ -24,6 +24,7 @@ const (
 
 	ShadowFile                = "/etc/shadow"
 	PasswdFile                = "/etc/passwd"
+	GroupFile                 = "/etc/group"
 	SSHDirectoryName          = ".ssh"
 	SSHAuthorizedKeysFileName = "authorized_keys"
 )
@@ -93,7 +94,7 @@ func AddUser(username string, homeDir string, primaryGroup string, hashedPasswor
 	}
 
 	err := installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(false /*squashErrors*/, "useradd", args...)
+		return shell.ExecuteLiveWithErr(1, "useradd", args...)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to add user (%s):\n%w", username, err)
