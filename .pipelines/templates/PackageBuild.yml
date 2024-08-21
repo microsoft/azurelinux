@@ -6,6 +6,10 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: checkBuildRetries
+    type: string
+    default: ""
+
   - name: concurrentPackageBuilds
     type: number
     default: 12
@@ -19,10 +23,6 @@ parameters:
     default: "toolchain_built_rpms_all.tar.gz"
 
   - name: extraPackageRepos
-    type: string
-    default: ""
-
-  - name: testRerunList
     type: string
     default: ""
 
@@ -125,6 +125,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: testSuiteName
     type: string
     default: "Package test"
@@ -176,6 +180,10 @@ steps:
         displayName: "Populate cache RPMs"
 
   - script: |
+      if [[ -n "${{ parameters.checkBuildRetries }}" ]]; then
+        check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
+      fi
+
       if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
       elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
@@ -217,6 +225,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
+        $check_build_retries_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \

@@ -53,8 +53,8 @@ PACKAGE_CACHE_SUMMARY                ?=
 IMAGE_CACHE_SUMMARY                  ?=
 INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
-PACKAGE_BUILD_RETRIES                ?= 1
-CHECK_BUILD_RETRIES                  ?= 1
+PACKAGE_BUILD_RETRIES                ?= 0
+CHECK_BUILD_RETRIES                  ?= 0
 EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
