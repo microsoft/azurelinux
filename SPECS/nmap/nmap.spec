@@ -1,3 +1,13 @@
+%global use_llvm_clang %{nil}
+%global use_llvm_linker %{nil}
+%global __spec_prep_template \
+%{__spec_prep_pre}\
+%{nil}
+%global __spec_build_template \
+%{__spec_build_pre}\
+%{set_build_flags}\
+%{nil}
+
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.94
@@ -37,6 +47,10 @@ Nmap implementation of the ncat tool
 rm -rf libpcap macosx mswin32 libssh2 libz
 
 %build
+export CFLAGS="-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/azl/default-hardened-cc1    -fcommon -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection"
+export CXXFLAGS="-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/azl/default-hardened-cc1    -fcommon -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection"
+export LDLAGS="%{build_ldflags_gnu}"
+
 # Remove zenmap as it's a GUI-based tool
 %configure --without-zenmap
 %make_build
