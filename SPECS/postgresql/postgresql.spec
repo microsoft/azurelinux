@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.3
+Version:        16.4
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -173,6 +173,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Mon Aug 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.4-1
+- Auto-upgrade to 16.4 - CVE-2024-7348
+ 
 * Mon May 20 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 16.3-1
 - Upgrade to version 16.3 to fix CVE-2024-4317
 
