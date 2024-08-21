@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,6 +26,7 @@ Patch2:         CVE-2024-0397.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
+Patch1001:      CVE-2024-7592.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -318,6 +319,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.9.19-4
+- Patch for CVE-2024-7592
+
 * Tue Jul 23 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.9.19-3
 - Patch for CVE-2024-0397
 
