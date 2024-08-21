@@ -35,7 +35,7 @@ Requires: python3-configobj
 Requires: python3-dbus 
 Requires: python3-decorator
 Requires: python3-linux-procfs
-Requires: python3-perf
+Requires: python3-perf-rt
 Requires: python3-gobject
 Requires: python3-pyudev
 Requires: python3-schedutils
