@@ -1,6 +1,6 @@
 Name:           perl-Role-Tiny
 Version:        2.001004
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A nouvelle cuisine portion size slice of Moose
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ Role::Tiny is a minimalist role composition tool.
 %{_mandir}/man3/Role::Tiny::With.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 2.001004-4
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.001004-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
