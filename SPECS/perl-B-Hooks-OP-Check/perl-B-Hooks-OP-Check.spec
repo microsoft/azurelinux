@@ -1,7 +1,7 @@
 Name:           perl-B-Hooks-OP-Check
 Summary:        Wrap OP check callbacks
 Version:        0.22
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,9 @@ make test
 %{_mandir}/man3/B::Hooks::OP::Check.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.22-11
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

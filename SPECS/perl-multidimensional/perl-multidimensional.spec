@@ -1,6 +1,6 @@
 Name:           perl-multidimensional
 Version:        0.014
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Disables multidimensional array emulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.014-9
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.014-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
