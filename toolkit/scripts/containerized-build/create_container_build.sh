@@ -234,8 +234,7 @@ sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/azl.Dockerfile"
 
-# TODO: Remove test mode when image is available for 3.0
-if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base image
+if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
@@ -255,7 +254,7 @@ if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base imag
         docker import "${chroot_file}" $container_img
     fi
 else
-    container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
+    container_img="mcr.microsoft.com/azurelinux/base/core:${version}"
 fi
 
 # ================== Launch Container ==================
