@@ -1,6 +1,6 @@
 Name:           perl-Class-XSAccessor
 Version:        1.19
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        Generate fast XS accessors without run-time compilation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -65,6 +65,9 @@ make test
 %{_mandir}/man3/Class::*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.19-22
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

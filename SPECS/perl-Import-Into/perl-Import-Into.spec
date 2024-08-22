@@ -1,6 +1,6 @@
 Name:           perl-Import-Into
 Version:        1.002005
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Import packages into other packages
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -48,6 +48,9 @@ make test
 %{_mandir}/man3/Import::Into.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 1.002005-15
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.002005-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

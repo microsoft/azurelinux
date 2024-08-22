@@ -1,6 +1,6 @@
 Name:           perl-Sub-Quote
 Version:        2.006006
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Efficient generation of subroutines via string eval
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 2.006006-4
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.006006-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

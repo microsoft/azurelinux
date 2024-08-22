@@ -9,7 +9,7 @@
 
 Name:           perl-Module-Runtime
 Version:        0.016
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Runtime module handling
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ make test
 %{_mandir}/man3/Module::Runtime.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.016-10
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.016-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
