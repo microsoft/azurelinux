@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch1:         rpm-ostree-disable-selinux.patch
 Patch2:         CVE-2022-31394.patch
 Patch3:         rpm-ostree-drop-lint-which-treats-warning-as-error.patch
 Patch4:         CVE-2022-47085.patch
+Patch5:         CVE-2023-26964.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -157,6 +158,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Thu Aug 22 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2022.1-7
+- Add patch to resolve CVE-2023-26964 in vendored 'h2' sources
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2022.1-6
 - Bump package to rebuild with rust 1.72.0
 
