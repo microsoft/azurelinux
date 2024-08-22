@@ -16,6 +16,7 @@ Patch2:         CVE-2024-27289.patch
 Patch3:         CVE-2024-35255.patch
 Patch4:         CVE-2024-37298.patch
 Patch5:         CVE-2024-24786.patch
+Patch6:         CVE-2024-28180.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -87,7 +88,7 @@ fi
 
 %changelog
 * Wed Aug 21 2024 Muhammad Falak <mwani@microsoft.com> - 1.29.4-8
-- Address CVE-2024-24786
+- Address CVE-2024-24786 & CVE-2024-28180
 
 * Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.4-7
 - Add patch for CVE-2024-37298
