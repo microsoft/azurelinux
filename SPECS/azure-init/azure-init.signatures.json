@@ -1,7 +1,7 @@
 {
-    "Signatures": {
-     "azure-init-local-vendor.tar.gz": "5e0ef52b7941fe59ae2328b1f12051708f081132f4b585ac256af6ae54d0c7f2",
-     "azure-init-local.tar.gz": "4bf8163fdbfbe69eef461e616cc8c72884c140b6f143fc87db80934b290abcf5",
-     "cargo-config": "77e9219c27274120197571fd165cbe4121963b5ad3bc0b20b383c86ef0ce6c2b"
-    }
+ "Signatures": {
+  "azure-init-local-vendor.tar.gz": "1815470a9d153ee82eb221ae5f9464c450d3bc98cc05884a36a30f21a1d16198",
+  "azure-init-local.tar.gz": "345103a59451e3aa59dfc0877b28074e9a13f2fc4b72a9374c582f6d10f0a455",
+  "cargo-config": "77e9219c27274120197571fd165cbe4121963b5ad3bc0b20b383c86ef0ce6c2b"
+ }
 }
