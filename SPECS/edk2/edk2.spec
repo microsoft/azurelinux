@@ -70,8 +70,8 @@ Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
 Source3: softfloat-%{softfloat_version}.tar.xz
 Source4: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
 Source5: jansson-2.13.1.tar.bz2
-Source6: hvloader-%{HVLOADER_COMMIT}.tar.gz
-Source7: README.experimental
+Source6: README.experimental
+Source7: hvloader-%{HVLOADER_COMMIT}.tar.gz
 Source8: hvloader-target.txt
 
 # json description files
@@ -348,10 +348,6 @@ tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/
 mkdir -p RedfishPkg/Library/JsonLib/jansson
 tar -xf %{SOURCE5} --strip-components=1 --directory RedfishPkg/Library/JsonLib/jansson
 
-# extract hvloader source into place
-tar -xf %{SOURCE6} --directory MdeModulePkg/Application
-sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
-
 # include paths pointing to unused submodules
 mkdir -p MdePkg/Library/MipiSysTLib/mipisyst/library/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include
@@ -363,7 +359,7 @@ mkdir -p SecurityPkg/DeviceSecurity/SpdmLib/libspdm/include
 chmod -Rf a+rX,u+w,g-w,o-w .
 
 cp -a -- \
-   %{SOURCE7} \
+   %{SOURCE6} \
    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
    %{SOURCE20} \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
@@ -374,6 +370,10 @@ cp -a -- \
    %{SOURCE80} %{SOURCE81} %{SOURCE82} %{SOURCE83} \
    %{SOURCE90} %{SOURCE91} \
    .
+
+# extract hvloader source into place
+tar -xf %{SOURCE7} --directory MdeModulePkg/Application
+sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
 
 %build
 
