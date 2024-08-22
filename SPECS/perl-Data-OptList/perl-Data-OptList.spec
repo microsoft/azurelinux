@@ -10,7 +10,7 @@
 
 Name:           perl-Data-OptList
 Version:        0.110
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Parse and validate simple name/value option pairs
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -98,6 +98,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Data::OptList.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.110-14
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.110-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

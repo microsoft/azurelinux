@@ -9,7 +9,7 @@
 
 Name:		perl-Package-Generator
 Version:	1.106
-Release:	18%{?dist}
+Release:	19%{?dist}
 Summary:	Generate new packages quickly and easily
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -69,6 +69,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Package::Reaper.3pm*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 1.106-19
+- Promote package to Core repository.
+
 * Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 1.106-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove colons from patchnames

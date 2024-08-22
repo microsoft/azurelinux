@@ -7,7 +7,7 @@
 
 Name:           perl-Sub-Install
 Version:        0.928
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Install subroutines into packages easily
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ make test
 %{_mandir}/man3/Sub::Install.3pm*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.928-24
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.928-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

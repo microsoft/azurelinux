@@ -10,7 +10,7 @@
 
 Name:		perl-Sub-Exporter
 Version:	0.987
-Release:	22%{?dist}
+Release:	23%{?dist}
 Summary:	Sophisticated exporter for custom-built routines
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -104,6 +104,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Sub::Exporter::Util.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.987-23
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.987-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

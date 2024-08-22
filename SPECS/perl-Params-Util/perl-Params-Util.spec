@@ -1,6 +1,6 @@
 Name:		perl-Params-Util
 Version:	1.07
-Release:	30%{?dist}
+Release:	31%{?dist}
 Summary:	Simple standalone parameter-checking functions
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -39,7 +39,7 @@ BuildRequires:	perl(File::Spec::Functions)
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Scalar::Util\\)$
 
 %description
-Params::Util provides a basic set of importable functions that 
+Params::Util provides a basic set of importable functions that
 makes checking parameters a hell of a lot easier.
 
 %prep
@@ -67,6 +67,9 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 1.07-31
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.07-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -184,7 +187,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 * Fri May 07 2010 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.01-1
 - Upstream update.
 - Revert Marcela's 2010-05-04 changes.
-- Remove BR's on perl(Test::MinimumVersion), perl(Test::Pod), 
+- Remove BR's on perl(Test::MinimumVersion), perl(Test::Pod),
   perl(Test::CPAN::Meta).
   (Reflect upstream having disabled tests depending on them).
 

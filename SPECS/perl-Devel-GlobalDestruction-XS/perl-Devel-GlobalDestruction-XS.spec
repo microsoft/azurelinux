@@ -1,6 +1,6 @@
 Name:		perl-Devel-GlobalDestruction-XS
 Version:	0.03
-Release:	13%{?dist}
+Release:	14%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,9 @@ make test
 %{_mandir}/man3/Devel::GlobalDestruction::XS.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.03-14
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.03-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
