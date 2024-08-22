@@ -7,7 +7,7 @@
 
 Name:           perl-strictures
 Version:        2.000006
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Turn on strict and make most warnings fatal
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -76,6 +76,9 @@ make test
 %{_mandir}/man3/strictures::extra.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 2.000006-9
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.000006-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
