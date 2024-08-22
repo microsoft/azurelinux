@@ -1,6 +1,6 @@
 Name:           perl-bareword-filehandles
 Version:        0.007
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Disables bareword filehandles
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.007-6
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.007-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

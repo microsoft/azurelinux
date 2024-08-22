@@ -7,7 +7,7 @@
 
 Name:           perl-indirect
 Version:        0.39
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Lexically warn about using the indirect object syntax
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ make test
 %{_mandir}/man3/indirect.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.39-6
+- Promote package to Core repository.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.39-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
