@@ -39,7 +39,7 @@ func TestUpdateHostname(t *testing.T) {
 }
 
 func TestCustomizeImageHostname(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageHostname")
 	buildDir := filepath.Join(testTmpDir, "build")
