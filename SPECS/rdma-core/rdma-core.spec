@@ -1,7 +1,7 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
 Version:        39.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -304,10 +304,10 @@ rm -f %{buildroot}/%{_sbindir}/srp_daemon.sh
 %postun -n librdmacm -p /sbin/ldconfig
 
 %post -n rdma-core
-if [ -x /sbin/udevadm ]; then
-/sbin/udevadm trigger --subsystem-match=infiniband --action=change || true
-/sbin/udevadm trigger --subsystem-match=net --action=change || true
-/sbin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
+if [ -x /bin/udevadm ]; then
+/bin/udevadm trigger --subsystem-match=infiniband --action=change || true
+/bin/udevadm trigger --subsystem-match=net --action=change || true
+/bin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
 fi
 
 %post -n ibacm
@@ -603,6 +603,9 @@ fi
 %{_docdir}/%{name}/tests/*.py
 
 %changelog
+* Thu Jun 20 2024 Andy Zaugg <azaugg@linkedin.com> - 39.0-3
+- Fix post scripts allowing udev to run after install
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 39.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
