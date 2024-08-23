@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode,
@@ -28,7 +29,9 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecus
 
 	logger.Log.Infof("Enable filesystem overlays")
 
-	// Integrate overlay driver into the initramfs img.
+	// Integrate the overlay driver into the initrd image. Including the overlay
+	// driver in initrd is essential for enabling the system to recognize and
+	// mount overlay filesystems during the initrd phase of the boot process.
 	overlayDriver := "overlay"
 	err = addDracutDriver(overlayDriver, imageChroot)
 	if err != nil {
@@ -76,34 +79,23 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 		workDir := overlay.WorkDir
 		mountDependencies := overlay.MountDependencies
 
-		// Validate that each mountDependency has the x-initrd.mount option in
-		// the corresponding fstab entry.
-		for _, dep := range mountDependencies {
-			found := false
-			for _, entry := range fstabEntries {
-				if entry.Target == dep {
-					found = true
-					// Split the options by comma and check if x-initrd.mount is present
-					options := strings.Split(entry.Options, ",")
-					optionFound := false
-					for _, option := range options {
-						if option == "x-initrd.mount" {
-							optionFound = true
-							break
-						}
-					}
-					if !optionFound {
-						return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fstab", dep)
-					}
-					break
+		if overlay.IsRootfsOverlay {
+			// Validate that each mountDependency has the x-initrd.mount option in
+			// the corresponding fstab entry.
+			for _, dep := range mountDependencies {
+				entry, found := sliceutils.FindValueFunc(fstabEntries, func(entry diskutils.FstabEntry) bool {
+					return entry.Target == dep
+				})
+				if !found {
+					return fmt.Errorf("mountDependency %s not found in fstab", dep)
+				}
+
+				optionFound := sliceutils.ContainsValue(strings.Split(entry.Options, ","), "x-initrd.mount")
+				if !optionFound {
+					return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fstab", dep)
 				}
 			}
-			if !found {
-				return fmt.Errorf("mountDependency %s not found in fstab", dep)
-			}
-		}
 
-		if overlay.IsRootfsOverlay {
 			for i, dir := range lowerDirs {
 				lowerDirs[i] = path.Join("/sysroot", dir)
 			}
@@ -193,4 +185,14 @@ func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
 	}
 
 	return nil
+}
+
+func hasInitrdMountOption(entry diskutils.FstabEntry) bool {
+	options := strings.Split(entry.Options, ",")
+	for _, option := range options {
+		if option == "x-initrd.mount" {
+			return true
+		}
+	}
+	return false
 }

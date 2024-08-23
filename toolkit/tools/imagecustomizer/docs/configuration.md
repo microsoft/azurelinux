@@ -392,11 +392,11 @@ storage:
 os:
   resetBootLoaderType: hard-reset
   overlays:
-    - lowerDirs: 
+    - mountPoint: /etc
+      lowerDirs: 
       - /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
-      mountPoint: /etc
       isRootfsOverlay: true
       mountDependencies:
       - /var
