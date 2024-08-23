@@ -1,6 +1,6 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.13.3
+Version:        1.15.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -17,7 +17,7 @@ Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
-Requires:       %{name}-cmctl
+Requires:       %{name}-startupapicheck
 Requires:       %{name}-controller
 Requires:       %{name}-webhook
 
@@ -45,11 +45,11 @@ Summary:        cert-manager's controller binary
 cert-manager is a Kubernetes addon to automate the management and issuance of
 TLS certificates from various issuing sources.
 
-%package cmctl
-Summary:        cert-manager's cmctl binary
+%package startupapicheck
+Summary:        cert-manager's startupapicheck binary
 
-%description cmctl
-cmctl is a CLI tool manage and configure cert-manager resources for Kubernetes
+%description startupapicheck
+unknown
 
 %package webhook
 Summary:        cert-manager's webhook binary
@@ -75,8 +75,8 @@ pushd cmd/controller
 go build -o ../../bin/controller main.go
 popd
 
-pushd cmd/ctl
-go build -o ../../bin/cmctl main.go
+pushd cmd/startupapicheck
+go build -o ../../bin/startupapicheck main.go
 popd
 
 pushd cmd/webhook
@@ -88,7 +88,7 @@ mkdir -p %{buildroot}%{_bindir}
 install -D -m0755 bin/acmesolver %{buildroot}%{_bindir}/
 install -D -m0755 bin/cainjector %{buildroot}%{_bindir}/
 install -D -m0755 bin/controller %{buildroot}%{_bindir}/
-install -D -m0755 bin/cmctl %{buildroot}%{_bindir}/
+install -D -m0755 bin/startupapicheck %{buildroot}%{_bindir}/
 install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %files
 
@@ -107,10 +107,10 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %doc README.md
 %{_bindir}/controller
 
-%files cmctl
+%files startupapicheck
 %license LICENSE LICENSES
 %doc README.md
-%{_bindir}/cmctl
+%{_bindir}/startupapicheck
 
 %files webhook
 %license LICENSE LICENSES
@@ -118,8 +118,8 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Thu Aug 22 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.13.3-1
-- Bump release to rebuild with updated version of Go.
+* Thu Aug 22 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.15.3-1
+- Upgrade to 1.15.3 to address CVE-2023-45142, CVE-2023-6337
 
 * Wed Aug 07 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.12.12-2
 - Patch for CVE-2024-25620
