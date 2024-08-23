@@ -89,9 +89,11 @@ clean-toolchain-rpms:
 
 # We need to clear the toolchain if we are using a daily build, or we change validation state. The filenames will all be
 # the same, but the actual .rpm files may be fundamentally different.
+# We leave the directory structure in place since docker based builds using re-usable chroots will have mounted the
+# toolchain subdirectories into the chroots. Removing the directories would break the mounts.
 $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag $(depend_VALIDATE_TOOLCHAIN_GPG)
 	@echo "Daily build ID or validation mode changed, sanitizing toolchain"
-	rm -rf $(TOOLCHAIN_RPMS_DIR)
+	find $(TOOLCHAIN_RPMS_DIR) -type f -name '*.rpm' -exec rm -f {} +
 	touch $@
 
 copy-toolchain-rpms:
