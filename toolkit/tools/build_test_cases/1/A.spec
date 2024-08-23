@@ -9,7 +9,7 @@ Group:          Test
 Vendor:         Microsoft
 Distribution:   Azure Linux
 
-BuildRequires:  B
+BuildRequires:  A
 
 %description
 Test spec A.
