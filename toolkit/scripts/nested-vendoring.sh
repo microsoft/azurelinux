@@ -1,4 +1,12 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Certain go packages contain nested modules, each with their own set of vendored dependencies.
+# To ease updating the vendored sources for these nested modules, this script is used. It will
+# recursively detect nested modules and vendor them all, rolling them up into one nested vendor tarball. 
+
+set -e
 
 # Takes two arguments: $1 - directory to search for vendors; $2 - output directory to 
 # place new vendored packages in.
@@ -7,26 +15,19 @@ function vendor_all() {
   if [ ! -d "$2" ]; then 
     mkdir -p "$2"
   fi
-  # Check if the argument is a valid directory
   if [ -d "$1" ]; then
-    # Change to the given directory
     pushd "$1"
     # Loop through all the go.mod files in the current directory and its subdirectories
     for f in $(find . -name "go.mod"); do
-      # Push the directory containing the go.mod file to the stack
       rel_path=$(dirname $f)
       pushd $rel_path > /dev/null
-      # Create the corresponding directory in the second argument
       mkdir -p "$2/$rel_path/vendor"
-      # Run go mod vendor
       go mod vendor -o "$2/$rel_path/vendor"
-      # Pop the directory from the stack
       popd > /dev/null
     done
     # Restore the original directory
     popd
   else
-    # Print an error message if the argument is not a valid directory
     echo "Invalid directory: $1"
     return 1
   fi
