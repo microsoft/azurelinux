@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -92,6 +92,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Fri Aug 23 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 2.16.1-6
+- Bump release to build with new python3 to fix CVE-2024-7592
+
 * Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.16.1-5
 - Bump release to build with new python-werkzeug to fix CVE-2024-34069
 
