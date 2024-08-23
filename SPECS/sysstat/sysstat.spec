@@ -1,14 +1,13 @@
 Summary:        The Sysstat package contains utilities to monitor system performance and usage activity
 Name:           sysstat
-Version:        12.7.1
-Release:        3%{?dist}
+Version:        12.7.6
+Release:        1%{?dist}
 License:        GPL-2.0-only
 URL:            http://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-33204.patch
 
 BuildRequires:  cronie-anacron
 
@@ -54,6 +53,10 @@ install -D -m 0644 %{_builddir}/%{name}-%{version}/cron/sysstat-collect.service 
 
 
 %changelog
+* Fri Aug 23 2024 Muhammad Falak <mwani@microsoft.com> - 12.7.6-1
+- Bump version to 12.7.6 to address CVE-2018-19416
+- Drop patches already present in the source
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 12.7.1-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
