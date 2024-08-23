@@ -3,6 +3,14 @@ From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
 Date: Wed, 14 Aug 2019 15:57:42 +0200
 Subject: [PATCH] udev: use bfq as the default scheduler
 
+NOTE change for azurelinux:
+
+This patch from Fedora has been renamed from "bfq" to "none" and adjusted
+to set the udev rule's i/o scheduler from "bfq" to "none" which is the
+preferred default i/o scheduler in Azure VMs and for NVMe drives.
+
+Original Fedora commit message below:
+
 As requested in https://bugzilla.redhat.com/show_bug.cgi?id=1738828.
 Test results are that bfq seems to behave better and more consistently on
 typical hardware. The kernel does not have a configuration option to set
@@ -25,7 +33,7 @@ index 0000000000..850b64540e
 +
 +ACTION=="add", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", \
 +  KERNEL=="mmcblk*[0-9]|msblk*[0-9]|mspblk*[0-9]|sd*[!0-9]|sr*", \
-+  ATTR{queue/scheduler}="bfq"
++  ATTR{queue/scheduler}="none"
 diff --git a/rules.d/meson.build b/rules.d/meson.build
 index 20fca222da..94fee9d7c0 100644
 --- a/rules.d/meson.build
