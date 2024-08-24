@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-6%{?dist}
+BuildRequires:  glibc-static >= 2.38-7%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -269,6 +269,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.2.0-5
+- Bump to rebuild with updated glibc
+
 * Thu Jun 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-4
 - Deleting Hotplug_Grace_Period.patch since it is no longer required.
 

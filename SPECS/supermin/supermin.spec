@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.3.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.38-6%{?dist}
+BuildRequires:  glibc-static >= 2.38-7%{?dist}
 %endif
 
 %if 0%{?with_check}
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 5.3.4-2
+- Bump to rebuild with updated glibc
+
 * Tue May 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.3.4-1
 - Upgrade to version 5.3.4 to support building using ocaml 5.1.1
 - Fixed patch for the test suite

@@ -3,18 +3,18 @@
 
 %global with_python3 1
 
-%global talloc_version 2.3.1
-%global tdb_version 1.4.3
-%global tevent_version 0.10.2
+%global talloc_version 2.4.0
+%global tdb_version 1.4.8
+%global tevent_version 0.14.1
 
 Name: libldb
-Version: 2.1.4
-Release: 2%{?dist}
+Version: 2.7.2
+Release: 1%{?dist}
 Summary: A schema-less, ldap like, API and database
 Requires: libtalloc%{?_isa} >= %{talloc_version}
 Requires: libtdb%{?_isa} >= %{tdb_version}
 Requires: libtevent%{?_isa} >= %{tevent_version}
-License: LGPLv3+
+License: LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://ldb.samba.org/
@@ -221,6 +221,10 @@ rm -f $RPM_BUILD_ROOT/%{_mandir}/man3/_*
 %endif
 
 %changelog
+* Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 2.7.2-1
+- Upgrade to 2.7.2 to build with Python 3.12 for 3.0
+- License verified. Using SPDX format
+
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 2.1.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove distro condition check

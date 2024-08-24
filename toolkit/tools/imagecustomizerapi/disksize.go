@@ -40,6 +40,25 @@ func (s *DiskSize) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (s DiskSize) HumanReadable() string {
+	switch {
+	case s%diskutils.TiB == 0:
+		return fmt.Sprintf("%d TiB", s/diskutils.TiB)
+
+	case s%diskutils.GiB == 0:
+		return fmt.Sprintf("%d GiB", s/diskutils.GiB)
+
+	case s%diskutils.MiB == 0:
+		return fmt.Sprintf("%d MiB", s/diskutils.MiB)
+
+	case s%diskutils.KiB == 0:
+		return fmt.Sprintf("%d KiB", s/diskutils.KiB)
+
+	default:
+		return fmt.Sprintf("%d bytes", s)
+	}
+}
+
 func parseDiskSize(diskSizeString string) (DiskSize, error) {
 	match := diskSizeRegex.FindStringSubmatch(diskSizeString)
 	if match == nil {
@@ -72,8 +91,9 @@ func parseDiskSize(diskSizeString string) (DiskSize, error) {
 	}
 
 	// The imager's diskutils works in MiB. So, restrict disk and partition sizes to multiples of 1 MiB.
-	if num%diskutils.MiB != 0 {
-		return 0, fmt.Errorf("(%d) must be a multiple of 1 MiB", num)
+	if num%DefaultPartitionAlignment != 0 {
+		return 0, fmt.Errorf("(%s) must be a multiple of %s", diskSizeString,
+			DiskSize(DefaultPartitionAlignment).HumanReadable())
 	}
 
 	return DiskSize(num), nil

@@ -7,7 +7,6 @@
         "dracut-hyperv",
         "grubby",
         "hyperv-daemons",
-        "kexec-tools",
         "netplan",
         "openssh-server",
         "python3",

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -22,6 +23,9 @@ import (
 
 var (
 	bootPartitionRegex = regexp.MustCompile(`(?m)^search -n -u ([a-zA-Z0-9\-]+) -s$`)
+
+	// Extract the partition number from the loopback partition path.
+	partitionNumberRegex = regexp.MustCompile(`^/dev/loop\d+p(\d+)$`)
 )
 
 func findPartitions(buildDir string, diskDevice string) ([]*safechroot.MountPoint, error) {
@@ -426,4 +430,22 @@ func getNonSpecialChrootMountPoints(imageChroot *safechroot.Chroot) []*safechroo
 			}
 		},
 	)
+}
+
+// Extract the partition number from the partition path.
+// Ideally, we would use `lsblk --output PARTN` instead of this. But that is only available in util-linux v2.39+.
+func getPartitionNum(partitionLoopDevice string) (int, error) {
+	match := partitionNumberRegex.FindStringSubmatch(partitionLoopDevice)
+	if match == nil {
+		return 0, fmt.Errorf("failed to find partition number in partition dev path (%s)", partitionLoopDevice)
+	}
+
+	numStr := match[1]
+
+	num, err := strconv.Atoi(numStr)
+	if match == nil {
+		return 0, fmt.Errorf("failed to parse partition number (%s):\n%w", numStr, err)
+	}
+
+	return num, nil
 }

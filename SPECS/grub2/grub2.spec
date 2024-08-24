@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,6 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
-Source3:        macros.grub2
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
 Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -48,7 +47,7 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 # CVE-2021-3981
-Patch0167:      0167-restore-umask-for-grub-config.patch 
+Patch0167:      0167-restore-umask-for-grub-config.patch
 # Fix to reset the global errno to success upon success.
 Patch0170:      0170-fix-memory-alloc-errno-reset.patch
 Patch0171:      CVE-2022-2601.patch
@@ -193,14 +192,6 @@ Requires:       %{name}-tools-minimal = %{version}-%{release}
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
 
-%package rpm-macros
-Summary:        GRUB RPM Macros
-Group:          System Environment/Base
-
-%description rpm-macros
-GRUB RPM Macros for enabling package updates supporting
-the grub2-mkconfig flow on AzureLinux
-
 %package configuration
 Summary:        Location for local grub configurations
 Group:          System Environment/Base
@@ -335,10 +326,6 @@ GRUB_MODULE_SOURCE=
 
 install -d $EFI_BOOT_DIR
 
-# Install grub2 macros
-mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
-install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d
-
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
 GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
@@ -426,9 +413,6 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_libdir}/grub/*
 %endif
 
-%files rpm-macros
-%{_rpmconfigdir}/macros.d/macros.grub2
-
 %files configuration
 %dir %{_sysconfdir}/grub.d
 %dir %{_sysconfdir}/default/grub.d
@@ -444,6 +428,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
+- Move grub2-rpm-macros to the azurelinux-rpm-macros package
+
 * Wed Jun 12 2024 George Mileka <gmileka@microsoft.com> - 2.06-19
 - disable code optimization for ip checksum calculation
 
@@ -473,7 +460,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 - Enable support for grub2-mkconfig grub.cfg generation
 - Introduce rpm-macros, configuration subpackage
 - The Mariner /etc/default/grub now sources files from /etc/default/grub.d
-    before the remainder of grub2-mkconfig runs. This allows RPM to 
+    before the remainder of grub2-mkconfig runs. This allows RPM to
     install package-specific configurations that the users can safely
     override.
 

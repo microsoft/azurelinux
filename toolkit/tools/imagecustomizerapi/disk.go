@@ -6,9 +6,22 @@ package imagecustomizerapi
 import (
 	"fmt"
 	"sort"
-	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+)
+
+const (
+	DefaultSectorSize = 512
+
+	// For SSDs, aligning partition's to 1 MiB is beneficial for performance reasons.
+	// In addition, the imager's diskutils works in MiB.
+	DefaultPartitionAlignment = diskutils.MiB
+
+	// The number of sectors (LBA) that the GPT header requires.
+	GptHeaderSectorNum = 34
+
+	// The number of sectors (LBA) that the GPT footer requires.
+	GptFooterSectorNum = 33
 )
 
 type Disk struct {
@@ -39,6 +52,9 @@ func (d *Disk) IsValid() error {
 		}
 	}
 
+	gptHeaderSize := DiskSize(roundUp(GptHeaderSectorNum*DefaultSectorSize, DefaultPartitionAlignment))
+	gptFooterSize := DiskSize(roundUp(GptFooterSectorNum*DefaultSectorSize, DefaultPartitionAlignment))
+
 	// Check for overlapping partitions.
 	// First, sort partitions by start index.
 	sortedPartitions := append([]Partition(nil), d.Partitions...)
@@ -59,18 +75,19 @@ func (d *Disk) IsValid() error {
 			bEnd, bHasEnd := b.GetEnd()
 			bEndStr := ""
 			if bHasEnd {
-				bEndStr = strconv.FormatUint(uint64(bEnd), 10)
+				bEndStr = bEnd.HumanReadable()
 			}
-			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
-				a.Id, a.Start, aEnd, b.Id, b.Start, bEndStr)
+			return fmt.Errorf("partition's (%s) range [%s, %s) overlaps partition's (%s) range [%s, %s)",
+				a.Id, a.Start.HumanReadable(), aEnd.HumanReadable(), b.Id, b.Start.HumanReadable(), bEndStr)
 		}
 	}
 
 	if len(sortedPartitions) > 0 {
 		// Make sure the first block isn't used.
 		firstPartition := sortedPartitions[0]
-		if firstPartition.Start < diskutils.MiB {
-			return fmt.Errorf("first 1 MiB must be reserved for the MBR header (%s)", firstPartition.Id)
+		if firstPartition.Start < gptHeaderSize {
+			return fmt.Errorf("invalid partition (%s) start:\nfirst %s of disk is reserved for the GPT header",
+				firstPartition.Id, gptHeaderSize.HumanReadable())
 		}
 
 		// Check that the disk is big enough for the partition layout.
@@ -80,15 +97,27 @@ func (d *Disk) IsValid() error {
 
 		var requiredSize DiskSize
 		if !lastPartitionHasEnd {
-			requiredSize = lastPartition.Start + diskutils.MiB
+			requiredSize = lastPartition.Start + DefaultPartitionAlignment
 		} else {
 			requiredSize = lastPartitionEnd
 		}
 
+		requiredSize += gptFooterSize
+
 		if requiredSize > d.MaxSize {
-			return fmt.Errorf("disk's partitions need %d bytes but maxSize is only %d bytes", requiredSize, d.MaxSize)
+			return fmt.Errorf("disk's partitions need %s but maxSize is only %s:\nGPT footer size is %s",
+				requiredSize.HumanReadable(), d.MaxSize.HumanReadable(), gptFooterSize.HumanReadable())
 		}
 	}
 
 	return nil
+}
+
+func roundUp(size uint64, alignment uint64) uint64 {
+	div := size / alignment
+	mod := size % alignment
+	if mod == 0 {
+		return size
+	}
+	return (div + 1) * alignment
 }

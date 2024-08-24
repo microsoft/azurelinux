@@ -116,5 +116,10 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		}
 	}
 
+	err = checkForInstalledKernel(imageChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

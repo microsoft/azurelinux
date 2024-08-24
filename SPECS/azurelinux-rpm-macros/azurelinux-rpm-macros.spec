@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,7 @@ Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/
 Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-fix-pyc-reproducibility
 Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
 Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
+Source32:       macros.grub2
 ###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
@@ -58,6 +59,9 @@ Provides:       rust-srpm-macros
 
 Obsoletes:      mariner-rpm-macros <= 2.0-25
 Provides:       mariner-rpm-macros = %{version}-%{release}
+
+Obsoletes:      grub2-rpm-macros <= 2.06-19%{?dist}
+Provides:       grub2-rpm-macros = %{version}-%{release}
 
 BuildArch:      noarch
 
@@ -124,6 +128,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.rust-srpm
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
+%{_rpmconfigdir}/macros.d/macros.grub2
 %{_rpmconfigdir}/macros.d/macros.suse
 
 %dir %{rcluadir}
@@ -138,6 +143,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-6
+- Move grub2-rpm-macros to the azurelinux-rpm-macros package
+
 * Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-5
 - Moved ocaml-srpm-macros into its own package.
 

@@ -612,8 +612,15 @@ chroot_and_install_rpms libselinux
 # PCRE2 needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
 
-# coreutils and findutils require libselinux
-# for SELinux support.
+# attr requires gettext, libtool
+build_rpm_in_chroot_no_install attr
+
+# acl requires libattr
+chroot_and_install_rpms libattr
+build_rpm_in_chroot_no_install acl
+
+# coreutils and findutils require libselinux, libacl, libattr
+chroot_and_install_rpms libacl
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install findutils
 

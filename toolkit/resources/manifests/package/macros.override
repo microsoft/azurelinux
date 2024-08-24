@@ -14,7 +14,6 @@
 
 # Check hangs
 %skip_check_glibc 1
-%skip_check_bash 1
 %skip_check_gtk_doc 1
 %skip_check_tdnf 1
 %skip_check_vim 1

@@ -1,7 +1,7 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
-Version:        4.0.1
-Release:        2%{?dist}
+Version:        4.0.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,9 @@ fi
 %{_mandir}/man7
 
 %changelog
+- Fri Aug 09 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.0.2-1
+- Bump version to 4.0.2 to resolve CVE-2024-29040
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0.1-2
 - Remove circular dependency that systemd-rpm-macros introduced.
 

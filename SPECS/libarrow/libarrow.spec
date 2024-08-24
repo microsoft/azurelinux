@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -51,7 +51,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	python3-devel
 BuildRequires:	python3-numpy
 BuildRequires:	python3-Cython
-BuildRequires:	abseil-cpp-devel
+BuildRequires:	abseil-cpp-devel >= 20240116.0-2
 BuildRequires:	c-ares-devel
 BuildRequires:	thrift-devel
 %if %{with have_rapidjson}
@@ -232,7 +232,7 @@ popd
 %{_libdir}/pkgconfig/arrow-json.pc
 %{_libdir}/pkgconfig/arrow.pc
 %{_datadir}/arrow/gdb/gdb_arrow.py
-#%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
+#%%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
 
 
 %files -n parquet-libs
@@ -246,6 +246,10 @@ popd
 %{_libdir}/pkgconfig/parquet*.pc
  
 %changelog
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 15.0.0-6
+- Bump release to rebuild with latest 'abseil-cpp'.
+- Fix 'rpm' warning about macro expansion inside a comment.
+
 * Mon May 20 2024 Henry Beberman <henry.beberman@microsoft.com> - 15.0.0-5
 - Move to using source tarball from GitHub releases.
 

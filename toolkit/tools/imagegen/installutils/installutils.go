@@ -1722,7 +1722,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 
 				if passwordChanged == "" {
 					// Set to the number of days since epoch
-					fields[passwordChangedField] = fmt.Sprintf("%d", int64(time.Since(time.Unix(0, 0)).Hours()/24))
+					fields[passwordChangedField] = fmt.Sprintf("%d", DaysSinceUnixEpoch())
 				}
 				passwordAge, err = strconv.ParseInt(fields[passwordChangedField], 10, 64)
 				if err != nil {
@@ -1745,17 +1745,19 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
+func DaysSinceUnixEpoch() int64 {
+	return int64(time.Since(time.Unix(0, 0)).Hours() / 24)
+}
+
 func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 ) (err error) {
-	const squashErrors = false
-
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) primary group (%s):\n%w", username, primaryGroup, err)
 		}
 	}
 
@@ -1764,16 +1766,13 @@ func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterfac
 
 func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
 ) (err error) {
-	const squashErrors = false
-
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-a", "-G", allGroups, username)
 		})
-
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) secondary groups:\n%w", username, err)
 		}
 	}
 
@@ -1782,8 +1781,7 @@ func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterf
 
 func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, username string, startupCommand string) (err error) {
 	const (
-		passwdFilePath = "etc/passwd"
-		sedDelimiter   = "|"
+		sedDelimiter = "|"
 	)
 
 	if startupCommand == "" {
@@ -1794,7 +1792,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 
 	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
 	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
-	filePath := filepath.Join(installChroot.RootDir(), passwdFilePath)
+	filePath := filepath.Join(installChroot.RootDir(), userutils.PasswdFile)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
 		err = fmt.Errorf("failed to update user's (%s) startup command (%s):\n%w", username, startupCommand, err)
@@ -1822,7 +1820,11 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	userSSHKeyDir, err := userutils.UserSSHDirectory(installChroot.RootDir(), username)
+	if err != nil {
+		return fmt.Errorf("failed to get user's SSH directory:\n%w", err)
+	}
+
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
@@ -1893,7 +1895,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	allSSHKeys = append(allSSHKeys, sshPubKeys...)
 
 	for _, pubKey := range allSSHKeys {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		pubKey += "\n"
 
 		err = file.Append(pubKey, authorizedKeysTempFile)

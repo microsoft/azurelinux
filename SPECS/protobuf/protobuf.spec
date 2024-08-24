@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        25.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,7 @@ BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  cmake
 BuildRequires:  unzip
-BuildRequires:  abseil-cpp-devel
+BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 %if 0%{?with_check}
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
@@ -20,7 +20,7 @@ BuildRequires:  gmock-devel
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
 
-Requires:       abseil-cpp
+Requires:       abseil-cpp >= 20240116.0-2
 
 %description
 Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data. You can find protobuf's documentation on the Google Developers site.
@@ -30,7 +30,7 @@ Summary:        Development files for protobuf
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-lite-devel = %{version}-%{release}
-Requires:       abseil-cpp-devel
+Requires:       abseil-cpp-devel >= 20240116.0-2
 
 %description    devel
 The protobuf-devel package contains libraries and header files for
@@ -122,6 +122,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 25.3-4
+- Bump release to rebuild with latest 'abseil-cpp'.
+
 * Mon Jun 03 2024 Sindhu Karri <lakarri@microsoft.com> - 25.3-3
 - Enable ptest using system gtest package
 
