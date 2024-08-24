@@ -1,0 +1,54 @@
+From e3ba5800d26065df9ce03ee2ac58ec6f08506423 Mon Sep 17 00:00:00 2001
+From: Ksenija Stanojevic <KsenijaS@users.noreply.github.com>
+Date: Fri, 5 Apr 2024 16:52:26 -0700
+Subject: [PATCH 2/3] feat(azure): parse ProvisionGuestProxyAgent as bool
+ (#5126)
+
+---
+ cloudinit/sources/helpers/azure.py    |  1 +
+ tests/unittests/sources/test_azure.py | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/cloudinit/sources/helpers/azure.py b/cloudinit/sources/helpers/azure.py
+index 2847a9e53..165f47429 100644
+--- a/cloudinit/sources/helpers/azure.py
++++ b/cloudinit/sources/helpers/azure.py
+@@ -1221,6 +1221,7 @@ class OvfEnvXml:
+         self.provision_guest_proxy_agent = self._parse_property(
+             platform_settings,
+             "ProvisionGuestProxyAgent",
++            parse_bool=True,
+             default=False,
+             required=False,
+         )
+diff --git a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
+index 6afde95fd..255991ec3 100644
+--- a/tests/unittests/sources/test_azure.py
++++ b/tests/unittests/sources/test_azure.py
+@@ -2675,13 +2675,21 @@ class TestPreprovisioningReadAzureOvfFlag(CiTestCase):
+         self.assertTrue(cfg["PreprovisionedVm"])
+         self.assertEqual("Savable", cfg["PreprovisionedVMType"])
+ 
+-    def test_read_azure_ovf_with_proxy_guest_agent(self):
++    def test_read_azure_ovf_with_proxy_guest_agent_true(self):
+         """The read_azure_ovf method should set ProvisionGuestProxyAgent
+         cfg flag to True."""
+         content = construct_ovf_env(provision_guest_proxy_agent=True)
+         ret = dsaz.read_azure_ovf(content)
+         cfg = ret[2]
+-        self.assertTrue(cfg["ProvisionGuestProxyAgent"])
++        assert cfg["ProvisionGuestProxyAgent"] is True
++
++    def test_read_azure_ovf_with_proxy_guest_agent_false(self):
++        """The read_azure_ovf method should set ProvisionGuestProxyAgent
++        cfg flag to False."""
++        content = construct_ovf_env(provision_guest_proxy_agent=False)
++        ret = dsaz.read_azure_ovf(content)
++        cfg = ret[2]
++        assert cfg["ProvisionGuestProxyAgent"] is False
+ 
+ 
+ @pytest.mark.parametrize(
+-- 
+2.34.1
+

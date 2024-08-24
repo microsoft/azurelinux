@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3.P1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
@@ -9,6 +9,13 @@ Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  systemd
+Patch0:         CVE-2022-38177.patch
+Patch1:         CVE-2022-38178.patch
+Patch2:         CVE-2022-2795.patch
+Patch3:         CVE-2023-2828.patch
+Patch4:         CVE-2024-1737.patch
+Patch5:         CVE-2024-1975.patch
+
 %description
 The ISC DHCP package contains both the client and server programs for DHCP. dhclient (the client) is used for connecting to a network which uses DHCP to assign network addresses. dhcpd (the server) is used for assigning network addresses on private networks
 
@@ -38,7 +45,13 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%autosetup -p1 -n dhcp-4.4.3-P1
+%setup -q -n dhcp-4.4.3-P1
+
+# Extracting bundled 'bind' to allow some of the patches to modify it.
+tar -C bind -xf bind/bind.tar.gz
+ln -s bind/bind-9* bind_ln
+
+%autopatch -p1
 
 %build -n dhcp-4.4.3-P1
 CFLAGS="$CFLAGS \
@@ -169,6 +182,10 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Mon Jul 29 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.3-P1-2
+- Add patch for CVE-2024-1737 & CVE-2024-1975 in bundled bind-9
+- Apply old patches meant for bundled bind-9
+
 * Wed Jun 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-P1-1
 - Auto-upgrade to 4.4.3-P1 - CVE-2022-2928, CVE-2022-2929
 - Updating spec to match 3.0

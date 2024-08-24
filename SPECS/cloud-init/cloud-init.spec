@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,9 @@ Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 Patch1:         exec_cmd_error_handling.patch
 Patch2:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
+Patch3:         0001-feat-azure-Add-ProvisionGuestProxyAgent-OVF-setting-.patch
+Patch4:         0002-feat-azure-parse-ProvisionGuestProxyAgent-as-bool-51.patch
+Patch5:         0003-feat-azure-add-support-for-azure-proxy-agent.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -151,6 +154,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Mon July 15 2024 Ksenija Stanojevic <ksstanoj@microsoft.com> - 23.3.3-4
+- Add patches to support azure-proxy-agent.
+
 * Wed May 8 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1:23.3-3
 - Add patch to add network interface renaming support for CAPM3 Met.
 
