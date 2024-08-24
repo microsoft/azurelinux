@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        16%{?dist}
+Release:        17%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -122,10 +122,17 @@ GIT_DIR=../../src/systemd/.git git diffab -M v233..master@{2017-06-15} -- hwdb/[
 # Drop when dracut-060 is available.
 Patch0001:      https://github.com/systemd/systemd/pull/26494.patch
 
-
 # Those are downstream-only patches, but we don't want them in packit builds:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1738828
-Patch0490:      use-bfq-scheduler.patch
+%if 0%{?azl}
+# On Azure, it is recommended to use an i/o scheduler that passes the scheduling
+# decisions to the underlying Hyper-V hypervisor. In our case, we should use
+# the "none" scheduler, which is also ideal for fast random I/O devices like
+# NVMe. So we update Fedora's bfq patch to change the udev rule to select "none"
+# instead of Fedora's default Budget Fair Queuing (bfq) and rename the patch
+# from referencing "bfq" to "none".
+Patch0490:      use-none-scheduler.patch
+%endif
 
 # Adjust upstream config to use our shared stack
 # NOTE: the patch was based on the fedora patch, but renamed to
@@ -1202,6 +1209,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17
+- Change bfq scheduler patch to select "none" i/o scheduler
+
 * Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-16
 - Update tag to build systemd-boot exclusively on x86_64
 
