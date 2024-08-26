@@ -15,8 +15,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
-Patch0:         CVE-2024-7347.1.patch
-Patch1:         CVE-2024-7347.2.patch
+Patch0:         CVE-2024-7347.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
