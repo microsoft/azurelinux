@@ -36,8 +36,6 @@ Patch0:         CVE-2024-37890.patch
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2017-18214.patch
 Patch3:         CVE-2024-42459.patch
-Patch4:         CVE-2024-42460.nopatch
-Patch5:         CVE-2024-42461.nopatch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
