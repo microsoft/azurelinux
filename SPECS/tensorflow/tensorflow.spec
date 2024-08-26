@@ -58,7 +58,7 @@ Requires:       python3-wrapt
 Python 3 version.
 
 %prep
-%autosetup
+%setup -qc 
 
 
 %build
