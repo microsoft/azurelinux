@@ -833,6 +833,7 @@ projects to store temporary data. If an application is already using TDB for
 temporary data it is very easy to convert that application to be cluster aware
 and use CTDB instead.
 
+%if %{with testsuite}
 ### CTDB-TEST
 %package -n ctdb-tests
 Summary: CTDB clustered database test suite
@@ -852,6 +853,10 @@ CTDB is a cluster implementation of the TDB database used by Samba and other
 projects to store temporary data. If an application is already using TDB for
 temporary data it is very easy to convert that application to be cluster aware
 and use CTDB instead.
+
+#endif with testsuite (with selftest enabled)
+%endif
+
 #endif with_clustering_support
 %endif
 
@@ -3083,6 +3088,7 @@ fi
 %{_datadir}/ctdb/events/legacy/70.iscsi.script
 %{_datadir}/ctdb/events/legacy/91.lvs.script
 
+%if %{with testsuite}
 %files -n ctdb-tests
 %doc ctdb/tests/README
 %{_bindir}/ctdb_run_tests
@@ -3854,6 +3860,9 @@ fi
 %dir %{_datadir}/ctdb/tests/UNIT/tool/scripts
 %{_datadir}/ctdb/tests/UNIT/tool/scripts/local.sh
  
+#endif with testsuite (with selftest enabled)
+%endif
+
 #endif with_clustering_support
 %endif
 
