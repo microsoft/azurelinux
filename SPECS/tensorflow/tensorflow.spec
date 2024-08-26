@@ -58,11 +58,13 @@ Requires:       python3-wrapt
 Python 3 version.
 
 %prep
-%setup -qc
-
+%autosetup -N
+pwd
+ls
 
 %build
-pushd %{name}-%{version}
+pwd
+ls
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
