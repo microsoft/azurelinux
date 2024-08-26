@@ -58,10 +58,11 @@ Requires:       python3-wrapt
 Python 3 version.
 
 %prep
-%setup -qc 
+%setup -qc
 
 
 %build
+pushd %{name}-%{version}
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
@@ -73,6 +74,7 @@ popd
 
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
+
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
 
