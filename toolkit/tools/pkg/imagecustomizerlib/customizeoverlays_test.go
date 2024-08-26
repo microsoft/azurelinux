@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,6 +58,7 @@ func TestCustomizeImageOverlays(t *testing.T) {
 	defer imageConnection.Close()
 
 	verifyOverlays(t, imageConnection.chroot.RootDir())
+	verifyOverlaysEquivalencyRules(t, imageConnection.chroot.RootDir())
 }
 
 func verifyOverlays(t *testing.T, rootPath string) {
@@ -76,4 +78,29 @@ func verifyOverlays(t *testing.T, rootPath string) {
 	assert.Contains(t, fstabContents,
 		"overlay /media overlay lowerdir=/media:/home,"+
 			"upperdir=/overlays/media/upper,workdir=/overlays/media/work 0 0")
+}
+
+func verifyOverlaysEquivalencyRules(t *testing.T, rootPath string) {
+	upperDirPaths := map[string]string{
+		"/var/overlays/etc/upper": "/etc",
+		"/overlays/media/upper":   "/media",
+	}
+
+	for upperDir, correspondingDir := range upperDirPaths {
+		upperDirFullPath := filepath.Join(rootPath, upperDir)
+		correspondingDirFullPath := filepath.Join(rootPath, correspondingDir)
+
+		upperDirLabel, _, err := shell.Execute("ls -Zd " + upperDirFullPath)
+		if !assert.NoError(t, err, "Failed to get SELinux label for %s", upperDirFullPath) {
+			return
+		}
+
+		correspondingDirLabel, _, err := shell.Execute("ls -Zd " + correspondingDirFullPath)
+		if !assert.NoError(t, err, "Failed to get SELinux label for %s", correspondingDirFullPath) {
+			return
+		}
+
+		assert.Equal(t, correspondingDirLabel, upperDirLabel,
+			"SELinux label mismatch between %s and %s", upperDirFullPath, correspondingDirFullPath)
+	}
 }
