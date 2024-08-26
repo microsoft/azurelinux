@@ -1055,7 +1055,6 @@ for i in \
     %{_libdir}/samba/libdnsserver-common-samba4.so \
     %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so \
     %{_libdir}/samba/libscavenge-dns-records-samba4.so \
-    %{_libdir}/libdcerpc-server-core.so* \
     %{_mandir}/man8/samba.8 \
     %{_mandir}/man8/samba_downgrade_db.8 \
     %{_mandir}/man8/samba-gpupdate.8 \
@@ -1509,6 +1508,7 @@ fi
 ### CLIENT-LIBS
 %files client-libs
 %{_libdir}/libdcerpc-binding.so.*
+%{_libdir}/libdcerpc-server-core.so*
 %{_libdir}/libndr.so.*
 %{_libdir}/libndr-krb5pac.so.*
 %{_libdir}/libndr-nbt.so.*
@@ -1784,7 +1784,6 @@ fi
 %{_libdir}/samba/service/winbindd.so
 %{_libdir}/samba/service/wrepl.so
 %{_libdir}/libdcerpc-server.so.*
-%{_libdir}/libdcerpc-server-core.so.*
 %{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
