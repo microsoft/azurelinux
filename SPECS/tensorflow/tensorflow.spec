@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache2.tar.gz
+Patch0:         CVE-2024-7592.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -57,13 +58,15 @@ Requires:       python3-wrapt
 Python 3 version.
 
 %prep
-%autosetup -p1
+%autosetup
 
 
 %build
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
+# Need to patch CVE-2024-7592 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+(cd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu\lib\python3.12\http && patch -p1 ) < %{PATCH0}
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
