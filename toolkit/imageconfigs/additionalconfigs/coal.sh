@@ -1,3 +1,6 @@
+#!/bin/bash
+set -xe
+
 # Setup the data partition
 mkdir /data/overlays
 mkdir -p /data/overlays/etc/upper
@@ -10,8 +13,6 @@ mkdir -p /data/overlays/root/upper
 mkdir -p /data/overlays/root/work
 mkdir -p /data/containerd
 
-# Make rootfs mount as read-only
-sed -i "s/\/ ext4 defaults/\/ ext4 defaults,ro/" /etc/fstab
 
 # Ensure data partition is mounted in initrd along with overlay
 sed -i "s/data ext4 defaults/data ext4 defaults,x-initrd.mount,x-systemd.growfs/" /etc/fstab
@@ -24,13 +25,45 @@ echo "/data/containerd /var/lib/containerd none bind 0 0" >> /etc/fstab
 # Enable initrd to break into a shell
 #sed -i "s/rd.shell=0 rd.emergency=reboot/rd.shell=1 rd.break=pre-pivot/" /boot/grub2/grub.cfg
 
-# Ensure overlay driver is available in initrd
-echo "add_drivers+=\" overlay \"" >> /etc/dracut.conf.d/01-coal.conf
-# Enable systemd-repart in the initrd
-echo "add_dracutmodules+=\" systemd-repart \"" >> /etc/dracut.conf.d/01-coal.conf
+# UKI logic
+EFIDIR="BOOT"
+# Image generation is done in a chroot environment, so running `uname -r`
+# will return the version of the host running kernel. This function works
+# under the assumption that exactly one kernel is installed in the end image.
+KERNEL_VERSION="$(ls $/usr/lib/modules)"
 
 mkdir -p /etc/repart.d
 echo -e "[Partition]\nType=esp" > /etc/repart.d/10-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/11-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/12-coal.conf; echo -e "[Partition]\nType=linux-generic" > /etc/repart.d/13-coal.conf
 
+# symlink /boot/efi to ../efi
+cp -a /boot/efi/. /efi
+rm -rf /boot/efi
+ln -s ../efi /boot/efi
+
+# The shim has its default boot-loader filename built in as grubx64.efi.
+# To switch to systemd-boot, we overwrite that file location with the
+# sd-boot EFI binary as a workaround.
+cp /lib/systemd/boot/efi/systemd-bootx64.efi /efi/EFI/$EFIDIR/grubx64.efi
+
+# empty /etc/fstab file
+echo > /etc/fstab
+
+# copy UKI into the ESP
+mkdir -p /efi/EFI/Linux
+get_kernel_version
+echo "Kernel version = $KERNEL_VERSION"
+cp /lib/modules/$KERNEL_VERSION/vmlinuz-uki.efi /efi/EFI/Linux/vmlinuz-uki-$KERNEL_VERSION.efi
+
+# END UKI Logic
+
+# Added to `kernel-uki-dracut.conf` used by kernel-uki.spec
+# Ensure overlay driver is available in initrd
+# echo "add_drivers+=\" overlay \"" >> /etc/dracut.conf.d/01-coal.conf
+
+# Added to `kernel-uki-dracut.conf` used by kernel-uki.spec
+# Enable systemd-repart in the initrd
+# echo "add_dracutmodules+=\" systemd-repart \"" >> /etc/dracut.conf.d/01-coal.conf
+
+# No longer needed now that we generate kernel-uki
 # Regenerate initrd with locale in it
-dracut --force --regenerate-all --include /usr/lib/locale /usr/lib/locale
+# dracut --force --regenerate-all --include /usr/lib/locale /usr/lib/locale
