@@ -393,14 +393,29 @@ os:
   resetBootLoaderType: hard-reset
   overlays:
     - mountPoint: /etc
-      lowerDirs: 
+      lowerDirs:
       - /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
       isRootfsOverlay: true
       mountDependencies:
       - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work
 ```
+
+### `mountPoint` [string]
+
+The directory where the combined view of the `upperDir` and `lowerDir` will be
+mounted. This is the location where users will see the merged contents of the
+overlay filesystem. It is common for the `mountPoint` to be the same as the
+`lowerDir`. But this is not required.
+
+Example: `/etc`
 
 ### `lowerDirs` [string[]]
 
@@ -433,15 +448,6 @@ is used for temporary storage by the overlay filesystem to ensure atomic
 operations. The workDir is not directly accessible to users. 
   
 Example: `/var/overlays/etc/work`
-
-### `mountPoint` [string]
-
-The directory where the combined view of the `upperDir` and `lowerDir` will be
-mounted. This is the location where users will see the merged contents of the
-overlay filesystem. It is common for the `mountPoint` to be the same as the
-`lowerDir`. But this is not required.
-
-Example: `/etc`
 
 ### `isRootfsOverlay` [bool]
 

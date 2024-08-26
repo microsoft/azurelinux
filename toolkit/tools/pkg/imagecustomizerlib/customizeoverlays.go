@@ -82,7 +82,7 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 		if overlay.IsRootfsOverlay {
 			// Validate that each mountDependency has the x-initrd.mount option in
 			// the corresponding fstab entry.
-			for _, dep := range mountDependencies {
+			for i, dep := range mountDependencies {
 				entry, found := sliceutils.FindValueFunc(fstabEntries, func(entry diskutils.FstabEntry) bool {
 					return entry.Target == dep
 				})
@@ -94,6 +94,8 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 				if !optionFound {
 					return fmt.Errorf("mountDependency %s requires x-initrd.mount option in fstab", dep)
 				}
+
+				mountDependencies[i] = path.Join("/sysroot", dep)
 			}
 
 			for i, dir := range lowerDirs {
@@ -101,9 +103,6 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 			}
 			upperDir = path.Join("/sysroot", overlay.UpperDir)
 			workDir = path.Join("/sysroot", overlay.WorkDir)
-			for i, dep := range mountDependencies {
-				mountDependencies[i] = path.Join("/sysroot", dep)
-			}
 		}
 
 		// Multiple lower layers can be specified by joining directory names
@@ -119,7 +118,7 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 			options = fmt.Sprintf("%s,x-systemd.requires=%s", options, dep)
 		}
 		if overlay.IsRootfsOverlay {
-			options = fmt.Sprintf("%s,x-initrd.mount", options)
+			options = fmt.Sprintf("%s,x-initrd.mount,x-systemd.wanted-by=initrd-fs.target", options)
 		}
 		if overlay.MountOptions != "" {
 			options = fmt.Sprintf("%s,%s", options, overlay.MountOptions)
@@ -185,14 +184,4 @@ func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
 	}
 
 	return nil
-}
-
-func hasInitrdMountOption(entry diskutils.FstabEntry) bool {
-	options := strings.Split(entry.Options, ",")
-	for _, option := range options {
-		if option == "x-initrd.mount" {
-			return true
-		}
-	}
-	return false
 }

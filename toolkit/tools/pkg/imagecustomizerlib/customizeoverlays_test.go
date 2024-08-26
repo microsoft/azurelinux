@@ -61,7 +61,7 @@ func TestCustomizeImageOverlays(t *testing.T) {
 
 func verifyOverlays(t *testing.T, rootPath string) {
 	// Verify fstab for Overlays.
-	fstabPath := filepath.Join(rootPath, "/etc/fstab")
+	fstabPath := filepath.Join(rootPath, "etc/fstab")
 	fstabContents, err := file.Read(fstabPath)
 	if !assert.NoError(t, err) {
 		return
@@ -69,11 +69,11 @@ func verifyOverlays(t *testing.T, rootPath string) {
 
 	// Check for specific overlay configurations in fstab
 	assert.Contains(t, fstabContents,
-		"overlay /etc overlay lowerdir=/sysroot/etc:/sysroot/home,"+
+		"overlay /etc overlay lowerdir=/sysroot/etc,"+
 			"upperdir=/sysroot/var/overlays/etc/upper,workdir=/sysroot/var/overlays/etc/work,"+
-			"x-systemd.requires=/sysroot/var,x-initrd.mount 0 0")
+			"x-systemd.requires=/sysroot/var,x-initrd.mount,x-systemd.wanted-by=initrd-fs.target 0 0")
 
 	assert.Contains(t, fstabContents,
-		"overlay /media overlay lowerdir=/media,"+
-			"upperdir=/var/overlays/media/upper,workdir=/var/overlays/media/work 0 0")
+		"overlay /media overlay lowerdir=/media:/home,"+
+			"upperdir=/overlays/media/upper,workdir=/overlays/media/work 0 0")
 }
