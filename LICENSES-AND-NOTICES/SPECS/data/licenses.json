@@ -2401,6 +2401,7 @@
                 "rubygem-yajl-ruby",
                 "rubygem-zip-zip",
                 "runc",
+                "rust-coreutils",
                 "sdbus-cpp",
                 "sgx-backwards-compatibility",
                 "shim",
