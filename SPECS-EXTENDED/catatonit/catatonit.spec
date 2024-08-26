@@ -61,7 +61,7 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
-* Fri Jun 21 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.1.7-16
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.1.7-16
 - Update to build dep latest glibc-static version
 
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 0.1.7-15

@@ -1147,7 +1147,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Fri Jun 21 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.52.0-9
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.52.0-9
 - Update to build dep latest glibc-static version
 
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.52.0-8

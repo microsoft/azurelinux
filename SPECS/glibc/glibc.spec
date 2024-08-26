@@ -345,7 +345,7 @@ make %{?_smp_mflags} check
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
-* Fri Jun 21 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.38-7
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.38-8
 - Enable check section for glibc
 
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 2.38-7
