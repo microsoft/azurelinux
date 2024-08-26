@@ -3,7 +3,7 @@
 
 Name:		perl-Sub-Exporter-Progressive
 Version:	0.001013
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Only use Sub::Exporter if you need it
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -80,6 +80,10 @@ make test
 %{_mandir}/man3/Sub::Exporter::Progressive.3*
 
 %changelog
+* Mon Aug 26 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.001013-13
+- Promote package to Core repository.
+- License verified.
+
 * Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 0.001013-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove colons from patchnames
