@@ -52,8 +52,7 @@ func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 	}
 
 	err := overlay.IsValid()
-	assert.ErrorContains(t, err, "invalid workDir ( )")
-	assert.ErrorContains(t, err, "path ( ) contains spaces and is invalid")
+	assert.ErrorContains(t, err, "invalid workDir ( ):\npath ( ) contains invalid characters (spaces, tabs, newlines, colons, or commas)")
 }
 
 func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
@@ -147,5 +146,5 @@ func TestOverlayInvalidMountOptions(t *testing.T) {
 	}
 
 	err := overlay.IsValid()
-	assert.ErrorContains(t, err, "mountOptions (invalid option with spaces) contains spaces and is invalid")
+	assert.ErrorContains(t, err, "mountOptions (invalid option with spaces) contain spaces, tabs, or newlines and are invalid")
 }
