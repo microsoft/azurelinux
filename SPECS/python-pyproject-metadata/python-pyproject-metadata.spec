@@ -1,17 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%global pkgname pyproject-metadata
+
 # Building the documentation requires the furo Sphinx theme.  But building furo
 # requires sphinx_theme_builder, which requires this package.  Avoid a
 # dependency loop with this conditional.
 %bcond_with doc
 
-Name:           python-pyproject-metadata
+Name:           python-%{pkgname}
 Version:        0.7.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        PEP 621 metadata parsing
 
 License:        MIT
-URL:            https://github.com/FFY00/python-pyproject-metadata
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://github.com/FFY00/python-%{pkgname}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 # Remove two tests that throw different errors in python 3.11 and 3.12
 Patch0:         %{name}-test.patch
@@ -23,6 +25,10 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  %{py3_dist docutils}
 
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
+
 %global _desc %{expand:
 Dataclass for PEP 621 metadata with support for core metadata generation.
 
@@ -33,29 +39,29 @@ generate a PEP 643-compliant metadata file (e.g. PKG-INFO).}
 
 %description %_desc
 
-%package     -n python3-pyproject-metadata
+%package     -n python3-%{pkgname}
 Summary:        PEP 621 metadata parsing
 
 # This can be removed when F40 reaches EOL
 Obsoletes:      python3-pep621 < 0.5
 Provides:       python3-pep621 = %{version}-%{release}
 
-%description -n python3-pyproject-metadata %_desc
+%description -n python3-%{pkgname} %_desc
 
 %if %{with doc}
 %package        doc
-Summary:        Documentation for python3-pyproject-metadata
+Summary:        Documentation for python3-%{pkgname}
 
 # This can be removed when F40 reaches EOL
 Obsoletes:      python3-pep621-doc < 0.5
 Provides:       python3-pep621-doc = %{version}-%{release}
 
 %description    doc
-Documentation for python3-pyproject-metadata.
+Documentation for python3-%{pkgname}.
 %endif
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{pkgname}-%{version}
 # No need to BuildRequire pytest-cov to run pytest
 sed -i /pytest-cov/d setup.cfg
 
@@ -83,9 +89,10 @@ rm -rf html/{.buildinfo,.doctrees}
 %pyproject_save_files pyproject_metadata
 
 %check
+pip3 install iniconfig==2.0.0
 %pytest
 
-%files -n python3-pyproject-metadata -f %{pyproject_files}
+%files -n python3-%{pkgname} -f %{pyproject_files}
 %doc CHANGELOG.html README.md
 %license LICENSE
 
@@ -95,6 +102,10 @@ rm -rf html/{.buildinfo,.doctrees}
 %endif
 
 %changelog
+* Tue Aug 27 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.1-7
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- License Verified
+
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 

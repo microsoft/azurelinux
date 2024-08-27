@@ -48,6 +48,7 @@ Provides:       numpy = %{version}-%{release}
 Provides:       numpy%{?_isa} = %{version}-%{release}
 %if 0%{?with_check}
 BuildRequires:  meson
+BuildRequires:  python3-hypothesis
 BuildRequires:  python3-pytest
 BuildRequires:  python3-typing-extensions
 %endif
@@ -127,8 +128,7 @@ ln -s %{python3_sitearch}/%{name}/core/include/numpy/ %{buildroot}%{_includedir}
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
 # Freezing package versions to keep the tests stable.
-# Hypothesis 6.72.0 introduced a deprecation error for "Healthcheck.all()" which fails the test run
-pip3 install 'hypothesis<6.72.0' iniconfig==2.0.0 sortedcontainers==2.4.0
+pip3 install iniconfig==2.0.0 sortedcontainers==2.4.0
 
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
 # https://github.com/numpy/numpy/issues/21094
