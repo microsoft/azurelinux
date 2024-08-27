@@ -81,26 +81,25 @@ func verifyOverlays(t *testing.T, rootPath string) {
 }
 
 func verifyOverlaysEquivalencyRules(t *testing.T, rootPath string) {
-	upperDirPaths := map[string]string{
-		"/var/overlays/etc/upper": "/etc",
-		"/overlays/media/upper":   "/media",
+	mntPoints := map[string]string{
+		"/etc":   "/var/overlays/etc/upper",
+		"/media": "/overlays/media/upper",
 	}
 
-	for upperDir, correspondingDir := range upperDirPaths {
+	for mntPoint, upperDir := range mntPoints {
+		mntPointFullPath := filepath.Join(rootPath, mntPoint)
 		upperDirFullPath := filepath.Join(rootPath, upperDir)
-		correspondingDirFullPath := filepath.Join(rootPath, correspondingDir)
 
+		mntPointLabel, _, err := shell.Execute("ls", "-Zd", mntPointFullPath)
+		if !assert.NoError(t, err, "Failed to get SELinux label for %s", mntPointFullPath) {
+			return
+		}
 		upperDirLabel, _, err := shell.Execute("ls", "-Zd", upperDirFullPath)
 		if !assert.NoError(t, err, "Failed to get SELinux label for %s", upperDirFullPath) {
 			return
 		}
 
-		correspondingDirLabel, _, err := shell.Execute("ls", "-Zd", correspondingDirFullPath)
-		if !assert.NoError(t, err, "Failed to get SELinux label for %s", correspondingDirFullPath) {
-			return
-		}
-
-		assert.Equal(t, correspondingDirLabel, upperDirLabel,
-			"SELinux label mismatch between %s and %s", upperDirFullPath, correspondingDirFullPath)
+		assert.Equal(t, mntPointLabel, upperDirLabel,
+			"SELinux label mismatch between %s and %s", mntPointFullPath, upperDirFullPath)
 	}
 }
