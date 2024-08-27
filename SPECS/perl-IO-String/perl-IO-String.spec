@@ -173,11 +173,7 @@ make test
 - Remove "|| :" from check section
 - Add dist tag
 - Fix Source URL
-- Fix old changelog
-* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.08-39
-- Promote package to Core repository.
-- License verified.
- entries
+- Fix old changelog entries
 - Resolves: bz#226265
 
 * Tue Oct 16 2007 Tom "spot" Callaway <tcallawa@redhat.com> - 1.08-2
