@@ -73,7 +73,7 @@ make test
 
 %changelog
 * Mon Aug 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.012-6
-- Initial AZL import from Fedora 42 (license: MIT).
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.012-5

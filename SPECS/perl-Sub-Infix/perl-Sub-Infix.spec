@@ -52,7 +52,7 @@ source filters, or Devel::Declare, or any of that magic.
 
 %changelog
 * Mon Aug 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.004-25
-- Initial AZL import from Fedora 42 (license: MIT).
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-24
