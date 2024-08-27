@@ -100,6 +100,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %changelog
 * Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.110-14
 - Promote package to Core repository.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.110-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

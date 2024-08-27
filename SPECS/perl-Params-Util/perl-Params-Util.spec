@@ -69,6 +69,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 %changelog
 * Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 1.07-31
 - Promote package to Core repository.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.07-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

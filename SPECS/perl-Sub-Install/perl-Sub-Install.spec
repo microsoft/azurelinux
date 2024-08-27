@@ -65,6 +65,7 @@ make test
 %changelog
 * Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.928-24
 - Promote package to Core repository.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.928-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
