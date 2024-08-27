@@ -146,5 +146,5 @@ func TestOverlayInvalidMountOptions(t *testing.T) {
 	}
 
 	err := overlay.IsValid()
-	assert.ErrorContains(t, err, "mountOptions (invalid option with spaces) contain spaces, tabs, or newlines and are invalid")
+	assert.ErrorContains(t, err, "mountOptions (invalid option with spaces) contain spaces, tabs, or newlines are invalid")
 }
