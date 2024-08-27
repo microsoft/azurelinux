@@ -1,8 +1,8 @@
 Name:           perl-Sub-Infix
 Version:        0.004
-Release:        24%{?dist}
+Release:        25%{?dist}
 Summary:        Create a fake infix operator
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ OR Artistic
 URL:            https://metacpan.org/release/Sub-Infix
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Sub-Infix-%{version}.tar.gz
 BuildArch:      noarch
@@ -51,6 +51,10 @@ source filters, or Devel::Declare, or any of that magic.
 %{_mandir}/man3/*
 
 %changelog
+* Mon Aug 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.004-25
+- Initial AZL import from Fedora 42 (license: MIT).
+- License verified.
+
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
