@@ -3,8 +3,8 @@
 %bcond_without perl_Sub_Name_enables_optional_test
 
 Name:		perl-Sub-Name
-Version:	0.26
-Release:	4%{?dist}
+Version:	0.27
+Release:	1%{?dist}
 Summary:	Name - or rename - a sub
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -79,6 +79,9 @@ make test
 %{_mandir}/man3/Sub::Name.3*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.27-1
+- Update to v0.27.
+
 * Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.26-4
 - Promote package to Core repository.
 - License verified.

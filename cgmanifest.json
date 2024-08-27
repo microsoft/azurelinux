@@ -19473,8 +19473,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sub-Name",
-          "version": "0.26",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Sub/Sub-Name-0.26.tar.gz"
+          "version": "0.27",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Sub/Sub-Name-0.27.tar.gz"
         }
       }
     },
@@ -27945,16 +27945,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "stress-ng",
-          "version": "0.18.02",
-          "downloadUrl": "https://github.com/ColinIanKing/stress-ng/archive/V0.18.02/stress-ng-0.18.02.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "strace",
           "version": "6.8",
           "downloadUrl": "https://strace.io/files/6.8/strace-6.8.tar.xz"
@@ -27968,6 +27958,16 @@
           "name": "stratis-cli",
           "version": "2.0.1",
           "downloadUrl": "https://github.com/stratis-storage/stratis-cli/archive/v2.0.1/stratis-cli-2.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "stress-ng",
+          "version": "0.18.02",
+          "downloadUrl": "https://github.com/ColinIanKing/stress-ng/archive/V0.18.02/stress-ng-0.18.02.tar.gz"
         }
       }
     },
