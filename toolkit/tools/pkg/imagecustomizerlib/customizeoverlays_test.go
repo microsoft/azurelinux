@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -99,6 +100,9 @@ func verifyOverlaysEquivalencyRules(t *testing.T, rootPath string) {
 			return
 		}
 
+		// Modify the labels to remove the first section (before the first colon) and path.
+		mntPointLabel = strings.Fields(mntPointLabel[strings.Index(mntPointLabel, ":")+1:])[0]
+		upperDirLabel = strings.Fields(upperDirLabel[strings.Index(upperDirLabel, ":")+1:])[0]
 		assert.Equal(t, mntPointLabel, upperDirLabel,
 			"SELinux label mismatch between %s and %s", mntPointFullPath, upperDirFullPath)
 	}
