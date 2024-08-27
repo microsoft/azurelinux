@@ -1,6 +1,6 @@
 Name:           perl-IO-String
 Version:        1.08
-Release:        38%{?dist}
+Release:        39%{?dist}
 Summary:        Emulate file interface for in-core strings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -56,6 +56,10 @@ make test
 
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.08-39
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.08-38
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -169,7 +173,11 @@ make test
 - Remove "|| :" from check section
 - Add dist tag
 - Fix Source URL
-- Fix old changelog entries
+- Fix old changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.08-39
+- Promote package to Core repository.
+- License verified.
+ entries
 - Resolves: bz#226265
 
 * Tue Oct 16 2007 Tom "spot" Callaway <tcallawa@redhat.com> - 1.08-2
