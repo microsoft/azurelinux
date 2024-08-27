@@ -15,7 +15,6 @@ Source1:        krb5.conf
 Source2:        krb5kdc.service
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
-BuildRequires:  systemd-rpm-macros
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{version}-%{release}
