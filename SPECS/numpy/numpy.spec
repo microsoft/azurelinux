@@ -40,8 +40,8 @@ BuildRequires:  ninja-build
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  python3-setuptools
 BuildRequires:  python3-pyproject-metadata
+BuildRequires:  python3-setuptools
 Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
@@ -126,9 +126,9 @@ ln -s %{python3_sitearch}/%{name}/core/include/numpy/ %{buildroot}%{_includedir}
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
+# Freezing package versions to keep the tests stable.
 # Hypothesis 6.72.0 introduced a deprecation error for "Healthcheck.all()" which fails the test run
-# pip install 'pytest==7.2' 'hypothesis<6.72.0' typing-extensions
-pip3 install 'hypothesis<6.72.0' iniconfig sortedcontainers
+pip3 install 'hypothesis<6.72.0' iniconfig==2.0.0 sortedcontainers==2.4.0
 
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
 # https://github.com/numpy/numpy/issues/21094
@@ -155,6 +155,7 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 %{python3_sitearch}/%{name}/compat
 %{python3_sitearch}/%{name}/matrixlib
 %{python3_sitearch}/%{name}/polynomial
+%{python3_sitearch}/%{name}-*.dist-info
 %{_includedir}/numpy
 %{python3_sitearch}/%{name}/__init__.pxd
 %{python3_sitearch}/%{name}/__init__.cython-30.pxd
@@ -166,7 +167,9 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 
 %files -n python3-numpy-f2py
 %{_bindir}/f2py
+%{_bindir}/f2py3
 %{_bindir}/f2py.numpy
+%{_bindir}/f2py%{python3_version}
 %{python3_sitearch}/%{name}/f2py
 
 %files -n python3-numpy-doc
@@ -176,6 +179,7 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 * Tue Aug 27 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26.3-3
 - Fix package tests.
 - Update to build using python3-pyproject-metadata.
+- Align the python3-numpy-f2py file links with Fedora.
 - Using Fedora 40 (license: MIT) for guidance.
 
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.26.3-2
