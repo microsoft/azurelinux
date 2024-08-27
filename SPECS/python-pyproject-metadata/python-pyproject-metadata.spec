@@ -89,6 +89,7 @@ rm -rf html/{.buildinfo,.doctrees}
 %pyproject_save_files pyproject_metadata
 
 %check
+# Freezing package versions to keep the tests stable.
 pip3 install iniconfig==2.0.0
 %pytest
 
