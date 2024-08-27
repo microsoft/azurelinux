@@ -6,21 +6,20 @@
 %bcond_with doc
 
 Name:           python-%{pkgname}
-Version:        0.7.1
-Release:        7%{?dist}
+Version:        0.8.0
+Release:        1%{?dist}
 Summary:        PEP 621 metadata parsing
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/FFY00/python-%{pkgname}
+URL:            https://github.com/pypa/python-%{pkgname}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-# Remove two tests that throw different errors in python 3.11 and 3.12
-Patch0:         %{name}-test.patch
 
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  %{py3_dist docutils}
@@ -63,7 +62,7 @@ Documentation for python3-%{pkgname}.
 %prep
 %autosetup -p1 -n %{pkgname}-%{version}
 # No need to BuildRequire pytest-cov to run pytest
-sed -i /pytest-cov/d setup.cfg
+sed -i /pytest-cov/d pyproject.toml
 
 %generate_buildrequires
 %if %{with doc}
@@ -103,9 +102,11 @@ pip3 install iniconfig==2.0.0
 %endif
 
 %changelog
-* Tue Aug 27 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.1-7
+* Tue Aug 27 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.0-1
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License Verified
+- Upgraded to version 0.8.0.
+- Switched to using original upstream source.
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild

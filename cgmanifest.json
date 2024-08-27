@@ -23723,8 +23723,8 @@
         "type": "other",
         "other": {
           "name": "python-pyproject-metadata",
-          "version": "0.7.1",
-          "downloadUrl": "https://github.com/FFY00/python-pyproject-metadata/archive/0.7.1/python-pyproject-metadata-0.7.1.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/pypa/python-pyproject-metadata/archive/0.8.0/python-pyproject-metadata-0.8.0.tar.gz"
         }
       }
     },
