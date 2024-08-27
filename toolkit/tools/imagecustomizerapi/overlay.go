@@ -41,8 +41,8 @@ func (o *Overlay) IsValid() error {
 		}
 	}
 
-	if strings.Contains(o.MountOptions, " ") {
-		return fmt.Errorf("mountOptions (%s) contains spaces and is invalid", o.MountOptions)
+	if validateMountOptions(o.MountOptions) {
+		return fmt.Errorf("mountOptions (%s) contain spaces, tabs, or newlines are invalid", o.MountOptions)
 	}
 
 	// Check if UpperDir and WorkDir are identical.
@@ -67,9 +67,9 @@ func validatePath(filePath string) error {
 		return fmt.Errorf("path cannot be empty")
 	}
 
-	// Check if the path contains spaces.
-	if strings.Contains(filePath, " ") {
-		return fmt.Errorf("path (%s) contains spaces and is invalid", filePath)
+	// Check if the path contains spaces, tabs, newlines, colons, or commas.
+	if strings.ContainsAny(filePath, " \t\n:,") {
+		return fmt.Errorf("path (%s) contains invalid characters (spaces, tabs, newlines, colons, or commas)", filePath)
 	}
 
 	// Check if the path is an absolute path.
@@ -78,6 +78,11 @@ func validatePath(filePath string) error {
 	}
 
 	return nil
+}
+
+func validateMountOptions(mountOptions string) bool {
+	// Check if the value contains spaces, tabs, or newlines.
+	return strings.ContainsAny(mountOptions, " \t\n")
 }
 
 func isSubDirString(dir1, dir2 string) bool {
