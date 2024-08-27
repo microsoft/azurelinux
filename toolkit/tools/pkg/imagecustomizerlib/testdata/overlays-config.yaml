@@ -15,7 +15,9 @@ storage:
     - id: rootfs
       start: 108M
       end: 2048M
-      label: rootfs
+    
+    - id: var
+      start: 2048M
       
   bootType: efi
 
@@ -36,21 +38,35 @@ storage:
     mountPoint:
       path: /
 
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+
 os:
   resetBootLoaderType: hard-reset
 
   packages:
     install:
-    - dracut-overlayfs
     - openssh-server
-    - vim
 
-  additionalFiles:
-    # Workaround until updated dracut-overlayfs package has been published.
-    ../../../../../SPECS/dracut/20overlayfs/module-setup.sh: /lib/dracut/modules.d/20overlayfs/module-setup.sh
-    ../../../../../SPECS/dracut/20overlayfs/overlayfs-mount.sh: /lib/dracut/modules.d/20overlayfs/overlayfs-mount.sh
+  services:
+    enable:
+    - sshd
 
   overlays:
-  - lowerDir: /
-    upperDir: /upper_root
-    workDir: /work_root
+    - mountPoint: /etc
+      lowerDirs:
+      - /etc
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      isRootfsOverlay: true
+      mountDependencies: 
+      - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work
