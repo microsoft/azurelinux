@@ -56,17 +56,17 @@ os:
     - sshd
 
   overlays:
-    - lowerDirs:
+    - mountPoint: /etc
+      lowerDirs:
       - /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
-      mountPoint: /etc
       isRootfsOverlay: true
       mountDependencies: 
       - /var
-    - lowerDirs:
+    - mountPoint: /media
+      lowerDirs:
       - /media
       - /home
       upperDir: /overlays/media/upper
       workDir: /overlays/media/work
-      mountPoint: /media

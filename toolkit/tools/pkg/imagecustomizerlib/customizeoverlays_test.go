@@ -90,12 +90,12 @@ func verifyOverlaysEquivalencyRules(t *testing.T, rootPath string) {
 		upperDirFullPath := filepath.Join(rootPath, upperDir)
 		correspondingDirFullPath := filepath.Join(rootPath, correspondingDir)
 
-		upperDirLabel, _, err := shell.Execute("ls -Zd " + upperDirFullPath)
+		upperDirLabel, _, err := shell.Execute("ls", "-Zd", upperDirFullPath)
 		if !assert.NoError(t, err, "Failed to get SELinux label for %s", upperDirFullPath) {
 			return
 		}
 
-		correspondingDirLabel, _, err := shell.Execute("ls -Zd " + correspondingDirFullPath)
+		correspondingDirLabel, _, err := shell.Execute("ls", "-Zd", correspondingDirFullPath)
 		if !assert.NoError(t, err, "Failed to get SELinux label for %s", correspondingDirFullPath) {
 			return
 		}
