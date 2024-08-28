@@ -4,7 +4,7 @@ A tool for installing and managing Python packages}
 
 Summary:        A tool for installing and managing Python packages
 Name:           python-pip
-Version:        24.0
+Version:        24.2
 Release:        1%{?dist}
 License:        MIT AND Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 Vendor:         Microsoft Corporation
@@ -52,6 +52,9 @@ pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
 %{python3_sitelib}/pip*
 
 %changelog
+* Wed Aug 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.2-1
+- Auto-upgrade to 24.2 - CVE-2024-3651
+
 * Tue Feb 13 2024 Andrew Phelps anphel@microsoft.com - 24.0-1
 - License verified
 - Original version for Azure Linux.
