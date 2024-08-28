@@ -1,6 +1,6 @@
 Name:           perl-Test-Memory-Cycle
 Version:        1.06
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Check for memory leaks and circular memory references
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -63,6 +63,10 @@ make test
 %{_mandir}/man3/Test::Memory::Cycle.3*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.06-16
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.06-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

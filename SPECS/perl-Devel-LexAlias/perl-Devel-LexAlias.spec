@@ -1,6 +1,6 @@
 Name:           perl-Devel-LexAlias
 Version:        0.05
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Alias lexical variables
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -54,6 +54,10 @@ make test
 %{_mandir}/man3/Devel::LexAlias.3*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.05-24
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.05-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
