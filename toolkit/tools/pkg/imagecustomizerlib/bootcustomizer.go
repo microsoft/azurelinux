@@ -83,7 +83,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 
 	// Get the SELinux kernel command-line args.
 	if b.isGrubMkconfig {
-		_, args, _, err = getDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
+		_, args, _, err = GetDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
 		if err != nil {
 			return "", err
 		}
@@ -160,7 +160,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 }
 
 // Makes changes to the /etc/default/grub file that are needed/useful for enabling verity.
-func (b *BootCustomizer) PrepareForVerity() error {
+func (b *BootCustomizer) PrepareForVerity(rootDeviceValue string) error {
 	if b.isGrubMkconfig {
 		// Force root command-line arg to be referenced by /dev path instead of by UUID.
 		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
@@ -175,6 +175,14 @@ func (b *BootCustomizer) PrepareForVerity() error {
 			"true")
 		if err != nil {
 			return err
+		}
+
+		// Check if rootDeviceValue is available as a field in BootCustomizer or another way
+		if rootDeviceValue != "" {
+			defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE", rootDeviceValue)
+			if err != nil {
+				return err
+			}
 		}
 
 		b.defaultGrubFileContent = defaultGrubFileContent
@@ -214,4 +222,45 @@ func (b *BootCustomizer) ApplyChangesToGrub(varName string, newValue string) err
 
 	b.defaultGrubFileContent = defaultGrubFileContent
 	return nil
+}
+
+func (b *BootCustomizer) UpdateCmdlineValues(newValues string) (string, error) {
+
+	_, existingCmdlineArgs, _, err := GetDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, "GRUB_CMDLINE_LINUX")
+	if err != nil {
+		return "", err
+	}
+
+	// Convert existing arguments to a map for easier updating.
+	existingArgsMap := make(map[string]string)
+	for _, arg := range existingCmdlineArgs {
+		existingArgsMap[arg.Name] = arg.Value
+	}
+
+	// Parse the newValues string into key-value pairs.
+	newPairs := strings.Split(newValues, ",")
+	for _, pair := range newPairs {
+		pair = strings.TrimSpace(pair)
+		kvParts := strings.SplitN(pair, "=", 2)
+		if len(kvParts) == 2 {
+			// Update or add the argument in the map.
+			existingArgsMap[kvParts[0]] = kvParts[1]
+		} else {
+			// If there's no "=", it's just a flag (boolean argument).
+			existingArgsMap[kvParts[0]] = ""
+		}
+	}
+
+	// Convert the map back to a single string.
+	var updatedCmdlineArgs []string
+	for name, value := range existingArgsMap {
+		if value != "" {
+			updatedCmdlineArgs = append(updatedCmdlineArgs, name+"="+value)
+		} else {
+			updatedCmdlineArgs = append(updatedCmdlineArgs, name)
+		}
+	}
+
+	// Join the arguments with spaces to form the final command line string.
+	return strings.Join(updatedCmdlineArgs, " "), nil
 }

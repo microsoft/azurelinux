@@ -137,7 +137,7 @@ func findDefaultGrubFileVarAssign(varAssigns []defaultGrubFileVarAssign, name de
 //   - cmdLineVarAssign: The variable assignment that matches 'varName'.
 //   - args: The list of kernel command-line args.
 //   - insertAt: An index that new kernel command-line args can be inserted at.
-func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
+func GetDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
 ) (defaultGrubFileVarAssign, []grubConfigLinuxArg, int, error) {
 	varAssigns, err := findDefaultGrubFileVarAssigns(defaultGrubFileContent)
 	if err != nil {
@@ -185,7 +185,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 
 // Takes the string contents of /etc/default/grub file and inserts the provided command-line args.
 func AddExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
-	cmdLineVarAssign, _, insertAt, err := getDefaultGrubFileLinuxArgs(defaultGrubFileContent,
+	cmdLineVarAssign, _, insertAt, err := GetDefaultGrubFileLinuxArgs(defaultGrubFileContent,
 		defaultGrubFileVarNameCmdlineLinuxDefault)
 	if err != nil {
 		return "", err
@@ -215,7 +215,7 @@ func AddExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCo
 func updateDefaultGrubFileKernelCommandLineArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
 	argsToRemove []string, newArgs []string,
 ) (string, error) {
-	cmdLineVarAssign, args, insertAt, err := getDefaultGrubFileLinuxArgs(defaultGrubFileContent, varName)
+	cmdLineVarAssign, args, insertAt, err := GetDefaultGrubFileLinuxArgs(defaultGrubFileContent, varName)
 	if err != nil {
 		return "", err
 	}

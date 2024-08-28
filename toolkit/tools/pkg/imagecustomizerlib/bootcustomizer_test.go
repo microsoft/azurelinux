@@ -149,7 +149,7 @@ func TestBootCustomizerSELinuxMode30(t *testing.T) {
 func TestBootCustomizerVerity20(t *testing.T) {
 	b := createBootCustomizerFor20(t)
 
-	err := b.PrepareForVerity()
+	err := b.PrepareForVerity("")
 	assert.NoError(t, err)
 
 	checkDiffs20(t, b, "", "")
@@ -158,7 +158,7 @@ func TestBootCustomizerVerity20(t *testing.T) {
 func TestBootCustomizerVerity30(t *testing.T) {
 	b := createBootCustomizerFor30(t)
 
-	err := b.PrepareForVerity()
+	err := b.PrepareForVerity("")
 	assert.NoError(t, err)
 
 	expectedDefaultGrubFileDiff := `6a7,8
@@ -168,7 +168,7 @@ func TestBootCustomizerVerity30(t *testing.T) {
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 
 	// Do it again to make sure there aren't any changes.
-	err = b.PrepareForVerity()
+	err = b.PrepareForVerity("")
 	assert.NoError(t, err)
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 }
