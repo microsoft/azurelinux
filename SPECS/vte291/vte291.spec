@@ -203,7 +203,7 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.66.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Dec 08 2022 Henry Li <lihl@microsoft.com> - 0.66.2-1
+* Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 0.66.2-1
 - Upgrade to version 0.66.2
 - Update vte291-cntnr-precmd-preexec-scroll.patch
 - Update gtk3_version macro
