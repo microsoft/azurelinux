@@ -19473,8 +19473,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sub-Name",
-          "version": "0.26",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Sub/Sub-Name-0.26.tar.gz"
+          "version": "0.27",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Sub/Sub-Name-0.27.tar.gz"
         }
       }
     },
