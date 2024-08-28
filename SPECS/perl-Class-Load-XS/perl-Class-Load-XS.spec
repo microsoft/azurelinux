@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		perl-Class-Load-XS
 Version:	0.10
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	XS implementation of parts of Class::Load
 License:	Artistic 2.0
 URL:		https://metacpan.org/release/Class-Load-XS
@@ -74,6 +74,10 @@ make test
 %{_mandir}/man3/Class::Load::XS.3*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-13
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
