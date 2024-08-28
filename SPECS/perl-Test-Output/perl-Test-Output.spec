@@ -3,7 +3,7 @@
 Name:           perl-Test-Output
 # Keep 2-digit precision
 Version:        %(echo '%{cpan_version}' | sed 's/\(\...\)\(.\)/\1.\2/')
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Utilities to test STDOUT and STDERR messages
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -58,6 +58,10 @@ make test
 %{_mandir}/man3/Test::Output.3pm*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.03.1-12
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.03.1-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

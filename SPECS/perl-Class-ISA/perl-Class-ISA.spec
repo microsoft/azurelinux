@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Class-ISA
 Version:        0.36
-Release:        1030%{?dist}
+Release:        1031%{?dist}
 Summary:        Report the search path for a class's ISA tree
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Class-ISA
@@ -40,6 +40,10 @@ make test
 %{perl_vendorlib}/*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.36-1031
+- Promote package to Core repository.
+- License verified.
+
 * Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.36-1030
 - Add an explicit BR on `perl(deprecate)` to enable ptest
 - License verified

@@ -7,7 +7,7 @@
 Name:		perl-Test-Requires
 Summary:	Checks to see if a given module can be loaded
 Version:	0.10
-Release:	20%{?dist}
+Release:	21%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,6 +78,10 @@ make test TEST_FILES="xt/*.t"
 %{_mandir}/man3/Test::Requires.3*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-21
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
