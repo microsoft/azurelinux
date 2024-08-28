@@ -1,6 +1,6 @@
 Name:           perl-Test-Without-Module
 Version:        0.20
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Test fallback behavior in absence of modules
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -54,6 +54,10 @@ make test
 %{_mandir}/man3/Test*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.20-13
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

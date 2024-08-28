@@ -1,6 +1,6 @@
 Name:           perl-PadWalker
 Version:        2.3
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Play with other people's lexical variables
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -56,6 +56,10 @@ make test
 %{_mandir}/man3/PadWalker.3*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3-10
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
