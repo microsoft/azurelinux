@@ -18,7 +18,7 @@
 
 Name:           vte291
 Version:        0.74.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        GTK+ 3 terminal emulator library
 
 # libvte-2.91.so is generated from LGPLv2+ and MIT sources
@@ -30,6 +30,7 @@ Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version
 # https://bugzilla.redhat.com/show_bug.cgi?id=1103380
 # https://pagure.io/fedora-workstation/issue/216
 Patch0:         vte291-cntnr-precmd-preexec-scroll.patch
+Patch1:         CVE-2024-37535.patch
 BuildRequires:  pkgconfig(fribidi) >= %{fribidi_version}
 BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
@@ -193,13 +194,16 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+* Thu Aug 28 2024 Dallas Delaney <dadelan@microsoft.com> - 0.74.2-6
+- Patch CVE-2024-37535
+
 * Thu Mar 21 2024 Daniel McIlvaney <damcilav@microsoft.com> - 0.74.2-5
 - Refresh from F40
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.66.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Dec 08 2022 Henry Li <lihl@microsoft.com> - 0.66.2-1
+* Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 0.66.2-1
 - Upgrade to version 0.66.2
 - Update vte291-cntnr-precmd-preexec-scroll.patch
 - Update gtk3_version macro
