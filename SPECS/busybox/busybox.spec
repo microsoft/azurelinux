@@ -44,7 +44,10 @@ better suited to normal use.
 %autosetup -p1
 
 %build
-
+export CFLAGS="-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/azl/default-hardened-cc1    -fcommon -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection"
+export CXXFLAGS="-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/azl/default-hardened-cc1    -fcommon -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection"
+#export LDFLAGS="%{build_ldflags_gnu}"
+export LDFLAGS=
 cp %{SOURCE1} .config
 # set all new options to defaults
 yes "" | make oldconfig
@@ -59,7 +62,8 @@ echo "# CONFIG_FEATURE_MOUNT_NFS is not set" >>.config
 echo "# CONFIG_FEATURE_INETD_RPC is not set" >>.config
 yes "" | make oldconfig
 cat .config
-make V=1 CC="gcc %{optflags}"
+# make V=1 CC="gcc %{optflags}"
+make V=1
 cp busybox_unstripped busybox.static
 cp docs/busybox.1 docs/busybox.static.1
 
@@ -70,7 +74,8 @@ cp %{SOURCE2} .config
 # set all new options to defaults
 yes "" | make oldconfig
 cat .config
-make V=1 CC="gcc %{optflags}"
+# make V=1 CC="gcc %{optflags}"
+make V=1
 cp busybox_unstripped busybox.petitboot
 cp docs/busybox.1 docs/busybox.petitboot.1
 
