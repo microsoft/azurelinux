@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache2.tar.gz
+Patch0:         CVE-2024-7592.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -57,15 +58,22 @@ Requires:       python3-wrapt
 Python 3 version.
 
 %prep
-%autosetup -p1
-
+# use -N to **not** apply patches, will apply patch after getting SOURCE1 in build stage
+%autosetup -N
 
 %build
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
+
+# Need to patch CVE-2024-7592 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/http
+patch -p1 < %{PATCH0}
+popd
+
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
+
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
 
@@ -92,6 +100,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Fri Aug 23 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 2.16.1-6
+- Bump release to build with new python3 to fix CVE-2024-7592
+
 * Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.16.1-5
 - Bump release to build with new python-werkzeug to fix CVE-2024-34069
 
