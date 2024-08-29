@@ -1,4 +1,4 @@
-%define full_verison %{version}.0
+%define full_version %{version}.0
 %define commit_hash gdfea26
 
 Summary:        C11 Annex K functions
@@ -35,7 +35,7 @@ Summary:        Tools to detect use of unsafe libc APIs
 Tools to detect use of unsafe libc APIs
 
 %prep
-%autosetup -n safeclib-%{full_verison}-%{commit_hash} -p1
+%autosetup -n safeclib-%{full_version}-%{commit_hash} -p1
 
 %build
 autoreconf -Wall --install
