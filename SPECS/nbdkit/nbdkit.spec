@@ -51,7 +51,7 @@ Distribution:   Azure Linux
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -110,7 +110,7 @@ BuildRequires:  %{_bindir}/certtool
 BuildRequires:  %{_bindir}/cut
 BuildRequires:  expect
 BuildRequires:  %{_bindir}/hexdump
-BuildRequires:  /sbin/ip
+BuildRequires:  %{_sbindir}/ip
 BuildRequires:  jq
 BuildRequires:  %{_bindir}/nbdcopy
 BuildRequires:  %{_bindir}/nbdinfo
@@ -120,7 +120,7 @@ BuildRequires:  %{_bindir}/qemu-io
 BuildRequires:  %{_bindir}/qemu-nbd
 BuildRequires:  /sbin/sfdisk
 BuildRequires:  %{_bindir}/socat
-BuildRequires:  /sbin/ss
+BuildRequires:  %{_sbindir}/ss
 BuildRequires:  %{_bindir}/stat
 %endif
 
@@ -1195,6 +1195,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Thu Aug 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.3-6
+- Fixed test-time dependencies to match correct AZL paths.
+
 * Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.35.3-5
 - Upgraded ocaml dependency to 5.1.1
 
