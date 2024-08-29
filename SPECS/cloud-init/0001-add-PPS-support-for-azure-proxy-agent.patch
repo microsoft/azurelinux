@@ -1,0 +1,94 @@
+From 19442eedae2a3f96d424626dad20e037f10f147b Mon Sep 17 00:00:00 2001
+From: Ksenija Stanojevic <ksenija.stanojevic@gmail.com>
+Date: Tue, 13 Aug 2024 09:44:25 -0700
+Subject: [PATCH] add PPS support for azure-proxy-agent
+
+---
+ cloudinit/sources/DataSourceAzure.py  | 23 +++++++++++++++++++++--
+ cloudinit/sources/azure/errors.py     |  5 +----
+ tests/unittests/sources/test_azure.py |  5 ++++-
+ 3 files changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/cloudinit/sources/DataSourceAzure.py b/cloudinit/sources/DataSourceAzure.py
+index c2f74e173..aed740b89 100644
+--- a/cloudinit/sources/DataSourceAzure.py
++++ b/cloudinit/sources/DataSourceAzure.py
+@@ -504,15 +504,31 @@ class DataSourceAzure(sources.DataSource):
+             ]
+             out, err = subp.subp(cmd)
+             report_diagnostic_event(
+-                "Running azure-proxy-agent %s resulted"
+-                "in stderr output: %s with stdout: %s" % (cmd, err, out),
++                "Executing %s resulted "
++                "in stderr=%r with stdout=%r" % (cmd, err, out),
+                 logger_func=LOG.debug,
+             )
+         except subp.ProcessExecutionError as error:
+             if isinstance(error.reason, FileNotFoundError):
++                LOG.error(
++                    "Failed to activate Azure Guest Proxy Agent: "
++                    "azure-proxy-agent not found"
++                )
+                 report_error = errors.ReportableErrorProxyAgentNotFound()
+                 self._report_failure(report_error)
+             else:
++                report_diagnostic_event(
++                    "Failed to activate Azure Guest Proxy Agent: "
++                    "status check failed "
++                    "cmd=%r stderr=%r stdout=%r exit_code=%s"
++                    % (
++                        error.cmd,
++                        error.stderr,
++                        error.stdout,
++                        error.exit_code,
++                    ),
++                    logger_func=LOG.error,
++                )
+                 reportable_error = (
+                     errors.ReportableErrorProxyAgentStatusFailure(error)
+                 )
+@@ -637,6 +653,9 @@ class DataSourceAzure(sources.DataSource):
+                 self._wait_for_pps_unknown_reuse()
+ 
+             md, userdata_raw, cfg, files = self._reprovision()
++            if cfg.get("ProvisionGuestProxyAgent"):
++                self._check_azure_proxy_agent_status()
++
+             # fetch metadata again as it has changed after reprovisioning
+             imds_md = self.get_metadata_from_imds(report_failure=True)
+ 
+diff --git a/cloudinit/sources/azure/errors.py b/cloudinit/sources/azure/errors.py
+index b331cd686..6595ceda9 100644
+--- a/cloudinit/sources/azure/errors.py
++++ b/cloudinit/sources/azure/errors.py
+@@ -155,10 +155,7 @@ class ReportableErrorUnhandledException(ReportableError):
+ 
+ class ReportableErrorProxyAgentNotFound(ReportableError):
+     def __init__(self) -> None:
+-        super().__init__(
+-            "Unable to activate Azure Guest Proxy Agent."
+-            "azure-proxy-agent not found"
+-        )
++        super().__init__("azure-proxy-agent not found")
+ 
+ 
+ class ReportableErrorProxyAgentStatusFailure(ReportableError):
+diff --git a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
+index 9b6672e1e..446d5bf31 100644
+--- a/tests/unittests/sources/test_azure.py
++++ b/tests/unittests/sources/test_azure.py
+@@ -4532,7 +4532,10 @@ class TestCheckAzureProxyAgent:
+             subp.SubpResult("Guest Proxy Agent running", ""),
+         ]
+         self.azure_ds._check_azure_proxy_agent_status()
+-        assert "Running azure-proxy-agent" in self.caplog.text
++        assert (
++            "Executing ['azure-proxy-agent', '--status', '--wait', '120']"
++            in self.caplog.text
++        )
+         assert self.mock_wrapping_report_failure.mock_calls == []
+ 
+     def test_check_azure_proxy_agent_status_notfound(self):
+-- 
+2.34.1
+
