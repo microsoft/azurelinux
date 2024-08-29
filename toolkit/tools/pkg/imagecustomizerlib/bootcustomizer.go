@@ -232,7 +232,7 @@ func (b *BootCustomizer) UpdateCmdlineValues(newValues string) (string, error) {
 		return "", err
 	}
 
-	// Convert existing arguments to a map for easier updating.
+	// Convert existing arguments to a map
 	existingArgsMap := make(map[string]string)
 	for _, arg := range existingCmdlineArgs {
 		existingArgsMap[arg.Name] = arg.Value
@@ -262,6 +262,5 @@ func (b *BootCustomizer) UpdateCmdlineValues(newValues string) (string, error) {
 		}
 	}
 
-	// Join the arguments with spaces to form the final command line string.
-	return strings.Join(updatedCmdlineArgs, " "), nil
+	return GrubArgsToString(updatedCmdlineArgs), nil
 }
