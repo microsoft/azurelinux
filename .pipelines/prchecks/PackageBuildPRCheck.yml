@@ -13,13 +13,13 @@ parameters:
       - name: "AMD64"
         agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         maxCPUs: "$(($(nproc) / 2))"
-        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
-        rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64)"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64_2.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64_2.0)"
       - name: "ARM64"
         agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         maxCPUs: "$(($(nproc) / 3))"
-        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
-        rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64)"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_2.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_2.0)"
   - name: debug
     type: boolean
     default: false
@@ -34,6 +34,7 @@ resources:
 
 variables:
   - group: "Agent pools (DEV)"
+  - group: "Raw toolchain info"
   - name: rpmsArtifactNameBase
     value: RPMs
   - name: toolchainArtifactNameBase
