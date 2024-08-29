@@ -1,13 +1,16 @@
+%define username postgres
+%define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        16.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
+Source1:	%{name}.service
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -20,6 +23,8 @@ BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
+BuildRequires:	systemd-rpm-macros
+BuildRequires:	systemd-devel
 
 %if 0%{?with_check}
 BuildRequires:  sudo
@@ -33,6 +38,7 @@ Requires:       openssl
 Requires:       readline
 Requires:       tzdata
 Requires:       zlib
+Requires:	openssl-libs
 
 %description
 PostgreSQL is an object-relational database management system.
@@ -65,12 +71,21 @@ Obsoletes:      libpq-devel < 13
 The postgresql-devel package contains libraries and header files for
 developing applications that use postgresql.
 
+%package	service
+Summary:	To setup postgresql as a service
+Requires:	%{name} = %{version}-%{release}
+Requires:	util-linux
+
+%description	service
+Install postgresql-service if you want to run postgresql as a service
+
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h &&
 ./configure \
+    --with-systemd \
     --enable-thread-safety \
     --prefix=%{_prefix} \
     --with-ldap \
@@ -88,6 +103,8 @@ cd contrib && make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 cd contrib && make install DESTDIR=%{buildroot}
 
+install -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
+
 # For postgresql 10+, commands are renamed
 # Ref: https://wiki.postgresql.org/wiki/New_in_postgres_10
 ln -sf pg_receivewal %{buildroot}%{_bindir}/pg_receivexlog
@@ -101,6 +118,50 @@ chown -Rv nobody .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %ldconfig_scriptlets
+%pre service
+if ! getent group postgres >/dev/null; then
+    /sbin/groupadd -r postgres
+fi
+
+if ! getent passwd postgres >/dev/null; then
+    /sbin/useradd -g postgres postgres
+fi
+
+%post service
+PGDATA="/usr/local/pgsql/data"
+PGRUN="/run/postgresql"
+
+if [ ! -d "$PGDATA" ]; then
+    mkdir -p "$PGDATA"
+    chown postgres:postgres "$PGDATA"
+    su -c /usr/bin/initdb -D "$PGDATA" postgres
+    chown -R postgres:postgres "$PGDATA"
+fi
+
+if [ ! -d "$PGRUN" ]; then
+    mkdir -p "$PGRUN"
+    chown postgres:postgres "$PGRUN"
+    chmod 700 "$PGRUN"
+fi
+
+%systemd_post %{name}.service
+
+%preun
+%systemd_preun %{name}.service
+
+%postun
+if [ $1 -eq 0 ] ; then
+    if getent passwd postgres >/dev/null; then
+        /sbin/userdel postgres
+    fi
+    if getent group %{name} >/dev/null; then
+        /sbin/groupdel postgres
+    fi
+    rm -rf /var/log/%{name}
+    rm -rf /var/run/%{name}
+fi
+
+%systemd_postun_with_restart %{name}.service
 
 %files
 %defattr(-,root,root)
@@ -172,7 +233,13 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libecpg_compat.a
 %{_libdir}/libpgtypes.a
 
+%files service
+%{_unitdir}/%{name}.service
+
 %changelog
+* Thu Aug 29 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.4-2
+- Add postgresql-service as a subpackage
+
 * Mon Aug 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.4-1
 - Auto-upgrade to 16.4 - CVE-2024-7348
  
