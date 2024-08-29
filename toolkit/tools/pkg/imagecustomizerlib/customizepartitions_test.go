@@ -354,13 +354,13 @@ func verifyBootGrubCfg(t *testing.T, imageConnection *ImageConnection, extraComm
 	}
 
 	switch imageVersion {
-	case baseImageVersion20:
+	case baseImageVersionAzl2:
 		assert.Regexp(t, fmt.Sprintf(`(?m)^search -n -u %s -s$`, regexp.QuoteMeta(bootInfo.Uuid)),
 			grubCfgContents)
 		assert.Regexp(t, fmt.Sprintf(`(?m)^set rootdevice=PARTUUID=%s$`, regexp.QuoteMeta(rootfsInfo.PartUuid)),
 			grubCfgContents)
 
-	case baseImageVersion30:
+	case baseImageVersionAzl3:
 		assert.Regexp(t, fmt.Sprintf(`(?m)[\t ]*search.* --fs-uuid --set=root %s$`, regexp.QuoteMeta(bootInfo.Uuid)),
 			grubCfgContents)
 

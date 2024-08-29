@@ -26,19 +26,19 @@ const (
 type baseImageVersion string
 
 const (
-	baseImageVersion20 baseImageVersion = "2.0"
-	baseImageVersion30 baseImageVersion = "3.0"
+	baseImageVersionAzl2 baseImageVersion = "2.0"
+	baseImageVersionAzl3 baseImageVersion = "3.0"
 
 	// Most features don't have version Azure Linux version specific behavior.
 	// So, there is only minimal value in duplicating the tests across versions for such features.
-	baseImageVersionDefault = baseImageVersion20
+	baseImageVersionDefault = baseImageVersionAzl2
 )
 
 var (
-	baseImageCoreEfi20    = flag.String("base-image-core-efi-20", "", "A core-efi 2.0 image to use as a base image.")
-	baseImageCoreEfi30    = flag.String("base-image-core-efi-30", "", "A core-efi 3.0 image to use as a base image.")
-	baseImageCoreLegacy20 = flag.String("base-image-core-legacy-20", "", "A core-legacy 2.0 image to use as a base image.")
-	baseImageCoreLegacy30 = flag.String("base-image-core-legacy-30", "", "A core-legacy 3.0 image to use as a base image.")
+	baseImageCoreEfiAzl2    = flag.String("base-image-core-efi-azl2", "", "A core-efi 2.0 image to use as a base image.")
+	baseImageCoreEfiAzl3    = flag.String("base-image-core-efi-azl3", "", "A core-efi 3.0 image to use as a base image.")
+	baseImageCoreLegacyAzl2 = flag.String("base-image-core-legacy-azl2", "", "A core-legacy 2.0 image to use as a base image.")
+	baseImageCoreLegacyAzl3 = flag.String("base-image-core-legacy-azl3", "", "A core-legacy 3.0 image to use as a base image.")
 )
 
 var (
@@ -47,8 +47,8 @@ var (
 	workingDir string
 
 	supportedAzureLinuxVersions = []baseImageVersion{
-		baseImageVersion20,
-		baseImageVersion30,
+		baseImageVersionAzl2,
+		baseImageVersionAzl3,
 	}
 )
 
@@ -104,20 +104,20 @@ func getImageParamAndName(baseImageType baseImageType, baseImageVersion baseImag
 	switch baseImageType {
 	case baseImageTypeCoreEfi:
 		switch baseImageVersion {
-		case baseImageVersion20:
-			return baseImageCoreEfi20, "base-image-core-efi-20"
+		case baseImageVersionAzl2:
+			return baseImageCoreEfiAzl2, "base-image-core-efi-azl2"
 
-		case baseImageVersion30:
-			return baseImageCoreEfi30, "base-image-core-efi-30"
+		case baseImageVersionAzl3:
+			return baseImageCoreEfiAzl3, "base-image-core-efi-azl3"
 		}
 
 	case baseImageTypeCoreLegacy:
 		switch baseImageVersion {
-		case baseImageVersion20:
-			return baseImageCoreLegacy20, "base-image-core-legacy-20"
+		case baseImageVersionAzl2:
+			return baseImageCoreLegacyAzl2, "base-image-core-legacy-azl2"
 
-		case baseImageVersion30:
-			return baseImageCoreLegacy30, "base-image-core-legacy-30"
+		case baseImageVersionAzl3:
+			return baseImageCoreLegacyAzl3, "base-image-core-legacy-azl3"
 		}
 	}
 
