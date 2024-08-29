@@ -33,7 +33,7 @@ func addDracutModuleAndDriver(dracutModuleName string, dracutDriverName string, 
 	return addDracutConfig(dracutConfigFile, lines)
 }
 
-func addDracutModule(dracutModuleName string, imageChroot safechroot.ChrootInterface) error {
+func addDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) error {
 	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
 	lines := []string{
 		"add_dracutmodules+=\" " + dracutModuleName + " \"",
@@ -41,7 +41,7 @@ func addDracutModule(dracutModuleName string, imageChroot safechroot.ChrootInter
 	return addDracutConfig(dracutConfigFile, lines)
 }
 
-func addDracutDriver(dracutDriverName string, imageChroot safechroot.ChrootInterface) error {
+func addDracutDriver(dracutDriverName string, imageChroot *safechroot.Chroot) error {
 	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutDriverName+".conf")
 	lines := []string{
 		"add_drivers+=\" " + dracutDriverName + " \"",

@@ -184,7 +184,7 @@ func GetDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 }
 
 // Takes the string contents of /etc/default/grub file and inserts the provided command-line args.
-func AddExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
+func addExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
 	cmdLineVarAssign, _, insertAt, err := GetDefaultGrubFileLinuxArgs(defaultGrubFileContent,
 		defaultGrubFileVarNameCmdlineLinuxDefault)
 	if err != nil {

@@ -19,7 +19,7 @@ import (
 )
 
 func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecustomizerapi.SELinuxMode,
-	imageChroot safechroot.ChrootInterface,
+	imageChroot *safechroot.Chroot,
 ) (bool, error) {
 	var err error
 
@@ -60,7 +60,7 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, selinuxMode imagecus
 	return true, nil
 }
 
-func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot safechroot.ChrootInterface,
+func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
@@ -145,7 +145,7 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot s
 	return nil
 }
 
-func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot safechroot.ChrootInterface) error {
+func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	for _, overlay := range overlays {
 		dirsToCreate := []string{
 			filepath.Join(imageChroot.RootDir(), overlay.MountPoint),
@@ -165,7 +165,7 @@ func createOverlayDirectories(overlays []imagecustomizerapi.Overlay, imageChroot
 }
 
 func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
-	overlays []imagecustomizerapi.Overlay, imageChroot safechroot.ChrootInterface,
+	overlays []imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 

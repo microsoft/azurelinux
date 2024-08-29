@@ -57,7 +57,7 @@ func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 	}
 
 	if b.isGrubMkconfig {
-		defaultGrubFileContent, err := AddExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, extraCommandLine)
+		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, extraCommandLine)
 		if err != nil {
 			return err
 		}
