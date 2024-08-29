@@ -13,11 +13,10 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	Hostname string                        `yaml:"hostname"`
-	SELinux  imagecustomizerapi.SELinux    `yaml:"selinux"`
-	Users    []imagecustomizerapi.User     `yaml:"users"`
-	Verity   *imagecustomizerapi.Verity    `yaml:"verity"`
-	Overlays *[]imagecustomizerapi.Overlay `yaml:"overlays"`
+	Hostname string                     `yaml:"hostname"`
+	SELinux  imagecustomizerapi.SELinux `yaml:"selinux"`
+	Users    []imagecustomizerapi.User  `yaml:"users"`
+	Overlays *[]Overlay                 `yaml:"overlays"`
 }
 
 func (s *OS) IsValid() error {
@@ -38,13 +37,6 @@ func (s *OS) IsValid() error {
 		err = user.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid users item at index %d:\n%w", i, err)
-		}
-	}
-
-	if s.Verity != nil {
-		err = s.Verity.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid verity:\n%w", err)
 		}
 	}
 

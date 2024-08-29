@@ -194,6 +194,7 @@ func (b *BootCustomizer) PrepareForVerity(rootDeviceValue string) error {
 func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
+		fmt.Println("heheheheheheheh", b.defaultGrubFileContent)
 		err := WriteDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err

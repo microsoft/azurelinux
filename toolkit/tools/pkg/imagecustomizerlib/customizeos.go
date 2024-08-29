@@ -75,7 +75,7 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	overlayUpdated, err := EnableOverlays(config.OS.Overlays, imageChroot)
+	overlayUpdated, err := enableOverlays(config.OS.Overlays, selinuxMode, imageChroot)
 	if err != nil {
 		return err
 	}
