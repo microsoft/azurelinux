@@ -2648,8 +2648,8 @@
         "type": "other",
         "other": {
           "name": "distribution-gpg-keys",
-          "version": "1.104",
-          "downloadUrl": "https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.104-1.tar.gz"
+          "version": "1.105",
+          "downloadUrl": "https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.105-1.tar.gz"
         }
       }
     },
@@ -11321,8 +11321,8 @@
         "type": "other",
         "other": {
           "name": "libuser",
-          "version": "0.63",
-          "downloadUrl": "https://releases.pagure.org/libuser/libuser-0.63.tar.xz"
+          "version": "0.64",
+          "downloadUrl": "https://releases.pagure.org/libuser/libuser-0.64.tar.gz"
         }
       }
     },
@@ -13162,8 +13162,8 @@
         "type": "other",
         "other": {
           "name": "mock",
-          "version": "2.16",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.16-1.tar.gz"
+          "version": "5.6",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-5.6-1.tar.gz"
         }
       }
     },
@@ -13172,8 +13172,8 @@
         "type": "other",
         "other": {
           "name": "mock-core-configs",
-          "version": "36.4",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.4-1/mock-core-configs-36.4-1.tar.gz"
+          "version": "41.2",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-41.2-1/mock-core-configs-41.2-1.tar.gz"
         }
       }
     },
@@ -21782,6 +21782,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-backoff",
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/litl/backoff/archive/refs/tags/v2.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-bcrypt",
           "version": "3.2.0",
           "downloadUrl": "https://pypi.io/packages/source/b/bcrypt/bcrypt-3.2.0.tar.gz"
@@ -23813,8 +23823,8 @@
         "type": "other",
         "other": {
           "name": "python-pyroute2",
-          "version": "0.6.5",
-          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.6.5.tar.gz"
+          "version": "0.7.12",
+          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.7.12.tar.gz"
         }
       }
     },
@@ -24195,6 +24205,16 @@
           "name": "python-rpm-generators",
           "version": "10",
           "downloadUrl": "https://raw.githubusercontent.com/rpm-software-management/rpm/102eab50b3d0d6546dfe082eac0ade21e6b3dbf1/COPYING"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rpmautospec-core",
+          "version": "0.1.5",
+          "downloadUrl": "https://github.com/fedora-infra/rpmautospec-core/releases/download/0.1.5/rpmautospec_core-0.1.5.tar.gz"
         }
       }
     },
@@ -24593,8 +24613,8 @@
         "type": "other",
         "other": {
           "name": "python-templated-dictionary",
-          "version": "1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz"
+          "version": "1.4",
+          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.4-1.tar.gz"
         }
       }
     },
@@ -29136,8 +29156,8 @@
         "type": "other",
         "other": {
           "name": "usermode",
-          "version": "1.112",
-          "downloadUrl": "https://releases.pagure.org/usermode/usermode-1.112.autotoolized.tar.xz"
+          "version": "1.114",
+          "downloadUrl": "https://releases.pagure.org/usermode/usermode-1.114.tar.xz"
         }
       }
     },

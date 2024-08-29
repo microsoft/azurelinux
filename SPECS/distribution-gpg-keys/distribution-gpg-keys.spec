@@ -1,7 +1,9 @@
 Summary:	GPG keys of various Linux distributions
 Name:		distribution-gpg-keys
-Version:	1.104
+Version:	1.105
 Release:	1%{?dist}
+Vendor:     Microsoft Corporation
+Distribution: Azure Linux
 License:	CC0
 URL:		https://github.com/rpm-software-management/distribution-gpg-keys
 # Sources can be obtained by
@@ -45,6 +47,9 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/copr
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.105-1
+- Upgrade to 1.105.
+
 * Fri Aug 02 2024 Devin Anderson <danderson@microsoft.com> - 1.104-1
 - Update to 1.104, a more recent version that includes the Azure Linux keys.
 - Use the official repository URI to download sources.

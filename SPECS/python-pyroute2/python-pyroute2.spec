@@ -1,90 +1,60 @@
 %global srcname pyroute2
 
-Summary:        Pure Python netlink library
-Name:           python-%{srcname}
-Version:        0.6.5
-Release:        3%{?dist}
-License:        GPLv2+
-URL:            https://github.com/svinota/%{srcname}
-Source0:        https://pypi.io/packages/source/p/pyroute2/%{srcname}-%{version}.tar.gz
-Source1:        %{srcname}.core-%{version}.tar.gz
-Source2:        %{srcname}.nslink-%{version}.tar.gz
-Source3:        %{srcname}.nftables-%{version}.tar.gz
-Source4:        %{srcname}.ethtool-%{version}.tar.gz
-Source5:        %{srcname}.ipset-%{version}.tar.gz
-Source6:        %{srcname}.ipdb-%{version}.tar.gz
-Source7:        %{srcname}.ndb-%{version}.tar.gz
-BuildArch:      noarch
-
-%description
-PyRoute2 provides several levels of API to work with Netlink
-protocols, such as Generic Netlink, RTNL, TaskStats, NFNetlink,
+%global _description \
+PyRoute2 provides several levels of API to work with Netlink\
+protocols, such as Generic Netlink, RTNL, TaskStats, NFNetlink,\
 IPQ.
 
-%package -n python3-%{srcname}
-Summary:        %{summary}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
- 
-%description -n python3-%{srcname}
-PyRoute2 provides several levels of API to work with Netlink
-protocols, such as Generic Netlink, RTNL, TaskStats, NFNetlink,
-IPQ.
+Name: python-%{srcname}
+Version: 0.7.12
+Release: 1%{?dist}
+Vendor: Microsoft Corporation
+Distribution: Azure Linux
+Summary: Pure Python netlink library
+License: GPL-2.0-or-later OR Apache-2.0
+URL: https://github.com/svinota/%{srcname}
+
+BuildArch: noarch
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
+Source0: %{name}-%{version}.tar.gz
+
+%description %{_description}
+
+
+%package -n python%{python3_pkgversion}-%{srcname}
+Summary: %{summary}
+BuildRequires: python%{python3_pkgversion}-devel
+BuildRequires: python%{python3_pkgversion}-setuptools
+
+%description -n python%{python3_pkgversion}-%{srcname} %{_description}
 
 %prep
-%setup -q -n %{srcname}-%{version}
-cd ..
-tar xzvf %{SOURCE1}
-tar xzvf %{SOURCE2}
-tar xzvf %{SOURCE3}
-tar xzvf %{SOURCE4}
-tar xzvf %{SOURCE5}
-tar xzvf %{SOURCE6}
-tar xzvf %{SOURCE7}
+%autosetup -n %{srcname}-%{version}
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
-cd ../pyroute2.core-%{version}
-%py3_build
-cd ../pyroute2.nslink-%{version}
-%py3_build
-cd ../pyroute2.nftables-%{version}
-%py3_build
-cd ../pyroute2.ethtool-%{version}
-%py3_build
-cd ../pyroute2.ipset-%{version}
-%py3_build
-cd ../pyroute2.ipdb-%{version}
-%py3_build
-cd ../pyroute2.ndb-%{version}
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-cd ../pyroute2.core-%{version}
-%py3_install
-cd ../pyroute2.nslink-%{version}
-%py3_install
-cd ../pyroute2.nftables-%{version}
-%py3_install
-cd ../pyroute2.ethtool-%{version}
-%py3_install
-cd ../pyroute2.ipset-%{version}
-%py3_install
-cd ../pyroute2.ipdb-%{version}
-%py3_install
-cd ../pyroute2.ndb-%{version}
-%py3_install
+%pyproject_install
+%pyproject_save_files pyroute2
 
-%files -n python3-%{srcname}
+%files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %{_bindir}/ss2
 %{_bindir}/%{srcname}-cli
-%doc README* LICENSE.GPL.v2 LICENSE.Apache.v2
-%{python3_sitelib}/%{srcname}*
+%{_bindir}/%{srcname}-dhcp-client
+%{_bindir}/%{srcname}-test-platform
+%doc README*
+%license LICENSE.GPL-2.0-or-later LICENSE.Apache-2.0
 %{python3_sitelib}/pr2modules
 
-
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.7.12-1
+- Upgrading to 0.7.12.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.5-3
 - Fixing source URL.
 

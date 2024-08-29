@@ -1,34 +1,38 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# Add `--without gtk' option (enable gtk by default):
+# No GTK 2 in RHEL 10
+%if 0%{?azl} || 0%{?rhel} > 9
+%bcond_with gtk
+%else
+%bcond_without gtk
+%endif
+
 Summary: Tools for certain user account management tasks
 Name: usermode
-Version: 1.112
-Release: 12%{?dist}
-License: GPLv2+
-URL: https://pagure.io/usermode/
-Source: https://releases.pagure.org/usermode/usermode-%{version}.autotoolized.tar.xz
+Version: 1.114
+Release: 1%{?dist}
+Vendor:     Microsoft Corporation
+Distribution: Azure Linux
+License: GPL-2.0-or-later
+URL: https://pagure.io/%{name}/
+Source: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz
 Source1: config-util
-# Backport of c5a0bfd174e4a88fcd49fe7a130b37b6779c1a18
-# - inclusion of <sys/sysmacros.h> from <sys/types.h> is now deprecated
-Patch0: sysmacros.patch
-# Backport of da01d6325a1a9eb8154abb6a4590c610e8db8ec4
-# - bad FSF address fix
-Patch1: fsfaddr.patch
-# Backport of 48c4085004caad1ec928fa103b7f3e3fe684c826
-# - <selinux/flask.h> and <selinux/av_permissions.h> are now deprecated
-Patch2: selinux_deprecated.patch
 Requires: pam, passwd, util-linux
 # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/IJFYI5Q2BYZKIGDFS2WLOBDUSEGWHIKV/
+BuildRequires: make
 BuildRequires: gcc
-BuildRequires: perl(File::Find)
-BuildRequires: desktop-file-utils, gettext, glib2-devel, gtk2-devel, intltool
-BuildRequires: libblkid-devel, libSM-devel, libselinux-devel, libuser-devel
-BuildRequires: pam-devel, perl-XML-Parser, startup-notification-devel
+BuildRequires: gettext, glib2-devel, intltool
+%if %{with gtk}
+BuildRequires: desktop-file-utils, gtk2-devel, startup-notification-devel, libSM-devel
+%endif
+BuildRequires: libblkid-devel, libselinux-devel, libuser-devel
+BuildRequires: pam-devel, perl-XML-Parser
 BuildRequires: util-linux
 
+%if %{with gtk}
 %package gtk
 Summary: Graphical tools for certain user account management tasks
 Requires: %{name} = %{version}-%{release}
+%endif
 
 %global _hardened_build 1
 
@@ -37,6 +41,7 @@ The usermode package contains the userhelper program, which can be
 used to allow configured programs to be run with superuser privileges
 by ordinary users.
 
+%if %{with gtk}
 %description gtk
 The usermode-gtk package contains several graphical tools for users:
 userinfo, usermount and userpasswd.  Userinfo allows users to change
@@ -46,29 +51,30 @@ passwords.
 
 Install the usermode-gtk package if you would like to provide users with
 graphical tools for certain account management tasks.
+%endif
 
 %prep
 %setup -q
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
 
 %build
-%configure --with-selinux
+%configure --with-selinux --without-fexecve %{!?with_gtk:--without-gtk}
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+%make_install
 
+%if %{with gtk}
 # make userformat symlink to usermount
 ln -sf usermount $RPM_BUILD_ROOT%{_bindir}/userformat
 ln -s usermount.1 $RPM_BUILD_ROOT%{_mandir}/man1/userformat.1
+%endif
 
 mkdir -p $RPM_BUILD_ROOT/etc/security/console.apps
 install -p -m 644 %{SOURCE1} \
 	$RPM_BUILD_ROOT/etc/security/console.apps/config-util
 
+%if %{with gtk}
 for i in redhat-userinfo.desktop redhat-userpasswd.desktop \
 	redhat-usermount.desktop; do
 	echo 'NotShowIn=GNOME;KDE;' >>$RPM_BUILD_ROOT%{_datadir}/applications/$i
@@ -76,6 +82,7 @@ for i in redhat-userinfo.desktop redhat-userpasswd.desktop \
 		--dir $RPM_BUILD_ROOT%{_datadir}/applications \
 		$RPM_BUILD_ROOT%{_datadir}/applications/$i
 done
+%endif
 
 %find_lang %{name}
 
@@ -88,6 +95,7 @@ done
 %{_mandir}/man8/consolehelper.8*
 %config(noreplace) /etc/security/console.apps/config-util
 
+%if %{with gtk}
 %files gtk
 %{_bindir}/usermount
 %{_mandir}/man1/usermount.1*
@@ -104,8 +112,12 @@ done
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*
+%endif
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.114-1
+- Upgraded to 1.114 and sync'd with Fedora spec.
+
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.112-12
 - License verified.
 

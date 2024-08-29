@@ -1,54 +1,84 @@
-Summary:    Mock core config files basic chroots
+%if 0%{?el8}
+%global python3 /usr/libexec/platform-python
+%endif
+
 Name:       mock-core-configs
-Version:    36.4
+Version:    41.2
 Release:    1%{?dist}
-License:    GPLv2+
+Vendor:     Microsoft Corporation
+Distribution: Azure Linux
+Summary:    Mock core config files basic chroots
+
+License:    GPL-2.0-or-later
 URL:        https://github.com/rpm-software-management/mock/
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
 # cd mock/mock-core-configs
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
-Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-# distribution-gpg-keys contains GPG keys used by mock configs
-Requires:   distribution-gpg-keys >= 1.59
-# specify minimal compatible version of mock
-Requires:   mock >= 2.5
-Requires:   mock-filesystem
-Requires(post): coreutils
+Source:     https://github.com/rpm-software-management/mock/releases/download/%{name}-%{version}-1/%{name}-%{version}.tar.gz
+Source1:    azurelinux-3.0-x86_64.cfg
+Source2:    azurelinux-3.0-aarch64.cfg
+Source3:    azurelinux-3.0.tpl
+BuildArch:  noarch
+
 # The mock.rpm requires this.  Other packages may provide this if they tend to
 # replace the mock-core-configs.rpm functionality.
 Provides: mock-configs
-BuildArch:  noarch
+
+# distribution-gpg-keys contains GPG keys used by mock configs
+Requires:   distribution-gpg-keys >= 1.105
+
+%if ! 0%{?azl}
+# specify minimal compatible version of mock
+Requires:   mock >= 5.4.post1
+Requires:   mock-filesystem
+%endif
+
+Requires(post): coreutils
+# to detect correct default.cfg
+Requires(post): python3-dnf
+Requires(post): python3-hawkey
+Requires(post): system-release
+Requires(post): python3
+Requires(post): sed
 
 %description
-Config files which allow you to create chroots for:
- * Fedora
- * Epel
- * Mageia
- * Custom chroot
- * OpenSuse Tumbleweed and Leap
+Mock configuration files which allow you to create chroots for Alma Linux,
+Amazon Linux, Azure Linux, CentOS, CentOS Stream, Circle Linux, EuroLinux, Fedora,
+Fedora EPEL, Mageia, Navy Linux, OpenMandriva Lx, openSUSE, Oracle Linux,
+Red Hat Enterprise Linux, Rocky Linux and various other specific or combined
+chroots.
+
 
 %prep
-%setup -q -n mock-%{name}-%{version}-1/mock-core-configs
+%setup -q -n mock-%{name}-%{version}-1/%{name}
 
 
 %build
 
-%install
-mkdir -p %{buildroot}%{_sysusersdir}
 
+%install
 mkdir -p %{buildroot}%{_sysconfdir}/mock/eol/templates
 mkdir -p %{buildroot}%{_sysconfdir}/mock/templates
 cp -a etc/mock/*.cfg %{buildroot}%{_sysconfdir}/mock
 cp -a etc/mock/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/templates
+
+%if 0%{?azl}
+cp -a %{SOURCE1} %{SOURCE2} %{buildroot}/%{_sysconfdir}/mock
+cp -a %{SOURCE3} %{buildroot}/%{_sysconfdir}/mock/templates
+%endif
+
 cp -a etc/mock/eol/*cfg %{buildroot}%{_sysconfdir}/mock/eol
 cp -a etc/mock/eol/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/eol/templates
 
 # generate files section with config - there is many of them
 echo "%defattr(0644, root, mock)" > %{name}.cfgs
 find %{buildroot}%{_sysconfdir}/mock -name "*.cfg" -o -name '*.tpl' \
+    | grep -v chroot-aliases \
     | sed -e "s|^%{buildroot}|%%config(noreplace) |" >> %{name}.cfgs
+echo "%%config %{_sysconfdir}/mock/chroot-aliases.cfg" >> %{name}.cfgs
+
 # just for %%ghosting purposes
 ln -s fedora-rawhide-x86_64.cfg %{buildroot}%{_sysconfdir}/mock/default.cfg
 # bash-completion
@@ -62,15 +92,64 @@ fi
 # reference valid mock.rpm's docdir with example site-defaults.cfg
 mock_docs=%{_pkgdocdir}
 mock_docs=${mock_docs//mock-core-configs/mock}
-mock_docs=${mock_docs//-%{version}/-*}
+mock_docs=${mock_docs//-%version/-*}
 sed -i "s~@MOCK_DOCS@~$mock_docs~" %{buildroot}%{_sysconfdir}/mock/site-defaults.cfg
 
 %post
-if [ -s %{_sysconfdir}/os-release ]; then
-    ver=$(source %{_sysconfdir}/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
+if [ -s /etc/os-release ]; then
+    # fedora and rhel7+
+    if grep -Fiq Rawhide /etc/os-release; then
+        ver=rawhide
+    # mageia
+    elif [ -s /etc/mageia-release ]; then
+        if grep -Fiq Cauldron /etc/mageia-release; then
+           ver=cauldron
+        fi
+    else
+        ver=$(source /etc/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
+    fi
+else
+    # something obsure, use buildtime version
+    ver=%{?rhel}%{?fedora}%{?mageia}
 fi
-mock_arch=$(python -c "import rpmUtils.arch; baseArch = rpmUtils.arch.getBaseArch(); print baseArch")
-cfg=%{?fedora:fedora}%{?rhel:epel}%{?mageia:mageia}-$ver-${mock_arch}.cfg
+if [ -s /etc/mageia-release ]; then
+    mock_arch=$(sed -n '/^$/!{$ s/.* \(\w*\)$/\1/p}' /etc/mageia-release)
+else
+    mock_arch=$(%{python3} -c "import dnf.rpm; import hawkey; print(dnf.rpm.basearch(hawkey.detect_arch()))")
+fi
+
+cfg=unknown-distro
+%if 0%{?fedora}
+cfg=fedora-$ver-$mock_arch.cfg
+%endif
+%if 0%{?azl}
+cfg=azurelinux-3.0-$mock_arch.cfg
+%endif
+%if 0%{?rhel}
+# Being installed on RHEL, or a RHEL fork.  Detect it.
+distro_id=$(. /etc/os-release; echo $ID)
+case $distro_id in
+centos)
+  # This package is EL8+, and there's only CentOS Stream now.
+  distro_id=centos-stream
+  ;;
+almalinux)
+  # AlmaLinux configs look like 'alma+epel'
+  distro_id=alma
+  ;;
+esac
+cfg=$distro_id+epel-$ver-$mock_arch.cfg
+%endif
+
+%if 0%{?eln}
+# overrides rhel value which resolves in fedora+epel-rawhide-$mock_arch.cfg
+cfg=fedora-eln-$mock_arch.cfg
+%endif
+
+%if 0%{?mageia}
+cfg=mageia-$ver-$mock_arch.cfg
+%endif
+
 if [ -e %{_sysconfdir}/mock/$cfg ]; then
     if [ "$(readlink %{_sysconfdir}/mock/default.cfg)" != "$cfg" ]; then
         ln -s $cfg %{_sysconfdir}/mock/default.cfg 2>/dev/null || ln -s -f $cfg %{_sysconfdir}/mock/default.cfg.rpmnew
@@ -81,11 +160,16 @@ else
 fi
 :
 
+
 %files -f %{name}.cfgs
 %license COPYING
+%doc README
 %ghost %config(noreplace,missingok) %{_sysconfdir}/mock/default.cfg
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 41.2-1
+- Sync with Fedora 41 version of spec.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 36.4-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 36.4 source

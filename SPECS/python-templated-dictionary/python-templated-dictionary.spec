@@ -1,44 +1,63 @@
 %global srcname templated-dictionary
 %global python3_pkgversion 3
 
-Summary:        Dictionary with Jinja2 expansion
-Name:           python-%{srcname}
-Version:        1.1
-Release:        6%{?dist}
-License:        GPLv2+
-URL:            https://github.com/xsuchy/templated-dictionary
-Source0:        https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-Requires:       python%{python3_pkgversion}-jinja2
+%if 0%{?rhel} == 7
+%global python3_pkgversion 36
+%endif
+
+Name:       python-%{srcname}
+Version:    1.4
+Release:    5%{?dist}
+Vendor:     Microsoft Corporation
+Distribution: Azure Linux
+Summary:    Dictionary with Jinja2 expansion
+
+License:    GPL-2.0-or-later
+URL:        https://github.com/xsuchy/templated-dictionary
+
+# Source is created by:
+# git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
+# tito build --tgz --tag %%name-%%version-%%release
+Source0:    %name-%version.tar.gz
+
 BuildArch: noarch
+
+BuildRequires: python%{python3_pkgversion}-devel
+BuildRequires: python%{python3_pkgversion}-setuptools
+Requires:      python%{python3_pkgversion}-jinja2
 
 %global _description\
 Dictionary where __getitem__() is run through Jinja2 template.
 
 %description %_description
 
+
 %package -n python3-%{srcname}
 Summary: %{summary}
 %{?py_provides:%py_provides python3-%{srcname}}
-%description -n python3-%{srcname} %{_description}
+%description -n python3-%{srcname} %_description
+
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%setup -q
+
 
 %build
-version="%{version}" python3 setup.py build '--executable=%{_bindir}/python3 -s'
+version="%version" %py3_build
 
 %install
-version="%{version}" python3 setup.py install -O1 --skip-build --root %{buildroot}
+version=%version %py3_install
+
 
 %files -n python3-%{srcname}
-# %%license LICENSE
-# Annoyingly, the build produces templated_dictionary with an '_', 
-# not matching up with srcname which uses '-'
-%{python3_sitelib}/templated_dictionary*
+%license LICENSE
+%{python3_sitelib}/templated_dictionary-*.egg-info/
+%{python3_sitelib}/templated_dictionary/
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.4-1
+- Upgraded to 1.4 and sync'd with Fedora spec.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-6
 - Fixing source URL.
 

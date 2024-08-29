@@ -1,13 +1,13 @@
 %bcond_with tex_docs
 
 Name: libuser
-Version: 0.63
-Release: 10%{?dist}
+Version: 0.64
+Release: 1%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: https://pagure.io/libuser
-Source: https://releases.pagure.org/libuser/libuser-%{version}.tar.xz
+Source: https://releases.pagure.org/libuser/libuser-%{version}.tar.gz
 BuildRequires: glib2-devel
 %if %{with tex_docs}
 BuildRequires: linuxdoc-tools
@@ -36,9 +36,6 @@ BuildRequires: gtk-doc
 BuildRequires: audit-libs-devel
 
 Summary: A user and group account administration library
-
-Patch0: %{url}/pull-request/49.patch#/libuser-0.63-PR49_add_yescrypt.patch
-Patch1: libuser-0.63-downstream_test_xcrypt.patch
 
 %global __provides_exclude_from ^(%{_libdir}/%{name}|%{python3_sitearch})/.*$
 
@@ -149,6 +146,9 @@ export PYTHONPATH
 %endif
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.64-1
+- Upgraded to 0.64.
+
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.63-10
 - Disabling missing test dependency.
 - License verified.
