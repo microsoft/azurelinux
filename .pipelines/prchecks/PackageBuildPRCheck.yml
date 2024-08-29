@@ -2,9 +2,7 @@
 # Licensed under the MIT License.
 
 # Since we're boosting our builds by using a private, pre-compiled raw toolchain
-# the pipeline requires defining the following variables outside of the YAML:
-# - rawToolchainCacheURL_AMD64
-# - rawToolchainCacheURL_ARM64
+# the pipeline requires defining the 'rawToolchainCache*' variables outside of the YAML.
 
 trigger: none
 
@@ -16,12 +14,12 @@ parameters:
         agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         maxCPUs: "$(($(nproc) / 2))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64_3.0)"
-        rawToolchainExpectedHash: "eb66904a6c3c935a03af9a546821b03a3308173232a5b6c450eea524aeb93bf1"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64_3.0)"
       - name: "ARM64"
         agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_3.0)"
-        rawToolchainExpectedHash: "78949ceaa5a88c8f4adfcb34f1041a419d97e1ffbb8da6362dd90a6b851b5869"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_3.0)"
   - name: debug
     type: boolean
     default: false
