@@ -1,6 +1,6 @@
 Name:		perl-Algorithm-C3
-Version:	0.10
-Release:	19%{?dist}
+Version:	0.11
+Release:	1%{?dist}
 Summary:	Module for merging hierarchies using the C3 algorithm
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -51,9 +51,10 @@ make test
 %{_mandir}/man3/Algorithm::C3.3*
 
 %changelog
-* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-19
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.11-1
 - Promote package to Core repository.
 - License verified.
+- Upgrade to v0.11
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
