@@ -4,7 +4,7 @@ Release:        38%{?dist}
 Summary:        Obtain the REFCNT value of a referent
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Devel-Refcount
-Source0:        http://www.cpan.org/modules/by-module/Devel/Devel-Refcount-%{version}.tar.gz
+Source0:        https://www.cpan.org/modules/by-module/Devel/Devel-Refcount-%{version}.tar.gz
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils

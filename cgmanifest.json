@@ -16894,7 +16894,7 @@
         "other": {
           "name": "perl-Devel-Refcount",
           "version": "0.10",
-          "downloadUrl": "http://www.cpan.org/modules/by-module/Devel/Devel-Refcount-0.10.tar.gz"
+          "downloadUrl": "https://www.cpan.org/modules/by-module/Devel/Devel-Refcount-0.10.tar.gz"
         }
       }
     },
