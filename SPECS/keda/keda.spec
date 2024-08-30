@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.4.0
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Fri Aug 30 2024 Sindhu Karri <lakarri@microsoft.com> - 2.4.0-22
+- Fix CVE-2022-32149 with a patch
+
 * Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.4.0-21
 - Drop requirement on a specific version of golang
 
