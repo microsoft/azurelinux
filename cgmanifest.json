@@ -10761,8 +10761,8 @@
         "type": "other",
         "other": {
           "name": "libsafec",
-          "version": "3.7.1",
-          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.7.1/safeclib-3.7.1.tar.xz"
+          "version": "3.8.1",
+          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.8.1/safeclib-3.8.1.tar.xz"
         }
       }
     },
