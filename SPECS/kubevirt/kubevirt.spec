@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-7%{?dist}
+BuildRequires:  glibc-static >= 2.38-8%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -269,6 +269,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.2.0-6
+- Update to build dep latest glibc-static version
+
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.2.0-5
 - Bump to rebuild with updated glibc
 
@@ -320,10 +323,10 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 - Bump release to rebuild with go 1.19.10
 
 * Fri May 12 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
-- Patch 0.59.0 with Operator Nexus patches 
+- Patch 0.59.0 with Operator Nexus patches
 
 * Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-1
-- Upgrade to v0.59.0 
+- Upgrade to v0.59.0
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-7
 - Bump release to rebuild with go 1.19.8

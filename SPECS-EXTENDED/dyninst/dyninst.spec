@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 17%{?dist}
+Release: 18%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://www.dyninst.org
@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.38-7%{?dist}
+BuildRequires: glibc-static >= 2.38-8%{?dist}
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -194,6 +194,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 10.1.0-18
+- Update to build dep latest glibc-static version
+
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 10.1.0-17
 - Bump to rebuild with updated glibc
 
@@ -236,7 +239,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Fri Nov 15 2019 Stan Cox <scox@redhat.com> - 10.1.0-4
-- Fix rhbz963475 dyninst must be ported to aarch64 
+- Fix rhbz963475 dyninst must be ported to aarch64
 
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild

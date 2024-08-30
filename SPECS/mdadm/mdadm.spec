@@ -2,7 +2,7 @@
 
 Name:        mdadm
 Version:     4.2
-Release:     5%{?dist}
+Release:     6%{?dist}
 Summary:     The mdadm program controls Linux md devices (software RAID arrays)
 URL:         http://www.kernel.org/pub/linux/utils/raid/mdadm/
 License:     GPLv2+
@@ -145,10 +145,10 @@ Patch198:    mdadm-2.5.2-static.patch
 Patch199:    disable-Werror.patch
 
 BuildRequires: make
-BuildRequires: glibc-static >= 2.38-7%{?dist}
-BuildRequires: systemd-rpm-macros 
-BuildRequires: binutils-devel 
-BuildRequires: gcc 
+BuildRequires: glibc-static >= 2.38-8%{?dist}
+BuildRequires: systemd-rpm-macros
+BuildRequires: binutils-devel
+BuildRequires: gcc
 BuildRequires: systemd-devel
 %if %{with libreport}
 Requires:       libreport-filesystem
@@ -157,7 +157,7 @@ Requires(post): systemd coreutils
 Requires(preun): systemd
 Requires(postun): systemd coreutils
 
-%description 
+%description
 The mdadm program is used to create, manage, and monitor Linux MD (software
 RAID) devices.  As such, it provides similar functionality to the raidtools
 package.  However, mdadm is a single program, and it can perform
@@ -219,6 +219,9 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 %{_datadir}/mdadm/mdcheck
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 4.2-6
+- Update to build dep latest glibc-static version
+
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 4.2-5
 - Bump to rebuild with updated glibc
 
@@ -326,7 +329,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
 * Thu Jan 12 2017 Xiao Ni <xni@redhat.com> - 4.0-1
-- Upgrade to mdadm-4.0 
+- Upgrade to mdadm-4.0
 - Resolves bz1411555
 
 * Mon Aug 15 2016 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.4-3
@@ -423,7 +426,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 
 * Wed Oct 9 2013 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.3-3
 - Check for DM_UDEV_DISABLE_OTHER_RULES_FLAG instead of
-  DM_UDEV_DISABLE_DISK_RULES_FLAG in 65-md-incremental.rules 
+  DM_UDEV_DISABLE_DISK_RULES_FLAG in 65-md-incremental.rules
 - Resolves bz1015521
 
 * Tue Oct 8 2013 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.3-2
@@ -444,7 +447,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 
 * Wed Apr 24 2013 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.2.6-19
 - Fix problem where  rebuild of IMSM RAID5 volume started in OROM,
-  does not proceed in OS 
+  does not proceed in OS
 - Resolves bz956021 (f18), bz956026 (f17), bz956031 (f19)
 
 * Tue Apr 23 2013 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.2.6-18
@@ -557,7 +560,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 
 * Wed Jul 18 2012 Karsten Hopp <karsten@redhat.com> 3.2.5-5
 - include <linux/types.h> in some to avoid type clashes.
-  same problem as rhbz #840902  
+  same problem as rhbz #840902
 
 * Mon Jul 16 2012 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.2.5-4
 - Move /etc/tmpfiles.d/mdadm.conf to /lib/tmpfiles.d/ to comply with
@@ -632,7 +635,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 * Thu Feb 16 2012 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.2.3-5
 - Fix issue with devices failing to be added to a raid using bitmaps,
   due to trying to write the bitmap with mis-aligned buffers using
-  O_DIRECT 
+  O_DIRECT
 - Resolves: bz789898 (f16) bz791189 (f15)
 
 * Mon Jan 30 2012 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.2.3-4
@@ -932,7 +935,7 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 - Modify mdadm to put its mapfile in /dev/md instead of /var/run/mdadm
   since at startup /var/run/mdadm is read-only by default and this
   breaks incremental assembly
-- Change how mdadm decides to assemble incremental devices using their 
+- Change how mdadm decides to assemble incremental devices using their
   preferred name or a random name to avoid possible conflicts when plugging
   a foreign array into a host
 
