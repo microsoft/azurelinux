@@ -35,7 +35,7 @@ Requires: python3-configobj
 Requires: python3-dbus 
 Requires: python3-decorator
 Requires: python3-linux-procfs
-Requires: python3-perf-rt
+Requires: (python3-perf or python3-perf-rt)
 Requires: python3-gobject
 Requires: python3-pyudev
 Requires: python3-schedutils
@@ -429,7 +429,7 @@ fi
 
 %changelog
 * Fri Aug 30 2024 Harshit gupta <guptaharshit@microsoft.com> 2.21.0-2
-- Change dependency on python3-perf to python3-perf-rt
+- Require either python3-perf or python3-perf-rt dependency.
 
 * Tue Jan 16 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 2.21.0-1
 - Upgrade package version to 2.21.0
