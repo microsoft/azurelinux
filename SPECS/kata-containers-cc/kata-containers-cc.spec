@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl2
+Version:      3.2.0.azl5
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
@@ -141,6 +141,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Aug 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl5-1
+- Auto-upgrade to 3.2.0.azl5
+
 * Wed May 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-1
 - Auto-upgrade to 3.2.0.azl2
 - Update cloud-hypervisor-snp symlink to also point to /usr/bin/cloud-hypervisor
