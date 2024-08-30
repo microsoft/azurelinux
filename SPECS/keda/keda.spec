@@ -31,6 +31,7 @@ Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2022-21698.patch
 Patch1:         CVE-2023-44487.patch
 Patch2:         CVE-2021-44716.patch
+Patch3:         CVE-2022-32149.patch
 
 BuildRequires:  golang
 
