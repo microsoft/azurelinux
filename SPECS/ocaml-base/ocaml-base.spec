@@ -6,7 +6,7 @@
 Summary:        Jane Street standard library for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.16.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,9 +22,7 @@ BuildRequires:  ocaml-sexplib0-devel >= 0.16
 
 %if %{with_check}
 BuildRequires:  ocaml-num-devel
-BuildRequires:  ocaml-ppx-jane-devel
 BuildRequires:  ocaml-sexplib-devel
-BuildRequires:  ocaml-stdio-devel
 BuildRequires:  ocaml-uutf-devel
 %endif
 
@@ -66,6 +64,9 @@ developing applications that use %{name}.
 %files devel -f .ofiles-devel
 
 %changelog
+* Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 0.16.3-2
+- Remove unneeded test dependencies
+
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.3-1
 - Converted spec file to match with Fedora 41.
 - Upgrade to 0.16.3
