@@ -5,7 +5,6 @@ package osmodifierlib
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
@@ -31,16 +30,13 @@ func modifyDefaultGrub() error {
 		return fmt.Errorf("failed to prepare grub config files for verity:\n%w", err)
 	}
 
-	// Merge existing grub cmdline values with new values
-	updatedCmdline, err := bootCustomizer.UpdateCmdlineValues(values)
-	if err != nil {
-		return err
-	}
+	old := []string{"rd.overlayfs", "selinux", "enforcing", "rd.systemd.verity", "roothash",
+		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}
 
 	// Stamp verity, selinux and overlayfs values to /etc/default/grub
-	err = bootCustomizer.ApplyChangesToGrub("GRUB_CMDLINE_LINUX", updatedCmdline)
+	err = bootCustomizer.UpdateKernelCommandLineArgs("GRUB_CMDLINE_LINUX", old, values)
 	if err != nil {
-		return fmt.Errorf("error applying verity changes to default grub:\n%w", err)
+		return err
 	}
 
 	err = bootCustomizer.WriteToFile(dummyChroot)
@@ -53,33 +49,33 @@ func modifyDefaultGrub() error {
 	return nil
 }
 
-func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) (string, string, error) {
+func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]string, string, error) {
 	grubCfgContent, err := imagecustomizerlib.ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
-		return "", "", err
+		return nil, "", err
 	}
 
 	line, err := imagecustomizerlib.FindLinuxLine(grubCfgContent)
 	if err != nil {
-		return "", "", err
+		return nil, "", err
 	}
 
 	argTokens, err := imagecustomizerlib.ParseCommandLineArgs(line.Tokens)
 	if err != nil {
-		return "", "", err
+		return nil, "", err
 	}
 
 	var values []string
 	var rootValue string
 	for _, arg := range argTokens {
-		if strings.Contains(arg.Name, "overlayfs") ||
-			strings.Contains(arg.Name, "verity") ||
-			strings.Contains(arg.Name, "roothash") ||
-			strings.Contains(arg.Name, "verity_root_data") ||
-			strings.Contains(arg.Name, "verity_root_hash") ||
-			strings.Contains(arg.Name, "verity_root_options") ||
-			strings.Contains(arg.Name, "selinux") ||
-			strings.Contains(arg.Name, "enforcing") {
+		if arg.Name == "rd.overlayfs" ||
+			arg.Name == "roothash" ||
+			arg.Name == "rd.systemd.verity" ||
+			arg.Name == "systemd.verity_root_data" ||
+			arg.Name == "systemd.verity_root_hash" ||
+			arg.Name == "systemd.verity_root_options" ||
+			arg.Name == "selinux" ||
+			arg.Name == "enforcing" {
 			if arg.Value != "" {
 				values = append(values, arg.Name+"="+arg.Value)
 			}
@@ -90,5 +86,5 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) (string
 		}
 	}
 
-	return imagecustomizerlib.GrubArgsToString(values), rootValue, nil
+	return values, rootValue, nil
 }

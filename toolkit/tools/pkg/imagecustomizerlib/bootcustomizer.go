@@ -194,7 +194,6 @@ func (b *BootCustomizer) PrepareForVerity(rootDeviceValue string) error {
 func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
-		fmt.Println("heheheheheheheh", b.defaultGrubFileContent)
 		err := WriteDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
@@ -213,54 +212,4 @@ func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) err
 	}
 
 	return nil
-}
-
-func (b *BootCustomizer) ApplyChangesToGrub(varName string, newValue string) error {
-	defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, varName, newValue)
-	if err != nil {
-		return fmt.Errorf("failed to update verity variables %s: %w", newValue, err)
-	}
-
-	b.defaultGrubFileContent = defaultGrubFileContent
-	return nil
-}
-
-func (b *BootCustomizer) UpdateCmdlineValues(newValues string) (string, error) {
-
-	_, existingCmdlineArgs, _, err := GetDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, "GRUB_CMDLINE_LINUX")
-	if err != nil {
-		return "", err
-	}
-
-	// Convert existing arguments to a map
-	existingArgsMap := make(map[string]string)
-	for _, arg := range existingCmdlineArgs {
-		existingArgsMap[arg.Name] = arg.Value
-	}
-
-	// Parse the newValues string into key-value pairs.
-	newPairs := strings.Split(newValues, ",")
-	for _, pair := range newPairs {
-		pair = strings.TrimSpace(pair)
-		kvParts := strings.SplitN(pair, "=", 2)
-		if len(kvParts) == 2 {
-			// Update or add the argument in the map.
-			existingArgsMap[kvParts[0]] = kvParts[1]
-		} else {
-			// If there's no "=", it's just a flag (boolean argument).
-			existingArgsMap[kvParts[0]] = ""
-		}
-	}
-
-	// Convert the map back to a single string.
-	var updatedCmdlineArgs []string
-	for name, value := range existingArgsMap {
-		if value != "" {
-			updatedCmdlineArgs = append(updatedCmdlineArgs, name+"="+value)
-		} else {
-			updatedCmdlineArgs = append(updatedCmdlineArgs, name)
-		}
-	}
-
-	return GrubArgsToString(updatedCmdlineArgs), nil
 }

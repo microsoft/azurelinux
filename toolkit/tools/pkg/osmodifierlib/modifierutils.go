@@ -16,7 +16,6 @@ import (
 
 func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 	var dummyChroot safechroot.ChrootInterface = &safechroot.DummyChroot{}
-	var bootCustomizer *imagecustomizerlib.BootCustomizer
 
 	err := imagecustomizerlib.AddOrUpdateUsers(osConfig.Users, baseConfigPath, dummyChroot)
 	if err != nil {
@@ -46,11 +45,9 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 	}
 
 	if osConfig.SELinux.Mode != "" {
-		if bootCustomizer == nil {
-			bootCustomizer, err = imagecustomizerlib.NewBootCustomizer(dummyChroot)
-			if err != nil {
-				return err
-			}
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
 		}
 
 		err = handleSELinux(osConfig.SELinux.Mode, bootCustomizer, dummyChroot)
