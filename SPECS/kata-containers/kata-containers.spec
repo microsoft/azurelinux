@@ -86,8 +86,8 @@ popd
 %{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
 %{tools_pkg}/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
 
-%dir %{tools_pkg}/tools/osbuilder/initrd-builder
-%{tools_pkg}/tools/osbuilder/initrd-builder/initrd_builder.sh
+%dir %{tools_pkg}/tools/osbuilder/image-builder
+%{tools_pkg}/tools/osbuilder/image-builder/image_builder.sh
 
 %dir %{tools_pkg}/tools/osbuilder/node-builder
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux
