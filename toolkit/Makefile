@@ -256,7 +256,7 @@ include $(SCRIPTS_DIR)/repoquerywrapper.mk
 include $(SCRIPTS_DIR)/pkggen.mk
 
 # Create images with:
-#   image, iso, clean-imggen
+#   image, iso, clean-imagegen
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:
