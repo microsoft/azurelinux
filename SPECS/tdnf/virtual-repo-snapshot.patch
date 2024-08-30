@@ -1,7 +1,7 @@
 From bed541b7ceafaf75f67911ef64e231569b8eec84 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
-Subject: [PATCH] Add virtual repo snapshot feature to tdnf
+Subject: [PATCH 1/2] Add virtual repo snapshot feature to tdnf
 
 ---
  client/config.c                            |   5 +
@@ -1127,6 +1127,215 @@ index 0558611..18c84fc 100644
      {"skipobsoletes", no_argument, 0, 0},                  //--skipobsoletes to skip obsolete problems
      {"skipsignature", no_argument, 0, 0},                  //--skipsignature to skip verifying RPM signatures
 +    {"snapshottime",required_argument, 0, 0},              //--snapshottime
+     {"source",        no_argument, &_opt.nSource, 1},
+     {"testonly",      no_argument, &_opt.nTestOnly, 1},
+     {"verbose",       no_argument, &_opt.nVerbose, 1},     //-v --verbose
+-- 
+2.34.1
+
+
+From 729e3374fbd2dd54c2124eb8e16664cddf5ac2ba Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Wed, 28 Aug 2024 16:26:12 -0700
+Subject: [PATCH 2/2] Add snapshotexclude feature to remove a specific repo
+ from the snapshot
+
+---
+ client/prototypes.h                        |  6 +++
+ client/repo.c                              |  2 +-
+ client/repolist.c                          | 54 ++++++++++++++++++++++
+ etc/bash_completion.d/tdnf-completion.bash |  7 ++-
+ include/tdnftypes.h                        |  1 +
+ tools/cli/lib/help.c                       |  3 +-
+ tools/cli/lib/parseargs.c                  |  3 +-
+ 7 files changed, 72 insertions(+), 4 deletions(-)
+
+diff --git a/client/prototypes.h b/client/prototypes.h
+index cb8a8d3..ddac483 100644
+--- a/client/prototypes.h
++++ b/client/prototypes.h
+@@ -771,6 +771,12 @@ TDNFAlterRepoState(
+     const char* pszId
+     );
+ 
++uint32_t
++TDNFExcludeFromSnapshot(
++    PTDNF_REPO_DATA pRepos,
++    const char* pszId
++    );
++
+ uint32_t
+ TDNFCloneRepo(
+     PTDNF_REPO_DATA pRepoIn,
+diff --git a/client/repo.c b/client/repo.c
+index 0331796..c675821 100644
+--- a/client/repo.c
++++ b/client/repo.c
+@@ -99,7 +99,7 @@ TDNFInitRepo(
+     pRepo->appdata = pSolvRepoInfo;
+ 
+     if (pRepoData->nHasMetaData) {
+-        if (pszSnapshotTime != NULL) {
++        if (!pRepoData->nExcludeSnapshot && pszSnapshotTime != NULL) {
+             dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD, pszSnapshotTime);
+             BAIL_ON_TDNF_ERROR(dwError);
+         } else {
+diff --git a/client/repolist.c b/client/repolist.c
+index df37959..40146de 100644
+--- a/client/repolist.c
++++ b/client/repolist.c
+@@ -358,6 +358,7 @@ TDNFCreateRepo(
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     pRepo->nEnabled = TDNF_REPO_DEFAULT_ENABLED;
++    pRepo->nExcludeSnapshot = 0;
+     pRepo->nHasMetaData = 1;
+     pRepo->nSkipIfUnavailable = TDNF_REPO_DEFAULT_SKIP;
+     pRepo->nGPGCheck = TDNF_REPO_DEFAULT_GPGCHECK;
+@@ -695,6 +696,12 @@ TDNFRepoListFinalize(
+                           1,
+                           pSetOpt->pszOptValue);
+         }
++        else if (strcmp(pSetOpt->pszOptName, "excludesnapshot") == 0)
++        {
++            dwError = TDNFExcludeFromSnapshot(
++                pTdnf->pRepos,
++                pSetOpt->pszOptValue);
++        }
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+@@ -787,6 +794,53 @@ error:
+     goto cleanup;
+ }
+ 
++uint32_t
++TDNFExcludeFromSnapshot(
++    PTDNF_REPO_DATA pRepos,
++    const char* pszId
++    )
++{
++    uint32_t dwError = 0;
++    int nIsGlob = 0;
++    if(!pRepos && IsNullOrEmptyString(pszId))
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    nIsGlob = TDNFIsGlob(pszId);
++
++    for (int nMatch = 0; pRepos; pRepos = pRepos->pNext)
++    {
++        if(nIsGlob)
++        {
++            if(!fnmatch(pszId, pRepos->pszId, 0))
++            {
++                nMatch = 1;
++            }
++        }
++        else if(!strcmp(pRepos->pszId, pszId))
++        {
++            nMatch = 1;
++        }
++
++        if(nMatch)
++        {
++            pRepos->nExcludeSnapshot = 1;
++            if(!nIsGlob)
++            {
++                break;
++            }
++        }
++    }
++
++cleanup:
++    return dwError;
++
++error:
++    goto cleanup;
++}
++
+ uint32_t
+ TDNFCloneRepo(
+     PTDNF_REPO_DATA pRepoIn,
+diff --git a/etc/bash_completion.d/tdnf-completion.bash b/etc/bash_completion.d/tdnf-completion.bash
+index 3f310d4..f3fa829 100644
+--- a/etc/bash_completion.d/tdnf-completion.bash
++++ b/etc/bash_completion.d/tdnf-completion.bash
+@@ -26,6 +26,11 @@ _tdnf__process_if_prev_is_option()
+             COMPREPLY=( $(compgen -W "$opts" -- $cur) )
+             return 0
+             ;;
++        --excludesnapshot)
++            opts=`tdnf repolist enabled | awk '{if (NR > 1) print $1}'`
++            COMPREPLY=( $(compgen -W "$opts" -- $cur) )
++            return 0
++            ;;
+         --installroot)
+             COMPREPLY=( $(compgen -d -- $cur) )
+             return 0
+@@ -92,7 +97,7 @@ _tdnf()
+ {
+     local c=0 cur __opts __cmds
+     COMPREPLY=()
+-    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --snapshottime --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
++    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --exclude --excludesnapshot --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --snapshottime --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
+     __cmds="autoerase autoremove check check-local check-update clean distro-sync downgrade erase help history info install list makecache mark provides whatprovides reinstall remove repolist repoquery reposync search update update-to updateinfo upgrade upgrade-to"
+     cur="${COMP_WORDS[COMP_CWORD]}"
+     _tdnf__process_if_prev_is_option && return 0
+diff --git a/include/tdnftypes.h b/include/tdnftypes.h
+index f371430..b95c81f 100644
+--- a/include/tdnftypes.h
++++ b/include/tdnftypes.h
+@@ -276,6 +276,7 @@ typedef struct _TDNF_CONF
+ typedef struct _TDNF_REPO_DATA
+ {
+     int nEnabled;
++    int nExcludeSnapshot;
+     int nSkipIfUnavailable;
+     int nGPGCheck;
+     int nHasMetaData;
+diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
+index 86c34e7..4097203 100644
+--- a/tools/cli/lib/help.c
++++ b/tools/cli/lib/help.c
+@@ -23,8 +23,8 @@ static const char *help_msg =
+  "           [--downloadonly]\n"
+  "           [--enablerepo=<repoid>]\n"
+  "           [--enableplugin=<plugin_name>]\n"
+- "           [--snapshottime=<POSIX_time>]\n"
+  "           [--exclude [file1,file2,...]]\n"
++ "           [--excludesnapshot=<repoid>]\n"
+  "           [--installroot [path]]\n"
+  "           [--noautoremove]\n"
+  "           [--nogpgcheck]\n"
+@@ -45,6 +45,7 @@ static const char *help_msg =
+  "           [--skipdigest]\n"
+  "           [--skipsignature]\n"
+  "           [--skipobsoletes]\n"
++ "           [--snapshottime=<POSIX_time>]\n"
+  "           [--testonly]\n"
+  "           [--version]\n\n"
+  "repoquery select options:\n"
+diff --git a/tools/cli/lib/parseargs.c b/tools/cli/lib/parseargs.c
+index 18c84fc..0aec4b7 100644
+--- a/tools/cli/lib/parseargs.c
++++ b/tools/cli/lib/parseargs.c
+@@ -45,6 +45,7 @@ static struct option pstOptions[] =
+     {"enableplugin",  required_argument, 0, 0},            //--enableplugin
+     {"enablerepo",    required_argument, 0, 0},            //--enablerepo
+     {"exclude",       required_argument, 0, 0},            //--exclude
++    {"excludesnapshot", required_argument, 0, 0},          //--excludesnapshot
+     {"help",          no_argument, 0, 'h'},                //-h --help
+     {"installroot",   required_argument, 0, 'i'},          //--installroot
+     {"json",          no_argument, &_opt.nJsonOutput, 1},
+@@ -70,7 +71,7 @@ static struct option pstOptions[] =
+     {"skipdigest",    no_argument, 0, 0},                  //--skipdigest to skip verifying RPM digest
+     {"skipobsoletes", no_argument, 0, 0},                  //--skipobsoletes to skip obsolete problems
+     {"skipsignature", no_argument, 0, 0},                  //--skipsignature to skip verifying RPM signatures
+-    {"snapshottime",required_argument, 0, 0},              //--snapshottime
++    {"snapshottime",  required_argument, 0, 0},            //--snapshottime
      {"source",        no_argument, &_opt.nSource, 1},
      {"testonly",      no_argument, &_opt.nTestOnly, 1},
      {"verbose",       no_argument, &_opt.nVerbose, 1},     //-v --verbose
