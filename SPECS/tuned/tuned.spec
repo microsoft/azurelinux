@@ -7,7 +7,7 @@
 Summary:      A dynamic adaptive system tuning daemon
 Name:         tuned
 Version:      2.21.0
-Release:      1%{?dist}
+Release:      2%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,7 +35,7 @@ Requires: python3-configobj
 Requires: python3-dbus 
 Requires: python3-decorator
 Requires: python3-linux-procfs
-Requires: python3-perf
+Requires: (python3-perf or python3-perf-rt)
 Requires: python3-gobject
 Requires: python3-pyudev
 Requires: python3-schedutils
@@ -428,6 +428,9 @@ fi
 %{_mandir}/man7/tuned-profiles-openshift.7*
 
 %changelog
+* Fri Aug 30 2024 Harshit gupta <guptaharshit@microsoft.com> 2.21.0-2
+- Require either python3-perf or python3-perf-rt dependency.
+
 * Tue Jan 16 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 2.21.0-1
 - Upgrade package version to 2.21.0
 - Modifying SPEC file to reflect upstream changes (https://github.com/redhat-performance/tuned/blob/v2.21.0/tuned.spec)
