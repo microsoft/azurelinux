@@ -236,7 +236,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
-%{buildroot}/virt_launcher.cil
+/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
