@@ -1,0 +1,197 @@
+diff -ruN 90livenet-ori/fetch-liveupdate.sh 90livenet/fetch-liveupdate.sh
+--- 90livenet-ori/fetch-liveupdate.sh	2024-08-30 16:47:12.975964141 -0700
++++ 90livenet/fetch-liveupdate.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -3,6 +3,8 @@
+ # this gets called by the "initqueue/online" hook for each network interface
+ # that comes online.
+ 
++echo "---- debug ---- fetch-liveupdate.sh [kmsg] ----" > /dev/kmsg
++
+ # no updates requested? we're not needed.
+ [ -e /tmp/liveupdates.info ] || return 0
+ 
+diff -ruN 90livenet-ori/livenet-generator.sh 90livenet/livenet-generator.sh
+--- 90livenet-ori/livenet-generator.sh	2024-08-30 16:47:12.983964150 -0700
++++ 90livenet/livenet-generator.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -1,5 +1,7 @@
+ #!/bin/bash
+ 
++echo "---- debug ---- livenet-generator.sh [kmsg] ----" > /dev/kmsg
++
+ type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
+ 
+ [ -z "$root" ] && root=$(getarg root=)
+diff -ruN 90livenet-ori/livenetroot.sh 90livenet/livenetroot.sh
+--- 90livenet-ori/livenetroot.sh	2024-08-30 16:47:12.979964145 -0700
++++ 90livenet/livenetroot.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -1,6 +1,8 @@
+ #!/bin/sh
+ # livenetroot - fetch a live image from the network and run it
+ 
++echo "---- debug ---- livenetroot.sh [kmsg] ----" > /dev/kmsg
++
+ type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
+ 
+ . /lib/url-lib.sh
+diff -ruN 90livenet-ori/liveos-artifacts-download.service 90livenet/liveos-artifacts-download.service
+--- 90livenet-ori/liveos-artifacts-download.service	1969-12-31 16:00:00.000000000 -0800
++++ 90livenet/liveos-artifacts-download.service	2024-08-30 16:57:12.012486264 -0700
+@@ -0,0 +1,11 @@
++[Unit]
++Description=LiveOS Artifacts Download Daemon
++After=network-online.target
++Wants=network-online.target
++
++[Service]
++ExecStart=/sbin/liveos-artifacts-download
++Type=oneshot
++
++[Install]
++WantedBy=multi-user.target
+diff -ruN 90livenet-ori/liveos-artifacts-download.sh 90livenet/liveos-artifacts-download.sh
+--- 90livenet-ori/liveos-artifacts-download.sh	1969-12-31 16:00:00.000000000 -0800
++++ 90livenet/liveos-artifacts-download.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -0,0 +1,89 @@
++#!/bin/bash
++
++# set -x
++
++echo "---- debug ---- liveos-artifacts-download.sh [kmsg] ----" > /dev/kmsg
++
++echo "executing liveos-artifacts-download.sh - v0.1" > /dev/kmsg
++
++. /usr/lib/dracut-lib.sh
++root=$(getarg root -d "")
++
++downloadedArtifactsDirs=/run/initramfs/downloaded-artifacts
++
++set -e
++
++function isSupportedProtocol() {
++    local kernelParamValue=$1
++
++    case "$kernelParamValue" in
++        live:http://* | http://*)
++            # remove `live:` if it exists
++            urlValue="${kernelParamValue#live:}"
++            ;;
++    esac
++
++    echo $urlValue
++}
++
++function downloadArtifact () {
++    local paramValueNoLive=$1
++
++    IFS=';'
++    read -ra valueParts <<< "$paramValueNoLive"
++    IFS=$' \t\n'
++
++    sourceUrl=${valueParts[0]}
++    targetDir=
++    targetPath=
++    arrayLength=${#valueParts[@]}
++    if (( arrayLength > 1 )); then
++        targetPath=${valueParts[1]}
++    else
++        targetPath=$downloadedArtifactsDirs/${sourceUrl##*/}
++    fi
++    targetDir="${targetPath%/*}"
++
++    mkdir -p $targetDir
++    httpRetCode=$(curl $sourceUrl -o $targetPath -w "%{http_code}\n")
++    # echo "curl returned ($httpRetCode)" > /dev/kmsg
++    if [ $httpRetCode -ne 200 ]; then
++        echo "error: failed to download $sourceUrl" > /dev/kmsg
++        exit 0
++    fi
++
++    echo $targetPath
++}
++
++# download
++echo "---- debug ---- liveos-artifacts-download.sh = downloading ----" > /dev/kmsg
++
++isoUrl=$(isSupportedProtocol "$root")
++if [[ -z "$isoUrl" ]]; then
++    # this is not a live iso url, there is nothing for us to do.
++    echo "root is set to a non-live iso url ($root)" > /dev/kmsg
++    exit 0
++fi
++localIsoPath=$(downloadArtifact "$isoUrl")
++if [[ "$localIsoPath" == "error:"* ]]; then
++    echo "failed to download ($isoUrl)" > /dev/kmsg
++    exit 1
++fi
++
++echo "---- debug ---- localIsoPath   : $localIsoPath" > /dev/kmsg
++echo "---- debug ---- launching dmsquash-live-root" > /dev/kmsg
++
++# create a loopback device and prepare rootfs
++rootDevice=$(losetup -f --show $localIsoPath)
++
++echo "---- debug ---- liveos-artifacts-download.sh launching /usr/sbin/dmsquash-live-root ----" > /dev/kmsg
++
++# see: c:\temp\dracut\modules.d\98dracut-systemd\dracut-cmdline.sh
++# if ! root="$(getarg root=)"; then
++#     root_unset='UNSET'
++# fi
++# rflags="$(getarg rootflags=)"
++# fstype="$(getarg rootfstype=)"
++export fstype="auto"
++export DRACUT_SYSTEMD=1
++/usr/sbin/dmsquash-live-root $rootDevice
+diff -ruN 90livenet-ori/module-setup.sh 90livenet/module-setup.sh
+--- 90livenet-ori/module-setup.sh	2024-08-30 16:47:12.975964141 -0700
++++ 90livenet/module-setup.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -17,6 +17,8 @@
+     inst_hook cmdline 29 "$moddir/parse-livenet.sh"
+     inst_hook initqueue/online 95 "$moddir/fetch-liveupdate.sh"
+     inst_script "$moddir/livenetroot.sh" "/sbin/livenetroot"
++    inst_simple "$moddir/liveos-artifacts-download.service" "/etc/systemd/system/liveos-artifacts-download.service"
++    inst_script "$moddir/liveos-artifacts-download.sh" "/sbin/liveos-artifacts-download"
+     if dracut_module_included "systemd-initrd"; then
+         inst_script "$moddir/livenet-generator.sh" "$systemdutildir"/system-generators/dracut-livenet-generator
+     fi
+diff -ruN 90livenet-ori/parse-livenet.sh 90livenet/parse-livenet.sh
+--- 90livenet-ori/parse-livenet.sh	2024-08-30 16:47:12.979964145 -0700
++++ 90livenet/parse-livenet.sh	2024-08-30 16:57:12.012486264 -0700
+@@ -2,6 +2,9 @@
+ # live net images - just like live images, but specified like:
+ # root=live:[url-to-backing-file]
+ 
++echo "---- debug ---- parse-livenet.sh [kmsg] ----" > /dev/kmsg
++# sleep 1s
++
+ [ -z "$root" ] && root=$(getarg root=)
+ . /lib/url-lib.sh
+ 
+@@ -20,14 +23,28 @@
+ str_starts "$liveurl" "live:" || return
+ liveurl="${liveurl#live:}"
+ 
++echo "---- debug ---- parse-livenet.sh [1] root=($root) ----" > /dev/kmsg
++echo "---- debug ---- parse-livenet.sh [2] liveurl=($liveurl) ----" > /dev/kmsg
++
+ # setting netroot to "livenet:..." makes "livenetroot" get run after ifup
+ if get_url_handler "$liveurl" > /dev/null; then
++    echo "---- debug ---- parse-livenet.sh [3] found handler ----" > /dev/kmsg
+     info "livenet: root image at $liveurl"
+     netroot="livenet:$liveurl"
+     root="livenet" # quiet complaints from init
+     # shellcheck disable=SC2034
+     rootok=1
++
++    echo "---- debug ---- parse-livenet.sh [4] root=($root) ----" > /dev/kmsg
++    echo "---- debug ---- parse-livenet.sh [5] netroot=($netroot) ----" > /dev/kmsg
++    echo "---- debug ---- parse-livenet.sh [5] rootok=($rootok) ----" > /dev/kmsg
++
++    echo "---- debug ---- parse-livenet.sh [6] scheduling the download service ----" > /dev/kmsg
++    systemctl enable liveos-artifacts-download
++    systemctl start liveos-artifacts-download &    
++
+     wait_for_dev -n /dev/root
+ else
++    echo "---- debug ---- parse-livenet.sh [6] did not find handler ----" > /dev/kmsg
+     info "livenet: no url handler for $liveurl"
+ fi
