@@ -125,6 +125,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Sep 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.3-1
+- Auto-upgrade to 1.21.3 - krb5: upgrade to 8.0.39 to patch CVE-2024-21165
+
 * Wed Jul 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.3-1
 - Auto-upgrade to 1.21.3 - CVE-2024-37371, CVE-2024-37370
 
