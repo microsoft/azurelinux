@@ -1,6 +1,24 @@
-diff -ruN 90livenet-ori/fetch-liveupdate.sh 90livenet/fetch-liveupdate.sh
---- 90livenet-ori/fetch-liveupdate.sh	2024-08-30 16:47:12.975964141 -0700
-+++ 90livenet/fetch-liveupdate.sh	2024-08-30 16:57:12.012486264 -0700
+From ea2d526142ad3d76be87b3d25d56b85824a2b840 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Fri, 30 Aug 2024 18:17:00 -0700
+Subject: [PATCH] Add a download daemon to the livenet module.
+
+---
+ modules.d/90livenet/fetch-liveupdate.sh       |  2 +
+ modules.d/90livenet/livenet-generator.sh      |  2 +
+ modules.d/90livenet/livenetroot.sh            |  2 +
+ .../liveos-artifacts-download.service         | 11 +++
+ .../90livenet/liveos-artifacts-download.sh    | 89 +++++++++++++++++++
+ modules.d/90livenet/module-setup.sh           |  2 +
+ modules.d/90livenet/parse-livenet.sh          | 17 ++++
+ 7 files changed, 125 insertions(+)
+ create mode 100644 modules.d/90livenet/liveos-artifacts-download.service
+ create mode 100755 modules.d/90livenet/liveos-artifacts-download.sh
+
+diff --git a/modules.d/90livenet/fetch-liveupdate.sh b/modules.d/90livenet/fetch-liveupdate.sh
+index 3ff2a9c2..c3ab627e 100755
+--- a/modules.d/90livenet/fetch-liveupdate.sh
++++ b/modules.d/90livenet/fetch-liveupdate.sh
 @@ -3,6 +3,8 @@
  # this gets called by the "initqueue/online" hook for each network interface
  # that comes online.
@@ -10,9 +28,10 @@ diff -ruN 90livenet-ori/fetch-liveupdate.sh 90livenet/fetch-liveupdate.sh
  # no updates requested? we're not needed.
  [ -e /tmp/liveupdates.info ] || return 0
  
-diff -ruN 90livenet-ori/livenet-generator.sh 90livenet/livenet-generator.sh
---- 90livenet-ori/livenet-generator.sh	2024-08-30 16:47:12.983964150 -0700
-+++ 90livenet/livenet-generator.sh	2024-08-30 16:57:12.012486264 -0700
+diff --git a/modules.d/90livenet/livenet-generator.sh b/modules.d/90livenet/livenet-generator.sh
+index 3e9226be..8d5a614f 100755
+--- a/modules.d/90livenet/livenet-generator.sh
++++ b/modules.d/90livenet/livenet-generator.sh
 @@ -1,5 +1,7 @@
  #!/bin/bash
  
@@ -21,9 +40,10 @@ diff -ruN 90livenet-ori/livenet-generator.sh 90livenet/livenet-generator.sh
  type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
  
  [ -z "$root" ] && root=$(getarg root=)
-diff -ruN 90livenet-ori/livenetroot.sh 90livenet/livenetroot.sh
---- 90livenet-ori/livenetroot.sh	2024-08-30 16:47:12.979964145 -0700
-+++ 90livenet/livenetroot.sh	2024-08-30 16:57:12.012486264 -0700
+diff --git a/modules.d/90livenet/livenetroot.sh b/modules.d/90livenet/livenetroot.sh
+index 34f91ff1..1e0e4d5e 100755
+--- a/modules.d/90livenet/livenetroot.sh
++++ b/modules.d/90livenet/livenetroot.sh
 @@ -1,6 +1,8 @@
  #!/bin/sh
  # livenetroot - fetch a live image from the network and run it
@@ -33,9 +53,11 @@ diff -ruN 90livenet-ori/livenetroot.sh 90livenet/livenetroot.sh
  type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
  
  . /lib/url-lib.sh
-diff -ruN 90livenet-ori/liveos-artifacts-download.service 90livenet/liveos-artifacts-download.service
---- 90livenet-ori/liveos-artifacts-download.service	1969-12-31 16:00:00.000000000 -0800
-+++ 90livenet/liveos-artifacts-download.service	2024-08-30 16:57:12.012486264 -0700
+diff --git a/modules.d/90livenet/liveos-artifacts-download.service b/modules.d/90livenet/liveos-artifacts-download.service
+new file mode 100644
+index 00000000..c700af51
+--- /dev/null
++++ b/modules.d/90livenet/liveos-artifacts-download.service
 @@ -0,0 +1,11 @@
 +[Unit]
 +Description=LiveOS Artifacts Download Daemon
@@ -48,9 +70,11 @@ diff -ruN 90livenet-ori/liveos-artifacts-download.service 90livenet/liveos-artif
 +
 +[Install]
 +WantedBy=multi-user.target
-diff -ruN 90livenet-ori/liveos-artifacts-download.sh 90livenet/liveos-artifacts-download.sh
---- 90livenet-ori/liveos-artifacts-download.sh	1969-12-31 16:00:00.000000000 -0800
-+++ 90livenet/liveos-artifacts-download.sh	2024-08-30 16:57:12.012486264 -0700
+diff --git a/modules.d/90livenet/liveos-artifacts-download.sh b/modules.d/90livenet/liveos-artifacts-download.sh
+new file mode 100755
+index 00000000..7495c6d2
+--- /dev/null
++++ b/modules.d/90livenet/liveos-artifacts-download.sh
 @@ -0,0 +1,89 @@
 +#!/bin/bash
 +
@@ -141,10 +165,11 @@ diff -ruN 90livenet-ori/liveos-artifacts-download.sh 90livenet/liveos-artifacts-
 +export fstype="auto"
 +export DRACUT_SYSTEMD=1
 +/usr/sbin/dmsquash-live-root $rootDevice
-diff -ruN 90livenet-ori/module-setup.sh 90livenet/module-setup.sh
---- 90livenet-ori/module-setup.sh	2024-08-30 16:47:12.975964141 -0700
-+++ 90livenet/module-setup.sh	2024-08-30 16:57:12.012486264 -0700
-@@ -17,6 +17,8 @@
+diff --git a/modules.d/90livenet/module-setup.sh b/modules.d/90livenet/module-setup.sh
+index db0def50..74bacd6c 100755
+--- a/modules.d/90livenet/module-setup.sh
++++ b/modules.d/90livenet/module-setup.sh
+@@ -17,6 +17,8 @@ install() {
      inst_hook cmdline 29 "$moddir/parse-livenet.sh"
      inst_hook initqueue/online 95 "$moddir/fetch-liveupdate.sh"
      inst_script "$moddir/livenetroot.sh" "/sbin/livenetroot"
@@ -153,9 +178,10 @@ diff -ruN 90livenet-ori/module-setup.sh 90livenet/module-setup.sh
      if dracut_module_included "systemd-initrd"; then
          inst_script "$moddir/livenet-generator.sh" "$systemdutildir"/system-generators/dracut-livenet-generator
      fi
-diff -ruN 90livenet-ori/parse-livenet.sh 90livenet/parse-livenet.sh
---- 90livenet-ori/parse-livenet.sh	2024-08-30 16:47:12.979964145 -0700
-+++ 90livenet/parse-livenet.sh	2024-08-30 16:57:12.012486264 -0700
+diff --git a/modules.d/90livenet/parse-livenet.sh b/modules.d/90livenet/parse-livenet.sh
+index a1d14a8f..7660d695 100755
+--- a/modules.d/90livenet/parse-livenet.sh
++++ b/modules.d/90livenet/parse-livenet.sh
 @@ -2,6 +2,9 @@
  # live net images - just like live images, but specified like:
  # root=live:[url-to-backing-file]
@@ -166,7 +192,7 @@ diff -ruN 90livenet-ori/parse-livenet.sh 90livenet/parse-livenet.sh
  [ -z "$root" ] && root=$(getarg root=)
  . /lib/url-lib.sh
  
-@@ -20,14 +23,28 @@
+@@ -20,14 +23,28 @@ str_starts "$root" "live:" && liveurl="$root"
  str_starts "$liveurl" "live:" || return
  liveurl="${liveurl#live:}"
  
@@ -195,3 +221,6 @@ diff -ruN 90livenet-ori/parse-livenet.sh 90livenet/parse-livenet.sh
 +    echo "---- debug ---- parse-livenet.sh [6] did not find handler ----" > /dev/kmsg
      info "livenet: no url handler for $liveurl"
  fi
+-- 
+2.34.1
+

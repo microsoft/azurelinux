@@ -55,8 +55,8 @@ const (
 	// customizations.
 	savedKernelArgsFileName = "iso-kernel-args.txt"
 
-	dracutConfig = `add_dracutmodules+=" dmsquash-live "
-add_drivers+=" overlay livenet "
+	dracutConfig = `add_dracutmodules+=" dmsquash-live livenet "
+add_drivers+=" overlay "
 hostonly="no"
 `
 	// the total size of a collection of files is multiplied by the
