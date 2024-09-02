@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.11.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Group:          Applications/Databases
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 Patch0:         CVE-2024-0901.patch
+Patch1:         CVE-2024-5991.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -469,6 +470,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Sep 02 2024 Sindhu Karri <lakarri@microsoft.com> - 10.11.6-4
+- Fix CVE-2024-5991 with a patch
+
 * Fri Jun 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 10.11.6-3
 - Patch CVE-2024-0901
 
