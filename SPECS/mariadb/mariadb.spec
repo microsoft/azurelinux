@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.6.9
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 Patch0:         CVE-2022-47015.patch
 Patch1:         fix_symlink_location_db_install.patch
+Patch2:         CVE-2024-5991.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -465,6 +466,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Sep 02 2024 Sindhu Karri <lakarri@microsoft.com> - 10.6.9-7
+- Fix CVE-2024-5991 with a patch
+
 * Thu Jan 18 2024 Andy Zaugg <azaugg@linkedin.com> - 10.6.9-6
 - Fix post scripts for rpm install, missing setup(mysql_install_db) script.
 
