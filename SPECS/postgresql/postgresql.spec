@@ -74,7 +74,10 @@ developing applications that use postgresql.
 %package	service
 Summary:	To setup postgresql as a service
 Requires:	%{name} = %{version}-%{release}
-Requires:	util-linux
+Requires(post):	util-linux
+Requires(pre):	shadow-utils
+Requires(post):	shadow-utils
+Requires(postun):shadow-utils
 
 %description	service
 Install postgresql-service if you want to run postgresql as a service
@@ -134,7 +137,7 @@ PGRUN="/run/postgresql"
 if [ ! -d "$PGDATA" ]; then
     mkdir -p "$PGDATA"
     chown postgres:postgres "$PGDATA"
-    su -c /usr/bin/initdb -D "$PGDATA" postgres
+    su - postgres -c /usr/bin/initdb
     chown -R postgres:postgres "$PGDATA"
 fi
 
