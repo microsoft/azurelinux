@@ -1,8 +1,8 @@
 Summary:        Docbook-xsl-1.79.1
 Name:           docbook-style-xsl
 Version:        1.79.1
-Release:        13%{?dist}
-License:        ASL 2.0
+Release:        14%{?dist}
+License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
@@ -96,12 +96,15 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license COPYING extensions/LICENSE.txt
 %{_datadir}/xml/docbook/xsl-stylesheets-%{version}
 %{_datadir}/sgml/docbook/xsl-stylesheets
 %{_docdir}/*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.79.1-14
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.79.1-10
 - Added %%license line automatically
 
