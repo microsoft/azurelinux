@@ -15703,8 +15703,8 @@
         "type": "other",
         "other": {
           "name": "perl-Algorithm-C3",
-          "version": "0.10",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-C3-0.10.tar.gz"
+          "version": "0.11",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-C3-0.11.tar.gz"
         }
       }
     },
