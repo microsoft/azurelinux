@@ -52,6 +52,50 @@ parse_kernel_cmdline_args() {
     [ -z "${overlayfs}" ] && overlayfs=$(getarg rd.overlayfs=)
 }
 
+# Modified function to mount volatile or persistent volume.
+mount_volatile_persistent_volume() {
+    local _volume=$1
+    local _overlay_mount=$2
+
+    mkdir -p "${_overlay_mount}"
+
+    if [[ "${_volume}" == "volatile" ]]; then
+        # Fallback to volatile overlay if no persistent volume is specified.
+        echo "No overlayfs persistent volume specified. Creating a volatile overlay."
+        mount -t tmpfs tmpfs "${_overlay_mount}" || \
+            die "Failed to create overlay tmpfs at ${_overlay_mount}"
+    else
+        # Check if the specified Overlay RAID volume is present in the system.
+        if mdadm --examine --scan | grep -qs "${_volume}"; then
+            # If the specified Overlay RAID volume is found, attempt to assemble it.
+            mdadm --assemble "${_volume}" || \
+                die "Failed to assemble RAID volume."
+        fi
+
+        # Mount the specified persistent volume.
+        mount "${_volume}" "${_overlay_mount}" || \
+            die "Failed to mount ${_volume} at ${_overlay_mount}"
+    fi
+}
+
+create_overlayfs() {
+    local _lower=$1
+    local _upper=$2
+    local _work=$3
+    local _mode=$4
+
+    [ -d "$_lower" ] || die "Unable to create overlay as $_lower does not exist"
+
+    mkdir -p "${_upper}" || die "Failed to create upper directory ${_upper}"
+    mkdir -p "${_work}" || die "Failed to create work directory ${_work}"
+
+    # Note for now, the mountpoint / mergedir is set to the same directory as the lowerdir.
+    # This means the overlay will be mounted directly on the lower directory.
+    # TODO: Add support for a customized mountpoint in future versions.
+    mount -t overlay overlay -o "${_mode}",lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
+        die "Failed to mount overlay in ${_lower}"
+}
+
 mount_overlayfs() {
     local cnt=0
     local volume_mount_with_cnt
@@ -104,50 +148,6 @@ mount_overlayfs() {
     echo "Done Verity Root Mounting and OverlayFS Mounting"
     # Re-mount the verity mount along with overlayfs to the sysroot.
     mount --rbind "${ROOT_VERITY_MOUNTPOINT}" "${NEWROOT}"
-}
-
-# Modified function to mount volatile or persistent volume.
-mount_volatile_persistent_volume() {
-    local _volume=$1
-    local _overlay_mount=$2
-
-    mkdir -p "${_overlay_mount}"
-
-    if [[ "${_volume}" == "volatile" ]]; then
-        # Fallback to volatile overlay if no persistent volume is specified.
-        echo "No overlayfs persistent volume specified. Creating a volatile overlay."
-        mount -t tmpfs tmpfs "${_overlay_mount}" || \
-            die "Failed to create overlay tmpfs at ${_overlay_mount}"
-    else
-        # Check if the specified Overlay RAID volume is present in the system.
-        if mdadm --examine --scan | grep -qs "${_volume}"; then
-            # If the specified Overlay RAID volume is found, attempt to assemble it.
-            mdadm --assemble "${_volume}" || \
-                die "Failed to assemble RAID volume."
-        fi
-
-        # Mount the specified persistent volume.
-        mount "${_volume}" "${_overlay_mount}" || \
-            die "Failed to mount ${_volume} at ${_overlay_mount}"
-    fi
-}
-
-create_overlayfs() {
-    local _lower=$1
-    local _upper=$2
-    local _work=$3
-    local _mode=$4
-
-    [ -d "$_lower" ] || die "Unable to create overlay as $_lower does not exist"
-
-    mkdir -p "${_upper}" || die "Failed to create upper directory ${_upper}"
-    mkdir -p "${_work}" || die "Failed to create work directory ${_work}"
-
-    # Note for now, the mountpoint / mergedir is set to the same directory as the lowerdir.
-    # This means the overlay will be mounted directly on the lower directory.
-    # TODO: Add support for a customized mountpoint in future versions.
-    mount -t overlay overlay -o "${_mode}",lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
-        die "Failed to mount overlay in ${_lower}"
 }
 
 # Keep a copy of this function here from verity-read-only-root package.
