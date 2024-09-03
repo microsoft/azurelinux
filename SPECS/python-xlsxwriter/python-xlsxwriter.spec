@@ -8,7 +8,7 @@ Summary:	Python module for writing files in the Excel 2007+ XLSX file format
 License:	BSD
 URL:		https://pypi.python.org/pypi/XlsxWriter
 Vendor:     Microsoft Corporation
-Distribution: Azure Linux
+Distribution:  Azure Linux
 Source0:	https://github.com/jmcnamara/XlsxWriter/archive/refs/tags/RELEASE_3.2.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 

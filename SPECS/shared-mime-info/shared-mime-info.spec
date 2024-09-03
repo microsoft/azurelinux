@@ -404,10 +404,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 - Prefer Rhythmbox to Totem for music files
 
 * Sun Sep 18 2011 Bastien Nocera <bnocera@redhat.com> 0.91-2
-- Fix changelog
-* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2-3
-- Add missing Vendor and Distribution tags.
- entries
+- Fix changelog entries
 
 * Sun Sep 18 2011 Bastien Nocera <bnocera@redhat.com> 0.91-1
 - Update to 0.91

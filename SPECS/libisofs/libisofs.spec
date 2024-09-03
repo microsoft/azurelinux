@@ -6,8 +6,8 @@ Release:  2%{?dist}
 License:  GPLv2+ and LGPLv2+
 Group:    System Environment/Libraries
 URL:      https://dev.lovelyhq.com/libburnia/libisofs
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Vendor:   Microsoft Corporation
+Distribution:  Azure Linux
 Source0:  https://files.libburnia-project.org/releases/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
