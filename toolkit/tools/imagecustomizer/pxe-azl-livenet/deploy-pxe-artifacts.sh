@@ -75,7 +75,7 @@ function createPxeGrubCfg() {
     cat <<EOF > $pxeGrubCfg
 set timeout=10
 set bootprefix=/boot
-set debug=all
+# set debug=all
 
 menuentry "CBL-Mariner" {
         linux /boot/vmlinuz \\
@@ -161,12 +161,12 @@ function deploy_tftp_folder() {
     # copy_file $mount_dir/boot/grub2/efiboot.img $tftpbootLocalDir/boot/grub2/efiboot.img
     #
 
-    # copy_file $mount_dir/boot/grub2/grub.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
-    createPxeGrubCfg \
-        $tftpbootLocalDir/boot/grub2/grub.cfg \
-        $isoRelativePath \
-        $hostScriptRelativePath \
-        $hostConfigRelativePath
+    copy_file $mount_dir/boot/grub2/grub-pxe.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+    # createPxeGrubCfg \
+    #    $tftpbootLocalDir/boot/grub2/grub.cfg \
+    #    $isoRelativePath \
+    #    $hostScriptRelativePath \
+    #    $hostConfigRelativePath
 }
 
 function deploy_http_folder() {

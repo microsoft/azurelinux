@@ -5,7 +5,7 @@ package imagecustomizerapi
 
 // Iso defines how the generated iso media should be configured.
 type Pxe struct {
-	IsoUrl string `yaml:"isoUrl"`
+	IsoImageUrl string `yaml:"isoImageUrl"`
 }
 
 func (i *Pxe) IsValid() error {
