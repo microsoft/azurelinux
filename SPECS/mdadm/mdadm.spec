@@ -2,9 +2,11 @@
 
 Name:        mdadm
 Version:     4.2
-Release:     6%{?dist}
+Release:     7%{?dist}
 Summary:     The mdadm program controls Linux md devices (software RAID arrays)
 URL:         http://www.kernel.org/pub/linux/utils/raid/mdadm/
+Vendor:      Microsoft Corporation
+Distribution: Azure Linux
 License:     GPLv2+
 
 Source:      http://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}.tar.gz
@@ -219,6 +221,9 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 %{_datadir}/mdadm/mdcheck
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-7
+- Add missing Vendor and Distribution tags.
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 4.2-6
 - Update to build dep latest glibc-static version
 

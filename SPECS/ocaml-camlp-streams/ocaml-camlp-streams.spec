@@ -7,10 +7,12 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-camlp-streams
 Version:        5.0.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Stream and Genlex libraries for OCaml
 License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/ocaml/camlp-streams
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{url}/archive/v%{version}/camlp-streams-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 5.1.1
@@ -65,6 +67,9 @@ files for developing applications that use %{name}.
 %files devel -f .ofiles-devel
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 5.0.1-14
+- Add missing Vendor and Distribution tags.
+
 * Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.0.1-13
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified

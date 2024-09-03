@@ -1,10 +1,12 @@
 Name:           python-hatch-fancy-pypi-readme
 Version:        24.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Hatch plugin for writing fancy PyPI readmes
 
 License:        MIT
 URL:            https://github.com/hynek/hatch-fancy-pypi-readme
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/b4/c2/c9094283a07dd96c5a8f7a5f1910259d40d2e29223b95dd875a6ca13b58f/hatch_fancy_pypi_readme-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
@@ -67,6 +69,9 @@ pip3 install iniconfig
 %{_bindir}/hatch-fancy-pypi-readme
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 24.1.0-5
+- Add missing Vendor and Distribution tags.
+
 * Tue Mar 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 24.1.0-4
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - Remove toml.
