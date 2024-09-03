@@ -4,6 +4,8 @@ Release:        38%{?dist}
 Summary:        Obtain the REFCNT value of a referent
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Devel-Refcount
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://www.cpan.org/modules/by-module/Devel/Devel-Refcount-%{version}.tar.gz
 # Build
 BuildRequires:  coreutils
@@ -21,12 +23,12 @@ BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 BuildRequires:  perl(XSLoader)
-# Test Suite
+%if 0%{?with_check}
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More)
-# Optional Tests
 BuildRequires:  perl(Test::Pod) >= 1.00
+%endif
 # Dependencies
 Requires:       perl(B)
 
