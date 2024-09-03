@@ -4,6 +4,8 @@ Release:        6%{?dist}
 Summary:        Simplified clone of smartmatch operator
 License:        GPL+ OR Artistic
 URL:            http://search.cpan.org/dist/match-simple/
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/match-simple-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils

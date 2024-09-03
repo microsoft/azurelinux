@@ -4,6 +4,8 @@ Release:        25%{?dist}
 Summary:        Create a fake infix operator
 License:        GPL+ OR Artistic
 URL:            https://metacpan.org/release/Sub-Infix
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Sub-Infix-%{version}.tar.gz
 BuildArch:      noarch
 
