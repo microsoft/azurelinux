@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "azcopy",
-          "version": "10.24.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.24.0.tar.gz"
+          "version": "10.25.1",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.25.1.tar.gz"
         }
       }
     },
@@ -13552,6 +13552,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ModemManager",
           "version": "1.18.6",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.6.tar.xz"
@@ -21454,8 +21464,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.12",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.12/postgresql-14.12.tar.bz2"
+          "version": "14.13",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.13/postgresql-14.13.tar.bz2"
         }
       }
     },
