@@ -1,12 +1,12 @@
 %undefine _ld_as_needed
 
-Name:			ebtables
-Version:		2.0.11
-Release:		8%{?dist}
-Summary:		Ethernet Bridge frame table administration tool
-License:		GPLv2+
-URL:        http://ebtables.sourceforge.net/
-Vendor:     Microsoft Corporation
+Name:          ebtables
+Version:		   2.0.11
+Release:		   8%{?dist}
+Summary:		   Ethernet Bridge frame table administration tool
+License:		   GPLv2+
+URL:           http://ebtables.sourceforge.net/
+Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 
 Source0:		https://netfilter.org/pub/ebtables/%{name}-%{version}.tar.gz
