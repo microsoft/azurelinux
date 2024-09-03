@@ -1,10 +1,10 @@
 Summary:        Compiler Cache
 Name:           ccache
 Version:        4.8.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BeOpen AND BSD AND GPLv3+ AND (Patrick Powell's AND Holger Weiss' license) AND Public Domain AND Python AND zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ccache.dev
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
@@ -56,6 +56,9 @@ done
 %{_libdir}/*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.3-2
+- Fix the 'Distribution' tag.
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.8.3-1
 - Upgrade to version 4.8.3
 

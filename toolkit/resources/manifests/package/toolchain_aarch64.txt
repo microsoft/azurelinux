@@ -42,8 +42,8 @@ ca-certificates-base-3.0.0-7.azl3.noarch.rpm
 ca-certificates-legacy-3.0.0-7.azl3.noarch.rpm
 ca-certificates-shared-3.0.0-7.azl3.noarch.rpm
 ca-certificates-tools-3.0.0-7.azl3.noarch.rpm
-ccache-4.8.3-1.azl3.aarch64.rpm
-ccache-debuginfo-4.8.3-1.azl3.aarch64.rpm
+ccache-4.8.3-2.azl3.aarch64.rpm
+ccache-debuginfo-4.8.3-2.azl3.aarch64.rpm
 check-0.15.2-1.azl3.aarch64.rpm
 check-debuginfo-0.15.2-1.azl3.aarch64.rpm
 chkconfig-1.25-1.azl3.aarch64.rpm
