@@ -1,7 +1,11 @@
+%global maj_ver 18
+%global min_ver 1
+%global patch_ver 2
+
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        18.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,7 +60,8 @@ cmake -G Ninja                              \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DLLVM_BINUTILS_INCDIR=%{_includedir} \
-      -Wno-dev ../llvm
+      -Wno-dev                              \
+      ../llvm
 
 %ninja_build LLVM
 %ninja_build
@@ -87,10 +92,21 @@ ninja check-all
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-%{_bindir}/*
-%{_libdir}/*.so
-%{_libdir}/*.so.*
+%{_bindir}/bugpoint
+%{_bindir}/dsymutil
+%{_bindir}/llc
+%{_bindir}/lli
+%{_bindir}/llvm-*
+%{_bindir}/opt
+%{_bindir}/sancov
+%{_bindir}/sanstats
+%{_bindir}/verify-uselistorder
 %{_libdir}/bfd-plugins/LLVMgold.so
+%{_libdir}/LLVMgold.so
+%{_libdir}/libLLVM-%{maj_ver}.so
+%{_libdir}/libLLVM.so.%{maj_ver}.%{min_ver}
+%{_libdir}/libLTO.so*
+%{_libdir}/libRemarks.so*
 %dir %{_datadir}/opt-viewer
 %{_datadir}/opt-viewer/opt-diff.py
 %{_datadir}/opt-viewer/opt-stats.py
@@ -101,10 +117,15 @@ ninja check-all
 
 %files devel
 %{_libdir}/*.a
-%{_libdir}/cmake/*
-%{_includedir}/*
+%{_libdir}/cmake/llvm/*
+%{_libdir}/libLLVM.so
+%{_includedir}/llvm
+%{_includedir}/llvm-c
 
 %changelog
+* Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-4
+- Update file listing with explicit filenames
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-3
 - Patch CVE-2024-31852
 

@@ -8900,6 +8900,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcxx",
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libdaemon",
           "version": "0.14",
           "downloadUrl": "https://0pointer.de/lennart/projects/libdaemon/libdaemon-0.14.tar.gz"
