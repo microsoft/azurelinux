@@ -23824,7 +23824,7 @@
         "other": {
           "name": "python-pyroute2",
           "version": "0.7.12",
-          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.7.12.tar.gz"
+          "downloadUrl": "https://github.com/svinota/pyroute2/archive/refs/tags/0.7.12.tar.gz"
         }
       }
     },
