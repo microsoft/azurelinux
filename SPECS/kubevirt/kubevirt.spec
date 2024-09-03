@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -188,7 +188,7 @@ mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
 
 # virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}%{_datadir}/kube-virt/virt-handler/
+install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
 
 # Persistent reservation helper configuration files
 mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
@@ -236,6 +236,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
+/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
@@ -269,13 +270,16 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Aug 30 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.2.0-7
+- Update installation path of virt_launcher.cil in virt-handler container.
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.2.0-6
 - Update to build dep latest glibc-static version
 
 * Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.2.0-5
 - Bump to rebuild with updated glibc
 
-* Thu Jun 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-4
+* Wed Jun 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-4
 - Deleting Hotplug_Grace_Period.patch since it is no longer required.
 
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-3
