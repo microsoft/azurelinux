@@ -1,0 +1,58 @@
+From accb61e9c1a005e5c8ff96a8b33893100bb42d11 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Markus=20Schifferm=C3=BCller?=
+ <45643263+Markus-MS@users.noreply.github.com>
+Date: Tue, 13 Aug 2024 22:21:52 -0400
+Subject: [PATCH] lib: DER signature decoding correction
+
+---
+ lib/elliptic/ec/signature.js    | 10 ++++++++++
+ lib/elliptic/eddsa/signature.js |  1 +
+ 2 files changed, 11 insertions(+)
+
+diff --git a/src/ui/node_modules/elliptic/lib/elliptic/ec/signature.js b/src/ui/node_modules/elliptic/lib/elliptic/ec/signature.js
+index 539df6a2..48e3a26f 100644
+--- a/src/ui/node_modules/elliptic/lib/elliptic/ec/signature.js
++++ b/src/ui/node_modules/elliptic/lib/elliptic/ec/signature.js
+@@ -38,6 +38,10 @@ function getLength(buf, p) {
+     return false;
+   }
+ 
++  if(buf[p.place] === 0x00) {
++    return false;
++  }
++
+   var val = 0;
+   for (var i = 0, off = p.place; i < octetLen; i++, off++) {
+     val <<= 8;
+@@ -86,6 +90,9 @@ Signature.prototype._importDER = function _importDER(data, enc) {
+   if (rlen === false) {
+     return false;
+   }
++  if ((data[p.place] & 128) !== 0) {
++    return false;
++  }
+   var r = data.slice(p.place, rlen + p.place);
+   p.place += rlen;
+   if (data[p.place++] !== 0x02) {
+@@ -98,6 +105,9 @@ Signature.prototype._importDER = function _importDER(data, enc) {
+   if (data.length !== slen + p.place) {
+     return false;
+   }
++  if ((data[p.place] & 128) !== 0) {
++    return false;
++  }
+   var s = data.slice(p.place, slen + p.place);
+   if (r[0] === 0) {
+     if (r[1] & 0x80) {
+diff --git a/src/ui/node_modules/elliptic/lib/elliptic/eddsa/signature.js b/src/ui/node_modules/elliptic/lib/elliptic/eddsa/signature.js
+index 30ebc920..b224ad1c 100644
+--- a/src/ui/node_modules/elliptic/lib/elliptic/eddsa/signature.js
++++ b/src/ui/node_modules/elliptic/lib/elliptic/eddsa/signature.js
+@@ -21,6 +21,7 @@ function Signature(eddsa, sig) {
+     sig = parseBytes(sig);
+ 
+   if (Array.isArray(sig)) {
++    assert(sig.length === eddsa.encodingLength * 2, 'Signature has invalid size');
+     sig = {
+       R: sig.slice(0, eddsa.encodingLength),
+       S: sig.slice(eddsa.encodingLength),
