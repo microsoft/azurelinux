@@ -1207,6 +1207,7 @@
                 "perl-Devel-Hide",
                 "perl-Devel-Leak",
                 "perl-Devel-LexAlias",
+                "perl-Devel-Refcount",
                 "perl-Devel-Size",
                 "perl-Devel-StackTrace",
                 "perl-Devel-Symdump",

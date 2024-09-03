@@ -16892,6 +16892,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Devel-Refcount",
+          "version": "0.10",
+          "downloadUrl": "https://www.cpan.org/modules/by-module/Devel/Devel-Refcount-0.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Devel-Size",
           "version": "0.83",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-Size-0.83.tar.gz"
