@@ -313,7 +313,6 @@ func UpdateDefaultGrubFileVariable(defaultGrubFileContent string, varName string
 		}
 
 		defaultGrubFileContent = insertDefaultGrubFileVarAssign(defaultGrubFileContent, insertAfter, varName, newValue)
-
 	}
 
 	return defaultGrubFileContent, nil
