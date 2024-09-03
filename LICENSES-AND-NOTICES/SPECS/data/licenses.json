@@ -601,6 +601,7 @@
                 "libcmpiutil",
                 "libcomps",
                 "libcroco",
+                "libcxx",
                 "libdaemon",
                 "libdap",
                 "libdatrie",
