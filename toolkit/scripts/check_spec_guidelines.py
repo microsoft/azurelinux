@@ -13,25 +13,25 @@ import sys
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
 # Checking if the specs include only the valid 'Distribution: Azure Linux' tag.
-invalid_distribution_tag_regex = re.compile(
+INVALID_DISTRIBUTION_TAG_REGEX = re.compile(
     r'^\s*Distribution:\s*(?!Azure Linux\s*$)\S+', re.MULTILINE)
 
 # Checking for the deprecated '%patch[number]' format.
 # For more info, see: https://rpm-software-management.github.io/rpm/manual/spec.html.
-invalid_patch_macro_regex = re.compile(
+INVALID_PATCH_MACRO_REGEX = re.compile(
     r'^\s*%patch\d', re.MULTILINE)
 
 # Check for '%patch' macros not using the '-P' flag.
-invalid_toolchain_patch_macro = re.compile(
+INVALID_TOOLCHAIN_PATCH_MACRO = re.compile(
     r'^\s*%patch((?!-P\s+\d+).)*$', re.MULTILINE)
 
-license_regex = re.compile(
+LICENSE_REGEX = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
 
-valid_release_tag_regex = re.compile(
+VALID_RELEASE_TAG_REGEX = re.compile(
     r'^[1-9]\d*%\{\?dist\}$')
 
-valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
+VALID_SOURCE_ATTRIBUTIONS_ONE_PER_LINE = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
 
 
 def check_distribution_tag(spec_path: str):
@@ -39,7 +39,7 @@ def check_distribution_tag(spec_path: str):
     with open(spec_path) as file:
         contents = file.read()
 
-    if invalid_distribution_tag_regex.search(contents) is not None:
+    if INVALID_DISTRIBUTION_TAG_REGEX.search(contents) is not None:
         print(f"""
 ERROR: detected an invalid 'Distribution' tag.
 
@@ -55,7 +55,7 @@ def check_patch_macro(spec_path: str):
     with open(spec_path) as file:
         contents = file.read()
 
-    if invalid_patch_macro_regex.search(contents) is not None:
+    if INVALID_PATCH_MACRO_REGEX.search(contents) is not None:
         print(f"""
 ERROR: use of deprecated '%patch[number]' format (no space between '%patch' and the number of the patch).
 
@@ -73,7 +73,7 @@ def check_release_tag(spec_path: str):
     """Checks if the 'Release' tag is in one of Azure Linux's expected formats. """
     spec = Spec.from_file(spec_path)
 
-    if valid_release_tag_regex.match(spec.release) is None:
+    if VALID_RELEASE_TAG_REGEX.match(spec.release) is None:
         print(f"""
 ERROR: invalid 'Release' tag.
 
@@ -90,7 +90,7 @@ def check_license_verification(spec_path: str):
     """Checks if the package's license has been verified. """
     spec = Spec.from_file(spec_path)
 
-    if len(license_regex.findall(spec.changelog)) == 0:
+    if len(LICENSE_REGEX.findall(spec.changelog)) == 0:
         print(f"""
 ERROR: license not verified.
 
@@ -117,7 +117,7 @@ ERROR: no valid source attribution.
     Make sure to indicate the origin of the spec file in the changelog.
     Currently supported source attributions (in form of regular expressions):
 
-{valid_source_attributions_one_per_line}
+{VALID_SOURCE_ATTRIBUTIONS_ONE_PER_LINE}
 
     If you're importing a spec from a source, which doesn't fit the currently supported list,
     please update the 'VALID_SOURCE_ATTRIBUTIONS' variable inside the '{dirname(realpath(__file__))}/spec_source_attributions.py' script.
@@ -138,7 +138,7 @@ def check_toolchain_patch_lines(spec_path: str, toolchain_specs: set):
     with open(spec_path) as file:
         contents = file.read()
         
-    if invalid_toolchain_patch_macro.search(contents) is not None:
+    if INVALID_TOOLCHAIN_PATCH_MACRO.search(contents) is not None:
         print(f"""
 ERROR: detected a toolchain spec with invalid '%patch' macros.
 
