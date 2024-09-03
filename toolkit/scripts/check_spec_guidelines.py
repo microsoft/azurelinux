@@ -206,7 +206,7 @@ ERROR: missing 'Vendor' tag.
 
     Please add 'Vendor: {EXPECTED_VENDOR_TAG}'.
 """)
-            return False
+        return False
 
     return True
 
