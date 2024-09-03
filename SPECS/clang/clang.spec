@@ -90,7 +90,6 @@ Development header files for clang tools.
 
 %prep
 %setup -q -n %{clang_srcdir}
-grep -rli 'llvm/Option/OptParser.td' * | xargs -i@ sed -i 's|llvm/Option/OptParser.td|/usr/src/azl/BUILD/llvm-project-llvmorg-18.1.2/llvm/include/llvm/Option/OptParser.td|g' @
 
 %py3_shebang_fix \
     clang-tools-extra/clang-tidy/tool/ \
@@ -115,6 +114,7 @@ mkdir -p build
 cd build
 cmake \
        -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm        \
        -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
        -DCMAKE_BUILD_TYPE=Release              \
        -DLLVM_ENABLE_EH=ON                     \
