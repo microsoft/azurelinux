@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -262,6 +262,7 @@ Base is the package that includes all the files shared amongst ceph servers
 Summary:        Utility to bootstrap Ceph clusters
 Requires:       lvm2
 Requires:       python%{python3_pkgversion}
+Requires(pre):  shadow-utils
 %description -n cephadm
 Utility to bootstrap a Ceph cluster and manage Ceph daemons deployed
 with systemd and podman.
@@ -278,6 +279,7 @@ Requires:   python%{python3_pkgversion}-rgw = %{version}-%{release}
 Requires:   python%{python3_pkgversion}-ceph-argparse = %{version}-%{release}
 Requires:   python%{python3_pkgversion}-ceph-common = %{version}-%{release}
 Requires:   python%{python3_pkgversion}-prettytable
+Requires(pre):  shadow-utils
 %if 0%{with libradosstriper}
 Requires:   libradosstriper1 = %{version}-%{release}
 %endif
@@ -1811,6 +1813,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Sat Aug 24 2024 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-6
+- Add missing Requires for shadow-utils
+
 * Mon Jul 15 2024 Vince Perri <viperri@microsoft.com> - 16.2.10-5
 - Patch CVE-2024-38517
 
