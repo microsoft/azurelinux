@@ -18833,8 +18833,8 @@
         "type": "other",
         "other": {
           "name": "perl-PadWalker",
-          "version": "2.3",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBIN/PadWalker-2.3.tar.gz"
+          "version": "2.5",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBIN/PadWalker-2.5.tar.gz"
         }
       }
     },
@@ -20113,8 +20113,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Without-Module",
-          "version": "0.20",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Without-Module-0.20.tar.gz"
+          "version": "0.23",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Without-Module-0.23.tar.gz"
         }
       }
     },
