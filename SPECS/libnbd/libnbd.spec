@@ -8,10 +8,12 @@
 %global source_directory 1.18-stable
 Name:           libnbd
 Version:        1.18.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        NBD client library in userspace
 License:        LGPL-2.0-or-later AND BSD-3-Clause
 URL:            https://gitlab.com/nbdkit/libnbd
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
 
 %if !0%{?azl}
@@ -331,6 +333,9 @@ skip_test tests/connect-tcp6
 
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.18.3-3
+- Add missing Vendor and Distribution tags.
+
 * Mon Aug 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.18.3-2
 - Add patches to fix CVE-2024-7383
 

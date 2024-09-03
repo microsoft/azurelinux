@@ -4,9 +4,11 @@
 Summary:        C11 Annex K functions
 Name:           libsafec
 Version:        3.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/rurban/safeclib
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://github.com/rurban/safeclib/releases/download/v%{version}/safeclib-%{version}.tar.xz
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -70,6 +72,9 @@ find %{buildroot} -type f -name "*.pc" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.1-2
+- Add missing Vendor and Distribution tags.
+
 * Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.8.1-1
 - Upgrade to version 3.8.1
 

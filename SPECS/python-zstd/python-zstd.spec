@@ -3,12 +3,14 @@
 
 Name:           python-%{pypi_name}
 Version:        1.5.5.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Zstd Bindings for Python
 
 # original zstd bits are GPL-2.0-or-later OR BSD-2-Clause
 License:        BSD-2-Clause AND (GPL-2.0-or-later OR BSD-2-Clause)
 URL:            https://github.com/sergey-dryabzhinsky/python-zstd
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source:         %{pypi_source}
 
 # Patches to fix test execution
@@ -65,6 +67,9 @@ sed -i -e '/test_version/d' tests/__init__.py
 %{python3_sitearch}/%{pypi_name}*.so
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.5.5.1-4
+- Add missing Vendor and Distribution tags.
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.5.5.1-3
 - Add Provides python3dist(zstd)
 

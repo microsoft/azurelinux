@@ -1,9 +1,11 @@
 Name: libiscsi
 Summary: iSCSI client library
 Version: 1.19.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2+
 URL: https://github.com/sahlberg/%{name}
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 
 Source: https://github.com/sahlberg/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -96,6 +98,9 @@ The libiscsi-devel package includes the header files for libiscsi.
 %{_libdir}/pkgconfig/libiscsi.pc
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.19.0-2
+- Add missing Vendor and Distribution tags.
+
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.0-1
 - Upgrade to 1.19 from Fedora
 

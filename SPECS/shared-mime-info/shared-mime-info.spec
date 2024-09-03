@@ -4,9 +4,11 @@
 Summary:        Shared MIME information database
 Name:           shared-mime-info
 Version:        2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            https://freedesktop.org/Software/shared-mime-info
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/%{version}/shared-mime-info-%{version}.tar.bz2
 
 Source1:        gnome-mimeapps.list
@@ -115,6 +117,9 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 %{_datadir}/gettext/its/shared-mime-info.loc
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2-3
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2-2
 - Updating naming for 3.0 version of Azure Linux.
 
@@ -363,11 +368,11 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
-* Tue May 22 2012 Rex Dieter <rdieter@fedoraproject.org> 
+* Tue May 22 2012 Rex Dieter <rdieter@fedoraproject.org>
 - 1.0-4
 - defaults.list: s/mozilla-firefox/firefox/ (see #736558)
 - defaults.list: s/gpk-install-file/gpk-install-local-file/
-- defaults.list: application/x-catalog=gpk-install-catalog.desktop (#770019) 
+- defaults.list: application/x-catalog=gpk-install-catalog.desktop (#770019)
 
 * Fri May 11 2012 Bastien Nocera <bnocera@redhat.com> 1.0-3
 - Use gnome-disk-image-mounter from gnome-disk-utility to handle
@@ -399,7 +404,10 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 - Prefer Rhythmbox to Totem for music files
 
 * Sun Sep 18 2011 Bastien Nocera <bnocera@redhat.com> 0.91-2
-- Fix changelog entries
+- Fix changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2-3
+- Add missing Vendor and Distribution tags.
+ entries
 
 * Sun Sep 18 2011 Bastien Nocera <bnocera@redhat.com> 0.91-1
 - Update to 0.91
@@ -600,7 +608,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 - rebuilt for new gcc4.1 snapshot and glibc changes
 
 * Mon Jan 30 2006 Caolan McNamara <caolanm@redhat.com> - 0.16.cvs20051219-2
-- rh#179138# add openoffice.org as preferred app for oasis formats 
+- rh#179138# add openoffice.org as preferred app for oasis formats
 
 * Mon Dec 19 2005 Matthias Clasen <mclasen@redhat.com> - 0.16.cvs20051219-1
 - Newer cvs snapshot
@@ -652,7 +660,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 - Handle XUL files. #134122
 
 * Wed Oct 13 2004 Colin Walters <walters@redhat.com> - 0.15-7
-- Make helix default for ogg and mp3, will switch wav/flac too 
+- Make helix default for ogg and mp3, will switch wav/flac too
   when support is added
 
 * Wed Oct  6 2004 Alexander Larsson <alexl@redhat.com> - 0.15-6

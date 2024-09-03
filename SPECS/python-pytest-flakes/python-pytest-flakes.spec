@@ -3,11 +3,13 @@
 
 Name:           python-%{srcname}
 Version:        4.0.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Pytest plugin to check source code with pyflakes
 
 License:        MIT
 URL:            https://pypi.python.org/pypi/pytest-flakes
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{pypi_source}
 
 BuildArch:      noarch
@@ -52,6 +54,9 @@ rm -rf *.egg-info
 %{python3_sitelib}/__pycache__/pytest_flakes.*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.5-10
+- Add missing Vendor and Distribution tags.
+
 * Mon May 20 2024 Sam Meluch <sammeluch@microsoft.com> - 4.0.5-9
 - Add pip test dependency to fix package tests
 
