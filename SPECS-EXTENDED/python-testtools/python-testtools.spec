@@ -27,11 +27,11 @@ framework.}
 
 Name:           python-%{pkgname}
 Version:        2.4.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Extensions to the Python unit testing framework
 License:        MIT
 URL:            https://launchpad.net/testtools
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/t/%{libname}/%{libname}-%{version}.tar.gz
 Patch0:         testtools-2.4.0-remove_backports.patch
@@ -107,6 +107,9 @@ make PYTHON=%{__python3} check
 %endif
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-9
+- Release bump to fix package information.
+
 * Tue Oct 13 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.4.0-8
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

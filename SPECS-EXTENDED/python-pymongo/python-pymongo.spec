@@ -7,12 +7,12 @@
 
 Name:           python-pymongo
 Version:        3.10.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 # All code is ASL 2.0 except bson/time64*.{c,h} which is MIT
 License:        ASL 2.0 and MIT
 Summary:        Python driver for MongoDB
 URL:            https://github.com/mongodb/mongo-python-driver
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/mongodb/mongo-python-driver/archive/%{version}/pymongo-%{version}.tar.gz
 # This patch removes the bundled ssl.match_hostname library as it was vulnerable to CVE-2013-7440
@@ -112,6 +112,9 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 %{python3_sitearch}/gridfs
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.10.1-6
+- Release bump to fix package information.
+
 * Mon Oct 19 2020 Steve Laughman <steve.laughman@microsoft.com> - 3.10.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
