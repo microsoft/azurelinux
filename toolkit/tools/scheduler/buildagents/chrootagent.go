@@ -110,9 +110,9 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 
 	if config.UseCcache {
 // temp: disable ccache
-//		serializedArgs = append(serializedArgs, "--use-ccache")
-//		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-root-dir=%s", config.CCacheDir))
-//		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-config=%s", config.CCacheConfig))
+		serializedArgs = append(serializedArgs, "--use-ccache")
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-root-dir=%s", config.CCacheDir))
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-config=%s", config.CCacheConfig))
 	}
 
 	for _, dependency := range dependencies {
