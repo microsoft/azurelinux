@@ -143,6 +143,9 @@ create_overlayfs() {
     mkdir -p "${_upper}" || die "Failed to create upper directory ${_upper}"
     mkdir -p "${_work}" || die "Failed to create work directory ${_work}"
 
+    # Note for now, the mountpoint / mergedir is set to the same directory as the lowerdir.
+    # This means the overlay will be mounted directly on the lower directory.
+    # TODO: Add support for a customized mountpoint in future versions.
     mount -t overlay overlay -o "${_mode}",lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
         die "Failed to mount overlay in ${_lower}"
 }
