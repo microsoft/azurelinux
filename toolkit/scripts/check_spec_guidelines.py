@@ -12,29 +12,42 @@ import sys
 
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
+EXPECTED_DISTRIBUTION_TAG = "Azure Linux"
+EXPECTED_VENDOR_TAG = "Microsoft Corporation"
+
+# Checking if the specs contains a 'Distribution' tag.
+DISTRIBUTION_TAG_PRESENT_REGEX = re.compile(r"^\s*Distribution:\s*", re.MULTILINE)
+
 # Checking if the specs include only the valid 'Distribution: Azure Linux' tag.
 INVALID_DISTRIBUTION_TAG_REGEX = re.compile(
-    r'^\s*Distribution:\s*(?!Azure Linux\s*$)\S+', re.MULTILINE)
+    rf"^\s*Distribution:\s*(?!{EXPECTED_DISTRIBUTION_TAG}\s*$)\S+", re.MULTILINE
+)
+
+# Checking if the specs include only the valid 'Vendor: Microsoft Corporation' tag.
+INVALID_VENDOR_TAG_REGEX = re.compile(
+    rf"^\s*Vendor:\s*(?!{EXPECTED_VENDOR_TAG}\s*$)\S+", re.MULTILINE
+)
+
+# Checking if the specs contains a 'Vendor' tag.
+VENDOR_TAG_PRESENT_REGEX = re.compile(r"^\s*Vendor:\s*", re.MULTILINE)
 
 # Checking for the deprecated '%patch[number]' format.
 # For more info, see: https://rpm-software-management.github.io/rpm/manual/spec.html.
-INVALID_PATCH_MACRO_REGEX = re.compile(
-    r'^\s*%patch\d', re.MULTILINE)
+INVALID_PATCH_MACRO_REGEX = re.compile(r"^\s*%patch\d", re.MULTILINE)
 
 # Check for '%patch' macros not using the '-P' flag.
-INVALID_TOOLCHAIN_PATCH_MACRO = re.compile(
-    r'^\s*%patch((?!-P\s+\d+).)*$', re.MULTILINE)
+INVALID_TOOLCHAIN_PATCH_MACRO = re.compile(r"^\s*%patch((?!-P\s+\d+).)*$", re.MULTILINE)
 
-LICENSE_REGEX = re.compile(
-    r"\b(license verified|verified license)\b", re.IGNORECASE)
+LICENSE_REGEX = re.compile(r"\b(license verified|verified license)\b", re.IGNORECASE)
 
-VALID_RELEASE_TAG_REGEX = re.compile(
-    r'^[1-9]\d*%\{\?dist\}$')
+VALID_RELEASE_TAG_REGEX = re.compile(r"^[1-9]\d*%\{\?dist\}$")
 
-VALID_SOURCE_ATTRIBUTIONS_ONE_PER_LINE = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
+VALID_SOURCE_ATTRIBUTIONS_ONE_PER_LINE = "\n".join(
+    f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items()
+)
 
 
-def check_distribution_tag(spec_path: str):
+def check_distribution_tag_correct(spec_path: str):
     """Checks if the 'Distribution' tags match 'Azure Linux'. """
     with open(spec_path) as file:
         contents = file.read()
@@ -43,7 +56,23 @@ def check_distribution_tag(spec_path: str):
         print(f"""
 ERROR: detected an invalid 'Distribution' tag.
 
-    Please use 'Distribution: Azure Linux'.
+    Please use 'Distribution: {EXPECTED_DISTRIBUTION_TAG}'.
+""")
+        return False
+
+    return True
+
+
+def check_distribution_tag_exists(spec_path: str):
+    """Checks if the 'Distribution' tag exists. """
+    with open(spec_path) as file:
+        contents = file.read()
+
+    if DISTRIBUTION_TAG_PRESENT_REGEX.search(contents) is None:
+        print(f"""
+ERROR: missing 'Distribution' tag.
+
+    Please add 'Distribution: {EXPECTED_DISTRIBUTION_TAG}'.
 """)
         return False
 
@@ -137,7 +166,7 @@ def check_toolchain_patch_lines(spec_path: str, toolchain_specs: set):
 
     with open(spec_path) as file:
         contents = file.read()
-        
+
     if INVALID_TOOLCHAIN_PATCH_MACRO.search(contents) is not None:
         print(f"""
 ERROR: detected a toolchain spec with invalid '%patch' macros.
@@ -150,26 +179,59 @@ ERROR: detected a toolchain spec with invalid '%patch' macros.
     return True
 
 
+def check_vendor_tag_correct(spec_path: str):
+    """Checks if the 'Vendor' tags match 'Microsoft Corporation'. """
+    with open(spec_path) as file:
+        contents = file.read()
+
+    if INVALID_VENDOR_TAG_REGEX.search(contents) is not None:
+        print(f"""
+ERROR: detected an invalid 'Vendor' tag.
+
+    Please use 'Vendor: {EXPECTED_VENDOR_TAG}'.
+""")
+        return False
+
+    return True
+
+
+def check_vendor_tag_exists(spec_path: str):
+    """Checks if the 'Vendor' tag exists. """
+    with open(spec_path) as file:
+        contents = file.read()
+
+    if VENDOR_TAG_PRESENT_REGEX.search(contents) is None:
+        print(f"""
+ERROR: missing 'Vendor' tag.
+
+    Please add 'Vendor: {EXPECTED_VENDOR_TAG}'.
+""")
+            return False
+
+    return True
+
+
+SPEC_CHECKS = [
+    check_distribution_tag_correct,
+    check_distribution_tag_exists,
+    check_license_verification,
+    check_patch_macro,
+    check_release_tag,
+    check_source_attribution,
+    check_vendor_tag_correct,
+    check_vendor_tag_exists,
+]
+
+
 def check_spec(spec_path, toolchain_specs):
     spec_correct = True
 
-    print(f"Checking {spec_path}")
+    print(f"Checking {spec_path}.")
 
-    if not check_distribution_tag(spec_path):
-        spec_correct = False
+    for spec_check in SPEC_CHECKS:
+        if not spec_check(spec_path):
+            spec_correct = False
 
-    if not check_patch_macro(spec_path):
-        spec_correct = False
-
-    if not check_release_tag(spec_path):
-        spec_correct = False
-
-    if not check_source_attribution(spec_path):
-        spec_correct = False
-
-    if not check_license_verification(spec_path):
-        spec_correct = False
-    
     if not check_toolchain_patch_lines(spec_path, toolchain_specs):
         spec_correct = False
 
@@ -190,7 +252,7 @@ if __name__ == '__main__':
                         nargs='+',
                         help='path to an RPM spec file')
     args = parser.parse_args()
-    
+
     toolchain_specs = set(args.toolchain_specs.split())
 
     specs_correct = True
