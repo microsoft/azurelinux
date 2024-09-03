@@ -91,8 +91,8 @@ func main() {
 
 	logger.Log.Info("NOTE: Building with clang/llvm")
 	defines[rpm.UseLLVMClangDefine] = "true"
-	logger.Log.Info("NOTE: Linking with LLVM lld")
-	defines[rpm.UseLLVMLinkerDefine] = "true"
+	logger.Log.Info("NOTE: NOT Linking with LLVM lld")
+	//defines[rpm.UseLLVMLinkerDefine] = "true"
 
 	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
