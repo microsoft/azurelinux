@@ -60,6 +60,7 @@ Python 3 version.
 %changelog
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-13
 - Release bump to fix package information.
+- License verified.
 
 * Thu Oct 22 2020 Steve Laughman <steve.laughman@microsoft.com> - 4.0-12
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

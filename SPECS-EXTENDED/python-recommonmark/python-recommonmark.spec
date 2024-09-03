@@ -83,6 +83,7 @@ popd  # Leave buildroot bindir
 %changelog
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-5
 - Release bump to fix package information.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.

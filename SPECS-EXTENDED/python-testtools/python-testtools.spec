@@ -109,6 +109,7 @@ make PYTHON=%{__python3} check
 %changelog
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-9
 - Release bump to fix package information.
+- License verified.
 
 * Tue Oct 13 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.4.0-8
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
