@@ -1,0 +1,157 @@
+From 5c1a31642e243f4870c0bd1f2afc7597976521bf Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Mon, 19 Aug 2024 22:26:07 +0200
+Subject: [PATCH 1/3] lib: Reject negative len for XML_ParseBuffer
+
+Reported by TaiYou
+---
+ expat/lib/xmlparse.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/expat/lib/xmlparse.c b/expat/lib/xmlparse.c
+index 91682c188..ba1038119 100644
+--- a/expat/lib/xmlparse.c
++++ b/expat/lib/xmlparse.c
+@@ -2038,6 +2038,12 @@ XML_ParseBuffer(XML_Parser parser, int len, int isFinal) {
+ 
+   if (parser == NULL)
+     return XML_STATUS_ERROR;
++
++  if (len < 0) {
++    parser->m_errorCode = XML_ERROR_INVALID_ARGUMENT;
++    return XML_STATUS_ERROR;
++  }
++
+   switch (parser->m_parsingStatus.parsing) {
+   case XML_SUSPENDED:
+     parser->m_errorCode = XML_ERROR_SUSPENDED;
+
+From c12f039b8024d6b9a11c20858370495ff6ff5245 Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Tue, 20 Aug 2024 22:57:12 +0200
+Subject: [PATCH 2/3] tests: Cover "len < 0" for both XML_Parse and
+ XML_ParseBuffer
+
+---
+ expat/tests/basic_tests.c | 57 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/expat/tests/basic_tests.c b/expat/tests/basic_tests.c
+index 91c8dd7a3..0d97b1090 100644
+--- a/expat/tests/basic_tests.c
++++ b/expat/tests/basic_tests.c
+@@ -2804,6 +2804,61 @@ START_TEST(test_empty_parse) {
+ }
+ END_TEST
+ 
++/* Test XML_Parse for len < 0 */
++START_TEST(test_negative_len_parse) {
++  const char *const doc = "<root/>";
++  for (int isFinal = 0; isFinal < 2; isFinal++) {
++    set_subtest("isFinal=%d", isFinal);
++
++    XML_Parser parser = XML_ParserCreate(NULL);
++
++    if (XML_GetErrorCode(parser) != XML_ERROR_NONE)
++      fail("There was not supposed to be any initial parse error.");
++
++    const enum XML_Status status = XML_Parse(parser, doc, -1, isFinal);
++
++    if (status != XML_STATUS_ERROR)
++      fail("Negative len was expected to fail the parse but did not.");
++
++    if (XML_GetErrorCode(parser) != XML_ERROR_INVALID_ARGUMENT)
++      fail("Parse error does not match XML_ERROR_INVALID_ARGUMENT.");
++
++    XML_ParserFree(parser);
++  }
++}
++END_TEST
++
++/* Test XML_ParseBuffer for len < 0 */
++START_TEST(test_negative_len_parse_buffer) {
++  const char *const doc = "<root/>";
++  for (int isFinal = 0; isFinal < 2; isFinal++) {
++    set_subtest("isFinal=%d", isFinal);
++
++    XML_Parser parser = XML_ParserCreate(NULL);
++
++    if (XML_GetErrorCode(parser) != XML_ERROR_NONE)
++      fail("There was not supposed to be any initial parse error.");
++
++    void *const buffer = XML_GetBuffer(parser, (int)strlen(doc));
++
++    if (buffer == NULL)
++      fail("XML_GetBuffer failed.");
++
++    memcpy(buffer, doc, strlen(doc));
++
++    const enum XML_Status status = XML_ParseBuffer(parser, -1, isFinal);
++
++    if (status != XML_STATUS_ERROR)
++      fail("Negative len was expected to fail the parse but did not.");
++
++    if (XML_GetErrorCode(parser) != XML_ERROR_INVALID_ARGUMENT)
++      fail("Parse error does not match XML_ERROR_INVALID_ARGUMENT.");
++
++    XML_ParserFree(parser);
++  }
++}
++END_TEST
++
+ /* Test odd corners of the XML_GetBuffer interface */
+ static enum XML_Status
+ get_feature(enum XML_FeatureEnum feature_id, long *presult) {
+@@ -5955,6 +6010,8 @@ make_basic_test_case(Suite *s) {
+   tcase_add_test__ifdef_xml_dtd(tc_basic, test_user_parameters);
+   tcase_add_test__ifdef_xml_dtd(tc_basic, test_ext_entity_ref_parameter);
+   tcase_add_test(tc_basic, test_empty_parse);
++  tcase_add_test(tc_basic, test_negative_len_parse);
++  tcase_add_test(tc_basic, test_negative_len_parse_buffer);
+   tcase_add_test(tc_basic, test_get_buffer_1);
+   tcase_add_test(tc_basic, test_get_buffer_2);
+ #if XML_CONTEXT_BYTES > 0
+
+From 2db233019f551fe4c701bbbc5eb0fa58ff349daa Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Sun, 25 Aug 2024 19:09:51 +0200
+Subject: [PATCH 3/3] doc: Document that XML_Parse/XML_ParseBuffer reject "len
+ < 0"
+
+---
+ expat/doc/reference.html | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/expat/doc/reference.html b/expat/doc/reference.html
+index bd205ed4c..c600fbba3 100644
+--- a/expat/doc/reference.html
++++ b/expat/doc/reference.html
+@@ -1135,7 +1135,9 @@ <h4 id="XML_Parse">XML_Parse</h4>
+ that are part of the document is indicated by <code>len</code>. This means
+ that <code>s</code> doesn't have to be null-terminated. It also means that
+ if <code>len</code> is larger than the number of bytes in the block of
+-memory that <code>s</code> points at, then a memory fault is likely. The
++memory that <code>s</code> points at, then a memory fault is likely.
++Negative values for <code>len</code> are rejected since Expat 2.2.1.
++The
+ <code>isFinal</code> parameter informs the parser that this is the last
+ piece of the document. Frequently, the last piece is empty (i.e.
+ <code>len</code> is zero.)
+@@ -1183,11 +1185,17 @@ <h4 id="XML_ParseBuffer">XML_ParseBuffer</h4>
+                 int isFinal);
+ </pre>
+ <div class="fcndef">
++<p>
+ This is just like <code><a href= "#XML_Parse" >XML_Parse</a></code>,
+ except in this case Expat provides the buffer.  By obtaining the
+ buffer from Expat with the <code><a href= "#XML_GetBuffer"
+ >XML_GetBuffer</a></code> function, the application can avoid double
+ copying of the input.
++</p>
++
++<p>
++Negative values for <code>len</code> are rejected since Expat 2.6.3.
++</p>
+ </div>
+ 
+ <h4 id="XML_GetBuffer">XML_GetBuffer</h4>
