@@ -1,8 +1,5 @@
 {
  "Signatures": {
-  "azurelinux-3.0-aarch64.cfg": "438b42b8e57dff9a34117bff4ff8b30a4e5433196b61e2149169dfe3c7adf343",
-  "azurelinux-3.0-x86_64.cfg": "8e31ce8fad6d780ee8f909f38f18c101e72ac8b23969d2d672bbeb53ed39f582",
-  "azurelinux-3.0.tpl": "912f0ba49b389894cd967d6bd7e9b25b282644ecf8daed94e6c6fd9155dbbaca",
   "mock-core-configs-41.2.tar.gz": "01c7511d427e23c01d2763ebdf76d177c89c3a8f84afe546c22e24dbe388b4b8"
  }
 }

@@ -17,9 +17,6 @@ URL:        https://github.com/rpm-software-management/mock/
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
 Source:     https://github.com/rpm-software-management/mock/releases/download/%{name}-%{version}-1/%{name}-%{version}.tar.gz
-Source1:    azurelinux-3.0-x86_64.cfg
-Source2:    azurelinux-3.0-aarch64.cfg
-Source3:    azurelinux-3.0.tpl
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
@@ -63,11 +60,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/mock/eol/templates
 mkdir -p %{buildroot}%{_sysconfdir}/mock/templates
 cp -a etc/mock/*.cfg %{buildroot}%{_sysconfdir}/mock
 cp -a etc/mock/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/templates
-
-%if 0%{?azl}
-cp -a %{SOURCE1} %{SOURCE2} %{buildroot}/%{_sysconfdir}/mock
-cp -a %{SOURCE3} %{buildroot}/%{_sysconfdir}/mock/templates
-%endif
 
 cp -a etc/mock/eol/*cfg %{buildroot}%{_sysconfdir}/mock/eol
 cp -a etc/mock/eol/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/eol/templates
