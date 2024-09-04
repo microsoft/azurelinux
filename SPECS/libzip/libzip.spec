@@ -31,6 +31,7 @@ BuildRequires:  perl(UNIVERSAL)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 %endif
+Patch0:         always_generate_regression_tests.patch
 
 %description
 libzip is a C library for reading, creating, and modifying zip archives. Files
@@ -63,8 +64,9 @@ The %{name}-tools package provides command line tools split off %{name}:
 rm INSTALL.md
 
 %build
-# Always install nihtest, which is required for package tests. It needs to be detected at build-time to enable the regression tests
+%if 0%{?with_check}
 pip3 install nihtest
+%endif
 mkdir build
 cd build
 %cmake \
@@ -116,6 +118,7 @@ make test
 * Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.10.1-2
 - Fix package tests
 - Switch to out-of-source build
+- Add patch to ensure regression tests are built even when nihtest is not detected
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-1
 - Auto-upgrade to 1.10.1 - Azure Linux 3.0 - package upgrades
