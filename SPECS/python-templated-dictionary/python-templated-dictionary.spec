@@ -39,7 +39,7 @@ Summary: %{summary}
 
 
 %prep
-%setup -q
+%setup -q -n %{srcname}-%{name}-%{version}-1
 
 
 %build
