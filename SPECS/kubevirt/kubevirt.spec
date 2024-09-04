@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,15 +29,17 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 Source1:        disks-images-provider.yaml
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
-Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
-Patch2:         Hotplug_detach_grace_period.patch
-Patch3:         CVE-2023-44487.patch
-Patch4:         CVE-2024-21626.patch
-Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
-Patch6:         CVE-2022-41723.patch
-Patch7:         CVE-2024-24786.patch
-Patch8:         CVE-2023-45288.patch
+Patch00:        Cleanup-housekeeping-cgroup-on-vm-del.patch
+Patch01:        Allocate-2-cpu-for-the-emulator-thread.patch
+Patch02:        Hotplug_detach_grace_period.patch
+Patch03:        CVE-2023-44487.patch
+Patch04:        CVE-2024-21626.patch
+Patch05:        Hp-volume-pod-should-respect-blockdevices.patch
+Patch06:        CVE-2022-41723.patch
+Patch07:        CVE-2024-24786.patch
+Patch08:        CVE-2023-45288.patch
+Patch09:        CVE-2022-32149.patch
+Patch10:        CVE-2023-26484.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
@@ -217,6 +219,10 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Aug 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-20
+- Fix for CVE-2022-32149
+- Fix for CVE-2023-26484
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-19
 - Bump release to rebuild with go 1.21.11
 
