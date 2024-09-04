@@ -405,25 +405,26 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedArgsFilePath string, isoGrubCfgFil
 
 func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, outputImageBase string, pxeGrubCfgFileName string) error {
 
-	logger.Log.Debugf("-- [0] (%s)", pxeIsoImageUrl)
+	inputContentString, err := removeCommandAll(inputContentString, "search")
+	if err != nil {
+		return fmt.Errorf("failed to remove the 'search' commands from PXE grub.cfg:\n%w", err)
+	}
+
 	if filepath.Ext(pxeIsoImageUrl) != ".iso" {
 		pxeIsoImagePath := strings.TrimPrefix(pxeIsoImageUrl, "http://")
-		logger.Log.Debugf("-- [1] (%s)", pxeIsoImagePath)
 		pxeIsoImagePath = filepath.Join(pxeIsoImagePath, outputImageBase+".iso")
-		logger.Log.Debugf("-- [2] (%s)", pxeIsoImagePath)
 		pxeIsoImageUrl = "http://" + pxeIsoImagePath
-		logger.Log.Debugf("-- [3] (%s)", pxeIsoImageUrl)
 	}
 	rootValue := fmt.Sprintf(pxeRootValueTemplate, pxeIsoImageUrl)
-	inputContentString, _, err := replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
+	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
 	if err != nil {
-		return fmt.Errorf("failed to update the root kernel argument with the PXE iso image url in the iso grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to update the root kernel argument with the PXE iso image url in the PXE grub.cfg:\n%w", err)
 	}
 
 	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, " ip=dhcp ",
 		true /*allowMultiple*/, false /*requireKernelOpts*/)
 	if err != nil {
-		return fmt.Errorf("failed to update the kernel arguments with the PXE support configuration \"ip=dhcp\" in the iso grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to append the kernel arguments with the PXE support configuration \"ip=dhcp\" in the PXE grub.cfg:\n%w", err)
 	}
 
 	err = file.Write(inputContentString, pxeGrubCfgFileName)

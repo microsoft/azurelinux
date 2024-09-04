@@ -75,6 +75,26 @@ func replaceSearchCommandAll(inputGrubCfgContent string, newSearchCommand string
 	return outputGrubCfgContent, nil
 }
 
+// Finds all command occurences and removes them.
+func removeCommandAll(inputGrubCfgContent string, command string) (outputGrubCfgContent string, err error) {
+	lines, err := findGrubCommandAll(inputGrubCfgContent, command, true /*allowMultiple*/)
+	if err != nil {
+		return "", err
+	}
+	outputGrubCfgContent = inputGrubCfgContent
+	// loop from last to first so that the captured locations from
+	// findGrubCommandAll are not invalidated as reconstructing
+	// outputGrubCfgContent.
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
+		start := line.Tokens[0].Loc.Start.Index
+		end := line.EndToken.Loc.Start.Index
+		outputGrubCfgContent = outputGrubCfgContent[:start] + outputGrubCfgContent[end:]
+	}
+
+	return outputGrubCfgContent, nil
+}
+
 func replaceToken(inputGrubCfgContent string, oldToken string, newToken string) (outputGrubCfgContent string, err error) {
 
 	// escape special characters that would interfer with defining the regular
