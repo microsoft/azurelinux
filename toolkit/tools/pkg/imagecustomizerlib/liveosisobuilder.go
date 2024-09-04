@@ -892,7 +892,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedArgsFilePath 
 //
 // ouptuts:
 //   - create a LiveOS ISO.
-func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) error {
+func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) (isoRepoDirPath string, err error) {
 	baseDirPath := ""
 
 	// unattended install is where the ISO OS configures a persistent storage
@@ -909,12 +909,13 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	// No stock resources are needed for the LiveOS scenario.
 	// No rpms are needed for the LiveOS scenario.
 	enableRpmRepo := false
-	isoRepoDirPath := ""
+	isoRepoDirPath = ""
 
 	// isoMaker constructs the final image name as follows:
 	// {isoOutputDir}/{isoOutputBaseName}{releaseVersion}{imageNameTag}.iso
 	releaseVersion := ""
 	imageNameTag := ""
+	isoImagePath := filepath.Join(isoOutputDir, isoOutputBaseName+releaseVersion+imageNameTag+".iso")
 
 	// empty target system config since LiveOS does not install the OS
 	// artifacts to the target system.
@@ -940,7 +941,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	// Add the iso config file
 	exists, err := file.PathExists(b.artifacts.savedArgsFilePath)
 	if err != nil {
-		return nil
+		return "", nil
 	}
 	if exists {
 		fileToCopy := safechroot.FileToCopy{
@@ -953,7 +954,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	// Add the grub-pxe.cfg file
 	exists, err = file.PathExists(b.artifacts.pxeGrubCfgPath)
 	if err != nil {
-		return nil
+		return "", nil
 	}
 	if exists {
 		fileToCopy := safechroot.FileToCopy{
@@ -965,7 +966,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 
 	err = os.MkdirAll(isoOutputDir, os.ModePerm)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	isoMaker, err := isomakerlib.NewIsoMakerWithConfig(
@@ -986,15 +987,15 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 		isoOutputBaseName,
 		imageNameTag)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = isoMaker.Make()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return isoImagePath, nil
 }
 
 // micIsoConfigToIsoMakerConfig
@@ -1073,7 +1074,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 //
 //	creates a LiveOS ISO image.
 func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *LiveOSIsoBuilder, isoConfig *imagecustomizerapi.Iso,
-	pxeConfig *imagecustomizerapi.Pxe, rawImageFile, outputImageDir, outputImageBase string) (err error) {
+	pxeConfig *imagecustomizerapi.Pxe, rawImageFile, outputImageDir, outputImageBase string, outputPXEArtifactsDir string) (err error) {
 
 	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
 	if err != nil {
@@ -1152,7 +1153,12 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		}
 	}
 
-	err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	isoImagePath, err := isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	if err != nil {
+		return err
+	}
+
+	err = generatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir)
 	if err != nil {
 		return err
 	}
@@ -1381,7 +1387,8 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 // outputs:
 //
 //   - creates an iso image.
-func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, pxeConfig *imagecustomizerapi.Pxe, outputImageDir string, outputImageBase string) error {
+func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, pxeConfig *imagecustomizerapi.Pxe,
+	outputImageDir string, outputImageBase string, outputPXEArtifactsDir string) error {
 
 	logger.Log.Infof("Creating LiveOS iso image using unchanged OS partitions")
 
@@ -1400,9 +1407,47 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
 
-	err = b.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	isoImagePath, err := b.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to create iso image:\n%w", err)
+	}
+
+	err = generatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArtifactsDir string) error {
+
+	if outputPXEArtifactsDir == "" {
+		return nil
+	}
+
+	logger.Log.Infof("Copying PXE artifacts to (%s)", outputPXEArtifactsDir)
+
+	err := os.RemoveAll(outputPXEArtifactsDir)
+	if err != nil {
+		return fmt.Errorf("failed to remove (%s):\n%w", outputPXEArtifactsDir, err)
+	}
+
+	err = extractIsoImageContents(buildDir, isoImagePath, outputPXEArtifactsDir)
+	if err != nil {
+		return err
+	}
+
+	isoGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub.cfg")
+	pxeGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub-pxe.cfg")
+	err = file.Copy(pxeGrubCfg, isoGrubCfg)
+	if err != nil {
+		return fmt.Errorf("failed to update grub.cfg with the grub.cfg with PXE:\n%w", err)
+	}
+
+	err = os.RemoveAll(pxeGrubCfg)
+	if err != nil {
+		return fmt.Errorf("failed to remove duplicate file (%s):\n%w", pxeGrubCfg, err)
 	}
 
 	return nil
