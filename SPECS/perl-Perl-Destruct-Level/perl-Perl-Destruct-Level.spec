@@ -1,7 +1,7 @@
 Name:		perl-Perl-Destruct-Level
 Summary:	Allows you to change perl's internal destruction level
 Version:	0.02
-Release:	27%{?dist}
+Release:	28%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,10 @@ make test
 %{_mandir}/man3/Perl::Destruct::Level.3*
 
 %changelog
+* Wed Sep 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.02-28
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
