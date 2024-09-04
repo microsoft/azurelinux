@@ -86,7 +86,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Tue Aug 13 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 8.8.0-2
+* Wed Sep 4 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 8.8.0-2
 - Patch CVE-2024-6197
 
 * Mon Jul 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-1
