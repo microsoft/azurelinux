@@ -1,6 +1,6 @@
 Name:           perl-Devel-Caller
-Version:        2.06
-Release:        22%{?dist}
+Version:        2.07
+Release:        1%{?dist}
 Summary:        Meatier versions of caller
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -56,6 +56,11 @@ make test
 %{_mandir}/man3/Devel::Caller.3pm*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.07-1
+- Promote package to Core repository.
+- License verified.
+- Updated to v2.07.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
