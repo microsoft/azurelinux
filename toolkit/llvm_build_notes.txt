@@ -1,31 +1,44 @@
 
-# LLVM build setup
+##
+## LLVM build setup
+##
+
 git clone https://github.com/microsoft/azurelinux.git
 git checkout anphel/3-llvm-toolchain-proto2
-sudo make clean
 
-# Toolchain build
+##
+## Toolchain build
+##
+
 # Quick toolchain setup
+sudo make clean
 mkdir -pv ../build/toolchain
-cp ~/toolchain_built_rpms_all_llvm_aug20.tar.gz ../build/toolchain/toolchain_from_container.tar.gz
-time sudo make toolchain -j20 REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y TOOLCHAIN_ARCHIVE=../build/toolchain/toolchain_from_container.tar.gz
+wget -nv --no-clobber https://azurelinuxsrcstorage.blob.core.windows.net/rawtoolchaincache/toolchain_from_container_3.0.20240716_606288_x86_64.tar.gz
+cp toolchain_from_container_3.0.20240716_606288_x86_64.tar.gz ../build/toolchain/toolchain_from_container.tar.gz
+touch ../build/toolchain/toolchain_from_container.tar.gz
+time sudo make toolchain -j20 REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y DELTA_BUILD=y ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=y 2>&1 | tee ./tclog.txt
+
 # Full toolchain rebuild
-time sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y 2>&1 | tee ./toolchain_clang_aug28.log
+sudo make clean
+time sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y 2>&1 | tee ./tcfull.txt
 
 # Refresh RPM macros
 time sudo make build-packages REBUILD_TOOLS=y USE_CCACHE=n SRPM_PACK_LIST="azurelinux-rpm-macros" PACKAGE_REBUILD_LIST="azurelinux-rpm-macros" ALLOW_TOOLCHAIN_REBUILDS=y SRPM_FILE_SIGNATURE_HANDLING=update
 sudo cp -v ../out/RPMS/noarch/azurelinux-rpm-macros-3.0-6.azl3.noarch.rpm ../build/toolchain_rpms/noarch
 sudo cp -v ../out/RPMS/noarch/azurelinux-check-macros-3.0-6.azl3.noarch.rpm ../build/toolchain_rpms/noarch
 
+##
+## Package build
+##
+
+# Attempt to build all packages
+time sudo make build-packages REBUILD_TOOLS=y DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
+
 # Build packages needed to create distroless images
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="azurelinux-release filesystem tzdata prebuilt-ca-certificates" PACKAGE_REBUILD_LIST="azurelinux-release filesystem tzdata prebuilt-ca-certificates" DISABLE_UPSTREAM_REPOS=y ALLOW_TOOLCHAIN_REBUILDS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="SymCrypt SymCrypt-OpenSSL pyelftools iana-etc" PACKAGE_REBUILD_LIST="SymCrypt SymCrypt-OpenSSL pyelftools iana-etc" DISABLE_UPSTREAM_REPOS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="distroless-packages busybox" PACKAGE_REBUILD_LIST="distroless-packages busybox" DISABLE_UPSTREAM_REPOS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="device-mapper-multipath userspace-rcu json-c libaio" PACKAGE_REBUILD_LIST="device-mapper-multipath userspace-rcu json-c libaio" DISABLE_UPSTREAM_REPOS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="acl attr libseccomp" PACKAGE_REBUILD_LIST="acl attr libseccomp" DISABLE_UPSTREAM_REPOS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="device-mapper-multipath lvm2 dbus dbus-python" PACKAGE_REBUILD_LIST="device-mapper-multipath lvm2 dbus-python" DISABLE_UPSTREAM_REPOS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="annobin alsa-lib" PACKAGE_REBUILD_LIST="annobin alsa-lib" DISABLE_UPSTREAM_REPOS=y ALLOW_TOOLCHAIN_REBUILDS=y
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="grub2" PACKAGE_REBUILD_LIST="grub2" DISABLE_UPSTREAM_REPOS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="azurelinux-release filesystem tzdata prebuilt-ca-certificates" DISABLE_UPSTREAM_REPOS=y ALLOW_TOOLCHAIN_REBUILDS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="SymCrypt SymCrypt-OpenSSL pyelftools iana-etc" DISABLE_UPSTREAM_REPOS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="distroless-packages busybox userspace-rcu json-c libaio" DISABLE_UPSTREAM_REPOS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="device-mapper-multipath lvm2 dbus dbus-python acl attr libseccomp" DISABLE_UPSTREAM_REPOS=y
 
 # Manually download some dependency packages that cannot yet be built
 wget -nv https://packages.microsoft.com/azurelinux/3.0/prod/base/x86_64/Packages/d/device-mapper-2.03.23-1.azl3.x86_64.rpm
@@ -44,11 +57,14 @@ wget -nv https://packages.microsoft.com/azurelinux/3.0/prod/base/x86_64/Packages
 mv -v ./systemd*noarch*.rpm ../out/RPMS/noarch
 mv -v ./systemd*x86_64*.rpm ../out/RPMS/x86_64
 
-# Attempt to build all packages
-time sudo make build-packages REBUILD_TOOLS=y DISABLE_UPSTREAM_REPOS=y
+##
+## Image build
+##
 
 # Build image
 time sudo make image CONFIG_FILE=./imageconfigs/distroless-minimal.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
 time sudo make image CONFIG_FILE=./imageconfigs/distroless-debug.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
 time sudo make image CONFIG_FILE=./imageconfigs/distroless-base.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
 time sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
+time sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y SRPM_PACK_LIST="" DISABLE_UPSTREAM_REPOS=y
+time sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
