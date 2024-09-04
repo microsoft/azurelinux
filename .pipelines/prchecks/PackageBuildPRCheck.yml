@@ -102,6 +102,7 @@ extends:
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
+                      checkBuildRetries: "1"
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                       isCheckBuild: true
                       isQuickRebuildPackages: true
@@ -109,8 +110,8 @@ extends:
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
-                      testSuiteName: "[${{ configuration.name }}] Package test"
                       testRerunList: "$(testListFromToolchain)"
+                      testSuiteName: "[${{ configuration.name }}] Package test"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
