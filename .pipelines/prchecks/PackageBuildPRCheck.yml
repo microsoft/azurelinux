@@ -106,6 +106,7 @@ extends:
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
+                      checkBuildRetries: "1"
                       customToolchainArtifactName: $(toolchainArtifactName)
                       isCheckBuild: true
                       isQuickRebuildPackages: true
@@ -114,8 +115,8 @@ extends:
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
-                      testSuiteName: "[${{ configuration.name }}] Package test"
                       testRerunList: "$(testListFromToolchain)"
+                      testSuiteName: "[${{ configuration.name }}] Package test"
 
                   - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "RPMsArtifactName"
