@@ -11230,9 +11230,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracecmd",
+          "version": "1.5.1",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
-          "version": "1.7.2",
-          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtracefs",
+          "version": "1.8.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
         }
       }
     },
@@ -28909,6 +28929,16 @@
           "name": "tpm2-tss",
           "version": "2.4.6",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "trace-cmd",
+          "version": "3.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v3.2.tar.gz"
         }
       }
     },
