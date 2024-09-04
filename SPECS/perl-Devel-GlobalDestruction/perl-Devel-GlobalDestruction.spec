@@ -3,7 +3,7 @@
 
 Name:		perl-Devel-GlobalDestruction
 Version:	0.14
-Release:	12%{?dist}
+Release:	13%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -81,6 +81,10 @@ make test
 %{_mandir}/man3/Devel::GlobalDestruction.3*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.14-13
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -292,4 +296,3 @@ make test
 * Sun Oct 19 2008 Chris Weyl <cweyl@alumni.drew.edu> 0.02-0.1
 - initial RPM packaging
 - generated with cpan2dist (CPANPLUS::Dist::RPM version 0.0.5)
-
