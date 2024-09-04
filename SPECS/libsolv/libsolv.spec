@@ -1,7 +1,7 @@
 Summary:        A free package dependency solver
 Name:           libsolv
 Version:        0.7.28
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
+BuildRequires:  libzstd-devel
 Requires:       expat-libs
 
 %description
@@ -47,7 +48,8 @@ Requires:       xz
     -DENABLE_RPMDB_BYRPMHEADER=ON       \
     -DENABLE_RPMDB_LIBRPM=ON            \
     -DENABLE_RPMMD=ON                   \
-    -DENABLE_COMPS=ON
+    -DENABLE_COMPS=ON                   \
+    -DENABLE_ZSTD_COMPRESSION=ON
 %make_build
 
 %install
@@ -77,6 +79,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Wed Sep 04 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.7.28-2
+- Enable zstd support to match createrepo_c.
+
 * Wed Feb 07 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 0.7.28-1
 - Upgrade to version 0.7.28
 
