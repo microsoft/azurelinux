@@ -13,8 +13,6 @@ BuildRequires:  gcc
 BuildRequires:  openssl-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-BuildRequires:  python3
-BuildRequires:  python3-pip
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
@@ -30,6 +28,8 @@ BuildRequires:  perl(Symbol)
 BuildRequires:  perl(UNIVERSAL)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+BuildRequires:  python3
+BuildRequires:  python3-pip
 %endif
 Patch0:         always_generate_regression_tests.patch
 
