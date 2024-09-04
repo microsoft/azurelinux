@@ -88,7 +88,7 @@ jobs:
         sudo env "PATH=$PATH" make go-test-coverage
 
     - name: Upload test coverage
-      uses: actions/upload-artifact@v2.1.4
+      uses: actions/upload-artifact@v4
       with:
         name: TestCoverage
         path: toolkit/out/tools/test_coverage_report.html
