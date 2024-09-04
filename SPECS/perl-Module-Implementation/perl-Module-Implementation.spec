@@ -10,7 +10,7 @@
 
 Name:		perl-Module-Implementation
 Version:	0.09
-Release:	24%{?dist}
+Release:	25%{?dist}
 Summary:	Loads one of several alternate underlying implementations for a module
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -131,6 +131,10 @@ make test
 %{_mandir}/man3/Module::Implementation.3*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.09-25
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.09-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

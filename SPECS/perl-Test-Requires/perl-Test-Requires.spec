@@ -4,16 +4,16 @@
 # Only need manual requires for "use base XXX;" prior to rpm 4.9
 %global rpm49 %(rpm --version | perl -p -e 's/^.* (\\d+)\\.(\\d+).*/sprintf("%d.%03d",$1,$2) ge 4.009 ? 1 : 0/e' 2>/dev/null || echo 0)
 
-Name:		perl-Test-Requires
+Name:		  perl-Test-Requires
 Summary:	Checks to see if a given module can be loaded
 Version:	0.10
 Release:	21%{?dist}
 License:	GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:		https://metacpan.org/release/Test-Requires
+Vendor:   Microsoft Corporation
+Distribution:  Azure Linux
+URL:		  https://metacpan.org/release/Test-Requires
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Requires-%{version}.tar.gz#/perl-Test-Requires-%{version}.tar.gz
-BuildArch:	noarch
+BuildArch:  noarch
 # Module Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -78,7 +78,7 @@ make test TEST_FILES="xt/*.t"
 %{_mandir}/man3/Test::Requires.3*
 
 %changelog
-* Tue Aug 27 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-21
+* Wed Sep 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-21
 - Promote package to Core repository.
 - License verified.
 
@@ -246,5 +246,3 @@ make test TEST_FILES="xt/*.t"
 
 * Sat Mar 20 2010 Chris Weyl <cweyl@alumni.drew.edu> - 0.03-1
 - Specfile by Fedora::App::MaintainerTools 0.006
-
-
