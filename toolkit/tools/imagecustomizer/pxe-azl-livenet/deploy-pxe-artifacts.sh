@@ -20,7 +20,8 @@ mount_dir=/mnt/$(basename $sourceIsoPath)
 tftpbootLocalDir="/var/lib/tftpboot"
 httpLocalDir="/etc/httpd/marineros"
 httpRoot="http://192.168.0.1/marineros"
-isoRelativePath=liveos/azure-linux.iso
+# isoRelativePath=liveos/azure-linux.iso
+isoRelativePath=liveos/
 # optional arguments
 hostScriptRelativePath=liveos/host-script.sh
 hostConfigRelativePath=liveos/host-config.cfg
@@ -46,64 +47,64 @@ function copy_file () {
     chown root:root $target_file
 }
 
-function createPxeGrubCfg() {
-    local pxeGrubCfg=$1
-    local isoRelativePath=$2
-    local hostScriptRelativePath=$3
-    local hostConfigRelativePath=$4
+# function createPxeGrubCfg() {
+#     local pxeGrubCfg=$1
+#     local isoRelativePath=$2
+#     local hostScriptRelativePath=$3
+#     local hostConfigRelativePath=$4
 
-    if [[ -z $httpRoot ]]; then
-        echo "error: failed to create grub.cfg. An http root path must be specified."
-        exit 1
-    fi
+#     if [[ -z $httpRoot ]]; then
+#         echo "error: failed to create grub.cfg. An http root path must be specified."
+#         exit 1
+#     fi
 
-    if [[ -z $isoRelativePath ]]; then
-        echo "error: failed to create grub.cfg. An iso relative path must be specified."
-        exit 1
-    fi
+#     if [[ -z $isoRelativePath ]]; then
+#         echo "error: failed to create grub.cfg. An iso relative path must be specified."
+#         exit 1
+#     fi
 
-    rdRoot="root=live:$httpRoot/$isoRelativePath"
+#     rdRoot="root=live:$httpRoot/$isoRelativePath"
 
-    if [[ -n $hostScriptRelativePath ]]; then
-        rdHostScript="rd.host.script=live:$httpRoot/$hostScriptRelativePath"
-    fi
+#     if [[ -n $hostScriptRelativePath ]]; then
+#         rdHostScript="rd.host.script=live:$httpRoot/$hostScriptRelativePath"
+#     fi
 
-    if [[ -n $hostConfigRelativePath ]]; then
-        rdHostConfig="rd.host.config=live:$httpRoot/$hostConfigRelativePath"
-    fi
+#     if [[ -n $hostConfigRelativePath ]]; then
+#         rdHostConfig="rd.host.config=live:$httpRoot/$hostConfigRelativePath"
+#     fi
 
-    cat <<EOF > $pxeGrubCfg
-set timeout=10
-set bootprefix=/boot
-# set debug=all
+#     cat <<EOF > $pxeGrubCfg
+# set timeout=10
+# set bootprefix=/boot
+# # set debug=all
 
-menuentry "CBL-Mariner" {
-        linux /boot/vmlinuz \\
-                ip=dhcp \\
-                $rdRoot \\
-                $rdHostScript \\
-                $rdHostConfig \\
-                rd.auto=1 \\
-                selinux=0 security= \\
-                console=tty0 console=ttyS0 \\
-                sysctl.kernel.unprivileged_bpf_disabled=1 \\
-                rd.info \\
-                log_buf_len=1M \\
-                rd.shell \\
-                rd.live.image \\
-                rd.live.dir=liveos \\
-                rd.live.squashimg=rootfs.img \\
-                rd.live.overlay=1 \\
-                rd.live.overlay.overlayfs \\
-                rd.live.overlay.nouserconfirmprompt
+# menuentry "CBL-Mariner" {
+#         linux /boot/vmlinuz \\
+#                 ip=dhcp \\
+#                 $rdRoot \\
+#                 $rdHostScript \\
+#                 $rdHostConfig \\
+#                 rd.auto=1 \\
+#                 selinux=0 security= \\
+#                 console=tty0 console=ttyS0 \\
+#                 sysctl.kernel.unprivileged_bpf_disabled=1 \\
+#                 rd.info \\
+#                 log_buf_len=1M \\
+#                 rd.shell \\
+#                 rd.live.image \\
+#                 rd.live.dir=liveos \\
+#                 rd.live.squashimg=rootfs.img \\
+#                 rd.live.overlay=1 \\
+#                 rd.live.overlay.overlayfs \\
+#                 rd.live.overlay.nouserconfirmprompt
 
-        initrd /boot/initrd.img
-}
-EOF
+#         initrd /boot/initrd.img
+# }
+# EOF
 
-    chmod 755 $pxeGrubCfg
-    chown root:root $pxeGrubCfg
-}
+#     chmod 755 $pxeGrubCfg
+#     chown root:root $pxeGrubCfg
+# }
 
 function createPxeHostCfg() {
     local pxeHostConfig=$1
@@ -162,6 +163,9 @@ function deploy_tftp_folder() {
     #
 
     copy_file $mount_dir/boot/grub2/grub-pxe.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+
+    sed -i 's/iso-publish-path/192.168.0.1\/marineros\/liveos/g' $tftpbootLocalDir/boot/grub2/grub.cfg
+
     # createPxeGrubCfg \
     #    $tftpbootLocalDir/boot/grub2/grub.cfg \
     #    $isoRelativePath \
@@ -176,13 +180,13 @@ function deploy_http_folder() {
     mkdir -p $httpLocalDir/liveos
     chmod 755 $httpLocalDir/liveos
     # copy_file $mount_dir/liveos/rootfs.img $httpLocalDir/liveos/rootfs.img
-    copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath
-    if [[ -n $hostScriptRelativePath ]]; then
-        createPxeHostScript $httpLocalDir/$hostScriptRelativePath
-    fi
-    if [[ -n $hostConfigRelativePath ]]; then
-        createPxeHostCfg $httpLocalDir/$hostConfigRelativePath
-    fi
+    copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath/$(basename $sourceIsoPath)
+    # if [[ -n $hostScriptRelativePath ]]; then
+    #     createPxeHostScript $httpLocalDir/$hostScriptRelativePath
+    # fi
+    # if [[ -n $hostConfigRelativePath ]]; then
+    #     createPxeHostCfg $httpLocalDir/$hostConfigRelativePath
+    # fi
 }
 
 function clean() {
