@@ -16793,8 +16793,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-Caller",
-          "version": "2.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.06.tar.gz"
+          "version": "2.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.07.tar.gz"
         }
       }
     },
