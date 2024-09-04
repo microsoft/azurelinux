@@ -17,7 +17,7 @@ URL: https://github.com/svinota/%{srcname}
 BuildArch: noarch
 BuildRequires: python3-pip
 BuildRequires: python3-wheel
-Source0: %{name}-%{version}.tar.gz
+Source0: %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %description %{_description}
 

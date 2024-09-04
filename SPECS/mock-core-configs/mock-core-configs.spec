@@ -16,7 +16,7 @@ URL:        https://github.com/rpm-software-management/mock/
 # cd mock/mock-core-configs
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
-Source:     https://github.com/rpm-software-management/mock/releases/download/%{name}-%{version}-1/%{name}-%{version}.tar.gz
+Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to

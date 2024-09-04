@@ -18,7 +18,7 @@ URL:        https://github.com/xsuchy/templated-dictionary
 # Source is created by:
 # git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
 # tito build --tgz --tag %%name-%%version-%%release
-Source0:    %name-%version.tar.gz
+Source0:    %{url}/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch: noarch
 

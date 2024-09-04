@@ -16,7 +16,7 @@ BuildArch: noarch
 License: MIT
 Summary: Python library providing function decorators for configurable backoff and retry
 URL:     https://github.com/litl/backoff
-Source0: %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+Source0: %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
 BuildRequires: pyproject-rpm-macros
 BuildRequires: python3-pip

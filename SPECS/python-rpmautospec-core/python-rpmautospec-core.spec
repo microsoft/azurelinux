@@ -26,7 +26,7 @@ Summary: Minimum functionality for rpmautospec
 
 License: MIT
 URL: https://github.com/fedora-infra/%{canonicalname}
-Source0: %{canonicalname}-%{version}.tar.gz
+Source0: %{url}/releases/download/%{version}/rpmautospec_core-%{version}.tar.gz#/%{canonicalname}-%{version}.tar.gz
 BuildArch: noarch
 BuildRequires: python3-devel >= 3.6.0
 # The dependencies needed for testing donâ€™t get auto-generated.
