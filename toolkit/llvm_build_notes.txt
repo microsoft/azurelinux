@@ -18,6 +18,10 @@ cp toolchain_from_container_3.0.20240716_606288_x86_64.tar.gz ../build/toolchain
 touch ../build/toolchain/toolchain_from_container.tar.gz
 time sudo make toolchain -j20 REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y DELTA_BUILD=y ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=y 2>&1 | tee ./tclog.txt
 
+# Toolchain hydration
+sudo make clean
+sudo make toolchain -j20 REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y TOOLCHAIN_ARCHIVE=~/toolchain_built_rpms_all_llvm_anphel_x64_633539.tar.gz
+
 # Full toolchain rebuild
 sudo make clean
 time sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y 2>&1 | tee ./tcfull.txt
@@ -35,10 +39,14 @@ sudo cp -v ../out/RPMS/noarch/azurelinux-check-macros-3.0-6.azl3.noarch.rpm ../b
 time sudo make build-packages REBUILD_TOOLS=y DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
 
 # Build packages needed to create distroless images
-time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="azurelinux-release filesystem tzdata prebuilt-ca-certificates" DISABLE_UPSTREAM_REPOS=y ALLOW_TOOLCHAIN_REBUILDS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="azurelinux-release tzdata prebuilt-ca-certificates" DISABLE_UPSTREAM_REPOS=y
 time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="SymCrypt SymCrypt-OpenSSL pyelftools iana-etc" DISABLE_UPSTREAM_REPOS=y
 time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="distroless-packages busybox userspace-rcu json-c libaio" DISABLE_UPSTREAM_REPOS=y
 time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="device-mapper-multipath lvm2 dbus dbus-python acl attr libseccomp" DISABLE_UPSTREAM_REPOS=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="systemd python-pefile future numpy openblas execstack" DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="grub2" DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
+
+time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="lvm2 autoconf-archive dbus dbus-python dbus-glib" DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
 
 # Manually download some dependency packages that cannot yet be built
 wget -nv https://packages.microsoft.com/azurelinux/3.0/prod/base/x86_64/Packages/d/device-mapper-2.03.23-1.azl3.x86_64.rpm
@@ -62,7 +70,7 @@ mv -v ./systemd*x86_64*.rpm ../out/RPMS/x86_64
 ##
 
 # Build image
-time sudo make image CONFIG_FILE=./imageconfigs/distroless-minimal.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
+time sudo make image CONFIG_FILE=./imageconfigs/distroless-minimal.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
 time sudo make image CONFIG_FILE=./imageconfigs/distroless-debug.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
 time sudo make image CONFIG_FILE=./imageconfigs/distroless-base.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
 time sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SRPM_PACK_LIST= DISABLE_UPSTREAM_REPOS=y
