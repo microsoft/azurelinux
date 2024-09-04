@@ -1,11 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:		perl-Class-Load-XS
+Name:		  perl-Class-Load-XS
 Version:	0.10
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	XS implementation of parts of Class::Load
 License:	Artistic 2.0
-URL:		https://metacpan.org/release/Class-Load-XS
+URL:		  https://metacpan.org/release/Class-Load-XS
+Vendor:   Microsoft Corporation
+Distribution:  Azure Linux
 Source0:	https://cpan.metacpan.org/modules/by-module/Class/Class-Load-XS-%{version}.tar.gz#/perl-Class-Load-XS-%{version}.tar.gz
 # ===================================================================
 # Module build requirements
@@ -74,6 +74,10 @@ make test
 %{_mandir}/man3/Class::Load::XS.3*
 
 %changelog
+* Wed Sep 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10-13
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -194,8 +198,8 @@ make test
   - Some small test changes for the latest Module::Implementation and
     Class::Load
 - Bump Class::Load version requirement to 0.15
-- BR: perl(constant), perl(Module::Implementation) ≥ 0.04, 
-  perl(Test::Requires), perl(Test::Without::Module) and perl(version) for test 
+- BR: perl(constant), perl(Module::Implementation) ≥ 0.04,
+  perl(Test::Requires), perl(Test::Without::Module) and perl(version) for test
   suite
 
 * Tue Jan 10 2012 Paul Howarth <paul@city-fan.org> - 0.03-2

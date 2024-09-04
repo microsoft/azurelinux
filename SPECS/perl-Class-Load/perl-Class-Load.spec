@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 
 Name:		perl-Class-Load
 Version:	0.25
-Release:	11%{?dist}
+Release:	12%{?dist}
 Summary:	A working (require "Class::Name") and more
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/Class-Load
@@ -96,6 +96,10 @@ make test
 %{_mandir}/man3/Class::Load.3*
 
 %changelog
+* Wed Sep 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.25-12
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.25-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
