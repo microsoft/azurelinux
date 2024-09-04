@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
-BuildRequires:  libzstd-devel
+BuildRequires:  zstd-devel
 Requires:       expat-libs
 
 %description
