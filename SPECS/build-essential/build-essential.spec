@@ -33,7 +33,7 @@ Metapackage to install all build tools
 %defattr(-,root,root,0755)
 
 %changelog
-* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - %{azl}.0-3
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0-3
 - Add missing Vendor and Distribution tags.
 
 * Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
