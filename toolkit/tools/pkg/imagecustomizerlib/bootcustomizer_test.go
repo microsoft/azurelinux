@@ -164,6 +164,7 @@ func TestBootCustomizerVerity30(t *testing.T) {
 	expectedDefaultGrubFileDiff := `6a7,8
 > GRUB_DISABLE_UUID="true"
 > GRUB_DISABLE_RECOVERY="true"
+> GRUB_DEVICE="/dev/mapper/root"
 `
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 
