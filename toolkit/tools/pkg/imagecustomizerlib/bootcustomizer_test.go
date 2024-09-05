@@ -161,7 +161,7 @@ func TestBootCustomizerVerity30(t *testing.T) {
 	err := b.PrepareForVerity()
 	assert.NoError(t, err)
 
-	expectedDefaultGrubFileDiff := `6a7,8
+	expectedDefaultGrubFileDiff := `6a7,9
 > GRUB_DISABLE_UUID="true"
 > GRUB_DISABLE_RECOVERY="true"
 > GRUB_DEVICE="/dev/mapper/root"
