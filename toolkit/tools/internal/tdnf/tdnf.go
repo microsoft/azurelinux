@@ -159,7 +159,7 @@ func getMajorVersionFromString(version string) (majorVersion string, err error) 
 	return
 }
 
-func getRepoSnapshotCliArg(posixTime string) (repoSnapshot string, err error) {
+func GetRepoSnapshotCliArg(posixTime string) (repoSnapshot string, err error) {
 	const (
 		errorFormatString = "cannot generate snapshot cli arg for: %s"
 	)
@@ -179,7 +179,7 @@ func getRepoSnapshotCliArg(posixTime string) (repoSnapshot string, err error) {
 	return repoSnapshot, nil
 }
 
-func getRepoSnapshotExcludeCliArg(excludeRepo string) (excludeArg string, err error) {
+func GetRepoSnapshotExcludeCliArg(excludeRepo string) (excludeArg string, err error) {
 	if excludeRepo == "" {
 		err = fmt.Errorf("exclude repo cannot be empty")
 		return "", err

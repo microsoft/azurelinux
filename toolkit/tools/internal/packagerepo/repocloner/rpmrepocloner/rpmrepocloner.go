@@ -706,6 +706,12 @@ func (r *RpmRepoCloner) GetRepoSnapshotArgs() []string {
 }
 
 func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
+	var (
+		snapshotTimeArg    string
+		snapshotExcludeArg string
+		err                error
+	)
+
 	r.repoSnapshotTime = posixTime
 	r.repoSnapshotArgs = []string{}
 
@@ -713,8 +719,19 @@ func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
 		return
 	}
 
-	r.repoSnapshotArgs = append(r.repoSnapshotArgs, fmt.Sprintf("--snapshottime=%s", r.repoSnapshotTime))
-	r.repoSnapshotArgs = append(r.repoSnapshotArgs, fmt.Sprintf("--excludesnapshot=%s", repoIDBuilt))
+	snapshotTimeArg, err = tdnf.GetRepoSnapshotCliArg(r.repoSnapshotTime)
+	if err != nil {
+		logger.Log.Errorf("Snapshot Time is invalid")
+		return
+	}
+	snapshotExcludeArg, err = tdnf.GetRepoSnapshotExcludeCliArg(repoIDBuilt)
+	if err != nil {
+		logger.Log.Errorf("Snapshot Repo to exclude is invalid")
+		return
+	}
+
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotTimeArg)
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotExcludeArg)
 
 }
 
