@@ -409,6 +409,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-4
 - Enable paravirt spinlocks
+- Enable CET and IBT
 
 * Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
 - Enable usb hiddev and serial ch341
