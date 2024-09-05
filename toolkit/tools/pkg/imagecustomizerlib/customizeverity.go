@@ -84,7 +84,7 @@ func prepareGrubConfigForVerity(imageChroot *safechroot.Chroot) error {
 		return err
 	}
 
-	err = bootCustomizer.PrepareForVerity("")
+	err = bootCustomizer.PrepareForVerity()
 	if err != nil {
 		return err
 	}

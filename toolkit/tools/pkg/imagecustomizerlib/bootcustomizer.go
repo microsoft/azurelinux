@@ -160,7 +160,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 }
 
 // Makes changes to the /etc/default/grub file that are needed/useful for enabling verity.
-func (b *BootCustomizer) PrepareForVerity(rootDeviceValue string) error {
+func (b *BootCustomizer) PrepareForVerity() error {
 	if b.isGrubMkconfig {
 		// Force root command-line arg to be referenced by /dev path instead of by UUID.
 		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
@@ -177,12 +177,10 @@ func (b *BootCustomizer) PrepareForVerity(rootDeviceValue string) error {
 			return err
 		}
 
-		// Check if rootDeviceValue is available as a field in BootCustomizer or another way
-		if rootDeviceValue != "" {
-			defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE", rootDeviceValue)
-			if err != nil {
-				return err
-			}
+		// For verity, the root device will always be "/dev/mapper/root"
+		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE", "/dev/mapper/root")
+		if err != nil {
+			return err
 		}
 
 		b.defaultGrubFileContent = defaultGrubFileContent
