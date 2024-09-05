@@ -409,6 +409,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
 - Enable dm_verity and dm_bufio by default
+- Enable virtio_console by default
 
 * Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
 - UKI: remove usrmount from initrd
