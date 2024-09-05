@@ -14,9 +14,20 @@ import (
 )
 
 func TestCustomizeImageSELinux(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImageSELinuxHelper(t, "TestCustomizeImageSELinux"+string(version), baseImageTypeCoreEfi,
+				version)
+		})
+	}
+}
 
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageSELinux")
+func testCustomizeImageSELinuxHelper(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
+
+	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
 	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
@@ -100,9 +111,20 @@ func TestCustomizeImageSELinux(t *testing.T) {
 }
 
 func TestCustomizeImageSELinuxAndPartitions(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImageSELinuxAndPartitionsHelper(t, "TestCustomizeImageSELinuxAndPartitions"+string(version),
+				baseImageTypeCoreEfi, version)
+		})
+	}
+}
 
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageSELinuxAndPartitions")
+func testCustomizeImageSELinuxAndPartitionsHelper(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
+
+	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
 	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
@@ -150,7 +172,7 @@ func TestCustomizeImageSELinuxAndPartitions(t *testing.T) {
 }
 
 func TestCustomizeImageSELinuxNoPolicy(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageSELinuxNoPolicy")
 	buildDir := filepath.Join(testTmpDir, "build")

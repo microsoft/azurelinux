@@ -2,11 +2,13 @@
 
 Name:           mdevctl
 Version:        1.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
 URL:            https://crates.io/crates/mdevctl
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
 Source1:        https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
 
@@ -37,7 +39,7 @@ vfio-mdev for assignment to virtual machines.
 %autosetup -n %{crate}-%{version} -p1
 
 # Do vendor expansion here manually by
-# calling `tar x` and setting up 
+# calling `tar x` and setting up
 # .cargo/config to use it.
 tar fx %{SOURCE1}
 mkdir -p .cargo
@@ -92,6 +94,9 @@ cargo test
 %{bashcompletiondir}/lsmdev
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.0-4
+- Add missing Vendor and Distribution tags.
+
 * Wed Mar 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-3
 - Enable for other architectures.
 

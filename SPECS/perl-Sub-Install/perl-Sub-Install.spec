@@ -6,8 +6,8 @@
 %endif
 
 Name:           perl-Sub-Install
-Version:        0.928
-Release:        24%{?dist}
+Version:        0.929
+Release:        1%{?dist}
 Summary:        Install subroutines into packages easily
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ make test
 %{_mandir}/man3/Sub::Install.3pm*
 
 %changelog
+* Tue Aug 27 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.929-1
+- Update to v0.929.
+
 * Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 0.928-24
 - Promote package to Core repository.
 - License verified.

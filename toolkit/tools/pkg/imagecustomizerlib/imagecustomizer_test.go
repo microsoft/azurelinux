@@ -48,7 +48,7 @@ var (
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
@@ -67,7 +67,7 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 func TestCustomizeImageCopyFiles(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
 	configFile := filepath.Join(testDir, "addfiles-config.yaml")
@@ -206,7 +206,7 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageKernelCommandLine")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")

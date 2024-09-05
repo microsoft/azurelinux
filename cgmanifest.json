@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.43.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.43.1.tar.gz"
+          "version": "6.6.44.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.44.1.tar.gz"
         }
       }
     },
@@ -10761,8 +10761,8 @@
         "type": "other",
         "other": {
           "name": "libsafec",
-          "version": "3.7.1",
-          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.7.1/safeclib-3.7.1.tar.xz"
+          "version": "3.8.1",
+          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.8.1/safeclib-3.8.1.tar.xz"
         }
       }
     },
@@ -15703,8 +15703,8 @@
         "type": "other",
         "other": {
           "name": "perl-Algorithm-C3",
-          "version": "0.10",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-C3-0.10.tar.gz"
+          "version": "0.11",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-C3-0.11.tar.gz"
         }
       }
     },
@@ -16793,8 +16793,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-Caller",
-          "version": "2.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.06.tar.gz"
+          "version": "2.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.07.tar.gz"
         }
       }
     },
@@ -16885,6 +16885,16 @@
           "name": "perl-Devel-LexAlias",
           "version": "0.05",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-LexAlias-0.05.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Devel-Refcount",
+          "version": "0.10",
+          "downloadUrl": "https://www.cpan.org/modules/by-module/Devel/Devel-Refcount-0.10.tar.gz"
         }
       }
     },
@@ -18142,6 +18152,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-match-simple",
+          "version": "0.012",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/match-simple-0.012.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Math-Int64",
           "version": "0.54",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-0.54.tar.gz"
@@ -18823,8 +18843,8 @@
         "type": "other",
         "other": {
           "name": "perl-PadWalker",
-          "version": "2.3",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBIN/PadWalker-2.3.tar.gz"
+          "version": "2.5",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBIN/PadWalker-2.5.tar.gz"
         }
       }
     },
@@ -19452,6 +19472,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Sub-Infix",
+          "version": "0.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Sub-Infix-0.004.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Sub-Info",
           "version": "0.002",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Sub-Info-0.002.tar.gz"
@@ -19463,8 +19493,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sub-Install",
-          "version": "0.928",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Install-0.928.tar.gz"
+          "version": "0.929",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Install-0.929.tar.gz"
         }
       }
     },
@@ -20093,8 +20123,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Without-Module",
-          "version": "0.20",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Without-Module-0.20.tar.gz"
+          "version": "0.23",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Without-Module-0.23.tar.gz"
         }
       }
     },

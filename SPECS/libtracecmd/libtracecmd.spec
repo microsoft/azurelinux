@@ -1,10 +1,12 @@
 Name:          libtracecmd
 Version:       1.5.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 License:       LGPL-2.1-only AND LGPL-2.1-or-later AND GPL-2.0-only AND GPL-2.0-or-later
 Summary:       A library for reading tracing instances stored in a trace file
 
 URL:           https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 Source0:       https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 ExcludeArch:   %{ix86} %{arm}
@@ -69,6 +71,9 @@ chrpath --delete %{buildroot}/%{_libdir}/libtracecmd.so*
 %{_includedir}/trace-cmd
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.5.1-2
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.5.1-1
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified
