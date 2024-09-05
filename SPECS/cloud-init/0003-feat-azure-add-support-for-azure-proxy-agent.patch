@@ -116,7 +116,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          yield m
  
  
-++@pytest.fixture
++@pytest.fixture
 +def mock_wrapping_report_failure(azure_ds):
 +    with mock.patch.object(
 +        azure_ds,
@@ -133,7 +133,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          yield m
  
  
-++@pytest.fixture
++@pytest.fixture
 +def mock_timestamp():
 +    timestamp = datetime.datetime.utcnow()
 +    with mock.patch.object(errors, "datetime", autospec=True) as m:
