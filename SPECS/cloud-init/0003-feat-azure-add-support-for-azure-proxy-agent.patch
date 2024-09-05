@@ -103,7 +103,7 @@ index 966725b00..b331cd686 100644
 +        self.supporting_data["stderr"] = exception.stderr
 diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
 --- a/tests/unittests/sources/test_azure.py	2023-08-28 09:20:24.000000000 -0700
-+++ b/tests/unittests/sources/test_azure.py	2024-09-04 16:47:35.140368594 -0700
++++ b/tests/unittests/sources/test_azure.py	2024-09-05 16:19:14.035134350 -0700
 @@ -1,6 +1,7 @@
  # This file is part of cloud-init. See LICENSE file for license information.
  
@@ -112,11 +112,10 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
  import json
  import os
  import stat
-@@ -48,6 +49,16 @@
-         yield m
+@@ -49,6 +50,16 @@
  
  
-+@pytest.fixture
+ @pytest.fixture
 +def mock_wrapping_report_failure(azure_ds):
 +    with mock.patch.object(
 +        azure_ds,
@@ -126,14 +125,14 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        yield m
 +
 +
- @pytest.fixture
++@pytest.fixture
  def mock_azure_helper_readurl():
      with mock.patch(
-@@ -253,6 +264,14 @@
-         yield m
+         "cloudinit.sources.helpers.azure.url_helper.readurl", autospec=True
+@@ -254,6 +265,14 @@
  
  
-+@pytest.fixture
+ @pytest.fixture
 +def mock_timestamp():
 +    timestamp = datetime.datetime.utcnow()
 +    with mock.patch.object(errors, "datetime", autospec=True) as m:
@@ -141,23 +140,24 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        yield timestamp
 +
 +
- @pytest.fixture
++@pytest.fixture
  def mock_util_ensure_dir():
      with mock.patch(
-@@ -3649,6 +3668,9 @@
+         MOCKPATH + "util.ensure_dir",
+@@ -3649,6 +3668,78 @@
          }
  
      def test_no_pps(self):
 +        ovf = construct_ovf_env(provision_guest_proxy_agent=False)
 +        md, ud, cfg = dsaz.read_azure_ovf(ovf)
 +        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
-         self.mock_readurl.side_effect = [
-             mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
-         ]
-@@ -3656,6 +3678,81 @@
- 
-         self.azure_ds._check_and_get_data()
- 
++        self.mock_readurl.side_effect = [
++            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
++        ]
++        self.mock_azure_get_metadata_from_fabric.return_value = []
++
++        self.azure_ds._check_and_get_data()
++
 +        assert self.mock_subp_subp.mock_calls == []
 +
 +        # Verify DHCP is setup once.
@@ -220,13 +220,13 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        ovf = construct_ovf_env(provision_guest_proxy_agent=True)
 +        md, ud, cfg = dsaz.read_azure_ovf(ovf)
 +        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
-+        self.mock_readurl.side_effect = [
-+            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
-+        ]
-+        self.mock_azure_get_metadata_from_fabric.return_value = []
-+
-+        self.azure_ds._check_and_get_data()
-+
+         self.mock_readurl.side_effect = [
+             mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
+         ]
+@@ -3656,6 +3747,11 @@
+ 
+         self.azure_ds._check_and_get_data()
+ 
 +        assert self.mock_subp_subp.mock_calls == [
 +            mock.call(
 +                ["azure-proxy-agent", "--status", "--wait", "120"],
@@ -235,7 +235,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          assert self.mock_readurl.mock_calls == [
              mock.call(
                  "http://169.254.169.254/metadata/instance?"
-@@ -3713,6 +3810,92 @@
+@@ -3713,6 +3809,92 @@
  
          # Verify reports via KVP.
          assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
@@ -328,7 +328,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
  
      def test_running_pps(self):
-@@ -4292,6 +4475,64 @@
+@@ -4292,6 +4474,64 @@
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
  
  
