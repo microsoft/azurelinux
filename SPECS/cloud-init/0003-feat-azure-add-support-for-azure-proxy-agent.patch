@@ -101,21 +101,22 @@ index 966725b00..b331cd686 100644
 +        self.supporting_data["exit_code"] = exception.exit_code
 +        self.supporting_data["stdout"] = exception.stdout
 +        self.supporting_data["stderr"] = exception.stderr
-diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
---- a/tests/unittests/sources/test_azure.py	2023-08-28 09:20:24.000000000 -0700
-+++ b/tests/unittests/sources/test_azure.py	2024-09-04 16:47:35.140368594 -0700
+diff --git a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
+index 255991ec3..75abf09c6 100644
+--- a/tests/unittests/sources/test_azure.py
++++ b/tests/unittests/sources/test_azure.py
 @@ -1,6 +1,7 @@
  # This file is part of cloud-init. See LICENSE file for license information.
- 
+
  import copy
 +import datetime
  import json
  import os
  import stat
-@@ -48,6 +49,16 @@
+@@ -48,6 +49,16 @@ def mock_wrapping_setup_ephemeral_networking(azure_ds):
          yield m
- 
- 
+
+
 +@pytest.fixture
 +def mock_wrapping_report_failure(azure_ds):
 +    with mock.patch.object(
@@ -129,10 +130,10 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
  @pytest.fixture
  def mock_azure_helper_readurl():
      with mock.patch(
-@@ -253,6 +264,14 @@
+@@ -253,6 +264,14 @@ def mock_subp_subp():
          yield m
- 
- 
+
+
 +@pytest.fixture
 +def mock_timestamp():
 +    timestamp = datetime.datetime.utcnow()
@@ -144,9 +145,25 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
  @pytest.fixture
  def mock_util_ensure_dir():
      with mock.patch(
-@@ -3649,6 +3668,9 @@
+@@ -288,6 +307,15 @@ def mock_util_mount_cb():
+         yield m
+
+
++@pytest.fixture
++def mock_report_failure():
++    with mock.patch(
++        MOCKPATH + "_report_failure",
++        autospec=True,
++    ) as m:
++        yield m
++
++
+ @pytest.fixture
+ def wrapped_util_write_file():
+     with mock.patch.object(
+@@ -3672,6 +3700,9 @@ class TestProvisioning:
          }
- 
+
      def test_no_pps(self):
 +        ovf = construct_ovf_env(provision_guest_proxy_agent=False)
 +        md, ud, cfg = dsaz.read_azure_ovf(ovf)
@@ -154,11 +171,54 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          self.mock_readurl.side_effect = [
              mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
          ]
-@@ -3656,6 +3678,81 @@
- 
+@@ -3679,6 +3710,8 @@ class TestProvisioning:
+
          self.azure_ds._check_and_get_data()
- 
+
 +        assert self.mock_subp_subp.mock_calls == []
++
+         assert self.mock_readurl.mock_calls == [
+             mock.call(
+                 "http://169.254.169.254/metadata/instance?"
+@@ -3736,6 +3769,174 @@ class TestProvisioning:
+
+         # Verify reports via KVP.
+         assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
++        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
++        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
++
++    def test_no_pps_gpa(self):
++        """test full provisioning scope when azure-proxy-agent
++        is enabled and running."""
++        self.mock_subp_subp.side_effect = [
++            subp.SubpResult("Guest Proxy Agent running", ""),
++        ]
++        ovf = construct_ovf_env(provision_guest_proxy_agent=True)
++        md, ud, cfg = dsaz.read_azure_ovf(ovf)
++        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
++        self.mock_readurl.side_effect = [
++            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
++        ]
++        self.mock_azure_get_metadata_from_fabric.return_value = []
++
++        self.azure_ds._check_and_get_data()
++
++        assert self.mock_subp_subp.mock_calls == [
++            mock.call(
++                ["azure-proxy-agent", "--status", "--wait", "120"],
++            ),
++        ]
++        assert self.mock_readurl.mock_calls == [
++            mock.call(
++                "http://169.254.169.254/metadata/instance?"
++                "api-version=2021-08-01&extended=true",
++                timeout=30,
++                headers={"Metadata": "true"},
++                exception_cb=mock.ANY,
++                infinite=True,
++                log_req_resp=True,
++            ),
++        ]
 +
 +        # Verify DHCP is setup once.
 +        assert self.mock_wrapping_setup_ephemeral_networking.mock_calls == [
@@ -191,7 +251,6 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        assert self.mock_azure_get_metadata_from_fabric.mock_calls == [
 +            mock.call(
 +                endpoint="10.11.12.13",
-+                distro=self.azure_ds.distro,
 +                iso_dev="/dev/sr0",
 +                pubkey_info=None,
 +            )
@@ -206,40 +265,6 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +
 +        # Verify reports via KVP.
 +        assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
-+        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
-+        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
-+
-+        # Verify dmesg reported via KVP.
-+        assert len(self.mock_report_dmesg_to_kvp.mock_calls) == 1
-+
-+    def test_no_pps_gpa(self):
-+        """test full provisioning scope when azure-proxy-agent
-+        is enabled and running."""
-+        self.mock_subp_subp.side_effect = [
-+            subp.SubpResult("Guest Proxy Agent running", ""),
-+        ]
-+        ovf = construct_ovf_env(provision_guest_proxy_agent=True)
-+        md, ud, cfg = dsaz.read_azure_ovf(ovf)
-+        self.mock_util_mount_cb.return_value = (md, ud, cfg, {})
-+        self.mock_readurl.side_effect = [
-+            mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
-+        ]
-+        self.mock_azure_get_metadata_from_fabric.return_value = []
-+
-+        self.azure_ds._check_and_get_data()
-+
-+        assert self.mock_subp_subp.mock_calls == [
-+            mock.call(
-+                ["azure-proxy-agent", "--status", "--wait", "120"],
-+            ),
-+        ]
-         assert self.mock_readurl.mock_calls == [
-             mock.call(
-                 "http://169.254.169.254/metadata/instance?"
-@@ -3713,6 +3810,92 @@
- 
-         # Verify reports via KVP.
-         assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
 +        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
 +        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
 +
@@ -263,6 +288,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        self.mock_azure_get_metadata_from_fabric.return_value = []
 +
 +        self.azure_ds._check_and_get_data()
++
 +        assert self.mock_subp_subp.mock_calls == [
 +            mock.call(
 +                ["azure-proxy-agent", "--status", "--wait", "120"],
@@ -327,12 +353,12 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 1
 +        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 1
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
- 
+
      def test_running_pps(self):
-@@ -4292,6 +4475,64 @@
+@@ -4315,6 +4516,61 @@ class TestProvisioning:
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
- 
- 
+
+
 +class TestCheckAzureProxyAgent:
 +    @pytest.fixture(autouse=True)
 +    def proxy_setup(
@@ -358,10 +384,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        assert self.mock_wrapping_report_failure.mock_calls == []
 +
 +    def test_check_azure_proxy_agent_status_notfound(self):
-+        exception = subp.ProcessExecutionError(reason=FileNotFoundError())
-+        self.mock_subp_subp.side_effect = [
-+            exception,
-+        ]
++        self.mock_subp_subp.side_effect = [FileNotFoundError]
 +        self.azure_ds._check_azure_proxy_agent_status()
 +        assert "azure-proxy-agent not found" in self.caplog.text
 +        assert self.mock_wrapping_report_failure.mock_calls == [
