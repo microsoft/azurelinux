@@ -75,6 +75,13 @@ clean-imagegen:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(IMAGEGEN_DIR)" && \
 	rm -rf $(IMAGEGEN_DIR)
 
+# We need to clear the rpm package cache if we have a snapshot time. The filenames will all be
+# the same, but the actual .rpm files may be fundamentally different.
+$(STATUS_FLAGS_DIR)/imagegen_cleanup.flag: $(depend_REPO_SNAPSHOT_TIME)
+	@echo "REPO_SNAPSHOT_TIME has changed, sanitizing rpm cache"
+	rm -rf $(local_and_external_rpm_cache)
+	touch $@
+
 ##help:target:fetch-image-packages=Locate and download all packages required for an image build.
 fetch-image-packages: $(image_package_cache_summary)
 
@@ -113,7 +120,11 @@ ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms)
+ifneq ($(REPO_SNAPSHOT_TIME),)
+imagepkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
+endif
+
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
@@ -198,7 +209,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/roast.jsonl
 
-$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
+$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \

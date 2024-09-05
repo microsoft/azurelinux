@@ -201,7 +201,7 @@ ifeq ($(PRECACHE),y)
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS) $(depend_REPO_SNAPSHOT_TIME)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag
 	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -263,6 +263,13 @@ clean-compress-rpms:
 	rm -rf $(pkggen_archive)
 clean-compress-srpms:
 	rm -rf $(srpms_archive)
+
+# We need to clear the rpm package cache if we have a snapshot time. The filenames will all be
+# the same, but the actual .rpm files may be fundamentally different.
+$(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag: $(depend_REPO_SNAPSHOT_TIME)
+	@echo "REPO_SNAPSHOT_TIME has changed, sanitizing rpm cache"
+	rm -rf $(remote_rpms_cache_dir)
+	touch $@
 
 ifeq ($(REBUILD_PACKAGES),y)
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
