@@ -125,7 +125,7 @@ os:
             - [end](#end-uint64)
             - [size](#size-uint64)
             - [type](#partition-type-string)
-    - [fileSystems](#filesystems-filesystem)
+    - [filesystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
         - [type](#type-string)
@@ -245,7 +245,7 @@ storage:
     - id: rootfs
       start: 9M
       
-  fileSystems:
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
@@ -369,7 +369,7 @@ storage:
     - id: var
       start: 2G
 
-  fileSystems:
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
@@ -477,11 +477,11 @@ mountDependencies:
 
 **Important**: If any directory specified in `mountDependencies` needs to be
 available during the initrd phase, you must ensure that this directory's mount
-configuration in the `fileSystems` section includes the `x-initrd.mount` option.
+configuration in the `filesystems` section includes the `x-initrd.mount` option.
 For example:
 
 ```yaml
-fileSystems:
+filesystems:
   - deviceId: var
     type: ext4
     mountPoint:
@@ -1560,6 +1560,6 @@ Supported options:
 
 Contains the options for provisioning disks and their partitions.
 
-### fileSystems [[fileSystem](#filesystem-type)[]]
+### filesystems [[fileSystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
