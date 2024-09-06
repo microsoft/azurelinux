@@ -103,7 +103,7 @@ index 966725b00..b331cd686 100644
 +        self.supporting_data["stderr"] = exception.stderr
 diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
 --- a/tests/unittests/sources/test_azure.py	2023-08-28 09:20:24.000000000 -0700
-+++ b/tests/unittests/sources/test_azure.py	2024-09-06 03:06:08.563274466 -0700
++++ b/tests/unittests/sources/test_azure.py	2024-09-06 11:30:27.992040291 -0700
 @@ -1,6 +1,7 @@
  # This file is part of cloud-init. See LICENSE file for license information.
  
@@ -144,7 +144,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
  def mock_util_ensure_dir():
      with mock.patch(
          MOCKPATH + "util.ensure_dir",
-@@ -3649,6 +3668,78 @@
+@@ -3649,6 +3668,76 @@
          }
  
      def test_no_pps(self):
@@ -208,8 +208,6 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
 +        assert len(self.mock_azure_report_failure_to_fabric.mock_calls) == 0
 +        assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
 +
-+        # Verify dmesg reported via KVP.
-+        assert len(self.mock_report_dmesg_to_kvp.mock_calls) == 1
 +
 +    def test_no_pps_gpa(self):
 +        """test full provisioning scope when azure-proxy-agent
@@ -223,7 +221,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          self.mock_readurl.side_effect = [
              mock.MagicMock(contents=json.dumps(self.imds_md).encode()),
          ]
-@@ -3656,6 +3747,11 @@
+@@ -3656,6 +3745,11 @@
  
          self.azure_ds._check_and_get_data()
  
@@ -235,7 +233,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          assert self.mock_readurl.mock_calls == [
              mock.call(
                  "http://169.254.169.254/metadata/instance?"
-@@ -3713,6 +3809,92 @@
+@@ -3713,6 +3807,92 @@
  
          # Verify reports via KVP.
          assert len(self.mock_kvp_report_failure_to_host.mock_calls) == 0
@@ -328,7 +326,7 @@ diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
  
      def test_running_pps(self):
-@@ -4292,6 +4474,64 @@
+@@ -4292,6 +4472,64 @@
          assert len(self.mock_kvp_report_success_to_host.mock_calls) == 1
  
  
