@@ -10,7 +10,7 @@ import (
 type Storage struct {
 	BootType    BootType     `yaml:"bootType"`
 	Disks       []Disk       `yaml:"disks"`
-	FileSystems []FileSystem `yaml:"fileSystems"`
+	FileSystems []FileSystem `yaml:"filesystems"`
 }
 
 func (s *Storage) IsValid() error {
@@ -39,7 +39,7 @@ func (s *Storage) IsValid() error {
 	for i, fileSystem := range s.FileSystems {
 		err = fileSystem.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid fileSystems item at index %d: %w", i, err)
+			return fmt.Errorf("invalid filesystems item at index %d: %w", i, err)
 		}
 
 		if _, existingName := fileSystemSet[fileSystem.DeviceId]; existingName {

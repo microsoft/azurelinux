@@ -288,7 +288,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid fileSystems item at index 0")
+	assert.ErrorContains(t, err, "invalid filesystems item at index 0")
 	assert.ErrorContains(t, err, "invalid mountPoint value")
 	assert.ErrorContains(t, err, "invalid path (boot/efi): must be an absolute path")
 }
