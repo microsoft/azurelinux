@@ -156,7 +156,7 @@ install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindi
 install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
 
 install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
-install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server /shared/server
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}/shared/server
 
 install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
 
@@ -192,7 +192,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_bindir}/cdi-containerimage-server
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
-/shared/server
+%{buildroot}/shared/server
 
 %files operator
 %license LICENSE
