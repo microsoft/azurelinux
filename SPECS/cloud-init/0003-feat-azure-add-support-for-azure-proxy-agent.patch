@@ -103,7 +103,7 @@ index 966725b00..b331cd686 100644
 +        self.supporting_data["stderr"] = exception.stderr
 diff -ruN a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
 --- a/tests/unittests/sources/test_azure.py	2023-08-28 09:20:24.000000000 -0700
-+++ b/tests/unittests/sources/test_azure.py	2024-09-05 16:19:14.035134350 -0700
++++ b/tests/unittests/sources/test_azure.py	2024-09-06 03:06:08.563274466 -0700
 @@ -1,6 +1,7 @@
  # This file is part of cloud-init. See LICENSE file for license information.
  
