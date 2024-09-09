@@ -3,6 +3,19 @@ From: Ksenija Stanojevic <ksenija.stanojevic@gmail.com>
 Date: Mon, 15 Jul 2024 18:48:19 -0700
 Subject: [PATCH 3/3] feat(azure): add support for azure-proxy-agent
 
+NOTE change for azurelinux :
+
+This patch has some addtional modifications in the test_azure.py. Those changes remove
+some tests which would fail to run:
+1. removing unit tests for imds.headers_cb in test_no_pps, which is not implement 
+in our current version of cloud-init
+2. remove checking for distro=self.azure_ds.distro in test_no_pps, this is due to
+a behavior difference in mock_azure_get_metadata_from_fabric which would not return
+self.azure_ds.distro
+3. remove mock_report_dmesg_to_kvp test in test_no_pps, as mock_report_dmesg_to_kvp is not 
+implemented in our current version of cloud-init
+
+Original Fedora commit message below:
 ---
  cloudinit/sources/DataSourceAzure.py  |  40 ++++
  cloudinit/sources/azure/errors.py     |  19 +-
