@@ -40,7 +40,7 @@ variables:
   - name: toolchainArtifactNameBase
     value: Toolchain
   - name: system.debug
-    value: '${{ parameters.debug }}'
+    value: "${{ parameters.debug }}"
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -115,7 +115,6 @@ extends:
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
-                      testRerunList: "$(testListFromToolchain)"
                       testSuiteName: "[${{ configuration.name }}] Package test"
 
                   - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
@@ -138,13 +137,15 @@ extends:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_TestToolchain_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
+                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       checkBuildRetries: "1"
-                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      customToolchainArtifactName: $(toolchainArtifactName)
                       isCheckBuild: true
                       isQuickRebuildPackages: true
+                      isUseCCache: true
                       outputArtifactsFolder: $(ob_outputDirectory)
                       outputRPMsTarballName: "" # We don't need to publish any output RPMs for toolchain tests.
                       outputSRPMsTarballName: "" # We don't need to publish any output SRPMs for toolchain tests.
