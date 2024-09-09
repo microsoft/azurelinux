@@ -99,7 +99,7 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: $(rpmsArtifactNameBase)_BuildAndTest_${{ configuration.name }}_$(System.JobAttempt)
+                  ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                   toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
@@ -125,7 +125,7 @@ extends:
 
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: $(rpmsArtifactNameBase)_BuildAndTest_${{ configuration.name }}_$(System.JobAttempt)
+                      artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
