@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -132,6 +132,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-15
+- Bump release to rebuild with go 1.22.7
+
 * Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 2.37.0-14
 - Patch for CVE-2024-6104
 

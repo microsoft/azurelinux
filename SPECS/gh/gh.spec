@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-20
+- Bump release to rebuild with go 1.22.7
+
 <<<<<<< HEAD
 * Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-19
 - Drop requirement on a specific version of golang
