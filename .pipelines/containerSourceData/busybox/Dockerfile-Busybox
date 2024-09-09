@@ -33,6 +33,7 @@ RUN mkdir /staging \
     && pushd /staging \
     && rm -rf boot media mnt opt run \
     && rm -rf usr/lib/sysimage \
+    && find /var/lib/ -mindepth 1 -maxdepth 1 -type d ! -name 'rpm' -exec rm -rf {} + \
     && rm -rf var/cache; \
 	ln -vL /staging/usr/sbin/busybox /staging/bin/; \
 	chroot /staging /bin/busybox --install -s /bin
