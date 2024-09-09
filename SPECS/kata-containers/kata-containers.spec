@@ -38,8 +38,8 @@
 
 Summary:        Kata Containers
 Name:           kata-containers
-Version:        3.2.0.azl2
-Release:        3%{?dist}
+Version:        3.8.0.azl0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -215,6 +215,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.0.azl0-1
+- Auto-upgrade to 3.8.0.azl0
+
 * Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
 - Call make clean with OS distro variable
 
