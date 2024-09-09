@@ -1402,7 +1402,7 @@ Specifies the user's password.
 
 WARNING: Passwords should not be used in images used in production.
 
-### PasswordExpiresDays [int]
+### passwordExpiresDays [int]
 
 The number of days until the password expires and the user can no longer login.
 
@@ -1421,7 +1421,7 @@ os:
 
 ### sshPublicKeyPaths [string[]]
 
-File paths to SSH public key files.
+A list of file paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
 
 Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
@@ -1435,6 +1435,24 @@ os:
   - name: test
     sshPublicKeyPaths:
     - id_ed25519.pub
+```
+
+### sshPublicKeys [string[]]
+
+A list of SSH public keys.
+These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
+
+Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
+individual public keys.
+
+Example:
+
+```yaml
+os:
+  users:
+  - name: test
+    sshPublicKeys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFyWtgGE06d/uBFQm70tYKvJKwJfRDoh06bWQQwC6Qkm test@test-machine
 ```
 
 ### primaryGroup [string]
