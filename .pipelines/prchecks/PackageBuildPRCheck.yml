@@ -108,11 +108,13 @@ extends:
                     parameters:
                       checkBuildRetries: "1"
                       customToolchainArtifactName: $(toolchainArtifactName)
+                      isAllowToolchainRebuilds: true
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       isUseCCache: true
-                      outputArtifactsFolder: $(ob_outputDirectory)
                       maxCPU: "${{ configuration.maxCPUs }}"
+                      outputArtifactsFolder: $(ob_outputDirectory)
+                      packageRebuildList: "$(testListFromToolchain)"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
@@ -127,41 +129,6 @@ extends:
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
-
-              - job: TestToolchain
-                pool:
-                  type: linux
-                  isCustom: true
-                  name: ${{ configuration.agentPool }}
-                variables:
-                  ob_artifactBaseName: $(rpmsArtifactNameBase)_TestToolchain_${{ configuration.name }}_$(System.JobAttempt)
-                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
-                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
-                steps:
-                  - template: .pipelines/templates/PackageBuild.yml@self
-                    parameters:
-                      checkBuildRetries: "1"
-                      customToolchainArtifactName: $(toolchainArtifactName)
-                      isCheckBuild: true
-                      isQuickRebuildPackages: true
-                      isUseCCache: true
-                      outputArtifactsFolder: $(ob_outputDirectory)
-                      outputRPMsTarballName: "" # We don't need to publish any output RPMs for toolchain tests.
-                      outputSRPMsTarballName: "" # We don't need to publish any output SRPMs for toolchain tests.
-                      maxCPU: "${{ configuration.maxCPUs }}"
-                      packageBuildList: "$(testListFromToolchain)"
-                      pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
-                      selfRepoName: self
-                      testRerunList: "$(testListFromToolchain)"
-                      testSuiteName: "[${{ configuration.name }}] Toolchain package test"
-
-                  - task: PublishPipelineArtifact@1
-                    inputs:
-                      artifact: $(rpmsArtifactNameBase)_TestToolchain_${{ configuration.name }}_$(System.JobAttempt)
-                      targetPath: $(ob_outputDirectory)
-                    condition: always()
-                    displayName: "Publish toolchain test artifacts"
 
           - stage: sodiff_${{ configuration.name }}
             dependsOn: RPMs_${{ configuration.name }}
