@@ -126,7 +126,7 @@ os:
             - [size](#size-uint64)
             - [type](#partition-type-string)
     - [filesystems](#filesystems-filesystem)
-      - [fileSystem type](#filesystem-type)
+      - [filesystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
         - [type](#type-string)
         - [mountPoint](#mountpoint-mountpoint)
@@ -640,7 +640,7 @@ os:
       childFilePermissions: "644"
 ```
 
-## fileSystem type
+## filesystem type
 
 Specifies the mount options for a partition.
 
@@ -649,7 +649,7 @@ Specifies the mount options for a partition.
 Required.
 
 The ID of the partition.
-This is used correlate [partition](#partition-type) objects with fileSystem objects.
+This is used correlate [partition](#partition-type) objects with filesystem objects.
 
 ### type [string]
 
@@ -883,7 +883,7 @@ os:
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [fileSystem](#filesystem-type)
+This is used to correlate Partition objects with [filesystem](#filesystem-type)
 objects.
 
 ### label [string]
@@ -1560,6 +1560,6 @@ Supported options:
 
 Contains the options for provisioning disks and their partitions.
 
-### filesystems [[fileSystem](#filesystem-type)[]]
+### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
