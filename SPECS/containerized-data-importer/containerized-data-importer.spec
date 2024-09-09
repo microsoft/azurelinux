@@ -193,7 +193,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_bindir}/cdi-containerimage-server
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
-%{buildroot}/shared/server
+/shared/server
 
 %files operator
 %license LICENSE
