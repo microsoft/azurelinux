@@ -4,8 +4,8 @@
 
 Summary:        dnf equivalent using C libs
 Name:           tdnf
-Version:        3.5.6
-Release:        2%{?dist}
+Version:        3.5.8
+Release:        1%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -219,6 +219,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Mon Sep 09 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-1
+- Minor upgrade to tdnf
+
 * Fri Jul 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-2
 - Add tdnf virtual repo snapshots
 
