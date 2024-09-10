@@ -204,6 +204,7 @@ steps:
         allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=y"
       elif [[ ${{ parameters.isAllowToolchainRebuilds }} == "false" ]]; then
         allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=n"
+      fi
 
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
