@@ -13,7 +13,7 @@ Source1:        runuser
 Source2:        runuser-l
 Source3:        su
 Source4:        su-l
-Patch0:         0001-wall-fix-escape-sequence-Injection-CVE-2024-28085.patch
+Patch0:         CVE-2024-28085.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
