@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.55.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ Provides:       cdi = %{version}-%{release}
 ExclusiveArch:  x86_64 aarch64
 Patch0:         CVE-2023-44487.patch
 Patch1:         CVE-2024-3727.patch
+Patch2:         CVE-2022-41717.patch
+Patch3:         CVE-2022-32149.patch
+Patch4:         CVE-2024-28180.patch
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -202,6 +205,11 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Wed Aug 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.55.0-20
+- Address CVE-2022-41717
+- Address CVE-2022-32149
+- Address CVE-2024-28180
+
 * Thu Jun 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.55.0-19
 - Address CVE-2024-3727 by patching vendored github.com/containers/image
 
