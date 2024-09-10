@@ -123,7 +123,7 @@ func TestStorageIsValidBadEspFsType(t *testing.T) {
 
 	err := storage.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ESP partition must have 'fat32' filesystem type")
+	assert.ErrorContains(t, err, "ESP partition must have 'fat32' or 'vfat' filesystem type")
 }
 
 func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
@@ -151,7 +151,7 @@ func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
 
 	err := storage.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "BIOS boot partition must have 'fat32' filesystem type")
+	assert.ErrorContains(t, err, "BIOS boot partition must have 'fat32' or 'vfat' filesystem type")
 }
 
 func TestStorageIsValidBadBiosBootStart(t *testing.T) {

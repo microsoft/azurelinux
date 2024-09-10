@@ -39,7 +39,7 @@ func (s *Storage) IsValid() error {
 	for i, fileSystem := range s.FileSystems {
 		err = fileSystem.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid filesystems item at index %d: %w", i, err)
+			return fmt.Errorf("invalid filesystems item at index %d:\n%w", i, err)
 		}
 
 		if _, existingName := fileSystemSet[fileSystem.DeviceId]; existingName {
@@ -73,16 +73,16 @@ func (s *Storage) IsValid() error {
 			if partition.IsESP() {
 				espPartitionExists = true
 
-				if fileSystem.Type != FileSystemTypeFat32 {
-					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
+				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
+					return fmt.Errorf("ESP partition must have 'fat32' or 'vfat' filesystem type")
 				}
 			}
 
 			if partition.IsBiosBoot() {
 				biosBootPartitionExists = true
 
-				if fileSystem.Type != FileSystemTypeFat32 {
-					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
+				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
+					return fmt.Errorf("BIOS boot partition must have 'fat32' or 'vfat' filesystem type")
 				}
 			}
 
