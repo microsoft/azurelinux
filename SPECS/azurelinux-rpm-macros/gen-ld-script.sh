@@ -6,26 +6,30 @@
 # gen-ld-script.sh
 # Generate linker script to embed ELF binaries with build metadata
 
-# /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}
+# /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version}-%{release} %{_topdir} %{distro_release_version}
 echo "gen-ld-script.sh name($1) version($2) _topdir($3) osversion($4)"
 
 OS_VERSION=$(echo $4 | cut -d. -f1,2)
 
+# When generating moduleVersion, strip everything after the dash.
+# ex: "1.8.0-2.azl3" -> "1.8.0",
+VERSION_NO_RELEASE=$(echo $2 | cut -d- -f1)
+
 # Count number of dot separators in $2 (version)
-NUM_DOT_SEPARATORS="${2//[^.]}"
+NUM_DOT_SEPARATORS="${VERSION_NO_RELEASE//[^.]}"
 # Ensure moduleVersion contains 4 version parts by adding ".0" padding
 case ${#NUM_DOT_SEPARATORS} in
   0)
-    MODULEVERSION=$2".0.0.0"
+    MODULEVERSION=$VERSION_NO_RELEASE".0.0.0"
     ;;
   1)
-    MODULEVERSION=$2".0.0"
+    MODULEVERSION=$VERSION_NO_RELEASE".0.0"
     ;;
   2)
-    MODULEVERSION=$2".0"
+    MODULEVERSION=$VERSION_NO_RELEASE".0"
     ;;
   *)
-    MODULEVERSION=$2
+    MODULEVERSION=$VERSION_NO_RELEASE
     ;;
 esac
 
