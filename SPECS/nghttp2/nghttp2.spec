@@ -1,7 +1,7 @@
 Summary:        nghttp2 is an implementation of HTTP/2 and its header compression algorithm, HPACK.
 Name:           nghttp2
-Version:        1.59.0
-Release:        1%{?dist}
+Version:        1.61.0
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,7 +11,7 @@ Source0:        https://github.com/nghttp2/nghttp2/releases/download/v%{version}
 BuildRequires:  gcc
 BuildRequires:  make
 %if 0%{?with_check}
-BuildRequires:  cunit
+BuildRequires:  CUnit
 %endif
 Provides:       libnghttp2 = %{version}-%{release}
 
@@ -59,6 +59,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Aug 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.61.0-2
+- Fix test-time dependency on CUnit.
+
+* Thu Aug 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.61.0-1
+- Upgrade version to 1.61.0 to address CVE-2024-28182
+
 * Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.59.0-1
 - Auto-upgrade to 1.59.0 - 3.0 package upgrade
 

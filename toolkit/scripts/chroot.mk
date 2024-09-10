@@ -21,22 +21,18 @@ clean-chroot-tools:
 	rm -rf $(BUILD_DIR)/worker && \
 	rm -rf $(BUILD_DIR)/validatechroot
 
-# Worker chroot manifest is a file corresponding to the TOOLCHAIN_MANIFEST name.
-toolchain_config_name=$(notdir $(TOOLCHAIN_MANIFEST))
-worker_manifest_name=$(shell echo "$(toolchain_config_name)" | sed -E 's:^toolchain:pkggen_core:' )
-worker_chroot_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/$(worker_manifest_name)
 #$(TOOLCHAIN_MANIFESTS_DIR)/pkggen_core_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
 # Outputs: $(TOOLCHAIN_RPMS_DIR)/<arch>/<name>.<arch>.rpm
 sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\2/\1`p'
-worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chroot_manifest))
+worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(WORKER_CHROOT_MANIFEST))
 
 # The worker chroot depends on specific toolchain RPMs, the $(toolchain_rpms): target in toolchain.mk knows how
 # to update these RPMs if required.
 worker_chroot_deps := \
-	$(worker_chroot_manifest) \
+	$(WORKER_CHROOT_MANIFEST) \
 	$(worker_chroot_rpm_paths) \
 	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
@@ -45,14 +41,14 @@ $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOO
 else
 $(chroot_worker):
 endif
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(worker_chroot_manifest) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh $(BUILD_DIR)/worker $(WORKER_CHROOT_MANIFEST) $(TOOLCHAIN_RPMS_DIR) $(LOGS_DIR)
 
 validate-chroot: $(go-validatechroot) $(chroot_worker)
 	$(go-validatechroot) \
 	--rpm-dir="$(TOOLCHAIN_RPMS_DIR)" \
 	--tmp-dir="$(BUILD_DIR)/validatechroot" \
 	--worker-chroot="$(chroot_worker)" \
-	--worker-manifest="$(worker_chroot_manifest)" \
+	--worker-manifest="$(WORKER_CHROOT_MANIFEST)" \
 	--log-file="$(LOGS_DIR)/worker/validate.log" \
 	--log-level="$(LOG_LEVEL)" \
 	--log-color="$(LOG_COLOR)"

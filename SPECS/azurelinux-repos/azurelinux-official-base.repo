@@ -1,7 +1,7 @@
 [azurelinux-official-base]
 name=Azure Linux Official Base $releasever $basearch
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=1
@@ -11,7 +11,7 @@ sslverify=1
 [azurelinux-official-base-debuginfo]
 name=Azure Linux Official Base $releasever $basearch Debuginfo
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/base/debuginfo/$basearch
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=0
@@ -21,7 +21,7 @@ sslverify=1
 [azurelinux-official-base-source]
 name=Azure Linux Official Base $releasever Source
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/base/srpms
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=0

@@ -1,0 +1,109 @@
+From 97b37cca000c83e0cbc36479fff5cf8491a67d43 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Fri, 19 Jul 2024 10:39:54 -0400
+Subject: [PATCH 35/35] rpm: Run systemd-sysctl from %post.
+
+Run commands such as:
+
+/usr/lib/systemd/systemd-sysctl /etc/sysctl.d/10-default-yama-scope.conf
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/rpm.te      |  4 +++
+ policy/modules/system/systemd.if | 44 ++++++++++++++++++++++++++++++++
+ policy/modules/system/systemd.te |  2 ++
+ 3 files changed, 50 insertions(+)
+
+diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
+index 41253a4e2..809e8c573 100644
+--- a/policy/modules/admin/rpm.te
++++ b/policy/modules/admin/rpm.te
+@@ -416,6 +416,10 @@ optional_policy(`
+ 	ntp_domtrans(rpm_script_t)
+ ')
+ 
++optional_policy(`
++	systemd_run_sysctl(rpm_script_t, rpm_roles)
++')
++
+ optional_policy(`
+ 	tzdata_run(rpm_t, rpm_roles)
+ 	tzdata_run(rpm_script_t, rpm_roles)
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index b7a392a13..2cb5ae2ed 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -2629,6 +2629,50 @@ interface(`systemd_read_resolved_runtime',`
+ 	read_files_pattern($1, systemd_resolved_runtime_t, systemd_resolved_runtime_t)
+ ')
+ 
++########################################
++## <summary>
++##  Execute systemd-sysctl in the systemd sysctl domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_domtrans_sysctl', `
++	gen_require(`
++		type systemd_sysctl_t, systemd_sysctl_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, systemd_sysctl_exec_t, systemd_sysctl_t)
++')
++
++########################################
++## <summary>
++##  Run systemd-sysctl with a domain transition.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`systemd_run_sysctl', `
++	gen_require(`
++		attribute_role systemd_sysctl_roles;
++	')
++
++	systemd_domtrans_sysctl($1)
++	roleattribute $2 systemd_sysctl_roles;
++')
++
+ ########################################
+ ## <summary>
+ ##	Execute the systemctl program.
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 664f4f31a..3ad5bb651 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -58,6 +58,7 @@ attribute systemd_user_session_type;
+ attribute systemd_user_activated_sock_file_type;
+ attribute systemd_user_unix_stream_activated_socket_type;
+ 
++attribute_role systemd_sysctl_roles;
+ attribute_role systemd_sysusers_roles;
+ 
+ type systemd_activate_t;
+@@ -288,6 +289,7 @@ init_unit_file(systemd_socket_proxyd_unit_file_t)
+ type systemd_sysctl_t;
+ type systemd_sysctl_exec_t;
+ init_daemon_domain(systemd_sysctl_t, systemd_sysctl_exec_t)
++role systemd_sysctl_roles types systemd_sysctl_t;
+ 
+ type systemd_sysusers_t;
+ type systemd_sysusers_exec_t;
+-- 
+2.45.2
+

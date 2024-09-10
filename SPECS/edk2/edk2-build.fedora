@@ -7,7 +7,7 @@ NETWORK_ISCSI_ENABLE     = TRUE
 NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 TPM2_ENABLE              = TRUE
 TPM2_CONFIG_ENABLE       = TRUE
-TPM1_ENABLE              = TRUE
+TPM1_ENABLE              = FALSE
 CAVIUM_ERRATUM_27456     = TRUE
 
 [opts.ovmf.4m]
@@ -21,15 +21,13 @@ NETWORK_TLS_ENABLE       = FALSE
 [opts.ovmf.sb.smm]
 SECURE_BOOT_ENABLE       = TRUE
 SMM_REQUIRE              = TRUE
-# old downstream
-EXCLUDE_SHELL_FROM_FD    = TRUE
-# new upstream
 BUILD_SHELL              = FALSE
 
 # requires edk2 2022-11 or newer
 [opts.ovmf.sb.stateless]
 SECURE_BOOT_ENABLE       = TRUE
 SMM_REQUIRE              = FALSE
+BUILD_SHELL              = FALSE
 
 [opts.armvirt.verbose]
 DEBUG_PRINT_ERROR_LEVEL  = 0x8040004F
@@ -39,6 +37,7 @@ DEBUG_PRINT_ERROR_LEVEL  = 0x80000000
 
 [opts.armvirt.sb.testonly]
 SECURE_BOOT_ENABLE       = TRUE
+BUILD_SHELL              = FALSE
 
 [opts.armvirt.kernel]
 TPM2_ENABLE              = FALSE

@@ -1,4 +1,4 @@
-From 274c5af6a0c43eb21071791bd691ebdca77c0265 Mon Sep 17 00:00:00 2001
+From 83b44bcbad5cb3e8df5505ea0cdc6d5d319b3612 Mon Sep 17 00:00:00 2001
 From: Laszlo Ersek <lersek@redhat.com>
 Date: Tue, 25 Feb 2014 22:40:01 +0100
 Subject: [PATCH 03/17] MdeModulePkg: TerminalDxe: set xterm resolution on mode
@@ -87,10 +87,10 @@ Signed-off-by: Laszlo Ersek <lersek@redhat.com>
  3 files changed, 35 insertions(+)
 
 diff --git a/MdeModulePkg/MdeModulePkg.dec b/MdeModulePkg/MdeModulePkg.dec
-index 98b3acb703f5..49b5cde4c6cb 100644
+index badb93238ff1..5ee6db534d41 100644
 --- a/MdeModulePkg/MdeModulePkg.dec
 +++ b/MdeModulePkg/MdeModulePkg.dec
-@@ -2164,6 +2164,10 @@ [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+@@ -2222,6 +2222,10 @@ [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
    # @Prompt The value is use for Usb Network rate limiting supported.
    gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
  
@@ -176,5 +176,5 @@ index 7809869e7d49..496849458db4 100644
  
    Status = This->ClearScreen (This);
 -- 
-2.43.1
+2.45.0
 

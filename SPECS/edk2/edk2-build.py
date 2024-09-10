@@ -248,7 +248,7 @@ def build_one(cfg, build, jobs = None, silent = False, nologs = False):
 
 def build_basetools(silent = False, nologs = False):
     build_message('building: BaseTools', silent = silent)
-    basedir = os.environ['EDK_TOOLS_PATH']
+    basedir = os.environ['EDK_TOOLS_PATH'] + '/Source/C'
     cmdline = [ 'make', '-C', basedir ]
     build_run(cmdline, 'BaseTools', 'build.basetools', silent, nologs)
 

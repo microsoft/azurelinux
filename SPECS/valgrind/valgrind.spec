@@ -1,7 +1,7 @@
 %global security_hardening none
 Summary:        Memory Management Debugger.
 Name:           valgrind
-Version:        3.21.0
+Version:        3.22.0
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
@@ -50,6 +50,9 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
+* Tue Aug 06 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-1
+- Bump version to 3.22.0.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.21.0-1
 - Auto-upgrade to 3.21.0 - Azure Linux 3.0 - package upgrades
 

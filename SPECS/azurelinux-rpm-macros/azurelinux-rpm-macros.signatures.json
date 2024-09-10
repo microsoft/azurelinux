@@ -18,6 +18,7 @@
   "macros.check": "79367176c3c7d10c0158b6e5d881e0fc3c8fd50c5957dad2f097c2d4a37833e7",
   "macros.fonts": "f52edc646414c5dd0f5f4cdd570f2f9dbe6fb97d4f0db360908deb56d96492f8",
   "macros.forge": "52cdffd48217cafe33afe47c625cd6aac6460848cd76de66fe61031c26beeaf4",
+  "macros.grub2": "b03f6f713601214406971de53538dfc25136bf836f09a663eaffc4332a72c38b",
   "macros.mono-srpm": "a9201ae36fc482e966134e38f42412378e955faf296b214cb6dd63981af8bc49",
   "macros.nodejs-srpm": "b2515cc7fad3f14849cff8593b10543a3f73edccff4c3c6d0d2764dae19c38e8",
   "macros.ocaml-srpm": "c35c6db7ede8ea534212329d010920646f80368e1fbd0b9025e48ed0a85a09ce",

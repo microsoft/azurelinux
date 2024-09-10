@@ -1,4 +1,4 @@
-From ed3b5b2fb8a5bd8bada8aa009c611c0482cf143b Mon Sep 17 00:00:00 2001
+From 643f3d555a97c9187e0e817083da145c2a564d3e Mon Sep 17 00:00:00 2001
 From: Philippe Mathieu-Daude <philmd@redhat.com>
 Date: Thu, 1 Aug 2019 20:43:48 +0200
 Subject: [PATCH 09/17] OvmfPkg: QemuRamfbDxe: Do not report DXE failure on
@@ -92,5 +92,5 @@ index 5a1044f0dc7b..3a687901b0d2 100644
    }
  
 -- 
-2.43.1
+2.45.0
 

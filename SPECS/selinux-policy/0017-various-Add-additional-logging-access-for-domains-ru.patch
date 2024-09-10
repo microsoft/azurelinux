@@ -1,70 +1,28 @@
-From 87a23a94731c5bb6979d27ef81e470b84cfc4bfe Mon Sep 17 00:00:00 2001
+From f6c4470e528370d5b6e8cf25b86e753c98022592 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <chpebeni@linux.microsoft.com>
 Date: Mon, 25 Mar 2024 09:50:17 -0400
-Subject: [PATCH 17/24] various: Add additional logging access for domains run
+Subject: [PATCH 17/33] various: Add additional logging access for domains run
  from cloud_init.
 
 Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
 ---
- policy/modules/admin/bootloader.te   |  6 ++++++
- policy/modules/admin/cloudinit.if    | 19 +++++++++++++++++++
+ policy/modules/admin/bootloader.te   |  2 ++
  policy/modules/admin/rpm.if          |  2 +-
  policy/modules/system/selinuxutil.te | 10 ++++++++++
  policy/modules/system/udev.te        |  5 +++++
- 5 files changed, 41 insertions(+), 1 deletion(-)
+ 4 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/policy/modules/admin/bootloader.te b/policy/modules/admin/bootloader.te
-index 84b243c0c..4e097a1b9 100644
+index 84b243c0c..af162dd9b 100644
 --- a/policy/modules/admin/bootloader.te
 +++ b/policy/modules/admin/bootloader.te
-@@ -227,6 +227,10 @@ ifdef(`init_systemd',`
- 	init_rw_inherited_stream_socket(bootloader_t)
- ')
- 
-+optional_policy(`
-+	cloudinit_write_inherited_tmp_files(bootloader_t)
-+')
-+
- optional_policy(`
- 	fstools_exec(bootloader_t)
- ')
-@@ -258,4 +262,6 @@ optional_policy(`
+@@ -258,4 +258,6 @@ optional_policy(`
  
  optional_policy(`
  	rpm_rw_pipes(bootloader_t)
 +	rpm_read_inherited_tmp_files(bootloader_t)
 +	rpm_append_inherited_tmp_files(bootloader_t)
  ')
-diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
-index 6d427e771..e69698fae 100644
---- a/policy/modules/admin/cloudinit.if
-+++ b/policy/modules/admin/cloudinit.if
-@@ -181,6 +181,25 @@ interface(`cloudinit_getattr_state_files',`
- 	allow $1 cloud_init_state_t:file getattr;
- ')
- 
-+########################################
-+## <summary>
-+##	Append inherited cloud-init temporary files.
-+## </summary>
-+## <param name="domain">
-+##	<summary>
-+##	Domain allowed access.
-+##	</summary>
-+## </param>
-+#
-+interface(`cloudinit_append_inherited_tmp_files',`
-+	gen_require(`
-+		type cloud_init_t, cloud_init_tmp_t;
-+	')
-+
-+	allow $1 cloud_init_t:fd use;
-+	allow $1 cloud_init_tmp_t:file append_inherited_file_perms;
-+')
-+
- ########################################
- ## <summary>
- ##	Write inherited cloud-init temporary files.
 diff --git a/policy/modules/admin/rpm.if b/policy/modules/admin/rpm.if
 index b20c3cd3d..19943a0ae 100644
 --- a/policy/modules/admin/rpm.if
@@ -120,5 +78,5 @@ index bebefdda8..8af0d90e0 100644
 +	rpm_append_inherited_tmp_files(udevadm_t)
 +')
 -- 
-2.44.0
+2.45.2
 

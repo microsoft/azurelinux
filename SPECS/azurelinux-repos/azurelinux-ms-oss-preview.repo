@@ -1,7 +1,7 @@
 [azurelinux-official-ms-oss-preview]
 name=Azure Linux Official Microsoft Open Source Preview $releasever $basearch
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/ms-oss/$basearch
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=1

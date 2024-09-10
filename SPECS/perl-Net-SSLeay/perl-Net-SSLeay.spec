@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -19,7 +19,7 @@ BuildRequires:  perl(English)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-generators
 %if 0%{?with_check}
-BuildRequires:  perl(Autoloader)
+BuildRequires:  perl(AutoLoader)
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(CPAN::Meta::Requirements)
@@ -81,6 +81,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Aug 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.92-5
+- Fix bad capitalization of perl(AutoLoader)
+
 * Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 1.92-4
 - Add BR on openssl
 

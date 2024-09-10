@@ -1,4 +1,4 @@
-From 86c60612a24691ee29fd64bfdb1b9ac6bd117102 Mon Sep 17 00:00:00 2001
+From 1fb97b6dfd4538216a118b5f303048c6c2686553 Mon Sep 17 00:00:00 2001
 From: Gerd Hoffmann <kraxel@redhat.com>
 Date: Mon, 25 Sep 2023 09:48:46 +0200
 Subject: [PATCH 16/17] OvmfPkg: set PcdVariableStoreSize +
@@ -12,10 +12,10 @@ Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
  3 files changed, 30 deletions(-)
 
 diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index 8a8c7a0b3794..093248dc638a 100644
+index 9371b3a5e917..2d8669c759d7 100644
 --- a/OvmfPkg/OvmfPkgIa32.dsc
 +++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -491,23 +491,13 @@ [PcdsFixedAtBuild]
+@@ -492,23 +492,13 @@ [PcdsFixedAtBuild]
  !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -40,10 +40,10 @@ index 8a8c7a0b3794..093248dc638a 100644
    gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
    gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index 4bde14a05a89..046f8a9810e9 100644
+index 483bcc69966d..0ee075a23d7b 100644
 --- a/OvmfPkg/OvmfPkgIa32X64.dsc
 +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -498,23 +498,13 @@ [PcdsFixedAtBuild]
+@@ -499,23 +499,13 @@ [PcdsFixedAtBuild]
  !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -68,10 +68,10 @@ index 4bde14a05a89..046f8a9810e9 100644
    gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
    gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index a43352ede4e2..8961fd4c54dd 100644
+index 9e243c5c086b..9bd223a880d5 100644
 --- a/OvmfPkg/OvmfPkgX64.dsc
 +++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -517,23 +517,13 @@ [PcdsFixedAtBuild]
+@@ -518,23 +518,13 @@ [PcdsFixedAtBuild]
  !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
    gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -96,5 +96,5 @@ index a43352ede4e2..8961fd4c54dd 100644
    gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
    gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 -- 
-2.43.1
+2.45.0
 

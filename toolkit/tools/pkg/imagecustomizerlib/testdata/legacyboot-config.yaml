@@ -25,7 +25,3 @@ storage:
 
 os:
   resetBootLoaderType: hard-reset
-
-  packages:
-    install:
-    - grub2

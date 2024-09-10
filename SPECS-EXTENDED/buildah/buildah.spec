@@ -21,7 +21,7 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           buildah
 Version:        1.18.0
-Release:        26%{?dist}
+Release:        28%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,7 +32,7 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-6%{?dist}
+BuildRequires:  glibc-static >= 2.38-8%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
@@ -123,6 +123,12 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.18.0-28
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.18.0-27
+- Bump to rebuild with updated glibc
+
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.18.0-26
 - update to build dep latest glibc-static version
 
@@ -1893,7 +1899,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 * Thu Feb 22 2018 Dan Walsh <dwalsh@redhat.com> 0.13-1
 - Vendor in latest containers/storage
-- This fixes a large SELinux bug.  
+- This fixes a large SELinux bug.
 - run: do not open /etc/hosts if not needed
 - Add the following flags to buildah bud and from
             --add-host
@@ -2021,7 +2027,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 - Bump for inclusion of OCI 1.0 Runtime and Image Spec
 
 * Tue Jul 18 2017 Dan Walsh <dwalsh@redhat.com> 0.2.0-1.gitac2aad6
-- buildah run: Add support for -- ending options parsing 
+- buildah run: Add support for -- ending options parsing
 - buildah Add/Copy support for glob syntax
 - buildah commit: Add flag to remove containers on commit
 - buildah push: Improve man page and help information

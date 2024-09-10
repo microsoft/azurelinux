@@ -20,7 +20,7 @@ import (
 
 func TestAddSkippableFrame(t *testing.T) {
 	// Create a skippable frame containing the metadata and prepend the frame to the partition file
-	skippableFrameMetadata, err := createSkippableFrameMetadata()
+	skippableFrameMetadata, _, err := createUuid()
 	assert.NoError(t, err)
 
 	// Create test raw partition file
@@ -146,7 +146,7 @@ func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber 
 func TestCustomizeImageNopShrink(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageNopShrink")
 	configFile := filepath.Join(testDir, "consume-space.yaml")

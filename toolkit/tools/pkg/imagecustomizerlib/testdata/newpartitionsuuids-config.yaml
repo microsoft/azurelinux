@@ -1,0 +1,4 @@
+resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset

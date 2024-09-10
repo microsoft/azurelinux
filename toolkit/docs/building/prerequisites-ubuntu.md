@@ -30,9 +30,9 @@ sudo apt -y install \
     xfsprogs \
     zstd
 
-# Fix go 1.20 link
-sudo ln -vsf /usr/lib/go-1.20/bin/go /usr/bin/go
-sudo ln -vsf /usr/lib/go-1.20/bin/gofmt /usr/bin/gofmt
+# Fix go 1.21 link
+sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go
+sudo ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
 
 # Install and configure Docker.
 curl -fsSL https://get.docker.com -o get-docker.sh

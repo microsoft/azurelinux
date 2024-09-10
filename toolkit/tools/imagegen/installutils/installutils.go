@@ -79,11 +79,16 @@ const (
 
 	// GrubDefFile is the filepath of the config file used by grub-mkconfig.
 	GrubDefFile = "/etc/default/grub"
+
+	// CombinedBootPartitionBootPrefix is the grub.cfg boot prefix used when the boot partition is the same as the
+	// rootfs partition.
+	CombinedBootPartitionBootPrefix = "/boot"
 )
 
 const (
 	overlay        = "overlay"
 	rootMountPoint = "/"
+	bootMountPoint = "/boot"
 
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
@@ -1226,18 +1231,36 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	timestamp.StartEvent("configuring bootloader", nil)
 	defer timestamp.StopEvent(nil)
 
-	const rootMountPoint = "/"
-	const bootMountPoint = "/boot"
+	if mountPointMap[rootMountPoint] == NullDevice {
+		// In case of overlay device being mounted at root, no need to change the bootloader.
+		return
+	}
 
-	var rootDevice string
+	rootPartitionSetting := configuration.FindRootPartitionSetting(partitionSettings)
+	if rootPartitionSetting == nil {
+		err = fmt.Errorf("failed to find partition setting for root mountpoint")
+		return
+	}
+	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 
+	return ConfigureDiskBootloaderWithRootMountIdType(bootType, encryptionEnable, readOnlyVerityRootEnable,
+		rootMountIdentifier, kernelCommandLine, installChroot, diskDevPath, mountPointMap, encryptedRoot, readOnlyRoot,
+		enableGrubMkconfig, includeLegacyGrubCfg)
+}
+
+func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
+	rootMountIdentifier configuration.MountIdentifier, kernelCommandLine configuration.KernelCommandLine,
+	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
+	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
+	includeLegacyGrubCfg bool,
+) (err error) {
 	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, isBootPartitionSeparate := mountPointMap[bootMountPoint]
 	bootPrefix := ""
 	if !isBootPartitionSeparate {
 		bootDevice = mountPointMap[rootMountPoint]
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
-		bootPrefix = "/boot"
+		bootPrefix = CombinedBootPartitionBootPrefix
 	}
 
 	if mountPointMap[rootMountPoint] == NullDevice {
@@ -1259,12 +1282,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	}
 
 	// Add grub config to image
-	rootPartitionSetting := configuration.FindRootPartitionSetting(partitionSettings)
-	if rootPartitionSetting == nil {
-		err = fmt.Errorf("failed to find partition setting for root mountpoint")
-		return
-	}
-	rootMountIdentifier := rootPartitionSetting.MountIdentifier
+	var rootDevice string
 	if encryptionEnable {
 		// Encrypted devices don't currently support identifiers
 		rootDevice = mountPointMap[rootMountPoint]
@@ -1456,7 +1474,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	return
 }
 
-func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
+func CallGrubMkconfig(installChroot safechroot.ChrootInterface) (err error) {
 	squashErrors := false
 
 	ReportActionf("Running grub2-mkconfig...")
@@ -1704,7 +1722,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 
 				if passwordChanged == "" {
 					// Set to the number of days since epoch
-					fields[passwordChangedField] = fmt.Sprintf("%d", int64(time.Since(time.Unix(0, 0)).Hours()/24))
+					fields[passwordChangedField] = fmt.Sprintf("%d", DaysSinceUnixEpoch())
 				}
 				passwordAge, err = strconv.ParseInt(fields[passwordChangedField], 10, 64)
 				if err != nil {
@@ -1727,17 +1745,19 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
+func DaysSinceUnixEpoch() int64 {
+	return int64(time.Since(time.Unix(0, 0)).Hours() / 24)
+}
+
 func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 ) (err error) {
-	const squashErrors = false
-
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) primary group (%s):\n%w", username, primaryGroup, err)
 		}
 	}
 
@@ -1746,16 +1766,13 @@ func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterfac
 
 func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
 ) (err error) {
-	const squashErrors = false
-
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-a", "-G", allGroups, username)
 		})
-
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) secondary groups:\n%w", username, err)
 		}
 	}
 
@@ -1764,8 +1781,7 @@ func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterf
 
 func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, username string, startupCommand string) (err error) {
 	const (
-		passwdFilePath = "etc/passwd"
-		sedDelimiter   = "|"
+		sedDelimiter = "|"
 	)
 
 	if startupCommand == "" {
@@ -1776,7 +1792,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 
 	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
 	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
-	filePath := filepath.Join(installChroot.RootDir(), passwdFilePath)
+	filePath := filepath.Join(installChroot.RootDir(), userutils.PasswdFile)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
 		err = fmt.Errorf("failed to update user's (%s) startup command (%s):\n%w", username, startupCommand, err)
@@ -1804,7 +1820,11 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	userSSHKeyDir, err := userutils.UserSSHDirectory(installChroot.RootDir(), username)
+	if err != nil {
+		return fmt.Errorf("failed to get user's SSH directory:\n%w", err)
+	}
+
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
@@ -1875,7 +1895,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	allSSHKeys = append(allSSHKeys, sshPubKeys...)
 
 	for _, pubKey := range allSSHKeys {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		pubKey += "\n"
 
 		err = file.Append(pubKey, authorizedKeysTempFile)
@@ -1945,7 +1965,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot safechroot.ChrootInterface) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1966,7 +1986,7 @@ func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot safechroot.ChrootInterface, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
@@ -2132,10 +2152,12 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 // as part of a general "root" partition is assumed to have been done already.
 func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string, encryptEnabled bool) (err error) {
 	const (
-		squashErrors = false
-		bootDir      = "/boot"
-		bootDirArg   = "--boot-directory"
-		grub2BootDir = "/boot/grub2"
+		squashErrors     = false
+		bootDir          = "/boot"
+		bootDirArg       = "--boot-directory"
+		grub2BootDir     = "/boot/grub2"
+		grub2InstallName = "grub2-install"
+		grubInstallName  = "grub-install"
 	)
 
 	// Add grub cryptodisk settings
@@ -2147,10 +2169,31 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 	}
 	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
 	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
-	err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
+
+	installName := grub2InstallName
+	grub2InstallExists, err := file.CommandExists(grub2InstallName)
 	if err != nil {
 		return
 	}
+
+	if !grub2InstallExists {
+		grubInstallExists, err := file.CommandExists(grubInstallName)
+		if err != nil {
+			return err
+		}
+
+		if !grubInstallExists {
+			return fmt.Errorf("neither 'grub2-install' command nor 'grub-install' command found")
+		}
+
+		installName = grubInstallName
+	}
+
+	err = shell.ExecuteLive(squashErrors, installName, "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
+	if err != nil {
+		return
+	}
+
 	installGrub2BootDir := filepath.Join(installChroot.RootDir(), grub2BootDir)
 	err = shell.ExecuteLive(squashErrors, "chmod", "-R", "go-rwx", installGrub2BootDir)
 	return

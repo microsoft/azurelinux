@@ -3,7 +3,7 @@
   "Makefile.devel": "cd065e896d7eb11e238a05b9102359ea370ec75b27785a81935c985899ed2df6",
   "booleans_targeted.conf": "009f880c7179a007569dfdbf40ef64ae41671ad33cc2717eebbdaeb8ab431d12",
   "macros.selinux-policy": "027f5d27441a7262365c26076dc3b7ab1f1ac62026ae94514020e0607e53a73a",
-  "modules_targeted.conf": "b8fdff7cf2280bf71fa5841e9d3e5a8add4b30cdcbd21bc4fb2340d53b3bc23f",
+  "modules_targeted.conf": "161f7075f935afb15402084e5dc6b67da9a6b578631f0f77459b0461176da9e2",
   "refpolicy-2.20240226.tar.bz2": "7ed41f4f45189b9ee9706da8ac357eccc103651b56daabaddb54c436e8117cf9"
  }
 }

@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static >= 2.38-6%{?dist}
+BuildRequires:  glibc-static >= 2.38-8%{?dist}
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gperf
 BuildRequires:  grep
@@ -1147,6 +1147,12 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.52.0-9
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.52.0-8
+- Bump to rebuild with updated glibc
+
 * Thu Jul 18 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-7
 - Return the tests
 

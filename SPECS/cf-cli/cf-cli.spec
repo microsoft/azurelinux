@@ -1,7 +1,11 @@
+# NOTE(mfrw): Modify the CF_BUILD_SHA by running: `git rev-parse --short HEAD` on the release
+%global cf_build_sha efd1d03e7
+
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
+# Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +31,7 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-39325.patch
 
 BuildRequires:  golang >= 1.18.3
 %global debug_package %{nil}
@@ -37,13 +42,14 @@ The official command line client for Cloud Foundry.
 
 %prep
 %setup -q -n cli-%{version}
+tar --no-same-owner -xf %{SOURCE1}
+%patch 0 -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No mod download use vednor cache locally
 sed -i 's/GOFLAGS := -mod=mod/GOFLAGS := -mod=vendor/' ./Makefile
-make build
+make build CF_BUILD_SHA=%{cf_build_sha}
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -59,6 +65,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Mon Jul 29 2024 Muhammad Falak <mwani@microsoft.com> - 8.7.3-2
+- Fix CF_BUILD_SHA to have correct build sha in the binary
+- Move Source1 un-taring in prep section
+- Address CVE-2023-39325
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.7.3-1
 - Auto-upgrade to 8.7.3 - Azure Linux 3.0 - package upgrades
 

@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -15,7 +14,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
-func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot,
+func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot,
 ) (bool, error) {
 	var err error
 
@@ -25,15 +24,20 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 
 	logger.Log.Infof("Enable verity")
 
+	err = validateVerityDependencies(imageChroot)
+	if err != nil {
+		return false, fmt.Errorf("failed to validate package dependencies for verity:\n%w", err)
+	}
+
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
-	err = addDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
+	err = addDracutModuleAndDriver(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to add dracut modules for verity:\n%w", err)
 	}
 
-	err = updateFstabForVerity(buildDir, imageChroot)
+	err = updateFstabForVerity(imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to update fstab file for verity:\n%w", err)
 	}
@@ -46,26 +50,7 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	return true, nil
 }
 
-func addDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
-	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
-
-	// Check if the dracut module configuration file already exists.
-	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
-		lines := []string{
-			// Add white spaces on both sides for dracut config syntax.
-			"add_dracutmodules+=\" " + dracutModuleName + " \"",
-			"add_drivers+=\" " + dracutDriverName + " \"",
-		}
-		err = file.WriteLines(lines, dracutConfigFile)
-		if err != nil {
-			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
-		}
-	}
-
-	return nil
-}
-
-func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error {
+func updateFstabForVerity(imageChroot *safechroot.Chroot) error {
 	var err error
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
@@ -246,4 +231,18 @@ func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.Corruptio
 	default:
 		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(corruptionOption))
 	}
+}
+
+func validateVerityDependencies(imageChroot *safechroot.Chroot) error {
+	requiredRpms := []string{"lvm2"}
+
+	// Iterate over each required package and check if it's installed.
+	for _, pkg := range requiredRpms {
+		logger.Log.Debugf("Checking if package (%s) is installed", pkg)
+		if !isPackageInstalled(imageChroot, pkg) {
+			return fmt.Errorf("package (%s) is not installed:\nthe following packages must be installed to use Verity: %v", pkg, requiredRpms)
+		}
+	}
+
+	return nil
 }

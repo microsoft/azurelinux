@@ -13,15 +13,15 @@ When security vulnerabilities arise, Azure Linux supports both a package-based u
 
 ## Getting Started with Azure Linux
 
+NOTE: Looking for CBL-Mariner 2.0 Source?  Click [here](https://github.com/microsoft/azurelinux/tree/2.0)
+
 ### Build
 
-Instructions for building Azure Linux may be found here: [Toolkit Documentation](./toolkit/README.md).
+Instructions for building Azure Linux 3.0 may be found here: [Toolkit Documentation](./toolkit/README.md).
 
 ### ISO
 
-You can try Azure Linux with the following ISO images:
-
-- [Mariner 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso).
+To try Azure Linux Download the ISO here: [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
 
 Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
 
@@ -33,9 +33,6 @@ Note: Support for the ISO is community based. Before filing a new bug or feature
 ## Getting Help
 - Bugs, feature requests and questions can be filed as GitHub issues.
 - We are starting a public community call for Azure Linux users to get together and discuss new features, provide feedback, and learn more about how others are using Azure Linux. In each session, we will feature a new demo. The schedule for the upcoming community calls are:
-- 1/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
-- 3/28/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
-- 5/23/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
 - 7/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
 - 9/26/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d)
 
@@ -47,12 +44,12 @@ This project may contain trademarks or logos for projects, products, or services
 
 Any Linux distribution, including Azure Linux, benefits from contributions by the open software community. We gratefully acknowledge all contributions made from the broader open source community, in particular:
 
-1) The [Photon OS Project](https://vmware.github.io/photon/) for SPEC files originating from the Photon distribution.
+1) [GNU](https://www.gnu.org/) and the [Free Software Foundation](https://www.fsf.org/)
 
 2) [The Fedora Project](https://start.fedoraproject.org/) for SPEC files, particularly with respect to Qt, DNF and content in the SPECS-EXTENDED folder.
 
-3) [GNU](https://www.gnu.org/) and the [Free Software Foundation](https://www.fsf.org/)
+3) The [Photon OS Project](https://vmware.github.io/photon/) for SPEC files originating from the Photon distribution.
 
 4) [Linux from Scratch](http://www.linuxfromscratch.org)
 
-5) [Openmamba](https://openmamba.org/en/) for SPEC files
+5) And other open source projects as referenced [here](LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md)

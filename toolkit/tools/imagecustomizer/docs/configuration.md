@@ -6,6 +6,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 1. If partitions were specified in the config, customize the disk partitions.
 
+   Otherwise, if the [resetpartitionsuuidstype](#resetpartitionsuuidstype-string) value
+   is specified, then the partitions' UUIDs are changed.
+
 2. Override the `/etc/resolv.conf` file with the version from the host OS.
 
 3. Update packages:
@@ -33,7 +36,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 9. Configure kernel modules. ([modules](#modules-module))
 
-10. Write the `/etc/mariner-customizer-release` file.
+10. Write the `/etc/image-customizer-release` file.
 
 11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
@@ -131,6 +134,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
+  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
@@ -257,6 +261,35 @@ os:
   resetBootLoaderType: hard-reset
 ```
 
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```
+
+### iso [[iso](#iso-type)]
+
+Specifies the configuration for the generated ISO media.
+
 ### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
@@ -267,6 +300,10 @@ Example:
 os:
   hostname: example-image
 ```
+
+### scripts [[scripts](#scripts-type)]
+
+Specifies custom scripts to run during the customization process.
 
 ## disk type
 
@@ -309,50 +346,157 @@ Specifies the configuration for the generated ISO media.
 
 Specifies the configuration for overlay filesystem.
 
-- `lowerDir`: This directory acts as the read-only layer in the overlay
-  filesystem. It contains the base files and directories which will be overlaid
-  by the upperDir. Changes to the overlay filesystem do not affect the contents
-  of lowerDir.
+Overlays Configuration Example:
 
-- `upperDir`: This directory is the writable layer of the overlay filesystem.
-  Any modifications, such as file additions, deletions, or changes, are made in
-  the upperDir. These changes are what make the overlay filesystem appear
-  different from the lowerDir alone.
+```yaml
+storage:
+  disks:
+  bootType: efi
+  - partitionTableType: gpt
+    maxSize: 4G
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+    - id: boot
+      start: 9M
+      end: 108M
+    - id: rootfs
+      label: rootfs
+      start: 108M
+      end: 2G
+    - id: var
+      start: 2G
 
-- `workDir`: This is a required directory used for preparing files before they
-  are merged into the upperDir. It needs to be on the same filesystem as the
-  upperDir and is used for temporary storage by the overlay filesystem to ensure
-  atomic operations. The workDir is not directly accessible to users.
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
 
-- `partition`: Optional field: If configured, a partition will be attached to
-  the current targeted overlay, making it persistent and ensuring that changes
-  are retained. If not configured, the overlay will be volatile.
+os:
+  resetBootLoaderType: hard-reset
+  overlays:
+    - mountPoint: /etc
+      lowerDirs:
+      - /etc
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      isRootfsOverlay: true
+      mountDependencies:
+      - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work
+```
 
-  - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+### `mountPoint` [string]
 
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
+The directory where the combined view of the `upperDir` and `lowerDir` will be
+mounted. This is the location where users will see the merged contents of the
+overlay filesystem. It is common for the `mountPoint` to be the same as the
+`lowerDir`. But this is not required.
+
+Example: `/etc`
+
+### `lowerDirs` [string[]]
+
+These directories act as the read-only layers in the overlay filesystem. They
+contain the base files and directories which will be overlaid by the `upperDir`.
+Multiple lower directories can be specified by providing a list of paths, which
+will be joined using a colon (`:`) as a separator.
 
 Example:
 
 ```yaml
-os:
-  overlays:
-    - lowerDir: /etc
-      upperDir: /upper_etc
-      workDir: /work_etc
-      partition:
-        idType: part-label
-        id: partition-etc
-    - lowerDir: /var/lib
-      upperDir: /upper_var_lib
-      workDir: /work_var_lib
-    - lowerDir: /var/log
-      upperDir: /upper_var_log
-      workDir: /work_var_log
+lowerDirs: 
+- /etc
 ```
+
+### `upperDir` [string]
+
+This directory is the writable layer of the overlay filesystem. Any
+modifications, such as file additions, deletions, or changes, are made in the
+upperDir. These changes are what make the overlay filesystem appear different
+from the lowerDir alone. 
+  
+Example: `/var/overlays/etc/upper`
+
+### `workDir` [string]
+
+This is a required directory used for preparing files before they are merged
+into the upperDir. It needs to be on the same filesystem as the upperDir and
+is used for temporary storage by the overlay filesystem to ensure atomic
+operations. The workDir is not directly accessible to users. 
+  
+Example: `/var/overlays/etc/work`
+
+### `isRootfsOverlay` [bool]
+
+A boolean flag indicating whether this overlay is part of the root filesystem.
+If set to `true`, specific adjustments will be made, such as prefixing certain
+paths with `/sysroot`, and the overlay will be added to the fstab file with the
+`x-initrd.mount` option to ensure it is available during the initrd phase.
+
+This is an optional argument.
+
+Example: `False`
+
+### `mountDependencies` [string[]]
+
+Specifies a list of directories that must be mounted before this overlay. Each
+directory in the list should be mounted and available before the overlay
+filesystem is mounted.
+
+This is an optional argument.
+
+Example:
+
+```yaml
+mountDependencies: 
+- /var
+```
+
+**Important**: If any directory specified in `mountDependencies` needs to be
+available during the initrd phase, you must ensure that this directory's mount
+configuration in the `fileSystems` section includes the `x-initrd.mount` option.
+For example:
+
+```yaml
+fileSystems:
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+```
+
+### `mountOptions` [string]
+
+A string of additional mount options that can be applied to the overlay mount.
+Multiple options should be separated by commas.
+
+This is an optional argument.
+
+Example: `noatime,nodiratime`
 
 ## verity type
 
@@ -1000,6 +1144,8 @@ scripts:
 
 ## scripts type
 
+Specifies custom scripts to run during the customization process.
+
 Note: Script files must be in the same directory or a child directory of the directory
 that contains the config file.
 
@@ -1090,8 +1236,6 @@ Supported options:
 - `hard-reset`: Fully reset the boot-loader and its configuration.
   This includes removing any customized kernel command-line arguments that were added to
   base image.
-
-This field can only be specified if [Disks](#disks-disk) is also specified.
 
 ### hostname [string]
 

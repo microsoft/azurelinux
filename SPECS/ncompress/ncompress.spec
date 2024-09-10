@@ -1,13 +1,12 @@
 Summary:        A fast, simple LZW file compressor
 Name:           ncompress
 Version:        5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/vapier/ncompress
-#Source0:       https://github.com/vapier/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/vapier/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  make
@@ -47,5 +46,8 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install_core
 %{_mandir}/man1/*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0-2
+- License verified.
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 5.0-1
 - Original version for CBL-Mariner

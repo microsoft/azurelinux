@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,8 @@ another program was doing at the moment it crashed.
     --with-system-readline \
     --with-system-zlib \
     --disable-sim \
-    --with-python=%{python3}
+    --with-python=%{python3} \
+    --enable-unit-tests
 %make_build
 
 %install
@@ -71,8 +72,18 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 
 %check
 # disable security hardening for tests
-rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
-%make_build check TESTS="gdb.base/default.exp"
+rm -vf $(dirname $(gcc -print-libgcc-file-name))/../specs
+
+# Run unit tests
+pushd gdb
+make run GDBFLAGS='-batch -ex "maintenance selftest"'
+popd
+
+# Remove libctf test suite, which causes compilation errors with the base tests
+rm -rvf libctf/testsuite
+
+# Run base tests
+make check TESTS='gdb.base/default.exp'
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -89,6 +100,10 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 16 2024 Andrew Phelps <anphel@microsoft.com> - 13.2-2
+- Fix package tests
+- Enable and run unit tests
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 13.2-1
 - Upgrade to version 13.2
 

@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "mix_task_archive_deps-1.0.0.ez": "e6079c02cbbb41526ea18e8142a14093094c2f1942865f1cb64fbc4eb6212a48",
   "rabbitmq-server-3.13.0.tar.xz": "3715e559a69b138a5d0a4bf242ee69f3264d4f5cf3c1e3726c66d9d33476d4ef"
  }
 }

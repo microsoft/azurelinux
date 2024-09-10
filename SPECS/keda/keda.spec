@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-6104.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -29,7 +30,7 @@ KEDA is a Kubernetes-based Event Driven Autoscaling component.
 It provides event driven scale for any container running in Kubernetes 
 
 %prep
-%setup -q
+%autosetup -p1 -a 1
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
@@ -59,6 +60,9 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 2.14.0-2
+- Added CVE-2024-6104.patch
+
 * Mon May 06 2024 Sean Dougherty <sdougherty@microsoft.com> - 2.14.0-1
 - Upgrade to 2.14.0 for Azure Linux 3.0
 - Added keda-admission-webhooks binary, added to KEDA in v2.10.0

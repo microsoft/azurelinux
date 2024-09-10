@@ -1,11 +1,13 @@
 %undefine _ld_as_needed
 
-Name:			ebtables
-Version:		2.0.11
-Release:		7%{?dist}
-Summary:		Ethernet Bridge frame table administration tool
-License:		GPLv2+
-URL:			http://ebtables.sourceforge.net/
+Name:          ebtables
+Version:		   2.0.11
+Release:		   8%{?dist}
+Summary:		   Ethernet Bridge frame table administration tool
+License:		   GPLv2+
+URL:           http://ebtables.sourceforge.net/
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 
 Source0:		https://netfilter.org/pub/ebtables/%{name}-%{version}.tar.gz
 Source1:		ebtables-legacy-save
@@ -118,6 +120,9 @@ ln -sf ebtables-legacy-restore %{buildroot}%{_sbindir}/ebtables-restore
 %ghost %{_sysconfdir}/sysconfig/ebtables
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.11-8
+- Add missing Vendor and Distribution tags.
+
 * Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.11-7
 - workaround "circular dependencies" from build tooling
 - license verified
@@ -259,7 +264,7 @@ ln -sf ebtables-legacy-restore %{buildroot}%{_sbindir}/ebtables-restore
 - fix missing symbol issue with extension modules (bz810006)
 
 * Thu Feb 16 2012 Thomas Woerner <twoerner@redhat.com> - 2.0.10-4
-- replaced ebtables-save perl script by bash script to get rid of the perl 
+- replaced ebtables-save perl script by bash script to get rid of the perl
   requirement
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.10-3

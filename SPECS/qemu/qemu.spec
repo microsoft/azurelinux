@@ -428,7 +428,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -640,7 +640,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-6
+BuildRequires: glibc-static >= 2.38-8
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -3421,6 +3421,12 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 8.2.0-11
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 8.2.0-10
+- Bump to rebuild with updated glibc
+
 * Wed Jun 19 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 8.2.0-9
 - Enable vnc related packages/dependencies required for Kubevirt
 - Removing the have_ui flag to install virtio required components.

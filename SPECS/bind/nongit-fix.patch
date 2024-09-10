@@ -1,20 +1,23 @@
-From 26d6eeabf3925d6fb7da4bbdabed6091c10c87e6 Mon Sep 17 00:00:00 2001
+From 431fa0dcec199512effecb4842a889eee5884c72 Mon Sep 17 00:00:00 2001
 From: alejandro-microsoft <alejandroma@microsoft.com>
 Date: Fri, 1 Mar 2024 17:49:51 -0800
 Subject: [PATCH] Fix issue where bind directory isn't downloaded via git
 
+Ported to v.9.20.0 from v9.19.21 by @mfrw on 24-July-2024
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
 ---
  configure.ac | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 512cb83..1f31c35 100644
+index a911163..b58d5be 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 19)dnl
- m4_define([bind_VERSION_PATCH], 21)dnl
+@@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 20)dnl
+ m4_define([bind_VERSION_PATCH], 0)dnl
  m4_define([bind_VERSION_EXTRA], )dnl
- m4_define([bind_DESCRIPTION], [(Development Release)])dnl
+ m4_define([bind_DESCRIPTION], [(Stable Release)])dnl
 -m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD | cut -b1-7])])dnl
 +m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD 2>/dev/null || echo "unsetID" | cut -b1-7])])dnl 
  m4_define([bind_PKG_VERSION], [[bind_VERSION_MAJOR.bind_VERSION_MINOR.bind_VERSION_PATCH]bind_VERSION_EXTRA])dnl
@@ -32,5 +35,5 @@ index 512cb83..1f31c35 100644
  
  #
 -- 
-2.34.1
+2.40.1
 

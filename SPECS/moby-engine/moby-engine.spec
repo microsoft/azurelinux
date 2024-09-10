@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 3%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -13,9 +13,10 @@ Distribution: Azure Linux
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: docker.service
 Source2: docker.socket
-Source3: daemon.json
 
 Patch0:  CVE-2022-2879.patch
+Patch1:  enable-docker-proxy-libexec-search.patch
+Patch2:  CVE-2024-41110.patch
 
 %{?systemd_requires}
 
@@ -92,9 +93,6 @@ mkdir -p %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
 
-mkdir -p -m 755 %{buildroot}%{_sysconfdir}/docker
-install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/docker/daemon.json
-
 %post
 if ! grep -q "^docker:" /etc/group; then
     groupadd --system docker
@@ -110,12 +108,16 @@ fi
 %license LICENSE NOTICE
 %{_bindir}/dockerd
 %{_libexecdir}/docker-proxy
-%dir %{_sysconfdir}/docker
-%config(noreplace) %{_sysconfdir}/docker/daemon.json
 %{_sysconfdir}/*
 %{_unitdir}/*
 
 %changelog
+* Tue Aug 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 25.0.3-5
+- Address CVE-2024-41110
+
+* Fri Aug 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-4
+- Backport upstream change to search /usr/libexec for docker-proxy without daemon.json
+
 * Tue Jun 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 25.0.3-3
 - Address CVE-2022-2879
 

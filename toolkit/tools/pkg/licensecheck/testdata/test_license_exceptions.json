@@ -1,0 +1,23 @@
+{
+    "PkgExceptions": [
+        {
+            "PackageName": "TestPackage1",
+            "IgnoredFilesRegexList": [
+                "/usr/share/doc/LICENSE",
+                "/usr/share/doc/README.GPL",
+                ".*GLOB1"
+            ]
+        },
+        {
+            "PackageName": "TestPackage2",
+            "IgnoredFilesRegexList": [
+                "/usr/share/doc/LICENSE",
+                "/usr/share/doc/README.GPL",
+                ".*GLOB2"
+            ]
+        }
+    ],
+    "GlobalExceptionsRegexList": [
+        ".*GLOB3"
+    ]
+}

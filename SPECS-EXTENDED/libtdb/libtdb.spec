@@ -4,19 +4,16 @@ Distribution:   Azure Linux
 %global with_python3 1
 
 Name: libtdb
-Version: 1.4.3
-Release: 4%{?dist}
+Version: 1.4.8
+Release: 1%{?dist}
 Summary: The tdb library
 License: LGPLv3+
-URL: http://tdb.samba.org/
-Source0: http://samba.org/ftp/tdb/tdb-%{version}.tar.gz
-Source1: http://samba.org/ftp/tdb/tdb-%{version}.tar.asc
+URL: https://tdb.samba.org/
+Source0: https://samba.org/ftp/tdb/tdb-%{version}.tar.gz
+Source1: https://samba.org/ftp/tdb/tdb-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tdb.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
 Source2: tdb.keyring
 Source3: %{name}-LICENSE.txt
-
-# Patches
-Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
 
 BuildRequires: gcc
 BuildRequires: gnupg2
@@ -105,6 +102,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %ldconfig_scriptlets
 
 %changelog
+* Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 1.4.8-1
+- Upgrade to 1.4.8 to build with Python 3.12 in 3.0
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.3-4
 - License verified
 

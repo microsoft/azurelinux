@@ -30,13 +30,13 @@ type PackageRepo struct {
 	Install      bool   `json:"Install"`
 	GPGCheck     bool   `json:"GPGCheck"`     // Default value is true
 	RepoGPGCheck bool   `json:"RepoGPGCheck"` // Default value is true
-	GPGKeys      string `json:"GPGKeys"`      // Default value is "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+	GPGKeys      string `json:"GPGKeys"`      // Default value is "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY"
 }
 
 const (
 	packageRepoDefaultGPGCheck     = true
 	packageRepoDefaultRepoGPGCheck = true
-	packageRepoDefaultGPGKeys      = "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY"
+	packageRepoDefaultGPGKeys      = "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY"
 )
 
 // UnmarshalJSON Unmarshals a PackageRepo entry

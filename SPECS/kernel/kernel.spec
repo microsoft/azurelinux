@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.35.1
-Release:        5%{?dist}
+Version:        6.6.47.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,50 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
+- UKI: remove usrmount from initrd
+
+* Thu Aug 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.47.1-1
+- Auto-upgrade to 6.6.47.1
+
+* Wed Aug 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.44.1-1
+- Auto-upgrade to 6.6.44.1
+
+* Sat Aug 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-7
+- Include systemd-cryptsetup in UKI
+
+* Wed Aug 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.43.1-6
+- Rebuild UKI with new initrd
+
+* Tue Aug 06 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-5
+- Enable USB_TMC
+
+* Sat Aug 03 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-4
+- Enable MPTCP
+
+* Thu Aug 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.43.1-3
+- Enable EVM
+
+* Wed Jul 31 2024 Chris Co <chrco@microsoft.com> - 6.6.43.1-2
+- Enable FS_VERITY
+- Enable IPE LSM
+
+* Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
+- Auto-upgrade to 6.6.43.1
+
+* Tue Jul 30 2024 Chris Co <chrco@microsoft.com> - 6.6.39.1-2
+- Enable DMI_SYSFS as module
+- Enable EROFS_FS as module
+- Enable DM_VERITY_VERIFY_ROOTHASH_SIG_SECONDARY_KEYRING
+- Enable IMA_ARCH_POLICY
+- Enable INTEGRITY_MACHINE_KEYRING
+
+* Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.39.1-1
+- Auto-upgrade to 6.6.39.1
+
+* Tue Jul 16 2024 Kelsey Steele <kelseysteele@microsoft.com> - 6.6.35.1-6
+- config_aarch64: Convert selected configs to modules
+
 * Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-5
 - Bump release to match kernel-uki
 

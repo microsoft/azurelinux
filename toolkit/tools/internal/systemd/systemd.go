@@ -4,29 +4,36 @@
 package systemd
 
 import (
-	"errors"
 	"fmt"
-	"os/exec"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 // IsServiceEnabled checks if a service is enabled or disabled.
 func IsServiceEnabled(name string, imageChroot safechroot.ChrootInterface) (bool, error) {
 	serviceEnabled := true
 	err := imageChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLive(true, "systemctl", "is-enabled", name)
+		stdout, _, err := shell.NewExecBuilder("systemctl", "is-enabled", name).
+			LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			ExecuteCaptureOuput()
 
-		// is-enabled returns:
-		//   0: service is enabled
-		//   1: service is disabled
-		var exitError *exec.ExitError
-		if errors.As(err, &exitError) && exitError.ExitCode() == 1 {
+		// `systemctl is-enabled` returns:
+		//   enabled:  Exit code = 0, stdout = "enabled"
+		//   disabled: Exit code = 1, stdout = "disabled"
+		//   error:    Exit code = 1, stdout = ""
+		if err != nil {
+			if strings.TrimSpace(stdout) != "disabled" {
+				return err
+			}
+
 			serviceEnabled = false
-			return nil
 		}
-		return err
+
+		return nil
 	})
 	if err != nil {
 		return false, fmt.Errorf("failed to check if (%s) service is enabled:\n%w", name, err)

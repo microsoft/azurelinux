@@ -29,13 +29,15 @@ const (
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
-	activeBuilds     map[int64]*BuildRequest
-	nodeToState      map[*pkggraph.PkgNode]*nodeState
-	maxFreshness     uint
-	failures         []*BuildResult
-	reservedFiles    map[string]bool
-	conflictingRPMs  map[string]bool
-	conflictingSRPMs map[string]bool
+	activeBuilds        map[int64]*BuildRequest
+	nodeToState         map[*pkggraph.PkgNode]*nodeState
+	maxFreshness        uint
+	failures            []*BuildResult
+	reservedFiles       map[string]bool
+	conflictingRPMs     map[string]bool
+	conflictingSRPMs    map[string]bool
+	licenseWarningSRPMs map[string]bool
+	licenseErrorSRPMs   map[string]bool
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
@@ -47,12 +49,14 @@ func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuil
 	filesMap := sliceutils.SliceToSet[string](reservedFiles)
 
 	return &GraphBuildState{
-		activeBuilds:     make(map[int64]*BuildRequest),
-		nodeToState:      make(map[*pkggraph.PkgNode]*nodeState),
-		reservedFiles:    filesMap,
-		conflictingRPMs:  make(map[string]bool),
-		conflictingSRPMs: make(map[string]bool),
-		maxFreshness:     maxFreshness,
+		activeBuilds:        make(map[int64]*BuildRequest),
+		nodeToState:         make(map[*pkggraph.PkgNode]*nodeState),
+		maxFreshness:        maxFreshness,
+		reservedFiles:       filesMap,
+		conflictingRPMs:     make(map[string]bool),
+		conflictingSRPMs:    make(map[string]bool),
+		licenseWarningSRPMs: make(map[string]bool),
+		licenseErrorSRPMs:   make(map[string]bool),
 	}
 }
 
@@ -60,6 +64,24 @@ func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuil
 func (g *GraphBuildState) DidNodeFail(node *pkggraph.PkgNode) bool {
 	state := g.nodeToState[node]
 	return state != nil && !state.available
+}
+
+// DidNodeHaveLicenseWarning returns true if the node had at least one license warning.
+func (g *GraphBuildState) DidNodeHaveLicenseWarning(node *pkggraph.PkgNode) bool {
+	return g.licenseWarningSRPMs[filepath.Base(node.SrpmPath)]
+}
+
+// DidNodeHaveLicenseError returns true if the node had at least one license error.
+func (g *GraphBuildState) DidNodeHaveLicenseError(node *pkggraph.PkgNode) bool {
+	return g.licenseErrorSRPMs[filepath.Base(node.SrpmPath)]
+}
+
+// LicenseFailureSRPMs will return a list of *.src.rpm files which have fatal license errors.
+func (g *GraphBuildState) LicenseFailureSRPMs() (srpms []string) {
+	srpms = sliceutils.SetToSlice(g.licenseErrorSRPMs)
+	sort.Strings(srpms)
+
+	return srpms
 }
 
 // IsNodeProcessed returns true if the requested node is has been processed already.
@@ -250,6 +272,13 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 		}
 	} else {
 		logger.Log.Tracef("Skipping checking toolchain conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'.", res.Node)
+	}
+
+	if res.HasLicenseErrors {
+		g.licenseErrorSRPMs[filepath.Base(res.Node.SrpmPath)] = true
+	}
+	if res.HasLicenseWarnings {
+		g.licenseWarningSRPMs[filepath.Base(res.Node.SrpmPath)] = true
 	}
 	return
 }

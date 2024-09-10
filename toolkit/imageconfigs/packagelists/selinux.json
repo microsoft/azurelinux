@@ -1,6 +1,5 @@
 {
     "packages": [
-        "selinux-policy",
-        "selinux-policy-modules"
+        "selinux-policy"
     ]
 }

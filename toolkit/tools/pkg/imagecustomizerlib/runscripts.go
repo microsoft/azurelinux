@@ -16,6 +16,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+const (
+	configDirMountPathInChroot = "/_imageconfigs"
+)
+
 func runUserScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, listName string,
 	imageChroot *safechroot.Chroot,
 ) error {

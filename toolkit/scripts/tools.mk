@@ -42,6 +42,7 @@ go_tool_list = \
 	imagepkgfetcher \
 	imager \
 	isomaker \
+	licensecheck \
 	liveinstaller \
 	osmodifier \
 	pkgworker \

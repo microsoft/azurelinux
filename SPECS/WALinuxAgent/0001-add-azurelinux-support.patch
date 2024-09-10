@@ -1,0 +1,57 @@
+From 7cd338bde79a5919c27f3a3c081da4cdeda34a93 Mon Sep 17 00:00:00 2001
+From: "narrieta@microsoft" <narrieta>
+Date: Mon, 15 Jul 2024 07:53:26 -0700
+Subject: [PATCH] .
+
+---
+ azurelinuxagent/common/osutil/factory.py | 2 +-
+ tests_e2e/test_suites/images.yml         | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/azurelinuxagent/common/osutil/factory.py b/azurelinuxagent/common/osutil/factory.py
+index 58afd0af..fd66fbb0 100644
+--- a/azurelinuxagent/common/osutil/factory.py
++++ b/azurelinuxagent/common/osutil/factory.py
+@@ -142,7 +142,7 @@ def _get_osutil(distro_name, distro_code_name, distro_version, distro_full_name)
+     if distro_name == "iosxe":
+         return IosxeOSUtil()
+ 
+-    if distro_name == "mariner":
++    if distro_name in ["mariner", "azurelinux"]:
+         return MarinerOSUtil()
+ 
+     if distro_name == "nsbsd":
+diff --git a/tests_e2e/test_suites/images.yml b/tests_e2e/test_suites/images.yml
+index fb6cc7f1..1afbce4d 100644
+--- a/tests_e2e/test_suites/images.yml
++++ b/tests_e2e/test_suites/images.yml
+@@ -17,8 +17,8 @@ image-sets:
+       - "debian_11"
+       - "flatcar"
+       - "suse_12"
+-      - "mariner_1"
+       - "mariner_2"
++      - "azure-linux_3"
+       - "suse_15"
+       - "rhel_79"
+       - "rhel_82"
+@@ -37,6 +37,7 @@ image-sets:
+       - "debian_11_arm64"
+       - "flatcar_arm64"
+       - "mariner_2_arm64"
++      - "azure-linux_3_arm64"
+       - "rhel_90_arm64"
+       - "ubuntu_2204_arm64"
+ 
+@@ -87,6 +88,8 @@ images:
+       urn: "almalinux almalinux 9-gen2 latest"
+       locations:
+          AzureChinaCloud: []
++   azure-linux_3: "microsoftcblmariner azure-linux azure-linux-3 latest"
++   azure-linux_3_arm64: "microsoftcblmariner azure-linux azure-linux-arm64 latest"
+    centos_610: "OpenLogic CentOS 6.10 latest"
+    centos_75: "OpenLogic CentOS 7.5 latest"
+    centos_79: "OpenLogic CentOS 7_9 latest"
+-- 
+2.45.1
+

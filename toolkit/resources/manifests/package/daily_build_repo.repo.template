@@ -1,0 +1,10 @@
+[daily-build-repo]
+name=Azure Linux {{.DAILY_REPO_NAME}}
+baseurl=https://mariner3dailydevrepo.blob.core.windows.net/{{.DAILY_REPO_NAME}}
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+gpgcheck=0
+repo_gpgcheck=0
+enabled=1
+skip_if_unavailable=True
+sslverify=0
+priority=10

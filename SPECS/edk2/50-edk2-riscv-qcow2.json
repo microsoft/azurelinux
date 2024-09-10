@@ -1,0 +1,33 @@
+{
+    "description": "UEFI firmware for RISC-V virtual machines",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "flash",
+        "mode" : "split",
+        "executable": {
+            "filename": "/usr/share/edk2/riscv/RISCV_VIRT_CODE.qcow2",
+            "format": "qcow2"
+        },
+        "nvram-template": {
+            "filename": "/usr/share/edk2/riscv/RISCV_VIRT_VARS.qcow2",
+            "format": "qcow2"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "riscv64",
+            "machines": [
+                "virt",
+                "virt-*"
+            ]
+        }
+    ],
+    "features": [
+
+    ],
+    "tags": [
+
+    ]
+}

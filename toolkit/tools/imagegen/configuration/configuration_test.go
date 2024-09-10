@@ -475,7 +475,7 @@ var expectedConfiguration Config = Config{
 					Install:      false,
 					GPGCheck:     false,
 					RepoGPGCheck: false,
-					GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+					GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY",
 				},
 			},
 			PreInstallScripts: []InstallScript{

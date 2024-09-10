@@ -230,6 +230,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}()
 
+	err = checkEnvironmentVars()
+	if err != nil {
+		return err
+	}
+
 	// ensure build and output folders are created up front
 	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
 	if err != nil {
@@ -345,9 +350,15 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 	ic.rawImageFile = newRawImageFile
 
+	// Create a uuid for the image
+	imageUuid, imageUuidStr, err := createUuid()
+	if err != nil {
+		return err
+	}
+
 	// Customize the raw image file.
 	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
-		partitionsCustomized)
+		partitionsCustomized, imageUuidStr)
 	if err != nil {
 		return err
 	}
@@ -382,7 +393,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if ic.outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat, imageUuid)
 		if err != nil {
 			return err
 		}
@@ -496,10 +507,6 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	}
 
 	return nil
-}
-
-func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Storage != nil
 }
 
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
@@ -643,7 +650,7 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-) error {
+	imageUuidStr string) error {
 	logger.Log.Debugf("Customizing OS")
 
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
@@ -653,8 +660,8 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
-		useBaseImageRpmRepos, partitionsCustomized)
+	err = doOsCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized, imageUuidStr)
 
 	// Out of disk space errors can be difficult to diagnose.
 	// So, warn about any partitions with low free space.
@@ -672,7 +679,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string) error {
+func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string, imageUuid [UuidSize]byte) error {
 	imageLoopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
 		return err
@@ -680,7 +687,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	defer imageLoopback.Close()
 
 	// Extract the partitions as files.
-	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat)
+	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat, imageUuid)
 	if err != nil {
 		return err
 	}
@@ -896,4 +903,30 @@ func humanReadableUnitSizeAndName(size int64) (int64, string) {
 	default:
 		return 1, "B"
 	}
+}
+
+func checkEnvironmentVars() error {
+	// Some commands, like tdnf (and gpg), require the USER and HOME environment variables to make sense in the OS they
+	// are running under. Since the image customization tool is pretty much always run under root/sudo, this will
+	// generally always be the case since root is always a valid user. However, this might not be true if the user
+	// decides to use `sudo -E` instead of just `sudo`. So, check for this to avoid the user running into confusing
+	// tdnf errors.
+	//
+	// In an ideal world, the USER, HOME, and PATH environment variables should be overridden whenever an external
+	// command is called under chroot. But such a change would be quite involved.
+	const (
+		rootHome = "/root"
+		rootUser = "root"
+	)
+
+	envHome := os.Getenv("HOME")
+	envUser := os.Getenv("USER")
+
+	if envHome != rootHome || (envUser != "" && envUser != rootUser) {
+		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
+			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
+			rootHome, envHome, rootUser, envUser)
+	}
+
+	return nil
 }

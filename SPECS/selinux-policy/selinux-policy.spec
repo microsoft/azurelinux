@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,7 +51,9 @@ Patch29:        0029-filesystem-systemd-memory.pressure-fixes.patch
 Patch30:        0030-init-Add-homectl-dbus-access.patch
 Patch31:        0031-Temporary-workaround-for-memory.pressure-labeling-is.patch
 Patch32:        0032-rpm-Fixes-from-various-post-scripts.patch
-Patch33:        0033-cloud-init-and-kmod-fixes.patch
+Patch33:        0033-kmod-fix-for-run-modprobe.d.patch
+Patch34:        0034-systemd-Fix-dac_override-use-in-systemd-machine-id-s.patch
+Patch35:        0035-rpm-Run-systemd-sysctl-from-post.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -128,7 +130,7 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
 %exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
-%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
+%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
 
 %package modules
 Summary:        SELinux policy modules
@@ -136,18 +138,17 @@ Requires:       selinux-policy = %{version}-%{release}
 Requires(pre):  selinux-policy = %{version}-%{release}
 
 %description modules
-Additional SELinux policy modules
+Additional SELinux policy modules -- deprecated: all policy modules are now
+in selinux-policy.  This package will be removed in Azure Linux 4.0.
 
 %files modules
-%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/disabled
 
 %package devel
 Summary:        SELinux policy devel
 Requires:       %{_bindir}/make
 Requires:       checkpolicy >= %{CHECKPOLICYVER}
 Requires:       m4
+Requires:       selinux-policy = %{version}-%{release}
 Requires(post): policycoreutils-devel >= %{POLICYCOREUTILSVER}
 
 %description devel
@@ -188,18 +189,12 @@ install -m0644 %{_sourcedir}/modules_%{1}.conf policy/modules.conf \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} conf \
 install -m0644 %{_sourcedir}/booleans_%{1}.conf policy/booleans.conf
 
-# After all the modules are inserted into the module store, the non-base
-# modules are disabled so the selinux-policy package only has the base module.
-# The selinux-policy-modules RPM then drops the disable flags using %exclude
-# in the %files section so the entire policy is enabled when the
-# selinux-policy-modules RPM is installed.
 %define installCmds() \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} base.pp \
 %make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} modules \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install-appconfig \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} SEMODULE="semodule -p %{buildroot} -X 100 " load \
-semodule -p %{buildroot} -l | grep -v base | xargs semodule -p %{buildroot} -d \
 mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
 touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
 install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
@@ -312,11 +307,6 @@ fi
 %postInstall $1 %{policy_name}
 exit 0
 
-%post modules
-%{_sbindir}/semodule -B -n -s %{policy_name}
-[ "${SELINUXTYPE}" == "%{policy_name}" ] && selinuxenabled && load_policy
-exit 0
-
 %postun
 if [ $1 = 0 ]; then
      setenforce 0 2> /dev/null
@@ -335,6 +325,16 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon Aug 13 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-7
+- Change policy composition so the base module only consits of policy modules
+  that must be in the base.  This will allow dowstream users to disable or
+  override the individual policy modules.
+
+* Thu Jul 18 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-6
+- Drop rules that are specific to AzureLinux testing systems.
+- Add fix for systemd-machine-id-setup CAP_DAC_OVERRIDE use.
+- Run systemd-sysctl from RPM scripts.
+
 * Tue Jul 16 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-5
 - Change unconfined to a separate module so it can be disabled.
 

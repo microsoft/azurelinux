@@ -1,4 +1,4 @@
-From 58bb314e849e0a2a30efbc0a9567e0bf33f100f8 Mon Sep 17 00:00:00 2001
+From 7cb925d8dad6be9e9b749c7331fe0b0da8fd5e1c Mon Sep 17 00:00:00 2001
 From: Laszlo Ersek <lersek@redhat.com>
 Date: Wed, 24 Jun 2020 11:40:09 +0200
 Subject: [PATCH 12/17] SecurityPkg/Tcg2Dxe: suppress error on no swtpm in
@@ -31,7 +31,7 @@ Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
  2 files changed, 18 insertions(+)
 
 diff --git a/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf b/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-index 7dc7a2683d71..3bc88339311e 100644
+index a645474bf3cd..57795bd8d512 100644
 --- a/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 +++ b/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 @@ -55,6 +55,7 @@ [LibraryClasses]
@@ -43,10 +43,10 @@ index 7dc7a2683d71..3bc88339311e 100644
    PrintLib
    UefiLib
 diff --git a/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.c b/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.c
-index f6ea8b2bbf18..681eb7e08b98 100644
+index b55b6c12d2c5..4028cd0e1be3 100644
 --- a/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.c
 +++ b/SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.c
-@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
+@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
  #include <Protocol/ResetNotification.h>
  
  #include <Library/DebugLib.h>
@@ -54,7 +54,7 @@ index f6ea8b2bbf18..681eb7e08b98 100644
  #include <Library/BaseMemoryLib.h>
  #include <Library/UefiRuntimeServicesTableLib.h>
  #include <Library/UefiDriverEntryPoint.h>
-@@ -2691,6 +2692,22 @@ DriverEntry (
+@@ -2743,6 +2744,22 @@ DriverEntry (
        CompareGuid (PcdGetPtr (PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid))
    {
      DEBUG ((DEBUG_INFO, "No TPM2 instance required!\n"));
@@ -78,5 +78,5 @@ index f6ea8b2bbf18..681eb7e08b98 100644
    }
  
 -- 
-2.43.1
+2.45.0
 

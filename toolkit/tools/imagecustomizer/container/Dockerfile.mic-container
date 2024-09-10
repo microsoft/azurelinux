@@ -2,6 +2,6 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
 RUN tdnf update -y && \
    tdnf install -y qemu-img rpm coreutils util-linux systemd openssl \
       sed createrepo_c squashfs-tools cdrkit parted e2fsprogs dosfstools \
-      xfsprogs zstd veritysetup
+      xfsprogs zstd veritysetup grub2 grub2-pc
 
 COPY . /

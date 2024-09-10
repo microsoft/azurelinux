@@ -15,7 +15,7 @@ func TestConfigIsValid(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -52,7 +52,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "boot",
@@ -109,7 +109,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -136,7 +136,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "os.resetBootLoaderType and storage must be specified together")
+	assert.ErrorContains(t, err, "os.resetBootLoaderType must be specified if storage is specified")
 }
 
 func TestConfigIsValidMultipleDisks(t *testing.T) {
@@ -260,7 +260,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",
@@ -298,7 +298,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            3 * diskutils.MiB,
 				Partitions: []Partition{
 					{
 						Id:    "esp",

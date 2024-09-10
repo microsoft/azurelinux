@@ -6,14 +6,14 @@ package imagecustomizerapi
 import "fmt"
 
 type Config struct {
-	Storage *Storage `yaml:"storage"`
-	Iso     *Iso     `yaml:"iso"`
-	OS      *OS      `yaml:"os"`
-	Scripts *Scripts `yaml:"scripts"`
+	Storage                  *Storage                 `yaml:"storage"`
+	ResetPartitionsUuidsType ResetPartitionsUuidsType `yaml:"resetPartitionsUuidsType"`
+	Iso                      *Iso                     `yaml:"iso"`
+	OS                       *OS                      `yaml:"os"`
+	Scripts                  *Scripts                 `yaml:"scripts"`
 }
 
 func (c *Config) IsValid() (err error) {
-
 	hasStorage := false
 	if c.Storage != nil {
 		err = c.Storage.IsValid()
@@ -22,6 +22,12 @@ func (c *Config) IsValid() (err error) {
 		}
 		hasStorage = true
 	}
+
+	err = c.ResetPartitionsUuidsType.IsValid()
+	if err != nil {
+		return err
+	}
+	hasResetPartitionsUuids := c.ResetPartitionsUuidsType != ResetPartitionsUuidsTypeDefault
 
 	if c.Iso != nil {
 		err = c.Iso.IsValid()
@@ -46,8 +52,16 @@ func (c *Config) IsValid() (err error) {
 		}
 	}
 
-	if hasStorage != hasResetBootLoader {
-		return fmt.Errorf("os.resetBootLoaderType and storage must be specified together")
+	if hasStorage && hasResetPartitionsUuids {
+		return fmt.Errorf("storage and resetPartitionsUuidsType cannot be specified together")
+	}
+
+	if hasStorage && !hasResetBootLoader {
+		return fmt.Errorf("os.resetBootLoaderType must be specified if storage is specified")
+	}
+
+	if hasResetPartitionsUuids && !hasResetBootLoader {
+		return fmt.Errorf("os.resetBootLoaderType must be specified if resetPartitionsUuidsType is specified")
 	}
 
 	return nil

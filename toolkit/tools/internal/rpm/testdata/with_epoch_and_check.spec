@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        MIT
 URL:            https://test.com
 Group:          Test
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %description

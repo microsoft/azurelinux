@@ -1,7 +1,7 @@
 [mariner-preview]
 name=Azure Linux Official Preview $releasever $basearch
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/base/$basearch
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=1
@@ -11,7 +11,7 @@ sslverify=1
 [mariner-preview-debuginfo]
 name=Azure Linux Official Preview $releasever $basearch Debuginfo
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/base/debuginfo/$basearch
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=0
@@ -21,7 +21,7 @@ sslverify=1
 [mariner-preview-source]
 name=Azure Linux Official Preview $releasever Source
 baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/base/srpms
-gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
 enabled=0

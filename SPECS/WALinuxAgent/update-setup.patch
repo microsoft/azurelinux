@@ -1,0 +1,22 @@
+From 187f0d694626cf11e24aa45b2ff6789c4b739fc1 Mon Sep 17 00:00:00 2001
+From: "narrieta@microsoft" <narrieta>
+Date: Wed, 14 Aug 2024 21:19:57 -0700
+Subject: [PATCH] Update setup.py
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 2d51fae8c2..0bb053d4c2 100755
+--- a/setup.py
++++ b/setup.py
+@@ -147,7 +147,7 @@ def get_data_files(name, version, fullname):  # pylint: disable=R0912
+                        src=["config/clearlinux/waagent.conf"])
+         set_systemd_files(data_files, dest=systemd_dir_path,
+                           src=["init/clearlinux/waagent.service"])
+-    elif name == 'mariner':
++    elif name in ["mariner", "azurelinux"]:
+         set_bin_files(data_files, dest=agent_bin_path)
+         set_conf_files(data_files, dest="/etc",
+                        src=["config/mariner/waagent.conf"])

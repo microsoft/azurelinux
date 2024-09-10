@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -175,6 +175,16 @@ rm -fv docs/INSTALL
 %build
 # Use autogen to kill rpaths
 rm -fv missing
+
+# AZL: avahi-daemon hangs in libssp's fail() routine when built with libssp support enabled.
+# This support is dynamically set when avahi's configure scans the current build environment
+# for the presence of the standalone libssp built by gcc. 
+# This standalone implementation of libssp is generally obsoleted in most modern systems,
+# and instead the libc's implementation of SSP is used.
+# So we will remove the libssp files from here if we find they are present. Avahi's configure
+# will instead use glibc's ssp implementation which does not hang and is proper.
+rm -fv /usr/lib64/libssp.*
+
 NOCONFIGURE=1 ./autogen.sh
 
 # Note that "--with-distro=none" is necessary to prevent initscripts from being installed
@@ -405,6 +415,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Aug 14 2024 Chris Co <chrco@microsoft.com> - 0.8-2
+- Remove libssp from build environment to fix avahi-daemon hang
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
 - Upgrade to latest upstream version to fix CVE-2017-6519
 - Add upstream patch to fix CVE-2021-3502
