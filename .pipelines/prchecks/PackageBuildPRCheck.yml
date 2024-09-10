@@ -39,6 +39,8 @@ variables:
     value: RPMs
   - name: toolchainArtifactNameBase
     value: Toolchain
+  - name: toolchainTestsArtifactNameBase
+    value: Toolchain_tests
   - name: system.debug
     value: "${{ parameters.debug }}"
 
@@ -101,6 +103,43 @@ extends:
                 variables:
                   ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
+                steps:
+                  - template: .pipelines/templates/PackageBuild.yml@self
+                    parameters:
+                      checkBuildRetries: "1"
+                      customToolchainArtifactName: $(toolchainArtifactName)
+                      isCheckBuild: true
+                      isQuickRebuildPackages: true
+                      isUseCCache: true
+                      maxCPU: "${{ configuration.maxCPUs }}"
+                      outputArtifactsFolder: $(ob_outputDirectory)
+                      pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
+                      selfRepoName: self
+                      testSuiteName: "[${{ configuration.name }}] Package test"
+
+                  - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
+                    name: "RPMsArtifactName"
+                    displayName: "Set variable for published artifact name"
+
+                  - task: PublishPipelineArtifact@1
+                    inputs:
+                      artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
+                      targetPath: $(ob_outputDirectory)
+                    condition: always()
+                    displayName: "Publish packages build artifacts"
+
+          - stage: Toolchain_tests_${{ configuration.name }}
+            dependsOn: Toolchain_${{ configuration.name }}
+            jobs:
+              - job: TestToolchainPackages
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                variables:
+                  ob_artifactBaseName: $(toolchainTestsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
+                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                   toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                 steps:
@@ -117,20 +156,16 @@ extends:
                       packageRebuildList: "$(testListFromToolchain)"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
-                      testSuiteName: "[${{ configuration.name }}] Package test"
-
-                  - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
-                    name: "RPMsArtifactName"
-                    displayName: "Set variable for published artifact name"
+                      testSuiteName: "[${{ configuration.name }}] Toolchain test"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
+                      artifact: $(toolchainTestsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
-                    displayName: "Publish packages build artifacts"
+                    displayName: "Publish toolchain build artifacts"
 
-          - stage: sodiff_${{ configuration.name }}
+          - stage: Sodiff_${{ configuration.name }}
             dependsOn: RPMs_${{ configuration.name }}
             jobs:
               - job: Sodiff_Check
