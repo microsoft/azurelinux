@@ -26,7 +26,7 @@ storage:
     - id: var
       start: 3200M
 
-  fileSystems:
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
