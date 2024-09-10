@@ -11,6 +11,47 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestStorageIsValidCoreEfi(t *testing.T) {
+	value := Storage{
+		Disks: []Disk{{
+			PartitionTableType: "gpt",
+			MaxSize:            4 * diskutils.GiB,
+			Partitions: []Partition{
+				{
+					Id:    "esp",
+					Start: 1 * diskutils.MiB,
+					End:   ptrutils.PtrTo(DiskSize(9 * diskutils.MiB)),
+					Type:  PartitionTypeESP,
+				},
+				{
+					Id:    "rootfs",
+					Start: 9 * diskutils.MiB,
+				},
+			},
+		}},
+		BootType: "efi",
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "esp",
+				Type:     "vfat",
+				MountPoint: &MountPoint{
+					Path: "/boot/efi",
+				},
+			},
+			{
+				DeviceId: "rootfs",
+				Type:     "ext4",
+				MountPoint: &MountPoint{
+					Path: "/",
+				},
+			},
+		},
+	}
+
+	err := value.IsValid()
+	assert.NoError(t, err)
+}
+
 func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
