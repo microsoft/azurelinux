@@ -4620,8 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.5",
-          "downloadUrl": "https://golang.org/dl/go1.22.5.src.tar.gz"
+          "version": "1.22.7",
+          "downloadUrl": "https://golang.org/dl/go1.22.7.src.tar.gz"
         }
       }
     },

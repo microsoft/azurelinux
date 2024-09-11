@@ -3,7 +3,7 @@
 Summary:        The open-source application container engine client.
 Name:           moby-cli
 Version:        24.0.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,6 +78,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.9-4
+- Bump release to rebuild with go 1.22.7
+
 * Thu Aug 22 2024 Sumedh Sharma <sumsharma@microsoft.com> - 24.0.9-3
 - Add patch to resolve CVE-2023-45288
 

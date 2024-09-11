@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.22.5
+Version:        1.22.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -156,6 +156,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.7-1
+- Auto-upgrade to 1.22.7 - Address CVE-2024-34158, CVE-2024-34156, CVE-2024-34155 
+
 * Mon Jul 29 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.22.5
 - Bump version to 1.22.5
 

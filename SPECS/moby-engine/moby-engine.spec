@@ -124,8 +124,13 @@ fi
 %{_unitdir}/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.0.9-9
 - Patch CVE-2024-29018
+=======
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.9-9
+- Bump release to rebuild with go 1.22.7
+>>>>>>> a5d86edbc (golang: update 1.22.5 -> 1.22.7 to address 3 CVEs (#10388))
 
 * Mon Aug 05 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-8
 - Drop requirement on a specific version of golang
