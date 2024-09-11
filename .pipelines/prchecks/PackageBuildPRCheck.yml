@@ -76,6 +76,9 @@ extends:
                   # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
                   # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
                   - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
+                    parameters:
+                      # GCC fails to build as a regular package.
+                      ignoredSpecs: ["gcc"]
 
                   - script: echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "ToolchainArtifactName"
@@ -131,6 +134,11 @@ extends:
 
           - stage: Toolchain_tests_${{ configuration.name }}
             dependsOn: Toolchain_${{ configuration.name }}
+            condition: |
+              and(
+                succeeded(),
+                ne(dependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'], '')
+              )
             jobs:
               - job: TestToolchainPackages
                 pool:
