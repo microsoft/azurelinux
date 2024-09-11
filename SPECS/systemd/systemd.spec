@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        17%{?dist}
+Release:        18%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -495,6 +495,7 @@ line. systemd-boot supports systems with UEFI firmware only.
 
 This package contains the unsigned version. Install systemd-boot instead to get
 the version that works with Secure Boot.
+
 %endif
 
 %package container
@@ -890,6 +891,11 @@ ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/i
 # Split files in build root into rpms
 python3 %{SOURCE2} %buildroot %{!?want_bootloader:--no-bootloader}
 
+%if 0%{?want_bootloader}
+mkdir -p %{buildroot}/boot/efi/EFI/BOOT
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+%endif
+
 %check
 %if %{with tests}
 meson test -C %{_vpath_builddir} -t 6 --print-errorlogs
@@ -1174,6 +1180,7 @@ fi
 %if 0%{?want_bootloader}
 %files ukify -f .file-list-ukify
 %files boot -f .file-list-boot
+/boot/efi/EFI/BOOT/grubx64.efi
 %endif
 
 %files container -f .file-list-container
@@ -1209,6 +1216,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Sep 09 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
+- Install systemd-boot binary to ESP
+
 * Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17
 - Change bfq scheduler patch to select "none" i/o scheduler
 

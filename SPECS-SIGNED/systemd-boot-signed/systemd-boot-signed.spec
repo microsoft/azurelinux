@@ -14,7 +14,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,6 +86,9 @@ popd
 /usr/share/man/man7/systemd-boot.7.gz
 
 %changelog
+* Mon Sep 09 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
+- Update sd-boot install location
+
 * Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17
 - Bump release to match systemd spec
 
