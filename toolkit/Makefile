@@ -72,6 +72,7 @@ IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
 CACHED_PACKAGES_ARCHIVE              ?=
 USE_CCACHE                           ?= n
 BUILD_TOOLS_NONPROD                  ?= n
+USE_LLVM_TOOLCHAIN                   ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n

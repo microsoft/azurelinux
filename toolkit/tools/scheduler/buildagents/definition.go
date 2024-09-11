@@ -29,6 +29,7 @@ type BuildAgentConfig struct {
 
 	NoCleanup bool
 	UseCcache bool
+	UseLLVMToolchain bool
 	MaxCpu    string
 	Timeout   time.Duration
 

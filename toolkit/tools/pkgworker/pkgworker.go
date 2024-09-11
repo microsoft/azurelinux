@@ -58,6 +58,7 @@ var (
 	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	ccacheRootDir        = app.Flag("ccache-root-dir", "The directory used to store ccache outputs").String()
 	ccachConfig          = app.Flag("ccache-config", "The configuration file for ccache.").String()
+	useLLVMToolchain     = app.Flag("use-llvm-toolchain", "Configure default build worker chroot to use LLVM toolchain").Bool()
 	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
@@ -77,6 +78,7 @@ func main() {
 	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
 
 	toolchainDirAbsPath, err := filepath.Abs(*toolchainDirPath)
+
 	logger.PanicOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
 
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
@@ -89,10 +91,14 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.AzureLinuxModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	logger.Log.Info("NOTE: Building with clang/llvm")
-	defines[rpm.UseLLVMClangDefine] = "true"
-	logger.Log.Info("NOTE: NOT Linking with LLVM lld")
-	//defines[rpm.UseLLVMLinkerDefine] = "true"
+	if *useLLVMToolchain {
+		logger.Log.Info("NOTE: Building with LLVM toolchain")
+		defines[rpm.UseLLVMClangDefine] = "true"
+		//logger.Log.Info("NOTE: Linking with LLVM lld")
+		//defines[rpm.UseLLVMLinkerDefine] = "true"
+	} else {
+		logger.Log.Info("NOTE: Building with default GNU toolchain")
+	}
 
 	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
