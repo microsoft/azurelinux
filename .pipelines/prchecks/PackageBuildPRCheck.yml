@@ -134,13 +134,9 @@ extends:
 
           - stage: Toolchain_tests_${{ configuration.name }}
             dependsOn: Toolchain_${{ configuration.name }}
-            condition: |
-              and(
-                succeeded(),
-                ne(dependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'], '')
-              )
             jobs:
               - job: TestToolchainPackages
+                condition: stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList']
                 pool:
                   type: linux
                   isCustom: true
