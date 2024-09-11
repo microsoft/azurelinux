@@ -8,14 +8,14 @@
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
-Version:        9.0.0
-Release:        0%{?dist}
+Version:        7.10.0
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Virtualization/Libraries
 URL:            https://libvirt.org/
-Source0:        https://download.libvirt.org/%{name}-%{version}.tar.xz
+Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
 # CVE-2023-2700 is fixed by https://gitlab.com/libvirt/libvirt/-/commit/6425a311b8ad19d6f9c0b315bf1d722551ea3585
 Patch1:         CVE-2023-2700.patch
 Patch2:         CVE-2024-1441.patch
@@ -517,6 +517,8 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     -Drpath=disabled \
     -Dsecdriver_apparmor=disabled \
     -Dstorage_iscsi_direct=disabled \
+    -Dstorage_sheepdog=disabled \
+    -Dstorage_vstorage=disabled \
     -Dstorage_zfs=disabled \
     -Dwireshark_dissector=disabled
 
@@ -741,7 +743,6 @@ exit 0
 %files client
 %{_mandir}/man1/virsh.1*
 %{_mandir}/man1/virt-xml-validate.1*
-%{_mandir}/man1/virt-pki-query-dn.1*
 %{_mandir}/man1/virt-pki-validate.1*
 %{_mandir}/man1/virt-host-validate.1*
 %{_bindir}/virsh
@@ -756,6 +757,7 @@ exit 0
 %{_datadir}/systemtap/tapset/libvirt_qemu_probes*.stp
 
 %{_unitdir}/libvirt-guests.service
+%config(noreplace) %{_sysconfdir}/sysconfig/libvirt-guests
 %attr(0755, root, root) %{_libexecdir}/libvirt-guests.sh
 
 %files daemon
@@ -781,6 +783,10 @@ exit 0
 %{_unitdir}/virtlockd.service
 %{_unitdir}/virtlockd.socket
 %{_unitdir}/virtlockd-admin.socket
+%config(noreplace) %{_sysconfdir}/sysconfig/libvirtd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtlogd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtlockd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtproxyd
 %config(noreplace) %{_sysconfdir}/libvirt/libvirtd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtproxyd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtlogd.conf
@@ -833,8 +839,6 @@ exit 0
 %{_mandir}/man8/virtlogd.8*
 %{_mandir}/man8/virtlockd.8*
 %{_mandir}/man8/virtproxyd.8*
-%{_mandir}/man8/virt-ssh-helper.8*
-%{_mandir}/man8/libvirt-guests.8*
 %{_mandir}/man7/virkey*.7*
 
 %files daemon-config-network
@@ -849,6 +853,7 @@ exit 0
 %ghost %{_sysconfdir}/libvirt/nwfilter/*.xml
 
 %files daemon-driver-interface
+%config(noreplace) %{_sysconfdir}/sysconfig/virtinterfaced
 %config(noreplace) %{_sysconfdir}/libvirt/virtinterfaced.conf
 %{_datadir}/augeas/lenses/virtinterfaced.aug
 %{_datadir}/augeas/lenses/tests/test_virtinterfaced.aug
@@ -861,6 +866,7 @@ exit 0
 %{_mandir}/man8/virtinterfaced.8*
 
 %files daemon-driver-network
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnetworkd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnetworkd.conf
 %{_datadir}/augeas/lenses/virtnetworkd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnetworkd.aug
@@ -880,6 +886,7 @@ exit 0
 %{_mandir}/man8/virtnetworkd.8*
 
 %files daemon-driver-nodedev
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnodedevd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnodedevd.conf
 %{_datadir}/augeas/lenses/virtnodedevd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnodedevd.aug
@@ -892,6 +899,7 @@ exit 0
 %{_mandir}/man8/virtnodedevd.8*
 
 %files daemon-driver-nwfilter
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnwfilterd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnwfilterd.conf
 %{_datadir}/augeas/lenses/virtnwfilterd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnwfilterd.aug
@@ -906,8 +914,8 @@ exit 0
 %{_mandir}/man8/virtnwfilterd.8*
 
 %files daemon-driver-qemu
+%config(noreplace) %{_sysconfdir}/sysconfig/virtqemud
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
-%config(noreplace) %{_prefix}/lib/sysctl.d/60-qemu-postcopy-migration.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
 %{_unitdir}/virtqemud.service
@@ -933,6 +941,7 @@ exit 0
 %{_mandir}/man8/virtqemud.8*
 
 %files daemon-driver-secret
+%config(noreplace) %{_sysconfdir}/sysconfig/virtsecretd
 %config(noreplace) %{_sysconfdir}/libvirt/virtsecretd.conf
 %{_datadir}/augeas/lenses/virtsecretd.aug
 %{_datadir}/augeas/lenses/tests/test_virtsecretd.aug
@@ -947,6 +956,7 @@ exit 0
 %files daemon-driver-storage
 
 %files daemon-driver-storage-core
+%config(noreplace) %{_sysconfdir}/sysconfig/virtstoraged
 %config(noreplace) %{_sysconfdir}/libvirt/virtstoraged.conf
 %{_datadir}/augeas/lenses/virtstoraged.aug
 %{_datadir}/augeas/lenses/tests/test_virtstoraged.aug
@@ -983,11 +993,10 @@ exit 0
 %files daemon-driver-storage-scsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_scsi.so
 
-%{_libdir}/%{name}/storage-backend/libvirt_storage_backend_vstorage.so
-
 %files daemon-kvm
 
 %files daemon-driver-vbox
+%config(noreplace) %{_sysconfdir}/sysconfig/virtvboxd
 %config(noreplace) %{_sysconfdir}/libvirt/virtvboxd.conf
 %{_datadir}/augeas/lenses/virtvboxd.aug
 %{_datadir}/augeas/lenses/tests/test_virtvboxd.aug
@@ -1015,11 +1024,6 @@ exit 0
 %files docs
 %doc AUTHORS.rst NEWS.rst README.rst
 %doc libvirt-docs/*
-
-%{_mandir}/man1/virt-qemu-qmp-proxy.1*
-%{_mandir}/man1/virt-qemu-sev-validate.1*
-%{_bindir}/virt-qemu-qmp-proxy
-%{_bindir}/virt-qemu-sev-validate
 
 %files libs -f %{name}.lang
 %license COPYING COPYING.LESSER
@@ -1055,9 +1059,6 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
-* Tue Aug 20 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 9.0.0-1
-- Updating libvirt version to align with kubevirt upstream
-
 * Wed May 22 2024 Juan Camposeco <juanarturoc@microsoft.com> - 7.10.0-10
 - Patch to address CVE-2024-4418
 
@@ -1073,7 +1074,7 @@ exit 0
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 7.10.0-6
 - Release bump with no changes to force a rebuild and consume new libssh2 build
 
-* Thu May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
+* Wed May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
 
 * Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.10.0-4

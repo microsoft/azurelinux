@@ -11421,8 +11421,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "9.0.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-9.0.0.tar.xz"
+          "version": "7.10.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-7.10.0.tar.xz"
         }
       }
     },
