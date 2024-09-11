@@ -7,7 +7,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.45.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -172,6 +172,9 @@ fi
 %endif
 
 %changelog
+* Wed Sep 11 2024 Jon Slobodzian <joslobo@microsoft.com> - 2.45.2-2
+- Just a Test...do not accept this change
+
 * Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.2-1
 - Auto-upgrade to 2.45.2 - none
 
