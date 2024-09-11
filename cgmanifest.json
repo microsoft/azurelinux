@@ -11422,7 +11422,7 @@
         "other": {
           "name": "libvirt",
           "version": "7.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-7.10.0.tar.xz"
+          "downloadUrl": "https://libvirt.org/sources/libvirt-7.10.0.tar.xz"
         }
       }
     },
