@@ -15,7 +15,6 @@ self.azure_ds.distro
 3. remove mock_report_dmesg_to_kvp test in test_no_pps, as mock_report_dmesg_to_kvp is not 
 implemented in our current version of cloud-init
 
-Original Fedora commit message below:
 ---
  cloudinit/sources/DataSourceAzure.py  |  40 ++++
  cloudinit/sources/azure/errors.py     |  19 +-
