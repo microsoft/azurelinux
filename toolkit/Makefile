@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation.
+test# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # Contains:
