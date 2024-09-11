@@ -15,17 +15,17 @@ func TestStorageIsValidCoreEfi(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
 			PartitionTableType: "gpt",
-			MaxSize:            4 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(4 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					End:   ptrutils.PtrTo(DiskSize(9 * diskutils.MiB)),
 					Type:  PartitionTypeESP,
 				},
 				{
 					Id:    "rootfs",
-					Start: 9 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(9 * diskutils.MiB)),
 				},
 			},
 		}},
