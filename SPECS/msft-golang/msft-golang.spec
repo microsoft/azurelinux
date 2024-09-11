@@ -153,7 +153,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Sep 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.22.7
+* Mon Sep 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.22.7-1
 - Bump version to 1.22.7 to address CVE-2024-34158, CVE-2024-34156, CVE-2024-34155
 
 * Thu Jul 04 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.5-1
