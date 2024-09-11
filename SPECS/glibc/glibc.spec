@@ -270,7 +270,7 @@ n=0
 grep "^FAIL: nptl/tst-cancel1" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: io/tst-lchmod" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
-[ `grep ^FAIL tests.sum | wc -l` -eq $n ] ||:
+[ `grep ^FAIL tests.sum | wc -l` -eq $n ]
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
