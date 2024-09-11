@@ -15,11 +15,11 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
 			PartitionTableType: "gpt",
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					Type:  PartitionTypeESP,
 				},
 			},
@@ -52,11 +52,11 @@ func TestStorageIsValidUnsupportedFileSystem(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "a",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					End:   nil,
 				},
 			},
@@ -79,11 +79,11 @@ func TestStorageIsValidMissingFileSystemEntry(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					End:   nil,
 					Type:  PartitionTypeESP,
 				},
@@ -102,11 +102,11 @@ func TestStorageIsValidBadEspFsType(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					End:   nil,
 					Type:  PartitionTypeESP,
 				},
@@ -130,11 +130,11 @@ func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "bios",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					End:   nil,
 					Type:  PartitionTypeBiosGrub,
 				},
@@ -158,11 +158,11 @@ func TestStorageIsValidBadBiosBootStart(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "bios",
-					Start: 2 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 					End:   nil,
 					Type:  PartitionTypeBiosGrub,
 				},
@@ -186,11 +186,11 @@ func TestStorageIsValidBadDeviceId(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
 			PartitionTableType: "gpt",
-			MaxSize:            2 * diskutils.GiB,
+			MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.GiB)),
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1 * diskutils.MiB,
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					Type:  PartitionTypeESP,
 				},
 			},
@@ -222,16 +222,16 @@ func TestStorageIsValidDuplicatePartitionId(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            4 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(4 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 					},
 					{
 						Id:    "a",
-						Start: 2 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 					},
 				},
 			},
@@ -254,11 +254,11 @@ func TestStorageIsValidNoLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
@@ -288,18 +288,18 @@ func TestStorageIsValidUniqueLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            4 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(4 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 						Label: "a",
 					},
 					{
 						Id:    "b",
-						Start: 2 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 						Label: "b",
 					},
 				},
@@ -335,18 +335,18 @@ func TestStorageIsValidDuplicateLabel(t *testing.T) {
 		Disks: []Disk{
 			{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            4 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(4 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 						Label: "a",
 					},
 					{
 						Id:    "b",
-						Start: 2 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 						Label: "a",
 					},
 				},

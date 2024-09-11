@@ -28,7 +28,9 @@ func (s *Storage) IsValid() error {
 		return fmt.Errorf("defining multiple disks is not currently supported")
 	}
 
-	for i, disk := range s.Disks {
+	for i := range s.Disks {
+		disk := &s.Disks[i]
+
 		err := disk.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid disk at index %d:\n%w", i, err)
