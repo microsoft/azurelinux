@@ -32,7 +32,7 @@ Source1:        disks-images-provider.yaml
 Patch00:        Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch01:        Allocate-2-cpu-for-the-emulator-thread.patch
 Patch02:        CVE-2023-44487.patch
-Patch03        CVE-2024-21626.patch
+Patch03:        CVE-2024-21626.patch
 Patch04:        Hp-volume-pod-should-respect-blockdevices.patch
 Patch05:        CVE-2022-41723.patch
 Patch06:        CVE-2024-24786.patch
