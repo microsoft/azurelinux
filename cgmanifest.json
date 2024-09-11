@@ -20792,6 +20792,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "php-pecl-apcu",
+          "version": "5.1.23",
+          "downloadUrl": "https://pecl.php.net/get/apcu-5.1.23.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "php-pecl-zip",
           "version": "1.22.3",
           "downloadUrl": "https://pecl.php.net/get/zip-1.22.3.tgz"
