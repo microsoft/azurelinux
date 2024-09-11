@@ -154,7 +154,7 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed Spe 04 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-4
+* Wed Sep 04 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-4
 - Add patches to support azure-proxy-agent.
 
 * Wed May 08 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1:23.3-3
