@@ -580,7 +580,13 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		}
 	}
 
-	mkpartArgs = append(mkpartArgs, partition.FsType, fmt.Sprintf(sFmt, start))
+	fsType := partition.FsType
+	if fsType == "vfat" {
+		// 'parted mkpart' requires value of either 'fat16' or 'fat32'.
+		fsType = "fat32"
+	}
+
+	mkpartArgs = append(mkpartArgs, fsType, fmt.Sprintf(sFmt, start))
 
 	if end == 0 {
 		mkpartArgs = append(mkpartArgs, fillToEndOption)
