@@ -4581,7 +4581,7 @@
         "other": {
           "name": "golang",
           "version": "1.22.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-1/go1.22.7-20240905.3.src.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-2/go1.22.7-20240910.4.src.tar.gz"
         }
       }
     },

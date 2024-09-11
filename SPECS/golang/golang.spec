@@ -1,7 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.7-20240905.3.src.tar.gz
-%global ms_go_revision  1
+%global ms_go_filename  go1.22.7-20240910.4.src.tar.gz
+%global ms_go_revision  2
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.22.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -153,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Sep 10 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-2
+- Bump version to 1.22.7-2
+
 * Fri Sep 06 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-1
 - Bump version to 1.22.7-1
 
