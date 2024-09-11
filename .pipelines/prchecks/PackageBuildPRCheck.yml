@@ -107,11 +107,7 @@ extends:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       checkBuildRetries: "1"
-<<<<<<< HEAD
-                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
-=======
                       customToolchainArtifactName: $(toolchainArtifactName)
->>>>>>> f97819a09 (Enabled ccache and set ptest retries to 1 for PR checks (CP: #8503, #10133) (#10392))
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       isUseCCache: true
@@ -121,13 +117,10 @@ extends:
                       selfRepoName: self
                       testRerunList: "$(testListFromToolchain)"
                       testSuiteName: "[${{ configuration.name }}] Package test"
-<<<<<<< HEAD
-=======
 
                   - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "RPMsArtifactName"
                     displayName: "Set variable for published artifact name"
->>>>>>> f97819a09 (Enabled ccache and set ptest retries to 1 for PR checks (CP: #8503, #10133) (#10392))
 
                   - task: PublishPipelineArtifact@1
                     inputs:
