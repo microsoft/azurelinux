@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.5-20240702.3.src.tar.gz
+%global ms_go_filename  go1.22.7-20240905.3.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.22.5
+Version:        1.22.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Sep 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.22.7-1
+- Bump version to 1.22.7 to address CVE-2024-34158, CVE-2024-34156, CVE-2024-34155
+
 * Thu Jul 04 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.5-1
 - Bump version to 1.22.4
 
