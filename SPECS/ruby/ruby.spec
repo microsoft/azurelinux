@@ -4,7 +4,7 @@
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
-%global ruby_version            3.3.5
+%global ruby_version            3.3.3
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
 %global rubygems_version        3.5.3
@@ -19,6 +19,8 @@
 %global csv_version             3.2.8
 %global date_version            3.3.4
 %global delegate_version        0.3.1
+%global did_you_mean_version    1.6.3
+%global digest_version          3.1.1
 %global drb_version             2.2.0
 %global english_version         0.8.0
 %global erb_version             4.0.3
@@ -28,6 +30,7 @@
 %global fiddle_version          1.1.2
 %global fileutils_version       1.7.2
 %global find_version            0.2.0
+%global forwardable_version     1.3.3
 %global getoptlong_version      0.2.1
 %global io_console_version      0.7.1
 %global io_nonblock_version     0.3.0
@@ -47,6 +50,7 @@
 %global optparse_version        0.4.0
 %global ostruct_version         0.6.0
 %global pathname_version        0.3.0
+%global prism_version           0.19.0
 %global pp_version              0.5.0
 %global prettyprint_version     0.2.0
 %global pstore_version          0.1.3
@@ -55,7 +59,9 @@
 %global readline_version        0.0.4
 %global reline_version          0.4.1
 %global resolv_version          0.3.0
+%global resolv_replace_version  0.1.1
 %global rinda_version           0.2.0
+%global ruby2_keywords_version  0.0.5
 %global securerandom_version    0.3.1
 %global set_version             1.1.0
 %global shellwords_version      0.2.0
@@ -82,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -137,6 +143,10 @@ Provides:       rubygem-date = %{date_version}-%{release}
 Provides:       rubygem(date) = %{date_version}-%{release}
 Provides:       rubygem(delegate) = %{delegate_version}-%{release}
 Provides:       rubygem-delegate = %{delegate_version}-%{release}
+Provides:       rubygem(did_you_mean) = %{did_you_mean_version}-%{release}
+Provides:       rubygem-did_you_mean = %{did_you_mean_version}-%{release}
+Provides:       rubygem(digest) = %{digest_version}-%{release}
+Provides:       rubygem-digest = %{digest_version}-%{release}
 Provides:       rubygem(drb) = %{drb_version}-%{release}
 Provides:       rubygem-drb = %{drb_version}-%{release}
 Provides:       rubygem(english) = %{english_version}-%{release}
@@ -155,6 +165,8 @@ Provides:       rubygem-fileutils = %{fileutils_version}-%{release}
 Provides:       rubygem(fileutils) = %{fileutils_version}-%{release}
 Provides:       rubygem-find = %{find_version}-%{release}
 Provides:       rubygem(find) = %{find_version}-%{release}
+Provides:       rubygem-forwardable = %{forwardable_version}-%{release}
+Provides:       rubygem(forwardable) = %{forwardable_version}-%{release}
 Provides:       rubygem-getoptlong = %{getoptlong_version}-%{release}
 Provides:       rubygem(getoptlong) = %{getoptlong_version}-%{release}
 Provides:       rubygem-io-console = %{io_console_version}-%{release}
@@ -197,6 +209,8 @@ Provides:       rubygem-pp = %{pp_version}-%{release}
 Provides:       rubygem(pp) = %{pp_version}-%{release}
 Provides:       rubygem-prettyprint = %{prettyprint_version}-%{release}
 Provides:       rubygem(prettyprint) = %{prettyprint_version}-%{release}
+Provides:       rubygem-prism = %{prism_version}-%{release}
+Provides:       rubygem(prism) = %{prism_version}-%{release}
 Provides:       rubygem-pstore = %{pstore_version}-%{release}
 Provides:       rubygem(pstore) = %{pstore_version}-%{release}
 Provides:       rubygem-psych = %{psych_version}-%{release}
@@ -209,8 +223,12 @@ Provides:       rubygem-reline = %{reline_version}-%{release}
 Provides:       rubygem(reline) = %{reline_version}-%{release}
 Provides:       rubygem-resolv = %{resolv_version}-%{release}
 Provides:       rubygem(resolv) = %{resolv_version}-%{release}
+Provides:       rubygem-resolv-replace = %{resolv_replace_version}-%{release}
+Provides:       rubygem(resolv-replace) = %{resolv_replace_version}-%{release}
 Provides:       rubygem-rinda = %{rinda_version}-%{release}
 Provides:       rubygem(rinda) = %{rinda_version}-%{release}
+Provides:       rubygem-ruby2_keywords = %{ruby2_keywords_version}-%{release}
+Provides:       rubygem(ruby2_keywords) = %{ruby2_keywords_version}-%{release}
 Provides:       rubygem-rubygems = %{rubygems_version}-%{release}
 Provides:       rubygem(rubygems) = %{rubygems_version}-%{release}
 Provides:       rubygem-securerandom = %{securerandom_version}-%{release}
