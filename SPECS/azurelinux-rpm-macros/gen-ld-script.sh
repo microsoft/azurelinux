@@ -16,9 +16,10 @@ OS_VERSION=$(echo $4 | cut -d. -f1,2)
 # ex: "1:3.0.0-7.azl3" -> "3.0.0"
 VERSION_NO_RELEASE=$(echo $2 | cut -d- -f1 | cut -d: -f2)
 
+# Azure Watson requires a "moduleVersion" field, which always contains a 4-part version number.
+# Ensure moduleVersion contains 4 version parts by adding ".0" padding
 # Count number of dot separators in $2 (version)
 NUM_DOT_SEPARATORS="${VERSION_NO_RELEASE//[^.]}"
-# Ensure moduleVersion contains 4 version parts by adding ".0" padding
 case ${#NUM_DOT_SEPARATORS} in
   0)
     MODULEVERSION=$VERSION_NO_RELEASE".0.0.0"
