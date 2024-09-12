@@ -15194,7 +15194,7 @@
         "other": {
           "name": "openssl",
           "version": "3.3.2",
-          "downloadUrl": "https://www.openssl.org/source/openssl-3.3.2.tar.gz"
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.2/openssl-3.3.2.tar.gz"
         }
       }
     },
