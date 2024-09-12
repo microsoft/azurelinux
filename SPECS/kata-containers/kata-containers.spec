@@ -216,7 +216,10 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
-* Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl2-2
+* Thu Sep 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.8.0.azl0-1 
+- Upgrade to v3.8.0.azl0.
+
+* Mon Jun 17 2024 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl2-2
 - Enable sandbox_cgroup_only configuration
 - Remove cgroupv1 kernel parameters
 
