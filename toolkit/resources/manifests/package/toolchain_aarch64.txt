@@ -547,13 +547,22 @@ python3-magic-5.45-1.azl3.noarch.rpm
 python3-markupsafe-2.1.3-1.azl3.aarch64.rpm
 python3-newt-0.52.23-1.azl3.aarch64.rpm
 python3-packaging-23.2-3.azl3.noarch.rpm
+<<<<<<< HEAD
 python3-pip-24.0-2.azl3.noarch.rpm
+=======
+python3-pip-24.0-1.azl3.noarch.rpm
+>>>>>>> 92604b84c (Applied fixes to unblock 3.0 fast-track builds. (Multiple cherry-picks.) (#10425))
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 python3-rpm-4.18.2-1.azl3.aarch64.rpm
 python3-rpm-generators-14-11.azl3.noarch.rpm
 python3-setuptools-69.0.3-3.azl3.noarch.rpm
+<<<<<<< HEAD
 python3-test-3.12.3-3.azl3.aarch64.rpm
 python3-tools-3.12.3-3.azl3.aarch64.rpm
+=======
+python3-test-3.12.3-2.azl3.aarch64.rpm
+python3-tools-3.12.3-2.azl3.aarch64.rpm
+>>>>>>> 92604b84c (Applied fixes to unblock 3.0 fast-track builds. (Multiple cherry-picks.) (#10425))
 python3-wheel-0.43.0-1.azl3.noarch.rpm
 readline-8.2-1.azl3.aarch64.rpm
 readline-debuginfo-8.2-1.azl3.aarch64.rpm
