@@ -8,8 +8,8 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.0
-Release: 2%{?dist}
+Version: 3.3.2
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -360,6 +360,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Sep 12 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.3.2-1
+- Upgrade version to 3.3.2 which fixes CVE-2024-6119
+
 * Fri Jul 12 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.3.0-2
 - Patch CVE-2023-5535
 
