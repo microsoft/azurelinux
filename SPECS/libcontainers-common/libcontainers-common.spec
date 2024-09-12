@@ -177,6 +177,9 @@ fi
 %license LICENSE
 
 %changelog
+* Thu Sep 12 2024 Sudipta Pandit <sudpandit@microsoft.com> - 20210626-7
+- Backport CVE-2024-3727 for all sources from upstream
+
 * Tue Aug 27 2024 Sindhu Karri <lakarri@microsoft.com> - 20210626-6
 - Patch CVE-2022-32149
 
