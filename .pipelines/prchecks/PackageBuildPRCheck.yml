@@ -159,6 +159,7 @@ extends:
                       outputArtifactsFolder: $(ob_outputDirectory)
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
+                      srpmPackList: "$(testListFromToolchain)"
                       testRerunList: "$(testListFromToolchain)"
                       testSuiteName: "[${{ configuration.name }}] Toolchain test"
 
