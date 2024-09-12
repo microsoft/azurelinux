@@ -15193,8 +15193,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.0",
-          "downloadUrl": "https://www.openssl.org/source/openssl-3.3.0.tar.gz"
+          "version": "3.3.2",
+          "downloadUrl": "https://www.openssl.org/source/openssl-3.3.2.tar.gz"
         }
       }
     },
