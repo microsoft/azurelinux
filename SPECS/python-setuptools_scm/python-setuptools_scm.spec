@@ -6,7 +6,7 @@
 Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-%{srcname}
 Version:        8.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -25,6 +25,7 @@ BuildRequires:  python3-pip
 BuildRequires:  cmake
 %if %{with_check}
 BuildRequires:  git
+BuildRequires:  python3-packaging >= 24.1
 %endif
 
 %description
@@ -79,6 +80,9 @@ tox -e py%{python3_version_nodots}
  
 
 %changelog
+* Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 8.0.3-2
+- bump package to use latest python3-packaging in ptest
+
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
 - Auto-upgrade to 8.0.3 - 3.0 package upgrade
 
