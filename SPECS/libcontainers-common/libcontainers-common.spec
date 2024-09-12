@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,8 @@ Patch0:         CVE-2021-44716.patch
 Patch1:         CVE-2024-37298.patch
 Patch2:         CVE-2021-43565.patch
 Patch3:         CVE-2022-32149.patch
+Patch4:         CVE-2024-3727.patch
+Patch5:         podman-CVE-2024-3727.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -65,15 +67,19 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 
 %prep
 %setup -q -T -D -b 0 -n image-%{imagever}
+%patch 4 -p6
+
 %setup -q -T -D -b 1 -n storage-%{storagever}
 
 %setup -q -T -D -b 7 -n podman-%{podmanver}
+%patch 5 -p1
 %patch 1 -p1
 %patch 3 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
 %patch 3 -p1
+%patch 4 -p1
 
 # copy the LICENSE file in the build root
 %patch 2 -p1 -d ../podman-%{podmanver}
