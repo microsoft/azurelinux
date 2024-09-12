@@ -23403,8 +23403,8 @@
         "type": "other",
         "other": {
           "name": "python-packaging",
-          "version": "23.2",
-          "downloadUrl": "https://github.com/pypa/packaging/archive/refs/tags/23.2.tar.gz"
+          "version": "24.1",
+          "downloadUrl": "https://github.com/pypa/packaging/archive/refs/tags/24.1.tar.gz"
         }
       }
     },

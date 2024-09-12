@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        Core utilities for Python packages
 Name:           python-packaging
-Version:        23.2
-Release:        3%{?dist}
+Version:        24.1
+Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,9 @@ Core utilities for Python packages
 %license LICENSE
 
 %changelog
+* Thu Sep 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1-1
+- Auto-upgrade to 24.1 - pTest fix
+
 * Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 23.2-3
 - Bump release to rebuild and resolve python3dist provides issue
 
