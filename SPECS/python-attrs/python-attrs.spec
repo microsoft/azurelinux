@@ -1,7 +1,7 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        21.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,7 +39,7 @@ Attributes without boilerplate.
 
 %check
 # explicitly  install packaging ver to match azl install to avoid pip conflict
-pip3 install tox packaging==23.2
+pip3 install tox 
 # Skip mypy tests- effort required in keeping these tests green is not justifiable,
 # as we don't ship mypy and these tests are very sensitive to mypy upstream changes
 
@@ -53,6 +53,9 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 %{python3_sitelib}/*
 
 %changelog
+* Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 21.4.0-7
+- Remove explicit python-packaging version to support new python-packaging upgrade.
+
 * Tue Jul 02 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-6
 - add python-packaging requires to fix ptest
 
