@@ -7,8 +7,10 @@
 %global ruby_version            3.3.5
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
+# Version of default rubygem gem. Please update when upgrading ruby.
+# A helpful one-liner script to check the current default version is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global rubygems_version        3.5.16
-# Add version for default gems from https://stdgems.org/
+# Add version for default gems from https://stdgems.org/. Please update when upgrading ruby.
 # A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
