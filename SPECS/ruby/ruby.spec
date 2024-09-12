@@ -389,8 +389,8 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Tue Sep 10 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.3-2
-- Bump release to build with new rubygem-rexml to fix CVE-2024-41946
+* Thu Sep 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.5-1
+- Upgrade ruby to 3.3.5 to fix CVE-2024-41946 by including bundled gem rexml v3.3.6
 
 * Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-1
 - Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
