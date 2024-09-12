@@ -314,7 +314,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 	}, checkAttempts, retryDuration)
 
 	if checkFailed {
-		logger.Log.Debugf("Tests failed for '%s' after %d retries.", basePackageName, checkAttempts)
+		logger.Log.Debugf("Tests failed for '%s' after %d attempt(s).", basePackageName, checkAttempts)
 		err = nil
 	}
 	return
