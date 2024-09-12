@@ -4,7 +4,7 @@
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
-%global ruby_version            3.3.3
+%global ruby_version            3.3.5
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
 %global rubygems_version        3.5.3
@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
