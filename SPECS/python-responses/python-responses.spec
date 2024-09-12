@@ -17,6 +17,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-urllib3
+BuildRequires:  python3-packaging >= 24.1
 %endif
 BuildArch:      noarch
 
