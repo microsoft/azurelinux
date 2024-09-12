@@ -7,10 +7,10 @@ compatible XML.
 Summary:        PyJUnitXML, a pyunit extension to output JUnit compatible XML
 Name:           python-%{pypi_name}
 Version:        0.7
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        LGPL-3.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://launchpad.net/pyjunitxml
 Source0:        https://pypi.python.org/packages/source/j/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
@@ -53,6 +53,10 @@ ln -s ./pyjunitxml-%{python3_version} %{buildroot}%{_bindir}/pyjunitxml-3
 %{python3_sitelib}/*
 
 %changelog
+* Thu Sep 12 2024 Zhichun Wan <zhichunwan@microsoft.com> - 0.7-39
+- Initial Azure Linux import from Fedora 42 (license: MIT)
+- License Verified
+
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-38
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
