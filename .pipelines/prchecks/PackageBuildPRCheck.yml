@@ -157,9 +157,9 @@ extends:
                       isUseCCache: true
                       maxCPU: "${{ configuration.maxCPUs }}"
                       outputArtifactsFolder: $(ob_outputDirectory)
-                      packageRebuildList: "$(testListFromToolchain)"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
+                      testRerunList: "$(testListFromToolchain)"
                       testSuiteName: "[${{ configuration.name }}] Toolchain test"
 
                   - task: PublishPipelineArtifact@1
