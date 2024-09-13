@@ -65,6 +65,9 @@ popd
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Tue Sep 10 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-3
+- Bump release to match kernel
+
 * Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
 - Bump release to match kernel
 

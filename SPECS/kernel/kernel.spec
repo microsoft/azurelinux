@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 10 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-3
+- UKI: remove dbus from initrd
+
 * Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
 - Build mpt2sas and mpt3sas drivers as modules
 - Build pata_legacy as module
