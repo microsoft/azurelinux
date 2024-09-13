@@ -25905,8 +25905,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.1.4",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.4.tar.xz"
+          "version": "3.3.5",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.5.tar.xz"
         }
       }
     },
@@ -26905,8 +26905,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rexml",
-          "version": "3.2.7",
-          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.2.7.tar.gz"
+          "version": "3.3.4",
+          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.3.4.tar.gz"
         }
       }
     },
