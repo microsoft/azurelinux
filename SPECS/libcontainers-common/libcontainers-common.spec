@@ -26,11 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-<<<<<<< HEAD
-Release:        5%{?dist}
-=======
 Release:        7%{?dist}
->>>>>>> a731dba9c (Backport CVE-2024-3727 fix for libcontainers-common (#10432))
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,12 +51,9 @@ Patch0:         CVE-2021-44716.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch1:         CVE-2024-37298.patch
 Patch2:         CVE-2021-43565.patch
-<<<<<<< HEAD
-=======
 Patch3:         CVE-2022-32149.patch
 Patch4:         CVE-2024-3727.patch
 Patch5:         podman-CVE-2024-3727.patch
->>>>>>> a731dba9c (Backport CVE-2024-3727 fix for libcontainers-common (#10432))
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -81,14 +74,12 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %setup -q -T -D -b 7 -n podman-%{podmanver}
 %patch 5 -p1
 %patch 1 -p1
+%patch 3 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
-<<<<<<< HEAD
-=======
 %patch 3 -p1
 %patch 4 -p1
->>>>>>> a731dba9c (Backport CVE-2024-3727 fix for libcontainers-common (#10432))
 
 # copy the LICENSE file in the build root
 %patch 2 -p1 -d ../podman-%{podmanver}
@@ -186,15 +177,12 @@ fi
 %license LICENSE
 
 %changelog
-<<<<<<< HEAD
-=======
 * Thu Sep 12 2024 Sudipta Pandit <sudpandit@microsoft.com> - 20210626-7
 - Backport CVE-2024-3727 for all sources from upstream
 
 * Tue Aug 27 2024 Sindhu Karri <lakarri@microsoft.com> - 20210626-6
 - Patch CVE-2022-32149
 
->>>>>>> a731dba9c (Backport CVE-2024-3727 fix for libcontainers-common (#10432))
 * Mon Jul 29 2024 Archana Choudhary <archana1@microsoft.com> - 20210626-5
 - Patch CVE-2021-43565
 
