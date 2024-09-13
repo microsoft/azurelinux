@@ -495,7 +495,6 @@ line. systemd-boot supports systems with UEFI firmware only.
 
 This package contains the unsigned version. Install systemd-boot instead to get
 the version that works with Secure Boot.
-
 %endif
 
 %package container
