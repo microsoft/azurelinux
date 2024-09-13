@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
