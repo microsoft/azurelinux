@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.bz2"
+          "version": "2.6.3",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_3/expat-2.6.3.tar.bz2"
         }
       }
     },
@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.6-1/go1.22.6-20240806.4.src.tar.gz"
+          "version": "1.22.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-1/go1.22.7-20240905.3.src.tar.gz"
         }
       }
     },
@@ -7121,8 +7121,8 @@
         "type": "other",
         "other": {
           "name": "ig",
-          "version": "0.30.0",
-          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.30.0.tar.gz"
+          "version": "0.32.0",
+          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.32.0.tar.gz"
         }
       }
     },
@@ -9953,6 +9953,16 @@
           "name": "libmbim",
           "version": "1.26.2",
           "downloadUrl": "https://www.freedesktop.org/software/libmbim/libmbim-1.26.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libmd",
+          "version": "1.1.0",
+          "downloadUrl": "https://libbsd.freedesktop.org/releases/libmd-1.1.0.tar.xz"
         }
       }
     },
@@ -16793,8 +16803,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-Caller",
-          "version": "2.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.06.tar.gz"
+          "version": "2.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-2.07.tar.gz"
         }
       }
     },

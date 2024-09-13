@@ -1216,7 +1216,7 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Mon Sep 09 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Install systemd-boot binary to ESP
 
 * Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17

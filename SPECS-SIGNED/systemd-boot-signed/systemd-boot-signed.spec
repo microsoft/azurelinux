@@ -86,7 +86,7 @@ popd
 /usr/share/man/man7/systemd-boot.7.gz
 
 %changelog
-* Mon Sep 09 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Update sd-boot install location
 
 * Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17

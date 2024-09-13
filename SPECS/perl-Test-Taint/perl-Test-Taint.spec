@@ -1,7 +1,7 @@
 Summary:        Tools to test taintedness
 Name:           perl-Test-Taint
 Version:        1.08
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,10 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.08-5
+- Promote package to Core repository.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.08-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

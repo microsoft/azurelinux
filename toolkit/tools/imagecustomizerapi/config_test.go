@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,11 +16,11 @@ func TestConfigIsValid(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -52,11 +53,11 @@ func TestConfigIsValidLegacy(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "boot",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeBiosGrub,
 					},
 				},
@@ -84,11 +85,11 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					},
 				},
 			}},
@@ -109,11 +110,11 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -145,11 +146,11 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 			Disks: []Disk{
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1 * diskutils.MiB,
+					MaxSize:            ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 				},
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1 * diskutils.MiB,
+					MaxSize:            ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 				},
 			},
 			BootType: "legacy",
@@ -199,7 +200,7 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 			BootType: BootTypeEfi,
 			Disks: []Disk{{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            0,
+				MaxSize:            ptrutils.PtrTo(DiskSize(0)),
 			}},
 		},
 		OS: &OS{
@@ -218,7 +219,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions:         []Partition{},
 			}},
 			BootType: "efi",
@@ -239,7 +240,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions:         []Partition{},
 			}},
 			BootType: "legacy",
@@ -260,11 +261,11 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -288,7 +289,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid fileSystems item at index 0")
+	assert.ErrorContains(t, err, "invalid filesystems item at index 0")
 	assert.ErrorContains(t, err, "invalid mountPoint value")
 	assert.ErrorContains(t, err, "invalid path (boot/efi): must be an absolute path")
 }
@@ -298,11 +299,11 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
