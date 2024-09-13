@@ -909,6 +909,7 @@
                 "mod_wsgi",
                 "mokutil",
                 "moreutils",
+                "mosh",
                 "mpage",
                 "mrtg",
                 "mstflint",
