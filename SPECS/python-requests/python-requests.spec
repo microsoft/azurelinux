@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.31.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ BuildRequires:  python3-idna
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-urllib3
+BuildRequires:  python3-packaging >= 24.1
 %endif
 
 %description -n python3-requests
@@ -71,6 +72,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 2.31.0-2
+- bump package to use latest python3-packaging in ptest
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.31.0-1
 - Auto-upgrade to 2.31.0 - Azure Linux 3.0 - package upgrades
 
