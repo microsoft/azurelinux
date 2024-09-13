@@ -19,7 +19,7 @@ storage:
 
   filesystems:
   - deviceId: esp
-    type: fat32
+    type: vfat
     mountPoint:
       path: /boot/efi
       options: umask=0077

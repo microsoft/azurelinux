@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.47.1
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Patch0:		    0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -409,6 +409,17 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Tue Sep 10 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-3
 - UKI: remove dbus from initrd
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
+- Build mpt2sas and mpt3sas drivers as modules
+- Build pata_legacy as module
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-4
+- Enable paravirt spinlocks
+- Enable CET and IBT
+
+* Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
+- Enable usb hiddev and serial ch341
 
 * Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
 - UKI: remove usrmount from initrd

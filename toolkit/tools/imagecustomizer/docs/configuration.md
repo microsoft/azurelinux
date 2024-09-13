@@ -244,7 +244,7 @@ storage:
 
     - id: rootfs
       start: 9M
-      
+
   filesystems:
   - deviceId: esp
     type: fat32
@@ -660,7 +660,8 @@ The filesystem type of the partition.
 Supported options:
 
 - `ext4`
-- `fat32`
+- `fat32` (alias for `vfat`)
+- `vfat` (will select either FAT12, FAT16, or FAT32 based on the size of the partition)
 - `xfs`
 
 ### mountPoint [[mountPoint](#mountpoint-type)]
@@ -939,7 +940,7 @@ Specifies options for the partition.
 Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
-  The partition must have a `fileSystemType` of `fat32`.
+  The partition must have a `fileSystemType` of `fat32` or `vfat`.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
