@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-8
+- Bump release to rebuild with go 1.22.7
+
 * Wed Jul 17 2024 Sindhu Karri <lakarri@microsoft.com> - 1.14.2-7
 - Fix CVE-2024-6104 in github.com/hashicorp/go-retryablehttp
 
