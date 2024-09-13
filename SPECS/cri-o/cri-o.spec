@@ -220,7 +220,7 @@ mkdir -p /opt/cni/bin
 
 %changelog
 * Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-6
-- Patch CVE-2021-43565
+- Patch CVE-2022-32149
 
 * Mon Jul 22 2024 Archana Choudhary <archana1@microsoft.com> - 1.22.3-5
 - Patch CVE-2021-43565
