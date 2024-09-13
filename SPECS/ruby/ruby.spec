@@ -1,12 +1,13 @@
+%define ruby_version_majmin %(echo %{version} | cut -d. -f1-2)
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
-%global rubygems_dir  %{_datadir}/rubygems
+%global rubygems_dir %{_datadir}/rubygems
 %global gem_dir %{_datadir}/ruby/gems
 # Version of default rubygem gem. Please update when upgrading ruby.
 # A helpful one-liner script to check the current default version is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global rubygems_version        3.5.16
 # Add version for default gems from https://stdgems.org/
-# A helpful one-liner script to check the current default versions is available via RUBY_VER=3.1 ./get_gem_versions.sh
+# A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
 %global benchmark_version       0.3.0
@@ -85,7 +86,6 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.3.5
-%define ruby_version_majmin     %(echo %{version} | cut -d. -f1-2)
 Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
