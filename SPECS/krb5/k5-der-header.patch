@@ -4,8 +4,8 @@ Date: Tue, 7 Mar 2023 00:19:33 -0500
 Subject: [PATCH] Add a simple DER support header
 
 ---
- src/include/k5-der.h | 149 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 149 insertions(+)
+ src/include/k5-der.h | 150 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 150 insertions(+)
  create mode 100644 src/include/k5-der.h
 
 diff --git a/src/include/k5-der.h b/src/include/k5-der.h
@@ -13,7 +13,7 @@ new file mode 100644
 index 0000000000..b8371d9b4d
 --- /dev/null
 +++ b/src/include/k5-der.h
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,150 @@
 +/* -*- mode: c; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 +/* include/k5-der.h - Distinguished Encoding Rules (DER) declarations */
 +/*
