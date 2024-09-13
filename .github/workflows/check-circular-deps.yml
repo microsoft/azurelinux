@@ -5,9 +5,9 @@ name: Circular dependency check
 
 on:
   push:
-    branches: [3.0*, fasttrack/3.0]
+    branches: [3.0*, fasttrack/*, "!fasttrack/2.0"]
   pull_request:
-    branches: [3.0*, fasttrack/3.0]
+    branches: [3.0*, fasttrack/*, "!fasttrack/2.0"]
 
 jobs:
   spec-check:
