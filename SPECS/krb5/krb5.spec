@@ -12,9 +12,10 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 Source1:        krb5.conf
-Patch0:         CVE-2024-26461.patch
-Patch1:         k5-der-header.patch
-Patch2:         CVE-2024-37370.patch
+Patch0:         CVE-2023-36054.patch
+Patch1:         CVE-2024-26461.patch
+Patch2:         k5-der-header.patch
+Patch3:         CVE-2024-37370.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
