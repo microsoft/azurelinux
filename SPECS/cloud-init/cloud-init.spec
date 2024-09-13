@@ -19,6 +19,7 @@ Patch2:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 Patch3:         0001-feat-azure-Add-ProvisionGuestProxyAgent-OVF-setting.patch
 Patch4:         0002-feat-azure-parse-ProvisionGuestProxyAgent-as-bool-51.patch
 Patch5:         0003-feat-azure-add-support-for-azure-proxy-agent.patch
+Patch6:         0001-add-PPS-support-for-azure-proxy-agent.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -154,6 +155,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Fri Sep 13 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-5
+- Add patche to have PPS support for azure-proxy-agent.
+
 * Wed Sep 04 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-4
 - Add patches to support azure-proxy-agent.
 
