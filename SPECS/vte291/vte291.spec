@@ -18,7 +18,11 @@
 
 Name:           vte291
 Version:        0.74.2
+<<<<<<< HEAD
 Release:        7%{?dist}
+=======
+Release:        6%{?dist}
+>>>>>>> ec3a6f6b9 (vte291: patch CVE-2024-37535 (CP: #10275) (#10288))
 Summary:        GTK+ 3 terminal emulator library
 
 # libvte-2.91.so is generated from LGPLv2+ and MIT sources
@@ -196,9 +200,12 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+<<<<<<< HEAD
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.74.2-7
 - Add missing Vendor and Distribution tags.
 
+=======
+>>>>>>> ec3a6f6b9 (vte291: patch CVE-2024-37535 (CP: #10275) (#10288))
 * Thu Aug 28 2024 Dallas Delaney <dadelan@microsoft.com> - 0.74.2-6
 - Patch CVE-2024-37535
 
