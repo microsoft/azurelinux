@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.11.2
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -120,6 +120,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-15
+- Bump release to rebuild with go 1.22.7
+
 * Wed Aug 21 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.11.2-14
 - Patch for CVE-2023-3978, CVE-2024-24786, CVE-2024-28180, CVE-2023-2253
 

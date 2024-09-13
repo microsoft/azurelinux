@@ -1,8 +1,8 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.6.2
-Release:        2%{?dist}
+Version:        2.6.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Mon Sep 09 2024 Gary Swalling <gaswal@microsoft.com> - 2.6.3-1
+- Upgrade to 2.6.3 to fix CVE-2024-45490, CVE-2024-45491, CVE-2024-45492
+
 * Thu Mar 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-2
 - Removed unnecessary "-p2" argument in "%%autosetup".
 
