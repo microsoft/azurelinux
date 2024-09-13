@@ -170,7 +170,7 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
-* Mon Aug 26 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.5.4-5
+* Wed Sep 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.5.4-5
 - Build nfs-utils to provide rsc.svcgssd service
 - Add rsc-gssd.service file to nfs-utils package
 
