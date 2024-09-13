@@ -3,14 +3,30 @@
 Summary:        An advanced file and recursive website downloader
 Name:           wget
 Version:        2.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND GFDL-1.3-or-later
 URL:            https://gitlab.com/gnuwget/wget2
 Group:          System Environment/NetworkingPrograms
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/wget/%{name}2-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+## Fix behavior for downloading to stdin (rhbz#2257700, gl#gnuwget/wget2#651)
 Patch0001:      0001-src-log.c-log_init-Redirect-INFO-logs-to-stderr-with.patch
+## Fix normalization of path part of URL (rhbz#2271362)
+Patch0002:      0002-normalize-path-in-url.patch
+# https://github.com/rockdaboot/wget2/pull/316
+# Allow option --no-tcp-fastopen to work on Linux kernels >= 4.11
+Patch0003:      0003-Allow-option-no-tcp-fastopen-to-work-on-Linux-kernel.patch
+# https://gitlab.com/gnuwget/wget2/-/issues/664
+# Disable explicit OCSP requests by default for privacy reasons.
+Patch0004:      0004-Disable-OCSP-by-default.patch
+# https://gitlab.com/gnuwget/wget2/-/issues/661
+# Accept --progress=dot:... for backwards compatibility
+Patch0005:      0005-Accept-progress-dot-.-for-backwards-compatibility.patch
+# https://gitlab.com/gnuwget/wget2/-/commit/7a945d31aeb34fc73cf86a494673ae97e069d84d
+# Disable TCP Fast Open by default
+# rhbz#2291017
+Patch0006:      0006-Disable-TCP-Fast-Open-by-default.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -108,6 +124,9 @@ install -D -m0644 -t %{buildroot}%{_mandir}/man1/ docs/man/man1/wget2.1
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
+# Delete useless noinstall binary
+rm -v %{buildroot}%{_bindir}/%{name}2_noinstall
+
 ln -sr %{buildroot}%{_bindir}/%{name}2 %{buildroot}%{_bindir}/wget
 # Link wget(1) to wget2(1)
 echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
@@ -121,7 +140,6 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %config(noreplace) /etc/wgetrc
 %{_bindir}/*
 %{_mandir}/man1/*
-%{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %files libs
 %license COPYING*
@@ -135,6 +153,11 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
+* Thu Sep 12 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-2
+- Add patches from Fedora upstream. Important ones include disabling OCSP and TCP Fast Open by default.
+- Don't install wget2_noinstall binary, which is specifically for testing.
+- Fix rpmbuild warnings.
+
 * Wed Feb 28 2024 Muhammad Falak <mwani@microsoft.com> - 2.1.0-1
 - Switch wget from 1.x to 2.x
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
