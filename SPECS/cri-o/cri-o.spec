@@ -26,11 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-<<<<<<< HEAD
-Release:        6%{?dist}
-=======
 Release:        8%{?dist}
->>>>>>> dbdb7141d (Fix CVE-2022-32149 in cri-o (#10443))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -224,15 +220,12 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
-<<<<<<< HEAD
-=======
 * Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-8
 - Patch CVE-2022-32149
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.3-7
 - Bump release to rebuild with go 1.22.7
 
->>>>>>> dbdb7141d (Fix CVE-2022-32149 in cri-o (#10443))
 * Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 1.22.3-6
 - Patch CVE-2024-6104
 
