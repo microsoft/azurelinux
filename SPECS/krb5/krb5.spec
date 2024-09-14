@@ -21,7 +21,7 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
-Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-libs = %{epoch}:%{version}-%{release}
 
 %description
 Kerberos V5 is a trusted-third-party network authentication system,
@@ -30,7 +30,7 @@ practice of clear text passwords.
 
 %package devel
 Summary:        Libraries and header files for krb5
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 Requires:       e2fsprogs-devel
 
 %description devel
@@ -39,7 +39,7 @@ Static libraries and header files for the support library for krb5
 %package lang
 Summary:        Additional language files for krb5
 Group:          System Environment/Security
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 
 %description lang
 These are the additional language files of krb5.
