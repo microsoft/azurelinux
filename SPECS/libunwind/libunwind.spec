@@ -32,6 +32,14 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
+# /usr/include/libunwind-ptrace.h
+# [...] aren't really part of the libunwind API.  They are implemented in
+# a archive library called libunwind-ptrace.a.
+mv -f $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace.a $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace.a-save
+rm -f $RPM_BUILD_ROOT%{_libdir}/libunwind*.a
+mv -f $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace.a-save $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace*.so*
+
 %files
 %defattr(-,root,root)
 %license COPYING
