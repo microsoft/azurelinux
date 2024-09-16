@@ -329,7 +329,7 @@ exit 0
 %changelog
 * Wed Sep 11 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-8
 - Add additional required permissions for cloud-utils-growpart.
-- Cherry-pick upstrem fix for typo in docker module.
+- Cherry-pick upstream fix for typo in docker module.
 
 * Mon Aug 13 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-7
 - Change policy composition so the base module only consits of policy modules
