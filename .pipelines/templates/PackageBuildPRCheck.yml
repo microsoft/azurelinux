@@ -158,6 +158,6 @@ stages:
             variables:
               rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
             steps:
-              - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
+              - template: ../templatesWithCheckout/SodiffCheck.yml@self
                 parameters:
                   inputArtifactName: $(rpmsArtifactName)
