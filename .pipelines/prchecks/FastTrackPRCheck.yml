@@ -32,6 +32,4 @@ extends:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
-      - template: .pipelines/templates/PackageBuildPRCheck.yml@self
-        parameters:
-          debug: ${{ parameters.debug }}
+      - template: ../templates/PackageBuildPRCheck.yml@self
