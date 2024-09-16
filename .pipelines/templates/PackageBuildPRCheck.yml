@@ -24,13 +24,6 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
-resources:
-  repositories:
-    - repository: templates
-      type: git
-      name: OneBranch.Pipelines/GovernedTemplates
-      ref: refs/heads/main
-
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
       - stage: Toolchain_${{ configuration.name }}
