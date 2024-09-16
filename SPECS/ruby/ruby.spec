@@ -1,6 +1,7 @@
+%define ruby_version_majmin %(echo %{version} | cut -d. -f1-2)
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
-%global rubygems_dir  %{_datadir}/rubygems
+%global rubygems_dir %{_datadir}/rubygems
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
@@ -10,7 +11,7 @@
 # A helpful one-liner script to check the current default version is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global rubygems_version        3.5.16
 # Add version for default gems from https://stdgems.org/
-# A helpful one-liner script to check the current default versions is available via RUBY_VER=3.1 ./get_gem_versions.sh
+# A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
 %global benchmark_version       0.3.0
