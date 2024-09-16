@@ -22,10 +22,10 @@ the specification.
  4 files changed, 79 insertions(+), 104 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
-index d2260baa0..f995ce4b1 100644
+index 97ec18faf..84ef61b24 100644
 --- a/cloudinit/sources/helpers/openstack.py
 +++ b/cloudinit/sources/helpers/openstack.py
-@@ -596,13 +596,14 @@ def convert_net_json(network_json=None, known_macs=None):
+@@ -600,13 +600,14 @@ def convert_net_json(network_json=None, known_macs=None):
          # present.  The 'id' in the spec is currently implemented as the host
          # nic's name, meaning something like 'tap-adfasdffd'.  We do not want
          # to name guest devices with such ugly names.
@@ -46,10 +46,10 @@ index d2260baa0..f995ce4b1 100644
          curinfo = {
              "name": cfg.get("name"),
 diff --git a/tests/unittests/sources/helpers/test_openstack.py b/tests/unittests/sources/helpers/test_openstack.py
-index ac8e2a354..143c12796 100644
+index 6ec0bd75b..02d7fb9c8 100644
 --- a/tests/unittests/sources/helpers/test_openstack.py
 +++ b/tests/unittests/sources/helpers/test_openstack.py
-@@ -42,9 +42,9 @@ class TestConvertNetJson(test_helpers.CiTestCase):
+@@ -41,9 +41,9 @@ class TestConvertNetJson:
              "version": 1,
              "config": [
                  {
@@ -61,7 +61,7 @@ index ac8e2a354..143c12796 100644
                      "subnets": [{"type": "dhcp4"}],
                      "type": "physical",
                  },
-@@ -94,9 +94,9 @@ class TestConvertNetJson(test_helpers.CiTestCase):
+@@ -90,9 +90,9 @@ class TestConvertNetJson:
              "version": 1,
              "config": [
                  {
@@ -251,10 +251,11 @@ index 70da4812a..e0afa2936 100644
          }
          self.assertEqual(expected, config_name2mac)
  
-diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
---- a/tests/unittests/test_net.py	2024-07-02 18:44:08.000000000 -0700
-+++ b/tests/unittests/test_net.py	2024-07-03 20:33:37.305007410 -0700
-@@ -566,13 +566,12 @@
+diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
+index 68e44fa80..aa92a600d 100644
+--- a/tests/unittests/test_net.py
++++ b/tests/unittests/test_net.py
+@@ -566,13 +566,12 @@ OS_SAMPLES = [
          },
          "out_sysconfig_opensuse": [
              (
@@ -269,7 +270,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  NETMASK=255.255.252.0
  STARTMODE=auto
  """.lstrip(),
-@@ -598,27 +597,22 @@
+@@ -598,27 +597,22 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -301,7 +302,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  IPADDR=172.19.1.34
  NETMASK=255.255.252.0
  ONBOOT=yes
-@@ -647,12 +641,8 @@
+@@ -647,12 +641,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
@@ -311,12 +312,12 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
 -                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
 -                    ]
 -                ),
-+	         # Since we do not set mac address, we are expecting the content to be nil
-+                 "",
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
              ),
          ],
          "expected_network_manager": [
-@@ -824,23 +814,23 @@
+@@ -824,23 +814,23 @@ dns = none
                  "".join(
                      [
                          "etc/NetworkManager/system-connections",
@@ -344,7 +345,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  
  [ipv4]
  method=manual
-@@ -904,14 +894,13 @@
+@@ -904,14 +894,13 @@ dns-search=example3.com;
          },
          "out_sysconfig_opensuse": [
              (
@@ -360,7 +361,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  NETMASK=255.255.252.0
  NETMASK1=255.255.255.0
  STARTMODE=auto
-@@ -937,25 +926,20 @@
+@@ -937,25 +926,20 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -390,7 +391,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  IPADDR=172.19.1.34
  IPADDR1=10.0.0.10
  NETMASK=255.255.252.0
-@@ -985,12 +969,8 @@
+@@ -985,12 +969,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
@@ -405,7 +406,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
              ),
          ],
      },
-@@ -1062,7 +1042,7 @@
+@@ -1062,7 +1042,7 @@ dns = none
          },
          "out_sysconfig_opensuse": [
              (
@@ -414,7 +415,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
                  """
  # Created by cloud-init automatically, do not edit.
  #
-@@ -1071,7 +1051,6 @@
+@@ -1071,7 +1051,6 @@ IPADDR=172.19.1.34
  IPADDR6=2001:DB8::10/64
  IPADDR6_1=2001:DB9::10/64
  IPADDR6_2=2001:DB10::10/64
@@ -422,7 +423,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  NETMASK=255.255.252.0
  STARTMODE=auto
  """.lstrip(),
-@@ -1095,25 +1074,20 @@
+@@ -1095,25 +1074,20 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -452,7 +453,7 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
  IPADDR=172.19.1.34
  IPV6ADDR=2001:DB8::10/64
  IPV6ADDR_SECONDARIES="2001:DB9::10/64 2001:DB10::10/64"
-@@ -1146,12 +1120,8 @@
+@@ -1146,12 +1120,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
@@ -467,4 +468,5 @@ diff -ruN a/tests/unittests/test_net.py b/tests/unittests/test_net.py
              ),
          ],
      },
-2.34.1
+-- 
+2.45.2
