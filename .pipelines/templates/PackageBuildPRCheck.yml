@@ -37,12 +37,12 @@ stages:
               ob_artifactBaseName: Toolchain_${{ configuration.name }}_$(System.JobAttempt)
               ob_outputDirectory: $(Build.ArtifactStagingDirectory)
             steps:
-              - template: .pipelines/templates/RawToolchainDownload.yml@self
+              - template: RawToolchainDownload.yml@self
                 parameters:
                   rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
                   rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
 
-              - template: .pipelines/templates/ToolchainBuild.yml@self
+              - template: ToolchainBuild.yml@self
                 parameters:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
                   outputArtifactsFolder: $(ob_outputDirectory)
@@ -50,7 +50,7 @@ stages:
 
               # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
               # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
-              - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
+              - template: ToolchainCalculatePackageRetests.yml@self
                 parameters:
                   # GCC fails to build as a regular package.
                   ignoredSpecs: ["gcc"]
@@ -83,7 +83,7 @@ stages:
               ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
             steps:
-              - template: .pipelines/templates/PackageBuild.yml@self
+              - template: PackageBuild.yml@self
                 parameters:
                   checkBuildRetries: "1"
                   customToolchainArtifactName: $(toolchainArtifactName)
@@ -123,7 +123,7 @@ stages:
               testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
               toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
             steps:
-              - template: .pipelines/templates/PackageBuild.yml@self
+              - template: PackageBuild.yml@self
                 parameters:
                   checkBuildRetries: "1"
                   customToolchainArtifactName: $(toolchainArtifactName)
