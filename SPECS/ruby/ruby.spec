@@ -57,7 +57,6 @@
 %global pstore_version          0.1.3
 %global psych_version           5.1.2
 %global rdoc_version            6.6.3.1
-%global readline_version        0.0.4
 %global reline_version          0.5.7
 %global resolv_version          0.3.0
 %global resolv_replace_version  0.1.1
@@ -127,6 +126,8 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
+Provides:       rubygem-bigdecimal = %{bigdecimal_version}-%{release}
+Provides:       rubygem(bigdecimal) = %{bigdecimal_version}-%{release}
 Provides:       rubygem-bundler = %{bundler_version}-%{release}
 Provides:       rubygem(bundler) = %{bundler_version}-%{release}
 # we have transitioned away from a seperate spec/package for bundler, obsolete that package
@@ -205,18 +206,14 @@ Provides:       rubygem-pp = %{pp_version}-%{release}
 Provides:       rubygem(pp) = %{pp_version}-%{release}
 Provides:       rubygem-prettyprint = %{prettyprint_version}-%{release}
 Provides:       rubygem(prettyprint) = %{prettyprint_version}-%{release}
+Provides:       rubygem-prism = %{prism_version}-%{release}
+Provides:       rubygem(prism) = %{prism_version}-%{release}
 Provides:       rubygem-pstore = %{pstore_version}-%{release}
 Provides:       rubygem(pstore) = %{pstore_version}-%{release}
 Provides:       rubygem-psych = %{psych_version}-%{release}
 Provides:       rubygem(psych) = %{psych_version}-%{release}
-Provides:       rubygem-racc = %{racc_version}-%{release}
-Provides:       rubygem(racc) = %{racc_version}-%{release}
 Provides:       rubygem-rdoc = %{rdoc_version}-%{release}
 Provides:       rubygem(rdoc) = %{rdoc_version}-%{release}
-Provides:       rubygem-readline = %{readline_version}-%{release}
-Provides:       rubygem(readline) = %{readline_version}-%{release}
-Provides:       rubygem-readline-ext = %{readline_ext_version}-%{release}
-Provides:       rubygem(readline-ext) = %{readline_ext_version}-%{release}
 Provides:       rubygem-reline = %{reline_version}-%{release}
 Provides:       rubygem(reline) = %{reline_version}-%{release}
 Provides:       rubygem-resolv = %{resolv_version}-%{release}
@@ -241,6 +238,8 @@ Provides:       rubygem-stringio = %{stringio_version}-%{release}
 Provides:       rubygem(stringio) = %{stringio_version}-%{release}
 Provides:       rubygem-strscan = %{strscan_version}-%{release}
 Provides:       rubygem(strscan) = %{strscan_version}-%{release}
+Provides:       rubygem-syntax_suggest = %{syntax_suggest_version}-%{release}
+Provides:       rubygem(syntax_suggest) = %{syntax_suggest_version}-%{release}
 Provides:       rubygem-syslog = %{syslog_version}-%{release}
 Provides:       rubygem(syslog) = %{syslog_version}-%{release}
 Provides:       rubygem-tempfile = %{tempfile_version}-%{release}
@@ -305,8 +304,6 @@ pushd gems
 find -not -name 'bundled_gems' -delete
 sed -i '2,$d' bundled_gems
 popd
-# Remove bigdecimal. Add them back when version provided by ruby >= current version
-rm -rf ext/bigdecimal
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -409,6 +406,7 @@ sudo -u test make test TESTS="-v"
 - Upgrade ruby to 3.3.5 to fix CVE-2024-41946 by including bundled gem rexml v3.3.6
 - Update versions of default gems
 - Remove CVE patches against older ruby version
+- Declare bigdecimal, prism and syntax_suggest builtin gems
 
 * Thu May 30 2024 Minghe Ren <mingheren@microsoft.com> - 3.1.4-6
 - Patch CVE-2024-35176
