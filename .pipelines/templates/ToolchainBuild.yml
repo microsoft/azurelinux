@@ -6,6 +6,11 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -27,7 +32,7 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain DAILY_BUILD_ID="${{ parameters.dailyBuildID }}" QUICK_REBUILD=y
     displayName: "Build toolchain"
 
   - bash: |

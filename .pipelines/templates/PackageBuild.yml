@@ -22,6 +22,11 @@ parameters:
     type: string
     default: "toolchain_built_rpms_all.tar.gz"
 
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -241,6 +246,7 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        DAILY_BUILD_ID="${{ parameters.dailyBuildID }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
         PACKAGE_BUILD_LIST="${{ parameters.packageBuildList }}" \
         PACKAGE_REBUILD_LIST="${{ parameters.packageRebuildList }}" \
