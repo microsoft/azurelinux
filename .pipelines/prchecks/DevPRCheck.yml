@@ -32,7 +32,7 @@ extends:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
-      - template: .pipelines/templates/PackageBuildPRCheck.yml@self
+      - template: /.pipelines/templates/PackageBuildPRCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
           debug: ${{ parameters.debug }}
