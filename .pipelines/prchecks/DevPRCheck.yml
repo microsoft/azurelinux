@@ -35,4 +35,3 @@ extends:
       - template: /.pipelines/templates/PackageBuildPRCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
-          debug: ${{ parameters.debug }}
