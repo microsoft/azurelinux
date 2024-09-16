@@ -4,8 +4,6 @@
 # The "agentPool" parameter is defined in the "Agent pools (DEV)" variable group.
 # The "rawToolchain*" parameters are defined in the "Raw toolchain info" variable group.
 
-trigger: none
-
 parameters:
   - name: buildConfiguration
     type: object
