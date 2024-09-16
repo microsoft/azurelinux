@@ -1,0 +1,37 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# The "agentPool" parameter is defined in the "Agent pools (DEV)" variable group.
+# The "rawToolchain*" parameters are defined in the "Raw toolchain info" variable group.
+
+trigger: none
+
+parameters:
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - group: "Agent pools (DEV)"
+  - group: "Raw toolchain info"
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - template: .pipelines/templates/PackageBuildPRCheck.yml@self
+        parameters:
+          debug: ${{ parameters.debug }}
