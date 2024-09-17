@@ -243,8 +243,8 @@ function prepare_docker_directory {
     mkdir -pv "$HOST_MOUNTED_DIR"
 
     # Copy files into docker context directory
-    tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
-    tar -xf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    tar -xvf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
     cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
 }
 
