@@ -119,6 +119,7 @@ Patch1005: CVE-2022-36763.patch
 Patch1006: CVE-2022-36764.patch
 Patch1007: CVE-2022-36765.patch
 Patch1008: CVE-2023-45230.patch
+Patch1009: CVE-2023-45236.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -705,8 +706,8 @@ $tests_ok
 
 %changelog
 * Mon Sep 16 2024 Minghe Ren <mingheren@microsoft.com> - 20230301gitf80f052277c8-40
-- Apply CVE-2022-36763, CVE-2022-36764,CVE-2022-36765, CVE-2023-45230 patch
-- Add nopatch for CVE-2023-45232, CVE-2023-45233, CVE-2023-45234, CVE-2023-45235
+- Apply CVE-2022-36763, CVE-2022-36764,CVE-2022-36765, CVE-2023-45230, CVE-2023-45236 patch
+- Add nopatch for CVE-2023-45232, CVE-2023-45233, CVE-2023-45234, CVE-2023-45235, CVE-2023-45237
 
 * Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39
 - Apply CVE-2024-1298 patch

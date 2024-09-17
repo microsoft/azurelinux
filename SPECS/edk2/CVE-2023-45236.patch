@@ -1,0 +1,715 @@
+From a1f639f404d095e955e58340b06d552efcd01398 Mon Sep 17 00:00:00 2001
+From: Douglas Flick <dougflick@microsoft.com>
+Date: Thu, 4 Jan 2024 13:25:45 -0800
+Subject: [PATCH] SECURITY PATCH - TCBZ4541 - Patch
+
+REF: https://bugzilla.tianocore.org/show_bug.cgi?id=4541
+
+Bug Details:
+PixieFail Bug #8
+CVE-2023-45236
+CVSS 5.8 : CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N
+CWE-338 Use of Cryptographically Weak Pseudo-Random Number Generator
+(PRNG)
+
+This change implements the the initial sequence number selection as
+proposed by https://datatracker.ietf.org/doc/html/rfc9293#section-3.4.1
+
+The following function will use the local and remote IP addresses and
+ports to generate a 32-bit initial sequence number.
+
+> EFI_STATUS
+> TcpGetIsn (
+>   IN UINT8       *LocalIp,
+>   IN UINTN       LocalIpSize,
+>   IN UINT16      LocalPort,
+>   IN UINT8       *RemoteIp,
+>   IN UINTN       RemoteIpSize,
+>   IN UINT16      RemotePort,
+>   OUT TCP_SEQNO  *Isn
+>   )
+
+This change depends on a platform providing the Hash2ServiceBinding
+protocol to the TcpDxe driver. If the platform does not provide this
+protocol, the TcpDxe driver will fail to start.
+
+This change will attempt to use SHA256 to generate the initial sequence
+number.
+---
+ NetworkPkg/TcpDxe/TcpDriver.c |  92 ++++++++++++-
+ NetworkPkg/TcpDxe/TcpDxe.inf  |   6 +-
+ NetworkPkg/TcpDxe/TcpFunc.h   |  21 ++-
+ NetworkPkg/TcpDxe/TcpInput.c  |  13 +-
+ NetworkPkg/TcpDxe/TcpMain.h   |  57 ++++++--
+ NetworkPkg/TcpDxe/TcpMisc.c   | 237 ++++++++++++++++++++++++++++++++--
+ NetworkPkg/TcpDxe/TcpTimer.c  |   1 -
+ 7 files changed, 382 insertions(+), 45 deletions(-)
+
+diff --git a/NetworkPkg/TcpDxe/TcpDriver.c b/NetworkPkg/TcpDxe/TcpDriver.c
+index 3ad6bd4ef9..68a4c1cf69 100644
+--- a/NetworkPkg/TcpDxe/TcpDriver.c
++++ b/NetworkPkg/TcpDxe/TcpDriver.c
+@@ -83,6 +83,12 @@ EFI_SERVICE_BINDING_PROTOCOL  gTcpServiceBinding = {
+   TcpServiceBindingDestroyChild
+ };
+ 
++//
++// This is the handle for the Hash2ServiceBinding Protocol instance this driver produces
++// if the platform does not provide one.
++//
++EFI_HANDLE  mHash2ServiceHandle = NULL;
++
+ /**
+   Create and start the heartbeat timer for the TCP driver.
+ 
+@@ -165,6 +171,23 @@ TcpDriverEntryPoint (
+   EFI_STATUS  Status;
+   UINT32      Random;
+ 
++  //
++  // Initialize the Secret used for hashing TCP sequence numbers
++  //
++  // Normally this should be regenerated periodically, but since
++  // this is only used for UEFI networking and not a general purpose
++  // operating system, it is not necessary to regenerate it.
++  //
++  Status = PseudoRandomU32 (&mTcpGlobalSecret);
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_ERROR, "Failed to generate random number: %r\n", Status));
++    return Status;
++  }
++
++  //
++  // Get a random number used to generate a random port number
++  // Intentionally not linking this to mTcpGlobalSecret to avoid leaking information about the secret
++  //
+   Status = PseudoRandomU32 (&Random);
+   if (EFI_ERROR (Status)) {
+     DEBUG ((DEBUG_ERROR, "Failed to generate random number: %r\n", Status));
+@@ -207,9 +230,8 @@ TcpDriverEntryPoint (
+   }
+ 
+   //
+-  // Initialize ISS and random port.
++  // Initialize the random port.
+   //
+-  mTcpGlobalIss   = Random % mTcpGlobalIss;
+   mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (Random % TCP_PORT_KNOWN));
+   mTcp6RandomPort = mTcp4RandomPort;
+ 
+@@ -224,6 +246,8 @@ TcpDriverEntryPoint (
+   @param[in]  IpVersion          IP_VERSION_4 or IP_VERSION_6.
+ 
+   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
++  @retval EFI_UNSUPPORTED        Service Binding Protocols are unavailable.
++  @retval EFI_ALREADY_STARTED    The TCP driver is already started on the controller.
+   @retval EFI_SUCCESS            A new IP6 service binding private was created.
+ 
+ **/
+@@ -234,11 +258,13 @@ TcpCreateService (
+   IN UINT8       IpVersion
+   )
+ {
+-  EFI_STATUS        Status;
+-  EFI_GUID          *IpServiceBindingGuid;
+-  EFI_GUID          *TcpServiceBindingGuid;
+-  TCP_SERVICE_DATA  *TcpServiceData;
+-  IP_IO_OPEN_DATA   OpenData;
++  EFI_STATUS                    Status;
++  EFI_GUID                      *IpServiceBindingGuid;
++  EFI_GUID                      *TcpServiceBindingGuid;
++  TCP_SERVICE_DATA              *TcpServiceData;
++  IP_IO_OPEN_DATA               OpenData;
++  EFI_SERVICE_BINDING_PROTOCOL  *Hash2ServiceBinding;
++  EFI_HASH2_PROTOCOL            *Hash2Protocol;
+ 
+   if (IpVersion == IP_VERSION_4) {
+     IpServiceBindingGuid  = &gEfiIp4ServiceBindingProtocolGuid;
+@@ -272,6 +298,33 @@ TcpCreateService (
+     return EFI_UNSUPPORTED;
+   }
+ 
++  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
++  if (EFI_ERROR (Status)) {
++    //
++    // If we can't find the Hashing protocol, then we need to create one.
++    //
++
++    //
++    // Platform is expected to publish the hash service binding protocol to support TCP.
++    //
++    Status = gBS->LocateProtocol (
++                    &gEfiHash2ServiceBindingProtocolGuid,
++                    NULL,
++                    (VOID **)&Hash2ServiceBinding
++                    );
++    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->CreateChild == NULL)) {
++      return EFI_UNSUPPORTED;
++    }
++
++    //
++    // Create an instance of the hash protocol for this controller.
++    //
++    Status = Hash2ServiceBinding->CreateChild (Hash2ServiceBinding, &mHash2ServiceHandle);
++    if (EFI_ERROR (Status)) {
++      return EFI_UNSUPPORTED;
++    }
++  }
++
+   //
+   // Create the TCP service data.
+   //
+@@ -423,6 +476,7 @@ TcpDestroyService (
+   EFI_STATUS                               Status;
+   LIST_ENTRY                               *List;
+   TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
++  EFI_SERVICE_BINDING_PROTOCOL             *Hash2ServiceBinding;
+ 
+   ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));
+ 
+@@ -439,6 +493,30 @@ TcpDestroyService (
+     return EFI_SUCCESS;
+   }
+ 
++  //
++  // Destroy the Hash2ServiceBinding instance if it is created by Tcp driver.
++  //
++  if (mHash2ServiceHandle != NULL) {
++    Status = gBS->LocateProtocol (
++                    &gEfiHash2ServiceBindingProtocolGuid,
++                    NULL,
++                    (VOID **)&Hash2ServiceBinding
++                    );
++    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->DestroyChild == NULL)) {
++      return EFI_UNSUPPORTED;
++    }
++
++    //
++    // Destroy the instance of the hashing protocol for this controller.
++    //
++    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, &mHash2ServiceHandle);
++    if (EFI_ERROR (Status)) {
++      return EFI_UNSUPPORTED;
++    }
++
++    mHash2ServiceHandle = NULL;
++  }
++
+   Status = gBS->OpenProtocol (
+                   NicHandle,
+                   ServiceBindingGuid,
+diff --git a/NetworkPkg/TcpDxe/TcpDxe.inf b/NetworkPkg/TcpDxe/TcpDxe.inf
+index c0acbdca57..d662e9d9e6 100644
+--- a/NetworkPkg/TcpDxe/TcpDxe.inf
++++ b/NetworkPkg/TcpDxe/TcpDxe.inf
+@@ -68,7 +68,6 @@
+   NetLib
+   IpIoLib
+ 
+-
+ [Protocols]
+   ## SOMETIMES_CONSUMES
+   ## SOMETIMES_PRODUCES
+@@ -81,6 +80,11 @@
+   gEfiIp6ServiceBindingProtocolGuid             ## TO_START
+   gEfiTcp6ProtocolGuid                          ## BY_START
+   gEfiTcp6ServiceBindingProtocolGuid            ## BY_START
++  gEfiHash2ProtocolGuid                         ## BY_START
++  gEfiHash2ServiceBindingProtocolGuid           ## BY_START
++
++[Guids]
++  gEfiHashAlgorithmSha256Guid                   ## CONSUMES
+ 
+ [UserExtensions.TianoCore."ExtraFiles"]
+   TcpDxeExtra.uni
+diff --git a/NetworkPkg/TcpDxe/TcpFunc.h b/NetworkPkg/TcpDxe/TcpFunc.h
+index a7af01fff2..e611151b7d 100644
+--- a/NetworkPkg/TcpDxe/TcpFunc.h
++++ b/NetworkPkg/TcpDxe/TcpFunc.h
+@@ -36,8 +36,11 @@ VOID
+ 
+   @param[in, out]  Tcb               Pointer to the TCP_CB of this TCP instance.
+ 
++  @retval EFI_SUCCESS             The operation completed successfully
++  @retval others                  The underlying functions failed and could not complete the operation
++
+ **/
+-VOID
++EFI_STATUS
+ TcpInitTcbLocal (
+   IN OUT TCP_CB  *Tcb
+   );
+@@ -128,17 +131,6 @@ TcpCloneTcb (
+   IN TCP_CB  *Tcb
+   );
+ 
+-/**
+-  Compute an ISS to be used by a new connection.
+-
+-  @return The result ISS.
+-
+-**/
+-TCP_SEQNO
+-TcpGetIss (
+-  VOID
+-  );
+-
+ /**
+   Get the local mss.
+ 
+@@ -202,8 +194,11 @@ TcpFormatNetbuf (
+   @param[in, out]  Tcb          Pointer to the TCP_CB that wants to initiate a
+                                 connection.
+ 
++  @retval EFI_SUCCESS             The operation completed successfully
++  @retval others                  The underlying functions failed and could not complete the operation
++
+ **/
+-VOID
++EFI_STATUS
+ TcpOnAppConnect (
+   IN OUT TCP_CB  *Tcb
+   );
+diff --git a/NetworkPkg/TcpDxe/TcpInput.c b/NetworkPkg/TcpDxe/TcpInput.c
+index 97633a3908..a5d575ccaf 100644
+--- a/NetworkPkg/TcpDxe/TcpInput.c
++++ b/NetworkPkg/TcpDxe/TcpInput.c
+@@ -724,6 +724,7 @@ TcpInput (
+   TCP_SEQNO   Urg;
+   UINT16      Checksum;
+   INT32       Usable;
++  EFI_STATUS  Status;
+ 
+   ASSERT ((Version == IP_VERSION_4) || (Version == IP_VERSION_6));
+ 
+@@ -872,7 +873,17 @@ TcpInput (
+       Tcb->LocalEnd.Port  = Head->DstPort;
+       Tcb->RemoteEnd.Port = Head->SrcPort;
+ 
+-      TcpInitTcbLocal (Tcb);
++      Status = TcpInitTcbLocal (Tcb);
++      if (EFI_ERROR (Status)) {
++        DEBUG (
++          (DEBUG_ERROR,
++           "TcpInput: discard a segment because failed to init local end for TCB %p\n",
++           Tcb)
++          );
++
++        goto DISCARD;
++      }
++
+       TcpInitTcbPeer (Tcb, Seg, &Option);
+ 
+       TcpSetState (Tcb, TCP_SYN_RCVD);
+diff --git a/NetworkPkg/TcpDxe/TcpMain.h b/NetworkPkg/TcpDxe/TcpMain.h
+index c0c9b7f46e..2cf5059fac 100644
+--- a/NetworkPkg/TcpDxe/TcpMain.h
++++ b/NetworkPkg/TcpDxe/TcpMain.h
+@@ -13,6 +13,7 @@
+ 
+ #include <Protocol/ServiceBinding.h>
+ #include <Protocol/DriverBinding.h>
++#include <Protocol/Hash2.h>
+ #include <Library/IpIoLib.h>
+ #include <Library/DevicePathLib.h>
+ #include <Library/PrintLib.h>
+@@ -31,7 +32,7 @@ extern EFI_UNICODE_STRING_TABLE      *gTcpControllerNameTable;
+ 
+ extern LIST_ENTRY  mTcpRunQue;
+ extern LIST_ENTRY  mTcpListenQue;
+-extern TCP_SEQNO   mTcpGlobalIss;
++extern TCP_SEQNO   mTcpGlobalSecret;
+ extern UINT32      mTcpTick;
+ 
+ ///
+@@ -45,14 +46,6 @@ extern UINT32      mTcpTick;
+ 
+ #define TCP_EXPIRE_TIME  65535
+ 
+-///
+-/// The implementation selects the initial send sequence number and the unit to
+-/// be added when it is increased.
+-///
+-#define TCP_BASE_ISS         0x4d7e980b
+-#define TCP_ISS_INCREMENT_1  2048
+-#define TCP_ISS_INCREMENT_2  100
+-
+ typedef union {
+   EFI_TCP4_CONFIG_DATA    Tcp4CfgData;
+   EFI_TCP6_CONFIG_DATA    Tcp6CfgData;
+@@ -774,4 +767,50 @@ Tcp6Poll (
+   IN EFI_TCP6_PROTOCOL  *This
+   );
+ 
++/**
++  Retrieves the Initial Sequence Number (ISN) for a TCP connection identified by local
++  and remote IP addresses and ports.
++
++  This method is based on https://datatracker.ietf.org/doc/html/rfc9293#section-3.4.1
++  Where the ISN is computed as follows:
++    ISN = TimeStamp + MD5(LocalIP, LocalPort, RemoteIP, RemotePort, Secret)
++
++  Otherwise:
++    ISN = M + F(localip, localport, remoteip, remoteport, secretkey)
++
++    "Here M is the 4 microsecond timer, and F() is a pseudorandom function (PRF) of the
++    connection's identifying parameters ("localip, localport, remoteip, remoteport")
++    and a secret key ("secretkey") (SHLD-1). F() MUST NOT be computable from the
++    outside (MUST-9), or an attacker could still guess at sequence numbers from the
++    ISN used for some other connection. The PRF could be implemented as a
++    cryptographic hash of the concatenation of the TCP connection parameters and some
++    secret data. For discussion of the selection of a specific hash algorithm and
++    management of the secret key data."
++
++  @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
++  @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
++  @param[in]       LocalPort      The local port number of the TCP connection.
++  @param[in]       RemoteIp       A pointer to the remote IP address of the TCP connection.
++  @param[in]       RemoteIpSize   The size, in bytes, of the RemoteIp buffer.
++  @param[in]       RemotePort     The remote port number of the TCP connection.
++  @param[out]      Isn            A pointer to the variable that will receive the Initial
++                                  Sequence Number (ISN).
++
++  @retval EFI_SUCCESS             The operation completed successfully, and the ISN was
++                                  retrieved.
++  @retval EFI_INVALID_PARAMETER   One or more of the input parameters are invalid.
++  @retval EFI_UNSUPPORTED         The operation is not supported.
++
++**/
++EFI_STATUS
++TcpGetIsn (
++  IN UINT8       *LocalIp,
++  IN UINTN       LocalIpSize,
++  IN UINT16      LocalPort,
++  IN UINT8       *RemoteIp,
++  IN UINTN       RemoteIpSize,
++  IN UINT16      RemotePort,
++  OUT TCP_SEQNO  *Isn
++  );
++
+ #endif
+diff --git a/NetworkPkg/TcpDxe/TcpMisc.c b/NetworkPkg/TcpDxe/TcpMisc.c
+index c93212d47d..56c2b37a52 100644
+--- a/NetworkPkg/TcpDxe/TcpMisc.c
++++ b/NetworkPkg/TcpDxe/TcpMisc.c
+@@ -20,7 +20,28 @@ LIST_ENTRY  mTcpListenQue = {
+   &mTcpListenQue
+ };
+ 
+-TCP_SEQNO  mTcpGlobalIss = TCP_BASE_ISS;
++//
++// The Session secret
++// This must be initialized to a random value at boot time
++//
++TCP_SEQNO  mTcpGlobalSecret;
++
++//
++// The ISN is computed by hashing this structure
++// It is initialized with the local and remote IP addresses and ports
++// and the secret
++//
++//
++typedef struct {
++  UINT16       LocalPort;
++  UINT16       RemotePort;
++  union {
++    UINT8    IPv4[4];
++    UINT8    IPv6[16];
++  } LocalAddress,
++    RemoteAddress;
++  TCP_SEQNO    Secret;
++} ISN_HASH_CTX;
+ 
+ CHAR16  *mTcpStateName[] = {
+   L"TCP_CLOSED",
+@@ -41,12 +62,18 @@ CHAR16  *mTcpStateName[] = {
+ 
+   @param[in, out]  Tcb               Pointer to the TCP_CB of this TCP instance.
+ 
++  @retval EFI_SUCCESS             The operation completed successfully
++  @retval others                  The underlying functions failed and could not complete the operation
++
+ **/
+-VOID
++EFI_STATUS
+ TcpInitTcbLocal (
+   IN OUT TCP_CB  *Tcb
+   )
+ {
++  TCP_SEQNO   Isn;
++  EFI_STATUS  Status;
++
+   //
+   // Compute the checksum of the fixed parts of pseudo header
+   //
+@@ -57,6 +84,16 @@ TcpInitTcbLocal (
+                      0x06,
+                      0
+                      );
++
++    Status = TcpGetIsn (
++               Tcb->LocalEnd.Ip.v4.Addr,
++               sizeof (IPv4_ADDRESS),
++               Tcb->LocalEnd.Port,
++               Tcb->RemoteEnd.Ip.v4.Addr,
++               sizeof (IPv4_ADDRESS),
++               Tcb->RemoteEnd.Port,
++               &Isn
++               );
+   } else {
+     Tcb->HeadSum = NetIp6PseudoHeadChecksum (
+                      &Tcb->LocalEnd.Ip.v6,
+@@ -64,9 +101,25 @@ TcpInitTcbLocal (
+                      0x06,
+                      0
+                      );
++
++    Status = TcpGetIsn (
++               Tcb->LocalEnd.Ip.v6.Addr,
++               sizeof (IPv6_ADDRESS),
++               Tcb->LocalEnd.Port,
++               Tcb->RemoteEnd.Ip.v6.Addr,
++               sizeof (IPv6_ADDRESS),
++               Tcb->RemoteEnd.Port,
++               &Isn
++               );
++  }
++
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_ERROR, "TcpInitTcbLocal: failed to get isn\n"));
++    ASSERT (FALSE);
++    return Status;
+   }
+ 
+-  Tcb->Iss    = TcpGetIss ();
++  Tcb->Iss    = Isn;
+   Tcb->SndUna = Tcb->Iss;
+   Tcb->SndNxt = Tcb->Iss;
+ 
+@@ -82,6 +135,8 @@ TcpInitTcbLocal (
+   Tcb->RetxmitSeqMax = 0;
+ 
+   Tcb->ProbeTimerOn = FALSE;
++
++  return EFI_SUCCESS;
+ }
+ 
+ /**
+@@ -506,18 +561,163 @@ TcpCloneTcb (
+ }
+ 
+ /**
+-  Compute an ISS to be used by a new connection.
+-
+-  @return The resulting ISS.
++  Retrieves the Initial Sequence Number (ISN) for a TCP connection identified by local
++  and remote IP addresses and ports.
++
++  This method is based on https://datatracker.ietf.org/doc/html/rfc9293#section-3.4.1
++  Where the ISN is computed as follows:
++    ISN = TimeStamp + MD5(LocalIP, LocalPort, RemoteIP, RemotePort, Secret)
++
++  Otherwise:
++    ISN = M + F(localip, localport, remoteip, remoteport, secretkey)
++
++    "Here M is the 4 microsecond timer, and F() is a pseudorandom function (PRF) of the
++    connection's identifying parameters ("localip, localport, remoteip, remoteport")
++    and a secret key ("secretkey") (SHLD-1). F() MUST NOT be computable from the
++    outside (MUST-9), or an attacker could still guess at sequence numbers from the
++    ISN used for some other connection. The PRF could be implemented as a
++    cryptographic hash of the concatenation of the TCP connection parameters and some
++    secret data. For discussion of the selection of a specific hash algorithm and
++    management of the secret key data."
++
++  @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
++  @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
++  @param[in]       LocalPort      The local port number of the TCP connection.
++  @param[in]       RemoteIp       A pointer to the remote IP address of the TCP connection.
++  @param[in]       RemoteIpSize   The size, in bytes, of the RemoteIp buffer.
++  @param[in]       RemotePort     The remote port number of the TCP connection.
++  @param[out]      Isn            A pointer to the variable that will receive the Initial
++                                  Sequence Number (ISN).
++
++  @retval EFI_SUCCESS             The operation completed successfully, and the ISN was
++                                  retrieved.
++  @retval EFI_INVALID_PARAMETER   One or more of the input parameters are invalid.
++  @retval EFI_UNSUPPORTED         The operation is not supported.
+ 
+ **/
+-TCP_SEQNO
+-TcpGetIss (
+-  VOID
++EFI_STATUS
++TcpGetIsn (
++  IN UINT8       *LocalIp,
++  IN UINTN       LocalIpSize,
++  IN UINT16      LocalPort,
++  IN UINT8       *RemoteIp,
++  IN UINTN       RemoteIpSize,
++  IN UINT16      RemotePort,
++  OUT TCP_SEQNO  *Isn
+   )
+ {
+-  mTcpGlobalIss += TCP_ISS_INCREMENT_1;
+-  return mTcpGlobalIss;
++  EFI_STATUS          Status;
++  EFI_HASH2_PROTOCOL  *Hash2Protocol;
++  EFI_HASH2_OUTPUT    HashResult;
++  ISN_HASH_CTX        IsnHashCtx;
++  EFI_TIME            TimeStamp;
++
++  //
++  // Check that the ISN pointer is valid
++  //
++  if (Isn == NULL) {
++    return EFI_INVALID_PARAMETER;
++  }
++
++  //
++  // The local ip may be a v4 or v6 address and may not be NULL
++  //
++  if ((LocalIp == NULL) || (LocalIpSize == 0) || (RemoteIp == NULL) || (RemoteIpSize == 0)) {
++    return EFI_INVALID_PARAMETER;
++  }
++
++  //
++  // the local ip may be a v4 or v6 address
++  //
++  if ((LocalIpSize != sizeof (EFI_IPv4_ADDRESS)) && (LocalIpSize != sizeof (EFI_IPv6_ADDRESS))) {
++    return EFI_INVALID_PARAMETER;
++  }
++
++  //
++  // Locate the Hash Protocol
++  //
++  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_NET, "Failed to locate Hash Protocol: %r\n", Status));
++
++    //
++    // TcpCreateService(..) is expected to be called prior to this function
++    //
++    ASSERT_EFI_ERROR (Status);
++    return Status;
++  }
++
++  //
++  // Fastest hash algorithm supported by most platforms that still provides
++  // a reasonable level of security
++  //
++  Status = Hash2Protocol->HashInit (Hash2Protocol, &gEfiHashAlgorithmSha256Guid);
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_NET, "Failed to initialize sha256 hash algorithm: %r\n", Status));
++    return Status;
++  }
++
++  IsnHashCtx.LocalPort  = LocalPort;
++  IsnHashCtx.RemotePort = RemotePort;
++  IsnHashCtx.Secret     = mTcpGlobalSecret;
++
++  //
++  // Check the IP address family and copy accordingly
++  //
++  if (LocalIpSize == sizeof (EFI_IPv4_ADDRESS)) {
++    CopyMem (&IsnHashCtx.LocalAddress.IPv4, LocalIp, LocalIpSize);
++  } else if (LocalIpSize == sizeof (EFI_IPv6_ADDRESS)) {
++    CopyMem (&IsnHashCtx.LocalAddress.IPv6, LocalIp, LocalIpSize);
++  } else {
++    return EFI_INVALID_PARAMETER; // Unsupported address size
++  }
++
++  //
++  // Repeat the process for the remote IP address
++  //
++  if (RemoteIpSize == sizeof (EFI_IPv4_ADDRESS)) {
++    CopyMem (&IsnHashCtx.RemoteAddress.IPv4, RemoteIp, RemoteIpSize);
++  } else if (RemoteIpSize == sizeof (EFI_IPv6_ADDRESS)) {
++    CopyMem (&IsnHashCtx.RemoteAddress.IPv6, RemoteIp, RemoteIpSize);
++  } else {
++    return EFI_INVALID_PARAMETER; // Unsupported address size
++  }
++
++  //
++  // Compute the hash
++  // Update the hash with the data
++  //
++  Status = Hash2Protocol->HashUpdate (Hash2Protocol, (UINT8 *)&IsnHashCtx, sizeof (IsnHashCtx));
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_NET, "Failed to update hash: %r\n", Status));
++    return Status;
++  }
++
++  //
++  // Finalize the hash and retrieve the result
++  //
++  Status = Hash2Protocol->HashFinal (Hash2Protocol, &HashResult);
++  if (EFI_ERROR (Status)) {
++    DEBUG ((DEBUG_NET, "Failed to finalize hash: %r\n", Status));
++    return Status;
++  }
++
++  Status = gRT->GetTime (&TimeStamp, NULL);
++  if (EFI_ERROR (Status)) {
++    return Status;
++  }
++
++  //
++  // copy the first 4 bytes of the hash result into the ISN
++  //
++  CopyMem (Isn, HashResult.Md5Hash, sizeof (*Isn));
++
++  //
++  // now add the timestamp to the ISN as 4 microseconds units (1000 / 4 = 250)
++  //
++  *Isn += (TCP_SEQNO)TimeStamp.Nanosecond * 250;
++
++  return Status;
+ }
+ 
+ /**
+@@ -721,17 +921,28 @@ TcpFormatNetbuf (
+   @param[in, out]  Tcb          Pointer to the TCP_CB that wants to initiate a
+                                 connection.
+ 
++  @retval EFI_SUCCESS             The operation completed successfully
++  @retval others                  The underlying functions failed and could not complete the operation
++
+ **/
+-VOID
++EFI_STATUS
+ TcpOnAppConnect (
+   IN OUT TCP_CB  *Tcb
+   )
+ {
+-  TcpInitTcbLocal (Tcb);
++  EFI_STATUS  Status;
++
++  Status = TcpInitTcbLocal (Tcb);
++  if (EFI_ERROR (Status)) {
++    return Status;
++  }
++
+   TcpSetState (Tcb, TCP_SYN_SENT);
+ 
+   TcpSetTimer (Tcb, TCP_TIMER_CONNECT, Tcb->ConnectTimeout);
+   TcpToSendData (Tcb, 1);
++
++  return EFI_SUCCESS;
+ }
+ 
+ /**
+diff --git a/NetworkPkg/TcpDxe/TcpTimer.c b/NetworkPkg/TcpDxe/TcpTimer.c
+index 5d2e124977..132031b7b3 100644
+--- a/NetworkPkg/TcpDxe/TcpTimer.c
++++ b/NetworkPkg/TcpDxe/TcpTimer.c
+@@ -483,7 +483,6 @@ TcpTickingDpc (
+   INT16       Index;
+ 
+   mTcpTick++;
+-  mTcpGlobalIss += TCP_ISS_INCREMENT_2;
+ 
+   //
+   // Don't use LIST_FOR_EACH, which isn't delete safe.
+-- 
+2.43.0.windows.1
+
