@@ -51,6 +51,7 @@ Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes: systemd-udev < 252.2^
+Conflicts: grub2-efi-binary
 
 %description -n systemd-boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
@@ -77,6 +78,8 @@ pushd rpm_contents
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
 
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+
 popd
 
 %files -n systemd-boot
@@ -84,6 +87,7 @@ popd
 /usr/share/man/man5/loader.conf.5.gz
 /usr/share/man/man7/sd-boot.7.gz
 /usr/share/man/man7/systemd-boot.7.gz
+/boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18

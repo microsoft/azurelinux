@@ -507,6 +507,7 @@ Requires(postun): systemd
 # obsolete parent package so that dnf will install new subpackage on upgrade (#1260394)
 Obsoletes:      %{name} < 229-5
 # Bias the system towards libcurl-minimal if nothing pulls in full libcurl (#1997040)
+Conflicts:      grub2-efi-binary
 Suggests:       libcurl-minimal
 License:        LGPL-2.1-or-later
 

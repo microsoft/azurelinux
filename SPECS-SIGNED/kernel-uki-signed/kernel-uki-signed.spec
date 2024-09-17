@@ -58,11 +58,14 @@ pushd rpm_contents
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
 
+cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
+
 popd
 
 %files -n kernel-uki
 /boot/vmlinuz-uki-%{kernelver}.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
+/boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.47.1-6
