@@ -120,12 +120,59 @@ func findLinuxOrInitrdLineAll(inputGrubCfgContent string, commandName string, al
 }
 
 // Find the linux command within the grub config file.
-func FindLinuxLine(inputGrubCfgContent string, allowMultiple bool) (grub.Line, error) {
-	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, allowMultiple)
+func FindLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, false /*allowMultiple*/)
 	if err != nil {
 		return grub.Line{}, err
 	}
 	return lines[0], nil
+}
+
+// Find the linux command within non-recovery mode menuentry block in the grub config file.
+func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
+	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
+	if err != nil {
+		return nil, err
+	}
+
+	grubLines := grub.SplitTokensIntoLines(grubTokens)
+	var linuxLines []grub.Line
+	var inMenuEntry bool
+	var isRecoveryMenu bool
+
+	// Iterate over all lines to find non-recovery mode menuentry and its linux line
+	for _, line := range grubLines {
+		if strings.HasPrefix(line.Tokens[0].RawContent, "menuentry") {
+			// Found a new 'menuentry', reset flags
+			inMenuEntry = true
+			isRecoveryMenu = false
+
+			// Check if this 'menuentry' contains the word 'recovery'
+			for _, token := range line.Tokens {
+				if strings.Contains(token.RawContent, "recovery") {
+					isRecoveryMenu = true
+					break
+				}
+			}
+
+			// If it's a recovery menuentry, ignore this block
+			if isRecoveryMenu {
+				inMenuEntry = false
+			}
+		} else if inMenuEntry {
+			// We are inside a non-recovery menuentry block
+			if len(line.Tokens) > 0 && strings.HasPrefix(line.Tokens[0].RawContent, "linux") {
+				// Append only lines that contain the 'linux' command
+				linuxLines = append(linuxLines, line)
+			}
+		}
+	}
+
+	if len(linuxLines) == 0 {
+		return nil, fmt.Errorf("no linux line found in non-recovery menuentry")
+	}
+
+	return linuxLines, nil
 }
 
 // Overrides the path of the kernel binary of all the linux commands within a grub config file.
