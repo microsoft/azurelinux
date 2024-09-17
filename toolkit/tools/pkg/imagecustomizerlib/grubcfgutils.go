@@ -120,8 +120,8 @@ func findLinuxOrInitrdLineAll(inputGrubCfgContent string, commandName string, al
 }
 
 // Find the linux command within the grub config file.
-func FindLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
-	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, false /*allowMultiple*/)
+func FindLinuxLine(inputGrubCfgContent string, allowMultiple bool) (grub.Line, error) {
+	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, allowMultiple)
 	if err != nil {
 		return grub.Line{}, err
 	}

@@ -64,7 +64,7 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]stri
 		return nil, err
 	}
 
-	line, err := imagecustomizerlib.FindLinuxLine(grubCfgContent)
+	line, err := imagecustomizerlib.FindLinuxLine(grubCfgContent, true)
 	if err != nil {
 		return nil, err
 	}
