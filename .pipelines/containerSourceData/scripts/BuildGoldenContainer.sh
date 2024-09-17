@@ -269,7 +269,7 @@ function prepare_docker_directory {
 
     # Copy files into docker context directory
     tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
-    tar -xf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    tar -xf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR/RPMS"/
     cp -v "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$HOST_MOUNTED_DIR"/
 }
 
