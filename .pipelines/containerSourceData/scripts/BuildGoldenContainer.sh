@@ -57,7 +57,7 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false" -u "true"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
