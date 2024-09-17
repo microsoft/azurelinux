@@ -1,4 +1,3 @@
-%undefine __cmake_in_source_build
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
 %define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
@@ -28,6 +27,7 @@ Patch4:         tdnf-sqlite-library.patch
 
 # Patch in vitual snapshot
 Patch5:	        virtual-repo-snapshot.patch
+Patch6:         fix-tests-for-azl.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -56,12 +56,20 @@ Requires:       tdnf-cli-libs = %{version}-%{release}
 Requires:       zlib
 Obsoletes:      yum
 %if 0%{?with_check}
+BuildRequires:  azurelinux-release
 BuildRequires:  createrepo_c
 BuildRequires:  glib
+BuildRequires:  e2fsprogs
+BuildRequires:  findutils
 BuildRequires:  libxml2
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-xml
+BuildRequires:  sed
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+BuildRequires:  util-linux
+BuildRequires:  which
 %endif
 
 %description
@@ -121,23 +129,30 @@ systemd services for periodic automatic update
 %autosetup -p1
 
 %build
+%if 0%{?with_check}
+# remove problematic test file when running tests from within the rpm build directory
+rm pytests/tests/test_srpms.py
+%endif
+
+mkdir -p build && cd build
 %cmake \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
-    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir}
+    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir} \
+	..
 
-%cmake_build
-
-cd %{__cmake_builddir}
+%make_build
 %make_build python
 
 %check
-pip3 install pytest requests pyOpenSSL
-cd build && make %{?_smp_mflags} check
+pip3 install pytest pyOpenSSL flake8
+cd build && %make_build check
 
 %install
-%cmake_install
+pushd build
+%make_install
+popd
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 mkdir -p %{buildroot}%{_tdnf_history_db_dir}
@@ -151,7 +166,7 @@ rm -rf %{buildroot}%{_datadir}/tdnf
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/protected.d
 
-pushd %{__cmake_builddir}/python
+pushd build/python
 %py3_install
 popd
 find %{buildroot} -name '*.pyc' -delete
