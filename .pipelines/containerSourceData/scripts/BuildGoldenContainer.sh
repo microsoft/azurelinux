@@ -244,7 +244,8 @@ function prepare_docker_directory {
 
     # Copy files into docker context directory
     tar -xvf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
-    tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    # we look for the toolchain rpms in the same directory as the rpms tarball
+    tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR/RPMS"/
     cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
 }
 
