@@ -140,13 +140,13 @@ mkdir -p build && cd build
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
     -DHISTORY_DB_DIR=%{_tdnf_history_db_dir} \
-	..
+    ..
 
 %make_build
 %make_build python
 
 %check
-pip3 install pytest pyOpenSSL flake8
+pip3 install 'pytest==8.3.3' 'pyOpenSSL==24.2.1' 'flake8==7.1.1'
 cd build && %make_build check
 
 %install
