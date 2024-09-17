@@ -252,7 +252,7 @@ index 70da4812a..e0afa2936 100644
          self.assertEqual(expected, config_name2mac)
  
 diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index 68e44fa80..83616cd52 100644
+index 68e44fa80..122928c17 100644
 --- a/tests/unittests/test_net.py
 +++ b/tests/unittests/test_net.py
 @@ -566,13 +566,12 @@ OS_SAMPLES = [
@@ -402,8 +402,8 @@ index 68e44fa80..83616cd52 100644
 -                        'ATTR{address}=="fa:16:3e:ed:9a:59", NAME="eth0"\n',
 -                    ]
 -                ),
-++                # Since we do not set mac address, we are expecting the content to be nil
-++                "",
++                # Since we do not set mac address, we are expecting the content to be nil
++                "",
              ),
          ],
          "expected_network_manager": [
