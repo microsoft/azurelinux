@@ -104,6 +104,8 @@ Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
 BuildRequires:  openssl-devel
+# Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
+BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
