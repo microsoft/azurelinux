@@ -487,6 +487,7 @@ Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes:      systemd-udev < 252.2^
+Conflicts:      grub2-efi-binary
 
 %description boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
@@ -507,7 +508,6 @@ Requires(postun): systemd
 # obsolete parent package so that dnf will install new subpackage on upgrade (#1260394)
 Obsoletes:      %{name} < 229-5
 # Bias the system towards libcurl-minimal if nothing pulls in full libcurl (#1997040)
-Conflicts:      grub2-efi-binary
 Suggests:       libcurl-minimal
 License:        LGPL-2.1-or-later
 
