@@ -157,7 +157,7 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
-* Tue Sep 17 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-4
+* Wed Sep 18 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-4
 - Add patch to prevent debug output from printing binary request bodies.
 
 * Fri Sep 13 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-3
