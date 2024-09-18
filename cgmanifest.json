@@ -24253,8 +24253,8 @@
         "type": "other",
         "other": {
           "name": "python-setuptools",
-          "version": "69.0.3",
-          "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
+          "version": "70.0.0",
+          "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-70.0.0.tar.gz"
         }
       }
     },
