@@ -137,22 +137,19 @@ func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
 
 	grubLines := grub.SplitTokensIntoLines(grubTokens)
 	var linuxLines []grub.Line
-	var inMenuEntry bool
+	inMenuEntry := false
 	var isRecoveryMenu bool
 
 	// Iterate over all lines to find non-recovery mode menuentry and its linux line
 	for _, line := range grubLines {
-		if strings.HasPrefix(line.Tokens[0].RawContent, "menuentry") {
+		if len(line.Tokens) > 0 && grub.IsTokenKeyword(line.Tokens[0], "menuentry") {
 			// Found a new 'menuentry', reset flags
 			inMenuEntry = true
 			isRecoveryMenu = false
 
-			// Check if this 'menuentry' contains the word 'recovery'
-			for _, token := range line.Tokens {
-				if strings.Contains(token.RawContent, "recovery") {
-					isRecoveryMenu = true
-					break
-				}
+			// Check if the title (second token) contains the word 'recovery'
+			if strings.Contains(line.Tokens[1].RawContent, "recovery") {
+				isRecoveryMenu = true
 			}
 
 			// If it's a recovery menuentry, ignore this block
@@ -161,7 +158,7 @@ func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
 			}
 		} else if inMenuEntry {
 			// We are inside a non-recovery menuentry block
-			if len(line.Tokens) > 0 && strings.HasPrefix(line.Tokens[0].RawContent, "linux") {
+			if len(line.Tokens) > 0 && grub.IsTokenKeyword(line.Tokens[0], "linux") {
 				// Append only lines that contain the 'linux' command
 				linuxLines = append(linuxLines, line)
 			}

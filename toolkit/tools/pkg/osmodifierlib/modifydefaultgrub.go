@@ -71,6 +71,10 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]stri
 
 	// TODO: Currently there is only one non-recovery menuentry in Trident test images, so lines[0]
 	// If there will be multiple non-recovery menuentries, update this code accordingly
+	if len(lines) != 1 {
+		return nil, fmt.Errorf("expected 1 non-recovery linux line, found %d", len(lines))
+	}
+
 	argTokens, err := imagecustomizerlib.ParseCommandLineArgs(lines[0].Tokens)
 	if err != nil {
 		return nil, err
