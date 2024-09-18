@@ -138,11 +138,11 @@ func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
 	grubLines := grub.SplitTokensIntoLines(grubTokens)
 	var linuxLines []grub.Line
 	inMenuEntry := false
-	var isRecoveryMenu bool
+	isRecoveryMenu := false
 
 	// Iterate over all lines to find non-recovery mode menuentry and its linux line
 	for _, line := range grubLines {
-		if len(line.Tokens) > 0 && grub.IsTokenKeyword(line.Tokens[0], "menuentry") {
+		if len(line.Tokens) > 1 && grub.IsTokenKeyword(line.Tokens[0], "menuentry") {
 			// Found a new 'menuentry', reset flags
 			inMenuEntry = true
 			isRecoveryMenu = false
