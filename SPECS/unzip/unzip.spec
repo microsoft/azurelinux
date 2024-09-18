@@ -55,6 +55,7 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/*
+/usr/man/man1/*
 
 %changelog
 * Thu Oct 06 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0-20
