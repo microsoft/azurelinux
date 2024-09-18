@@ -64,12 +64,16 @@ func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]stri
 		return nil, err
 	}
 
-	line, err := imagecustomizerlib.FindLinuxLine(grubCfgContent)
+	lines, err := imagecustomizerlib.FindNonRecoveryLinuxLine(grubCfgContent)
 	if err != nil {
 		return nil, err
 	}
 
-	argTokens, err := imagecustomizerlib.ParseCommandLineArgs(line.Tokens)
+	if len(lines) != 1 {
+		return nil, fmt.Errorf("expected 1 non-recovery linux line, found %d", len(lines))
+	}
+
+	argTokens, err := imagecustomizerlib.ParseCommandLineArgs(lines[0].Tokens)
 	if err != nil {
 		return nil, err
 	}
