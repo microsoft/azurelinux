@@ -171,7 +171,7 @@ function validate_inputs {
     fi
 
     if [[ ! -f $TOOLCHAIN_RPMS_TARBALL ]]; then
-        echo "Error - No RPMs tarball found."
+        echo "Error - No TOOLCHAIN_RPMS tarball found."
         exit 1
     fi
 
