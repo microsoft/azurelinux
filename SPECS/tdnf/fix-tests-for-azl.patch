@@ -1,19 +1,18 @@
-From 7933b78c793d687d4d25d68a9fdb9a858f9cf637 Mon Sep 17 00:00:00 2001
+From 39fed1f3b309e4aa088fedbb9174a4ec7327dfa3 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Wed, 11 Sep 2024 16:24:05 -0700
 Subject: [PATCH] fix tests for azl
 
-adjust keys
 ---
- pytests/repo/setup-repo.sh      | 12 ++++++------
+ pytests/repo/setup-repo.sh      | 10 +++++-----
  pytests/tests/test_cache.py     |  3 ++-
  pytests/tests/test_priority.py  |  2 +-
  pytests/tests/test_signature.py |  5 +++++
  pytests/tests/test_srpms.py     |  2 +-
- 5 files changed, 15 insertions(+), 9 deletions(-)
+ 5 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/pytests/repo/setup-repo.sh b/pytests/repo/setup-repo.sh
-index a19bd20..ea015b7 100755
+index a19bd20..9897715 100755
 --- a/pytests/repo/setup-repo.sh
 +++ b/pytests/repo/setup-repo.sh
 @@ -65,8 +65,8 @@ mkdir -p -m 755 ${BUILD_PATH}/BUILD \
@@ -40,15 +39,6 @@ index a19bd20..ea015b7 100755
  
  modifyrepo ${REPO_SRC_DIR}/updateinfo-1.xml ${PUBLISH_PATH}/repodata
  check_err "Failed to modify repo with updateinfo-1.xml."
-@@ -146,7 +146,7 @@ cat << EOF > ${TEST_REPO_DIR}/yum.repos.d/photon-test-src.repo
- [photon-test-src]
- name=basic
- baseurl=http://localhost:8080/photon-test-src
--gpgkey=file:///etc/pki/rpm-gpg/VMWARE-RPM-GPG-KEY
-+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
- gpgcheck=0
- enabled=0
- EOF
 diff --git a/pytests/tests/test_cache.py b/pytests/tests/test_cache.py
 index 2621b59..c01df02 100644
 --- a/pytests/tests/test_cache.py
