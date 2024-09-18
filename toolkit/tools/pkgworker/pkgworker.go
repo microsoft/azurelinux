@@ -74,13 +74,13 @@ func main() {
 	logger.InitBestEffort(logFlags)
 
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
+	logger.FatalOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
 
 	toolchainDirAbsPath, err := filepath.Abs(*toolchainDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
+	logger.FatalOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
 
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
+	logger.FatalOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
 
 	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
@@ -118,7 +118,7 @@ func main() {
 	}
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
-	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
+	logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
 	// - Copy the SRPM which produced the package to the output directory.
@@ -126,7 +126,7 @@ func main() {
 	//   Any output from logger will be on stderr so stdout will only contain this output.
 	if !*runCheck {
 		err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
-		logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+		logger.FatalOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
 
 		fmt.Print(strings.Join(builtRPMs, ","))
 	}
@@ -171,6 +171,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	quit := make(chan bool)
 	go func() {
 		logger.Log.Infof("Building (%s).", srpmBaseName)
+		startTime := time.Now()
 
 		for {
 			select {
@@ -180,7 +181,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 				}
 				return
 			case <-time.After(buildHeartbeatTimeout):
-				logger.Log.Infof("Heartbeat: still building (%s).", srpmBaseName)
+				logger.Log.Infof("Heartbeat: still building (%s) after %s.", srpmBaseName, time.Since(startTime).String())
 			}
 		}
 	}()
@@ -238,6 +239,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	case <-time.After(timeout):
 		logger.Log.Errorf("Timeout after %v: killing all processes in chroot...", timeout)
 		shell.PermanentlyStopAllChildProcesses(unix.SIGKILL)
+		time.Sleep(5 * time.Second) // If we don't wait, the chroot mounts may still be busy
 		err = fmt.Errorf("build timed out after %s", timeout)
 	}
 
