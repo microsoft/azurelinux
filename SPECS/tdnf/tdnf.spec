@@ -129,11 +129,6 @@ systemd services for periodic automatic update
 %autosetup -p1
 
 %build
-%if 0%{?with_check}
-# remove problematic test file when running tests from within the rpm build directory
-rm pytests/tests/test_srpms.py
-%endif
-
 mkdir -p build && cd build
 %cmake \
     -DCMAKE_BUILD_TYPE=Debug \
@@ -146,6 +141,14 @@ mkdir -p build && cd build
 %make_build python
 
 %check
+# remove test files with dependencies on state and cleanup of rpm build directory
+# these are problematic when running tests from within the rpm build directory
+rm pytests/tests/test_srpms.py
+rm build/pytests/tests/test_srpms.py
+
+# link MS key as expected VMWare Key in test files
+ln -sf /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/VMWARE-RPM-GPG-KEY
+
 pip3 install 'pytest==8.3.3' 'pyOpenSSL==24.2.1' 'flake8==7.1.1'
 cd build && %make_build check
 
