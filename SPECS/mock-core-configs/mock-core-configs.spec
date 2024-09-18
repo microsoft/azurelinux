@@ -16,7 +16,7 @@ BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
 # replace the mock-core-configs.rpm functionality.
-Provides:   mock-configs
+Provides:   mock-configs = %{version}-%{release}
 
 # distribution-gpg-keys contains GPG keys used by mock configs
 Requires:   distribution-gpg-keys >= 1.105
@@ -110,7 +110,7 @@ cfg=unknown-distro
 cfg=fedora-$ver-$mock_arch.cfg
 %endif
 %if 0%{?azl}
-cfg=azurelinux-3.0-$mock_arch.cfg
+cfg=azurelinux-$ver.0-$mock_arch.cfg
 %endif
 %if 0%{?rhel}
 # Being installed on RHEL, or a RHEL fork.  Detect it.

@@ -32,9 +32,6 @@ BuildRequires: python%{python3_pkgversion}-setuptools
 %prep
 %autosetup -n %{srcname}-%{version}
 
-%generate_buildrequires
-%pyproject_buildrequires
-
 %build
 %pyproject_wheel
 
