@@ -4,19 +4,17 @@
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
-%global ruby_version            3.3.5
+%global ruby_version            3.3.3
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
-# Version of default rubygem gem. Please update when upgrading ruby.
-# A helpful one-liner script to check the current default version is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
-%global rubygems_version        3.5.16
-# Add version for default gems from https://stdgems.org/. Please update when upgrading ruby.
+%global rubygems_version        3.5.3
+# Add version for default gems from https://stdgems.org/
 # A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
 %global benchmark_version       0.3.0
 %global bigdecimal_version      3.1.5
-%global bundler_version         2.5.16
+%global bundler_version         2.5.3
 %global cgi_version             0.4.1
 %global csv_version             3.2.8
 %global date_version            3.3.4
@@ -38,11 +36,11 @@
 %global io_nonblock_version     0.3.0
 %global io_wait_version         0.3.1
 %global ipaddr_version          1.2.6
-%global irb_version             1.13.1
+%global irb_version             1.11.0
 %global json_version            2.7.1
 %global logger_version          1.6.0
 %global mutex_m_version         0.2.0
-%global net_http_version        0.4.1
+%global net_http_version        0.4.0
 %global net_protocol_version    0.2.2
 %global nkf_version             0.1.3
 %global observer_version        0.1.2
@@ -57,9 +55,9 @@
 %global prettyprint_version     0.2.0
 %global pstore_version          0.1.3
 %global psych_version           5.1.2
-%global rdoc_version            6.6.3.1
+%global rdoc_version            6.6.2
 %global readline_version        0.0.4
-%global reline_version          0.5.7
+%global reline_version          0.4.1
 %global resolv_version          0.3.0
 %global resolv_replace_version  0.1.1
 %global rinda_version           0.2.0
@@ -68,8 +66,8 @@
 %global set_version             1.1.0
 %global shellwords_version      0.2.0
 %global singleton_version       0.2.0
-%global stringio_version        3.1.1
-%global strscan_version         3.0.9
+%global stringio_version        3.1.0
+%global strscan_version         3.0.7
 %global syslog_version          0.1.2
 %global syntax_suggest_version  2.0.0
 %global tempfile_version        0.2.1
@@ -78,11 +76,11 @@
 %global tmpdir_version          0.2.0
 %global tsort_version           0.2.0
 %global un_version              0.3.0
-%global uri_version             0.13.1
+%global uri_version             0.13.0
 %global weakref_version         0.1.3
 %global win32ole_version        1.8.10
 %global yaml_version            0.3.0
-%global zlib_version            3.1.1
+%global zlib_version            3.1.0
 
 Summary:        Ruby
 Name:           ruby
@@ -90,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -104,6 +102,7 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
+Patch0:         CVE-2024-41946.patch
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
@@ -409,9 +408,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Thu Sep 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.5-1
-- Upgrade ruby to 3.3.5 to fix CVE-2024-41946 by including bundled gem rexml v3.3.6
-- Update versions of default gems
+* Wed Sep 18 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.3-2
+- Revert ruby back to 3.3.3 to avoid build failure of rubygems-* packages
+- Add patch for CVE-2024-41946 for bundled gem rexml
 
 * Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-1
 - Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
