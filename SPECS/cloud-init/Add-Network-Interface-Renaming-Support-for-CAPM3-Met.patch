@@ -15,12 +15,26 @@ interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
 specification. This is a temporary fix until the "name" attribute is added to
 the specification.
 ---
+ Makefile                                      |   2 +-
  cloudinit/sources/helpers/openstack.py        |  11 +-
  .../sources/helpers/test_openstack.py         |   8 +-
  tests/unittests/sources/test_configdrive.py   |  84 ++++++-------
- tests/unittests/test_net.py                   | 112 ++++++------------
- 4 files changed, 90 insertions(+), 125 deletions(-)
+ tests/unittests/test_net.py                   | 110 ++++++------------
+ 5 files changed, 90 insertions(+), 125 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 1eebb048e..af3b735bb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -27,7 +27,7 @@ lint:
+ 	@$(CWD)/tools/run-lint
+ 
+ unittest: clean_pyc
+-	$(PYTHON) -m pytest -v tests/unittests cloudinit
++	$(PYTHON) -m pytest -vv -s tests/unittests cloudinit
+ 
+ render-template:
+ 	$(PYTHON) ./tools/render-template --variant=$(VARIANT) $(FILE) $(subst .tmpl,,$(FILE))
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index 97ec18faf..84ef61b24 100644
 --- a/cloudinit/sources/helpers/openstack.py
@@ -252,7 +266,7 @@ index 70da4812a..e0afa2936 100644
          self.assertEqual(expected, config_name2mac)
  
 diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index 68e44fa80..122928c17 100644
+index 68e44fa80..eee57d9e2 100644
 --- a/tests/unittests/test_net.py
 +++ b/tests/unittests/test_net.py
 @@ -566,13 +566,12 @@ OS_SAMPLES = [
@@ -345,14 +359,7 @@ index 68e44fa80..122928c17 100644
  
  [ipv4]
  method=manual
-@@ -732,13 +722,12 @@ dns-search=testweb.com;
-         },
-         "out_sysconfig_opensuse": [
-             (
--                "etc/sysconfig/network/ifcfg-eth0",
-+                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
-                 """
- # Created by cloud-init automatically, do not edit.
+@@ -738,7 +728,6 @@ dns-search=testweb.com;
  #
  BOOTPROTO=static
  IPADDR=172.19.1.34
@@ -360,7 +367,7 @@ index 68e44fa80..122928c17 100644
  NETMASK=255.255.252.0
  STARTMODE=auto
  """.lstrip(),
-@@ -763,27 +752,22 @@ dns = none
+@@ -763,12 +752,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -375,16 +382,7 @@ index 68e44fa80..122928c17 100644
              ),
          ],
          "out_sysconfig_rhel": [
-             (
--                "etc/sysconfig/network-scripts/ifcfg-eth0",
-+                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
-                 """
- # Created by cloud-init automatically, do not edit.
- #
- BOOTPROTO=none
- DEFROUTE=yes
--DEVICE=eth0
-+DEVICE=tap1a81968a-79
+@@ -783,7 +768,6 @@ DEVICE=eth0
  DNS1=172.19.0.12
  DOMAIN=example3.com
  GATEWAY=172.19.3.254
@@ -407,7 +405,7 @@ index 68e44fa80..122928c17 100644
              ),
          ],
          "expected_network_manager": [
-@@ -824,23 +804,23 @@ dns = none
+@@ -824,31 +804,31 @@ dns = none
                  "".join(
                      [
                          "etc/NetworkManager/system-connections",
@@ -435,6 +433,16 @@ index 68e44fa80..122928c17 100644
  
  [ipv4]
  method=manual
+ may-fail=false
+ address1=172.19.1.34/22
+ route1=0.0.0.0/0,172.19.3.254
+-dns=172.19.0.12;
+-dns-search=example3.com;
++dns=172.19.0.13;
++dns-search=testweb.com;
+ 
+ """.lstrip(),
+             ),
 @@ -904,14 +884,13 @@ dns-search=example3.com;
          },
          "out_sysconfig_opensuse": [
