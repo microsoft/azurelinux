@@ -25083,8 +25083,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.12.3",
-          "downloadUrl": "https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tar.xz"
+          "version": "3.12.6",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.6/Python-3.12.6.tar.xz"
         }
       }
     },

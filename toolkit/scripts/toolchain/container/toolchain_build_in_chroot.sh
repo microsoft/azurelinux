@@ -76,16 +76,16 @@ popd
 rm -rf perl-5.38.0
 touch /logs/status_perl_complete
 
-echo Python-3.12.3
-tar xf Python-3.12.3.tar.xz
-pushd Python-3.12.3
+echo Python-3.12.6
+tar xf Python-3.12.6.tar.xz
+pushd Python-3.12.6
 ./configure --prefix=/usr   \
             --enable-shared \
             --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.3
+rm -rf Python-3.12.6
 touch /logs/status_python312_temp_complete
 
 echo Texinfo-7.0.3
@@ -652,16 +652,16 @@ popd
 rm -rf libffi-3.4.4
 touch /logs/status_libffi_complete
 
-echo Python-3.12.3
-tar xf Python-3.12.3.tar.xz
-pushd Python-3.12.3
+echo Python-3.12.6
+tar xf Python-3.12.6.tar.xz
+pushd Python-3.12.6
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.3
+rm -rf Python-3.12.6
 touch /logs/status_python312_complete
 
 echo Flit-Core-3.9.0
