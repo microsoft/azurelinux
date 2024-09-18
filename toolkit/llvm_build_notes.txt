@@ -36,7 +36,7 @@ sudo cp -v ../out/RPMS/noarch/azurelinux-check-macros-3.0-6.azl3.noarch.rpm ../b
 ##
 
 # Attempt to build all packages
-time sudo make build-packages REBUILD_TOOLS=y DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y
+time sudo make build-packages REBUILD_TOOLS=y DISABLE_UPSTREAM_REPOS=y USE_CCACHE=y USE_LLVM_TOOLCHAIN=n
 
 # Build packages needed to create distroless images
 time sudo make build-packages REBUILD_TOOLS=y SRPM_PACK_LIST="azurelinux-release tzdata prebuilt-ca-certificates" DISABLE_UPSTREAM_REPOS=y

@@ -41,7 +41,7 @@ sed -i 's|STRIP = strip|STRIP = /bin/true|' unix/Makefile
 
 %install
 install -v -m755 -d %{buildroot}%{_bindir}
-%make_install prefix=%{_prefix}
+%make_install prefix=%{buildroot}%{_prefix}
 cp %{_builddir}/unzip60/funzip %{buildroot}%{_bindir}
 cp %{_builddir}/unzip60/unzip %{buildroot}%{_bindir}
 cp %{_builddir}/unzip60/unzipsfx %{buildroot}%{_bindir}
