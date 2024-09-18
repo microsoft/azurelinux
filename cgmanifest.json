@@ -16723,8 +16723,8 @@
         "type": "other",
         "other": {
           "name": "perl-DateTime-TimeZone",
-          "version": "2.39",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.39.tar.gz"
+          "version": "2.40",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.40.tar.gz"
         }
       }
     },
@@ -29156,8 +29156,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.39.2",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz"
+          "version": "2.40.2",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.2.tar.xz"
         }
       }
     },

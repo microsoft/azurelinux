@@ -98,14 +98,14 @@ popd
 rm -rf texinfo-7.0.3
 touch /logs/status_texinfo_complete
 
-echo util-linux-2.39.2
-tar xf util-linux-2.39.2.tar.xz
-pushd util-linux-2.39.2
+echo util-linux-2.40.2
+tar xf util-linux-2.40.2.tar.xz
+pushd util-linux-2.40.2
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --libdir=/usr/lib    \
             --runstatedir=/run   \
-            --docdir=/usr/share/doc/util-linux-2.39.2 \
+            --docdir=/usr/share/doc/util-linux-2.40.2 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -118,7 +118,7 @@ mkdir -pv /var/lib/hwclock
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.39.2
+rm -rf util-linux-2.40.2
 touch /logs/status_util-linux_complete
 
 # 7.13. Cleaning up and Saving the Temporary System
@@ -822,9 +822,9 @@ popd
 rm -rf procps-ng-4.0.4
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.39.2
-tar xf util-linux-2.39.2.tar.xz
-pushd util-linux-2.39.2
+echo util-linux-2.40.2
+tar xf util-linux-2.40.2.tar.xz
+pushd util-linux-2.40.2
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --bindir=/usr/bin    \
             --libdir=/usr/lib    \
@@ -841,11 +841,11 @@ pushd util-linux-2.39.2
             --without-python     \
             --without-systemd    \
             --without-systemdsystemunitdir \
-            --docdir=/usr/share/doc/util-linux-2.39.2
+            --docdir=/usr/share/doc/util-linux-2.40.2
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.39.2
+rm -rf util-linux-2.40.2
 touch /logs/status_util-linux_complete
 
 #
