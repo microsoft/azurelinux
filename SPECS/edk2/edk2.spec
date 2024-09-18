@@ -109,17 +109,17 @@ Patch0015: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
 Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 Patch0018: CVE-2024-1298.patch
+Patch0019: CVE-2022-36763.patch
+# Patch0020: CVE-2022-36764.patch
+# Patch0021: CVE-2022-36765.patch
+# Patch0022: CVE-2023-45230.patch
+# Patch0023: CVE-2023-45236.patch
 
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
 Patch1004: improve-safety-of-DH.patch
-Patch1005: CVE-2022-36763.patch
-Patch1006: CVE-2022-36764.patch
-Patch1007: CVE-2022-36765.patch
-Patch1008: CVE-2023-45230.patch
-Patch1009: CVE-2023-45236.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -706,7 +706,7 @@ $tests_ok
 
 %changelog
 * Mon Sep 16 2024 Minghe Ren <mingheren@microsoft.com> - 20230301gitf80f052277c8-40
-- Apply CVE-2022-36763, CVE-2022-36764,CVE-2022-36765, CVE-2023-45230, CVE-2023-45236 patch
+- Apply CVE-2022-36763, CVE-2022-36764, CVE-2022-36765, CVE-2023-45230, CVE-2023-45236 patch
 - Add nopatch for CVE-2023-45232, CVE-2023-45233, CVE-2023-45234, CVE-2023-45235, CVE-2023-45237
 
 * Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39
