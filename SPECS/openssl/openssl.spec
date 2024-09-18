@@ -12,7 +12,7 @@ Version: 3.3.2
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
+Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
 Source9: configuration-switch.h
