@@ -1,39 +1,39 @@
 %bcond_with tex_docs
 
-Name: libuser
-Version: 0.64
-Release: 1%{?dist}
-License: GPLv2
+Name:           libuser
+Version:        0.64
+Release:        1%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: https://pagure.io/libuser
-Source: https://releases.pagure.org/libuser/libuser-%{version}.tar.gz
-BuildRequires: glib2-devel
+URL:            https://pagure.io/libuser
+Source:         https://releases.pagure.org/libuser/libuser-%{version}.tar.gz
+BuildRequires:  glib2-devel
 %if %{with tex_docs}
-BuildRequires: linuxdoc-tools
+BuildRequires:  linuxdoc-tools
 %endif
-BuildRequires: pam-devel
-BuildRequires: popt-devel
-BuildRequires: cyrus-sasl-devel
-BuildRequires: libselinux-devel
-BuildRequires: openldap-devel
-BuildRequires: python3-devel
-BuildRequires: gcc
+BuildRequires:  pam-devel
+BuildRequires:  popt-devel
+BuildRequires:  cyrus-sasl-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  openldap-devel
+BuildRequires:  python3-devel
+BuildRequires:  gcc
 # For %%check
 %if 0%{?with_check}
 #BuildRequires: fakeroot
-BuildRequires: openldap-clients
-BuildRequires: openssl
+BuildRequires:  openldap-clients
+BuildRequires:  openssl
 
 # Missing test dependencies:
 # BuildRequires: openldap-servers
 %endif
-BuildRequires: make
-BuildRequires: bison
-BuildRequires: libtool
-BuildRequires: gettext-devel
-BuildRequires: gtk-doc
-BuildRequires: audit-libs-devel
+BuildRequires:  make
+BuildRequires:  bison
+BuildRequires:  libtool
+BuildRequires:  gettext-devel
+BuildRequires:  gtk-doc
+BuildRequires:  audit-libs-devel
 
 Summary: A user and group account administration library
 
@@ -57,10 +57,10 @@ The libuser-devel package contains header files, static libraries, and other
 files useful for developing applications with libuser.
 
 %package -n python3-libuser
-Summary: Python 3 bindings for the libuser library
-Requires: libuser%{?_isa} = %{version}-%{release}
-Provides: libuser-python3 = %{version}-%{release}
-Provides: libuser-python3%{?_isa} = %{version}-%{release}
+Summary:   Python 3 bindings for the libuser library
+Requires:  libuser%{?_isa} = %{version}-%{release}
+Provides:  libuser-python3 = %{version}-%{release}
+Provides:  libuser-python3%{?_isa} = %{version}-%{release}
 Obsoletes: libuser-python3 < 0.63-4
 %{?python_provide:%python_provide python3-libuser}
 
@@ -100,15 +100,17 @@ make
 %find_lang %{name}
 
 %check
-%make_build check || { cat test-suite.log; false; }
+tests_ok=true
+%make_build check || { cat test-suite.log; tests_ok=false; }
 
 # Verify that all python modules load, just in case.
 LD_LIBRARY_PATH=$RPM_BUILD_ROOT/%{_libdir}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 PYTHONPATH=$RPM_BUILD_ROOT%{python3_sitearch}
 export PYTHONPATH
-%{python3} -c "import libuser"
+%{python3} -c "import libuser" || tests_ok=false
 
+$tests_ok
 
 %ldconfig_scriptlets
 
