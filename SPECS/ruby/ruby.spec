@@ -412,10 +412,6 @@ sudo -u test make test TESTS="-v"
 - Revert ruby back to 3.3.3 to avoid build failure of rubygems-* packages
 - Add patch for CVE-2024-41946 for bundled gem rexml
 
-* Thu Sep 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.5-1
-- Upgrade ruby to 3.3.5 to fix CVE-2024-41946 by including bundled gem rexml v3.3.6
-- Update versions of default gems
-
 * Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-1
 - Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
 
