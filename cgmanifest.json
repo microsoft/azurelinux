@@ -22832,6 +22832,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-junitxml",
+          "version": "0.7",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/junitxml/junitxml-0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-justbases",
           "version": "0.9",
           "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.9.tar.gz"
@@ -28056,8 +28066,8 @@
         "type": "other",
         "other": {
           "name": "subunit",
-          "version": "1.4.0",
-          "downloadUrl": "https://launchpad.net/subunit/trunk/1.4.0/+download/subunit-1.4.0.tar.gz"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/testing-cabal/subunit/archive/1.4.4/subunit-1.4.4.tar.gz"
         }
       }
     },
