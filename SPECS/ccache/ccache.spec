@@ -58,7 +58,7 @@ done
 
 %changelog
 * Tue Sep 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.8.3-3
-- Remove dangling link to %{_host}-cc
+- Remove dangling link to %%{_host}-cc
 
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.3-2
 - Fix the 'Distribution' tag.
