@@ -11,17 +11,12 @@ Summary:    Mock core config files basic chroots
 
 License:    GPL-2.0-or-later
 URL:        https://github.com/rpm-software-management/mock/
-# Source is created by
-# git clone https://github.com/rpm-software-management/mock.git
-# cd mock/mock-core-configs
-# git reset --hard %%{name}-%%{version}
-# tito build --tgz
 Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
 # replace the mock-core-configs.rpm functionality.
-Provides: mock-configs
+Provides:   mock-configs
 
 # distribution-gpg-keys contains GPG keys used by mock configs
 Requires:   distribution-gpg-keys >= 1.105

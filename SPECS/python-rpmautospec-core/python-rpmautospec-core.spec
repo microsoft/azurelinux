@@ -17,17 +17,17 @@
 %global srcname rpmautospec_core
 %global canonicalname rpmautospec-core
 
-Name: python-%{canonicalname}
-Version: 0.1.5
-Release: 1%{?dist}
-Vendor:  Microsoft Corporation
-Distribution: Azure Linux
-Summary: Minimum functionality for rpmautospec
+Name:          python-%{canonicalname}
+Version:       0.1.5
+Release:       1%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Summary:       Minimum functionality for rpmautospec
 
-License: MIT
+License:       MIT
 URL: https://github.com/fedora-infra/%{canonicalname}
-Source0: %{url}/releases/download/%{version}/rpmautospec_core-%{version}.tar.gz#/%{canonicalname}-%{version}.tar.gz
-BuildArch: noarch
+Source0:       %{url}/releases/download/%{version}/rpmautospec_core-%{version}.tar.gz#/%{canonicalname}-%{version}.tar.gz
+BuildArch:     noarch
 BuildRequires: python3-devel >= 3.6.0
 # The dependencies needed for testing donâ€™t get auto-generated.
 BuildRequires: python3dist(pytest)

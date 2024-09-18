@@ -8,14 +8,14 @@
 
 Summary: Tools for certain user account management tasks
 Name: usermode
-Version: 1.114
-Release: 1%{?dist}
-Vendor:     Microsoft Corporation
-Distribution: Azure Linux
-License: GPL-2.0-or-later
-URL: https://pagure.io/%{name}/
-Source: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz
-Source1: config-util
+Version:       1.114
+Release:       1%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+License:       GPL-2.0-or-later
+URL:           https://pagure.io/%{name}/
+Source:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz
+Source1:       config-util
 Requires: pam, passwd, util-linux
 # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/IJFYI5Q2BYZKIGDFS2WLOBDUSEGWHIKV/
 BuildRequires: make

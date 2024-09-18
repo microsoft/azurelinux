@@ -5,21 +5,21 @@ PyRoute2 provides several levels of API to work with Netlink\
 protocols, such as Generic Netlink, RTNL, TaskStats, NFNetlink,\
 IPQ.
 
-Name: python-%{srcname}
-Version: 0.7.12
-Release: 1%{?dist}
-Vendor: Microsoft Corporation
-Distribution: Azure Linux
-Summary: Pure Python netlink library
-License: GPL-2.0-or-later OR Apache-2.0
-URL: https://github.com/svinota/%{srcname}
+Name:          python-%{srcname}
+Version:       0.7.12
+Release:       1%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Summary:       Pure Python netlink library
+License:       GPL-2.0-or-later OR Apache-2.0
+URL:           https://github.com/svinota/%{srcname}
 
-BuildArch: noarch
+BuildArch:     noarch
 BuildRequires: python3-pip
 BuildRequires: python3-wheel
-Source0: %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:       %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-%description %{_description}
+%description   %{_description}
 
 
 %package -n python%{python3_pkgversion}-%{srcname}

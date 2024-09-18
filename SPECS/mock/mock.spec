@@ -7,61 +7,56 @@
 %global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
 
-Summary: Builds packages inside chroots
-Name: mock
-Version: 5.6
-Release: 1%{?dist}
-Vendor:  Microsoft Corporation
-Distribution: Azure Linux
-License: GPL-2.0-or-later
-# Source is created by
-# git clone https://github.com/rpm-software-management/mock.git
-# cd mock
-# git reset --hard %%{name}-%%{version}
-# tito build --tgz
-Source: https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-URL: https://github.com/rpm-software-management/mock/
-BuildArch: noarch
-Requires: tar
-Requires: pigz
+Summary:       Builds packages inside chroots
+Name:          mock
+Version:       5.6
+Release:       1%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+License:       GPL-2.0-or-later
+Source:        https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+URL:           https://github.com/rpm-software-management/mock/
+BuildArch:     noarch
+Requires:      tar
+Requires:      pigz
 %if 0%{?mageia}
-Requires: usermode-consoleonly
+Requires:      usermode-consoleonly
 %else
-Requires: usermode
+Requires:      usermode
 %endif
-Requires: createrepo_c
+Requires:      createrepo_c
 
 # We know that the current version of mock isn't compatible with older variants,
 # and we want to enforce automatic upgrades.
-Conflicts: mock-core-configs < 33
+Conflicts:     mock-core-configs < 33
 
-# Requires 'mock-core-configs', or replacement (GitHub PR#544).
-Requires: mock-configs
-Requires: %{name}-filesystem = %{version}-%{release}
+# Requires 'mock-core-configs', or replacement
+Requires:      mock-configs
+Requires:      %{name}-filesystem = %{version}-%{release}
 %if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
 # This is still preferred package providing 'mock-configs'
-Suggests: mock-core-configs
+Suggests:      mock-core-configs
 %endif
 
-Requires: systemd
+Requires:      systemd
 %if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
-Requires: systemd-container
+Requires:      systemd-container
 %endif
-Requires: coreutils
+Requires:      coreutils
 %if 0%{?fedora}
-Suggests: iproute
+Suggests:      iproute
 %endif
 %if 0%{?mageia}
-Suggests: iproute2
+Suggests:      iproute2
 %endif
 BuildRequires: bash-completion
-Requires: python%{python3_pkgversion}-distro
-Requires: python%{python3_pkgversion}-jinja2
-Requires: python%{python3_pkgversion}-requests
-Requires: python%{python3_pkgversion}-rpm
-Requires: python%{python3_pkgversion}-pyroute2
-Requires: python%{python3_pkgversion}-templated-dictionary
-Requires: python%{python3_pkgversion}-backoff
+Requires:      python%{python3_pkgversion}-distro
+Requires:      python%{python3_pkgversion}-jinja2
+Requires:      python%{python3_pkgversion}-requests
+Requires:      python%{python3_pkgversion}-rpm
+Requires:      python%{python3_pkgversion}-pyroute2
+Requires:      python%{python3_pkgversion}-templated-dictionary
+Requires:      python%{python3_pkgversion}-backoff
 BuildRequires: python%{python3_pkgversion}-backoff
 BuildRequires: python%{python3_pkgversion}-devel
 %if %{with lint}
@@ -72,22 +67,22 @@ BuildRequires: python%{python3_pkgversion}-rpmautospec-core
 
 %if 0%{?fedora} >= 38
 # DNF5 stack
-Recommends: dnf5
-Recommends: dnf5-plugins
+Recommends:    dnf5
+Recommends:    dnf5-plugins
 %endif
 
 # DNF4 stack
-Recommends: python3-dnf
-Recommends: python3-dnf-plugins-core
+Recommends:    python3-dnf
+Recommends:    python3-dnf-plugins-core
 
 # YUM stack, dnf-utils replace yum-utils
-Recommends: yum
-Recommends: dnf-utils
+Recommends:    yum
+Recommends:    dnf-utils
 
-Recommends: btrfs-progs
-Suggests: qemu-user-static
-Suggests: procenv
-Recommends: podman
+Recommends:    btrfs-progs
+Suggests:      qemu-user-static
+Suggests:      procenv
+Recommends:    podman
 
 %if %{with tests}
 BuildRequires: python%{python3_pkgversion}-distro
@@ -104,10 +99,10 @@ BuildRequires: perl-interpreter
 BuildRequires: perl
 %endif
 # hwinfo plugin
-Requires: util-linux
-Requires: coreutils
-Requires: procps-ng
-Requires: shadow-utils
+Requires:      util-linux
+Requires:      coreutils
+Requires:      procps-ng
+Requires:      shadow-utils
 
 
 %description
@@ -115,17 +110,17 @@ Mock takes an SRPM and builds it in a chroot.
 
 %package scm
 Summary: Mock SCM integration module
-Requires: %{name} = %{version}-%{release}
+Requires:      %{name} = %{version}-%{release}
 %if ! 0%{?azl}
-Recommends: cvs
+Recommends:    cvs
 %endif
-Recommends: git
-Recommends: subversion
-Recommends: tar
+Recommends:    git
+Recommends:    subversion
+Recommends:    tar
 
 %if ! 0%{?azl}
 # We could migrate to 'copr-distgit-client'
-Recommends: rpkg
+Recommends:    rpkg
 %endif
 
 %description scm
@@ -133,25 +128,25 @@ Mock SCM integration module.
 
 %package lvm
 Summary: LVM plugin for mock
-Requires: %{name} = %{version}-%{release}
-Requires: lvm2
+Requires:      %{name} = %{version}-%{release}
+Requires:      lvm2
 
 %description lvm
 Mock plugin that enables using LVM as a backend and support creating snapshots
 of the buildroot.
 
 %package rpmautospec
-Summary: Rpmautospec plugin for mock
-Requires: %{name} = %{version}-%{release}
+Summary:       Rpmautospec plugin for mock
+Requires:      %{name} = %{version}-%{release}
 # This lets mock determine if a spec file needs to be processed with rpmautospec.
-Requires: python%{python3_pkgversion}-rpmautospec-core
+Requires:      python%{python3_pkgversion}-rpmautospec-core
 
 %description rpmautospec
 Mock plugin that preprocesses spec files using rpmautospec.
 
 %package filesystem
-Summary:  Mock filesystem layout
-Requires(pre):  shadow-utils
+Summary:       Mock filesystem layout
+Requires(pre): shadow-utils
 
 %description filesystem
 Filesystem layout and group for Mock.

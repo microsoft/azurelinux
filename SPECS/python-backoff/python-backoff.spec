@@ -6,17 +6,17 @@ APIs. Somewhat more generally, it may also be of use for dynamically \
 polling resources for externally generated content.
 %global srcname backoff
 
-Name:      python-%{srcname}
-Version:   2.2.1
-Release:   9%{?dist}
-Vendor:    Microsoft Corporation
-Distribution: Azure Linux
-BuildArch: noarch
+Name:          python-%{srcname}
+Version:       2.2.1
+Release:       9%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+BuildArch:     noarch
 
-License: MIT
-Summary: Python library providing function decorators for configurable backoff and retry
-URL:     https://github.com/litl/backoff
-Source0: %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+License:       MIT
+Summary:       Python library providing function decorators for configurable backoff and retry
+URL:           https://github.com/litl/backoff
+Source0:       %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
 BuildRequires: pyproject-rpm-macros
 BuildRequires: python3-pip
@@ -26,7 +26,7 @@ BuildRequires: python3-poetry
 %{desc}
 
 %package -n python3-%{srcname}
-Summary: %{summary}
+Summary:       %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}

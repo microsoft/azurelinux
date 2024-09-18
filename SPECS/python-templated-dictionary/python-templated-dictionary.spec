@@ -5,22 +5,18 @@
 %global python3_pkgversion 36
 %endif
 
-Name:       python-%{srcname}
-Version:    1.4
-Release:    5%{?dist}
-Vendor:     Microsoft Corporation
-Distribution: Azure Linux
-Summary:    Dictionary with Jinja2 expansion
+Name:          python-%{srcname}
+Version:       1.4
+Release:       5%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Summary:       Dictionary with Jinja2 expansion
 
-License:    GPL-2.0-or-later
-URL:        https://github.com/xsuchy/templated-dictionary
+License:       GPL-2.0-or-later
+URL:           https://github.com/xsuchy/templated-dictionary
+Source0:       %{url}/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 
-# Source is created by:
-# git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
-# tito build --tgz --tag %%name-%%version-%%release
-Source0:    %{url}/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildArch: noarch
+BuildArch:     noarch
 
 BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
