@@ -215,6 +215,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints, true)
 	if err != nil {
+		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return
 	}
 	defer chroot.Close(noCleanup)
@@ -222,28 +223,31 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	// Place extra files that will be needed to build into the chroot
 	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile, runCheck)
 	if err != nil {
+		err = fmt.Errorf("failed to copy files into chroot:\n%w", err)
 		return
 	}
 
 	// Run the build in a go routine so we can monitor and kill it if it takes too long.
 	results := make(chan error)
-	go func() {
-		buildErr := chroot.Run(func() (err error) {
-			return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
-		})
-		results <- buildErr
-	}()
+	err = chroot.Run(func() (err error) {
+		go func() {
+			results <- buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
+		}()
 
-	select {
-	case err = <-results:
-	case <-time.After(timeout):
-		logger.Log.Errorf("Timeout after %v: killing all processes in chroot...", timeout)
-		shell.PermanentlyStopAllChildProcesses(unix.SIGKILL)
-		time.Sleep(5 * time.Second) // If we don't wait, the chroot mounts may still be busy
-		err = fmt.Errorf("build timed out after %s", timeout)
-	}
+		var chrootErr error = nil
+		select {
+		case chrootErr = <-results:
+			logger.Log.Debug("Build thread in chroot finished.")
+		case <-time.After(timeout):
+			logger.Log.Errorf("Timeout after %v: stopping chroot...", timeout)
+			shell.StopAllChildProcesses(unix.SIGKILL)
+			chrootErr = fmt.Errorf("build timed out after %s", timeout)
+		}
+		return chrootErr // Internal error is returned via the channel
+	})
 
 	if err != nil {
+		err = fmt.Errorf("failed to build RPM from SRPM in chroot:\n%w", err)
 		return
 	}
 
@@ -268,18 +272,21 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
 	if err != nil {
+		err = fmt.Errorf("failed to create local RPM repository:\n%w", err)
 		return
 	}
 
 	// Convert /toolchainrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalToolchainDir)
 	if err != nil {
+		err = fmt.Errorf("failed to create toolchain RPM repository:\n%w", err)
 		return
 	}
 
 	// install any additional packages, such as build dependencies.
 	err = tdnfInstall(packagesToInstall)
 	if err != nil {
+		err = fmt.Errorf("failed to install additional packages:\n%w", err)
 		return
 	}
 
@@ -288,6 +295,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 		logger.Log.Infof("USE_CCACHE: installing package: %s", ccachePkgName[0])
 		err = tdnfInstall(ccachePkgName)
 		if err != nil {
+			err = fmt.Errorf("failed to install ccache:\n%w", err)
 			return
 		}
 	}
@@ -298,6 +306,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	// build failures.
 	err = removeLibArchivesFromSystem()
 	if err != nil {
+		err = fmt.Errorf("failed to remove lib archives from system:\n%w", err)
 		return
 	}
 
@@ -306,6 +315,10 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 		err = rpm.TestRPMFromSRPM(srpmFile, outArch, defines)
 	} else {
 		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines)
+	}
+	if err != nil {
+		err = fmt.Errorf("failed to build/test RPM from SRPM:\n%w", err)
+		return
 	}
 
 	return
