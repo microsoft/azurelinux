@@ -17,8 +17,6 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
-Patch1:         CVE-2024-7592.patch
-Patch2:         CVE-2024-6923.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
