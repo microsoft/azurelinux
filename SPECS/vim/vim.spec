@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2121
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,9 @@ URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-22667.patch
 Patch1:         CVE-2024-43374.patch
+Patch2:         CVE-2024-41957.patch
+Patch3:         CVE-2024-41965.patch
+
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -198,6 +201,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Sep 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2121-4
+- Add patch to resolve CVE-2024-41957 & CVE-2024-41965
+
 * Tue Aug 20 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 9.0.2121-3
 - Patch CVE-2024-43374
 
