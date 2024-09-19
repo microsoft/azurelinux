@@ -37,6 +37,9 @@
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
 /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{?epoch:%{epoch}:}%{version}-%{release} %{_topdir} %{distro_release_version}\
+%{?use_llvm_clang:ln -svf /usr/bin/clang /usr/bin/cc}\
+%{?use_llvm_clang:ln -svf /usr/bin/clang++ /usr/bin/c++}\
+%{?use_llvm_linker:ln -svf /usr/bin/ld.lld /usr/bin/ld}\
 %{nil}
 
 # This section overrides the default behavior of the build macro to export
@@ -51,7 +54,9 @@
 %{?ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
 %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
-%{?ccache_enabled:ccache --zero-stats} \
+%{?ccache_enabled:ccache --zero-stats}\
+%{?use_llvm_clang:export CC=clang}\
+%{?use_llvm_clang:export CXX=clang++}\
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -204,7 +209,11 @@ print(result)
 %_frame_pointers_cflags %{?_include_frame_pointers:-fno-omit-frame-pointer}
 
 %_legacy_common_support 1
-%__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon}
+%_gnu_compiler_flags            -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags}
+%_llvm_compiler_flags           -w
+%__global_compiler_flags        -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{?use_llvm_clang:%{_llvm_compiler_flags}} %{!?use_llvm_clang:%{_gnu_compiler_flags}}
+%__global_compiler_flags_gnu    -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{_gnu_compiler_flags}
+%__global_compiler_flags_llvm   -O2 -g -pipe %{_annotated_cflags} %{_frame_pointers_cflags} %{?_legacy_common_support: -fcommon} %{_llvm_compiler_flags}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
 #%ldconfig /sbin/ldconfig

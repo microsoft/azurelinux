@@ -5,7 +5,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -113,6 +113,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir -p build
 cd build
 cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm        \
        -DLLVM_PARALLEL_LINK_JOBS=1             \
        -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
        -DCMAKE_BUILD_TYPE=Release              \

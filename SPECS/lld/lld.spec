@@ -3,20 +3,20 @@
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://lld.llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
-BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  file
 BuildRequires:  llvm-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3
 Requires:       %{name}-libs = %{version}-%{release}
+Patch0:         0002-PATCH-lld-Import-compact_unwind_encoding.h-from-libu.patch
 
 %package devel
 Summary:        Libraries and header files for LLD
@@ -36,39 +36,44 @@ programs that use the LLD infrastructure.
 Shared libraries for LLD.
 
 %prep
-%setup -q -n %{lld_srcdir}
+%autosetup -q -n %{lld_srcdir}
 
 %build
 mkdir -p build
 cd build
-%cmake ..                                                         \
-       -G Ninja                                                   \
+%cmake \
        -DCMAKE_BUILD_TYPE=Release                                 \
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}                          \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm                           \
+       -DBUILD_SHARED_LIBS:BOOL=ON                                \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
        -Wno-dev ../lld
 
-%ninja_build
+%cmake_build
 
 %install
 cd build
-%ninja_install
+%cmake_install
 
 %files
 %license LICENSE.TXT
-%{_bindir}/*
+%{_bindir}/lld*
+%{_bindir}/ld.lld
+%{_bindir}/ld64.lld
+%{_bindir}/wasm-ld
 
 %files devel
 %{_includedir}/lld/
 %{_libdir}/cmake/lld/*.cmake
-%{_libdir}/*.so
+%{_libdir}/liblld*.so
 
 %files libs
 %license LICENSE.TXT
-%{_libdir}/*.so.*
+%{_libdir}/liblld*.so.*
 
 %changelog
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2

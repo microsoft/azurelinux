@@ -87,6 +87,7 @@ var (
 	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	ccacheDir                  = app.Flag("ccache-dir", "The directory used to store ccache outputs").String()
 	ccacheConfig               = app.Flag("ccache-config", "The ccache configuration file path.").String()
+	useLLVMToolchain           = app.Flag("use-llvm-toolchain", "Configure default build worker chroot to use LLVM toolchain").Bool()
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout                    = app.Flag("timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
@@ -198,6 +199,7 @@ func main() {
 		UseCcache:    *useCcache,
 		CCacheDir:    *ccacheDir,
 		CCacheConfig: *ccacheConfig,
+		UseLLVMToolchain: *useLLVMToolchain,
 		MaxCpu:       *maxCPU,
 		Timeout:      *timeout,
 

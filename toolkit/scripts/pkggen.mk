@@ -321,6 +321,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(if $(filter y,$(USE_CCACHE)),--ccache-dir="$(CCACHE_DIR)") \
 		$(if $(filter y,$(USE_CCACHE)),--ccache-config="$(CCACHE_CONFIG)") \
+		$(if $(filter y,$(USE_LLVM_TOOLCHAIN)),--use-llvm-toolchain) \
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		--max-cpu="$(MAX_CPU)" \
 		$(if $(PACKAGE_BUILD_TIMEOUT),--timeout="$(PACKAGE_BUILD_TIMEOUT)") \

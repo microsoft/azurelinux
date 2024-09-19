@@ -58,6 +58,7 @@ var (
 	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	ccacheRootDir        = app.Flag("ccache-root-dir", "The directory used to store ccache outputs").String()
 	ccachConfig          = app.Flag("ccache-config", "The configuration file for ccache.").String()
+	useLLVMToolchain     = app.Flag("use-llvm-toolchain", "Configure default build worker chroot to use LLVM toolchain").Bool()
 	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
@@ -111,6 +112,15 @@ func main() {
 	} else {
 		logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", ccacheErr)
 		ccacheManager = nil
+	}
+
+	if *useLLVMToolchain {
+		logger.Log.Info("NOTE: Building with LLVM toolchain")
+		defines[rpm.UseLLVMClangDefine] = "true"
+		//logger.Log.Info("NOTE: Linking with LLVM lld")
+		//defines[rpm.UseLLVMLinkerDefine] = "true"
+	} else {
+		logger.Log.Info("NOTE: Building with default GNU toolchain")
 	}
 
 	if *maxCPU != "" {

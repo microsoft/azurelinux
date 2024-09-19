@@ -209,8 +209,8 @@ libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
 lua-libs-5.4.6-1.azl3.aarch64.rpm
-azurelinux-rpm-macros-3.0-7.azl3.noarch.rpm
-azurelinux-check-macros-3.0-7.azl3.noarch.rpm
+azurelinux-rpm-macros-3.0-8.azl3.noarch.rpm
+azurelinux-check-macros-3.0-8.azl3.noarch.rpm
 tdnf-3.5.6-2.azl3.aarch64.rpm
 tdnf-cli-libs-3.5.6-2.azl3.aarch64.rpm
 tdnf-devel-3.5.6-2.azl3.aarch64.rpm
@@ -261,3 +261,16 @@ audit-3.1.2-1.azl3.aarch64.rpm
 audit-libs-3.1.2-1.azl3.aarch64.rpm
 libxcrypt-4.4.36-2.azl3.aarch64.rpm
 libxcrypt-devel-4.4.36-2.azl3.aarch64.rpm
+llvm-18.1.2-4.azl3.aarch64.rpm
+compiler-rt-18.1.2-3.azl3.aarch64.rpm
+clang-libs-18.1.2-3.azl3.aarch64.rpm
+clang-18.1.2-3.azl3.aarch64.rpm
+lld-devel-18.1.2-3.azl3.aarch64.rpm
+lld-libs-18.1.2-3.azl3.aarch64.rpm
+lld-18.1.2-3.azl3.aarch64.rpm
+libcxx-18.1.2-2.azl3.aarch64.rpm
+libcxx-devel-18.1.2-2.azl3.aarch64.rpm
+libcxx-static-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-devel-18.1.2-2.azl3.aarch64.rpm
+libcxxabi-static-18.1.2-2.azl3.aarch64.rpm
