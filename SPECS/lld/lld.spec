@@ -36,7 +36,7 @@ programs that use the LLD infrastructure.
 Shared libraries for LLD.
 
 %prep
-%autosetup -q -n %{lld_srcdir}
+%autosetup -n %{lld_srcdir}
 
 %build
 mkdir -p build
