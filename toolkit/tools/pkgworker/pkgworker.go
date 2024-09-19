@@ -227,7 +227,16 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
-	// Run the build in a go routine so we can monitor and kill it if it takes too long.
+	// Run the build in a goroutine so we can monitor and kill it if it takes too long.
+	//
+	// It is important to run the timeout logic inside the chroot so that the chroot cleanup
+	// flow in chroot.Run() is executed if the build times out.
+	//
+	// If the timeout logic is run outside of the chroot.Run() call, the process will still
+	// be running in the chroot's context and the automatic chroot cleanup triggered by the
+	// process exiting will fail (see safechroot.go:cleanupAllChroots()). For example,
+	// `unmount /path/to/chroot/dev` will fail since our root is currently `/path/to/chroot`,
+	// and `/path/to/chroot/path/to/chroot/dev` is not a real path.
 	results := make(chan error)
 	err = chroot.Run(func() (err error) {
 		go func() {
