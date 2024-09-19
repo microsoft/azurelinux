@@ -6500,8 +6500,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.47.1.tar.gz"
+          "version": "6.6.51.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.51.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.47.1.tar.gz"
+          "version": "6.6.51.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.51.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.47.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.47.1.tar.gz"
+          "version": "6.6.51.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.51.1.tar.gz"
         }
       }
     },
@@ -15203,8 +15203,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.0",
-          "downloadUrl": "https://www.openssl.org/source/openssl-3.3.0.tar.gz"
+          "version": "3.3.2",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.2/openssl-3.3.2.tar.gz"
         }
       }
     },
@@ -22832,6 +22832,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-junitxml",
+          "version": "0.7",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/junitxml/junitxml-0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-justbases",
           "version": "0.9",
           "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.9.tar.gz"
@@ -28056,8 +28066,8 @@
         "type": "other",
         "other": {
           "name": "subunit",
-          "version": "1.4.0",
-          "downloadUrl": "https://launchpad.net/subunit/trunk/1.4.0/+download/subunit-1.4.0.tar.gz"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/testing-cabal/subunit/archive/1.4.4/subunit-1.4.4.tar.gz"
         }
       }
     },
@@ -28426,8 +28436,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "3.5.6",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.5.6.tar.gz"
+          "version": "3.5.8",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.5.8.tar.gz"
         }
       }
     },

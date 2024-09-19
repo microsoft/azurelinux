@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.47.1
-Release:        5%{?dist}
+Version:        6.6.51.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,8 +407,17 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Sep 10 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-3
+* Thu Sep 19 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.51.1-2
 - UKI: remove dbus from initrd
+
+* Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.51.1-1
+- Auto-upgrade to 6.6.51.1
+
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.47.1-7
+- UKI: Install binary to ESP
+
+* Fri Sep 13 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-6
+- Disable xen debugfs and I2C Baytrail configs
 
 * Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
 - Build mpt2sas and mpt3sas drivers as modules

@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -102,6 +102,7 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
+Patch0:         CVE-2024-41946.patch
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
@@ -407,6 +408,10 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Wed Sep 18 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.3-2
+- Revert ruby back to 3.3.3 to avoid build failure of rubygems-* packages
+- Add patch for CVE-2024-41946 for bundled gem rexml
+
 * Wed Aug 07 2024 Alejandro Martinez Torres <alejandroma@microsoft.com> - 3.3.3-1
 - Upgrade ruby to 3.3.3 to resolve CVE-2024-41946
 

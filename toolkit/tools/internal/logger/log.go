@@ -163,6 +163,17 @@ func PanicOnError(err interface{}, args ...interface{}) {
 	}
 }
 
+// FatalOnError logs a fatal error and any message strings, then exists (while
+// running any cleanup functions registered with the log package)
+func FatalOnError(err interface{}, args ...interface{}) {
+	if err != nil {
+		if len(args) > 0 {
+			Log.Errorf(args[0].(string), args[1:]...)
+		}
+		Log.Fatalln(err)
+	}
+}
+
 // WarningOnError logs a warning error and any message strings
 func WarningOnError(err interface{}, args ...interface{}) {
 	if err != nil {

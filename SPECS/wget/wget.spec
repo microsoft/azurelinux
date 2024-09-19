@@ -3,7 +3,7 @@
 Summary:        An advanced file and recursive website downloader
 Name:           wget
 Version:        2.1.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND GFDL-1.3-or-later
 URL:            https://gitlab.com/gnuwget/wget2
 Group:          System Environment/NetworkingPrograms
@@ -27,6 +27,10 @@ Patch0005:      0005-Accept-progress-dot-.-for-backwards-compatibility.patch
 # Disable TCP Fast Open by default
 # rhbz#2291017
 Patch0006:      0006-Disable-TCP-Fast-Open-by-default.patch
+# https://github.com/rockdaboot/wget2/issues/342
+Patch0007:      fix-ssl-read-and-write-error-check.patch
+# https://github.com/rockdaboot/wget2/issues/344
+Patch0008:      set-debug_skip_body-for-OCSP-requests-in-openssl-tls-provider.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -153,6 +157,12 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
+* Wed Sep 18 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-4
+- Add patch to prevent debug output from printing binary request bodies.
+
+* Fri Sep 13 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-3
+- Add patch to fix SSL read and write error check.
+
 * Thu Sep 12 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-2
 - Add patches from Fedora upstream. Important ones include disabling OCSP and TCP Fast Open by default.
 - Don't install wget2_noinstall binary, which is specifically for testing.
