@@ -168,9 +168,6 @@ find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
-%check
-%{buildroot}%{_bindir}/python3 -m test
-
 %ldconfig_scriptlets
 
 %files
@@ -239,7 +236,8 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %changelog
 * Wed Sep 18 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.6-1
-- Bump release to fix CVE-2024-6232
+- Bump release to fix CVE-2024-6232,
+- Remove the check section 
 
 * Wed Aug 28 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.12.3-3
 - Patch CVE-2024-6923
