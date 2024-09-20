@@ -3,7 +3,7 @@
 Summary:        Tool to check ELF binary hardening configuration
 Name:           hardening-check
 Version:        2.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            http://packages.debian.org/hardening-wrapper
 Group:          Development/Tools
@@ -53,6 +53,9 @@ make
 %{_mandir}/man1/hardening-check.1.*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-3
+- License verified.
+
 * Wed May 20 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.6-2
 - Initial CBL-Mariner import from Fedora 26 (license: MIT).
 - Changed package name from 'hardening-wrapper'.

@@ -14,7 +14,7 @@ storage:
 
   bootType: legacy
 
-  fileSystems:
+  filesystems:
   - deviceId: boot
     type: fat32
 

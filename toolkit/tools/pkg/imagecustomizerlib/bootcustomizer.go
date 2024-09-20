@@ -23,8 +23,8 @@ type BootCustomizer struct {
 	isGrubMkconfig bool
 }
 
-func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) {
-	grubCfgContent, err := readGrub2ConfigFile(imageChroot)
+func NewBootCustomizer(imageChroot safechroot.ChrootInterface) (*BootCustomizer, error) {
+	grubCfgContent, err := ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 
 	// Get the SELinux kernel command-line args.
 	if b.isGrubMkconfig {
-		_, args, _, err = getDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
+		_, args, _, err = GetDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
 		if err != nil {
 			return "", err
 		}
@@ -103,7 +103,7 @@ func (b *BootCustomizer) getSELinuxModeFromGrub() (imagecustomizerapi.SELinuxMod
 	return selinuxMode, nil
 }
 
-func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
+func (b *BootCustomizer) GetSELinuxMode(imageChroot safechroot.ChrootInterface) (imagecustomizerapi.SELinuxMode, error) {
 	// Get the SELinux mode from the kernel command-line args.
 	selinuxMode, err := b.getSELinuxModeFromGrub()
 	if err != nil {
@@ -163,7 +163,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defa
 func (b *BootCustomizer) PrepareForVerity() error {
 	if b.isGrubMkconfig {
 		// Force root command-line arg to be referenced by /dev path instead of by UUID.
-		defaultGrubFileContent, err := updateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
+		defaultGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DISABLE_UUID",
 			"true")
 		if err != nil {
 			return err
@@ -171,8 +171,14 @@ func (b *BootCustomizer) PrepareForVerity() error {
 
 		// Disable recovery menu entry, to avoid having more than 1 linux command in the grub.cfg file.
 		// This will make it easier to modify the grub.cfg file to add the verity args.
-		defaultGrubFileContent, err = updateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DISABLE_RECOVERY",
+		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DISABLE_RECOVERY",
 			"true")
+		if err != nil {
+			return err
+		}
+
+		// For verity, the root device will always be "/dev/mapper/root"
+		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE", "/dev/mapper/root")
 		if err != nil {
 			return err
 		}
@@ -183,14 +189,13 @@ func (b *BootCustomizer) PrepareForVerity() error {
 	return nil
 }
 
-func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
+func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
-		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
+		err := WriteDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
 		}
-
 		// Update /boot/grub2/grub.cfg file.
 		err = installutils.CallGrubMkconfig(imageChroot)
 		if err != nil {

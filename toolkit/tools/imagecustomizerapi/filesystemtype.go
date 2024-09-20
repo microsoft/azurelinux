@@ -3,7 +3,9 @@
 
 package imagecustomizerapi
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // FileSystemType is a type of file system (e.g. ext4, xfs, etc.)
 type FileSystemType string
@@ -12,11 +14,12 @@ const (
 	FileSystemTypeExt4  FileSystemType = "ext4"
 	FileSystemTypeXfs   FileSystemType = "xfs"
 	FileSystemTypeFat32 FileSystemType = "fat32"
+	FileSystemTypeVfat  FileSystemType = "vfat"
 )
 
 func (t FileSystemType) IsValid() error {
 	switch t {
-	case FileSystemTypeExt4, FileSystemTypeXfs, FileSystemTypeFat32:
+	case FileSystemTypeExt4, FileSystemTypeXfs, FileSystemTypeFat32, FileSystemTypeVfat:
 		// All good.
 		return nil
 

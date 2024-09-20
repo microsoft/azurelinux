@@ -1,0 +1,32 @@
+From 3d4e70f8591d84c48d449d0b8d600d6e138ca6c2 Mon Sep 17 00:00:00 2001
+From: "Tobias Brick (he/him)" <tobiasb@microsoft.com>
+Date: Wed, 11 Sep 2024 22:46:37 +0000
+Subject: [PATCH] count 0 as an error for SSL_read and SS_write, per
+ documentation
+
+---
+ libwget/ssl_openssl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libwget/ssl_openssl.c b/libwget/ssl_openssl.c
+index 6cac6ecb..2a892ff5 100644
+--- a/libwget/ssl_openssl.c
++++ b/libwget/ssl_openssl.c
+@@ -1816,7 +1816,7 @@ static int ssl_transfer(int want,
+ 		else
+ 			retval = SSL_write(ssl, buf, count);
+ 
+-		if (retval < 0) {
++		if (retval <= 0) {
+ 			error = SSL_get_error(ssl, retval);
+ 
+ 			if (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE) {
+@@ -1830,7 +1830,7 @@ static int ssl_transfer(int want,
+ 				return WGET_E_HANDSHAKE;
+ 			}
+ 		}
+-	} while (retval < 0);
++	} while (retval <= 0);
+ 
+ 	return retval;
+ }

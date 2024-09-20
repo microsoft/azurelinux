@@ -1,9 +1,11 @@
 Name:           lujavrite
 Version:        1.0.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Lua library for calling Java code
 License:        Apache-2.0
 URL:            https://github.com/mizdebsk/lujavrite
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 
 Source0:        https://github.com/mizdebsk/lujavrite/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -36,6 +38,9 @@ lua test.lua
 %doc README.md
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.2-6
+- Add missing Vendor and Distribution tags.
+
 * Thu Apr 04 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.2-5
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.

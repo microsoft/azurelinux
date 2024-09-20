@@ -587,6 +587,12 @@ build_rpm_in_chroot_no_install ocaml-srpm-macros
 
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging
+# rebuild python-packaging to resolve circular dependency
+build_rpm_in_chroot_no_install python-packaging
+
+# Now that python-packaging is built, re-build pygments and setuptools to re-evaluate auto-generated provides
+build_rpm_in_chroot_no_install python-pygments
+build_rpm_in_chroot_no_install python-setuptools
 
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython

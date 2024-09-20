@@ -19,7 +19,7 @@ import (
 func TestCustomizeImagePackagesAddOfflineDir(t *testing.T) {
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePackagesAddOfflineDir")
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 	downloadedRpmsDir := getDownloadedRpmsDir(t, "2.0")
 
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -134,7 +134,7 @@ func copyRpms(sourceDir string, targetDir string, excludePrefixes []string) erro
 func TestCustomizeImagePackagesAddOfflineLocalRepo(t *testing.T) {
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePackagesAddOfflineLocalRepo")
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	downloadedRpmsRepoFile := getDownloadedRpmsRepoFile(t, "2.0")
 	rpmSources := []string{downloadedRpmsRepoFile}
@@ -164,7 +164,7 @@ func TestCustomizeImagePackagesAddOfflineLocalRepo(t *testing.T) {
 }
 
 func TestCustomizeImagePackagesUpdate(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePackagesUpdate")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -197,7 +197,7 @@ func TestCustomizeImagePackagesUpdate(t *testing.T) {
 }
 
 func TestCustomizeImagePackagesDiskSpace(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePackagesDiskSpace")
 	buildDir := filepath.Join(testTmpDir, "build")
