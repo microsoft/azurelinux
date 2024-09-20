@@ -64,37 +64,6 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 	checkFileType(t, outImageFilePath, "vhd")
 }
 
-func TestCustomizeImageCopyFiles(t *testing.T) {
-	var err error
-
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
-	configFile := filepath.Join(testDir, "addfiles-config.yaml")
-	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
-
-	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "", false, false)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Check output file type.
-	checkFileType(t, outImageFilePath, "raw")
-
-	// Mount the output disk image so that its contents can be checked.
-	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer imageConnection.Close()
-
-	// Check the contents of the copied file.
-	file_contents, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "a.txt"))
-	assert.NoError(t, err)
-	assert.Equal(t, "abcdefg\n", string(file_contents))
-}
-
 func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
 	return connectToImage(buildDir, imageFilePath, false /*includeDefaultMounts*/, coreEfiMountPoints)
 }
@@ -149,8 +118,11 @@ func partitionDevPath(imageConnection *ImageConnection, partitionNum int) string
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/a.txt": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.NoError(t, err)
@@ -159,8 +131,11 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/missing_a.txt": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/missing_a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)
@@ -169,8 +144,11 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)

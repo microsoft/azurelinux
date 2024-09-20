@@ -334,8 +334,8 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 func TestConfigIsValidInvalidIso(t *testing.T) {
 	config := &Config{
 		Iso: &Iso{
-			AdditionalFiles: AdditionalFilesMap{
-				"": FileConfigList{},
+			AdditionalFiles: AdditionalFileList{
+				{},
 			},
 		},
 	}
