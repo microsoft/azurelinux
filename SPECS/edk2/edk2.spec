@@ -109,14 +109,17 @@ Patch0015: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
 Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 Patch0018: CVE-2024-1298.patch
-#Patch0019: CVE-2022-36763.patch
-Patch0020: CVE-2022-36765.patch
-Patch0021: CVE-2023-45230.patch
-Patch0022: CVE-2023-45232.patch
-Patch0023: CVE-2023-45234.patch
-Patch0024: CVE-2023-45235.patch
-Patch0025: full-patch.patch
-#Patch0026: CVE-2023-45236.patch
+Patch0019: CVE-2022-36763.patch
+# This patch is need for CVE-2022-36763 to resolve the tpm1 and tpm2 build conflicts
+# See https://edk2.groups.io/g/devel/topic/patch_0_6_security_patches/103675434
+Patch0020: fix-tpm-build-issue-from-CVE-2022-36763.patch
+Patch0021: CVE-2022-36765.patch
+Patch0022: CVE-2023-45230.patch
+Patch0023: CVE-2023-45232.patch
+Patch0024: CVE-2023-45234.patch
+Patch0025: CVE-2023-45235.patch
+Patch0026: CVE-2023-45237.patch
+Patch0027: CVE-2023-45236.patch
 
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
@@ -709,7 +712,8 @@ $tests_ok
 
 %changelog
 * Mon Sep 16 2024 Minghe Ren <mingheren@microsoft.com> - 20230301gitf80f052277c8-40
-- Apply CVE-2022-36763, CVE-2022-36765, CVE-2023-45230, CVE-2023-45232, CVE-2023-45234, CVE-2023-45235, CVE-2023-45236, CVE-2023-45237 patch
+- Add CVE-2022-36763, CVE-2022-36765, CVE-2023-45230, CVE-2023-45232, CVE-2023-45234, CVE-2023-45235, CVE-2023-45236, CVE-2023-45237 patch
+- Add fix-tpm-build-issue-from-CVE-2022-36763.patch 
 - Add nopatch for CVE-2022-36764, CVE-2023-45233
 
 * Thu Jun 06 2024 Archana Choudhary <archana1@microsoft.com> - 20230301gitf80f052277c8-39
