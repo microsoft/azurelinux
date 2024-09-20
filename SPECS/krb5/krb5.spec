@@ -3,8 +3,9 @@
 
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.21.3
-Release:        2%{?dist}
+Epoch:          1
+Version:        1.19.4
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,12 +13,14 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 Source1:        krb5.conf
-Patch0:         CVE-2024-26461.patch
+Patch0:         CVE-2023-36054.patch
+Patch1:         CVE-2024-26461.patch
+Patch2:         CVE-2024-37370.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
-Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-libs = %{epoch}:%{version}-%{release}
 
 %description
 Kerberos V5 is a trusted-third-party network authentication system,
@@ -26,7 +29,7 @@ practice of clear text passwords.
 
 %package devel
 Summary:        Libraries and header files for krb5
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 Requires:       e2fsprogs-devel
 
 %description devel
@@ -35,7 +38,7 @@ Static libraries and header files for the support library for krb5
 %package lang
 Summary:        Additional language files for krb5
 Group:          System Environment/Security
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 
 %description lang
 These are the additional language files of krb5.
@@ -45,6 +48,7 @@ These are the additional language files of krb5.
 
 %build
 cd src
+sed -e 's@\^u}@^u cols 300}@' -i tests/dejagnu/config/default.exp
 CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" \
 autoconf &&
 ./configure \
@@ -126,6 +130,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Thu Sep 12 2024 Adit Jha <aditjha@microsoft.com> - 1:1.19.4-3
+- Revert to 1.19.4, add epoch and add patch for CVE-2024-37371 and CVE-2024-37370
+
 * Mon Sep 2 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.21.3-2
 - Add patch for CVE-2024-26458 and CVE-2024-26461
 
