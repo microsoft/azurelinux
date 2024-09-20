@@ -709,6 +709,7 @@ func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
 	var (
 		snapshotTimeArg    string
 		snapshotExcludeArg string
+		excludeRepoIds     []string
 		err                error
 	)
 
@@ -724,15 +725,14 @@ func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
 		logger.Log.Errorf("Snapshot Time is invalid")
 		return
 	}
-	snapshotExcludeArg, err = tdnf.GetRepoSnapshotExcludeCliArg(repoIDBuilt)
+	excludeRepoIds = []string{repoIDBuilt, repoIDToolchain, r.repoIDCache, repoIDCacheRegular}
+	snapshotExcludeArg, err = tdnf.GetRepoSnapshotExcludeCliArg(excludeRepoIds)
 	if err != nil {
 		logger.Log.Errorf("Snapshot Repo to exclude is invalid")
 		return
 	}
 
-	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotTimeArg)
-	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotExcludeArg)
-
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotTimeArg, snapshotExcludeArg)
 }
 
 // GetEnabledRepos returns the repo flags that the cloner is allowed to use for its queries.

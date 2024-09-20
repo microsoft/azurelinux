@@ -36,8 +36,8 @@ var (
 	imagerTool         = app.Flag("imager", "Path to the imager tool.").Required().ExistingFile()
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-
-	logFlags = exe.SetupLogFlags(app)
+	repoSnapshotTime   = app.Flag("repo-snapshot-time", "tdnf repo snapshot time").String()
+	logFlags           = exe.SetupLogFlags(app)
 )
 
 // Every valid mouse event handler will follow the format:
@@ -45,13 +45,14 @@ var (
 var mouseEventHandlerRegex = regexp.MustCompile(`^H:\s+Handlers=(\w+)\s+mouse\d+`)
 
 type imagerArguments struct {
-	imagerTool   string
-	configFile   string
-	buildDir     string
-	baseDirPath  string
-	emitProgress bool
-	logFile      string
-	logLevel     string
+	imagerTool       string
+	configFile       string
+	buildDir         string
+	baseDirPath      string
+	emitProgress     bool
+	logFile          string
+	logLevel         string
+	repoSnapshotTime string
 }
 
 type installationDetails struct {
@@ -79,11 +80,12 @@ func main() {
 
 	// Imager's stdout/stderr will be combined with this tool's, so it will automatically be logged to the current log file
 	args := imagerArguments{
-		imagerTool:  *imagerTool,
-		buildDir:    *buildDir,
-		baseDirPath: *baseDirPath,
-		logLevel:    logger.Log.GetLevel().String(),
-		logFile:     imagerLogFile,
+		imagerTool:       *imagerTool,
+		buildDir:         *buildDir,
+		baseDirPath:      *baseDirPath,
+		logLevel:         logger.Log.GetLevel().String(),
+		logFile:          imagerLogFile,
+		repoSnapshotTime: *repoSnapshotTime,
 	}
 
 	installFunc := installerFactory(*forceAttended, *configFile, *templateConfigFile)
@@ -451,6 +453,7 @@ func formatImagerCommand(args imagerArguments) (program string, commandArgs []st
 		fmt.Sprintf("--base-dir=%s", args.baseDirPath),
 		fmt.Sprintf("--log-file=%s", args.logFile),
 		fmt.Sprintf("--log-level=%s", args.logLevel),
+		fmt.Sprintf("--repo-snapshot-time=%s", args.repoSnapshotTime),
 	}
 
 	if args.emitProgress {

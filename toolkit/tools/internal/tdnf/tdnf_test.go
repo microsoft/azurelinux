@@ -4,9 +4,12 @@
 package tdnf
 
 import (
+	"fmt"
 	"os"
+	"path"
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -243,7 +246,7 @@ func TestPackageLookupNameMatchRegex_FailsForOutputWithOnlyPluginLoaded(t *testi
 
 	assert.False(t, PackageProvidesRegex.MatchString(line))
 
-func Test_getRepoSnapshotCliArg(t *testing.T) {
+func Test_GetRepoSnapshotCliArg(t *testing.T) {
 	type args struct {
 		posixTime string
 	}
@@ -259,16 +262,16 @@ func Test_getRepoSnapshotCliArg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRepoSnapshot, err := getRepoSnapshotCliArg(tt.args.posixTime)
+			gotRepoSnapshot, err := GetRepoSnapshotCliArg(tt.args.posixTime)
 			assert.Equal(t, tt.wantErr, err != nil)
 			assert.Equal(t, tt.wantRepoSnapshot, gotRepoSnapshot)
 		})
 	}
 }
 
-func Test_getRepoSnapshotExcludeCliArg(t *testing.T) {
+func Test_GetRepoSnapshotExcludeCliArg(t *testing.T) {
 	type args struct {
-		excludeRepo string
+		excludeRepos []string
 	}
 	tests := []struct {
 		name           string
@@ -276,18 +279,65 @@ func Test_getRepoSnapshotExcludeCliArg(t *testing.T) {
 		wantExcludeArg string
 		wantErr        bool
 	}{
-		{name: "testEmpty", args: args{excludeRepo: ""}, wantExcludeArg: "", wantErr: true},
-		{name: "testRepo", args: args{excludeRepo: "local-repo"}, wantExcludeArg: "--excludesnapshot=local-repo", wantErr: false},
+		{name: "testEmptyArray", args: args{excludeRepos: nil}, wantExcludeArg: "", wantErr: true},
+		{name: "testEmptyMember", args: args{excludeRepos: []string{""}}, wantExcludeArg: "", wantErr: true},
+		{name: "testRepo", args: args{excludeRepos: []string{"local-repo"}}, wantExcludeArg: "--snapshotexcluderepos=local-repo", wantErr: false},
+		{name: "testMultiRepo", args: args{excludeRepos: []string{"local-repo", "test-repo"}}, wantExcludeArg: "--snapshotexcluderepos=local-repo,test-repo", wantErr: false},
+		{name: "testMultiRepoOneEmpty", args: args{excludeRepos: []string{"local-repo", ""}}, wantExcludeArg: "", wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExcludeArg, err := getRepoSnapshotExcludeCliArg(tt.args.excludeRepo)
+			gotExcludeArg, err := GetRepoSnapshotExcludeCliArg(tt.args.excludeRepos)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getRepoSnapshotExcludeCliArg() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetRepoSnapshotExcludeCliArg() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotExcludeArg != tt.wantExcludeArg {
-				t.Errorf("getRepoSnapshotExcludeCliArg() = %v, want %v", gotExcludeArg, tt.wantExcludeArg)
+				t.Errorf("GetRepoSnapshotExcludeCliArg() = %v, want %v", gotExcludeArg, tt.wantExcludeArg)
+			}
+		})
+	}
+}
+
+func TestAddSnapshotToConfig(t *testing.T) {
+	type args struct {
+		configFilePath string
+		posixTime      string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{name: "testEmptyPath", args: args{configFilePath: "", posixTime: "12345"}, wantErr: true},
+		{name: "testEmptyTime", args: args{configFilePath: "tdnf.conf", posixTime: ""}, wantErr: true},
+		{name: "testBadPath", args: args{configFilePath: "test", posixTime: "12345"}, wantErr: false},
+		{name: "testConfigAdded", args: args{configFilePath: "tdnf.conf", posixTime: "12345"}, wantErr: false},
+	}
+	testConfigFilePath := path.Join("testdata", "tdnf.conf")
+	for _, tt := range tests {
+		testConfigFileLines, _ := file.ReadLines(testConfigFilePath)
+
+		//
+		destpath := tt.args.configFilePath
+		testConfigDir := t.TempDir()
+		if destpath != "" {
+			file.Copy(testConfigFilePath, path.Join(testConfigDir, "tdnf.conf"))
+			destpath = path.Join(testConfigDir, tt.args.configFilePath)
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			if err := AddSnapshotToConfig(destpath, tt.args.posixTime); (err != nil) != tt.wantErr {
+				assert.True(t, (err != nil) != tt.wantErr, "AddSnapshotToConfig() error = %v, wantErr %v", err, tt.wantErr)
+			} else if !tt.wantErr && tt.args.configFilePath == "tdnf.conf" {
+				// check for change
+				resultConfigFileLines, _ := file.ReadLines(destpath)
+				testConfigFileLines = append(testConfigFileLines, fmt.Sprintf("snapshottime=%s", tt.args.posixTime))
+				assert.Equal(t, resultConfigFileLines, testConfigFileLines, "Expected: %v, Actual: %v", testConfigFileLines, resultConfigFileLines)
+			} else if !tt.wantErr && tt.args.configFilePath != "tdnf.conf" {
+				// check for no change
+				resultConfigFileLines, _ := file.ReadLines(path.Join(testConfigDir, "tdnf.conf"))
+				assert.Equal(t, resultConfigFileLines, testConfigFileLines, "Expected: %v, Actual: %v", testConfigFileLines, resultConfigFileLines)
+
 			}
 		})
 	}

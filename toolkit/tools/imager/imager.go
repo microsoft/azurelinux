@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
@@ -18,6 +19,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
@@ -25,22 +27,23 @@ import (
 )
 
 var (
-	app             = kingpin.New("imager", "Tool to create and install images.")
-	buildDir        = app.Flag("build-dir", "Directory to store temporary files while building.").ExistingDir()
-	configFile      = exe.InputFlag(app, "Path to the image config file.")
-	localRepo       = app.Flag("local-repo", "Path to local RPM repo").ExistingDir()
-	tdnfTar         = app.Flag("tdnf-worker", "Path to tdnf worker tarball").ExistingFile()
-	repoFile        = app.Flag("repo-file", "Full path to local.repo.").ExistingFile()
-	assets          = app.Flag("assets", "Path to assets directory.").ExistingDir()
-	baseDirPath     = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-	outputDir       = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
-	imgContentFile  = app.Flag("output-image-contents", "File that stores list of packages used to compose the image.").String()
-	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
-	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
-	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	buildNumber     = app.Flag("build-number", "Build number to be used in the image.").String()
-	logFlags        = exe.SetupLogFlags(app)
-	profFlags       = exe.SetupProfileFlags(app)
+	app              = kingpin.New("imager", "Tool to create and install images.")
+	buildDir         = app.Flag("build-dir", "Directory to store temporary files while building.").ExistingDir()
+	configFile       = exe.InputFlag(app, "Path to the image config file.")
+	localRepo        = app.Flag("local-repo", "Path to local RPM repo").ExistingDir()
+	tdnfTar          = app.Flag("tdnf-worker", "Path to tdnf worker tarball").ExistingFile()
+	repoFile         = app.Flag("repo-file", "Full path to local.repo.").ExistingFile()
+	assets           = app.Flag("assets", "Path to assets directory.").ExistingDir()
+	baseDirPath      = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
+	outputDir        = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
+	imgContentFile   = app.Flag("output-image-contents", "File that stores list of packages used to compose the image.").String()
+	liveInstallFlag  = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
+	emitProgress     = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
+	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	buildNumber      = app.Flag("build-number", "Build number to be used in the image.").String()
+	repoSnapshotTime = app.Flag("repo-snapshot-time", "Snapshot time to be added to the image tdnf.conf").String()
+	logFlags         = exe.SetupLogFlags(app)
+	profFlags        = exe.SetupProfileFlags(app)
 )
 
 const (
@@ -620,6 +623,14 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if err != nil {
 		err = fmt.Errorf("failed to add image ID file:\n%w", err)
 		return
+	}
+
+	//add snapshot to installchroot tdnf.conf if both a present, warning if only snapshot time present
+	if *repoSnapshotTime != "" {
+		err = tdnf.AddSnapshotToConfig(path.Join(installChroot.RootDir(), "etc", "tdnf", "tdnf.conf"), *repoSnapshotTime)
+		if err != nil {
+			return
+		}
 	}
 
 	// Configure the final image with the customized macros so that rpm continues to behave the same way in the final image

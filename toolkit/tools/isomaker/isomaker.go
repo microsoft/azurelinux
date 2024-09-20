@@ -24,6 +24,7 @@ var (
 	releaseVersion    = app.Flag("release-version", "The repository OS release version").Required().String()
 	resourcesDirPath  = app.Flag("resources", "Path to 'resources' directory").Required().ExistingDir()
 	outputDir         = app.Flag("output-dir", "Path to directory to place final image").Required().String()
+	repoSnapshotTime  = app.Flag("repo-snapshot-time", "tdnf image repo snapshot time").String()
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
@@ -46,7 +47,8 @@ func main() {
 		*initrdPath,
 		*isoRepoDirPath,
 		*outputDir,
-		*imageTag)
+		*imageTag,
+		*repoSnapshotTime)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
