@@ -1424,24 +1424,22 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 
 	// define a disk layout with a boot partition and a rootfs partition
 	maxDiskSizeMB := imagecustomizerapi.DiskSize(safeDiskSizeMB * diskutils.MiB)
-	var bootPartitionStart imagecustomizerapi.DiskSize
-	bootPartitionStart = imagecustomizerapi.DiskSize(1 * diskutils.MiB)
-	var bootPartitionEnd imagecustomizerapi.DiskSize
-	bootPartitionEnd = imagecustomizerapi.DiskSize(9 * diskutils.MiB)
+	bootPartitionStart := imagecustomizerapi.DiskSize(1 * diskutils.MiB)
+	bootPartitionEnd := imagecustomizerapi.DiskSize(9 * diskutils.MiB)
 
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
-		MaxSize:            maxDiskSizeMB,
+		MaxSize:            &maxDiskSizeMB,
 		Partitions: []imagecustomizerapi.Partition{
 			{
 				Id:    "esp",
-				Start: bootPartitionStart,
+				Start: &bootPartitionStart,
 				End:   &bootPartitionEnd,
 				Type:  imagecustomizerapi.PartitionTypeESP,
 			},
 			{
 				Id:    "rootfs",
-				Start: bootPartitionEnd,
+				Start: &bootPartitionEnd,
 			},
 		},
 	}

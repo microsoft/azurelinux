@@ -125,8 +125,8 @@ os:
             - [end](#end-uint64)
             - [size](#size-uint64)
             - [type](#partition-type-string)
-    - [fileSystems](#filesystems-filesystem)
-      - [fileSystem type](#filesystem-type)
+    - [filesystems](#filesystems-filesystem)
+      - [filesystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
         - [type](#type-string)
         - [mountPoint](#mountpoint-mountpoint)
@@ -244,8 +244,8 @@ storage:
 
     - id: rootfs
       start: 9M
-      
-  fileSystems:
+
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
@@ -346,50 +346,157 @@ Specifies the configuration for the generated ISO media.
 
 Specifies the configuration for overlay filesystem.
 
-- `lowerDir`: This directory acts as the read-only layer in the overlay
-  filesystem. It contains the base files and directories which will be overlaid
-  by the upperDir. Changes to the overlay filesystem do not affect the contents
-  of lowerDir.
+Overlays Configuration Example:
 
-- `upperDir`: This directory is the writable layer of the overlay filesystem.
-  Any modifications, such as file additions, deletions, or changes, are made in
-  the upperDir. These changes are what make the overlay filesystem appear
-  different from the lowerDir alone.
+```yaml
+storage:
+  disks:
+  bootType: efi
+  - partitionTableType: gpt
+    maxSize: 4G
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+    - id: boot
+      start: 9M
+      end: 108M
+    - id: rootfs
+      label: rootfs
+      start: 108M
+      end: 2G
+    - id: var
+      start: 2G
 
-- `workDir`: This is a required directory used for preparing files before they
-  are merged into the upperDir. It needs to be on the same filesystem as the
-  upperDir and is used for temporary storage by the overlay filesystem to ensure
-  atomic operations. The workDir is not directly accessible to users.
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
 
-- `partition`: Optional field: If configured, a partition will be attached to
-  the current targeted overlay, making it persistent and ensuring that changes
-  are retained. If not configured, the overlay will be volatile.
+os:
+  resetBootLoaderType: hard-reset
+  overlays:
+    - mountPoint: /etc
+      lowerDirs:
+      - /etc
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      isRootfsOverlay: true
+      mountDependencies:
+      - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work
+```
 
-  - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+### `mountPoint` [string]
 
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
+The directory where the combined view of the `upperDir` and `lowerDir` will be
+mounted. This is the location where users will see the merged contents of the
+overlay filesystem. It is common for the `mountPoint` to be the same as the
+`lowerDir`. But this is not required.
+
+Example: `/etc`
+
+### `lowerDirs` [string[]]
+
+These directories act as the read-only layers in the overlay filesystem. They
+contain the base files and directories which will be overlaid by the `upperDir`.
+Multiple lower directories can be specified by providing a list of paths, which
+will be joined using a colon (`:`) as a separator.
 
 Example:
 
 ```yaml
-os:
-  overlays:
-    - lowerDir: /etc
-      upperDir: /upper_etc
-      workDir: /work_etc
-      partition:
-        idType: part-label
-        id: partition-etc
-    - lowerDir: /var/lib
-      upperDir: /upper_var_lib
-      workDir: /work_var_lib
-    - lowerDir: /var/log
-      upperDir: /upper_var_log
-      workDir: /work_var_log
+lowerDirs: 
+- /etc
 ```
+
+### `upperDir` [string]
+
+This directory is the writable layer of the overlay filesystem. Any
+modifications, such as file additions, deletions, or changes, are made in the
+upperDir. These changes are what make the overlay filesystem appear different
+from the lowerDir alone. 
+  
+Example: `/var/overlays/etc/upper`
+
+### `workDir` [string]
+
+This is a required directory used for preparing files before they are merged
+into the upperDir. It needs to be on the same filesystem as the upperDir and
+is used for temporary storage by the overlay filesystem to ensure atomic
+operations. The workDir is not directly accessible to users. 
+  
+Example: `/var/overlays/etc/work`
+
+### `isRootfsOverlay` [bool]
+
+A boolean flag indicating whether this overlay is part of the root filesystem.
+If set to `true`, specific adjustments will be made, such as prefixing certain
+paths with `/sysroot`, and the overlay will be added to the fstab file with the
+`x-initrd.mount` option to ensure it is available during the initrd phase.
+
+This is an optional argument.
+
+Example: `False`
+
+### `mountDependencies` [string[]]
+
+Specifies a list of directories that must be mounted before this overlay. Each
+directory in the list should be mounted and available before the overlay
+filesystem is mounted.
+
+This is an optional argument.
+
+Example:
+
+```yaml
+mountDependencies: 
+- /var
+```
+
+**Important**: If any directory specified in `mountDependencies` needs to be
+available during the initrd phase, you must ensure that this directory's mount
+configuration in the `filesystems` section includes the `x-initrd.mount` option.
+For example:
+
+```yaml
+filesystems:
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+```
+
+### `mountOptions` [string]
+
+A string of additional mount options that can be applied to the overlay mount.
+Multiple options should be separated by commas.
+
+This is an optional argument.
+
+Example: `noatime,nodiratime`
 
 ## verity type
 
@@ -533,7 +640,7 @@ os:
       childFilePermissions: "644"
 ```
 
-## fileSystem type
+## filesystem type
 
 Specifies the mount options for a partition.
 
@@ -542,7 +649,7 @@ Specifies the mount options for a partition.
 Required.
 
 The ID of the partition.
-This is used correlate [partition](#partition-type) objects with fileSystem objects.
+This is used correlate [partition](#partition-type) objects with filesystem objects.
 
 ### type [string]
 
@@ -553,7 +660,8 @@ The filesystem type of the partition.
 Supported options:
 
 - `ext4`
-- `fat32`
+- `fat32` (alias for `vfat`)
+- `vfat` (will select either FAT12, FAT16, or FAT32 based on the size of the partition)
 - `xfs`
 
 ### mountPoint [[mountPoint](#mountpoint-type)]
@@ -776,7 +884,7 @@ os:
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [fileSystem](#filesystem-type)
+This is used to correlate Partition objects with [filesystem](#filesystem-type)
 objects.
 
 ### label [string]
@@ -832,7 +940,7 @@ Specifies options for the partition.
 Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
-  The partition must have a `fileSystemType` of `fat32`.
+  The partition must have a `fileSystemType` of `fat32` or `vfat`.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -1295,7 +1403,7 @@ Specifies the user's password.
 
 WARNING: Passwords should not be used in images used in production.
 
-### PasswordExpiresDays [int]
+### passwordExpiresDays [int]
 
 The number of days until the password expires and the user can no longer login.
 
@@ -1314,7 +1422,7 @@ os:
 
 ### sshPublicKeyPaths [string[]]
 
-File paths to SSH public key files.
+A list of file paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
 
 Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
@@ -1328,6 +1436,24 @@ os:
   - name: test
     sshPublicKeyPaths:
     - id_ed25519.pub
+```
+
+### sshPublicKeys [string[]]
+
+A list of SSH public keys.
+These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
+
+Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
+individual public keys.
+
+Example:
+
+```yaml
+os:
+  users:
+  - name: test
+    sshPublicKeys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFyWtgGE06d/uBFQm70tYKvJKwJfRDoh06bWQQwC6Qkm test@test-machine
 ```
 
 ### primaryGroup [string]
@@ -1453,6 +1579,6 @@ Supported options:
 
 Contains the options for provisioning disks and their partitions.
 
-### fileSystems [[fileSystem](#filesystem-type)[]]
+### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.

@@ -16,11 +16,11 @@ Documentation is available on Read the Docs: http://recommonmark.readthedocs.org
 
 Name:           python-%{github_name}
 Version:        0.6.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        %{sum}
 License:        MIT
 URL:            https://github.com/%{project_owner}/%{github_name}
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/%{project_owner}/%{github_name}/archive/%{version}/%{github_name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -81,6 +81,10 @@ popd  # Leave buildroot bindir
 %{_bindir}/cm2*-%{python3_version}
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-5
+- Release bump to fix package information.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

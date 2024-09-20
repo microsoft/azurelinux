@@ -14,7 +14,7 @@ import (
 )
 
 func TestCustomizeImageResolvConfDelete(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfDelete")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -51,7 +51,7 @@ func TestCustomizeImageResolvConfDelete(t *testing.T) {
 }
 
 func TestCustomizeImageResolvConfRestoreFile(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfRestoreFile")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -122,7 +122,7 @@ func TestCustomizeImageResolvConfRestoreFile(t *testing.T) {
 }
 
 func TestCustomizeImageResolvConfRestoreSymlink(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfRestoreSymlink")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -185,7 +185,7 @@ func TestCustomizeImageResolvConfRestoreSymlink(t *testing.T) {
 }
 
 func TestCustomizeImageResolvConfNewSymlink(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageResolvConfNewSymlink")
 	buildDir := filepath.Join(testTmpDir, "build")

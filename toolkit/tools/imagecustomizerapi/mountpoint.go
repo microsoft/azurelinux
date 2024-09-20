@@ -5,7 +5,6 @@ package imagecustomizerapi
 
 import (
 	"fmt"
-	"path"
 )
 
 // MountPoint holds the mounting information for each partition.
@@ -25,12 +24,14 @@ func (p *MountPoint) IsValid() error {
 		return fmt.Errorf("invalid idType value:\n%w", err)
 	}
 
-	if p.Path == "" {
-		return fmt.Errorf("invalid path: must not be empty")
+	// Use validatePath to check the Path field.
+	if err := validatePath(p.Path); err != nil {
+		return fmt.Errorf("invalid path:\n%w", err)
 	}
 
-	if !path.IsAbs(p.Path) {
-		return fmt.Errorf("invalid path (%s): must be an absolute path", p.Path)
+	// Use validateMountOptions to check Options.
+	if validateMountOptions(p.Options) {
+		return fmt.Errorf("options (%s) contain spaces, tabs, or newlines and are invalid", p.Options)
 	}
 
 	return nil

@@ -41,17 +41,30 @@ func CurrentEnvironment() []string {
 
 // PermanentlyStopAllChildProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
-// Invoking this will also block future process creation, causing the Execute methods to return an error.
+// Invoking this will also block future process creation, causing the Execute methods to return an error. Be aware that
+// this will block the gpg-agent cleanup mechanism from running, which may cause chroots to not unmount properly. Consider
+// using StopAllChildProcesses instead.
 func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
-	logger.Log.Info("Waiting for outstanding processes to be created")
+	logger.Log.Info("Waiting for outstanding processes to be created before blocking all future processes")
+
+	activeCommandsMutex.Lock()
+	// Disallow future processes from being created
+	allowProcessCreation = false
+	activeCommandsMutex.Unlock()
+
+	StopAllChildProcesses(signal)
+}
+
+// StopAllChildProcesses will stop all currently running processes spawned by this package, but will not block future process creation.
+func StopAllChildProcesses(signal unix.Signal) {
+	// Acquire the global activeCommandsMutex to ensure no
+	// new commands are executed during this teardown routine
+	logger.Log.Info("Waiting for outstanding processes to be created before stopping all child processes")
 
 	activeCommandsMutex.Lock()
 	defer activeCommandsMutex.Unlock()
-
-	// Disallow future processes from being created
-	allowProcessCreation = false
 
 	// For every running process, issue the provided signal to its process group,
 	// resulting in both the process and all of its children being stopped.

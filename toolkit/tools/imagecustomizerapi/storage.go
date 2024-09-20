@@ -10,7 +10,7 @@ import (
 type Storage struct {
 	BootType    BootType     `yaml:"bootType"`
 	Disks       []Disk       `yaml:"disks"`
-	FileSystems []FileSystem `yaml:"fileSystems"`
+	FileSystems []FileSystem `yaml:"filesystems"`
 }
 
 func (s *Storage) IsValid() error {
@@ -28,7 +28,9 @@ func (s *Storage) IsValid() error {
 		return fmt.Errorf("defining multiple disks is not currently supported")
 	}
 
-	for i, disk := range s.Disks {
+	for i := range s.Disks {
+		disk := &s.Disks[i]
+
 		err := disk.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid disk at index %d:\n%w", i, err)
@@ -39,7 +41,7 @@ func (s *Storage) IsValid() error {
 	for i, fileSystem := range s.FileSystems {
 		err = fileSystem.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid fileSystems item at index %d: %w", i, err)
+			return fmt.Errorf("invalid filesystems item at index %d:\n%w", i, err)
 		}
 
 		if _, existingName := fileSystemSet[fileSystem.DeviceId]; existingName {
@@ -73,16 +75,16 @@ func (s *Storage) IsValid() error {
 			if partition.IsESP() {
 				espPartitionExists = true
 
-				if fileSystem.Type != FileSystemTypeFat32 {
-					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
+				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
+					return fmt.Errorf("ESP partition must have 'fat32' or 'vfat' filesystem type")
 				}
 			}
 
 			if partition.IsBiosBoot() {
 				biosBootPartitionExists = true
 
-				if fileSystem.Type != FileSystemTypeFat32 {
-					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
+				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
+					return fmt.Errorf("BIOS boot partition must have 'fat32' or 'vfat' filesystem type")
 				}
 			}
 
