@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.11.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,8 @@ Source3:        rabbitmq-server-hex-cache-%{version}.tar.gz
 # 8. Run `tar -czf rabbitmq-server-hex-cache-<version>.tar.gz cache.erl`
 # --------
 
+Patch0:					CVE-2023-50966.patch
+
 BuildRequires:  erlang
 BuildRequires:  elixir
 BuildRequires:  libxslt
@@ -56,7 +58,7 @@ Requires:       glibc-lang
 rabbitmq-server
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 export LANG="en_US.UTF-8"
@@ -115,6 +117,9 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Fri Sep 20 2024 Archana Choudhary <archana1@microsoft.com> - 3.11.11-3
+- Add patch for CVE-2023-50966
+
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.11.11-2
 - Release bump with no changes to force a rebuild and consume new erlang build
 
