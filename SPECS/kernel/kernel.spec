@@ -173,7 +173,7 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig LLVM=1
 
 # Verify the config files match
 cp .config new_config
@@ -191,17 +191,17 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} LLVM=1
 
 # Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all
+make -C tools/perf PYTHON=%{python3} all LLVM=1
 
 %ifarch x86_64
-make -C tools turbostat cpupower
+make -C tools turbostat cpupower LLVM=1
 %endif
 
 #Compile bpftool
-make -C tools/bpf/bpftool
+make -C tools/bpf/bpftool LLVM=1
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
