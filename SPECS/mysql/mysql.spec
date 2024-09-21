@@ -37,8 +37,8 @@ cmake . \
       -DINSTALL_DOCREADMEDIR=share/doc \
       -DINSTALL_SUPPORTFILESDIR=share/support-files \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_C_FLAGS=-fPIC \
-      -DCMAKE_CXX_FLAGS=-fPIC \
+      -DCMAKE_C_FLAGS="-fPIC -Wno-error=enum-constexpr-conversion" \
+      -DCMAKE_CXX_FLAGS="-fPIC -Wno-error=enum-constexpr-conversion" \
       -DWITH_EMBEDDED_SERVER=OFF \
       -DFORCE_INSOURCE_BUILD=1
 

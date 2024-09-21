@@ -161,8 +161,8 @@ fi
 
 autoreconf -fi
 %configure \
-    CFLAGS="%{optflags} -fPIC" \
-    CXXFLAGS="%{optflags}" \
+    CFLAGS="%{optflags} -fPIC -Wno-error=implicit-function-declaration" \
+    CXXFLAGS="%{optflags} -Wno-error=implicit-function-declaration" \
     --disable-macos-framework \
     --disable-otp \
     --disable-sample \

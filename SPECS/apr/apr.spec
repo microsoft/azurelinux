@@ -31,8 +31,7 @@ It contains the libraries and header files to create applications
 ./configure --prefix=%{_prefix} \
         --includedir=%{_includedir}/apr-%{aprver} \
         --with-installbuilddir=%{_libdir}/apr/build-%{aprver} \
-        --with-devrandom=/dev/urandom \
-        CC=gcc CXX=g++
+        --with-devrandom=/dev/urandom
 
 make %{?_smp_mflags}
 

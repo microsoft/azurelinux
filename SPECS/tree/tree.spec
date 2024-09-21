@@ -16,10 +16,12 @@ Tree is a recursive directory listing command that produces a depth indented lis
 %setup -q
 
 %build
+%if "0%{?use_llvm_clang}" != "0"
+sed -i 's/CC=gcc/CC=clang/g' ./Makefile
+%endif
 make %{?_smp_mflags}
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install BINDIR=%{buildroot}%{_bindir} \
              MANDIR=%{buildroot}%{_mandir}/man1
 

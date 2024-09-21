@@ -56,6 +56,11 @@ This package provides an html manual for mcpp.
 %patch 2 -p1
 
 %build
+%if "0%{?use_llvm_clang}" != "0"
+export CFLAGS="%{optflags} -Wno-error=implicit-function-declaration"
+export CXXFLAGS="%{optflags} -Wno-error=implicit-function-declaration"
+%endif
+
 %configure --enable-mcpplib --disable-static
 %make_build
 mv mcpp-gcc.1 mcpp.1

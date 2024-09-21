@@ -28,10 +28,11 @@ pushd build
 %make_install
 popd
 install -dm 755 %{buildroot}%{_libdir}/ccache
-for n in cc gcc g++ c++ ; do
+for n in gcc g++ c++ ; do
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/$n
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/%{_host}-$n
 done
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/cc
 ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang
 ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang++
 
