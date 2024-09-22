@@ -1,0 +1,24 @@
+{
+    "packages": [
+        "dbus",
+        "e2fsprogs",
+        "iana-etc",
+        "iproute",
+        "systemd",
+        "systemd-networkd",
+        "systemd-resolved",
+        "systemd-udev",
+        "util-linux",
+        "bash",
+        "filesystem",
+        "azurelinux-release",
+        "ncurses-libs",
+        "zlib",
+        "shim",
+        "grub2",
+        "grub2-efi-binary",
+        "dracut-hostonly",
+        "initramfs",
+        "shadow-utils"
+    ]
+}
