@@ -45,7 +45,7 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/minimal-os-packages"
+                "packagelists/minimal-os-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
