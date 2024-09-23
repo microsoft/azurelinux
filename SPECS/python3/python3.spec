@@ -20,6 +20,7 @@ Patch0:         cgi3.patch
 Patch1:         CVE-2024-7592.patch
 Patch2:         CVE-2024-6923.patch
 Patch3:         CVE-2024-6232.patch
+Patch4:         CVE-2024-8088.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -242,7 +243,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %changelog
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4
-- Patch CVE-2024-6232
+- Patch CVE-2024-6232 and CVE-2024-8088
 
 * Wed Aug 28 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.12.3-3
 - Patch CVE-2024-6923
