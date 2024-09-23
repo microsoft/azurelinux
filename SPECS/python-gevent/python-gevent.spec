@@ -1,7 +1,7 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        23.9.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ BuildRequires:  python3-greenlet
 BuildRequires:  python3-zope-interface
 BuildRequires:  python3-zope-event
 BuildRequires:  python3-requests
+BuildRequires:  python3-packaging   >= 24.1
 %endif
 
 %description -n python3-gevent
@@ -63,7 +64,7 @@ Features include:
 
 %check
 # freeze packaging since we already have it available
-pip3 install packaging==23.2 tox tox-current-env 
+pip3 install tox tox-current-env 
 %tox
 
 %files -n python3-gevent -f %{pyproject_files}
@@ -71,6 +72,9 @@ pip3 install packaging==23.2 tox tox-current-env
 %license LICENSE
 
 %changelog
+* Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 2.31.0-3
+- bump package to use latest python3-packaging in ptest
+
 * Mon Jul 01 2024 Nick Samson <nisamson@microsoft.com> - 23.9.1-3
 - Patch to address CVE-2024-24806
 - Migrate tests to use tox
