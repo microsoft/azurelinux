@@ -212,10 +212,13 @@ func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) err
 	return nil
 }
 
-func (b *BootCustomizer) GetDefaultGrubFileContent() string {
-	return b.defaultGrubFileContent
-}
+func (b *BootCustomizer) SetRootDevice(rootDevice string) error {
+	updatedGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DEVICE", rootDevice)
+	if err != nil {
+		return err
+	}
 
-func (b *BootCustomizer) SetDefaultGrubFileContent(content string) {
-	b.defaultGrubFileContent = content
+	b.defaultGrubFileContent = updatedGrubFileContent
+
+	return nil
 }

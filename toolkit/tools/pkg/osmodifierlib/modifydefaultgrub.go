@@ -44,12 +44,10 @@ func modifyDefaultGrub() error {
 	}
 
 	// Stamp root device to /etc/default/grub
-	defaultGrubFileContent, err := imagecustomizerlib.UpdateDefaultGrubFileVariable(bootCustomizer.GetDefaultGrubFileContent(), "GRUB_DEVICE", rootDevice)
+	err = bootCustomizer.SetRootDevice(rootDevice)
 	if err != nil {
 		return err
 	}
-
-	bootCustomizer.SetDefaultGrubFileContent(defaultGrubFileContent)
 
 	err = bootCustomizer.WriteToFile(dummyChroot)
 	if err != nil {
