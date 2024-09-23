@@ -25,6 +25,7 @@ Patch1:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch2:         CVE-2024-0397.patch
 Patch3:         CVE-2024-7592.patch
 Patch4:         CVE-2024-6232.patch
+Patch5:         CVE-2024-8088.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
@@ -322,7 +323,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %changelog
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.9.19-5
-- Patch CVE-2024-6232
+- Patch CVE-2024-6232 and CVE-2024-8088
 
 * Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.9.19-4
 - Patch for CVE-2024-7592
