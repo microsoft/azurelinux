@@ -20,11 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-<<<<<<< HEAD
 Release:        8%{?dist}
-=======
-Release:        7%{?dist}
->>>>>>> cbb0b31dc ([Cherry-pick] Update virt_launcher.cil installation path in virt-handler container (#10493))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -275,12 +271,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-<<<<<<< HEAD
-* Mon Aug 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-8
+* Fri Sep 06 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-8
 - Adding swtpm tools for building kubevirt RPM.
 
-=======
->>>>>>> cbb0b31dc ([Cherry-pick] Update virt_launcher.cil installation path in virt-handler container (#10493))
 * Fri Aug 30 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.2.0-7
 - Update installation path of virt_launcher.cil in virt-handler container.
 
