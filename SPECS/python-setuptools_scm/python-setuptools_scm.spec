@@ -23,7 +23,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 BuildRequires:  cmake
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  git
 BuildRequires:  python3-packaging >= 24.1
 %endif
@@ -62,11 +62,9 @@ It also handles file finders for the supported scm’s.
 %install
 %pyproject_install
 
-%if %{with_check}
 %check
 pip3 install tox tox-current-env
 tox -e py%{python3_version_nodots}
-%endif
 
 %files -n python3-%{srcname}
 %license LICENSE
