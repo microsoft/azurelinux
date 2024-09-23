@@ -47,8 +47,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 12. Update the SELinux mode. [mode](#mode-string)
 
-13. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
-    and update the grub config.
+13. If ([overlays](#overlay-type)) are specified, then add the overlay driver
+    and update the fstab file with the overlay mount information.
 
 14. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
     and update the grub config.
