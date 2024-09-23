@@ -5,7 +5,7 @@
 Name:           cloud-hypervisor-cvm
 Summary:        Cloud Hypervisor CVM is an open source Virtual Machine Monitor (VMM) that enables running SEV SNP enabled VMs on top of MSHV using the IGVM file format as payload.
 Version:        38.0.72.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,14 +15,22 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 %if 0%{?using_vendored_crates}
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
-#   tar -xf %{name}-%{version}.tar.gz
-#   cd %{name}-%{version}
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}
+#   patch -u -p0 < ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
-# rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
-Source1:        %{name}-%{version}-cargo.tar.gz
+#   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
+# rename the tarball to %%{name}-%%{version}-2-cargo.tar.gz when updating version
+# (feel free to drop -2 and this comment on version change)
+Source1:        %{name}-%{version}-2-cargo.tar.gz
 Source2:        config.toml
 %endif
+# Generated using:
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}
+#   cargo update -p openssl-src --precise 300.3.2+3.3.2
+#   diff -u ../cloud-hypervisor-msft-v38.0.72.2.backup/Cargo.lock Cargo.lock > ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
+Patch0:         upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
 
 Conflicts: cloud-hypervisor
 
@@ -77,6 +85,9 @@ tar xf %{SOURCE1}
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
+# The vendored archive has been populated based on the patch, so we need to
+# repatch here as well in order to use the same versions
+%autopatch -p0
 
 %install
 install -d %{buildroot}%{_bindir}
@@ -138,6 +149,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 38.0.72.2-2
+- Patch openssl in the vendored archive to 3.3.2 to address CVE-2024-6119
+
 * Thu Jul 04 2024 Archana Choudhary <archana1@microsoft.com> - 38.0.72.2-1
 - Upgrade to v38.0.72.2
 - Fixes CVE-2023-45853, CVE-2018-25032, CVE-2023-5363, CVE-2023-5678, CVE-2023-6129, CVE-2023-6237, CVE-2024-0727, CVE-2024-4603
