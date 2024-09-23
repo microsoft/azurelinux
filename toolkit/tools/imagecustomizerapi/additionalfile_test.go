@@ -20,7 +20,7 @@ func TestAdditionalFilesIsValidNoDestination(t *testing.T) {
 	err := additionalFiles.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "detination path must not be empty")
+	assert.ErrorContains(t, err, "destination path must not be empty")
 }
 
 func TestAdditionalFilesIsValidNoSourceOrContent(t *testing.T) {

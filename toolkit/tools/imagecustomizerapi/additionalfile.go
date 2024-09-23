@@ -38,7 +38,7 @@ func (l AdditionalFileList) IsValid() (err error) {
 
 func (f *AdditionalFile) IsValid() (err error) {
 	if f.Destination == "" {
-		return fmt.Errorf("detination path must not be empty")
+		return fmt.Errorf("destination path must not be empty")
 	}
 
 	if f.Source == "" && f.Content == nil {
