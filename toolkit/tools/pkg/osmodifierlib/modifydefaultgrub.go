@@ -15,6 +15,7 @@ import (
 var grubArgs = []string{
 	"rd.overlayfs",
 	"roothash",
+	"root",
 	"rd.systemd.verity",
 	"systemd.verity_root_data",
 	"systemd.verity_root_hash",
@@ -26,7 +27,7 @@ var grubArgs = []string{
 func modifyDefaultGrub() error {
 	var dummyChroot safechroot.ChrootInterface = &safechroot.DummyChroot{}
 	// Get verity, selinux, overlayfs, and root device values from /boot/grub2/grub.cfg
-	values, err := extractValuesFromGrubConfig(dummyChroot)
+	values, rootDevice, err := extractValuesFromGrubConfig(dummyChroot)
 	if err != nil {
 		return fmt.Errorf("error getting verity, selinux and overlayfs values from grub.cfg:\n%w", err)
 	}
@@ -36,14 +37,14 @@ func modifyDefaultGrub() error {
 		return err
 	}
 
-	// Stamp root device value to /etc/default/grub
-	err = bootCustomizer.PrepareForVerity()
-	if err != nil {
-		return fmt.Errorf("failed to prepare grub config files for verity:\n%w", err)
-	}
-
 	// Stamp verity, selinux and overlayfs values to /etc/default/grub
 	err = bootCustomizer.UpdateKernelCommandLineArgs("GRUB_CMDLINE_LINUX", grubArgs, values)
+	if err != nil {
+		return err
+	}
+
+	// Stamp root device to /etc/default/grub
+	err = bootCustomizer.SetRootDevice(rootDevice)
 	if err != nil {
 		return err
 	}
@@ -58,34 +59,39 @@ func modifyDefaultGrub() error {
 	return nil
 }
 
-func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]string, error) {
+func extractValuesFromGrubConfig(imageChroot safechroot.ChrootInterface) ([]string, string, error) {
 	grubCfgContent, err := imagecustomizerlib.ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	lines, err := imagecustomizerlib.FindNonRecoveryLinuxLine(grubCfgContent)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if len(lines) != 1 {
-		return nil, fmt.Errorf("expected 1 non-recovery linux line, found %d", len(lines))
+		return nil, "", fmt.Errorf("expected 1 non-recovery linux line, found %d", len(lines))
 	}
 
 	argTokens, err := imagecustomizerlib.ParseCommandLineArgs(lines[0].Tokens)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var values []string
+	var rootDevice string
 	for _, arg := range argTokens {
 		if sliceutils.ContainsValue(grubArgs, arg.Name) {
 			if arg.Value != "" {
-				values = append(values, arg.Name+"="+arg.Value)
+				if arg.Name == "root" {
+					rootDevice = arg.Value
+				} else {
+					values = append(values, arg.Name+"="+arg.Value)
+				}
 			}
 		}
 	}
 
-	return values, nil
+	return values, rootDevice, nil
 }
