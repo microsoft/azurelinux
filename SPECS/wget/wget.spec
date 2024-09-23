@@ -3,7 +3,7 @@
 Summary:        An advanced file and recursive website downloader
 Name:           wget
 Version:        2.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND GFDL-1.3-or-later
 URL:            https://gitlab.com/gnuwget/wget2
 Group:          System Environment/NetworkingPrograms
@@ -157,6 +157,9 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
+* Mon Sep 23 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-5
+- Align fix for SSL read and write error check with upstream.
+
 * Wed Sep 18 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-4
 - Add patch to prevent debug output from printing binary request bodies.
 
