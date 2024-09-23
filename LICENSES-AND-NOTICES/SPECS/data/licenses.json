@@ -1573,6 +1573,7 @@
                 "phodav",
                 "php",
                 "php-pear",
+                "php-pecl-apcu",
                 "php-pecl-zip",
                 "physfs",
                 "picosat",
