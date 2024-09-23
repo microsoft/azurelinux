@@ -32,7 +32,7 @@ func TestAdditionalFilesIsValidNoSourceOrContent(t *testing.T) {
 	err := additionalFiles.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "must specify either 'path' or 'content'")
+	assert.ErrorContains(t, err, "must specify either 'source' or 'content'")
 }
 
 func TestAdditionalFilesIsValidBothSourceAndContent(t *testing.T) {
@@ -46,7 +46,7 @@ func TestAdditionalFilesIsValidBothSourceAndContent(t *testing.T) {
 	err := additionalFiles.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "cannot specify both 'path' and 'content'")
+	assert.ErrorContains(t, err, "cannot specify both 'source' and 'content'")
 }
 
 func TestAdditionalFilesIsValidBadPermissions(t *testing.T) {
