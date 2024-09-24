@@ -271,7 +271,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-* Mon Aug 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-8
+* Fri Sep 06 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-8
 - Adding swtpm tools for building kubevirt RPM.
 
 * Fri Aug 30 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.2.0-7

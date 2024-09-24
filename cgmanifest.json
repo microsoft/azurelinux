@@ -1547,8 +1547,8 @@
         "type": "other",
         "other": {
           "name": "cert-manager",
-          "version": "1.12.12",
-          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.12.tar.gz"
+          "version": "1.12.13",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.13.tar.gz"
         }
       }
     },
@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "24.2",
-          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.2.tar.gz"
+          "version": "24.3",
+          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.3.tar.gz"
         }
       }
     },
@@ -8081,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "keepalived",
-          "version": "2.2.8",
-          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.8.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.3.1.tar.gz"
         }
       }
     },
@@ -13291,6 +13291,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ModemManager",
           "version": "1.18.12",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.12.tar.xz"
@@ -16723,8 +16733,8 @@
         "type": "other",
         "other": {
           "name": "perl-DateTime-TimeZone",
-          "version": "2.39",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.39.tar.gz"
+          "version": "2.40",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.40.tar.gz"
         }
       }
     },
@@ -20795,6 +20805,16 @@
           "name": "php-pear",
           "version": "1.10.13",
           "downloadUrl": "http://download.pear.php.net/package/PEAR-1.10.13.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "php-pecl-apcu",
+          "version": "5.1.23",
+          "downloadUrl": "https://pecl.php.net/get/apcu-5.1.23.tgz"
         }
       }
     },
@@ -25343,8 +25363,8 @@
         "type": "other",
         "other": {
           "name": "rabbitmq-server",
-          "version": "3.13.0",
-          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.13.0/rabbitmq-server-3.13.0.tar.xz"
+          "version": "3.13.7",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.13.7/rabbitmq-server-3.13.7.tar.xz"
         }
       }
     },
@@ -29166,8 +29186,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.39.2",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz"
+          "version": "2.40.2",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.2.tar.xz"
         }
       }
     },
