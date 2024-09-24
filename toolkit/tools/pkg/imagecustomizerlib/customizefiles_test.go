@@ -30,10 +30,15 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	copy_2_filemode := os.FileMode(0o777)
 
 	// Copy a file.
-	err = copyAdditionalFiles(baseConfigPath, map[string]imagecustomizerapi.FileConfigList{
-		"files/a.txt": {
-			{Path: "/copy_1.txt"},
-			{Path: "/copy_2.txt", Permissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(copy_2_filemode))},
+	err = copyAdditionalFiles(baseConfigPath, imagecustomizerapi.AdditionalFileList{
+		{
+			Source:      "files/a.txt",
+			Destination: "/copy_1.txt",
+		},
+		{
+			Source:      "files/a.txt",
+			Destination: "/copy_2.txt",
+			Permissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(copy_2_filemode)),
 		},
 	}, chroot)
 	assert.NoError(t, err)
@@ -51,9 +56,10 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	verifyFileContentsSame(t, a_orig_path, copy_2_path)
 
 	// Copy a different file to the same location.
-	err = copyAdditionalFiles(baseConfigPath, map[string]imagecustomizerapi.FileConfigList{
-		"files/b.txt": {
-			{Path: "/copy_1.txt"},
+	err = copyAdditionalFiles(baseConfigPath, imagecustomizerapi.AdditionalFileList{
+		{
+			Source:      "files/b.txt",
+			Destination: "/copy_1.txt",
 		},
 	}, chroot)
 	assert.NoError(t, err)
@@ -79,6 +85,9 @@ func TestCustomizeImageAdditionalFiles(t *testing.T) {
 		return
 	}
 
+	// Check output file type.
+	checkFileType(t, outImageFilePath, "raw")
+
 	// Connect to customized image.
 	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
 	if !assert.NoError(t, err) {
@@ -93,10 +102,18 @@ func TestCustomizeImageAdditionalFiles(t *testing.T) {
 	helloworld_path := filepath.Join(testDir, "files/helloworld.sh")
 	helloworld_copy_path := filepath.Join(imageConnection.Chroot().RootDir(), "/usr/local/bin/helloworld.sh")
 
+	animals_copy_path := filepath.Join(imageConnection.Chroot().RootDir(), "/animals.txt")
+	alphabet_copy_path := filepath.Join(imageConnection.Chroot().RootDir(), "/alphabet.txt")
+	empty_copy_path := filepath.Join(imageConnection.Chroot().RootDir(), "/empty.txt")
+
 	verifyFileContentsSame(t, a_path, a_copy_path)
 	verifyFileContentsSame(t, helloworld_path, helloworld_copy_path)
+	verifyFileContentsEqual(t, animals_copy_path, "cat\ndog\n")
+	verifyFileContentsEqual(t, alphabet_copy_path, "abcdefghijklmnopqrstuvwxyz")
+	verifyFileContentsEqual(t, empty_copy_path, "")
 
 	verifyFilePermissions(t, os.FileMode(0o755), helloworld_copy_path)
+	verifyFilePermissions(t, os.FileMode(0o644), alphabet_copy_path)
 }
 
 func TestCustomizeImageAdditionalFilesInfiniteFile(t *testing.T) {
@@ -259,6 +276,15 @@ func verifyFileContentsSame(t *testing.T, origPath string, newPath string) {
 	}
 
 	assert.Equalf(t, orignContents, newContents, "file contents differ (%s) from (%s)", newPath, origPath)
+}
+
+func verifyFileContentsEqual(t *testing.T, path string, expected string) {
+	contents, err := os.ReadFile(path)
+	if !assert.NoErrorf(t, err, "read new file (%s)", path) {
+		return
+	}
+
+	assert.Equalf(t, expected, string(contents), "unexpected file contents (%s)", path)
 }
 
 func verifyFilePermissions(t *testing.T, expectedPermissions os.FileMode, path string) {

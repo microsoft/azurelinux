@@ -26,7 +26,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 4. Update hostname. ([hostname](#hostname-string))
 
-5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
+5. Copy additional files. ([additionalFiles](#os-additionalfiles))
   
 6. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
 
@@ -136,16 +136,18 @@ os:
             - [path](#mountpoint-path)
   - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
+    - [additionalFiles](#iso-additionalfiles)
+      - [additionalFile type](#additionalfile-type)
+        - [source](#source-string)
+        - [content](#content-string)
+        - [destination](#destination-string)
         - [permissions](#permissions-string)
-    - [kernelCommandLine](#kernelcommandline-type)
+    - [kernelCommandLine](#iso-kernelcommandline)
       - [extraCommandLine](#extracommandline-string)
   - [os type](#os-type)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
-    - [kernelCommandLine](#kernelcommandline-type)
+    - [kernelCommandLine](#os-kernelcommandline)
       - [extraCommandLine](#extracommandline-string)
     - [packages](#packages-packages)
       - [packages type](#packages-type)
@@ -160,9 +162,11 @@ os:
         - [remove](#remove-string)
         - [updateLists](#updatelists-string)
         - [update](#update-string)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
+    - [additionalFiles](#os-additionalfiles)
+      - [additionalFile type](#additionalfile-type)
+        - [source](#source-string)
+        - [content](#content-string)
+        - [destination](#destination-string)
         - [permissions](#permissions-string)
     - [additionalDirs](#additionaldirs-dirconfig)
       - [dirConfig](#dirconfig-type)
@@ -334,13 +338,17 @@ The partitions to provision on the disk.
 
 Specifies the configuration for the generated ISO media.
 
-### kernelExtraCommandLine [string]
+<div id="iso-kernelcommandline"></div>
 
-- See [extraCommandLine](#extracommandline-string).
+### kernelCommandLine [[kernelCommandLine](#kernelcommandline-type)]
 
-### additionalFiles
+Specifies extra kernel command line options.
 
-- See [additionalFiles](#additionalfiles-mapstring-fileconfig).
+<div id="iso-additionalfiles"></div>
+
+### additionalFiles [[additionalFile](#additionalfile-type)[]>]
+
+Adds files to the ISO.
 
 ## overlay type
 
@@ -542,17 +550,15 @@ os:
     corruptionOption: panic
 ```
 
-## fileConfig type
+## additionalFile type
 
 Specifies options for placing a file in the OS.
 
-Type is used by: [additionalFiles](#additionalfiles-mapstring-fileconfig)
+Type is used by: [additionalFiles](#additionalfiles-additionalfile)
 
-<div id="fileconfig-path"></div>
+### source [string]
 
-### path [string]
-
-The absolute path of the destination file.
+The path of the source file to copy to the destination path.
 
 Example:
 
@@ -561,6 +567,33 @@ os:
   additionalFiles:
     files/a.txt:
     - path: /a.txt
+```
+
+### content [string]
+
+The contents of the file to write to the destination path.
+
+Example:
+
+```yaml
+os:
+  additionalFiles:
+  - content: |
+      abc
+    destination: /a.txt
+```
+
+### destination [string]
+
+The absolute path of the destination file.
+
+Example:
+
+```yaml
+os:
+  additionalFiles:
+  - source: files/a.txt
+    destination: /a.txt
 ```
 
 ### permissions [string]
@@ -576,9 +609,9 @@ Example:
 ```yaml
 os:
   additionalFiles:
-    files/a.txt:
-    - path: /a.txt
-      permissions: "664"
+  - source: files/a.txt
+    destination: /a.txt
+    permissions: "664"
 ```
 
 ## dirConfig type
@@ -1251,45 +1284,32 @@ os:
   hostname: example-image
 ```
 
+<div id="os-kernelcommandline"></div>
+
 ### kernelCommandLine [[kernelCommandLine](#kernelcommandline-type)]
 
-Specifies extra kernel command line options, as well as other configuration values
-relating to the kernel.
+Specifies extra kernel command line options.
 
 ### packages [packages](#packages-type)
 
 Remove, update, and install packages on the system.
 
-### additionalFiles [map\<string, [fileConfig](#fileconfig-type)[]>]
+<div id="os-additionalfiles"></div>
+
+### additionalFiles [[additionalFile](#additionalfile-type)[]>]
 
 Copy files into the OS image.
-
-This property is a dictionary of source file paths to destination files.
-
-The destination files value can be one of:
-
-- The absolute path of a destination file.
-- A [fileConfig](#fileconfig-type) object.
-- A list containing a mixture of paths and [fileConfig](#fileconfig-type) objects.
-
-Example:
 
 ```yaml
 os:
   additionalFiles:
-    # Single destination.
-    files/a.txt: /a.txt
+  - source: files/a.txt
+    destination: /a.txt
 
-    # Single destinations with options.
-    files/b.txt:
-      path: /b.txt
-      permissions: "664"
-
-    # Multiple destinations.
-    files/c.txt:
-    - /c1.txt
-    - path: /c2.txt
-      permissions: "664"
+  - content: |
+      abc
+    destination: /b.txt
+    permissions: "664"
 ```
 
 ### additionalDirs [[dirConfig](#dirconfig-type)[]]
