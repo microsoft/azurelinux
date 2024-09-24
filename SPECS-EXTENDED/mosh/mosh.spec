@@ -16,8 +16,6 @@ BuildRequires:  perl-diagnostics
 BuildRequires:  perl-generators
 BuildRequires:  protobuf-compiler
 BuildRequires:  protobuf-devel
-BuildRequires:  protobuf-static
-BuildRequires:  protobuf-c-devel
 BuildRequires:  zlib-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
