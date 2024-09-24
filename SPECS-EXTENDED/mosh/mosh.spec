@@ -3,7 +3,7 @@ Version:        1.4.0
 Release:        7%{?dist}
 Summary:        Mobile shell that supports roaming and intelligent local echo
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 License:        GPLv3+
 URL:            https://mosh.mit.edu/
