@@ -1,7 +1,9 @@
-%global goroot          %{_libdir}/golang
+%global goroot          %{_libdir}/golang-%{version}
 %global gopath          %{_datadir}/gocode
+%global version_major_minor %(echo %{version} | awk -F. '{print $1"."$2}')
 %global ms_go_filename  go1.22.7-20240925.5.src.tar.gz
 %global ms_go_revision  3
+%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -13,7 +15,7 @@
 %define _use_internal_dependency_generator 0
 %define __find_requires %{nil}
 Summary:        Go
-Name:           golang
+Name:           golang-%{version_major_minor}
 Version:        1.22.7
 Release:        2%{?dist}
 License:        BSD-3-Clause
@@ -33,6 +35,7 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
+Provides:       golang = %{version}-%{release}
 Provides:       msft-golang = %{version}-%{release}
 
 %description
@@ -131,10 +134,17 @@ cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
 EOF
 
 %post -p /sbin/ldconfig
+
+alternatives --install %{_bindir}/go go %{goroot}/bin/go %{go_priority}
+alternatives --install %{_bindir}/gofmt gofmt %{goroot}/bin/gofmt %{go_priority}
+
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ]; then
-  #This is uninstall
+  # This is uninstall
+  alternatives --remove go %{goroot}/bin/go
+  alternatives --remove gofmt %{goroot}/bin/gofmt
+
   rm %{_sysconfdir}/profile.d/go-exports.sh
   rm -rf /opt/go
   exit 0
