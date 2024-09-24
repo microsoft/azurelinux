@@ -63,7 +63,7 @@ export CXXFLAGS="${CXXFLAGS} -std=c++17"
 - AzureLinux move from 2.0 branch to 3.0
 
 * Sun Aug 11 2024 Chris Co <chrco@microsoft.com> - 1.4.0-6
-- Initial CBL-Mariner import from Fedora 40 (license: MIT)
+- Initial Azure Linux import from Fedora 40 (license: MIT)
 - License verified
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-5
