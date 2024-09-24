@@ -66,7 +66,6 @@ func TestConfigIsValidLegacy(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "boot",
-					Type:     "fat32",
 				},
 			},
 		},

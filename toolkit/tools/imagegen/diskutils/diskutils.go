@@ -586,7 +586,11 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		fsType = "fat32"
 	}
 
-	mkpartArgs = append(mkpartArgs, fsType, fmt.Sprintf(sFmt, start))
+	if fsType != "" {
+		mkpartArgs = append(mkpartArgs, fsType)
+	}
+
+	mkpartArgs = append(mkpartArgs, fmt.Sprintf(sFmt, start))
 
 	if end == 0 {
 		mkpartArgs = append(mkpartArgs, fillToEndOption)
