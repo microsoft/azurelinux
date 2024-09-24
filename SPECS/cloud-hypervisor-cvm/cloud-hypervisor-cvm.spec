@@ -150,11 +150,11 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSE-BSD-3-Clause
 
 %changelog
-* Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 38.0.72.2-3
-- Patch openssl in the vendored archive to 3.3.2 to address CVE-2024-6119
-
-* Fri Aug 23 2024 Manuel Huber <mahuber@microsoft.com> - 38.0.72.2-2
+* Mon Sep 23 2024 Manuel Huber <mahuber@microsoft.com> - 38.0.72.2-3
 - Add upstream patch to prevent crash
+
+* Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 38.0.72.2-2
+- Patch openssl in the vendored archive to 3.3.2 to address CVE-2024-6119
 
 * Thu Jul 04 2024 Archana Choudhary <archana1@microsoft.com> - 38.0.72.2-1
 - Upgrade to v38.0.72.2
