@@ -10851,8 +10851,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.5.3",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.3/libseccomp-2.5.3.tar.gz"
+          "version": "2.5.5",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libseccomp-2.5.5.tar.gz"
         }
       }
     },
@@ -13393,8 +13393,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.26",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.26.tar.gz"
+          "version": "1.6.36",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.36.tar.gz"
         }
       }
     },
@@ -13423,8 +13423,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.9",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.9.tar.gz"
+          "version": "1.1.14",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.14.tar.gz"
         }
       }
     },
