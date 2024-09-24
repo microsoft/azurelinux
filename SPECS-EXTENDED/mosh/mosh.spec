@@ -1,6 +1,6 @@
 Name:           mosh
 Version:        1.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Mobile shell that supports roaming and intelligent local echo
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ Mosh is a remote terminal application that supports:
 
 
 %changelog
+- Tue Sep 24 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.4.0-7
+- AzureLinux move from 2.0 branch to 3.0
+
 * Sun Aug 11 2024 Chris Co <chrco@microsoft.com> - 1.4.0-6
 - Initial CBL-Mariner import from Fedora 40 (license: MIT)
 - License verified
