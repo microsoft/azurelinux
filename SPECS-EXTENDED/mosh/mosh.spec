@@ -37,7 +37,7 @@ Mosh is a remote terminal application that supports:
 
 
 %build
-export CXXFLAGS="${CXXFLAGS} -std=c++14"
+export CXXFLAGS="${CXXFLAGS} -std=c++17"
 %configure --disable-silent-rules CC=gcc CXX=g++
 %make_build
 
