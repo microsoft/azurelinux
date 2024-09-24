@@ -922,6 +922,7 @@
                 "mod_security_crs",
                 "mod_wsgi",
                 "mokutil",
+                "mosh",
                 "mpage",
                 "mrtg",
                 "mstflint",
