@@ -37,6 +37,7 @@ Mosh is a remote terminal application that supports:
 
 
 %build
+%cmake -DCMAKE_CXX_STANDARD=14
 %configure --disable-silent-rules CC=gcc CXX=g++
 %make_build
 
