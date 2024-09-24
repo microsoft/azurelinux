@@ -1,6 +1,6 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
-Version:        2.5.3
+Version:        2.5.5
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Tue Sep 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.5-1
+- Auto-upgrade to 2.5.5 - required by runc 1.1.14
+
 * Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.5.3-1
 - Upgrade to version 2.5.3
 - Add gperf as BR
