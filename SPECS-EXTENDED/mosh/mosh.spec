@@ -34,7 +34,7 @@ Mosh is a remote terminal application that supports:
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 
 %build
