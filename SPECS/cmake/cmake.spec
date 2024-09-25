@@ -1,7 +1,7 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.29.6
+Version:        3.30.3
 Release:        1%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -90,6 +90,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Mon Sep 23 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-1
+- Upgrade to 3.30.3 to address CVE-2024-24806
+
 * Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
 - Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
 - Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
