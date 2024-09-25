@@ -17,7 +17,7 @@
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
-Version:        6.6.47.1
+Version:        6.6.51.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -65,11 +65,37 @@ install -vdm 700 %{buildroot}/lib/modules/%{kernelver}
 install -vm 600 vmlinuz-uki.efi %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi
 ln -s /boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/lib/modules/%{kernelver}/vmlinuz-uki.efi
 
+# install to ESP
+install -vdm 700 %{buildroot}/boot/efi/EFI/Linux
+cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
+
 %files
 /boot/vmlinuz-uki-%{kernelver}.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
+/boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Fri Sep 20 2024 Chris Co <chrco@microsoft.com> - 6.6.51.1-2
+- Bump release to match kernel
+
+* Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.51.1-1
+- Auto-upgrade to 6.6.51.1
+
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.47.1-7
+- Install binary to ESP
+
+* Fri Sep 13 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-6
+- Bump release to match kernel
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
+- Bump release to match kernel
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-4
+- Bump release to match kernel
+
+* Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
+- Bump release to match kernel
+
 * Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
 - Remove usrmount from initrd
 

@@ -1,0 +1,115 @@
+From b9d020a7a6ec6a9f63f53c461c84ac88ea32c1d5 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 6 Aug 2024 11:35:33 -0400
+Subject: [PATCH 36/37] fstools: Add additional perms for cloud-utils-growpart.
+
+Missed in previous growpart patch due to testing errors.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.if | 38 +++++++++++++++++++++++++++++++
+ policy/modules/system/fstools.fc  |  2 ++
+ policy/modules/system/fstools.te  | 14 ++++++++++--
+ 3 files changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
+index 6d427e771..25e94729e 100644
+--- a/policy/modules/admin/cloudinit.if
++++ b/policy/modules/admin/cloudinit.if
+@@ -181,6 +181,25 @@ interface(`cloudinit_getattr_state_files',`
+ 	allow $1 cloud_init_state_t:file getattr;
+ ')
+ 
++########################################
++## <summary>
++##	Create, read, write, and delete cloud-init temporary dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_manage_tmp_dirs',`
++	gen_require(`
++		type cloud_init_tmp_t;
++	')
++
++	files_search_tmp($1)
++	manage_dirs_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Write inherited cloud-init temporary files.
+@@ -237,3 +256,22 @@ interface(`cloudinit_create_tmp_files',`
+ 	files_search_tmp($1)
+ 	create_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
+ ')
++
++########################################
++## <summary>
++##	Create, read, write, and delete cloud-init temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_manage_tmp_files',`
++	gen_require(`
++		type cloud_init_tmp_t;
++	')
++
++	files_search_tmp($1)
++	manage_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
++')
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index 63423802d..0fa9fb5c0 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -18,6 +18,7 @@
+ /usr/bin/findfs			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/fsck.*			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/gdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/bin/growpart		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/hdparm			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/install-mbr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/jfs_.*			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -75,6 +76,7 @@
+ /usr/sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fsck.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/gdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/sbin/growpart		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/hdparm		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/install-mbr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/jfs_.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
+index d5e090c28..18a42890c 100644
+--- a/policy/modules/system/fstools.te
++++ b/policy/modules/system/fstools.te
+@@ -201,8 +201,18 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
+-	cloudinit_rw_tmp_files(fsadm_t)
+-	cloudinit_create_tmp_files(fsadm_t)
++	cloudinit_manage_tmp_files(fsadm_t)
++	cloudinit_manage_tmp_dirs(fsadm_t)
++
++	optional_policy(`
++		# cloud-utils-growpart
++		lvm_domtrans(fsadm_t)
++	')
++
++	optional_policy(`
++		# cloud-utils-growpart
++		udev_domtrans(fsadm_t)
++	')
+ ')
+ 
+ optional_policy(`
+-- 
+2.46.0
+

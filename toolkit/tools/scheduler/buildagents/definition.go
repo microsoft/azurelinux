@@ -48,7 +48,8 @@ type BuildAgent interface {
 	// - outArch is the target architecture to build for.
 	// - runCheck is true if the package should run the "%check" section during the build
 	// - dependencies is a list of dependencies that need to be installed before building.
-	BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string) ([]string, string, error)
+	// - allowableRuntime is how long the package build is allowed to run.
+	BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string, allowableRuntime time.Duration) ([]string, string, error)
 
 	// Config returns a copy of the agent's configuration.
 	Config() BuildAgentConfig

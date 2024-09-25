@@ -17,22 +17,27 @@ const (
 	defaultFilePermissions = 0o755
 )
 
-func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap, imageChroot *safechroot.Chroot) error {
-	for sourceFile, fileConfigs := range additionalFiles {
-		absSourceFile := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
-		for _, fileConfig := range fileConfigs {
-			logger.Log.Infof("Copying: %s", fileConfig.Path)
+func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFileList,
+	imageChroot *safechroot.Chroot,
+) error {
+	for _, additionalFile := range additionalFiles {
+		logger.Log.Infof("Copying: %s", additionalFile.Destination)
 
-			fileToCopy := safechroot.FileToCopy{
-				Src:         absSourceFile,
-				Dest:        fileConfig.Path,
-				Permissions: (*fs.FileMode)(fileConfig.Permissions),
-			}
+		absSourceFile := ""
+		if additionalFile.Source != "" {
+			absSourceFile = file.GetAbsPathWithBase(baseConfigPath, additionalFile.Source)
+		}
 
-			err := imageChroot.AddFiles(fileToCopy)
-			if err != nil {
-				return err
-			}
+		fileToCopy := safechroot.FileToCopy{
+			Src:         absSourceFile,
+			Content:     additionalFile.Content,
+			Dest:        additionalFile.Destination,
+			Permissions: (*fs.FileMode)(additionalFile.Permissions),
+		}
+
+		err := imageChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return err
 		}
 	}
 

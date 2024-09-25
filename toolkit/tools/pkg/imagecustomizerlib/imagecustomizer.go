@@ -509,20 +509,25 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	return nil
 }
 
-func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
-	var aggregateErr error
-	for sourceFile := range additionalFiles {
-		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
-		isFile, err := file.IsFile(sourceFileFullPath)
-		if err != nil {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", sourceFile, err))
-		}
+func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFileList) error {
+	errs := []error(nil)
+	for _, additionalFile := range additionalFiles {
+		switch {
+		case additionalFile.Source != "":
+			sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, additionalFile.Source)
+			isFile, err := file.IsFile(sourceFileFullPath)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", additionalFile.Source, err))
+			}
 
-		if !isFile {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s): not a file", sourceFile))
+			if !isFile {
+				errs = append(errs, fmt.Errorf("invalid additionalFiles source file (%s):\nnot a file",
+					additionalFile.Source))
+			}
 		}
 	}
-	return aggregateErr
+
+	return errors.Join(errs...)
 }
 
 func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) error {

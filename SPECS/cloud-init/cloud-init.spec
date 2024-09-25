@@ -145,6 +145,7 @@ make check %{?_smp_mflags}
 * Tue Sep 10 2024 Minghe Ren <mingheren@microsoft.com> - 24.3-1
 - Upgrade cloud-init to 24.3 to add azure proxy agent support
 - Remove unnecessary Binaries-location.patch
+- Update Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch for newer version
 
 * Tue Jul 16 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-2
 - Add patch to point default cloud-init binaries location

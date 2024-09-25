@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.12.12
-Release:        3%{?dist}
+Version:        1.12.13
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,8 +13,6 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2024-25620.patch
-Patch1:         CVE-2024-6104.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -60,8 +58,6 @@ Webhook component providing API validation, mutation and conversion functionalit
 
 %prep
 %setup -q -a 1
-%autopatch -p1
-
 
 %build
 
@@ -107,8 +103,8 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 1.12.12-3
-- Patch for CVE-2024-6104
+* Mon Sep 16 2024 Jiri Appl <jiria@microsoft.com> - 1.12.13-1
+- Upgrade to 1.12.13 which carries helm 3.14.2 to fix CVE-2024-26147 and CVE-2024-25620
 
 * Wed Aug 07 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.12.12-2
 - Patch for CVE-2024-25620
