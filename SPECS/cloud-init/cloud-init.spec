@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        24.3
-Release:        1%{?dist}
+Version:        24.2
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
+Patch1:         Binaries-location.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -132,7 +133,7 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/templates/*
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/05_logging.cfg
-%config(noreplace) %{_libdir}/systemd/system/sshd-keygen@.service.d/disable-sshd-keygen-if-cloud-init-active.conf
+%config(noreplace) %{_sysconfdir}/systemd/system/sshd-keygen@.service.d/disable-sshd-keygen-if-cloud-init-active.conf
 %{_unitdir}/*
 %{_systemdgeneratordir}/cloud-init-generator
 /usr/lib/udev/rules.d/66-azure-ephemeral.rules
@@ -142,11 +143,6 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Tue Sep 10 2024 Minghe Ren <mingheren@microsoft.com> - 24.3-1
-- Upgrade cloud-init to 24.3 to add azure proxy agent support
-- Remove unnecessary Binaries-location.patch
-- Update Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch for newer version
-
 * Tue Jul 16 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-2
 - Add patch to point default cloud-init binaries location
 
