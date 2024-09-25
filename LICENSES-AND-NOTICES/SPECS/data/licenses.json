@@ -2233,6 +2233,7 @@
                 "docker-compose",
                 "doxygen",
                 "dtc",
+                "edk2-hvloader-signed",
                 "elixir",
                 "espeak-ng",
                 "espeakup",

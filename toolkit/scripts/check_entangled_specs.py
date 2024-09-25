@@ -26,6 +26,10 @@ version_release_matching_groups = [
         "SPECS/systemd/systemd.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/edk2-hvloader-signed/edk2-hvloader-signed.spec",
+        "SPECS/edk2/edk2.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
