@@ -86,9 +86,6 @@ tar xf %{SOURCE1}
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
-# The vendored archive has been populated based on the patch, so we need to
-# repatch here as well in order to use the same versions
-%autopatch -p1
 
 %install
 install -d %{buildroot}%{_bindir}
