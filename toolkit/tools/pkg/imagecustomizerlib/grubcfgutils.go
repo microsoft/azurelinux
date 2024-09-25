@@ -581,8 +581,11 @@ func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, er
 		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
 			installutils.CmdlineSELinuxEnforcingArg}
 
-	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
+	case imagecustomizerapi.SELinuxModeEnforcing:
 		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg}
+
+	case imagecustomizerapi.SELinuxModePermissive:
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg, installutils.CmdlineSELinuxPermissiveArg}
 
 	default:
 		return nil, fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
