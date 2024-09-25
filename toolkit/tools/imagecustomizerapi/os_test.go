@@ -110,8 +110,8 @@ func TestOSIsValidInvalidAdditionalDirs(t *testing.T) {
 	os := OS{
 		AdditionalDirs: DirConfigList{
 			{
-				SourcePath:      "",
-				DestinationPath: "/a",
+				Source:      "",
+				Destination: "/a",
 			},
 		},
 	}
@@ -119,7 +119,7 @@ func TestOSIsValidInvalidAdditionalDirs(t *testing.T) {
 	err := os.IsValid()
 	assert.ErrorContains(t, err, "invalid additionalDirs")
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "invalid sourcePath value: empty string")
+	assert.ErrorContains(t, err, "invalid 'source' value: empty string")
 }
 
 func TestOSIsValidInvalidUser(t *testing.T) {
