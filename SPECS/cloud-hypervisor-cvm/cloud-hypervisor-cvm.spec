@@ -25,13 +25,13 @@ Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/
 Source1:        %{name}-%{version}-2-cargo.tar.gz
 Source2:        config.toml
 %endif
-Patch0:         0001-hypervisor-mshv-Fix-panic-when-rejecting-extended-gu.patch
 # Generated using:
 #   tar -xf %%{name}-%%{version}.tar.gz
 #   cd %%{name}-%%{version}
 #   cargo update -p openssl-src --precise 300.3.2+3.3.2
 #   diff -u ../cloud-hypervisor-msft-v38.0.72.2.backup/Cargo.lock Cargo.lock > ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
-Patch1:         upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
+Patch0:         upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
+Patch1:         0001-hypervisor-mshv-Fix-panic-when-rejecting-extended-gu.patch
 
 Conflicts: cloud-hypervisor
 
@@ -80,12 +80,16 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%autosetup -p1 -n cloud-hypervisor-msft-v%{version}
+%setup -n cloud-hypervisor-msft-v%{version}
+%patch 1 -p1
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
+# The vendored archive has been populated based on the patch, so we need to
+# repatch here as well in order to use the same versions
+%patch 0 -p0
 
 %install
 install -d %{buildroot}%{_bindir}
