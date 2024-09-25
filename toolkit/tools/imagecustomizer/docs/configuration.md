@@ -170,8 +170,8 @@ os:
         - [permissions](#permissions-string)
     - [additionalDirs](#additionaldirs-dirconfig)
       - [dirConfig](#dirconfig-type)
-        - [sourcePath](#dirconfig-sourcePath)
-        - [destinationPath](#dirconfig-destinationPath)
+        - [source](#dirconfig-source)
+        - [destination](#dirconfig-destination)
         - [newDirPermissions](#newdirpermissions-string)
         - [mergedDirPermissions](#mergeddirpermissions-string)
         - [childFilePermissions](#childfilepermissions-string)
@@ -620,15 +620,15 @@ Specifies options for placing a directory in the OS.
 
 Type is used by: [additionalDirs](#additionaldirs-dirconfig)
 
-<div id="dirconfig-sourcePath"></div>
+<div id="dirconfig-source"></div>
 
-### sourcePath [string]
+### source [string]
 
 The absolute path to the source directory that will be copied.
 
-<div id="dirconfig-destinationPath"></div>
+<div id="dirconfig-destination"></div>
 
-### destinationPath [string]
+### destination [string]
 
 The absolute path in the target OS that the source directory will be copied to.
 
@@ -637,8 +637,8 @@ Example:
 ```yaml
 os:
   additionalDirs:
-    - sourcePath: "home/files/targetDir"
-      destinationPath: "usr/project/targetDir"
+    - source: "home/files/targetDir"
+      destination: "usr/project/targetDir"
 ```
 
 ### newDirPermissions [string]
@@ -666,8 +666,8 @@ Example:
 ```yaml
 os:
   additionalDirs:
-    - sourcePath: "home/files/targetDir"
-      destinationPath: "usr/project/targetDir"
+    - source: "home/files/targetDir"
+      destination: "usr/project/targetDir"
       newDirPermissions: "644"
       mergedDirPermissions: "777"
       childFilePermissions: "644"
@@ -1324,11 +1324,11 @@ Example:
 os:
   additionalDirs:
     # Copying directory with default permission options.
-    - sourcePath: "path/to/local/directory/"
-      destinationPath: "/path/to/destination/directory/"
+    - source: "path/to/local/directory/"
+      destination: "/path/to/destination/directory/"
     # Copying directory with specific permission options.
-    - sourcePath: "path/to/local/directory/"
-      destinationPath: "/path/to/destination/directory/"
+    - source: "path/to/local/directory/"
+      destination: "/path/to/destination/directory/"
       newDirPermissions: 0644
       mergedDirPermissions: 0777
       childFilePermissions: 0644
