@@ -1,36 +1,19 @@
 Name:		realmd
-Version:	0.16.3
-Release:	25%{?dist}
+Version:	0.17.1
+Release:	1%{?dist}
 Summary:	Kerberos realm enrollment service
 License:	LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://cgit.freedesktop.org/realmd/realmd/
-Source0:	http://www.freedesktop.org/software/realmd/releases/realmd-%{version}.tar.gz
+URL:		https://gitlab.freedesktop.org/realmd/realmd
+Source0:	https://gitlab.freedesktop.org/realmd/realmd/-/archive/0.17.1/realmd-%{version}.tar.gz
 
-Patch1:		0001-LDAP-don-t-close-LDAP-socket-twice.patch
-Patch2:		0001-service-Add-nss-and-pam-sssd.conf-services-after-joi.patch
-Patch3:		0001-Kerberos-fall-back-to-tcp-SRV-lookup.patch
-Patch4:		0001-service-Add-pam-and-nss-services-in-realm_sssd_confi.patch
-Patch5:		0001-switch-to-authselect.patch
-Patch6:		0001-Fix-man-page-reference-in-systemd-service-file.patch
-Patch7:		0001-Use-current-idmap-options-for-smb.conf.patch
-Patch8:		0001-Find-NetBIOS-name-in-keytab-while-leaving.patch
-Patch9:		0001-tests-run-tests-with-python3.patch
-
-Patch10:	0001-Fix-issues-found-by-Coverity.patch
-Patch11:	0002-Change-qualified-names-default-for-IPA.patch
-Patch12:	0003-discover-try-to-get-domain-name-from-hostname.patch
-
-Patch13:	0001-IPA-do-not-call-sssd-enable-logins.patch
-
-Patch14:	0001-Set-NEWEST-flag-when-resolving-packages-with-Package.patch
-
-# Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1675879
-Patch15:	0001-tests-ignore-order-in-test_update_domain.patch
-
-# Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1736578
-Patch16:	0001-Remove-support-for-deprecated-gtester-format.patch
+Patch1:	        0001-service-allow-multiple-names-and-_srv_-ad_server-opt.patch			
+Patch2:		0002-service-fix-error-message-when-removing-host-from-AD.patch
+Patch3:		0003-doc-fix-reference-in-realmd.conf-man-page.patch
+Patch4:		0001-sssd-package-fix.patch
+Patch5:		0001-tools-fix-ccache-handling-for-leave-operation.patch
+Patch6:		0001-ipa-Propagate-hostname-error.patch
 
 BuildRequires:	gcc
 BuildRequires:	perl(File::Find)
@@ -43,6 +26,7 @@ BuildRequires:	openldap-devel
 BuildRequires:	polkit-devel
 BuildRequires:	krb5-devel
 BuildRequires:	systemd-devel
+BuildRequires:  systemd-units
 BuildRequires:	libxslt
 BuildRequires:	xmlto
 BuildRequires:	python3
@@ -82,6 +66,14 @@ make check
 make install DESTDIR=%{buildroot}
 
 %find_lang realmd
+%post
+%systemd_post realmd.service
+
+%preun
+%systemd_preun realmd.service
+
+%postun
+%systemd_postun_with_restart realmd.service
 
 %files -f realmd.lang
 %license COPYING
@@ -89,7 +81,7 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.realmd.conf
 %{_sbindir}/realm
 %dir %{_prefix}/lib/realmd
-%{_prefix}/lib/realmd/realmd
+%{_libexecdir}/realmd
 %{_prefix}/lib/realmd/realmd-defaults.conf
 %{_prefix}/lib/realmd/realmd-distro.conf
 %{_unitdir}/realmd.service
@@ -102,6 +94,9 @@ make install DESTDIR=%{buildroot}
 %doc ChangeLog
 
 %changelog
+* Thu Sept 26 2024 Jyoti kanase <v-jykanase@microsoft.com> - 0.17.1-1
+- Update to version 0.17.1
+
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.3-25
 - License verified.
 
