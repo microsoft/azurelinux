@@ -66,26 +66,34 @@ func (s *Storage) IsValid() error {
 			partitionSet[partition.Id] = partition
 
 			fileSystem, hasFileSystem := fileSystemSet[partition.Id]
-			if !hasFileSystem {
-				return fmt.Errorf("invalid disk at index %d:\npartition (%s) at index %d must have a corresponding filesystem entry",
-					i, partition.Id, j)
-			}
 
 			// Ensure special partitions have the correct filesystem type.
-			if partition.IsESP() {
+			switch partition.Type {
+			case PartitionTypeESP:
 				espPartitionExists = true
 
-				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
-					return fmt.Errorf("ESP partition must have 'fat32' or 'vfat' filesystem type")
+				if !hasFileSystem || (fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat) {
+					return fmt.Errorf("ESP partition (%s) must have 'fat32' or 'vfat' filesystem type", partition.Id)
+				}
+
+			case PartitionTypeBiosGrub:
+				biosBootPartitionExists = true
+
+				if hasFileSystem {
+					if fileSystem.Type != "" {
+						return fmt.Errorf("BIOS boot partition (%s) must not have a filesystem 'type'",
+							partition.Id)
+					}
+
+					if fileSystem.MountPoint != nil {
+						return fmt.Errorf("BIOS boot partition (%s) must not have a 'mountPoint'", partition.Id)
+					}
 				}
 			}
 
-			if partition.IsBiosBoot() {
-				biosBootPartitionExists = true
-
-				if fileSystem.Type != FileSystemTypeFat32 && fileSystem.Type != FileSystemTypeVfat {
-					return fmt.Errorf("BIOS boot partition must have 'fat32' or 'vfat' filesystem type")
-				}
+			// Ensure filesystem entires with a mountPoint also have a filesystem type value.
+			if hasFileSystem && fileSystem.MountPoint != nil && fileSystem.Type == FileSystemTypeNone {
+				return fmt.Errorf("filesystem with 'mountPoint' must have a 'type'")
 			}
 
 			// Count the number of partitions that use each label.

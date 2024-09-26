@@ -42,9 +42,6 @@ storage:
     type: ext4
     mountPoint:
       path: /
-      
-  - deviceId: verityhash
-    type: fat32
 
   - deviceId: var
     type: ext4

@@ -58,14 +58,6 @@ func (p *Partition) GetEnd() (DiskSize, bool) {
 	return 0, false
 }
 
-func (p *Partition) IsESP() bool {
-	return p.Type == PartitionTypeESP
-}
-
-func (p *Partition) IsBiosBoot() bool {
-	return p.Type == PartitionTypeBiosGrub
-}
-
 // isGPTNameValid checks if a GPT partition name is valid.
 func isGPTNameValid(name string) error {
 	// The max partition name length is 36 UTF-16 code units, including a null terminator.
