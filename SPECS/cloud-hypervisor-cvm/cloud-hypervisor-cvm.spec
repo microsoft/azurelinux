@@ -80,8 +80,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%setup -n cloud-hypervisor-msft-v%{version}
-%patch 1 -p1
+%autosetup -n cloud-hypervisor-msft-v%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
@@ -89,7 +88,7 @@ cp %{SOURCE2} .cargo/
 %endif
 # The vendored archive has been populated based on the patch, so we need to
 # repatch here as well in order to use the same versions
-%patch 0 -p0
+%autopatch -p1
 
 %install
 install -d %{buildroot}%{_bindir}
