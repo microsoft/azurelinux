@@ -175,6 +175,7 @@ fi
 
 %changelog
 * Thu Sep 26 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-13
+- Patch CVE-2024-45590 in body-parser module
 
 * Wed Sep 25 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-12
 - Patch CVE-2024-43796 in express module
