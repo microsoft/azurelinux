@@ -46,8 +46,8 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 
 func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
 	for _, dirConfigElement := range additionalDirs {
-		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
-		logger.Log.Infof("Copying %s to %s", absSourceDir, dirConfigElement.DestinationPath)
+		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.Source)
+		logger.Log.Infof("Copying %s to %s", absSourceDir, dirConfigElement.Destination)
 
 		// Setting permissions values. They are set to a default value if they have not been specified.
 		newDirPermissionsValue := fs.FileMode(defaultFilePermissions)
@@ -61,14 +61,14 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 
 		dirToCopy := safechroot.DirToCopy{
 			Src:                  absSourceDir,
-			Dest:                 dirConfigElement.DestinationPath,
+			Dest:                 dirConfigElement.Destination,
 			NewDirPermissions:    newDirPermissionsValue,
 			ChildFilePermissions: childFilePermissionsValue,
 			MergedDirPermissions: (*fs.FileMode)(dirConfigElement.MergedDirPermissions),
 		}
 		err := imageChroot.AddDirs(dirToCopy)
 		if err != nil {
-			return fmt.Errorf("failed to copy directory (%s) to (%s):\n%w", absSourceDir, dirConfigElement.DestinationPath, err)
+			return fmt.Errorf("failed to copy directory (%s) to (%s):\n%w", absSourceDir, dirConfigElement.Destination, err)
 		}
 	}
 	return nil

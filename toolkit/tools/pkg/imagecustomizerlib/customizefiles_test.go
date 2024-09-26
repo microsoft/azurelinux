@@ -148,8 +148,8 @@ func TestCopyAdditionalDirs(t *testing.T) {
 	err = copyAdditionalDirs(baseConfigPath,
 		imagecustomizerapi.DirConfigList{
 			{
-				SourcePath:           "dirs/a",
-				DestinationPath:      "/",
+				Source:               "dirs/a",
+				Destination:          "/",
 				ChildFilePermissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o755)),
 				NewDirPermissions:    ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o750)),
 			},
@@ -172,8 +172,8 @@ func TestCopyAdditionalDirs(t *testing.T) {
 	err = copyAdditionalDirs(baseConfigPath,
 		imagecustomizerapi.DirConfigList{
 			{
-				SourcePath:           "dirs/b",
-				DestinationPath:      "/usr/local",
+				Source:               "dirs/b",
+				Destination:          "/usr/local",
 				ChildFilePermissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o750)),
 				MergedDirPermissions: ptrutils.PtrTo(imagecustomizerapi.FilePermissions(0o755)),
 			},
@@ -249,8 +249,8 @@ func TestCustomizeImageAdditionalDirsInfiniteFile(t *testing.T) {
 		OS: &imagecustomizerapi.OS{
 			AdditionalDirs: []imagecustomizerapi.DirConfig{
 				{
-					SourcePath:      srcDirPath,
-					DestinationPath: "/a",
+					Source:      srcDirPath,
+					Destination: "/a",
 				},
 			},
 		},
