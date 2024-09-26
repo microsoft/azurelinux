@@ -127,7 +127,7 @@ func TestBootCustomizerSELinuxMode30(t *testing.T) {
 	expectedDefaultGrubFileDiff = `5c5
 < GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity "
 ---
-> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity   security=selinux selinux=1 enforcing=1 "
+> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity    security=selinux selinux=1 enforcing=1 "
 `
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 
@@ -141,7 +141,7 @@ func TestBootCustomizerSELinuxMode30(t *testing.T) {
 	expectedDefaultGrubFileDiff = `5c5
 < GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity "
 ---
-> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity     selinux=0 "
+> GRUB_CMDLINE_LINUX="      rd.auto=1 net.ifnames=0 lockdown=integrity      selinux=0 "
 `
 	checkDiffs30(t, b, "", expectedDefaultGrubFileDiff)
 }
