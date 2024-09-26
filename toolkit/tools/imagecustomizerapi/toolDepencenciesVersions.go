@@ -2,6 +2,7 @@ package imagecustomizerapi
 
 import (
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -54,35 +55,40 @@ func getDistroAndVersion() (string, string) {
 		output = []byte("Unknown Distro")
 	}
 	distro := strings.TrimSpace(string(output))
-
 	output, err = exec.Command("lsb_release", "-sr").Output()
 	if err != nil {
 		output = []byte("Unknown Version")
 	}
 	version := strings.TrimSpace(string(output))
-
 	return distro, version
 }
 
 // Function to get the version of a package
 func getPackageVersion(pkg string, versionFlagParameter string) (string, error) {
 	var cmd *exec.Cmd
-	// shell.ExecuteLive()
+	var pkgVersion string
+
+	// If the pkg does not have a parameter, we call the package alone and extract the version from the output
 	if versionFlagParameter == "none" {
-		// logger.Log.Debugf("in none case")
 		cmd = exec.Command(pkg)
 	} else {
-		// logger.Log.Debugf("%s %s", pkg, versionFlagParameter)
 		cmd = exec.Command(pkg, versionFlagParameter)
 	}
 
-	output, _ := cmd.Output()
+	output, _ := cmd.CombinedOutput()
+	outputLines := strings.Split(string(output), "\n")
 
-	return parsePackageVersion(string(output)), nil
-}
+	if versionFlagParameter == "none" {
+		// Regular expression to match various version formats including num.num.num, num.num, and alphanumeric versions
+		re := regexp.MustCompile(`\b\d+(\.\d+){1,3}(-\w+)?\b`)
+		for _, line := range outputLines {
+			if re.MatchString(line) {
+				pkgVersion = line
+			}
+		}
+	} else {
+		pkgVersion = strings.Split(string(output), "\n")[0]
+	}
 
-// Function to parse the version from the output
-func parsePackageVersion(output string) string {
-	lines := strings.Split(output, "\n")
-	return lines[0]
+	return pkgVersion, nil
 }
