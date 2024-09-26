@@ -172,6 +172,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
+	getVersionsOfToolDeps()
+
 	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {

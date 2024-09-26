@@ -14,7 +14,6 @@ type Config struct {
 }
 
 func (c *Config) IsValid() (err error) {
-	getToolDependencenciesVersions()
 
 	hasStorage := false
 	if c.Storage != nil {

@@ -1,4 +1,4 @@
-package imagecustomizerapi
+package imagecustomizerlib
 
 import (
 	"os/exec"
@@ -8,7 +8,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
-func getToolDependencenciesVersions() {
+func getVersionsOfToolDeps() {
 	// Map of version flags with corresponding packages
 	versionFlags := map[string][]string{
 		"--version": {
@@ -68,7 +68,7 @@ func getPackageVersion(pkg string, versionFlagParameter string) (string, error) 
 	var cmd *exec.Cmd
 	var pkgVersion string
 
-	// If the pkg does not have a parameter, we call the package alone and extract the version from the output
+	// If the package does not have a parameter, we call the package alone and extract the version from the output
 	if versionFlagParameter == "none" {
 		cmd = exec.Command(pkg)
 	} else {
@@ -87,6 +87,7 @@ func getPackageVersion(pkg string, versionFlagParameter string) (string, error) 
 			}
 		}
 	} else {
+		// Packages with a version parameter will have the version outputted as the first line
 		pkgVersion = strings.Split(string(output), "\n")[0]
 	}
 
