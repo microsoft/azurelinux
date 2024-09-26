@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -204,7 +204,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{dracutlibdir}
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
-%exclude %{_libdir}/kernel
+%{_libdir}/kernel
 %exclude %{dracutlibdir}/modules.d/20overlayfs
 %{_libdir}/%{name}/%{name}-init.sh
 %{_datadir}/pkgconfig/%{name}.pc
@@ -288,6 +288,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Thu Sep 26 2024 Chris Co <chrco@microsoft.com> - 102-5
+- rebuilt
+
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
 - Drop 0002-disable-xattr.patch
 - Introduce dracut-noxattr subpackage to expose this behavior as an option
