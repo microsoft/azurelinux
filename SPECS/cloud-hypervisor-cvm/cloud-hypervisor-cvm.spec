@@ -80,7 +80,7 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %prep
 
-%autosetup -n cloud-hypervisor-msft-v%{version}
+%setup -n cloud-hypervisor-msft-v%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
 mkdir -p .cargo
