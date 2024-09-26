@@ -405,7 +405,7 @@ os:
       - /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
-      isRootfsOverlay: true
+      isInitrdOverlay: true
       mountDependencies:
       - /var
     - mountPoint: /media
@@ -457,7 +457,7 @@ operations. The workDir is not directly accessible to users.
   
 Example: `/var/overlays/etc/work`
 
-### `isRootfsOverlay` [bool]
+### `isInitrdOverlay` [bool]
 
 A boolean flag indicating whether this overlay is part of the root filesystem.
 If set to `true`, specific adjustments will be made, such as prefixing certain

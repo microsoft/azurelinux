@@ -14,7 +14,7 @@ type Overlay struct {
 	UpperDir          string   `yaml:"upperDir"`
 	WorkDir           string   `yaml:"workDir"`
 	MountPoint        string   `yaml:"mountPoint"`
-	IsRootfsOverlay   bool     `yaml:"isRootfsOverlay"`
+	IsInitrdOverlay   bool     `yaml:"isInitrdOverlay"`
 	MountDependencies []string `yaml:"mountDependencies"`
 	MountOptions      string   `yaml:"mountOptions"`
 }
