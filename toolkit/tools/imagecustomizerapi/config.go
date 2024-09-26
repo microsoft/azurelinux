@@ -14,7 +14,6 @@ type Config struct {
 }
 
 func (c *Config) IsValid() (err error) {
-
 	hasStorage := false
 	if c.Storage != nil {
 		err = c.Storage.IsValid()
