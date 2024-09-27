@@ -18,13 +18,13 @@ mount_dir=/mnt/$(basename $sourceIsoPath)
 
 tftpbootLocalDir="/var/lib/tftpboot"
 httpLocalDir="/etc/httpd/marineros"
-httpPlaceHolder="iso-publish-path"
-httpRoot="http://192.168.0.1/marineros/liveos"
+httpRootPlaceHolder="iso-publish-path"
+httpRoot="192.168.0.1/marineros/liveos"
 isoRelativePath=liveos/
 
 # ---- helper functions ----
 
-function mountIso() {
+function mount_iso() {
     local isoPath=$1
     local mountDir=$2
     sudo rm -rf $mountDir
@@ -32,7 +32,7 @@ function mountIso() {
     sudo mount $isoPath $mountDir
 }
 
-function unmountIso() {
+function unmount_iso() {
     local mountDir=$1    
     sudo umount $mountDir
     sudo rm -r $mountDir
@@ -71,8 +71,11 @@ function deploy_tftp_folder() {
     mkdir -p $tftpbootLocalDir/boot/grub2
     copy_file $artifactsRootDir/boot/grub2/grub-pxe.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
 
-    # todo: use variables instead of hard-coding
-    sed -i 's/iso-publish-path/192.168.0.1\/marineros\/liveos/g' $tftpbootLocalDir/boot/grub2/grub.cfg
+    # replace every '/' with a '\/' to avoid breaking sed search/replace syntax.
+    escapedHttpRoot=${httpRoot//\//\\\/}
+    set -x
+    sed -i "s/$httpRootPlaceHolder/$escapedHttpRoot/g" $tftpbootLocalDir/boot/grub2/grub.cfg
+    set +x
 }
 
 function deploy_http_folder() {
@@ -98,7 +101,7 @@ function clean() {
     clean_http_folder
 }
 
-function listDeployedFiles() {
+function list_deployed_files() {
     sudo find $tftpbootLocalDir -type f
     sudo find $httpLocalDir -type f
 }
@@ -106,13 +109,13 @@ function listDeployedFiles() {
 # ---- main ----
 
 clean
-mountIso $sourceIsoPath $mount_dir
+mount_iso $sourceIsoPath $mount_dir
 deploy $mount_dir
-unmountIso $mount_dir
+unmount_iso $mount_dir
 
 # todo: open only what's necessary
 iptables -P INPUT ACCEPT
 iptables -P OUTPUT ACCEPT
 iptables -P FORWARD ACCEPT
 
-listDeployedFiles
+list_deployed_files
