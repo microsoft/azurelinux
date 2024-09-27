@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,9 @@ URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache2.tar.gz
 Patch0:         CVE-2024-7592.patch
+Patch1:         CVE-2024-6232.patch
+Patch2:         CVE-2024-8088.patch
+Patch3:         CVE-2024-3651.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -71,6 +74,21 @@ pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-l
 patch -p1 < %{PATCH0}
 popd
 
+# Need to patch CVE-2024-6232 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/
+patch -p1 < %{PATCH1}
+popd
+
+# Need to patch CVE-2024-8088 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/
+patch -p1 < %{PATCH2}
+popd  
+
+# Need to patch CVE-2024-3651 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/pip/_vendor/idna
+patch -p1 < %{PATCH3}
+popd
+
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 
@@ -100,6 +118,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
+- Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
+
 * Fri Aug 23 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 2.16.1-6
 - Bump release to build with new python3 to fix CVE-2024-7592
 
