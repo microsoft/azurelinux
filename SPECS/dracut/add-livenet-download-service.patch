@@ -1,4 +1,4 @@
-From ea2d526142ad3d76be87b3d25d56b85824a2b840 Mon Sep 17 00:00:00 2001
+From 66e279fb4de88d47707756918cb4c12babe561d1 Mon Sep 17 00:00:00 2001
 From: George Mileka <gmileka@microsoft.com>
 Date: Fri, 30 Aug 2024 18:17:00 -0700
 Subject: [PATCH] Add a download daemon to the livenet module.
@@ -10,8 +10,8 @@ Subject: [PATCH] Add a download daemon to the livenet module.
  .../liveos-artifacts-download.service         | 11 +++
  .../90livenet/liveos-artifacts-download.sh    | 89 +++++++++++++++++++
  modules.d/90livenet/module-setup.sh           |  2 +
- modules.d/90livenet/parse-livenet.sh          | 17 ++++
- 7 files changed, 125 insertions(+)
+ modules.d/90livenet/parse-livenet.sh          | 21 +++++
+ 7 files changed, 129 insertions(+)
  create mode 100644 modules.d/90livenet/liveos-artifacts-download.service
  create mode 100755 modules.d/90livenet/liveos-artifacts-download.sh
 
@@ -179,7 +179,7 @@ index db0def50..74bacd6c 100755
          inst_script "$moddir/livenet-generator.sh" "$systemdutildir"/system-generators/dracut-livenet-generator
      fi
 diff --git a/modules.d/90livenet/parse-livenet.sh b/modules.d/90livenet/parse-livenet.sh
-index a1d14a8f..7660d695 100755
+index a1d14a8f..b2764ab4 100755
 --- a/modules.d/90livenet/parse-livenet.sh
 +++ b/modules.d/90livenet/parse-livenet.sh
 @@ -2,6 +2,9 @@
@@ -192,7 +192,7 @@ index a1d14a8f..7660d695 100755
  [ -z "$root" ] && root=$(getarg root=)
  . /lib/url-lib.sh
  
-@@ -20,14 +23,28 @@ str_starts "$root" "live:" && liveurl="$root"
+@@ -20,14 +23,32 @@ str_starts "$root" "live:" && liveurl="$root"
  str_starts "$liveurl" "live:" || return
  liveurl="${liveurl#live:}"
  
@@ -208,17 +208,21 @@ index a1d14a8f..7660d695 100755
      # shellcheck disable=SC2034
      rootok=1
 +
++    enableAzureLinuxDownloader=$(getarg rd.live.azldownloader=)
++
 +    echo "---- debug ---- parse-livenet.sh [4] root=($root) ----" > /dev/kmsg
 +    echo "---- debug ---- parse-livenet.sh [5] netroot=($netroot) ----" > /dev/kmsg
-+    echo "---- debug ---- parse-livenet.sh [5] rootok=($rootok) ----" > /dev/kmsg
-+
-+    echo "---- debug ---- parse-livenet.sh [6] scheduling the download service ----" > /dev/kmsg
-+    systemctl enable liveos-artifacts-download
-+    systemctl start liveos-artifacts-download &    
++    echo "---- debug ---- parse-livenet.sh [6] rootok=($rootok) ----" > /dev/kmsg
++    echo "---- debug ---- parse-livenet.sh [7] enableAzureLinuxDownloader=($enableAzureLinuxDownloader) ----" > /dev/kmsg
++    if [[ "$enableAzureLinuxDownloader" == "enable" ]]; then
++        echo "---- debug ---- parse-livenet.sh [8] scheduling the download service ----" > /dev/kmsg
++        systemctl enable liveos-artifacts-download
++        systemctl start liveos-artifacts-download &
++    fi
 +
      wait_for_dev -n /dev/root
  else
-+    echo "---- debug ---- parse-livenet.sh [6] did not find handler ----" > /dev/kmsg
++    echo "---- debug ---- parse-livenet.sh [9] did not find handler ----" > /dev/kmsg
      info "livenet: no url handler for $liveurl"
  fi
 -- 
