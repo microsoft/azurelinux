@@ -73,7 +73,7 @@ License:          GPL-3.0-or-later AND (0BSD OR Apache-2.0 OR MIT) AND (Apache-2
 URL:              https://www.port389.org
 Vendor:           Microsoft Corporation
 Distribution:     Azure Linux
-Source0:          %{name}-%{version}.tar.bz2
+Source0:          https://github.com/389ds/389-ds-base/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 Source2:          %{name}-devel.README
 %if %{with bundle_jemalloc}
 Source3:          https://github.com/jemalloc/%{jemalloc_name}/releases/download/%{jemalloc_ver}/%{jemalloc_name}-%{jemalloc_ver}.tar.bz2
