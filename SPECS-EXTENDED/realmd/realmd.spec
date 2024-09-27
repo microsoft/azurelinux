@@ -76,7 +76,7 @@ make install DESTDIR=%{buildroot}
 %postun
 %systemd_postun_with_restart realmd.service
 
-%files -f realmd.langi
+%files -f realmd.lang
 %license COPYING
 %doc AUTHORS NEWS README
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.realmd.conf
