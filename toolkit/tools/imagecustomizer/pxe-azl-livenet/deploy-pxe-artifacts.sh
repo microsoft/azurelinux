@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -x
+set -x
 set -e
 
 if [ -z "$1" ]; then
@@ -68,7 +68,11 @@ function deploy_tftp_folder() {
     copy_file $artifactsRootDir/boot/initrd.img $tftpbootLocalDir/boot/initrd.img
 
     mkdir -p $tftpbootLocalDir/boot/grub2
-    copy_file $artifactsRootDir/boot/grub2/grub-pxe.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+    if [[ -f $artifactsRootDir/boot/grub2/grub-pxe.cfg ]]; then
+        copy_file $artifactsRootDir/boot/grub2/grub-pxe.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+    else
+        copy_file $artifactsRootDir/boot/grub2/grub.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
+    fi
 
     # replace every '/' with a '\/' to avoid breaking sed search/replace syntax.
     escapedHttpRoot=${httpRoot//\//\\\/}
@@ -121,7 +125,7 @@ if [[ -f "$sourcePath" ]]; then
 
 elif [[ -d "$sourcePath" ]]; then
 
-    sourceIsoPath=${find "$sourcePath" -name "*.iso"}
+    sourceIsoPath=$(find "$sourcePath" -name "*.iso")
     deploy $sourcePath $sourceIsoPath
 fi
 

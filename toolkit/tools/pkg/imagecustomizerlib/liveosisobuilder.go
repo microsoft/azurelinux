@@ -1198,7 +1198,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		return err
 	}
 
-	err = generatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir)
+	err = generatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
 	if err != nil {
 		return err
 	}
@@ -1452,7 +1452,7 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		return fmt.Errorf("failed to create iso image:\n%w", err)
 	}
 
-	err = generatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir)
+	err = generatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
 	if err != nil {
 		return err
 	}
@@ -1460,7 +1460,7 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 	return nil
 }
 
-func generatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArtifactsDir string) error {
+func generatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArtifactsDir string, outputImageBase string) error {
 
 	if outputPXEArtifactsDir == "" {
 		return nil
@@ -1482,12 +1482,18 @@ func generatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArti
 	pxeGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub-pxe.cfg")
 	err = file.Copy(pxeGrubCfg, isoGrubCfg)
 	if err != nil {
-		return fmt.Errorf("failed to update grub.cfg with the grub.cfg with PXE:\n%w", err)
+		return fmt.Errorf("failed to copy (%s) to (%s) while populating the PXE artifacts directory:\n%w", pxeGrubCfg, isoGrubCfg, err)
 	}
 
 	err = os.RemoveAll(pxeGrubCfg)
 	if err != nil {
-		return fmt.Errorf("failed to remove duplicate file (%s):\n%w", pxeGrubCfg, err)
+		return fmt.Errorf("failed to remove file (%s):\n%w", pxeGrubCfg, err)
+	}
+
+	artifactsIsoImagePath := filepath.Join(outputPXEArtifactsDir, outputImageBase+".iso")
+	err = file.Copy(isoImagePath, artifactsIsoImagePath)
+	if err != nil {
+		return fmt.Errorf("failed to copy (%s) while populating the PXE artifacts directory:\n%w", isoImagePath, err)
 	}
 
 	return nil
