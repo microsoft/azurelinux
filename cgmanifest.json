@@ -25513,8 +25513,8 @@
         "type": "other",
         "other": {
           "name": "realmd",
-          "version": "0.16.3",
-          "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
+          "version": "0.17.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/realmd/realmd/-/archive/0.17.1/realmd-0.17.1.tar.gz"
         }
       }
     },
