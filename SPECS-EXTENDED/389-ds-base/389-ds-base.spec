@@ -733,7 +733,8 @@ exit 0
 
 %changelog
 * Fri Sep 20 2024 Muhammad Falak <mwani@microsoft.com> 3.1.0-2
-- Initial Azure Linux Import from Fedora 42 (license: MIT)
+- Initial Azure Linux import from Fedora 42 (license: MIT)
+- License verified
 
 * Tue May 14 2024 James Chapman <jachapma@redhat.com> - 3.1.0-1
 - Bump version to 3.1.0
