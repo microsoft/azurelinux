@@ -1,6 +1,7 @@
 package imagecustomizerlib
 
 import (
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -50,7 +51,7 @@ func logVersionsOfToolDeps() {
 
 // Function to get the distribution and version of the host machine
 func getDistroAndVersion() (string, string) {
-	output, err := exec.Command("cat", "/etc/os-release").Output()
+	output, err := os.ReadFile("/etc/os-release")
 	if err != nil {
 		return "Unknown Distro", "Unknown Version"
 	}
