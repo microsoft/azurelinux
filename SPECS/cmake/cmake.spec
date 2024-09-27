@@ -13,9 +13,8 @@ Source1:        macros.cmake
 Patch0:         0001-manually-recreating-patches.patch
 Patch1:         CVE-2024-6197.patch
 Patch2:         CVE-2024-6874.patch
-Patch3:         CVE-2024-7264.patch
-Patch4:         CVE-2024-8096.patch
-Patch5:         CVE-2024-28182.patch
+Patch3:         CVE-2024-8096.patch
+Patch4:         CVE-2024-28182.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -96,7 +95,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %changelog
 * Thu Sep 26 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-2
-- Fix CVE-2024-6197, CVE-2024-6874, CVE-2024-7264, CVE-2024-8096, and CVE-2024-28182
+- Fix CVE-2024-6197, CVE-2024-6874, CVE-2024-8096, and CVE-2024-28182
 
 * Mon Sep 23 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-1
 - Upgrade to 3.30.3 to address CVE-2024-24806
