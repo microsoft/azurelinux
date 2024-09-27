@@ -11,8 +11,7 @@ fi
 scriptPath=$(realpath ${BASH_SOURCE[0]})
 scriptDir=$(dirname "$scriptPath")
 
-sourceIsoPath=$1
-mount_dir=/mnt/$(basename $sourceIsoPath)
+sourcePath=$1
 
 # ---- constants ----
 
@@ -90,6 +89,7 @@ function deploy_http_folder() {
 
 function deploy() {
     local artifactsRootDir=$1
+    local sourceIsoPath=$2
 
     deploy_http_folder $sourceIsoPath $isoRelativePath $httpLocalDir
     deploy_tftp_folder $artifactsRootDir $tftpbootLocalDir
@@ -109,9 +109,21 @@ function list_deployed_files() {
 # ---- main ----
 
 clean
-mount_iso $sourceIsoPath $mount_dir
-deploy $mount_dir
-unmount_iso $mount_dir
+
+# if sourcePath is a file, we assume it's the path to the iso image.
+if [[ -f "$sourcePath" ]]; then
+    isoMountDir=/mnt/$(basename $sourcePath)
+    sourceIsoPath=$sourcePath
+
+    mount_iso $sourceIsoPath $isoMountDir
+    deploy $isoMountDir $sourceIsoPath
+    # unmount_iso $isoMountDir
+
+elif [[ -d "$sourcePath" ]]; then
+
+    sourceIsoPath=${find "$sourcePath" -name "*.iso"}
+    deploy $sourcePath $sourceIsoPath
+fi
 
 # todo: open only what's necessary
 iptables -P INPUT ACCEPT
