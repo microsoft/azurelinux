@@ -22983,8 +22983,8 @@
         "type": "other",
         "other": {
           "name": "python-ldap",
-          "version": "3.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-ldap/python-ldap-3.4.0.tar.gz"
+          "version": "3.4.4",
+          "downloadUrl": "https://github.com/python-ldap/python-ldap/archive/refs/tags/python-ldap-3.4.4.tar.gz"
         }
       }
     },

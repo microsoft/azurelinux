@@ -1,5 +1,4 @@
 ### Abstract ###
-# global prerelease b4
 %global openldap_version 2.4.45-4
 %global _description\
 python-ldap provides an object-oriented API for working with LDAP within\
@@ -15,7 +14,7 @@ License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://python-ldap.org/
-Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 
 # Test dependencies
 BuildRequires:  %{_bindir}/tox
