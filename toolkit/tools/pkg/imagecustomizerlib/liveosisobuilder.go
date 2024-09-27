@@ -52,11 +52,11 @@ const (
 
 	// location on output iso where some of the input mic configuration will be
 	// saved for future iso-to-iso customizations.
-	savedArgsDir = "azl-customizer-config"
+	savedConfigsDir = "azl-image-customizer"
 	// file holding the iso kernel parameters from the input mic configuration
 	// to be re-appended/merged with newer configures for future iso-to-iso
 	// customizations.
-	savedArgsFileName = "saved-args.yaml"
+	savedConfigsFileName = "saved-configs.yaml"
 
 	dracutConfig = `add_dracutmodules+=" dmsquash-live livenet "
 add_drivers+=" overlay "
@@ -986,7 +986,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	if exists {
 		fileToCopy := safechroot.FileToCopy{
 			Src:  b.artifacts.savedConfigsFilePath,
-			Dest: filepath.Join("/", savedArgsDir, savedArgsFileName),
+			Dest: filepath.Join("/", savedConfigsDir, savedConfigsFileName),
 		}
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
@@ -1145,7 +1145,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 			isomakerBuildDir: isomakerBuildDir,
 		},
 		artifacts: IsoArtifacts{
-			savedConfigsFilePath: filepath.Join(isoArtifactsDir, savedArgsDir, savedArgsFileName),
+			savedConfigsFilePath: filepath.Join(isoArtifactsDir, savedConfigsDir, savedConfigsFileName),
 		},
 	}
 	defer func() {
@@ -1308,7 +1308,7 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 			isomakerBuildDir: isomakerBuildDir,
 		},
 		artifacts: IsoArtifacts{
-			savedConfigsFilePath: filepath.Join(isoArtifactsDir, savedArgsDir, savedArgsFileName),
+			savedConfigsFilePath: filepath.Join(isoArtifactsDir, savedConfigsDir, savedConfigsFileName),
 		},
 	}
 	defer func() {
@@ -1383,7 +1383,7 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 			isoBuilder.artifacts.initrdImagePath = isoFile
 			// initrd.img is passed as a parameter to isomaker.
 			scheduleAdditionalFile = false
-		case savedArgsFileName:
+		case savedConfigsFileName:
 			isoBuilder.artifacts.savedConfigsFilePath = isoFile
 			scheduleAdditionalFile = false
 		}
