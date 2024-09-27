@@ -73,6 +73,7 @@ function deploy_tftp_folder() {
     else
         copy_file $artifactsRootDir/boot/grub2/grub.cfg $tftpbootLocalDir/boot/grub2/grub.cfg
     fi
+    copy_file $artifactsRootDir/boot/grub2/grubenv $tftpbootLocalDir/boot/grub2/grubenv    
 
     # replace every '/' with a '\/' to avoid breaking sed search/replace syntax.
     escapedHttpRoot=${httpRoot//\//\\\/}
