@@ -8,7 +8,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
-func getVersionsOfToolDeps() {
+func logVersionsOfToolDeps() {
 	// Map of version flags with corresponding packages
 	versionFlags := map[string][]string{
 		"--version": {
@@ -25,14 +25,14 @@ func getVersionsOfToolDeps() {
 		"-V": {
 			"mkfs.ext4", "mkfs.xfs", "e2fsck", "xfs_repair", "xfs_admin",
 		},
-		"none": {
+		"": {
 			"mkfs.vfat", "resize2fs", "tune2fs",
 		},
 	}
 
 	// Get distro and version
 	distro, version := getDistroAndVersion()
-	logger.Log.Debugf("Distro: %s, Version: %s\n", distro, version)
+	logger.Log.Debugf("Distro: %s, Version: %s", distro, version)
 
 	// Get versions of packages
 	logger.Log.Debugf("Tool Dependencies:")
@@ -40,7 +40,7 @@ func getVersionsOfToolDeps() {
 		for _, pkg := range pkgList {
 			version, err := getPackageVersion(pkg, versionFlag)
 			if err != nil {
-				logger.Log.Debugf("%s: not installed or error retrieving version\n", pkg)
+				logger.Log.Debugf("%s: not installed or error retrieving version", pkg)
 			} else {
 				logger.Log.Debugf("%s: %s", pkg, version)
 			}
@@ -48,18 +48,25 @@ func getVersionsOfToolDeps() {
 	}
 }
 
-// Function to get the distribution and version of host machine
+// Function to get the distribution and version of the host machine
 func getDistroAndVersion() (string, string) {
-	output, err := exec.Command("lsb_release", "-si").Output()
+	output, err := exec.Command("cat", "/etc/os-release").Output()
 	if err != nil {
-		output = []byte("Unknown Distro")
+		return "Unknown Distro", "Unknown Version"
 	}
-	distro := strings.TrimSpace(string(output))
-	output, err = exec.Command("lsb_release", "-sr").Output()
-	if err != nil {
-		output = []byte("Unknown Version")
+
+	lines := strings.Split(string(output), "\n")
+	distro := "Unknown Distro"
+	version := "Unknown Version"
+
+	for _, line := range lines {
+		if strings.HasPrefix(line, "NAME=") {
+			distro = strings.Trim(strings.TrimPrefix(line, "NAME="), "\"")
+		} else if strings.HasPrefix(line, "VERSION=") {
+			version = strings.Trim(strings.TrimPrefix(line, "VERSION="), "\"")
+		}
 	}
-	version := strings.TrimSpace(string(output))
+
 	return distro, version
 }
 
@@ -68,17 +75,12 @@ func getPackageVersion(pkg string, versionFlagParameter string) (string, error) 
 	var cmd *exec.Cmd
 	var pkgVersion string
 
-	// If the package does not have a parameter, we call the package alone and extract the version from the output
-	if versionFlagParameter == "none" {
-		cmd = exec.Command(pkg)
-	} else {
-		cmd = exec.Command(pkg, versionFlagParameter)
-	}
-
+	cmd = exec.Command(pkg, versionFlagParameter)
 	output, _ := cmd.CombinedOutput()
 	outputLines := strings.Split(string(output), "\n")
 
-	if versionFlagParameter == "none" {
+	// If the package does not have a version parameter, we need extract the version from the full output
+	if versionFlagParameter == "" {
 		// Regular expression to match various version formats including num.num.num, num.num, and alphanumeric versions
 		re := regexp.MustCompile(`\b\d+(\.\d+){1,3}(-\w+)?\b`)
 		for _, line := range outputLines {
