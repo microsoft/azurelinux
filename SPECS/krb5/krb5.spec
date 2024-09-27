@@ -5,7 +5,7 @@ Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Epoch:          1
 Version:        1.19.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Patch1:         CVE-2024-26461.patch
 Patch2:         CVE-2024-37370.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
+BuildRequires:  openldap-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{epoch}:%{version}-%{release}
@@ -59,6 +60,7 @@ autoconf &&
     --localstatedir=%{_sharedstatedir} \
     --with-system-et         \
     --with-system-ss         \
+    --with-ldap              \
     --with-system-verto=no   \
     --enable-dns-for-realm   \
     --enable-pkinit          \
@@ -130,6 +132,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Sep 27 2024 Andy Zaugg <azaugg@linkedin.com> - 1:1.19.3-4
+- Compile with ldap module backend
+
 * Thu Sep 12 2024 Adit Jha <aditjha@microsoft.com> - 1:1.19.4-3
 - Revert to 1.19.4, add epoch and add patch for CVE-2024-37371 and CVE-2024-37370
 
