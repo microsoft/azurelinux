@@ -1,24 +1,22 @@
-Summary:	GPG keys of various Linux distributions
-Name:		distribution-gpg-keys
-Version:	1.104
-Release:	1%{?dist}
-License:	CC0
-URL:		https://github.com/rpm-software-management/distribution-gpg-keys
-# Sources can be obtained by
-# git clone git://github.com/rpm-software-management/distribution-gpg-keys.git
-# cd distribution-gpg-keys
-# tito build --tgz
-Source0:	https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-BuildArch:	noarch
+Summary:	  GPG keys of various Linux distributions
+Name:		  distribution-gpg-keys
+Version:	  1.105
+Release:	  1%{?dist}
+Vendor:       Microsoft Corporation
+Distribution: Azure Linux
+License:	  CC0
+URL:		  https://github.com/rpm-software-management/distribution-gpg-keys
+Source0:	  https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+BuildArch:	  noarch
 
 %description
 GPG keys used by various Linux distributions to sign packages.
 
 %package copr
-Summary:    GPG keys for Copr projects
-BuildArch:  noarch
+Summary:      GPG keys for Copr projects
+BuildArch:    noarch
 
-%description copr
+%description  copr
 GPG keys used by Copr projects.
 
 %prep
@@ -45,6 +43,9 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/copr
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.105-1
+- Upgrade to 1.105.
+
 * Fri Aug 02 2024 Devin Anderson <danderson@microsoft.com> - 1.104-1
 - Update to 1.104, a more recent version that includes the Azure Linux keys.
 - Use the official repository URI to download sources.

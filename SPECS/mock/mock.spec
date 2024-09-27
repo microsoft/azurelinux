@@ -1,77 +1,165 @@
-# mock group id allocate (Must not overlap with any other gid in Mariner)
+%bcond_with lint
+%bcond_without tests
+
+# mock group id allocate for Fedora
 %global mockgid 135
+
 %global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
 
-Summary:        Builds packages inside chroots
-Name:           mock
-Version:        2.16
-Release:        2%{?dist}
-License:        GPLv2+
-# Source is created by
-# git clone https://github.com/rpm-software-management/mock.git
-# cd mock
-# git reset --hard %%{name}-%%{version}
-# tito build --tgz
-URL:            https://github.com/rpm-software-management/mock/
-Source:         https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  bash-completion
-BuildRequires:  perl
-BuildRequires:  python3-devel
-Requires:       %{name}-filesystem
-Requires:       coreutils
-Requires:       createrepo_c
-Requires:       dnf
-Requires:       dnf-plugins-core
-Requires:       mock-configs
-Requires:       pigz
-Requires:       procps-ng
-Requires:       python3-distro
-Requires:       python3-jinja2
-Requires:       python3-pyroute2
-Requires:       python3-requests
-Requires:       python3-rpm
-Requires:       python3-templated-dictionary
-Requires:       systemd
-Requires:       tar
-Requires:       usermode
-# hwinfo plugin
-Requires:       util-linux
-BuildArch:      noarch
-%if 0%{?with_check}
-BuildRequires:  python3-distro
-BuildRequires:  python3-jinja2
-BuildRequires:  python3-pip
-BuildRequires:  python3-pyroute2
-BuildRequires:  python3-requests
-BuildRequires:  python3-templated-dictionary
+Summary:       Builds packages inside chroots
+Name:          mock
+Version:       5.6
+Release:       1%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+License:       GPL-2.0-or-later
+Source:        https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+URL:           https://github.com/rpm-software-management/mock/
+BuildArch:     noarch
+Requires:      tar
+Requires:      pigz
+%if 0%{?mageia}
+Requires:      usermode-consoleonly
+%else
+Requires:      usermode
 %endif
+Requires:      createrepo_c
+
+# We know that the current version of mock isn't compatible with older variants,
+# and we want to enforce automatic upgrades.
+Conflicts:     mock-core-configs < 33
+
+# Requires 'mock-core-configs', or replacement
+Requires:      mock-configs
+Requires:      %{name}-filesystem = %{version}-%{release}
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
+# This is still preferred package providing 'mock-configs'
+Suggests:      mock-core-configs
+%endif
+
+Requires:      systemd
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
+Requires:      systemd-container
+%endif
+Requires:      coreutils
+%if 0%{?fedora}
+Suggests:      iproute
+%endif
+%if 0%{?mageia}
+Suggests:      iproute2
+%endif
+BuildRequires: bash-completion
+Requires:      python%{python3_pkgversion}-distro
+Requires:      python%{python3_pkgversion}-jinja2
+Requires:      python%{python3_pkgversion}-requests
+Requires:      python%{python3_pkgversion}-rpm
+Requires:      python%{python3_pkgversion}-pyroute2
+Requires:      python%{python3_pkgversion}-templated-dictionary
+Requires:      python%{python3_pkgversion}-backoff
+BuildRequires: python%{python3_pkgversion}-backoff
+BuildRequires: python%{python3_pkgversion}-devel
+%if %{with lint}
+BuildRequires: python%{python3_pkgversion}-pylint
+%endif
+BuildRequires: python%{python3_pkgversion}-rpm
+BuildRequires: python%{python3_pkgversion}-rpmautospec-core
+
+%if 0%{?fedora} >= 38
+# DNF5 stack
+Recommends:    dnf5
+Recommends:    dnf5-plugins
+%endif
+
+# DNF4 stack
+Recommends:    python3-dnf
+Recommends:    python3-dnf-plugins-core
+
+# YUM stack, dnf-utils replace yum-utils
+Recommends:    yum
+Recommends:    dnf-utils
+
+Recommends:    btrfs-progs
+Suggests:      qemu-user-static
+Suggests:      procenv
+Recommends:    podman
+
+%if %{with tests}
+BuildRequires: python%{python3_pkgversion}-distro
+BuildRequires: python%{python3_pkgversion}-jinja2
+BuildRequires: python%{python3_pkgversion}-pyroute2
+BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python%{python3_pkgversion}-requests
+BuildRequires: python%{python3_pkgversion}-templated-dictionary
+%endif
+
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
+BuildRequires: perl-interpreter
+%else
+BuildRequires: perl
+%endif
+# hwinfo plugin
+Requires:      util-linux
+Requires:      coreutils
+Requires:      procps-ng
+Requires:      shadow-utils
+
 
 %description
 Mock takes an SRPM and builds it in a chroot.
 
+%package scm
+Summary: Mock SCM integration module
+Requires:      %{name} = %{version}-%{release}
+%if ! 0%{?azl}
+Recommends:    cvs
+%endif
+Recommends:    git
+Recommends:    subversion
+Recommends:    tar
+
+%if ! 0%{?azl}
+# We could migrate to 'copr-distgit-client'
+Recommends:    rpkg
+%endif
+
+%description scm
+Mock SCM integration module.
+
 %package lvm
 Summary: LVM plugin for mock
-Requires: %{name} = %{version}-%{release}
-Requires: lvm2
+Requires:      %{name} = %{version}-%{release}
+Requires:      lvm2
 
 %description lvm
 Mock plugin that enables using LVM as a backend and support creating snapshots
 of the buildroot.
 
+%package rpmautospec
+Summary:       Rpmautospec plugin for mock
+Requires:      %{name} = %{version}-%{release}
+# This lets mock determine if a spec file needs to be processed with rpmautospec.
+Requires:      python%{python3_pkgversion}-rpmautospec-core
+
+%description rpmautospec
+Mock plugin that preprocesses spec files using rpmautospec.
+
 %package filesystem
-Summary:  Mock filesystem layout
-Requires(pre):  shadow-utils
+Summary:       Mock filesystem layout
+Requires(pre): shadow-utils
 
 %description filesystem
 Filesystem layout and group for Mock.
 
 %prep
-%setup -q -n mock-%{name}-%{version}-1/mock
+%setup -q -n mock-%{name}-%{version}-1/%{name}
+for file in py/mock.py py/mock-parse-buildlog.py; do
+  sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
+done
 
 %build
-for i in py/mock.py py/mock-parse-buildlog.py; do
-    perl -p -i -e 's|^__VERSION__\s*=.*|__VERSION__="%{version}"|' $i
+for i in py/mockbuild/constants.py py/mock-parse-buildlog.py; do
+    perl -p -i -e 's|^VERSION\s*=.*|VERSION="%{version}"|' $i
     perl -p -i -e 's|^SYSCONFDIR\s*=.*|SYSCONFDIR="%{_sysconfdir}"|' $i
     perl -p -i -e 's|^PYTHONDIR\s*=.*|PYTHONDIR="%{python_sitelib}"|' $i
     perl -p -i -e 's|^PKGPYTHONDIR\s*=.*|PKGPYTHONDIR="%{python_sitelib}/mockbuild"|' $i
@@ -79,6 +167,10 @@ done
 for i in docs/mock.1 docs/mock-parse-buildlog.1; do
     perl -p -i -e 's|\@VERSION\@|%{version}"|' $i
 done
+
+%if ! 0%{?azl}
+./precompile-bash-completion "mock.complete"
+%endif
 
 %install
 #base filesystem
@@ -104,6 +196,9 @@ cp -a etc/consolehelper/mock %{buildroot}%{_sysconfdir}/security/console.apps/%{
 
 install -d %{buildroot}%{_datadir}/bash-completion/completions/
 cp -a etc/bash_completion.d/* %{buildroot}%{_datadir}/bash-completion/completions/
+%if ! 0%{?azl}
+cp -a mock.complete %{buildroot}%{_datadir}/bash-completion/completions/mock
+%endif
 ln -s mock %{buildroot}%{_datadir}/bash-completion/completions/mock-parse-buildlog
 
 install -d %{buildroot}%{_sysconfdir}/pki/mock
@@ -132,8 +227,14 @@ getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
 exit 0
 
 %check
-%{__python3} -m pip install pytest==7.1.2 pytest-cov==3.0.0
-./run-tests.sh
+%if %{with lint}
+# ignore the errors for now, just print them and hopefully somebody will fix it one day
+pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
+%endif
+
+%if %{with tests}
+./run-tests.sh --no-cov
+%endif
 
 
 %files
@@ -172,13 +273,21 @@ exit 0
 %{_datadir}/cheat/mock
 
 # cache & build dirs
-%defattr(0775, root, mock, 02775)
+%defattr(0775, root, mock, 0775)
 %dir %{_localstatedir}/cache/mock
 %dir %{_localstatedir}/lib/mock
+
+%files scm
+%{python_sitelib}/mockbuild/scm.py*
+%{python3_sitelib}/mockbuild/__pycache__/scm.*.py*
 
 %files lvm
 %{python_sitelib}/mockbuild/plugins/lvm_root.*
 %{python3_sitelib}/mockbuild/plugins/__pycache__/lvm_root.*.py*
+
+%files rpmautospec
+%{python_sitelib}/mockbuild/plugins/rpmautospec.*
+%{python3_sitelib}/mockbuild/plugins/__pycache__/rpmautospec.*.py*
 
 %files filesystem
 %license COPYING
@@ -189,6 +298,9 @@ exit 0
 %dir  %{_datadir}/cheat
 
 %changelog
+* Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 5.6-1
+- Sync with Fedora 41 version of spec.
+
 * Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 2.16-2
 - Add BR on `python3-pip` & drop un-needed deps to enable ptest
 
