@@ -4,6 +4,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "389-ds-base",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/389ds/389-ds-base/releases/download/389-ds-base-3.1.1/389-ds-base-3.1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "a52dec",
           "version": "0.7.4",
           "downloadUrl": "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
@@ -13291,16 +13301,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mosh",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ModemManager",
           "version": "1.18.12",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.12.tar.xz"
@@ -13314,6 +13314,16 @@
           "name": "mokutil",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/lcp/mokutil/archive/0.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
         }
       }
     },
