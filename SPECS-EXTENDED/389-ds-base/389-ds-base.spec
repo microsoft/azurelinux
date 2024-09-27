@@ -71,6 +71,7 @@ Version:          3.1.1
 Release:          2%{?dist}
 License:          GPL-3.0-or-later AND (0BSD OR Apache-2.0 OR MIT) AND (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND (Apache-2.0 OR BSL-1.0) AND (Apache-2.0 OR MIT OR Zlib) AND (Apache-2.0 OR MIT) AND (CC-BY-4.0 AND MIT) AND (MIT OR Apache-2.0) AND Unicode-DFS-2016 AND (MIT OR CC0-1.0) AND (MIT OR Unlicense) AND 0BSD AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MIT AND ISC AND MPL-2.0 AND PSF-2.0
 URL:              https://www.port389.org
+Vendor:           Microsoft Corporation
 Distribution:     Azure Linux
 Source0:          %{name}-%{version}.tar.bz2
 Source2:          %{name}-devel.README
@@ -732,7 +733,7 @@ exit 0
 
 %changelog
 * Fri Sep 20 2024 Muhammad Falak <mwani@microsoft.com> 3.1.0-2
-- Initial AzureLinux Import from Fedora 42 (license: MIT)
+- Initial Azure Linux Import from Fedora 42 (license: MIT)
 
 * Tue May 14 2024 James Chapman <jachapma@redhat.com> - 3.1.0-1
 - Bump version to 3.1.0
