@@ -35,6 +35,7 @@ BuildRequires:  e2fsprogs-devel
 Requires:	authselect
 Requires:	polkit
 
+
 %description
 realmd is a DBus system service which manages discovery and enrollment in realms
 and domains like Active Directory or IPA. The control center uses realmd as the
@@ -75,7 +76,7 @@ make install DESTDIR=%{buildroot}
 %postun
 %systemd_postun_with_restart realmd.service
 
-%files -f realmd.lang
+%files -f realmd.langi
 %license COPYING
 %doc AUTHORS NEWS README
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.realmd.conf
