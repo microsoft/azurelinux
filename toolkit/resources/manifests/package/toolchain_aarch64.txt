@@ -49,7 +49,7 @@ check-debuginfo-0.15.2-1.azl3.aarch64.rpm
 chkconfig-1.25-1.azl3.aarch64.rpm
 chkconfig-debuginfo-1.25-1.azl3.aarch64.rpm
 chkconfig-lang-1.25-1.azl3.aarch64.rpm
-cmake-3.30.3-1.azl3.aarch64.rpm
+cmake-3.30.3-2.azl3.aarch64.rpm
 cmake-debuginfo-3.30.3-1.azl3.aarch64.rpm
 coreutils-9.4-6.azl3.aarch64.rpm
 coreutils-debuginfo-9.4-6.azl3.aarch64.rpm
