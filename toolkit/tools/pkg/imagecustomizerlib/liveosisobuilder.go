@@ -30,10 +30,10 @@ const (
 	grubx64Binary         = "grubx64.efi"
 	grubx64NoPrefixBinary = "grubx64-noprefix.efi"
 
-	isoGrubCfg    = "grub.cfg"
-	pxeGrubCfg    = "grub-pxe.cfg"
-	pxeGrubCfgDir = "/boot/grub2"
-	pxeKernelsArgs= " ip=dhcp rd.live.azldownloader=enable "
+	isoGrubCfg     = "grub.cfg"
+	pxeGrubCfg     = "grub-pxe.cfg"
+	pxeGrubCfgDir  = "/boot/grub2"
+	pxeKernelsArgs = " ip=dhcp rd.live.azldownloader=enable "
 
 	searchCommandTemplate   = "search --label %s --set root"
 	rootValueLiveOSTemplate = "live:LABEL=%s"
@@ -457,15 +457,17 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 //     containing the full file name or just the folder. If it is only the
 //     folder, the function will append the outputImageBase.iso to it.
 //     For example:
-//     - http://192.168.0.1/liveos/my-iso.Iso
-//     - http://192.168.0.1/liveos
+//   - http://192.168.0.1/liveos/my-iso.Iso
+//   - http://192.168.0.1/liveos
 //   - outputImageBase:
 //     the generated iso name. This value will be used only if the pxeIsoImageUrl
 //     parameter does not specify a full iso name.
 //   - pxeGrubCfgFileName:
 //     path of file to hold the PXE grub configuration.
+//
 // returns:
 //   - error: nil if successful, otherwise an error object.
+//
 // generates:
 //   - grub configuration file for PXE booting.
 func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, outputImageBase string, pxeGrubCfgFileName string) error {
@@ -479,7 +481,7 @@ func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, output
 	// If the specified URL is not a full path to an iso, append the generated
 	// iso file name to it.
 	if filepath.Ext(pxeIsoImageUrl) != ".iso" {
-		pxeIsoImageUrl = string.TrimSuffix(pxeIsoImageUrl, "/") + "/" + outputImageBase+".iso"
+		pxeIsoImageUrl = strings.TrimSuffix(pxeIsoImageUrl, "/") + "/" + outputImageBase + ".iso"
 	}
 	rootValue := fmt.Sprintf(rootValuePxeTemplate, pxeIsoImageUrl)
 	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
