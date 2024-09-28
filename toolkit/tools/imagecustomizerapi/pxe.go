@@ -25,7 +25,7 @@ func (i *Pxe) IsValid() error {
 			}
 		}
 		if !protocolFound {
-			return fmt.Errorf("invalid iso image URL prefix in (%s). One of (%v) is expected.", i.IsoImageUrl, PxeIsoDownloadProtocols)
+			return fmt.Errorf("unsupported iso image URL protocol in (%s). One of (%v) is expected.", i.IsoImageUrl, PxeIsoDownloadProtocols)
 		}
 	}
 	return nil

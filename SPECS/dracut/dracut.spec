@@ -289,7 +289,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
-* Fri Aug 30 2024 George Mileka <gmileka@microsoft.com> - 102-5
+* Fri Sept 30 2024 George Mileka <gmileka@microsoft.com> - 102-5
 - Augment livenet module with a download daemon.
 
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
