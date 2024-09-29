@@ -243,7 +243,7 @@ check_config()
 		case "$config_opt" in
 		\#* | "")
 			;;
-		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes)
+		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes|disable_crash_dump_reboot)
 			# remove inline comments after the end of a directive.
 			[ -z "$config_val" ] && {
 				echo "Invalid kdump config value for option $config_opt."
@@ -1249,6 +1249,23 @@ main ()
 	  start)
 		if [ -s /proc/vmcore ]; then
 			save_core
+
+			local _disable_crash_dump_reboot disable_crash_dump_reboot="0"
+			_disable_crash_dump_reboot=`grep ^disable_crash_dump_reboot $KDUMP_CONFIG_FILE 2>/dev/null`
+
+			if [ $? -eq 0 ]; then
+				disable_crash_dump_reboot=`echo $_disable_crash_dump_reboot | cut -d' '  -f2`
+
+				if [ "$disable_crash_dump_reboot" != "0" ] && [ "$disable_crash_dump_reboot" != "1" ]; then
+					echo "Error: disable_crash_dump_reboot value is invalid"
+					return 1
+				fi
+			fi
+
+			if [ "$disable_crash_dump_reboot" == "1" ]; then
+				exit 0
+			fi
+
 			reboot
 		else
 			start
