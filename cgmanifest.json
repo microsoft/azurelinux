@@ -29275,6 +29275,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "valkey",
+          "version": "8.0.0",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "varnish",
           "version": "6.4.0",
           "downloadUrl": "http://varnish-cache.org/_downloads/varnish-6.4.0.tgz"
