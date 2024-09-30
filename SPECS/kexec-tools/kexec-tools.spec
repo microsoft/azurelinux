@@ -330,6 +330,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Mon Mar 31 2026 Nicholas Angelastro <nangelastro@microsoft.com> - 2.0.27-9
+- Support saving crash dumps on systems hosted in RAM
+
 * Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 2.0.27-8
 - Updated dependency handling for kexec-tools:
   Changed from hard dependency on a single package.
