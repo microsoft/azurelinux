@@ -456,9 +456,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 //     url to the iso image to download at boot time. This can be a url
 //     containing the full file name or just the folder. If it is only the
 //     folder, the function will append the outputImageBase.iso to it.
-//     For example:
-//   - http://192.168.0.1/liveos/my-iso.Iso
-//   - http://192.168.0.1/liveos
+//     For example: http://192.168.0.1/liveos/my-iso.Iso or
+//     http://192.168.0.1/liveos
 //   - outputImageBase:
 //     the generated iso name. This value will be used only if the pxeIsoImageUrl
 //     parameter does not specify a full iso name.
