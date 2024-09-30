@@ -2,7 +2,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.1.12
+Version:        1.1.13
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Thu Sep 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.13-1
+- Auto-upgrade to 1.1.13 - required by the latest containerd
+
 * Mon Feb 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.1.12-1
 - Bump version to 1.1.12
 - Drop cgroups cpuset patch because it's included upstream now
