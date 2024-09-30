@@ -61,6 +61,45 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		}
 	}
 
+	if osConfig.Verity != nil {
+
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
+		}
+
+		err = updateDefaultGrubForVerity(osConfig.RootHash, osConfig.Verity, bootCustomizer)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.WriteToFile(dummyChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func updateDefaultGrubForVerity(roothash string, verity *imagecustomizerapi.Verity, bootCustomizer *imagecustomizerlib.BootCustomizer) error {
+
+	var err error
+
+	newArgs := []string{
+		"rd.systemd.verity=1",
+		fmt.Sprintf("roothash=%s", roothash),
+		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataPartition),
+		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashPartition),
+		fmt.Sprintf("systemd.verity_root_options=%s", verity.CorruptionOption),
+	}
+
+	err = bootCustomizer.UpdateKernelCommandLineArgs("GRUB_CMDLINE_LINUX", []string{"rd.systemd.verity", "roothash",
+		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

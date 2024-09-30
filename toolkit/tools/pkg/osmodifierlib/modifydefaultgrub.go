@@ -14,12 +14,8 @@ import (
 
 var grubArgs = []string{
 	"rd.overlayfs",
-	"roothash",
 	"root",
 	"rd.systemd.verity",
-	"systemd.verity_root_data",
-	"systemd.verity_root_hash",
-	"systemd.verity_root_options",
 	"selinux",
 	"enforcing",
 }

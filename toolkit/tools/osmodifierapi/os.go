@@ -17,6 +17,8 @@ type OS struct {
 	SELinux  imagecustomizerapi.SELinux `yaml:"selinux"`
 	Users    []imagecustomizerapi.User  `yaml:"users"`
 	Overlays *[]Overlay                 `yaml:"overlays"`
+	Verity   *imagecustomizerapi.Verity `yaml:"verity"`
+	RootHash string                     `yaml:"rootHash"`
 }
 
 func (s *OS) IsValid() error {
