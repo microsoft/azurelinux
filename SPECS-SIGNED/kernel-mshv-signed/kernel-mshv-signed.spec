@@ -10,7 +10,7 @@ Version:        5.15.157.mshv1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This spec purpose is to take an input kernel rpm and input secure-boot-signed
@@ -137,5 +137,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.157.mshv1-2
-- Original version for AzureLinux.
+- Original version for Azure Linux.
+- license: MIT
 - License verified

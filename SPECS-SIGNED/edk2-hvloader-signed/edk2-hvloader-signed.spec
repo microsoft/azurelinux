@@ -9,7 +9,7 @@ Version:        20240524git3e722403cd16
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/microsoft/HvLoader
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.
@@ -70,5 +70,5 @@ popd
 
 %changelog
 * Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
-- Original version for AzureLinux.
+- Original version for Azure Linux.
 - License verified
