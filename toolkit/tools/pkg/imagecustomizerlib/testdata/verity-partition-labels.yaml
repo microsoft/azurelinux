@@ -14,10 +14,12 @@ storage:
       end: 1024M
 
     - id: root
+      label: root
       start: 1024M
       end: 3072M
 
-    - id: roothash
+    - id: verityhash
+      label: root-hash
       start: 3072M
       end: 3200M
 
@@ -40,6 +42,9 @@ storage:
     type: ext4
     mountPoint:
       path: /
+      
+  - deviceId: verityhash
+    type: fat32
 
   - deviceId: var
     type: ext4
@@ -63,11 +68,11 @@ os:
   verity:
     corruptionOption: panic
     dataPartition:
-      idType: id
+      idType: part-label
       id: root
     hashPartition:
-      idType: id
-      id: roothash
+      idType: part-label
+      id: root-hash
 
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.

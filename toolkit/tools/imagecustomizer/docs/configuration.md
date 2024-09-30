@@ -519,8 +519,8 @@ please refer to the [overlay type](#overlay-type) section.
   at each system boot.
 
   - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+    `id` (partition [id](#id-string)), `part-label` (partition label),
+    `uuid` (filesystem UUID), and `part-uuid` (partition UUID).
 
   - `id`: The unique identifier value of the partition, corresponding to the
     specified IdType.
