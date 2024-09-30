@@ -70,35 +70,32 @@ hostonly="no"
 )
 
 type SavedConfigs struct {
-	IsoKernelArgs  string `yaml:"isoKernelArgs"`
-	PxeIsoImageUrl string `yaml:"pxeIsoImageUrl"`
+	Iso imagecustomizerapi.Iso `yaml:"iso"`
+	Pxe imagecustomizerapi.Pxe `yaml:"pxe"`
 }
 
-func (ic *SavedConfigs) IsEmpty() bool {
-	return ic.IsoKernelArgs == "" && ic.PxeIsoImageUrl == ""
-}
+func (c *SavedConfigs) IsValid() (err error) {
+	err = c.Iso.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid 'iso' field:\n%w", err)
+	}
 
-func (ic *SavedConfigs) IsValid() error {
-	if ic.IsoKernelArgs != "" {
-		// can we use the methods in kernelextraarguments.go?
+	err = c.Pxe.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid 'pxe' field:\n%w", err)
 	}
-	if ic.PxeIsoImageUrl != "" {
-		protocolFound := false
-		for _, protocol := range imagecustomizerapi.PxeIsoDownloadProtocols {
-			if strings.HasPrefix(ic.PxeIsoImageUrl, protocol) {
-				protocolFound = true
-				break
-			}
-		}
-		if !protocolFound {
-			return fmt.Errorf("invalid iso image URL prefix in (%s). One of (%v) is expected.", ic.PxeIsoImageUrl, imagecustomizerapi.PxeIsoDownloadProtocols)
-		}
-	}
+
 	return nil
 }
 
-func (ic *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err error) {
-	if ic.IsEmpty() {
+func (c *SavedConfigs) IsEmpty() bool {
+	isoConfigEmpty := c.Iso.KernelCommandLine.ExtraCommandLine == ""
+	pxeConfigEmpty := c.Pxe.IsoImageUrl == ""
+	return isoConfigEmpty && pxeConfigEmpty
+}
+
+func (c *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err error) {
+	if c.IsEmpty() {
 		return nil
 	}
 
@@ -107,22 +104,9 @@ func (ic *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err er
 		return fmt.Errorf("failed to create directory for (%s):\n%w", savedConfigsFilePath, err)
 	}
 
-	stringBuilder := strings.Builder{}
-	stringBuilder.WriteString("isoKernelArgs")
-	stringBuilder.WriteString(": ")
-	stringBuilder.WriteString(ic.IsoKernelArgs)
-	stringBuilder.WriteString("\n")
-
-	stringBuilder.WriteString("pxeIsoImageUrl")
-	stringBuilder.WriteString(": ")
-	stringBuilder.WriteString(ic.PxeIsoImageUrl)
-	stringBuilder.WriteString("\n")
-
-	fileContent := stringBuilder.String()
-
-	err = file.Write(fileContent, savedConfigsFilePath)
+	err = imagecustomizerapi.MarshalYamlFile(savedConfigsFilePath, c)
 	if err != nil {
-		return fmt.Errorf("failed to write %s:\n%w", savedConfigsFilePath, err)
+		return fmt.Errorf("failed to save configs to (%s):\n%w", savedConfigsFilePath, err)
 	}
 
 	return nil
@@ -326,10 +310,11 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
-func mergeConfigs(savedConfigsFilePath string, newKernelArgs string, newPxeIsoImageUrl string) (mergedConfigs *SavedConfigs, err error) {
+func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.KernelExtraArguments,
+	newPxeIsoImageUrl string) (mergedConfigs *SavedConfigs, err error) {
 	mergedConfigs = &SavedConfigs{}
-	mergedConfigs.IsoKernelArgs = newKernelArgs
-	mergedConfigs.PxeIsoImageUrl = newPxeIsoImageUrl
+	mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = newKernelArgs
+	mergedConfigs.Pxe.IsoImageUrl = newPxeIsoImageUrl
 
 	exists, savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
 	if err != nil {
@@ -338,21 +323,24 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs string, newPxeIsoIm
 
 	if exists {
 		// do we have kernel arguments from a previous run?
-		if savedConfigs.IsoKernelArgs != "" {
+		if savedConfigs.Iso.KernelCommandLine.ExtraCommandLine != "" {
 			// If yes, add them before the new kernel arguments.
-			mergedConfigs.IsoKernelArgs = savedConfigs.IsoKernelArgs + " " + newKernelArgs
+			savedArgs := strings.TrimSpace(string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
+			newArgs := strings.TrimSpace(string(newKernelArgs))
+			mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = imagecustomizerapi.KernelExtraArguments(savedArgs + " " + newArgs)
 		}
 
 		// if the PXE iso image url is not set, set it to the value from the previous run.
-		if newPxeIsoImageUrl == "" && savedConfigs.PxeIsoImageUrl != "" {
-			mergedConfigs.PxeIsoImageUrl = savedConfigs.PxeIsoImageUrl
+		if newPxeIsoImageUrl == "" && savedConfigs.Pxe.IsoImageUrl != "" {
+			mergedConfigs.Pxe.IsoImageUrl = savedConfigs.Pxe.IsoImageUrl
 		}
 	}
 
 	return mergedConfigs, nil
 }
 
-func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfgFileName string, extraCommandLine string, pxeGrubCfgFileName string, pxeIsoImageUrl string, outputImageBase string) error {
+func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfgFileName string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
+	pxeGrubCfgFileName string, pxeIsoImageUrl string, outputImageBase string) error {
 
 	inputContentString, err := file.Read(isoGrubCfgFileName)
 	if err != nil {
@@ -418,7 +406,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
-	additionalKernelCommandline := liveosKernelArgs + " " + mergedConfigs.IsoKernelArgs
+	additionalKernelCommandline := liveosKernelArgs + " " + string(mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine)
 
 	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline,
 		true /*allowMultiple*/, false /*requireKernelOpts*/)
@@ -436,7 +424,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 		return fmt.Errorf("failed to write %s:\n%w", isoGrubCfgFileName, err)
 	}
 
-	err = generatePxeGrubCfg(inputContentString, mergedConfigs.PxeIsoImageUrl, outputImageBase, pxeGrubCfgFileName)
+	err = generatePxeGrubCfg(inputContentString, mergedConfigs.Pxe.IsoImageUrl, outputImageBase, pxeGrubCfgFileName)
 	if err != nil {
 		return fmt.Errorf("failed to create grub configuration for PXE booting.\n%w", err)
 	}
@@ -748,7 +736,7 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, writeableRootfsDir string,
-	isoMakerArtifactsStagingDir string, extraCommandLine string, pxeIsoImageUrl string, outputImageBase string) error {
+	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments, pxeIsoImageUrl string, outputImageBase string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -914,7 +902,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //     `LiveOSIsoBuilder.workingDirs.isoArtifactsDir` folder.
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
-func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePath string, rawImageFile string, extraCommandLine string,
+func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePath string, rawImageFile string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
 	pxeIsoImageUrl string, outputImageBase string) error {
 
 	logger.Log.Infof("Preparing iso artifacts")
@@ -1091,13 +1079,11 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 // outputs:
 //   - 'additionalIsoFiles'
 //     list of files to copy from the build machine to the iso media.
-func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommandLine string, err error) {
+func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommandLine imagecustomizerapi.KernelExtraArguments, err error) {
 
 	if isoConfig == nil {
 		return
 	}
-
-	extraCommandLine = strings.TrimSpace(string(isoConfig.KernelCommandLine.ExtraCommandLine))
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
@@ -1115,7 +1101,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
 
-	return additionalIsoFiles, extraCommandLine, nil
+	return additionalIsoFiles, isoConfig.KernelCommandLine.ExtraCommandLine, nil
 }
 
 // createLiveOSIsoImage

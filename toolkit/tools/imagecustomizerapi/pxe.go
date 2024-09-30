@@ -15,17 +15,17 @@ type Pxe struct {
 	IsoImageUrl string `yaml:"isoImageUrl"`
 }
 
-func (i *Pxe) IsValid() error {
-	if i.IsoImageUrl != "" {
+func (p *Pxe) IsValid() error {
+	if p.IsoImageUrl != "" {
 		protocolFound := false
 		for _, protocol := range PxeIsoDownloadProtocols {
-			if strings.HasPrefix(i.IsoImageUrl, protocol) {
+			if strings.HasPrefix(p.IsoImageUrl, protocol) {
 				protocolFound = true
 				break
 			}
 		}
 		if !protocolFound {
-			return fmt.Errorf("unsupported iso image URL protocol in (%s). One of (%v) is expected.", i.IsoImageUrl, PxeIsoDownloadProtocols)
+			return fmt.Errorf("unsupported iso image URL protocol in (%s). One of (%v) is expected.", p.IsoImageUrl, PxeIsoDownloadProtocols)
 		}
 	}
 	return nil
