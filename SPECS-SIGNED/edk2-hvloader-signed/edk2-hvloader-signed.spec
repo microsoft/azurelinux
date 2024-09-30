@@ -2,10 +2,15 @@
 %define name_github   HvLoader
 %ifarch x86_64
 %global buildarch x86_64
+
+# edk2-stable202402
+%define GITDATE        20240524
+%define GITCOMMIT      3e722403cd16
+
 %endif
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           edk2-hvloader-signed-%{buildarch}
-Version:        20240524git3e722403cd16
+Version:        %{GITDATE}git%{GITCOMMIT}
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
