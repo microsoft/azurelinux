@@ -14,7 +14,6 @@
 
 # Check hangs
 %skip_check_gtk_doc 1
-%skip_check_tdnf 1
 %skip_check_vim 1
 
 # We are missing many of the dependency packages for the Dracut tests

@@ -75,7 +75,7 @@ func (b FileCopyBuilder) Run() (err error) {
 
 	err = createDestinationDir(b.Dst, b.DirFileMode)
 	if err != nil {
-		return
+		return fmt.Errorf("failed to create destination directory (%s):\n%w", b.Dst, err)
 	}
 
 	args := []string(nil)
@@ -96,7 +96,10 @@ func (b FileCopyBuilder) Run() (err error) {
 	if b.ChangeFileMode {
 		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", b.Dst, b.FileMode)
 		err = os.Chmod(b.Dst, b.FileMode)
+		if err != nil {
+			return fmt.Errorf("failed to set file mode (%s):\n%w", b.Dst, err)
+		}
 	}
 
-	return
+	return nil
 }

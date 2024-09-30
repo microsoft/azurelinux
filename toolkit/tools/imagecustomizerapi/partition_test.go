@@ -14,7 +14,7 @@ import (
 func TestPartitionIsValidExpanding(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 	}
 
 	err := partition.IsValid()
@@ -24,7 +24,7 @@ func TestPartitionIsValidExpanding(t *testing.T) {
 func TestPartitionIsValidFixedSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
@@ -35,7 +35,7 @@ func TestPartitionIsValidFixedSize(t *testing.T) {
 func TestPartitionIsValidZeroSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   ptrutils.PtrTo(DiskSize(0)),
 	}
 
@@ -48,7 +48,7 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		Size: PartitionSize{
 			Type: PartitionSizeTypeExplicit,
 			Size: 0,
@@ -63,7 +63,7 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2 * diskutils.MiB,
+		Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
@@ -75,7 +75,7 @@ func TestPartitionIsValidNegativeSize(t *testing.T) {
 func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2 * diskutils.MiB,
+		Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 		End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 		Size: PartitionSize{
 			Type: PartitionSizeTypeExplicit,
@@ -91,7 +91,7 @@ func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 func TestPartitionIsValidEndAndGrow(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2 * diskutils.MiB,
+		Start: ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 		End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 		Size: PartitionSize{
 			Type: PartitionSizeTypeGrow,
@@ -106,7 +106,7 @@ func TestPartitionIsValidEndAndGrow(t *testing.T) {
 func TestPartitionIsValidGoodName(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   nil,
 		Label: "a",
 	}
@@ -118,7 +118,7 @@ func TestPartitionIsValidGoodName(t *testing.T) {
 func TestPartitionIsValidNameTooLong(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   nil,
 		Label: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
@@ -132,7 +132,7 @@ func TestPartitionIsValidNameTooLong(t *testing.T) {
 func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   nil,
 		Label: "❤️",
 	}
@@ -146,7 +146,7 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 func TestPartitionIsValidGoodType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   nil,
 		Type:  PartitionTypeESP,
 	}
@@ -158,7 +158,7 @@ func TestPartitionIsValidGoodType(t *testing.T) {
 func TestPartitionIsValidBadType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 0,
+		Start: ptrutils.PtrTo(DiskSize(0)),
 		End:   nil,
 		Type:  PartitionType("a"),
 	}

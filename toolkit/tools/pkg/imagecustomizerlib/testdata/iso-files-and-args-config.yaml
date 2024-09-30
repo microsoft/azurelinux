@@ -1,6 +1,7 @@
 iso:
   additionalFiles:
-    files/a.txt: /a.txt
+  - source: files/a.txt
+    destination: /a.txt
 
   kernelCommandLine:
     extraCommandLine: rd.info

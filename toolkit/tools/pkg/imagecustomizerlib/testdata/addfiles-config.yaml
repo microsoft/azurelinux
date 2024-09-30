@@ -1,6 +1,21 @@
 os:
   additionalFiles:
-    files/a.txt: /a.txt
-    files/helloworld.sh:
-    - path: /usr/local/bin/helloworld.sh
-      permissions: 755
+  - source: files/a.txt
+    destination: /a.txt
+
+  - source: files/helloworld.sh
+    destination: /usr/local/bin/helloworld.sh
+    permissions: 755
+
+  - content: |
+      cat
+      dog
+    destination: /animals.txt
+
+  - content: |-
+      abcdefghijklmnopqrstuvwxyz
+    destination: /alphabet.txt
+    permissions: 644
+
+  - content: ""
+    destination: /empty.txt

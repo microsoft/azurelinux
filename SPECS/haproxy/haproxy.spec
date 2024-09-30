@@ -1,7 +1,7 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
-Version:        2.9.1
-Release:        2%{?dist}
+Version:        2.9.11
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,10 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.9.11-1
+- Upgrade to 2.9.11
+- Fix CVE-2024-45506
+
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.9.1-2
 - Move from pcre to pcre2
 

@@ -8,6 +8,7 @@
         "core-packages-base-image",
         "dracut-hostonly",
         "dracut-vrf",
+        "shadow-utils",
         "initramfs"
     ]
 }

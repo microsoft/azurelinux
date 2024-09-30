@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,30 +27,30 @@ func TestOSInvalidHostname(t *testing.T) {
 	assert.ErrorContains(t, err, "invalid hostname")
 }
 
-func TestOSInvalidAdditionalFiles(t *testing.T) {
+func TestOSIsValidInvalidAdditionalFilesSource(t *testing.T) {
 	os := OS{
-		AdditionalFiles: AdditionalFilesMap{
-			"a.txt": FileConfigList{},
-		},
-	}
-	err := os.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid additionalFiles:\ninvalid file configs for (a.txt):\nlist is empty")
-}
-
-func TestOSIsValidInvalidAdditionalFilesEmptySourcePath(t *testing.T) {
-	os := OS{
-		AdditionalFiles: AdditionalFilesMap{
-			"": FileConfigList{
-				{
-					Path: "/a.txt",
-				},
+		AdditionalFiles: []AdditionalFile{
+			{
+				Destination: "/a.txt",
+				Source:      "a.txt",
 			},
 		},
 	}
 	err := os.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid additionalFiles:\ninvalid source path: cannot be empty")
+	assert.NoError(t, err)
+}
+
+func TestOSIsValidInvalidAdditionalFilesContent(t *testing.T) {
+	os := OS{
+		AdditionalFiles: []AdditionalFile{
+			{
+				Destination: "/a.txt",
+				Content:     ptrutils.PtrTo("abc"),
+			},
+		},
+	}
+	err := os.IsValid()
+	assert.NoError(t, err)
 }
 
 func TestOSIsValidVerityInValidPartUuid(t *testing.T) {
@@ -93,12 +94,24 @@ func TestOSIsValidInvalidSELinux(t *testing.T) {
 	assert.ErrorContains(t, err, "invalid selinux value (bad)")
 }
 
+func TestOSIsValidInvalidAdditionalFiles(t *testing.T) {
+	os := OS{
+		AdditionalFiles: AdditionalFileList{
+			{},
+		},
+	}
+
+	err := os.IsValid()
+	assert.ErrorContains(t, err, "invalid additionalFiles")
+	assert.ErrorContains(t, err, "invalid value at index 0")
+}
+
 func TestOSIsValidInvalidAdditionalDirs(t *testing.T) {
 	os := OS{
 		AdditionalDirs: DirConfigList{
 			{
-				SourcePath:      "",
-				DestinationPath: "/a",
+				Source:      "",
+				Destination: "/a",
 			},
 		},
 	}
@@ -106,7 +119,7 @@ func TestOSIsValidInvalidAdditionalDirs(t *testing.T) {
 	err := os.IsValid()
 	assert.ErrorContains(t, err, "invalid additionalDirs")
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "invalid sourcePath value: empty string")
+	assert.ErrorContains(t, err, "invalid 'source' value: empty string")
 }
 
 func TestOSIsValidInvalidUser(t *testing.T) {

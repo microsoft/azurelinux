@@ -1,11 +1,11 @@
 Summary:        Provides a way for the Kubernetes users to utilize the local storage in each node
 Name:           local-path-provisioner
 Version:        0.0.24
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/rancher/local-path-provisioner
 Group:          Applications/Text
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/rancher/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 #Note that the source file should be renamed to the format {name}-%{version}.tar.gz
@@ -30,6 +30,9 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 %{_bindir}/local-path-provisioner
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.24-2
+- Release bump to fix package information.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.24-1
 - Auto-upgrade to 0.0.24 - Azure Linux 3.0 - package upgrades
 

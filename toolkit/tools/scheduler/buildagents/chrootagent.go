@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/sirupsen/logrus"
@@ -38,7 +39,7 @@ func (c *ChrootAgent) Initialize(config *BuildAgentConfig) (err error) {
 // - outArch is the target architecture to build for.
 // - runCheck is true if the package should run the "%check" section during the build
 // - dependencies is a list of dependencies that need to be installed before building.
-func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
+func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string, allowableRuntime time.Duration) (builtFiles []string, logFile string, err error) {
 	// On success, pkgworker will print a comma-seperated list of all RPMs built to stdout.
 	// This will be the last stdout line written.
 	const delimiter = ","
@@ -50,7 +51,7 @@ func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch 
 		lastStdoutLine = strings.TrimSpace(line)
 	}
 
-	args := serializeChrootBuildAgentConfig(c.config, basePackageName, inputFile, logFile, outArch, runCheck, dependencies)
+	args := serializeChrootBuildAgentConfig(c.config, basePackageName, inputFile, logFile, outArch, runCheck, dependencies, allowableRuntime)
 	err = shell.NewExecBuilder(c.config.Program, args...).
 		StdoutCallback(onStdout).
 		LogLevel(logrus.TraceLevel, logrus.TraceLevel).
@@ -75,7 +76,7 @@ func (c *ChrootAgent) Close() (err error) {
 }
 
 // serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
-func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
+func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, inputFile, logFile, outArch string, runCheck bool, dependencies []string, allowableRuntime time.Duration) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -93,7 +94,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		fmt.Sprintf("--log-level=%s", config.LogLevel),
 		fmt.Sprintf("--out-arch=%s", outArch),
 		fmt.Sprintf("--max-cpu=%s", config.MaxCpu),
-		fmt.Sprintf("--timeout=%s", config.Timeout.String()),
+		fmt.Sprintf("--timeout=%s", allowableRuntime),
 	}
 
 	if config.RpmmacrosFile != "" {

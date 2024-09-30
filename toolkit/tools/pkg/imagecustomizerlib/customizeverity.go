@@ -97,23 +97,22 @@ func prepareGrubConfigForVerity(imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
-	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string,
-	corruptionOption imagecustomizerapi.CorruptionOption, rootHash string, grubCfgFullPath string,
+func updateGrubConfigForVerity(verity *imagecustomizerapi.Verity, rootHash string, grubCfgFullPath string,
+	partIdToPartUuid map[string]string,
 ) error {
 	var err error
 
 	// Format the dataPartitionId and hashPartitionId using the helper function.
-	formattedDataPartition, err := systemdFormatPartitionId(dataPartitionIdType, dataPartitionId)
+	formattedDataPartition, err := systemdFormatPartitionId(verity.DataPartition, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
-	formattedHashPartition, err := systemdFormatPartitionId(hashPartitionIdType, hashPartitionId)
+	formattedHashPartition, err := systemdFormatPartitionId(verity.HashPartition, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
 
-	formattedCorruptionOption, err := systemdFormatCorruptionOption(corruptionOption)
+	formattedCorruptionOption, err := systemdFormatCorruptionOption(verity.CorruptionOption)
 	if err != nil {
 		return err
 	}
@@ -164,11 +163,11 @@ func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, da
 
 // idToPartitionBlockDevicePath returns the block device path for a given idType and id.
 func idToPartitionBlockDevicePath(partitionId imagecustomizerapi.IdentifiedPartition,
-	diskPartitions []diskutils.PartitionInfo,
+	diskPartitions []diskutils.PartitionInfo, partIdToPartUuid map[string]string,
 ) (string, error) {
 	// Iterate over each partition to find the matching id.
 	for _, partition := range diskPartitions {
-		matches, err := partitionMatchesId(partitionId, partition)
+		matches, err := partitionMatchesId(partitionId, partition, partIdToPartUuid)
 		if err != nil {
 			return "", err
 		}
@@ -183,38 +182,46 @@ func idToPartitionBlockDevicePath(partitionId imagecustomizerapi.IdentifiedParti
 }
 
 func partitionMatchesId(partitionId imagecustomizerapi.IdentifiedPartition, partition diskutils.PartitionInfo,
+	partIdToPartUuid map[string]string,
 ) (bool, error) {
 	switch partitionId.IdType {
+	case imagecustomizerapi.IdTypeId:
+		partUuid := partIdToPartUuid[partitionId.Id]
+		return partition.PartUuid == partUuid, nil
+
 	case imagecustomizerapi.IdTypePartLabel:
-		if partition.PartLabel == partitionId.Id {
-			return true, nil
-		}
+		return partition.PartLabel == partitionId.Id, nil
+
 	case imagecustomizerapi.IdTypeUuid:
-		if partition.Uuid == partitionId.Id {
-			return true, nil
-		}
+		return partition.Uuid == partitionId.Id, nil
+
 	case imagecustomizerapi.IdTypePartUuid:
-		if partition.PartUuid == partitionId.Id {
-			return true, nil
-		}
+		return partition.PartUuid == partitionId.Id, nil
+
 	default:
 		return true, fmt.Errorf("invalid idType provided (%s)", string(partitionId.IdType))
 	}
-
-	return false, nil
 }
 
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
-func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
-	switch idType {
+func systemdFormatPartitionId(partition imagecustomizerapi.IdentifiedPartition, partIdToPartUuid map[string]string,
+) (string, error) {
+	switch partition.IdType {
+	case imagecustomizerapi.IdTypeId:
+		partUuid := partIdToPartUuid[partition.Id]
+		return fmt.Sprintf("%s=%s", "PARTUUID", partUuid), nil
+
 	case imagecustomizerapi.IdTypePartLabel:
-		return fmt.Sprintf("%s=%s", "PARTLABEL", id), nil
+		return fmt.Sprintf("%s=%s", "PARTLABEL", partition.Id), nil
+
 	case imagecustomizerapi.IdTypeUuid:
-		return fmt.Sprintf("%s=%s", "UUID", id), nil
+		return fmt.Sprintf("%s=%s", "UUID", partition.Id), nil
+
 	case imagecustomizerapi.IdTypePartUuid:
-		return fmt.Sprintf("%s=%s", "PARTUUID", id), nil
+		return fmt.Sprintf("%s=%s", "PARTUUID", partition.Id), nil
+
 	default:
-		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
+		return "", fmt.Errorf("invalid idType provided (%s)", string(partition.IdType))
 	}
 }
 

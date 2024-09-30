@@ -120,12 +120,56 @@ func findLinuxOrInitrdLineAll(inputGrubCfgContent string, commandName string, al
 }
 
 // Find the linux command within the grub config file.
-func findLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
+func FindLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
 	lines, err := findLinuxOrInitrdLineAll(inputGrubCfgContent, linuxCommand, false /*allowMultiple*/)
 	if err != nil {
 		return grub.Line{}, err
 	}
 	return lines[0], nil
+}
+
+// Find the linux command within non-recovery mode menuentry block in the grub config file.
+func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
+	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
+	if err != nil {
+		return nil, err
+	}
+
+	grubLines := grub.SplitTokensIntoLines(grubTokens)
+	var linuxLines []grub.Line
+	inMenuEntry := false
+	isRecoveryMenu := false
+
+	// Iterate over all lines to find non-recovery mode menuentry and its linux line
+	for _, line := range grubLines {
+		if len(line.Tokens) > 1 && grub.IsTokenKeyword(line.Tokens[0], "menuentry") {
+			// Found a new 'menuentry', reset flags
+			inMenuEntry = true
+			isRecoveryMenu = false
+
+			// Check if the title (second token) contains the word 'recovery'
+			if strings.Contains(line.Tokens[1].RawContent, "recovery") {
+				isRecoveryMenu = true
+			}
+
+			// If it's a recovery menuentry, ignore this block
+			if isRecoveryMenu {
+				inMenuEntry = false
+			}
+		} else if inMenuEntry {
+			// We are inside a non-recovery menuentry block
+			if len(line.Tokens) > 0 && grub.IsTokenKeyword(line.Tokens[0], "linux") {
+				// Append only lines that contain the 'linux' command
+				linuxLines = append(linuxLines, line)
+			}
+		}
+	}
+
+	if len(linuxLines) == 0 {
+		return nil, fmt.Errorf("no linux line found in non-recovery menuentry")
+	}
+
+	return linuxLines, nil
 }
 
 // Overrides the path of the kernel binary of all the linux commands within a grub config file.
@@ -245,7 +289,7 @@ func getLinuxCommandLineArgs(grub2Config string, requireKernelOpts bool) ([]grub
 		return nil, 0, err
 	}
 
-	args, err := parseCommandLineArgs(argTokens)
+	args, err := ParseCommandLineArgs(argTokens)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -295,7 +339,7 @@ func findCommandLineInsertAt(argTokens []grub.Token, requireKernelOpts bool) (in
 }
 
 // Takes a tokenized grub.cfg file and makes a best effort to extract the kernel command-line args.
-func parseCommandLineArgs(argTokens []grub.Token) ([]grubConfigLinuxArg, error) {
+func ParseCommandLineArgs(argTokens []grub.Token) ([]grubConfigLinuxArg, error) {
 	args := []grubConfigLinuxArg(nil)
 
 	for i := range argTokens {
@@ -400,7 +444,7 @@ func replaceKernelCommandLineArgValueAll(inputGrubCfgContent string, name string
 		// Skip the "linux" command and the kernel binary path arg.
 		argTokens := line.Tokens[2:]
 
-		args, err := parseCommandLineArgs(argTokens)
+		args, err := ParseCommandLineArgs(argTokens)
 		if err != nil {
 			return "", nil, err
 		}
@@ -445,7 +489,7 @@ func updateKernelCommandLineArgsAll(grub2Config string, argsToRemove []string, n
 			return "", err
 		}
 
-		args, err := parseCommandLineArgs(argTokens)
+		args, err := ParseCommandLineArgs(argTokens)
 		if err != nil {
 			return "", err
 		}
@@ -474,7 +518,7 @@ func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newA
 func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, insertAt int,
 	argsToRemove []string, newArgs []string,
 ) (string, error) {
-	newArgsQuoted := grubArgsToString(newArgs)
+	newArgsQuoted := GrubArgsToString(newArgs)
 	foundArgs := findMatchingCommandLineArgs(args, argsToRemove)
 
 	builder := strings.Builder{}
@@ -511,7 +555,7 @@ func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, 
 
 // Takes a list of unescaped and unquoted kernel command-line args and combines them into a single string with
 // appropriate quoting for a grub.cfg file.
-func grubArgsToString(args []string) string {
+func GrubArgsToString(args []string) string {
 	builder := strings.Builder{}
 	for i, arg := range args {
 		if i != 0 {
@@ -666,7 +710,7 @@ func getSELinuxModeFromLinuxArgs(args []grubConfigLinuxArg) (imagecustomizerapi.
 }
 
 // Gets the SELinux mode set by the /etc/selinux/config file.
-func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
+func getSELinuxModeFromConfigFile(imageChroot safechroot.ChrootInterface) (imagecustomizerapi.SELinuxMode, error) {
 	selinuxConfigFilePath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 
 	// Read the SELinux config file.
@@ -701,7 +745,7 @@ func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomiz
 }
 
 // Reads the /boot/grub2/grub.cfg file.
-func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
+func ReadGrub2ConfigFile(imageChroot safechroot.ChrootInterface) (string, error) {
 	logger.Log.Debugf("Reading grub.cfg file")
 
 	grub2ConfigFilePath := getGrub2ConfigFilePath(imageChroot)
@@ -716,7 +760,7 @@ func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
 }
 
 // Writes the /boot/grub2/grub.cfg file.
-func writeGrub2ConfigFile(grub2Config string, imageChroot *safechroot.Chroot) error {
+func writeGrub2ConfigFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing grub.cfg file")
 
 	grub2ConfigFilePath := getGrub2ConfigFilePath(imageChroot)
@@ -730,7 +774,7 @@ func writeGrub2ConfigFile(grub2Config string, imageChroot *safechroot.Chroot) er
 	return nil
 }
 
-func getGrub2ConfigFilePath(imageChroot *safechroot.Chroot) string {
+func getGrub2ConfigFilePath(imageChroot safechroot.ChrootInterface) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubCfgFile)
 }
 
