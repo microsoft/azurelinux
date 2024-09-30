@@ -8,7 +8,7 @@
 
 Summary:        C++ standard library targeting C++11
 Name:           libcxx
-Version:        18.1.2
+Version:        %{maj_ver}.1.2
 Release:        2%{?dist}
 License:        Apache-2.0 WITH LLVM-exception OR MIT OR NCSA
 Vendor:         Microsoft Corporation

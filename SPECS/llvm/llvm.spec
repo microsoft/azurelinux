@@ -4,7 +4,7 @@
 
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        18.1.2
+Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
 Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
