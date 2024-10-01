@@ -78,7 +78,7 @@ func TestInstallPackageRegex_MatchesPackageName(t *testing.T) {
 
 	matches := InstallPackageRegex.FindStringSubmatch(line)
 
-	assert.Len(t, matches, InstallMaxMatchLen)
+	assert.Len(t, matches, InstallPackageMaxMatchLen)
 	assert.Equal(t, "X", matches[InstallPackageName])
 }
 
@@ -93,7 +93,7 @@ func TestInstallPackageRegex_MatchesPackageArch(t *testing.T) {
 
 	matches := InstallPackageRegex.FindStringSubmatch(line)
 
-	assert.Len(t, matches, InstallMaxMatchLen)
+	assert.Len(t, matches, InstallPackageMaxMatchLen)
 	assert.Equal(t, "aarch64", matches[InstallPackageArch])
 }
 
@@ -108,7 +108,7 @@ func TestInstallPackageRegex_MatchesPackageVersionNoEpoch(t *testing.T) {
 
 	matches := InstallPackageRegex.FindStringSubmatch(line)
 
-	assert.Len(t, matches, InstallMaxMatchLen)
+	assert.Len(t, matches, InstallPackageMaxMatchLen)
 	assert.Equal(t, "1.1b.8_X-22~rc1", matches[InstallPackageVersion])
 }
 
@@ -117,7 +117,7 @@ func TestInstallPackageRegex_MatchesPackageVersionWithEpoch(t *testing.T) {
 
 	matches := InstallPackageRegex.FindStringSubmatch(line)
 
-	assert.Len(t, matches, InstallMaxMatchLen)
+	assert.Len(t, matches, InstallPackageMaxMatchLen)
 	assert.Equal(t, "5:1.1b.8_X-22~rc1", matches[InstallPackageVersion])
 }
 
@@ -132,7 +132,7 @@ func TestInstallPackageRegex_MatchesPackageDist(t *testing.T) {
 
 	matches := InstallPackageRegex.FindStringSubmatch(line)
 
-	assert.Len(t, matches, InstallMaxMatchLen)
+	assert.Len(t, matches, InstallPackageMaxMatchLen)
 	assert.Equal(t, "azl3", matches[InstallPackageDist])
 }
 
@@ -152,4 +152,93 @@ func TestInstallPackageRegex_DoesNotMatchInvalidLine(t *testing.T) {
 	const line = "Invalid line"
 
 	assert.False(t, InstallPackageRegex.MatchString(line))
+}
+func TestPackageLookupNameMatchRegex_MatchesExternalRepo(t *testing.T) {
+	const line = "xz-devel-5.4.4-1.azl3.x86_64 : Header and development files for xz\nRepo : toolchain-repo"
+
+	matches := PackageProvidesRegex.FindStringSubmatch(line)
+
+	assert.Len(t, matches, PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-5.4.4-1.azl3.x86_64", matches[PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_MatchesPackageWithEpoch(t *testing.T) {
+	const line = "xz-devel-2:5.4.4-1.azl3.x86_64 : Header and development files for xz\nRepo : toolchain-repo"
+
+	matches := PackageProvidesRegex.FindStringSubmatch(line)
+
+	assert.Len(t, matches, PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-2:5.4.4-1.azl3.x86_64", matches[PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_FailsForOutputWithoutRepo(t *testing.T) {
+	const line = "xz-devel-5.4.4-1.azl3.x86_64 : Header and development files for xz"
+
+	assert.False(t, PackageProvidesRegex.MatchString(line))
+}
+
+func TestPackageLookupNameMatchRegex_FailsForOutputWithSystemRepo(t *testing.T) {
+	const line = "xz-devel-5.4.4-1.azl3.x86_64 : Header and development files for xz\nRepo : @System"
+
+	assert.False(t, PackageProvidesRegex.MatchString(line))
+}
+
+func TestPackageLookupNameMatchRegex_FailsForEmptyOutput(t *testing.T) {
+	const line = ""
+
+	assert.False(t, PackageProvidesRegex.MatchString(line))
+}
+
+func TestPackageLookupNameMatchRegex_FailsForInvalidOutput(t *testing.T) {
+	const line = "Invalid output line"
+
+	assert.False(t, PackageProvidesRegex.MatchString(line))
+}
+
+func TestPackageLookupNameMatchRegex_MatchesOutputWithCapabilityMatch(t *testing.T) {
+	const line = "[using capability match for 'pkgconfig(liblzma)'] xz-devel-5.4.4-1.azl3.x86_64 : Header and development files for xz\nRepo : toolchain-repo"
+
+	matches := PackageProvidesRegex.FindStringSubmatch(line)
+
+	assert.Len(t, matches, PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-5.4.4-1.azl3.x86_64", matches[PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_MatchesOutputWithMultiplePackages(t *testing.T) {
+	const line = "xz-devel-5.4.4-1.azl3.x86_64 : ABC\nRepo : toolchain-repo\nother-package-4.4.4-1.azl3.x86_64 : ABC2\nRepo : other-repo\n"
+
+	allMatches := PackageProvidesRegex.FindAllStringSubmatch(line, -1)
+
+	assert.Len(t, allMatches, 2)
+	assert.Len(t, allMatches[0], PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-5.4.4-1.azl3.x86_64", allMatches[0][PackageProvidesNameIndex])
+
+	assert.Len(t, allMatches[1], PackageProvidesMaxMatchLen)
+	assert.Equal(t, "other-package-4.4.4-1.azl3.x86_64", allMatches[1][PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_MatchesOutputWithExternalAndSystemMix(t *testing.T) {
+	const line = "xz-devel-5.4.4-1.azl3.x86_64 : ABC\nRepo : toolchain-repo\nother-package-4.4.4-1.azl3.x86_64 : ABC2\nRepo : @System\n"
+
+	allMatches := PackageProvidesRegex.FindAllStringSubmatch(line, -1)
+
+	assert.Len(t, allMatches, 1)
+	assert.Len(t, allMatches[0], PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-5.4.4-1.azl3.x86_64", allMatches[0][PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_MatchesOutputWithSystemFirstExternalSecond(t *testing.T) {
+	const line = "other-package-4.4.4-1.azl3.x86_64 : ABC2\nRepo : @System\nxz-devel-5.4.4-1.azl3.x86_64 : ABC\nRepo : toolchain-repo"
+
+	allMatches := PackageProvidesRegex.FindAllStringSubmatch(line, -1)
+
+	assert.Len(t, allMatches, 1)
+	assert.Len(t, allMatches[0], PackageProvidesMaxMatchLen)
+	assert.Equal(t, "xz-devel-5.4.4-1.azl3.x86_64", allMatches[0][PackageProvidesNameIndex])
+}
+
+func TestPackageLookupNameMatchRegex_FailsForOutputWithOnlyPluginLoaded(t *testing.T) {
+	const line = "Loaded plugin: tdnfrepogpgcheck"
+
+	assert.False(t, PackageProvidesRegex.MatchString(line))
 }
