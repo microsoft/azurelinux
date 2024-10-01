@@ -1,5 +1,4 @@
 # Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 %global srcname platformdirs
 %bcond_without tests
 %global common_description %{expand:
@@ -26,6 +25,12 @@ BuildRequires:  python3-pathspec
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-tomli
 BuildRequires:  python3-trove-classifiers
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-mock
+BuildRequires:  python3-appdirs
+BuildRequires:  python3-iniconfig
+%endif
 BuildArch:      noarch
 
 %description %{common_description}
@@ -51,12 +56,10 @@ BuildRequires:  python3-devel
 
 
 %check
-%if 0%{?with_check}
 %if %{with tests}
 %pytest
 %else
 %pyproject_check_import
-%endif
 %endif
 
 
