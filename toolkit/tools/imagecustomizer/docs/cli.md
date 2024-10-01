@@ -109,23 +109,23 @@ installation.
 ## --output-pxe-artifacts-dir
 
 Create the specified folder and populate it with the artifacts to be used for
-PXE booting. The contents of the folder include the exported of the contents of
-the live OS ISO image generated along with the ISO image file itself.
+PXE booting. The folder will hold the exported contents of the generated live OS
+ISO image along with the live OS ISO image file itself.
 
 Below is a list of the files necessary for PXE booting:
 
 ```
 ./efi
   |- boot
-      |- bootx64.efi            // <tftp-server-root>/bootx64.efi
-      |- grubx64.efi            // <tftp-server-root>/grubx64.efi
+      |- bootx64.efi            // target: <tftp-server-root>/bootx64.efi
+      |- grubx64.efi            // target: <tftp-server-root>/grubx64.efi
 ./boot
    |- grub2
-       |- grub.cfg              // <tftp-server-root>/boot/grub2/grub.cfg
-       |- grubenv               // <tftp-server-root>/boot/grub2/grubenv
-   |- vmlinuz                   // <tftp-server-root>/boot/vmlinuz
-   |- initrd.img                // <tftp-server-root>/boot/initrd.img
-./pxe-20240930-1331.iso         // <http-server-root>/marineros/liveos/pxe-20240930-1331.iso
+       |- grub.cfg              // target: <tftp-server-root>/boot/grub2/grub.cfg
+       |- grubenv               // target: <tftp-server-root>/boot/grub2/grubenv
+   |- vmlinuz                   // target: <tftp-server-root>/boot/vmlinuz
+   |- initrd.img                // target: <tftp-server-root>/boot/initrd.img
+./pxe-20240930-1331.iso         // target: <http-server-root>/marineros/liveos/pxe-20240930-1331.iso
 
 # tftp server default local root is at: /var/lib/tftpboot
 # http server default local root is at: /etc/httpd
