@@ -86,12 +86,17 @@ func updateDefaultGrubForVerity(roothash string, verity *imagecustomizerapi.Veri
 
 	var err error
 
+	formattedCorruptionOption, err := imagecustomizerlib.SystemdFormatCorruptionOption(verity.CorruptionOption)
+	if err != nil {
+		return err
+	}
+
 	newArgs := []string{
 		"rd.systemd.verity=1",
 		fmt.Sprintf("roothash=%s", roothash),
-		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataPartition),
-		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashPartition),
-		fmt.Sprintf("systemd.verity_root_options=%s", verity.CorruptionOption),
+		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataPartition.Id),
+		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashPartition.Id),
+		fmt.Sprintf("systemd.verity_root_options=%s", formattedCorruptionOption),
 	}
 
 	err = bootCustomizer.UpdateKernelCommandLineArgs("GRUB_CMDLINE_LINUX", []string{"rd.systemd.verity", "roothash",

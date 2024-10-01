@@ -113,7 +113,7 @@ func updateGrubConfigForVerity(dataPartitionIdType imagecustomizerapi.IdType, da
 		return err
 	}
 
-	formattedCorruptionOption, err := systemdFormatCorruptionOption(corruptionOption)
+	formattedCorruptionOption, err := SystemdFormatCorruptionOption(corruptionOption)
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (stri
 	}
 }
 
-func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
+func SystemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
 	switch corruptionOption {
 	case imagecustomizerapi.CorruptionOptionDefault, imagecustomizerapi.CorruptionOptionIoError:
 		return "", nil

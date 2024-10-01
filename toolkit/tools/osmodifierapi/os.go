@@ -18,7 +18,7 @@ type OS struct {
 	Users    []imagecustomizerapi.User  `yaml:"users"`
 	Overlays *[]Overlay                 `yaml:"overlays"`
 	Verity   *imagecustomizerapi.Verity `yaml:"verity"`
-	RootHash string                     `yaml:"rootHash"`
+	RootHash string                     `yaml:"roothash"`
 }
 
 func (s *OS) IsValid() error {
