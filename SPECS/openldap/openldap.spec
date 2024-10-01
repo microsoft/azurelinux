@@ -3,7 +3,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.6.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D
         --disable-static    \
         --enable-dynamic    \
         --disable-debug     \
-        --disable-slapd     \
+        --enable-slapd      \
         --with-tls=openssl
 %make_build depend
 %make_build
@@ -59,6 +59,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/*
+%{_sbindir}/*
+%{_libexecdir}/*
 %{_libdir}/*.so*
 %{_includedir}/*
 %{_libdir}/pkgconfig/lber.pc
@@ -70,6 +72,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Wed Sep 25 2024 Muhammad Falak <mwani@microsoft.com> - 2.6.7-2
+- Configure with `--enable-slapd` to enable slapd
+
 * Thu Feb 01 2024 Thien Trung Vuong <tvuong@microsoft.com> - 2.6.7-1
 - Upgrade to version 2.6.7 - Package upgrade for Azure Linux 3.0
 - Add patch to resolve reference to ber_sockbuf_io_udp

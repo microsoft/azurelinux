@@ -66,7 +66,6 @@ func TestConfigIsValidLegacy(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "boot",
-					Type:     "fat32",
 				},
 			},
 		},
@@ -357,4 +356,157 @@ func TestConfigIsValidInvalidScripts(t *testing.T) {
 	err := config.IsValid()
 	assert.ErrorContains(t, err, "invalid postCustomization script at index 0")
 	assert.ErrorContains(t, err, "either path or content must have a value")
+}
+
+func TestConfigIsValidVerityValid(t *testing.T) {
+	config := &Config{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				Partitions: []Partition{
+					{
+						Id: "esp",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 8 * diskutils.MiB,
+						},
+						Type: PartitionTypeESP,
+					},
+					{
+						Id: "root",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 1 * diskutils.GiB,
+						},
+					},
+					{
+						Id: "verityhash",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 100 * diskutils.MiB,
+						},
+					},
+				},
+			}},
+			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+				{
+					DeviceId: "root",
+					Type:     "ext4",
+					MountPoint: &MountPoint{
+						Path: "/",
+					},
+				},
+			},
+		},
+		OS: &OS{
+			ResetBootLoaderType: "hard-reset",
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "root",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.NoError(t, err)
+}
+
+func TestConfigIsValidVerityPartitionNotFound(t *testing.T) {
+	config := &Config{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				Partitions: []Partition{
+					{
+						Id: "esp",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 8 * diskutils.MiB,
+						},
+						Type: PartitionTypeESP,
+					},
+					{
+						Id: "root",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 1 * diskutils.GiB,
+						},
+					},
+					{
+						Id: "verityhash",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 100 * diskutils.MiB,
+						},
+					},
+				},
+			}},
+			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+				{
+					DeviceId: "root",
+					Type:     "ext4",
+					MountPoint: &MountPoint{
+						Path: "/",
+					},
+				},
+			},
+		},
+		OS: &OS{
+			ResetBootLoaderType: "hard-reset",
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "wrongname",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid verity 'dataPartition'")
+	assert.ErrorContains(t, err, "partition with 'id' (wrongname) not found")
+}
+
+func TestConfigIsValidVerityNoStorage(t *testing.T) {
+	config := &Config{
+		OS: &OS{
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypePartLabel,
+					Id:     "root",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid verity 'hashPartition'")
+	assert.ErrorContains(t, err, "'idType' cannot be 'id' if 'storage' is not specified")
 }

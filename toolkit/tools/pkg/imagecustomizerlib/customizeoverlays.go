@@ -79,7 +79,7 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 		workDir := overlay.WorkDir
 		mountDependencies := overlay.MountDependencies
 
-		if overlay.IsRootfsOverlay {
+		if overlay.IsInitrdOverlay {
 			// Validate that each mountDependency has the x-initrd.mount option in
 			// the corresponding fstab entry.
 			for i, dep := range mountDependencies {
@@ -117,7 +117,7 @@ func updateFstabForOverlays(overlays []imagecustomizerapi.Overlay, imageChroot *
 		for _, dep := range mountDependencies {
 			options = fmt.Sprintf("%s,x-systemd.requires=%s", options, dep)
 		}
-		if overlay.IsRootfsOverlay {
+		if overlay.IsInitrdOverlay {
 			options = fmt.Sprintf("%s,x-initrd.mount,x-systemd.wanted-by=initrd-fs.target", options)
 		}
 		if overlay.MountOptions != "" {

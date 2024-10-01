@@ -4,6 +4,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "389-ds-base",
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/389ds/389-ds-base/releases/download/389-ds-base-3.1.1/389-ds-base-3.1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "a52dec",
           "version": "0.7.4",
           "downloadUrl": "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
@@ -1127,8 +1137,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.3.0.tar.gz"
+          "version": "2.3.2",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.3.2.tar.gz"
         }
       }
     },
@@ -1617,8 +1627,8 @@
         "type": "other",
         "other": {
           "name": "CharLS",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/team-charls/charls/archive/2.0.0/CharLS-2.0.0.tar.gz"
+          "version": "2.4.2",
+          "downloadUrl": "https://github.com/team-charls/charls/archive/refs/tags/2.4.2.tar.gz"
         }
       }
     },
@@ -1777,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "24.3",
-          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.3.tar.gz"
+          "version": "24.2",
+          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.2.tar.gz"
         }
       }
     },
@@ -1837,8 +1847,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.29.6",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.29.6/cmake-3.29.6.tar.gz"
+          "version": "3.30.3",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3.tar.gz"
         }
       }
     },
@@ -2638,8 +2648,8 @@
         "type": "other",
         "other": {
           "name": "distribution-gpg-keys",
-          "version": "1.104",
-          "downloadUrl": "https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.104-1.tar.gz"
+          "version": "1.105",
+          "downloadUrl": "https://github.com/rpm-software-management/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.105-1.tar.gz"
         }
       }
     },
@@ -4581,7 +4591,7 @@
         "other": {
           "name": "golang",
           "version": "1.22.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-1/go1.22.7-20240905.3.src.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-3/go1.22.7-20240925.5.src.tar.gz"
         }
       }
     },
@@ -5110,8 +5120,8 @@
         "type": "other",
         "other": {
           "name": "haproxy",
-          "version": "2.9.1",
-          "downloadUrl": "https://www.haproxy.org/download/2.9/src/haproxy-2.9.1.tar.gz"
+          "version": "2.9.11",
+          "downloadUrl": "https://www.haproxy.org/download/2.9/src/haproxy-2.9.11.tar.gz"
         }
       }
     },
@@ -8071,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "keda",
-          "version": "2.14.0",
-          "downloadUrl": "https://github.com/kedacore/keda/archive/refs/tags/v2.14.0.tar.gz"
+          "version": "2.14.1",
+          "downloadUrl": "https://github.com/kedacore/keda/archive/refs/tags/v2.14.1.tar.gz"
         }
       }
     },
@@ -8893,6 +8903,16 @@
           "name": "libcroco",
           "version": "0.6.13",
           "downloadUrl": "https://gitlab.gnome.org/Archive/libcroco/-/archive/0.6.13/libcroco-0.6.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libcxx",
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -11311,8 +11331,8 @@
         "type": "other",
         "other": {
           "name": "libuser",
-          "version": "0.63",
-          "downloadUrl": "https://releases.pagure.org/libuser/libuser-0.63.tar.xz"
+          "version": "0.64",
+          "downloadUrl": "https://releases.pagure.org/libuser/libuser-0.64.tar.gz"
         }
       }
     },
@@ -13152,8 +13172,8 @@
         "type": "other",
         "other": {
           "name": "mock",
-          "version": "2.16",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.16-1.tar.gz"
+          "version": "5.6",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-5.6-1.tar.gz"
         }
       }
     },
@@ -13162,8 +13182,8 @@
         "type": "other",
         "other": {
           "name": "mock-core-configs",
-          "version": "36.4",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.4-1/mock-core-configs-36.4-1.tar.gz"
+          "version": "41.2",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-41.2-1/mock-core-configs-41.2-1.tar.gz"
         }
       }
     },
@@ -13291,16 +13311,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mosh",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ModemManager",
           "version": "1.18.12",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.12.tar.xz"
@@ -13314,6 +13324,16 @@
           "name": "mokutil",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/lcp/mokutil/archive/0.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
         }
       }
     },
@@ -21772,6 +21792,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-backoff",
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/litl/backoff/archive/refs/tags/v2.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-bcrypt",
           "version": "3.2.0",
           "downloadUrl": "https://pypi.io/packages/source/b/bcrypt/bcrypt-3.2.0.tar.gz"
@@ -22983,8 +23013,8 @@
         "type": "other",
         "other": {
           "name": "python-ldap",
-          "version": "3.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-ldap/python-ldap-3.4.0.tar.gz"
+          "version": "3.4.4",
+          "downloadUrl": "https://github.com/python-ldap/python-ldap/archive/refs/tags/python-ldap-3.4.4.tar.gz"
         }
       }
     },
@@ -23803,8 +23833,8 @@
         "type": "other",
         "other": {
           "name": "python-pyroute2",
-          "version": "0.6.5",
-          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.6.5.tar.gz"
+          "version": "0.7.12",
+          "downloadUrl": "https://github.com/svinota/pyroute2/archive/refs/tags/0.7.12.tar.gz"
         }
       }
     },
@@ -24185,6 +24215,16 @@
           "name": "python-rpm-generators",
           "version": "10",
           "downloadUrl": "https://raw.githubusercontent.com/rpm-software-management/rpm/102eab50b3d0d6546dfe082eac0ade21e6b3dbf1/COPYING"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rpmautospec-core",
+          "version": "0.1.5",
+          "downloadUrl": "https://github.com/fedora-infra/rpmautospec-core/releases/download/0.1.5/rpmautospec_core-0.1.5.tar.gz"
         }
       }
     },
@@ -24583,8 +24623,8 @@
         "type": "other",
         "other": {
           "name": "python-templated-dictionary",
-          "version": "1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz"
+          "version": "1.4",
+          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.4-1.tar.gz"
         }
       }
     },
@@ -25503,8 +25543,8 @@
         "type": "other",
         "other": {
           "name": "realmd",
-          "version": "0.16.3",
-          "downloadUrl": "http://www.freedesktop.org/software/realmd/releases/realmd-0.16.3.tar.gz"
+          "version": "0.17.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/realmd/realmd/-/archive/0.17.1/realmd-0.17.1.tar.gz"
         }
       }
     },
@@ -29126,8 +29166,8 @@
         "type": "other",
         "other": {
           "name": "usermode",
-          "version": "1.112",
-          "downloadUrl": "https://releases.pagure.org/usermode/usermode-1.112.autotoolized.tar.xz"
+          "version": "1.114",
+          "downloadUrl": "https://releases.pagure.org/usermode/usermode-1.114.tar.xz"
         }
       }
     },
@@ -29238,6 +29278,16 @@
           "name": "valgrind",
           "version": "3.22.0",
           "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "valkey",
+          "version": "8.0.0",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.0.tar.gz"
         }
       }
     },

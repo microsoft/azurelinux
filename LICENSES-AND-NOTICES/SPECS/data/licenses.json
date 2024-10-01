@@ -35,6 +35,7 @@
         "Fedora": {
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
+                "389-ds-base",
                 "a52dec",
                 "abseil-cpp",
                 "accountsservice",
@@ -601,6 +602,7 @@
                 "libcmpiutil",
                 "libcomps",
                 "libcroco",
+                "libcxx",
                 "libdaemon",
                 "libdap",
                 "libdatrie",
@@ -1641,6 +1643,7 @@
                 "python-async-generator",
                 "python-augeas",
                 "python-azure-sdk",
+                "python-backoff",
                 "python-beautifulsoup4",
                 "python-betamax",
                 "python-blinker",
@@ -1801,6 +1804,7 @@
                 "python-rfc3986",
                 "python-rich",
                 "python-rpm-generators",
+                "python-rpmautospec-core",
                 "python-rpmfluff",
                 "python-rtslib",
                 "python-ruamel-yaml",
@@ -2428,6 +2432,7 @@
                 "umoci",
                 "usrsctp",
                 "vala",
+                "valkey",
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"

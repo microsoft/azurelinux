@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.29.6
-Release:        1%{?dist}
+Version:        3.30.3
+Release:        2%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,9 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         0001-manually-recreating-patches.patch
+Patch1:         CVE-2024-6197.patch
+Patch2:         CVE-2024-6874.patch
+Patch3:         CVE-2024-8096.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -90,6 +93,12 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Thu Sep 26 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-2
+- Fix CVE-2024-6197, CVE-2024-6874, and CVE-2024-8096
+
+* Mon Sep 23 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-1
+- Upgrade to 3.30.3 to address CVE-2024-24806
+
 * Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
 - Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
 - Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
