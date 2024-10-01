@@ -58,6 +58,7 @@ version_matching_groups = [
     frozenset([
         "SPECS/clang/clang.spec",
         "SPECS/compiler-rt/compiler-rt.spec",
+        "SPECS/libcxx/libcxx.spec",
         "SPECS/lld/lld.spec",
         "SPECS/lldb/lldb.spec",
         "SPECS/llvm/llvm.spec"
