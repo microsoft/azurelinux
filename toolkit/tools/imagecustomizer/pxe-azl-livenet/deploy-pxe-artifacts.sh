@@ -11,7 +11,12 @@ scriptDir=$(dirname "$scriptPath")
 tftpLocalDir="/var/lib/tftpboot"
 httpLocalDir="/etc/httpd/azl-os"
 
+# `iso-publish-path` can be specified in the Azure Linux configuration under
+# `pxe|pxeImageUrl`
 httpRootPlaceHolder="iso-publish-path"
+
+# `192.168.0.1/azl-os` must match the http server ip and the folder configured
+# to server artifacts from.
 httpRoot="192.168.0.1/azl-os"
 
 # ---- Commnad Line ----
@@ -20,19 +25,31 @@ function show_usage() {
     echo
     echo "$(basename ${BASH_SOURCE[0]}) <source-path>"
     echo
-    echo "  Sample script that sets up a PXE server with the Azure Linux artifacts for PXE booting."
+    echo "  Sample script that deploys the Azure Linux PXE artifacts to a PXE server."
     echo "  It assumes a tftp and an http servers are running on the local machine where:"
     echo "  - tftp root is at /var/lib/tftpboot"
     echo "  - http root is at /etc/httpd"
     echo
-    echo "  <source-path>: local path to the source of the artifacts to deploy."
-    echo "                 It accepts either:"
-    echo "                 - a full path to an iso image file."
-    echo "                 - a full path to a local folder populated by the imagecustomizer --output-pxe-artifacts-dir"
+    echo "  <source-path>        : local path to the source of the artifacts to deploy."
+    echo "                         It accepts either:"
+    echo "                         - a full path to an iso image file."
+    echo "                         - a full path to a local folder populated by the imagecustomizer --output-pxe-artifacts-dir"
     echo
-    echo " <iso-url-place-holder>: place-holder string in grub.cfg to replace."
+    echo " <iso-url-place-holder>: place-holder string in grub.cfg to be replaced with the http server ip and root path at deployment time."
+    echo "                         This string can be specified in the Image Customizer configuration under pxe | isoImageUrl"
+    echo "                         For example:"
     echo
-    echo " <iso-url>             : url string to replace the place-holder string in grub.cfg."
+    echo "                         -p iso-publish-path"
+    echo
+    echo "                         where the Image Customizer config file has:"
+    echo
+    echo "                         pxe:"
+    echo "                           isoImageUrl: http://iso-publish-path/my-os.iso"
+    echo
+    echo " <iso-url>             : string holding the http server ip and root path to replace the place holder string specified by <iso-url-place-holder>."
+    echo "                         For example:"
+    echo
+    echo "                         -r 192.168.0.1/azl-os"
     echo
 }
 
