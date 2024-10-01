@@ -5,7 +5,7 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "cblmariner-gen2-fips",
+                    "Name": "azurelinux-gen2-fips",
                     "Type": "vhd"
                 }
             ],
