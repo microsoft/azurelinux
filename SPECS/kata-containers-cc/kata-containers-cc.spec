@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%define sourceName kata-containers
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl3
@@ -8,8 +9,8 @@ License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
 Vendor:       Microsoft Corporation
 Distribution: Azure Linux
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:      %{name}-%{version}-cargo.tar.gz
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
+Source1:      %{sourceName}-%{version}-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
@@ -40,14 +41,16 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 %description tools
 This package contains the scripts and files required to build the UVM
 
+
+
 %prep
-%autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
+%autosetup -p1 -n %{sourceName}-%{version}
+pushd %{_builddir}/%{sourceName}-%{version}
 tar -xf %{SOURCE1}
 popd
 
 %build
-pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
 OS_VERSION=3.0 %make_build package-confpods
 popd
 
@@ -58,7 +61,7 @@ popd
 %define tools_pkg     %{kata_path}/uvm
 
 %install
-pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
+pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-confpods-package
 PREFIX=%{buildroot} %make_build deploy-confpods-package-tools
 popd
