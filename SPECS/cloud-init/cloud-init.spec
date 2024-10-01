@@ -142,6 +142,10 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Oct 01 2024 Minghe Ren <mingheren@microsoft.com> - 24.3-1
+- Upgrade cloud-init to 24.3 to support azure-proxy-agent
+- Add upstream patch no-single-process.patch to revert a behavior change on cloud-init systemd
+
 * Tue Jul 16 2024 Minghe Ren <mingheren@microsoft.com> - 24.2-2
 - Add patch to point default cloud-init binaries location
 
