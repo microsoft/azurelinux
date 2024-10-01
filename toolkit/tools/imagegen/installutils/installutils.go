@@ -820,7 +820,7 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 		// end with an empty line.
 		for _, line := range splitStdout {
 			matches := tdnf.InstallPackageRegex.FindStringSubmatch(line)
-			if len(matches) != tdnf.InstallMaxMatchLen {
+			if len(matches) != tdnf.InstallPackageMaxMatchLen {
 				// This line contains output other than a package information; skip it
 				continue
 			}

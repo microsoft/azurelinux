@@ -474,8 +474,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			// MUST keep order of packages printed by TDNF.
 			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
 			// https://github.com/rpm-software-management/rpm/issues/2359
-			for _, matches := range tdnf.PackageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
-				packageName := matches[tdnf.PackageNameIndex]
+			for _, matches := range tdnf.PackageProvidesRegex.FindAllStringSubmatch(stdout, -1) {
+				packageName := matches[tdnf.PackageProvidesNameIndex]
 				if lookupIgnoredCase {
 					logger.Log.Warnf("'%s' was found by case-insensitive lookup of '%s', but this is not valid and will be ignored", packageName, pkgVer.Name)
 					// This is not a valid mapping of requires -> provides, so we skip it. This is not a fatal error since
@@ -556,15 +556,15 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 	repoContents = &repocloner.RepoContents{}
 	onStdout := func(line string) {
 		matches := tdnf.ListedPackageRegex.FindStringSubmatch(line)
-		if len(matches) != tdnf.ListMaxMatchLen {
+		if len(matches) != tdnf.ListedPackageMaxMatchLen {
 			return
 		}
 
 		pkg := &repocloner.RepoPackage{
-			Name:         matches[tdnf.ListPackageName],
-			Version:      matches[tdnf.ListPackageVersion],
-			Architecture: matches[tdnf.ListPackageArch],
-			Distribution: matches[tdnf.ListPackageDist],
+			Name:         matches[tdnf.ListedPackageName],
+			Version:      matches[tdnf.ListedPackageVersion],
+			Architecture: matches[tdnf.ListedPackageArch],
+			Distribution: matches[tdnf.ListedPackageDist],
 		}
 
 		pkgID := pkg.ID()
