@@ -130,6 +130,8 @@ Below is a list of the files necessary for PXE booting:
 # tftp server default local root is at: /var/lib/tftpboot
 # http server default local root is at: /etc/httpd
 ```
+For a sample script deploying the artifacts to a PXE server, see
+[./samples/deploy-pxe-artifacts.sh](./samples/deploy-pxe-artifacts.sh).
 
 ## --log-level=LEVEL
 
