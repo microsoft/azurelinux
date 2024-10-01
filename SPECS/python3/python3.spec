@@ -325,7 +325,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Tue Oct 01 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-5
+* Tue Oct 01 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-6
 - Patch for CVE-2024-4032
 
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.9.19-5
