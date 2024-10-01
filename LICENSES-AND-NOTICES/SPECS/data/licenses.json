@@ -2431,6 +2431,7 @@
                 "umoci",
                 "usrsctp",
                 "vala",
+                "valkey",
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"
