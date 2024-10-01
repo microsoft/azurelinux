@@ -144,17 +144,14 @@
   systemctl start httpd
   systemctl status httpd
 
-  mkdir /etc/httpd/marineros
-  # copy all artifacts
-  # touch /etc/httpd/marineros/index.html
-  # vim /etc/httpd/marineros/index.html
-  chmod -R 755 /etc/httpd/marineros/
+  mkdir /etc/httpd/azl-os
+  chmod -R 755 /etc/httpd/azl-os/
 
   vim /etc/httpd/conf/httpd.conf
   # right below `ServerName localhost:80`
 
-  Alias /marineros /etc/httpd/marineros 
-  <Directory /etc/httpd/marineros> 
+  Alias /azl-os /etc/httpd/azl-os 
+  <Directory /etc/httpd/azl-os> 
       Options Indexes FollowSymLinks 
       AllowOverride None 
       Require all granted 

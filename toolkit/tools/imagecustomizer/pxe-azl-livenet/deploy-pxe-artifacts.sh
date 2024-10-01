@@ -1,25 +1,64 @@
 #!/bin/bash
 
-set -x
+# set -x
 set -e
-
-if [ -z "$1" ]; then
-    echo "Must provide the name of the iso image file."
-    exit 1
-fi
 
 scriptPath=$(realpath ${BASH_SOURCE[0]})
 scriptDir=$(dirname "$scriptPath")
 
-sourcePath=$1
-
 # ---- constants ----
 
 tftpLocalDir="/var/lib/tftpboot"
-httpLocalDir="/etc/httpd/marineros"
+httpLocalDir="/etc/httpd/azl-os"
+
 httpRootPlaceHolder="iso-publish-path"
-httpRoot="192.168.0.1/marineros/liveos"
-isoRelativePath=liveos/
+httpRoot="192.168.0.1/azl-os"
+
+# ---- Commnad Line ----
+
+function show_usage() {
+    echo
+    echo "$(basename ${BASH_SOURCE[0]}) <source-path>"
+    echo
+    echo "  Sample script that sets up a PXE server with the Azure Linux artifacts for PXE booting."
+    echo "  It assumes a tftp and an http servers are running on the local machine where:"
+    echo "  - tftp root is at /var/lib/tftpboot"
+    echo "  - http root is at /etc/httpd"
+    echo
+    echo "  <source-path>: local path to the source of the artifacts to deploy."
+    echo "                 It accepts either:"
+    echo "                 - a full path to an iso image file."
+    echo "                 - a full path to a local folder populated by the imagecustomizer --output-pxe-artifacts-dir"
+    echo
+    echo " <iso-url-place-holder>: place-holder string in grub.cfg to replace."
+    echo
+    echo " <iso-url>             : url string to replace the place-holder string in grub.cfg."
+    echo
+}
+
+# -s -> input iso or input directory containing the PXE artifacts.
+while getopts ":s:p:r:" OPTIONS; do
+  case "${OPTIONS}" in
+    s ) sourcePath=$OPTARG ;;
+    p ) httpRootPlaceHolder=$OPTARG ;;
+    r ) httpRoot=$OPTARG ;;
+
+    \? )
+        echo "Error - Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+  esac
+done
+
+if [ -z "$sourcePath" ]; then
+    echo "error: missing required parameter 'source-path'."
+    show_usage
+    exit 1
+fi
 
 # ---- helper functions ----
 
@@ -84,19 +123,21 @@ function deploy_tftp_folder() {
 
 function deploy_http_folder() {
     local sourceIsoPath=$1
-    local isoRelativePath=$2
-    local httpLocalDir=$3
+#    local isoRelativePath=$2
+    local httpLocalDir=$2
 
     mkdir -p $httpLocalDir/liveos
     chmod 755 $httpLocalDir/liveos
-    copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath/$(basename $sourceIsoPath)
+    # copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath/$(basename $sourceIsoPath)
+    copy_file $sourceIsoPath $httpLocalDir/$(basename $sourceIsoPath)
 }
 
 function deploy() {
     local artifactsRootDir=$1
     local sourceIsoPath=$2
 
-    deploy_http_folder $sourceIsoPath $isoRelativePath $httpLocalDir
+    # deploy_http_folder $sourceIsoPath $isoRelativePath $httpLocalDir
+    deploy_http_folder $sourceIsoPath $httpLocalDir
     deploy_tftp_folder $artifactsRootDir $tftpLocalDir
     systemctl restart httpd
 }
@@ -122,7 +163,7 @@ if [[ -f "$sourcePath" ]]; then
 
     mount_iso $sourceIsoPath $isoMountDir
     deploy $isoMountDir $sourceIsoPath
-    # unmount_iso $isoMountDir
+    unmount_iso $isoMountDir
 
 elif [[ -d "$sourcePath" ]]; then
 
