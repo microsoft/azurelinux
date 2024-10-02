@@ -29,11 +29,6 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	err = cleanUpImage(imageChroot)
-	if err != nil {
-		return err
-	}
-
 	err = UpdateHostname(config.OS.Hostname, imageChroot)
 	if err != nil {
 		return err
@@ -76,6 +71,11 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 
 	selinuxMode, err := handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
 		imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = cleanUpImage(imageChroot)
 	if err != nil {
 		return err
 	}

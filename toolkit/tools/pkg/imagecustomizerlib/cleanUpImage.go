@@ -35,10 +35,12 @@ func cleanUpImage(imageChroot *safechroot.Chroot) error {
 
 	// Run all cleanup tasks inside the chroot environment
 	return imageChroot.UnsafeRun(func() error {
-		if err := tdnfClean(); err != nil {
+		err := tdnfClean()
+		if err != nil {
 			return err
 		}
-		if err := clearJournalLogs(); err != nil {
+		err = clearJournalLogs()
+		if err != nil {
 			return err
 		}
 		return nil
