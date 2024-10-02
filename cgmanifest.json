@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "24.3",
-          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.3.tar.gz"
+          "version": "24.3.1",
+          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.3.1.tar.gz"
         }
       }
     },
