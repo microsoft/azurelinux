@@ -511,10 +511,6 @@ Example: `noatime,nodiratime`
 Specifies the configuration for dm-verity root integrity verification. Please
 execute `sudo modprobe nbd` before building the image with verity enablement.
 
-Please enable overlays for the `/var/lib` and `/var/log` directories, along with
-verity enablement, to ensure proper functioning of services. For an example,
-please refer to the [overlay type](#overlay-type) section.
-
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
 
@@ -549,6 +545,22 @@ os:
       Id: hash_partition
     corruptionOption: panic
 ```
+
+When enabling the Verity feature, it is recommended that overlays are applied to
+the following paths to maintain proper service functionality.
+
+| Path            | Properties                                 | Services Unblocked                                                            |
+| --------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
+| /var/lib        | • writable<br>• executable<br>• persistent | • systemd-networkd.service<br>• accounts-daemon.service                       |
+| /var/lib/cloud  | • writable<br>• executable<br>• volatile   | • cloud-init-local.service<br>• cloud-config.service<br>• cloud-final.service |
+| /var/lib/docker | • writable<br>• executable<br>• persistent | • docker.service                                                              |
+| /var/log        | • writable<br>• executable<br>• persistent | • auditd.service<br>• logrotate.service                                       |
+
+In addition to applying overlays, it is recommended to disable unnecessary
+services to ensure proper functionality and optimize performance for
+Verity-enabled images. For example, services like `systemd-growfs-root.service`,
+which attempts to resize the root filesystem, should be disabled since the root
+filesystem is protected and mounted as read-only by Verity.
 
 ## additionalFile type
 
