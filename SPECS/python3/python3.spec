@@ -170,6 +170,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
