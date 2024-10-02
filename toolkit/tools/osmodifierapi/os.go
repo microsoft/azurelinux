@@ -18,7 +18,6 @@ type OS struct {
 	Users    []imagecustomizerapi.User  `yaml:"users"`
 	Overlays *[]Overlay                 `yaml:"overlays"`
 	Verity   *imagecustomizerapi.Verity `yaml:"verity"`
-	RootHash string                     `yaml:"roothash"`
 }
 
 func (s *OS) IsValid() error {
@@ -64,6 +63,13 @@ func (s *OS) IsValid() error {
 				return fmt.Errorf("duplicate workDir (%s) found in overlay at index %d", overlay.WorkDir, i)
 			}
 			workDirs[overlay.WorkDir] = true
+		}
+	}
+
+	if s.Verity != nil {
+		err = s.Verity.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid verity:\n%w", err)
 		}
 	}
 
