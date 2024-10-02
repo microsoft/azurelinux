@@ -494,3 +494,49 @@ func TestConflictingPackageRegex(t *testing.T) {
 		})
 	}
 }
+
+func TestStripEpochFromVersion(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputVersion   string
+		expectedOutput string
+	}{
+		{
+			name:           "version with epoch",
+			inputVersion:   "4:5.34.1-489.azlX",
+			expectedOutput: "5.34.1-489.azlX",
+		},
+		{
+			name:           "version without epoch",
+			inputVersion:   "5.34.1-489.azlX",
+			expectedOutput: "5.34.1-489.azlX",
+		},
+		{
+			name:           "version with zero epoch",
+			inputVersion:   "0:5.34.1-489.azlX",
+			expectedOutput: "5.34.1-489.azlX",
+		},
+		{
+			name:           "empty version",
+			inputVersion:   "",
+			expectedOutput: "",
+		},
+		{
+			name:           "version with only epoch",
+			inputVersion:   "4:",
+			expectedOutput: "",
+		},
+		{
+			name:           "version with underscore in the release",
+			inputVersion:   "4:5.34.1-489_azlX",
+			expectedOutput: "5.34.1-489_azlX",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := StripEpochFromVersion(test.inputVersion)
+			assert.Equal(t, test.expectedOutput, output)
+		})
+	}
+}

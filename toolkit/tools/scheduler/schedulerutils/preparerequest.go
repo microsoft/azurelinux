@@ -133,7 +133,7 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		Freshness:      buildState.GetMaxFreshness(),
 	}
 
-	requiredRebuild := isRequiredRebuild(pkgGraph, request.Node, packagesToRebuild)
+	requiredRebuild := isRequiredRebuild(pkgGraph, builtNode, packagesToRebuild)
 	if !requiredRebuild && isCacheAllowed {
 		// We might be able to use the cache, set the freshness based on node's dependencies.
 		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
@@ -207,6 +207,8 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 // - missing RPMs or
 // - user explicitly requesting the node to be rebuilt.
 func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer) bool {
+	logger.Log.Debugf("Checking if node %v is required to be rebuilt.", node.FriendlyName())
+
 	return nodeHasMissingRPMs(pkgGraph, node) || nodeRequestedForRebuildByUser(node, packagesToRebuild)
 }
 
@@ -266,6 +268,10 @@ func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *Gr
 // nodeHasMissingRPMs checks if all RPMs expected from the node's SRPM are present.
 // If any of the RPMs produced by the SRPM are missing, we must build the SRPM and reset the freshness of the node.
 func nodeHasMissingRPMs(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode) (rpmsMissing bool) {
+	if node.SrpmPath == pkggraph.NoSRPMPath {
+		return
+	}
+
 	expectedFiles, missingFiles := pkggraph.FindRPMFiles(node.SrpmPath, pkgGraph, nil)
 
 	rpmsMissing = len(missingFiles) != 0

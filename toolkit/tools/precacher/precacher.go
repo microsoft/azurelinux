@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"os"
 	"path"
-	"strings"
 	"sync"
 	"time"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
@@ -267,10 +267,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 
 func formatName(pkg *repocloner.RepoPackage) (pkgName, fileName string) {
 	// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
-	version := pkg.Version
-	if strings.Contains(version, ":") {
-		version = strings.Split(version, ":")[1]
-	}
+	version := rpm.StripEpochFromVersion(pkg.Version)
 
 	pkgName = fmt.Sprintf("%s-%s.%s.%s", pkg.Name, version, pkg.Distribution, pkg.Architecture)
 	fileName = fmt.Sprintf("%s.rpm", pkgName)

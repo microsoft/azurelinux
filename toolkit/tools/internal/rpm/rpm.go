@@ -527,9 +527,7 @@ func extractCompetingPackageInfoFromLine(line string) (match bool, pkgName strin
 		version := matches[installedRPMRegexVersionIndex]
 		arch := matches[installedRPMRegexArchIndex]
 		// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
-		if strings.Contains(version, ":") {
-			version = strings.Split(version, ":")[1]
-		}
+		version = StripEpochFromVersion(version)
 
 		return true, fmt.Sprintf("%s-%s.%s", pkgName, version, arch)
 	}
@@ -634,6 +632,14 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	}
 
 	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// StripEpochFromVersion removes the epoch from a version string if it is present.
+func StripEpochFromVersion(version string) string {
+	if strings.Contains(version, ":") {
+		return strings.Split(version, ":")[1]
+	}
+	return version
 }
 
 // TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file
