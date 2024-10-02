@@ -1,9 +1,6 @@
 {
     "packages": [
         "azurelinux-release",
-        "azurelinux-repos",
-        "azurelinux-repos-ms-non-oss",
-        "azurelinux-repos-ms-oss",
         "azurelinux-rpm-macros",
         "bash",
         "ca-certificates",
