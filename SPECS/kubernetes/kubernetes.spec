@@ -23,6 +23,7 @@ Patch1:         CVE-2023-48795.patch
 Patch2:         CVE-2023-5408.patch
 Patch3:         CVE-2023-45288.patch
 Patch4:         CVE-2024-28180.patch
+Patch5:         CVE-2024-24786.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -270,7 +271,7 @@ fi
 
 %changelog
 * Mon Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.28.4-11
-- Add patch to resolve CVE-2024-28180
+- Add patch to resolve CVE-2024-28180 and CVE-2024-24786
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.4-10
 - Bump release to rebuild with go 1.22.7
