@@ -125,7 +125,9 @@ Below is a list of the files necessary for PXE booting:
        |- grubenv               // target: <tftp-server-root>/boot/grub2/grubenv
    |- vmlinuz                   // target: <tftp-server-root>/boot/vmlinuz
    |- initrd.img                // target: <tftp-server-root>/boot/initrd.img
-./pxe-20240930-1331.iso         // target: <http-server-root>/marineros/liveos/pxe-20240930-1331.iso
+./pxe-20240930-1331.iso         // target: <http-server-root>/pxe-20240930-1331.iso
+                                //         The iso location must map to what the user
+                                //         specifies in grub.cfg root=live:<path>.
 
 # tftp server default local root is at: /var/lib/tftpboot
 # http server default local root is at: /etc/httpd
