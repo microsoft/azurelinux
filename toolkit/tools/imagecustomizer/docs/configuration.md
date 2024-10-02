@@ -547,7 +547,8 @@ os:
 ```
 
 When enabling the Verity feature, it is recommended that overlays are applied to
-the following paths to maintain proper service functionality.
+the following paths to ensure proper service functionality, provided that your
+image has the relevant services enabled.
 
 | Path            | Properties                                 | Services Unblocked                                                            |
 | --------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
@@ -557,10 +558,10 @@ the following paths to maintain proper service functionality.
 | /var/log        | • writable<br>• executable<br>• persistent | • auditd.service<br>• logrotate.service                                       |
 
 In addition to applying overlays, it is recommended to disable unnecessary
-services to ensure proper functionality and optimize performance for
-Verity-enabled images. For example, services like `systemd-growfs-root.service`,
-which attempts to resize the root filesystem, should be disabled since the root
-filesystem is protected and mounted as read-only by Verity.
+services to ensure proper functionality for Verity-enabled images. For example,
+if your image has the `systemd-growfs-root.service` enabled, which attempts to
+resize the root filesystem, it should be disabled since the root filesystem is
+protected and mounted as read-only by Verity.
 
 ## additionalFile type
 
