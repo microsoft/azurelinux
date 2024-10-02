@@ -29,6 +29,11 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
+	err = cleanUpImage(imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = UpdateHostname(config.OS.Hostname, imageChroot)
 	if err != nil {
 		return err
