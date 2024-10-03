@@ -26,20 +26,9 @@ func cleanUpImage(imageChroot *safechroot.Chroot) error {
 			Execute()
 	}
 
-	// Clear journal logs
-	clearJournalLogs := func() error {
-		return shell.NewExecBuilder("journalctl", "--vacuum-time=1s").
-			LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
-			Execute()
-	}
-
 	// Run all cleanup tasks inside the chroot environment
 	return imageChroot.UnsafeRun(func() error {
 		err := tdnfClean()
-		if err != nil {
-			return err
-		}
-		err = clearJournalLogs()
 		if err != nil {
 			return err
 		}
