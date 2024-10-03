@@ -546,22 +546,26 @@ os:
     corruptionOption: panic
 ```
 
-When enabling the Verity feature, it is recommended that overlays are applied to
-the following paths to ensure proper service functionality, provided that your
-image has the relevant services enabled.
+The Verity-enabled root filesystem is always mounted as read-only. Its root hash
+and hash tree are computed at build time and verified by systemd during the
+initramfs phase on each boot. When enabling the Verity feature, it is
+recommended to create a writable persistent partition (e.g., /var) for any
+directories that require write access. Critical files and directories, such as
+SSH host keys or logs, can be redirected to the writable partition using
+symlinks or similar methods. See [Verity Filesystem Layout
+Recommendations](./verity-filesystem-layout-recommendations.md) for details.
 
-| Path            | Properties                                 | Services Unblocked                                                            |
-| --------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
-| /var/lib        | • writable<br>• executable<br>• persistent | • systemd-networkd.service<br>• accounts-daemon.service                       |
-| /var/lib/cloud  | • writable<br>• executable<br>• volatile   | • cloud-init-local.service<br>• cloud-config.service<br>• cloud-final.service |
-| /var/lib/docker | • writable<br>• executable<br>• persistent | • docker.service                                                              |
-| /var/log        | • writable<br>• executable<br>• persistent | • auditd.service<br>• logrotate.service                                       |
+Please note that some services and programs on Azure Linux may require specific
+handling when using Verity. Depending on user needs, there are different
+configuration options that offer tradeoffs between convenience and security.
+Some configurations can be made flexible to allow changes, while others may be
+set as immutable for enhanced security. 
 
-In addition to applying overlays, it is recommended to disable unnecessary
-services to ensure proper functionality for Verity-enabled images. For example,
-if your image has the `systemd-growfs-root.service` enabled, which attempts to
-resize the root filesystem, it should be disabled since the root filesystem is
-protected and mounted as read-only by Verity.
+For example, if your image includes the `systemd-growfs-root.service`, which
+attempts to resize the root filesystem, there are two approaches you can take.
+One option is to disable the service to prevent failure. Alternatively, you can
+leave the service unchanged, as it will not cause any issues since the root
+filesystem is protected and mounted as read-only by Verity.
 
 ## additionalFile type
 
