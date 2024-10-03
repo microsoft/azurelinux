@@ -92,6 +92,23 @@ var (
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+)-([^-]+-[^-]+) (\S+)-linux.*$`)
 
+	// A full qualified RPM name contains the package name, epoch, version, release, and architecture.
+	// Optional fields:
+	// 	- epoch,
+	// 	- architecture.
+	//
+	// Sample match:
+	//
+	//	pkg-name-0:1.2.3-4.azl3.x86_64
+	//
+	// Groups can be used to split it into:
+	//   - name:			pkg-name
+	//   - epoch:			0
+	//   - version:			1.2.3
+	//   - release:			4.azl3
+	//   - architecture:	x86_64
+	packageFQNRegex = regexp.MustCompile(`^\s*(\S+)-(?:(\d+):)?([^-]+)-(\S+?)(?:\.([^.]+?))?\s*$`)
+
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
 	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
@@ -526,8 +543,6 @@ func extractCompetingPackageInfoFromLine(line string) (match bool, pkgName strin
 		pkgName := matches[installedRPMRegexRPMIndex]
 		version := matches[installedRPMRegexVersionIndex]
 		arch := matches[installedRPMRegexArchIndex]
-		// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
-		version = StripEpochFromVersion(version)
 
 		return true, fmt.Sprintf("%s-%s.%s", pkgName, version, arch)
 	}
@@ -632,6 +647,13 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	}
 
 	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// StripEpochFromPackageFullQualifiedName removes the epoch from a package full qualified name if it is present.
+// Example:
+//
+//	"pkg-name-0:1.2.3-4.azl3.x86_64" -> "pkg-name-1.2.3-4.azl3.x86_64"
+func StripEpochFromPackageFullQualifiedName(version string) string {
 }
 
 // StripEpochFromVersion removes the epoch from a version string if it is present.

@@ -470,7 +470,7 @@ func TestConflictingPackageRegex(t *testing.T) {
 			name:           "perl with epoch",
 			inputLine:      "D: ========== +++ perl-4:5.34.1-489.cm2 x86_64-linux 0x0",
 			expectedMatch:  true,
-			expectedOutput: "perl-5.34.1-489.cm2.x86_64",
+			expectedOutput: "perl-4:5.34.1-489.cm2.x86_64",
 		},
 		{
 			name:           "systemd no epoch",
