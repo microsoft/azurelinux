@@ -29,7 +29,6 @@ BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-mock
 BuildRequires:  python3-appdirs
-BuildRequires:  python3-iniconfig
 %endif
 BuildArch:      noarch
 
@@ -57,6 +56,7 @@ BuildRequires:  python3-devel
 
 %check
 %if %{with tests}
+pip install iniconfig=2.0.0
 %pytest
 %else
 %pyproject_check_import
