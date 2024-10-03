@@ -925,8 +925,8 @@
         "type": "other",
         "other": {
           "name": "babl",
-          "version": "0.1.82",
-          "downloadUrl": "https://download.gimp.org/pub/babl/0.1/babl-0.1.82.tar.xz"
+          "version": "0.1.108",
+          "downloadUrl": "https://download.gimp.org/pub/babl/0.1/babl-0.1.108.tar.xz"
         }
       }
     },
