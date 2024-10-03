@@ -409,6 +409,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Thu Oct 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-5
 - Make e1000 drivers modules instead of built-in
+- Enable virtio console by default
 
 * Wed Oct 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-4
 - Enable nfsd v4 security label
