@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 %global short_name jcommander
 Name:           beust-%{short_name}
-Version:        1.78
+Version:        2.0
 Release:        1%{?dist}
 Summary:        Java framework for parsing command line parameters
 License:        Apache-2.0
@@ -30,7 +30,6 @@ Source0:        https://github.com/cbeust/%{short_name}/archive/%{version}.tar.g
 # Adapted from earlier version that still shipped poms. It uses kobalt for building now
 Source1:        %{name}.pom
 Source2:        %{name}-build.xml
-Patch0:         0001-ParseValues-NullPointerException-patch.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
@@ -52,9 +51,8 @@ Group:          Development/Libraries/Java
 This package contains the %{summary}.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{short_name}-%{version}
 rm -rf gradle* kobalt* lib
-%patch 0 -p1
 
 chmod -x license.txt
 cp -p %{SOURCE1} pom.xml
@@ -90,6 +88,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Oct 03 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.0-1
+- Catch up to upstream
+- License Verified
+
 * Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.78-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Use javapackages-local-bootstrap to avoid build cycle.
