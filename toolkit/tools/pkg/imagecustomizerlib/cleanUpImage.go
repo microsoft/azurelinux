@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func cleanUpImage(imageChroot *safechroot.Chroot) error {
+func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
 
 	logger.Log.Infof("Cleaning up image")
 

@@ -82,8 +82,7 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
-	// Clean up tdnf cache.
-	err = cleanUpImage(imageChroot)
+	err = cleanTdnfCache(imageChroot)
 	if err != nil {
 		return err
 	}
