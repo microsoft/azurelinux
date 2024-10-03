@@ -245,6 +245,7 @@ func TestPackageLookupNameMatchRegex_FailsForOutputWithOnlyPluginLoaded(t *testi
 	const line = "Loaded plugin: tdnfrepogpgcheck"
 
 	assert.False(t, PackageProvidesRegex.MatchString(line))
+}
 
 func Test_GetRepoSnapshotCliArg(t *testing.T) {
 	type args struct {
