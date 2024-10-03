@@ -12,7 +12,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +79,9 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Thu Oct 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.06-21
+- Dummy bump.
+
 * Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
 - Move grub2-rpm-macros to the azurelinux-rpm-macros package
 

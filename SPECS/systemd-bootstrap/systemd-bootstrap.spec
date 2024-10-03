@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -285,6 +285,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Thu Oct 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-18
+- Dummy bump.
+
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-17
 - Split libs into their own subpackage to align with full systemd.
 

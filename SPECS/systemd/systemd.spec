@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        17%{?dist}
+Release:        18%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -1209,6 +1209,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Oct 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-18
+- Dummy bump.
+
 * Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17
 - Change bfq scheduler patch to select "none" i/o scheduler
 
