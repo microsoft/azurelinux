@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.7.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ Patch4:         CVE-2022-42898.patch
 Patch5:         0001-lib-krb5-krb5_pac_parse-mem-leak-if-pac_header_size-.patch
 Patch6:         0002-kdc-Check-generate_pac-return-code.patch
 Patch7:         0003-kdc-avoid-re-encoding-KDC-REQ-BODY.patch
+Patch8:         CVE-2022-3116.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -487,6 +488,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Tue Oct 01 2024 Ankita Pareek <ankitapareek@microsoft.com> - 7.7.1-4
+- Add backported patch for CVE-2022-3116
+
 * Thu Aug 24 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 7.7.1-3
 - Address CVE-2022-42898
 - Introduce 3 more patches that fix bugs: https://github.com/heimdal/heimdal/issues/1011
