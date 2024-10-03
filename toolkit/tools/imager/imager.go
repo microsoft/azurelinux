@@ -41,7 +41,7 @@ var (
 	emitProgress     = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
 	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 	buildNumber      = app.Flag("build-number", "Build number to be used in the image.").String()
-	repoSnapshotTime = app.Flag("repo-snapshot-time", "Snapshot time to be added to the image tdnf.conf").String()
+	repoSnapshotTime = app.Flag("repo-snapshot-time", "Optional: Snapshot time to be added to the image tdnf.conf").String()
 	logFlags         = exe.SetupLogFlags(app)
 	profFlags        = exe.SetupProfileFlags(app)
 )

@@ -36,7 +36,7 @@ var (
 	imagerTool         = app.Flag("imager", "Path to the imager tool.").Required().ExistingFile()
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-	repoSnapshotTime   = app.Flag("repo-snapshot-time", "tdnf repo snapshot time").String()
+	repoSnapshotTime   = app.Flag("repo-snapshot-time", "Optional: tdnf repo snapshot time").String()
 	logFlags           = exe.SetupLogFlags(app)
 )
 
