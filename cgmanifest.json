@@ -10781,8 +10781,8 @@
         "type": "other",
         "other": {
           "name": "LibRaw",
-          "version": "0.19.5",
-          "downloadUrl": "http://www.libraw.org/data/LibRaw-0.19.5.tar.gz"
+          "version": "0.21.3",
+          "downloadUrl": "https://www.libraw.org/data/LibRaw-0.21.3.tar.gz"
         }
       }
     },
