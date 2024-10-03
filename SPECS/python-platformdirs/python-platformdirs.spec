@@ -7,7 +7,7 @@ a "user data dir".}
 Summary:        Python module for determining appropriate platform-specific dirs
 Name:           python-%{srcname}
 Version:        4.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,6 +68,9 @@ pip install iniconfig=2.0.0
 %doc README.rst
 
 %changelog
+* Thu Oct 03 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-2
+- Fixing the missing dependency in the test section and enable it
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-1
 - Upgraded to 4.2.0
 - Disable tests as pytest requires new package python-exceptiongroup
