@@ -56,7 +56,7 @@ BuildRequires:  python3-devel
 
 %check
 %if %{with tests}
-pip install iniconfig=2.0.0
+pip install iniconfig==2.0.0
 %pytest
 %else
 %pyproject_check_import
