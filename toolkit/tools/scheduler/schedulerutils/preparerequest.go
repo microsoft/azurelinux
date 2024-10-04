@@ -269,6 +269,7 @@ func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *Gr
 // If any of the RPMs produced by the SRPM are missing, we must build the SRPM and reset the freshness of the node.
 func nodeHasMissingRPMs(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode) (rpmsMissing bool) {
 	if node.SrpmPath == pkggraph.NoSRPMPath {
+		logger.Log.Debugf("Node %v has no SRPM path, skipping check for missing RPMs.", node.FriendlyName())
 		return
 	}
 
