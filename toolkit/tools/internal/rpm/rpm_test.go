@@ -561,6 +561,11 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 			input:          "nvidia-container-toolkit-1.15.0-1.azl3.x86_64.rpm",
 			expectedGroups: []string{"nvidia-container-toolkit", "", "1.15.0", "1.azl3", "x86_64", "rpm"},
 		},
+		{
+			name:           "package with underscore in release",
+			input:          "nvidia-container-toolkit-550.54.15-2_5.15.162.2.1.azl3.x86_64.rpm",
+			expectedGroups: []string{"nvidia-container-toolkit", "", "550.54.15", "2_5.15.162.2.1.azl3", "x86_64", "rpm"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -600,10 +605,6 @@ func TestPackageFQNRegexWithInvalidInput(t *testing.T) {
 		{
 			name:  "package with release not beginning with a digit",
 			input: "pkg-name-0:1.2.3-D4.azl3.x86_64.rpm",
-		},
-		{
-			name:  "package with release not beginning with a number followed by a '.'",
-			input: "pkg-name-0:1.2.3-4_1.azl3.x86_64.rpm",
 		},
 		{
 			name:  "package with epoch not beginning with a digit",
