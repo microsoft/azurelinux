@@ -3418,8 +3418,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.bz2"
+          "version": "2.6.3",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_3/expat-2.6.3.tar.bz2"
         }
       }
     },
@@ -4620,8 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.5",
-          "downloadUrl": "https://golang.org/dl/go1.22.5.src.tar.gz"
+          "version": "1.22.7",
+          "downloadUrl": "https://golang.org/dl/go1.22.7.src.tar.gz"
         }
       }
     },
@@ -6540,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.164.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.164.1.tar.gz"
+          "version": "5.15.167.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.167.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "keepalived",
-          "version": "2.2.7",
-          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.7.tar.gz"
+          "version": "2.3.1",
+          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.3.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.164.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.164.1.tar.gz"
+          "version": "5.15.167.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.167.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.164.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.164.1.tar.gz"
+          "version": "5.15.167.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.167.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.164.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.164.1.tar.gz"
+          "version": "5.15.167.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.167.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.164.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.164.1.tar.gz"
+          "version": "5.15.167.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.167.1.tar.gz"
         }
       }
     },
@@ -8341,8 +8341,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.21.3",
-          "downloadUrl": "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
+          "version": "1.19.4",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.4.tar.gz"
         }
       }
     },
@@ -11230,9 +11230,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracecmd",
+          "version": "1.5.1",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
-          "version": "1.7.2",
-          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtracefs",
+          "version": "1.8.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
         }
       }
     },
@@ -13653,8 +13673,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.5-1/go1.22.5-20240702.3.src.tar.gz"
+          "version": "1.22.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.7-1/go1.22.7-20240905.3.src.tar.gz"
         }
       }
     },
@@ -24994,8 +25014,8 @@
         "type": "other",
         "other": {
           "name": "python-webob",
-          "version": "1.8.7",
-          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.7.tar.gz"
+          "version": "1.8.8",
+          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.8.tar.gz"
         }
       }
     },
@@ -28457,8 +28477,8 @@
         "type": "other",
         "other": {
           "name": "sysstat",
-          "version": "12.7.1",
-          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.7.1.tar.gz"
+          "version": "12.7.6",
+          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.7.6.tar.gz"
         }
       }
     },
@@ -28909,6 +28929,16 @@
           "name": "tpm2-tss",
           "version": "2.4.6",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "trace-cmd",
+          "version": "3.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v3.2.tar.gz"
         }
       }
     },
