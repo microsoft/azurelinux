@@ -133,7 +133,7 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		Freshness:      buildState.GetMaxFreshness(),
 	}
 
-	requiredRebuild := isRequiredRebuild(pkgGraph, builtNode, packagesToRebuild)
+	requiredRebuild := isRequiredRebuild(pkgGraph, request.Node, packagesToRebuild)
 	if !requiredRebuild && isCacheAllowed {
 		// We might be able to use the cache, set the freshness based on node's dependencies.
 		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
