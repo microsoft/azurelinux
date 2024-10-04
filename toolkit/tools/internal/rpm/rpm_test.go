@@ -556,6 +556,11 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 			input:          "pkg-name-1.2.3-45.azl3~2.x86_64.rpm",
 			expectedGroups: []string{"pkg-name", "", "1.2.3", "45.azl3~2", "x86_64", "rpm"},
 		},
+		{
+			name:           "package with double dash in name",
+			input:          "nvidia-container-toolkit-1.15.0-1.azl3.x86_64.rpm",
+			expectedGroups: []string{"nvidia-container-toolkit", "", "1.15.0", "1.azl3", "x86_64", "rpm"},
+		},
 	}
 
 	for _, tt := range tests {
