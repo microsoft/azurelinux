@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.15.0
+Version:        1.16.2
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Fri Oct 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.16.2-1
+- Auto-upgrade to 1.16.2 - Critical vulnerability CVE-2024-0132, Medium vulnerability CVE-2024-0133
+
 * Fri Jun 07 2024 Henry Li <lihl@microsoft.com> - 1.15.0-1
 - Upgrade to version 1.15.0
 - Generate config.toml file during %posttrans
