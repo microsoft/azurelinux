@@ -504,7 +504,7 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package with epoch and architecture",
 			input:          "pkg-name-0:1.2.3-4.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with epoch and architecture but no '.rpm' suffix",
@@ -514,7 +514,7 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package without epoch, and architecture",
 			input:          "pkg-name-1.2.3-4.azl3.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", ""},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "", "rpm"},
 		},
 		{
 			name:           "package with architecture but no epoch",
@@ -529,32 +529,32 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package without '.rpm' suffix",
 			input:          "pkg-name-1.2.3-4.azl3.x86_64",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with version containing the '+' character",
 			input:          "pkg-name-1.2.3+4-4.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3+4", "4.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3+4", "4.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with version containing the '~' character",
 			input:          "pkg-name-1.2.3~4-4.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3~4", "4.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3~4", "4.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with release containing two '.' characters",
 			input:          "pkg-name-1.2.3-4.5.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.5.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.5.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with release containing the '_' character",
-			input:          "pkg-name-1.2.3-4_5.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4_5.azl3", "x86_64"},
+			input:          "pkg-name-1.2.3-45.az_l3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4_5.azl3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with release containing the `~` character",
 			input:          "pkg-name-1.2.3-4~5.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4~5.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4~5.azl3", "x86_64", "rpm"},
 		},
 	}
 
@@ -595,6 +595,10 @@ func TestPackageFQNRegexWithInvalidInput(t *testing.T) {
 		{
 			name:  "package with release not beginning with a digit",
 			input: "pkg-name-0:1.2.3-D4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with release not beginning with a number followed by a '.'",
+			input: "pkg-name-0:1.2.3-4_1.azl3.x86_64.rpm",
 		},
 		{
 			name:  "package with epoch not beginning with a digit",
