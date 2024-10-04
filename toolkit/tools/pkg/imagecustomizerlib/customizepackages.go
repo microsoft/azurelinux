@@ -238,7 +238,7 @@ func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
 			"-v", "clean", "all",
 		}
 		err := shell.NewExecBuilder("tdnf", tdnfArgs...).
-			LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+			LogLevel(logrus.TraceLevel, logrus.DebugLevel).
 			ErrorStderrLines(1).
 			Execute()
 		if err != nil {
