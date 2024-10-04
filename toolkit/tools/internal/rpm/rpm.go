@@ -113,7 +113,7 @@ var (
 	//   - version:			1.2.3
 	//   - release:			4.azl3
 	//   - architecture:	x86_64
-	//   - extension:		.rpm
+	//   - extension:		rpm
 	packageFQNRegex = regexp.MustCompile(`^\s*(\S+[^-])-(?:(\d+):)?(\d[^-:_]*)-(\d+(?:[^-\s]*?))(?:\.(noarch|x86_64|aarch64|src))?(?:\.(rpm))?\s*$`)
 
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
