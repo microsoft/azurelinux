@@ -553,7 +553,7 @@ recommended to create a writable persistent partition (e.g., /var) for any
 directories that require write access. Critical files and directories, such as
 SSH host keys or logs, can be redirected to the writable partition using
 symlinks or similar methods. See [Verity Filesystem Layout
-Recommendations](./verity-filesystem-layout-recommendations.md) for details.
+Recommendations](./verity.md) for details.
 
 Please note that some services and programs on Azure Linux may require specific
 handling when using Verity. Depending on user needs, there are different
