@@ -229,3 +229,21 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 	}
 	return true
 }
+
+func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
+	logger.Log.Infof("Cleaning up image")
+	// Run all cleanup tasks inside the chroot environment
+	return imageChroot.UnsafeRun(func() error {
+		tdnfArgs := []string{
+			"-v", "clean", "all",
+		}
+		err := shell.NewExecBuilder("tdnf", tdnfArgs...).
+			LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			Execute()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
