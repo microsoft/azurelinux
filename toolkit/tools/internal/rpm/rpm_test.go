@@ -509,7 +509,7 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package with epoch and architecture but no '.rpm' suffix",
 			input:          "pkg-name-0:1.2.3-4.azl3.x86_64",
-			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64"},
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64", ""},
 		},
 		{
 			name:           "package without epoch, and architecture",
@@ -519,17 +519,17 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package with architecture but no epoch",
 			input:          "pkg-name-1.2.3-4.azl3.aarch64",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "aarch64"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "aarch64", ""},
 		},
 		{
 			name:           "package with epoch but no architecture",
 			input:          "pkg-name-0:1.2.3-4.azl3",
-			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", ""},
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "", ""},
 		},
 		{
 			name:           "package without '.rpm' suffix",
 			input:          "pkg-name-1.2.3-4.azl3.x86_64",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "x86_64", "rpm"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "x86_64", ""},
 		},
 		{
 			name:           "package with version containing the '+' character",
@@ -549,12 +549,12 @@ func TestPackageFQNRegexWithValidInput(t *testing.T) {
 		{
 			name:           "package with release containing the '_' character",
 			input:          "pkg-name-1.2.3-45.az_l3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4_5.azl3", "x86_64", "rpm"},
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "45.az_l3", "x86_64", "rpm"},
 		},
 		{
 			name:           "package with release containing the `~` character",
-			input:          "pkg-name-1.2.3-4~5.azl3.x86_64.rpm",
-			expectedGroups: []string{"pkg-name", "", "1.2.3", "4~5.azl3", "x86_64", "rpm"},
+			input:          "pkg-name-1.2.3-45.azl3~2.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "45.azl3~2", "x86_64", "rpm"},
 		},
 	}
 
