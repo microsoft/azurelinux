@@ -1,6 +1,7 @@
 {
     "packages": [
         "azurelinux-release",
+        "azurelinux-repos",
         "azurelinux-rpm-macros",
         "bash",
         "ca-certificates",
