@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -33,6 +34,7 @@ const (
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
 	defaultImageNameBase            = "azure-linux"
 	defaultOSFilesPath              = "isolinux"
+	repoSnapshotFilePath            = "repo-snapshot-time.txt"
 )
 
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
@@ -54,13 +56,14 @@ type IsoMaker struct {
 	additionalIsoFiles []safechroot.FileToCopy // Additional files to copy to the ISO media (absolute-source-path -> iso-root-relative-path).
 	imageNameBase      string                  // Base name of the ISO to generate (no path, and no file extension).
 	imageNameTag       string                  // Optional user-supplied tag appended to the generated ISO's name.
+	repoSnapshotTime   string                  // tdnf repo snapshot time
 	osFilesPath        string
 
 	isoMakerCleanUpTasks []func() error // List of clean-up tasks to perform at the end of the ISO generation process.
 }
 
 // NewIsoMaker returns a new ISO maker.
-func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, imageNameTag string) (isoMaker *IsoMaker, err error) {
+func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, imageNameTag, isoRepoSnapshotTime string) (isoMaker *IsoMaker, err error) {
 	if baseDirPath == "" {
 		baseDirPath = filepath.Dir(configFilePath)
 	}
@@ -91,6 +94,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
 		osFilesPath:        defaultOSFilesPath,
+		repoSnapshotTime:   isoRepoSnapshotTime,
 	}
 
 	return isoMaker, nil
@@ -128,6 +132,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
 		osFilesPath:        osFilesPath,
+		repoSnapshotTime:   "",
 	}
 
 	return isoMaker, nil
@@ -554,6 +559,13 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 	if err != nil {
 		return err
 	}
+
+	// add snapshot file here
+	err = im.addSnapshotTimeFile(configFilesAbsDirPath)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -563,6 +575,17 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
 	logger.Log.Debugf("Copying ISO additional files")
 	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles...)
+}
+
+func (im *IsoMaker) addSnapshotTimeFile(configFilesAbsDirPath string) (err error) {
+	if im.repoSnapshotTime != "" {
+		logger.Log.Debugf("Adding snapshot time to file")
+		err = file.WriteLines([]string{im.repoSnapshotTime}, path.Join(configFilesAbsDirPath, repoSnapshotFilePath))
+		if err != nil {
+			return
+		}
+	}
+	return
 }
 
 // copyAndRenameAdditionalFiles will copy all additional files into an

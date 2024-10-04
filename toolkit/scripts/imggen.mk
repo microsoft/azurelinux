@@ -75,6 +75,13 @@ clean-imagegen:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(IMAGEGEN_DIR)" && \
 	rm -rf $(IMAGEGEN_DIR)
 
+# We need to clear the rpm package cache if we have a snapshot time. The filenames will all be
+# the same, but the actual .rpm files may be fundamentally different.
+$(STATUS_FLAGS_DIR)/imagegen_cleanup.flag: $(depend_REPO_SNAPSHOT_TIME)
+	@echo "REPO_SNAPSHOT_TIME has changed, sanitizing rpm cache"
+	rm -rf $(local_and_external_rpm_cache)
+	touch $@
+
 ##help:target:fetch-image-packages=Locate and download all packages required for an image build.
 fetch-image-packages: $(image_package_cache_summary)
 
@@ -113,7 +120,11 @@ ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms)
+ifneq ($(REPO_SNAPSHOT_TIME),)
+imagepkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
+endif
+
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
@@ -146,7 +157,7 @@ $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
 	@touch $@
 	@echo Finished updating $@
 
-$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(license_results_file_img) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(assets_files)
+$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(license_results_file_img) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(assets_files) $(depend_REPO_SNAPSHOT_TIME)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	mkdir -p $(imager_disk_output_dir) && \
 	rm -rf $(imager_disk_output_dir)/* && \
@@ -159,6 +170,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--log-color=$(LOG_COLOR) \
 		--local-repo $(local_and_external_rpm_cache) \
 		--tdnf-worker $(chroot_worker) \
+		--repo-snapshot-time=$(REPO_SNAPSHOT_TIME) \
 		--repo-file=$(imggen_local_repo) \
 		--output-image-contents=$(image_package_manifest) \
 		--assets $(assets_dir) \
@@ -198,7 +210,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/roast.jsonl
 
-$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
+$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
@@ -229,7 +241,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 
 # We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as
 # order-only-prerequisites to initrd_img
-iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary) $(license_results_file_img)
+iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary) $(license_results_file_img) $(depend_REPO_SNAPSHOT_TIME)
 # The initrd bundles these files into the image, we should rebuild it if they change
 initrd_bundled_files = $(go-liveinstaller) $(go-imager) $(assets_files) $(initrd_assets_files) $(imggen_local_repo)
 
@@ -250,6 +262,7 @@ iso: $(initrd_img) $(iso_deps)
 		--input $(CONFIG_FILE) \
 		--release-version $(RELEASE_VERSION) \
 		--resources $(RESOURCES_DIR) \
+		--repo-snapshot-time=$(REPO_SNAPSHOT_TIME) \
 		--iso-repo $(local_and_external_rpm_cache) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/isomaker.log \
