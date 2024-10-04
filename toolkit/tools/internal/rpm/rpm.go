@@ -63,11 +63,25 @@ const (
 )
 
 const (
-	installedRPMRegexRPMIndex        = 1
-	installedRPMRegexVersionIndex    = 2
-	installedRPMRegexArchIndex       = 3
-	installedRPMRegexExpectedMatches = 4
+	packageFQNRegexMatchSubString  = iota
+	packageFQNRegexNameIndex       = iota
+	packageFQNRegexEpochIndex      = iota
+	packageFQNRegexVersionIndex    = iota
+	packageFQNRegexReleaseIndex    = iota
+	packageFQNRegexArchIndex       = iota
+	packageFQNRegexExtensionIndex  = iota
+	packageFQNRegexExpectedMatches = iota
+)
 
+const (
+	installedRPMRegexMatchSubString  = iota
+	installedRPMRegexRPMIndex        = iota
+	installedRPMRegexVersionIndex    = iota
+	installedRPMRegexArchIndex       = iota
+	installedRPMRegexExpectedMatches = iota
+)
+
+const (
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
 	rpmBuildProgram = "rpmbuild"
@@ -83,6 +97,25 @@ var (
 	// It works multi-line strings containing the whole file content, thus the need for the 'm' flag.
 	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check`)
 
+	// A full qualified RPM name contains the package name, epoch, version, release, architecture, and extension.
+	// Optional fields:
+	// 	- epoch,
+	// 	- architecture.
+	//	- "rpm" extension.
+	//
+	// Sample match:
+	//
+	//	pkg-name-0:1.2.3-4.azl3.x86_64.rpm
+	//
+	// Groups can be used to split it into:
+	//   - name:			pkg-name
+	//   - epoch:			0
+	//   - version:			1.2.3
+	//   - release:			4.azl3
+	//   - architecture:	x86_64
+	//   - extension:		.rpm
+	packageFQNRegex = regexp.MustCompile(`^\s*(\S+[^-])-(?:(\d+):)?(\d[^-:_]*)-(\d+(?:\.[^-.\s]+)+?)(?:\.(noarch|x86_64|aarch64))?(?:\.(rpm))?\s*$`)
+
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
 	//	D: ========== +++ [name]-([epoch]:)[version]-[release].[distribution] [architecture]-linux [hex_value]
@@ -91,23 +124,6 @@ var (
 	//
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+)-([^-]+-[^-]+) (\S+)-linux.*$`)
-
-	// A full qualified RPM name contains the package name, epoch, version, release, and architecture.
-	// Optional fields:
-	// 	- epoch,
-	// 	- architecture.
-	//
-	// Sample match:
-	//
-	//	pkg-name-0:1.2.3-4.azl3.x86_64
-	//
-	// Groups can be used to split it into:
-	//   - name:			pkg-name
-	//   - epoch:			0
-	//   - version:			1.2.3
-	//   - release:			4.azl3
-	//   - architecture:	x86_64
-	packageFQNRegex = regexp.MustCompile(`^\s*(\S+)-(?:(\d+):)?([^-]+)-(\S+?)(?:\.([^.]+?))?\s*$`)
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
@@ -204,19 +220,15 @@ func getMacroDirWithFallback(allowDefault bool) (macroDir string, err error) {
 func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
 	baseName := filepath.Base(rpmFilePath)
 
+	matches := packageFQNRegex.FindStringSubmatch(baseName)
+
 	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
-	if !strings.Contains(baseName, "-") {
+	if matches == nil {
 		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
 		return
 	}
 
-	rpmFileSplit := strings.Split(baseName, "-")
-	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
-	if packageName == "" {
-		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
-		return
-	}
-	return
+	return matches[packageFQNRegexNameIndex], nil
 }
 
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
@@ -653,15 +665,33 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 // Example:
 //
 //	"pkg-name-0:1.2.3-4.azl3.x86_64" -> "pkg-name-1.2.3-4.azl3.x86_64"
-func StripEpochFromPackageFullQualifiedName(version string) string {
-}
+func StripEpochFromPackageFullQualifiedName(packageFQN string) string {
+	var packageFQNBuilder strings.Builder
 
-// StripEpochFromVersion removes the epoch from a version string if it is present.
-func StripEpochFromVersion(version string) string {
-	if strings.Contains(version, ":") {
-		return strings.Split(version, ":")[1]
+	matches := packageFQNRegex.FindStringSubmatch(packageFQN)
+	if matches == nil {
+		return packageFQN
 	}
-	return version
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexNameIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexVersionIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexReleaseIndex])
+
+	if matches[packageFQNRegexArchIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexArchIndex])
+	}
+
+	if matches[packageFQNRegexExtensionIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexExtensionIndex])
+	}
+
+	return packageFQNBuilder.String()
 }
 
 // TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file

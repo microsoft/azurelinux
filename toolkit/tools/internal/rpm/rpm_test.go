@@ -495,48 +495,259 @@ func TestConflictingPackageRegex(t *testing.T) {
 	}
 }
 
-func TestStripEpochFromVersion(t *testing.T) {
+func TestPackageFQNRegexWithValidInput(t *testing.T) {
 	tests := []struct {
 		name           string
-		inputVersion   string
-		expectedOutput string
+		input          string
+		expectedGroups []string
 	}{
 		{
-			name:           "version with epoch",
-			inputVersion:   "4:5.34.1-489.azlX",
-			expectedOutput: "5.34.1-489.azlX",
+			name:           "package with epoch and architecture",
+			input:          "pkg-name-0:1.2.3-4.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64"},
 		},
 		{
-			name:           "version without epoch",
-			inputVersion:   "5.34.1-489.azlX",
-			expectedOutput: "5.34.1-489.azlX",
+			name:           "package with epoch and architecture but no '.rpm' suffix",
+			input:          "pkg-name-0:1.2.3-4.azl3.x86_64",
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", "x86_64"},
 		},
 		{
-			name:           "version with zero epoch",
-			inputVersion:   "0:5.34.1-489.azlX",
-			expectedOutput: "5.34.1-489.azlX",
+			name:           "package without epoch, and architecture",
+			input:          "pkg-name-1.2.3-4.azl3.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", ""},
 		},
 		{
-			name:           "empty version",
-			inputVersion:   "",
-			expectedOutput: "",
+			name:           "package with architecture but no epoch",
+			input:          "pkg-name-1.2.3-4.azl3.aarch64",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "aarch64"},
 		},
 		{
-			name:           "version with only epoch",
-			inputVersion:   "4:",
-			expectedOutput: "",
+			name:           "package with epoch but no architecture",
+			input:          "pkg-name-0:1.2.3-4.azl3",
+			expectedGroups: []string{"pkg-name", "0", "1.2.3", "4.azl3", ""},
 		},
 		{
-			name:           "version with underscore in the release",
-			inputVersion:   "4:5.34.1-489_azlX",
-			expectedOutput: "5.34.1-489_azlX",
+			name:           "package without '.rpm' suffix",
+			input:          "pkg-name-1.2.3-4.azl3.x86_64",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.azl3", "x86_64"},
+		},
+		{
+			name:           "package with version containing the '+' character",
+			input:          "pkg-name-1.2.3+4-4.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3+4", "4.azl3", "x86_64"},
+		},
+		{
+			name:           "package with version containing the '~' character",
+			input:          "pkg-name-1.2.3~4-4.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3~4", "4.azl3", "x86_64"},
+		},
+		{
+			name:           "package with release containing two '.' characters",
+			input:          "pkg-name-1.2.3-4.5.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4.5.azl3", "x86_64"},
+		},
+		{
+			name:           "package with release containing the '_' character",
+			input:          "pkg-name-1.2.3-4_5.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4_5.azl3", "x86_64"},
+		},
+		{
+			name:           "package with release containing the `~` character",
+			input:          "pkg-name-1.2.3-4~5.azl3.x86_64.rpm",
+			expectedGroups: []string{"pkg-name", "", "1.2.3", "4~5.azl3", "x86_64"},
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			output := StripEpochFromVersion(test.inputVersion)
-			assert.Equal(t, test.expectedOutput, output)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			matches := packageFQNRegex.FindStringSubmatch(tt.input)
+			assert.NotNil(t, matches)
+			assert.Equal(t, tt.expectedGroups, matches[1:])
+		})
+	}
+}
+
+func TestPackageFQNRegexWithInvalidInput(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "package with missing version",
+			input: "pkg-name--4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with missing release",
+			input: "pkg-name-1.2.3-.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with missing name",
+			input: "-1.2.3-4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with only hyphen",
+			input: "-",
+		},
+		{
+			name:  "package with version not beginning with a digit",
+			input: "pkg-name-0:a1.2.3-4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with release not beginning with a digit",
+			input: "pkg-name-0:1.2.3-D4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with epoch not beginning with a digit",
+			input: "pkg-name-0:1.2.3-D4.azl3.x86_64.rpm",
+		},
+		{
+			name:  "package with epoch unsupported architecture",
+			input: "pkg-name-0:1.2.3-D4.azl3.other_arch.rpm",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			matches := packageFQNRegex.FindStringSubmatch(tt.input)
+			assert.Nil(t, matches)
+		})
+	}
+}
+
+func TestConflictingPackageRegex(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputLine      string
+		expectedMatch  bool
+		expectedOutput string
+	}{
+		{
+			name:           "perl with epoch",
+			inputLine:      "D: ========== +++ perl-4:5.34.1-489.cm2 x86_64-linux 0x0",
+			expectedMatch:  true,
+			expectedOutput: "perl-4:5.34.1-489.cm2.x86_64",
+		},
+		{
+			name:           "systemd no epoch",
+			inputLine:      "D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0",
+			expectedMatch:  true,
+			expectedOutput: "systemd-devel-239-42.cm2.x86_64",
+		},
+		{
+			name:           "non-matching line",
+			inputLine:      "D: ========== tsorting packages (order, #predecessors, #succesors, depth)",
+			expectedMatch:  false,
+			expectedOutput: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			match, actualOut := extractCompetingPackageInfoFromLine(tt.inputLine)
+			assert.Equal(t, tt.expectedMatch, match)
+			assert.Equal(t, tt.expectedOutput, actualOut)
+		})
+	}
+}
+
+func TestStripEpochFromPackageFullQualifiedNameWithValidInput(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "package with epoch and architecture",
+			input:    "pkg-name-0:1.2.3-4.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3-4.azl3.x86_64.rpm",
+		},
+		{
+			name:     "package with epoch and architecture but no '.rpm' suffix",
+			input:    "pkg-name-0:1.2.3-4.azl3.x86_64",
+			expected: "pkg-name-1.2.3-4.azl3.x86_64",
+		},
+		{
+			name:     "package with epoch but no architecture",
+			input:    "pkg-name-0:1.2.3-4.azl3",
+			expected: "pkg-name-1.2.3-4.azl3",
+		},
+		{
+			name:     "package with architecture but no epoch",
+			input:    "pkg-name-1.2.3-4.azl3.aarch64",
+			expected: "pkg-name-1.2.3-4.azl3.aarch64",
+		},
+		{
+			name:     "package without epoch, and architecture",
+			input:    "pkg-name-1.2.3-4.azl3.rpm",
+			expected: "pkg-name-1.2.3-4.azl3.rpm",
+		},
+		{
+			name:     "package with version containing the '+' character",
+			input:    "pkg-name-1.2.3+4-4.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3+4-4.azl3.x86_64.rpm",
+		},
+		{
+			name:     "package with version containing the '~' character",
+			input:    "pkg-name-1.2.3~4-4.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3~4-4.azl3.x86_64.rpm",
+		},
+		{
+			name:     "package with release containing two '.' characters",
+			input:    "pkg-name-1.2.3-4.5.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3-4.5.azl3.x86_64.rpm",
+		},
+		{
+			name:     "package with release containing the '_' character",
+			input:    "pkg-name-1.2.3-4_5.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3-4_5.azl3.x86_64.rpm",
+		},
+		{
+			name:     "package with release containing the `~` character",
+			input:    "pkg-name-1.2.3-4~5.azl3.x86_64.rpm",
+			expected: "pkg-name-1.2.3-4~5.azl3.x86_64.rpm",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := StripEpochFromPackageFullQualifiedName(tt.input)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
+}
+
+func TestStripEpochFromPackageFullQualifiedNameWithInvalidInput(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "invalid package name",
+			input:    "invalid-package-name",
+			expected: "invalid-package-name",
+		},
+		{
+			name:     "empty package name",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "package name with only hyphens",
+			input:    "----",
+			expected: "----",
+		},
+		{
+			name:     "package name with spaces",
+			input:    "pkg name-1.2.3-4.azl3.x86_64.rpm",
+			expected: "pkg name-1.2.3-4.azl3.x86_64.rpm",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := StripEpochFromPackageFullQualifiedName(tt.input)
+			assert.Equal(t, tt.expected, actual)
 		})
 	}
 }
