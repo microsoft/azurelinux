@@ -553,7 +553,8 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 }
 
 func rpmPackageToRPMPath(rpmPackage, outDir string) string {
-	// Construct the rpm path of the cloned package.
+	// Construct the RPM path of the cloned package.
+	rpmPackage = rpm.StripEpochFromPackageFullQualifiedName(rpmPackage)
 	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
 	return filepath.Join(outDir, rpmName)
 }
