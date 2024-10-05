@@ -11,7 +11,6 @@ Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{versio
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2024-3727.patch
 Patch2:         CVE-2024-6104.patch
-Patch3:         CVE-2024-6104.patch
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  btrfs-progs-devel
@@ -49,10 +48,7 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Fri Oct 04 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.14.2-8
-- patch skopeo to fix CVE-2024-28180
-
-* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-8
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-9
 - Bump release to rebuild with go 1.22.7
 
 * Wed Jul 17 2024 Sindhu Karri <lakarri@microsoft.com> - 1.14.2-7
