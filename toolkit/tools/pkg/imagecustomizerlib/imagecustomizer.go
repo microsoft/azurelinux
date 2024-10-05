@@ -172,6 +172,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
+	logVersionsOfToolDeps()
+
 	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {
@@ -344,7 +346,8 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 
 	// Customize the partitions.
-	partitionsCustomized, newRawImageFile, err := customizePartitions(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
+	partitionsCustomized, newRawImageFile, partIdToPartUuid, err := customizePartitions(ic.buildDirAbs,
+		ic.configPath, ic.config, ic.rawImageFile)
 	if err != nil {
 		return err
 	}
@@ -357,8 +360,8 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
-		partitionsCustomized, imageUuidStr)
+	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources,
+		ic.useBaseImageRpmRepos, partitionsCustomized, imageUuidStr)
 	if err != nil {
 		return err
 	}
@@ -370,7 +373,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
 		}
 
-		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId)
+		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId, partIdToPartUuid)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
@@ -378,7 +381,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	if ic.config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
+		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, partIdToPartUuid)
 		if err != nil {
 			return err
 		}
@@ -509,20 +512,25 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 	return nil
 }
 
-func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
-	var aggregateErr error
-	for sourceFile := range additionalFiles {
-		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
-		isFile, err := file.IsFile(sourceFileFullPath)
-		if err != nil {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", sourceFile, err))
-		}
+func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFileList) error {
+	errs := []error(nil)
+	for _, additionalFile := range additionalFiles {
+		switch {
+		case additionalFile.Source != "":
+			sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, additionalFile.Source)
+			isFile, err := file.IsFile(sourceFileFullPath)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", additionalFile.Source, err))
+			}
 
-		if !isFile {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s): not a file", sourceFile))
+			if !isFile {
+				errs = append(errs, fmt.Errorf("invalid additionalFiles source file (%s):\nnot a file",
+					additionalFile.Source))
+			}
 		}
 	}
-	return aggregateErr
+
+	return errors.Join(errs...)
 }
 
 func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) error {
@@ -650,7 +658,8 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-	imageUuidStr string) error {
+	imageUuidStr string,
+) error {
 	logger.Log.Debugf("Customizing OS")
 
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
@@ -700,7 +709,9 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
+func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+	partIdToPartUuid map[string]string,
+) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -708,7 +719,7 @@ func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecu
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition)
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -722,7 +733,7 @@ func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecu
 }
 
 func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string,
+	buildImageFile string, partIdToPartUuid map[string]string,
 ) error {
 	var err error
 
@@ -738,11 +749,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -788,9 +799,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfigForVerity(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
-		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
-		rootHash, grubCfgFullPath)
+	err = updateGrubConfigForVerity(config.OS.Verity, rootHash, grubCfgFullPath, partIdToPartUuid)
 	if err != nil {
 		return err
 	}

@@ -2,14 +2,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-from typing import FrozenSet, List, Set
-from pyrpm.spec import Spec
-
-import argparse
 from collections import defaultdict
-from pathlib import Path
+from os import path
+from typing import FrozenSet, List, Set
+import argparse
 import pprint
 import sys
+
+from pyrpm.spec import replace_macros, Spec
 
 version_release_matching_groups = [
     frozenset([
@@ -58,6 +58,7 @@ version_matching_groups = [
     frozenset([
         "SPECS/clang/clang.spec",
         "SPECS/compiler-rt/compiler-rt.spec",
+        "SPECS/libcxx/libcxx.spec",
         "SPECS/lld/lld.spec",
         "SPECS/lldb/lldb.spec",
         "SPECS/llvm/llvm.spec"
@@ -86,9 +87,10 @@ def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) ->
         variants = defaultdict(set)
 
         for spec_filename in group:
-            parsed_spec = Spec.from_file(Path(base_path, spec_filename))
+            parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
             for tag in tags:
-                variants[tag].add(getattr(parsed_spec, tag))
+                tag_value = get_tag_value(parsed_spec, tag)
+                variants[tag].add(tag_value)
 
         for tag in tags:
             if len(variants[tag]) > 1: err_groups.add(group)
@@ -144,6 +146,13 @@ def check_matches(base_path: str):
                 printer.pprint(e)
                 
         sys.exit(1)
+
+
+def get_tag_value(spec: "Spec", tag: str) -> str:
+    value = getattr(spec, tag)
+    if value:
+        value = replace_macros(value, spec)
+    return value
 
 
 if __name__ == '__main__':

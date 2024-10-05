@@ -928,16 +928,18 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
-	for sourcePath, fileConfigs := range isoConfig.AdditionalFiles {
-		absSourcePath := file.GetAbsPathWithBase(baseConfigPath, sourcePath)
-		for _, fileConfig := range fileConfigs {
-			fileToCopy := safechroot.FileToCopy{
-				Src:         absSourcePath,
-				Dest:        fileConfig.Path,
-				Permissions: (*fs.FileMode)(fileConfig.Permissions),
-			}
-			additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
+	for _, additionalFile := range isoConfig.AdditionalFiles {
+		absSourceFile := ""
+		if additionalFile.Source != "" {
+			absSourceFile = file.GetAbsPathWithBase(baseConfigPath, additionalFile.Source)
 		}
+		fileToCopy := safechroot.FileToCopy{
+			Src:         absSourceFile,
+			Content:     additionalFile.Content,
+			Dest:        additionalFile.Destination,
+			Permissions: (*fs.FileMode)(additionalFile.Permissions),
+		}
+		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
 
 	return additionalIsoFiles, extraCommandLine, nil
@@ -1477,7 +1479,7 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 
 	// create the new raw disk image
 	writeableChrootDir := "writeable-raw-image"
-	err = createNewImage(rawImageFile, diskConfig, fileSystemConfigs, buildDir, writeableChrootDir, installOSFunc)
+	_, err = createNewImage(rawImageFile, diskConfig, fileSystemConfigs, buildDir, writeableChrootDir, installOSFunc)
 	if err != nil {
 		return fmt.Errorf("failed to copy squashfs into new writeable image (%s):\n%w", rawImageFile, err)
 	}

@@ -143,8 +143,13 @@ cd /installer
 # Turn off echoing while the installer runs to stop sensitive data from rendering in the TTY session.
 stty -echo
 
+# add call to static time file to populate liveinstaller option here
+if [[ -f "$CONFIG_ROOT/repo-snapshot-time.txt" ]]; then
+REPO_TIME=$(cat /"$CONFIG_ROOT/repo-snapshot-time.txt")
+fi
+
 ./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --template-config $CONFIG_ROOT/attended_config.json \
-                --build-dir $PWD --log-file=/installer/log.txt
+                --build-dir $PWD --log-file=/installer/log.txt --repo-snapshot-time="$REPO_TIME"
 installerExitCode=$?
 
 # Consume any buffered stdin to prevent it from being passed to any future programs,

@@ -78,14 +78,11 @@ func partitionsToImager(partitions []imagecustomizerapi.Partition, fileSystems [
 
 func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []imagecustomizerapi.FileSystem,
 ) (configuration.Partition, error) {
-	fileSystem, foundMountPoint := sliceutils.FindValueFunc(fileSystems,
+	fileSystem, _ := sliceutils.FindValueFunc(fileSystems,
 		func(fileSystem imagecustomizerapi.FileSystem) bool {
 			return fileSystem.DeviceId == partition.Id
 		},
 	)
-	if !foundMountPoint {
-		return configuration.Partition{}, fmt.Errorf("failed to find filesystem entry with ID (%s)", partition.Id)
-	}
 
 	imagerStart := *partition.Start / diskutils.MiB
 	if *partition.Start%diskutils.MiB != 0 {

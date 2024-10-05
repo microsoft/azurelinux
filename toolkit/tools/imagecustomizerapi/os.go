@@ -17,7 +17,7 @@ type OS struct {
 	Packages            Packages            `yaml:"packages"`
 	SELinux             SELinux             `yaml:"selinux"`
 	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles     AdditionalFilesMap  `yaml:"additionalFiles"`
+	AdditionalFiles     AdditionalFileList  `yaml:"additionalFiles"`
 	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
 	Users               []User              `yaml:"users"`
 	Services            Services            `yaml:"services"`

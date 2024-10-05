@@ -61,7 +61,7 @@ os:
       - /etc
       upperDir: /var/overlays/etc/upper
       workDir: /var/overlays/etc/work
-      isRootfsOverlay: true
+      isInitrdOverlay: true
       mountDependencies: 
       - /var
     - mountPoint: /media
