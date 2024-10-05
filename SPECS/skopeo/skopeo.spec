@@ -49,7 +49,7 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-8
+* Fri Oct 04 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.14.2-8
 - patch skopeo to fix CVE-2024-28180
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-8
