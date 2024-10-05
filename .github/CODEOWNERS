@@ -11,28 +11,3 @@
 /.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
 
 /SPECS-EXTENDED/ @microsoft/cbl-mariner-devs
-
-# Modifications to the toolkit requires reviews from the toolkit team
-/toolkit/ @microsoft/cbl-mariner-tooling
-
-/toolkit/docs/ @microsoft/cbl-mariner-stable-maintainers
-
-/toolkit/imageconfigs/ @microsoft/cbl-mariner-stable-maintainers
-
-/toolkit/resources/manifests/package/pkggen_core_aarch64.txt @microsoft/cbl-mariner-stable-maintainers
-/toolkit/resources/manifests/package/pkggen_core_x86_64.txt @microsoft/cbl-mariner-stable-maintainers
-/toolkit/resources/manifests/package/toolchain_aarch64.txt @microsoft/cbl-mariner-stable-maintainers
-/toolkit/resources/manifests/package/toolchain_x86_64.txt @microsoft/cbl-mariner-stable-maintainers
-
-# Modifications to the raw toolchain require admin approval.
-/toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins
-/toolkit/scripts/toolchain/cgmanifest.json @microsoft/cbl-mariner-admins
-/toolkit/scripts/toolchain/create_toolchain_in_container.sh @microsoft/cbl-mariner-admins
-
-# Image Customizer
-/toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/imagecustomizerapi/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/osmodifier @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/imagecustomizerlib/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/osmodifierlib @microsoft/cbl-mariner-imagecustomizer
-/toolkit/scripts/build_tag_imagecustomizer.mk @microsoft/cbl-mariner-imagecustomizer
