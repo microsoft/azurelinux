@@ -50,7 +50,7 @@ go test -mod=vendor ./...
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
-* Wed Oct 04 2024 Your Name <your.email@example.com> - 0.0.2-19
+* Wed Oct 04 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 0.0.2-19
 - Fix CVE-2023-28180
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.2-18
