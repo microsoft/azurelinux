@@ -31,10 +31,9 @@ BuildRequires: golang
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups.
 
 %prep
-%autosetup -N
-# Apply vendor before patching
 tar -xvf %{SOURCE1}
-%autopatch -p1
+%autosetup -N
+%autopatch -p1 -S git
 
 %build
 go build -mod=vendor
@@ -50,7 +49,7 @@ go test -mod=vendor ./...
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
-* Wed Oct 04 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 0.0.2-19
+* Wed Oct 03 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 0.0.2-19
 - Fix CVE-2023-28180
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.2-18
