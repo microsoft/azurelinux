@@ -1,0 +1,431 @@
+From 3e7aeeab4f744ad15108775685db68d3a35b0735 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Thu, 23 Mar 2023 18:07:40 +0100
+Subject: [PATCH] debugedit: Add support for .debug_str_offsets (DW_FORM_strx)
+
+In theory supporting strx .debug_str_offsets is easy, the strings in
+.debug_str are just read through an indirection table. When the
+strings are updated in .debug_str we just need to rewrite the
+indirection table.
+
+The tricky part is the ET_REL (object files or kernel modules)
+support. Relocation reading is "global" per section and we expect to
+read a relocation only once. But we need to read the
+DW_AT_str_offsets_base before reading any strx form attributes. So we
+read that first, then reset the relptr. And when we read from the
+.debug_str_offsets section we need to save and restore the .debug_info
+relptr.
+
+	* tools/debugedit.c (do_read_24): New function.
+	(str_offsets_base): New static variable.
+	(buf_read_ule24): New function.
+	(buf_read_ube24): Likewise.
+	(setup_relbuf): Handle .debug_str_offsets.
+	(do_read_uleb128): New function.
+	(do_read_str_form_relocated): Likewise.
+	(read_abbrev): Handle DW_FORM_strx[1234].
+	(edit_strp): Take the actual string form as argument.
+	Use do_read_str_form_relocated.
+	(read_dwarf5_line_entries): Pass form to edit_strp.
+	(edit_attributes_str_comp_dir): Take the actual string
+	form as argument. Use do_read_str_form_relocated.
+	(edit_attributes): Handle DW_FORM_strx[1234].
+	(edit_info): Read DW_AT_str_offsets_base first.
+	(update_str_offsets): New function.
+	(edit_dwarf2): Setup do_read_24. Call update_str_offsets.
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=28728
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+---
+ tools/debugedit.c | 216 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 192 insertions(+), 24 deletions(-)
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index e654981..7802f9f 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -1,4 +1,5 @@
+ /* Copyright (C) 2001-2003, 2005, 2007, 2009-2011, 2016, 2017 Red Hat, Inc.
++   Copyright (C) 2022, 2023 Mark J. Wielaard <mark@klomp.org>
+    Written by Alexander Larsson <alexl@redhat.com>, 2002
+    Based on code by Jakub Jelinek <jakub@redhat.com>, 2001.
+    String/Line table rewriting by Mark Wielaard <mjw@redhat.com>, 2017.
+@@ -264,6 +264,7 @@ typedef struct
+ })
+ 
+ static uint16_t (*do_read_16) (unsigned char *ptr);
++static uint32_t (*do_read_24) (unsigned char *ptr);
+ static uint32_t (*do_read_32) (unsigned char *ptr);
+ static void (*do_write_16) (unsigned char *ptr, uint16_t val);
+ static void (*do_write_32) (unsigned char *ptr, uint32_t val);
+@@ -271,6 +272,9 @@ static void (*do_write_32) (unsigned char *ptr, uint32_t val);
+ static int ptr_size;
+ static int cu_version;
+ 
++/* The offset into the .debug_str_offsets section for the current CU.  */
++static uint32_t str_offsets_base;
++
+ static inline uint16_t
+ buf_read_ule16 (unsigned char *data)
+ {
+@@ -283,6 +287,18 @@ buf_read_ube16 (unsigned char *data)
+   return data[1] | (data[0] << 8);
+ }
+ 
++static inline uint32_t
++buf_read_ule24 (unsigned char *data)
++{
++  return data[0] | (data[1] << 8) | (data[2] << 16);
++}
++
++static inline uint32_t
++buf_read_ube24 (unsigned char *data)
++{
++  return data[2] | (data[1] << 8) | (data[0] << 16);
++}
++
+ static inline uint32_t
+ buf_read_ule32 (unsigned char *data)
+ {
+@@ -544,10 +560,12 @@ setup_relbuf (DSO *dso, debug_section *sec, int *reltype)
+       /* Relocations against section symbols are uninteresting in REL.  */
+       if (dso->shdr[i].sh_type == SHT_REL && sym.st_value == 0)
+ 	continue;
+-      /* Only consider relocations against .debug_str, .debug_line,
+-	 .debug_line_str, and .debug_abbrev.  */
++      /* Only consider relocations against .debug_str,
++	 .debug_str_offsets, .debug_line, .debug_line_str, and
++	 .debug_abbrev.  */
+       if (sym.st_shndx == 0 ||
+ 	  (sym.st_shndx != debug_sections[DEBUG_STR].sec
++	   && sym.st_shndx != debug_sections[DEBUG_STR_OFFSETS].sec
+ 	   && sym.st_shndx != debug_sections[DEBUG_LINE].sec
+ 	   && sym.st_shndx != debug_sections[DEBUG_LINE_STR].sec
+ 	   && sym.st_shndx != debug_sections[DEBUG_ABBREV].sec))
+@@ -684,6 +702,59 @@ update_rela_data (DSO *dso, struct debug_section *sec)
+   free (sec->relbuf);
+ }
+ 
++static inline uint32_t
++do_read_uleb128 (unsigned char *ptr)
++{
++  unsigned char *uleb_ptr = ptr;
++  return read_uleb128 (uleb_ptr);
++}
++
++static inline uint32_t
++do_read_str_form_relocated (DSO *dso, uint32_t form, unsigned char *ptr)
++{
++  uint32_t idx;
++  switch (form)
++    {
++    case DW_FORM_strp:
++    case DW_FORM_line_strp:
++      return do_read_32_relocated (ptr);
++
++    case DW_FORM_strx1:
++      idx = *ptr;
++      break;
++    case DW_FORM_strx2:
++      idx = do_read_16 (ptr);
++      break;
++    case DW_FORM_strx3:
++      idx = do_read_24 (ptr);
++      break;
++    case DW_FORM_strx4:
++      idx = do_read_32 (ptr);
++      break;
++    case DW_FORM_strx:
++      idx = do_read_uleb128 (ptr);
++      break;
++    default:
++      error (1, 0, "Unhandled string form DW_FORM_0x%x", form);
++      return -1;
++    }
++
++  unsigned char *str_off_ptr = debug_sections[DEBUG_STR_OFFSETS].data;
++  str_off_ptr += str_offsets_base;
++  str_off_ptr += idx * 4;
++
++  /* Switch rel reading... */
++  REL *old_relptr = relptr;
++  REL *old_relend = relend;
++  setup_relbuf(dso, &debug_sections[DEBUG_STR_OFFSETS], &reltype);
++
++  uint32_t str_off = do_read_32_relocated (str_off_ptr);
++
++  relptr = old_relptr;
++  relend = old_relend;
++  return str_off;
++}
++
+ struct abbrev_attr
+   {
+     unsigned int attr;
+@@ -789,7 +860,12 @@ no_memory:
+ 		       || form == DW_FORM_addrx1
+ 		       || form == DW_FORM_addrx2
+ 		       || form == DW_FORM_addrx3
+-		       || form == DW_FORM_addrx4)))
++		       || form == DW_FORM_addrx4
++		       || form == DW_FORM_strx
++		       || form == DW_FORM_strx1
++		       || form == DW_FORM_strx2
++		       || form == DW_FORM_strx3
++		       || form == DW_FORM_strx4)))
+ 	    {
+ 	      error (0, 0, "%s: Unknown DWARF DW_FORM_0x%x", dso->filename,
+ 		     form);
+@@ -1520,9 +1596,10 @@ edit_dwarf2_line (DSO *dso)
+     }
+ }
+ 
+-/* Record or adjust (according to phase) DW_FORM_strp or DW_FORM_line_strp.  */
++/* Record or adjust (according to phase) DW_FORM_strp or DW_FORM_line_strp.
++   Also handles DW_FORM_strx, but just for recording the (indexed) string.  */
+ static void
+-edit_strp (DSO *dso, bool line_strp, unsigned char *ptr, int phase,
++edit_strp (DSO *dso, uint32_t form, unsigned char *ptr, int phase,
+ 	   bool handled_strp)
+ {
+   unsigned char *ptr_orig = ptr;
+@@ -1537,16 +1614,19 @@ edit_strp (DSO *dso, bool line_strp, unsigned char *ptr, int phase,
+ 	 recorded. */
+       if (! handled_strp)
+ 	{
+-	  size_t idx = do_read_32_relocated (ptr);
+-	  record_existing_string_entry_idx (line_strp, dso, idx);
++	  size_t idx = do_read_str_form_relocated (dso, form, ptr);
++	  record_existing_string_entry_idx (form == DW_FORM_line_strp,
++					    dso, idx);
+ 	}
+     }
+-  else if (line_strp
+-	   ? need_line_strp_update : need_strp_update) /* && phase == 1 */
++  else if ((form == DW_FORM_strp
++	    || form == DW_FORM_line_strp) /* DW_FORM_strx stays the same.  */
++	   && (form == DW_FORM_line_strp
++	       ? need_line_strp_update : need_strp_update)) /* && phase == 1 */
+     {
+       struct stridxentry *entry;
+       size_t idx, new_idx;
+-      struct strings *strings = (line_strp
++      struct strings *strings = (form == DW_FORM_line_strp
+ 				 ? &dso->debug_line_str : &dso->debug_str);
+       idx = do_read_32_relocated (ptr);
+       entry = string_find_entry (strings, idx);
+@@ -1926,9 +2006,10 @@ read_dwarf5_line_entries (DSO *dso, unsigned char **ptrp,
+ 
+ 	  switch (form)
+ 	    {
++	    /* Note we don't expect DW_FORM_strx in the line table.  */
+ 	    case DW_FORM_strp:
+ 	    case DW_FORM_line_strp:
+-	      edit_strp (dso, line_strp, *ptrp, phase, handled_strp);
++	      edit_strp (dso, form, *ptrp, phase, handled_strp);
+ 	      break;
+ 	    }
+ 
+@@ -2110,11 +2191,12 @@ find_new_list_offs (struct debug_lines *lines, size_t idx)
+ 
+ /* Read DW_FORM_strp or DW_FORM_line_strp collecting compilation directory.  */
+ static void
+-edit_attributes_str_comp_dir (bool line_strp, DSO *dso, unsigned char **ptrp,
++edit_attributes_str_comp_dir (uint32_t form, DSO *dso, unsigned char **ptrp,
+ 			      int phase, char **comp_dirp, bool *handled_strpp)
+ {
+   const char *dir;
+-  size_t idx = do_read_32_relocated (*ptrp);
++  size_t idx = do_read_str_form_relocated (dso, form, *ptrp);
++  bool line_strp = form == DW_FORM_line_strp;
+   /* In phase zero we collect the comp_dir.  */
+   if (phase == 0)
+     {
+@@ -2245,20 +2327,29 @@ edit_attributes (DSO *dso, unsigned char *ptr, struct abbrev_tag *t, int phase)
+ 			}
+ 		    }
+ 		}
+-	      else if (form == DW_FORM_strp)
+-		edit_attributes_str_comp_dir (false /* line_strp */, dso,
++	      else if (form == DW_FORM_strp
++		       || form == DW_FORM_line_strp
++		       || form == DW_FORM_strx
++		       || form == DW_FORM_strx1
++		       || form == DW_FORM_strx2
++		       || form == DW_FORM_strx3
++		       || form == DW_FORM_strx4)
++		edit_attributes_str_comp_dir (form, dso,
+ 					      &ptr, phase, &comp_dir,
+ 					      &handled_strp);
+-	      else if (form == DW_FORM_line_strp)
+-		edit_attributes_str_comp_dir (true /* line_strp */, dso, &ptr,
+-					      phase, &comp_dir, &handled_strp);
+ 	    }
+ 	  else if ((t->tag == DW_TAG_compile_unit
+ 		    || t->tag == DW_TAG_partial_unit)
+ 		   && ((form == DW_FORM_strp
+ 			&& debug_sections[DEBUG_STR].data)
+ 		       || (form == DW_FORM_line_strp
+-			   && debug_sections[DEBUG_LINE_STR].data))
++			   && debug_sections[DEBUG_LINE_STR].data)
++		       || ((form == DW_FORM_strx
++			    || form == DW_FORM_strx1
++			    || form == DW_FORM_strx2
++			    || form == DW_FORM_strx3
++			    || form == DW_FORM_strx4)
++			   && debug_sections[DEBUG_STR_OFFSETS].data))
+ 		   && t->attr[i].attr == DW_AT_name)
+ 	    {
+ 	      bool line_strp = form == DW_FORM_line_strp;
+@@ -2267,7 +2358,7 @@ edit_attributes (DSO *dso, unsigned char *ptr, struct abbrev_tag *t, int phase)
+ 		 unit. If starting with / it is a full path name.
+ 		 Note that we don't handle DW_FORM_string in this
+ 		 case.  */
+-	      size_t idx = do_read_32_relocated (ptr);
++	      size_t idx = do_read_str_form_relocated (dso, form, ptr);
+ 
+ 	      /* In phase zero we will look for a comp_dir to use.  */
+ 	      if (phase == 0)
+@@ -2314,10 +2405,13 @@ edit_attributes (DSO *dso, unsigned char *ptr, struct abbrev_tag *t, int phase)
+ 	  switch (form)
+ 	    {
+ 	    case DW_FORM_strp:
+-	      edit_strp (dso, false /* line_strp */, ptr, phase, handled_strp);
+-	      break;
+ 	    case DW_FORM_line_strp:
+-	      edit_strp (dso, true /* line_strp */, ptr, phase, handled_strp);
++	    case DW_FORM_strx:
++	    case DW_FORM_strx1:
++	    case DW_FORM_strx2:
++	    case DW_FORM_strx3:
++	    case DW_FORM_strx4:
++	      edit_strp (dso, form, ptr, phase, handled_strp);
+ 	      break;
+ 	    }
+ 
+@@ -2404,6 +2498,8 @@ edit_info (DSO *dso, int phase, struct debug_section *sec)
+   uint32_t value;
+   htab_t abbrev;
+   struct abbrev_tag tag, *t;
++  int i;
++  bool first;
+ 
+   ptr = sec->data;
+   if (ptr == NULL)
+@@ -2507,6 +2603,8 @@ edit_info (DSO *dso, int phase, struct debug_section *sec)
+       if (abbrev == NULL)
+ 	return 1;
+ 
++      first = true;
++      str_offsets_base = 0;
+       while (ptr < endcu)
+ 	{
+ 	  tag.entry = read_uleb128 (ptr);
+@@ -2521,6 +2619,30 @@ edit_info (DSO *dso, int phase, struct debug_section *sec)
+ 	      return 1;
+ 	    }
+ 
++	  /* We need str_offsets_base before processing the CU. */
++	  if (first)
++	    {
++	      first = false;
++	      if (cu_version >= 5)
++		{
++		  uint32_t form;
++		  unsigned char *fptr = ptr;
++		  // We will read this DIE again, save and reset rel reading
++		  REL *old_relptr = relptr;
++		  for (i = 0; i < t->nattr; ++i)
++		    {
++		      form = t->attr[i].form;
++		      if (t->attr[i].attr == DW_AT_str_offsets_base)
++			{
++			  str_offsets_base = do_read_32_relocated (fptr);
++			  break;
++			}
++		      skip_form (dso, &form, &fptr);
++		    }
++		  // Reset the rel reading...
++		  relptr = old_relptr;
++		}
++	    }
+ 	  ptr = edit_attributes (dso, ptr, t, phase);
+ 	  if (ptr == NULL)
+ 	    break;
+@@ -2554,6 +2676,41 @@ edit_dwarf2_any_str (DSO *dso, struct strings *strings, debug_section *secp)
+   strings->str_buf = strdata->d_buf;
+ }
+ 
++/* Rebuild .debug_str_offsets.  */
++static void
++update_str_offsets (DSO *dso)
++{
++  unsigned char *ptr = debug_sections[DEBUG_STR_OFFSETS].data;
++  unsigned char *endp = ptr + debug_sections[DEBUG_STR_OFFSETS].size;
++
++  while (ptr < endp)
++    {
++      /* Read header, unit_length, version and padding.  */
++      if (endp - ptr < 3 * 4)
++	break;
++      uint32_t unit_length = read_32 (ptr);
++      if (unit_length == 0xffffffff || endp - ptr < unit_length)
++	break;
++      unsigned char *endidxp = ptr + unit_length;
++      uint32_t version = read_32 (ptr);
++      if (version != 5)
++	break;
++      uint32_t padding = read_32 (ptr);
++      if (padding != 0)
++	break;
++
++      while (ptr < endidxp)
++	{
++	  struct stridxentry *entry;
++	  size_t idx, new_idx;
++	  idx = do_read_32_relocated (ptr);
++	  entry = string_find_entry (&dso->debug_str, idx);
++	  new_idx = strent_offset (entry->entry);
++	  write_32_relocated (ptr, new_idx);
++	}
++    }
++}
++
+ static int
+ edit_dwarf2 (DSO *dso)
+ {
+@@ -2675,6 +2832,7 @@ edit_dwarf2 (DSO *dso)
+   if (dso->ehdr.e_ident[EI_DATA] == ELFDATA2LSB)
+     {
+       do_read_16 = buf_read_ule16;
++      do_read_24 = buf_read_ule24;
+       do_read_32 = buf_read_ule32;
+       do_write_16 = dwarf2_write_le16;
+       do_write_32 = dwarf2_write_le32;
+@@ -2682,6 +2840,7 @@ edit_dwarf2 (DSO *dso)
+   else if (dso->ehdr.e_ident[EI_DATA] == ELFDATA2MSB)
+     {
+       do_read_16 = buf_read_ube16;
++      do_read_24 = buf_read_ube24;
+       do_read_32 = buf_read_ube32;
+       do_write_16 = dwarf2_write_be16;
+       do_write_32 = dwarf2_write_be32;
+@@ -2997,6 +3156,15 @@ edit_dwarf2 (DSO *dso)
+     dirty_section (DEBUG_MACRO);
+   if (need_stmt_update || need_line_strp_update)
+     dirty_section (DEBUG_LINE);
++  if (need_strp_update && debug_sections[DEBUG_STR_OFFSETS].data != NULL)
++    {
++      setup_relbuf(dso, &debug_sections[DEBUG_STR_OFFSETS], &reltype);
++      rel_updated = false;
++      update_str_offsets (dso);
++      dirty_section (DEBUG_STR_OFFSETS);
++      if (rel_updated)
++	update_rela_data (dso, &debug_sections[DEBUG_STR_OFFSETS]);
++    }
+ 
+   /* Update any relocations addends we might have touched. */
+   if (info_rel_updated)
+-- 
+2.42.0
