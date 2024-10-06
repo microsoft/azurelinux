@@ -508,8 +508,7 @@ Example: `noatime,nodiratime`
 
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification. Please
-execute `sudo modprobe nbd` before building the image with verity enablement.
+Specifies the configuration for dm-verity root integrity verification.
 
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
@@ -546,26 +545,8 @@ os:
     corruptionOption: panic
 ```
 
-The Verity-enabled root filesystem is always mounted as read-only. Its root hash
-and hash tree are computed at build time and verified by systemd during the
-initramfs phase on each boot. When enabling the Verity feature, it is
-recommended to create a writable persistent partition (e.g., /var) for any
-directories that require write access. Critical files and directories, such as
-SSH host keys or logs, can be redirected to the writable partition using
-symlinks or similar methods. See [Verity Filesystem Layout
-Recommendations](./verity.md) for details.
-
-Please note that some services and programs on Azure Linux may require specific
-handling when using Verity. Depending on user needs, there are different
-configuration options that offer tradeoffs between convenience and security.
-Some configurations can be made flexible to allow changes, while others may be
-set as immutable for enhanced security. 
-
-For example, if your image includes the `systemd-growfs-root.service`, which
-attempts to resize the root filesystem, there are two approaches you can take.
-One option is to disable the service to prevent failure. Alternatively, you can
-leave the service unchanged, as it will not cause any issues since the root
-filesystem is protected and mounted as read-only by Verity.
+There are multiple ways to configure a verity enabled image. For
+recommendations, see [Verity Image Recommendations](./verity.md).
 
 ## additionalFile type
 
