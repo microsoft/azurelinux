@@ -65,18 +65,11 @@ install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 
-cp config/config.toml.rpm-yum config.toml
-mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
-install -m 644 -t %{buildroot}%{_sysconfdir}/nvidia-container-runtime config.toml
-
-mkdir -p %{buildroot}%{_libexecdir}/oci/hooks.d
-install -m 755 -t %{buildroot}%{_libexecdir}/oci/hooks.d oci-nvidia-hook
-
-mkdir -p %{buildroot}%{_datadir}/containers/oci/hooks.d
-install -m 644 -t %{buildroot}%{_datadir}/containers/oci/hooks.d oci-nvidia-hook.json
-
 %posttrans
 ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
+
+# Generate the default config; If this file already exists no changes are made.
+%{_bindir}/nvidia-ctk --quiet config --config-file=%{_sysconfdir}/nvidia-container-runtime/config.toml --in-place
 
 %postun
 rm -f %{_bindir}/nvidia-container-toolkit
@@ -84,12 +77,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %files
 %license LICENSE
 %{_bindir}/nvidia-container-runtime-hook
-%{_libexecdir}/oci/hooks.d/oci-nvidia-hook
-%{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %files base
 %license LICENSE
-%config %{_sysconfdir}/nvidia-container-runtime/config.toml
 %{_bindir}/nvidia-container-runtime
 %{_bindir}/nvidia-ctk
 
