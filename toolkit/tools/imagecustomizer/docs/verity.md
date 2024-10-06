@@ -109,7 +109,7 @@ Refer to the YAML layout under the
 [cloud-init](#cloud-init-local-cloud-config-cloud-final) section for the
 partition configuration.
 
-### sshd
+## sshd
 
 The `sshd` service requires write access to the SSH host keys, which by default
 are stored in `/etc/ssh`. However, with the root filesystem being read-only,
