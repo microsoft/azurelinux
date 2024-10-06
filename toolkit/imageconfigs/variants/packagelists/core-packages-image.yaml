@@ -1,0 +1,5 @@
+packages:
+  - cronie-anacron
+  - logrotate
+  - core-packages-base-image
+  - dracut-vrf

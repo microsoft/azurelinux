@@ -1,0 +1,29 @@
+storage:
+  bootType: efi
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096M
+    partitions:
+    - id: boot
+      start: 1M
+      end: 9M
+    - id: rootfs
+      start: 9M
+  filesystems:
+  - deviceId: boot
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+os:
+  hostname: azure-linux
+  packages:
+    installLists:
+    - packagelists/hyperv-packages.yaml
+    - packagelists/core-packages-image.yaml
+    - packagelists/cloud-init-packages.yaml
+    - packagelists/virt-guest-packages.yaml

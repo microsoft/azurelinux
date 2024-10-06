@@ -1,0 +1,4 @@
+packages:
+  - dracut-hyperv
+  - dracut-virtio
+  - dracut-xen
