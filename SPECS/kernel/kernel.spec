@@ -336,6 +336,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
+%post drivers-intree-amdgpu
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
