@@ -1,6 +1,6 @@
 Summary:        The eBPF tool and systems inspection framework for Kubernetes, containers and Linux hosts.
 Name:           ig
-Version:        0.32.0
+Version:        0.33.0
 Release:        1%{?dist}
 License:        Apache 2.0 and GPL 2.0 for eBPF code
 Vendor:         Microsoft Corporation
@@ -64,6 +64,9 @@ fi
 %{_bindir}/ig
 
 %changelog
+* Mon Oct 07 2024 Francis Laniel <flaniel@linux.microsoft.com> - 0.33.0-1
+- Bump to version 0.33.0
+
 * Tue Sep 03 2024 Francis Laniel <flaniel@linux.microsoft.com> - 0.32.0-1
 - Bump to version 0.32.0
 
