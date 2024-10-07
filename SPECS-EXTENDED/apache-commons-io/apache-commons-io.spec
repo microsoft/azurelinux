@@ -22,8 +22,8 @@ Distribution:   Mariner
 %define short_name      commons-%{base_name}
 %bcond_with tests
 Name:           apache-%{short_name}
-Version:        2.8.0
-Release:        2%{?dist}
+Version:        2.14.0
+Release:        1%{?dist}
 Summary:        Utilities to assist with developing IO functionality
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -93,6 +93,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Oct 7 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.14.0-1
+- Upgrade to 2.14.0 to fix the CVE-2024-47554.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
