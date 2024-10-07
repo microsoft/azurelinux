@@ -5,6 +5,7 @@ storage:
     maxSize: 4096M
     partitions:
     - id: boot
+      type: esp
       start: 1M
       end: 9M
     - id: rootfs

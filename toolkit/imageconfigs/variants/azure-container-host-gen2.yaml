@@ -5,6 +5,7 @@ storage:
     maxSize: 5000M
     partitions:
     - id: efi
+      type: esp
       start: 1M
       end: 65M
     - id: boot
@@ -28,11 +29,10 @@ storage:
       path: /
 os:
   kernelCommandLine:
-    extraCommandLine: "console=ttyS0 fips=1"
+    extraCommandLine: "console=ttyS0"
   hostname: azurelinux
   packages:
     installLists:
-    - packagelists/fips-packages.yaml
     - packagelists/core-packages-image.yaml
     - packagelists/marketplace-tools-packages.yaml
     - packagelists/azurevm-packages.yaml

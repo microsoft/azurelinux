@@ -1,23 +1,21 @@
 storage:
-  bootType: efi
+  bootType: legacy
   disks:
   - partitionTableType: gpt
     maxSize: 5000M
     partitions:
-    - id: efi
+    - id: reserved
+      type: bios-grub
       start: 1M
-      end: 65M
+      end: 9M
     - id: boot
-      start: 65M
-      end: 565M
+      start: 9M
+      end: 509M
     - id: rootfs
-      start: 565M
+      start: 509M
   filesystems:
-  - deviceId: efi
+  - deviceId: reserved
     type: fat32
-    mountPoint:
-      path: /boot/efi
-      options: umask=0077
   - deviceId: boot
     type: ext4
     mountPoint:
