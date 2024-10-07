@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.0.6
+Version:        1.4.1
 Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -136,6 +136,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Oct 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
+- Auto-upgrade to 1.4.1 - testing
+
 * Thu Apr 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.0.6-1
 - Upgrade to version 1.0.6
 
