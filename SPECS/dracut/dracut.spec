@@ -113,6 +113,7 @@ This package contains tools to assemble the local initrd and host configuration.
 %package overlayfs
 Summary:        dracut module to build a dracut initramfs with OverlayFS support
 Requires:       %{name} = %{version}-%{release}
+# Version 102-4 and below of the xen subpackage owned files packaged by overlayfs
 Conflicts:      %{name}-xen <= 102-4
 
 %description overlayfs
