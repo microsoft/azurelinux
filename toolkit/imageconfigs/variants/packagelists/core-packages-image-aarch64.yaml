@@ -1,0 +1,6 @@
+packages:
+  - shim-unsigned
+  - cronie-anacron
+  - logrotate
+  - core-packages-base-image
+  - dracut-vrf

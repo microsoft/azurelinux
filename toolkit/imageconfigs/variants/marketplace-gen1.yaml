@@ -1,0 +1,47 @@
+storage:
+  bootType: legacy
+  disks:
+  - partitionTableType: gpt
+    maxSize: 5000M
+    partitions:
+    - id: reserved
+      start: 1M
+      end: 9M
+    - id: boot
+      start: 9M
+      end: 509M
+    - id: rootfs
+      start: 509M
+  filesystems:
+  - deviceId: reserved
+    type: fat32
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+os:
+  kernelCommandLine:
+    extraCommandLine: "console=ttyS0"
+  hostname: azurelinux
+  packages:
+    installLists:
+    - packagelists/core-packages-image.yaml
+    - packagelists/marketplace-tools-packages.yaml
+    - packagelists/azurevm-packages.yaml
+    - packagelists/hyperv-packages.yaml
+  additionalFiles:
+  - source: ../additionalconfigs/cloud-init.cfg
+    destination: /etc/cloud/cloud.cfg
+  - source: ../additionalconfigs/chrony.cfg
+    destination: /etc/chrony.conf
+  - source: ../additionalconfigs/wait-for-ptp-hyperv.conf
+    destination: /etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf
+  - source: ../additionalconfigs/51-ptp-hyperv.rules
+    destination: /etc/udev/rules.d/51-ptp-hyperv.rules
+scripts:
+  postCustomization:
+  - path: ../additionalconfigs/configure-systemd-networkd.sh
