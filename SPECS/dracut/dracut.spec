@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -113,6 +113,7 @@ This package contains tools to assemble the local initrd and host configuration.
 %package overlayfs
 Summary:        dracut module to build a dracut initramfs with OverlayFS support
 Requires:       %{name} = %{version}-%{release}
+Conflicts:      %{name}-xen <= 102-4
 
 %description overlayfs
 This package contains dracut module needed to build an initramfs with OverlayFS support.
@@ -269,6 +270,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %files overlayfs
 %dir %{dracutlibdir}/modules.d/20overlayfs
 %{dracutlibdir}/modules.d/20overlayfs/*
+%{_bindir}/%{name}-catimages
+%dir /boot/%{name}
+%dir %{_sharedstatedir}/%{name}
+%dir %{_sharedstatedir}/%{name}/overlay
 
 %files virtio
 %defattr(-,root,root,0755)
@@ -282,12 +287,10 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %defattr(-,root,root,0755)
 %{_sysconfdir}/dracut.conf.d/00-xen.conf
 
-%{_bindir}/%{name}-catimages
-%dir /boot/%{name}
-%dir %{_sharedstatedir}/%{name}
-%dir %{_sharedstatedir}/%{name}/overlay
-
 %changelog
+* Mon Oct 07 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-5
+- Return loose files to the correct subpackage, dracut-overlayfs
+
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
 - Drop 0002-disable-xattr.patch
 - Introduce dracut-noxattr subpackage to expose this behavior as an option
