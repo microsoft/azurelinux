@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "clamav-1.0.6.tar.gz": "7a9691525bd150f9419c337d25d8c28402ed35beea7aa19563aabcddc248de52",
-  "clamav-1.0.6-cargo.tar.gz": "20b6179033c32ad81023ccc4a4262730d10fa80cd7ae678b386f139305b1e31f"
- }
+  "Signatures": {
+    "clamav-1.0.6-cargo.tar.gz": "20b6179033c32ad81023ccc4a4262730d10fa80cd7ae678b386f139305b1e31f",
+    "clamav-1.4.1.tar.gz": "f2016f214d6fd94ff77a0e3103755d18bfac1d62c1ca9f8cb823481b3c0a63d1"
+  }
 }
