@@ -8,7 +8,20 @@
 
 set -x
 
-touch /logs/status_start_toolchain_build_in_chroot
+# Progress logging
+last_step=""
+log_step() {
+    step=$1
+    last_step=$step
+    touch "/logs/status_$step"
+}
+# Print the last step when we exit
+log_exit() {
+    echo "Last step: $last_step"
+}
+trap log_exit EXIT
+
+log_step start_toolchain_build_in_chroot
 
 echo Calling script to create files:
 
@@ -35,7 +48,7 @@ set -e
 #
 cd /sources
 
-touch /logs/status_building_temp_tools_in_chroot
+log_step building_temp_tools_in_chroot
 
 echo Gettext-0.22
 tar xf gettext-0.22.tar.xz
@@ -45,7 +58,7 @@ make -j$(nproc)
 cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin
 popd
 rm -rf gettext-0.22
-touch /logs/status_gettext_complete
+log_step gettext_complete
 
 echo Bison-3.8.2
 tar xf bison-3.8.2.tar.xz
@@ -55,7 +68,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf bison-3.8.2
-touch /logs/status_bison_complete
+log_step bison_complete
 
 echo Perl-5.38.0
 tar xf perl-5.38.0.tar.xz
@@ -74,7 +87,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf perl-5.38.0
-touch /logs/status_perl_complete
+log_step perl_complete
 
 echo Python-3.12.3
 tar xf Python-3.12.3.tar.xz
@@ -86,7 +99,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf Python-3.12.3
-touch /logs/status_python312_temp_complete
+log_step python312_temp_complete
 
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
@@ -96,9 +109,9 @@ make -j$(nproc)
 make install
 popd
 rm -rf texinfo-7.0.3
-touch /logs/status_texinfo_complete
+log_step texinfo_complete
 
-echo util-linux-2.40.2
+echo util-linux-2.40.2 - Pass 1
 tar xf util-linux-2.40.2.tar.xz
 pushd util-linux-2.40.2
 mkdir -pv /var/lib/hwclock
@@ -119,7 +132,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf util-linux-2.40.2
-touch /logs/status_util-linux_complete
+log_step util-linux_pass1_complete
 
 # 7.13. Cleaning up and Saving the Temporary System
 rm -rf /usr/share/{info,man,doc}/*
@@ -127,7 +140,7 @@ find /usr/{lib,libexec} -name \*.la -delete
 # do not delete /tools yet, contains rpm patch file
 #rm -rf /tools
 
-touch /logs/status_build_cross_temp_tools_done
+log_step build_cross_temp_tools_done
 
 echo glibc-2.38
 tar xf glibc-2.38.tar.xz
@@ -161,7 +174,7 @@ mkdir -pv /etc/ld.so.conf.d
 popd
 rm -rf glibc-2.38
 
-touch /logs/status_glibc_complete
+log_step glibc_complete
 
 echo Zlib-1.3.1
 tar xf zlib-1.3.1.tar.xz
@@ -172,7 +185,7 @@ make install
 rm -fv /usr/lib/libz.a
 popd
 rm -rf zlib-1.3.1
-touch /logs/status_zlib_complete
+log_step zlib_complete
 
 echo Bzip2-1.0.8
 tar xf bzip2-1.0.8.tar.gz
@@ -192,7 +205,7 @@ done
 rm -fv /usr/lib/libbz2.a
 popd
 rm -rf bzip2-1.0.8
-touch /logs/status_bzip2_complete
+log_step bzip2_complete
 
 echo Xz-5.4.4
 tar xf xz-5.4.4.tar.xz
@@ -204,7 +217,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf xz-5.4.4
-touch /logs/status_xz_complete
+log_step xz_complete
 
 echo zstd-1.5.5
 tar xf zstd-1.5.5.tar.gz
@@ -214,7 +227,7 @@ make prefix=/usr install
 rm -v /usr/lib/libzstd.a
 popd
 rm -rf zstd-1.5.5
-touch /logs/status_zstd_complete
+log_step zstd_complete
 
 echo File-5.45
 tar xf file-5.45.tar.gz
@@ -224,7 +237,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf file-5.45
-touch /logs/status_file_complete
+log_step file_complete
 
 echo Readline-8.2
 tar xf readline-8.2.tar.gz
@@ -240,7 +253,7 @@ make SHLIB_LIBS="-lncursesw"
 make SHLIB_LIBS="-lncursesw" install
 popd
 rm -rf readline-8.2
-touch /logs/status_readline_complete
+log_step readline_complete
 
 echo M4-1.4.19
 tar xf m4-1.4.19.tar.gz
@@ -250,7 +263,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf m4-1.4.19
-touch /logs/status_m4_complete
+log_step m4_complete
 
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz
@@ -261,7 +274,7 @@ make install
 ln -sv flex /usr/bin/lex
 popd
 rm -rf flex-2.6.4
-touch /logs/status_flex_complete
+log_step flex_complete
 
 echo Binutils-2.41
 tar xf binutils-2.41.tar.xz
@@ -284,7 +297,7 @@ make tooldir=/usr install
 rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
 popd
 rm -rf binutils-2.41
-touch /logs/status_binutils_complete
+log_step binutils_complete
 
 echo GMP-6.3.0
 tar xf gmp-6.3.0.tar.xz
@@ -300,7 +313,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf gmp-6.3.0
-touch /logs/status_gmp_complete
+log_step gmp_complete
 
 echo MPFR-4.2.1
 tar xf mpfr-4.2.1.tar.xz
@@ -313,7 +326,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf mpfr-4.2.1
-touch /logs/status_mpfr_complete
+log_step mpfr_complete
 
 echo MPC-1.3.1
 tar xf mpc-1.3.1.tar.gz
@@ -325,7 +338,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf mpc-1.3.1
-touch /logs/status_libmpc_complete
+log_step libmpc_complete
 
 echo libcap-2.69
 tar xf libcap-2.69.tar.xz
@@ -335,7 +348,7 @@ make -j$(nproc) prefix=/usr lib=lib
 make prefix=/usr lib=lib install
 popd
 rm -rf libcap-2.69
-touch /logs/status_libcap_complete
+log_step libcap_complete
 
 echo GCC-13.2.0
 tar xf gcc-13.2.0.tar.xz
@@ -375,7 +388,7 @@ mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
 popd
 rm -rf gcc-13.2.0
 
-touch /logs/status_gcc_complete
+log_step gcc_complete
 
 echo Pkgconf-2.0.2
 tar xf pkgconf-2.0.2.tar.xz
@@ -389,7 +402,7 @@ make install
 ln -sv pkgconf   /usr/bin/pkg-config
 popd
 rm -rf pkgconf-2.0.2
-touch /logs/status_pkgconf_complete
+log_step pkgconf_complete
 
 echo Ncurses-6.4
 tar xf ncurses-6.4.tar.gz
@@ -419,7 +432,7 @@ echo "INPUT(-lncursesw)" > /usr/lib/libcursesw.so
 ln -sfv libncurses.so      /usr/lib/libcurses.so
 popd
 rm -rf ncurses-6.4
-touch /logs/status_ncurses_complete
+log_step ncurses_complete
 
 echo Sed-4.9
 tar xf sed-4.9.tar.xz
@@ -429,7 +442,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf sed-4.9
-touch /logs/status_sed_complete
+log_step sed_complete
 
 echo Gettext-0.22
 tar xf gettext-0.22.tar.xz
@@ -442,7 +455,7 @@ make install
 chmod -v 0755 /usr/lib/preloadable_libintl.so
 popd
 rm -rf gettext-0.22
-touch /logs/status_gettext_complete
+log_step gettext_complete
 
 echo Bison-3.8.2
 tar xf bison-3.8.2.tar.xz
@@ -452,7 +465,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf bison-3.8.2
-touch /logs/status_bison_complete
+log_step bison_complete
 
 echo Grep-3.11
 tar xf grep-3.11.tar.xz
@@ -462,7 +475,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf grep-3.11
-touch /logs/status_grep_complete
+log_step grep_complete
 
 echo Bash-5.2.15
 tar xf bash-5.2.15.tar.gz
@@ -475,7 +488,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf bash-5.2.15
-touch /logs/status_bash_complete
+log_step bash_complete
 
 # Login again to use new bash?
 #exec /usr/bin/bash --login
@@ -489,7 +502,7 @@ make install
 rm -fv /usr/lib/libltdl.a
 popd
 rm -rf libtool-2.4.7
-touch /logs/status_libtool_complete
+log_step libtool_complete
 
 echo GDBM-1.23
 tar xf gdbm-1.23.tar.gz
@@ -501,7 +514,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf gdbm-1.23
-touch /logs/status_gdbm_complete
+log_step gdbm_complete
 
 echo gperf-3.1
 tar xf gperf-3.1.tar.gz
@@ -511,7 +524,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf gperf-3.1
-touch /logs/status_gperf_complete
+log_step gperf_complete
 
 echo Expat-2.4.8
 tar xf expat-2.4.8.tar.bz2
@@ -523,7 +536,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf expat-2.4.8
-touch /logs/status_expat_complete
+log_step expat_complete
 
 echo Perl-5.38.0
 tar xf perl-5.38.0.tar.xz
@@ -549,7 +562,7 @@ make install
 unset BUILD_ZLIB BUILD_BZIP2
 popd
 rm -rf perl-5.38.0
-touch /logs/status_perl_complete
+log_step perl_complete
 
 echo Autoconf-2.71
 tar xf autoconf-2.71.tar.xz
@@ -559,7 +572,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf autoconf-2.71
-touch /logs/status_autoconf_complete
+log_step autoconf_complete
 
 echo Automake-1.16.5
 tar xf automake-1.16.5.tar.gz
@@ -569,7 +582,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf automake-1.16.5
-touch /logs/status_automake_complete
+log_step automake_complete
 
 echo OpenSSL-3.3.2
 tar xf openssl-3.3.2.tar.gz
@@ -592,7 +605,7 @@ sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
 rm -rf openssl-3.3.2
-touch /logs/status_openssl_complete
+log_step openssl_complete
 
 echo Elfutils-0.189
 tar xjf elfutils-0.189.tar.bz2
@@ -611,7 +624,7 @@ make -C libdw install
 make install
 popd
 rm -rf elfutils-0.189
-touch /logs/status_libelf_complete
+log_step libelf_complete
 
 echo Libffi-3.4.4
 tar xf libffi-3.4.4.tar.gz
@@ -650,7 +663,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf libffi-3.4.4
-touch /logs/status_libffi_complete
+log_step libffi_complete
 
 echo Python-3.12.3
 tar xf Python-3.12.3.tar.xz
@@ -662,7 +675,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf Python-3.12.3
-touch /logs/status_python312_complete
+log_step python312_complete
 
 echo Flit-Core-3.9.0
 tar xf flit_core-3.9.0.tar.gz
@@ -671,7 +684,7 @@ pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 pip3 install --no-index --no-user --find-links dist flit_core
 popd
 rm -rf flit_core-3.9.0
-touch /logs/status_flit_core_390_complete
+log_step flit_core_390_complete
 
 echo wheel-0.42.0
 tar xf wheel-0.42.0.tar.gz
@@ -680,7 +693,7 @@ pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 pip3 install --no-index --find-links dist wheel
 popd
 rm -rf wheel-0.42.0
-touch /logs/status_wheel_0420_complete
+log_step wheel_0420_complete
 
 echo setuptools-69.0.3
 tar xf setuptools-69.0.3.tar.gz
@@ -689,7 +702,7 @@ pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 pip3 install --no-index --find-links dist setuptools
 popd
 rm -rf setuptools-69.0.3
-touch /logs/status_setuptools_6903_complete
+log_step setuptools_6903_complete
 
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
@@ -704,7 +717,7 @@ make install
 mv -v /usr/bin/chroot /usr/sbin
 popd
 rm -rf coreutils-9.4
-touch /logs/status_coreutils_complete
+log_step coreutils_complete
 
 echo Diffutils-3.10
 tar xf diffutils-3.10.tar.xz
@@ -714,7 +727,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf diffutils-3.10
-touch /logs/status_diffutils_complete
+log_step diffutils_complete
 
 echo Gawk-5.2.2
 tar xf gawk-5.2.2.tar.xz
@@ -725,7 +738,7 @@ make -j$(nproc)
 make LN='ln -f' install
 popd
 rm -rf gawk-5.2.2
-touch /logs/status_gawk_complete
+log_step gawk_complete
 
 echo Findutils-4.9.0
 tar xf findutils-4.9.0.tar.xz
@@ -735,7 +748,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf findutils-4.9.0
-touch /logs/status_findutils_complete
+log_step findutils_complete
 
 # Groff is only needed for perl and we might be able to remove it.
 echo Groff-1.23.0
@@ -746,7 +759,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf groff-1.23.0
-touch /logs/status_groff_complete
+log_step groff_complete
 
 echo Gzip-1.13
 tar xf gzip-1.13.tar.xz
@@ -756,7 +769,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf gzip-1.13
-touch /logs/status_gzip_complete
+log_step gzip_complete
 
 echo Libpipeline-1.5.7
 tar xf libpipeline-1.5.7.tar.gz
@@ -766,7 +779,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf libpipeline-1.5.7
-touch /logs/status_libpipeline_complete
+log_step libpipeline_complete
 
 echo Make-4.4.1
 tar xf make-4.4.1.tar.gz
@@ -776,7 +789,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf make-4.4.1
-touch /logs/status_make_complete
+log_step make_complete
 
 echo Patch-2.7.6
 tar xf patch-2.7.6.tar.xz
@@ -786,7 +799,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf patch-2.7.6
-touch /logs/status_patch_complete
+log_step patch_complete
 
 echo Tar-1.35
 tar xf tar-1.35.tar.xz
@@ -797,7 +810,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf tar-1.35
-touch /logs/status_tar_complete
+log_step tar_complete
 
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
@@ -807,7 +820,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf texinfo-7.0.3
-touch /logs/status_texinfo_complete
+log_step texinfo_complete
 
 echo Procps-ng-4.0.4
 tar xf procps-ng-4.0.4.tar.xz
@@ -820,9 +833,9 @@ make -j$(nproc)
 make install
 popd
 rm -rf procps-ng-4.0.4
-touch /logs/status_procpsng_complete
+log_step procpsng_complete
 
-echo util-linux-2.40.2
+echo util-linux-2.40.2 - Pass 2
 tar xf util-linux-2.40.2.tar.xz
 pushd util-linux-2.40.2
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
@@ -846,7 +859,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf util-linux-2.40.2
-touch /logs/status_util-linux_complete
+log_step util-linux_pass2_complete
 
 #
 # These next packages include rpm/rpmbuild and dependencies
@@ -872,7 +885,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf sqlite-autoconf-3440000
-touch /logs/status_sqlite-autoconf_complete
+log_step sqlite-autoconf_complete
 
 echo popt-1.19
 tar xf popt-1.19.tar.gz
@@ -884,7 +897,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf popt-1.19
-touch /logs/status_popt_complete
+log_step popt_complete
 
 echo cpio-2.14
 tar xjf cpio-2.14.tar.bz2
@@ -898,7 +911,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf cpio-2.14
-touch /logs/status_cpio_complete
+log_step cpio_complete
 
 echo libarchive-3.7.1
 tar xf libarchive-3.7.1.tar.gz
@@ -908,7 +921,7 @@ make -j$(nproc)
 make install
 popd
 rm -rf libarchive-3.7.1
-touch /logs/status_libarchive_complete
+log_step libarchive_complete
 
 echo lua-5.4.6
 tar xf lua-5.4.6.tar.gz
@@ -943,7 +956,7 @@ make INSTALL_TOP=/usr                \
 install -v -m644 -D lua.pc /usr/lib/pkgconfig/lua.pc
 popd
 rm -rf lua-5.4.6
-touch /logs/status_lua_complete
+log_step lua_complete
 
 DEBUGEDIT_WITH_VERSION=debugedit-5.0
 echo $DEBUGEDIT_WITH_VERSION
@@ -954,7 +967,7 @@ make
 make install
 popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
-touch /logs/status_debugedit_complete
+log_step debugedit_complete
 
 RPM_WITH_VERSION=rpm-4.18.2
 RPM_FOLDER="$RPM_WITH_VERSION"
@@ -984,7 +997,7 @@ popd
 
 rm -rf "$RPM_FOLDER"
 
-touch /logs/status_rpm_complete
+log_step rpm_complete
 
 # Cleanup
 rm -rf /tmp/*
@@ -994,4 +1007,4 @@ find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 # sanity check 6
 sh /tools/sanity_check.sh "6"
 
-touch /logs/status_building_in_chroot_complete
+log_step building_in_chroot_complete

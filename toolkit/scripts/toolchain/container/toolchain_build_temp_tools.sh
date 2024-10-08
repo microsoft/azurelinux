@@ -11,7 +11,20 @@ fi
 echo LFS root is: $LFS
 cd $LFS/sources
 
-touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
+# Progress logging
+last_step=""
+log_step() {
+    step=$1
+    last_step=$step
+    touch "$LFS/logs/temptoolchain/status_$step"
+}
+# Print the last step when we exit
+log_exit() {
+    echo "Last temptoolchain step: $last_step"
+}
+trap log_exit EXIT
+
+log_step temp_toolchain_build_started
 
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
@@ -34,7 +47,7 @@ make install
 popd
 rm -rf binutils-2.41
 
-touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
+log_step binutils_pass1_complete
 
 echo GCC-13.2.0 - Pass 1
 tar xf gcc-13.2.0.tar.xz
@@ -84,7 +97,7 @@ cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
 popd
 rm -rf gcc-13.2.0
 
-touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
+log_step gcc_pass1_complete
 
 KERNEL_VERSION="6.6.51.1"
 echo Linux-${KERNEL_VERSION} API Headers
@@ -98,7 +111,7 @@ cp -rv usr/include/* $LFS/usr/include
 popd
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}
 
-touch $LFS/logs/temptoolchain/status_kernel_headers_complete
+log_step kernel_headers_complete
 
 echo glibc-2.38
 tar xf glibc-2.38.tar.xz
@@ -127,7 +140,7 @@ sed '/RTLDLIST=/s@/usr@@g' -i $LFS/usr/bin/ldd
 popd
 rm -rf glibc-2.38
 
-touch $LFS/logs/temptoolchain/status_glibc_complete
+log_step glibc_complete
 
 # sanity check 1
 sh /tools/sanity_check.sh "1"
@@ -152,7 +165,7 @@ rm -v $LFS/usr/lib/lib{stdc++,stdc++fs,supc++}.la
 popd
 rm -rf gcc-13.2.0
 
-touch $LFS/logs/temptoolchain/status_libstdc++_complete
+log_step libstdc++_complete
 
 # Cross compile temp tools
 
@@ -167,7 +180,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf m4-1.4.19
 
-touch $LFS/logs/temptoolchain/status_m4_complete
+log_step m4_complete
 
 echo Ncurses-6.4
 tar xf ncurses-6.4.tar.gz
@@ -197,7 +210,7 @@ echo "INPUT(-lncursesw)" > $LFS/usr/lib/libncurses.so
 popd
 rm -rf ncurses-6.4
 
-touch $LFS/logs/temptoolchain/status_ncurses_complete
+log_step ncurses_complete
 
 echo Bash-5.2.15
 tar xf bash-5.2.15.tar.gz
@@ -212,7 +225,7 @@ ln -sv bash $LFS/bin/sh
 popd
 rm -rf bash-5.2.15
 
-touch $LFS/logs/temptoolchain/status_bash_complete
+log_step bash_complete
 
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
@@ -229,7 +242,7 @@ mv -v $LFS/usr/bin/chroot              $LFS/usr/sbin
 popd
 rm -rf coreutils-9.4
 
-touch $LFS/logs/temptoolchain/status_coreutils_complete
+log_step coreutils_complete
 
 echo Diffutils-3.10
 tar xf diffutils-3.10.tar.xz
@@ -242,7 +255,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf diffutils-3.10
 
-touch $LFS/logs/temptoolchain/status_diffutils_complete
+log_step diffutils_complete
 
 echo File-5.45
 tar xf file-5.45.tar.gz
@@ -262,7 +275,7 @@ rm -v $LFS/usr/lib/libmagic.la
 popd
 rm -rf file-5.45
 
-touch $LFS/logs/temptoolchain/status_file_complete
+log_step file_complete
 
 echo Findutils-4.9.0
 tar xf findutils-4.9.0.tar.xz
@@ -276,7 +289,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf findutils-4.9.0
 
-touch $LFS/logs/temptoolchain/status_findutils_complete
+log_step findutils_complete
 
 echo Gawk-5.2.2
 tar xf gawk-5.2.2.tar.xz
@@ -290,7 +303,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf gawk-5.2.2
 
-touch $LFS/logs/temptoolchain/status_gawk_complete
+log_step gawk_complete
 
 echo Grep-3.11
 tar xf grep-3.11.tar.xz
@@ -303,7 +316,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf grep-3.11
 
-touch $LFS/logs/temptoolchain/status_grep_complete
+log_step grep_complete
 
 echo Gzip-1.13
 tar xf gzip-1.13.tar.xz
@@ -314,7 +327,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf gzip-1.13
 
-touch $LFS/logs/temptoolchain/status_gzip_complete
+log_step gzip_complete
 
 echo Make-4.4.1
 tar xf make-4.4.1.tar.gz
@@ -328,7 +341,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf make-4.4.1
 
-touch $LFS/logs/temptoolchain/status_make_complete
+log_step make_complete
 
 echo Patch-2.7.6
 tar xf patch-2.7.6.tar.xz
@@ -341,7 +354,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf patch-2.7.6
 
-touch $LFS/logs/temptoolchain/status_patch_complete
+log_step patch_complete
 
 echo Sed-4.9
 tar xf sed-4.9.tar.xz
@@ -354,7 +367,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf sed-4.9
 
-touch $LFS/logs/temptoolchain/status_sed_complete
+log_step sed_complete
 
 echo Tar-1.35
 tar xf tar-1.35.tar.xz
@@ -367,7 +380,7 @@ make DESTDIR=$LFS install
 popd
 rm -rf tar-1.35
 
-touch $LFS/logs/temptoolchain/status_tar_complete
+log_step tar_complete
 
 echo Xz-5.4.4
 tar xf xz-5.4.4.tar.xz
@@ -383,7 +396,7 @@ rm -v $LFS/usr/lib/liblzma.la
 popd
 rm -rf xz-5.4.4
 
-touch $LFS/logs/temptoolchain/status_xz_complete
+log_step xz_complete
 
 # Binutils pass 2
 echo Binutils-2.41 - Pass 2
@@ -407,7 +420,7 @@ rm -v $LFS/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}
 popd
 rm -rf binutils-2.41
 
-touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
+log_step binutils_pass2_complete
 
 # Gcc pass 2
 echo GCC-13.2.0 - Pass 2
@@ -456,8 +469,8 @@ ln -sv gcc $LFS/usr/bin/cc
 popd
 rm -rf gcc-13.2.0
 
-touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
+log_step gcc_pass2_complete
 
-touch $LFS/logs/temptoolchain/status_temp_toolchain_complete
+log_step temp_toolchain_complete
 
 echo Done with script

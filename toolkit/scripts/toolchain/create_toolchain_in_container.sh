@@ -10,6 +10,12 @@ MARINER_SPECS_DIR=$2
 MARINER_SOURCE_URL=$3
 INCREMENTAL_TOOLCHAIN=$4
 ARCHIVE_TOOL=$5
+LOG_DIR=$6
+
+if [ -z "$MARINER_BUILD_DIR" ] || [ -z "$MARINER_SPECS_DIR" ] || [ -z "$MARINER_SOURCE_URL" ] || [ -z "$INCREMENTAL_TOOLCHAIN" ] || [ -z "$ARCHIVE_TOOL" ] || [ -z "$LOG_DIR" ]; then
+    echo "Usage: $0 <MARINER_BUILD_DIR> <MARINER_SPECS_DIR> <MARINER_SOURCE_URL> <INCREMENTAL_TOOLCHAIN> <ARCHIVE_TOOL> <LOG_DIR>"
+    exit 1
+fi
 
 # Grab an identity for the raw toolchain components so we can avoid rebuilding it if it hasn't changed
 files_to_watch=(    "./create_toolchain_in_container.sh" \
@@ -85,7 +91,10 @@ pushd $MARINER_BUILD_DIR/toolchain
 # Pull out the populated toolchain from the container
 docker rm -f marinertoolchain-container-temp 2>/dev/null || true
 temporary_toolchain_container=$(docker create --name marinertoolchain-container-temp marinertoolchain_populated:${sha_component_tag})
+rm -rf ${LOG_DIR}/logs
+mkdir -p ${LOG_DIR}/logs
 docker cp "${temporary_toolchain_container}":/temptoolchain/lfs .
+docker cp "${temporary_toolchain_container}":/temptoolchain/lfs/logs ${LOG_DIR}
 docker rm marinertoolchain-container-temp
 
 rm -rf ./populated_toolchain
@@ -104,5 +113,14 @@ popd
 rm -vf ./container/*.patch
 rm -vf ./container/.bashrc
 rm -vf ./container/toolchain-local-wget-list
+
+# Ensure the populated toolchain was created successfully
+if [ ! -f ${LOG_DIR}/logs/status_building_in_chroot_complete ]; then
+    echo "Error: Raw toolchain container build failed, check logs in ${LOG_DIR} for details"
+    # We leave breadcrumbs in the main log file "Last step: <step>", print the last step to help debugging
+    last_step=$(grep "^Last step:" ${LOG_DIR}/create_toolchain_in_container_full.log | tail -n 1)
+    echo "Last recorded step from ${LOG_DIR}/create_toolchain_in_container_full.log: '${last_step}'"
+    exit 1
+fi
 
 echo Raw toolchain build complete
