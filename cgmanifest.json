@@ -10351,8 +10351,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.16.2.tar.gz"
         }
       }
     },
@@ -14602,19 +14602,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nvidia-container-runtime",
-          "version": "3.13.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.13.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.13.5.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.16.2.tar.gz"
         }
       }
     },
@@ -14633,8 +14623,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-modprobe",
-          "version": "495.44",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/495.44.tar.gz"
+          "version": "550.54.14",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/550.54.14.tar.gz"
         }
       }
     },
