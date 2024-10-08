@@ -1,13 +1,16 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-39128.patch
+Patch1:         CVE-2023-39129.patch
+Patch2:         CVE-2023-39130.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -88,6 +91,9 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Tue Oct 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 11.3
+- Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
