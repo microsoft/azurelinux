@@ -162,6 +162,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.1-1
+- Upgrade to 1.23.1
+
 * Thu Sep 26 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-2
 - Bump version to 1.22.7-3
 
