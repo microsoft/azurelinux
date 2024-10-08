@@ -1,7 +1,7 @@
 From 058c72f0bdc5daa6078de96674aa68d8895ae921 Mon Sep 17 00:00:00 2001
-From: Dallas Delaney <dadelan@example.com>
+From: Dallas Delaney <dadelan@microsoft.com>
 Date: Tue, 8 Oct 2024 12:59:09 -0700
-Subject: [PATCH] add patch
+Subject: [PATCH] remove version dependency on protocol-http1
 
 ---
  async-http.gemspec | 2 +-

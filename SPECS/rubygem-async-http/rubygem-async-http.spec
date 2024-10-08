@@ -10,7 +10,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/socketry/async-http
 Source0:        https://github.com/socketry/async-http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         0001-add-patch.patch
+Patch0:         remove-http-protocol1-dep.patch
 BuildRequires:  ruby
 Requires:       rubygem-async
 Requires:       rubygem-async-io
