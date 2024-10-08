@@ -1,14 +1,15 @@
 Summary:        One-time password components
 Name:           oath-toolkit
 Version:        2.6.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.nongnu.org/oath-toolkit/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
-Patch0:        oath-toolkit-2.6.2-lockfile.patch
+Patch0:         oath-toolkit-2.6.2-lockfile.patch
+Patch1:         CVE-2024-47191.patch
 
 BuildRequires: pam-devel
 BuildRequires: gtk-doc
@@ -110,8 +111,7 @@ Requires: pam
 A PAM module for pluggable login authentication for OATH.
 
 %prep
-%setup -q
-%patch0 -p1 -b .lockfile
+%autosetup -p1
 
 %build
 autoreconf -fi
@@ -186,6 +186,9 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %{_libdir}/security/pam_oath.so
 
 %changelog
+* Thu Oct 03 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.6.7-3
+- Fix CVE-2024-47191
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.6.7-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
