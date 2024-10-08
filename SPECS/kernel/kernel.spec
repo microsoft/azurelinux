@@ -62,6 +62,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
 BuildRequires:  libtraceevent-devel
+BuildRequires:  lld
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
@@ -191,10 +192,15 @@ if [ -s config_diff ]; then
 fi
 
 %build
+# -linkmode=external
+# "extracting debug info from /usr/src/azl/BUILDROOT/kernel-6.6.47.1-5.azl3.x86_64/usr/src/linux-headers-6.6.47.1-5.azl3/scripts/ipe/polgen/polgen"
+# "*** ERROR: No build ID note found in /usr/src/azl/BUILDROOT/kernel-6.6.47.1-5.azl3.x86_64/usr/src/linux-headers-6.6.47.1-5.azl3/scripts/ipe/polgen/polgen"
+export LDFLAGS="-Wl,-z,relro -Wl,--build-id=sha1 -latomic -Wl,--undefined-version"
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} LLVM=1
 
 # Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all LLVM=1
+make -C tools/perf PYTHON=%{python3} NO_LIBELF=1 LIBC_SUPPORT=1 NO_LIBTRACEEVENT=1 all LLVM=1
 
 %ifarch x86_64
 make -C tools turbostat cpupower LLVM=1
