@@ -165,7 +165,10 @@ $(raw_toolchain): $(toolchain_files)
 			$(SOURCE_URL) \
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(ARCHIVE_TOOL) \
-			$(toolchain_raw_logs_dir) 2>&1 | tee $(toolchain_raw_logs_dir)/create_toolchain_in_container_full.log
+			$(toolchain_raw_logs_dir) 2>&1 | tee $(toolchain_raw_logs_dir)/create_toolchain_in_container_full.log; \
+		if [ $${PIPESTATUS[0]} -ne 0 ]; then \
+			$(call print_error, create_toolchain_in_container.sh failed); \
+		fi
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -229,7 +232,10 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 			"$(toolchain_from_repos)" \
 			"$(TOOLCHAIN_MANIFEST)" \
 			"$(go-bldtracker)" \
-			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" 2>&1 | tee $(toolchain_official_logs_dir)/build_official_rpms.log && \
+			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" 2>&1 | tee $(toolchain_official_logs_dir)/build_official_rpms.log; \
+		if [ $${PIPESTATUS[0]} -ne 0 ]; then \
+			$(call print_error, build_mariner_toolchain.sh failed); \
+		fi && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
