@@ -117,6 +117,9 @@ rm -vf ./container/toolchain-local-wget-list
 # Ensure the populated toolchain was created successfully
 if [ ! -f ${LOG_DIR}/logs/status_building_in_chroot_complete ]; then
     echo "Error: Raw toolchain container build failed, check logs in ${LOG_DIR} for details"
+    # We leave breadcrumbs in the main log file "Last step: <step>", print the last step to help debugging
+    last_step=$(grep "^Last step:" ${LOG_DIR}/create_toolchain_in_container_full.log | tail -n 1)
+    echo "Last recorded step from ${LOG_DIR}/create_toolchain_in_container_full.log: '${last_step}'"
     exit 1
 fi
 
