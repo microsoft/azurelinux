@@ -682,6 +682,9 @@ build_rpm_in_chroot_no_install libcap-ng
 chroot_and_install_rpms libselinux
 chroot_and_install_rpms libcap-ng
 build_rpm_in_chroot_no_install util-linux
+# debugedit requires help2man
+build_rpm_in_chroot_no_install help2man
+chroot_and_install_rpms help2man
 # rpm requires debugedit
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit

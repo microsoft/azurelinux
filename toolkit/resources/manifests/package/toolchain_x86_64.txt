@@ -167,6 +167,7 @@ grep-lang-3.11-2.azl3.x86_64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 gzip-1.13-1.azl3.x86_64.rpm
 gzip-debuginfo-1.13-1.azl3.x86_64.rpm
+help2man-1.49.3-1.azl3.noarch.rpm
 intltool-0.51.0-7.azl3.noarch.rpm
 itstool-2.0.7-1.azl3.noarch.rpm
 kbd-2.2.0-2.azl3.x86_64.rpm
