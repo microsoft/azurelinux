@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,8 +115,8 @@ This package provides the CRI-O container runtime configuration for kubeadm
 
 %prep
 %setup -q
-%autopatch -p1
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 
@@ -220,6 +220,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon Sep 16 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-9
+- Moved autopatching step to occur after vendor tarball extraction to ensure that all CVE patches are applied
+
 * Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-8
 - Patch CVE-2022-32149
 
