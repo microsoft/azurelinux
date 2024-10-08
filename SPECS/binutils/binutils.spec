@@ -20,8 +20,8 @@
 
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.37
-Release:        8%{?dist}
+Version:        2.41
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -294,6 +294,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Tue Oct 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.41-1
+- Auto-upgrade to 2.41 - fix cve
+
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
 - Add the cross-compilation subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
