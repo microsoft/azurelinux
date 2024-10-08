@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.51.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Oct  4 22:40:48 UTC 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-6
+- Enable dm_verity and dm_bufio by default
+
 * Thu Oct 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-5
 - Make e1000 drivers modules instead of built-in
 - Enable virtio console by default
