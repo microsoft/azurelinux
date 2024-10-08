@@ -3,6 +3,7 @@
 %global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define mariner_version 3
+%global debug_package %{nil}
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -11,7 +12,7 @@
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
-%global _missing_build_ids_terminate_build 1
+%global _missing_build_ids_terminate_build 0
 %global _no_recompute_build_ids 1
 
 %ifarch x86_64
@@ -220,13 +221,14 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 # We want to compress modules after stripping. Extra step is added to
 # the default __spec_install_post.
 %define __spec_install_post\
-    %{?__debug_package:%{__debug_install_post}}\
     %{__arch_install_post}\
     %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
 
 %install
+export LDFLAGS="-Wl,-z,relro -Wl,--build-id=sha1 -latomic -Wl,--undefined-version"
+
 install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
@@ -350,6 +352,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinu*
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
