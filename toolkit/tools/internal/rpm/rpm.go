@@ -63,11 +63,25 @@ const (
 )
 
 const (
-	installedRPMRegexRPMIndex        = 1
-	installedRPMRegexVersionIndex    = 2
-	installedRPMRegexArchIndex       = 3
-	installedRPMRegexExpectedMatches = 4
+	packageFQNRegexMatchSubString  = iota
+	packageFQNRegexNameIndex       = iota
+	packageFQNRegexEpochIndex      = iota
+	packageFQNRegexVersionIndex    = iota
+	packageFQNRegexReleaseIndex    = iota
+	packageFQNRegexArchIndex       = iota
+	packageFQNRegexExtensionIndex  = iota
+	packageFQNRegexExpectedMatches = iota
+)
 
+const (
+	installedRPMRegexMatchSubString  = iota
+	installedRPMRegexRPMIndex        = iota
+	installedRPMRegexVersionIndex    = iota
+	installedRPMRegexArchIndex       = iota
+	installedRPMRegexExpectedMatches = iota
+)
+
+const (
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
 	rpmBuildProgram = "rpmbuild"
@@ -82,6 +96,25 @@ var (
 	// checkSectionRegex is used to determine if a SPEC file has a '%check' section.
 	// It works multi-line strings containing the whole file content, thus the need for the 'm' flag.
 	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check`)
+
+	// A full qualified RPM name contains the package name, epoch, version, release, architecture, and extension.
+	// Optional fields:
+	// 	- epoch,
+	// 	- architecture.
+	//	- "rpm" extension.
+	//
+	// Sample match:
+	//
+	//	pkg-name-0:1.2.3-4.azl3.x86_64.rpm
+	//
+	// Groups can be used to split it into:
+	//   - name:			pkg-name
+	//   - epoch:			0
+	//   - version:			1.2.3
+	//   - release:			4.azl3
+	//   - architecture:	x86_64
+	//   - extension:		rpm
+	packageFQNRegex = regexp.MustCompile(`^\s*(\S+[^-])-(?:(\d+):)?(\d[^-:_]*)-(\d+(?:[^-\s]*?))(?:\.(noarch|x86_64|aarch64|src))?(?:\.(rpm))?\s*$`)
 
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
@@ -187,19 +220,15 @@ func getMacroDirWithFallback(allowDefault bool) (macroDir string, err error) {
 func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
 	baseName := filepath.Base(rpmFilePath)
 
+	matches := packageFQNRegex.FindStringSubmatch(baseName)
+
 	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
-	if !strings.Contains(baseName, "-") {
+	if matches == nil {
 		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
 		return
 	}
 
-	rpmFileSplit := strings.Split(baseName, "-")
-	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
-	if packageName == "" {
-		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
-		return
-	}
-	return
+	return matches[packageFQNRegexNameIndex], nil
 }
 
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
@@ -526,10 +555,6 @@ func extractCompetingPackageInfoFromLine(line string) (match bool, pkgName strin
 		pkgName := matches[installedRPMRegexRPMIndex]
 		version := matches[installedRPMRegexVersionIndex]
 		arch := matches[installedRPMRegexArchIndex]
-		// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
-		if strings.Contains(version, ":") {
-			version = strings.Split(version, ":")[1]
-		}
 
 		return true, fmt.Sprintf("%s-%s.%s", pkgName, version, arch)
 	}
@@ -634,6 +659,39 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	}
 
 	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// StripEpochFromPackageFullQualifiedName removes the epoch from a package full qualified name if it is present.
+// Example:
+//
+//	"pkg-name-0:1.2.3-4.azl3.x86_64" -> "pkg-name-1.2.3-4.azl3.x86_64"
+func StripEpochFromPackageFullQualifiedName(packageFQN string) string {
+	var packageFQNBuilder strings.Builder
+
+	matches := packageFQNRegex.FindStringSubmatch(packageFQN)
+	if matches == nil {
+		return packageFQN
+	}
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexNameIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexVersionIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexReleaseIndex])
+
+	if matches[packageFQNRegexArchIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexArchIndex])
+	}
+
+	if matches[packageFQNRegexExtensionIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexExtensionIndex])
+	}
+
+	return packageFQNBuilder.String()
 }
 
 // TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file

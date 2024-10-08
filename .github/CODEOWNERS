@@ -1,6 +1,5 @@
-# By default, all files require a review by at least one member of the Azure Linux developers team.
-# See teams here: https://github.com/orgs/microsoft/teams?query=mariner
-* @microsoft/cbl-mariner-devs
+# For stable release branches, ensure stable release maintainers are added as code reviewers
+* @microsoft/cbl-mariner-stable-maintainers
 
 # Modification to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
@@ -11,88 +10,4 @@
 # Modifications to the CredScan exceptions require admin approval.
 /.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
 
-# Modification to what is considered "core packages" require admin approval.
-/SPECS/core-packages/* @microsoft/cbl-mariner-admins
-
-# Modification to specific packages go to specific teams
-/SPECS/kernel/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
-/SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
-
-/SPECS/grub2/* @microsoft/cbl-mariner-bootloader
-/SPECS/grubby/* @microsoft/cbl-mariner-bootloader
-/SPECS/shim/* @microsoft/cbl-mariner-bootloader
-/SPECS/shim-unsigned/* @microsoft/cbl-mariner-bootloader
-/SPECS/shim-unsigned-x64/* @microsoft/cbl-mariner-bootloader
-/SPECS/shim-unsigned-aarch64/* @microsoft/cbl-mariner-bootloader
-/SPECS-SIGNED/grub2-efi-binary-signed/* @microsoft/cbl-mariner-bootloader
-
-/SPECS/dracut/* @microsoft/cbl-mariner-dracut
-/SPECS/initramfs/* @microsoft/cbl-mariner-dracut
-/SPECS/verity-read-only-root/* @microsoft/cbl-mariner-dracut
-
-/SPECS/systemd/* @microsoft/cbl-mariner-systemd
-
-/SPECS/bcc/* @microsoft/cbl-mariner-debug-tools
-/SPECS/bpftrace/* @microsoft/cbl-mariner-debug-tools
-/SPECS/crash/* @microsoft/cbl-mariner-debug-tools
-/SPECS/gdb/* @microsoft/cbl-mariner-debug-tools
-/SPECS/kexec-tools/* @microsoft/cbl-mariner-debug-tools
-
-/SPECS/openssl/* @microsoft/cbl-mariner-openssl
-/SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
-/SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
-
-/SPECS/dnf/* @microsoft/cbl-mariner-package-managers
-/SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
-/SPECS/rpm/* @microsoft/cbl-mariner-package-managers
-/SPECS/tdnf/* @microsoft/cbl-mariner-package-managers
-
-/SPECS/containerd/* @microsoft/cbl-mariner-container-runtime
-/SPECS/docker-buildx/* @microsoft/cbl-mariner-container-runtime
-/SPECS/docker-cli/* @microsoft/cbl-mariner-container-runtime
-/SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
-/SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-kata-containers
-/SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
-/SPECS/runc/* @microsoft/cbl-mariner-container-runtime
-/SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
-
-/SPECS/cloud-hypervisor-cvm/* @microsoft/cbl-mariner-kata-containers
-
-/SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
-/SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
-
-# Modifications to the toolkit requires reviews from the toolkit team
-/toolkit/ @microsoft/cbl-mariner-tooling
-
-# Docs to be reviewed by general Azure Linux devs
-/toolkit/docs/ @microsoft/cbl-mariner-devs
-
-# Default image configurations to be reviewed by general Azure Linux devs
-/toolkit/imageconfigs/ @microsoft/cbl-mariner-devs
-
-# Package and toolchain manifests to be reviewed by toolchain team
-/toolkit/resources/manifests/package/pkggen_core_aarch64.txt @microsoft/cbl-mariner-toolchain
-/toolkit/resources/manifests/package/pkggen_core_x86_64.txt @microsoft/cbl-mariner-toolchain
-/toolkit/resources/manifests/package/toolchain_aarch64.txt @microsoft/cbl-mariner-toolchain
-/toolkit/resources/manifests/package/toolchain_x86_64.txt @microsoft/cbl-mariner-toolchain
-
-# Modifications to the raw toolchain require admin approval.
-/toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins
-/toolkit/scripts/toolchain/cgmanifest.json @microsoft/cbl-mariner-admins
-/toolkit/scripts/toolchain/create_toolchain_in_container.sh @microsoft/cbl-mariner-admins
-
-# Modifications to the trusted CA certificates require admin approval.
-/SPECS/*ca-certificates*/* @microsoft/cbl-mariner-admins
-
-# Image Customizer
-/toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/imagecustomizerapi/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/osmodifier @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/imagecustomizerlib/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/osmodifierlib @microsoft/cbl-mariner-imagecustomizer
-/toolkit/scripts/build_tag_imagecustomizer.mk @microsoft/cbl-mariner-imagecustomizer
+/SPECS-EXTENDED/ @microsoft/cbl-mariner-devs

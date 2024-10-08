@@ -7,8 +7,11 @@ package tdnf
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 var (
@@ -156,4 +159,77 @@ func getMajorVersionFromString(version string) (majorVersion string, err error) 
 		return
 	}
 	return
+}
+
+func GetRepoSnapshotCliArg(posixTime string) (repoSnapshot string, err error) {
+	const (
+		errorFormatString = "cannot generate snapshot cli arg for: %s"
+	)
+	if posixTime == "" {
+		err = fmt.Errorf(errorFormatString, posixTime)
+		return "", err
+	}
+
+	_, err = strconv.Atoi(posixTime)
+	if err != nil {
+		err = fmt.Errorf(errorFormatString, posixTime)
+		return "", err
+	}
+
+	repoSnapshot = fmt.Sprintf("--snapshottime=%s", posixTime)
+
+	return repoSnapshot, nil
+}
+
+func GetRepoSnapshotExcludeCliArg(excludeRepos []string) (excludeArg string, err error) {
+	if excludeRepos == nil {
+		err = fmt.Errorf("exclude repos cannot be empty")
+		return "", err
+	}
+
+	repos := ""
+	for _, repo := range excludeRepos {
+		if repo == "" {
+			err = fmt.Errorf("exclude repo member cannot be empty")
+			return "", err
+		}
+
+		if repos == "" {
+			repos = repo
+		} else {
+			repos = fmt.Sprintf("%s,%s", repos, repo)
+		}
+	}
+	excludeArg = fmt.Sprintf("--snapshotexcluderepos=%s", repos)
+
+	return excludeArg, nil
+}
+
+func AddSnapshotToConfig(configFilePath, posixTime string) (err error) {
+	if configFilePath == "" {
+		err = fmt.Errorf("config file path cannot be empty")
+		return err
+	}
+
+	if posixTime == "" {
+		err = fmt.Errorf("posix time cannot be empty")
+		return err
+	}
+	exists, err := file.PathExists(configFilePath)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		// print warning
+		logger.Log.Warnf("config file path does not exist, nothing to append")
+		return nil
+	}
+
+	// create config entry, and add to config file
+	snapshotConfigEntry := fmt.Sprintf("snapshottime=%s\n", posixTime)
+	err = file.Append(snapshotConfigEntry, configFilePath)
+	if err != nil {
+		return err
+	}
+	return nil
 }

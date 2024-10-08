@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "24.2",
-          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.2.tar.gz"
+          "version": "24.3.1",
+          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/24.3.1.tar.gz"
         }
       }
     },
@@ -12881,8 +12881,8 @@
         "type": "other",
         "other": {
           "name": "mdadm",
-          "version": "4.2",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.2.tar.gz"
+          "version": "4.3",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.3.tar.gz"
         }
       }
     },
