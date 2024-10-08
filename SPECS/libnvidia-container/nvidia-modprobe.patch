@@ -24,6 +24,8 @@ diff -ruN nvidia-modprobe-550.54.14/modprobe-utils/nvidia-modprobe-utils.h nvidi
  int nvidia_cap_mknod(const char* cap_file_path, int *minor);
  int nvidia_cap_get_file_state(const char* cap_file_path);
 +int nvidia_cap_get_device_file_attrs(const char* cap_file_path, int *major, int *minor, char *name);
+ int nvidia_cap_imex_channel_mknod(int minor);
+ int nvidia_cap_imex_channel_file_state(int minor);
  int nvidia_get_chardev_major(const char *name);
  int nvidia_msr_modprobe(void);
  
