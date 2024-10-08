@@ -585,8 +585,8 @@
         "type": "other",
         "other": {
           "name": "asio",
-          "version": "1.10.8",
-          "downloadUrl": "https://github.com/chriskohlhoff/asio/archive/28d9b8d6df708024af5227c551673fdb2519f5bf.tar.gz"
+          "version": "1.31.0",
+          "downloadUrl": "https://github.com/chriskohlhoff/asio/archive/1f534288b4be0be2dd664aab43882a0aa3106a1d.tar.gz"
         }
       }
     },
