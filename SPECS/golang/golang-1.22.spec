@@ -16,7 +16,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.22.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -162,6 +162,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.7-3
+- Fork out 1.22 as supported version
+
 * Thu Sep 26 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-2
 - Bump version to 1.22.7-3
 
