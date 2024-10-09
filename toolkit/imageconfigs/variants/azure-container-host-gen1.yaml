@@ -31,7 +31,7 @@ os:
   packages:
     installLists:
     - packagelists/core-packages-image.yaml
-    - packagelists/marketplace-tools-packages.yaml
+    - packagelists/azure-container-host-packages.yaml
     - packagelists/azurevm-packages.yaml
     - packagelists/hyperv-packages.yaml
   additionalFiles:
