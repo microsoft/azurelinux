@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
 Patch1:         CVE-2024-6104.patch
+Patch2:         CVE-2024-24786.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  systemd-rpm-macros
@@ -132,6 +133,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Tue Oct 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.0-16
+- Patch for CVE-2024-24786
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-15
 - Bump release to rebuild with go 1.22.7
 
