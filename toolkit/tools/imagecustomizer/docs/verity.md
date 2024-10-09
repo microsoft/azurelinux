@@ -13,39 +13,16 @@ different configuration options that offer tradeoffs between convenience and
 security. Some configurations can be made flexible to allow changes, while
 others may be set as immutable for enhanced security.
 
-## systemd-growfs-root
+## Writable `/var` Partition
 
-This service attempts to resize the root filesystem, which fails since verity
-makes the root filesystem readonly and a fixed size.
+Many services  (e.g., auditd, docker, logrotate, etc.) require write access to
+the /var directory.
 
-### Solution 1: Do nothing
+### Solution: Create a Writable Persistent /var Partition
 
-Since the root filesystem is readonly, the `systemd-growfs-root` service will
-fail. However, the only impact will be an error in the boot logs.
-
-### Solution 2: Disable service
-
-Disabling the service removes the error from the boot logs.
-
-```yaml
-os:
-  services:
-    disable:
-    - systemd-growfs-root
-```
-
-## cloud-init-local, cloud-config, cloud-final
-
-These services require write access to certain directories, such as
-`/var/lib/cloud`, which conflicts with the read-only nature of the
-verity-protected root filesystem.
-
-### Solution: Create a writable persistent partition
-
-To provide the required write access, create a writable persistent partition for
-`/var`. This will allow the `cloud-init-local`, `cloud-config`, and
-`cloud-final` services to function correctly without issues caused by the
-read-only root filesystem.
+To provide the required write access, create a separate writable partition for
+/var. Here is an example of how to define the partitions and filesystems in your
+configuration:
 
 ```yaml
 storage:
@@ -79,35 +56,62 @@ storage:
       path: /var
 ```
 
-## docker
+## Network Configuration for Verity Images
 
-The `docker.service` requires write access to `/var/lib/docker`, which is
-restricted by the read-only root filesystem.
+In non-verity images, usually user can leverage cloud-init to provide default
+networking settings. However, cloud-init fails to provision the network in
+verity images since /etc is not writable.
 
-### Solution: Create a writable persistent partition
+### Solution: Specify Network Settings Manually
 
-To unblock `docker.service`, create a writable persistent partition for `/var`.
-This allows Docker to write to `/var/lib/docker` without any issues caused by
-the read-only root filesystem. 
+For verity images, it's recommended to specify network settings manually. Here
+is an example network configuration that can be added to the `additionalFiles`
+in your configuration YAML file:
 
-Refer to the YAML layout under the
-[cloud-init](#cloud-init-local-cloud-config-cloud-final) section for the
-partition configuration.
+```yaml
+os:
+  additionalFiles:
+  - content: |
+      # SPDX-License-Identifier: MIT-0
+      #
+      # This example config file is installed as part of systemd.
+      # It may be freely copied and edited (following the MIT No Attribution license).
+      #
+      # To use the file, one of the following methods may be used:
+      # 1. add a symlink from /etc/systemd/network to the current location of this file,
+      # 2. copy the file into /etc/systemd/network or one of the other paths checked
+      #    by systemd-networkd and edit it there.
+      # This file should not be edited in place, because it'll be overwritten on upgrades.
 
-## auditd, logrotate
+      # Enable DHCPv4 and DHCPv6 on all physical ethernet links
+      [Match]
+      Kind=!*
+      Type=ether
 
-The `auditd.service` and `logrotate.service` need write access to `/var/log` for
-logging purposes. However, the root filesystem's read-only nature blocks these
-services.
+      [Network]
+      DHCP=yes
+    destination: /etc/systemd/network/89-ethernet.network
+    permissions: "664"
+```
 
-### Solution: Create a writable persistent partition
+## cloud-init
 
-To unblock `auditd.service` and `logrotate.service`, ensure that `/var` is
-mounted as a writable persistent partition, allowing write access to `/var/log`.
+cloud-init has various features to configure the system (e.g., user accounts,
+networking, etc.), but many of these require the /etc directory to be writable.
+In verity-protected images with a read-only root filesystem, cloud-init cannot
+perform these configurations effectively.
 
-Refer to the YAML layout under the
-[cloud-init](#cloud-init-local-cloud-config-cloud-final) section for the
-partition configuration.
+### Solution: Disable cloud-init
+
+Given the limitations, the general recommendation is to disable cloud-init in
+verity images to prevent potential issues.
+
+```yaml
+os:
+  services:
+    disable:
+    - cloud-init
+```
 
 ## sshd
 
@@ -122,20 +126,102 @@ host keys from `/etc` to `/var`. This ensures that `sshd` can write and access
 the necessary keys without encountering issues due to the read-only root
 filesystem.
 
-Refer to the YAML layout under the
-[cloud-init](#cloud-init-local-cloud-config-cloud-final) section for the
-partition configuration.
+Example Image Config:
 
-The following example script can be added to the `postCustomization` scripts to
-automatically move the SSH host keys and update the `sshd_config` file:
+```yaml
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 5120M
+    partitions:
+    - id: boot
+      start: 1M
+      end: 1024M
+    - id: root
+      start: 1024M
+      end: 3072M
+    - id: roothash
+      start: 3072M
+      end: 3200M
+    - id: var
+      start: 3200M
+  filesystems:
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: root
+    type: ext4
+    mountPoint:
+      path: /
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+os:
+  verity:
+    dataPartition:
+      idType: id
+      id: root
+    hashPartition:
+      idType: id
+      id: roothash
+  additionalFiles:
+    # Change the directory that the sshd-keygen service writes the SSH host keys to.
+  - content: |
+      [Unit]
+      Description=Generate sshd host keys
+      ConditionPathExists=|!/var/etc/ssh/ssh_host_rsa_key
+      ConditionPathExists=|!/var/etc/ssh/ssh_host_ecdsa_key
+      ConditionPathExists=|!/var/etc/ssh/ssh_host_ed25519_key
+      Before=sshd.service
 
-```bash
-# Move the SSH host keys off the read-only /etc directory, so that sshd can run.
-SSH_VAR_DIR="/var/etc/ssh/"
-mkdir -p "$SSH_VAR_DIR"
-cat << EOF >> /etc/ssh/sshd_config
-HostKey $SSH_VAR_DIR/ssh_host_rsa_key
-HostKey $SSH_VAR_DIR/ssh_host_ecdsa_key
-HostKey $SSH_VAR_DIR/ssh_host_ed25519_key
-EOF
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/bin/ssh-keygen -A -f /var
+
+      [Install]
+      WantedBy=multi-user.target
+    destination: /usr/lib/systemd/system/sshd-keygen.service
+    permissions: "664"
+  services:
+    enable:
+    - sshd
+scripts:
+  postCustomization:
+    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
+  - content: |
+      # Move the SSH host keys off the read-only /etc directory, so that sshd can run.
+      SSH_VAR_DIR="/var/etc/ssh/"
+      mkdir -p "$SSH_VAR_DIR"
+
+      cat << EOF >> /etc/ssh/sshd_config
+
+      HostKey $SSH_VAR_DIR/ssh_host_rsa_key
+      HostKey $SSH_VAR_DIR/ssh_host_ecdsa_key
+      HostKey $SSH_VAR_DIR/ssh_host_ed25519_key
+      EOF
+  name: ssh-move-host-keys.sh
+```
+
+## systemd-growfs-root
+
+This service attempts to resize the root filesystem, which fails since verity
+makes the root filesystem readonly and a fixed size.
+
+### Solution 1: Do nothing
+
+Since the root filesystem is readonly, the `systemd-growfs-root` service will
+fail. However, the only impact will be an error in the boot logs.
+
+### Solution 2: Disable service
+
+Disabling the service removes the error from the boot logs.
+
+```yaml
+os:
+  services:
+    disable:
+    - systemd-growfs-root
 ```
