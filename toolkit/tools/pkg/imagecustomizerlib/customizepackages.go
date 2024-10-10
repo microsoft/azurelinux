@@ -82,9 +82,11 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
-	err = cleanTdnfCache(imageChroot)
-	if err != nil {
-		return err
+	if needRpmsSources {
+		err = cleanTdnfCache(imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -242,7 +244,7 @@ func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
 			ErrorStderrLines(1).
 			Execute()
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed to clean tdnf cache: %w", err)
 		}
 		return nil
 	})

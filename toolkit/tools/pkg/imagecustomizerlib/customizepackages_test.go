@@ -12,6 +12,7 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -156,6 +157,8 @@ func TestCustomizeImagePackagesAddOfflineLocalRepo(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
+	logChrootDirectoryTest(imageConnection, "/var/cache/tdnf")
+
 	// Ensure packages were installed.
 	ensureFilesExist(t, imageConnection,
 		"/usr/bin/jq",
@@ -185,6 +188,9 @@ func TestCustomizeImagePackagesUpdate(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
+	// Ensure tdnf cache was cleaned.
+	ensureTdnfCacheCleanup(t, imageConnection, "/var/tdnf/cache")
+
 	// Ensure packages were installed.
 	ensureFilesExist(t, imageConnection,
 		"/usr/bin/jq",
@@ -210,4 +216,55 @@ func TestCustomizeImagePackagesDiskSpace(t *testing.T) {
 		true /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.ErrorContains(t, err, "failed to customize raw image")
 	assert.ErrorContains(t, err, "failed to install package (gcc)")
+}
+
+func logChrootDirectoryTest(imageConnection *ImageConnection, dirPath string) ([]string, error) {
+	var folderNames []string
+
+	// Join the chroot root directory with the directory you want to log
+	fullPath := filepath.Join(imageConnection.Chroot().RootDir(), dirPath)
+
+	// Read the directory contents
+	entries, err := os.ReadDir(fullPath)
+	if err != nil {
+		logger.Log.Infof("Failed to read directory (%s): %v", fullPath, err)
+		return folderNames, fmt.Errorf("Failed to read directory (%s): %v", fullPath, err)
+	}
+
+	// Log each entry (file or directory)
+	logger.Log.Infof("Contents of directory: %s", fullPath)
+	for _, entry := range entries {
+		folderNames = append(folderNames, entry.Name())
+		logger.Log.Infof(" - %s", entry.Name())
+	}
+
+	return folderNames, nil
+}
+
+func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirPath string) error {
+
+	folderNames, err := logChrootDirectoryTest(imageConnection, "/var/cache/tdnf")
+	if err != nil {
+		return err
+	}
+
+	// Ensure there are exactly 2 folders after the tdnf cleanup
+	assert.Equal(t, 2, len(folderNames), "Expected exactly 2 folders, but got %d", len(folderNames))
+
+	// Check for one folder containing 'local-repo' and another ending with 'official-base'
+	var foundLocalRepo, foundOfficialBase bool
+
+	for _, folderName := range folderNames {
+		if strings.Contains(folderName, "local-repo") {
+			foundLocalRepo = true
+		} else if strings.HasSuffix(folderName, "official-base") {
+			foundOfficialBase = true
+		}
+	}
+
+	// Assert that both folders were found
+	assert.True(t, foundLocalRepo, "Expected to find a folder containing 'local-repo'")
+	assert.True(t, foundOfficialBase, "Expected to find a folder ending with 'official-base'")
+
+	return nil
 }
