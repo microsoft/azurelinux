@@ -23,6 +23,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
+BuildRequires:  luajit-devel
 
 %description
 
@@ -57,7 +58,7 @@ Development files for %{name}
     -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
     -DFLB_JEMALLOC=On \
-    -DFLB_LUAJIT=Off \
+    -DFLB_PREFER_SYSTEM_LIBS=On
 
 %cmake_build
 
@@ -65,7 +66,7 @@ Development files for %{name}
 %cmake_install
 
 %check
-%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
+%ctest --exclude-regex "flb-rt-in_podman_metrics|.*\\.sh"
 
 %files
 %license LICENSE
@@ -80,6 +81,9 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Thu Oct 10 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+- Update to 3.1.9 to enable Lua filter plugin using system luajit library.
+
 * Tue May 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.6-1
 - Update to v3.0.6 to fix CVE-2024-4323.
 
