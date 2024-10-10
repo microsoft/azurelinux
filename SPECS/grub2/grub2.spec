@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -323,6 +323,7 @@ install -d %{buildroot}%{_datadir}/grub2-efi
 EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/BOOT
 GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
+GRUB_MODULE_DIR_SOURCE=
 
 install -d $EFI_BOOT_DIR
 
@@ -331,6 +332,9 @@ GRUB_MODULE_NAME=grubx64.efi
 GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi
+
+mv %{buildroot}%{_libdir}/grub/i386-pc %{buildroot}/boot/grub2
+mv %{buildroot}%{_libdir}/grub/x86_64-efi %{buildroot}/boot/grub2
 %endif
 
 %ifarch aarch64
@@ -338,6 +342,8 @@ GRUB_MODULE_NAME=grubaa64.efi
 GRUB_PXE_MODULE_NAME=grubaa64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi
+
+mv %{buildroot}%{_libdir}/grub/arm64-efi %{buildroot}/boot/grub2
 %endif
 
 cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
@@ -383,10 +389,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %ifarch x86_64
 %files pc
-%{_libdir}/grub/i386-pc
+/boot/%{name}/i386-pc
 
 %files efi
-%{_libdir}/grub/x86_64-efi
+/boot/%{name}/x86_64-efi
 %endif
 
 %files efi-unsigned
@@ -410,7 +416,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %ifarch aarch64
 %files efi
-%{_libdir}/grub/*
+/boot/%{name}/arm64-efi
 %endif
 
 %files configuration
@@ -428,6 +434,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Oct 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-21
+- Move -efi and -pc grub module packages to correct location in /boot/grub2
+
 * Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
 - Move grub2-rpm-macros to the azurelinux-rpm-macros package
 
