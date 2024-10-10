@@ -22514,8 +22514,8 @@
         "type": "other",
         "other": {
           "name": "python-dns",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/rthalley/dnspython/archive/v2.1.0rc1/python-dns-2.1.0rc1.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/rthalley/dnspython/archive/refs/tags/v2.2.1.tar.gz"
         }
       }
     },
