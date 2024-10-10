@@ -1,6 +1,6 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        3.0.6
+Version:        3.1.9
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
