@@ -1,13 +1,16 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-39128.patch
+Patch1:         CVE-2023-39129.patch
+Patch2:         CVE-2023-39130.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -100,6 +103,9 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Wed Oct 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 13.3
+- Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
+
 * Fri Aug 16 2024 Andrew Phelps <anphel@microsoft.com> - 13.2-2
 - Fix package tests
 - Enable and run unit tests
