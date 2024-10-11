@@ -1,0 +1,11 @@
+[Unit]
+Description=LiveOS Artifacts Download Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/sbin/liveos-artifacts-download
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
