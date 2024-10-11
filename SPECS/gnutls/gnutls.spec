@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
-Version:        3.7.7
-Release:        4%{?dist}
+Version:        3.8.3
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,6 +96,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.3-1
+- Auto-upgrade to 3.8.3 - to fix CVE-2024-0553
+
 * Wed Sep 20 2023 Zhichun Wan <zhichunwan@microsoft.com> - 3.7.7-4
 - Add patch to fix CVE-2024-0567
 
