@@ -65,8 +65,8 @@
         "type": "other",
         "other": {
           "name": "acpid",
-          "version": "2.0.32",
-          "downloadUrl": "http://downloads.sourceforge.net/acpid2/acpid-2.0.32.tar.xz"
+          "version": "2.0.34",
+          "downloadUrl": "http://downloads.sourceforge.net/acpid2/acpid-2.0.34.tar.xz"
         }
       }
     },
