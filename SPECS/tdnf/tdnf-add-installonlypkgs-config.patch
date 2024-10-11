@@ -15,7 +15,7 @@ index 67c4d51..8ec4003 100644
  [main]
  gpgcheck=1
  installonly_limit=3
-+installonlypkgs=kernel kernel-hci kernel-mos kernel-mshv kernel-uvm kernel-azure
++installonlypkgs=kernel kernel-mshv kernel-uvm
  clean_requirements_on_remove=0
  repodir=/etc/yum.repos.d
  cachedir=/var/cache/tdnf
