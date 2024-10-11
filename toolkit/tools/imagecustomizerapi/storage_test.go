@@ -475,3 +475,70 @@ func TestStorageIsValidDuplicateLabel(t *testing.T) {
 	assert.ErrorContains(t, err, "invalid fileSystem at index 0")
 	assert.ErrorContains(t, err, "more than one partition has a label of (a)")
 }
+
+func TestStorageIsValidBothDisksAndResetUuid(t *testing.T) {
+	value := Storage{
+		Disks: []Disk{{
+			PartitionTableType: "gpt",
+			MaxSize:            ptrutils.PtrTo(DiskSize(4 * diskutils.GiB)),
+			Partitions: []Partition{
+				{
+					Id:    "esp",
+					Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
+					End:   ptrutils.PtrTo(DiskSize(9 * diskutils.MiB)),
+					Type:  PartitionTypeESP,
+				},
+				{
+					Id:    "rootfs",
+					Start: ptrutils.PtrTo(DiskSize(9 * diskutils.MiB)),
+				},
+			},
+		}},
+		BootType: "efi",
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "esp",
+				Type:     "vfat",
+				MountPoint: &MountPoint{
+					Path: "/boot/efi",
+				},
+			},
+			{
+				DeviceId: "rootfs",
+				Type:     "ext4",
+				MountPoint: &MountPoint{
+					Path: "/",
+				},
+			},
+		},
+		ResetPartitionsUuidsType: ResetPartitionsUuidsTypeAll,
+	}
+
+	err := value.IsValid()
+	assert.ErrorContains(t, err, "cannot specify both 'resetPartitionsUuidsType' and 'disks'")
+}
+
+func TestStorageIsValidFileSystemsWithoutDisks(t *testing.T) {
+	value := Storage{
+		FileSystems: []FileSystem{
+			{
+				DeviceId: "esp",
+				Type:     "vfat",
+				MountPoint: &MountPoint{
+					Path: "/boot/efi",
+				},
+			},
+			{
+				DeviceId: "rootfs",
+				Type:     "ext4",
+				MountPoint: &MountPoint{
+					Path: "/",
+				},
+			},
+		},
+		ResetPartitionsUuidsType: ResetPartitionsUuidsTypeAll,
+	}
+
+	err := value.IsValid()
+	assert.ErrorContains(t, err, "cannot specify 'filesystems' without specifying 'disks'")
+}
