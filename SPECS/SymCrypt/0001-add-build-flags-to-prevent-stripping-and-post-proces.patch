@@ -1,0 +1,108 @@
+From a91f9a55e6b8b01511538827005a6e948ccf6e27 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 12 Oct 2024 02:06:21 +0000
+Subject: [PATCH] add build flags to prevent stripping and post processing
+
+---
+ BUILD.md                                |  2 ++
+ CMakeLists.txt                          | 14 ++++++++++++++
+ modules/linux/common/ModuleCommon.cmake |  4 ++--
+ scripts/build.py                        |  8 ++++++++
+ 4 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/BUILD.md b/BUILD.md
+index e7f0618..a4984da 100644
+--- a/BUILD.md
++++ b/BUILD.md
+@@ -63,6 +63,8 @@ and building the Linux modules with FIPS integrity checks.
+       * To cross-compile for Linux ARM64, you must also use `--toolchain=cmake-configs/Toolchain-Clang-ARM64.cmake`
+     * `-DSYMCRYPT_USE_ASM=<ON|OFF>` to choose whether to use assembly optimizations. Defaults to `ON`.
+     * `-DSYMCRYPT_FIPS_BUILD=<ON|OFF>` to choose whether to enable FIPS self-tests in the SymCrypt shared object module. Defaults to `ON`. Currently only affects Linux builds.
++    * `-DSYMCRYPT_STRIP_BINARY=<ON|OFF>` to choose whether to strip the binary. Defaults to `ON`.
++    * `-DSYMCRYPT_FIPS_POSTPROCESS=<ON|OFF>` to choose whether to run the FIPS postprocess script. Defaults to `ON`.
+     * For a release build, specify `-DCMAKE_BUILD_TYPE=RelWithDebInfo`
+ 1. `cmake --build bin`
+     * Optionally, for a release build on Windows, specify `--config Release`
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6da485d..1533e9d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,6 +54,18 @@ if(SYMCRYPT_FIPS_BUILD)
+     add_compile_options(-DSYMCRYPT_DO_FIPS_SELFTESTS=1)
+ endif()
+ 
++option(
++    SYMCRYPT_STRIP_BINARY
++    "When enabled, SymCrypt will strip the binary in release mode."
++    ON
++)
++
++option(
++    SYMCRYPT_FIPS_POSTPROCESS
++    "When enabled, SymCrypt will do postprocessing the binary for FIPS integrity verification."
++    ON
++)
++
+ option(
+     SYMCRYPT_TEST_LEGACY_IMPL
+     "When enabled, the SymCrypt unit tests will be linked against and configured to run compatibility and performance tests on the legacy
+@@ -94,6 +106,8 @@ message(STATUS "Host: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+ message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${SYMCRYPT_TARGET_ARCH} ${SYMCRYPT_TARGET_ENV}")
+ message(STATUS "ASM optimizations: ${SYMCRYPT_USE_ASM}")
+ message(STATUS "FIPS build: ${SYMCRYPT_FIPS_BUILD}")
++message(STATUS "Strip binary: ${SYMCRYPT_STRIP_BINARY}")
++message(STATUS "FIPS postprocess: ${SYMCRYPT_FIPS_POSTPROCESS}")
+ 
+ # Set output directories binaries
+ # Note: we use a generator expression because "Multi-configuration generators [e.g. Visual Studio]
+diff --git a/modules/linux/common/ModuleCommon.cmake b/modules/linux/common/ModuleCommon.cmake
+index ced60ac..7d626c0 100644
+--- a/modules/linux/common/ModuleCommon.cmake
++++ b/modules/linux/common/ModuleCommon.cmake
+@@ -57,7 +57,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+ set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+ 
+ 
+-if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
++if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo" AND SYMCRYPT_STRIP_BINARY)
+     add_custom_command(
+         TARGET ${TARGET_NAME}
+         POST_BUILD
+@@ -69,7 +69,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+     )
+ endif()
+ 
+-if(SYMCRYPT_FIPS_BUILD)
++if(SYMCRYPT_FIPS_BUILD AND SYMCRYPT_FIPS_POSTPROCESS)
+     add_custom_command(
+         TARGET ${TARGET_NAME}
+         POST_BUILD
+diff --git a/scripts/build.py b/scripts/build.py
+index bbf0c89..48a7146 100755
+--- a/scripts/build.py
++++ b/scripts/build.py
+@@ -101,6 +101,12 @@ def configure_cmake(args : argparse.Namespace) -> None:
+     if not args.fips:
+         cmake_args.append("-DSYMCRYPT_FIPS_BUILD=OFF")
+ 
++    if not args.strip_binary:
++        cmake_args.append("-DSYMCRYPT_STRIP_BINARY=OFF")
++
++    if not args.fips_postprocess:
++        cmake_args.append("-DSYMCRYPT_FIPS_POSTPROCESS=OFF")
++
+     if args.test_legacy_impl:
+         cmake_args.append("-DSYMCRYPT_TEST_LEGACY_IMPL=ON")
+ 
+@@ -215,6 +221,8 @@ def main() -> None:
+     parser_cmake.add_argument("--cxx", type = str, help = "Specify the C++ compiler to use. If not provided, uses platform default.")
+     parser_cmake.add_argument("--no-asm", action = "store_false", dest = "asm", help = "Disable handwritten ASM optimizations.", default = True)
+     parser_cmake.add_argument("--no-fips", action = "store_false", dest = "fips", help = "Disable FIPS selftests and postprocessing of binary. Currently only affects Linux targets.", default = True)
++    parser_cmake.add_argument("--no-strip-binary", action = "store_false", dest = "strip_binary", help = "Disable stripping of binary.", default = True)
++    parser_cmake.add_argument("--no-fips-postprocess", action = "store_false", dest = "fips_postprocess", help = "Disable FIPS postprocessing of binary.", default = True)
+     parser_cmake.add_argument("--test-legacy-impl", action = "store_true",
+         help = "Build unit tests with support for legacy Windows cryptographic implementations. Requires access to private static libraries.",
+         default = False)
+-- 
+2.39.4
+
