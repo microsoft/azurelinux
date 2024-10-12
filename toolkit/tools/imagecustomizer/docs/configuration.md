@@ -508,12 +508,7 @@ Example: `noatime,nodiratime`
 
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification. Please
-execute `sudo modprobe nbd` before building the image with verity enablement.
-
-Please enable overlays for the `/var/lib` and `/var/log` directories, along with
-verity enablement, to ensure proper functioning of services. For an example,
-please refer to the [overlay type](#overlay-type) section.
+Specifies the configuration for dm-verity root integrity verification.
 
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
@@ -549,6 +544,9 @@ os:
       Id: hash_partition
     corruptionOption: panic
 ```
+
+There are multiple ways to configure a verity enabled image. For
+recommendations, see [Verity Image Recommendations](./verity.md).
 
 ## additionalFile type
 
