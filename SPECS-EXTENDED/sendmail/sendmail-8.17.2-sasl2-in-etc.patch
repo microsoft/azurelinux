@@ -1,19 +1,19 @@
 diff --git a/sendmail/usersmtp.c b/sendmail/usersmtp.c
-index c217ffa..e4dadd3 100644
+index f60537d..8c2dcf7 100644
 --- a/sendmail/usersmtp.c
 +++ b/sendmail/usersmtp.c
-@@ -1331,9 +1331,7 @@ safesaslfile(context, file)
+@@ -1379,9 +1379,7 @@ safesaslfile(context, file)
  {
  	long sff;
  	int r;
--#if SASL <= 10515
+-# if SASL <= 10515
  	size_t len;
--#endif /* SASL <= 10515 */
+-# endif
  	char *p;
  
- 	if (file == NULL || *file == '\0')
-@@ -1369,9 +1367,16 @@ safesaslfile(context, file)
- #endif /* SASL <= 10515 */
+ 	if (SM_IS_EMPTY(file))
+@@ -1419,9 +1417,16 @@ safesaslfile(context, file)
+ # endif /* SASL <= 10515 */
  
  	p = (char *) file;
 +	len = strlen(p);
