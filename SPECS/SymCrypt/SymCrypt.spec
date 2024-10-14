@@ -72,12 +72,15 @@ cmake --build bin
 %define _find_debuginfo_opts --keep-symbol SymCryptVolatileFipsHmacKey --keep-symbol SymCryptVolatileFipsHmacKeyRva --keep-symbol SymCryptVolatileFipsBoundaryOffset --keep-symbol SymCryptVolatileFipsHmacDigest
 
 # Override the default to allow us to do custom fips post-processing after debug info/stripping is done.
+# The post-processing script writes the modified file to the same location as the original file, which
+# is subject to default permissions, so we need to set permissions manually after the script.
 %define __spec_install_post \
     %{?__debug_package:%{__debug_install_post}} \
     %{__arch_install_post} \
     %{__os_install_post} \
     mkdir -p "bin/module/generic/processing" \
     python3 "scripts/process_fips_module.py" "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" --processing-dir "bin/module/generic/processing" --debug \
+    chmod 755 "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" \
 %{nil}
 
 %install
