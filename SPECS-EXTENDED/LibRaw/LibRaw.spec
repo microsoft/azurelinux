@@ -12,7 +12,7 @@ Version: 0.21.3
 Release: 1%{?dist}
 License: BSD and (CDDL or LGPLv2)
 URL: http://www.libraw.org
-Source0: http://www.libraw.org/data/%{name}-%{version}.tar.gz
+Source0: https://www.libraw.org/data/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc-c++
 BuildRequires: pkgconfig(lcms2)
