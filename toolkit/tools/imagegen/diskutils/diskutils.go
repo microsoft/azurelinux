@@ -691,7 +691,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 
 	// If disk path ends in a digit, then the 'p<x>' style must be used.
 	// So, don't check the other style to avoid ambiguities. For example, /dev/loop1 vs. /dev/loop11.
-	// The is particularly relevant on Ubuntu, due to snap's use of loopback devices.
+	// This is particularly relevant on Ubuntu, due to snap's use of loopback devices.
 	if !isDigit(diskDevPath[len(diskDevPath)-1]) {
 		devPath := fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr)
 		testPartDevPaths = append(testPartDevPaths, devPath)
