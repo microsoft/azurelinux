@@ -1,0 +1,32 @@
+From 234ac402dd04cac78033fb2334cdeb7d96526648 Mon Sep 17 00:00:00 2001
+From: Tom Dohrmann <erbse.13@gmx.de>
+Date: Wed, 14 Aug 2024 16:02:39 +0200
+Subject: [PATCH] hypervisor: mshv: Fix panic when rejecting extended guest
+ report
+
+swei2_rw_gpa_arg.data is an array of size 16 and value.to_le_bytes() is
+only 8 bytes.
+
+Co-authored-by: Paul Meyer <49727155+katexochen@users.noreply.github.com>
+Signed-off-by: Tom Dohrmann <erbse.13@gmx.de>
+---
+ hypervisor/src/mshv/mod.rs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hypervisor/src/mshv/mod.rs b/hypervisor/src/mshv/mod.rs
+index 62e0dfa5..5d23492f 100644
+--- a/hypervisor/src/mshv/mod.rs
++++ b/hypervisor/src/mshv/mod.rs
+@@ -1012,7 +1012,8 @@ impl cpu::Vcpu for MshvVcpu {
+                                         byte_count: std::mem::size_of::<u64>() as u32,
+                                         ..Default::default()
+                                     };
+-                                    swei2_rw_gpa_arg.data.copy_from_slice(&value.to_le_bytes());
++                                    swei2_rw_gpa_arg.data[0..8]
++                                        .copy_from_slice(&value.to_le_bytes());
+                                     self.fd
+                                         .gpa_write(&mut swei2_rw_gpa_arg)
+                                         .map_err(|e| cpu::HypervisorCpuError::GpaWrite(e.into()))?;
+-- 
+2.39.4
+
