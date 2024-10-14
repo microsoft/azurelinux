@@ -12,7 +12,7 @@
 
 
 Name:           netplan
-Version:        1.0
+Version:        1.1
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
@@ -228,6 +228,9 @@ chmod 600 %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-network
 %meson_test
 
 %changelog
+* Mon Oct 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1-1
+- Auto-upgrade to 1.1 - testing
+
 * Fri Mar 29 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 1.0-1
 - Upgrade to 1.0
 
