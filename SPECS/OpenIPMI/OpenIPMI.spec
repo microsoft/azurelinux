@@ -1,6 +1,6 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
-Version:        2.0.33
+Version:        2.0.36
 Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
@@ -190,6 +190,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Mon Oct 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.36-1
+- Auto-upgrade to 2.0.36 - to fix CVE-2024-42934
+
 * Thu Mar 28 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 2.0.33-1
 - Upgrade to 2.0.33
 
