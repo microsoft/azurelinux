@@ -39,6 +39,7 @@ Patch3:         CVE-2024-42459.patch
 Patch4:         CVE-2024-45296.patch
 Patch5:         CVE-2024-43799.patch
 Patch6:         CVE-2024-43800.patch
+Patch7:         CVE-2024-47764.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -180,6 +181,7 @@ fi
 - CVE-2024-45296: upgrade path-to-regexp from 0.1.7 to 1.1.11 in reaper-srcui-node-modules
 - CVE-2024-43799: patch send in reaper-srcui-node-modules
 - CVE-2024-43800: patch serve-static in reaper-srcui-node-modules
+- CVE-2024-47764: patch cookie in reaper-srcui-node-modules
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.1.1-11
 - Introduce DER-signature-decoding-correction.patch to address CVE-2024-42459,
