@@ -51,3 +51,32 @@ func UnmarshalYaml[ValueType HasIsValid](yamlData []byte, value ValueType) error
 
 	return nil
 }
+
+func MarshalYamlFile[ValueType HasIsValid](yamlfilePath string, value ValueType) error {
+	yamlString, err := MarshalYaml(value)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(yamlfilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(yamlString)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func MarshalYaml[ValueType HasIsValid](value ValueType) (string, error) {
+	yamlData, err := yaml.Marshal(value)
+	if err != nil {
+		return "", err
+	}
+
+	return string(yamlData), nil
+}

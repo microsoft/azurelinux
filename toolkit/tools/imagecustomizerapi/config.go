@@ -9,6 +9,7 @@ type Config struct {
 	Storage                  *Storage                 `yaml:"storage"`
 	ResetPartitionsUuidsType ResetPartitionsUuidsType `yaml:"resetPartitionsUuidsType"`
 	Iso                      *Iso                     `yaml:"iso"`
+	Pxe                      *Pxe                     `yaml:"pxe"`
 	OS                       *OS                      `yaml:"os"`
 	Scripts                  *Scripts                 `yaml:"scripts"`
 }
@@ -33,6 +34,13 @@ func (c *Config) IsValid() (err error) {
 		err = c.Iso.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid 'iso' field:\n%w", err)
+		}
+	}
+
+	if c.Pxe != nil {
+		err = c.Pxe.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid 'pxe' field:\n%w", err)
 		}
 	}
 
