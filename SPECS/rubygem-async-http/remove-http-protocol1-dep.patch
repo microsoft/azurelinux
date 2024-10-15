@@ -1,0 +1,25 @@
+From 058c72f0bdc5daa6078de96674aa68d8895ae921 Mon Sep 17 00:00:00 2001
+From: Dallas Delaney <dadelan@microsoft.com>
+Date: Tue, 8 Oct 2024 12:59:09 -0700
+Subject: [PATCH] remove version dependency on protocol-http1
+
+---
+ async-http.gemspec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/async-http.gemspec b/async-http.gemspec
+index 5078ab0..44c8035 100644
+--- a/async-http.gemspec
++++ b/async-http.gemspec
+@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
+ 	spec.add_dependency "async-io", ">= 1.28"
+ 	spec.add_dependency "async-pool", ">= 0.2"
+ 	spec.add_dependency "protocol-http", "~> 0.22.0"
+-	spec.add_dependency "protocol-http1", "~> 0.14.0"
++	spec.add_dependency "protocol-http1"
+ 	spec.add_dependency "protocol-http2", "~> 0.14.0"
+ 	
+ 	spec.add_development_dependency "async-container", "~> 0.14"
+-- 
+2.34.1
+
