@@ -46,8 +46,6 @@ A core cryptographic library written by Microsoft
 # Create a symbolic link as if jitterentropy-library has been pulled in as git submodule
 rm -rf 3rdparty/jitterentropy-library
 ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
-# Copy the custom find-debuginfo script
-cp %{SOURCE2} .
 
 %build
 SYMCRYPT_BRANCH=main \
@@ -68,7 +66,7 @@ cmake --build bin
 # Override the default find-debuginfo script to our own custom one, which is modified
 # to allow us to keep symbols.
 # Also add custom options to the call to find-debuginfo.
-%define __find_debuginfo ./find-debuginfo
+%define __find_debuginfo %{SOURCE2}
 %define _find_debuginfo_opts \\\
     --keep-symbol SymCryptVolatileFipsHmacKey \\\
     --keep-symbol SymCryptVolatileFipsHmacKeyRva \\\
