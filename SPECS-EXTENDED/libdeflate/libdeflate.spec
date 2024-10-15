@@ -1,8 +1,7 @@
 Summary:        Fast implementation of DEFLATE, gzip, and zlib
 
-
 Name:           libdeflate
-Version:        1.21
+Version:        1.22
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -74,8 +73,9 @@ cmake_opts="\
 
 
 %changelog
-* Mon Oct 7 2024 Jyoti kanase <v-jykanase@microsoft.com> - 1.21-1
-- Update to version 1.21
+* Mon Oct 14 2024 Jyoti kanase <v-jykanase@microsoft.com> - 1.22-1
+- Update to version 1.22
+- License verified
 
 * Wed Jan 18 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.9-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
