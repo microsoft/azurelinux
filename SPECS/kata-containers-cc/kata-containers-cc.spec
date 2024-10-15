@@ -24,7 +24,8 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  cmake
 BuildRequires:  fuse-devel
 
-# kernel-uvm is used for testing in a debug configuration w/o SEV SNP enablement
+# kernel-uvm is required for debuggability, exercising confidential guest (confidential_guest=true)
+# code paths without actual SEV SNP enablement (sev_snp_guest=false)
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
@@ -40,8 +41,6 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 
 %description tools
 This package contains the scripts and files required to build the UVM
-
-
 
 %prep
 %autosetup -p1 -n %{sourceName}-%{version}
