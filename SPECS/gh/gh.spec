@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.43.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,7 +28,7 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
-BuildRequires:  golang >= 1.21.1
+BuildRequires:  golang <= 1.22.99
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -70,6 +70,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 2.43.1-2
+- Pin golang version to <= 1.22
+
 * Mon Feb 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.43.1-1
 - Update to v2.43.1
 
