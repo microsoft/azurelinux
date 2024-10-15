@@ -233,7 +233,7 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 }
 
 func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Cleaning up image")
+	logger.Log.Infof("Cleaning up RPM cache")
 	// Run all cleanup tasks inside the chroot environment
 	return imageChroot.UnsafeRun(func() error {
 		tdnfArgs := []string{
