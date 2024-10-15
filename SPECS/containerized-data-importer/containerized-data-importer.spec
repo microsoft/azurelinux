@@ -114,6 +114,7 @@ tar --strip-components=1 -xf %{SOURCE0}
 
 %build
 
+export GO_EXTLINK_ENABLED=0
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
 env \
@@ -121,6 +122,7 @@ CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
+CGO_ENABLED=0 \
 ./hack/build/build-go.sh build \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
@@ -156,8 +158,6 @@ install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindi
 install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
 
 install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
-mkdir -p %{buildroot}/shared
-install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}/shared/server
 
 install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
 
@@ -193,7 +193,6 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_bindir}/cdi-containerimage-server
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
-/shared/server
 
 %files operator
 %license LICENSE
@@ -221,7 +220,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 %changelog
 * Fri Sep 06 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-5
-- Copying cdi-containerimage-server binary to /shared/server location
+- Statically building binaries
 
 * Fri Jul 19 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-4
 - Building cdi tool binaries within package build
