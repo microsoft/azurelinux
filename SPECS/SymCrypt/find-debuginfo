@@ -345,7 +345,7 @@ strip_to_debug()
   # will need to be modified to either find the equivalent in strip, or intentionally
   # decide to not support these flags.
   if [ -n "$r" ] || [ -n "$g" ]; then
-    echo >&2 "*** ERROR: strip_to_debug: r ('${r}') or g ('${r}') is set, but this script does not support it"
+    echo >&2 "*** ERROR: strip_to_debug: r ('${r}') or g ('${g}') is set, but this script does not support it"
     exit 2
   fi
 
