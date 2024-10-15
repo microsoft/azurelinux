@@ -150,7 +150,7 @@ fi
 
 %changelog
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
-- Upgrade to 3.2.0.azl3 release, using build instructions from fork
+- Upgrade to 3.2.0.azl3 release, refactor build instructions
 
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2.0.azl2-7
 - Add missing Distribution tag.
