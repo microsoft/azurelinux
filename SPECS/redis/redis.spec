@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        6.2.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
+Patch2:         CVE-2024-31449.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
@@ -84,6 +85,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Thu Oct 10 2024 Suresh Thelkar <sthelkar@microsoft.com> - 6.2.14-3
+- Patch for CVE-2024-31449
+
 * Fri Apr 26 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 6.2.14-2
 - Build with BUILD_TLS=yes option.
 
