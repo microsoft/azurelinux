@@ -69,11 +69,11 @@ cmake --build bin
 # to allow us to keep symbols.
 # Also add custom options to the call to find-debuginfo.
 %define __find_debuginfo ./find-debuginfo
-%define _find_debuginfo_opts \
-    --keep-symbol SymCryptVolatileFipsHmacKey \
-    --keep-symbol SymCryptVolatileFipsHmacKeyRva \
-    --keep-symbol SymCryptVolatileFipsBoundaryOffset \
-    --keep-symbol SymCryptVolatileFipsHmacDigest \
+%define _find_debuginfo_opts \\\
+    --keep-symbol SymCryptVolatileFipsHmacKey \\\
+    --keep-symbol SymCryptVolatileFipsHmacKeyRva \\\
+    --keep-symbol SymCryptVolatileFipsBoundaryOffset \\\
+    --keep-symbol SymCryptVolatileFipsHmacDigest \\\
     %{nil}
 
 # Override the default to allow us to do custom fips post-processing after debug info/stripping is done.
