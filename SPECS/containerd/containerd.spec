@@ -4,7 +4,7 @@
 Summary: Industry-standard container runtime
 Name: containerd
 Version: 1.7.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -22,7 +22,7 @@ Patch3:  CVE-2023-47108.patch
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang
+BuildRequires: golang <= 1.22.99
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -87,6 +87,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.13-4
+- Pin golang version to <= 1.22
+
 * Wed Jun 26 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.13-3
 - Address CVE-2023-44487 and CVE-2023-47108
 

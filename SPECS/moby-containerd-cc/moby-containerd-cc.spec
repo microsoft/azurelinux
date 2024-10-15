@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -23,7 +23,7 @@ Patch2: fix_cc_tests_for_golang1.21.patch
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang >= 1.19.0
+BuildRequires: golang <= 1.22.99
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -76,6 +76,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.7-4
+- Pin golang version to <= 1.22
+
 * Mon Apr 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.7.7-3
 - Drop obsolete btrfs-progs-devel build dependency
 
