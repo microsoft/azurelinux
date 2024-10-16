@@ -9471,8 +9471,8 @@
         "type": "other",
         "other": {
           "name": "libgphoto2",
-          "version": "2.5.27",
-          "downloadUrl": "http://downloads.sourceforge.net/gphoto/libgphoto2-2.5.27.tar.bz2"
+          "version": "2.5.31",
+          "downloadUrl": "http://downloads.sourceforge.net/gphoto/libgphoto2-2.5.31.tar.bz2"
         }
       }
     },
