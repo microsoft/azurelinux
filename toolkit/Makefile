@@ -45,6 +45,8 @@ RUN_CHECK                            ?= n
 USE_PREVIEW_REPO                     ?= n
 DISABLE_UPSTREAM_REPOS               ?= n
 DISABLE_DEFAULT_REPOS                ?= n
+##help:var:REPO_SNAPSHOT_TIME:<posix_time>=Posix time to be used as a snapshot for remote repositories when fetching packages. Example: REPO_SNAPSHOT_TIME="1724119509".
+REPO_SNAPSHOT_TIME                   ?=
 TOOLCHAIN_CONTAINER_ARCHIVE          ?=
 TOOLCHAIN_ARCHIVE                    ?=
 TOOLCHAIN_SOURCES_ARCHIVE            ?=
@@ -256,7 +258,7 @@ include $(SCRIPTS_DIR)/repoquerywrapper.mk
 include $(SCRIPTS_DIR)/pkggen.mk
 
 # Create images with:
-#   image, iso, clean-imggen
+#   image, iso, clean-imagegen
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:

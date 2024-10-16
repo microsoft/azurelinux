@@ -3,14 +3,13 @@
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://lld.llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
-BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  file
 BuildRequires:  llvm-devel
@@ -36,7 +35,7 @@ programs that use the LLD infrastructure.
 Shared libraries for LLD.
 
 %prep
-%setup -q -n %{lld_srcdir}
+%autosetup -n %{lld_srcdir}
 
 %build
 mkdir -p build
@@ -48,8 +47,12 @@ cd build
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}                          \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm                           \
+       -DBUILD_SHARED_LIBS:BOOL=ON                                \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
-       -Wno-dev ../lld
+       -Wno-dev                                                   \
+       ../lld
 
 %ninja_build
 
@@ -59,18 +62,24 @@ cd build
 
 %files
 %license LICENSE.TXT
-%{_bindir}/*
+%{_bindir}/lld*
+%{_bindir}/ld.lld
+%{_bindir}/ld64.lld
+%{_bindir}/wasm-ld
 
 %files devel
 %{_includedir}/lld/
 %{_libdir}/cmake/lld/*.cmake
-%{_libdir}/*.so
+%{_libdir}/liblld*.so
 
 %files libs
-%license LICENSE.TXT
-%{_libdir}/*.so.*
+%{_libdir}/liblld*.so.*
 
 %changelog
+* Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
+- Update file listing with explicit filenames
+- Remove unnecessary BR on build-essential
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
 - Bump release to build with new llvm to fix CVE-2024-31852
 

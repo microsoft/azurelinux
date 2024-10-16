@@ -11,7 +11,7 @@ RC=n
 WCREFRESH=y
 SDIR=../SPECS
 USEPKGBLDCACHE=y
-
+USECCACHE=y
 helpFuncion () {
 	echo ""
 	echo "Build a package(s) for 3.0 locally:"
@@ -24,6 +24,7 @@ helpFuncion () {
         echo "  -f  : Force a Rebuild"
         echo "  -n  : Cleanup input-srpms expand-srpms"
         echo "  -d  : [DryRun] Show the command to be executed"
+	echo "  -x  : Disable build using ccache (Default USE_CCACHE=y)"
 	echo ""
 	echo "Examples:"
 	echo "[inside the toolkit dir]"
@@ -43,7 +44,7 @@ helpFuncion () {
 }
 
 
-while getopts "hs:b:cp:rfnd" opt
+while getopts "hs:b:cp:rfndx" opt
 do
 	case "$opt" in
 		h ) helpVar=y;;
@@ -55,6 +56,7 @@ do
 		f ) forceVar=y;;
 		n ) nukeVar=y;;
 		d ) dryrunVar=y;;
+		x ) cacheVar=y;;
 	esac
 done
 shift $((OPTIND - 1))
@@ -103,6 +105,11 @@ then
 	USEPKGBLDCACHE=n
 fi
 
+if [ -n "$cacheVar" ]
+then
+	USECCACHE=n
+fi
+
 if [ -n "$nukeVar" ]
 then
 	echo "Cleaning up expanded specs and input srpms"
@@ -113,6 +120,8 @@ if [ -n "$dryrunVar" ]
 then
 	echo "sudo make build-packages \ "
 	echo "     REBUILD_TOOLS=y \ "
+	echo "     QUICK_REBUILD_PACKAGES=y \ "
+	echo "     USE_CCACHE=${USECCACHE} \ "
 	echo "     PACKAGE_REBUILD_LIST="${TOBUILD}" \ ";
 	echo "     SRPM_PACK_LIST="${TOBUILD}" \ ";
 	echo "     RUN_CHECK=$RC \ ";
@@ -131,6 +140,8 @@ fi
 
 sudo make build-packages \
 	REBUILD_TOOLS=y \
+	QUICK_REBUILD_PACKAGES=y \
+	USE_CCACHE=${USECCACHE} \
 	PACKAGE_REBUILD_LIST="${TOBUILD}" \
 	SRPM_PACK_LIST="${TOBUILD}" \
 	RUN_CHECK=$RC \

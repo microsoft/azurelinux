@@ -13,7 +13,7 @@ import (
 )
 
 func TestCustomizeImageServicesEnableDisable(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageServicesEnableDisable")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -45,7 +45,7 @@ func TestCustomizeImageServicesEnableDisable(t *testing.T) {
 }
 
 func TestCustomizeImageServicesEnableUnknown(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageServicesEnableUnknown")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -69,7 +69,7 @@ func TestCustomizeImageServicesEnableUnknown(t *testing.T) {
 }
 
 func TestCustomizeImageServicesDisableUnknown(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageServicesDisableUnknown")
 	buildDir := filepath.Join(testTmpDir, "build")

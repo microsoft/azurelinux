@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,11 +16,11 @@ func TestConfigIsValid(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -52,11 +53,11 @@ func TestConfigIsValidLegacy(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "boot",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeBiosGrub,
 					},
 				},
@@ -65,7 +66,6 @@ func TestConfigIsValidLegacy(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "boot",
-					Type:     "fat32",
 				},
 			},
 		},
@@ -84,11 +84,11 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "a",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 					},
 				},
 			}},
@@ -109,11 +109,11 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -145,11 +145,11 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 			Disks: []Disk{
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1 * diskutils.MiB,
+					MaxSize:            ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 				},
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1 * diskutils.MiB,
+					MaxSize:            ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 				},
 			},
 			BootType: "legacy",
@@ -199,7 +199,7 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 			BootType: BootTypeEfi,
 			Disks: []Disk{{
 				PartitionTableType: PartitionTableTypeGpt,
-				MaxSize:            0,
+				MaxSize:            ptrutils.PtrTo(DiskSize(0)),
 			}},
 		},
 		OS: &OS{
@@ -218,7 +218,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions:         []Partition{},
 			}},
 			BootType: "efi",
@@ -239,7 +239,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 				Partitions:         []Partition{},
 			}},
 			BootType: "legacy",
@@ -260,11 +260,11 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -288,7 +288,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid fileSystems item at index 0")
+	assert.ErrorContains(t, err, "invalid filesystems item at index 0")
 	assert.ErrorContains(t, err, "invalid mountPoint value")
 	assert.ErrorContains(t, err, "invalid path (boot/efi): must be an absolute path")
 }
@@ -298,11 +298,11 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            3 * diskutils.MiB,
+				MaxSize:            ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 				Partitions: []Partition{
 					{
 						Id:    "esp",
-						Start: 1 * diskutils.MiB,
+						Start: ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 						Type:  PartitionTypeESP,
 					},
 				},
@@ -333,8 +333,8 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 func TestConfigIsValidInvalidIso(t *testing.T) {
 	config := &Config{
 		Iso: &Iso{
-			AdditionalFiles: AdditionalFilesMap{
-				"": FileConfigList{},
+			AdditionalFiles: AdditionalFileList{
+				{},
 			},
 		},
 	}
@@ -356,4 +356,157 @@ func TestConfigIsValidInvalidScripts(t *testing.T) {
 	err := config.IsValid()
 	assert.ErrorContains(t, err, "invalid postCustomization script at index 0")
 	assert.ErrorContains(t, err, "either path or content must have a value")
+}
+
+func TestConfigIsValidVerityValid(t *testing.T) {
+	config := &Config{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				Partitions: []Partition{
+					{
+						Id: "esp",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 8 * diskutils.MiB,
+						},
+						Type: PartitionTypeESP,
+					},
+					{
+						Id: "root",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 1 * diskutils.GiB,
+						},
+					},
+					{
+						Id: "verityhash",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 100 * diskutils.MiB,
+						},
+					},
+				},
+			}},
+			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+				{
+					DeviceId: "root",
+					Type:     "ext4",
+					MountPoint: &MountPoint{
+						Path: "/",
+					},
+				},
+			},
+		},
+		OS: &OS{
+			ResetBootLoaderType: "hard-reset",
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "root",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.NoError(t, err)
+}
+
+func TestConfigIsValidVerityPartitionNotFound(t *testing.T) {
+	config := &Config{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				Partitions: []Partition{
+					{
+						Id: "esp",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 8 * diskutils.MiB,
+						},
+						Type: PartitionTypeESP,
+					},
+					{
+						Id: "root",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 1 * diskutils.GiB,
+						},
+					},
+					{
+						Id: "verityhash",
+						Size: PartitionSize{
+							Type: PartitionSizeTypeExplicit,
+							Size: 100 * diskutils.MiB,
+						},
+					},
+				},
+			}},
+			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+				{
+					DeviceId: "root",
+					Type:     "ext4",
+					MountPoint: &MountPoint{
+						Path: "/",
+					},
+				},
+			},
+		},
+		OS: &OS{
+			ResetBootLoaderType: "hard-reset",
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "wrongname",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid verity 'dataPartition'")
+	assert.ErrorContains(t, err, "partition with 'id' (wrongname) not found")
+}
+
+func TestConfigIsValidVerityNoStorage(t *testing.T) {
+	config := &Config{
+		OS: &OS{
+			Verity: &Verity{
+				DataPartition: IdentifiedPartition{
+					IdType: IdTypePartLabel,
+					Id:     "root",
+				},
+				HashPartition: IdentifiedPartition{
+					IdType: IdTypeId,
+					Id:     "verityhash",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.ErrorContains(t, err, "invalid verity 'hashPartition'")
+	assert.ErrorContains(t, err, "'idType' cannot be 'id' if 'storage' is not specified")
 }

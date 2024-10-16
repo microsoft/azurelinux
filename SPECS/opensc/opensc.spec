@@ -1,11 +1,12 @@
 Name:           opensc
 Version:        0.25.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause
-Vendor:         Microsoft Corporation
 URL:            https://github.com/OpenSC/OpenSC/wiki
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
 Patch1:         opensc-0.19.0-pinpad.patch
@@ -202,6 +203,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.25.1-4
+- Add missing Distribution tag.
+
 * Tue May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 0.25.1-3
 - Imported from fedora rawhide
 - Remove fedora and rhel macro usage
@@ -218,7 +222,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.22.0-2
 - test-pkcs11-tool-test-threads is marked as xfail upstream- remove Fedora-specific line un-xfailing the test
-- Remove obsoletes for packages Mariner has never shipped 
+- Remove obsoletes for packages Mariner has never shipped
 - Remove Fedora, RHEL, multilib compatibility code
 - Lint spec
 

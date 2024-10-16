@@ -22,7 +22,7 @@ import (
 // - Kernel command-line arg append.
 // - .iso.additionalFiles
 func TestCustomizeImageLiveCd1(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTempDir := filepath.Join(tmpDir, "TestCustomizeImageLiveCd1")
 	buildDir := filepath.Join(testTempDir, "build")
@@ -82,15 +82,15 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
 				ExtraCommandLine: "rd.debug",
 			},
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/b.txt": []imagecustomizerapi.FileConfig{
-					{
-						Path: "/b1.txt",
-					},
-					{
-						Path:        "/b2.txt",
-						Permissions: &b2FilePerms,
-					},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/b.txt",
+					Destination: "/b1.txt",
+				},
+				{
+					Source:      "files/b.txt",
+					Destination: "/b2.txt",
+					Permissions: &b2FilePerms,
 				},
 			},
 		},
@@ -139,7 +139,7 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 // - vhdx to ISO, with no OS changes.
 // - ISO to ISO, with OS changes.
 func TestCustomizeImageLiveCd2(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTempDir := filepath.Join(tmpDir, "TestCustomizeImageLiveCd2")
 	buildDir := filepath.Join(testTempDir, "build")
@@ -201,7 +201,7 @@ func TestCustomizeImageLiveCd2(t *testing.T) {
 }
 
 func TestCustomizeImageLiveCdIsoNoShimEfi(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageLiveCdIso")
 	outImageFilePath := filepath.Join(buildDir, "image.iso")
@@ -223,7 +223,7 @@ func TestCustomizeImageLiveCdIsoNoShimEfi(t *testing.T) {
 }
 
 func TestCustomizeImageLiveCdIsoNoGrubEfi(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageLiveCdIso")
 	outImageFilePath := filepath.Join(buildDir, "image.iso")

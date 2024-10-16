@@ -18,10 +18,10 @@ original structure is left untouched.}
 Name:           python-%{pypi_name}
 Summary:        Persistent/Functional/Immutable data structures
 Version:        0.17.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            http://github.com/tobgu/pyrsistent/
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 # relax dependencies specified in setup.py
@@ -71,6 +71,10 @@ rm -rf %{pypi_name}.egg-info
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.17.3-3
+- Release bump to fix package information.
+- License verified.
+
 * Thu Oct 22 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.17.3-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

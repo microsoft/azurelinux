@@ -10,3 +10,4 @@ diff -ruN a/cloudinit/distros/azurelinux.py b/cloudinit/distros/azurelinux.py
      def __init__(self, name, cfg, paths):
          super().__init__(name, cfg, paths)
          self.osfamily = "azurelinux"
+

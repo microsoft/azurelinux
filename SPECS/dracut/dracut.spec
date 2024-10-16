@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -288,6 +288,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Sun Oct 06 2024 Jon Slobodzian <joslobo@microsoft.com> - 102-5
+- Bump version to build with latest systemd
+
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
 - Drop 0002-disable-xattr.patch
 - Introduce dracut-noxattr subpackage to expose this behavior as an option

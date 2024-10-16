@@ -5,7 +5,7 @@
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
-Version:        2.3.0
+Version:        2.3.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -59,6 +59,10 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Fri Sep 27 2024 Archana Choudhary <archana1@microsoft.com> - 2.3.2-1
+- Upgrade to version 2.3.2.
+- Fixes CVE-2024-35255
+
 * Tue Jul 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-1
 - Update to version 2.3.0.
 

@@ -18,17 +18,27 @@ import (
 )
 
 func TestCustomizeImagePartitions(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-	testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitions", baseImage)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitions"+string(version),
+				baseImageTypeCoreEfi, version)
+		})
+	}
 }
 
 func TestCustomizeImagePartitionsLegacyToEfi(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreLegacy)
-	testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitionsLegacyToEfi", baseImage)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImagePartitionsToEfi(t, "TestCustomizeImagePartitionsLegacyToEfi"+string(version),
+				baseImageTypeCoreLegacy, version)
+		})
+	}
 }
 
-func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage string) {
-	var err error
+func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
 
 	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -36,7 +46,7 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage 
 	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
 
 	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
 		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
@@ -94,28 +104,96 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, baseImage 
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
 	assert.NoError(t, err, "check for /var/log")
 
-	partitions, err = getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
+	// Check that the fstab entries are correct.
+	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
+	verifyBootloaderConfig(t, imageConnection, "console=tty0 console=ttyS0",
+		partitions[mountPoints[1].PartitionNum],
+		partitions[mountPoints[0].PartitionNum],
+		imageVersion)
+}
+
+func TestCustomizeImagePartitionsSizeOnly(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePartitionsSizeOnly")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "partitions-size-only-config.yaml")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	// Customize image.
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	// Check output file type.
+	checkFileType(t, outImageFilePath, "raw")
+
+	mountPoints := []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+		{
+			PartitionNum:   3,
+			Path:           "/var",
+			FileSystemType: "ext4",
+		},
+	}
+
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, false /*includeDefaultMounts*/, mountPoints)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
+	// Check for key files/directories on the partitions.
+	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/usr/bin/bash"))
+	assert.NoError(t, err, "check for /usr/bin/bash")
+
+	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
+	assert.NoError(t, err, "check for /var/log")
+
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
 	assert.NoError(t, err, "get disk partitions")
 
 	// Check that the fstab entries are correct.
 	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
-	verifyBootloaderConfig(t, imageConnection, "console=tty0 console=ttyS0",
-		partitions[mountPoints[1].PartitionNum].Uuid,
-		partitions[mountPoints[0].PartitionNum].PartUuid)
+	verifyBootloaderConfig(t, imageConnection, "",
+		partitions[mountPoints[0].PartitionNum],
+		partitions[mountPoints[0].PartitionNum],
+		baseImageVersionDefault)
 }
 
 func TestCustomizeImagePartitionsEfiToLegacy(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-	testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsEfiToLegacy", baseImage)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsEfiToLegacy"+string(version),
+				baseImageTypeCoreEfi, version)
+		})
+	}
 }
 
 func TestCustomizeImagePartitionsLegacy(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreLegacy)
-	testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsLegacy", baseImage)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImagePartitionsToLegacy(t, "TestCustomizeImagePartitionsLegacy"+string(version),
+				baseImageTypeCoreLegacy, version)
+		})
+	}
 }
 
-func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, baseImage string) {
-	var err error
+func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
 
 	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -123,7 +201,7 @@ func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, baseIma
 	outImageFilePath := filepath.Join(buildDir, "image.raw")
 
 	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
 		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
@@ -145,16 +223,24 @@ func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, baseIma
 	// Check that the fstab entries are correct.
 	verifyFstabEntries(t, imageConnection, coreLegacyMountPoints, partitions)
 	verifyBootGrubCfg(t, imageConnection, "",
-		partitions[coreLegacyMountPoints[0].PartitionNum].Uuid,
-		partitions[coreLegacyMountPoints[0].PartitionNum].PartUuid)
+		partitions[coreLegacyMountPoints[0].PartitionNum],
+		partitions[coreLegacyMountPoints[0].PartitionNum],
+		imageVersion)
 }
 
 func TestCustomizeImageKernelCommandLine(t *testing.T) {
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, version)
+			testCustomizeImageKernelCommandLineHelper(t, "TestCustomizeImageKernelCommandLine"+string(version), baseImage)
+		})
+	}
+}
+
+func testCustomizeImageKernelCommandLineHelper(t *testing.T, testName string, baseImage string) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageKernelCommandLine")
+	buildDir := filepath.Join(tmpDir, testName)
 	configFile := filepath.Join(testDir, "extracommandline-config.yaml")
 	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
 
@@ -179,9 +265,20 @@ func TestCustomizeImageKernelCommandLine(t *testing.T) {
 }
 
 func TestCustomizeImageNewUUIDs(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImageNewUUIDsHelper(t, "TestCustomizeImageNewUUIDs"+string(version), baseImageTypeCoreEfi,
+				version)
+		})
+	}
+}
 
-	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageNewUUIDs")
+func testCustomizeImageNewUUIDsHelper(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
+
+	testTmpDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTmpDir, "build")
 	configFile := filepath.Join(testDir, "newpartitionsuuids-config.yaml")
 	tempRawBaseImage := filepath.Join(testTmpDir, "baseImage.raw")
@@ -253,8 +350,9 @@ func TestCustomizeImageNewUUIDs(t *testing.T) {
 	// Check that the fstab entries are correct.
 	verifyFstabEntries(t, imageConnection, coreEfiMountPoints, newImagePartitions)
 	verifyBootloaderConfig(t, imageConnection, "",
-		newImagePartitions[coreEfiMountPoints[0].PartitionNum].Uuid,
-		newImagePartitions[coreEfiMountPoints[0].PartitionNum].PartUuid)
+		newImagePartitions[coreEfiMountPoints[0].PartitionNum],
+		newImagePartitions[coreEfiMountPoints[0].PartitionNum],
+		imageVersion)
 }
 
 func verifyFstabEntries(t *testing.T, imageConnection *ImageConnection, mountPoints []mountPoint,
@@ -286,10 +384,10 @@ func verifyFstabEntries(t *testing.T, imageConnection *ImageConnection, mountPoi
 }
 
 func verifyBootloaderConfig(t *testing.T, imageConnection *ImageConnection, extraCommandLineArgs string,
-	bootUuid string, rootfsPartUuid string,
+	bootInfo diskutils.PartitionInfo, rootfsInfo diskutils.PartitionInfo, imageVersion baseImageVersion,
 ) {
-	verifyEspGrubCfg(t, imageConnection, bootUuid)
-	verifyBootGrubCfg(t, imageConnection, extraCommandLineArgs, bootUuid, rootfsPartUuid)
+	verifyEspGrubCfg(t, imageConnection, bootInfo.Uuid)
+	verifyBootGrubCfg(t, imageConnection, extraCommandLineArgs, bootInfo, rootfsInfo, imageVersion)
 }
 
 func verifyEspGrubCfg(t *testing.T, imageConnection *ImageConnection, bootUuid string) {
@@ -302,8 +400,9 @@ func verifyEspGrubCfg(t *testing.T, imageConnection *ImageConnection, bootUuid s
 	assert.Regexp(t, fmt.Sprintf("(?m)^search -n -u %s -s$", regexp.QuoteMeta(bootUuid)), grubCfgContents)
 }
 
-func verifyBootGrubCfg(t *testing.T, imageConnection *ImageConnection, extraCommandLineArgs string, bootUuid string,
-	rootfsPartUuid string,
+func verifyBootGrubCfg(t *testing.T, imageConnection *ImageConnection, extraCommandLineArgs string,
+	bootInfo diskutils.PartitionInfo, rootfsInfo diskutils.PartitionInfo,
+	imageVersion baseImageVersion,
 ) {
 	grubCfgFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
 	grubCfgContents, err := file.Read(grubCfgFilePath)
@@ -311,11 +410,27 @@ func verifyBootGrubCfg(t *testing.T, imageConnection *ImageConnection, extraComm
 		return
 	}
 
-	assert.Regexp(t, fmt.Sprintf("(?m)^search -n -u %s -s$", regexp.QuoteMeta(bootUuid)), grubCfgContents)
-	assert.Regexp(t, fmt.Sprintf("(?m)^set rootdevice=PARTUUID=%s$", regexp.QuoteMeta(rootfsPartUuid)), grubCfgContents)
+	switch imageVersion {
+	case baseImageVersionAzl2:
+		assert.Regexp(t, fmt.Sprintf(`(?m)^search -n -u %s -s$`, regexp.QuoteMeta(bootInfo.Uuid)),
+			grubCfgContents)
+		assert.Regexp(t, fmt.Sprintf(`(?m)^set rootdevice=PARTUUID=%s$`, regexp.QuoteMeta(rootfsInfo.PartUuid)),
+			grubCfgContents)
+
+	case baseImageVersionAzl3:
+		assert.Regexp(t, fmt.Sprintf(`(?m)[\t ]*search.* --fs-uuid --set=root %s$`, regexp.QuoteMeta(bootInfo.Uuid)),
+			grubCfgContents)
+
+		// In theory, UUID should always be used (unless GRUB_DISABLE_UUID is set in the /etc/default/grub file, which
+		// it isn't). But on some build hosts, PARTUUID is used instead. Not sure why this is the case. But the OS will
+		// still boot either way. So, allow both for now.
+		assert.Regexp(t, fmt.Sprintf(`(?m)[\t ]*linux.* root=(UUID=%s|PARTUUID=%s) `, regexp.QuoteMeta(rootfsInfo.Uuid),
+			regexp.QuoteMeta(rootfsInfo.PartUuid)),
+			grubCfgContents)
+	}
 
 	if extraCommandLineArgs != "" {
-		assert.Regexp(t, fmt.Sprintf("linux.* %s ", regexp.QuoteMeta(extraCommandLineArgs)), grubCfgContents)
+		assert.Regexp(t, fmt.Sprintf(`(?m)[\t ]*linux.* %s `, regexp.QuoteMeta(extraCommandLineArgs)), grubCfgContents)
 	}
 }
 

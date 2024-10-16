@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,9 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
 Patch1:         CVE-2024-7592.patch
+Patch2:         CVE-2024-6923.patch
+Patch3:         CVE-2024-6232.patch
+Patch4:         CVE-2024-8088.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -239,6 +242,12 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4
+- Patch CVE-2024-6232 and CVE-2024-8088
+
+* Wed Aug 28 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.12.3-3
+- Patch CVE-2024-6923
+
 * Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.12.3-2
 - Patch CVE-2024-7592
 
