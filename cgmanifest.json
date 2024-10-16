@@ -28186,8 +28186,8 @@
         "type": "other",
         "other": {
           "name": "SuperLU",
-          "version": "5.2.1",
-          "downloadUrl": "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_5.2.1.tar.gz"
+          "version": "7.0.0",
+          "downloadUrl": "https://github.com/xiaoyeli/superlu/archive/refs/tags/v7.0.0.tar.gz"
         }
       }
     },
