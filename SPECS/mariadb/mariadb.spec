@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.11.6
-Release:        3%{?dist}
+Version:        10.11.8
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,7 +11,6 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         CVE-2024-0901.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -469,6 +468,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Wed Oct 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.8-1
+- Auto-upgrade to 10.11.8 - Fix CVE-2024-21096
+
 * Fri Jun 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 10.11.6-3
 - Patch CVE-2024-0901
 
