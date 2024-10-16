@@ -17,7 +17,7 @@ type OS struct {
 	Packages            Packages            `yaml:"packages"`
 	SELinux             SELinux             `yaml:"selinux"`
 	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles     AdditionalFilesMap  `yaml:"additionalFiles"`
+	AdditionalFiles     AdditionalFileList  `yaml:"additionalFiles"`
 	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
 	Users               []User              `yaml:"users"`
 	Services            Services            `yaml:"services"`
@@ -91,6 +91,7 @@ func (s *OS) IsValid() error {
 	}
 
 	if s.Overlays != nil {
+		mountPoints := make(map[string]bool)
 		upperDirs := make(map[string]bool)
 		workDirs := make(map[string]bool)
 
@@ -100,6 +101,12 @@ func (s *OS) IsValid() error {
 			if err != nil {
 				return fmt.Errorf("invalid overlay at index %d:\n%w", i, err)
 			}
+
+			// Check for unique MountPoint
+			if _, exists := mountPoints[overlay.MountPoint]; exists {
+				return fmt.Errorf("duplicate mountPoint (%s) found in overlay at index %d", overlay.MountPoint, i)
+			}
+			mountPoints[overlay.MountPoint] = true
 
 			// Check for unique UpperDir
 			if _, exists := upperDirs[overlay.UpperDir]; exists {

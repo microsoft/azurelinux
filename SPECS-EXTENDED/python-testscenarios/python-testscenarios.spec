@@ -5,11 +5,11 @@
 
 Name:           python-%{pypi_name}
 Version:        0.5.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Testscenarios, a pyunit extension for dependency injection
 License:        ASL 2.0 and BSD
 URL:            https://launchpad.net/testscenarios
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.python.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -71,6 +71,9 @@ CFLAGS="%{optflags}" %{__python3} setup.py build
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-23
+- Release bump to fix package information.
+
 * Fri Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.5.0-22
 - Add BR on `pip` to enable ptest
 - License verified

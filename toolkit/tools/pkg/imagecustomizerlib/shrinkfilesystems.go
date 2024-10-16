@@ -23,7 +23,9 @@ var (
 	fdiskPartitionsTableEntryRegexp  = regexp.MustCompile(`^([0-9A-Za-z-_/]+)[\t ]+(\d+)[\t ]+`)
 )
 
-func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
+func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+	partIdToPartUuid map[string]string,
+) error {
 	logger.Log.Infof("Shrinking filesystems")
 
 	// Get partition info
@@ -53,7 +55,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		if verityHashPartition != nil {
-			matches, err := partitionMatchesId(*verityHashPartition, diskPartition)
+			matches, err := partitionMatchesId(*verityHashPartition, diskPartition, partIdToPartUuid)
 			if err != nil {
 				return err
 			}

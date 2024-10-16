@@ -14,7 +14,7 @@ import (
 func TestCustomizeImageRunScripts(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageRunScripts")
 	buildDir := filepath.Join(testTmpDir, "build")

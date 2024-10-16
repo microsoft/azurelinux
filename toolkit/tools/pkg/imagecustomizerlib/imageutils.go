@@ -60,52 +60,52 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
-) error {
+) (map[string]string, error) {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
+	partIdToPartUuid, err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
 		installOS)
 	if err != nil {
-		return fmt.Errorf("failed to create new image:\n%w", err)
+		return nil, fmt.Errorf("failed to create new image:\n%w", err)
 	}
 
 	// Close image.
 	err = imageConnection.CleanClose()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return partIdToPartUuid, nil
 }
 
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
 	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
-) error {
+) (map[string]string, error) {
 
 	// Convert config to image config types, so that the imager's utils can be used.
 	imagerDiskConfig, err := diskConfigToImager(diskConfig, fileSystems)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create imager boilerplate.
-	_, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
-		imagerPartitionSettings)
+	partIdToPartUuid, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName,
+		imagerDiskConfig, imagerPartitionSettings)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Install the OS.
 	err = installOS(imageConnection.Chroot())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Move the fstab file into the image.
@@ -113,10 +113,10 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 	err = file.Move(tmpFstabFile, imageFstabFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to move fstab into new image:\n%w", err)
+		return nil, fmt.Errorf("failed to move fstab into new image:\n%w", err)
 	}
 
-	return nil
+	return partIdToPartUuid, nil
 }
 
 func configureDiskBootLoader(imageConnection *ImageConnection, rootMountIdType imagecustomizerapi.MountIdentifierType,
@@ -189,6 +189,12 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		return nil, "", err
 	}
 
+	// Create mapping from partition ID to partition UUID.
+	partIdToPartUuid, err := createPartIdToPartUuidMap(partIDToDevPathMap, diskPartitions)
+	if err != nil {
+		return nil, "", err
+	}
+
 	// Create the fstab file.
 	// This is done so that we can read back the file using findmnt, which conveniently splits the vfs and fs mount
 	// options for us. If we wanted to handle this more directly, we could create a golang wrapper around libmount
@@ -232,5 +238,22 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		return nil, "", err
 	}
 
-	return mountPointMap, tmpFstabFile, nil
+	return partIdToPartUuid, tmpFstabFile, nil
+}
+
+func createPartIdToPartUuidMap(partIDToDevPathMap map[string]string, diskPartitions []diskutils.PartitionInfo,
+) (map[string]string, error) {
+	partIdToPartUuid := make(map[string]string)
+	for partId, devPath := range partIDToDevPathMap {
+		partition, found := sliceutils.FindValueFunc(diskPartitions, func(partition diskutils.PartitionInfo) bool {
+			return devPath == partition.Path
+		})
+		if !found {
+			return nil, fmt.Errorf("failed to find partition for device path (%s)", devPath)
+		}
+
+		partIdToPartUuid[partId] = partition.PartUuid
+	}
+
+	return partIdToPartUuid, nil
 }

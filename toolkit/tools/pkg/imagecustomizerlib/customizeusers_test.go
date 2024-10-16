@@ -25,7 +25,7 @@ var (
 )
 
 func TestCustomizeImageUsers(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageUsers")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -144,7 +144,7 @@ func TestCustomizeImageUsers(t *testing.T) {
 }
 
 func TestCustomizeImageUsersExitingUserHomeDir(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageUsers")
 	buildDir := filepath.Join(testTmpDir, "build")
@@ -168,7 +168,7 @@ func TestCustomizeImageUsersExitingUserHomeDir(t *testing.T) {
 }
 
 func TestCustomizeImageUsersExitingUserUid(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageUsers")
 	buildDir := filepath.Join(testTmpDir, "build")
