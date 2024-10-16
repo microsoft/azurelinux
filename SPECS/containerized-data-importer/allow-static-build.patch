@@ -1,0 +1,13 @@
+diff --git a/hack/build/build-go.sh b/hack/build/build-go.sh
+index 9ab28a434..d89b07762 100755
+--- a/hack/build/build-go.sh
++++ b/hack/build/build-go.sh
+@@ -61,7 +61,7 @@ elif [ "${go_opt}" == "build" ]; then
+         (
+             cd $tgt
+             # Only build executables for linux
+-            GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
++            GOOS=linux go build -o ${outFile} -tags netgo,strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
+ 
+             ln -sf ${outFile} ${outLink}
+         )
