@@ -2918,8 +2918,8 @@
         "type": "other",
         "other": {
           "name": "dotconf",
-          "version": "1.3",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/dotconf-1.3.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/williamh/dotconf/archive/v1.4.1/dotconf-1.4.1.tar.gz"
         }
       }
     },

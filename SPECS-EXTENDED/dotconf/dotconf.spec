@@ -1,18 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		dotconf
-Version:	1.3
-Release:	26%{?dist}
+Version:	1.4.1
+Release:	1%{?dist}
 Summary:	Libraries to parse configuration files
-License:	LGPLv2.1
+# src/readdir* are Apache-1.1
+License:	LGPLv2.1-only AND Apache-1.1
 URL:		https://github.com/williamh/dotconf/
 # Upstream source's hash different from the Mariner one.
 # Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source:		%{_distro_sources_url}/%{name}-%{version}.tar.gz
- 
+Source: 	https://github.com/williamh/dotconf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	findutils
 BuildRequires:	gcc
 BuildRequires:	glibc-common
+BuildRequires:	libtool
 BuildRequires:	make
 
 %description
@@ -30,14 +34,15 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
+autoreconf -fiv
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%make_install
 
 iconv -f iso-8859-2 -t utf-8 -o iconv.tmp AUTHORS
 mv iconv.tmp AUTHORS
