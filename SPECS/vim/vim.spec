@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.2121
-Release:        4%{?dist}
+Version:        9.1.0789
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -201,6 +201,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Oct 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.0789-1
+- Auto-upgrade to 9.1.0789 - Fix CVE-2024-47814, CVE-2024-43802, CVE-2024-43790 
+
 * Wed Sep 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2121-4
 - Add patch to resolve CVE-2024-41957 & CVE-2024-41965
 
