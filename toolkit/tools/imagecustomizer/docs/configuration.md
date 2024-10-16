@@ -134,7 +134,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
-  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
+    - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#iso-additionalfiles)
       - [additionalFile type](#additionalfile-type)
@@ -260,31 +260,6 @@ storage:
     type: ext4
     mountPoint:
       path: /
-
-os:
-  resetBootLoaderType: hard-reset
-```
-
-### resetPartitionsUuidsType [string]
-
-Specifies that the partition UUIDs and filesystem UUIDs should be reset.
-
-Value is optional.
-
-This value cannot be specified if [storage](#storage-storage) is specified (since
-customizing the partition layout resets all the UUIDs anyway).
-
-If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
-must also be specified.
-
-Supported options:
-
-- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
-
-Example:
-
-```yaml
-resetPartitionsUuidsType: reset-all
 
 os:
   resetBootLoaderType: hard-reset
@@ -1600,3 +1575,29 @@ Contains the options for provisioning disks and their partitions.
 ### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
+
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+storage:
+  resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```
