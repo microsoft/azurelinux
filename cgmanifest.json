@@ -22792,6 +22792,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-iniconfig",
+          "version": "1.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/23/a2/97899f6bd0e873fed3a7e67ae8d3a08b21799430fb4da15cfedf10d6e2c2/iniconfig-1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-iso8601",
           "version": "0.1.12",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/i/iso8601/iso8601-0.1.12.tar.gz"
