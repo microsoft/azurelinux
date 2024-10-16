@@ -2919,7 +2919,7 @@
         "other": {
           "name": "dotconf",
           "version": "1.4.1",
-          "downloadUrl": "https://github.com/williamh/dotconf/archive/v1.4.1/dotconf-1.4.1.tar.gz"
+          "downloadUrl": "https://github.com/williamh/dotconf/archive/refs/tags/v1.4.1.tar.gz"
         }
       }
     },
