@@ -85,8 +85,8 @@
         "type": "other",
         "other": {
           "name": "adobe-mappings-cmap",
-          "version": "20171205",
-          "downloadUrl": "https://github.com/adobe-type-tools/cmap-resources/archive/20171205.tar.gz"
+          "version": "20231115",
+          "downloadUrl": "https://github.com/adobe-type-tools/cmap-resources/archive/refs/tags/20231115.tar.gz"
         }
       }
     },
