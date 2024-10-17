@@ -35,8 +35,8 @@
         "type": "other",
         "other": {
           "name": "accountsservice",
-          "version": "0.6.55",
-          "downloadUrl": "http://www.freedesktop.org/software/accountsservice/accountsservice-0.6.55.tar.xz"
+          "version": "23.13.9",
+          "downloadUrl": "https://www.freedesktop.org/software/accountsservice/accountsservice-23.13.9.tar.xz"
         }
       }
     },
