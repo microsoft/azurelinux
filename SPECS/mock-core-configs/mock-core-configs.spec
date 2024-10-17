@@ -4,7 +4,7 @@
 
 Name:       mock-core-configs
 Version:    41.2
-Release:    1%{?dist}
+Release:    2%{?dist}
 Vendor:     Microsoft Corporation
 Distribution: Azure Linux
 Summary:    Mock core config files basic chroots
@@ -12,6 +12,9 @@ Summary:    Mock core config files basic chroots
 License:    GPL-2.0-or-later
 URL:        https://github.com/rpm-software-management/mock/
 Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+Source1:    azurelinux-%{azl}.0-x86_64.cfg
+Source2:    azurelinux-%{azl}.0-aarch64.cfg
+Source3:    azurelinux-%{azl}.0.tpl
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
@@ -55,6 +58,11 @@ mkdir -p %{buildroot}%{_sysconfdir}/mock/eol/templates
 mkdir -p %{buildroot}%{_sysconfdir}/mock/templates
 cp -a etc/mock/*.cfg %{buildroot}%{_sysconfdir}/mock
 cp -a etc/mock/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/templates
+
+%if 0%{?azl}
+cp -a %{SOURCE1} %{SOURCE2} %{buildroot}/%{_sysconfdir}/mock
+cp -a %{SOURCE3} %{buildroot}/%{_sysconfdir}/mock/templates
+%endif
 
 cp -a etc/mock/eol/*cfg %{buildroot}%{_sysconfdir}/mock/eol
 cp -a etc/mock/eol/templates/*.tpl %{buildroot}%{_sysconfdir}/mock/eol/templates
@@ -154,6 +162,9 @@ fi
 %ghost %config(noreplace,missingok) %{_sysconfdir}/mock/default.cfg
 
 %changelog
+* Thu Oct 17 2024 Reuben Olinsky <reubeno@microsoft.com> - 41.2-2
+- Add default mock configuration for Azure Linux 3.0.
+
 * Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 41.2-1
 - Sync with Fedora 41 version of spec.
 
