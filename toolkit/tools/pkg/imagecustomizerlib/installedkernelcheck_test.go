@@ -11,7 +11,7 @@ import (
 )
 
 func TestCustomizeImageMissingKernel(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageMissingKernel")
 	buildDir := filepath.Join(testTmpDir, "build")

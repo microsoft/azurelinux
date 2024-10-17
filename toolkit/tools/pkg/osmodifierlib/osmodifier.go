@@ -8,12 +8,13 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/osmodifierapi"
 )
 
 func ModifyOSWithConfigFile(configFile string) error {
 	var err error
 
-	var osConfig imagecustomizerapi.OS
+	var osConfig osmodifierapi.OS
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &osConfig)
 	if err != nil {
 		return err
@@ -34,8 +35,17 @@ func ModifyOSWithConfigFile(configFile string) error {
 	return nil
 }
 
-func ModifyOS(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
+func ModifyOS(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 	err := doModifications(baseConfigPath, osConfig)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ModifyDefaultGrub() error {
+	err := modifyDefaultGrub()
 	if err != nil {
 		return err
 	}

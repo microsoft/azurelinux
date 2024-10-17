@@ -14,10 +14,7 @@ storage:
 
   bootType: legacy
 
-  fileSystems:
-  - deviceId: boot
-    type: fat32
-
+  filesystems:
   - deviceId: rootfs
     type: ext4
     mountPoint:

@@ -1,26 +1,27 @@
-From bed541b7ceafaf75f67911ef64e231569b8eec84 Mon Sep 17 00:00:00 2001
+From 7af976b8d0977f32f9903220d8b44378e72d4336 Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 30 Apr 2024 13:56:44 -0700
 Subject: [PATCH] Add virtual repo snapshot feature to tdnf
 
 ---
  client/config.c                            |   5 +
- client/prototypes.h                        |   3 +-
+ client/prototypes.h                        |   9 +-
  client/repo.c                              |  50 +-
+ client/repolist.c                          |  66 ++
  common/config.h                            |   1 +
- etc/bash_completion.d/tdnf-completion.bash |   2 +-
+ etc/bash_completion.d/tdnf-completion.bash |   7 +-
  include/tdnferror.h                        |   9 +
- include/tdnftypes.h                        |   2 +
+ include/tdnftypes.h                        |   3 +
  solv/defines.h                             |  29 +
  solv/includes.h                            |   6 +-
  solv/prototypes.h                          |   3 +-
  solv/tdnfrepo.c                            | 783 ++++++++++++++++++++-
- tools/cli/lib/help.c                       |   1 +
- tools/cli/lib/parseargs.c                  |   1 +
- 13 files changed, 878 insertions(+), 17 deletions(-)
+ tools/cli/lib/help.c                       |   2 +
+ tools/cli/lib/parseargs.c                  |   2 +
+ 14 files changed, 958 insertions(+), 17 deletions(-)
 
 diff --git a/client/config.c b/client/config.c
-index 8ddcc7a..805fff1 100644
+index 8ddcc7a..ef16467 100644
 --- a/client/config.c
 +++ b/client/config.c
 @@ -85,6 +85,7 @@ TDNFReadConfig(
@@ -37,13 +38,13 @@ index 8ddcc7a..805fff1 100644
          }
 +        else if (strcmp(cn->name, TDNF_CONF_KEY_SNAPSHOT_TIME) == 0)
 +        {
-+            pConf->pszSnapshotTime = cn->value; //assumes your system's time_t is typedef long
++            pConf->pszSnapshotTime = strdup(cn->value); //assumes your system's time_t is typedef long
 +        }
          else if (strcmp(cn->name, TDNF_CONF_KEY_CLEAN_REQ_ON_REMOVE) == 0)
          {
              pConf->nCleanRequirementsOnRemove = isTrue(cn->value);
 diff --git a/client/prototypes.h b/client/prototypes.h
-index bb7fba1..cb8a8d3 100644
+index bb7fba1..ddac483 100644
 --- a/client/prototypes.h
 +++ b/client/prototypes.h
 @@ -586,7 +586,8 @@ uint32_t
@@ -56,8 +57,21 @@ index bb7fba1..cb8a8d3 100644
      );
  
  uint32_t
+@@ -770,6 +771,12 @@ TDNFAlterRepoState(
+     const char* pszId
+     );
+ 
++uint32_t
++TDNFExcludeFromSnapshot(
++    PTDNF_REPO_DATA pRepos,
++    const char* pszId
++    );
++
+ uint32_t
+ TDNFCloneRepo(
+     PTDNF_REPO_DATA pRepoIn,
 diff --git a/client/repo.c b/client/repo.c
-index b6073e2..0331796 100644
+index 809c39d..95f7694 100644
 --- a/client/repo.c
 +++ b/client/repo.c
 @@ -36,6 +36,8 @@ TDNFInitRepo(
@@ -91,7 +105,7 @@ index b6073e2..0331796 100644
      pPool = pSack->pPool;
  
      dwError = TDNFGetCachePath(pTdnf, pRepoData,
-@@ -82,20 +99,27 @@ TDNFInitRepo(
+@@ -89,20 +106,27 @@ TDNFInitRepo(
      pRepo->appdata = pSolvRepoInfo;
  
      if (pRepoData->nHasMetaData) {
@@ -104,7 +118,7 @@ index b6073e2..0331796 100644
 -
 -        if (nUseMetaDataCache == 0) {
 -            dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD);
-+        if (pszSnapshotTime != NULL) {
++        if (!pRepoData->nExcludeSnapshot && pszSnapshotTime != NULL) {
 +            dwError = TDNFInitRepoFromMetadata(pRepo, pRepoData->pszId, pRepoMD, pszSnapshotTime);
              BAIL_ON_TDNF_ERROR(dwError);
 +        } else {
@@ -129,7 +143,7 @@ index b6073e2..0331796 100644
      } else {
          dwError = SolvReadRpmsFromDirectory(pRepo, pRepoData->ppszBaseUrls[0]);
          BAIL_ON_TDNF_ERROR(dwError);
-@@ -135,7 +159,8 @@ uint32_t
+@@ -142,7 +166,8 @@ uint32_t
  TDNFInitRepoFromMetadata(
      Repo *pRepo,
      const char* pszRepoName,
@@ -139,7 +153,7 @@ index b6073e2..0331796 100644
      )
  {
      uint32_t dwError = 0;
-@@ -152,7 +177,8 @@ TDNFInitRepoFromMetadata(
+@@ -159,7 +184,8 @@ TDNFInitRepoFromMetadata(
                    pRepoMD->pszPrimary,
                    pRepoMD->pszFileLists,
                    pRepoMD->pszUpdateInfo,
@@ -149,6 +163,111 @@ index b6073e2..0331796 100644
  cleanup:
      return dwError;
  
+diff --git a/client/repolist.c b/client/repolist.c
+index df37959..be94f6c 100644
+--- a/client/repolist.c
++++ b/client/repolist.c
+@@ -358,6 +358,7 @@ TDNFCreateRepo(
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+     pRepo->nEnabled = TDNF_REPO_DEFAULT_ENABLED;
++    pRepo->nExcludeSnapshot = 0;
+     pRepo->nHasMetaData = 1;
+     pRepo->nSkipIfUnavailable = TDNF_REPO_DEFAULT_SKIP;
+     pRepo->nGPGCheck = TDNF_REPO_DEFAULT_GPGCHECK;
+@@ -655,6 +656,7 @@ TDNFRepoListFinalize(
+     PTDNF_CMD_OPT pSetOpt = NULL;
+     PTDNF_REPO_DATA pRepo = NULL;
+     int nRepoidSeen = 0;
++    char ** ppszRepos = NULL;
+ 
+     if(!pTdnf || !pTdnf->pArgs || !pTdnf->pRepos)
+     {
+@@ -695,6 +697,22 @@ TDNFRepoListFinalize(
+                           1,
+                           pSetOpt->pszOptValue);
+         }
++        else if (strcmp(pSetOpt->pszOptName, "snapshotexcluderepos") == 0)
++        {
++            ppszRepos = NULL;
++            int i = 0;
++            dwError = TDNFSplitStringToArray(pSetOpt->pszOptValue, ",", &ppszRepos);
++            BAIL_ON_TDNF_ERROR(dwError);
++
++            while (ppszRepos && ppszRepos[i]){
++                dwError = TDNFExcludeFromSnapshot(
++                pTdnf->pRepos,
++                ppszRepos[i]);
++                BAIL_ON_TDNF_ERROR(dwError);
++                i++;
++            }
++            
++        }
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+@@ -736,6 +754,7 @@ TDNFRepoListFinalize(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ cleanup:
++    TDNFFreeStringArray(ppszRepos);
+     return dwError;
+ error:
+     goto cleanup;
+@@ -787,6 +806,53 @@ error:
+     goto cleanup;
+ }
+ 
++uint32_t
++TDNFExcludeFromSnapshot(
++    PTDNF_REPO_DATA pRepos,
++    const char* pszId
++    )
++{
++    uint32_t dwError = 0;
++    int nIsGlob = 0;
++    if(!pRepos || IsNullOrEmptyString(pszId))
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    nIsGlob = TDNFIsGlob(pszId);
++
++    for (int nMatch = 0; pRepos; pRepos = pRepos->pNext)
++    {
++        if(nIsGlob)
++        {
++            if(!fnmatch(pszId, pRepos->pszId, 0))
++            {
++                nMatch = 1;
++            }
++        }
++        else if(!strcmp(pRepos->pszId, pszId))
++        {
++            nMatch = 1;
++        }
++
++        if(nMatch)
++        {
++            pRepos->nExcludeSnapshot = 1;
++            if(!nIsGlob)
++            {
++                break;
++            }
++        }
++    }
++
++cleanup:
++    return dwError;
++
++error:
++    goto cleanup;
++}
++
+ uint32_t
+ TDNFCloneRepo(
+     PTDNF_REPO_DATA pRepoIn,
 diff --git a/common/config.h b/common/config.h
 index 222a448..364f7ec 100644
 --- a/common/config.h
@@ -162,15 +281,27 @@ index 222a448..364f7ec 100644
  #define TDNF_CONF_KEY_REPODIR             "repodir" // typo, keep for back compatibility
  #define TDNF_CONF_KEY_REPOSDIR            "reposdir"
 diff --git a/etc/bash_completion.d/tdnf-completion.bash b/etc/bash_completion.d/tdnf-completion.bash
-index 4e48040..3f310d4 100644
+index 4e48040..46a6201 100644
 --- a/etc/bash_completion.d/tdnf-completion.bash
 +++ b/etc/bash_completion.d/tdnf-completion.bash
-@@ -92,7 +92,7 @@ _tdnf()
+@@ -26,6 +26,11 @@ _tdnf__process_if_prev_is_option()
+             COMPREPLY=( $(compgen -W "$opts" -- $cur) )
+             return 0
+             ;;
++        --snapshotexcluderepos)
++            opts=`tdnf repolist enabled | awk '{if (NR > 1) print $1}'`
++            COMPREPLY=( $(compgen -W "$opts" -- $cur) )
++            return 0
++            ;;
+         --installroot)
+             COMPREPLY=( $(compgen -d -- $cur) )
+             return 0
+@@ -92,7 +97,7 @@ _tdnf()
  {
      local c=0 cur __opts __cmds
      COMPREPLY=()
 -    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
-+    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --snapshottime --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
++    __opts="--assumeno --assumeyes --cacheonly --debugsolver --disableexcludes --disableplugin --disablerepo --downloaddir --downloadonly --enablerepo --enableplugin --exclude --installroot --noautoremove --nogpgcheck --noplugins --quiet --reboot --refresh --releasever --repo --repofrompath --repoid --rpmverbosity --security --sec --setopt --skip --skipconflicts --skipdigest --skipsignature --skipobsoletes --snapshotexcluderepos --snapshottime --testonly --version --available --duplicates --extras --file --installed --whatdepends --whatrequires --whatenhances --whatobsoletes --whatprovides --whatrecommends --whatrequires --whatsuggests --whatsupplements --depends --enhances --list --obsoletes --provides --recommends --requires --requires --suggests --source --supplements --arch --delete --download --download --gpgcheck --metadata --newest --norepopath --source --urls"
      __cmds="autoerase autoremove check check-local check-update clean distro-sync downgrade erase help history info install list makecache mark provides whatprovides reinstall remove repolist repoquery reposync search update update-to updateinfo upgrade upgrade-to"
      cur="${COMP_WORDS[COMP_CWORD]}"
      _tdnf__process_if_prev_is_option && return 0
@@ -195,7 +326,7 @@ index c9349a0..02b8d4c 100644
  #define ERROR_TDNF_PLUGIN_BASE          2000
  
 diff --git a/include/tdnftypes.h b/include/tdnftypes.h
-index a806010..f371430 100644
+index a806010..b95c81f 100644
 --- a/include/tdnftypes.h
 +++ b/include/tdnftypes.h
 @@ -9,6 +9,7 @@
@@ -214,6 +345,14 @@ index a806010..f371430 100644
      char* pszCacheDir;
      char* pszPersistDir;
      char* pszProxy;
+@@ -274,6 +276,7 @@ typedef struct _TDNF_CONF
+ typedef struct _TDNF_REPO_DATA
+ {
+     int nEnabled;
++    int nExcludeSnapshot;
+     int nSkipIfUnavailable;
+     int nGPGCheck;
+     int nHasMetaData;
 diff --git a/solv/defines.h b/solv/defines.h
 index 38f5ab1..ddb3355 100644
 --- a/solv/defines.h
@@ -1107,26 +1246,28 @@ index c27b907..fec3ba7 100644
      return dwError;
  
 diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
-index bc4cf83..86c34e7 100644
+index bc4cf83..6c1d349 100644
 --- a/tools/cli/lib/help.c
 +++ b/tools/cli/lib/help.c
-@@ -23,6 +23,7 @@ static const char *help_msg =
-  "           [--downloadonly]\n"
-  "           [--enablerepo=<repoid>]\n"
-  "           [--enableplugin=<plugin_name>]\n"
+@@ -44,6 +44,8 @@ static const char *help_msg =
+  "           [--skipdigest]\n"
+  "           [--skipsignature]\n"
+  "           [--skipobsoletes]\n"
++ "           [--snapshotexcluderepos=<repoid>[,<repoid2>,...]\n"
 + "           [--snapshottime=<POSIX_time>]\n"
-  "           [--exclude [file1,file2,...]]\n"
-  "           [--installroot [path]]\n"
-  "           [--noautoremove]\n"
+  "           [--testonly]\n"
+  "           [--version]\n\n"
+  "repoquery select options:\n"
 diff --git a/tools/cli/lib/parseargs.c b/tools/cli/lib/parseargs.c
-index 0558611..18c84fc 100644
+index 4421927..9c5e282 100644
 --- a/tools/cli/lib/parseargs.c
 +++ b/tools/cli/lib/parseargs.c
-@@ -70,6 +70,7 @@ static struct option pstOptions[] =
+@@ -70,6 +70,8 @@ static struct option pstOptions[] =
      {"skipdigest",    no_argument, 0, 0},                  //--skipdigest to skip verifying RPM digest
      {"skipobsoletes", no_argument, 0, 0},                  //--skipobsoletes to skip obsolete problems
      {"skipsignature", no_argument, 0, 0},                  //--skipsignature to skip verifying RPM signatures
-+    {"snapshottime",required_argument, 0, 0},              //--snapshottime
++    {"snapshotexcluderepos", required_argument, 0, 0},     //--snapshotexcluderepos
++    {"snapshottime",  required_argument, 0, 0},            //--snapshottime
      {"source",        no_argument, &_opt.nSource, 1},
      {"testonly",      no_argument, &_opt.nTestOnly, 1},
      {"verbose",       no_argument, &_opt.nVerbose, 1},     //-v --verbose

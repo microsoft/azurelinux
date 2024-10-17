@@ -14,19 +14,17 @@ storage:
       end: 1024M
 
     - id: root
-      label: root
       start: 1024M
       end: 3072M
 
-    - id: verityhash
-      label: root-hash
+    - id: roothash
       start: 3072M
       end: 3200M
 
     - id: var
       start: 3200M
 
-  fileSystems:
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
@@ -42,9 +40,6 @@ storage:
     type: ext4
     mountPoint:
       path: /
-      
-  - deviceId: verityhash
-    type: fat32
 
   - deviceId: var
     type: ext4
@@ -68,17 +63,20 @@ os:
   verity:
     corruptionOption: panic
     dataPartition:
-      idType: part-label
+      idType: id
       id: root
     hashPartition:
-      idType: part-label
-      id: root-hash
+      idType: id
+      id: roothash
 
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
-    files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
+  - source: files/sshd-keygen.service
+    destination: /usr/lib/systemd/system/sshd-keygen.service
+
     # Enable DHCP client on all of the physical NICs.
-    files/89-ethernet.network: /etc/systemd/network/89-ethernet.network
+  - source: files/89-ethernet.network
+    destination: /etc/systemd/network/89-ethernet.network
 
   services:
     enable:

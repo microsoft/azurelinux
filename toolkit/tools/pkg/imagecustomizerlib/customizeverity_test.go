@@ -19,9 +19,20 @@ import (
 )
 
 func TestCustomizeImageVerity(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImageVerityHelper(t, "TestCustomizeImageVerity"+string(version), baseImageTypeCoreEfi,
+				version)
+		})
+	}
+}
 
-	testTempDir := filepath.Join(tmpDir, "TestCustomizeImageVerity")
+func testCustomizeImageVerityHelper(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
+
+	testTempDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTempDir, "build")
 	outImageFilePath := filepath.Join(testTempDir, "image.raw")
 	configFile := filepath.Join(testDir, "verity-config.yaml")
@@ -63,20 +74,35 @@ func TestCustomizeImageVerity(t *testing.T) {
 	}
 	defer imageConnection.Close()
 
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
+	assert.NoError(t, err, "get disk partitions")
+
 	// Verify that verity is configured correctly.
 	bootPath := filepath.Join(imageConnection.chroot.RootDir(), "/boot")
 	rootDevice := partitionDevPath(imageConnection, 3)
 	hashDevice := partitionDevPath(imageConnection, 4)
-	verifyVerity(t, bootPath, rootDevice, hashDevice)
+	verifyVerity(t, bootPath, rootDevice, hashDevice, "PARTUUID="+partitions[3].PartUuid,
+		"PARTUUID="+partitions[4].PartUuid)
 }
 
 func TestCustomizeImageVerityShrinkExtract(t *testing.T) {
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	for _, version := range supportedAzureLinuxVersions {
+		t.Run(string(version), func(t *testing.T) {
+			testCustomizeImageVerityShrinkExtractHelper(t, "TestCustomizeImageVerityShrinkExtract"+string(version),
+				baseImageTypeCoreEfi, version)
+		})
+	}
+}
 
-	testTempDir := filepath.Join(tmpDir, "TestCustomizeImageVerityShrinkExtract")
+func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, imageType baseImageType,
+	imageVersion baseImageVersion,
+) {
+	baseImage := checkSkipForCustomizeImage(t, imageType, imageVersion)
+
+	testTempDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTempDir, "build")
 	outImageFilePath := filepath.Join(testTempDir, "image.raw")
-	configFile := filepath.Join(testDir, "verity-config.yaml")
+	configFile := filepath.Join(testDir, "verity-partition-labels.yaml")
 
 	var config imagecustomizerapi.Config
 	err := imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
@@ -130,10 +156,11 @@ func TestCustomizeImageVerityShrinkExtract(t *testing.T) {
 	defer bootMount.Close()
 
 	// Verify that verity is configured correctly.
-	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath())
+	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath(), "PARTLABEL=root",
+		"PARTLABEL=root-hash")
 }
 
-func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string) {
+func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string, rootId string, hashId string) {
 	// Verify verity kernel args.
 	grubCfgPath := filepath.Join(bootPath, "/grub2/grub.cfg")
 	grubCfgContents, err := file.Read(grubCfgPath)
@@ -141,13 +168,13 @@ func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice s
 		return
 	}
 
-	assert.Regexp(t, "linux.* rd.systemd.verity=1 ", grubCfgContents)
-	assert.Regexp(t, "linux.* systemd.verity_root_data=PARTLABEL=root ", grubCfgContents)
-	assert.Regexp(t, "linux.* systemd.verity_root_hash=PARTLABEL=root-hash ", grubCfgContents)
-	assert.Regexp(t, "linux.* systemd.verity_root_options=panic-on-corruption ", grubCfgContents)
+	assert.Regexp(t, `(?m)linux.* rd.systemd.verity=1 `, grubCfgContents)
+	assert.Regexp(t, fmt.Sprintf(`(?m)linux.* systemd.verity_root_data=%s `, rootId), grubCfgContents)
+	assert.Regexp(t, fmt.Sprintf(`(?m)linux.* systemd.verity_root_hash=%s `, hashId), grubCfgContents)
+	assert.Regexp(t, `(?m)linux.* systemd.verity_root_options=panic-on-corruption `, grubCfgContents)
 
 	// Read root hash from grub.cfg file.
-	roothashRegexp, err := regexp.Compile("linux.* roothash=([a-fA-F0-9]*) ")
+	roothashRegexp, err := regexp.Compile(`(?m)linux.* roothash=([a-fA-F0-9]*) `)
 	if !assert.NoError(t, err) {
 		return
 	}

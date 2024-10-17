@@ -14,14 +14,27 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
+const (
+	modprobeConfigDir    = "/etc/modprobe.d"
+	modulesLoadConfigDir = "/etc/modules-load.d"
+
+	moduleDisabledFileName = "modules-disabled.conf"
+	moduleLoadFileName     = "modules-load.conf"
+	moduleOptionsFileName  = "module-options.conf"
+
+	moduleDisabledPath = modprobeConfigDir + "/" + moduleDisabledFileName
+	moduleLoadPath     = modulesLoadConfigDir + "/" + moduleLoadFileName
+	moduleOptionsPath  = modprobeConfigDir + "/" + moduleOptionsFileName
+)
+
 func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) error {
 	var err error
 	var modulesToLoad []string
 	var modulesToDisable []string
 	moduleOptionsUpdates := make(map[string]map[string]string)
-	moduleDisableFilePath := filepath.Join(rootDir, "etc/modprobe.d/modules-disabled.conf")
-	moduleLoadFilePath := filepath.Join(rootDir, "etc/modules-load.d/modules-load.conf")
-	moduleOptionsFilePath := filepath.Join(rootDir, "etc/modprobe.d/module-options.conf")
+	moduleDisableFilePath := filepath.Join(rootDir, moduleDisabledPath)
+	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
+	moduleOptionsFilePath := filepath.Join(rootDir, moduleOptionsPath)
 
 	for i, module := range modules {
 		switch module.LoadMode {
@@ -154,10 +167,10 @@ func ensureModulesDisabled(moduleNames []string, moduleDisableFilePath string) e
 	needUpdate := false
 
 	for _, moduleName := range moduleNames {
-		blacklistEntry := "blacklist " + moduleName
-		if !strings.Contains(contentString, blacklistEntry+"\n") {
+		disableEntry := "blacklist " + moduleName
+		if !strings.Contains(contentString, disableEntry+"\n") {
 			// Append the module to be disabled if it's not already in the file
-			updatedContent += blacklistEntry + "\n"
+			updatedContent += disableEntry + "\n"
 			needUpdate = true
 			logger.Log.Infof("Setting module (%s) to be disabled", moduleName)
 		}
@@ -188,8 +201,8 @@ func isModuleDisabled(moduleName, moduleDisableFilePath string) (bool, error) {
 		return false, err
 	}
 
-	blacklistEntry := "blacklist " + moduleName
-	if strings.Contains(string(content), blacklistEntry+"\n") {
+	disableEntry := "blacklist " + moduleName
+	if strings.Contains(string(content), disableEntry+"\n") {
 		return true, nil
 	}
 

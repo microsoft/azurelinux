@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,9 @@ BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
 BuildRequires:  python3-six
+
+Patch1:         CVE-2024-27318.patch
+Patch2:         CVE-2022-1941.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -56,7 +59,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1 -n %{name}-v%{version}
+%autosetup -a 1 -p 1 -n %{name}-v%{version}
 
 %build
 export USE_CUDA=0
@@ -84,6 +87,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Tue Sep 17 2024 Archana Choudhary <archana1@microsoft.com> - 2.2.2-2
+- patch for CVE-2024-27318, CVE-2022-1941
+
 * Tue Apr 02 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.2.2-1
 - Upgrade to pytorch 2.2.2
 

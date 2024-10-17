@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,9 +36,9 @@ func TestLoadOrDisableModules(t *testing.T) {
 	err := loadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
-	moduleLoadFilePath := filepath.Join(rootDir, "etc/modules-load.d/modules-load.conf")
-	moduleOptionsFilePath := filepath.Join(rootDir, "etc/modprobe.d/module-options.conf")
-	moduleDisableFilePath := filepath.Join(rootDir, "etc/modprobe.d/modules-disabled.conf")
+	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
+	moduleOptionsFilePath := filepath.Join(rootDir, moduleOptionsPath)
+	moduleDisableFilePath := filepath.Join(rootDir, moduleDisabledPath)
 
 	moduleLoadContent, err := os.ReadFile(moduleLoadFilePath)
 	if err != nil {
@@ -118,8 +119,8 @@ func TestLoadOrDisableModules(t *testing.T) {
 
 func TestEnsureModulesLoaded(t *testing.T) {
 	buildDir := filepath.Join(tmpDir, "TestEnsureModulesLoaded")
-	modulesLoadPath := filepath.Join(buildDir, "etc/modules-load.d")
-	moduleLoadFilePath := filepath.Join(modulesLoadPath, "modules.conf")
+	modulesLoadPath := filepath.Join(buildDir, modulesLoadConfigDir)
+	moduleLoadFilePath := filepath.Join(modulesLoadPath, moduleLoadFileName)
 
 	// Only create parent directory. Test case where the file does not exist
 	err := os.MkdirAll(modulesLoadPath, os.ModePerm)
@@ -153,8 +154,8 @@ func TestEnsureModulesLoaded(t *testing.T) {
 
 func TestEnsureModulesDisabled(t *testing.T) {
 	buildDir := filepath.Join(tmpDir, "TestEnsureModulesDisabled")
-	modprobePath := filepath.Join(buildDir, "etc/modprobe.d")
-	moduleDisableFilePath := filepath.Join(modprobePath, "blacklist.conf")
+	modprobePath := filepath.Join(buildDir, modprobeConfigDir)
+	moduleDisableFilePath := filepath.Join(modprobePath, moduleDisabledFileName)
 	err := os.MkdirAll(modprobePath, os.ModePerm)
 	assert.NoError(t, err)
 
@@ -185,8 +186,8 @@ func TestEnsureModulesDisabled(t *testing.T) {
 
 func TestRemoveModuleFromDisableList(t *testing.T) {
 	buildDir := filepath.Join(tmpDir, "TestRemoveModuleFromDisableList")
-	modprobePath := filepath.Join(buildDir, "etc/modprobe.d")
-	moduleDisableFilePath := filepath.Join(modprobePath, "blacklist.conf")
+	modprobePath := filepath.Join(buildDir, modprobeConfigDir)
+	moduleDisableFilePath := filepath.Join(modprobePath, moduleDisabledFileName)
 	err := os.MkdirAll(modprobePath, os.ModePerm)
 	assert.NoError(t, err)
 
@@ -215,4 +216,44 @@ func TestRemoveModuleFromDisableList(t *testing.T) {
 	content, err = os.ReadFile(moduleDisableFilePath)
 	assert.NoError(t, err)
 	assert.Equal(t, "blacklist module2\n", string(content))
+}
+
+func TestCustomizeImageKernelModules(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImageKernelModules")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "modules-config.yaml")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	// Customize image.
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
+	// Verify 'loadMode: always'
+	loadContent, err := file.Read(filepath.Join(imageConnection.Chroot().RootDir(), moduleLoadPath))
+	assert.NoError(t, err)
+	assert.Regexp(t, "(?m)^vfio$", loadContent)
+	assert.Regexp(t, "(?m)^mlx5_ib$", loadContent)
+
+	// Verify 'loadMode: disable'
+	disabledContent, err := file.Read(filepath.Join(imageConnection.Chroot().RootDir(), moduleDisabledPath))
+	assert.NoError(t, err)
+	assert.Regexp(t, "(?m)^blacklist mousedev$", disabledContent)
+
+	// Verify 'options'.
+	optionsContent, err := file.Read(filepath.Join(imageConnection.Chroot().RootDir(), moduleOptionsPath))
+	assert.NoError(t, err)
+	assert.Regexp(t, "(?m)^options vfio.* enable_unsafe_noiommu_mode=Y", optionsContent)
+	assert.Regexp(t, "(?m)^options vfio.* disable_vga=Y", optionsContent)
+	assert.Regexp(t, "(?m)^options e1000e InterruptThrottleRate=3000,3000,3000$", optionsContent)
 }

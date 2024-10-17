@@ -18,10 +18,11 @@ import (
 var (
 	app = kingpin.New("osmodifier", "Used to modify os")
 
-	configFile    = app.Flag("config-file", "Path of the os modification config file.").Required().String()
+	configFile    = app.Flag("config-file", "Path of the os modification config file.").String()
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	updateGrub    = app.Flag("update-grub", "Update default GRUB.").Bool()
 )
 
 func main() {
@@ -40,9 +41,19 @@ func main() {
 	timestamp.BeginTiming("osmodifier", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	err = modifyImage()
-	if err != nil {
-		log.Fatalf("os modification failed: %v", err)
+	// Check if the updateGrub flag is set
+	if *updateGrub {
+		err := osmodifierlib.ModifyDefaultGrub()
+		if err != nil {
+			log.Fatalf("update grub failed: %v", err)
+		}
+	}
+
+	if len(*configFile) > 0 {
+		err = modifyImage()
+		if err != nil {
+			log.Fatalf("OS modification failed: %v", err)
+		}
 	}
 }
 

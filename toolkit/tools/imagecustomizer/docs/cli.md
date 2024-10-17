@@ -97,6 +97,10 @@ given the lowest priority.
 See, [Building custom packages](building-packages.md) for a guide on how to build your
 own packages for Azure Linux.
 
+See, [Cloning an RPM repo](clone-rpm-repo.md) for how to clone or download RPMs from a
+existing RPM repo (such as packages.microsoft.com). Using a cloned repo with
+`--rpm-source` can help your builds avoid dependencies on external resources.
+
 ## --disable-base-image-rpm-repos
 
 Disable the base image's installed RPM repos as a source of RPMs during package
