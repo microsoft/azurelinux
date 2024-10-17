@@ -136,6 +136,7 @@ fi
 %{_datarootdir}/vim/vim*/lang/*.vim
 %doc %{_datarootdir}/vim/vim*/lang/*.txt
 %lang(af) %{_datarootdir}/vim/vim*/lang/af/LC_MESSAGES/vim.mo
+%lang(am) %{_datarootdir}/vim/vim*/lang/am/LC_MESSAGES/vim.mo
 %lang(ca) %{_datarootdir}/vim/vim*/lang/ca/LC_MESSAGES/vim.mo
 %lang(cs) %{_datarootdir}/vim/vim*/lang/cs/LC_MESSAGES/vim.mo
 %lang(de) %{_datarootdir}/vim/vim*/lang/de/LC_MESSAGES/vim.mo
@@ -145,6 +146,7 @@ fi
 %lang(fi) %{_datarootdir}/vim/vim*/lang/fi/LC_MESSAGES/vim.mo
 %lang(fr) %{_datarootdir}/vim/vim*/lang/fr/LC_MESSAGES/vim.mo
 %lang(ga) %{_datarootdir}/vim/vim*/lang/ga/LC_MESSAGES/vim.mo
+%lang(hu) %{_datarootdir}/vim/vim*/lang/hu/LC_MESSAGES/vim.mo
 %lang(it) %{_datarootdir}/vim/vim*/lang/it/LC_MESSAGES/vim.mo
 %lang(ja) %{_datarootdir}/vim/vim*/lang/ja/LC_MESSAGES/vim.mo
 %lang(ko.UTF-8) %{_datarootdir}/vim/vim*/lang/ko.UTF-8/LC_MESSAGES/vim.mo
@@ -199,6 +201,7 @@ fi
 %changelog
 * Thu Oct 17 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
 - Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
+- Added language configurations for Amharic and Hungarian
 
 * Wed Sep 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2121-4
 - Add patch to resolve CVE-2024-41957 & CVE-2024-41965
