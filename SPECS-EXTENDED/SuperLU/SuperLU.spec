@@ -117,6 +117,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:MATGEN
 %changelog
 * Tue Oct 15 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 7.0.0-1
 - Update to 7.0.0
+-License verified
 
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-10
 - Removing unused BR on "atlas".
