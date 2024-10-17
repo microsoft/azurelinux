@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -216,118 +217,35 @@ func TestCustomizeImagePackagesDiskSpace(t *testing.T) {
 }
 
 func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirPath string) error {
-	// Get version of base image
-	osVersion := getImageVersion(imageConnection)
-
-	// Variables to capture root directory contents
-	var rootDirContents []string
-	var foundLocalRepo, foundOfficialBase bool
-
-	entries, err := os.ReadDir(filepath.Join(imageConnection.Chroot().RootDir(), dirPath))
-	if err != nil {
-		return fmt.Errorf("Failed to read directory (%s): %v", dirPath, err)
-	}
-
-	for _, entry := range entries {
-		if strings.Contains(entry.Name(), "local-repo") {
-			foundLocalRepo = true
-		}
-		if strings.HasSuffix(entry.Name(), "official-base") {
-			foundOfficialBase = true
-		}
-		entryFullPath := filepath.Join(dirPath, entry.Name())
-		rootDirContents = append(rootDirContents, entryFullPath)
-	}
-
-	// Ensure there are only the expected number of folders after the tdnf cleanup
-	if strings.HasPrefix(osVersion, "2.0") {
-		assert.True(t, foundLocalRepo, "Expected to find a folder containing 'local-repo'")
-		assert.True(t, foundOfficialBase, "Expected to find a folder ending with 'official-base'")
-		assert.Equal(t, 2, len(rootDirContents), "Expected exactly 2 folders, but got %d", len(rootDirContents))
-	}
-	if strings.HasPrefix(osVersion, "3.0") {
-		assert.True(t, foundOfficialBase, "Expected to find a folder ending with 'official-base'")
-		assert.Equal(t, 1, len(rootDirContents), "Expected exactly 1 folders, but got %d", len(rootDirContents))
-	}
-
-	// Search the cache directory and all subdirectories and extract all contents
-	dirContents, err := searchChrootDirectory(imageConnection, dirPath)
-	if err != nil {
-		return err
-	}
-
-	// Filter and collect non-directory files, excluding those related to 'local-repo'
+	// Array to capture all the files of the provided root directory
 	var existingFiles []string
-	for _, entry := range dirContents {
-		if !strings.Contains(entry, "local-repo") {
-			fileInfo, err := os.Stat(entry)
 
+	// Start the directory walk from the initial dirPath and collect all existing files
+	fullPath := filepath.Join(imageConnection.Chroot().RootDir(), dirPath)
+	err := filepath.WalkDir(fullPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return fmt.Errorf("Failed to access path (%s): %w", path, err)
+		}
+		// Ignore files in the local-repo folder if the base image version is 2.0
+		if !(strings.Contains(path, "local-repo") && baseImageVersionDefault == "2.0") {
+			fileInfo, err := os.Stat(path)
 			if err != nil {
-				return fmt.Errorf("failed to get file info for %s: %w", entry, err)
+				return fmt.Errorf("failed to get file info for %s: %w", path, err)
 			}
 			if !fileInfo.IsDir() {
-				existingFiles = append(existingFiles, entry)
+				// Append the file to the existingFiles array
+				existingFiles = append(existingFiles, path)
 			}
 		}
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("filepath.WalkDir() failed to run: %w", err)
 	}
 
 	// Ensure the cache has been cleaned up
 	assert.Equal(t, 0, len(existingFiles), "Expected no file data in cache, but got %d files", len(existingFiles))
 
 	return nil
-}
-
-func getImageVersion(imageConnection *ImageConnection) string {
-	output, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "/etc/os-release"))
-	if err != nil {
-		return "Unknown Version"
-	}
-
-	lines := strings.Split(string(output), "\n")
-	version := "Unknown Version"
-
-	for _, line := range lines {
-		if strings.HasPrefix(line, "VERSION=") {
-			version = strings.Trim(strings.TrimPrefix(line, "VERSION="), "\"")
-		}
-	}
-
-	return version
-}
-
-func searchChrootDirectory(imageConnection *ImageConnection, dirPath string) ([]string, error) {
-	// Array to capture all the contents of the provided root directory
-	var dirContents []string
-
-	// Helper function to recursively read directories
-	var readDirRecursive func(fullPath string) error
-	readDirRecursive = func(fullPath string) error {
-		entries, err := os.ReadDir(fullPath)
-		if err != nil {
-			return fmt.Errorf("Failed to read directory (%s): %v", fullPath, err)
-		}
-
-		for _, entry := range entries {
-			entryFullPath := filepath.Join(fullPath, entry.Name())
-			dirContents = append(dirContents, entryFullPath)
-
-			// If it's a directory, recursively read its contents
-			if entry.IsDir() {
-				err = readDirRecursive(entryFullPath)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	}
-
-	// Start the recursive directory read from the initial path
-	fullPath := filepath.Join(imageConnection.Chroot().RootDir(), dirPath)
-	err := readDirRecursive(fullPath)
-	if err != nil {
-		return dirContents, err
-	}
-
-	return dirContents, nil
 }
