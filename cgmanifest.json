@@ -25204,8 +25204,8 @@
         "type": "other",
         "other": {
           "name": "pyusb",
-          "version": "1.0.2",
-          "downloadUrl": "https://github.com/pyusb/pyusb/archive/pyusb-1.0.2.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/pyusb/pyusb/archive/pyusb-1.2.1.tar.gz"
         }
       }
     },
