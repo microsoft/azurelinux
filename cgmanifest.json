@@ -24423,8 +24423,8 @@
         "type": "other",
         "other": {
           "name": "python-soupsieve",
-          "version": "1.9.2",
-          "downloadUrl": "https://github.com/facelessuser/soupsieve/archive/1.9.2/python-soupsieve-1.9.2.tar.gz"
+          "version": "2.6",
+          "downloadUrl": "https://github.com/facelessuser/soupsieve/archive/2.6/python-soupsieve-2.6.tar.gz"
         }
       }
     },
