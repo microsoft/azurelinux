@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.37
+Version:        8.0.40
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -97,8 +97,8 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-* Thu Oct 17 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.37-1
-- Upgrade to 8.0.37 to fix CVE-2024-21096
+* Fri Oct 18 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.37-1
+- Upgrade to 8.0.40 to fix CVE-2024-21096
 - Remove patch for CVE-2023-46218 (fixed in 8.0.37)
 
 * Tue Jun 18 2024 Archana Choudhary <archana1@microsoft.com> - 8.0.36-1
