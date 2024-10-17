@@ -269,7 +269,7 @@ clean-compress-srpms:
 # the same, but the actual .rpm files may be fundamentally different.
 $(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag: $(depend_REPO_SNAPSHOT_TIME)
 	@echo "REPO_SNAPSHOT_TIME has changed, sanitizing rpm cache"
-	rm -rf $(remote_rpms_cache_dir)
+	find "$(remote_rpms_cache_dir)" -type f -name '*.rpm' -delete
 	touch $@
 
 ifeq ($(REBUILD_PACKAGES),y)
