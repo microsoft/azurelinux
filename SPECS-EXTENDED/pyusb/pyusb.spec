@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: pyusb
-Version: 1.0.2
-Release: 7%{?dist}
+Version: 1.2.1
+Release: 1%{?dist}
 Summary: Python bindings for libusb
 License: BSD
 URL: https://github.com/pyusb/pyusb/
@@ -41,6 +41,9 @@ sed -i -e 's/\r//g' README.rst
 %{python3_sitelib}/*
 
 %changelog
+* Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.1-1
+- Auto-upgrade to 1.2.1 - upgrade to version 1.2.1
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
