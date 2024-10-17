@@ -101,6 +101,7 @@ rm -r $RPM_BUILD_ROOT%{_docdir}
 
 * Wed Oct 16 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.6.6-1
 - Update to 1.6.6
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
