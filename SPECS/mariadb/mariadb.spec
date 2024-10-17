@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.9
-Release:        6%{?dist}
+Version:        10.6.18
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,8 +11,7 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         CVE-2022-47015.patch
-Patch1:         fix_symlink_location_db_install.patch
+Patch0:         fix_symlink_location_db_install.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
