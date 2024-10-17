@@ -240,9 +240,7 @@ func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirP
 		return nil
 	})
 
-	if err != nil {
-		return fmt.Errorf("filepath.WalkDir() failed to run: %w", err)
-	}
+	assert.NoError(t, err)
 
 	// Ensure the cache has been cleaned up
 	assert.Equal(t, 0, len(existingFiles), "Expected no file data in cache, but got %d files", len(existingFiles))
