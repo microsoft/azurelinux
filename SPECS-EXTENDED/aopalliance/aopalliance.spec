@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           aopalliance
 Version:        1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Java/J2EE AOP standards
 License:        Public Domain
 Group:          Development/Libraries/Java
@@ -87,7 +87,7 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue 08 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0-4
+* Tue 08 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0-5
 - Updating javac source and javac target from 1.6 to 1.8.
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-4
