@@ -3,10 +3,10 @@ Distribution:   Azure Linux
 %global _hardened_build 1
 
 Name:           accountsservice
-Version:        0.6.55
-Release:        4%{?dist}
+Version:        23.13.9
+Release:        1%{?dist}
 Summary:        D-Bus interfaces for querying and manipulating user account information
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://www.freedesktop.org/wiki/Software/AccountsService/
 
 #VCS: git:git://git.freedesktop.org/accountsservice
@@ -22,10 +22,15 @@ BuildRequires:  systemd-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  git
 BuildRequires:  meson
+BuildRequires:  gtk-doc
+BuildRequires:  vala
 
 Requires:       polkit
 Requires:       shadow-utils
 %{?systemd_requires}
+
+Patch10001:    0001-mocklibc-Fix-compiler-warning.patch
+Patch10002:    0002-user-manager-Fix-another-compiler-warning.patch
 
 %description
 The accountsservice project provides a set of D-Bus interfaces for
@@ -54,11 +59,14 @@ files needed to build applications that use accountsservice-libs.
 %autosetup -S git
 
 %build
-%meson -Dgtk_doc=false -Dsystemd=true -Duser_heuristics=true
+%meson -Dgtk_doc=True \
+	-Dadmin_group=wheel
 %meson_build
 
 %install
 %meson_install
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/accountsservice/interfaces/
 
 %find_lang accounts-service
 
@@ -76,10 +84,13 @@ files needed to build applications that use accountsservice-libs.
 %files -f accounts-service.lang
 %license COPYING
 %doc README.md AUTHORS
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.Accounts.conf
 %{_libexecdir}/accounts-daemon
+%dir %{_datadir}/accountsservice/
+%dir %{_datadir}/accountsservice/interfaces/
+%{_datadir}/accountsservice/user-templates/
 %{_datadir}/dbus-1/interfaces/org.freedesktop.Accounts.xml
 %{_datadir}/dbus-1/interfaces/org.freedesktop.Accounts.User.xml
+%{_datadir}/dbus-1/system.d/org.freedesktop.Accounts.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.Accounts.service
 %{_datadir}/polkit-1/actions/org.freedesktop.accounts.policy
 %dir %{_localstatedir}/lib/AccountsService/
@@ -89,15 +100,25 @@ files needed to build applications that use accountsservice-libs.
 
 %files libs
 %{_libdir}/libaccountsservice.so.*
+%dir %{_libdir}/girepository-1.0/
 %{_libdir}/girepository-1.0/AccountsService-1.0.typelib
 
 %files devel
 %{_includedir}/accountsservice-1.0
 %{_libdir}/libaccountsservice.so
 %{_libdir}/pkgconfig/accountsservice.pc
+%dir %{_datadir}/gir-1.0/
 %{_datadir}/gir-1.0/AccountsService-1.0.gir
+%dir %{_datadir}/gtk-doc/html/libaccountsservice
+%{_datadir}/gtk-doc/html/libaccountsservice/*
+%dir %{_datadir}/vala/
+%dir %{_datadir}/vala/vapi/
+%{_datadir}/vala/vapi/accountsservice.*
 
 %changelog
+* Thu Oct 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 23.13.9-1
+- Update to version 23.13.9
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.55-4
 - Adding BR on '%%{_bindir}/xsltproc'.
 - License verified.

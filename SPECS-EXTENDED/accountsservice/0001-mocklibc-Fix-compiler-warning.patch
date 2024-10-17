@@ -1,0 +1,54 @@
+From da65bee12d9118fe1a49c8718d428fe61d232339 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 11 Apr 2023 10:09:07 -0400
+Subject: [PATCH 1/2] mocklibc: Fix compiler warning
+
+print_indent is defined in one file and used in another without a
+forward declaration. That leads to a compiler warning/error.
+
+This commit fixes that.
+---
+ subprojects/mocklibc.wrap                           |  2 ++
+ subprojects/packagefiles/mocklibc-print-indent.diff | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
+ create mode 100644 subprojects/packagefiles/mocklibc-print-indent.diff
+
+diff --git a/subprojects/mocklibc.wrap b/subprojects/mocklibc.wrap
+index af82298..539ee83 100644
+--- a/subprojects/mocklibc.wrap
++++ b/subprojects/mocklibc.wrap
+@@ -1,10 +1,12 @@
+ [wrap-file]
+ directory = mocklibc-1.0
+ 
+ source_url = https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mocklibc/mocklibc-1.0.tar.gz
+ source_filename = mocklibc-1.0.tar.gz
+ source_hash = b2236a6af1028414783e9734a46ea051916ec226479d6a55a3bb823bff68f120
+ 
+ patch_url = https://wrapdb.mesonbuild.com/v1/projects/mocklibc/1.0/2/get_zip
+ patch_filename = mocklibc-1.0-2-wrap.zip
+ patch_hash = 0280f96a2eeb3c023e5acf4e00cef03d362868218d4a85347ea45137c0ef6c56
++
++diff_files = mocklibc-print-indent.diff
+diff --git a/subprojects/packagefiles/mocklibc-print-indent.diff b/subprojects/packagefiles/mocklibc-print-indent.diff
+new file mode 100644
+index 0000000..4aaed40
+--- /dev/null
++++ b/subprojects/packagefiles/mocklibc-print-indent.diff
+@@ -0,0 +1,13 @@
++diff -up mocklibc-1.0/src/netgroup-debug.c.print-indent mocklibc-1.0/src/netgroup-debug.c
++--- mocklibc-1.0/src/netgroup-debug.c.print-indent	2023-04-11 10:20:53.717381559 -0400
+++++ mocklibc-1.0/src/netgroup-debug.c	2023-04-11 10:21:02.296270333 -0400
++@@ -21,6 +21,9 @@
++ #include <stdio.h>
++ #include <stdlib.h>
++ 
+++void print_indent (FILE        *stream,
+++                   unsigned int indent);
+++
++ void netgroup_debug_print_entry(struct entry *entry, FILE *stream, unsigned int indent) {
++   print_indent(stream, indent);
++ 
+-- 
+2.39.2
+
