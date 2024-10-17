@@ -216,7 +216,7 @@ func TestCustomizeImagePackagesDiskSpace(t *testing.T) {
 	assert.ErrorContains(t, err, "failed to install package (gcc)")
 }
 
-func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirPath string) error {
+func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirPath string) {
 	// Array to capture all the files of the provided root directory
 	var existingFiles []string
 
@@ -244,6 +244,4 @@ func ensureTdnfCacheCleanup(t *testing.T, imageConnection *ImageConnection, dirP
 
 	// Ensure the cache has been cleaned up
 	assert.Equal(t, 0, len(existingFiles), "Expected no file data in cache, but got %d files", len(existingFiles))
-
-	return nil
 }
