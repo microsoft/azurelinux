@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "gstreamer-1.20.0.tar.xz": "edf4bffff85591d4fff7b21bb9ed7f0feabc123ac4a4eff29e73cbce454f9db7",
+  "gstreamer-1.24.8.tar.xz": "b807dbf36c5d2b3ce1c604133ed0c737350f9523ce4d8d644a1177c5f9d6ded3",
   "gstreamer1.attr": "340f3a82ccd5f005e503a498b67df82d731cccf8d7eeb4d5627a62d443785b37",
   "gstreamer1.prov": "ccf26099c6413e2d4acc3bc22ad75c4e0954d09965ea47c888b5374705f881ba"
  }
