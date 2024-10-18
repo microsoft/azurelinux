@@ -103,7 +103,7 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
-* Wed Oct 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 13.3
+* Wed Oct 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 13.2-3
 - Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
 
 * Fri Aug 16 2024 Andrew Phelps <anphel@microsoft.com> - 13.2-2
