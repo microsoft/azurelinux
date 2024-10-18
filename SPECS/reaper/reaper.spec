@@ -36,12 +36,12 @@ Patch0:         CVE-2024-37890.patch
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2017-18214.patch
 Patch3:         CVE-2024-42459.patch
-Patch4:         CVE-2024-45296.patch
-Patch5:         CVE-2024-43799.patch
-Patch6:         CVE-2024-43800.patch
-Patch7:         CVE-2024-47764.patch
-Patch8:         CVE-2024-48949.patch
-Patch9:         CVE-2024-43796.patch
+Patch4:         CVE-2024-43796.patch
+Patch5:         CVE-2024-45296.patch
+Patch6:         CVE-2024-43799.patch
+Patch7:         CVE-2024-43800.patch
+Patch8:         CVE-2024-47764.patch
+Patch9:         CVE-2024-48949.patch
 Patch10:        CVE-2024-45590.patch
 
 BuildRequires:  git
