@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 )
 
@@ -26,8 +25,22 @@ import (
 // and we need to remember to add the ISO specific arguments from the previous
 // runs. SavedConfigs is the place where we can store such arguments so we can
 // re-apply them.
+
+type IsoSavedConfigs struct {
+	KernelCommandLine imagecustomizerapi.KernelCommandLine  `yaml:"kernelCommandLine"`
+}
+
+func (i *IsoSavedConfigs) IsValid() error {
+	err := i.KernelCommandLine.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid kernelCommandLine: %w", err)
+	}
+
+	return nil
+}
+
 type SavedConfigs struct {
-	Iso imagecustomizerapi.Iso `yaml:"iso"`
+	Iso IsoSavedConfigs `yaml:"iso"`
 }
 
 func (c *SavedConfigs) IsValid() (err error) {
