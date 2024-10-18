@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,9 +30,9 @@ Requires:       lz4
 Requires:       procps-ng
 Requires:       readline
 Requires:       sed
-# Note: We currently only support using systemd for our init process, not the kata-agent. 
+# Note: We currently only support using systemd for our init process, not the kata-agent.
 # When we go to add support for AGENT_INIT=yes, can drop this.
-# https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10 
+# https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10
 Requires:       systemd
 Requires:       tar
 Requires:       tzdata
@@ -55,12 +55,15 @@ Requires:       systemd-udev
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
+Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
+Requires:       kernel-uvm-devel
 # Uncomment and remove duplicates once msigvm is available
 #Requires:       msigvm
+Requires:       parted
 # Python dependencies for non-packaged IGVM tool
 Requires:       python3
 Requires:       python3-pip
@@ -72,10 +75,11 @@ Requires:       python3-cstruct
 Requires:       python3-devel
 Requires:       python3-libs
 Requires:       python3-setuptools
-Requires:       python3-pytest 
+Requires:       python3-pytest
 Requires:       python3-libclang
-Requires:       python3-tomli    
-Requires:       veritysetup 
+Requires:       python3-tomli
+Requires:       qemu-img
+Requires:       veritysetup
 
 %description    build
 
@@ -101,6 +105,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-6
+- Update for 3.2.0.azl3 kata-containers(-cc) packages
+
 * Wed Jun 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-5
 - Add explicit systemd dependencies for UVM
 
