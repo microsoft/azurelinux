@@ -79,6 +79,24 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		}
 	}
 
+	if osConfig.RootDevice != "" {
+
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.SetRootDevice(osConfig.RootDevice)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.WriteToFile(dummyChroot)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

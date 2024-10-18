@@ -13,11 +13,12 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	Hostname string                     `yaml:"hostname"`
-	SELinux  imagecustomizerapi.SELinux `yaml:"selinux"`
-	Users    []imagecustomizerapi.User  `yaml:"users"`
-	Overlays *[]Overlay                 `yaml:"overlays"`
-	Verity   *imagecustomizerapi.Verity `yaml:"verity"`
+	Hostname   string                     `yaml:"hostname"`
+	SELinux    imagecustomizerapi.SELinux `yaml:"selinux"`
+	Users      []imagecustomizerapi.User  `yaml:"users"`
+	Overlays   *[]Overlay                 `yaml:"overlays"`
+	Verity     *imagecustomizerapi.Verity `yaml:"verity"`
+	RootDevice string                     `yaml:"rootDevice"`
 }
 
 func (s *OS) IsValid() error {
@@ -65,13 +66,6 @@ func (s *OS) IsValid() error {
 			workDirs[overlay.WorkDir] = true
 		}
 	}
-
-	// if s.Verity != nil {
-	// 	err = s.Verity.IsValid()
-	// 	if err != nil {
-	// 		return fmt.Errorf("invalid verity:\n%w", err)
-	// 	}
-	// }
 
 	return nil
 }
