@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		gssntlmssp
-Version:	0.9.0
-Release:	2%{?dist}
+Version:	1.3.1
+Release:	1%{?dist}
 Summary:	GSSAPI NTLMSSP Mechanism
 
 License:	LGPLv3+
-URL:		https://fedorahosted.org/gss-ntlmssp
-Source0:        https://fedorahosted.org/released/gss-ntlmssp/%{name}-%{version}.tar.gz
+URL:		https://github.com/gssapi/gss-ntlmssp
+Source0:	https://github.com/gssapi/gss-ntlmssp/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 Requires: krb5-libs >= 1.12.1-9
 
@@ -69,6 +69,10 @@ make test_gssntlmssp
 %{_includedir}/gssapi/gssapi_ntlmssp.h
 
 %changelog
+* Fri Oct 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.3.1-1
+- Upgrade to 1.3.1 release for azl 3.0
+- License verified
+
 * Fri Jul 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing architecture info from 'krb5-libs' dependency to adjust it to CBL-Mariner's packages.
