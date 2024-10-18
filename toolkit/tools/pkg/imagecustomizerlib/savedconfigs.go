@@ -22,7 +22,7 @@ import (
 // For example, if the user specifies a kernel argument that is specific to the
 // ISO image, it will not be present in any of the grub config files on the
 // root file system - only in the final ISO image grub.cfg. When that ISO image
-// is further customized, the root file system grub.cfg migith get re-generated
+// is further customized, the root file system grub.cfg might get re-generated
 // and we need to remember to add the ISO specific arguments from the previous
 // runs. SavedConfigs is the place where we can store such arguments so we can
 // re-apply them.
