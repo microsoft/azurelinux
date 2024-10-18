@@ -91,7 +91,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
-* Tue Oct 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 11.3
+* Tue Oct 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 11.2-3
 - Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
