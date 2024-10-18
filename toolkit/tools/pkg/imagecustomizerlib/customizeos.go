@@ -92,7 +92,9 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		}
 	}
 
-	err = enableUki(config.OS.Uki, imageChroot)
+	// Put UKI prepare here, the order is after enableVerityPartition, however,
+	// it may change in the future dev.
+	err = prepareUki(config.OS.Uki, imageChroot)
 	if err != nil {
 		return err
 	}

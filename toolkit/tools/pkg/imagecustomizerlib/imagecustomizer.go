@@ -24,6 +24,7 @@ import (
 
 const (
 	tmpParitionDirName = "tmppartition"
+	tmpEspParitionDirName = "tmpesppartition"
 
 	// supported input formats
 	ImageFormatVhd      = "vhd"
@@ -389,6 +390,11 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 		}
 	}
 
+	err = customizeUkiImageHelper(ic.buildDirAbs, ic.rawImageFile)
+	if err != nil {
+		return err
+	}
+
 	// Check file systems for corruption.
 	err = checkFileSystems(ic.rawImageFile)
 	if err != nil {
@@ -683,6 +689,165 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 
 	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
+	logger.Log.Debugf("Customizing UKI")
+
+	var err error
+
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect to image file to provision verity:\n%w", err)
+	}
+	defer loopback.Close()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return err
+	}
+	bootPartition, err := findBootPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return err
+	}
+
+	systemBootPartitionTmpDir := filepath.Join(buildDir, tmpEspParitionDirName)
+	// Temporarily mount the esp partition.
+	systemBootPartitionMount, err := safemount.NewMount(systemBootPartition.Path, systemBootPartitionTmpDir, systemBootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer systemBootPartitionMount.Close()
+
+	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
+	// Temporarily mount the partition.
+	bootPartitionMount, err := safemount.NewMount(bootPartition.Path, bootPartitionTmpDir, bootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer bootPartitionMount.Close()
+
+	grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+	}
+
+	// Read and print the grub.cfg file
+    grubCfgContent, err := os.ReadFile(grubCfgFullPath)
+    if err != nil {
+        return fmt.Errorf("failed to read file (%s):\n%w", grubCfgFullPath, err)
+    }
+
+	// Split the file content into lines and search for the 'linux' line
+	lines := strings.Split(string(grubCfgContent), "\n")
+	var linuxLine string
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmedLine, "linux") {
+			linuxLine = trimmedLine
+			break
+		}
+	}
+
+	if linuxLine == "" {
+		return fmt.Errorf("failed to find linux line in %s", grubCfgFullPath)
+	}
+
+	// Print the linux line (Cmdline)
+	logger.Log.Infof("Found linux line: %s", linuxLine)
+
+	ukifyConfigFullPath := filepath.Join(bootPartitionTmpDir, "ukify.conf")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Read the existing ukify.conf file content
+	ukifyConfigContent, err := os.ReadFile(ukifyConfigFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to read file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Retrieve the Linux value from the ukify.conf
+	linuxValue, err := retrieveLinuxFromUkifyConfig(ukifyConfigFullPath)
+	if err != nil {
+		logger.Log.Errorf("Error retrieving Linux value: %v", err)
+		return err
+	}
+
+	linuxValueFullPath := filepath.Join(bootPartitionTmpDir, linuxValue)
+	// Print the Linux value
+	logger.Log.Infof("Retrieved Linux value: %s", linuxValueFullPath)
+
+	// Retrieve the Linux value from the ukify.conf
+	initrdValue, err := retrieveInitrdFromUkifyConfig(ukifyConfigFullPath)
+	if err != nil {
+		logger.Log.Errorf("Error retrieving Linux value: %v", err)
+		return err
+	}
+
+	initrdValueFullPath := filepath.Join(bootPartitionTmpDir, initrdValue)
+	// Print the Linux value
+	logger.Log.Infof("Retrieved Linux value: %s", initrdValueFullPath)
+
+	// Replace the existing Linux and Initrd values with the full paths
+	updatedUkifyConfigContent := strings.Replace(string(ukifyConfigContent), 
+	fmt.Sprintf("Linux=/boot%s", linuxValue), fmt.Sprintf("Linux=%s", linuxValueFullPath), 1)
+	updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent, 
+	fmt.Sprintf("Initrd=/boot%s", initrdValue), fmt.Sprintf("Initrd=%s", initrdValueFullPath), 1)
+
+	// Append the linux line as Cmdline to the ukify.conf file content
+	updatedUkifyConfigContent += fmt.Sprintf("Cmdline=%s\n", linuxLine)
+
+	// Write the updated content back to the ukify.conf file
+	err = os.WriteFile(ukifyConfigFullPath, []byte(updatedUkifyConfigContent), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write to ukify.conf (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Read the updated ukify.conf file to print the latest content
+	latestUkifyConfigContent, err := os.ReadFile(ukifyConfigFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to read updated ukify.conf file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Print the latest ukify.conf content
+	logger.Log.Infof("Updated ukify.conf content:\n%s", string(latestUkifyConfigContent))
+
+	stubPath := filepath.Join(bootPartitionTmpDir, "linuxx64.efi.stub")
+	ukiFullPath := filepath.Join(systemBootPartitionTmpDir, fmt.Sprintf("EFI/Linux/%s.unsigned.efi", linuxValue))
+
+	ukifyCmd := []string{
+		"ukify", "-c", fmt.Sprintf("%s", ukifyConfigFullPath), "build",
+		fmt.Sprintf("--stub=%s", stubPath),
+		fmt.Sprintf("--output=%s", ukiFullPath),
+	}
+
+	err = shell.ExecuteLiveWithErr(1, "sudo", ukifyCmd...)
+	if err != nil {
+		return fmt.Errorf("failed to build UKI:\n%w", err)
+	}
+
+	err = systemBootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
 	if err != nil {
 		return err
 	}

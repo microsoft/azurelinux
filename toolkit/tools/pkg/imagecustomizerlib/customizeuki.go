@@ -4,10 +4,10 @@
 package imagecustomizerlib
 
 import (
-	"bufio"
+	//"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
+	//"path/filepath"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
+func prepareUki(uki bool, imageChroot *safechroot.Chroot) error {
 	var err error
 	var grubCfgOutput string
 
@@ -62,26 +62,19 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 		return fmt.Errorf("failed to read GRUB configuration:\n%w", err)
 	}
 
-	// Parse UUID from GRUB config
-	uuid, kernel, initrd, err := extractRootUUIDKernelInitrdFromGrub(grubCfgOutput)
+	// Parse kernel and initrd from GRUB config.
+	kernel, initrd, err := extractKernelInitrdFromGrub(grubCfgOutput)
 	if err != nil {
-		return fmt.Errorf("failed to extract UUID, kernel, or initrd from GRUB configuration:\n%w", err)
+		return fmt.Errorf("failed to extract kernel, or initrd from GRUB configuration:\n%w", err)
 	}
 
-	if strings.HasPrefix(uuid, "/dev/mapper/root") {
-		uuid = "/dev/mapper/root"
-	} else {
-		uuid = fmt.Sprintf("UUID=%s", uuid)
-	}
-
-	logger.Log.Infof("Extracted UUID: %s", uuid)
 	logger.Log.Infof("Extracted Kernel: %s", kernel)
 	logger.Log.Infof("Extracted Initrd: %s", initrd)
 
 	// Write the Ukify config to /boot/ukify.conf
 	err = imageChroot.UnsafeRun(func() error {
 		configFilePath := "/boot/ukify.conf"
-		configContent := fmt.Sprintf("[UKI]\nLinux=/boot%s\nInitrd=/boot%s\nCmdline=BOOT_IMAGE=%s root=%s ro selinux=0 rd.auto=1 net.ifnames=0 lockdown=integrity console=tty0 console=ttyS0 rd.debug\n", kernel, initrd, kernel, uuid)
+		configContent := fmt.Sprintf("[UKI]\nLinux=/boot%s\nInitrd=/boot%s", kernel, initrd)
 
 		// Open file and write the content
 		err := shell.ExecuteLiveWithErr(1, "sudo", "sh", "-c", fmt.Sprintf("echo '%s' > %s", configContent, configFilePath))
@@ -90,6 +83,7 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 			return err
 		}
 		logger.Log.Infof("Successfully wrote the Ukify config to %s", configFilePath)
+		fmt.Println(configContent)
 		return nil
 	})
 	if err != nil {
@@ -104,34 +98,29 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 		return fmt.Errorf("failed to install systemd-boot:\n%w", err)
 	}
 
-	// Run ukify to build UKI using the helper function inside the imageChroot
-	err = runUkifyBuild(imageChroot)
+	err = imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLiveWithErr(1, "sudo", "cp", "/usr/lib/systemd/boot/efi/linuxx64.efi.stub", "/boot")
+	})
 	if err != nil {
-		return fmt.Errorf("failed to build UKI:\n%w", err)
+		return fmt.Errorf("failed to cp linuxx64.efi.stub:\n%w", err)
 	}
 
 	return nil
 }
 
-func extractRootUUIDKernelInitrdFromGrub(grubCfgContent string) (string, string, string, error) {
-	var uuid, kernel, initrd string
+func extractKernelInitrdFromGrub(grubCfgContent string) (string, string, error) {
+	var kernel, initrd string
 
 	lines := strings.Split(grubCfgContent, "\n")
 	for _, line := range lines {
 		if strings.Contains(line, "linux") {
 			parts := strings.Fields(line)
 			for _, part := range parts {
-				if strings.HasPrefix(part, "root=UUID=") {
-					uuid = strings.TrimPrefix(part, "root=UUID=")
-				} else if part == "root=/dev/mapper/root" {
-					uuid = "/dev/mapper/root"
-				}
 				if strings.HasPrefix(part, "/vmlinuz") {
 					kernel = part
 				}
 			}
 		}
-
 		if strings.Contains(line, "initrd") {
 			parts := strings.Fields(line)
 			for _, part := range parts {
@@ -141,13 +130,84 @@ func extractRootUUIDKernelInitrdFromGrub(grubCfgContent string) (string, string,
 			}
 		}
 
-		if uuid != "" && kernel != "" && initrd != "" {
-			return uuid, kernel, initrd, nil
+		if kernel != "" && initrd != "" {
+			return kernel, initrd, nil
 		}
 	}
-	return "", "", "", fmt.Errorf("failed to extract UUID, kernel, initrd from GRUB config")
+	return "", "", fmt.Errorf("failed to extract kernel, initrd from GRUB config")
 }
 
+func retrieveLinuxFromUkifyConfig(ukifyConfigFullPath string) (string, error) {
+	// Read the ukify.conf file
+	ukifyConfigContent, err := os.ReadFile(ukifyConfigFullPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read ukify.conf file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Split the content into lines and search for the 'Linux=' line
+	lines := strings.Split(string(ukifyConfigContent), "\n")
+	var linuxLine string
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Linux=") {
+			linuxLine = strings.TrimPrefix(line, "Linux=")
+			break
+		}
+	}
+
+	if linuxLine == "" {
+		return "", fmt.Errorf("failed to find 'Linux=' entry in ukify.conf (%s)", ukifyConfigFullPath)
+	}
+
+	// Remove the /boot prefix if present
+	linuxValue := strings.TrimPrefix(linuxLine, "/boot")
+
+	// Return the Linux value
+	return linuxValue, nil
+}
+
+func retrieveInitrdFromUkifyConfig(ukifyConfigFullPath string) (string, error) {
+	// Read the ukify.conf file
+	ukifyConfigContent, err := os.ReadFile(ukifyConfigFullPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read ukify.conf file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Split the content into lines and search for the 'Linux=' line
+	lines := strings.Split(string(ukifyConfigContent), "\n")
+	var initrdLine string
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Initrd=") {
+			initrdLine = strings.TrimPrefix(line, "Initrd=")
+			break
+		}
+	}
+
+	if initrdLine == "" {
+		return "", fmt.Errorf("failed to find 'Linux=' entry in ukify.conf (%s)", ukifyConfigFullPath)
+	}
+
+	// Remove the /boot prefix if present
+	initrdValue := strings.TrimPrefix(initrdLine, "/boot")
+
+	// Return the Linux value
+	return initrdValue, nil
+}
+
+func validateUkiDependencies(imageChroot *safechroot.Chroot) error {
+	requiredRpms := []string{"systemd-ukify", "systemd-boot", "efibootmgr"}
+
+	// Iterate over each required package and check if it's installed.
+	for _, pkg := range requiredRpms {
+		logger.Log.Debugf("Checking if package (%s) is installed", pkg)
+		if !isPackageInstalled(imageChroot, pkg) {
+			return fmt.Errorf("package (%s) is not installed:\nthe following packages must be installed to use Uki: %v", pkg, requiredRpms)
+		}
+	}
+
+	return nil
+}
+
+/*
 func runUkifyBuild(imageChroot *safechroot.Chroot) error {
 	err := imageChroot.UnsafeRun(func() error {
 		configFilePath := "/boot/ukify.conf"
@@ -191,17 +251,4 @@ func runUkifyBuild(imageChroot *safechroot.Chroot) error {
 
 	return nil
 }
-
-func validateUkiDependencies(imageChroot *safechroot.Chroot) error {
-	requiredRpms := []string{"systemd-ukify", "systemd-boot", "efibootmgr"}
-
-	// Iterate over each required package and check if it's installed.
-	for _, pkg := range requiredRpms {
-		logger.Log.Debugf("Checking if package (%s) is installed", pkg)
-		if !isPackageInstalled(imageChroot, pkg) {
-			return fmt.Errorf("package (%s) is not installed:\nthe following packages must be installed to use Uki: %v", pkg, requiredRpms)
-		}
-	}
-
-	return nil
-}
+*/
