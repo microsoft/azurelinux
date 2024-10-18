@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,11 +43,10 @@ It contains the libraries and header files to create applications.
     --exec-prefix= \
     --with-xtlibdir=%{_libdir}/iptables \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
-    --disable-nftables \
     --enable-libipq \
     --enable-devel
 
-make V=0
+%make_build
 
 %install
 %make_install
@@ -65,12 +64,12 @@ find %{buildroot} -name '*.a'  -delete
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-%preun
-%systemd_preun iptables.service
-
 %post
 /sbin/ldconfig
 %systemd_post iptables.service
+
+%preun
+%systemd_preun iptables.service
 
 %postun
 /sbin/ldconfig
@@ -83,6 +82,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %{_sysconfdir}/systemd/scripts/iptables.stop
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip4save
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip6save
+%config(noreplace) %{_sysconfdir}/ethertypes
 %{_unitdir}/iptables.service
 %{_sbindir}/*
 %{_bindir}/*
@@ -100,6 +100,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
+- Enable nftables
+
 * Mon Mar 18 2024 Andy Zaugg <azaugg@linkedin.com> - 1.8.10-2
 - Flush raw table when restarting iptables service
 
