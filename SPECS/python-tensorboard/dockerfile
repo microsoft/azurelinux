@@ -9,12 +9,6 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
 ARG TB_VERSION
 
 WORKDIR /root/
-# RUN tdnf -y install createrepo
-# COPY RPMS /opt/rpms
-# COPY custom.repo /etc/yum.repos.d
-
-# COPY toolchain_rpms /opt/rpms
-# RUN createrepo /opt/rpms
 #bazel version must match with the .bazelversion
 RUN tdnf -y install build-essential git tar bazel python3-devel python3-numpy python3-pip python3-wheel python3-six python3-setuptools python3-virtualenv python3-protobuf python3-absl-py gcc zlib wget ca-certificates
 RUN tdnf -y install which python3-werkzeug
