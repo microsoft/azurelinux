@@ -4,7 +4,10 @@
 package imagecustomizerlib
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -16,7 +19,7 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 	var err error
 	var grubCfgOutput string
 
-	if uki == false {
+	if !uki {
 		return nil
 	}
 
@@ -34,6 +37,14 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create EFI directory:\n%w", err)
+	}
+
+	// Create the Ukify config.
+	err = imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLiveWithErr(1, "sudo", "touch", "/boot/ukify.conf")
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create Ukify config:\n%w", err)
 	}
 
 	// Extract /boot/grub2/grub.cfg
@@ -57,23 +68,32 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 		return fmt.Errorf("failed to extract UUID, kernel, or initrd from GRUB configuration:\n%w", err)
 	}
 
+	if strings.HasPrefix(uuid, "/dev/mapper/root") {
+		uuid = "/dev/mapper/root"
+	} else {
+		uuid = fmt.Sprintf("UUID=%s", uuid)
+	}
+
 	logger.Log.Infof("Extracted UUID: %s", uuid)
 	logger.Log.Infof("Extracted Kernel: %s", kernel)
 	logger.Log.Infof("Extracted Initrd: %s", initrd)
 
-	// Run ukify to build UKI.
+	// Write the Ukify config to /boot/ukify.conf
 	err = imageChroot.UnsafeRun(func() error {
-		ukifyCmd := []string{
-			"ukify", "build",
-			fmt.Sprintf("--linux=/boot%s", kernel),
-			fmt.Sprintf("--initrd=/boot%s", initrd), 
-			fmt.Sprintf("--cmdline=BOOT_IMAGE=%s root=UUID=%s ro selinux=0 rd.auto=1 net.ifnames=0 lockdown=integrity console=tty0 console=ttyS0 rd.debug", kernel, uuid),
-			fmt.Sprintf("--output=/boot/efi/EFI/Linux%s.unsigned.efi", kernel),
+		configFilePath := "/boot/ukify.conf"
+		configContent := fmt.Sprintf("[UKI]\nLinux=/boot%s\nInitrd=/boot%s\nCmdline=BOOT_IMAGE=%s root=%s ro selinux=0 rd.auto=1 net.ifnames=0 lockdown=integrity console=tty0 console=ttyS0 rd.debug\n", kernel, initrd, kernel, uuid)
+
+		// Open file and write the content
+		err := shell.ExecuteLiveWithErr(1, "sudo", "sh", "-c", fmt.Sprintf("echo '%s' > %s", configContent, configFilePath))
+		if err != nil {
+			logger.Log.Errorf("failed to write Ukify config to %s: %v", configFilePath, err)
+			return err
 		}
-		return shell.ExecuteLiveWithErr(1, "sudo", ukifyCmd...)
+		logger.Log.Infof("Successfully wrote the Ukify config to %s", configFilePath)
+		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("failed to build UKI:\n%w", err)
+		return fmt.Errorf("failed to write Ukify config file:\n%w", err)
 	}
 
 	// Install systemd-boot.
@@ -82,6 +102,12 @@ func enableUki(uki bool, imageChroot *safechroot.Chroot) error {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to install systemd-boot:\n%w", err)
+	}
+
+	// Run ukify to build UKI using the helper function inside the imageChroot
+	err = runUkifyBuild(imageChroot)
+	if err != nil {
+		return fmt.Errorf("failed to build UKI:\n%w", err)
 	}
 
 	return nil
@@ -97,6 +123,8 @@ func extractRootUUIDKernelInitrdFromGrub(grubCfgContent string) (string, string,
 			for _, part := range parts {
 				if strings.HasPrefix(part, "root=UUID=") {
 					uuid = strings.TrimPrefix(part, "root=UUID=")
+				} else if part == "root=/dev/mapper/root" {
+					uuid = "/dev/mapper/root"
 				}
 				if strings.HasPrefix(part, "/vmlinuz") {
 					kernel = part
@@ -118,6 +146,50 @@ func extractRootUUIDKernelInitrdFromGrub(grubCfgContent string) (string, string,
 		}
 	}
 	return "", "", "", fmt.Errorf("failed to extract UUID, kernel, initrd from GRUB config")
+}
+
+func runUkifyBuild(imageChroot *safechroot.Chroot) error {
+	err := imageChroot.UnsafeRun(func() error {
+		configFilePath := "/boot/ukify.conf"
+
+		// Read the ukify config file to extract the kernel from the "Linux=" line
+		var kernel string
+		file, err := os.Open(configFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to open ukify config file: %w", err)
+		}
+		defer file.Close()
+
+		// Scan through the config file to find the "Linux=" line
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, "Linux=") {
+				kernel = strings.TrimPrefix(line, "Linux=")
+				break
+			}
+		}
+
+		if kernel == "" {
+			return fmt.Errorf("failed to find Linux= entry in %s", configFilePath)
+		}
+
+		// Strip the /boot prefix from the kernel path if present
+		kernelFileName := filepath.Base(kernel)
+
+		// Prepare the ukify command
+		ukifyCmd := []string{
+			"ukify", "-c", "/boot/ukify.conf", "build",
+			fmt.Sprintf("--output=/boot/efi/EFI/Linux/%s.unsigned.efi", kernelFileName),
+		}
+
+		return shell.ExecuteLiveWithErr(1, "sudo", ukifyCmd...)
+	})
+	if err != nil {
+		return fmt.Errorf("failed to build UKI:\n%w", err)
+	}
+
+	return nil
 }
 
 func validateUkiDependencies(imageChroot *safechroot.Chroot) error {
