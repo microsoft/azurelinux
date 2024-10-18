@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 )
 
@@ -27,7 +28,7 @@ import (
 // re-apply them.
 
 type IsoSavedConfigs struct {
-	KernelCommandLine imagecustomizerapi.KernelCommandLine  `yaml:"kernelCommandLine"`
+	KernelCommandLine imagecustomizerapi.KernelCommandLine `yaml:"kernelCommandLine"`
 }
 
 func (i *IsoSavedConfigs) IsValid() error {
