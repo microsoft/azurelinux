@@ -6,8 +6,8 @@ Distribution:   Azure Linux
 %global macros_dir %{_rpmconfigdir}/macros.d
 
 Name:           ghc-srpm-macros
-Version:        1.5.0
-Release:        3%{?dist}
+Version:        1.9.2
+Release:        1%{?dist}
 Summary:        RPM macros for building Haskell source packages
 
 License:        GPLv2+
@@ -37,6 +37,9 @@ install -p -D -m 0644 %{SOURCE0} %{buildroot}/%{macros_dir}/macros.ghc-srpm
 
 
 %changelog
+* Fri Oct 18 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.9.2-1
+- Upgrade to 1.9.2-1.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
