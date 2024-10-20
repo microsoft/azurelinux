@@ -1,13 +1,14 @@
 Summary:        nghttp2 is an implementation of HTTP/2 and its header compression algorithm, HPACK.
 Name:           nghttp2
 Version:        1.57.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://nghttp2.org
 Source0:        https://github.com/nghttp2/nghttp2/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2024-28182.patch
 BuildRequires:  gcc
 BuildRequires:  make
 %if %{with_check}
@@ -59,6 +60,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.57.0-2
+- Address CVE-2024-28182
+
 * Wed Oct 11 2023 Dan Streetman <ddstreet@ieee.org> - 1.57.0-1
 - Update version to 1.57.0 to include patches for CVE-2023-44487
 
