@@ -78,6 +78,9 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/*.a
 
 %changelog
+* Mon Oct 21 2024 Sudipta Pandit <sudpandit@microsoft.com> - 1.10.1-3
+- Backport patch for CVE-2024-8006
+
 * Wed Dec 13 2023 Zhichun Wan <zhichunwan@microsoft.com> - 1.10.1-2
 - Add static library as sub package
 
