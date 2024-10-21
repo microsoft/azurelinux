@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:             adobe-mappings-pdf
 Summary:          PDF mapping resources from Adobe
-Version:          20180407
-Release:          6%{?dist}
+Version:          20230118
+Release:          1%{?dist}
 License:          BSD
 
 URL:              https://www.adobe.com/
@@ -11,6 +11,7 @@ Source:           https://github.com/adobe-type-tools/mapping-resources-pdf/arch
 
 BuildArch:        noarch
 BuildRequires:    git
+BuildRequires:    make
 
 %description
 Mapping resources for PDF have a variety of functions, such as mapping CIDs
@@ -74,6 +75,10 @@ _EOF
 # =============================================================================
 
 %changelog
+* Mon Oct 21 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 20230118-1
+- Update to 20230118
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20180407-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
