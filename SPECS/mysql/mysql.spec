@@ -97,8 +97,8 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-* Fri Oct 18 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.37-1
-- Upgrade to 8.0.40 to fix CVE-2024-21096
+* Fri Oct 18 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.40-1
+- Upgrade to 8.0.40 to fix multiple CVEs
 - Remove patch for CVE-2023-46218 (fixed in 8.0.37)
 
 * Tue Jun 18 2024 Archana Choudhary <archana1@microsoft.com> - 8.0.36-1
