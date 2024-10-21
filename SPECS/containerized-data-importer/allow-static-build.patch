@@ -7,7 +7,7 @@ index 9ab28a434..d89b07762 100755
              cd $tgt
              # Only build executables for linux
 -            GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
-+            GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags "-extldflags $static_flag" -ldflags "$(cdi::version::ldflags)"
++            GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags "-extldflags static" -ldflags "$(cdi::version::ldflags)"
  
              ln -sf ${outFile} ${outLink}
          )
