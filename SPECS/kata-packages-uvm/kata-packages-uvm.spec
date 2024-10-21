@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,14 +53,26 @@ Requires:       systemd-udev
 %description    coco
 
 %package        build
-Summary:        Metapackage to install the set of packages for building a Kata UVM.
+Summary:        Metapackage to install the set of packages for building a Kata UVM (common).
 Requires:       acpica-tools
 Requires:       clang
-Requires:       kata-containers-tools
-Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
 # Uncomment and remove duplicates once msigvm is available
 #Requires:       msigvm
+
+%description    build
+
+%package        build-tools
+Summary:        Metapackage to install the set of packages for building a Kata UVM (vanilla).
+Requires:       %{name} = %{version}-%{release}
+Requires:       kata-containers-tools
+
+%description    build-tools
+
+%package        build-tools-cc
+Summary:        Metapackage to install the set of packages for building a Kata UVM (CC).
+Requires:       %{name} = %{version}-%{release}
+Requires:       kata-containers-tools-cc
 # Python dependencies for non-packaged IGVM tool
 Requires:       python3
 Requires:       python3-pip
@@ -77,7 +89,7 @@ Requires:       python3-libclang
 Requires:       python3-tomli    
 Requires:       veritysetup 
 
-%description    build
+%description    build-tools-cc
 
 %package        coco-sign
 Summary:        Metapackage to install the set of packages for building the signing tool for Kata confidential containers UVM.
@@ -101,6 +113,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Thu Sep 5 2024 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-6
+- Split kata-containers-tools and kata-containers-tools-cc into their own subpackages
+
 * Wed Jun 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-5
 - Add explicit systemd dependencies for UVM
 
