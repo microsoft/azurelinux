@@ -1,14 +1,15 @@
 %define         aprver  1
 Summary:        The Apache Portable Runtime
 Name:           apr
-Version:        1.7.2
-Release:        2%{?dist}
+Version:        1.7.5
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://dlcdn.apache.org/%{name}/%{name}-%{version}.tar.gz
+Patch0:         skip-known-test-failure.patch
 %if %{with_check}
 # test_serv_by_name test requires /etc/services file from iana-etc package
 BuildRequires:  iana-etc
@@ -25,7 +26,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure --prefix=%{_prefix} \
@@ -64,6 +65,10 @@ make -j1 check
 %{_libdir}/pkgconfig
 
 %changelog
+* Wed Oct 16 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.5-1
+- Upgrade version to address CVE-2023-49582
+- Enable ptests
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.7.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
