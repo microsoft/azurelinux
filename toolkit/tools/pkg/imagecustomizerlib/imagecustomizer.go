@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	tmpParitionDirName = "tmppartition"
+	tmpParitionDirName    = "tmppartition"
 	tmpEspParitionDirName = "tmpesppartition"
 
 	// supported input formats
@@ -743,10 +743,10 @@ func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
 	}
 
 	// Read and print the grub.cfg file
-    grubCfgContent, err := os.ReadFile(grubCfgFullPath)
-    if err != nil {
-        return fmt.Errorf("failed to read file (%s):\n%w", grubCfgFullPath, err)
-    }
+	grubCfgContent, err := os.ReadFile(grubCfgFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to read file (%s):\n%w", grubCfgFullPath, err)
+	}
 
 	// Split the file content into lines and search for the 'linux' line
 	lines := strings.Split(string(grubCfgContent), "\n")
@@ -800,10 +800,10 @@ func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
 	logger.Log.Infof("Retrieved Linux value: %s", initrdValueFullPath)
 
 	// Replace the existing Linux and Initrd values with the full paths
-	updatedUkifyConfigContent := strings.Replace(string(ukifyConfigContent), 
-	fmt.Sprintf("Linux=/boot%s", linuxValue), fmt.Sprintf("Linux=%s", linuxValueFullPath), 1)
-	updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent, 
-	fmt.Sprintf("Initrd=/boot%s", initrdValue), fmt.Sprintf("Initrd=%s", initrdValueFullPath), 1)
+	updatedUkifyConfigContent := strings.Replace(string(ukifyConfigContent),
+		fmt.Sprintf("Linux=/boot%s", linuxValue), fmt.Sprintf("Linux=%s", linuxValueFullPath), 1)
+	updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent,
+		fmt.Sprintf("Initrd=/boot%s", initrdValue), fmt.Sprintf("Initrd=%s", initrdValueFullPath), 1)
 
 	// Append the linux line as Cmdline to the ukify.conf file content
 	updatedUkifyConfigContent += fmt.Sprintf("Cmdline=%s\n", linuxLine)
