@@ -1,7 +1,7 @@
 Summary:        Contains a utility for determining file types
 Name:           file
 Version:        5.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Applications/File
 URL:            https://www.darwinsys.com/file
 Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
 Patch1:         fix_xz_mime_type_reporting.patch
+Patch2:         CVE-2022-48554.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -91,6 +92,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Thu Oct 17 2024 Muhammad Falak <mwani@microsoft.com> - 5.40-3
+- Address CVE-2022-48554
+
 * Tue Mar 15 2022 Bala <balakumaran.kannan@microsoft.com> - 5.40-2
 - Add patch to fix xz mime type reporting
 
