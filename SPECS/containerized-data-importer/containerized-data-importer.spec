@@ -130,11 +130,14 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
-	tools/cdi-containerimage-server \
 	tools/cdi-image-size-detection \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
 	%{nil}
+
+export GO_EXTLINK_ENABLED=0
+CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
+
 
 ./hack/build/build-manifests.sh
 
