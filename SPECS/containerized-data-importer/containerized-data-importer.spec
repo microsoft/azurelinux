@@ -117,6 +117,9 @@ tar --strip-components=1 -xf %{SOURCE0}
 
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
+
+CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
+
 env \
 CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
@@ -134,10 +137,6 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
 	%{nil}
-
-export GO_EXTLINK_ENABLED=0
-CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
-
 
 ./hack/build/build-manifests.sh
 
