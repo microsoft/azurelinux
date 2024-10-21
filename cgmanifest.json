@@ -8541,8 +8541,8 @@
         "type": "other",
         "other": {
           "name": "kyotocabinet",
-          "version": "1.2.78",
-          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.78.tar.gz"
+          "version": "1.2.80",
+          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.80.tar.gz"
         }
       }
     },
