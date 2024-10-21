@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.36
+Version:        8.0.40
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
-Patch1:         CVE-2023-46218.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -98,6 +97,10 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Fri Oct 18 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.37-1
+- Upgrade to 8.0.40 to fix CVE-2024-21096
+- Remove patch for CVE-2023-46218 (fixed in 8.0.37)
+
 * Tue Jun 18 2024 Archana Choudhary <archana1@microsoft.com> - 8.0.36-1
 - Upgrade to 8.0.36 to fix 10 CVEs
 
