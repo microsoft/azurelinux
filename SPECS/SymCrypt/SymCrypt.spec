@@ -1,7 +1,7 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.4.2
-Release:        2%{?dist}
+Version:        103.5.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,9 @@ URL:            https://github.com/microsoft/SymCrypt
 Source0:        https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz#/jitterentropy-library-3.3.1.tar.gz
 Source2:        find-debuginfo
+# Use ./generate-env-file.sh <git-version-tag> to generate this. For example:
+#   ./generate-env-file.sh v103.5.1
+Source3:        symcrypt-build-environment-variables-v%{version}.sh
 Patch1:         0001-add-build-flags-to-prevent-stripping-and-post-proces.patch
 Patch2:         0001-add-parameter-to-process_fips_module-to-specify-the-.patch
 BuildRequires:  cmake
@@ -48,9 +51,7 @@ rm -rf 3rdparty/jitterentropy-library
 ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 
 %build
-SYMCRYPT_BRANCH=main \
-SYMCRYPT_COMMIT_HASH=a84ffe1 \
-SYMCRYPT_COMMIT_TIMESTAMP=2024-01-26T22:00:47-08:00 \
+source %{SOURCE3}
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
         -DSYMCRYPT_STRIP_BINARY=OFF \
@@ -104,6 +105,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Mon Oct 21 2024 Tobias Brick <tobiasb@microsoft.com> - 103.5.1-1
+- Update 103.5.1
+
 * Mon Oct 14 2024 Tobias Brick <tobiasb@microsoft.com> - 103.4.2-2
 - Add debuginfo package
 
