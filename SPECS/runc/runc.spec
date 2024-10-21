@@ -3,7 +3,7 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
 Version:        1.1.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,7 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang
+BuildRequires:  golang <= 1.22.99
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -43,6 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.1.12-2
+- Pin golang version to <= 1.22
+
 * Mon Feb 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.1.12-1
 - Bump version to 1.1.12
 - Drop cgroups cpuset patch because it's included upstream now

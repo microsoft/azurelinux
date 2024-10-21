@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -215,7 +215,7 @@ BuildRequires:  php-devel
 %endif
 
 %ifarch %{golang_arches}
-BuildRequires:  golang
+BuildRequires:  golang <= 1.22.99
 %endif
 
 %ifarch x86_64
@@ -1147,6 +1147,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.52.0-10
+- Pin golang version to <= 1.22
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.52.0-9
 - Update to build dep latest glibc-static version
 
