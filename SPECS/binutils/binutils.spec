@@ -20,8 +20,8 @@
 
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.37
-Release:        8%{?dist}
+Version:        2.41
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,14 +30,8 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
-# Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
-Patch1:         linker-script-readonly-keyword-support.patch
-Patch2:         thin_archive_descriptor.patch
-Patch3:         CVE-2021-45078.patch
-Patch4:         CVE-2022-38533.patch
-Patch5:         CVE-2022-4285.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
-Patch6:         disable_gold_test.patch
+Patch1:         disable_gold_test.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -129,6 +123,7 @@ pushd build
     --enable-ld=default \
     --enable-plugins    \
     --enable-shared     \
+    --enable-64-bit-bfd \
     --with-system-zlib
 
 popd
@@ -237,6 +232,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/ranlib
 %{_bindir}/readelf
 %{_bindir}/strip
+%{_sysconfdir}/gprofng.rc
+%{_bindir}/gp-archive
+%{_bindir}/gp-collect-app
+%{_bindir}/gp-display-html
+%{_bindir}/gp-display-src
+%{_bindir}/gp-display-text
+%{_bindir}/gprofng
 %{_libdir}/ldscripts/*
 %{_libdir}/libbfd-%{version}.so
 %{_libdir}/libopcodes-%{version}.so
@@ -258,6 +260,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
+%{_mandir}/man1/gp-archive.1.gz
+%{_mandir}/man1/gp-collect-app.1.gz
+%{_mandir}/man1/gp-display-html.1.gz
+%{_mandir}/man1/gp-display-src.1.gz
+%{_mandir}/man1/gp-display-text.1.gz
+%{_mandir}/man1/gprofng.1.gz
 
 %files devel
 %{_includedir}/ansidecl.h
@@ -285,6 +293,25 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libiberty.a
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
+%{_includedir}/collectorAPI.h
+%{_includedir}/libcollector.h
+%{_includedir}/libfcollector.h
+%{_includedir}/sframe-api.h
+%{_includedir}/sframe.h
+%{_libdir}/gprofng/libgp-collector.so
+%{_libdir}/gprofng/libgp-collectorAPI.a
+%{_libdir}/gprofng/libgp-collectorAPI.so
+%{_libdir}/gprofng/libgp-heap.so
+%{_libdir}/gprofng/libgp-iotrace.so
+%{_libdir}/gprofng/libgp-sync.so
+%{_libdir}/libgprofng.a
+%{_libdir}/libgprofng.so
+%{_libdir}/libgprofng.so.0
+%{_libdir}/libgprofng.so.0.0.0
+%{_libdir}/libsframe.a
+%{_libdir}/libsframe.so
+%{_libdir}/libsframe.so.1
+%{_libdir}/libsframe.so.1.0.0
 
 %if %{build_cross}
 %files -n cross-%{name}-common -f files.cross
@@ -294,6 +321,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Tue Oct 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 2.41-1
+- Update version to 2.41
+
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
 - Add the cross-compilation subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
