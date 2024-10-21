@@ -905,8 +905,8 @@
         "type": "other",
         "other": {
           "name": "babeltrace",
-          "version": "1.5.7",
-          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace-1.5.7.tar.bz2"
+          "version": "1.5.11",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace-1.5.11.tar.bz2"
         }
       }
     },
