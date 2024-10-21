@@ -135,8 +135,7 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/csv-generator \
 	%{nil}
 
-export GO_EXTLINK_ENABLED=0
-CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
+./hack/build/build-go.sh build tools/cdi-containerimage-server
 
 
 ./hack/build/build-manifests.sh
