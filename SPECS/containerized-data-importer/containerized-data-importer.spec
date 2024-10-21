@@ -122,7 +122,7 @@ CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
-CGO_ENABLED=0 ./hack/build/build-go.sh build \
+./hack/build/build-go.sh build \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
 	cmd/cdi-controller \
@@ -135,7 +135,15 @@ CGO_ENABLED=0 ./hack/build/build-go.sh build \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
 	%{nil}
-
+ 
+env \
+CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
+CDI_GIT_COMMIT='v%{version}' \
+CDI_GIT_VERSION='v%{version}' \
+CDI_GIT_TREE_STATE="clean" \
+CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server \
+	%{nil}
+ 
 ./hack/build/build-manifests.sh
 
 %install
