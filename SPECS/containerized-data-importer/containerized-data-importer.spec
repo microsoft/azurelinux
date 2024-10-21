@@ -117,15 +117,12 @@ tar --strip-components=1 -xf %{SOURCE0}
 
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
-
-CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
-
 env \
 CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
-./hack/build/build-go.sh build \
+CGO_ENABLED=0 ./hack/build/build-go.sh build \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
 	cmd/cdi-controller \
@@ -133,6 +130,7 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
+	tools/cdi-containerimage-server \
 	tools/cdi-image-size-detection \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
