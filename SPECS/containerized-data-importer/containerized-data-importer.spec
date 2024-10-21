@@ -135,7 +135,9 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/csv-generator \
 	%{nil}
 
+set -eux
 CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
+set +eux
 
 
 ./hack/build/build-manifests.sh
