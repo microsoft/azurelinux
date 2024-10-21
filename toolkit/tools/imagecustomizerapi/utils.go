@@ -5,6 +5,7 @@ package imagecustomizerapi
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -50,4 +51,42 @@ func UnmarshalYaml[ValueType HasIsValid](yamlData []byte, value ValueType) error
 	}
 
 	return nil
+}
+
+func MarshalYamlFile[ValueType HasIsValid](yamlfilePath string, value ValueType) (err error) {
+	yamlString, err := MarshalYaml(value)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(yamlfilePath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := file.Close()
+		if closeErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%w:\nfailed to close (%s): %w", err, yamlfilePath, closeErr)
+			} else {
+				err = fmt.Errorf("failed to close (%s): %w", yamlfilePath, closeErr)
+			}
+		}
+	}()
+
+	_, err = file.WriteString(yamlString)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func MarshalYaml[ValueType HasIsValid](value ValueType) (string, error) {
+	yamlData, err := yaml.Marshal(value)
+	if err != nil {
+		return "", err
+	}
+
+	return string(yamlData), nil
 }
