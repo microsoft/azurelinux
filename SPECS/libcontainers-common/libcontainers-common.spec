@@ -54,6 +54,7 @@ Patch3:         CVE-2024-3727.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch4:         CVE-2024-37298.patch
 Patch5:         CVE-2024-6104.patch
+Patch6:         CVE-2024-9407-01.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -80,6 +81,7 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 3 -p1
 %patch 4 -p1
 %patch 5 -p1
+%patch 6 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
@@ -181,6 +183,9 @@ fi
 %license LICENSE
 
 %changelog
+* Mon Oct 14 2024 Nick Samson <nisamson@microsoft.com> - 20240213-3
+- Address CVE-2024-9407 by patching podman
+
 * Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 - Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
