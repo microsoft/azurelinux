@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           graphene
-Version:        1.10.4
-Release:        3%{?dist}
+Version:        1.10.8
+Release:        1%{?dist}
 Summary:        Thin layer of types for graphic libraries
 
 License:        MIT
 URL:            https://github.com/ebassi/graphene
-Source:         %{url}/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source:		%{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
@@ -65,6 +65,10 @@ the functionality of the installed %{name} package.
 %{_datadir}/installed-tests/
 
 %changelog
+* Thu Oct 17 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.10.8-1
+- Upgrade to 1.10.8
+- License Verified
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.4-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

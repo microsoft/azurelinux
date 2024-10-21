@@ -4780,8 +4780,8 @@
         "type": "other",
         "other": {
           "name": "graphene",
-          "version": "1.10.4",
-          "downloadUrl": "https://github.com/ebassi/graphene/releases/download/1.10.4/graphene-1.10.4.tar.xz"
+          "version": "1.10.8",
+          "downloadUrl": "https://github.com/ebassi/graphene/archive/refs/tags/1.10.8.tar.gz"
         }
       }
     },
