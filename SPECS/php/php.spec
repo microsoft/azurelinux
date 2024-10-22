@@ -32,7 +32,7 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.3.8
+Version:        8.3.12
 Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -70,7 +70,7 @@ Patch8:         php-8.1.0-libdb.patch
 # Use system nikic/php-parser
 Patch41:        php-8.3.3-parser.patch
 # use system tzdata
-Patch42:        php-8.3.0-systzdata-v24.patch
+Patch42:        php-8.3.12-systzdata-v25.patch
 # See http://bugs.php.net/53436
 Patch43:        php-7.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
@@ -1514,6 +1514,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Wed Oct 16 2024 Archana Choudhary <archana1@microsoft.com> - 8.3.12-1
+- Upgarde to 8.3.12 to fix CVE-2024-8927, CVE-2024-8925
+- Refactor patch (with fuzzing) for system tzdata
+
 * Tue Jun 11 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 8.3.8-1
 - Upgrade to 8.3.8 to fix CVE-2024-4577, CVE-2024-5458, CVE-2024-5585
 
