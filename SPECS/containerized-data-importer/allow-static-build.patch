@@ -1,12 +1,16 @@
 diff --git a/hack/build/build-go.sh b/hack/build/build-go.sh
-index 9ab28a434..d03e23ebe 100755
+index 9ab28a434..b8ab48d48 100755
 --- a/hack/build/build-go.sh
 +++ b/hack/build/build-go.sh
-@@ -61,6 +61,9 @@ elif [ "${go_opt}" == "build" ]; then
+@@ -57,10 +57,13 @@ elif [ "${go_opt}" == "build" ]; then
+         static_flag=""
+         if [ "$tgt" == "tools/cdi-containerimage-server" ]; then
+           static_flag="static"
++          echo $CGO_ENABLED
+         fi
          (
              cd $tgt
              # Only build executables for linux
-+            echo $CGO_ENABLED
 +            echo $(cdi::version::ldflags)
 +            echo $static_flag
              GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
