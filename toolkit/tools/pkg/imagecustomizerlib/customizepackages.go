@@ -82,6 +82,13 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
+	if needRpmsSources {
+		err = cleanTdnfCache(imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -223,4 +230,22 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 		return false
 	}
 	return true
+}
+
+func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
+	logger.Log.Infof("Cleaning up RPM cache")
+	// Run all cleanup tasks inside the chroot environment
+	return imageChroot.UnsafeRun(func() error {
+		tdnfArgs := []string{
+			"-v", "clean", "all",
+		}
+		err := shell.NewExecBuilder("tdnf", tdnfArgs...).
+			LogLevel(logrus.TraceLevel, logrus.DebugLevel).
+			ErrorStderrLines(1).
+			Execute()
+		if err != nil {
+			return fmt.Errorf("Failed to clean tdnf cache: %w", err)
+		}
+		return nil
+	})
 }
