@@ -75,7 +75,7 @@ jobs:
             fi
           done
 
-          if [[ merge_conflict_found =~ [Tt]rue ]]; then
+          if [[ $merge_conflict_found =~ [Tt]rue ]]; then
             echo "Merge conflict found in one or more files"
             exit 1
           fi
