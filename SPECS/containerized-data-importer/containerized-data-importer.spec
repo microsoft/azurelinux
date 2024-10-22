@@ -136,6 +136,8 @@ CDI_GIT_TREE_STATE="clean" \
 	%{nil}
 
 set -eux
+which go
+go version
 CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
 set +eux
 
