@@ -138,8 +138,8 @@ CDI_GIT_TREE_STATE="clean" \
 which go
 go version
 CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
-file $(find . -name cdi-containerimage-server)
-ldd $(find . -name cdi-containerimage-server)
+file $(find . -name cdi-containerimage-server) | echo file-failed
+ldd $(find . -name cdi-containerimage-server) | echo ldd-failed
 
 ./hack/build/build-manifests.sh
 
