@@ -390,9 +390,11 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 		}
 	}
 
-	err = customizeUkiImageHelper(ic.buildDirAbs, ic.rawImageFile)
-	if err != nil {
-		return err
+	if ic.config.OS.Uki {
+		err = customizeUkiImageHelper(ic.buildDirAbs, ic.rawImageFile)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Check file systems for corruption.
