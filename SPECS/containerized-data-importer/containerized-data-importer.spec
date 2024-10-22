@@ -135,7 +135,9 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
 	%{nil}
- 
+
+echo $CGO_ENABLED
+echo $(cdi::version::ldflags)
 env \
 CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
@@ -143,6 +145,7 @@ CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
 CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server \
 	%{nil}
+echo $static_flag
  
 ./hack/build/build-manifests.sh
 
