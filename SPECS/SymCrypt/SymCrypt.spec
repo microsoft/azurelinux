@@ -10,8 +10,8 @@ URL:            https://github.com/microsoft/SymCrypt
 Source0:        https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz#/jitterentropy-library-3.3.1.tar.gz
 Source2:        find-debuginfo
-# Use ./generate-env-file.sh <git-version-tag> to generate this. For example:
-#   ./generate-env-file.sh v103.5.1
+# Use ./generate-env-file.sh --release-tag <git-version-tag> to generate this. For example:
+#   ./generate-env-file.sh --release-tag v103.5.1
 Source3:        symcrypt-build-environment-variables-v%{version}.sh
 Patch1:         0001-add-build-flags-to-prevent-stripping-and-post-proces.patch
 Patch2:         0001-add-parameter-to-process_fips_module-to-specify-the-.patch
