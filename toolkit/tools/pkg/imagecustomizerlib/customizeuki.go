@@ -39,6 +39,14 @@ func prepareUki(uki bool, imageChroot *safechroot.Chroot) error {
 		return fmt.Errorf("failed to create EFI directory:\n%w", err)
 	}
 
+	// Carry over the os-subrelease file.
+	err = imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLiveWithErr(1, "sudo", "cp", "/etc/os-release", "/boot/os-release")
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create Ukify config:\n%w", err)
+	}
+
 	// Create the Ukify config.
 	err = imageChroot.UnsafeRun(func() error {
 		return shell.ExecuteLiveWithErr(1, "sudo", "touch", "/boot/ukify.conf")

@@ -808,6 +808,11 @@ func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
 	// Append the linux line as Cmdline to the ukify.conf file content
 	updatedUkifyConfigContent += fmt.Sprintf("Cmdline=%s\n", linuxLine)
 
+	// os-subrelease
+	osSubreleaseFullPath := filepath.Join(bootPartitionTmpDir, "os-release")
+
+	updatedUkifyConfigContent += fmt.Sprintf("OSRelease=@%s\n", osSubreleaseFullPath)
+
 	// Write the updated content back to the ukify.conf file
 	err = os.WriteFile(ukifyConfigFullPath, []byte(updatedUkifyConfigContent), 0644)
 	if err != nil {
