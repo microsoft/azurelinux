@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -115,26 +115,30 @@ tar --strip-components=1 -xf %{SOURCE0}
 %build
 
 export GOPATH=%{_builddir}/go
-export GOFLAGS+="-buildmode=pie -mod=vendor"
-env \
-CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
-CDI_GIT_COMMIT='v%{version}' \
-CDI_GIT_VERSION='v%{version}' \
-CDI_GIT_TREE_STATE="clean" \
-./hack/build/build-go.sh build \
-	cmd/cdi-apiserver \
-	cmd/cdi-cloner \
-	cmd/cdi-controller \
-	cmd/cdi-importer \
-	cmd/cdi-uploadproxy \
-	cmd/cdi-uploadserver \
-	cmd/cdi-operator \
-	tools/cdi-containerimage-server \
-	tools/cdi-image-size-detection \
-	tools/cdi-source-update-poller \
-	tools/csv-generator \
-	%{nil}
+export GOFLAGS="-mod=vendor"
+export CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)"
+export CDI_GIT_COMMIT='v%{version}'
+export CDI_GIT_VERSION='v%{version}'
+export CDI_GIT_TREE_STATE="clean"
 
+GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
+    cmd/cdi-apiserver \
+    cmd/cdi-cloner \
+    cmd/cdi-controller \
+    cmd/cdi-importer \
+    cmd/cdi-uploadproxy \
+    cmd/cdi-uploadserver \
+    cmd/cdi-operator \
+    tools/cdi-image-size-detection \
+    tools/cdi-source-update-poller \
+    tools/csv-generator \
+    %{nil}
+
+# Disable cgo to build static binaries, so they can run on scratch images
+CGO_ENABLED=0 ./hack/build/build-go.sh build \
+    tools/cdi-containerimage-server \
+    %{nil}
+ 
 ./hack/build/build-manifests.sh
 
 %install
@@ -217,6 +221,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Fri Sep 06 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-5
+- Statically building binaries
+
 * Fri Jul 19 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-4
 - Building cdi tool binaries within package build
 
