@@ -844,6 +844,26 @@ func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
 		return fmt.Errorf("failed to build UKI:\n%w", err)
 	}
 
+	// Read the existing ukify.conf file content
+	ukifyConfigContent, err = os.ReadFile(ukifyConfigFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to read file (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
+	// Replace the existing Linux and Initrd values with the full paths
+	updatedUkifyConfigContent = strings.Replace(string(ukifyConfigContent),
+		fmt.Sprintf("Linux=%s", linuxValueFullPath), fmt.Sprintf("Linux=/boot%s", linuxValue), 1)
+	updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent,
+		fmt.Sprintf("Initrd=%s", initrdValueFullPath), fmt.Sprintf("Initrd=/boot%s", initrdValue), 1)
+	updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent,
+		fmt.Sprintf("OSRelease=@%s\n", osSubreleaseFullPath), "OSRelease=@/etc/os-release\n", 1)
+
+	// Write the updated content back to the ukify.conf file
+	err = os.WriteFile(ukifyConfigFullPath, []byte(updatedUkifyConfigContent), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write to ukify.conf (%s):\n%w", ukifyConfigFullPath, err)
+	}
+
 	err = systemBootPartitionMount.CleanClose()
 	if err != nil {
 		return err
