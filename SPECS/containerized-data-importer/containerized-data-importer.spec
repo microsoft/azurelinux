@@ -131,6 +131,7 @@ GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
     cmd/cdi-operator \
     tools/cdi-image-size-detection \
     tools/cdi-source-update-poller \
+    tools/csv-generator \
     %{nil}
 
 # Disable cgo to build static binaries, so they can run on scratch images
