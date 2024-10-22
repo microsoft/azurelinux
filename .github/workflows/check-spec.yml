@@ -58,17 +58,17 @@ jobs:
           for file in changed_files ; do
             if [ -f $file ]; then
               echo "Checking for merge conflicts in $file"
-              if grep -H -r "<<<<<<< HEAD" $file; then
+              if grep -H -r "^<<<<<<< HEAD" $file; then
                 echo "Merge conflict found in $file"
                 merge_conflict_found=true
               fi
 
-              if grep -H -r ">>>>>>>" $file; then
+              if grep -H -r "^>>>>>>>" $file; then
                 echo "Merge conflict found in $file"
                 merge_conflict_found=true
               fi
 
-              if grep -H -r "=======" $file; then
+              if grep -H -r "^=======" $file; then
                 echo "Merge conflict found in $file"
                 merge_conflict_found=true
               fi
