@@ -1,6 +1,3 @@
-# This MIC config is only for demonstrating UKI PoC demo purpose, it should NOT
-# be merged.
-
 storage:
   bootType: efi
   disks:
@@ -52,7 +49,7 @@ storage:
 os:
   resetBootLoaderType: hard-reset
   selinux:
-    mode: disabled
+    mode: enforcing
 
   kernelCommandLine:
     extraCommandLine: "console=tty0 console=ttyS0 rd.debug"
@@ -67,6 +64,8 @@ os:
     - vim
     - lvm2
     - veritysetup
+    - selinux-policy
+    - selinux-policy-modules
 
   users:
   - name: test
