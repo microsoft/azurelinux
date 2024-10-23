@@ -21,7 +21,6 @@ BuildArch:      noarch
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-wheel
-BuildRequires:  python3-tomli
 
 %description -n python3-pip %{_description}
 
