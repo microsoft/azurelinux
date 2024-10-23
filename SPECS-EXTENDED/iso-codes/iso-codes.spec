@@ -57,6 +57,9 @@ sed -i 's/ & / and /g' data/iso_3166-2.json
 
 
 %changelog
+* Wed oct 23 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.17.0-1
+- Update to version 4.17.0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
