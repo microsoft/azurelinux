@@ -1,0 +1,45 @@
+From 0226a7b4048ad103ceb55b6273615bc631ad3e6e Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Fri, 30 Aug 2024 18:17:00 -0700
+Subject: [PATCH] Add a download daemon to the livenet module.
+
+---
+ modules.d/90livenet/module-setup.sh  | 2 ++
+ modules.d/90livenet/parse-livenet.sh | 8 ++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/modules.d/90livenet/module-setup.sh b/modules.d/90livenet/module-setup.sh
+index db0def50..74bacd6c 100755
+--- a/modules.d/90livenet/module-setup.sh
++++ b/modules.d/90livenet/module-setup.sh
+@@ -17,6 +17,8 @@ install() {
+     inst_hook cmdline 29 "$moddir/parse-livenet.sh"
+     inst_hook initqueue/online 95 "$moddir/fetch-liveupdate.sh"
+     inst_script "$moddir/livenetroot.sh" "/sbin/livenetroot"
++    inst_simple "$moddir/liveos-artifacts-download.service" "/etc/systemd/system/liveos-artifacts-download.service"
++    inst_script "$moddir/liveos-artifacts-download.sh" "/sbin/liveos-artifacts-download"
+     if dracut_module_included "systemd-initrd"; then
+         inst_script "$moddir/livenet-generator.sh" "$systemdutildir"/system-generators/dracut-livenet-generator
+     fi
+diff --git a/modules.d/90livenet/parse-livenet.sh b/modules.d/90livenet/parse-livenet.sh
+index a1d14a8f..996f5210 100755
+--- a/modules.d/90livenet/parse-livenet.sh
++++ b/modules.d/90livenet/parse-livenet.sh
+@@ -27,6 +27,14 @@ if get_url_handler "$liveurl" > /dev/null; then
+     root="livenet" # quiet complaints from init
+     # shellcheck disable=SC2034
+     rootok=1
++
++    enableAzureLinuxDownloader=$(getarg rd.live.azldownloader=)
++
++    if [[ "$enableAzureLinuxDownloader" == "enable" ]]; then
++        systemctl enable liveos-artifacts-download
++        systemctl start liveos-artifacts-download &
++    fi
++
+     wait_for_dev -n /dev/root
+ else
+     info "livenet: no url handler for $liveurl"
+-- 
+2.34.1
+
