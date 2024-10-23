@@ -505,8 +505,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.5",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.5.tar.gz"
+          "version": "1.7.4",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.4.tar.gz"
         }
       }
     },
@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.7.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
         }
       }
     },
@@ -7511,8 +7511,8 @@
         "type": "other",
         "other": {
           "name": "iso-codes",
-          "version": "4.4",
-          "downloadUrl": "https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/iso-codes-4.4/iso-codes-iso-codes-4.4.tar.gz"
+          "version": "4.17.0",
+          "downloadUrl": "https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/v4.17.0/iso-codes-v4.17.0.tar.gz"
         }
       }
     },
@@ -8031,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -8041,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
+          "version": "3.2.0.azl2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
         }
       }
     },
@@ -20813,8 +20813,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.12",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.12.tar.xz"
+          "version": "8.3.8",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.8.tar.xz"
         }
       }
     },
