@@ -3418,8 +3418,8 @@
         "type": "other",
         "other": {
           "name": "exiv2",
-          "version": "0.28.0",
-          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.0.tar.gz"
+          "version": "0.28.3",
+          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.3.tar.gz"
         }
       }
     },
