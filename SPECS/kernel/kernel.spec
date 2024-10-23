@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.167.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Oct 22 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.167.1-2
+- Enable CONFIG_X86_AMD_PLATFORM_DEVICE built-in
+
 * Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.167.1-1
 - Auto-upgrade to 5.15.167.1
 
