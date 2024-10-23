@@ -6,11 +6,11 @@ package imagecustomizerapi
 import "fmt"
 
 type Config struct {
-	Storage                  *Storage                 `yaml:"storage"`
-	Iso                      *Iso                     `yaml:"iso"`
-	Pxe                      *Pxe                     `yaml:"pxe"`
-	OS                       *OS                      `yaml:"os"`
-	Scripts                  *Scripts                 `yaml:"scripts"`
+	Storage Storage `yaml:"storage"`
+	Iso     *Iso    `yaml:"iso"`
+	Pxe     *Pxe    `yaml:"pxe"`
+	OS      *OS     `yaml:"os"`
+	Scripts Scripts `yaml:"scripts"`
 }
 
 func (c *Config) IsValid() (err error) {

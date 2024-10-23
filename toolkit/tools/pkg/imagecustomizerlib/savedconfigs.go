@@ -40,14 +40,28 @@ func (i *IsoSavedConfigs) IsValid() error {
 	return nil
 }
 
+type PxeSavedConfigs struct {
+	IsoImageUrl string `yaml:"isoImageUrl"`
+}
+
+func (i *PxeSavedConfigs) IsValid() error {
+	return nil
+}
+
 type SavedConfigs struct {
 	Iso IsoSavedConfigs `yaml:"iso"`
+	Pxe PxeSavedConfigs `yaml:"pxe"`
 }
 
 func (c *SavedConfigs) IsValid() (err error) {
 	err = c.Iso.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid 'iso' field:\n%w", err)
+	}
+
+	err = c.Pxe.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid 'pxe' field:\n%w", err)
 	}
 
 	return nil
