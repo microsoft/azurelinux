@@ -69,69 +69,6 @@ hostonly="no"
 	expansionSafetyFactor = 1.5
 )
 
-type SavedConfigs struct {
-	Iso imagecustomizerapi.Iso `yaml:"iso"`
-	Pxe imagecustomizerapi.Pxe `yaml:"pxe"`
-}
-
-func (c *SavedConfigs) IsValid() (err error) {
-	err = c.Iso.IsValid()
-	if err != nil {
-		return fmt.Errorf("invalid 'iso' field:\n%w", err)
-	}
-
-	err = c.Pxe.IsValid()
-	if err != nil {
-		return fmt.Errorf("invalid 'pxe' field:\n%w", err)
-	}
-
-	return nil
-}
-
-func (c *SavedConfigs) IsEmpty() bool {
-	isoConfigEmpty := c.Iso.KernelCommandLine.ExtraCommandLine == ""
-	pxeConfigEmpty := c.Pxe.IsoImageUrl == ""
-	return isoConfigEmpty && pxeConfigEmpty
-}
-
-func (c *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err error) {
-	if c.IsEmpty() {
-		return nil
-	}
-
-	err = os.MkdirAll(filepath.Dir(savedConfigsFilePath), os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to create directory for (%s):\n%w", savedConfigsFilePath, err)
-	}
-
-	err = imagecustomizerapi.MarshalYamlFile(savedConfigsFilePath, c)
-	if err != nil {
-		return fmt.Errorf("failed to save configs to (%s):\n%w", savedConfigsFilePath, err)
-	}
-
-	return nil
-}
-
-func loadSavedConfigs(savedConfigsFilePath string) (exists bool, savedConfigs *SavedConfigs, err error) {
-
-	exists, err = file.PathExists(savedConfigsFilePath)
-	if err != nil {
-		return false, nil, fmt.Errorf("failed to check if (%s) exists:\n%w", savedConfigsFilePath, err)
-	}
-
-	if !exists {
-		return false, nil, nil
-	}
-
-	savedConfigs = &SavedConfigs{}
-	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
-	if err != nil {
-		return true, nil, fmt.Errorf("failed to saved arguments  file (%s):\n%w", savedConfigsFilePath, err)
-	}
-
-	return true, savedConfigs, nil
-}
-
 type IsoWorkingDirs struct {
 	// 'isoBuildDir' is where intermediate files will be placed during the
 	// build.
@@ -316,12 +253,12 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 	mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = newKernelArgs
 	mergedConfigs.Pxe.IsoImageUrl = newPxeIsoImageUrl
 
-	exists, savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
+	savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load saved configurations (%s):\n%w", savedConfigsFilePath, err)
 	}
 
-	if exists {
+	if savedConfigs != nil && !savedConfigs.IsEmpty() {
 		// do we have kernel arguments from a previous run?
 		if savedConfigs.Iso.KernelCommandLine.ExtraCommandLine != "" {
 			// If yes, add them before the new kernel arguments.
