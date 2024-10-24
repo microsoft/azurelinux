@@ -3,8 +3,8 @@
 
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        102
-Release:        4%{?dist}
+Version:        105
+Release:        1%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -24,16 +24,12 @@ Source8:        00-virtio.conf
 Source9:        00-vrf.conf
 Source10:       00-xen.conf
 Source11:       50-noxattr.conf
-
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
-Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
-Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
-Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -165,6 +161,24 @@ rm -fr -- %{buildroot}%{dracutlibdir}/modules.d/96securityfs \
           %{buildroot}%{dracutlibdir}/modules.d/97masterkey \
           %{buildroot}%{dracutlibdir}/modules.d/98integrity
 
+# remove unpackaged test files (to avoid "installed but not packaged" errors)
+rm -fr -- %{buildroot}%{dracutlibdir}/test
+
+# remove unpackaged config files (to avoid "installed but not packaged" errors)
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/fedora.conf.example
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/fips/50-fips.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/generic/50-generic.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/hostonly/50-hostonly.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/ima/50-ima.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/no-network/50-no-network.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/no-xattr/50-no-xattr.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/rescue/50-rescue.conf
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/suse.conf.example
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/test
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/test-makeroot
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/test-root
+rm -f -- %{buildroot}%{dracutlibdir}/dracut.conf.d/uki-virt/50-uki-virt.conf
+
 mkdir -p %{buildroot}/boot/%{name} \
          %{buildroot}%{_sharedstatedir}/%{name}/overlay \
          %{buildroot}%{_var}/log \
@@ -172,7 +186,7 @@ mkdir -p %{buildroot}/boot/%{name} \
          %{buildroot}%{_sharedstatedir}/initramfs \
          %{buildroot}%{_sbindir}
 
-install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
+install -m 0644 dracut.conf.d/fips/50-fips.conf %{buildroot}%{_sysconfdir}/dracut.conf.d/50-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
@@ -244,7 +258,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %files fips
 %defattr(-,root,root,0755)
 %{dracutlibdir}/modules.d/01fips
-%{_sysconfdir}/dracut.conf.d/40-fips.conf
+%{_sysconfdir}/dracut.conf.d/50-fips.conf
 %config(missingok) %{_sysconfdir}/system-fips
 
 %files hostonly
@@ -288,6 +302,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Thu Oct 24 2024 George Mileka <gmileka@microsoft.com> - 105-1
+- Upgrade to Dracut 105 to pick-up livenet support for systemd-networkd.
+
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
 - Drop 0002-disable-xattr.patch
 - Introduce dracut-noxattr subpackage to expose this behavior as an option
