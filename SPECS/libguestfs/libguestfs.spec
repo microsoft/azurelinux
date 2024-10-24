@@ -215,7 +215,7 @@ BuildRequires:  php-devel
 %endif
 
 %ifarch %{golang_arches}
-BuildRequires:  golang <= 1.22.99
+BuildRequires:  golang < 1.23
 %endif
 
 %ifarch x86_64

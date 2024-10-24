@@ -9,7 +9,7 @@ Group:          Tools/Container
 URL:            https://github.com/inspektor-gadget/inspektor-gadget
 Source0:        https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-BuildRequires:  golang <= 1.22.99
+BuildRequires:  golang < 1.23
 
 
 %description

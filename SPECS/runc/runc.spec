@@ -12,7 +12,7 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang <= 1.22.99
+BuildRequires:  golang < 1.23
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc

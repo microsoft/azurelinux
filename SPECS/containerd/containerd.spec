@@ -22,7 +22,7 @@ Patch3:  CVE-2023-47108.patch
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang <= 1.22.99
+BuildRequires: golang < 1.23
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros

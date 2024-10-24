@@ -28,7 +28,7 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
-BuildRequires:  golang <= 1.22.99
+BuildRequires:  golang < 1.23
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}

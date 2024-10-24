@@ -27,7 +27,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2017-14623.patch 
-BuildRequires: golang <= 1.22.99
+BuildRequires: golang < 1.23
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
