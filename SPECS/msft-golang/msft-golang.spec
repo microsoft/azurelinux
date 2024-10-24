@@ -47,7 +47,7 @@ mv -v go go-bootstrap-01
 tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
 
-%setup -q -n go
+%setup -q -n go-%{version}-%{ms_go_revision}
 
 %build
 # go 1.4 bootstraps with C.
