@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.8-20240905.3.src.tar.gz
+%global ms_go_filename  go1.22.8-20241001.6.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -47,7 +47,7 @@ mv -v go go-bootstrap-01
 tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
 
-%setup -q -n go-%{version}-%{ms_go_revision}
+%setup -q -n go
 
 %build
 # go 1.4 bootstraps with C.

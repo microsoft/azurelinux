@@ -13674,7 +13674,7 @@
         "other": {
           "name": "msft-golang",
           "version": "1.22.8",
-          "downloadUrl": "https://github.com/microsoft/go/archive/refs/tags/v1.22.8-1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.8-1/go1.22.8-20241001.6.src.tar.gz"
         }
       }
     },
