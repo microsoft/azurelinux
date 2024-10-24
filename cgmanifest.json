@@ -8601,8 +8601,8 @@
         "type": "other",
         "other": {
           "name": "libarchive",
-          "version": "3.7.7",
-          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.7/libarchive-3.7.7.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz"
         }
       }
     },
@@ -13502,8 +13502,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.36",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
+          "version": "8.0.40",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
         }
       }
     },
@@ -28216,8 +28216,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.4.2",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.2.tar.gz"
+          "version": "103.5.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.5.1.tar.gz"
         }
       }
     },
