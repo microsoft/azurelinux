@@ -23563,8 +23563,8 @@
         "type": "other",
         "other": {
           "name": "python-pip",
-          "version": "24.0",
-          "downloadUrl": "https://github.com/pypa/pip/archive/24.0/pip-24.0.tar.gz"
+          "version": "24.2",
+          "downloadUrl": "https://github.com/pypa/pip/archive/24.2/pip-24.2.tar.gz"
         }
       }
     },
