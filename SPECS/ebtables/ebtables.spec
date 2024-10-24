@@ -2,7 +2,7 @@
 
 Name:          ebtables
 Version:		   2.0.11
-Release:		   9%{?dist}
+Release:		   8%{?dist}
 Summary:		   Ethernet Bridge frame table administration tool
 License:		   GPLv2+
 URL:           http://ebtables.sourceforge.net/
@@ -35,9 +35,6 @@ like iptables. There are no known incompatibility issues.
 
 %package legacy
 Summary: Legacy user space tool to configure bridge netfilter rules in kernel
-Requires(post):   %{_sbindir}/update-alternatives
-Requires(post):   %{_bindir}/readlink
-Requires(postun): %{_sbindir}/update-alternatives
 Provides: ebtables
 
 %description legacy
@@ -93,22 +90,10 @@ rm %{buildroot}/%{_libdir}/libebtc.la
 # Drop these binaries (for now at least)
 rm %{buildroot}/%{_sbindir}/ebtables{d,u}
 
-# Prepare for Alternatives system
-touch %{buildroot}%{_sbindir}/ebtables
-touch %{buildroot}%{_sbindir}/ebtables-save
-touch %{buildroot}%{_sbindir}/ebtables-restore
-
-%post legacy
-pfx=%{_sbindir}/ebtables
-%{_sbindir}/update-alternatives --install %{_sbindir}/%{name} %{name} %{_sbindir}/%{name}-legacy 10000 \
-  --slave %{_sbindir}/%{name}-save %{name}-save %{_sbindir}/%{name}-legacy-save \
-  --slave %{_sbindir}/%{name}-restore %{name}-restore %{_sbindir}/%{name}-legacy-restore
-
-%postun legacy
-if [ $1 -eq 0 ]; then
-	%{_sbindir}/update-alternatives --remove \
-		%{name} %{_sbindir}/%{name}-legacy
-fi
+# Symlink ebtables-legacy to ebtables
+ln -sf ebtables-legacy %{buildroot}%{_sbindir}/ebtables
+ln -sf ebtables-legacy-save %{buildroot}%{_sbindir}/ebtables-save
+ln -sf ebtables-legacy-restore %{buildroot}%{_sbindir}/ebtables-restore
 
 %post services
 %systemd_post ebtables.service
@@ -123,10 +108,10 @@ fi
 %license COPYING
 %doc ChangeLog THANKS
 %{_sbindir}/ebtables-legacy*
+%{_sbindir}/ebtables*
 %{_mandir}/*/ebtables-legacy*
 %{_libdir}/libebtc.so*
 %{_sysconfdir}/ethertypes
-%ghost %{_sbindir}/ebtables{,-save,-restore}
 
 %files services
 %{_unitdir}/ebtables.service
@@ -135,9 +120,6 @@ fi
 %ghost %{_sysconfdir}/sysconfig/ebtables
 
 %changelog
-* Mon Oct 21 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.11-9
-- introduce alternatives for legacy
-
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.11-8
 - Add missing Vendor and Distribution tags.
 
