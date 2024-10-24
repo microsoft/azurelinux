@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.22.7
+Version:        1.22.8
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -153,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Oct 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.8-1
+- Auto-upgrade to 1.22.8 - To fix CVE-2022-41717
+
 * Mon Sep 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.22.7-1
 - Bump version to 1.22.7 to address CVE-2024-34158, CVE-2024-34156, CVE-2024-34155
 
