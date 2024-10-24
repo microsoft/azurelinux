@@ -24,6 +24,7 @@ type OS struct {
 	Modules             []Module            `yaml:"modules"`
 	Verity              *Verity             `yaml:"verity"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
+	Uki                 bool                `yaml:"uki"`
 }
 
 func (s *OS) IsValid() error {
