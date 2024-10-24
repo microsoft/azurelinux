@@ -2638,8 +2638,8 @@
         "type": "other",
         "other": {
           "name": "discount",
-          "version": "2.2.4",
-          "downloadUrl": "http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.4.tar.bz2"
+          "version": "2.2.7",
+          "downloadUrl": "https://github.com/Orc/discount/archive/v2.2.7.tar.gz"
         }
       }
     },
