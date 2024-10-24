@@ -2,7 +2,7 @@
 Summary:        A utility library for mocking out the requests Python library.
 Name:           python-%{srcname}
 Version:        0.23.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-urllib3
+BuildRequires:  python3-packaging >= 24.1
 %endif
 BuildArch:      noarch
 
@@ -54,6 +55,9 @@ tox -e py%{python3_version_nodots} --sitepackages
 %{python3_sitelib}/%{srcname}
 
 %changelog
+* Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 0.20.0-2
+- bump package to use latest python3-packaging in ptest
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.23.3-1
 - Auto-upgrade to 0.23.3 - Azure Linux 3.0 - package upgrades
 
