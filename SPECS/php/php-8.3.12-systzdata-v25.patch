@@ -36,11 +36,10 @@ r2: add filesystem trawl to set up name alias index
 r1: initial revision
 
 
-diff --git a/ext/date/config0.m4 b/ext/date/config0.m4
-index 6b803bf33e..53c3cdb3f4 100644
---- a/ext/date/config0.m4
-+++ b/ext/date/config0.m4
-@@ -4,6 +4,19 @@ AC_CHECK_HEADERS([io.h])
+diff --color -ruN b/ext/date/config0.m4 a/ext/date/config0.m4
+--- b/ext/date/config0.m4	2024-09-24 18:08:04.000000000 +0000
++++ a/ext/date/config0.m4	2024-10-16 12:11:31.140181713 +0000
+@@ -4,6 +4,19 @@
  dnl Check for strtoll, atoll
  AC_CHECK_FUNCS(strtoll atoll)
  
@@ -57,13 +56,57 @@ index 6b803bf33e..53c3cdb3f4 100644
 +   fi
 +fi
 +
- PHP_DATE_CFLAGS="-Wno-implicit-fallthrough -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
- timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
-                  lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
-diff --git a/ext/date/lib/parse_tz.c b/ext/date/lib/parse_tz.c
-index c7f93580d7..ec196a98b6 100644
---- a/ext/date/lib/parse_tz.c
-+++ b/ext/date/lib/parse_tz.c
+ AX_CHECK_COMPILE_FLAG([-Wno-implicit-fallthrough],
+   [PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -Wno-implicit-fallthrough"],,
+   [-Werror])
+diff --color -ruN b/ext/date/config0.m4.orig a/ext/date/config0.m4.orig
+--- b/ext/date/config0.m4.orig	1970-01-01 00:00:00.000000000 +0000
++++ a/ext/date/config0.m4.orig	2024-09-24 18:08:04.000000000 +0000
+@@ -0,0 +1,41 @@
++dnl Check for headers needed by timelib
++AC_CHECK_HEADERS([io.h])
++
++dnl Check for strtoll, atoll
++AC_CHECK_FUNCS(strtoll atoll)
++
++AX_CHECK_COMPILE_FLAG([-Wno-implicit-fallthrough],
++  [PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -Wno-implicit-fallthrough"],,
++  [-Werror])
++
++PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
++timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
++                 lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
++
++PHP_NEW_EXTENSION(date, php_date.c $timelib_sources, no,, $PHP_DATE_CFLAGS)
++
++PHP_ADD_BUILD_DIR([$ext_builddir/lib], 1)
++PHP_ADD_INCLUDE([$ext_builddir/lib])
++PHP_ADD_INCLUDE([$ext_srcdir/lib])
++
++PHP_INSTALL_HEADERS([ext/date], [php_date.h lib/timelib.h lib/timelib_config.h])
++AC_DEFINE([HAVE_TIMELIB_CONFIG_H], [1], [Have timelib_config.h])
++
++cat > $ext_builddir/lib/timelib_config.h <<EOF
++#ifdef PHP_WIN32
++# include "config.w32.h"
++#else
++# include <php_config.h>
++#endif
++#include <inttypes.h>
++#include <stdint.h>
++
++#include "zend.h"
++
++#define timelib_malloc  emalloc
++#define timelib_realloc erealloc
++#define timelib_calloc  ecalloc
++#define timelib_strdup  estrdup
++#define timelib_strndup estrndup
++#define timelib_free    efree
++EOF
+diff --color -ruN b/ext/date/lib/parse_tz.c a/ext/date/lib/parse_tz.c
+--- b/ext/date/lib/parse_tz.c	2024-09-24 18:08:04.000000000 +0000
++++ a/ext/date/lib/parse_tz.c	2024-10-16 12:11:31.140181713 +0000
 @@ -26,9 +26,33 @@
  #include "timelib.h"
  #include "timelib_private.h"
@@ -98,7 +141,7 @@ index c7f93580d7..ec196a98b6 100644
  
  #if (defined(__APPLE__) || defined(__APPLE_CC__)) && (defined(__BIG_ENDIAN__) || defined(__LITTLE_ENDIAN__))
  # if defined(__LITTLE_ENDIAN__)
-@@ -95,6 +119,11 @@ static int read_php_preamble(const unsigned char **tzf, timelib_tzinfo *tz)
+@@ -95,6 +119,11 @@
  {
  	uint32_t version;
  
@@ -110,7 +153,7 @@ index c7f93580d7..ec196a98b6 100644
  	/* read ID */
  	version = (*tzf)[3] - '0';
  	*tzf += 4;
-@@ -577,7 +606,475 @@ void timelib_dump_tzinfo(timelib_tzinfo *tz)
+@@ -577,7 +606,475 @@
  	}
  }
  
@@ -587,7 +630,7 @@ index c7f93580d7..ec196a98b6 100644
  {
  	int left = 0, right = tzdb->index_size - 1;
  
-@@ -603,9 +1100,49 @@ static int seek_to_tz_position(const unsigned char **tzf, const char *timezone,
+@@ -603,9 +1100,49 @@
  	return 0;
  }
  
@@ -637,7 +680,7 @@ index c7f93580d7..ec196a98b6 100644
  }
  
  const timelib_tzdb_index_entry *timelib_timezone_identifiers_list(const timelib_tzdb *tzdb, int *count)
-@@ -617,7 +1154,32 @@ const timelib_tzdb_index_entry *timelib_timezone_identifiers_list(const timelib_
+@@ -617,7 +1154,32 @@
  int timelib_timezone_id_is_valid(const char *timezone, const timelib_tzdb *tzdb)
  {
  	const unsigned char *tzf;
@@ -671,7 +714,7 @@ index c7f93580d7..ec196a98b6 100644
  }
  
  static int skip_64bit_preamble(const unsigned char **tzf, timelib_tzinfo *tz)
-@@ -662,6 +1224,8 @@ static timelib_tzinfo* timelib_tzinfo_ctor(const char *name)
+@@ -662,6 +1224,8 @@
  timelib_tzinfo *timelib_parse_tzfile(const char *timezone, const timelib_tzdb *tzdb, int *error_code)
  {
  	const unsigned char *tzf;
@@ -680,7 +723,7 @@ index c7f93580d7..ec196a98b6 100644
  	timelib_tzinfo *tmp;
  	int version;
  	int transitions_result, types_result;
-@@ -669,7 +1233,7 @@ timelib_tzinfo *timelib_parse_tzfile(const char *timezone, const timelib_tzdb *t
+@@ -669,7 +1233,7 @@
  
  	*error_code = TIMELIB_ERROR_NO_ERROR;
  
@@ -689,7 +732,7 @@ index c7f93580d7..ec196a98b6 100644
  		tmp = timelib_tzinfo_ctor(timezone);
  
  		version = read_preamble(&tzf, tmp, &type);
-@@ -712,11 +1276,38 @@ timelib_tzinfo *timelib_parse_tzfile(const char *timezone, const timelib_tzdb *t
+@@ -712,11 +1276,38 @@
  			return NULL;
  		}
  
@@ -728,11 +771,10 @@ index c7f93580d7..ec196a98b6 100644
  	} else {
  		*error_code = TIMELIB_ERROR_NO_SUCH_TIMEZONE;
  		tmp = NULL;
-diff --git a/ext/date/php_date.c b/ext/date/php_date.c
-index 48c82bf7ec..443299c089 100644
---- a/ext/date/php_date.c
-+++ b/ext/date/php_date.c
-@@ -490,7 +490,11 @@ PHP_MINFO_FUNCTION(date)
+diff --color -ruN b/ext/date/php_date.c a/ext/date/php_date.c
+--- b/ext/date/php_date.c	2024-09-24 18:08:04.000000000 +0000
++++ a/ext/date/php_date.c	2024-10-16 12:11:31.144181704 +0000
+@@ -490,7 +490,11 @@
  	php_info_print_table_row(2, "date/time support", "enabled");
  	php_info_print_table_row(2, "timelib version", TIMELIB_ASCII_VERSION);
  	php_info_print_table_row(2, "\"Olson\" Timezone Database Version", tzdb->version);
@@ -743,4 +785,3 @@ index 48c82bf7ec..443299c089 100644
 +#endif
  	php_info_print_table_row(2, "Default timezone", guess_timezone(tzdb));
  	php_info_print_table_end();
- 
