@@ -62,7 +62,7 @@ by default.
 %udev_rules_update
 
 %changelog
-* Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.111-2
+* Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.115-1
 - Update to version 0.115
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.111-2
