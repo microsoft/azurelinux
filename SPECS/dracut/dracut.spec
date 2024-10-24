@@ -30,7 +30,6 @@ Source11:       50-noxattr.conf
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
-Patch:          add-livenet-download-service.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
