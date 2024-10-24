@@ -874,9 +874,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "azure-nvme-utils",
-          "version": "0.1.1",
-          "downloadUrl": "https://github.com/Azure/azure-nvme-utils/archive/refs/tags/v0.1.1.tar.gz"
+          "name": "azure-storage-cpp",
+          "version": "7.5.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
         }
       }
     },
@@ -884,9 +884,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "azure-storage-cpp",
-          "version": "7.5.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
+          "name": "azure-vm-utils",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/Azure/azure-vm-utils/archive/refs/tags/v0.4.0.tar.gz"
         }
       }
     },
