@@ -1,10 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global commit	fa9dce43d1a667d6e6e26895fbed01b3b04362c9
+%global commit	2ba60536eb20ca0a6a751bd8b6501dba84ec45d3
 
 Name:		driverctl
-Version:	0.111
-Release:	2%{?dist}
+Version:	0.115
+Release:	1%{?dist}
 Summary:	Device driver control utility
 
 License:	LGPLv2
@@ -62,6 +62,9 @@ by default.
 %udev_rules_update
 
 %changelog
+* Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.111-2
+- Update to version 0.115
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.111-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
