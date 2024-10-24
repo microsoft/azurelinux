@@ -2,13 +2,17 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.71.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-29499.patch
+Patch1:         CVE-2023-32665.nopatch
+Patch2:         CVE-2023-32611.nopatch
+Patch3:         CVE-2023-32643.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -122,6 +126,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Thu Sep 19 2024 Archana Choudhary <archana1@microsoft.com> - 2.71.0-3
+- Add patch for CVE-2023-29499, CVE-2023-32665, CVE-2023-32643, CVE-2023-32611
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.71.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
