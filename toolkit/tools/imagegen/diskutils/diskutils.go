@@ -682,13 +682,19 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
 	// There are two primary partition naming conventions:
-	// /dev/sdN<y> style or /dev/loopNp<x> style
+	// - /dev/sdN<y>
+	// - /dev/loopNp<x>
 	// Detect the exact one we are using.
-	// Make sure we check for /dev/loopNp<x> FIRST, since /dev/loop1 would generate /dev/loop11 as a partition
-	// device which may be a valid device. We want to select /dev/loop1p1 first.
 	testPartDevPaths := []string{
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
-		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
+	}
+
+	// If disk path ends in a digit, then the 'p<x>' style must be used.
+	// So, don't check the other style to avoid ambiguities. For example, /dev/loop1 vs. /dev/loop11.
+	// This is particularly relevant on Ubuntu, due to snap's use of loopback devices.
+	if !isDigit(diskDevPath[len(diskDevPath)-1]) {
+		devPath := fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr)
+		testPartDevPaths = append(testPartDevPaths, devPath)
 	}
 
 	err = retry.Run(func() error {
@@ -757,6 +763,10 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
 	return
+}
+
+func isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
 }
 
 func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
