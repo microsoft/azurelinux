@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -131,6 +131,7 @@ Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
 Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
 Patch1000: CVE-2022-3996.patch
 Patch1001: CVE-2024-6119.patch
+Patch1002: CVE-2024-9143.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -339,10 +340,11 @@ git config am.keepcr true
 %autopatch -M 999
 
 cp -a -- %{SOURCE1} .
-tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
+tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x --no-same-owner
 # Need to patch CVE-2022-3996 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
+pushd CryptoPkg/Library/OpensslLib/openssl
+%autopatch -p1 -m 1000
+popd
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
@@ -785,6 +787,9 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Wed Oct 23 2024 Tobias Brick <tobiasb@microsoft> - 20240524git3e722403cd16-4
+- Patch CVE-2024-9143 in bundled OpenSSL
+
 * Thu Sep 19 2024 Minghe Ren <mingheren@microsoft.com> - 20240524git3e722403cd16-3
 - Add patch for CVE-2024-6119
 
