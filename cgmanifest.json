@@ -4980,8 +4980,8 @@
         "type": "other",
         "other": {
           "name": "gtk-vnc",
-          "version": "1.3.0",
-          "downloadUrl": "https://download.gnome.org/sources/gtk-vnc/1.3/gtk-vnc-1.3.0.tar.xz"
+          "version": "1.3.1",
+          "downloadUrl": "https://download.gnome.org/sources/gtk-vnc/1.3/gtk-vnc-1.3.1.tar.xz"
         }
       }
     },
