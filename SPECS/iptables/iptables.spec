@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,8 @@ BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       iana-etc
+Requires(post): %{_sbindir}/alternatives
+Requires(postun): %{_sbindir}/alternatives
 # Our build tooling cannot handle this
 #Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
@@ -130,6 +132,9 @@ fi
 %{_mandir}/man3/*
 
 %changelog
+* Wed Oct 23 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-4
+- Add runtime requirements for alternatives
+
 * Fri Oct 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
 - Enable nftables and use alternatives.
 
