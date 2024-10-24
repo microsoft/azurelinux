@@ -4920,8 +4920,8 @@
         "type": "other",
         "other": {
           "name": "gssntlmssp",
-          "version": "0.9.0",
-          "downloadUrl": "https://fedorahosted.org/released/gss-ntlmssp/gssntlmssp-0.9.0.tar.gz"
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/gssapi/gss-ntlmssp/releases/download/v1.3.1/gssntlmssp-1.3.1.tar.gz"
         }
       }
     },
