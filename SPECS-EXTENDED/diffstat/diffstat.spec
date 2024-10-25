@@ -1,7 +1,7 @@
 Summary: A utility which provides statistics based on the output of diff
 Name: diffstat
-Version: 1.63
-Release: 3%{?dist}
+Version: 1.66
+Release: 1%{?dist}
 License: MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source1: COPYING
 
 BuildRequires: gcc
 BuildRequires: xz
+BuildRequires: make
 
 %description
 The diff command compares files line by line.  Diffstat reads the
@@ -43,6 +44,9 @@ make check
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 14 2021 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.66-1
+- Update to 1.66
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
