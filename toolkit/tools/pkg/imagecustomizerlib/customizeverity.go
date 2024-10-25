@@ -50,12 +50,8 @@ func enableVerityPartition(verity []imagecustomizerapi.Verity, imageChroot *safe
 	return true, nil
 }
 
-func updateFstabForVerity(verity []imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
+func updateFstabForVerity(verityList []imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
 	var err error
-
-	// Verity support is limited to only rootfs at the moment, which is verified in the API validity checks.
-	// Hence, it is safe to assume that index 0 is rootfs.
-	rootfsVerity := verity[0]
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
 	fstabEntries, err := diskutils.ReadFstabFile(fstabFile)
@@ -63,18 +59,27 @@ func updateFstabForVerity(verity []imagecustomizerapi.Verity, imageChroot *safec
 		return fmt.Errorf("failed to read fstab file: %v", err)
 	}
 
-	var updatedEntries []diskutils.FstabEntry
-	for _, entry := range fstabEntries {
-		if entry.Target == "/" {
-			// Replace existing root partition line with the Verity target.
-			entry.Source = verityDevicePath(rootfsVerity)
-			entry.Options = "ro," + entry.Options
+	// Update fstab entries so that verity mounts point to verity device paths.
+	for _, verity := range verityList {
+		if verity.FileSystem == nil || verity.FileSystem.MountPoint == nil {
+			// No mount point assigned to verity device.
+			continue
 		}
-		updatedEntries = append(updatedEntries, entry)
+
+		mountPath := verity.FileSystem.MountPoint.Path
+
+		for j := range fstabEntries {
+			entry := &fstabEntries[j]
+			if entry.Target == mountPath {
+				// Replace mount's source with verity device.
+				entry.Source = verityDevicePath(verity)
+				entry.Options = "ro," + entry.Options
+			}
+		}
 	}
 
 	// Write the updated fstab entries back to the fstab file
-	err = diskutils.WriteFstabFile(updatedEntries, fstabFile)
+	err = diskutils.WriteFstabFile(fstabEntries, fstabFile)
 	if err != nil {
 		return err
 	}

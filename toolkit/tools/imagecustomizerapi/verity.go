@@ -34,6 +34,10 @@ type Verity struct {
 	HashDeviceMountIdType MountIdentifierType `yaml:"hashDeviceMountIdType"`
 	// How to handle corruption.
 	CorruptionOption CorruptionOption `yaml:"corruptionOption"`
+
+	// The filesystem config that points to this verity device.
+	// Value is filled in by Storage.IsValid().
+	FileSystem *FileSystem
 }
 
 func (v *Verity) IsValid() error {

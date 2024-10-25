@@ -140,8 +140,13 @@ func (s *Storage) IsValid() error {
 	}
 
 	// Validate verity filesystem settings.
-	for _, verity := range s.Verity {
+	for i := range s.Verity {
+		verity := &s.Verity[i]
+
 		filesystem, hasFileSystem := deviceParents[verity.Id].(*FileSystem)
+		if hasFileSystem {
+			verity.FileSystem = filesystem
+		}
 
 		if !hasFileSystem || filesystem.MountPoint == nil || filesystem.MountPoint.Path != "/" {
 			return fmt.Errorf("defining non-root verity devices is not currently supported:\n"+
