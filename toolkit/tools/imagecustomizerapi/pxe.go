@@ -5,6 +5,7 @@ package imagecustomizerapi
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -17,6 +18,11 @@ type Pxe struct {
 
 func (p *Pxe) IsValid() error {
 	if p.IsoImageUrl != "" {
+		_, err := url.Parse(p.IsoImageUrl)
+		if err != nil {
+			return fmt.Errorf("invalud ISO image URL:\n%w", err)
+		}
+
 		protocolFound := false
 		for _, protocol := range PxeIsoDownloadProtocols {
 			if strings.HasPrefix(p.IsoImageUrl, protocol) {

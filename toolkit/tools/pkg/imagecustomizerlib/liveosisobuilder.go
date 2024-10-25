@@ -6,6 +6,7 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,7 +34,7 @@ const (
 	isoGrubCfg     = "grub.cfg"
 	pxeGrubCfg     = "grub-pxe.cfg"
 	pxeGrubCfgDir  = "/boot/grub2"
-	pxeKernelsArgs = " ip=dhcp rd.live.azldownloader=enable "
+	pxeKernelsArgs = "ip=dhcp"
 
 	searchCommandTemplate   = "search --label %s --set root"
 	rootValueLiveOSTemplate = "live:LABEL=%s"
@@ -395,7 +396,6 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 // generates:
 //   - grub configuration file for PXE booting.
 func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, outputImageBase string, pxeGrubCfgFileName string) error {
-
 	// remove 'search' commands from PXE grub.cfg because it is not needed.
 	inputContentString, err := removeCommandAll(inputContentString, "search")
 	if err != nil {
@@ -405,7 +405,10 @@ func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, output
 	// If the specified URL is not a full path to an iso, append the generated
 	// iso file name to it.
 	if filepath.Ext(pxeIsoImageUrl) != ".iso" {
-		pxeIsoImageUrl = strings.TrimSuffix(pxeIsoImageUrl, "/") + "/" + outputImageBase + ".iso"
+		pxeIsoImageUrl, err = url.JoinPath(pxeIsoImageUrl, outputImageBase+".iso")
+		if err != nil {
+			return fmt.Errorf("failed to concatenate URL (%s) and (%s)\n%w", pxeIsoImageUrl, outputImageBase, err)
+		}
 	}
 	rootValue := fmt.Sprintf(rootValuePxeTemplate, pxeIsoImageUrl)
 	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
@@ -673,7 +676,8 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, writeableRootfsDir string,
-	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments, pxeIsoImageUrl string, outputImageBase string) error {
+	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments, pxeIsoImageUrl string,
+	outputImageBase string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -698,7 +702,8 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, wr
 		}
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine, b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
+	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine,
+		b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -1398,8 +1403,8 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 // outputs:
 //
 //   - creates an iso image.
-func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, pxeConfig *imagecustomizerapi.Pxe,
-	outputImageDir string, outputImageBase string, outputPXEArtifactsDir string) error {
+func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso,
+	pxeConfig *imagecustomizerapi.Pxe, outputImageDir string, outputImageBase string, outputPXEArtifactsDir string) error {
 
 	logger.Log.Infof("Creating LiveOS iso image using unchanged OS partitions")
 
@@ -1413,7 +1418,8 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		pxeIsoImageUrl = pxeConfig.IsoImageUrl
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine, b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
+	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine,
+		b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}

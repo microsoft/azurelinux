@@ -139,7 +139,7 @@ func createImageCustomizerParameters(buildDir string,
 	}
 
 	if ic.outputPXEArtifactsDir != "" && !ic.outputIsIso {
-		return nil, fmt.Errorf("the output PXE artifacts directory ('outputPXEArtifactsDir') can be specified only if the output format is an iso image.")
+		return nil, fmt.Errorf("the output PXE artifacts directory ('--output-pxe-artifacts-dir') can be specified only if the output format is an iso image.")
 	}
 
 	if ic.inputIsIso {
