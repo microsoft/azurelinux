@@ -50,7 +50,7 @@
                 "packagelists/qemu-guest-packages.json"
             ],
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0"
+                "ExtraCommandLine": "net.ifnames=1 console=tty0 console=ttyS0"
             },
             "KernelOptions": {
                 "default": "kernel"
