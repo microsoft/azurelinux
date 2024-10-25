@@ -92,11 +92,9 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		}
 	}
 
-	if config.Scripts != nil {
-		err = runUserScripts(baseConfigPath, config.Scripts.PostCustomization, "postCustomization", imageChroot)
-		if err != nil {
-			return err
-		}
+	err = runUserScripts(baseConfigPath, config.Scripts.PostCustomization, "postCustomization", imageChroot)
+	if err != nil {
+		return err
 	}
 
 	err = restoreResolvConf(resolvConf, imageChroot)
@@ -109,11 +107,9 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	if config.Scripts != nil {
-		err = runUserScripts(baseConfigPath, config.Scripts.FinalizeCustomization, "finalizeCustomization", imageChroot)
-		if err != nil {
-			return err
-		}
+	err = runUserScripts(baseConfigPath, config.Scripts.FinalizeCustomization, "finalizeCustomization", imageChroot)
+	if err != nil {
+		return err
 	}
 
 	err = checkForInstalledKernel(imageChroot)

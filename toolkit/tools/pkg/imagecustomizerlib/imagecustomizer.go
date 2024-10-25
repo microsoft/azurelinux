@@ -105,7 +105,9 @@ func createImageCustomizerParameters(buildDir string,
 	// configuration
 	ic.configPath = configPath
 	ic.config = config
-	ic.customizeOSPartitions = (config.Storage != nil) || (config.OS != nil) || (config.Scripts != nil)
+	ic.customizeOSPartitions = config.CustomizePartitions() || config.OS != nil ||
+		len(config.Scripts.PostCustomization) > 0 ||
+		len(config.Scripts.FinalizeCustomization) > 0
 
 	ic.useBaseImageRpmRepos = useBaseImageRpmRepos
 	ic.rpmsSources = rpmsSources
@@ -158,8 +160,8 @@ func createImageCustomizerParameters(buildDir string,
 		// While defining a storage configuration can work when the input image is
 		// an iso, there is no obvious point of moving content between partitions
 		// where all partitions get collapsed into the squashfs at the end.
-		if config.Storage != nil {
-			return nil, fmt.Errorf("cannot customize storage when the input is an iso")
+		if config.CustomizePartitions() {
+			return nil, fmt.Errorf("cannot customize partitions when the input is an iso")
 		}
 	}
 
@@ -504,7 +506,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	err = validateScripts(baseConfigPath, config.Scripts)
+	err = validateScripts(baseConfigPath, &config.Scripts)
 	if err != nil {
 		return err
 	}
