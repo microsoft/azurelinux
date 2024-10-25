@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,9 @@ Patch4:         tdnf-sqlite-library.patch
 # Patch in vitual snapshot
 Patch5:	        virtual-repo-snapshot.patch
 Patch6:         fix-tests-for-azl.patch
+
+# Install only package configuration
+Patch7:         tdnf-add-installonlypkgs-config.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -237,7 +240,13 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
-* Thu Aug 29 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-2
+* Thu Oct 10 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-4
+- Add install only packages to tdnf.conf
+
+* Fri Sep 20 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-3
+- Fix an issue with snapshottime config option
+
+* Wed Sep 18 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-2
 - Add virtual repo snapshot exclude repos
 
 * Mon Sep 09 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-1

@@ -105,7 +105,9 @@ func createImageCustomizerParameters(buildDir string,
 	// configuration
 	ic.configPath = configPath
 	ic.config = config
-	ic.customizeOSPartitions = (config.Storage != nil) || (config.OS != nil) || (config.Scripts != nil)
+	ic.customizeOSPartitions = config.CustomizePartitions() || config.OS != nil ||
+		len(config.Scripts.PostCustomization) > 0 ||
+		len(config.Scripts.FinalizeCustomization) > 0
 
 	ic.useBaseImageRpmRepos = useBaseImageRpmRepos
 	ic.rpmsSources = rpmsSources
@@ -158,8 +160,8 @@ func createImageCustomizerParameters(buildDir string,
 		// While defining a storage configuration can work when the input image is
 		// an iso, there is no obvious point of moving content between partitions
 		// where all partitions get collapsed into the squashfs at the end.
-		if config.Storage != nil {
-			return nil, fmt.Errorf("cannot customize storage when the input is an iso")
+		if config.CustomizePartitions() {
+			return nil, fmt.Errorf("cannot customize partitions when the input is an iso")
 		}
 	}
 
@@ -346,7 +348,8 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 
 	// Customize the partitions.
-	partitionsCustomized, newRawImageFile, err := customizePartitions(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
+	partitionsCustomized, newRawImageFile, partIdToPartUuid, err := customizePartitions(ic.buildDirAbs,
+		ic.configPath, ic.config, ic.rawImageFile)
 	if err != nil {
 		return err
 	}
@@ -359,8 +362,8 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
-		partitionsCustomized, imageUuidStr)
+	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources,
+		ic.useBaseImageRpmRepos, partitionsCustomized, imageUuidStr)
 	if err != nil {
 		return err
 	}
@@ -372,7 +375,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
 		}
 
-		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId)
+		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId, partIdToPartUuid)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
@@ -380,7 +383,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	if ic.config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
+		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, partIdToPartUuid)
 		if err != nil {
 			return err
 		}
@@ -503,7 +506,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	err = validateScripts(baseConfigPath, config.Scripts)
+	err = validateScripts(baseConfigPath, &config.Scripts)
 	if err != nil {
 		return err
 	}
@@ -657,7 +660,8 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
-	imageUuidStr string) error {
+	imageUuidStr string,
+) error {
 	logger.Log.Debugf("Customizing OS")
 
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
@@ -707,7 +711,9 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
+func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+	partIdToPartUuid map[string]string,
+) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -715,7 +721,7 @@ func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecu
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition)
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -729,7 +735,7 @@ func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecu
 }
 
 func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string,
+	buildImageFile string, partIdToPartUuid map[string]string,
 ) error {
 	var err error
 
@@ -745,11 +751,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -795,9 +801,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfigForVerity(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
-		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
-		rootHash, grubCfgFullPath)
+	err = updateGrubConfigForVerity(config.OS.Verity, rootHash, grubCfgFullPath, partIdToPartUuid)
 	if err != nil {
 		return err
 	}

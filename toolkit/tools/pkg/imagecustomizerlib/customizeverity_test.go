@@ -74,11 +74,15 @@ func testCustomizeImageVerityHelper(t *testing.T, testName string, imageType bas
 	}
 	defer imageConnection.Close()
 
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
+	assert.NoError(t, err, "get disk partitions")
+
 	// Verify that verity is configured correctly.
 	bootPath := filepath.Join(imageConnection.chroot.RootDir(), "/boot")
 	rootDevice := partitionDevPath(imageConnection, 3)
 	hashDevice := partitionDevPath(imageConnection, 4)
-	verifyVerity(t, bootPath, rootDevice, hashDevice)
+	verifyVerity(t, bootPath, rootDevice, hashDevice, "PARTUUID="+partitions[3].PartUuid,
+		"PARTUUID="+partitions[4].PartUuid)
 }
 
 func TestCustomizeImageVerityShrinkExtract(t *testing.T) {
@@ -98,7 +102,7 @@ func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, 
 	testTempDir := filepath.Join(tmpDir, testName)
 	buildDir := filepath.Join(testTempDir, "build")
 	outImageFilePath := filepath.Join(testTempDir, "image.raw")
-	configFile := filepath.Join(testDir, "verity-config.yaml")
+	configFile := filepath.Join(testDir, "verity-partition-labels.yaml")
 
 	var config imagecustomizerapi.Config
 	err := imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
@@ -152,10 +156,11 @@ func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, 
 	defer bootMount.Close()
 
 	// Verify that verity is configured correctly.
-	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath())
+	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath(), "PARTLABEL=root",
+		"PARTLABEL=root-hash")
 }
 
-func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string) {
+func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string, rootId string, hashId string) {
 	// Verify verity kernel args.
 	grubCfgPath := filepath.Join(bootPath, "/grub2/grub.cfg")
 	grubCfgContents, err := file.Read(grubCfgPath)
@@ -164,8 +169,8 @@ func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice s
 	}
 
 	assert.Regexp(t, `(?m)linux.* rd.systemd.verity=1 `, grubCfgContents)
-	assert.Regexp(t, `(?m)linux.* systemd.verity_root_data=PARTLABEL=root `, grubCfgContents)
-	assert.Regexp(t, `(?m)linux.* systemd.verity_root_hash=PARTLABEL=root-hash `, grubCfgContents)
+	assert.Regexp(t, fmt.Sprintf(`(?m)linux.* systemd.verity_root_data=%s `, rootId), grubCfgContents)
+	assert.Regexp(t, fmt.Sprintf(`(?m)linux.* systemd.verity_root_hash=%s `, hashId), grubCfgContents)
 	assert.Regexp(t, `(?m)linux.* systemd.verity_root_options=panic-on-corruption `, grubCfgContents)
 
 	// Read root hash from grub.cfg file.

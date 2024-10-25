@@ -602,6 +602,7 @@
                 "libcmpiutil",
                 "libcomps",
                 "libcroco",
+                "libcxx",
                 "libdaemon",
                 "libdap",
                 "libdatrie",
@@ -1708,6 +1709,7 @@
                 "python-humanize",
                 "python-hwdata",
                 "python-importlib-metadata",
+                "python-iniconfig",
                 "python-inotify",
                 "python-into-dbus-python",
                 "python-IPy",
@@ -2431,6 +2433,7 @@
                 "umoci",
                 "usrsctp",
                 "vala",
+                "valkey",
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"

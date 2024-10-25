@@ -134,7 +134,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
-  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
+    - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#iso-additionalfiles)
       - [additionalFile type](#additionalfile-type)
@@ -260,31 +260,6 @@ storage:
     type: ext4
     mountPoint:
       path: /
-
-os:
-  resetBootLoaderType: hard-reset
-```
-
-### resetPartitionsUuidsType [string]
-
-Specifies that the partition UUIDs and filesystem UUIDs should be reset.
-
-Value is optional.
-
-This value cannot be specified if [storage](#storage-storage) is specified (since
-customizing the partition layout resets all the UUIDs anyway).
-
-If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
-must also be specified.
-
-Supported options:
-
-- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
-
-Example:
-
-```yaml
-resetPartitionsUuidsType: reset-all
 
 os:
   resetBootLoaderType: hard-reset
@@ -508,19 +483,14 @@ Example: `noatime,nodiratime`
 
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification. Please
-execute `sudo modprobe nbd` before building the image with verity enablement.
-
-Please enable overlays for the `/var/lib` and `/var/log` directories, along with
-verity enablement, to ensure proper functioning of services. For an example,
-please refer to the [overlay type](#overlay-type) section.
+Specifies the configuration for dm-verity root integrity verification.
 
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
 
   - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+    `id` (partition [id](#id-string)), `part-label` (partition label),
+    `uuid` (filesystem UUID), and `part-uuid` (partition UUID).
 
   - `id`: The unique identifier value of the partition, corresponding to the
     specified IdType.
@@ -549,6 +519,9 @@ os:
       Id: hash_partition
     corruptionOption: panic
 ```
+
+There are multiple ways to configure a verity enabled image. For
+recommendations, see [Verity Image Recommendations](./verity.md).
 
 ## additionalFile type
 
@@ -1602,3 +1575,29 @@ Contains the options for provisioning disks and their partitions.
 ### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
+
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+storage:
+  resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```

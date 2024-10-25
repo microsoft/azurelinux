@@ -23,7 +23,9 @@ var (
 	fdiskPartitionsTableEntryRegexp  = regexp.MustCompile(`^([0-9A-Za-z-_/]+)[\t ]+(\d+)[\t ]+`)
 )
 
-func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition) error {
+func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+	partIdToPartUuid map[string]string,
+) error {
 	logger.Log.Infof("Shrinking filesystems")
 
 	// Get partition info
@@ -53,7 +55,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		if verityHashPartition != nil {
-			matches, err := partitionMatchesId(*verityHashPartition, diskPartition)
+			matches, err := partitionMatchesId(*verityHashPartition, diskPartition, partIdToPartUuid)
 			if err != nil {
 				return err
 			}
@@ -77,15 +79,16 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Check the file system with e2fsck
-		err = shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
+		err = shell.ExecuteLive(true /*squashErrors*/, "e2fsck", "-fy", partitionLoopDevice)
 		if err != nil {
 			return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
 		}
 
 		// Shrink the file system with resize2fs -M
-		stdout, stderr, err := shell.Execute("sudo", "resize2fs", "-M", partitionLoopDevice)
+		stdout, stderr, err := shell.Execute("flock", "--timeout", "5", imageLoopDevice,
+			"resize2fs", "-M", partitionLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resize %s with resize2fs (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Find the new partition end value
@@ -101,10 +104,11 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Resize the partition with parted resizepart
-		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty",
-			imageLoopDevice, "resizepart", strconv.Itoa(partitionNumber), end)
+		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "flock", "--timeout", "5", imageLoopDevice,
+			"parted", "---pretend-input-tty", imageLoopDevice, "resizepart",
+			strconv.Itoa(partitionNumber), end)
 		if err != nil {
-			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resizepart %s with parted (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Re-read the partition table
@@ -119,7 +123,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 // Get the start sectors of all partitions.
 // Ideally, we would use 'lsblk --output START' here. But that is only available in util-linux v2.38+.
 func getStartSectors(imageLoopDevice string, partitionCount int) (partitionStarts map[string]int, err error) {
-	stdout, stderr, err := shell.Execute("sudo", "fdisk", "--list", imageLoopDevice)
+	stdout, stderr, err := shell.Execute("fdisk", "--list", imageLoopDevice)
 	if err != nil {
 		return nil, fmt.Errorf("fdisk failed to list partitions:\n%v", stderr)
 	}
