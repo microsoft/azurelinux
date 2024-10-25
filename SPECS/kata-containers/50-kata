@@ -1,5 +1,0 @@
-[crio.runtime.runtimes.kata]
-  runtime_path = "/usr/bin/containerd-shim-kata-v2"
-  runtime_type = "vm"
-  runtime_root = "/run/vc"
-  privileged_without_host_devices = true

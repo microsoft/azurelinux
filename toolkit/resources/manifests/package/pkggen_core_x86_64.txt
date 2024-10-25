@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.56.1-1.azl3.noarch.rpm
+kernel-headers-6.6.56.1-5.azl3.noarch.rpm
 glibc-2.38-8.azl3.x86_64.rpm
 glibc-devel-2.38-8.azl3.x86_64.rpm
 glibc-i18n-2.38-8.azl3.x86_64.rpm
@@ -195,9 +195,9 @@ libssh2-1.11.0-1.azl3.x86_64.rpm
 libssh2-devel-1.11.0-1.azl3.x86_64.rpm
 krb5-1.21.3-2.azl3.x86_64.rpm
 nghttp2-1.61.0-2.azl3.x86_64.rpm
-curl-8.8.0-2.azl3.x86_64.rpm
-curl-devel-8.8.0-2.azl3.x86_64.rpm
-curl-libs-8.8.0-2.azl3.x86_64.rpm
+curl-8.8.0-3.azl3.x86_64.rpm
+curl-devel-8.8.0-3.azl3.x86_64.rpm
+curl-libs-8.8.0-3.azl3.x86_64.rpm
 createrepo_c-1.0.3-1.azl3.x86_64.rpm
 libxml2-2.11.5-1.azl3.x86_64.rpm
 libxml2-devel-2.11.5-1.azl3.x86_64.rpm
@@ -211,10 +211,10 @@ lua-5.4.6-1.azl3.x86_64.rpm
 lua-libs-5.4.6-1.azl3.x86_64.rpm
 azurelinux-rpm-macros-3.0-7.azl3.noarch.rpm
 azurelinux-check-macros-3.0-7.azl3.noarch.rpm
-tdnf-3.5.8-3.azl3.x86_64.rpm
-tdnf-cli-libs-3.5.8-3.azl3.x86_64.rpm
-tdnf-devel-3.5.8-3.azl3.x86_64.rpm
-tdnf-plugin-repogpgcheck-3.5.8-3.azl3.x86_64.rpm
+tdnf-3.5.8-4.azl3.x86_64.rpm
+tdnf-cli-libs-3.5.8-4.azl3.x86_64.rpm
+tdnf-devel-3.5.8-4.azl3.x86_64.rpm
+tdnf-plugin-repogpgcheck-3.5.8-4.azl3.x86_64.rpm
 libassuan-2.5.6-1.azl3.x86_64.rpm
 libassuan-devel-2.5.6-1.azl3.x86_64.rpm
 libgpg-error-1.47-1.azl3.x86_64.rpm

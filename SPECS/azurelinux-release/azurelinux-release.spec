@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,9 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Fri Oct 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-21
+- Bump release for November 2024
+
 * Fri Sep 27 2024 Rachel Menge <rachelmenge@microsoft.com> - 3.0-20
 - Enable iptables as default firewall
 

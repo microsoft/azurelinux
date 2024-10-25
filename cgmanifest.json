@@ -505,8 +505,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.4",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.4.tar.gz"
+          "version": "1.7.5",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.5.tar.gz"
         }
       }
     },
@@ -8031,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
+          "version": "3.2.0.azl3",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
         }
       }
     },
@@ -8041,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
+          "version": "3.2.0.azl3",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
         }
       }
     },
@@ -10481,8 +10481,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.10.4",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.4.tar.gz"
+          "version": "1.10.5",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.5.tar.gz"
         }
       }
     },
@@ -13502,8 +13502,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.36",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
+          "version": "8.0.40",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
         }
       }
     },
@@ -23563,8 +23563,8 @@
         "type": "other",
         "other": {
           "name": "python-pip",
-          "version": "24.0",
-          "downloadUrl": "https://github.com/pypa/pip/archive/24.0/pip-24.0.tar.gz"
+          "version": "24.2",
+          "downloadUrl": "https://github.com/pypa/pip/archive/24.2/pip-24.2.tar.gz"
         }
       }
     },
@@ -28226,8 +28226,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.4.2",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.2.tar.gz"
+          "version": "103.5.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.5.1.tar.gz"
         }
       }
     },
