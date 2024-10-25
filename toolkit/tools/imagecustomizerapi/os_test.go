@@ -53,25 +53,6 @@ func TestOSIsValidInvalidAdditionalFilesContent(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestOSIsValidVerityInValidPartUuid(t *testing.T) {
-	invalidVerity := OS{
-		Verity: &Verity{
-			DataPartition: IdentifiedPartition{
-				IdType: "part-uuid",
-				Id:     "incorrect-uuid-format",
-			},
-			HashPartition: IdentifiedPartition{
-				IdType: "part-label",
-				Id:     "hash_partition",
-			},
-		},
-	}
-
-	err := invalidVerity.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid id format")
-}
-
 func TestOSIsValidInvalidResetBootLoaderType(t *testing.T) {
 	os := OS{
 		ResetBootLoaderType: "bad",

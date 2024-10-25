@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
@@ -370,18 +369,13 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 
 	// Shrink the filesystems.
 	if ic.enableShrinkFilesystems {
-		verityHashPartitionId := (*imagecustomizerapi.IdentifiedPartition)(nil)
-		if ic.config.OS.Verity != nil {
-			verityHashPartitionId = ptrutils.PtrTo(ic.config.OS.Verity.HashPartition)
-		}
-
-		err = shrinkFilesystemsHelper(ic.rawImageFile, verityHashPartitionId, partIdToPartUuid)
+		err = shrinkFilesystemsHelper(ic.rawImageFile, ic.config.Storage.Verity, partIdToPartUuid)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
 	}
 
-	if ic.config.OS.Verity != nil {
+	if len(ic.config.Storage.Verity) > 0 {
 		// Customize image for dm-verity, setting up verity metadata and security features.
 		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, partIdToPartUuid)
 		if err != nil {
@@ -711,7 +705,7 @@ func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasena
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+func shrinkFilesystemsHelper(buildImageFile string, verity []imagecustomizerapi.Verity,
 	partIdToPartUuid map[string]string,
 ) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
@@ -721,7 +715,7 @@ func shrinkFilesystemsHelper(buildImageFile string, verityHashPartition *imagecu
 	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageLoopback.DevicePath(), verityHashPartition, partIdToPartUuid)
+	err = shrinkFilesystems(imageLoopback.DevicePath(), verity, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -750,12 +744,16 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return err
 	}
 
+	// Verity support is limited to only rootfs at the moment, which is verified in the API validity checks.
+	// Hence, it is safe to assume that index 0 is rootfs.
+	rootfsVerity := config.Storage.Verity[0]
+
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition, diskPartitions, partIdToPartUuid)
+	dataPartition, err := idToPartitionBlockDevicePath(rootfsVerity.DataDeviceId, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition, diskPartitions, partIdToPartUuid)
+	hashPartition, err := idToPartitionBlockDevicePath(rootfsVerity.HashDeviceId, diskPartitions, partIdToPartUuid)
 	if err != nil {
 		return err
 	}
@@ -801,7 +799,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfigForVerity(config.OS.Verity, rootHash, grubCfgFullPath, partIdToPartUuid)
+	err = updateGrubConfigForVerity(rootfsVerity, rootHash, grubCfgFullPath, partIdToPartUuid, diskPartitions)
 	if err != nil {
 		return err
 	}

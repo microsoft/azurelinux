@@ -157,7 +157,7 @@ func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, 
 
 	// Verify that verity is configured correctly.
 	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath(), "PARTLABEL=root",
-		"PARTLABEL=root-hash")
+		"PARTLABEL=roothash")
 }
 
 func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string, rootId string, hashId string) {
