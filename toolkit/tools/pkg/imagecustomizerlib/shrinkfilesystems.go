@@ -88,7 +88,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		stdout, stderr, err := shell.Execute("flock", "--timeout", "5", imageLoopDevice,
 			"resize2fs", "-M", partitionLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resize %s with resize2fs (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Find the new partition end value
@@ -108,7 +108,7 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 			"parted", "---pretend-input-tty", imageLoopDevice, "resizepart",
 			strconv.Itoa(partitionNumber), end)
 		if err != nil {
-			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resizepart %s with parted (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Re-read the partition table

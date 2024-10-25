@@ -811,7 +811,7 @@ func formatSinglePartition(diskDevPath string, partDevPath string, partition con
 		err = retry.Run(func() error {
 			_, stderr, err := shell.Execute("flock", mkfsArgs...)
 			if err != nil {
-				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
+				logger.Log.Warnf("Failed to format partition using mkfs (and flock): %v", stderr)
 				return err
 			}
 
