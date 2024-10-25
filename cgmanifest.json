@@ -2998,8 +2998,8 @@
         "type": "other",
         "other": {
           "name": "dropwatch",
-          "version": "1.5.3",
-          "downloadUrl": "https://github.com/nhorman/dropwatch/archive/v1.5.3/dropwatch-1.5.3.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://github.com/nhorman/dropwatch/archive/v1.5.4/dropwatch-1.5.4.tar.gz"
         }
       }
     },
