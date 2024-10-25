@@ -9,50 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerityIsValidInvalidDataPartition(t *testing.T) {
-	invalidVerity := Verity{
-		DataPartition: IdentifiedPartition{
-			IdType: "part-uuid",
-			Id:     "incorrect-uuid-format",
-		},
-		HashPartition: IdentifiedPartition{
-			IdType: "part-label",
-			Id:     "hash_partition",
-		},
-	}
-
-	err := invalidVerity.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid dataPartition")
-}
-
-func TestVerityIsValidInvalidHashPartition(t *testing.T) {
-	invalidVerity := Verity{
-		DataPartition: IdentifiedPartition{
-			IdType: "part-uuid",
-			Id:     "123e4567-e89b-4d3a-a456-426614174000",
-		},
-		HashPartition: IdentifiedPartition{
-			IdType: "part-label",
-			Id:     "",
-		},
-	}
-
-	err := invalidVerity.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid hashPartition")
-}
-
 func TestVerityIsValid(t *testing.T) {
 	validVerity := Verity{
-		DataPartition: IdentifiedPartition{
-			IdType: "part-uuid",
-			Id:     "123e4567-e89b-4d3a-a456-426614174000",
-		},
-		HashPartition: IdentifiedPartition{
-			IdType: "part-label",
-			Id:     "hash_partition",
-		},
+		Id:               "root",
+		Name:             "root",
+		DataDeviceId:     "root",
+		HashDeviceId:     "roothash",
 		CorruptionOption: CorruptionOption("panic"),
 	}
 
@@ -60,16 +22,61 @@ func TestVerityIsValid(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestVerityIsValidMissingId(t *testing.T) {
+	invalidVerity := Verity{
+		Name:         "root",
+		DataDeviceId: "root",
+		HashDeviceId: "roothash",
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "'id' may not be empty")
+}
+
+func TestVerityIsValidInvalidName(t *testing.T) {
+	invalidVerity := Verity{
+		Id:           "root",
+		Name:         "$root",
+		DataDeviceId: "root",
+		HashDeviceId: "roothash",
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid 'name' value ($root)")
+}
+
+func TestVerityIsValidMissingDataDeviceId(t *testing.T) {
+	invalidVerity := Verity{
+		Id:           "root",
+		Name:         "root",
+		HashDeviceId: "roothash",
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "'dataDeviceId' may not be empty")
+}
+
+func TestVerityIsValidMissingHashDeviceId(t *testing.T) {
+	invalidVerity := Verity{
+		Id:           "root",
+		Name:         "root",
+		DataDeviceId: "root",
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "'hashDeviceId' may not be empty")
+}
+
 func TestVerityIsValidInvalidCorruptionOption(t *testing.T) {
 	invalidVerity := Verity{
-		DataPartition: IdentifiedPartition{
-			IdType: "part-uuid",
-			Id:     "123e4567-e89b-4d3a-a456-426614174000",
-		},
-		HashPartition: IdentifiedPartition{
-			IdType: "part-label",
-			Id:     "hash_partition",
-		},
+		Id:               "root",
+		Name:             "root",
+		DataDeviceId:     "root",
+		HashDeviceId:     "roothash",
 		CorruptionOption: CorruptionOption("bad"),
 	}
 

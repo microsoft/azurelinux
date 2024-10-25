@@ -49,43 +49,6 @@ func (c *Config) IsValid() (err error) {
 		return fmt.Errorf("'os.resetBootLoaderType' must be specified if 'storage.resetPartitionsUuidsType' is specified")
 	}
 
-	if c.OS != nil && c.OS.Verity != nil {
-		err := ensureVerityPartitionIdExists(c.OS.Verity.DataPartition, &c.Storage)
-		if err != nil {
-			return fmt.Errorf("invalid verity 'dataPartition':\n%w", err)
-		}
-
-		err = ensureVerityPartitionIdExists(c.OS.Verity.HashPartition, &c.Storage)
-		if err != nil {
-			return fmt.Errorf("invalid verity 'hashPartition':\n%w", err)
-		}
-	}
-
-	return nil
-}
-
-func ensureVerityPartitionIdExists(verityPartition IdentifiedPartition, storage *Storage) error {
-	switch verityPartition.IdType {
-	case IdTypeId:
-		if !storage.CustomizePartitions() {
-			return fmt.Errorf("'idType' cannot be 'id' if 'storage.disks' is not specified")
-		}
-
-		foundPartition := false
-		for _, disk := range storage.Disks {
-			for _, partition := range disk.Partitions {
-				if partition.Id == verityPartition.Id {
-					foundPartition = true
-					break
-				}
-			}
-		}
-
-		if !foundPartition {
-			return fmt.Errorf("partition with 'id' (%s) not found", verityPartition.Id)
-		}
-	}
-
 	return nil
 }
 
