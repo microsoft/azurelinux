@@ -51,7 +51,7 @@
                 "packagelists/selinux.json"
             ],
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0 rd.info log_buf_len=1M",
+                "ExtraCommandLine": "net.ifnames=1 console=tty0 console=ttyS0 rd.info log_buf_len=1M",
                 "SELinux": "enforcing"
             },
             "KernelOptions": {
