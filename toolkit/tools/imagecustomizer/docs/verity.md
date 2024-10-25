@@ -145,12 +145,18 @@ storage:
       end: 3200M
     - id: var
       start: 3200M
+  verity:
+  - id: verityroot
+    name: root
+    dataDeviceId: root
+    hashDeviceId: roothash
+    corruptionOption: panic
   filesystems:
   - deviceId: boot
     type: ext4
     mountPoint:
       path: /boot
-  - deviceId: root
+  - deviceId: verityroot
     type: ext4
     mountPoint:
       path: /
@@ -159,13 +165,6 @@ storage:
     mountPoint:
       path: /var
 os:
-  verity:
-    dataPartition:
-      idType: id
-      id: root
-    hashPartition:
-      idType: id
-      id: roothash
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
   - content: |
