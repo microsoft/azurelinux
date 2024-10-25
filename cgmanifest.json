@@ -375,8 +375,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-io",
-          "version": "2.8.0",
-          "downloadUrl": "https://archive.apache.org/dist/commons/io/source/commons-io-2.8.0-src.tar.gz"
+          "version": "2.14.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/io/source/commons-io-2.14.0-src.tar.gz"
         }
       }
     },
@@ -505,8 +505,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.7.2",
-          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.2.tar.gz"
+          "version": "1.7.5",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.5.tar.gz"
         }
       }
     },
@@ -4570,8 +4570,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.7.7",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.7.tar.xz"
+          "version": "3.7.11",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.11.tar.xz"
         }
       }
     },
@@ -10351,8 +10351,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.16.2.tar.gz"
         }
       }
     },
@@ -14602,19 +14602,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nvidia-container-runtime",
-          "version": "3.13.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.13.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.13.5.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.16.2.tar.gz"
         }
       }
     },
@@ -14633,8 +14623,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-modprobe",
-          "version": "495.44",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/495.44.tar.gz"
+          "version": "550.54.14",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/550.54.14.tar.gz"
         }
       }
     },
@@ -15394,8 +15384,8 @@
         "type": "other",
         "other": {
           "name": "OpenIPMI",
-          "version": "2.0.32",
-          "downloadUrl": "https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz"
+          "version": "2.0.36",
+          "downloadUrl": "https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.36.tar.gz"
         }
       }
     },
@@ -21124,8 +21114,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.29",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.29.tar.xz"
+          "version": "8.1.30",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.30.tar.xz"
         }
       }
     },
@@ -21584,8 +21574,8 @@
         "type": "other",
         "other": {
           "name": "prometheus",
-          "version": "2.37.0",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.37.0.tar.gz"
+          "version": "2.37.9",
+          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.37.9.tar.gz"
         }
       }
     },
@@ -25614,8 +25604,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.14",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.14.tar.gz"
+          "version": "6.2.16",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.16.tar.gz"
         }
       }
     },
