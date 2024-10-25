@@ -2528,8 +2528,8 @@
         "type": "other",
         "other": {
           "name": "deltarpm",
-          "version": "3.6.2",
-          "downloadUrl": "https://github.com/rpm-software-management/deltarpm/archive/3.6.2/deltarpm-3.6.2.tar.gz"
+          "version": "3.6.5",
+          "downloadUrl": "https://github.com/rpm-software-management/deltarpm/archive/3.6.5/deltarpm-3.6.5.tar.gz"
         }
       }
     },

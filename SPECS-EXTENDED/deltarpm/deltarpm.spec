@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           deltarpm
 Summary:        Create deltas between rpms
-Version:        3.6.2
-Release:        7%{?dist}
+Version:        3.6.5
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/rpm-software-management/deltarpm
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
@@ -43,6 +43,7 @@ a difference between an old and a new iso containing rpms.
 Summary:        Python bindings for deltarpm
 %{?python_provide:%python_provide python3-%{name}}
 BuildRequires:  python3-devel
+BuildRequires: make
 Requires:       %{name}%{_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
@@ -54,17 +55,19 @@ Python 3 version.
 %autosetup -p1
 
 %build
-%{__make} %{?_smp_mflags} CFLAGS="%{build_cflags} -DWITH_ZSTD=1" LDFLAGS="%{build_ldflags}" \
+%set_build_flags
+%make_build CFLAGS="${CFLAGS} -DWITH_ZSTD=1" \
     bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
     zlibbundled='' zlibldflags='-lz' zlibcppflags=''
 
-%{__make} %{?_smp_mflags} CFLAGS="%{build_cflags} -DWITH_ZSTD=1" LDFLAGS="%{build_ldflags}" \
+%make_build CFLAGS="${CFLAGS} -DWITH_ZSTD=1" \
     bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
     zlibbundled='' zlibldflags='-lz' zlibcppflags='' \
     python
 
 %install
-%makeinstall pylibprefix=%{buildroot}
+# cannot use %%make_install here, as then prefix is not passed into the Makefile
+%make_build pylibprefix=%{buildroot} mandir=%{buildroot}%{_mandir} prefix=%{buildroot}%{_prefix} install
 
 %files
 %license LICENSE.BSD
@@ -95,6 +98,9 @@ Python 3 version.
 %{python3_sitearch}/__pycache__/%{name}.*
 
 %changelog
+* Mon Oct 14 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.6.5-1
+- Update to 3.6.5
+
 * Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.2-7
 - Remove unneeded deletion of Python 2 sitelib in buildroot
 
