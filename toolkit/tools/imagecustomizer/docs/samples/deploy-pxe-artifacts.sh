@@ -1,6 +1,9 @@
 #!/bin/bash
+if [ "$EUID" -ne 0 ]; then
+  echo "error: this script must be run as root."
+  exit 1
+fi
 
-# set -x
 set -e
 
 scriptPath=$(realpath ${BASH_SOURCE[0]})
@@ -11,45 +14,42 @@ scriptDir=$(dirname "$scriptPath")
 tftpLocalDir="/var/lib/tftpboot"
 httpLocalDir="/etc/httpd/azl-os"
 
-# `iso-publish-path` can be specified in the Azure Linux configuration under
-# `pxe|pxeImageUrl`
-httpRootPlaceHolder="iso-publish-path"
-
-# `192.168.0.1/azl-os` must match the http server ip and the folder configured
-# to server artifacts from.
-httpRoot="192.168.0.1/azl-os"
+# If a place holder string is used for `pxe|pxeImageUrl`, to replace it in
+# grub.cfg at build time, set 'httpRootPlaceHolder' to the place holder string.
+httpRootPlaceHolder=""
+httpRoot=""
 
 # ---- Commnad Line ----
 
 function show_usage() {
     echo
-    echo "$(basename ${BASH_SOURCE[0]}) <source-path>"
+    echo "$(basename ${BASH_SOURCE[0]}) -s <source-path> [-p <iso-url-place-holder> -r <iso-url>]"
     echo
     echo "  Sample script that deploys the Azure Linux PXE artifacts to a PXE server."
     echo "  It assumes a tftp and an http servers are running on the local machine where:"
     echo "  - tftp root is at /var/lib/tftpboot"
     echo "  - http root is at /etc/httpd"
     echo
-    echo "  <source-path>        : local path to the source of the artifacts to deploy."
-    echo "                         It accepts either:"
-    echo "                         - a full path to an iso image file."
-    echo "                         - a full path to a local folder populated by the imagecustomizer --output-pxe-artifacts-dir"
+    echo "  -s <source-path>         : local path to the source of the artifacts to deploy."
+    echo "                             It accepts either:"
+    echo "                             - a full path to an iso image file."
+    echo "                             - a full path to a local folder populated by the imagecustomizer --output-pxe-artifacts-dir"
     echo
-    echo " <iso-url-place-holder>: place-holder string in grub.cfg to be replaced with the http server ip and root path at deployment time."
-    echo "                         This string can be specified in the Image Customizer configuration under pxe | isoImageUrl"
-    echo "                         For example:"
+    echo "  -p <iso-url-place-holder>: place-holder string in grub.cfg to be replaced with the http server ip and root path at deployment time."
+    echo "                             This string can be specified in the Image Customizer configuration under pxe | isoImageUrl"
+    echo "                             For example:"
     echo
-    echo "                         -p iso-publish-path"
+    echo "                             -p iso-publish-path"
     echo
-    echo "                         where the Image Customizer config file has:"
+    echo "                             where the Image Customizer config file has:"
     echo
-    echo "                         pxe:"
-    echo "                           isoImageUrl: http://iso-publish-path/my-os.iso"
+    echo "                             pxe:"
+    echo "                               isoImageUrl: http://iso-publish-path/my-os.iso"
     echo
-    echo " <iso-url>             : string holding the http server ip and root path to replace the place holder string specified by <iso-url-place-holder>."
-    echo "                         For example:"
+    echo "  -r <iso-url>             : string holding the http server ip and root path to replace the place holder string specified by <iso-url-place-holder>."
+    echo "                             For example:"
     echo
-    echo "                         -r 192.168.0.1/azl-os"
+    echo "                             -r 192.168.0.1/azl-os"
     echo
 }
 
@@ -71,8 +71,20 @@ while getopts ":s:p:r:" OPTIONS; do
   esac
 done
 
-if [ -z "$sourcePath" ]; then
+if [[ -z "$sourcePath" ]]; then
     echo "error: missing required parameter 'source-path'."
+    show_usage
+    exit 1
+fi
+
+if [[ -z "$httpRootPlaceHolder" && -n "$httpRoot" ]]; then
+    echo "error: 'iso-url-place-holder' must be specified if 'iso-url' is specified."
+    show_usage
+    exit 1
+fi
+
+if [[ -n "$httpRootPlaceHolder" && -z "$httpRoot" ]]; then
+    echo "error: 'iso-url' must be specified if 'iso-url-place-holder' is specified."
     show_usage
     exit 1
 fi
@@ -82,15 +94,15 @@ fi
 function mount_iso() {
     local isoPath=$1
     local mountDir=$2
-    sudo rm -rf $mountDir
-    sudo mkdir -p $mountDir
-    sudo mount $isoPath $mountDir
+    rm -rf $mountDir
+    mkdir -p $mountDir
+    mount $isoPath $mountDir
 }
 
 function unmount_iso() {
     local mountDir=$1    
-    sudo umount $mountDir
-    sudo rm -r $mountDir
+    umount $mountDir
+    rm -r $mountDir
 }
 
 function clean_tftp_folder() {
@@ -131,21 +143,19 @@ function deploy_tftp_folder() {
     fi
     copy_file $artifactsRootDir/boot/grub2/grubenv $tftpLocalDir/boot/grub2/grubenv    
 
-    # replace every '/' with a '\/' to avoid breaking sed search/replace syntax.
-    escapedHttpRoot=${httpRoot//\//\\\/}
+    # If grub.cfg has been generated with a placeholder, make sure you update it
+    # now with the real URL.
     set -x
-    sed -i "s/$httpRootPlaceHolder/$escapedHttpRoot/g" $tftpLocalDir/boot/grub2/grub.cfg
+    sed -i "s|$httpRootPlaceHolder|$httpRoot|g" $tftpLocalDir/boot/grub2/grub.cfg
     set +x
 }
 
 function deploy_http_folder() {
     local sourceIsoPath=$1
-#    local isoRelativePath=$2
     local httpLocalDir=$2
 
     mkdir -p $httpLocalDir/liveos
     chmod 755 $httpLocalDir/liveos
-    # copy_file $sourceIsoPath $httpLocalDir/$isoRelativePath/$(basename $sourceIsoPath)
     copy_file $sourceIsoPath $httpLocalDir/$(basename $sourceIsoPath)
 }
 
@@ -153,7 +163,6 @@ function deploy() {
     local artifactsRootDir=$1
     local sourceIsoPath=$2
 
-    # deploy_http_folder $sourceIsoPath $isoRelativePath $httpLocalDir
     deploy_http_folder $sourceIsoPath $httpLocalDir
     deploy_tftp_folder $artifactsRootDir $tftpLocalDir
     systemctl restart httpd
@@ -165,8 +174,8 @@ function clean() {
 }
 
 function list_deployed_files() {
-    sudo find $tftpLocalDir -type f
-    sudo find $httpLocalDir -type f
+    find $tftpLocalDir -type f
+    find $httpLocalDir -type f
 }
 
 # ---- main ----
@@ -187,10 +196,5 @@ elif [[ -d "$sourcePath" ]]; then
     sourceIsoPath=$(find "$sourcePath" -name "*.iso")
     deploy $sourcePath $sourceIsoPath
 fi
-
-# todo: open only what's necessary
-iptables -P INPUT ACCEPT
-iptables -P OUTPUT ACCEPT
-iptables -P FORWARD ACCEPT
 
 list_deployed_files
