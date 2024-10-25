@@ -27,7 +27,7 @@ var (
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
 	enableShrinkFilesystems     = app.Flag("shrink-filesystems", "Enable shrinking of filesystems to minimum size. Supports ext2, ext3, ext4 filesystem types.").Bool()
-	outputPXEArtifactsDir       = app.Flag("output-pxe-artifacts-dir", "Directory to hold all the Azure Linux customized artifacts that can be copied to a PXE server to boot a PXE client. It is applicable only if the output format is set to 'iso'.").String()
+	outputPXEArtifactsDir       = app.Flag("output-pxe-artifacts-dir", "Create a directory with customized image PXE booting artifacts. '--output-image-format' must be set to 'iso'.").String()
 	logFlags                    = exe.SetupLogFlags(app)
 	profFlags                   = exe.SetupProfileFlags(app)
 	timestampFile               = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()

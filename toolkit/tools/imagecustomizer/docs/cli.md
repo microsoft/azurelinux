@@ -108,30 +108,35 @@ installation.
 
 ## --output-pxe-artifacts-dir
 
-Create the specified folder and populate it with the artifacts to be used for
-PXE booting. The folder will hold the exported contents of the generated live OS
-ISO image along with the live OS ISO image file itself.
+Create a folder containing the artifacts to be used for PXE booting.
 
-Below is a list of the files necessary for PXE booting:
+Below is a list of required artifacts and where on the PXE server they should
+be deployed:
 
 ```
-./efi
-  |- boot
-      |- bootx64.efi            // target: <tftp-server-root>/bootx64.efi
-      |- grubx64.efi            // target: <tftp-server-root>/grubx64.efi
-./boot
-   |- grub2
-       |- grub.cfg              // target: <tftp-server-root>/boot/grub2/grub.cfg
-       |- grubenv               // target: <tftp-server-root>/boot/grub2/grubenv
-   |- vmlinuz                   // target: <tftp-server-root>/boot/vmlinuz
-   |- initrd.img                // target: <tftp-server-root>/boot/initrd.img
-./pxe-20240930-1331.iso         // target: <http-server-root>/pxe-20240930-1331.iso
-                                //         The iso location must map to what the user
-                                //         specifies in grub.cfg root=live:<path>.
-
-# tftp server default local root is at: /var/lib/tftpboot
-# http server default local root is at: /etc/httpd
+folder artifacts            target on PXE server
+--------------------------  ------------------------------
+./efi                        <tftp-server-root>
+  |- boot                     |
+      |- bootx64.efi          |- bootx64.efi
+      |- grubx64.efi          |- grubx64.efi
+./boot                        |- boot
+  |- grub2                        |- grub2
+      |- grub.cfg                     |- grub.cfg
+      |- grubenv                      |- grubenv
+  |- vmlinuz                      |- vmlinuz
+  |- initrd.img                   |- initrd.img
+                             <yyyy-server-root>
+./pxe-20240930-1331.iso       |- pxe-20240930-1331.iso
 ```
+
+Notes:
+- `yyyy` can be any protocol supported by Dracut's `livenet` module (i.e
+  tftp, http, etc).
+- The ISO image file location under the server root is customizatable -
+  but it must such that its URL matches what is specified in the grub.cfg
+  `root=live:<URL>`.
+
 For a sample script deploying the artifacts to a PXE server, see
 [./samples/deploy-pxe-artifacts.sh](./samples/deploy-pxe-artifacts.sh).
 
