@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	VerityRootDevicePath = "/dev/mapper/root"
+	DeviceMapperPath = "/dev/mapper"
+
 	VerityRootDeviceName = "root"
 )
 

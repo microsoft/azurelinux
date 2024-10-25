@@ -18,7 +18,7 @@ func enableVerityPartition(verity []imagecustomizerapi.Verity, imageChroot *safe
 ) (bool, error) {
 	var err error
 
-	if verity == nil {
+	if len(verity) <= 0 {
 		return false, nil
 	}
 
@@ -37,7 +37,7 @@ func enableVerityPartition(verity []imagecustomizerapi.Verity, imageChroot *safe
 		return false, fmt.Errorf("failed to add dracut modules for verity:\n%w", err)
 	}
 
-	err = updateFstabForVerity(imageChroot)
+	err = updateFstabForVerity(verity, imageChroot)
 	if err != nil {
 		return false, fmt.Errorf("failed to update fstab file for verity:\n%w", err)
 	}
@@ -50,8 +50,12 @@ func enableVerityPartition(verity []imagecustomizerapi.Verity, imageChroot *safe
 	return true, nil
 }
 
-func updateFstabForVerity(imageChroot *safechroot.Chroot) error {
+func updateFstabForVerity(verity []imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
 	var err error
+
+	// Verity support is limited to only rootfs at the moment, which is verified in the API validity checks.
+	// Hence, it is safe to assume that index 0 is rootfs.
+	rootfsVerity := verity[0]
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
 	fstabEntries, err := diskutils.ReadFstabFile(fstabFile)
@@ -63,7 +67,7 @@ func updateFstabForVerity(imageChroot *safechroot.Chroot) error {
 	for _, entry := range fstabEntries {
 		if entry.Target == "/" {
 			// Replace existing root partition line with the Verity target.
-			entry.Source = imagecustomizerapi.VerityRootDevicePath
+			entry.Source = verityDevicePath(rootfsVerity)
 			entry.Options = "ro," + entry.Options
 		}
 		updatedEntries = append(updatedEntries, entry)
@@ -143,14 +147,16 @@ func updateGrubConfigForVerity(rootfsVerity imagecustomizerapi.Verity, rootHash 
 		return fmt.Errorf("failed to set verity kernel command line args:\n%w", err)
 	}
 
+	rootDevicePath := verityDevicePath(rootfsVerity)
+
 	if grubMkconfigEnabled {
 		grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"root"},
-			[]string{"root=" + imagecustomizerapi.VerityRootDevicePath})
+			[]string{"root=" + rootDevicePath})
 		if err != nil {
 			return fmt.Errorf("failed to set verity root command-line arg:\n%w", err)
 		}
 	} else {
-		grub2Config, err = replaceSetCommandValue(grub2Config, "rootdevice", imagecustomizerapi.VerityRootDevicePath)
+		grub2Config, err = replaceSetCommandValue(grub2Config, "rootdevice", rootDevicePath)
 		if err != nil {
 			return fmt.Errorf("failed to set verity root device:\n%w", err)
 		}
@@ -162,6 +168,14 @@ func updateGrubConfigForVerity(rootfsVerity imagecustomizerapi.Verity, rootHash 
 	}
 
 	return nil
+}
+
+func verityDevicePath(verity imagecustomizerapi.Verity) string {
+	return verityDevicePathFromName(verity.Name)
+}
+
+func verityDevicePathFromName(name string) string {
+	return imagecustomizerapi.DeviceMapperPath + "/" + name
 }
 
 // idToPartitionBlockDevicePath returns the block device path for a given idType and id.
