@@ -232,6 +232,20 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 	return true
 }
 
+// TODO: rename
+func getPackageVersion2(imageChroot *safechroot.Chroot, packageName string) (version string, err error) {
+
+	err = imageChroot.UnsafeRun(func() error {
+		version, _, err = shell.Execute("rpm", "-q", "--queryformat", "%{VERSION}", packageName)
+		return err
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return version, nil
+}
+
 func cleanTdnfCache(imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Cleaning up RPM cache")
 	// Run all cleanup tasks inside the chroot environment

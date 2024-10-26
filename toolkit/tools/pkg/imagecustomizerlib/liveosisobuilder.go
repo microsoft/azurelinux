@@ -31,10 +31,11 @@ const (
 	grubx64Binary         = "grubx64.efi"
 	grubx64NoPrefixBinary = "grubx64-noprefix.efi"
 
-	isoGrubCfg     = "grub.cfg"
-	pxeGrubCfg     = "grub-pxe.cfg"
-	pxeGrubCfgDir  = "/boot/grub2"
-	pxeKernelsArgs = "ip=dhcp"
+	grubCfgDir          = "/boot/grub2"
+	isoGrubCfg          = "grub.cfg"
+	pxeGrubCfg          = "grub-pxe.cfg"
+	pxeKernelsArgs      = "ip=dhcp"
+	pxeDracutMinVersion = 105
 
 	searchCommandTemplate   = "search --label %s --set root"
 	rootValueLiveOSTemplate = "live:LABEL=%s"
@@ -86,6 +87,7 @@ type IsoWorkingDirs struct {
 // a LiveOS ISO image.
 type IsoArtifacts struct {
 	kernelVersion        string
+	dracutVersion        uint64
 	bootx64EfiPath       string
 	grubx64EfiPath       string
 	isoGrubCfgPath       string
@@ -248,18 +250,47 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
+// mergeConfigs
+//
+//		This function merges:
+//	 - a subset of the user current input configuration yaml.
+//	 - a subset of the user saved (from previous runs) input configuration yaml.
+//
+//	 Depending on the configuration the behavior can be:
+//	 - Concatenation:
+//	   - like in the case of iso-specific kernel parameters.
+//	 - Replacement:
+//	   - like in the case of the pxeImageUrl
+//
+//	 In case of replacement, priority is given to the new configuration if
+//	 present.
+//
+// inputs:
+//   - savedConfigsFilePath:
+//     full path to the yaml configuration file hold configuration from previous
+//     runs.
+//   - newKernelArgs:
+//     kernel argument specified by the user in this run.
+//   - newPxeIsoImageUrl:
+//     PXE ISO image URL specified by the user in this run.
+//   - newOSDracutVersion:
+//     Dracut package version of the rootfs provided by the user.
+//
+// outputs:
+// - returns a SavedConfigs objects with the new merged values.
 func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.KernelExtraArguments,
-	newPxeIsoImageUrl string) (mergedConfigs *SavedConfigs, err error) {
+	newPxeIsoImageUrl string, newOSDracutVersion uint64) (mergedConfigs *SavedConfigs, err error) {
 	mergedConfigs = &SavedConfigs{}
 	mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = newKernelArgs
 	mergedConfigs.Pxe.IsoImageUrl = newPxeIsoImageUrl
+	mergedConfigs.OS.dracutVersion = newOSDracutVersion
 
 	savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load saved configurations (%s):\n%w", savedConfigsFilePath, err)
 	}
 
-	if savedConfigs != nil && !savedConfigs.IsEmpty() {
+	if savedConfigs != nil {
 		// do we have kernel arguments from a previous run?
 		if savedConfigs.Iso.KernelCommandLine.ExtraCommandLine != "" {
 			// If yes, add them before the new kernel arguments.
@@ -272,13 +303,28 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 		if newPxeIsoImageUrl == "" && savedConfigs.Pxe.IsoImageUrl != "" {
 			mergedConfigs.Pxe.IsoImageUrl = savedConfigs.Pxe.IsoImageUrl
 		}
+
+		// newOSDracutVersion can be 0 if the input is an ISO and the
+		// configuration does not specify OS changes.
+		// In such cases, the rootfs is not expanded, and no information will
+		// be retrieved from there. So, instead of extracting the version
+		// from the rootfs, we fall back to using the saved information for
+		// the dracut version.
+		if newOSDracutVersion == 0 {
+			mergedConfigs.OS.dracutVersion = savedConfigs.OS.dracutVersion
+		}
+	}
+
+	err = mergedConfigs.persistSavedConfigs(savedConfigsFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save iso configs:\n%w", err)
 	}
 
 	return mergedConfigs, nil
 }
 
-func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfgFileName string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
-	pxeGrubCfgFileName string, pxeIsoImageUrl string, outputImageBase string) error {
+func (b *LiveOSIsoBuilder) updateGrubCfg(isoGrubCfgFileName string, pxeGrubCfgFileName string,
+	savedConfigs *SavedConfigs, outputImageBase string) error {
 
 	inputContentString, err := file.Read(isoGrubCfgFileName)
 	if err != nil {
@@ -338,13 +384,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
 
-	mergedConfigs, err := mergeConfigs(savedConfigsFilePath, extraCommandLine, pxeIsoImageUrl)
-	if err != nil {
-		return fmt.Errorf("failed to combine additional kernel command line parameters:\n%w", err)
-	}
-
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
-	additionalKernelCommandline := liveosKernelArgs + " " + string(mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine)
+	additionalKernelCommandline := liveosKernelArgs + " " + string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine)
 
 	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline,
 		true /*allowMultiple*/, false /*requireKernelOpts*/)
@@ -352,19 +393,18 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfg
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}
 
-	err = mergedConfigs.persistSavedConfigs(savedConfigsFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to save iso configs:\n%w", err)
-	}
-
 	err = file.Write(inputContentString, isoGrubCfgFileName)
 	if err != nil {
 		return fmt.Errorf("failed to write %s:\n%w", isoGrubCfgFileName, err)
 	}
 
-	err = generatePxeGrubCfg(inputContentString, mergedConfigs.Pxe.IsoImageUrl, outputImageBase, pxeGrubCfgFileName)
-	if err != nil {
-		return fmt.Errorf("failed to create grub configuration for PXE booting.\n%w", err)
+	if savedConfigs.OS.dracutVersion >= pxeDracutMinVersion {
+		err = generatePxeGrubCfg(inputContentString, savedConfigs.Pxe.IsoImageUrl, outputImageBase, pxeGrubCfgFileName)
+		if err != nil {
+			return fmt.Errorf("failed to create grub configuration for PXE booting.\n%w", err)
+		}
+	} else {
+		logger.Log.Warnf("cannot generate grub.cfg for PXE booting. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, b.artifacts.dracutVersion)
 	}
 
 	return nil
@@ -601,8 +641,7 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 
 // findKernelVersion
 //
-// given a rootfs, this function:
-// - extracts the kernel version, and the files under the boot folder.
+// given a rootfs, this function extracts the kernel version.
 //
 // inputs:
 //   - writeableRootfsDir:
@@ -646,6 +685,47 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 	return nil
 }
 
+// findDracutVersion
+//
+// given a rootfs, this function extracts the dracut version.
+//
+// inputs:
+//   - rootfsSourceDir:
+//     local folder (on the build machine) of the rootfs to be used when
+//     querying for the dracut version.
+//
+// outputs:
+//   - the following is populated:
+//     b.artifacts.dracutVersion
+func (b *LiveOSIsoBuilder) findDracutVersion(rootfsSourceDir string) error {
+	chroot := safechroot.NewChroot(rootfsSourceDir, true /*isExistingDir*/)
+	if chroot == nil {
+		return fmt.Errorf("failed to create a new chroot object for %s.", rootfsSourceDir)
+	}
+	defer chroot.Close(true /*leaveOnDisk*/)
+
+	err := chroot.Initialize("", nil, nil, true /*includeDefaultMounts*/)
+	if err != nil {
+		return fmt.Errorf("failed to initialize chroot object for %s:\n%w", rootfsSourceDir, err)
+	}
+
+	// TODO: rename
+	packageName := "dracut"
+	versionString, err := getPackageVersion2(chroot, packageName)
+	if err != nil {
+		return fmt.Errorf("failed to get package version for (%s):\n%w", packageName, err)
+	}
+	version, err := strconv.ParseUint(versionString, 10 /*base*/, 64 /*size*/)
+	if err != nil {
+		return fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", versionString, packageName, err)
+	}
+	b.artifacts.dracutVersion = version
+
+	// TODO: remove
+	logger.Log.Debugf("Dracut version is (%d)\n", b.artifacts.dracutVersion)
+	return nil
+}
+
 // prepareLiveOSDir
 //
 //	given a rootfs, this function:
@@ -686,6 +766,11 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, wr
 		return err
 	}
 
+	err = b.findDracutVersion(writeableRootfsDir)
+	if err != nil {
+		return err
+	}
+
 	err = b.extractBootDirFiles(writeableRootfsDir)
 	if err != nil {
 		return err
@@ -702,8 +787,12 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, wr
 		}
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine,
-		b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
+	mergedConfigs, err := mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageUrl, b.artifacts.dracutVersion)
+	if err != nil {
+		return fmt.Errorf("failed to combine saved configurations with new configuration:\n%w", err)
+	}
+
+	err = b.updateGrubCfg(b.artifacts.isoGrubCfgPath, b.artifacts.pxeGrubCfgPath, mergedConfigs, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -899,7 +988,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePa
 //
 // ouptuts:
 //   - create a LiveOS ISO.
-func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) (isoRepoDirPath string, err error) {
+func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) (isoImagePath string, err error) {
 	baseDirPath := ""
 
 	// unattended install is where the ISO OS configures a persistent storage
@@ -916,13 +1005,13 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	// No stock resources are needed for the LiveOS scenario.
 	// No rpms are needed for the LiveOS scenario.
 	enableRpmRepo := false
-	isoRepoDirPath = ""
+	isoRepoDirPath := ""
 
 	// isoMaker constructs the final image name as follows:
 	// {isoOutputDir}/{isoOutputBaseName}{releaseVersion}{imageNameTag}.iso
 	releaseVersion := ""
 	imageNameTag := ""
-	isoImagePath := filepath.Join(isoOutputDir, isoOutputBaseName+releaseVersion+imageNameTag+".iso")
+	isoImagePath = filepath.Join(isoOutputDir, isoOutputBaseName+releaseVersion+imageNameTag+".iso")
 
 	// empty target system config since LiveOS does not install the OS
 	// artifacts to the target system.
@@ -966,7 +1055,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	if exists {
 		fileToCopy := safechroot.FileToCopy{
 			Src:  b.artifacts.pxeGrubCfgPath,
-			Dest: filepath.Join("/", pxeGrubCfgDir, pxeGrubCfg),
+			Dest: filepath.Join("/", grubCfgDir, pxeGrubCfg),
 		}
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
@@ -1168,9 +1257,14 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		return err
 	}
 
-	err = populatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
-	if err != nil {
-		return err
+	if outputPXEArtifactsDir != "" {
+		if isoBuilder.artifacts.dracutVersion < pxeDracutMinVersion {
+			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, isoBuilder.artifacts.dracutVersion)
+		}
+		err = populatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -1418,8 +1512,12 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		pxeIsoImageUrl = pxeConfig.IsoImageUrl
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine,
-		b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
+	mergedConfigs, err := mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageUrl, b.artifacts.dracutVersion)
+	if err != nil {
+		return fmt.Errorf("failed to combine saved configurations with new configuration:\n%w", err)
+	}
+
+	err = b.updateGrubCfg(b.artifacts.isoGrubCfgPath, b.artifacts.pxeGrubCfgPath, mergedConfigs, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -1429,9 +1527,15 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		return fmt.Errorf("failed to create iso image:\n%w", err)
 	}
 
-	err = populatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
-	if err != nil {
-		return err
+	if outputPXEArtifactsDir != "" {
+		if b.artifacts.dracutVersion < pxeDracutMinVersion {
+			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, b.artifacts.dracutVersion)
+		}
+
+		err = populatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -1460,10 +1564,6 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 //   - creates a folder with PXE artifacts.
 func populatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArtifactsDir string, outputImageBase string) error {
 
-	if outputPXEArtifactsDir == "" {
-		return nil
-	}
-
 	logger.Log.Infof("Copying PXE artifacts to (%s)", outputPXEArtifactsDir)
 
 	err := os.RemoveAll(outputPXEArtifactsDir)
@@ -1476,16 +1576,16 @@ func populatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArti
 		return err
 	}
 
-	isoGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub.cfg")
-	pxeGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub-pxe.cfg")
-	err = file.Copy(pxeGrubCfg, isoGrubCfg)
+	isoGrubCfgPath := filepath.Join(outputPXEArtifactsDir, grubCfgDir, isoGrubCfg)
+	pxeGrubCfgPath := filepath.Join(outputPXEArtifactsDir, grubCfgDir, pxeGrubCfg)
+	err = file.Copy(pxeGrubCfgPath, isoGrubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to copy (%s) to (%s) while populating the PXE artifacts directory:\n%w", pxeGrubCfg, isoGrubCfg, err)
+		return fmt.Errorf("failed to copy (%s) to (%s) while populating the PXE artifacts directory:\n%w", pxeGrubCfgPath, isoGrubCfgPath, err)
 	}
 
-	err = os.RemoveAll(pxeGrubCfg)
+	err = os.RemoveAll(pxeGrubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to remove file (%s):\n%w", pxeGrubCfg, err)
+		return fmt.Errorf("failed to remove file (%s):\n%w", pxeGrubCfgPath, err)
 	}
 
 	artifactsIsoImagePath := filepath.Join(outputPXEArtifactsDir, outputImageBase+".iso")
@@ -1514,7 +1614,7 @@ func getSizeOnDiskInBytes(rootDir string) (size uint64, err error) {
 
 	duStdout, _, err := shell.Execute("du", "-s", rootDir)
 	if err != nil {
-		return 0, fmt.Errorf("failed find the size of the specified folder using 'du' for (%s):\n%w", rootDir, err)
+		return 0, fmt.Errorf("failed to find the size of the specified folder using 'du' for (%s):\n%w", rootDir, err)
 	}
 
 	// parse and get count and unit

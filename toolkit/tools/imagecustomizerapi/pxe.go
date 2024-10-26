@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var PxeIsoDownloadProtocols = []string{"http://"}
+var PxeIsoDownloadProtocols = []string{"ftp://", "http://", "https://", "nfs://", "tftp://"}
 
 // Iso defines how the generated iso media should be configured.
 type Pxe struct {
@@ -20,7 +20,7 @@ func (p *Pxe) IsValid() error {
 	if p.IsoImageUrl != "" {
 		_, err := url.Parse(p.IsoImageUrl)
 		if err != nil {
-			return fmt.Errorf("invalud ISO image URL:\n%w", err)
+			return fmt.Errorf("invalid IsoImageUrl value (%s):\n%w", p.IsoImageUrl, err)
 		}
 
 		protocolFound := false
