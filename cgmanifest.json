@@ -21503,8 +21503,8 @@
         "type": "other",
         "other": {
           "name": "pyatspi",
-          "version": "2.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/pyatspi/2.36/pyatspi-2.36.0.tar.xz"
+          "version": "2.46.1",
+          "downloadUrl": "https://download.gnome.org/sources/pyatspi/2.46/pyatspi-2.46.1.tar.xz"
         }
       }
     },
