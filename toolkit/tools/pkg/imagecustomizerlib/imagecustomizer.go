@@ -428,18 +428,11 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 		}
 
 	case ImageFormatIso:
-		if ic.customizeOSPartitions || inputIsoArtifacts == nil {
-			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.config.Pxe, ic.rawImageFile,
-				ic.outputImageDir, ic.outputImageBase, ic.outputPXEArtifactsDir)
-			if err != nil {
-				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
-			}
-		} else {
-			err := inputIsoArtifacts.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.config.Pxe,
-				ic.outputImageDir, ic.outputImageBase, ic.outputPXEArtifactsDir)
-			if err != nil {
-				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
-			}
+		recreateRootfs := ic.customizeOSPartitions || inputIsoArtifacts == nil
+		err := createIsoImage(recreateRootfs, ic.rawImageFile, inputIsoArtifacts, ic.buildDir, ic.configPath, ic.config.Iso,
+			ic.config.Pxe, ic.outputImageDir, ic.outputImageBase, ic.outputPXEArtifactsDir)
+		if err != nil {
+			return fmt.Errorf("failed to create LiveOS iso image\n%w", err)
 		}
 	}
 
