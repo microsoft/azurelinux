@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -44,13 +45,29 @@ type PxeSavedConfigs struct {
 	IsoImageUrl string `yaml:"isoImageUrl"`
 }
 
-func (i *PxeSavedConfigs) IsValid() error {
+func (p *PxeSavedConfigs) IsValid() error {
+	if p.IsoImageUrl != "" {
+		_, err := url.Parse(p.IsoImageUrl)
+		if err != nil {
+			fmt.Errorf("invalid IsoImageUrl value (%s):\n%w", p.IsoImageUrl, err)
+		}
+	}
+
+	return nil
+}
+
+type OSSavedConfigs struct {
+	dracutVersion uint64 `yaml:"dracutVersion"`
+}
+
+func (i *OSSavedConfigs) IsValid() error {
 	return nil
 }
 
 type SavedConfigs struct {
 	Iso IsoSavedConfigs `yaml:"iso"`
 	Pxe PxeSavedConfigs `yaml:"pxe"`
+	OS  OSSavedConfigs  `yaml:"os"`
 }
 
 func (c *SavedConfigs) IsValid() (err error) {
@@ -64,19 +81,15 @@ func (c *SavedConfigs) IsValid() (err error) {
 		return fmt.Errorf("invalid 'pxe' field:\n%w", err)
 	}
 
+	err = c.OS.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalud 'os' field:\n%w", err)
+	}
+
 	return nil
 }
 
-func (c *SavedConfigs) IsEmpty() bool {
-	isoConfigEmpty := c.Iso.KernelCommandLine.ExtraCommandLine == ""
-	return isoConfigEmpty
-}
-
 func (c *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err error) {
-	if c.IsEmpty() {
-		return nil
-	}
-
 	err = os.MkdirAll(filepath.Dir(savedConfigsFilePath), os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create directory for (%s):\n%w", savedConfigsFilePath, err)
