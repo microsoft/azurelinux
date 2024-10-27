@@ -3148,8 +3148,8 @@
         "type": "other",
         "other": {
           "name": "edac-utils",
-          "version": "0.16",
-          "downloadUrl": "https://github.com/grondo/edac-utils/archive/refs/tags/edac-utils-0.16.tar.bz2"
+          "version": "0.18",
+          "downloadUrl": "https://github.com/grondo/edac-utils/archive/0.18/edac-utils-0.18.tar.gz"
         }
       }
     },
