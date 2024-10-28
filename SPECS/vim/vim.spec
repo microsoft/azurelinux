@@ -203,6 +203,9 @@ fi
 - Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
 - Added language configurations for Amharic and Hungarian
 
+* Tue Oct 08 2024 Sam Meluch <sammeluch@microsoft.com> - 9.0.2121-5
+- Add patch to resolve CVE-2024-43802
+
 * Wed Sep 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2121-4
 - Add patch to resolve CVE-2024-41957 & CVE-2024-41965
 
