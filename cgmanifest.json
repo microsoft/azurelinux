@@ -5170,8 +5170,8 @@
         "type": "other",
         "other": {
           "name": "hdf",
-          "version": "4.2.15",
-          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.15/src/hdf-4.2.15.tar.bz2"
+          "version": "4.3.0",
+          "downloadUrl": "https://github.com/HDFGroup/hdf4/archive/refs/tags/hdf4.3.0.tar.gz"
         }
       }
     },
