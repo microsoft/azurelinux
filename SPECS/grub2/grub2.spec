@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -311,18 +311,19 @@ cat ./sbat.csv
 # Generate grub efi image
 install -d %{buildroot}%{_datadir}/grub2-efi
 %ifarch x86_64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2 xfs
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi --prefix= -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2 xfs
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi password password_pbkdf2 fat cat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2 xfs
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi --prefix= -O x86_64-efi password password_pbkdf2 fat cat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2 xfs
 %endif
 %ifarch aarch64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp xfs
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi --prefix= -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp xfs
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi password password_pbkdf2 fat cat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp xfs
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi --prefix= -O arm64-efi password password_pbkdf2 fat cat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp xfs
 %endif
 
 # Install to efi directory
 EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/BOOT
 GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
+GRUB_MODULE_DIR_SOURCE=
 
 install -d $EFI_BOOT_DIR
 
@@ -331,6 +332,9 @@ GRUB_MODULE_NAME=grubx64.efi
 GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi
+
+mv %{buildroot}%{_libdir}/grub/i386-pc %{buildroot}/boot/grub2
+mv %{buildroot}%{_libdir}/grub/x86_64-efi %{buildroot}/boot/grub2
 %endif
 
 %ifarch aarch64
@@ -338,6 +342,8 @@ GRUB_MODULE_NAME=grubaa64.efi
 GRUB_PXE_MODULE_NAME=grubaa64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi
+
+mv %{buildroot}%{_libdir}/grub/arm64-efi %{buildroot}/boot/grub2
 %endif
 
 cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
@@ -383,10 +389,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %ifarch x86_64
 %files pc
-%{_libdir}/grub/i386-pc
+/boot/%{name}/i386-pc
 
 %files efi
-%{_libdir}/grub/x86_64-efi
+/boot/%{name}/x86_64-efi
 %endif
 
 %files efi-unsigned
@@ -410,7 +416,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %ifarch aarch64
 %files efi
-%{_libdir}/grub/*
+/boot/%{name}/arm64-efi
 %endif
 
 %files configuration
@@ -428,6 +434,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Oct 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-21
+- Move -efi and -pc grub module packages to correct location in /boot/grub2
+
 * Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
 - Move grub2-rpm-macros to the azurelinux-rpm-macros package
 
