@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 
@@ -42,17 +41,22 @@ func (i *IsoSavedConfigs) IsValid() error {
 }
 
 type PxeSavedConfigs struct {
-	IsoImageUrl string `yaml:"isoImageUrl"`
+	IsoImageBaseUrl string `yaml:"isoImageBaseUrl"`
+	IsoImageFileUrl string `yaml:"isoImageFileUrl"`
 }
 
 func (p *PxeSavedConfigs) IsValid() error {
-	if p.IsoImageUrl != "" {
-		_, err := url.Parse(p.IsoImageUrl)
-		if err != nil {
-			fmt.Errorf("invalid IsoImageUrl value (%s):\n%w", p.IsoImageUrl, err)
-		}
+	if p.IsoImageBaseUrl != "" && p.IsoImageFileUrl != "" {
+		return fmt.Errorf("cannot specify both 'isoImageBaseUrl' and 'isoImageFileUrl' at the same time.")
 	}
-
+	err := imagecustomizerapi.IsValidPxeUrl(p.IsoImageBaseUrl)
+	if err != nil {
+		return err
+	}
+	err = imagecustomizerapi.IsValidPxeUrl(p.IsoImageFileUrl)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
