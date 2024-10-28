@@ -32,7 +32,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-%{efiarch}
 Version:        15.8
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
