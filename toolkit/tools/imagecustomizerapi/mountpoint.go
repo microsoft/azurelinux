@@ -37,11 +37,6 @@ func (p *MountPoint) UnmarshalYAML(value *yaml.Node) error {
 
 // IsValid returns an error if the MountPoint is not valid
 func (p *MountPoint) IsValid() error {
-
-	if p.Path == "" {
-		return fmt.Errorf("invalid path: path cannot be empty")
-	}
-
 	err := p.IdType.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid idType value:\n%w", err)
