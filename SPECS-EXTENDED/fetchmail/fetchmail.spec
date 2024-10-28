@@ -1,17 +1,14 @@
 Summary:        A remote mail retrieval and forwarding utility
 Name:           fetchmail
-Version:        6.4.22
+Version:        6.5.0
 Release:        1%{?dist}
 # For a breakdown of the licensing, see COPYING
 License:        GPL+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.fetchmail.info/
-Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
-# systemd service file
-Source2:        fetchmail.service
-# example configuration file
-Source3:        fetchmailrc.example
+Source0:        https://sourceforge.net/projects/%{name}/files/branch_6.5/%{name}-%{version}.rc2.tar.xz
+Source1:        https://sourceforge.net/projects/%{name}/files/branch_6.5/%{name}-%{version}.rc2.tar.xz.asc
 BuildRequires:  gcc
 BuildRequires:  gettext-devel
 BuildRequires:  krb5-devel
@@ -31,7 +28,7 @@ Install fetchmail if you need to retrieve mail over SLIP or PPP
 connections.
 
 %prep
-%autosetup -p1
+%setup -q -n %{name}-%{version}.rc2
 
 %build
 %configure \
@@ -53,13 +50,6 @@ connections.
 %install
 %make_install DESTDIR=%{buildroot}
 
-# install example systemd unit
-mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/fetchmail.service
-
-# install example config file
-mkdir -p %{buildroot}%{_sysconfdir}
-install -p -m 600 %{SOURCE3} %{buildroot}%{_sysconfdir}/fetchmailrc.example
 
 # remove fetchmailconf stuff
 rm -f %{buildroot}%{_bindir}/fetchmailconf*
@@ -71,13 +61,15 @@ rm -f %{buildroot}%{python3_sitelib}/__pycache__/fetchmailconf*
 
 %files -f %{name}.lang
 %license COPYING
-%doc FAQ FEATURES NEWS NOTES README README.SSL TODO
+%doc FAQ FEATURES NEWS NOTES README README.SSL TODO contrib/systemd
 %{_bindir}/fetchmail
 %{_mandir}/man1/fetchmail.1*
-%{_unitdir}/fetchmail.service
-%config(noreplace) %attr(0600, mail, mail) %{_sysconfdir}/fetchmailrc.example
 
 %changelog
+* Mon Oct 28 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 6.5.0-1
+- Update to 6.5.0
+-License verified
+
 * Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 6.4.22-1
 - Upgrade version to address CVE-2021-39272 & CVE-2021-36386
 - License verified
