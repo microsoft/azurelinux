@@ -1,16 +1,19 @@
 %global dbver_rel 4.0
-%global dbver_snap 20201104
+%global dbver_snap 20241027
+
 Summary:        Database of printers and printer drivers
 Name:           foomatic-db
 Version:        %{dbver_rel}
-Release:        71%{?dist}
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.openprinting.org
-Source0:        %{_distro_sources_url}/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+Source0: http://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+
 Patch1:         foomatic-db-device-ids.patch
 Patch2:         foomatic-db-invalid.patch
+
 BuildRequires:  cups
 BuildRequires:  make
 BuildRequires:  perl-interpreter
@@ -45,9 +48,9 @@ Requires:       sed
 PPDs from printer manufacturers.
 
 %prep
-%setup -q -n foomatic-db-%{dbver_snap}
+%autosetup -n foomatic-db-%{dbver_snap}
 
-find -type d | xargs chmod g-s
+find -type d | xargs -d '\n' chmod g-s
 
 pushd db/source
 
@@ -164,6 +167,10 @@ ln -sf ../../foomatic/db/source/PPD %{buildroot}%{_datadir}/cups/model/foomatic-
 %{_datadir}/cups/model/foomatic-db-ppds
 
 %changelog
+* Mon Oct 28 2024 Jyoti kanase <v-jykanase@microsoft.com> - 4.0.20241027-1
+- Update to version 4.0.20241027
+- License verified
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-71
 - Updating naming for 3.0 version of Azure Linux.
 
