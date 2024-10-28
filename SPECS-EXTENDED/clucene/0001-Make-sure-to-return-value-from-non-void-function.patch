@@ -1,0 +1,40 @@
+From 44cc1d696b6528712d92d33660dd8017dcd0b3e2 Mon Sep 17 00:00:00 2001
+From: Stephan Bergmann <sbergman@redhat.com>
+Date: Wed, 31 Jul 2019 16:57:31 +0200
+Subject: [PATCH 1/2] Make sure to return value from non-void function
+
+This had been commented out with 92145f058c88a9607341d8a20c3944a96ec00cf8
+"All remaining memory leaks int tests removed. Fixes made by Veit and Anthony
+Novatsis are incorporated" for no apparent reason---presumably by accident.
+
+The effect (besides a -Wreturn-type warning) when building e.g. RelWithDebInfo
+(i.e., with optimizations) on Fedora 30 (with GCC 9.1) was that the implicit
+call to ~WhitespaceAnalyzer at the end of searchDocs was directly followed
+(lacking the code sequence corresponding to "return 0;") by some compiler-
+generated code to jump into some _Z10searchDocsPv.cold code (which is apparently
+meant as an optimization, to be called from certain cold conditions) which
+happened to also call ~WhitespaceAnalyzer.  The net effect was that the
+
+    WhitespaceAnalyzer an;
+
+object was deleted twice, causing a SIGSEGV.
+---
+ src/test/search/TestIndexSearcher.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/search/TestIndexSearcher.cpp b/src/test/search/TestIndexSearcher.cpp
+index 5c410ff4..02c21aaf 100644
+--- a/src/test/search/TestIndexSearcher.cpp
++++ b/src/test/search/TestIndexSearcher.cpp
+@@ -28,7 +28,7 @@ _LUCENE_THREAD_FUNC(searchDocs, _searcher) {
+     _CLLDELETE(query);
+ 
+     CONDITION_WAIT(deleteMutex, deleteCondition);
+-//    _LUCENE_THREAD_FUNC_RETURN(0);
++    _LUCENE_THREAD_FUNC_RETURN(0);
+ }
+ 
+ void testEndThreadException(CuTest *tc) {
+-- 
+2.21.0
+

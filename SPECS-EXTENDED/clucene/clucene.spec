@@ -27,6 +27,7 @@ BuildRequires:	cmake
 BuildRequires:	gawk
 BuildRequires:	gcc-c++
 BuildRequires:	zlib-devel
+BuildRequires: make
 
 ## upstreamable patches
 # include LUCENE_SYS_INCLUDES in pkgconfig --cflags output
@@ -43,6 +44,13 @@ Patch51: clucene-core-2.3.3.4-install_contribs_lib.patch
 Patch52: clucene-core-2.3.3.4-CLuceneConfig.patch
 # Fix tests for undefined usleep
 Patch53: clucene-core-2.3.3.4-usleep.patch
+# Upstream at <https://sourceforge.net/p/clucene/bugs/232/> "Patches for
+# TestIndexSearcher failures":
+Patch54: 0001-Make-sure-to-return-value-from-non-void-function.patch
+Patch55: 0002-Avoid-deadlock-in-TestIndexSearcher.patch
+# Upstream at <https://sourceforge.net/p/clucene/code/merge-requests/3/> "Fix
+# missing #include <time.h>":
+Patch56: 0001-Fix-missing-include-time.h.patch
 
 %description
 CLucene is a C++ port of the popular Apache Lucene search engine
@@ -79,32 +87,29 @@ Requires:	%{name}-core%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -n %{name}-core-%{version}
-
-%patch 50 -p1 -b .pkgconfig
-%patch 51 -p1 -b .install_contribs_lib
-%patch 52 -p1 -b .CLuceneConfig
-%patch 53 -p1 -b .usleep
+ 
+%patch -P50 -p1 -b .pkgconfig
+%patch -P51 -p1 -b .install_contribs_lib
+%patch -P52 -p1 -b .CLuceneConfig
+%patch -P53 -p1 -b .usleep
+%patch -P54 -p1 -b .return-value
+%patch -P55 -p1 -b .avoid-deadlock
+%patch -P56 -p1 -b .missing-include
 
 # nuke bundled code
 rm -rfv src/ext/{boost/,zlib/}
 
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
 %{cmake} \
   -DBUILD_CONTRIBS_LIB:BOOL=ON \
   -DLIB_DESTINATION:PATH=%{_libdir} \
-  -DLUCENE_SYS_INCLUDES:PATH=%{_libdir} \
-  ..
-popd
+  -DLUCENE_SYS_INCLUDES:PATH=%{_libdir}
 
-make %{?_smp_mflags} -C %{_target_platform}
-
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
-
+%cmake_install
 
 %check
 export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
