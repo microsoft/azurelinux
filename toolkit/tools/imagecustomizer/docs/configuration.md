@@ -1044,6 +1044,28 @@ The mounts will be sorted to ensure that parent directories are mounted before c
 directories.
 For example, `/boot` will be mounted before `/boot/efi`.
 
+#### Usage
+
+You can configure `mountPoint` in one of two ways:
+
+1. **Structured Format**: Use `idType`, `options`, and `path` fields for a more detailed configuration.
+   
+   ```yaml
+   mountPoint:
+     path: /boot/efi
+     options: umask=0077
+     idType: part-uuid
+   ```
+
+2. **Shorthand Path Format**: Provide the mount path directly as a string when only `path` is required.
+
+   ```yaml
+   mountPoint: /boot/efi
+   ```
+
+   In this shorthand format, only the `path` is specified, and default values will be applied to any optional fields.
+
+
 ## script type
 
 Points to a script file (typically a Bash script) to be run during customization.
