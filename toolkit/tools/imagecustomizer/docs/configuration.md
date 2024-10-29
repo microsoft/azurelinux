@@ -72,6 +72,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 22. If the output format is set to `iso`, copy additional iso media files.
     ([iso](#iso-type))
 
+23. If ([--output-pxe-artifacts-dir](./cli.md#output-pxe-artifacts-dir)) is specified,
+    then export the ISO image contents to the specified folder.
+
 ### /etc/resolv.conf
 
 The `/etc/resolv.conf` file is overridden during customization so that the package
@@ -363,6 +366,9 @@ For example,
 
 This field is mutually exclusive with `isoImageFileUrl`.
 
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
+
 ### isoImageFileUrl [string]
 
 Specifies the URL of the ISO image to download at boot time.
@@ -379,6 +385,9 @@ PXE Configuration Example:
 The supported download protocols are: nfs, http, https, ftp, torent, tftp.
 
 This field is mutually exclusive with `isoImageBaseUrl`.
+
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
 
 ## iso type
 

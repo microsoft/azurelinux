@@ -110,35 +110,8 @@ installation.
 
 Create a folder containing the artifacts to be used for PXE booting.
 
-Below is a list of required artifacts and where on the PXE server they should
-be deployed:
-
-```
-folder artifacts            target on PXE server
---------------------------  ------------------------------
-./efi                        <tftp-server-root>
-  |- boot                     |
-      |- bootx64.efi          |- bootx64.efi
-      |- grubx64.efi          |- grubx64.efi
-./boot                        |- boot
-  |- grub2                        |- grub2
-      |- grub.cfg                     |- grub.cfg
-      |- grubenv                      |- grubenv
-  |- vmlinuz                      |- vmlinuz
-  |- initrd.img                   |- initrd.img
-                             <yyyy-server-root>
-./pxe-20240930-1331.iso       |- pxe-20240930-1331.iso
-```
-
-Notes:
-- `yyyy` can be any protocol supported by Dracut's `livenet` module (i.e
-  tftp, http, etc).
-- The ISO image file location under the server root is customizatable -
-  but it must such that its URL matches what is specified in the grub.cfg
-  `root=live:<URL>`.
-
-For a sample script deploying the artifacts to a PXE server, see
-[./samples/deploy-pxe-artifacts.sh](./samples/deploy-pxe-artifacts.sh).
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
 
 ## --log-level=LEVEL
 
