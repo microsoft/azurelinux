@@ -1,17 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libgexiv2
-Version:        0.14.2
-Release:        1%{?dist}
+Version:        0.14.3
+Release:        2%{?dist}
 Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
-License:        GPLv2+
+License:        GPL-2.0-or-later
 URL:            https://wiki.gnome.org/Projects/gexiv2
 Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  exiv2-devel >= 0.28.0
+BuildRequires:  pkgconfig(exiv2)
 BuildRequires:  gcc-c++
+BuildRequires:  gtk-doc
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
 BuildRequires:  vala
@@ -32,36 +32,32 @@ developing applications that use %{name}.
 
 %package -n     python3-gexiv2
 Summary:        Python3 bindings for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       python3-gobject-base%{?_isa}
+BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
+#Requires:       python3-gobject-base-noarch
 
 %description -n python3-gexiv2
 This package contains the python3 bindings for %{name}
 
 %prep
-%setup -q -n gexiv2-%{version}
+%autosetup -p1 -n gexiv2-%{version}
 
 %build
 %meson \
-  -Dgtk_doc=false \
+  -Dgtk_doc=true \
+  -Dtests=true \
   %{nil}
 %meson_build
 
 %install
 %meson_install
 
-# Explicitly byte compile as the automagic byte compilation doesn't work for
-# /app prefix in flatpak builds
-%py_byte_compile %{__python3} %{buildroot}%{python3_sitearch}/gi/overrides
-
 %check
 %meson_test
 
-%ldconfig_scriptlets
-
 %files
 %license COPYING
-%doc AUTHORS THANKS README
+%doc AUTHORS NEWS README.md THANKS
 %{_libdir}/libgexiv2.so.2*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/GExiv2-0.10.typelib
@@ -72,18 +68,87 @@ This package contains the python3 bindings for %{name}
 %{_libdir}/pkgconfig/gexiv2.pc
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/GExiv2-0.10.gir
+%dir %{_datadir}/gtk-doc
+%dir %{_datadir}/gtk-doc/html
+%{_datadir}/gtk-doc/html/gexiv2/
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/gexiv2.deps
 %{_datadir}/vala/vapi/gexiv2.vapi
 
 %files -n python3-gexiv2
-%{python3_sitearch}/gi/overrides/GExiv2.py
-%{python3_sitearch}/gi/overrides/__pycache__/GExiv2*
+%pycached %{python3_sitelib}/gi/overrides/GExiv2.py
 
 %changelog
+* Mon Oct 18 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.14.3-3
+- Update to 0.14.3 from 0.14.2
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jul 01 2024 Nieves Montero <nmontero@redhat.com> - 0.14.3-1
+- Update to 0.14.3
+
+* Sun Jun 16 2024 Robert-André Mauchin <zebob.m@gmail.com> - 0.14.2-5
+- Rebuild for exiv2 0.28.2
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.14.2-4
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
 * Mon Sep 18 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.14.2-1
 - Upgrade version to enable build with exiv2 >= 0.28.0
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 0.14.1-2
+- Rebuilt for Python 3.12
+
+* Tue May 09 2023 David King <amigadave@amigadave.com> - 0.14.1-1
+- Update to 0.14.1
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.14.0-3
+- Rebuilt for Python 3.11
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Sep 18 2021 Kalev Lember <klember@redhat.com> - 0.14.0-1
+- Update to 0.14.0
+
+* Mon Aug 16 2021 Kalev Lember <klember@redhat.com> - 0.13.0-1
+- Update to 0.13.0
+ 
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.12.2-3
+- Rebuilt for Python 3.10
+
+* Sat Feb 20 2021 Kalev Lember <klember@redhat.com> - 0.12.2-2
+- Remove no longer needed ldconfig_scriptlets macro call
+- Remove explicit byte compilation as the automatic works for flatpak builds now
+
+* Sat Feb 20 2021 Kalev Lember <klember@redhat.com> - 0.12.2-1
+- Update to 0.12.2
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-3
 - Adding BR on '%%{_bindir}/xsltproc'.
@@ -92,6 +157,10 @@ This package contains the python3 bindings for %{name}
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.12.1-2
+- Rebuilt for Python 3.9
 
 * Mon May 25 2020 Kalev Lember <klember@redhat.com> - 0.12.1-1
 - Update to 0.12.1
