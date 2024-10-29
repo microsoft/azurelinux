@@ -17,6 +17,10 @@ BuildRequires:  openssl-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 
 %description
 MySQL is a free, widely used SQL engine. It can be used as a fast database as well as a rock-solid DBMS using a modular engine architecture.
@@ -56,8 +60,10 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
+# Tests expect to be run as a non-root user.
+useradd test -G test -m
 # In case of failure, print the test log.
-make test || { cat Testing/Temporary/LastTest.log; false; }
+sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
 %files
 %defattr(-,root,root)
