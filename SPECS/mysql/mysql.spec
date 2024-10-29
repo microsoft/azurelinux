@@ -17,6 +17,11 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
+
 Requires(postun): shadow-utils
 Requires(pre):  shadow-utils
 
@@ -53,8 +58,10 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
+# Tests expect to be run as a non-root user.
+useradd test -G test -m
 # In case of failure, print the test log.
-make test || { cat Testing/Temporary/LastTest.log; false; }
+sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
 %pre
 getent group  mysql  >/dev/null || groupadd -r mysql
