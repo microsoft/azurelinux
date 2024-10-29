@@ -61,7 +61,10 @@ make DESTDIR=%{buildroot} install
 
 %check
 # Tests expect to be run as a non-root user.
-useradd test -G test -m
+groupadd test
+useradd test -g test -m
+chown -R test:test .
+
 # In case of failure, print the test log.
 sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
