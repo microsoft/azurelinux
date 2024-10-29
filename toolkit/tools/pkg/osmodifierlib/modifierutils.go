@@ -111,8 +111,8 @@ func updateDefaultGrubForVerity(verity *imagecustomizerapi.Verity, bootCustomize
 
 	newArgs := []string{
 		"rd.systemd.verity=1",
-		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataPartition.Id),
-		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashPartition.Id),
+		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataDeviceId),
+		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashDeviceId),
 		fmt.Sprintf("systemd.verity_root_options=%s", formattedCorruptionOption),
 	}
 
@@ -180,6 +180,10 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, bootCustomizer *i
 		return err
 	}
 
-	// No need to set SELinux labels here as in trident there is reset labels at the end
+	err = imagecustomizerlib.SelinuxSetFiles(selinuxMode, dummyChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

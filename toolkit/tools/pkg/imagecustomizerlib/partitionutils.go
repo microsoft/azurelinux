@@ -305,6 +305,17 @@ func findSourcePartitionHelper(source string,
 		return imagecustomizerapi.MountIdentifierTypeDefault, diskutils.PartitionInfo{}, 0, err
 	}
 
+	partition, partitionIndex, err := findPartition(mountIdType, mountId, partitions)
+	if err != nil {
+		return imagecustomizerapi.MountIdentifierTypeDefault, diskutils.PartitionInfo{}, 0, err
+	}
+
+	return mountIdType, partition, partitionIndex, nil
+}
+
+func findPartition(mountIdType imagecustomizerapi.MountIdentifierType, mountId string,
+	partitions []diskutils.PartitionInfo,
+) (diskutils.PartitionInfo, int, error) {
 	matchedPartitionIndexes := []int(nil)
 	for i, partition := range partitions {
 		matches := false
@@ -322,18 +333,18 @@ func findSourcePartitionHelper(source string,
 	}
 
 	if len(matchedPartitionIndexes) < 1 {
-		err := fmt.Errorf("partition not found (%s)", source)
-		return imagecustomizerapi.MountIdentifierTypeDefault, diskutils.PartitionInfo{}, 0, err
+		err := fmt.Errorf("partition not found (%s=%s)", mountIdType, mountId)
+		return diskutils.PartitionInfo{}, 0, err
 	}
 	if len(matchedPartitionIndexes) > 1 {
-		err := fmt.Errorf("too many matches for partition found (%s)", source)
-		return imagecustomizerapi.MountIdentifierTypeDefault, diskutils.PartitionInfo{}, 0, err
+		err := fmt.Errorf("too many matches for partition found (%s=%s)", mountIdType, mountId)
+		return diskutils.PartitionInfo{}, 0, err
 	}
 
 	partitionIndex := matchedPartitionIndexes[0]
 	partition := partitions[partitionIndex]
 
-	return mountIdType, partition, partitionIndex, nil
+	return partition, partitionIndex, nil
 }
 
 func parseSourcePartition(source string) (imagecustomizerapi.MountIdentifierType, string, error) {
@@ -417,7 +428,7 @@ func getImageBootTypeHelper(diskPartitions []diskutils.PartitionInfo) (imagecust
 	}
 }
 
-func getNonSpecialChrootMountPoints(imageChroot *safechroot.Chroot) []*safechroot.MountPoint {
+func getNonSpecialChrootMountPoints(imageChroot safechroot.ChrootInterface) []*safechroot.MountPoint {
 	return sliceutils.FindMatches(imageChroot.GetMountPoints(),
 		func(mountPoint *safechroot.MountPoint) bool {
 			switch mountPoint.GetTarget() {
