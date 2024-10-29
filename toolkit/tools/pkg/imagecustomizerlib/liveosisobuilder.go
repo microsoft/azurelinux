@@ -1444,16 +1444,18 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 
 	fileSystemConfigs := []imagecustomizerapi.FileSystem{
 		{
-			DeviceId: "esp",
-			Type:     imagecustomizerapi.FileSystemTypeFat32,
+			DeviceId:    "esp",
+			PartitionId: "esp",
+			Type:        imagecustomizerapi.FileSystemTypeFat32,
 			MountPoint: &imagecustomizerapi.MountPoint{
 				Path:    "/boot/efi",
 				Options: "umask=0077",
 			},
 		},
 		{
-			DeviceId: "rootfs",
-			Type:     imagecustomizerapi.FileSystemTypeExt4,
+			DeviceId:    "rootfs",
+			PartitionId: "rootfs",
+			Type:        imagecustomizerapi.FileSystemTypeExt4,
 			MountPoint: &imagecustomizerapi.MountPoint{
 				Path: "/",
 			},
