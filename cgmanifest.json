@@ -6560,8 +6560,8 @@
         "type": "other",
         "other": {
           "name": "hyphen-ca",
-          "version": "0.9.3",
-          "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/2010/7/hyph-ca.oxt"
+          "version": "1.5",
+          "downloadUrl": "https://github.com/jaumeortola/hyphen-ca/archive/refs/tags/v1.5.tar.gz"
         }
       }
     },

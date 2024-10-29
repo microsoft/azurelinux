@@ -2,11 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: hyphen-ca
 Summary: Catalan hyphenation rules
-Version: 0.9.3
-Release: 20%{?dist}
-Source: https://downloads.sourceforge.net/project/aoo-extensions/2010/7/hyph-ca.oxt
-URL: http://extensions.services.openoffice.org/project/ca_hyph
-License: GPLv3
+Epoch: 1
+Version: 1.5
+Release: 5%{?dist}
+Source: https://github.com/jaumeortola/hyphen-ca/archive/refs/tags/v1.5.tar.gz#/%{name}-%{version}.tar.gz
+URL: https://github.com/jaumeortola/hyphen-ca
+License: GPL-3.0-or-later
 BuildArch: noarch
 
 Requires: hyphen
@@ -16,10 +17,10 @@ Supplements: (hyphen and langpacks-ca)
 Catalan hyphenation rules.
 
 %prep
-%autosetup -c
+%autosetup
 
 %build
-for i in release-note_en.txt release-note_ca.txt; do
+for i in office/release-note_en.txt; do
   tr -d '\r' < $i > $i.new
   touch -r $i $i.new
   mv -f $i.new $i
@@ -27,7 +28,7 @@ done
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
-cp -p hyph_ca_ANY.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_ca_ES.dic
+cp -p office/hyph_ca_ANY.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_ca_ES.dic
 pushd $RPM_BUILD_ROOT/%{_datadir}/hyphen/
 ca_ES_aliases="ca_AD ca_FR ca_IT"
 for lang in $ca_ES_aliases; do
@@ -37,15 +38,50 @@ popd
 
 
 %files
-%doc release-note_en.txt release-note_ca.txt LICENSES-en.txt LLICENCIES-ca.txt
+%doc office/release-note_en.txt README.md
+%license office/gpl.txt
 %{_datadir}/hyphen/*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.9.3-20
-- Remove epoch
+* Tue Oct 29 2024 Sreenivasulu Malavathula <v-smalavathu@microsft.com> - 1:1.5-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.9.3-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Parag Nemade <pnemade AT redhat DOT com> - 1:1.5-1
+- Resolves:rh#2230536 - Update to new Upstream Source
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 1:0.9.3-25
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
