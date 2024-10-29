@@ -1010,8 +1010,6 @@ The meaning of this value depends on the type property.
 
 ## mountPoint type
 
-#### Usage
-
 You can configure `mountPoint` in one of two ways:
 
 1. **Structured Format**: Use `idType`, `options`, and `path` fields for a more detailed configuration.
