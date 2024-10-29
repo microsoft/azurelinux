@@ -1065,7 +1065,6 @@ The mounts will be sorted to ensure that parent directories are mounted before c
 directories.
 For example, `/boot` will be mounted before `/boot/efi`.
 
-
 ## script type
 
 Points to a script file (typically a Bash script) to be run during customization.
