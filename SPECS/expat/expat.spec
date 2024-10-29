@@ -31,7 +31,7 @@ Group:          System Environment/Libraries
 This package contains minimal set of shared expat libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
