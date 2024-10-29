@@ -1010,6 +1010,25 @@ The meaning of this value depends on the type property.
 
 ## mountPoint type
 
+You can configure `mountPoint` in one of two ways:
+
+1. **Structured Format**: Use `idType`, `options`, and `path` fields for a more detailed configuration.
+   
+   ```yaml
+   mountPoint:
+     path: /boot/efi
+     options: umask=0077
+     idType: part-uuid
+   ```
+
+2. **Shorthand Path Format**: Provide the mount path directly as a string when only `path` is required.
+
+   ```yaml
+   mountPoint: /boot/efi
+   ```
+
+   In this shorthand format, only the `path` is specified, and default values will be applied to any optional fields.
+
 ### idType [string]
 
 Default: `part-uuid`
