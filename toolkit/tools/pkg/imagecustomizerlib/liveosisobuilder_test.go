@@ -4,6 +4,7 @@
 package imagecustomizerlib
 
 import (
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,7 +18,7 @@ import (
 )
 
 // Tests:
-// - vhdx to ISO, with OS changes.
+// - vhdx to ISO, with OS changes, and PXE image base URL.
 // - ISO to ISO, with no OS changes.
 // - Kernel command-line arg append.
 // - .iso.additionalFiles
@@ -26,12 +27,20 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 
 	testTempDir := filepath.Join(tmpDir, "TestCustomizeImageLiveCd1")
 	buildDir := filepath.Join(testTempDir, "build")
-	outImageFilePath := filepath.Join(testTempDir, "image.iso")
+	outImageFileName := "image.iso"
+	outImageFilePath := filepath.Join(testTempDir, outImageFileName)
+	pxeArtifactsPathVhdxToIso := filepath.Join(testTempDir, "pxe-artifacts-vhdx-to-iso")
+	pxeArtifactsPathIsoToIso := filepath.Join(testTempDir, "pxe-artifacts-iso-to-iso")
+	pxeKernelIpArg := "linux.* ip=dhcp "
+	pxeImageFileUrlV1, err := url.JoinPath("http://my-pxe-server-1/", outImageFileName)
+	assert.NoError(t, err)
+
+	pxeKernelRootArgV1 := "linux.* root=live:" + pxeImageFileUrlV1 + "/" + outImageFileName
 	configFile := filepath.Join(testDir, "iso-files-and-args-config.yaml")
 
 	// Customize vhdx to ISO, with OS changes.
-	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "iso", "",
-		"" /*outputPXEArtifactsDir*/, true /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "iso", "", /*outputSplitPartitionsFormat*/
+		pxeArtifactsPathVhdxToIso, true /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.NoError(t, err)
 
 	// Attach ISO.
@@ -67,6 +76,20 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
 	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
+	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
+	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
+		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
+		assert.NoError(t, err, "read grub-pxe.cfg file")
+		assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
+		assert.Regexp(t, pxeKernelRootArgV1, pxeGrubCfgContents)
+
+		exportedPxeGrubCfgFilePath := filepath.Join(pxeArtifactsPathVhdxToIso, "boot/grub2/grub.cfg")
+		exportedPxeGrubCfgContents, err := file.Read(exportedPxeGrubCfgFilePath)
+		assert.NoError(t, err, "read pxe grub.cfg file")
+		assert.Equal(t, pxeGrubCfgContents, exportedPxeGrubCfgContents)
+	}
+
 	err = isoImageMount.CleanClose()
 	if !assert.NoError(t, err) {
 		return
@@ -78,8 +101,15 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	}
 
 	// Customize ISO to ISO, with no OS changes.
+	pxeImageFileUrlV2, err := url.JoinPath("http://my-pxe-server-2/", outImageFileName)
+	assert.NoError(t, err)
+
+	pxeKernelRootArgV2 := "linux.* root=live:" + pxeImageFileUrlV2 + "/" + outImageFileName
 	b2FilePerms := imagecustomizerapi.FilePermissions(0o600)
 	config := imagecustomizerapi.Config{
+		Pxe: &imagecustomizerapi.Pxe{
+			IsoImageFileUrl: pxeImageFileUrlV2,
+		},
 		Iso: &imagecustomizerapi.Iso{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
 				ExtraCommandLine: "rd.debug",
@@ -97,8 +127,8 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 			},
 		},
 	}
-	err = CustomizeImage(buildDir, testDir, &config, outImageFilePath, nil, outImageFilePath, "iso", "",
-		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	err = CustomizeImage(buildDir, testDir, &config, outImageFilePath, nil, outImageFilePath, "iso", "", /*outputSplitPartitionsFormat*/
+		pxeArtifactsPathIsoToIso, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.NoError(t, err)
 
 	// Attach ISO.
@@ -137,6 +167,20 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
 	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
+
+	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
+	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
+		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
+		assert.NoError(t, err, "read grub-pxe.cfg file")
+		assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
+		assert.Regexp(t, pxeKernelRootArgV2, pxeGrubCfgContents)
+
+		exportedPxeGrubCfgFilePath := filepath.Join(pxeArtifactsPathIsoToIso, "boot/grub2/grub.cfg")
+		exportedPxeGrubCfgContents, err := file.Read(exportedPxeGrubCfgFilePath)
+		assert.NoError(t, err, "read pxe grub.cfg file")
+		assert.Equal(t, pxeGrubCfgContents, exportedPxeGrubCfgContents)
+	}
 }
 
 // Tests:

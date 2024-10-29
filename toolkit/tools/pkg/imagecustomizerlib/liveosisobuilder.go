@@ -36,7 +36,6 @@ const (
 	pxeGrubCfg                 = "grub-pxe.cfg"
 	pxeKernelsArgs             = "ip=dhcp"
 	pxeImageBaseUrlPlaceHolder = "http://pxe-image-base-url-place-holder"
-	pxeDracutMinVersion        = 105
 
 	searchCommandTemplate   = "search --label %s --set root"
 	rootValueLiveOSTemplate = "live:LABEL=%s"
@@ -415,14 +414,14 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(isoGrubCfgFileName string, pxeGrubCfgFi
 		return fmt.Errorf("failed to write %s:\n%w", isoGrubCfgFileName, err)
 	}
 
-	if savedConfigs.OS.dracutVersion >= pxeDracutMinVersion {
+	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
 		err = generatePxeGrubCfg(inputContentString, savedConfigs.Pxe.IsoImageBaseUrl, savedConfigs.Pxe.IsoImageFileUrl,
 			outputImageBase, pxeGrubCfgFileName)
 		if err != nil {
 			return fmt.Errorf("failed to create grub configuration for PXE booting.\n%w", err)
 		}
 	} else {
-		logger.Log.Warnf("cannot generate grub.cfg for PXE booting. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, b.artifacts.dracutVersion)
+		logger.Log.Warnf("cannot generate grub.cfg for PXE booting. Minimum Dracut package version required is (%d) but found (%d)", imagecustomizerapi.PxeDracutMinVersion, b.artifacts.dracutVersion)
 	}
 
 	return nil
@@ -788,7 +787,7 @@ func (b *LiveOSIsoBuilder) findDracutVersion(rootfsSourceDir string) error {
 //   - extracted artifacts
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, writeableRootfsDir string,
 	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments, pxeIsoImageBaseUrl string,
-	pxeIsoImageFileUrl string, outputImageBase string) (mergedConfigs *SavedConfigs, err error) {
+	pxeIsoImageFileUrl string, outputImageBase string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -818,7 +817,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, wr
 		}
 	}
 
-	mergedConfigs, err = mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageBaseUrl,
+	mergedConfigs, err := mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageBaseUrl,
 		pxeIsoImageFileUrl, b.artifacts.dracutVersion)
 	if err != nil {
 		return fmt.Errorf("failed to combine saved configurations with new configuration:\n%w", err)
@@ -970,7 +969,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
 func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePath string, rawImageFile string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
-	pxeIsoImageBaseUrl string, pxeIsoImageFileUrl string, outputImageBase string) (mergedConfigs *SavedConfigs, err error) {
+	pxeIsoImageBaseUrl string, pxeIsoImageFileUrl string, outputImageBase string) error {
 
 	logger.Log.Infof("Preparing iso artifacts")
 
@@ -988,7 +987,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePa
 	}
 
 	isoMakerArtifactsStagingDir := "/boot-staging"
-	mergedConfigs, err = b.prepareLiveOSDir(inputSavedConfigsFilePath, writeableRootfsDir, isoMakerArtifactsStagingDir,
+	err = b.prepareLiveOSDir(inputSavedConfigsFilePath, writeableRootfsDir, isoMakerArtifactsStagingDir,
 		extraCommandLine, pxeIsoImageBaseUrl, pxeIsoImageFileUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to convert rootfs folder to a LiveOS folder:\n%w", err)
@@ -1267,7 +1266,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		inputSavedConfigsFilePath = inputIsoArtifacts.artifacts.savedConfigsFilePath
 	}
 
-	mergedConfigs, err = isoBuilder.prepareArtifactsFromFullImage(inputSavedConfigsFilePath, rawImageFile, extraCommandLine, pxeIsoImageBaseUrl, pxeIsoImageFileUrl, outputImageBase)
+	err = isoBuilder.prepareArtifactsFromFullImage(inputSavedConfigsFilePath, rawImageFile, extraCommandLine, pxeIsoImageBaseUrl, pxeIsoImageFileUrl, outputImageBase)
 	if err != nil {
 		return err
 	}
@@ -1300,8 +1299,8 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 	}
 
 	if outputPXEArtifactsDir != "" {
-		if isoBuilder.artifacts.dracutVersion < pxeDracutMinVersion {
-			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, isoBuilder.artifacts.dracutVersion)
+		if isoBuilder.artifacts.dracutVersion < imagecustomizerapi.PxeDracutMinVersion {
+			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", imagecustomizerapi.PxeDracutMinVersion, isoBuilder.artifacts.dracutVersion)
 		}
 		err = populatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
 		if err != nil {
@@ -1559,7 +1558,7 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		pxeIsoImageFileUrl = pxeConfig.IsoImageFileUrl
 	}
 
-	mergedConfigs, err = mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageBaseUrl, pxeIsoImageFileUrl, b.artifacts.dracutVersion)
+	mergedConfigs, err := mergeConfigs(b.artifacts.savedConfigsFilePath, extraCommandLine, pxeIsoImageBaseUrl, pxeIsoImageFileUrl, b.artifacts.dracutVersion)
 	if err != nil {
 		return fmt.Errorf("failed to combine saved configurations with new configuration:\n%w", err)
 	}
@@ -1575,8 +1574,8 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 	}
 
 	if outputPXEArtifactsDir != "" {
-		if b.artifacts.dracutVersion < pxeDracutMinVersion {
-			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", pxeDracutMinVersion, b.artifacts.dracutVersion)
+		if b.artifacts.dracutVersion < imagecustomizerapi.PxeDracutMinVersion {
+			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", imagecustomizerapi.PxeDracutMinVersion, b.artifacts.dracutVersion)
 		}
 
 		err = populatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
