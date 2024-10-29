@@ -10541,8 +10541,8 @@
         "type": "other",
         "other": {
           "name": "libplist",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/libimobiledevice/libplist/archive/2.1.0.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/libimobiledevice/libplist/releases/download/2.6.0/libplist-2.6.0.tar.bz2"
         }
       }
     },
