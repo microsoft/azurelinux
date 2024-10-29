@@ -9,11 +9,11 @@ import (
 // MountPoint holds the mounting information for each partition.
 type MountPoint struct {
 	// The ID type to use for the source in the /etc/fstab file.
-	IdType MountIdentifierType `yaml:"idType,omitempty"`
+	IdType MountIdentifierType `yaml:"idType"`
 	// The additional options for the mount.
-	Options string `yaml:"options,omitempty"`
+	Options string `yaml:"options"`
 	// The target directory path of the mount.
-	Path string `yaml:"path,omitempty"`
+	Path string `yaml:"path"`
 }
 
 // UnmarshalYAML enables MountPoint to handle both a shorthand path and a structured object.
@@ -26,10 +26,10 @@ func (p *MountPoint) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	// Otherwise, decode as a full MountPoint struct.
-	type Alias MountPoint
-	var mp Alias
+	type IntermediateTypeMountPoint MountPoint
+	var mp IntermediateTypeMountPoint
 	if err := value.Decode(&mp); err != nil {
-		return fmt.Errorf("failed to parse MountPoint struct: %w", err)
+		return fmt.Errorf("failed to parse MountPoint struct:\n%w", err)
 	}
 	*p = MountPoint(mp)
 	return nil
