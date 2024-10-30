@@ -175,15 +175,5 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, bootCustomizer *i
 		return err
 	}
 
-	err = imagecustomizerlib.UpdateSELinuxModeInConfigFile(selinuxMode, dummyChroot)
-	if err != nil {
-		return err
-	}
-
-	err = imagecustomizerlib.SelinuxSetFiles(selinuxMode, dummyChroot)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
