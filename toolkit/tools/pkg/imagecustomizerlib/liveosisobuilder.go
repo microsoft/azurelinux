@@ -284,7 +284,7 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 	mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = newKernelArgs
 	mergedConfigs.Pxe.IsoImageBaseUrl = newPxeIsoImageBaseUrl
 	mergedConfigs.Pxe.IsoImageFileUrl = newPxeIsoImageFileUrl
-	mergedConfigs.OS.dracutVersion = newOSDracutVersion
+	mergedConfigs.OS.DracutVersion = newOSDracutVersion
 
 	savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
 	if err != nil {
@@ -327,7 +327,7 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 		// from the rootfs, we fall back to using the saved information for
 		// the dracut version.
 		if newOSDracutVersion == 0 {
-			mergedConfigs.OS.dracutVersion = savedConfigs.OS.dracutVersion
+			mergedConfigs.OS.DracutVersion = savedConfigs.OS.DracutVersion
 		}
 	}
 
@@ -414,7 +414,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(isoGrubCfgFileName string, pxeGrubCfgFi
 		return fmt.Errorf("failed to write %s:\n%w", isoGrubCfgFileName, err)
 	}
 
-	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+	if savedConfigs.OS.DracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
 		err = generatePxeGrubCfg(inputContentString, savedConfigs.Pxe.IsoImageBaseUrl, savedConfigs.Pxe.IsoImageFileUrl,
 			outputImageBase, pxeGrubCfgFileName)
 		if err != nil {
@@ -741,14 +741,12 @@ func (b *LiveOSIsoBuilder) findDracutVersion(rootfsSourceDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get package version for (%s):\n%w", packageName, err)
 	}
-	version, err := strconv.ParseUint(versionString, 10 /*base*/, 64 /*size*/)
+	versionUint64, err := strconv.ParseUint(versionString, 10 /*base*/, 64 /*size*/)
 	if err != nil {
 		return fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", versionString, packageName, err)
 	}
-	b.artifacts.dracutVersion = version
+	b.artifacts.dracutVersion = versionUint64
 
-	// TODO: remove
-	logger.Log.Debugf("Dracut version is (%d)\n", b.artifacts.dracutVersion)
 	return nil
 }
 
@@ -1574,7 +1572,7 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 	}
 
 	if outputPXEArtifactsDir != "" {
-		if b.artifacts.dracutVersion < imagecustomizerapi.PxeDracutMinVersion {
+		if mergedConfigs.OS.DracutVersion < imagecustomizerapi.PxeDracutMinVersion {
 			return fmt.Errorf("cannot generate the PXE artifacts folder. Minimum Dracut package version required is (%d) but found (%d)", imagecustomizerapi.PxeDracutMinVersion, b.artifacts.dracutVersion)
 		}
 

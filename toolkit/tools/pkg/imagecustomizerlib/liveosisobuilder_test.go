@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -35,7 +36,9 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	pxeImageFileUrlV1, err := url.JoinPath("http://my-pxe-server-1/", outImageFileName)
 	assert.NoError(t, err)
 
-	pxeKernelRootArgV1 := "linux.* root=live:" + pxeImageFileUrlV1 + "/" + outImageFileName
+	pxeKernelRootArgV1 := "linux.* root=live:" + pxeImageFileUrlV1
+	pxeKernelRootArgV1 = strings.ReplaceAll(pxeKernelRootArgV1, "/", "\\/")
+	pxeKernelRootArgV1 = strings.ReplaceAll(pxeKernelRootArgV1, ":", "\\:")
 	configFile := filepath.Join(testDir, "iso-files-and-args-config.yaml")
 
 	// Customize vhdx to ISO, with OS changes.
@@ -77,9 +80,10 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
 	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+	if savedConfigs.OS.DracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
 		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
 		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
+
 		assert.NoError(t, err, "read grub-pxe.cfg file")
 		assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
 		assert.Regexp(t, pxeKernelRootArgV1, pxeGrubCfgContents)
@@ -104,7 +108,10 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	pxeImageFileUrlV2, err := url.JoinPath("http://my-pxe-server-2/", outImageFileName)
 	assert.NoError(t, err)
 
-	pxeKernelRootArgV2 := "linux.* root=live:" + pxeImageFileUrlV2 + "/" + outImageFileName
+	pxeKernelRootArgV2 := "linux.* root=live:" + pxeImageFileUrlV2
+	pxeKernelRootArgV2 = strings.ReplaceAll(pxeKernelRootArgV2, "/", "\\/")
+	pxeKernelRootArgV2 = strings.ReplaceAll(pxeKernelRootArgV2, ":", "\\:")
+
 	b2FilePerms := imagecustomizerapi.FilePermissions(0o600)
 	config := imagecustomizerapi.Config{
 		Pxe: &imagecustomizerapi.Pxe{
@@ -169,7 +176,7 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
 	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-	if savedConfigs.OS.dracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+	if savedConfigs.OS.DracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
 		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
 		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
 		assert.NoError(t, err, "read grub-pxe.cfg file")
