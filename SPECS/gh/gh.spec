@@ -70,14 +70,6 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
-<<<<<<< HEAD
-* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-19
-- Drop requirement on a specific version of golang
-=======
-* Fri Jul 19 2024 Archana Choudhary <archana1@microsoft.com> - 2.13.0-19
-- Patch for CVE-2021-43565
->>>>>>> 9b583d8ff (gh: patch CVE-2021-43565 (#9894))
-
 * Mon Feb 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.43.1-1
 - Update to v2.43.1
 
