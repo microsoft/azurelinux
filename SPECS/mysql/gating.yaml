@@ -1,0 +1,6 @@
+--- !Policy
+product_versions:
+  - rhel-*
+decision_context: osci_compose_gate
+rules:
+  - !PassingTestCaseRule {test_case_name: baseos-ci.brew-build.tier1.functional}

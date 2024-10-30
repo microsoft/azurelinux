@@ -13662,8 +13662,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.40",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
+          "version": "8.4.3",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-8.4.3.tar.gz"
         }
       }
     },

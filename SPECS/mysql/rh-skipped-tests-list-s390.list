@@ -1,0 +1,7 @@
+# Fails since 8.0.34
+rpl.rpl_channel_creation_under_replica_load       : BUG#0
+rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts : BUG#0
+
+# Fails since 8.0.37
+innodb.lob_recovery                      : BUG#0
+sys_vars.myisam_data_pointer_size_func   : BUG#0

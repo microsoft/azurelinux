@@ -1,0 +1,17 @@
+diff -up mysql-8.0.35/support-files/mysql-log-rotate.in.origf mysql-8.0.35/support-files/mysql-log-rotate.in
+--- mysql-8.0.35/support-files/mysql-log-rotate.in.origf	2024-01-29 23:00:32.043257515 +0100
++++ mysql-8.0.35/support-files/mysql-log-rotate.in	2024-01-29 23:02:26.520440388 +0100
+@@ -49,11 +49,7 @@
+         missingok
+         compress
+     postrotate
+-	# just if mysqld is really running
+-	if test -x @bindir@/mysqladmin && \
+-	   @bindir@/mysqladmin ping &>/dev/null
+-	then
+-	   @bindir@/mysqladmin flush-logs
+-	fi
++	# SIGUSR1 makes the daemon to flush the logs, no need to connect
++	@bindir@/kill -USR1 $(systemctl show --property MainPID --value mysqld)
+     endscript
+ }

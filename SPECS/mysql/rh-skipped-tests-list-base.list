@@ -1,0 +1,37 @@
+auth_sec.keyring_file_data_qa              : BUG#0 failing on F32+
+innodb.alter_kill                          : BUG#0 failing on F34+
+main.mtr_unit_tests                        : BUG#0 failing on F35+
+
+# Expected to fail in Fedora 33+
+#  TLS 1.1 and older has been disabled by system-wide crypto-policies setting
+#  https://fedoraproject.org/wiki/Changes/StrongCryptoSettings2
+#  Tests pass when using legacy crypto-policies seetings
+x.connection_tls_version                   : BUG#0 Expected to fail on F33+
+
+# We intentionaly compile in a different default value than the upstream
+# Thus the commands expected by upstream to fail succeeds in our builds
+# and thus the test fails
+#   Cmake option: -DENABLED_LOCAL_INFILE=ON
+main.mysql_load_data_local_dir             : BUG#0 Intentional divergence from the upstream compiled-in default
+
+# Failing since MySQL 8.0.29
+main.mysqlpump_bugs                        : BUG#0
+
+# Failing since 8.0.34
+binlog.binlog_mysqlbinlog_linux            : BUG#0
+
+# Failing since 8.0.37
+auth_sec.wl15800_ciphers_tlsv13            : BUG#0
+binlog.binlog_mysqlbinlog_linux            : BUG#0
+
+main.archive                               : BUG#0
+main.mysqlpump_basic_lz4                   : BUG#0
+
+clone.local_dml_auto_tune                  : BUG#0
+clone.remote_dml_auto_tune                 : BUG#0
+
+innodb.check_ibd_filesize_16k              : BUG#0
+
+rpl_gtid.mysqldump_bug33630199             : BUG#0
+rpl.rpl_eventlog_psi_memory                : BUG#0
+rpl.rpl_tlsv13                             : BUG#0
