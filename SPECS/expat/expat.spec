@@ -2,7 +2,7 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Wed Oct 30 2024 Sindhu Karri <lakarri@microsoft.com> - 2.6.3-2
+- Fix CVE-2024-50602 with a patch
+
 * Tue Sep 04 2024 Gary Swalling <gaswal@microsoft.com> - 2.6.3-1
 - Upgrade to 2.6.3 to fix CVE-2024-45490, CVE-2024-45491, CVE-2024-45492
 
