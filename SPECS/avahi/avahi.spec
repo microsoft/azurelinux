@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source0:        https://github.com/lathiat/avahi/releases/download/v%{version}/%
 Patch0:         %{name}-libevent-pc-fix.patch
 Patch1:         CVE-2021-3468.patch
 Patch2:         CVE-2021-3502.patch
+Patch3:         CVE-2023-1981.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -214,6 +215,9 @@ NOCONFIGURE=1 ./autogen.sh
         --disable-gtk \
         --disable-gtk3 \
         --disable-mono \
+%if 0%{?with_check}
+        --enable-tests \
+%endif
 ;
 
 # workaround parallel build issues (aarch64 only so far, bug #1564553)
@@ -258,6 +262,7 @@ rm -fv  %{buildroot}%{_datadir}/avahi/interfaces/avahi-discover.ui
 
 
 %check
+%make_build -k V=1 check || make check V=1
 
 %pre
 getent group avahi >/dev/null || groupadd -f -g 70 -r avahi
@@ -415,6 +420,9 @@ exit 0
 %endif
 
 %changelog
+* Tue Oct 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.8-3
+- Fix CVE-2023-1981 with an upstream patch, enable basic check section
+
 * Wed Aug 14 2024 Chris Co <chrco@microsoft.com> - 0.8-2
 - Remove libssp from build environment to fix avahi-daemon hang
 
