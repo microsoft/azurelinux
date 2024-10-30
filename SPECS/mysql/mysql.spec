@@ -9,6 +9,7 @@ Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
+Patch1:         CVE-2012-2677.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
