@@ -30,8 +30,12 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	buildDir := filepath.Join(testTempDir, "build")
 	outImageFileName := "image.iso"
 	outImageFilePath := filepath.Join(testTempDir, outImageFileName)
-	pxeArtifactsPathVhdxToIso := filepath.Join(testTempDir, "pxe-artifacts-vhdx-to-iso")
-	pxeArtifactsPathIsoToIso := filepath.Join(testTempDir, "pxe-artifacts-iso-to-iso")
+	pxeArtifactsPathVhdxToIso := ""
+	pxeArtifactsPathIsoToIso := ""
+	if baseImageVersionDefault != baseImageVersionAzl2 {
+		pxeArtifactsPathVhdxToIso = filepath.Join(testTempDir, "pxe-artifacts-vhdx-to-iso")
+		pxeArtifactsPathIsoToIso = filepath.Join(testTempDir, "pxe-artifacts-iso-to-iso")
+	}
 	pxeKernelIpArg := "linux.* ip=dhcp "
 	pxeImageFileUrlV1, err := url.JoinPath("http://my-pxe-server-1/", outImageFileName)
 	assert.NoError(t, err)
