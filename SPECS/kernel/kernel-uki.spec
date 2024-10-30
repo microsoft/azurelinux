@@ -13,12 +13,12 @@
 # We need to temporarily turn it off by disabling xsaves until the problem
 # is fixed on Azure. Since shadow stack depends on xsaves, disabling xsaves
 # ensures the feature bit for shadow stack is also turned off.
-%define cmdline console=ttyS0 noxsaves
+%define cmdline console=ttyS0
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.57.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
+- Remove noxsaves parameter from cmdline
+
 * Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
 - Auto-upgrade to 6.6.57.1
 
