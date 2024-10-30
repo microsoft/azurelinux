@@ -9,6 +9,7 @@ Distribution:   Azure Linux
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2024-50602.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -29,7 +30,7 @@ Group:          System Environment/Libraries
 This package contains minimal set of shared expat libraries.
 
 %prep
-%autosetup -p2
+%autosetup -p1
 
 %build
 %configure \
