@@ -6510,8 +6510,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.56.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.56.1.tar.gz"
+          "version": "6.6.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.56.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.56.1.tar.gz"
+          "version": "6.6.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.56.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.56.1.tar.gz"
+          "version": "6.6.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
         }
       }
     },
@@ -13502,8 +13502,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.36",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
+          "version": "8.0.40",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
         }
       }
     },
@@ -23563,8 +23563,8 @@
         "type": "other",
         "other": {
           "name": "python-pip",
-          "version": "24.0",
-          "downloadUrl": "https://github.com/pypa/pip/archive/24.0/pip-24.0.tar.gz"
+          "version": "24.2",
+          "downloadUrl": "https://github.com/pypa/pip/archive/24.2/pip-24.2.tar.gz"
         }
       }
     },
@@ -29336,8 +29336,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2190",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2190.tar.gz"
+          "version": "9.1.0791",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.0791.tar.gz"
         }
       }
     },

@@ -23,7 +23,7 @@ var (
 	fdiskPartitionsTableEntryRegexp  = regexp.MustCompile(`^([0-9A-Za-z-_/]+)[\t ]+(\d+)[\t ]+`)
 )
 
-func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomizerapi.IdentifiedPartition,
+func shrinkFilesystems(imageLoopDevice string, verity []imagecustomizerapi.Verity,
 	partIdToPartUuid map[string]string,
 ) error {
 	logger.Log.Infof("Shrinking filesystems")
@@ -54,13 +54,9 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 			continue
 		}
 
-		if verityHashPartition != nil {
-			matches, err := partitionMatchesId(*verityHashPartition, diskPartition, partIdToPartUuid)
-			if err != nil {
-				return err
-			}
-
-			if matches {
+		// Don't try to shrink verity hash partitions.
+		for _, verityItem := range verity {
+			if partitionMatchesDeviceId(verityItem.HashDeviceId, diskPartition, partIdToPartUuid) {
 				logger.Log.Infof("Shrinking partition (%s): skipping verity hash partition", partitionLoopDevice)
 				continue
 			}
@@ -85,9 +81,10 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Shrink the file system with resize2fs -M
-		stdout, stderr, err := shell.Execute("resize2fs", "-M", partitionLoopDevice)
+		stdout, stderr, err := shell.Execute("flock", "--timeout", "5", imageLoopDevice,
+			"resize2fs", "-M", partitionLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resize %s with resize2fs (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Find the new partition end value
@@ -103,10 +100,11 @@ func shrinkFilesystems(imageLoopDevice string, verityHashPartition *imagecustomi
 		}
 
 		// Resize the partition with parted resizepart
-		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "parted", "---pretend-input-tty",
-			imageLoopDevice, "resizepart", strconv.Itoa(partitionNumber), end)
+		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "flock", "--timeout", "5", imageLoopDevice,
+			"parted", "---pretend-input-tty", imageLoopDevice, "resizepart",
+			strconv.Itoa(partitionNumber), end)
 		if err != nil {
-			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resizepart %s with parted (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Re-read the partition table

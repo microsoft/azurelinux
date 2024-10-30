@@ -492,7 +492,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
-		partFsType, err := FormatSinglePartition(partDevPath, partition)
+		partFsType, err := formatSinglePartition(diskDevPath, partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
@@ -682,13 +682,19 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
 	// There are two primary partition naming conventions:
-	// /dev/sdN<y> style or /dev/loopNp<x> style
+	// - /dev/sdN<y>
+	// - /dev/loopNp<x>
 	// Detect the exact one we are using.
-	// Make sure we check for /dev/loopNp<x> FIRST, since /dev/loop1 would generate /dev/loop11 as a partition
-	// device which may be a valid device. We want to select /dev/loop1p1 first.
 	testPartDevPaths := []string{
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
-		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
+	}
+
+	// If disk path ends in a digit, then the 'p<x>' style must be used.
+	// So, don't check the other style to avoid ambiguities. For example, /dev/loop1 vs. /dev/loop11.
+	// This is particularly relevant on Ubuntu, due to snap's use of loopback devices.
+	if !isDigit(diskDevPath[len(diskDevPath)-1]) {
+		devPath := fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr)
+		testPartDevPaths = append(testPartDevPaths, devPath)
 	}
 
 	err = retry.Run(func() error {
@@ -759,6 +765,10 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	return
 }
 
+func isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
+}
+
 func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
 	if supports, _ := PartedSupportsTypeCommand(); !supports {
 		logger.Log.Warn("parted version <3.6 does not support the 'type' session command - skipping this operation")
@@ -782,12 +792,13 @@ func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, di
 	return
 }
 
-// FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition,
+// formatSinglePartition formats the given partition to the type specified in the partition configuration
+func formatSinglePartition(diskDevPath string, partDevPath string, partition configuration.Partition,
 ) (fsType string, err error) {
 	const (
-		totalAttempts = 5
-		retryDuration = time.Second
+		totalAttempts    = 5
+		retryDuration    = time.Second
+		timeoutInSeconds = "5"
 	)
 
 	fsType = partition.FsType
@@ -803,14 +814,14 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 			fsType = "vfat"
 		}
 
-		mkfsArgs := []string{"-t", fsType}
+		mkfsArgs := []string{"--timeout", timeoutInSeconds, diskDevPath, "mkfs", "-t", fsType}
 		mkfsArgs = append(mkfsArgs, mkfsOptions...)
 		mkfsArgs = append(mkfsArgs, partDevPath)
 
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
+			_, stderr, err := shell.Execute("flock", mkfsArgs...)
 			if err != nil {
-				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
+				logger.Log.Warnf("Failed to format partition using mkfs (and flock): %v", stderr)
 				return err
 			}
 

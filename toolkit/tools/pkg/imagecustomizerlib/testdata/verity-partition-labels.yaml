@@ -18,13 +18,22 @@ storage:
       start: 1024M
       end: 3072M
 
-    - id: verityhash
-      label: root-hash
+    - id: roothash
+      label: roothash
       start: 3072M
       end: 3200M
 
     - id: var
       start: 3200M
+
+  verity:
+  - id: verityroot
+    name: root
+    dataDeviceId: root
+    hashDeviceId: roothash
+    dataDeviceMountIdType: part-label
+    hashDeviceMountIdType: part-label
+    corruptionOption: panic
 
   filesystems:
   - deviceId: esp
@@ -38,13 +47,10 @@ storage:
     mountPoint:
       path: /boot
 
-  - deviceId: root
+  - deviceId: verityroot
     type: ext4
     mountPoint:
       path: /
-      
-  - deviceId: verityhash
-    type: fat32
 
   - deviceId: var
     type: ext4
@@ -64,15 +70,6 @@ os:
     - openssh-server
     - veritysetup
     - vim
-
-  verity:
-    corruptionOption: panic
-    dataPartition:
-      idType: part-label
-      id: root
-    hashPartition:
-      idType: part-label
-      id: root-hash
 
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
