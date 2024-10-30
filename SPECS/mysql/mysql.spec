@@ -11,6 +11,9 @@ Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-%{majmin}/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
+# AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
+# ciphers unavailable.
+Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
