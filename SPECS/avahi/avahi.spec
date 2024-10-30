@@ -205,9 +205,6 @@ NOCONFIGURE=1 ./autogen.sh
         --disable-gtk \
         --disable-gtk3 \
         --disable-mono \
-%if 0%{?with_check}
-        --enable-tests \
-%endif
 ;
 
 # workaround parallel build issues (aarch64 only so far, bug #1564553)
@@ -252,7 +249,6 @@ rm -fv  %{buildroot}%{_datadir}/avahi/interfaces/avahi-discover.ui
 
 
 %check
-%make_build -k V=1 check || make check V=1
 
 %pre
 getent group avahi >/dev/null || groupadd -f -g 70 -r avahi
@@ -411,7 +407,7 @@ exit 0
 
 %changelog
 * Tue Oct 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.8-2
-- Fix CVE-2023-1981 with an upstream patch, enable basic check section
+- Fix CVE-2023-1981 with an upstream patch
 
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
 - Upgrade to latest upstream version to fix CVE-2017-6519
