@@ -12,6 +12,9 @@ Patch0:         CVE-2012-5627.nopatch
 # Patch can be removed after upgrading MySQL to 8.4+
 # or switching to system Protobuf 3.25+ with the 'WITH_PROTOBUF=system' option.
 Patch1:         CVE-2024-2410.patch
+# AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
+# ciphers unavailable.
+Patch2:         fix-tests-for-unsupported-chacha-ciphers.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
