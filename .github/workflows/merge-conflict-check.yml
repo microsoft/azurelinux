@@ -39,7 +39,7 @@ jobs:
           changed_files=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})
 
           merge_conflict_found=false
-          for file in changed_files ; do
+          for file in $changed_files ; do
             if [ -f $file ]; then
               echo "Checking for merge conflicts in $file"
               if grep -H -r "^<<<<<<< HEAD" $file; then
