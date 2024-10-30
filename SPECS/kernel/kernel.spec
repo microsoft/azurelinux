@@ -29,7 +29,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.56.1
+Version:        6.6.57.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -407,6 +407,21 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
+- Auto-upgrade to 6.6.57.1
+
+* Thu Oct 24 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-5
+- Enable Arm FF-A Support
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-4
+- Remove Amateur Radio X.25 PLP Rose for CVE-2022-2961
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-3
+- Enable Intel IFS
+
+* Tue Oct 22 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-2
+- Enable CONFIG_X86_AMD_PLATFORM_DEVICE built-in
+
 * Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.56.1-1
 - Auto-upgrade to 6.6.56.1
 
