@@ -10,7 +10,6 @@ import (
 )
 
 var PxeIsoDownloadProtocols = []string{"ftp://", "http://", "https://", "nfs://", "tftp://"}
-var PxeDracutMinVersion uint64 = 105
 
 // Iso defines how the generated iso media should be configured.
 type Pxe struct {

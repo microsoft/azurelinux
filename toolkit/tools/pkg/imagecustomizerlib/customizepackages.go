@@ -5,7 +5,9 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"math"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -24,6 +26,12 @@ const (
 var (
 	tdnfTransactionError = regexp.MustCompile(`^Found \d+ problems$`)
 )
+
+type packageInformation struct {
+	version        string
+	packageRelease uint32
+	distroRelease  string
+}
 
 func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.OS,
 	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
@@ -232,18 +240,43 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 	return true
 }
 
-// TODO: rename
-func getPackageVersion2(imageChroot *safechroot.Chroot, packageName string) (version string, err error) {
-
+func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (info packageInformation, err error) {
+	var version string
 	err = imageChroot.UnsafeRun(func() error {
 		version, _, err = shell.Execute("rpm", "-q", "--queryformat", "%{VERSION}", packageName)
 		return err
 	})
 	if err != nil {
-		return "", err
+		return info, err
 	}
 
-	return version, nil
+	releaseInfo := ""
+	err = imageChroot.UnsafeRun(func() error {
+		releaseInfo, _, err = shell.Execute("rpm", "-q", "--queryformat", "%{RELEASE}", packageName)
+		return err
+	})
+	if err != nil {
+		return info, err
+	}
+
+	parts := strings.Split(releaseInfo, ".")
+	if len(parts) != 2 {
+		return info, fmt.Errorf("unexpected package release information format. Missing '.' in (%s)", releaseInfo)
+	}
+
+	packageRelease, err := strconv.ParseUint(parts[0], 10 /*base*/, 64 /*size*/)
+	if err != nil {
+		return info, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", parts[0], packageName, err)
+	}
+	if packageRelease > math.MaxUint32 {
+		return info, fmt.Errorf("package release value (%d) exceeds maximum limit (32bit unsigned integer).", packageRelease)
+	}
+
+	info.version = version
+	info.packageRelease = uint32(packageRelease)
+	info.distroRelease = parts[1]
+
+	return info, nil
 }
 
 func cleanTdnfCache(imageChroot *safechroot.Chroot) error {

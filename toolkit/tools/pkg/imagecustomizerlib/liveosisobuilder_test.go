@@ -84,7 +84,8 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
 	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-	if savedConfigs.OS.DracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+	err = verifyDracutPXESupport(savedConfigs.OS.DracutPackageInfo)
+	if err == nil {
 		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
 		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
 
@@ -180,7 +181,8 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
 	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-	if savedConfigs.OS.DracutVersion >= imagecustomizerapi.PxeDracutMinVersion {
+	err = verifyDracutPXESupport(savedConfigs.OS.DracutPackageInfo)
+	if err == nil {
 		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
 		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
 		assert.NoError(t, err, "read grub-pxe.cfg file")
