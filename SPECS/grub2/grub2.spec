@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -428,6 +428,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
+- Add Fedora SBAT entries
+
 * Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
 - Move grub2-rpm-macros to the azurelinux-rpm-macros package
 
