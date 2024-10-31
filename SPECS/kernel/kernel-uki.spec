@@ -8,11 +8,6 @@
 # suffix, our kernel version does not.
 %define kernelver %{version}-%{release}
 
-# noxsaves: Azure CVM instances have trouble booting due to the hypervisor
-# not reporting an available CPU feature - shadow stack (X86_FEATURE_SHSTK).
-# We need to temporarily turn it off by disabling xsaves until the problem
-# is fixed on Azure. Since shadow stack depends on xsaves, disabling xsaves
-# ensures the feature bit for shadow stack is also turned off.
 %define cmdline console=ttyS0
 
 Summary:        Unified Kernel Image
