@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.14
-Release:        3%{?dist}
+Version:        6.2.16
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,10 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Mon Oct 21 2024 Sudipta Pandit <sudpandit@microsoft.com> - 6.2.16-1
+- Bump version to 6.2.16 (fixes CVE-2024-31228 and CVE-2024-31449)
+- Remove patch file for CVE-2024-31449
+
 * Thu Oct 10 2024 Suresh Thelkar <sthelkar@microsoft.com> - 6.2.14-3
 - Patch for CVE-2024-31449
 
