@@ -34,7 +34,7 @@ const (
 	grubCfgDir                 = "/boot/grub2"
 	isoGrubCfg                 = "grub.cfg"
 	pxeGrubCfg                 = "grub-pxe.cfg"
-	pxeKernelsArgs             = "ip=dhcp"
+	pxeKernelsArgs             = "ip=dhcp rd.live.azldownloader=enable"
 	pxeImageBaseUrlPlaceHolder = "http://pxe-image-base-url-place-holder"
 
 	searchCommandTemplate   = "search --label %s --set root"
