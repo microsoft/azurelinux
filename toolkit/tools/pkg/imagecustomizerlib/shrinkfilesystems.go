@@ -108,9 +108,9 @@ func shrinkFilesystems(imageLoopDevice string, verity []imagecustomizerapi.Verit
 		}
 
 		// Re-read the partition table
-		err = refreshPartitions(imageLoopDevice)
+		err = shell.ExecuteLive(true, "flock", "--timeout", "5", imageLoopDevice, "partprobe", "-s", imageLoopDevice)
 		if err != nil {
-			return err
+			return fmt.Errorf("partprobe failed:\n%w", err)
 		}
 	}
 	return nil
