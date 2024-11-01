@@ -11,7 +11,6 @@ URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
-Patch3:         CVE-2024-31584.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -87,7 +86,7 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 
 %changelog
 * Fri Nov 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.5.1-1
-- upgrade to 2.5.1
+- upgrade to 2.5.1 to fix CVE-2024-48063
 
 * Wed May 15 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.0-6
 - patch CVE-2024-27318
