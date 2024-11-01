@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,14 +13,18 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
-var PxeDracutMinVersion uint32 = 105
-var PxeDracutMinPackageRelease uint32 = 1
-var PxeDracutMinDistroVersion uint32 = 3
+const (
+	PxeDracutMinVersion        = 102
+	PxeDracutMinPackageRelease = 7
+	PxeDracutDistroName        = "azl"
+	PxeDracutMinDistroVersion  = 3
+)
 
 type DracutPackageInformation struct {
-	Version        uint32 `yaml:"version"`
+	PackageVersion uint32 `yaml:"packageVersion"`
 	PackageRelease uint32 `yaml:"packageRelease"`
-	DistroRelease  string `yaml:"distroRelease"`
+	DistroName     string `yaml:"distroName"`
+	DistroVersion  uint32 `yaml:"distroVersion"`
 }
 
 func addDracutConfig(dracutConfigFile string, lines []string) error {
@@ -78,31 +81,42 @@ func getDracutVersion(rootfsSourceDir string) (dracutPackageInfo DracutPackageIn
 	if err != nil {
 		return dracutPackageInfo, fmt.Errorf("failed to get package version for (%s):\n%w", packageName, err)
 	}
-	versionUint64, err := strconv.ParseUint(packageInfo.version, 10 /*base*/, 64 /*size*/)
+	versionUint64, err := strconv.ParseUint(packageInfo.packageVersion, 10 /*base*/, 32 /*size*/)
 	if err != nil {
-		return dracutPackageInfo, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", packageInfo.version, packageName, err)
-	}
-	if versionUint64 > math.MaxUint32 {
-		return dracutPackageInfo, fmt.Errorf("dracut package version (%d) exceeds maximum limit (32bit unsigned integer).", versionUint64)
+		return dracutPackageInfo, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", packageInfo.packageVersion, packageName, err)
 	}
 
-	dracutPackageInfo.Version = uint32(versionUint64)
+	dracutPackageInfo.PackageVersion = uint32(versionUint64)
 	dracutPackageInfo.PackageRelease = packageInfo.packageRelease
-	dracutPackageInfo.DistroRelease = packageInfo.distroRelease
+	dracutPackageInfo.DistroName = packageInfo.distroName
+	dracutPackageInfo.DistroVersion = packageInfo.distroVersion
 
 	return dracutPackageInfo, nil
 }
 
 func verifyDracutPXESupport(packageInfo DracutPackageInformation) error {
-	if packageInfo.Version < PxeDracutMinVersion {
+	if packageInfo.DistroName != azureLinuxPackagePrefix {
+		return fmt.Errorf("did not find required Azure Linux distro (%s) - found (%s)", azureLinuxPackagePrefix, packageInfo.DistroName)
+	}
+
+	if packageInfo.DistroVersion < PxeDracutMinDistroVersion {
+		return fmt.Errorf("did not find required Azure Linux distro version (%d) - found (%d)", PxeDracutMinDistroVersion, packageInfo.DistroVersion)
+	}
+
+	// Note that, theoretically, an new distro version could still have an older package version.
+	// So, it is not sufficient to check that packageInfo.DistroVersion > PxeDracutMinDistroVersion.
+	// We need to check the package version number.
+
+	if packageInfo.PackageVersion < PxeDracutMinVersion {
 		return fmt.Errorf("did not find required Dracut package version (%d-%d) - found (%d-%d)",
-			PxeDracutMinVersion, PxeDracutMinPackageRelease, packageInfo.Version, packageInfo.PackageRelease)
-	} else if packageInfo.Version > PxeDracutMinVersion {
+			PxeDracutMinVersion, PxeDracutMinPackageRelease, packageInfo.PackageVersion, packageInfo.PackageRelease)
+	} else if packageInfo.PackageVersion > PxeDracutMinVersion {
 		return nil
 	}
+
 	if packageInfo.PackageRelease < PxeDracutMinPackageRelease {
 		return fmt.Errorf("did not find required Dracut package release (%d-%d) - found (%d-%d)",
-			PxeDracutMinVersion, PxeDracutMinPackageRelease, packageInfo.Version, packageInfo.PackageRelease)
+			PxeDracutMinVersion, PxeDracutMinPackageRelease, packageInfo.PackageVersion, packageInfo.PackageRelease)
 	}
 	return nil
 }

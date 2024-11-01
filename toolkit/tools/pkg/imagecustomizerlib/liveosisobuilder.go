@@ -326,7 +326,7 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 		// be retrieved from there. So, instead of extracting the version
 		// from the rootfs, we fall back to using the saved information for
 		// the dracut version.
-		if newDracutPackageInfo.Version == 0 {
+		if newDracutPackageInfo.PackageVersion == 0 {
 			mergedConfigs.OS.DracutPackageInfo = savedConfigs.OS.DracutPackageInfo
 		}
 	}

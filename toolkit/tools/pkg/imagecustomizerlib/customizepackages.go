@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,8 +18,9 @@ import (
 )
 
 const (
-	tdnfInstallPrefix = "Installing/Updating: "
-	tdnfRemovePrefix  = "Removing: "
+	azureLinuxPackagePrefix = "azl"
+	tdnfInstallPrefix       = "Installing/Updating: "
+	tdnfRemovePrefix        = "Removing: "
 )
 
 var (
@@ -28,9 +28,10 @@ var (
 )
 
 type packageInformation struct {
-	version        string
+	packageVersion string
 	packageRelease uint32
-	distroRelease  string
+	distroName     string
+	distroVersion  uint32
 }
 
 func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.OS,
@@ -241,9 +242,9 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 }
 
 func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (info packageInformation, err error) {
-	var version string
+	var packageVersion string
 	err = imageChroot.UnsafeRun(func() error {
-		version, _, err = shell.Execute("rpm", "-q", "--queryformat", "%{VERSION}", packageName)
+		packageVersion, _, err = shell.Execute("rpm", "-q", "--queryformat", "%{VERSION}", packageName)
 		return err
 	})
 	if err != nil {
@@ -264,17 +265,31 @@ func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (
 		return info, fmt.Errorf("unexpected package release information format. Missing '.' in (%s)", releaseInfo)
 	}
 
-	packageRelease, err := strconv.ParseUint(parts[0], 10 /*base*/, 64 /*size*/)
+	// Extract package release
+	packageReleaseUint64, err := strconv.ParseUint(parts[0], 10 /*base*/, 32 /*size*/)
 	if err != nil {
 		return info, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", parts[0], packageName, err)
 	}
-	if packageRelease > math.MaxUint32 {
-		return info, fmt.Errorf("package release value (%d) exceeds maximum limit (32bit unsigned integer).", packageRelease)
+	packageRelease := uint32(packageReleaseUint64)
+
+	// Extrack package distro and version
+	distroName := ""
+	distroVersion := uint32(0)
+	if strings.HasPrefix(parts[1], azureLinuxPackagePrefix) {
+		distroName = azureLinuxPackagePrefix
+		distroVersionString := parts[1][len(azureLinuxPackagePrefix):]
+		distroVersionUint64, err := strconv.ParseUint(distroVersionString, 10 /*base*/, 32 /*size*/)
+		if err != nil {
+			return info, fmt.Errorf("failed to parse distro version (%s) for (%s) into an unsigned integer:\n%w", distroVersionString, packageName, err)
+		}
+		distroVersion = uint32(distroVersionUint64)
 	}
 
-	info.version = version
-	info.packageRelease = uint32(packageRelease)
-	info.distroRelease = parts[1]
+	// Set return values
+	info.packageVersion = packageVersion
+	info.packageRelease = packageRelease
+	info.distroName = distroName
+	info.distroVersion = distroVersion
 
 	return info, nil
 }
