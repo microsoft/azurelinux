@@ -78,6 +78,7 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_bindir}/convert-caffe2-to-onnx
 %{_bindir}/convert-onnx-to-caffe2
 %{_bindir}/torchrun
+%{_bindir}/torchfrtrace
 %{python3_sitearch}/*
 
 %files -n python3-pytorch-doc
