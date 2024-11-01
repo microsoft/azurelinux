@@ -492,7 +492,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
-		partFsType, err := formatSinglePartition(diskDevPath, partDevPath, partition)
+		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
@@ -792,13 +792,12 @@ func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, di
 	return
 }
 
-// formatSinglePartition formats the given partition to the type specified in the partition configuration
-func formatSinglePartition(diskDevPath string, partDevPath string, partition configuration.Partition,
+// FormatSinglePartition formats the given partition to the type specified in the partition configuration
+func FormatSinglePartition(partDevPath string, partition configuration.Partition,
 ) (fsType string, err error) {
 	const (
-		totalAttempts    = 5
-		retryDuration    = time.Second
-		timeoutInSeconds = "5"
+		totalAttempts = 5
+		retryDuration = time.Second
 	)
 
 	fsType = partition.FsType
@@ -814,14 +813,14 @@ func formatSinglePartition(diskDevPath string, partDevPath string, partition con
 			fsType = "vfat"
 		}
 
-		mkfsArgs := []string{"--timeout", timeoutInSeconds, diskDevPath, "mkfs", "-t", fsType}
+		mkfsArgs := []string{"-t", fsType}
 		mkfsArgs = append(mkfsArgs, mkfsOptions...)
 		mkfsArgs = append(mkfsArgs, partDevPath)
 
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("flock", mkfsArgs...)
+			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
 			if err != nil {
-				logger.Log.Warnf("Failed to format partition using mkfs (and flock): %v", stderr)
+				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
 			}
 
