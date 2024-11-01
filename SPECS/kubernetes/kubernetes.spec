@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.4
-Release:        10%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,8 @@ Patch0:         CVE-2024-21626.patch
 Patch1:         CVE-2023-48795.patch
 Patch2:         CVE-2023-5408.patch
 Patch3:         CVE-2023-45288.patch
+Patch4:         CVE-2024-28180.patch
+Patch5:         CVE-2024-24786.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -268,6 +270,12 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Mon Oct 14 2024 Henry Li <lihl@microsoft.com> - 1.28.4-12
+- Add patch to resolve CVE-2024-24786
+
+* Mon Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.28.4-11
+- Add patch to resolve CVE-2024-28180
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.4-10
 - Bump release to rebuild with go 1.22.7
 
