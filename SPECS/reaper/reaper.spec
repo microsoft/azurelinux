@@ -193,13 +193,6 @@ fi
 * Wed Sep 25 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-12
 - Patch CVE-2024-43796 in express module
 
-* Thu Oct 10 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-12
-- CVE-2024-45296: upgrade path-to-regexp from 0.1.7 to 1.1.11 in reaper-srcui-node-modules
-- CVE-2024-43799: patch send in reaper-srcui-node-modules
-- CVE-2024-43800: patch serve-static in reaper-srcui-node-modules
-- CVE-2024-47764: patch cookie in reaper-srcui-node-modules
-- CVE-2024-48949: patch elliptic in reaper-srcui-node-modules
-
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.1.1-11
 - Introduce DER-signature-decoding-correction.patch to address CVE-2024-42459,
 - CVE-2024-42460, CVE-2024-42461
