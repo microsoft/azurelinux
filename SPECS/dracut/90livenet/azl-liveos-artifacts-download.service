@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/sbin/liveos-artifacts-download
+ExecStart=/sbin/azl-liveos-artifacts-download
 Type=oneshot
 
 [Install]

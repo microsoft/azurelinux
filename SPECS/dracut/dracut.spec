@@ -24,12 +24,12 @@ Source8:        00-virtio.conf
 Source9:        00-vrf.conf
 Source10:       00-xen.conf
 Source11:       50-noxattr.conf
-# The 90livenet/liveos-artifacts-download.service and 
-# 90livenet/liveos-artifacts-download.sh are part of the 
+# The 90livenet/azl-liveos-artifacts-download.service and 
+# 90livenet/azl-liveos-artifacts-download.sh are part of the 
 # add-livenet-download-service.patch. They are kept separate for easier
 # code reviews given that they are new to Dracut.
-Source12:       90livenet/liveos-artifacts-download.service
-Source13:       90livenet/liveos-artifacts-download.sh
+Source12:       90livenet/azl-liveos-artifacts-download.service
+Source13:       90livenet/azl-liveos-artifacts-download.sh
 
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Azure Linux team to allow skipping the user confirmation prompt during
@@ -43,8 +43,8 @@ Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
 # image.
 # This is a temporary fix until Dracut is upgraded to 103.
 # - For reference, see https://github.com/dracut-ng/dracut-ng/issues/719.
-# This patch relies on two new files (liveos-artifacts-download.service and 
-# liveos-artifacts-download.sh) - which are included as separate sources in
+# This patch relies on two new files (azl-liveos-artifacts-download.service and 
+# azl-liveos-artifacts-download.sh) - which are included as separate sources in
 # this package.
 Patch:          add-livenet-download-service.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
@@ -202,8 +202,8 @@ install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-vrf.conf
 install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-xen.conf
 install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-noxattr.conf
 
-install -m 0644 %{SOURCE12} %{buildroot}%{dracutlibdir}/modules.d/90livenet/liveos-artifacts-download.service
-install -m 0755 %{SOURCE13} %{buildroot}%{dracutlibdir}/modules.d/90livenet/liveos-artifacts-download.sh
+install -m 0644 %{SOURCE12} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.service
+install -m 0755 %{SOURCE13} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.sh
 
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/

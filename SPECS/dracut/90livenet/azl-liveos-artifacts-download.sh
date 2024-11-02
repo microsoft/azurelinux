@@ -10,7 +10,7 @@
 # network stack is up and will basically call into the same livenet rootfs
 # handling code.
 
-echo "executing liveos-artifacts-download.sh" > /dev/kmsg
+echo "executing azl-liveos-artifacts-download.sh" > /dev/kmsg
 
 . /usr/lib/dracut-lib.sh
 . /lib/url-lib.sh
