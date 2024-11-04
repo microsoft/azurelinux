@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.9
-Release:        6%{?dist}
+Version:        10.6.20
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -465,6 +465,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Nov 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.6.20-1
+- Auto-upgrade to 10.6.20 - none
+
 * Thu Jan 18 2024 Andy Zaugg <azaugg@linkedin.com> - 10.6.9-6
 - Fix post scripts for rpm install, missing setup(mysql_install_db) script.
 
