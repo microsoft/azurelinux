@@ -3,13 +3,16 @@
 
 Summary:        Common RPM Macros for building EFI-related packages
 Name:           efi-rpm-macros
-Version:        4
-Release:        6%{?dist}
-License:        GPLv3
+Version:        5
+Release:        1%{?dist}
+License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/rhboot/%{name}/
-Source0:        https://github.com/rhboot/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/rhboot/%{name}/releases/download/%{version}/%{name}-5.tar.bz2
+
+Patch0001: 0001-Don-t-have-arm-as-an-alt-arch-of-aarch64.patch
+Patch0002: 0002-Makefile-fix-permission-on-boot-efi-EFI.patch
 
 BuildArch:      noarch
 
@@ -17,40 +20,42 @@ BuildRequires:  %{_sysconfdir}/os-release
 BuildRequires:  bash
 BuildRequires:  git
 BuildRequires:  sed
+BuildRequires: make
 
 %description
 %{name} provides a set of RPM macros for use in EFI-related packages.
 
 %package -n efi-srpm-macros
 Summary:        Common SRPM Macros for building EFI-related packages
-
-Requires:       rpm
+BuildArch: noarch
+Requires: rpm
 
 %description -n efi-srpm-macros
 efi-srpm-macros provides a set of SRPM macros for use in EFI-related packages.
 
 %package -n efi-filesystem
 Summary:        The basic directory layout for EFI machines
-
-Requires:       filesystem
+BuildArch: noarch
+Requires: filesystem
 
 %description -n efi-filesystem
 The efi-filesystem package contains the basic directory layout for EFI
 machine bootloaders and tools.
 
 %prep
-%autosetup -S git
+%autosetup -S git_am -n %{name}-5
 git config --local --add efi.vendor "%{_efi_vendor_}"
 git config --local --add efi.esp-root /boot/efi
 git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86}"
 
 %build
-%make_build SHELL=/bin/bash clean all
+%make_build clean all
 
 %install
-%make_install SHELL=/bin/bash
+%make_install
 
 %files -n efi-srpm-macros
+%{!?_licensedir:%global license %%doc}
 %license LICENSE
 %doc README
 %{_rpmmacrodir}/macros.efi-srpm
@@ -64,6 +69,9 @@ git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86}"
 %dir /boot/efi/EFI/%{_efi_vendor_}
 
 %changelog
+* Mon Nov 04 2024 Sumit Jena <v-sumtjena@microsoft.com> - 5-1
+- Update to version 5.
+
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4-6
 - Fixing package build by adding an explicit BR on '/etc/os-release'.
 - License verified.
