@@ -1,17 +1,19 @@
 Summary: A utility which provides statistics based on the output of diff
 Name: diffstat
-Version: 1.63
-Release: 3%{?dist}
+Version: 1.66
+Release: 1%{?dist}
 License: MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: MIT
 URL: http://invisible-island.net/diffstat
-Source0: ftp://ftp.invisible-island.net/pub/diffstat/%{name}-%{version}.tgz
+Source0: https://invisible-island.net/archives/diffstat/%{name}-%{version}.tgz
 # Taken from diffstat.c.
 Source1: COPYING
 
 BuildRequires: gcc
 BuildRequires: xz
+BuildRequires: make
 
 %description
 The diff command compares files line by line.  Diffstat reads the
@@ -43,6 +45,11 @@ make check
 %{_mandir}/*/*
 
 %changelog
+* Mon Nov 04 2024 Sreenivasulu Malavathula <vsmalavathu@microsoft.com> - 1.66-1
+- Updating Azure-Linux import from Fedora 41 (license: MIT).
+- Update License to SPDX
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
