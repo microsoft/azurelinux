@@ -89,8 +89,9 @@ make check
 %{_mandir}/man1/sbverify.1.*
 
 %changelog
-* Fri Jun 14 2024 Dan Streetman <ddstreet@microsoft.com> - 0.9.5-4
+* Mon Nov 04 2024 Chris Co <chrco@microsoft.com> - 0.9.5-4
 - Initial Azure Linux import from Fedora 40 (license: MIT)
+- License Verified
 
 * Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
