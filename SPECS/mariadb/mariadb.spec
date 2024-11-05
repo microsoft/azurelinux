@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.11.6
-Release:        3%{?dist}
+Version:        10.11.10
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,7 +11,6 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         CVE-2024-0901.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -127,7 +126,7 @@ rm %{buildroot}%{_libdir}/mysql/plugin/{auth_gssapi_client.so,caching_sha2_passw
 rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
 rm %{buildroot}%{_includedir}/mysql/{errmsg.h,ma_list.h,ma_pvio.h,ma_tls.h,mysql_version.h,mysqld_error.h,mariadb_com.h,mariadb_ctype.h,mariadb_dyncol.h,mariadb_rpl.h,mariadb_stmt.h,mariadb_version.h,mysql.h}
 rm %{buildroot}%{_includedir}/mysql/mariadb/ma_io.h
-rm %{buildroot}%{_includedir}/mysql/mysql/{client_plugin.h,plugin_auth.h,plugin_auth_common.h}
+rm %{buildroot}%{_includedir}/mysql/mysql/{client_plugin.h,plugin_auth.h}
 
 mv  %{buildroot}%{_datadir}/systemd/mariadb.service %{buildroot}/%{_libdir}/systemd/system/mariadb.service
 mv  %{buildroot}%{_datadir}/systemd/mariadb@.service %{buildroot}/%{_libdir}/systemd/system/mariadb@.service
@@ -363,6 +362,7 @@ fi
 %{_mandir}/man1/wsrep_sst_common.1.gz
 %{_mandir}/man1/wsrep_sst_mysqldump.1.gz
 %{_mandir}/man1/wsrep_sst_rsync.1.gz
+%{_mandir}/man1/wsrep_sst_backup.1.gz
 %{_mandir}/man1/mariabackup.1.gz
 %{_mandir}/man1/mbstream.1.gz
 %{_mandir}/man1/mysql_embedded.1.gz
@@ -469,6 +469,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
+- Auto-upgrade to 10.11.10 - to address CVE-2024-21096
+
 * Fri Jun 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 10.11.6-3
 - Patch CVE-2024-0901
 
