@@ -80,7 +80,7 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 ) (configuration.Partition, error) {
 	fileSystem, _ := sliceutils.FindValueFunc(fileSystems,
 		func(fileSystem imagecustomizerapi.FileSystem) bool {
-			return fileSystem.DeviceId == partition.Id
+			return fileSystem.PartitionId == partition.Id
 		},
 	)
 
@@ -157,7 +157,7 @@ func partitionSettingToImager(fileSystem imagecustomizerapi.FileSystem,
 	}
 
 	imagerPartitionSetting := configuration.PartitionSetting{
-		ID:              fileSystem.DeviceId,
+		ID:              fileSystem.PartitionId,
 		MountIdentifier: imagerMountIdentifierType,
 		MountOptions:    mountOptions,
 		MountPoint:      mountPath,
