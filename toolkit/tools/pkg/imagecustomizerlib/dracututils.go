@@ -64,39 +64,45 @@ func addDracutDriver(dracutDriverName string, imageChroot *safechroot.Chroot) er
 	return addDracutConfig(dracutConfigFile, lines)
 }
 
-func getDracutVersion(rootfsSourceDir string) (dracutPackageInfo DracutPackageInformation, err error) {
+func getDracutVersion(rootfsSourceDir string) (dracutPackageInfo *DracutPackageInformation, err error) {
 	chroot := safechroot.NewChroot(rootfsSourceDir, true /*isExistingDir*/)
 	if chroot == nil {
-		return dracutPackageInfo, fmt.Errorf("failed to create a new chroot object for %s.", rootfsSourceDir)
+		return nil, fmt.Errorf("failed to create a new chroot object for %s.", rootfsSourceDir)
 	}
 	defer chroot.Close(true /*leaveOnDisk*/)
 
 	err = chroot.Initialize("", nil, nil, true /*includeDefaultMounts*/)
 	if err != nil {
-		return dracutPackageInfo, fmt.Errorf("failed to initialize chroot object for %s:\n%w", rootfsSourceDir, err)
+		return nil, fmt.Errorf("failed to initialize chroot object for %s:\n%w", rootfsSourceDir, err)
 	}
 
 	packageName := "dracut"
 	packageInfo, err := getPackageInformation(chroot, packageName)
 	if err != nil {
-		return dracutPackageInfo, fmt.Errorf("failed to get package version for (%s):\n%w", packageName, err)
+		return nil, fmt.Errorf("failed to get package version for (%s):\n%w", packageName, err)
 	}
 	versionUint64, err := strconv.ParseUint(packageInfo.packageVersion, 10 /*base*/, 32 /*size*/)
 	if err != nil {
-		return dracutPackageInfo, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", packageInfo.packageVersion, packageName, err)
+		return nil, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", packageInfo.packageVersion, packageName, err)
 	}
 
-	dracutPackageInfo.PackageVersion = uint32(versionUint64)
-	dracutPackageInfo.PackageRelease = packageInfo.packageRelease
-	dracutPackageInfo.DistroName = packageInfo.distroName
-	dracutPackageInfo.DistroVersion = packageInfo.distroVersion
+	dracutPackageInfo = &DracutPackageInformation{
+		PackageVersion: uint32(versionUint64),
+		PackageRelease: packageInfo.packageRelease,
+		DistroName:     packageInfo.distroName,
+		DistroVersion:  packageInfo.distroVersion,
+	}
 
 	return dracutPackageInfo, nil
 }
 
-func verifyDracutPXESupport(packageInfo DracutPackageInformation) error {
-	if packageInfo.DistroName != azureLinuxPackagePrefix {
-		return fmt.Errorf("did not find required Azure Linux distro (%s) - found (%s)", azureLinuxPackagePrefix, packageInfo.DistroName)
+func verifyDracutPXESupport(packageInfo *DracutPackageInformation) error {
+	if packageInfo == nil {
+		return fmt.Errorf("no dracut package information provided")
+	}
+
+	if packageInfo.DistroName != PxeDracutDistroName {
+		return fmt.Errorf("did not find required Azure Linux distro (%s) - found (%s)", PxeDracutDistroName, packageInfo.DistroName)
 	}
 
 	if packageInfo.DistroVersion < PxeDracutMinDistroVersion {

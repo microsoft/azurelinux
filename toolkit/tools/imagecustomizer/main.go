@@ -71,7 +71,8 @@ func customizeImage() error {
 	var err error
 
 	err = imagecustomizerlib.CustomizeImageWithConfigFile(*buildDir, *configFile, *imageFile,
-		*rpmSources, *outputImageFile, *outputImageFormat, *outputSplitPartitionsFormat, *outputPXEArtifactsDir, !*disableBaseImageRpmRepos, *enableShrinkFilesystems)
+		*rpmSources, *outputImageFile, *outputImageFormat, *outputSplitPartitionsFormat, *outputPXEArtifactsDir,
+		!*disableBaseImageRpmRepos, *enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}

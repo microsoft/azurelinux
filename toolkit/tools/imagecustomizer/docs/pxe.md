@@ -18,6 +18,7 @@ tftp, then loading them into memory, and finally handing control over to the
 loaded OS.
 
 The tftp protocol expects certain artifacts to be present on the server:
+
 - the boot loader (the shim and something like grub).
 - the boot loader configuration (like grub.cfg).
 - the kernel image.
@@ -48,6 +49,7 @@ the initrd image over to the rootfs image.
 
 The **Azure Linux Image Customizer** produces such LiveOS ISO images. A typical
 image holds the following artifacts:
+
 - the boot loader (the shim and something like grub).
 - the boot loader configuration.
 - the kernel image.
@@ -78,6 +80,7 @@ can be taken and deployed to a PXE server.
 
 To make the deployment of the generated artifacts easier for the user, the
 Azure Linux Image Customizer offers the following configurations:
+
 - In the input configuration, there is a `pxe` node under which the user can
   configure PXE related properties - like the URL of the LiveOS ISO image to
   download (note that this image is the same image being built).
@@ -94,10 +97,10 @@ be deployed:
 ```
 ISO media layout           artifacts local folder      target on PXE server
 -----------------------    ------------------------    ------------------------------
-|- efi                      |- efi                     <tftp-server-root>
-   |- boot                     |- boot                    |
-      |- bootx64.efi              |- bootx64.efi          |- bootx64.efi
-      |- grubx64.efi              |- grubx64.efi          |- grubx64.efi
+|- efi                      |                           <tftp-server-root>
+   |- boot                  |                             |
+      |- bootx64.efi        |- bootx64.efi                |- bootx64.efi
+      |- grubx64.efi        |- grubx64.efi                |- grubx64.efi
 |- boot                     |- boot                       |- boot
    |- grub2                    |- grub2                      |- grub2
       |- grub-pxe.cfg             |- grub.cfg                   |- grub.cfg
@@ -108,10 +111,11 @@ ISO media layout           artifacts local folder      target on PXE server
 
                                                         <yyyy-server-root>
 |- other-user-artifacts     |- other-user-artifacts       |- other-user-artifacts
-                            |- pxe-20240930-1331.iso      |- pxe-20240930-1331.iso
+                            |- <liveos>.iso               |- <liveos>.iso
 ```
 
 Notes:
+
 - Note that the `/boot/grub2/grub.cfg` file in the ISO media is not used for
   PXE booting. Instead, the `/boot/grub2/grub-pxe.cfg` gets renamed to `grub.cfg`
   and is used instead.
@@ -120,6 +124,10 @@ Notes:
 - The ISO image file location under the server root is customizable -
   but it must be such that its URL matches what is specified in the grub.cfg
   `root=live:<URL>`.
-- Any additional user artifacts can be placed on an endpoint such that they
-  are downloadable by the download agent installed and configured by the user
-  on the rootfs. This part of the flow is completely owned by the user.
+- While the core OS artifacts (the bootloader, its configuration, the kernel,
+  initrd image, and rootfs image) will be downloaded and used automatically,
+  the user will need to independently implement a way to download any
+  additional artifacts. For example, the user can implement a daemon (and place
+  it on the root file system) that will reach out and download the additional
+  artifacts when it is up and running. The daemon can be configured with where
+  to download the artifacts from, and what to do with them.

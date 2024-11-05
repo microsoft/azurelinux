@@ -72,7 +72,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 22. If the output format is set to `iso`, copy additional iso media files.
     ([iso](#iso-type))
 
-23. If ([--output-pxe-artifacts-dir](./cli.md#output-pxe-artifacts-dir)) is specified,
+23. If [--output-pxe-artifacts-dir](./cli.md#output-pxe-artifacts-dir) is specified,
     then export the ISO image contents to the specified folder.
 
 ### /etc/resolv.conf
@@ -343,26 +343,32 @@ script deploying the artifacts to the PXE server does not update grub.cfg with
 the ISO image name.
 
 For example,
+
 - If the user has the following content in the configuration file:
-  - ```yaml
-    pxe:
-      isoImageBaseUrl: http://hostname-or-ip/iso-publish-path
-    ```
+
+  ```yaml
+  pxe:
+    isoImageBaseUrl: http://hostname-or-ip/iso-publish-path
+  ```
+
 - and specifies the following on the command line:
-  - ```bash
-    sudo imagecustomizer \
-      --image-file "~/input/azure-linux.vhdx" \
-      --config-file "~/input/customization-config.yaml" \
-      --rpm-source "~/input/rpms" \
-      --build-dir "~/build" \
-      --output-image-format "iso" \
-      --output-image-file "~/build/output/output.iso" \
-      --output-pxe-artifacts-dir "~/build/output/pxe-artifacts"
-    ```
+
+  ```bash
+  sudo imagecustomizer \
+    --image-file "./input/azure-linux.vhdx" \
+    --config-file "./input/customization-config.yaml" \
+    --rpm-source "./input/rpms" \
+    --build-dir "./build" \
+    --output-image-format "iso" \
+    --output-image-file "./build/output/output.iso" \
+    --output-pxe-artifacts-dir "./build/output/pxe-artifacts"
+  ```
+
 - then, during PXE booting, the ISO image will be downloaded from:
-  - ```bash
-    http://hostname-or-ip/iso-publish-path/output.iso
-    ```
+
+  ```bash
+  http://hostname-or-ip/iso-publish-path/output.iso
+  ```
 
 This field is mutually exclusive with `isoImageFileUrl`.
 
@@ -377,6 +383,7 @@ Customizer. The booting process will pivot to the root file system embedded
 in the ISO image after downloading it.
 
 PXE Configuration Example:
+
 - ```yaml
   pxe:
     isoImageFileUrl: http://hostname-or-ip/iso-publish-path/my-liveos.iso

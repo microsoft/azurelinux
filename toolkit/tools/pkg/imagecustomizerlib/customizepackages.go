@@ -18,9 +18,8 @@ import (
 )
 
 const (
-	azureLinuxPackagePrefix = "azl"
-	tdnfInstallPrefix       = "Installing/Updating: "
-	tdnfRemovePrefix        = "Removing: "
+	tdnfInstallPrefix = "Installing/Updating: "
+	tdnfRemovePrefix  = "Removing: "
 )
 
 var (
@@ -241,6 +240,37 @@ func isPackageInstalled(imageChroot *safechroot.Chroot, packageName string) bool
 	return true
 }
 
+func parseReleaseString(releaseInfo string) (packageRelease uint32, distroName string, distroVersion uint32, err error) {
+	pattern := `([0-9]+)\.([a-zA-Z]+)([0-9]+)`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(releaseInfo)
+
+	if matches == nil {
+		return 0, "", 0, fmt.Errorf("failed to parse package release information (%s)\n%w", releaseInfo, err)
+	}
+
+	// package release
+	packageReleaseString := matches[1]
+	packageReleaseUint64, err := strconv.ParseUint(packageReleaseString, 10 /*base*/, 32 /*size*/)
+	if err != nil {
+		return 0, "", 0, fmt.Errorf("failed to parse package release version (%s) into an unsigned integer:\n%w", packageReleaseString, err)
+	}
+	packageRelease = uint32(packageReleaseUint64)
+
+	// distro name
+	distroName = matches[2]
+
+	// distro version
+	distroVersionString := matches[3]
+	distroVersionUint64, err := strconv.ParseUint(distroVersionString, 10 /*base*/, 32 /*size*/)
+	if err != nil {
+		return 0, "", 0, fmt.Errorf("failed to parse distro version (%s) into an unsigned integer:\n%w", distroVersionString, err)
+	}
+	distroVersion = uint32(distroVersionUint64)
+
+	return packageRelease, distroName, distroVersion, nil
+}
+
 func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (info packageInformation, err error) {
 	var packageVersion string
 	err = imageChroot.UnsafeRun(func() error {
@@ -248,7 +278,7 @@ func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (
 		return err
 	})
 	if err != nil {
-		return info, err
+		return info, fmt.Errorf("failed to query current package information for (%s):\n%w", packageName, err)
 	}
 
 	releaseInfo := ""
@@ -257,32 +287,12 @@ func getPackageInformation(imageChroot *safechroot.Chroot, packageName string) (
 		return err
 	})
 	if err != nil {
-		return info, err
+		return info, fmt.Errorf("failed to query current package information for (%s):\n%w", packageName, err)
 	}
 
-	parts := strings.Split(releaseInfo, ".")
-	if len(parts) != 2 {
-		return info, fmt.Errorf("unexpected package release information format. Missing '.' in (%s)", releaseInfo)
-	}
-
-	// Extract package release
-	packageReleaseUint64, err := strconv.ParseUint(parts[0], 10 /*base*/, 32 /*size*/)
+	packageRelease, distroName, distroVersion, err := parseReleaseString(releaseInfo)
 	if err != nil {
-		return info, fmt.Errorf("failed to parse package version (%s) for (%s) into an unsigned integer:\n%w", parts[0], packageName, err)
-	}
-	packageRelease := uint32(packageReleaseUint64)
-
-	// Extrack package distro and version
-	distroName := ""
-	distroVersion := uint32(0)
-	if strings.HasPrefix(parts[1], azureLinuxPackagePrefix) {
-		distroName = azureLinuxPackagePrefix
-		distroVersionString := parts[1][len(azureLinuxPackagePrefix):]
-		distroVersionUint64, err := strconv.ParseUint(distroVersionString, 10 /*base*/, 32 /*size*/)
-		if err != nil {
-			return info, fmt.Errorf("failed to parse distro version (%s) for (%s) into an unsigned integer:\n%w", distroVersionString, packageName, err)
-		}
-		distroVersion = uint32(distroVersionUint64)
+		return info, fmt.Errorf("failed to parse release information for package (%s)\n%w", packageName, err)
 	}
 
 	// Set return values

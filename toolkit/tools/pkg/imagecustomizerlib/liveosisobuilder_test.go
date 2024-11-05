@@ -83,22 +83,8 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
 	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
-	// Check if PXE support is present in the Dracut package version in use.
-	err = verifyDracutPXESupport(savedConfigs.OS.DracutPackageInfo)
-	if err == nil {
-		// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
-		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
-
-		assert.NoError(t, err, "read grub-pxe.cfg file")
-		assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
-		assert.Regexp(t, pxeKernelRootArgV1, pxeGrubCfgContents)
-
-		exportedPxeGrubCfgFilePath := filepath.Join(pxeArtifactsPathVhdxToIso, "boot/grub2/grub.cfg")
-		exportedPxeGrubCfgContents, err := file.Read(exportedPxeGrubCfgFilePath)
-		assert.NoError(t, err, "read pxe grub.cfg file")
-		assert.Equal(t, pxeGrubCfgContents, exportedPxeGrubCfgContents)
-	}
+	VerifyPXEArtifacts(t, savedConfigs.OS.DracutPackageInfo, isoMountDir, pxeKernelIpArg, pxeKernelRootArgV1,
+		pxeArtifactsPathVhdxToIso)
 
 	err = isoImageMount.CleanClose()
 	if !assert.NoError(t, err) {
@@ -181,21 +167,31 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
 	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
-	// Check if PXE support is present in the Dracut package version in use.
-	err = verifyDracutPXESupport(savedConfigs.OS.DracutPackageInfo)
-	if err == nil {
-		// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
-		pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
-		pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
-		assert.NoError(t, err, "read grub-pxe.cfg file")
-		assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
-		assert.Regexp(t, pxeKernelRootArgV2, pxeGrubCfgContents)
+	VerifyPXEArtifacts(t, savedConfigs.OS.DracutPackageInfo, isoMountDir, pxeKernelIpArg, pxeKernelRootArgV2,
+		pxeArtifactsPathIsoToIso)
+}
 
-		exportedPxeGrubCfgFilePath := filepath.Join(pxeArtifactsPathIsoToIso, "boot/grub2/grub.cfg")
-		exportedPxeGrubCfgContents, err := file.Read(exportedPxeGrubCfgFilePath)
-		assert.NoError(t, err, "read pxe grub.cfg file")
-		assert.Equal(t, pxeGrubCfgContents, exportedPxeGrubCfgContents)
+func VerifyPXEArtifacts(t *testing.T, packageInfo *DracutPackageInformation, isoMountDir string, pxeKernelIpArg string,
+	pxeKernelRootArgV2 string, pxeArtifactsPathIsoToIso string) {
+
+	// Check if PXE support is present in the Dracut package version in use.
+	err := verifyDracutPXESupport(packageInfo)
+	if err != nil {
+		// If there is no PXE support, return
+		return
 	}
+
+	// Ensure grub-pxe.cfg file exists and has the pxe-specific command-line args.
+	pxeGrubCfgFilePath := filepath.Join(isoMountDir, "/boot/grub2/grub-pxe.cfg")
+	pxeGrubCfgContents, err := file.Read(pxeGrubCfgFilePath)
+	assert.NoError(t, err, "read grub-pxe.cfg file")
+	assert.Regexp(t, pxeKernelIpArg, pxeGrubCfgContents)
+	assert.Regexp(t, pxeKernelRootArgV2, pxeGrubCfgContents)
+
+	exportedPxeGrubCfgFilePath := filepath.Join(pxeArtifactsPathIsoToIso, "boot/grub2/grub.cfg")
+	exportedPxeGrubCfgContents, err := file.Read(exportedPxeGrubCfgFilePath)
+	assert.NoError(t, err, "read pxe grub.cfg file")
+	assert.Equal(t, pxeGrubCfgContents, exportedPxeGrubCfgContents)
 }
 
 // Tests:

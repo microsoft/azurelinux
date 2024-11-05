@@ -24,7 +24,7 @@ func IsValidPxeUrl(urlString string) error {
 
 	_, err := url.Parse(urlString)
 	if err != nil {
-		return fmt.Errorf("invalid IsoImageUrl value (%s):\n%w", urlString, err)
+		return fmt.Errorf("invalid URL value (%s):\n%w", urlString, err)
 	}
 
 	protocolFound := false
@@ -47,11 +47,11 @@ func (p *Pxe) IsValid() error {
 	}
 	err := IsValidPxeUrl(p.IsoImageBaseUrl)
 	if err != nil {
-		return err
+		return fmt.Errorf("invalid 'isoImageBaseUrl' field value (%s):\n%w", p.IsoImageBaseUrl, err)
 	}
 	err = IsValidPxeUrl(p.IsoImageFileUrl)
 	if err != nil {
-		return err
+		return fmt.Errorf("invalid 'isoImageFileUrl' field value (%s):\n%w", p.IsoImageFileUrl, err)
 	}
 	return nil
 }

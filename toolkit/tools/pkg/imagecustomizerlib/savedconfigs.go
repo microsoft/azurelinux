@@ -61,7 +61,7 @@ func (p *PxeSavedConfigs) IsValid() error {
 }
 
 type OSSavedConfigs struct {
-	DracutPackageInfo DracutPackageInformation `yaml:"dracutPackage"`
+	DracutPackageInfo *DracutPackageInformation `yaml:"dracutPackage"`
 }
 
 func (i *OSSavedConfigs) IsValid() error {
