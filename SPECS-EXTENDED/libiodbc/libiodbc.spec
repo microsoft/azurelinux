@@ -1,21 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-## admin gui build currently busted, FIXME?
-#define _enable_gui --enable-gui
+%define _enable_gui --enable-gui
 
 Summary: iODBC Driver Manager
 Name: libiodbc
-Version: 3.52.13
-Release: 4%{?dist}
+Version: 3.52.16
+Release: 1%{?dist}
 License: LGPLv2 or BSD
 URL: http://www.iodbc.org/
 Source0: https://github.com/openlink/iODBC/archive/v%{version}/%{name}-%{version}.tar.gz
-
-## upstream patches
-
-## downstream patches
-Patch100: libiodbc-3.52.12-multilib.patch
 
 %{?_enable_gui:BuildRequires: gtk2-devel}
 BuildRequires: gcc
@@ -110,6 +104,11 @@ rm -rfv %{buildroot}%{_datadir}/libiodbc/samples
 
 
 %changelog
+* Mon Nov 04 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 3.52.16-1
+- Update to 3.52.16
+- License verified.
+- Restored gui build
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.52.13-4
 - Updating source URL.
 - License verified.
