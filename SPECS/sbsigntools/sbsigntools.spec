@@ -90,7 +90,7 @@ make check
 
 %changelog
 * Fri Jun 14 2024 Dan Streetman <ddstreet@microsoft.com> - 0.9.5-4
-- import from fedora 40
+- Initial Azure Linux import from Fedora 40 (license: MIT)
 
 * Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
