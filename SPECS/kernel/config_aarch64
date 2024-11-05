@@ -275,7 +275,7 @@ CONFIG_KEXEC_CORE=y
 CONFIG_HAVE_IMA_KEXEC=y
 # CONFIG_KEXEC is not set
 CONFIG_KEXEC_FILE=y
-# CONFIG_KEXEC_SIG is not set
+CONFIG_KEXEC_SIG=y
 CONFIG_CRASH_DUMP=y
 # end of Kexec and crash features
 # end of General setup
