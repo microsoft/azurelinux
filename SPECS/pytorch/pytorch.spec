@@ -9,8 +9,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
-Source1:        %{name}-%{version}-submodules.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -26,6 +24,7 @@ BuildRequires:  python3-six
 
 Patch1:         CVE-2024-27318.patch
 Patch2:         CVE-2022-1941.patch
+Patch3:         CVE-2024-5187.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -59,7 +58,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1 -p 1 -n %{name}-v%{version}
+%autosetup -p 1 -n %{name}-v%{version}
 
 %build
 export USE_CUDA=0
