@@ -12721,8 +12721,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.6",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.11.6.tar.gz"
+          "version": "10.11.10",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.11.10.tar.gz"
         }
       }
     },
