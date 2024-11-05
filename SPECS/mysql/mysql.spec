@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ rm -r extra/protobuf
 cmake . \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DWITH_BOOST=boost/boost_1_77_0 \
+      -DWITH_CURL=system \
       -DWITH_PROTOBUF=system \
       -DINSTALL_MANDIR=share/man \
       -DINSTALL_DOCDIR=share/doc \
@@ -103,6 +104,9 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Nov 05 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-3
+- Switch to AZL version of "curl".
+
 * Mon Oct 28 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-2
 - Switch to ALZ version of protobuf instead of using the bundled one.
 
