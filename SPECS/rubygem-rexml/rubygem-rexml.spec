@@ -35,7 +35,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Tue Nov 5 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.7-2
+* Tue Nov 05 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.7-2
 - Add patch for CVE-2024-49761
 
 * Fri Aug 9 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.3.4-1
