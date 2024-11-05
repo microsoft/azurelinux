@@ -1966,6 +1966,7 @@
                 "sblim-sfcCommon",
                 "sblim-testsuite",
                 "sblim-wbemcli",
+                "sbsigntools",
                 "scl-utils",
                 "scotch",
                 "screen",
