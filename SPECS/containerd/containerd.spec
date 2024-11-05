@@ -3,8 +3,8 @@
 
 Summary: Industry-standard container runtime
 Name: containerd
-Version: 1.7.13
-Release: 4%{?dist}
+Version: 2.0.0
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,8 +16,6 @@ Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
 Patch1:  fix_tests_for_golang1.21.patch
-Patch2:	 CVE-2023-44487.patch
-Patch3:  CVE-2023-47108.patch
 
 %{?systemd_requires}
 
@@ -87,6 +85,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - none
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.13-4
 - Pin golang version to <= 1.22
 
