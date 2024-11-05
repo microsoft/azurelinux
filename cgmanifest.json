@@ -27323,6 +27323,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sbsigntools",
+          "version": "0.9.5",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sbsigntools-0.9.5.tar.xz" 
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "scl-utils",
           "version": "2.0.2",
           "downloadUrl": "https://github.com/sclorg/scl-utils/archive/2.0.2/scl-utils-2.0.2.tar.gz"
