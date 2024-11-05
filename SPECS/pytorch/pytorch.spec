@@ -1,8 +1,8 @@
 %global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
-Version:        2.0.0
-Release:        6%{?dist}
+Version:        2.5.1
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,11 +11,6 @@ URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
-Patch0:         CVE-2024-31580.patch
-Patch1:         CVE-2024-31583.patch
-Patch2:         CVE-2024-27319.patch
-Patch3:         CVE-2024-31584.patch
-Patch4:         CVE-2024-27318.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -28,6 +23,7 @@ BuildRequires:  python3-jinja2
 BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
+BuildRequires:  python3-six
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -81,6 +77,7 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_bindir}/convert-caffe2-to-onnx
 %{_bindir}/convert-onnx-to-caffe2
 %{_bindir}/torchrun
+%{_bindir}/torchfrtrace
 %{python3_sitearch}/*
 
 %files -n python3-pytorch-doc
@@ -88,6 +85,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Fri Nov 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.5.1-1
+- upgrade to 2.5.1 to fix CVE-2024-48063
+
 * Wed May 15 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.0-6
 - patch CVE-2024-27318
 
