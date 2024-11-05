@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -80,6 +80,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.7-7
+- Bump release to rebuild with go 1.22.7
+
 * Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.7.7-6
 - Drop requirement on a specific version of golang
 

@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.13.5
-Release:        6%{?dist}
+Version:        1.16.2
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,18 +65,11 @@ install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 
-cp config/config.toml.rpm-yum config.toml
-mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
-install -m 644 -t %{buildroot}%{_sysconfdir}/nvidia-container-runtime config.toml
-
-mkdir -p %{buildroot}%{_libexecdir}/oci/hooks.d
-install -m 755 -t %{buildroot}%{_libexecdir}/oci/hooks.d oci-nvidia-hook
-
-mkdir -p %{buildroot}%{_datadir}/containers/oci/hooks.d
-install -m 644 -t %{buildroot}%{_datadir}/containers/oci/hooks.d oci-nvidia-hook.json
-
 %posttrans
 ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
+
+# Generate the default config; If this file already exists no changes are made.
+%{_bindir}/nvidia-ctk --quiet config --config-file=%{_sysconfdir}/nvidia-container-runtime/config.toml --in-place
 
 %postun
 rm -f %{_bindir}/nvidia-container-toolkit
@@ -84,16 +77,19 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %files
 %license LICENSE
 %{_bindir}/nvidia-container-runtime-hook
-%{_libexecdir}/oci/hooks.d/oci-nvidia-hook
-%{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %files base
 %license LICENSE
-%config %{_sysconfdir}/nvidia-container-runtime/config.toml
 %{_bindir}/nvidia-container-runtime
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Fri Oct 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.16.2-1
+- Auto-upgrade to 1.16.2 - Critical vulnerability CVE-2024-0132, Medium vulnerability CVE-2024-0133
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.5-7
+- Bump release to rebuild with go 1.22.7
+
 * Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.13.5-6
 - Drop requirement on a specific version of golang
 
@@ -222,5 +218,5 @@ rm -f %{_bindir}/nvidia-container-toolkit
 * Fri May 15 2020 NVIDIA CORPORATION <cudatools@nvidia.com> 1.1.0-1
 - 4e4de762 Update build system to support multi-arch builds
 - fcc1d116 Add support for MIG (Multi-Instance GPUs)
-- d4ff0416 Add ability to merge envars of the form NVIDIA_VISIBLE_DEVICES_* 
+- d4ff0416 Add ability to merge envars of the form NVIDIA_VISIBLE_DEVICES_*
 - 60f165ad Add no-pivot option to toolkit

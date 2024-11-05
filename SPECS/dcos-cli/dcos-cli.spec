@@ -1,13 +1,14 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        17%{?dist}
+Release:        19%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://github.com/dcos/dcos-cli
 Source0:        https://github.com/dcos/dcos-cli/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-28180.patch
 
 BuildRequires:  golang
 BuildRequires:  git
@@ -45,6 +46,12 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Mon Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.2.0-19
+- Add patch to resolve CVE-2024-28180
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-18
+- Bump release to rebuild with go 1.22.7
+
 * Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.2.0-17
 - Drop requirement on a specific version of golang
 

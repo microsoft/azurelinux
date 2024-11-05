@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.5.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -82,6 +82,7 @@ sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
             --enable-libmount-mount     \
             --without-tcp-wrappers      \
             --enable-gss                \
+            --enable-svcgss             \
             --enable-nfsv4              \
             --with-rpcgen=internal      \
             --disable-static
@@ -112,6 +113,8 @@ install -m644 systemd/nfs-idmapd.service %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc_pipefs.target  %{buildroot}/lib/systemd/system/
 install -m644 systemd/var-lib-nfs-rpc_pipefs.mount  %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc-svcgssd.service %{buildroot}/lib/systemd/system/
+install -m644 systemd/rpc-gssd.service %{buildroot}/lib/systemd/system/
+
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 
 install -vdm755 %{buildroot}/usr/lib/systemd/system-preset
@@ -167,6 +170,10 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Wed Sep 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.5.4-5
+- Build nfs-utils to provide rsc.svcgssd service
+- Add rsc-gssd.service file to nfs-utils package
+
 * Wed Nov 01 2023 Andy Zaugg <azaugg@linkedin.com> - 2.5.4-4
 - Fix post-install script to create nobody user instead of named user
 

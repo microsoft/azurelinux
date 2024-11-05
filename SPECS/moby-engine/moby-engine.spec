@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 7%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -23,6 +23,7 @@ Patch3:  CVE-2023-45288.patch
 Patch4:  CVE-2023-44487.patch
 Patch5:  enable-docker-proxy-libexec-search.patch
 Patch6:  CVE-2024-41110.patch
+Patch7:  CVE-2024-29018.patch
 
 %{?systemd_requires}
 
@@ -123,13 +124,17 @@ fi
 %{_unitdir}/*
 
 %changelog
-<<<<<<< HEAD
-* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-7
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.9-10
+- Bump release to rebuild with go 1.22.7
+
+* Mon Aug 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.0.9-9
+- Patch CVE-2024-29018
+
+* Mon Aug 05 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 24.0.9-8
 - Drop requirement on a specific version of golang
-=======
+
 * Mon Jul 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 24.0.9-7
 - Fix for CVE-2024-41110
->>>>>>> dd2c6a30e (fix CVE-2024-41110 in moby-engine (#9951))
 
 * Tue Jun 25 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-6
 - Backport upstream change to search /usr/libexec for docker-proxy without daemon.json

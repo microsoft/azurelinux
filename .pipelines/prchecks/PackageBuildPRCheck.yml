@@ -1,10 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Since we're boosting our builds by using a private, pre-compiled raw toolchain
-# the pipeline requires defining the following variables outside of the YAML:
-# - rawToolchainCacheURL_AMD64
-# - rawToolchainCacheURL_ARM64
+# The "agentPool" parameter is defined in the "Agent pools (DEV)" variable group.
+# The "rawToolchain*" parameters are defined in the "Raw toolchain info" variable group.
 
 trigger: none
 
@@ -13,15 +11,15 @@ parameters:
     type: object
     default:
       - name: "AMD64"
-        agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
+        agentPool: "$(DEV_AMD64_Managed)"
         maxCPUs: "$(($(nproc) / 2))"
-        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
-        rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64_2.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64_2.0)"
       - name: "ARM64"
-        agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
+        agentPool: "$(DEV_ARM64_Managed)"
         maxCPUs: "$(($(nproc) / 3))"
-        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
-        rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_2.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_2.0)"
   - name: debug
     type: boolean
     default: false
@@ -36,12 +34,15 @@ resources:
 
 variables:
   - group: "Agent pools (DEV)"
+  - group: "Raw toolchain info"
   - name: rpmsArtifactNameBase
     value: RPMs
   - name: toolchainArtifactNameBase
     value: Toolchain
+  - name: toolchainTestsArtifactNameBase
+    value: Toolchain_tests
   - name: system.debug
-    value: '${{ parameters.debug }}'
+    value: "${{ parameters.debug }}"
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -75,6 +76,9 @@ extends:
                   # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
                   # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
                   - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
+                    parameters:
+                      # GCC fails to build as a regular package.
+                      ignoredSpecs: ["gcc"]
 
                   - script: echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "ToolchainArtifactName"
@@ -100,9 +104,8 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+                  ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                   toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
@@ -112,12 +115,11 @@ extends:
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       isUseCCache: true
-                      outputArtifactsFolder: $(ob_outputDirectory)
                       maxCPU: "${{ configuration.maxCPUs }}"
+                      outputArtifactsFolder: $(ob_outputDirectory)
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
-                      testRerunList: "$(testListFromToolchain)"
 
                   - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "RPMsArtifactName"
@@ -125,12 +127,50 @@ extends:
 
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+                      artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
 
-          - stage: sodiff_${{ configuration.name }}
+          - stage: Toolchain_tests_${{ configuration.name }}
+            dependsOn: Toolchain_${{ configuration.name }}
+            jobs:
+              - job: TestToolchainPackages
+                condition: stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList']
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                variables:
+                  ob_artifactBaseName: $(toolchainTestsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
+                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
+                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
+                steps:
+                  - template: .pipelines/templates/PackageBuild.yml@self
+                    parameters:
+                      checkBuildRetries: "1"
+                      customToolchainArtifactName: $(toolchainArtifactName)
+                      isAllowToolchainRebuilds: true
+                      isCheckBuild: true
+                      isQuickRebuildPackages: true
+                      isUseCCache: true
+                      maxCPU: "${{ configuration.maxCPUs }}"
+                      outputArtifactsFolder: $(ob_outputDirectory)
+                      pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
+                      selfRepoName: self
+                      srpmPackList: "$(testListFromToolchain)"
+                      testRerunList: "$(testListFromToolchain)"
+                      testSuiteName: "[${{ configuration.name }}] Toolchain test"
+
+                  - task: PublishPipelineArtifact@1
+                    inputs:
+                      artifact: $(toolchainTestsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
+                      targetPath: $(ob_outputDirectory)
+                    condition: always()
+                    displayName: "Publish toolchain build artifacts"
+
+          - stage: Sodiff_${{ configuration.name }}
             dependsOn: RPMs_${{ configuration.name }}
             jobs:
               - job: Sodiff_Check
