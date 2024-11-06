@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.45.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,8 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-Patch1:         CVE-2024-6104.patch
+patch1:         CVE-2023-45288.patch
+Patch2:         CVE-2024-6104.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
@@ -135,6 +136,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Wed Nov 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.45.4-4
+- Fix CVE-2023-45288
+
 * Fri Aug 02 2024 Bala <balakumaran.kannan@microsoft.com> - 2.45.4-3
 - Fix CVE-2024-6104 by patching vendor gomodule
 
