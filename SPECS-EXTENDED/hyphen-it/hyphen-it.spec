@@ -1,28 +1,26 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: LGPL-2.1-only
 Name: hyphen-it
 Summary: Italian hyphenation rules
-%global upstreamid 20071127
-Version: 0.%{upstreamid}
-Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_it_IT.zip
-Source1: hyphen-it-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
-License: LGPLv2+
+Version: 5.1.1
+Release: 1%{?dist}
+Source: https://pagure.io/dizionario_italiano/archive/%{version}/dizionario_italiano-%{version}.tar.gz
+URL:     https://pagure.io/dizionario_italiano
+License: LGPL-2.1-only
 BuildArch: noarch
 Requires: hyphen
 Supplements: (hyphen and langpacks-it)
-Provides: hyphen-la = 0.%{upstreamid}-3%{?dist}
+Provides: hyphen-la = %{version}
 
 %description
 Italian hyphenation rules.
 
 %prep
-%autosetup -c -n hyphen-it
-cp %{SOURCE1} ./LICENSE.txt
-chmod -x *
+%autosetup -n dizionario_italiano-%{version}
 
 %build
+# Nothing to do
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
@@ -37,11 +35,17 @@ done
 
 
 %files
-%license LICENSE.txt
-%doc README_hyph_it_IT.txt
-%{_datadir}/hyphen/*
+%license LICENSES/lgpl-2.1.txt
+%doc CHANGELOG.txt README.md README_hyph_it_IT.txt
+%{_datadir}/hyphen/hyph_it_IT.dic
+%{_datadir}/hyphen/hyph_it_CH.dic
+%{_datadir}/hyphen/hyph_la_VA.dic
 
 %changelog
+* Wed Nov 06 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 5.1.1-1
+- Updating Azure-Linux import from Fedora 41 (license: LGPL-2.1-only).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20071127-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
