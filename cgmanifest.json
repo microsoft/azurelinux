@@ -9861,8 +9861,8 @@
         "type": "other",
         "other": {
           "name": "libjcat",
-          "version": "0.1.6",
-          "downloadUrl": "https://people.freedesktop.org/~hughsient/releases/libjcat-0.1.6.tar.xz"
+          "version": "0.2.2",
+          "downloadUrl": "https://github.com/hughsie/libjcat/archive/refs/tags/0.2.2.tar.gz"
         }
       }
     },
