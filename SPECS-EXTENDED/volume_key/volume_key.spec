@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 Summary: An utility for manipulating storage encryption keys and passphrases
 Name: volume_key
 Version: 0.3.12
-Release: 8%{?dist}
+Release: 9%{?dist}
 # lib/{SECerrs,SSLerrs}.h are both licensed under MPLv1.1, GPLv2 and LGPLv2
 License: GPLv2 and (MPLv1.1 or GPLv2 or LGPLv2)
 URL: https://pagure.io/%{name}/
@@ -33,7 +33,14 @@ Source0: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz
 # Support all LUKS devices
 # - backport of 26c09768662d8958debe8c9410dae9fda02292c3
 Patch0: volume_key-0.3.12-support_LUKS2_and_more.patch
+# Fix resource leaks
+# - backport of bf6618ec0b09b4e51fc97fa021e687fbd87599ba
+Patch1: volume_key-0.3.12-fix_resource_leaks.patch
+
 BuildRequires: gcc
+BuildRequires: autoconf, automake, libtool
+BuildRequires: make
+
 BuildRequires: cryptsetup-luks-devel, gettext-devel, glib2-devel, /usr/bin/gpg2
 BuildRequires: gpgme-devel, libblkid-devel, nss-devel, python3-devel
 %if 0%{?drop_python2} < 1
@@ -106,14 +113,16 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q
-%patch 0 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+autoreconf -fiv
 
 %build
 %configure %{?with_pythons}
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+%make_install
 
 # Remove libtool archive
 find %{buildroot} -type f -name "*.la" -delete
@@ -157,6 +166,10 @@ exit 1; \
 %endif
 
 %changelog
+* Wed Nov 06 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.3.12-9
+- added patch & miner fixes
+
+
 * Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.3.12-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable python2 build and enable python3 build
