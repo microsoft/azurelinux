@@ -1,18 +1,14 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.2121
-Release:        4%{?dist}
+Version:        9.1.0791
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-22667.patch
-Patch1:         CVE-2024-43374.patch
-Patch2:         CVE-2024-41957.patch
-Patch3:         CVE-2024-41965.patch
 
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
@@ -132,14 +128,15 @@ fi
 %{_datarootdir}/vim/vim*/scripts.vim
 %{_datarootdir}/vim/vim*/spell/*
 %{_datarootdir}/vim/vim*/syntax/*
-%exclude %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%exclude %{_datarootdir}/vim/vim90/syntax/syntax.vim
-%exclude %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
+%exclude %{_datarootdir}/vim/vim*/syntax/nosyntax.vim
+%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
+%exclude %{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_datarootdir}/vim/vim*/tools/*
 %{_datarootdir}/vim/vim*/tutor/*
 %{_datarootdir}/vim/vim*/lang/*.vim
 %doc %{_datarootdir}/vim/vim*/lang/*.txt
 %lang(af) %{_datarootdir}/vim/vim*/lang/af/LC_MESSAGES/vim.mo
+%lang(am) %{_datarootdir}/vim/vim*/lang/am/LC_MESSAGES/vim.mo
 %lang(ca) %{_datarootdir}/vim/vim*/lang/ca/LC_MESSAGES/vim.mo
 %lang(cs) %{_datarootdir}/vim/vim*/lang/cs/LC_MESSAGES/vim.mo
 %lang(de) %{_datarootdir}/vim/vim*/lang/de/LC_MESSAGES/vim.mo
@@ -149,6 +146,7 @@ fi
 %lang(fi) %{_datarootdir}/vim/vim*/lang/fi/LC_MESSAGES/vim.mo
 %lang(fr) %{_datarootdir}/vim/vim*/lang/fr/LC_MESSAGES/vim.mo
 %lang(ga) %{_datarootdir}/vim/vim*/lang/ga/LC_MESSAGES/vim.mo
+%lang(hu) %{_datarootdir}/vim/vim*/lang/hu/LC_MESSAGES/vim.mo
 %lang(it) %{_datarootdir}/vim/vim*/lang/it/LC_MESSAGES/vim.mo
 %lang(ja) %{_datarootdir}/vim/vim*/lang/ja/LC_MESSAGES/vim.mo
 %lang(ko.UTF-8) %{_datarootdir}/vim/vim*/lang/ko.UTF-8/LC_MESSAGES/vim.mo
@@ -190,8 +188,8 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
-%{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim90/autoload/dist/ft.vim
+%{_datarootdir}/vim/vim*/syntax/nosyntax.vim
+%{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
 %{_bindir}/view
@@ -201,6 +199,13 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Oct 17 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
+- Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
+- Added language configurations for Amharic and Hungarian
+
+* Tue Oct 08 2024 Sam Meluch <sammeluch@microsoft.com> - 9.0.2121-5
+- Add patch to resolve CVE-2024-43802
+
 * Wed Sep 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2121-4
 - Add patch to resolve CVE-2024-41957 & CVE-2024-41965
 
