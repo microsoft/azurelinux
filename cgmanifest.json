@@ -6940,8 +6940,8 @@
         "type": "other",
         "other": {
           "name": "hyphen-tk",
-          "version": "0.20110620",
-          "downloadUrl": "https://github.com/hyphenation/tex-hyphen/blob/ee22323218150388abdeb36184ad5861e3669b65/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex"
+          "version": "0.20210322",
+          "downloadUrl": "http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex"
         }
       }
     },
