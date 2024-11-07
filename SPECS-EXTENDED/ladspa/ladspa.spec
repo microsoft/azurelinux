@@ -1,6 +1,6 @@
 Name:           ladspa
-Version:        1.13
-Release:        25%{?dist}
+Version:        1.17
+Release:        1%{?dist}
 
 Summary:        Linux Audio Developer's Simple Plug-in API, examples and tools
 
@@ -9,10 +9,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.ladspa.org/
 Source:         http://www.ladspa.org/download/%{name}_sdk_%{version}.tgz
-Patch1:         ladspa-1.13-plugindir.patch
+Patch1:         ladspa-1.17.patch
 
 BuildRequires:  perl-interpreter
 BuildRequires:  gcc-c++
+BuildRequires:  pkgconfig(sndfile)
 
 %description
 There is a large number of synthesis packages in use or development on
@@ -36,12 +37,12 @@ header file.
 
 
 %prep
-%setup -q -n ladspa_sdk
-%patch 1 -p0 -b .plugindir
+%setup -q -n ladspa_sdk_%{version}
+%patch -P1 -p1 -b .0001
 # respect RPM_OPT_FLAGS
-perl -pi -e 's/^(CFLAGS.*)-O3(.*)/$1\$\(RPM_OPT_FLAGS\)$2 -DPLUGINDIR=\$\(PLUGINDIR\)/' src/makefile
+perl -pi -e 's/^(CFLAGS.*)-O2(.*)/$1\$\(RPM_OPT_FLAGS\)$2 -DDEFAULT_LADSPA_PATH=\$\(PLUGINDIR\)/' src/Makefile
 # avoid X.org dependency
-perl -pi -e 's/-mkdirhier/-mkdir -p/' src/makefile
+perl -pi -e 's/-mkdirhier/-mkdir -p/' src/Makefile
 
 # fix links to the header file in the docs
 cd doc
@@ -49,8 +50,9 @@ perl -pi -e "s!HREF=\"ladspa.h.txt\"!href=\"file:///usr/include/ladspa.h\"!" *.h
 
 
 %build
+%set_build_flags
 cd src
-PLUGINDIR=\\\"%{_libdir}/ladspa\\\" make targets %{?_smp_mflags} LD="ld --build-id"
+PLUGINDIR=%{_libdir}/ladspa make targets %{?_smp_mflags} LD="ld --build-id"
 
 #make test
 #make check
@@ -85,6 +87,10 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/ladspa/rdf
 
 
 %changelog
+* Thu Nov 7 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.17-1
+- Updated to version 1.17
+- Verified license
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
