@@ -32,5 +32,5 @@ rm -r lib/ccan.git
 git log --date=short --format='%ad %t %an <%ae>%n%n  * %s%n' > ChangeLog
 cd ..
 mv sbsigntools sbsigntools-${version}
-tar cJf "$pwd"/sbsigntools-${version}.tar.xz --exclude=.git sbsigntools-${version}
+tar --sort=name --mtime="2021-04-26 00:00Z" --owner=0 --group=0 --numeric-owner --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime -cJf "$pwd"/sbsigntools-${version}.tar.xz --exclude=.git sbsigntools-${version}
 popd
