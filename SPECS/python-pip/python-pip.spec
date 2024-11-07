@@ -5,7 +5,7 @@ A tool for installing and managing Python packages}
 Summary:        A tool for installing and managing Python packages
 Name:           python-pip
 Version:        24.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT AND Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,10 @@ BuildArch:      noarch
 %package -n python3-pip
 Summary:        %{summary}
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
+
+Requires:  python3-setuptools
 
 %description -n python3-pip %{_description}
 
@@ -51,6 +54,10 @@ BuildRequires:  python3-wheel
 %{python3_sitelib}/pip*
 
 %changelog
+* Thu Nov 07 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.2.2
+- Patch CVE-2024-6345 by adding BuildRequires for setuptools
+- This way it does not depdend bundled setuptools of python3 
+
 * Wed Oct 23 2024 Bala <balakumaran.kannan@microsoft.com> - 24.2.1
 - Upgrade to 24.2 for fixing CVE-2024-6345
 - Update build and install steps for toml based build
