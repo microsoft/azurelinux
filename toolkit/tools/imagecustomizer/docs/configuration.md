@@ -50,8 +50,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 13. If ([overlays](#overlay-type)) are specified, then add the overlay driver
     and update the fstab file with the overlay mount information.
 
-14. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
-    and update the grub config.
+14. If a ([verity](#verity-type)) device is specified, then add the dm-verity dracut
+    driver and update the grub config.
 
 15. Regenerate the initramfs file (if needed).
 
@@ -66,8 +66,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 20. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
     the file systems.
 
-21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
-    grub config.
+21. If a ([verity](#verity-type)) device is specified, then create the hash tree and
+    update the grub config.
 
 22. If the output format is set to `iso`, copy additional iso media files.
     ([iso](#iso-type))
@@ -125,6 +125,13 @@ os:
             - [end](#end-uint64)
             - [size](#size-uint64)
             - [type](#partition-type-string)
+    - [verity](#verity-verity)
+      - [verity type](#verity-type)
+        - [id](#verity-id)
+        - [name](#verity-name)
+        - [dataDeviceId](#datadeviceid-string)
+        - [hashDeviceId](#hashdeviceid-string)
+        - [corruptionOption](#corruptionoption-string)
     - [filesystems](#filesystems-filesystem)
       - [filesystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
@@ -134,7 +141,7 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
-  - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
+    - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
     - [additionalFiles](#iso-additionalfiles)
       - [additionalFile type](#additionalfile-type)
@@ -198,8 +205,8 @@ os:
         - [name](#module-name)
         - [loadMode](#loadmode-string)
         - [options](#options-mapstring-string)
-    - [overlay type](#overlay-type)
-    - [verity type](#verity-type)
+    - [overlays](#overlays-overlay)
+      - [overlay type](#overlay-type)
   - [scripts type](#scripts-type)
     - [postCustomization](#postcustomization-script)
       - [script type](#script-type)
@@ -260,31 +267,6 @@ storage:
     type: ext4
     mountPoint:
       path: /
-
-os:
-  resetBootLoaderType: hard-reset
-```
-
-### resetPartitionsUuidsType [string]
-
-Specifies that the partition UUIDs and filesystem UUIDs should be reset.
-
-Value is optional.
-
-This value cannot be specified if [storage](#storage-storage) is specified (since
-customizing the partition layout resets all the UUIDs anyway).
-
-If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
-must also be specified.
-
-Supported options:
-
-- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
-
-Example:
-
-```yaml
-resetPartitionsUuidsType: reset-all
 
 os:
   resetBootLoaderType: hard-reset
@@ -508,45 +490,58 @@ Example: `noatime,nodiratime`
 
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification.
+Specifies the configuration for dm-verity integrity verification.
 
-- `dataPartition`: A partition configured with dm-verity, which verifies integrity
-  at each system boot.
-
-  - `idType`: Specifies the type of id for the partition. The options are
-    `id` (partition [id](#id-string)), `part-label` (partition label),
-    `uuid` (filesystem UUID), and `part-uuid` (partition UUID).
-
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
-
-- `hashPartition`: A partition used exclusively for storing a calculated hash
-  tree.
-
-- `corruptionOption`: Optional. Specifies the behavior in case of detected
-  corruption. This is configurable with the following options:
-  - `io-error`: Default setting. Fails the I/O operation with an I/O error.
-  - `ignore`: ignores the corruption and continues operation.
-  - `panic`: causes the system to panic (print errors) and then try restarting
-    if corruption is detected.
-  - `restart`: attempts to restart the system upon detecting corruption.
-
-Example:
-
-```yaml
-os:
-  verity:
-    dataPartition:
-      idType: part-uuid
-      id: 00000000-0000-0000-0000-000000000000
-    hashPartition:
-      idType: part-label
-      Id: hash_partition
-    corruptionOption: panic
-```
+Note: Currently only root partition (`/`) is supported. Support for other partitions
+(e.g. `/usr`) may be added in the future.
 
 There are multiple ways to configure a verity enabled image. For
 recommendations, see [Verity Image Recommendations](./verity.md).
+
+<div id="verity-id"></div>
+
+### id [string]
+
+Required.
+
+The ID of the verity object.
+This is used to correlate verity objects with [filesystem](#filesystem-type)
+objects.
+
+<div id="verity-name"></div>
+
+### name [string]
+
+Required.
+
+The name of the device mapper block device.
+
+The value must be:
+
+- `root` for root partition (i.e. `/`)
+
+### dataDeviceId [string]
+
+The ID of the [partition](#partition-type) to use as the verity data partition.
+
+### hashDeviceId [string]
+
+The ID of the [partition](#partition-type) to use as the verity hash partition.
+
+### corruptionOption [string]
+
+Optional.
+
+Specifies how a mismatch between the hash and the data partition is handled.
+
+Supported values:
+
+- `io-error`: Fails the I/O operation with an I/O error.
+- `ignore`: Ignores the corruption and continues operation.
+- `panic`: Causes the system to panic (print errors) and then try restarting.
+- `restart`: Attempts to restart the system.
+
+Default value: `io-error`.
 
 ## additionalFile type
 
@@ -679,8 +674,7 @@ Specifies the mount options for a partition.
 
 Required.
 
-The ID of the partition.
-This is used correlate [partition](#partition-type) objects with filesystem objects.
+The ID of the [partition](#partition-type) or [verity](#verity-type) object.
 
 ### type [string]
 
@@ -910,6 +904,8 @@ os:
 
 ## partition type
 
+<div id="partition-id"></div>
+
 ### id [string]
 
 Required.
@@ -1034,6 +1030,25 @@ The password's value.
 The meaning of this value depends on the type property.
 
 ## mountPoint type
+
+You can configure `mountPoint` in one of two ways:
+
+1. **Structured Format**: Use `idType`, `options`, and `path` fields for a more detailed configuration.
+   
+   ```yaml
+   mountPoint:
+     path: /boot/efi
+     options: umask=0077
+     idType: part-uuid
+   ```
+
+2. **Shorthand Path Format**: Provide the mount path directly as a string when only `path` is required.
+
+   ```yaml
+   mountPoint: /boot/efi
+   ```
+
+   In this shorthand format, only the `path` is specified, and default values will be applied to any optional fields.
 
 ### idType [string]
 
@@ -1356,6 +1371,10 @@ os:
     - name: vfio
 ```
 
+### overlays [[overlay](#overlay-type)[]]
+
+Used to add filesystem overlays.
+
 ### selinux [[selinux](#selinux-type)]
 
 Options for configuring SELinux.
@@ -1597,6 +1616,36 @@ Supported options:
 
 Contains the options for provisioning disks and their partitions.
 
+### verity [[verity](#verity-type)[]]
+
+Configure verity block devices.
+
 ### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
+
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+storage:
+  resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```
