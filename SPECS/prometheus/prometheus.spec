@@ -137,8 +137,9 @@ fi
 %changelog
 * Wed Nov 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.37.9-2
 - Patch for CVE-2023-39325 CVE-2023-45288
+- Fix previous changelog version number
 
-* Tue Oct 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.0-16
+* Tue Oct 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.9-1
 - Bump version to patch CVE-2022-41717
 - Patch for CVE-2024-24786
 
