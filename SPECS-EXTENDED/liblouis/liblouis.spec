@@ -1,8 +1,8 @@
 Summary:        Braille translation and back-translation library
 Name:           liblouis
-Version:        3.26.0
+Version:        3.31.0
 Release:        1%{?dist}
-License:        LGPL-2.1-or-later
+License:        LGPL-2.1-or-later AND GPL-3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/liblouis/liblouis
@@ -151,6 +151,10 @@ done
 %endif
 
 %changelog
+* Thu Nov 07 2024 Kevin Lockwood <v-klockwood@microsoft.com> 3.31.0-1
+- Update to 3.31.0
+- License verified
+
 * Tue Jul 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.26.0-1
 - Auto-upgrade to 3.26.0 - to fix CVE-2023-26767, CVE-2023-26768, CVE-2023-26769
 - oliviacrain: Fix LGPL version in license tags 

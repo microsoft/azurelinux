@@ -9931,8 +9931,8 @@
         "type": "other",
         "other": {
           "name": "liblouis",
-          "version": "3.26.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.26.0/liblouis-3.26.0.tar.gz"
+          "version": "3.31.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.31.0/liblouis-3.31.0.tar.gz"
         }
       }
     },
