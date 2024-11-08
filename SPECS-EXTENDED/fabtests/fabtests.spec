@@ -1,34 +1,44 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           fabtests
-Version:        1.12.0
-%global         __rc  rc1
+Version:        1.18.0
 Release:        1%{?dist}
 Summary:        Test suite for libfabric API
+
 # include/jsmn.h and common/jsmn.c are licensed under MIT.
 # All other source files permit distribution under BSD. Some of them
 # additionaly expressly allow the option to be licensed under GPLv2.
 # See the license headers in individual source files to see which those are.
 License:        BSD and (BSD or GPLv2) and MIT
 Url:            https://github.com/ofiwg/libfabric
-Source:         https://github.com/ofiwg/libfabric/releases/download/v%{version}%{__rc}/%{name}-%{version}%{__rc}.tar.bz2
+Source:         https://github.com/ofiwg/libfabric/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+
 Patch0:         0001-adjust-shebang-lines-in-rft_yaml_to_junit_xml-and-ru.patch
+
 BuildRequires:  libfabric-devel >= %{version}
+%ifarch %{valgrind_arches}
 BuildRequires:  valgrind-devel
+%endif
 BuildRequires:  gcc
 BuildRequires:  make
+Requires:       python3-pytest
 
 %description
 Fabtests provides a set of examples that uses libfabric - a high-performance
 fabric software library.
 
 %prep
-%setup -q -n %{name}-%{version}%{__rc}
-%patch 0 -p2
+%setup -q -n %{name}-%{version}
+%patch -P0 -p2
 
 %build
-%configure --with-valgrind
+%configure \
+%ifarch %{valgrind_arches}
+	--with-valgrind
+%endif
+
 make %{?_smp_mflags} V=1
+
 
 %install
 %make_install
@@ -44,6 +54,10 @@ rm -f %{buildroot}%{_libdir}/*.la
 %license COPYING
 
 %changelog
+* Fri Nov 08 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.18.0-1
+- Update to 1.18.0
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
