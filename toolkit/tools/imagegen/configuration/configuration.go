@@ -139,22 +139,22 @@ func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
 func checkDeviceMapperFlags(config *Config) (err error) {
 	for _, sysConfig := range config.SystemConfigs {
 		var dmRoot *Partition
-		if sysConfig.ReadOnlyVerityRoot.Enable || sysConfig.Encryption.Enable {
+		if sysConfig.Encryption.Enable {
 			if len(config.Disks) == 0 {
-				logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", sysConfig.Name)
+				logger.Log.Warnf("[Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", sysConfig.Name)
 				continue
 			}
 
 			rootPartSetting := sysConfig.GetRootPartitionSetting()
 			if rootPartSetting == nil {
-				return fmt.Errorf("can't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]")
+				return fmt.Errorf("can't find a root ('/') [PartitionSetting] to work with [Encryption]")
 			}
 			rootDiskPart := config.GetDiskPartByID(rootPartSetting.ID)
 			if rootDiskPart == nil {
 				return fmt.Errorf("can't find a [Disk] [Partition] to match with [PartitionSetting] '%s'", rootPartSetting.ID)
 			}
 			if !rootDiskPart.HasFlag(PartitionFlagDeviceMapperRoot) {
-				return fmt.Errorf("[Partition] (%s) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (%s)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", rootDiskPart.ID, sysConfig.Name)
+				return fmt.Errorf("[Partition] (%s) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (%s)'s root partition since it uses [Encryption]", rootDiskPart.ID, sysConfig.Name)
 			}
 		}
 		// There is currently a limitation in diskutils.CreatePartitions() which requires us to know our device-mapper
@@ -250,7 +250,7 @@ func (c *Config) IsValid() (err error) {
 	// Check the flags for the disks
 	err = checkDeviceMapperFlags(c)
 	if err != nil {
-		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n%w", err)
+		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\n%w", err)
 	}
 
 	err = checkInvalidMountIdentifiers(c)

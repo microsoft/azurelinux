@@ -41,7 +41,6 @@ type SystemConfig struct {
 	Encryption             RootEncryption            `json:"Encryption"`
 	RemoveRpmDb            bool                      `json:"RemoveRpmDb"`
 	PreserveTdnfCache      bool                      `json:"PreserveTdnfCache"`
-	ReadOnlyVerityRoot     ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
 	EnableHidepid          bool                      `json:"EnableHidepid"`
 	DisableRpmDocs         bool                      `json:"DisableRpmDocs"`
 	OverrideRpmLocales     string                    `json:"OverrideRpmLocales"`
@@ -159,24 +158,14 @@ func (s *SystemConfig) IsValid() (err error) {
 		}
 	}
 
-	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {
+	if s.Encryption.Enable {
 		if len(mountPointUsed) == 0 {
-			logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
+			logger.Log.Warnf("[Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
 		} else {
 			if !mountPointUsed["/"] {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
-			}
-			if s.ReadOnlyVerityRoot.Enable && s.Encryption.Enable {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot] and [Encryption]: verity root currently does not support root encryption")
-			}
-			if s.ReadOnlyVerityRoot.Enable && !mountPointUsed["/boot"] {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot]: must have a separate partition mounted at '/boot'")
+				return fmt.Errorf("invalid [Encryption]: must have a partition mounted at '/'")
 			}
 		}
-	}
-
-	if err = s.ReadOnlyVerityRoot.IsValid(); err != nil {
-		return fmt.Errorf("invalid [ReadOnlyVerityRoot]: %w", err)
 	}
 
 	if err = s.KernelCommandLine.IsValid(); err != nil {

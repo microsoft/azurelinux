@@ -434,8 +434,8 @@ func WaitForDevicesToSettle() error {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
-	readOnlyRootConfig configuration.ReadOnlyVerityRoot, diskKnownToBeEmpty bool,
-) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+	diskKnownToBeEmpty bool,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -489,29 +489,22 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			partedSupportsEmptyStringArgs)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
 				err = fmt.Errorf("failed to initialize encrypted root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
-		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
-			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
-			if err != nil {
-				err = fmt.Errorf("failed to initialize read only root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-			}
-			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
 		} else {
 			partDevPathMap[partition.ID] = partDevPath
 		}

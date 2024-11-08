@@ -149,9 +149,9 @@ func configureDiskBootLoader(imageConnection *ImageConnection, rootMountIdType i
 	}
 
 	// Configure the boot loader.
-	err = installutils.ConfigureDiskBootloaderWithRootMountIdType(imagerBootType, false, false, imagerRootMountIdType,
+	err = installutils.ConfigureDiskBootloaderWithRootMountIdType(imagerBootType, false, imagerRootMountIdType,
 		imagerKernelCommandLine, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
-		mountPointMap, diskutils.EncryptedRootDevice{}, diskutils.VerityDevice{}, grubMkconfigEnabled,
+		mountPointMap, diskutils.EncryptedRootDevice{}, grubMkconfigEnabled,
 		!grubMkconfigEnabled)
 	if err != nil {
 		return fmt.Errorf("failed to install bootloader:\n%w", err)
@@ -176,9 +176,9 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	}
 
 	// Set up partitions.
-	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(
+	partIDToDevPathMap, partIDToFsTypeMap, _, err := diskutils.CreatePartitions(
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
-		configuration.ReadOnlyVerityRoot{}, true /*diskKnownToBeEmpty*/)
+		true /*diskKnownToBeEmpty*/)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
