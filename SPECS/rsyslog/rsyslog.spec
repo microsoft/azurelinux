@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2204.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source3:        rsyslog.conf
 # Upstream only publishes built docs for base_version.0
 Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 Source5:        rsyslog.logrotate
+Patch0:         issue5158.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -66,6 +67,7 @@ HTML documentation for %{name}
 %prep
 # Unpack the code source tarball
 %setup -q
+patch -p1 < %{PATCH0}
 # Unpack the documentation tarball in the folder created above
 %setup -q -a 4 -T -D
 # Remove documentation sources
@@ -175,6 +177,9 @@ fi
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Fri Nov 08 2024 Andrew Phelps <anphel@microsoft.com> - 8.2204.1-4
+- Add patch to fix upstream issue #5158
+
 * Wed Oct 12 2022 Nan Liu <liunan@microsoft.com> - 8.2204.1-3
 - Add rsyslog configuration file to /etc/logrotate.d
 
