@@ -13,6 +13,9 @@ extends:
       - stage: InfoPublishing
         jobs:
           - job: PublishMergeInfo
+            pool:
+              type: linux
+
             steps:
               - script: |
                   echo "##vso[build.addbuildtag]Repository.Name:$(Build.Repository.Name)"
