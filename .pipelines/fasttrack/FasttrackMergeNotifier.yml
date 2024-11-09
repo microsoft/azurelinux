@@ -1,0 +1,22 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+trigger: none
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: InfoPublishing
+        jobs:
+          - job: PublishMergeInfo
+            steps:
+              - script: |
+                  echo "##vso[build.addbuildtag]Repository.Name:$(Build.Repository.Name)"
+                  echo "##vso[build.addbuildtag]Repository.Uri:$(Build.Repository.Uri)"
+                  echo "##vso[build.addbuildtag]SourceBranch:$(Build.SourceBranch)"
+                  echo "##vso[build.addbuildtag]SourceVersion:$(Build.SourceVersion)"
+                displayName: "Set merge info tags"
