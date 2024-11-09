@@ -23,6 +23,9 @@ extends:
             pool:
               type: linux
 
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/OB_template_complains_if_this_is_not_set"
+
             steps:
               - script: |
                   echo "##vso[build.addbuildtag]Repository.Name:$(Build.Repository.Name)"
