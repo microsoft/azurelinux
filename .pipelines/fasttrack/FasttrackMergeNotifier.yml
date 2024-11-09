@@ -30,8 +30,8 @@ extends:
 
             steps:
               - script: |
-                  echo "##vso[build.addbuildtag]Repository.Name_$(Build.Repository.Name)"
-                  echo "##vso[build.addbuildtag]Repository.Uri_$(Build.Repository.Uri)"
-                  echo "##vso[build.addbuildtag]SourceBranch_$(Build.SourceBranch)"
-                  echo "##vso[build.addbuildtag]SourceVersion_$(Build.SourceVersion)"
+                  echo "##vso[build.addbuildtag]Repository.Name-$(Build.Repository.Name)"
+                  echo "##vso[build.addbuildtag]Repository.Uri-$(Build.Repository.Uri)"
+                  echo "##vso[build.addbuildtag]SourceBranch-$(Build.SourceBranch)"
+                  echo "##vso[build.addbuildtag]SourceVersion-$(Build.SourceVersion)"
                 displayName: "Set merge info tags"
