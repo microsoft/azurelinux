@@ -1,6 +1,6 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
-Version:        2.5.4
+Version:        2.5.5
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Thu Sep 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.5-1
+- Auto-upgrade to 2.5.5 - 2.5.4 is no longer supported upstream
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.4-1
 - Auto-upgrade to 2.5.4 - Azure Linux 3.0 - package upgrades
 
