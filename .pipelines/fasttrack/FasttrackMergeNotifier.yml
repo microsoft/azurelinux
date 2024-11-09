@@ -3,6 +3,13 @@
 
 trigger: none
 
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
