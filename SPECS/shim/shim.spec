@@ -11,9 +11,9 @@
 # shim-unsigned package, see the TESTING file.
 #
 # Note: For Azure Linux 3.0, we will not be utilizing the fallback.efi
-# binary in order keep consistency with our 3.0 preview and earlier
+# binary in order to keep consistency with our 3.0 preview and earlier
 # offerings.
-# We will re-evaluate bringing in fallback.efi behavior again in the next
+# We will re-evaluate bringing in fallback.efi behavior in the next
 # major OS release.
 
 %global debug_package %{nil}
