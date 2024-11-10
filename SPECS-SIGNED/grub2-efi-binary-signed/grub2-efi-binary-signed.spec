@@ -84,8 +84,8 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 /boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 %changelog
-* Wed Oct 28 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-22
-- move EFI binary from BOOT into efidir
+* Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
+- Set efidir location to BOOT for eventual use in changing to "azurelinux"
 
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Bump release number to match grub release

@@ -434,8 +434,8 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %changelog
 * Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
-- Refactor spec to define efidir
-- bump release to also force signing with the new Azure Linux secure boot key
+- Set efidir location to BOOT for eventual use in changing to "azurelinux"
+- Bump release to also force signing with the new Azure Linux secure boot key
 
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Add Fedora SBAT entries
