@@ -51,6 +51,7 @@
         "rpm",
         "sed",
         "shadow-utils",
+        "shim",
         "squashfs-tools",
         "sqlite",
         "systemd",
