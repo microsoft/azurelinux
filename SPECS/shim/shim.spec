@@ -182,6 +182,7 @@ fi
 - update to 15.8
 - include mm and fb
 - protect from dnf removal
+- add signed binaries
 
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update signed shim binary to newer one associated with 15.4-2 unsigned build.
