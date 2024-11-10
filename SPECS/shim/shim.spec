@@ -3,13 +3,18 @@
 # already-signed EFI binaries as source, and packages them into the
 # proper locations under /boot. The shim EFI binary must be externally
 # reviewed and approved (by https://github.com/rhboot/shim-review) and
-# will then be externally signed. The fallback (fb) and mokmanager
-# (mm) EFI binaries should be signed by the production build pipeline.
+# will then be externally signed. The mokmanager (mm) EFI binary should
+# be signed by the production build pipeline.
 # This package does *not* sign anything.
 #
 # To test secure boot after making changes to this, or the
 # shim-unsigned package, see the TESTING file.
 #
+# Note: For Azure Linux 3.0, we will not be utilizing the fallback.efi
+# binary in order keep consistency with our 3.0 preview and earlier
+# offerings.
+# We will re-evaluate bringing in fallback.efi behavior again in the next
+# major OS release.
 
 %global debug_package %{nil}
 
@@ -61,14 +66,9 @@ BuildRequires:  util-linux
 # Microsoft UEFI signing key
 Source0:        shim%{efiarch}.efi
 
-# These are are FallBack and MokManager EFI binaries that have been
-# signed by the Azure Linux signing cert. If these files are empty
-# (the default), this build will use the unsigned binaries from the
-# shim-unsigned package. If these files are not empty, they will be
-# used instead. The production signing pipeline should replace the
-# empty default files with the signed files for production runs.
-Source1:        fb%{efiarch}.efi
-Source2:        mm%{efiarch}.efi
+# This is the MokManager EFI binaries that have been signed by the
+# Azure Linux signing cert.
+Source1:        mm%{efiarch}.efi
 
 %description
 Initial UEFI bootloader that handles chaining to a trusted full bootloader
@@ -80,10 +80,7 @@ on %{_arch} systems.
 %setup -c -T
 cp %{sources} .
 
-# By default, mm/fb are empty, in which case we will use the unsigned
-# binary from the shim-unsigned package. We do not actually check if
-# the file is signed here; that will be verified in %%check.
-for f in mm fb; do
+for f in mm; do
     efi=${f}%{efiarch}.efi
     if [[ -s $efi ]]; then
         echo "Using signed $efi"
@@ -104,10 +101,6 @@ echo -ne '\xff\xfe' | cat - %{shimdir}/BOOT%{EFIARCH}.CSV > BOOT%{EFIARCH}.CSV
 install -D dnf-protected.conf %{buildroot}%{_sysconfdir}/dnf/protected.d/%{name}.conf
 
 install -D shim%{efiarch}.efi %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi
-
-# Note: For Azure Linux 3.0, we will not be utilizing the fallback.efi binary in order
-# keep consistency with our earlier offerings.
-# We will re-evaluate this behavior again in the next major OS release.
 
 install -D mm%{efiarch}.efi -t %{buildroot}/boot/efi/EFI/%{efidir}
 
@@ -176,7 +169,7 @@ fi
 %changelog
 * Wed Nov 10 2024 Chris Co <chrco@microsoft.com> - 15.8-3
 - update to 15.8
-- include mm and fb
+- include mm
 - protect from dnf removal
 - add signed binaries
 
