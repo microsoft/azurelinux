@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global efidir azurelinux
+%global efidir BOOT
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
