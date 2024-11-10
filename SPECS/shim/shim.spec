@@ -1,5 +1,5 @@
 #
-# This generates a shim-%%{efiarch} package which takes all the
+# This generates a shim package which takes all the
 # already-signed EFI binaries as source, and packages them into the
 # proper locations under /boot. The shim EFI binary must be externally
 # reviewed and approved (by https://github.com/rhboot/shim-review) and
@@ -30,7 +30,7 @@
 %global shimdir %{shimversiondir}/%{efiarch}
 
 Summary:        First stage UEFI bootloader
-Name:           shim-%{efiarch}
+Name:           shim
 Version:        15.8
 Release:        3%{?dist}
 License:        BSD
@@ -178,7 +178,7 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
-* Wed Mar 13 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-1
+* Wed Nov 10 2024 Chris Co <chrco@microsoft.com> - 15.8-3
 - update to 15.8
 - include mm and fb
 - protect from dnf removal
