@@ -53,8 +53,6 @@ ignore_no_source_tarball=" \
   qt-rpm-macros \
   sgx-backwards-compatibility \
   shim \
-  shim-aa64 \
-  shim-x64 \
   web-assets \
   "
 
