@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "runc-1.1.12.tar.gz": "be31b07d6a54a8f234016501c300ad04b6c428c56588e7eca8c3b663308db208"
- }
+  "Signatures": {
+    "runc-1.2.1.tar.gz": "1418fdaf46e0d6da75b62b4ad788fb9bccbe8a1b6318675205bf27cc03a02427"
+  }
 }
