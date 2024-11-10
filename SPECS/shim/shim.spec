@@ -24,7 +24,7 @@
 %endif
 
 # From shim-unsigned-%%{efiarch}
-%global efidir azurelinux
+%global efidir BOOT
 %global shimrootdir %{_datadir}/shim/
 %global shimversiondir %{shimrootdir}/%{version}
 %global shimdir %{shimversiondir}/%{efiarch}
@@ -45,7 +45,7 @@ Obsoletes:      shim < %{version}-%{release}
 Provides:       shim-signed = %{version}-%{release}
 Provides:       shim-signed-%{efiarch} = %{version}-%{release}
 
-# This is when grub was updated to use our %%{efidir} instead of BOOT
+# This is when grub was updated to be signed with the newer Azure Linux certificate
 Conflicts:      grub2-efi-binary < 2.06-22
 
 BuildRequires:  shim-unsigned-%{efiarch} = %{version}-%{release}
@@ -104,11 +104,12 @@ echo -ne '\xff\xfe' | cat - %{shimdir}/BOOT%{EFIARCH}.CSV > BOOT%{EFIARCH}.CSV
 install -D dnf-protected.conf %{buildroot}%{_sysconfdir}/dnf/protected.d/%{name}.conf
 
 install -D shim%{efiarch}.efi %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi
-install -D fb%{efiarch}.efi -t %{buildroot}/boot/efi/EFI/BOOT
 
-install -D shim%{efiarch}.efi -t %{buildroot}/boot/efi/EFI/%{efidir}
+# Note: For Azure Linux 3.0, we will not be utilizing the fallback.efi binary in order
+# keep consistency with our earlier offerings.
+# We will re-evaluate this behavior again in the next major OS release.
+
 install -D mm%{efiarch}.efi -t %{buildroot}/boot/efi/EFI/%{efidir}
-install -D BOOT%{EFIARCH}.CSV -t %{buildroot}/boot/efi/EFI/%{efidir}
 
 %check
 HASH=$(cat %{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
@@ -117,13 +118,9 @@ HASH=$(cat %{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 [[ $HASH = $(pesign -h -i %{shimdir}/shim%{efiarch}.efi | cut -d ' ' -f 1) ]]
 # Verify the signed shim hash also matches
 [[ $HASH = $(pesign -h -i %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi | cut -d ' ' -f 1) ]]
-[[ $HASH = $(pesign -h -i %{buildroot}/boot/efi/EFI/%{efidir}/shim%{efiarch}.efi | cut -d ' ' -f 1) ]]
 
 # Verify the unsigned and signed mm hashes match
 [[ $(pesign -h -i %{shimdir}/mm%{efiarch}.efi | cut -d ' ' -f 1) = $(pesign -h -i %{buildroot}/boot/efi/EFI/%{efidir}/mm%{efiarch}.efi | cut -d ' ' -f 1) ]]
-
-# Verify the unsigned and signed fb hashes match
-[[ $(pesign -h -i %{shimdir}/fb%{efiarch}.efi | cut -d ' ' -f 1) = $(pesign -h -i %{buildroot}/boot/efi/EFI/BOOT/fb%{efiarch}.efi | cut -d ' ' -f 1) ]]
 
 objcopy -O binary -j .vendor_cert %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi cert.table
 
@@ -165,8 +162,7 @@ if [[ $DBX_SIZE != 0 ]]; then
     PESIGCHECK_PARAMS="$PESIGCHECK_PARAMS -X dbx.esl"
 fi
 
-# Verify the signatures of the FallBack and MokManager EFI binaries.
-[ -e fb-is-signed ] && pesigcheck $PESIGCHECK_PARAMS -i %{buildroot}/boot/efi/EFI/BOOT/fb%{efiarch}.efi
+# Verify the signature of MokManager EFI binary.
 [ -e mm-is-signed ] && pesigcheck $PESIGCHECK_PARAMS -i %{buildroot}/boot/efi/EFI/%{efidir}/mm%{efiarch}.efi
 
 : # Success

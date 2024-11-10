@@ -1,5 +1,5 @@
 %define debug_package %{nil}
-%define efidir azurelinux
+%define efidir BOOT
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
@@ -433,8 +433,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
-* Wed Oct 28 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-22
-- move EFI binary from BOOT into efidir
+* Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
+- Refactor spec to define efidir
+- bump release to also force signing with the new Azure Linux secure boot key
 
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Add Fedora SBAT entries
