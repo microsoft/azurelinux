@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,8 @@ URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2024-6104.patch
+Patch2:         CVE-2023-45288.patch
+Patch3:         CVE-2024-9676.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -49,6 +51,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Mon Nov 11 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.4-3
+- Fix CVE-2023-45288 and CVE-2024-9676
+
 * Fri Aug 02 2024 Sindhu Karri <lakarri@microsoft.com> - 1.14.4-2
 - Fix CVE-2024-6104 in github.com/hashicorp/go-retryablehttp with a patch
 
