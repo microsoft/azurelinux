@@ -93,6 +93,9 @@ Development files.
 %{_lib64dir}/libpqos.so
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 24.05-1
+- Update to version 24.05
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
