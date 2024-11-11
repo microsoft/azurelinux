@@ -188,6 +188,9 @@ make check %{?_smp_mflags}
 %{_infodir}/indent.info*
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.2.13-1
+-Update to version 2.2.13
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.12-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build tex-based documentation
