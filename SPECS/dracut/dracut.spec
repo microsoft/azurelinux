@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        5%{?dist}
+Release:        6%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -34,6 +34,8 @@ Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
+Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
+Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -288,6 +290,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Thu Oct 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 102-6
+- Add patch to make tpm2-tss an optional dependency for systemd-pcrphase
+
 * Sun Oct 06 2024 Jon Slobodzian <joslobo@microsoft.com> - 102-5
 - Bump version to build with latest systemd
 
