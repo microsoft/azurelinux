@@ -2026,6 +2026,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "containerd2",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "containerized-data-importer",
           "version": "1.57.0",
           "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
@@ -10831,8 +10841,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.5.4",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.4/libseccomp-2.5.4.tar.gz"
+          "version": "2.5.5",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libseccomp-2.5.5.tar.gz"
         }
       }
     },
@@ -27054,8 +27064,8 @@
         "type": "other",
         "other": {
           "name": "runc",
-          "version": "1.1.12",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.12.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.2.1.tar.gz"
         }
       }
     },
