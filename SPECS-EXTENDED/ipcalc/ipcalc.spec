@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: ipcalc
-Version: 0.4.1
-Release: 2%{?dist}
+Version: 1.0.3
+Release: 1%{?dist}
 Summary: IP network address calculator
-License: GPLv2+
+License: GPL-2.0-or-later
 URL: https://gitlab.com/ipcalc/ipcalc
 Source0: https://gitlab.com/ipcalc/ipcalc/-/archive/%{version}/ipcalc-%{version}.tar.gz
-
-BuildRequires: gcc, libmaxminddb-devel, meson
+#, rubygem-ronn-ng
+BuildRequires: gcc, libmaxminddb-devel, meson, rubygem-ronn
 Recommends:    libmaxminddb, geolite2-city, geolite2-country
 
 # Explicitly conflict with older initscript packages that ship ipcalc
@@ -45,6 +45,9 @@ or check the validity of an address.
 %{_mandir}/man1/ipcalc.1*
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
+- Update to version 1.0.3
+
 * Thu Jul 08 2021 Muhammad Falak Wani <mwani@microsoft.com> - 0.4.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - fix typo in changelog date `Aor -> Apr`
