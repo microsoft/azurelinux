@@ -1,10 +1,10 @@
 Name:           ioping
-Version:        1.1
-Release:        7%{?dist}
+Version:        1.3
+Release:        1%{?dist}
 Summary:        Simple disk I/O latency monitoring tool
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://github.com/koct9i/ioping
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
