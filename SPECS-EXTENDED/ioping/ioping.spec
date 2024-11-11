@@ -33,6 +33,9 @@ export LDFLAGS="%{?__global_ldflags}"
 %{_mandir}/man1/ioping.1*
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.3-1
+- Update to version 1.3
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1-7
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Verified license.
