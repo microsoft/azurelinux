@@ -7401,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "iprutils",
-          "version": "2.4.17.1",
-          "downloadUrl": "https://sourceforge.net/projects/iprdd/files/iprutils%20for%202.6%20kernels/2.4.17/iprutils-2.4.17.1.tar.gz"
+          "version": "2.4.19",
+          "downloadUrl": "https://github.com/bjking1/iprutils/archive/rel-2-4-19/iprutils-2.4.19.tar.gz"
         }
       }
     },
