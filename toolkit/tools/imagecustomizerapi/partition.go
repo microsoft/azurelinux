@@ -9,7 +9,7 @@ import (
 )
 
 type Partition struct {
-	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
+	// ID is used to correlate `Partition` objects with `FileSystem` objects.
 	Id string `yaml:"id"`
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
