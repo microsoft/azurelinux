@@ -1,12 +1,13 @@
 Summary:        Small, safe and fast formatting library for C++
 Name:           fmt
 Version:        10.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/fmtlib/%{name}
 Source0:        https://github.com/fmtlib/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         address-libfmt-issue-with-mariadb.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -80,6 +81,9 @@ sed -i "s/'--clean-css',//" doc/build.py
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Nov 05 2024 Nicolas Guibourge <mwani@microsoft.com> - 10.2.1-2
+- Add patch needed to build mariadb
+
 * Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 10.2.1-1
 - Bump version to 10.2.1
 

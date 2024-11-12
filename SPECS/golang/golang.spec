@@ -1,7 +1,8 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.7-20240925.5.src.tar.gz
+%global ms_go_filename  go1.23.1-20240925.6.src.tar.gz
 %global ms_go_revision  3
+%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -14,8 +15,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.22.7
-Release:        2%{?dist}
+Version:        1.23.1
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +34,7 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
+Provides:       golang = %{version}-%{release}
 Provides:       msft-golang = %{version}-%{release}
 
 %description
@@ -131,10 +133,17 @@ cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
 EOF
 
 %post -p /sbin/ldconfig
+
+alternatives --install %{_bindir}/go go %{goroot}/bin/go %{go_priority}
+alternatives --install %{_bindir}/gofmt gofmt %{goroot}/bin/gofmt %{go_priority}
+
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ]; then
-  #This is uninstall
+  # This is uninstall
+  alternatives --remove go %{goroot}/bin/go
+  alternatives --remove gofmt %{goroot}/bin/gofmt
+
   rm %{_sysconfdir}/profile.d/go-exports.sh
   rm -rf /opt/go
   exit 0
@@ -153,6 +162,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.1-1
+- Upgrade to 1.23.1
+
 * Thu Sep 26 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-2
 - Bump version to 1.22.7-3
 
