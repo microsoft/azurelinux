@@ -1,10 +1,10 @@
-Name: libteam
-Version: 1.30
-Release: 3%{?dist}
-Summary: Library for controlling team network device
-License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name: libteam
+Version: 1.32
+Release: 1%{?dist}
+Summary: Library for controlling team network device
+License: LGPLv2+
 URL: http://www.libteam.org
 Source: http://www.libteam.org/files/libteam-%{version}.tar.gz
 
@@ -16,6 +16,10 @@ BuildRequires: dbus-devel
 BuildRequires: systemd
 BuildRequires: swig
 BuildRequires: doxygen
+BuildRequires: make
+
+# subpackage removed in this version-release
+Obsoletes: network-scripts-teamd < 1.32-8
 
 %description
 This package contains a library which is a user-space
@@ -41,11 +45,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary: Libraries and header files for teamd development
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%package -n network-scripts-teamd
-Summary: teamd legacy network service support
-Requires: network-scripts
-Supplements: (%{name} and network-scripts)
-
 %description devel
 The libteam-devel package contains the header files and libraries
 necessary for developing programs using libteam.
@@ -56,11 +55,6 @@ The teamd package contains team network device control daemon.
 %description -n teamd-devel
 The teamd-devel package contains the header files and libraries
 necessary for developing programs using libteamdctl.
-
-%description -n network-scripts-teamd
-This provides the ifup and ifdown scripts for use with the legacy network
-service.
-service.
 
 %prep
 %setup -q
@@ -83,11 +77,6 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dbus-1/system.d
 install -p teamd/dbus/teamd.conf $RPM_BUILD_ROOT%{_sysconfdir}/dbus-1/system.d/
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 install -p teamd/redhat/systemd/teamd@.service $RPM_BUILD_ROOT%{_unitdir}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifup-Team $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifdown-Team $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifup-TeamPort $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifdown-TeamPort $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
 install -p -m 755 utils/bond2team $RPM_BUILD_ROOT%{_bindir}/bond2team
 
 %ldconfig_scriptlets
@@ -125,13 +114,11 @@ install -p -m 755 utils/bond2team $RPM_BUILD_ROOT%{_bindir}/bond2team
 %{_libdir}/libteamdctl.so
 %{_libdir}/pkgconfig/libteamdctl.pc
 
-%files -n network-scripts-teamd
-%{_sysconfdir}/sysconfig/network-scripts/ifup-Team
-%{_sysconfdir}/sysconfig/network-scripts/ifdown-Team
-%{_sysconfdir}/sysconfig/network-scripts/ifup-TeamPort
-%{_sysconfdir}/sysconfig/network-scripts/ifdown-TeamPort
-
 %changelog
+* Tue Nov 12 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.32-1
+- Update CBL-Mariner import from Fedora 41 (license: LGPLv2+).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.30-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
