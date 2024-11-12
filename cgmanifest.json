@@ -10821,8 +10821,8 @@
         "type": "other",
         "other": {
           "name": "libsass",
-          "version": "3.6.3",
-          "downloadUrl": "https://github.com/sass/libsass/archive/3.6.3/libsass-3.6.3.tar.gz"
+          "version": "3.6.6",
+          "downloadUrl": "https://github.com/sass/libsass/archive/3.6.6/libsass-3.6.6.tar.gz"
         }
       }
     },
