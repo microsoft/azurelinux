@@ -8851,8 +8851,8 @@
         "type": "other",
         "other": {
           "name": "libcli",
-          "version": "1.9.7",
-          "downloadUrl": "https://github.com/dparrish/libcli/archives/e60d4cca3d0e702c60ad0f9e2eecaa461baa4744.tar.gz"
+          "version": "1.10.7",
+          "downloadUrl": "https://github.com/dparrish/libcli/archive/refs/tags/V1.10.7.tar.gz"
         }
       }
     },
