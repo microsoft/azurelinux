@@ -8841,8 +8841,8 @@
         "type": "other",
         "other": {
           "name": "libcmis",
-          "version": "0.5.2",
-          "downloadUrl": "https://github.com/tdf/libcmis/releases/download/v0.5.2/libcmis-0.5.2.tar.xz"
+          "version": "0.6.2",
+          "downloadUrl": "https://github.com/tdf/libcmis/releases/download/v0.6.2/libcmis-0.6.2.tar.xz"
         }
       }
     },
