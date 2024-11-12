@@ -133,6 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 240
     needs: [detect-changes]
+    if: ${{ needs.detect-changes.outputs.updated_specs != '' || needs.detect-changes.outputs.updated_extended_specs != '' }}
     env:
       updated_specs: ${{ needs.detect-changes.outputs.updated_specs }}
       updated_extended_specs: ${{ needs.detect-changes.outputs.updated_extended_specs }}
@@ -217,6 +218,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 240
     needs: [detect-changes]
+    if: ${{ needs.detect-changes.outputs.updated_specs != '' || needs.detect-changes.outputs.updated_extended_specs != '' }}
     env:
       updated_specs: ${{ needs.detect-changes.outputs.updated_specs }}
       updated_extended_specs: ${{ needs.detect-changes.outputs.updated_extended_specs }}
@@ -264,6 +266,7 @@ jobs:
   install:
     name: 'Test installing RPM'
     needs: [build, detect-changes]
+    if: ${{ needs.detect-changes.outputs.updated_specs != '' || needs.detect-changes.outputs.updated_extended_specs != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
