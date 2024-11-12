@@ -1,8 +1,9 @@
 %global debug_package %{nil}
+%define upstream_name containerd
 %define commit_hash 207ad711eabd375a01713109a8a197d197ff6542
 
 Summary: Industry-standard container runtime
-Name: containerd2
+Name: %{upstream_name}2
 Version: 2.0.0
 Release: 1%{?dist}
 License: ASL 2.0
@@ -11,7 +12,7 @@ URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
-Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 
