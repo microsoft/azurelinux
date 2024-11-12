@@ -71,18 +71,19 @@ type ImageCustomizerParameters struct {
 	rawImageFile string
 
 	// output image
-	outputImageFormat string
-	outputIsIso       bool
-	outputImageFile   string
-	outputImageDir    string
-	outputImageBase   string
+	outputImageFormat     string
+	outputIsIso           bool
+	outputImageFile       string
+	outputImageDir        string
+	outputImageBase       string
+	outputPXEArtifactsDir string
 }
 
 func createImageCustomizerParameters(buildDir string,
 	inputImageFile string,
 	configPath string, config *imagecustomizerapi.Config,
 	useBaseImageRpmRepos bool, rpmsSources []string, enableShrinkFilesystems bool, outputSplitPartitionsFormat string,
-	outputImageFormat string, outputImageFile string) (*ImageCustomizerParameters, error) {
+	outputImageFormat string, outputImageFile string, outputPXEArtifactsDir string) (*ImageCustomizerParameters, error) {
 
 	ic := &ImageCustomizerParameters{}
 
@@ -127,12 +128,17 @@ func createImageCustomizerParameters(buildDir string,
 	ic.outputImageFile = outputImageFile
 	ic.outputImageBase = strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
 	ic.outputImageDir = filepath.Dir(outputImageFile)
+	ic.outputPXEArtifactsDir = outputPXEArtifactsDir
 
 	if ic.outputImageFormat != "" && !ic.outputIsIso {
 		err = validateImageFormat(ic.outputImageFormat)
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if ic.outputPXEArtifactsDir != "" && !ic.outputIsIso {
+		return nil, fmt.Errorf("the output PXE artifacts directory ('--output-pxe-artifacts-dir') can be specified only if the output format is an iso image.")
 	}
 
 	if ic.inputIsIso {
@@ -169,7 +175,8 @@ func createImageCustomizerParameters(buildDir string,
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
+	outputSplitPartitionsFormat string, outputPXEArtifactsDir string,
+	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 
@@ -189,7 +196,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		outputSplitPartitionsFormat, useBaseImageRpmRepos, enableShrinkFilesystems)
+		outputSplitPartitionsFormat, outputPXEArtifactsDir, useBaseImageRpmRepos, enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}
@@ -208,7 +215,7 @@ func cleanUp(ic *ImageCustomizerParameters) error {
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string,
-	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
+	outputPXEArtifactsDir string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	err := validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
@@ -218,7 +225,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
 		baseConfigPath, config,
 		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
-		outputImageFormat, outputImageFile)
+		outputImageFormat, outputImageFile, outputPXEArtifactsDir)
 	if err != nil {
 		return fmt.Errorf("failed to create image customizer parameters object:\n%w", err)
 	}
@@ -416,12 +423,14 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 
 	case ImageFormatIso:
 		if ic.customizeOSPartitions || inputIsoArtifacts == nil {
-			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
+			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.config.Pxe, ic.rawImageFile,
+				ic.outputImageDir, ic.outputImageBase, ic.outputPXEArtifactsDir)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
 			}
 		} else {
-			err := inputIsoArtifacts.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.outputImageDir, ic.outputImageBase)
+			err := inputIsoArtifacts.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.config.Pxe,
+				ic.outputImageDir, ic.outputImageBase, ic.outputPXEArtifactsDir)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
 			}
