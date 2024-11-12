@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.0
+Version:        8.0.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Group:          Applications/Databases
 URL:            https://valkey.io/
 Source0:        https://github.com/valkey-io/valkey/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         valkey-conf.patch
+Patch1:         disable-mem-defrag-tests.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
@@ -83,6 +84,12 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Mon Nov 04 2024 Sean Dougherty <sdougherty@microsoft.com> - 8.0.1-1
+- Version bump to address CVE-2024-31449 CVE-2024-31228 and CVE-2024-31227.
+
+* Tue Oct 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 8.0.0-2
+- Add patch to remove flaky mem defrag test.
+
 * Mon Sep 30 2024 Rohit Rawat <rohitrawat@microsoft.com> - 8.0.0-1
 - Original version for CBL-Mariner.
 - License Verified.

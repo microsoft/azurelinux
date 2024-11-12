@@ -59,11 +59,12 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.NoError(t, err, "read grub.cfg file")
 	assert.Regexp(t, "linux.* rd.info ", grubCfgContents)
 
-	// Check the iso-kernel-args.txt file.
-	isoKernelArgsPath := filepath.Join(isoMountDir, savedConfigIsoDir, savedKernelArgsFileName)
-	isoKernelArgsContents, err := file.Read(isoKernelArgsPath)
-	assert.NoErrorf(t, err, "read (%s) file", savedKernelArgsFileName)
-	assert.Equal(t, "rd.info", isoKernelArgsContents)
+	// Check the saved-configs.yaml file.
+	savedConfigsFilePath := filepath.Join(isoMountDir, savedConfigsDir, savedConfigsFileName)
+	savedConfigs := &SavedConfigs{}
+	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
+	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
+	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 
 	err = isoImageMount.CleanClose()
 	if !assert.NoError(t, err) {
@@ -130,9 +131,10 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	assert.Regexp(t, "linux.* rd.debug ", grubCfgContents)
 
 	// Check the iso-kernel-args.txt file.
-	isoKernelArgsContents, err = file.Read(isoKernelArgsPath)
-	assert.NoErrorf(t, err, "read (%s) file", savedKernelArgsFileName)
-	assert.Equal(t, "rd.info rd.debug", isoKernelArgsContents)
+	savedConfigs = &SavedConfigs{}
+	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
+	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
+	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
 }
 
 // Tests:
