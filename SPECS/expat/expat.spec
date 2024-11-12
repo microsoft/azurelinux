@@ -2,13 +2,14 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2024-50602.patch
 
 Requires:       %{name}-libs = %{version}-%{release}
 
@@ -30,7 +31,7 @@ Group:          System Environment/Libraries
 This package contains minimal set of shared expat libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -67,6 +68,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Tue Oct 29 2024 Sindhu Karri <lakarri@microsoft.com> - 2.6.3-2
+- Fix CVE-2024-50602 with a patch
+
 * Mon Sep 09 2024 Gary Swalling <gaswal@microsoft.com> - 2.6.3-1
 - Upgrade to 2.6.3 to fix CVE-2024-45490, CVE-2024-45491, CVE-2024-45492
 
