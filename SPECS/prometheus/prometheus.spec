@@ -18,7 +18,7 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-patch1:         CVE-2023-45288.patch
+Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2024-6104.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
