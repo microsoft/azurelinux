@@ -101,6 +101,7 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
+Patch0:         CVE-2024-49761.patch
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
@@ -409,6 +410,7 @@ sudo -u test make test TESTS="-v"
 * Fri Nov 08 2024 Saul Paredes <saulparedes@microsoft.com> - 3.3.5-1
 - Upgrade ruby to 3.3.5 to resolve CVE-2024-39908
 - Remove CVE-2024-41946.patch as it no longer applies as ruby 3.3.5 containers rubygem-rexml 3.3.6, where CVE-2024-41946 is already fixed
+- Patch CVE-2024-49761
 
 * Wed Sep 18 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.3.3-2
 - Revert ruby back to 3.3.3 to avoid build failure of rubygems-* packages
