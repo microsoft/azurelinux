@@ -10,7 +10,7 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
+Patch0:         0001-manually-recreating-patches.patch
 # We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
 Patch1:         CVE-2022-43551.patch
 Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
