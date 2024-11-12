@@ -1,0 +1,129 @@
+diff --git a/src/core/exec-invoke.c b/src/core/exec-invoke.c
+index 74c910fc12..2dab1772ea 100644
+--- a/src/core/exec-invoke.c
++++ b/src/core/exec-invoke.c
+@@ -4445,6 +4445,11 @@ int exec_invoke(
+ 
+         needs_mount_namespace = exec_needs_mount_namespace(context, params, runtime);
+ 
++        r = mac_selinux_set_current_context(params->unit_selinux_context, params->unit_id);
++        if (r < 0) {
++                return log_exec_error_errno(context, params, r, "Failed to set current process SELinux context: %m");
++        }
++
+         for (ExecDirectoryType dt = 0; dt < _EXEC_DIRECTORY_TYPE_MAX; dt++) {
+                 r = setup_exec_directory(context, params, uid, gid, dt, needs_mount_namespace, exit_status);
+                 if (r < 0)
+diff --git a/src/core/execute-serialize.c b/src/core/execute-serialize.c
+index 6c19cd42a2..82ad26a969 100644
+--- a/src/core/execute-serialize.c
++++ b/src/core/execute-serialize.c
+@@ -1403,6 +1403,10 @@ static int exec_parameters_serialize(const ExecParameters *p, const ExecContext
+         if (r < 0)
+                 return r;
+ 
++        r = serialize_item(f, "exec-parameters-unit-selinux-label", p->unit_selinux_context);
++        if (r < 0)
++                return r;
++
+         r = serialize_item(f, "exec-parameters-invocation-id-string", p->invocation_id_string);
+         if (r < 0)
+                 return r;
+@@ -1664,6 +1668,10 @@ static int exec_parameters_deserialize(ExecParameters *p, FILE *f, FDSet *fds) {
+                         r = free_and_strdup(&p->unit_id, val);
+                         if (r < 0)
+                                 return r;
++                } else if ((val = startswith(l, "exec-parameters-unit-selinux-label="))) {
++                        r = free_and_strdup(&p->unit_selinux_context, val);
++                        if (r < 0)
++                                return r;
+                 } else if ((val = startswith(l, "exec-parameters-invocation-id-string="))) {
+                         if (strlen(val) > SD_ID128_STRING_MAX - 1)
+                                 return -EINVAL;
+diff --git a/src/core/execute.h b/src/core/execute.h
+index 5a6927aa02..1344024a39 100644
+--- a/src/core/execute.h
++++ b/src/core/execute.h
+@@ -457,6 +457,7 @@ struct ExecParameters {
+ 
+         /* Used for logging in the executor functions */
+         char *unit_id;
++        char *unit_selinux_context;
+         sd_id128_t invocation_id;
+         char invocation_id_string[SD_ID128_STRING_MAX];
+ };
+diff --git a/src/core/unit.c b/src/core/unit.c
+index 41f3bdb226..040bc0fefd 100644
+--- a/src/core/unit.c
++++ b/src/core/unit.c
+@@ -5444,6 +5444,11 @@ int unit_set_exec_params(Unit *u, ExecParameters *p) {
+         p->unit_id = strdup(u->id);
+         if (!p->unit_id)
+                 return -ENOMEM;
++        if (u->access_selinux_context) {
++                p->unit_selinux_context = strdup(u->access_selinux_context);
++                if (!p->unit_selinux_context)
++                        return -ENOMEM;
++        }
+ 
+         return 0;
+ }
+diff --git a/src/shared/selinux-util.c b/src/shared/selinux-util.c
+index 2fef29c67f..46c5b4fa6a 100644
+--- a/src/shared/selinux-util.c
++++ b/src/shared/selinux-util.c
+@@ -760,3 +760,43 @@ skipped:
+ #endif
+         return RET_NERRNO(bind(fd, addr, addrlen));
+ }
++
++int mac_selinux_set_current_context(const char *unit_label, const char *unit_name) {
++        /* Set the current process context based on policy statements (dyntransition) */
++#if HAVE_SELINUX
++        _cleanup_freecon_ char *scon = NULL;
++        _cleanup_freecon_ char *tcon = NULL;
++        security_class_t tclass;
++
++        if (selinux_init(/* force= */ false) <= 0)
++                goto skipped;
++
++        if (_unlikely_(getcon_raw(&scon) < 0)) {
++                log_trace("Failed to get current SELinux context: %s": strerror(errno));
++                goto skipped;
++        }
++
++        tclass = string_to_security_class("process");
++        if (_unlikely_(tclass == 0)) {
++                log_trace("SELinux policy does not define a process class.");
++                goto skipped;
++        }
++
++        if (security_compute_create_name_raw(scon, unit_label, tclass, unit_name, &tcon) < 0) {
++                log_trace("security_compute_create_name_raw() failed: %s", strerror(errno));
++                goto skipped;
++        }
++
++        if (streq(scon, tcon)) {
++                /* skip setcon() since the context didn't change, otherwise this will
++                 * break on systems where the policy doesn't support this or want this.
++                 */
++                log_trace("No SELinux dyntransition requested.");
++                goto skipped;
++        }
++
++        return setcon_raw(tcon);
++skipped:
++#endif
++        return 0;
++}
+diff --git a/src/shared/selinux-util.h b/src/shared/selinux-util.h
+index 97ab5ebb2f..2d716112b1 100644
+--- a/src/shared/selinux-util.h
++++ b/src/shared/selinux-util.h
+@@ -47,4 +47,6 @@ void mac_selinux_create_socket_clear(void);
+ 
+ int mac_selinux_bind(int fd, const struct sockaddr *addr, socklen_t addrlen);
+ 
++int mac_selinux_set_current_context(const char *unit_label, const char *unit_name);
++
+ DEFINE_TRIVIAL_CLEANUP_FUNC(char*, mac_selinux_free);

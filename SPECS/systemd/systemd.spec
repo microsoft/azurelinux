@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        18%{?dist}
+Release:        19%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -142,6 +142,7 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
+Patch0902:      selinux-setcon.patch
 
 %ifarch %{ix86} x86_64
 %global want_bootloader 1
