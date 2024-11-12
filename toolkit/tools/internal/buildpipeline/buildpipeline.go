@@ -8,28 +8,144 @@ package buildpipeline
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/unix"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-
-	"golang.org/x/sys/unix"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
-	rootBaseDirEnv = "CHROOT_DIR"
-	chrootLock     = "chroot-pool.lock"
-	chrootUse      = "chroot-used"
+	rootBaseDirEnv        = "CHROOT_DIR"
+	chrootLock            = "chroot-pool.lock"
+	chrootUse             = "chroot-used"
+	systemdDetectVirtTool = "systemd-detect-virt"
 )
+
+var isRegularBuildCached *bool
+
+// checkIfContainerDockerEnvFile checks if the tool is running in a Docker container by checking if /.dockerenv exists. This
+// check may not be reliable in all environments, so it is recommended to use systemd-detect-virt if available.
+func checkIfContainerDockerEnvFile() bool {
+	exists, err := file.PathExists("/.dockerenv")
+	if err != nil {
+		logger.Log.Errorf("Error checking /.dockerenv: %v", err)
+		return false
+	}
+	return exists
+}
+
+// checkIfContainerIgnoreDockerEnvFile checks if the user has placed a file in the root directory to ignore the Docker
+// environment check.
+func checkIfContainerIgnoreDockerEnvFile() bool {
+	ignoreDockerEnvExists, err := file.PathExists("/.mariner-toolkit-ignore-dockerenv")
+	if err != nil {
+		logger.Log.Errorf("Failed to check if /.mariner-toolkit-ignore-dockerenv exists: %s", err)
+		return false
+	}
+	return ignoreDockerEnvExists
+}
+
+// checkIfContainerChrootDirEnv checks if the user has set the CHROOT_DIR environment variable, which is a requirement for
+// Docker-based builds. If the variable exists, it is likely that the tool is running in a Docker container.
+func checkIfContainerChrootDirEnv() bool {
+	_, exists := os.LookupEnv(rootBaseDirEnv)
+	return exists
+}
+
+// checkIfContainerSystemdDetectVirt uses systemd-detect-virt, a tool that can be used to detect if the system is running
+// in a virtualized environment. More specifically, using '-c' flag will detect container-based virtualization only.
+func checkIfContainerSystemdDetectVirt() (bool, error) {
+	// We should have the systemd-detect-virt command available in the environment, but check for it just in case since it
+	// was previously not explicitly required for the toolkit.
+	_, err := exec.LookPath(systemdDetectVirtTool)
+	if err != nil {
+		err = fmt.Errorf("failed to find %s in the PATH: %w", systemdDetectVirtTool, err)
+		return false, err
+	}
+
+	// The tool will return error code 1 based on detection, we only care about the stdout so ignore the return code.
+	stdout, _, _ := shell.Execute(systemdDetectVirtTool, "-c")
+
+	// There are several possible outputs from systemd-detect-virt we care about:
+	// - none: Not running in a virtualized environment, easy
+	// - wsl: Reports as a container, but we don't want to treat it as such. It should be able to handle regular builds
+	// - anything else: We'll assume it's a container
+	stdout = strings.TrimSpace(stdout)
+	switch stdout {
+	case "none":
+		logger.Log.Debugf("Tool is not running in a container, systemd-detect-virt reports: '%s'", stdout)
+		return false, nil
+	case "wsl":
+		logger.Log.Debugf("Tool is running in WSL, treating as a non-container environment, systemd-detect-virt reports: '%s'", stdout)
+		return false, nil
+	default:
+		logger.Log.Debugf("Tool is running in a container, systemd-detect-virt reports: '%s'", stdout)
+		return true, nil
+	}
+}
 
 // IsRegularBuild indicates if it is a regular build (without using docker)
 func IsRegularBuild() bool {
-	// some specific build pipeline builds Azure Linux from a Docker container and
-	// consequently have special requirements with regards to chroot
-	// check if .dockerenv file exist to disambiguate build pipeline
-	dockerEnvExists, _ := file.PathExists("/.dockerenv")
-	ignoreDockerEnvExists, _ := file.PathExists("/.mariner-toolkit-ignore-dockerenv")
-	return ignoreDockerEnvExists || !dockerEnvExists
+	if isRegularBuildCached != nil {
+		return *isRegularBuildCached
+	}
+
+	// If /.mariner-toolkit-ignore-dockerenv exists, then it is a regular build no matter what.
+	if checkIfContainerIgnoreDockerEnvFile() {
+		isRegularBuild := true
+		isRegularBuildCached = &isRegularBuild
+		return isRegularBuild
+	}
+
+	// There are multiple ways to detect if the build is running in a Docker container.
+	// - Check with systemd-detect-virt tool first. This is the most reliable way.
+	// - The legacy way is to check if /.dockerenv exists. However, this is not reliable
+	//   as it may not be present in all environments.
+	// - If the user has set the CHROOT_DIR environment variable, then it is likely a Docker build.
+	isRegularBuild := true
+	isDockerContainer, err := checkIfContainerSystemdDetectVirt()
+	if err != nil {
+		isRegularBuild = !checkIfContainerDockerEnvFile()
+		message := []string{
+			"Failed to detect if the system is running in a container using systemd-detect-virt.",
+			err.Error(),
+			"Checking if the system is running in a container by checking /.dockerenv.",
+		}
+		if isRegularBuild {
+			message = append(message, "Result: Not a container.")
+		} else {
+			message = append(message, "Result: Container detected.")
+		}
+		logger.PrintMessageBox(logrus.WarnLevel, message)
+	} else {
+		isRegularBuild = !isDockerContainer
+		if !isRegularBuild {
+			logger.Log.Info("systemd-detect-virt reports that the tool is running in a container, running as a container build")
+		}
+	}
+
+	// If the user set the CHROOT_DIR environment variable, but we don't detect a container, print a warning. This is
+	// likely a misconfiguration, however trust the user and force the build to run as a container. If this is a mistake,
+	// the tools should fail very quickly after this point.
+	if checkIfContainerChrootDirEnv() && isRegularBuild {
+		message := []string{
+			"CHROOT_DIR is set, but the system is not detected as a container.",
+			"This is likely a misconfiguration!",
+			"**Forcing the build to run as a container build**, however chroot operations may fail.",
+		}
+		logger.PrintMessageBox(logrus.WarnLevel, message)
+		isRegularBuild = false
+	}
+
+	// Cache the result
+	isRegularBuildCached = &isRegularBuild
+	return isRegularBuild
 }
 
 // GetChrootDir returns the chroot folder
@@ -43,7 +159,7 @@ func GetChrootDir(proposedDir string) (chrootDir string, err error) {
 
 	// In docker based pipeline pre-existing chroot pool is under a folder which path
 	// is indicated by an env variable
-	chrootPoolFolder, varExist := unix.Getenv(rootBaseDirEnv)
+	chrootPoolFolder, varExist := os.LookupEnv(rootBaseDirEnv)
 	if !varExist || len(chrootPoolFolder) == 0 {
 		err = fmt.Errorf("env variable %s not defined", rootBaseDirEnv)
 		logger.Log.Errorf("%s", err.Error())
