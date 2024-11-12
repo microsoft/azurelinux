@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# Triggers controlled on the ADO side.
 trigger: none
 
 resources:
@@ -30,6 +31,8 @@ extends:
 
             steps:
               - script: |
+                  set -e
+
                   echo "##vso[build.addbuildtag]Repository.Name-$(Build.Repository.Name)"
                   echo "##vso[build.addbuildtag]SourceBranch-$(Build.SourceBranch)"
                   echo "##vso[build.addbuildtag]SourceVersion-$(Build.SourceVersion)"
