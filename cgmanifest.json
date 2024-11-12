@@ -10681,8 +10681,8 @@
         "type": "other",
         "other": {
           "name": "libraqm",
-          "version": "0.7.0",
-          "downloadUrl": "https://github.com/HOST-Oman/libraqm/releases/download/v0.7.0/raqm-0.7.0.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/HOST-Oman/libraqm/releases/download/v0.8.0/raqm-0.8.0.tar.xz"
         }
       }
     },
