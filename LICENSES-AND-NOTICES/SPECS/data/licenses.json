@@ -2434,7 +2434,6 @@
                 "usrsctp",
                 "vala",
                 "valkey",
-                "verity-read-only-root",
                 "vnstat",
                 "zstd"
             ]
@@ -2713,6 +2712,7 @@
                 "gnutls",
                 "gobject-introspection",
                 "golang",
+                "golang-1.22",
                 "gperf",
                 "gperftools",
                 "gpgme",

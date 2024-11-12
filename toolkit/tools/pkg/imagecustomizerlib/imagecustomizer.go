@@ -466,6 +466,12 @@ func toQemuImageFormat(imageFormat string) (string, string) {
 	case ImageFormatVhdFixed:
 		return QemuFormatVpc, "subformat=fixed,force_size"
 
+	case ImageFormatVhdx:
+		// For VHDX, qemu-img dynamically picks the block-size based on the size of the disk.
+		// However, this can result in a significantly larger file size than other formats.
+		// So, use a fixed block-size of 2 MiB to match the block-sizes used for qcow2 and VHD.
+		return ImageFormatVhdx, "block_size=2097152"
+
 	default:
 		return imageFormat, ""
 	}

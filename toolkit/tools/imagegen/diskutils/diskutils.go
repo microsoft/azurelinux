@@ -434,8 +434,8 @@ func WaitForDevicesToSettle() error {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
-	readOnlyRootConfig configuration.ReadOnlyVerityRoot, diskKnownToBeEmpty bool,
-) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+	diskKnownToBeEmpty bool,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -489,29 +489,22 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			partedSupportsEmptyStringArgs)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
-		partFsType, err := formatSinglePartition(diskDevPath, partDevPath, partition)
+		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
 				err = fmt.Errorf("failed to initialize encrypted root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
-		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
-			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
-			if err != nil {
-				err = fmt.Errorf("failed to initialize read only root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-			}
-			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
 		} else {
 			partDevPathMap[partition.ID] = partDevPath
 		}
@@ -792,13 +785,12 @@ func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, di
 	return
 }
 
-// formatSinglePartition formats the given partition to the type specified in the partition configuration
-func formatSinglePartition(diskDevPath string, partDevPath string, partition configuration.Partition,
+// FormatSinglePartition formats the given partition to the type specified in the partition configuration
+func FormatSinglePartition(partDevPath string, partition configuration.Partition,
 ) (fsType string, err error) {
 	const (
-		totalAttempts    = 5
-		retryDuration    = time.Second
-		timeoutInSeconds = "5"
+		totalAttempts = 5
+		retryDuration = time.Second
 	)
 
 	fsType = partition.FsType
@@ -814,14 +806,14 @@ func formatSinglePartition(diskDevPath string, partDevPath string, partition con
 			fsType = "vfat"
 		}
 
-		mkfsArgs := []string{"--timeout", timeoutInSeconds, diskDevPath, "mkfs", "-t", fsType}
+		mkfsArgs := []string{"-t", fsType}
 		mkfsArgs = append(mkfsArgs, mkfsOptions...)
 		mkfsArgs = append(mkfsArgs, partDevPath)
 
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("flock", mkfsArgs...)
+			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
 			if err != nil {
-				logger.Log.Warnf("Failed to format partition using mkfs (and flock): %v", stderr)
+				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
 			}
 
