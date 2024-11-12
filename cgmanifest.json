@@ -11111,8 +11111,8 @@
         "type": "other",
         "other": {
           "name": "libteam",
-          "version": "1.30",
-          "downloadUrl": "http://www.libteam.org/files/libteam-1.30.tar.gz"
+          "version": "1.32",
+          "downloadUrl": "https://www.libteam.org/files/libteam-1.32.tar.gz"
         }
       }
     },
