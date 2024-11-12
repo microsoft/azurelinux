@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.21.4
-Release:        12%{?dist}
+Version:        3.29.6
+Release:        1%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,6 +88,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Tue Nov 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 - CVE-2023-46218, CVE-2023-27537, CVE-2023-27535, CVE-2023-27538, CVE-2023-27536, CVE-2023-23916, CVE-2023-23915, CVE-2022-43552
+
 * Wed Sep 18 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.21.4-12
 - Patch CVE-2023-27533 and CVE-2023-27534
 
