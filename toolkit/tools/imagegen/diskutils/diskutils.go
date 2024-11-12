@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/versioncompare"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,6 +37,10 @@ var (
 	}
 
 	partedVersionRegex = regexp.MustCompile(`^parted \(GNU parted\) (\d+)\.(\d+)`)
+
+	// Example:
+	//   mkfs.xfs version 6.5.0
+	mkfsXfsVersionRegex = regexp.MustCompile(`^mkfs\.xfs version (\d+\.\d+\.\d+)$`)
 
 	// The default partition name used when the version of `parted` is too old (<3.5).
 	LegacyDefaultParitionName = "primary"
@@ -492,7 +497,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
-		partFsType, err := FormatSinglePartition(partDevPath, partition)
+		partFsType, err := formatSinglePartition(partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
@@ -793,8 +798,7 @@ func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, di
 }
 
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition,
-) (fsType string, err error) {
+func formatSinglePartition(partDevPath string, partition configuration.Partition) (fsType string, err error) {
 	const (
 		totalAttempts = 5
 		retryDuration = time.Second
@@ -807,14 +811,17 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	// To handle such cases, we can retry the command.
 	switch fsType {
 	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
-		mkfsOptions := DefaultMkfsOptions[fsType]
-
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
 
+		options, err := getMkfsOptions(fsType)
+		if err != nil {
+			return "", fmt.Errorf("failed to generate mkfs options:\n%w", err)
+		}
+
 		mkfsArgs := []string{"-t", fsType}
-		mkfsArgs = append(mkfsArgs, mkfsOptions...)
+		mkfsArgs = append(mkfsArgs, options...)
 		mkfsArgs = append(mkfsArgs, partDevPath)
 
 		err = retry.Run(func() error {
@@ -828,7 +835,11 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		}, totalAttempts, retryDuration)
 		if err != nil {
 			err = fmt.Errorf("could not format partition with type %v after %v retries", fsType, totalAttempts)
+			return "", err
 		}
+
+		return fsType, nil
+
 	case "linux-swap":
 		err = retry.Run(func() error {
 			_, stderr, err := shell.Execute("mkswap", partDevPath)
@@ -840,6 +851,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		}, totalAttempts, retryDuration)
 		if err != nil {
 			err = fmt.Errorf("could not format partition with type %v after %v retries", fsType, totalAttempts)
+			return "", err
 		}
 
 		_, stderr, err := shell.Execute("swapon", partDevPath)
@@ -847,13 +859,58 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 			err = fmt.Errorf("failed to execute swapon:\n%v\n%w", stderr, err)
 			return "", err
 		}
+
+		return fsType, nil
+
 	case "":
 		logger.Log.Debugf("No filesystem type specified. Ignoring for partition: %v", partDevPath)
+		return "", nil
+
 	default:
 		return fsType, fmt.Errorf("unrecognized filesystem format: %v", fsType)
 	}
+}
 
-	return
+func getMkfsOptions(fsType string) ([]string, error) {
+	switch fsType {
+	case "xfs":
+		mkfsXfsVersion, err := getMkfsXfsVersion()
+		if err != nil {
+			return nil, err
+		}
+
+		// Feature  xfsprogs   kernel
+		// nrext64  v5.19      v5.19
+		if mkfsXfsVersion.Compare(versioncompare.New("5.19")) >= 0 {
+			// Disable feature that is not supported on older kernel.
+			options := []string{"-i", "nrext64=0"}
+			return options, nil
+		}
+
+		return nil, nil
+
+	default:
+		options := DefaultMkfsOptions[fsType]
+		return options, nil
+	}
+}
+
+func getMkfsXfsVersion() (*versioncompare.TolerantVersion, error) {
+	stdout, _, err := shell.Execute("mkfs.xfs", "-V")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get mkfs.xfs's version:\n%w", err)
+	}
+
+	fullVersionString := strings.TrimSpace(stdout)
+
+	match := mkfsXfsVersionRegex.FindStringSubmatch(fullVersionString)
+	if match == nil {
+		return nil, fmt.Errorf("failed to parse mkfs.xfs's version (%s)", fullVersionString)
+	}
+
+	versionString := match[1]
+	version := versioncompare.New(versionString)
+	return version, nil
 }
 
 // SystemBlockDevices returns all block devices on the host system.
