@@ -1,29 +1,11 @@
-From da2978fde58fb84175ae0b9b7a83c963430a7747 Mon Sep 17 00:00:00 2001
-From: Stephen Gallagher <sgallagh@redhat.com>
-Date: Mon, 13 Apr 2020 14:04:00 -0400
-Subject: [PATCH] Disable gzip-js
-
-Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
----
- Gruntfile.js | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/Gruntfile.js b/Gruntfile.js
-index 486a0f303932734b868b065d3c7b99a36002fac5..5ff8cdec4810d0cdf2180da2f4432020f91e6b10 100644
---- a/Gruntfile.js
-+++ b/Gruntfile.js
-@@ -11,11 +11,10 @@ module.exports = function( grunt ) {
- 		} catch ( e ) {}
- 		return data;
- 	}
+diff -up jquery-3.7.1/Gruntfile.js.gzip jquery-3.7.1/Gruntfile.js
+--- jquery-3.7.1/Gruntfile.js.gzip	2023-08-28 07:37:56.000000000 -0600
++++ jquery-3.7.1/Gruntfile.js	2023-09-01 18:36:58.570497362 -0600
+@@ -14,7 +14,6 @@ module.exports = function( grunt ) {
  
- 	var fs = require( "fs" ),
--		gzip = require( "gzip-js" ),
- 		isTravis = process.env.TRAVIS,
- 		travisBrowsers = process.env.BROWSERS && process.env.BROWSERS.split( "," );
- 
- 	if ( !grunt.option( "filename" ) ) {
- 		grunt.option( "filename", "jquery.js" );
--- 
-2.26.0
-
+ 	const fs = require( "fs" );
+ 	const { spawn } = require( "child_process" );
+-	const gzip = require( "gzip-js" );
+ 	const nodeV16OrNewer = !/^v1[0-5]\./.test( process.version );
+ 	const nodeV17OrNewer = !/^v1[0-6]\./.test( process.version );
+ 	const customBrowsers = process.env.BROWSERS && process.env.BROWSERS.split( "," );
