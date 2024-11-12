@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libmediaart
-Version:        1.9.4
-Release:        10%{?dist}
+Version:        1.9.6
+Release:        1%{?dist}
 Summary:        Library for managing media art caches
 
 License:        LGPLv2+
@@ -14,6 +14,9 @@ BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  gdk-pixbuf2-modules
 BuildRequires:  vala vala-devel
+BuildRequires:  meson
+
+Obsoletes:      libmediaart_tests < 1.9.5
 
 %description
 Library tasked with managing, extracting and handling media art caches.
@@ -27,39 +30,26 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%package  tests
-Summary:  Tests for the %{name} package
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description tests
-The %{name}-tests package contains tests that can be used to verify
-the functionality of the installed %{name} package.
-
 %prep
-%setup -q
-
+%autosetup
 
 %build
-%configure --disable-static \
-  --enable-gdkpixbuf \
-  --disable-qt \
-  --enable-installed-tests
-make %{?_smp_mflags}
-
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 find $RPM_BUILD_ROOT -name '*.la' -delete -print
 
 %check
-make check
+%meson_test
 
 %ldconfig_scriptlets
 
 
 %files
-%license COPYING.LESSER
-%doc AUTHORS NEWS
+%license COPYING COPYING.LESSER
+%doc NEWS
 %{_libdir}/libmediaart-2.0.so.*
 %{_libdir}/girepository-1.0/MediaArt-2.0.typelib
 
@@ -68,15 +58,16 @@ make check
 %{_libdir}/libmediaart-2.0.so
 %{_libdir}/pkgconfig/libmediaart-2.0.pc
 %{_datadir}/gir-1.0/MediaArt-2.0.gir
-%{_datadir}/gtk-doc/html/libmediaart
+%{_datadir}/vala/vapi/libmediaart-2.0.deps
 %{_datadir}/vala/vapi/libmediaart-2.0.vapi
-
-%files tests
-%{_libexecdir}/installed-tests/libmediaart
-%{_datadir}/installed-tests
 
 
 %changelog
+* Tue Nov 12 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.9.6-1
+- Update to 1.9.6
+- License verified.
+- Switch from configure to meson
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.4-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
