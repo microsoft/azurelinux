@@ -17,10 +17,6 @@ rm -r */lib */*/lib
 find -name '*.jar' -delete
 find -name '*.class' -delete
 
-tar --sort=name \
-    --mtime="2021-04-26 00:00Z" \
-    --owner=0 --group=0 --numeric-owner \
-    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -cf "../${name}-${version}.tar.gz" *
+tar -czf "../${name}-${version}.tar.gz" *
 popd
 rm -r tarball-tmp "${name}-${version}.orig.tar.gz"
