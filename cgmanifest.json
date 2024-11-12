@@ -10671,8 +10671,8 @@
         "type": "other",
         "other": {
           "name": "librabbitmq",
-          "version": "0.10.0",
-          "downloadUrl": "https://github.com/alanxz/rabbitmq-c/archive/ffe918a5fcef72038a88054dca3c56762b1953d4/rabbitmq-c-0.10.0-ffe918a.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/alanxz/rabbitmq-c/archive/124722b5045baa41a24ce2e2d7c52a47467e7ac0/rabbitmq-c-0.14.0-124722b.tar.gz"
         }
       }
     },
