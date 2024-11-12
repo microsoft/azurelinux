@@ -93,19 +93,20 @@ var lookupNodesTypes = map[NodeType]bool{
 
 // PkgNode represents a package.
 type PkgNode struct {
-	nodeID       int64               // Unique ID for the node
-	VersionedPkg *pkgjson.PackageVer // JSON derived structure holding the exact version information for a graph
-	State        NodeState           // The current state of the node (ie needs to be build, up-to-date, cached, etc)
-	Type         NodeType            // The purpose of the node (build, run , meta goal, etc)
-	SrpmPath     string              // SRPM file used to generate this package (likely shared with multiple other nodes)
-	RpmPath      string              // RPM file that produces this package (likely shared with multiple other nodes)
-	SpecPath     string              // The SPEC file extracted from the SRPM
-	SourceDir    string              // The directory containing extracted sources from the SRPM
-	Architecture string              // The architecture of the resulting package built.
-	SourceRepo   string              // The location this package was acquired from
-	GoalName     string              // Optional string for goal nodes
-	Implicit     bool                // If the package is an implicit provide
-	This         *PkgNode            // Self reference since the graph library returns nodes by value, not reference
+	nodeID         int64               // Unique ID for the node
+	VersionedPkg   *pkgjson.PackageVer // JSON derived structure holding the exact version information for a graph
+	State          NodeState           // The current state of the node (ie needs to be build, up-to-date, cached, etc)
+	Type           NodeType            // The purpose of the node (build, run , meta goal, etc)
+	SrpmPath       string              // SRPM file used to generate this package (likely shared with multiple other nodes)
+	RpmPath        string              // RPM file that produces this package (likely shared with multiple other nodes)
+	SpecPath       string              // The SPEC file extracted from the SRPM
+	SourceDir      string              // The directory containing extracted sources from the SRPM
+	Architecture   string              // The architecture of the resulting package built.
+	SourceRepo     string              // The location this package was acquired from
+	GoalName       string              // Optional string for goal nodes
+	Implicit       bool                // If the package is an implicit provide
+	ExpectedToFail bool                // Is this node *expected* to fail
+	This           *PkgNode            // Self reference since the graph library returns nodes by value, not reference
 }
 
 // ID implements the graph.Node interface, returns the node's unique ID

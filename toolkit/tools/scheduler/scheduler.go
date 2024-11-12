@@ -107,9 +107,10 @@ var (
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
-	testsToIgnore = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
-	testsToRun    = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
-	testsToRerun  = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
+	testsToIgnore   = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
+	testsToRun      = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
+	testsToRerun    = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
+	testResultsFile = app.Flag("test-results-file", "Path to test results JSON file.").Required().String()
 
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
@@ -556,6 +557,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.RecordLicenseSummary(licenseChecker)
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
+	schedulerutils.RecordTestSummary(builtGraph, graphMutex, buildState, *testResultsFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
 	}

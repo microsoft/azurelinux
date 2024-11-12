@@ -193,6 +193,8 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	}
 	logger.Log.Debugf("Adding test node (%s) with id %d", newTestNode.FriendlyName(), newTestNode.ID())
 
+	newTestNode.ExpectedToFail = pkg.TestExpectedToFail
+
 	// A "test" node has a dependency on its corresponding "build" node. This dependency is required
 	// to guarantee we will first check if the build node needs to be built or not before we make
 	// any decisions about running the tests.
