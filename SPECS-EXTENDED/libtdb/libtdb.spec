@@ -1,28 +1,23 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global with_python3 1
-
-Name: libtdb
-Version: 1.4.8
-Release: 1%{?dist}
-Summary: The tdb library
-License: LGPLv3+
-URL: https://tdb.samba.org/
-Source0: https://samba.org/ftp/tdb/tdb-%{version}.tar.gz
-Source1: https://samba.org/ftp/tdb/tdb-%{version}.tar.asc
+Name:            libtdb
+Version:         1.4.12
+Release:         1%{?dist}
+Summary:         The tdb library
+License:         LGPL-3.0-or-later
+URL:             http://tdb.samba.org/
+Source0:         http://samba.org/ftp/tdb/tdb-%{version}.tar.gz
+Source1:         http://samba.org/ftp/tdb/tdb-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tdb.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
-Source2: tdb.keyring
-Source3: %{name}-LICENSE.txt
+Source2:         tdb.keyring
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gnupg2
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
-BuildRequires: which
-%if 0%{?with_python3}
 BuildRequires: python3-devel
-%endif
 
 Provides: bundled(libreplace)
 Obsoletes: python2-tdb < 1.4.2-1
@@ -30,21 +25,22 @@ Obsoletes: python2-tdb < 1.4.2-1
 %description
 A library that implements a trivial database.
 
-%package devel
-Summary: Header files need to link the Tdb library
+%package         devel
+Summary:         Header files need to link the Tdb library
+
 Requires: libtdb = %{version}-%{release}
 
 %description devel
 Header files needed to develop programs that link against the Tdb library.
 
 %package -n tdb-tools
-Summary: Developer tools for the Tdb library
+Summary:         Developer tools for the Tdb library
+
 Requires: libtdb = %{version}-%{release}
 
 %description -n tdb-tools
 Tools to manage Tdb files
 
-%if 0%{?with_python3}
 %package -n python3-tdb
 Summary: Python3 bindings for the Tdb library
 Requires: libtdb = %{version}-%{release}
@@ -52,11 +48,9 @@ Requires: libtdb = %{version}-%{release}
 
 %description -n python3-tdb
 Python3 bindings for libtdb
-%endif
 
 %prep
 %autosetup -n tdb-%{version} -p1
-cp %{SOURCE3} ./LICENSE.txt
 
 %build
 zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
@@ -64,16 +58,13 @@ zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
            --bundled-libraries=NONE \
            --builtin-libraries=replace
 
-make %{?_smp_mflags} V=1
-
+%make_build
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-
+%make_install
 %files
-%license LICENSE.txt
 %{_libdir}/libtdb.so.*
 
 %files devel
@@ -92,16 +83,18 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_mandir}/man8/tdbtool.8*
 %{_mandir}/man8/tdbrestore.8*
 
-%if 0%{?with_python3}
 %files -n python3-tdb
 %{python3_sitearch}/__pycache__/_tdb_text.cpython*.py[co]
 %{python3_sitearch}/tdb.cpython*.so
 %{python3_sitearch}/_tdb_text.py
-%endif
 
 %ldconfig_scriptlets
 
+
 %changelog
+* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.12-1
+- Update to version 1.4.12
+
 * Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 1.4.8-1
 - Upgrade to 1.4.8 to build with Python 3.12 in 3.0
 
