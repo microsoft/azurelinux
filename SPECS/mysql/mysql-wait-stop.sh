@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common"
+source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common.sh"
 
 # This script waits for mysqld to be properly stopped
 # (which can be many seconds in some large load).

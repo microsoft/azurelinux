@@ -48,7 +48,7 @@ done
 # must correspond with values defined in mysqld_safe script and source
 # code itself.
 
-server_sections="mysqld_safe mysqld server mysqld-@MAJOR_VERSION@.@MINOR_VERSION@ client-server"
+server_sections="mysqld_safe mysqld server mysqld-@PACKAGE_VERSION@ client-server"
 
 get_mysql_option "$server_sections" datadir "@MYSQL_DATADIR@"
 datadir="$result"

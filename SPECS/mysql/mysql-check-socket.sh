@@ -5,7 +5,7 @@
 # positive result when starting and mysqld_safe could remove
 # a socket file, which is actually being used by a different daemon.
 
-source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common"
+source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common.sh"
 
 if test -e "$socketfile" ; then
     echo "Socket file $socketfile exists." >&2

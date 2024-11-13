@@ -13,7 +13,7 @@
 # properly. A solution for that is to created the locations for datadir and
 # logfile with correct ownership before starting the daemon.
 
-source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common"
+source "`dirname ${BASH_SOURCE[0]}`/mysql-scripts-common.sh"
 
 # If two args given first is user, second is group
 # otherwise the arg is the systemd service file
@@ -93,11 +93,11 @@ should_initialize ()
 if should_initialize "$datadir" ; then
 
     # Now create the database
-    echo "Initializing @NICE_PROJECT_NAME@ database"
+    echo "Initializing MySQL @PACKAGE_VERSION@ database"
     @libexecdir@/mysqld --initialize-insecure --datadir="$datadir" --user="$myuser"
     ret=$?
     if [ $ret -ne 0 ] ; then
-        echo "Initialization of @NICE_PROJECT_NAME@ database failed." >&2
+        echo "Initialization of MySQL @PACKAGE_VERSION@ database failed." >&2
         echo "Perhaps @sysconfdir@/my.cnf is misconfigured." >&2
         # Clean up any partially-created database files
         if [ ! -e "$datadir/mysql/user.frm" ] ; then
@@ -106,7 +106,7 @@ if should_initialize "$datadir" ; then
         exit $ret
     fi
     # upgrade does not need to be run on a fresh datadir
-    echo "@VERSION@" >"$datadir/mysql_upgrade_info"
+    echo "@PACKAGE_VERSION@" >"$datadir/mysql_upgrade_info"
 fi
 
 exit 0
