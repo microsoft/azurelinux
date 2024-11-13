@@ -175,5 +175,6 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, bootCustomizer *i
 		return err
 	}
 
+	// No need to set SELinux labels here as in trident there is reset labels at the end
 	return nil
 }

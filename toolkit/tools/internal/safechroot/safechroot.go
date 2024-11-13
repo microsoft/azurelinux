@@ -764,9 +764,9 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 
 // GetMountPoints gets a copy of the list of mounts the Chroot was initialized with.
 func (c *Chroot) GetMountPoints() []*MountPoint {
-	// Create a copy of the list so that the caller can't mess with the list.
-	mountPoints := append([]*MountPoint(nil), c.mountPoints...)
-	return mountPoints
+    // Create a copy of the list so that the caller can't mess with the list.
+    mountPoints := append([]*MountPoint(nil), c.mountPoints...)
+    return mountPoints
 }
 
 // stopGPGComponents stops gpg-agent and keyboxd if they are running inside the chroot.

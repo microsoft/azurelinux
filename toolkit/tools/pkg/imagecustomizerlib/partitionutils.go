@@ -429,7 +429,7 @@ func getImageBootTypeHelper(diskPartitions []diskutils.PartitionInfo) (imagecust
 	}
 }
 
-func getNonSpecialChrootMountPoints(imageChroot safechroot.ChrootInterface) []*safechroot.MountPoint {
+func getNonSpecialChrootMountPoints(imageChroot *safechroot.Chroot) []*safechroot.MountPoint {
 	return sliceutils.FindMatches(imageChroot.GetMountPoints(),
 		func(mountPoint *safechroot.MountPoint) bool {
 			switch mountPoint.GetTarget() {

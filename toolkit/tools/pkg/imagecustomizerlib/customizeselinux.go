@@ -95,7 +95,7 @@ func UpdateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, i
 	return nil
 }
 
-func SelinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot safechroot.ChrootInterface) error {
+func selinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
 		// SELinux is disabled in the kernel command line.
 		// So, no need to call setfiles.

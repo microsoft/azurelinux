@@ -102,7 +102,7 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	err = SelinuxSetFiles(selinuxMode, imageChroot)
+	err = selinuxSetFiles(selinuxMode, imageChroot)
 	if err != nil {
 		return err
 	}
