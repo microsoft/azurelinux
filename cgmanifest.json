@@ -10891,8 +10891,8 @@
         "type": "other",
         "other": {
           "name": "libsigc++20",
-          "version": "2.10.3",
-          "downloadUrl": "http://download.gnome.org/sources/libsigc++/2.10/libsigc++-2.10.3.tar.xz"
+          "version": "2.12.1",
+          "downloadUrl": "https://download.gnome.org/sources/libsigc++/2.12/libsigc++-2.12.1.tar.xz"
         }
       }
     },
