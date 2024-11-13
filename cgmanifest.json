@@ -8961,8 +8961,8 @@
         "type": "other",
         "other": {
           "name": "libdap",
-          "version": "3.20.5",
-          "downloadUrl": "http://www.opendap.org/pub/source/libdap-3.20.5.tar.gz"
+          "version": "3.21.0.27",
+          "downloadUrl": "https://github.com/OPENDAP/libdap4/archive/3.21.0-27/libdap-3.21.0.27.tar.gz"
         }
       }
     },
