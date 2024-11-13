@@ -1,11 +1,11 @@
 Summary:  Thai language support routines
 Name: libthai
-Version: 0.1.28
-Release: 5%{?dist}
+Version: 0.1.29
+Release: 1%{?dist}
 License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source: ftp://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
+Source: http://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
 Patch0: libthai-0.1.9-multilib.patch
 URL: http://linux.thai.net
 
@@ -58,6 +58,10 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Nov 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.1.29-1
+- Update CBL-Mariner import from Fedora 41 (license: LGPLv2+).
+- License verified.
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.1.28-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove doxygen dependency.
