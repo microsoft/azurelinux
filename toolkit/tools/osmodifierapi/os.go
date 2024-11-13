@@ -67,5 +67,10 @@ func (s *OS) IsValid() error {
 		}
 	}
 
+	err = s.Verity.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid verity:\n%w", err)
+	}
+
 	return nil
 }
