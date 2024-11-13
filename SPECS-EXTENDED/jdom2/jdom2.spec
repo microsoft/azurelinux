@@ -1,7 +1,7 @@
 Summary:        Java manipulation of XML made easy
 Name:           jdom2
 Version:        2.0.6.1
-Release:        9%{?dist}
+Release:        1%{?dist}
 # Sam as the "Saxpath" license but restricts the use of the name "JDOM" instead of "SAXPath".
 License:        JDOM
 Vendor:         Microsoft Corporation
@@ -82,6 +82,9 @@ cp -pr build/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* wed nov 13 20204 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.0.6.1-1
+- upgrade to version 2.0.6.1
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.6-29
 - Fixing source URL.
 
