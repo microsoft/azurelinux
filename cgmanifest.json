@@ -11011,8 +11011,8 @@
         "type": "other",
         "other": {
           "name": "libsrtp",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/cisco/libsrtp/archive/v2.3.0.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/cisco/libsrtp/archive/v2.6.0.tar.gz"
         }
       }
     },
