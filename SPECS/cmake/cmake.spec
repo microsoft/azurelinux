@@ -12,17 +12,9 @@ Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%
 Source1:        macros.cmake
 Patch0:         0001-manually-recreating-patches.patch
 # We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch1:         CVE-2022-43551.patch
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch5:         CVE-2023-35945.patch
-Patch6:         CVE-2023-38545.patch
-Patch7:         CVE-2023-38546.patch
-Patch8:         cve-2023-44487.patch
-Patch9:         CVE-2023-28320.patch
-Patch10:        CVE-2023-27533.patch
-Patch11:        CVE-2023-27534.patch
+Patch1:         CVE-2023-28320.patch
+Patch2:         CVE-2023-27533.patch
+Patch3:         CVE-2023-27534.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -90,6 +82,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %changelog
 * Tue Nov 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.29.6-1
 - Auto-upgrade to 3.29.6 - CVE-2023-46218, CVE-2023-27537, CVE-2023-27535, CVE-2023-27538, CVE-2023-27536, CVE-2023-23916, CVE-2023-23915, CVE-2022-43552
+- Remove old CVE patches that don't apply
 
 * Wed Sep 18 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.21.4-12
 - Patch CVE-2023-27533 and CVE-2023-27534
