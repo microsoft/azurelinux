@@ -1,14 +1,19 @@
 Name:           libdatrie
-Version:        0.2.9
-Release:        12%{?dist}
+Version:        0.2.13
+Release:        1%{?dist}
 Summary:        Implementation of Double-Array structure for representing trie
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://linux.thai.net/projects/datrie
-Source0:        http://linux.thai.net/pub/thailinux/software/libthai/%{name}-%{version}.tar.xz
-Patch0:         libdatrie-fixes-docs.patch
-BuildRequires:  autoconf, automake, libtool
+URL:            https://linux.thai.net/projects/datrie
+Source0:        https://linux.thai.net/pub/thailinux/software/libthai/%{name}-%{version}.tar.xz
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+BuildRequires:  autoconf-archive
+BuildRequires:  doxygen
+BuildRequires:  make
 
 %description
 datrie is an implementation of double-array structure for representing trie.
@@ -29,8 +34,7 @@ This package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .docs
+%autosetup
 
 %build
 autoreconf -f -i -v
@@ -62,8 +66,13 @@ LD_LIBRARY_PATH=../datrie/.libs %make_build check
 %{_libdir}/pkgconfig/datrie-0.2.pc
 %{_bindir}/trietool*
 %{_mandir}/man1/trietool*
+%{_pkgdocdir}-devel/*.{html,css,png,js,svg}
 
 %changelog
+* Wed Nov 13 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.2.13-1
+- Update to 0.2.13
+- License verified
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.2.9-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove doxygen dependency.
