@@ -1,0 +1,133 @@
+[
+    {
+        "name": "acl",
+        "azurelinux": "acl",
+        "ubuntu": "acl"
+    },
+    {
+        "name": "binutils",
+        "azurelinux": "binutils"
+    },
+    {
+        "name": "cdrkit",
+        "azurelinux": "cdrkit"
+    },
+    {
+        "name": "curl",
+        "azurelinux": "curl",
+        "ubuntu": "curl"
+    },
+    {
+        "name": "diffutils",
+        "azurelinux": "diffutils",
+        "ubuntu": "diffutils"
+    },
+    {
+        "name": "dosfstools",
+        "azurelinux": "dosfstools"
+    },
+    {
+        "name": "gawk",
+        "azurelinux": "gawk",
+        "ubuntu": "gawk"
+    },
+    {
+        "name": "glibc-devel",
+        "azurelinux": "glibc-devel"
+    },
+    {
+        "name": "genisoimage",
+        "azurelinux": "genisoimage",
+        "ubuntu": "genisoimage"
+    },
+    {
+        "name": "git",
+        "azurelinux": "git",
+        "ubuntu": "git"
+    },
+    {
+        "name": "golang",
+        "azurelinux": "golang",
+        "ubuntu": "golang-1.21-go"
+    },
+    {
+        "name": "jq",
+        "azurelinux": "jq",
+        "ubuntu": "jq"
+    },
+    {
+        "name": "kernel-headers",
+        "azurelinux": "kernel-headers"
+    },
+    {
+        "name": "make",
+        "azurelinux": "make",
+        "ubuntu": "make"
+    },
+    {
+        "name": "moby-cli",
+        "azurelinux": "moby-cli"
+    },
+    {
+        "name": "moby-engine",
+        "azurelinux": "moby-engine"
+    },
+    {
+        "name": "openssl",
+        "azurelinux": "openssl",
+        "ubuntu": "openssl"
+    },
+    {
+        "name": "parted",
+        "azurelinux": "parted",
+        "ubuntu": "parted"
+    },
+    {
+        "name": "pigz",
+        "azurelinux": "pigz",
+        "ubuntu": "pigz"
+    },
+    {
+        "name": "qemu-img",
+        "azurelinux": "qemu-img",
+        "ubuntu": "qemu-utils"
+    },
+    {
+        "name": "rpm",
+        "azurelinux": "rpm",
+        "ubuntu": "rpm"
+    },
+    {
+        "name": "rpm-build",
+        "azurelinux": "rpm-build"
+    },
+    {
+        "name": "sudo",
+        "azurelinux": "sudo"
+    },
+    {
+        "name": "systemd",
+        "azurelinux": "systemd",
+        "ubuntu": "systemd"
+    },
+    {
+        "name": "tar",
+        "azurelinux": "tar",
+        "ubuntu": "tar"
+    },
+    {
+        "name": "wget",
+        "azurelinux": "wget",
+        "ubuntu": "wget"
+    },
+    {
+        "name": "xfsprogs",
+        "azurelinux": "xfsprogs",
+        "ubuntu": "xfsprogs"
+    },
+    {
+        "name": "zstd",
+        "azurelinux": "zstd",
+        "ubuntu": "zstd"
+    }
+]

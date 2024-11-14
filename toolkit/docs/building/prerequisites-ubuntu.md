@@ -20,11 +20,12 @@ sudo apt -y install \
     golang-1.21-go \
     jq \
     make \
+    openssl \
     parted \
     pigz \
-    openssl \
     qemu-utils \
     rpm \
+    systemd \
     tar \
     wget \
     xfsprogs \

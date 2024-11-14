@@ -127,3 +127,9 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-level=$(LOG_LEVEL) \
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
+
+##help:target:install-azurelinux-prereqs=Install Azure Linux Prerequisites
+install-azurelinux-prereqs:
+	@echo "Installing Azure Linux Prerequisites"
+	prereqs="$$( $(SCRIPTS_DIR)/prerequisites.sh -s $(toolkit_root)/docs/building/prerequisites-src.json -d azurelinux -p )" && \
+	tdnf -y install $$prereqs

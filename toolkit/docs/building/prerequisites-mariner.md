@@ -16,9 +16,9 @@ sudo tdnf -y install \
     diffutils \
     dosfstools \
     gawk \
-    glibc-devel \
     genisoimage \
     git \
+    glibc-devel \
     golang \
     jq \
     kernel-headers \
