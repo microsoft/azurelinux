@@ -25,7 +25,6 @@ sudo apt -y install \
     pigz \
     qemu-utils \
     rpm \
-    systemd \
     tar \
     wget \
     xfsprogs \

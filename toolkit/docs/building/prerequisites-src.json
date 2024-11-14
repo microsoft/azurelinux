@@ -106,11 +106,6 @@
         "azurelinux": "sudo"
     },
     {
-        "name": "systemd",
-        "azurelinux": "systemd",
-        "ubuntu": "systemd"
-    },
-    {
         "name": "tar",
         "azurelinux": "tar",
         "ubuntu": "tar"
