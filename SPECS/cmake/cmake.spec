@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        14%{?dist}
+Release:        13%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,11 +92,8 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
-* Wed Nov 13 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 3.21.4-14
-- Patch CVE-2023-27535 and CVE-2023-27538
-
-* Tue Nov 12 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 3.21.4-13
-- Patch CVE-2022-43552 and CVE-2023-27536
+* Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 3.21.4-13
+- Patch CVE-2022-43552, CVE-2023-27536, CVE-2023-27535 and CVE-2023-27538
 
 * Wed Sep 18 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.21.4-12
 - Patch CVE-2023-27533 and CVE-2023-27534
