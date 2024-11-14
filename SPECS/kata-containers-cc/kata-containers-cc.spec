@@ -148,6 +148,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Thu Nov 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl3-1
+- Auto-upgrade to 3.2.0.azl3
+
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
 - Upgrade to 3.2.0.azl3 release, refactor build instructions
 
