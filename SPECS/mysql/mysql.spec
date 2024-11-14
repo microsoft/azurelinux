@@ -860,7 +860,7 @@ fi
 - Fix CVE-2024-9681
 
 * Tue Nov 12 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-4
-- Patched CVE-2012-2677
+- Patched CVE-2012-2677.
 
 * Tue Nov 05 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-3
 - Explicitly setting "WITH_CURL=none".
