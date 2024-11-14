@@ -21,7 +21,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,11 +36,15 @@ Patch2:         thin_archive_descriptor.patch
 Patch3:         CVE-2021-45078.patch
 Patch4:         CVE-2022-38533.patch
 Patch5:         CVE-2022-4285.patch
-Patch6:         CVE-2022-48063.patch
-Patch7:         CVE-2023-1972.patch
-Patch8:         CVE-2022-35205.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
-Patch9:         disable_gold_test.patch
+Patch6:         disable_gold_test.patch
+Patch7:         CVE-2022-47007.patch
+Patch8:         CVE-2022-47008.patch
+Patch9:         CVE-2022-47010.patch
+Patch10:        CVE-2022-47011.patch
+Patch11:         CVE-2022-48063.patch
+Patch12:         CVE-2023-1972.patch
+Patch13:         CVE-2022-35205.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -297,10 +301,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
-* Wed Jun 19 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 2.37-9
-- Added patch to fix CVE-2023-1972
-- Added patch to fix CVE-2022-48063
-- Added patch to fix CVE-2022-35205
+* Thu Nov 14 2024 Thien Trung Vuong <tvuong@microsoft.com> - 2.37-10
+- Added patch to fix CVE-2023-1972, CVE-2022-48063, CVE-2022-35205
+
+* Mon Nov 04 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.37-9
+- Address CVE-2022-47007, CVE-2022-47008, CVE-2022-47010, CVE-2022-47011.
 
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
 - Add the cross-compilation subpackage for aarch64.

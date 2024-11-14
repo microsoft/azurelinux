@@ -3,12 +3,13 @@
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.33.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+Patch0:         CVE-2022-40898.patch
 %global pypi_name wheel
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
@@ -102,6 +103,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 %endif
 
 %changelog
+* Fri Sep 09 2024 Sudipta Pandit <sudpandit@microsoft.com> - 0.33.6-8
+- Backport CVE-2022-40898 fix from upstream
+
 * Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
 - BR multiple python3 modules for PTest
 - pip3 install additional modules which not available as RPM

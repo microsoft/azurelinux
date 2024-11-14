@@ -2,7 +2,7 @@
 Summary:        A language for data analysis and graphics
 Name:           R
 Version:        4.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://cran.r-project.org/src/base/R-4/R-%{version}.tar.gz
 # in 2018. Given curl 8.0.0 is not an actual breaking change, this patch should be fine.
 # We should drop this when R eventually gets official support for build with curl >= 8.0.0
 Patch0:         0001-configure-fix-compilation-with-curl-8.0.0.patch
+Patch1:         CVE-2024-27322.patch
 BuildRequires:  build-essential
 BuildRequires:  bzip2-devel
 BuildRequires:  curl-devel
@@ -121,6 +122,9 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Wed Jun 19 2024 Saul Paredes <saulparedes@microsoft.com> - 4.1.0-5
+- Patch CVE-2024-27322
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

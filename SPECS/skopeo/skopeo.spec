@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.2
-Release:        4%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,12 +9,17 @@ Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-45288.patch
+Patch1:         CVE-2024-3727.patch
+Patch2:         CVE-2024-6104.patch
+Patch3:         CVE-2024-9676.patch
+Patch4:         CVE-2024-28180.patch
+Patch5:         CVE-2024-24786.patch
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  go-md2man
-BuildRequires:  golang >= 1.18
+BuildRequires:  golang
 BuildRequires:  gpgme-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  pkgconfig
@@ -46,8 +51,23 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-4
+* Mon Nov 11 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-9
+- Fix CVE-2024-9676, CVE-2024-28180 and CVE-2024-24786
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-8
+- Bump release to rebuild with go 1.22.7
+
+* Wed Jul 17 2024 Sindhu Karri <lakarri@microsoft.com> - 1.14.2-7
+- Fix CVE-2024-6104 in github.com/hashicorp/go-retryablehttp
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.14.2-6
+- Drop requirement on a specific version of golang
+
+* Wed Jun 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.2-5
 - Bump release to rebuild with go 1.21.11
+
+* Thu Jun 20 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.14.2-4
+- Fix CVE-2024-3727 in github.com/containers/image
 
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.14.2-3
 - Fix for CVE-2023-45288

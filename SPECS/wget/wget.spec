@@ -1,13 +1,14 @@
 Summary:        A network utility to retrieve files from the Web
 Name:           wget
 Version:        1.21.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later
 URL:            https://www.gnu.org/software/wget/wget.html
 Group:          System Environment/NetworkingPrograms
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-38428.patch
 BuildRequires:  openssl-devel
 %if %{with_check}
 BuildRequires:  perl
@@ -23,7 +24,7 @@ The Wget package contains a utility useful for non-interactive
 downloading of files from the Web.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -54,6 +55,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %changelog
+* Wed Jun 19 2024 Saul Paredes <saulparedes@microsoft.com> - 1.21.2-3
+- Patch for CVE-2024-38428
+
 * Thu Nov 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.21.2-2
 - Require test-related perl modules at check-time
 - Invoke make/configure with macros 

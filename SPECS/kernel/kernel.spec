@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.158.2
-Release:        1%{?dist}
+Version:        5.15.167.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,30 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.167.1-2
+- Remove Amateur Radio X.25 PLP Rose for CVE-2022-2961
+
+* Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.167.1-1
+- Auto-upgrade to 5.15.167.1
+
+* Thu Aug 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.165.1-1
+- Auto-upgrade to 5.15.165.1
+
+* Tue Aug 27 2024 Chris Co <chrco@microsoft.com> - 5.15.164.1-2
+- Enable USB_TMC
+
+* Fri Aug 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.164.1-1
+- Auto-upgrade to 5.15.164.1
+
+* Wed Jul 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.162.2-1
+- Auto-upgrade to 5.15.162.2
+
+* Thu Jul 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.162.1-1
+- Auto-upgrade to 5.15.162.1
+
+* Sat Jun 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.160.1-1
+- Auto-upgrade to 5.15.160.1
+
 * Fri Jun 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.158.2-1
 - Revert to 5.15.158.2
 

@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+        "trace-cmd-3.2.tar.gz": "62af2c6062eeb434925921bb5936774b0a0e17a5f86671fa2ea2f40704a080cd",
+        "98-trace-cmd.rules": "dfbcbe2a339715217d2777ccc74261a55417f87fe2aca849ed1c25f8d4a0f624",
+        "trace-cmd.conf": "c0b3d569dc5bb1095400f591747060cbdd7ef72a1abc0c0770b1fa308636e4f6",
+        "trace-cmd.service": "e72fe5edaf40e8a89e2912ca2b4da3b0b30a2078dabcc8d8e75604a0c3969bac"
+    }
+}

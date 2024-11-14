@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        3%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,10 @@ Patch8:         CVE-2023-44487.patch
 Patch9:         CVE-2024-28180.patch
 Patch10:        CVE-2024-21626.patch
 Patch11:        CVE-2024-3154.patch
+Patch12:        CVE-2024-3727.patch
+Patch13:        CVE-2021-43565.patch
+Patch14:        CVE-2024-6104.patch
+Patch15:        CVE-2022-32149.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -216,8 +220,23 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
-* Fri Jun 07 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-3
+* Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-8
+- Patch CVE-2022-32149
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.3-7
+- Bump release to rebuild with go 1.22.7
+
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 1.22.3-6
+- Patch CVE-2024-6104
+
+* Mon Jul 22 2024 Archana Choudhary <archana1@microsoft.com> - 1.22.3-5
+- Patch CVE-2021-43565
+
+* Wed Jun 26 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.3-4
 - Bump release to rebuild with go 1.21.11
+
+* Tue Jun 18 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 1.22.3-3
+- Patch CVE-2024-3727 in vendored github.com/containers/image.
 
 * Mon Jun 03 2024 Bala <balakumaran.kannan@microsoft.com> - 1.22.3-2
 - Patch CVE-2024-3154
