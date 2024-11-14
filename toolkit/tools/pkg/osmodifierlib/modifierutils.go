@@ -27,6 +27,16 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		return err
 	}
 
+	err = imagecustomizerlib.EnableOrDisableServices(osConfig.Services, dummyChroot)
+	if err != nil {
+		return err
+	}
+
+	err = imagecustomizerlib.LoadOrDisableModules(osConfig.Modules, dummyChroot.RootDir())
+	if err != nil {
+		return err
+	}
+
 	if osConfig.Overlays != nil {
 		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
 		if err != nil {
@@ -59,6 +69,11 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = imagecustomizerlib.AddKernelCommandLine(osConfig.KernelCommandLine.ExtraCommandLine, dummyChroot)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
 	}
 
 	return nil

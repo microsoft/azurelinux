@@ -33,7 +33,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 		},
 	}
 
-	err := loadOrDisableModules(modules, rootDir)
+	err := LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
@@ -68,7 +68,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 		},
 	}
 
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.Contains(t, err.Error(), "cannot add options for disabled module (module2)")
 
 	// Test updating module2's loadmode and module3's option
@@ -83,7 +83,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 			Options: map[string]string{"option3_1": "new_value3_1", "option3_3": "new_value3_3"},
 		},
 	}
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleDisableContent, _ = os.ReadFile(moduleDisableFilePath)
@@ -104,7 +104,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 		},
 	}
 
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleLoadContent, _ = os.ReadFile(moduleLoadFilePath)

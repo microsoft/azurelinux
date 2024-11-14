@@ -12,7 +12,7 @@ import (
 func TestIsoIsValid(t *testing.T) {
 	iso := Iso{
 		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "'",
+			ExtraCommandLine: KernelExtraArguments{"'"},
 		},
 	}
 

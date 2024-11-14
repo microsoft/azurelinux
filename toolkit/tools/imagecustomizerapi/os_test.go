@@ -219,7 +219,7 @@ func TestOSIsValidOverlayDuplicateWorkDir(t *testing.T) {
 func TestOSIsValidInvalidKernelCommandLine(t *testing.T) {
 	os := OS{
 		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "\"",
+			ExtraCommandLine: KernelExtraArguments{"\""},
 		},
 	}
 

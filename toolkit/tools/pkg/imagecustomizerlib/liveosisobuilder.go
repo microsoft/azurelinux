@@ -312,11 +312,14 @@ func updateSavedConfigs(savedConfigsFilePath string, newKernelArgs imagecustomiz
 
 	if savedConfigs != nil {
 		// do we have kernel arguments from a previous run?
-		if savedConfigs.Iso.KernelCommandLine.ExtraCommandLine != "" {
+		if len(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine) > 0 {
 			// If yes, add them before the new kernel arguments.
-			savedArgs := strings.TrimSpace(string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
-			newArgs := strings.TrimSpace(string(newKernelArgs))
-			updatedSavedConfigs.Iso.KernelCommandLine.ExtraCommandLine = imagecustomizerapi.KernelExtraArguments(savedArgs + " " + newArgs)
+			savedArgs := savedConfigs.Iso.KernelCommandLine.ExtraCommandLine
+			newArgs := newKernelArgs
+
+			// Combine saved arguments with new ones
+			combinedArgs := append(savedArgs, newArgs...)
+			updatedSavedConfigs.Iso.KernelCommandLine.ExtraCommandLine = imagecustomizerapi.KernelExtraArguments(combinedArgs)
 		}
 
 		// if the PXE iso image url is not set, set it to the value from the previous run.
@@ -420,7 +423,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(isoGrubCfgFileName string, pxeGrubCfgFi
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
-	additionalKernelCommandline := liveosKernelArgs + " " + string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine)
+	savedArgs := strings.Join(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine, " ")
+	additionalKernelCommandline := liveosKernelArgs + " " + savedArgs
 
 	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, additionalKernelCommandline,
 		true /*allowMultiple*/, false /*requireKernelOpts*/)

@@ -7,14 +7,15 @@ import (
 )
 
 // KernelExtraArguments defines one or more extra kernel arguments.
-type KernelExtraArguments string
+type KernelExtraArguments []string
 
 func (e KernelExtraArguments) IsValid() error {
-	err := validateKernelArgumentsFormat(string(e))
-	if err != nil {
-		return err
+	for _, arg := range e {
+		err := validateKernelArgumentsFormat(arg)
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 

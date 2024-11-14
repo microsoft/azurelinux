@@ -27,7 +27,7 @@ const (
 	moduleOptionsPath  = modprobeConfigDir + "/" + moduleOptionsFileName
 )
 
-func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) error {
+func LoadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) error {
 	var err error
 	var modulesToLoad []string
 	var modulesToDisable []string
