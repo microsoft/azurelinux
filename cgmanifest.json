@@ -9021,8 +9021,8 @@
         "type": "other",
         "other": {
           "name": "libdc1394",
-          "version": "2.2.2",
-          "downloadUrl": "http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.2.2/libdc1394-2.2.2.tar.gz"
+          "version": "2.2.7",
+          "downloadUrl": "https://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.2.7/libdc1394-2.2.7.tar.gz"
         }
       }
     },
