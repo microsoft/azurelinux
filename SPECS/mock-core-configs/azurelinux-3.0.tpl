@@ -1,6 +1,6 @@
 config_opts['root'] = 'azl-{{ releasever }}-{{ target_arch }}'
 
-config_opts['chroot_setup_cmd'] = 'install azurelinux-tools-package-build'
+config_opts['chroot_setup_cmd'] = 'install azurelinux-tools-packagebuild'
 config_opts['dist'] = 'azl3'
 config_opts['package_manager'] = 'dnf'
 config_opts['description'] = 'Azure Linux 3.0'

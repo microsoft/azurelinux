@@ -1,5 +1,5 @@
 Summary:        Metapackage of tools required to build Azure Linux packages
-Name:           azurelinux-tools-package-build
+Name:           azurelinux-tools-packagebuild
 Version:        %{azl}.0
 Release:        1%{?dist}
 License:        MIT
@@ -30,7 +30,7 @@ Requires: libpipeline
 Requires: msopenjdk-17
 Requires: ncurses-compat
 Requires: ncurses-term
-Requires: ocaml-rpm-macros
+Requires: ocaml-srpm-macros
 Requires: openssl-perl
 Requires: openssl-static
 Requires: perl
