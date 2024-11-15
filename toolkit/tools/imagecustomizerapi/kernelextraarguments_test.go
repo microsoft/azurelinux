@@ -57,53 +57,39 @@ func TestKernelExtraArgumentsIsValid(t *testing.T) {
 		config      KernelExtraArguments
 		expectedErr *string
 	}{
-		// Simple cases (no quoting)
+		// very simple cases (no quoting)
 		{KernelExtraArguments{""}, nil},
 		{KernelExtraArguments{"a"}, nil},
 		{KernelExtraArguments{"a=b"}, nil},
 		{KernelExtraArguments{"a=b", "x=y"}, nil},
-
-		// Enclosed in double quotes
+		// enlosed in double quotes (4)
 		{KernelExtraArguments{"\"a=b\""}, nil},
-
-		// Enclosed in single quotes
+		// enclosed in single quotes (2)
 		{KernelExtraArguments{"'a=b'"}, nil},
-
-		// Single quote embedded within double quotes and vice versa
-		{KernelExtraArguments{"\"a='b\" 'x=\"y'"}, nil},
-
-		// Single-quoted string embedded within a double-quoted value
-		{KernelExtraArguments{"\"'a=b'", "x=y\""}, nil},
-
-		// Double-quoted string embedded within a double-quoted value
-		{KernelExtraArguments{"\"a=b", "\\\"x=y\\\"\""}, nil},
-
-		// \n embedded within a double-quoted value
-		{KernelExtraArguments{"\"a=b", "x=y\\n\""}, nil},
-
-		// \ embedded within a double-quoted value
-		{KernelExtraArguments{"\"a=b", "x=y\\\\\""}, nil},
-
-		// Unmatched open double-quote - beginning of string
-		{KernelExtraArguments{"\"a=b", "x=y"}, &missingClosingDoubleQuotes},
-
-		// Unmatched open double-quote - middle of string
-		{KernelExtraArguments{"a=b", "\"x=y"}, &missingClosingDoubleQuotes},
-
-		// Unmatched open double-quote - end of string
-		{KernelExtraArguments{"a=b", "x=y\""}, &missingClosingDoubleQuotes},
-
-		// Unmatched open single-quote - beginning of string
-		{KernelExtraArguments{"'a=b", "x=y"}, &missingClosingSingleQuote},
-
-		// Unmatched open single-quote - middle of string
-		{KernelExtraArguments{"a=b", "'x=y"}, &missingClosingSingleQuote},
-
-		// Unmatched open single-quote - end of string
-		{KernelExtraArguments{"a=b", "x='y"}, &missingClosingSingleQuote},
-
-		// Attempt to use \ to escape single quotes
-		{KernelExtraArguments{"'a=\\'b'"}, &missingClosingSingleQuote},
+		// single quote embedded within double quotes and vice versa (2)
+		{KernelExtraArguments{`"a='b"`, `'x="y'`}, nil},
+		// single-quoted string embedded within a double quoted value (4)
+		{KernelExtraArguments{"'a=b'", "x=y"}, nil},
+		// double-quoted string embedded within a double quoted value (4)(6)(7)
+		{KernelExtraArguments{"a=b", "\\\"x=y\\\""}, nil},
+		// \n embedded within a double quoted value (4)(6)
+		{KernelExtraArguments{"a=b", "x=y\\n"}, nil},
+		// \ embedded within a double quoted value (4)(6)
+		{KernelExtraArguments{"a=b", "x=y\\\\"}, nil},
+		// unmatched open double-quote - beginning of string (4)
+		{KernelExtraArguments{"\"a=b"}, &missingClosingDoubleQuotes},
+		// unmatched open double-quote - middle of string (4)
+		{KernelExtraArguments{"\"x=y"}, &missingClosingDoubleQuotes},
+		// unmatched open double-quote - end of string (4)
+		{KernelExtraArguments{"x=y\""}, &missingClosingDoubleQuotes},
+		// unmatched open single-quote - beginning of string (2)
+		{KernelExtraArguments{"'a=b"}, &missingClosingSingleQuote},
+		// unmatched open single-quote - middle of string (2)
+		{KernelExtraArguments{"x'y=z"}, &missingClosingSingleQuote},
+		// unmatched open single-quote - end of string (2)
+		{KernelExtraArguments{"x='y"}, &missingClosingSingleQuote},
+		// attempt to use \ to escape single quotes (3)
+		{KernelExtraArguments{"a=\\'b'"}, &missingClosingSingleQuote},
 	}
 
 	for _, test := range configsToTest {
