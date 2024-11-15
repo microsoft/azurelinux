@@ -9,11 +9,11 @@ prereq_md_path=""
 prereq_json_path=""
 
 function print_help {
-    echo "Pre-requisite installer. Installs azurelinux pre-requisites for the toolkit."
+    echo "Build prereq utility. Lists or validates pre-requisites for a given distro."
     echo "Usage:"
-    echo '[MANDATORY] -m PATH -> path to the pre-requisite md file'
     echo '[MANDATORY] -s PATH -> path to the src json file'
-    echo '[MANDATORY] -d DISTRO -> One of "azurelinux" or "ubuntu"'
+    echo '[MANDATORY] -d DISTRO -> One of "mariner", "azurelinux" or "ubuntu"'
+    echo '[OPTIONAL] -m PATH -> path to the pre-requisite md file, must be provided if not in print mode'
     echo '[OPTIONAL]  -p -> print the canonical pre-requisite list and exit'
     echo '[OPTIONAL]  -h -> print this help dialogue and exit'
 }
@@ -47,10 +47,13 @@ if [ -z "$distro" ]; then
     exit 1
 fi
 
-if [ "$distro" != "azurelinux" ] && [ "$distro" != "ubuntu" ]; then
+if [ "$distro" != "mariner" ] && [ "$distro" != "azurelinux" ] && [ "$distro" != "ubuntu" ]; then
     echo "ERROR: Invalid distro. Must be one of 'azurelinux' or 'ubuntu'." >&2
     print_help
     exit 1
+fi
+if [ "$distro" == "mariner" ]; then
+    distro="azurelinux"
 fi
 
 # Load the pre-requisite source json for the distro of interest

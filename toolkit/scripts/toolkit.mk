@@ -128,8 +128,13 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
 
-##help:target:install-azurelinux-prereqs=Install Azure Linux Prerequisites
+##help:target:install-azurelinux-prereqs=Install build prerequisites, only supported on Mariner/AzureLinux.
 install-azurelinux-prereqs:
-	@echo "Installing Azure Linux Prerequisites"
+	@echo "Installing build prerequisites for AzureLinux..."
+	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
+	if [ "$$current_os" != "mariner" ] && [ "$$current_os" != "azurelinux" ]; then \
+		echo "This target is only supported on Mariner/AzureLinux." && \
+		exit 1; \
+	fi && \
 	prereqs="$$( $(SCRIPTS_DIR)/prerequisites.sh -s $(toolkit_root)/docs/building/prerequisites-src.json -d azurelinux -p )" && \
 	tdnf -y install $$prereqs
