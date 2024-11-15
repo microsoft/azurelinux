@@ -63,6 +63,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Fri Nov 15 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 7.95-2
+- Fix CVE-2024-8006
+
 * Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.95-1
 - Auto-upgrade to 7.95 to fix CVE-2022-33099
 
