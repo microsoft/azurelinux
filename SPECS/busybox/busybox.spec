@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.35.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ Patch8:         CVE-2021-42380.patch
 # Also Fixes CVE-2023-42364
 Patch9:         CVE-2023-42363.patch
 Patch10:        CVE-2023-42365.patch
+Patch11:        CVE-2023-42364.patch
+Patch12:        CVE-2023-42366.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
@@ -100,6 +102,9 @@ install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.pet
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Fri Nov 15 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.35.0-12
+- Address CVE-2023-42364 and CVE-2023-42366
+
 * Tue Aug 13 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.35.0-11
 - Address CVE-2021-42380, CVE-2023-42363, CVE-2023-42364 & CVE-2023-42365
 
