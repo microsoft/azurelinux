@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -103,6 +103,9 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Thu Nov 14 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-3
+- Dummy bump.
+
 * Mon Oct 28 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-2
 - Switch to ALZ version of protobuf instead of using the bundled one.
 
