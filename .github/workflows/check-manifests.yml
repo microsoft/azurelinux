@@ -38,8 +38,8 @@ jobs:
         echo "Run './scripts/toolchain/check_manifests.sh -a "x86_64"' and './scripts/check_tools_metapackages.sh -a "x86_64"' to validate locally"
         echo ##########
         pushd toolkit
-        ./scripts/toolchain/check_manifests.sh -a "x86_64"
-        ./scripts/toolchain/check_tools_metapackages.sh -a "x86_64"
+        ./scripts/toolchain/check_manifests.sh -v -a "x86_64"
+        ./scripts/toolchain/check_tools_metapackages.sh -v -a "x86_64"
         popd
 
     - name: Check aarch64 manifests
@@ -49,7 +49,7 @@ jobs:
         echo "Run './scripts/toolchain/check_manifests.sh -a "aarch64"' and './scripts/check_tools_metapackages.sh -a "aarch64"' to validate locally"
         echo ##########
         pushd toolkit
-        ./scripts/toolchain/check_manifests.sh -a "aarch64"
-        ./scripts/toolchain/check_tools_metapackages.sh -a "aarch64"
+        ./scripts/toolchain/check_manifests.sh -v -a "aarch64"
+        ./scripts/toolchain/check_tools_metapackages.sh -v -a "aarch64"
         popd
       if: always()

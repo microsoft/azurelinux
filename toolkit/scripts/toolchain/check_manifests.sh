@@ -13,6 +13,7 @@ help () {
     echo "[OPTIONAL] -m -> TOOLCHAIN_MANIFESTS_DIR"
     echo "[OPTIONAL] -d -> DIST_TAG"
     echo "[OPTIONAL] -i -> DISTRO_MACRO"
+    echo "[OPTIONAL] -v -> enable verbose output"
     echo "[OPTIONAL] -h -> print this help dialogue and exit"
 }
 
@@ -30,7 +31,7 @@ then
     exit 1
 fi
 
-while getopts "a:t:s:m:d:i:h:" OPTIONS
+while getopts "a:t:s:m:d:i:h:v" OPTIONS
 do
   case "${OPTIONS}" in
     a ) ARCH=$OPTARG ;;
@@ -39,6 +40,7 @@ do
     m ) MANIFESTS_DIR=$OPTARG ;;
     d ) DIST_TAG=$OPTARG ;;
     i ) DISTRO_MACRO=$OPTARG ;;
+    v ) set -x ;;
     h ) help; exit 0 ;;
     \? )
         echo "ERROR: Invalid Option: -$OPTARG" 1>&2
