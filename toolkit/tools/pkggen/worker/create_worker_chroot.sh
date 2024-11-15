@@ -10,7 +10,7 @@ set -o pipefail
 # $3 path to find RPMs. May be in PATH/<arch>/*.rpm
 # $4 path to log directory
 
-[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$4" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./containercheck> <./log_dir>"; exit; }
+[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./containercheck> <./log_dir>"; exit; }
 
 chroot_base=$1
 packages=$2
