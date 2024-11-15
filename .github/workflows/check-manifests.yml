@@ -26,7 +26,7 @@ jobs:
     steps:
     - name: Install prerequisites
       run: |
-        tdnf install -y ca-certificates createrepo_c dnf dnf-plugins-core jq sudo tar wget
+        tdnf install -y ca-certificates createrepo_c dnf dnf-plugins-core git jq make rpm rpm-build sudo tar wget
 
     - name: Check out code
       uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
         echo "Run './scripts/toolchain/check_manifests.sh -a "x86_64"' and './scripts/check_tools_metapackages.sh -a "x86_64"' to validate locally"
         echo ##########
         pushd toolkit
-        ./scripts/toolchain/check_manifests.sh -v -a "x86_64"
+        ./scripts/toolchain/check_manifests.sh -a "x86_64"
         ./scripts/toolchain/check_tools_metapackages.sh -v -a "x86_64"
         popd
 
@@ -51,7 +51,7 @@ jobs:
         echo "Run './scripts/toolchain/check_manifests.sh -a "aarch64"' and './scripts/check_tools_metapackages.sh -a "aarch64"' to validate locally"
         echo ##########
         pushd toolkit
-        ./scripts/toolchain/check_manifests.sh -v -a "aarch64"
-        ./scripts/toolchain/check_tools_metapackages.sh -v -a "aarch64"
+        ./scripts/toolchain/check_manifests.sh -a "aarch64"
+        ./scripts/toolchain/check_tools_metapackages.sh -a "aarch64"
         popd
       if: always()

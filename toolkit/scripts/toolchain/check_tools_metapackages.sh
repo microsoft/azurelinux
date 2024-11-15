@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-set -euox pipefail
+set -euo pipefail
 
 function display_usage_help() {
     echo "Script to check that distro tools meta-packages match toolchain manifests"
@@ -29,8 +29,7 @@ do
     a ) ARCH=$OPTARG ;;
     m ) MANIFESTS_DIR=$OPTARG ;;
     s ) SPECS_DIR=$OPTARG ;;
-    v ) VERBOSE=1
-        set -x ;;
+    v ) VERBOSE=1 ;;
     \? )
         echo "ERROR: Invalid Option: -$OPTARG" 1>&2
         echo "" >&2
