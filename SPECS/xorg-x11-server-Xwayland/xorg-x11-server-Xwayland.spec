@@ -140,7 +140,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %changelog
 * Thu Nov 14 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 24.1.1-3
 - Fix for CVE-2024-9632
-- Add systemd-devel build depndency
+- Added systemd-devel build requires dependency
 
 * Wed Jul 10 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 24.1.1-2
 - Initial CBL-Mariner import from Fedora 41 (license: MIT).
