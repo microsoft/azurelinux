@@ -2,10 +2,11 @@
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
 Version:        1.31
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
+Patch0:         CVE-2024-10224.patch
 URL:            http://search.cpan.org/dist/Module-ScanDeps/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +65,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Nov 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.31-3
+- Patched CVE-2024-10224.
+
 * Tue Aug 23 2020 Muhammad Falak <mwani@microsoft.com> - 1.31-2
 - Add BR on `perl-{(CPAN::*),(FindBin),(Test::More)}` to enable ptest
 
