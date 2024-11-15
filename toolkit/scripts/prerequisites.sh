@@ -13,7 +13,7 @@ function print_help {
     echo "Usage:"
     echo '[MANDATORY] -s PATH -> path to the src json file'
     echo '[MANDATORY] -d DISTRO -> One of "mariner", "azurelinux" or "ubuntu"'
-    echo '[OPTIONAL] -m PATH -> path to the pre-requisite md file, must be provided if not in print mode'
+    echo '[OPTIONAL]  -m PATH -> path to the pre-requisite md file, must be provided if not in print mode'
     echo '[OPTIONAL]  -p -> print the canonical pre-requisite list and exit'
     echo '[OPTIONAL]  -h -> print this help dialogue and exit'
 }
