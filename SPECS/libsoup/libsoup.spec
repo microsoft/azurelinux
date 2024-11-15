@@ -2,13 +2,18 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
+
+Patch:          CVE-2024-52530.patch
+Patch:          CVE-2024-52531.patch
+Patch:          CVE-2024-52532.patch
+
 BuildRequires:  meson
 BuildRequires:  autogen
 BuildRequires:  glib-devel
@@ -69,7 +74,7 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of libsoup.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson \
@@ -119,12 +124,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.0.4-2
+- Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
+
 * Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 3.0.4-1
 - Upgrade to version 3.0.4
-- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel, 
+- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel,
   gtk-doc, vala and python3-pygments as BR
 - Use meson to build and install
-- Add additional files to libsoup-devel 
+- Add additional files to libsoup-devel
 - License Verified
 
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8
