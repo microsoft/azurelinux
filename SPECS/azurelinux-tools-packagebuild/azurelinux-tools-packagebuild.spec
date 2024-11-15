@@ -118,4 +118,5 @@ Metapackage of tools required to build Azure Linux packages
 
 %changelog
 * Thu Oct 17 2024 Reuben Olinsky <reubeno@microsoft.com> - 3.0-1
-- Original version for Azure Linux
+- Original version for Azure Linux.
+- License Verified.
