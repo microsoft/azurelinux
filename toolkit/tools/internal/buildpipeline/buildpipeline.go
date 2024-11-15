@@ -31,24 +31,24 @@ var isRegularBuildCached *bool
 
 // checkIfContainerDockerEnvFile checks if the tool is running in a Docker container by checking if /.dockerenv exists. This
 // check may not be reliable in all environments, so it is recommended to use systemd-detect-virt if available.
-func checkIfContainerDockerEnvFile() bool {
+func checkIfContainerDockerEnvFile() (bool, error) {
 	exists, err := file.PathExists("/.dockerenv")
 	if err != nil {
-		logger.Log.Errorf("Error checking /.dockerenv: %v", err)
-		return false
+		err = fmt.Errorf("failed to check if /.dockerenv exists:\n%w", err)
+		return false, err
 	}
-	return exists
+	return exists, nil
 }
 
 // checkIfContainerIgnoreDockerEnvFile checks if the user has placed a file in the root directory to ignore the Docker
 // environment check.
-func checkIfContainerIgnoreDockerEnvFile() bool {
+func checkIfContainerIgnoreDockerEnvFile() (bool, error) {
 	ignoreDockerEnvExists, err := file.PathExists("/.mariner-toolkit-ignore-dockerenv")
 	if err != nil {
-		logger.Log.Errorf("Failed to check if /.mariner-toolkit-ignore-dockerenv exists: %s", err)
-		return false
+		err = fmt.Errorf("failed to check if /.mariner-toolkit-ignore-dockerenv exists:\n%w", err)
+		return false, err
 	}
-	return ignoreDockerEnvExists
+	return ignoreDockerEnvExists, nil
 }
 
 // checkIfContainerChrootDirEnv checks if the user has set the CHROOT_DIR environment variable, which is a requirement for
@@ -65,7 +65,7 @@ func checkIfContainerSystemdDetectVirt() (bool, error) {
 	// was previously not explicitly required for the toolkit.
 	_, err := exec.LookPath(systemdDetectVirtTool)
 	if err != nil {
-		err = fmt.Errorf("failed to find %s in the PATH: %w", systemdDetectVirtTool, err)
+		err = fmt.Errorf("failed to find %s in the PATH:\n%w", systemdDetectVirtTool, err)
 		return false, err
 	}
 
@@ -97,7 +97,12 @@ func IsRegularBuild() bool {
 	}
 
 	// If /.mariner-toolkit-ignore-dockerenv exists, then it is a regular build no matter what.
-	if checkIfContainerIgnoreDockerEnvFile() {
+	hasIgnoreFile, err := checkIfContainerIgnoreDockerEnvFile()
+	if err != nil {
+		// Log the error, but continue with the check.
+		logger.Log.Warnf("Failed to check if /.mariner-toolkit-ignore-dockerenv exists: %s", err)
+	}
+	if hasIgnoreFile {
 		isRegularBuild := true
 		isRegularBuildCached = &isRegularBuild
 		return isRegularBuild
@@ -111,7 +116,12 @@ func IsRegularBuild() bool {
 	isRegularBuild := true
 	isDockerContainer, err := checkIfContainerSystemdDetectVirt()
 	if err != nil {
-		isRegularBuild = !checkIfContainerDockerEnvFile()
+		isContainerBuild, err := checkIfContainerDockerEnvFile()
+		if err != nil {
+			// Log the error, but continue with the check.
+			logger.Log.Warnf("Failed to check if /.dockerenv exists: %s", err)
+		}
+		isRegularBuild = !isContainerBuild
 		message := []string{
 			"Failed to detect if the system is running in a container using systemd-detect-virt.",
 			err.Error(),
