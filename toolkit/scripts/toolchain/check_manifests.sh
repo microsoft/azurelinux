@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -e
+set -ex
 
 help () {
     echo "Script to check that the manifest files only contain RPMs that could have been generated from toolchain specs"

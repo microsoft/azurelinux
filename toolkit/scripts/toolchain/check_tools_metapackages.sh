@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-set -euo pipefail
+set -euox pipefail
 
 function display_usage_help() {
     echo "Script to check that distro tools meta-packages match toolchain manifests"
