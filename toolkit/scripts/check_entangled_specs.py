@@ -14,8 +14,10 @@ from pyrpm.spec import replace_macros, Spec
 version_release_matching_groups = [
     frozenset([
         "SPECS-SIGNED/kernel-signed/kernel-signed.spec",
+        "SPECS-SIGNED/kernel-64k-signed/kernel-64k-signed.spec",
         "SPECS-SIGNED/kernel-uki-signed/kernel-uki-signed.spec",
         "SPECS/kernel/kernel.spec",
+        "SPECS/kernel-64k/kernel-64k.spec",
         "SPECS/kernel/kernel-uki.spec",
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
