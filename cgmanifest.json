@@ -11351,8 +11351,8 @@
         "type": "other",
         "other": {
           "name": "libutempter",
-          "version": "1.1.6",
-          "downloadUrl": "https://github.com/altlinux/libutempter/archive/refs/tags/libutempter-1.1.6.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "ftp://ftp.altlinux.org/pub/people/ldv/utempter/libutempter-1.2.1.tar.gz"
         }
       }
     },
