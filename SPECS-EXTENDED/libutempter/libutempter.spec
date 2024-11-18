@@ -1,17 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%define utempter_compat_ver 0.5.2
+# SPDX-License-Identifier: LGPL-2.1-or-later AND LGPL-2.1-only AND BSD-2-Clause
 
+%define utempter_compat_ver 0.5.2
 Summary: A privileged helper for utmp/wtmp updates
 Name: libutempter
-Version: 1.1.6
-Release: 19%{?dist}
-License: LGPLv2+
+Version: 1.2.1
+Release: 1%{?dist}
+License: LGPL-2.1-or-later AND LGPL-2.1-only AND BSD-2-Clause
 URL: https://github.com/altlinux/libutempter
-# Sourece0: https://github.com/altlinux/libutempter/archive/refs/tags/1.1.6-alt2.tar.gz
-Source0: https://github.com/altlinux/libutempter/archive/refs/tags/%{name}-%{version}.tar.bz2
+# Sourece0: https://github.com/altlinux/libutempter/archive/refs/tags/1.2.1-alt1.tar.gz
+Source0: ftp://ftp.altlinux.org/pub/people/ldv/utempter/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
+BuildRequires: make
 
 Requires(pre): shadow-utils
 
@@ -42,10 +44,8 @@ make install DESTDIR="$RPM_BUILD_ROOT" libdir="%{_libdir}" libexecdir="%{_libexe
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %pre
-{
-    %{_sbindir}/groupadd -g 22 -r -f utmp || :
-    %{_sbindir}/groupadd -g 35 -r -f utempter || :
-}
+groupadd -g 22 -r -f utmp || :
+groupadd -g 35 -r -f utempter || :
 
 %ldconfig_scriptlets
 
@@ -63,6 +63,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.2.1-1
+- Update Azure-Linux import from Fedora 41 (license: LGPL-2.1-or-later AND LGPL-2.1-only AND BSD-2-Clause).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.6-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
