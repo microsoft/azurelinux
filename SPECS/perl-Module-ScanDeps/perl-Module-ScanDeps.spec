@@ -40,7 +40,7 @@ hash reference.  Its keys are the module names as they appear in %%INC (e.g.
 Test/More.pm).  The values are hash references.
 
 %prep
-%setup -q -n Module-ScanDeps-%{version}
+%autosetup -n Module-ScanDeps-%{version} -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
