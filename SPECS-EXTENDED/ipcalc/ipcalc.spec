@@ -8,7 +8,7 @@ License: GPL-2.0-or-later
 URL: https://gitlab.com/ipcalc/ipcalc
 Source0: https://gitlab.com/ipcalc/ipcalc/-/archive/%{version}/ipcalc-%{version}.tar.gz
 #, rubygem-ronn-ng
-BuildRequires: gcc, libmaxminddb-devel, meson, rubygem-ronn
+BuildRequires: gcc, libmaxminddb-devel, meson
 Recommends:    libmaxminddb, geolite2-city, geolite2-country
 
 # Explicitly conflict with older initscript packages that ship ipcalc
@@ -42,7 +42,7 @@ or check the validity of an address.
 %{_bindir}/ipcalc
 %license COPYING
 %doc README.md
-%{_mandir}/man1/ipcalc.1*
+#%{_mandir}/man1/ipcalc.1*
 
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
