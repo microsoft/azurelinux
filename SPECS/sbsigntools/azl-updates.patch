@@ -1,0 +1,474 @@
+From 8dbaff0d1e09c42aab6a86d70569c5c935e682df Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 15 Nov 2024 21:46:00 +0000
+Subject: [PATCH 1/5] print serial numbers of certificates in verbose mode
+
+---
+ src/sbverify.c | 63 +++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 19 deletions(-)
+
+diff --git a/src/sbverify.c b/src/sbverify.c
+index 8f14f35..f3eee98 100644
+--- a/src/sbverify.c
++++ b/src/sbverify.c
+@@ -114,9 +114,48 @@ int load_cert(X509_STORE *certs, const char *filename)
+ 	return 0;
+ }
+ 
+-static void print_signature_info(PKCS7 *p7)
++static void print_cert_info(char const * const subject, char const * const issuer, ASN1_INTEGER const * const serial)
++{
++	char * serial_hex = "";
++	bool serial_hex_allocated =false;
++
++	BIGNUM * const serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
++	if (!serial_bn) {
++		serial_hex = "Error converting serial number to BIGNUM";
++	} else {
++		serial_hex = BN_bn2hex(serial_bn);
++		if (!serial_hex) {
++			serial_hex = "Error converting serial number to hex";
++		} else {
++			serial_hex_allocated = true;
++		}
++		BN_free(serial_bn);
++	}
++
++	printf(" - subject: %s\n", subject);
++	printf("   issuer:  %s\n", issuer);
++	printf("   serial:  %s\n", serial_hex);
++
++	if (serial_hex_allocated) {
++		OPENSSL_free(serial_hex);
++	}
++}
++
++static void print_cert(X509 const * const cert)
+ {
+ 	char subject_name[cert_name_len + 1], issuer_name[cert_name_len + 1];
++	const ASN1_INTEGER * const serial = X509_get0_serialNumber(cert);
++
++	X509_NAME_oneline(X509_get_subject_name(cert),
++			subject_name, cert_name_len);
++	X509_NAME_oneline(X509_get_issuer_name(cert),
++			issuer_name, cert_name_len);
++	print_cert_info(subject_name, issuer_name, serial);
++}
++
++static void print_signature_info(PKCS7 *p7)
++{
++	char issuer_name[cert_name_len + 1];
+ 	PKCS7_SIGNER_INFO *si;
+ 	X509 *cert;
+ 	int i;
+@@ -128,26 +167,19 @@ static void print_signature_info(PKCS7 *p7)
+ 		si = sk_PKCS7_SIGNER_INFO_value(p7->d.sign->signer_info, i);
+ 		X509_NAME_oneline(si->issuer_and_serial->issuer,
+ 				issuer_name, cert_name_len);
+-		printf(" - %s\n", issuer_name);
+-	}
++		print_cert_info("<signature issuer subject unknown>", issuer_name, si->issuer_and_serial->serial);
++		}
+ 
+ 	printf("image signature certificates:\n");
+ 
+ 	for (i = 0; i < sk_X509_num(p7->d.sign->cert); i++) {
+ 		cert = sk_X509_value(p7->d.sign->cert, i);
+-		X509_NAME_oneline(X509_get_subject_name(cert),
+-				subject_name, cert_name_len);
+-		X509_NAME_oneline(X509_get_issuer_name(cert),
+-				issuer_name, cert_name_len);
+-
+-		printf(" - subject: %s\n", subject_name);
+-		printf("   issuer:  %s\n", issuer_name);
++		print_cert(cert);
+ 	}
+ }
+ 
+ static void print_certificate_store_certs(X509_STORE *certs)
+ {
+-	char subject_name[cert_name_len + 1], issuer_name[cert_name_len + 1];
+ 	STACK_OF(X509_OBJECT) *objs;
+ 	X509_OBJECT *obj;
+ 	X509 *cert;
+@@ -164,14 +196,7 @@ static void print_certificate_store_certs(X509_STORE *certs)
+ 			continue;
+ 
+ 		cert = X509_OBJECT_get0_X509(obj);
+-
+-		X509_NAME_oneline(X509_get_subject_name(cert),
+-				subject_name, cert_name_len);
+-		X509_NAME_oneline(X509_get_issuer_name(cert),
+-				issuer_name, cert_name_len);
+-
+-		printf(" - subject: %s\n", subject_name);
+-		printf("   issuer:  %s\n", issuer_name);
++		print_cert(cert);
+ 	}
+ }
+ 
+-- 
+2.39.4
+
+
+From 2e01d5004258bcf313de6b1f45186d44d48c7aa2 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 15 Nov 2024 21:52:16 +0000
+Subject: [PATCH 2/5] improve help text to match parameters
+
+---
+ src/sbverify.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/sbverify.c b/src/sbverify.c
+index f3eee98..79c5fc5 100644
+--- a/src/sbverify.c
++++ b/src/sbverify.c
+@@ -90,10 +90,14 @@ static void usage(void)
+ 	printf("Usage: %s [options] --cert <certfile> <efi-boot-image>\n"
+ 		"Verify a UEFI secure boot image.\n\n"
+ 		"Options:\n"
+-		"\t--cert <certfile>  certificate (x509 certificate)\n"
+-		"\t--list             list all signatures (but don't verify)\n"
+-		"\t--detached <file>  read signature from <file>, instead of\n"
+-		"\t                    looking for an embedded signature\n",
++		"\t-c, --cert <certfile>  certificate (x509 certificate)\n"
++		"\t-l, --list             list all signatures (but don't verify)\n"
++		"\t-d, --detached <file>  read signature from <file>, instead of\n"
++		"\t                       looking for an embedded signature\n"
++		"\t-v, --verbose          print verbose output; many be specified multiple\n"
++		"\t                       times for more verbosity, and abbrevieated like -vvv\n"
++		"\t-h, --help             display this help and exit\n"
++		"\t-V, --version          display version information and exit\n",
+ 			toolname);
+ }
+ 
+-- 
+2.39.4
+
+
+From 71cd84479bdc2af28a021d42c39e0557ca997d1f Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 15 Nov 2024 22:17:39 +0000
+Subject: [PATCH 3/5] add option to use a specific certificate to verify
+ signature, rather than the ones in the image
+
+---
+ src/sbverify.c | 52 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 41 insertions(+), 11 deletions(-)
+
+diff --git a/src/sbverify.c b/src/sbverify.c
+index 79c5fc5..36b86bd 100644
+--- a/src/sbverify.c
++++ b/src/sbverify.c
+@@ -77,6 +77,7 @@ enum verify_status {
+ 
+ static struct option options[] = {
+ 	{ "cert", required_argument, NULL, 'c' },
++	{ "signing-cert-to-check", required_argument, NULL, 's' },
+ 	{ "list", no_argument, NULL, 'l' },
+ 	{ "detached", required_argument, NULL, 'd' },
+ 	{ "verbose", no_argument, NULL, 'v' },
+@@ -90,14 +91,16 @@ static void usage(void)
+ 	printf("Usage: %s [options] --cert <certfile> <efi-boot-image>\n"
+ 		"Verify a UEFI secure boot image.\n\n"
+ 		"Options:\n"
+-		"\t-c, --cert <certfile>  certificate (x509 certificate)\n"
+-		"\t-l, --list             list all signatures (but don't verify)\n"
+-		"\t-d, --detached <file>  read signature from <file>, instead of\n"
+-		"\t                       looking for an embedded signature\n"
+-		"\t-v, --verbose          print verbose output; many be specified multiple\n"
+-		"\t                       times for more verbosity, and abbrevieated like -vvv\n"
+-		"\t-h, --help             display this help and exit\n"
+-		"\t-V, --version          display version information and exit\n",
++		"\t-c, --cert <certfile>                   certificate (x509 certificate) to use for cert chain validation\n"
++		"\t-s, --signing-cert-to-check <certfile>  certificate (x509 certificate) to check the signature against\n"
++		"\t                                        rather than the embedded certificates\n"
++		"\t-l, --list                              list all signatures (but don't verify)\n"
++		"\t-d, --detached <file>                   read signature from <file>, instead of\n"
++		"\t                                        looking for an embedded signature\n"
++		"\t-v, --verbose                           print verbose output; many be specified multiple\n"
++		"\t                                        times for more verbosity, and abbrevieated like -vvv\n"
++		"\t-h, --help                              display this help and exit\n"
++		"\t-V, --version                           display version information and exit\n",
+ 			toolname);
+ }
+ 
+@@ -204,6 +207,14 @@ static void print_certificate_store_certs(X509_STORE *certs)
+ 	}
+ }
+ 
++static void print_signature_check_cert(X509 *cert)
++{
++	printf("certificate for signature check:\n");
++	if (cert) {
++		print_cert(cert);
++	}
++}
++
+ static int load_detached_signature_data(struct image *image,
+ 		const char *filename, uint8_t **buf, size_t *len)
+ {
+@@ -272,6 +283,7 @@ int main(int argc, char **argv)
+ 	BIO *idcbio;
+ 	PKCS7 *p7;
+ 	int sig_count = 0;
++	X509 *cert_for_signature_check = NULL;
+ 
+ 	status = VERIFY_FAIL;
+ 	certs = X509_STORE_new();
+@@ -294,7 +306,7 @@ int main(int argc, char **argv)
+ 
+ 	for (;;) {
+ 		int idx;
+-		c = getopt_long(argc, argv, "c:d:lvVh", options, &idx);
++		c = getopt_long(argc, argv, "c:s:d:lvVh", options, &idx);
+ 		if (c == -1)
+ 			break;
+ 
+@@ -304,6 +316,11 @@ int main(int argc, char **argv)
+ 			if (rc)
+ 				return EXIT_FAILURE;
+ 			break;
++		case 's':
++			cert_for_signature_check = fileio_read_cert(optarg);
++			if (!cert_for_signature_check)
++				return EXIT_FAILURE;
++			break;
+ 		case 'd':
+ 			detached_sig_filename = optarg;
+ 			break;
+@@ -366,8 +383,10 @@ int main(int argc, char **argv)
+ 
+ 		if (verbose || list) {
+ 			print_signature_info(p7);
+-			if (verbose > 1)
++			if (verbose > 1) {
+ 				print_certificate_store_certs(certs);
++				print_signature_check_cert(cert_for_signature_check);
++			}
+ 		}
+ 
+ 		if (list)
+@@ -387,13 +406,24 @@ int main(int argc, char **argv)
+ 		}
+ 
+ 		flags = PKCS7_BINARY;
++		if (cert_for_signature_check) {
++			flags |= PKCS7_NOINTERN;
++		}
+ 
+ 		/* OpenSSL 1.0.2e no longer allows calling PKCS7_verify with
+ 		 * both data and content. Empty out the content. */
+ 		p7->d.sign->contents->d.ptr = NULL;
+ 
+ 		X509_STORE_set_verify_cb_func(certs, x509_verify_cb);
+-		rc = PKCS7_verify(p7, NULL, certs, idcbio, NULL, flags);
++		STACK_OF(X509) *cert_stack = NULL;
++		if (cert_for_signature_check) {
++			cert_stack = sk_X509_new_null();
++			sk_X509_push(cert_stack, cert_for_signature_check);
++		}
++		rc = PKCS7_verify(p7, cert_stack, certs, idcbio, NULL, flags);
++		if (cert_stack) {
++			sk_X509_free(cert_stack);
++		}
+ 		if (rc) {
+ 			if (verbose)
+ 				printf("PKCS7 verification passed\n");
+-- 
+2.39.4
+
+
+From 49c430d1b658401c8c6ee466119fab50c0d2a65c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 15 Nov 2024 22:59:58 +0000
+Subject: [PATCH 4/5] add command to save pkcs7 from image
+
+---
+ src/sbverify.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/src/sbverify.c b/src/sbverify.c
+index 36b86bd..b4e5c0a 100644
+--- a/src/sbverify.c
++++ b/src/sbverify.c
+@@ -80,6 +80,7 @@ static struct option options[] = {
+ 	{ "signing-cert-to-check", required_argument, NULL, 's' },
+ 	{ "list", no_argument, NULL, 'l' },
+ 	{ "detached", required_argument, NULL, 'd' },
++	{ "write-pkcs7-to", required_argument, NULL, 'w' },
+ 	{ "verbose", no_argument, NULL, 'v' },
+ 	{ "help", no_argument, NULL, 'h' },
+ 	{ "version", no_argument, NULL, 'V' },
+@@ -97,6 +98,7 @@ static void usage(void)
+ 		"\t-l, --list                              list all signatures (but don't verify)\n"
+ 		"\t-d, --detached <file>                   read signature from <file>, instead of\n"
+ 		"\t                                        looking for an embedded signature\n"
++		"\t-w, --write-pkcs7-to <file>             write PKCS7 data to <file> in addition to anything else\n"
+ 		"\t-v, --verbose                           print verbose output; many be specified multiple\n"
+ 		"\t                                        times for more verbosity, and abbrevieated like -vvv\n"
+ 		"\t-h, --help                              display this help and exit\n"
+@@ -284,6 +286,7 @@ int main(int argc, char **argv)
+ 	PKCS7 *p7;
+ 	int sig_count = 0;
+ 	X509 *cert_for_signature_check = NULL;
++	char const *pkc7s_output_file = NULL;
+ 
+ 	status = VERIFY_FAIL;
+ 	certs = X509_STORE_new();
+@@ -306,7 +309,7 @@ int main(int argc, char **argv)
+ 
+ 	for (;;) {
+ 		int idx;
+-		c = getopt_long(argc, argv, "c:s:d:lvVh", options, &idx);
++		c = getopt_long(argc, argv, "c:s:d:w:lvVh", options, &idx);
+ 		if (c == -1)
+ 			break;
+ 
+@@ -324,6 +327,9 @@ int main(int argc, char **argv)
+ 		case 'd':
+ 			detached_sig_filename = optarg;
+ 			break;
++		case 'w':
++			pkc7s_output_file = optarg;
++			break;
+ 		case 'l':
+ 			list = 1;
+ 			break;
+@@ -389,6 +395,25 @@ int main(int argc, char **argv)
+ 			}
+ 		}
+ 
++
++		// Write PKCS7 data to file
++		if (pkc7s_output_file)
++		{
++			BIO *pkc7s_bio = BIO_new_file(pkc7s_output_file, "w");
++			if (!pkc7s_bio)
++			{
++				fprintf(stderr, "Unable to open file %s for writing\n", pkc7s_output_file);
++				break;
++			}
++			if (i2d_PKCS7_bio(pkc7s_bio, p7) != 1)
++			{
++				fprintf(stderr, "Unable to write PKCS7 data to file %s\n", pkc7s_output_file);
++				BIO_free(pkc7s_bio);
++				break;
++			}
++			BIO_free(pkc7s_bio);
++		}
++
+ 		if (list)
+ 			continue;
+ 
+-- 
+2.39.4
+
+
+From 7cdd3ae5e9dc7806e6375c3aa30bf2999411d536 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Mon, 18 Nov 2024 16:48:00 +0000
+Subject: [PATCH 5/5] add option to not use the certs in the image file for
+ cert chain validation
+
+---
+ src/sbverify.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/src/sbverify.c b/src/sbverify.c
+index b4e5c0a..ca09f5f 100644
+--- a/src/sbverify.c
++++ b/src/sbverify.c
+@@ -77,6 +77,7 @@ enum verify_status {
+ 
+ static struct option options[] = {
+ 	{ "cert", required_argument, NULL, 'c' },
++	{ "no-internal-cert-chain", no_argument, NULL, 'n' },
+ 	{ "signing-cert-to-check", required_argument, NULL, 's' },
+ 	{ "list", no_argument, NULL, 'l' },
+ 	{ "detached", required_argument, NULL, 'd' },
+@@ -93,6 +94,7 @@ static void usage(void)
+ 		"Verify a UEFI secure boot image.\n\n"
+ 		"Options:\n"
+ 		"\t-c, --cert <certfile>                   certificate (x509 certificate) to use for cert chain validation\n"
++		"\t-n, --no-internal-cert-chain            do not use the internal certificate chain; use only the --cert parameter\n"
+ 		"\t-s, --signing-cert-to-check <certfile>  certificate (x509 certificate) to check the signature against\n"
+ 		"\t                                        rather than the embedded certificates\n"
+ 		"\t-l, --list                              list all signatures (but don't verify)\n"
+@@ -162,12 +164,16 @@ static void print_cert(X509 const * const cert)
+ 	print_cert_info(subject_name, issuer_name, serial);
+ }
+ 
+-static void print_signature_info(PKCS7 *p7)
++static void print_signature_info(PKCS7 *p7, bool no_internal_cert_chain)
+ {
+ 	char issuer_name[cert_name_len + 1];
+ 	PKCS7_SIGNER_INFO *si;
+ 	X509 *cert;
+ 	int i;
++	char const * internal_cert_chain_message = "used for cert chain validation";
++	if (no_internal_cert_chain) {
++		internal_cert_chain_message = "not used for cert chain validation";
++	}
+ 
+ 	printf("image signature issuers:\n");
+ 
+@@ -179,7 +185,7 @@ static void print_signature_info(PKCS7 *p7)
+ 		print_cert_info("<signature issuer subject unknown>", issuer_name, si->issuer_and_serial->serial);
+ 		}
+ 
+-	printf("image signature certificates:\n");
++	printf("image signature certificates (%s):\n", internal_cert_chain_message);
+ 
+ 	for (i = 0; i < sk_X509_num(p7->d.sign->cert); i++) {
+ 		cert = sk_X509_value(p7->d.sign->cert, i);
+@@ -287,6 +293,7 @@ int main(int argc, char **argv)
+ 	int sig_count = 0;
+ 	X509 *cert_for_signature_check = NULL;
+ 	char const *pkc7s_output_file = NULL;
++	bool no_internal_cert_chain = false;
+ 
+ 	status = VERIFY_FAIL;
+ 	certs = X509_STORE_new();
+@@ -309,7 +316,7 @@ int main(int argc, char **argv)
+ 
+ 	for (;;) {
+ 		int idx;
+-		c = getopt_long(argc, argv, "c:s:d:w:lvVh", options, &idx);
++		c = getopt_long(argc, argv, "c:s:d:w:nlvVh", options, &idx);
+ 		if (c == -1)
+ 			break;
+ 
+@@ -319,6 +326,9 @@ int main(int argc, char **argv)
+ 			if (rc)
+ 				return EXIT_FAILURE;
+ 			break;
++		case 'n':
++			no_internal_cert_chain = true;
++			break;
+ 		case 's':
+ 			cert_for_signature_check = fileio_read_cert(optarg);
+ 			if (!cert_for_signature_check)
+@@ -388,7 +398,7 @@ int main(int argc, char **argv)
+ 		}
+ 
+ 		if (verbose || list) {
+-			print_signature_info(p7);
++			print_signature_info(p7, no_internal_cert_chain);
+ 			if (verbose > 1) {
+ 				print_certificate_store_certs(certs);
+ 				print_signature_check_cert(cert_for_signature_check);
+@@ -434,6 +444,9 @@ int main(int argc, char **argv)
+ 		if (cert_for_signature_check) {
+ 			flags |= PKCS7_NOINTERN;
+ 		}
++		if (no_internal_cert_chain) {
++			flags |= PKCS7_NOCHAIN;
++		}
+ 
+ 		/* OpenSSL 1.0.2e no longer allows calling PKCS7_verify with
+ 		 * both data and content. Empty out the content. */
+-- 
+2.39.4
+

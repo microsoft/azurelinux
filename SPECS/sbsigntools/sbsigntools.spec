@@ -22,6 +22,9 @@ Patch0:        %{name}-no-git.patch
 # maybe we will if the naming gets changed back in the future...
 #Patch1:        %%{name}-gnuefi.patch
 
+# Add some features for debugging cert signing issues.
+Patch2:         azl-updates.patch
+
 # same as gnu-efi
 ExclusiveArch: x86_64 aarch64 %{arm} %{ix86}
 BuildRequires: make
@@ -92,6 +95,7 @@ make check
 * Mon Nov 04 2024 Chris Co <chrco@microsoft.com> - 0.9.5-4
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified
+- Added azl-updates.patch
 
 * Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
