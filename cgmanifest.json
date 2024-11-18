@@ -12451,8 +12451,8 @@
         "type": "other",
         "other": {
           "name": "logwatch",
-          "version": "7.5.3",
-          "downloadUrl": "https://sourceforge.net/projects/logwatch/files/logwatch-7.5.3/logwatch-7.5.3.tar.gz"
+          "version": "7.11",
+          "downloadUrl": "https://sourceforge.net/projects/logwatch/files/logwatch-7.11/logwatch-7.11.tar.gz"
         }
       }
     },
