@@ -1,22 +1,30 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: LGPL-2.0-or-later
 %global source_name libwnck
 
 Summary: Window Navigator Construction Kit
 Name: libwnck3
-Version: 3.36.0
-Release: 3%{?dist}
+Version: 43.1
+Release: 1%{?dist}
 URL: http://download.gnome.org/sources/%{source_name}/
-Source0: http://download.gnome.org/sources/%{source_name}/3.36/%{source_name}-%{version}.tar.xz
-License: GPLv2
+Source0: http://download.gnome.org/sources/%{source_name}/43/%{source_name}-%{version}.tar.xz
+License: LGPL-2.0-or-later
 
-BuildRequires: %{_bindir}/xsltproc
+# https://gitlab.gnome.org/GNOME/libwnck/-/merge_requests/10
+Patch1:        libwnck_0001-Expose-window-scaling-factor_v43.1.patch
+Patch2:        libwnck_0002-icons-Use-cairo-surfaces-to-render-icons_v43.1.patch
+Patch3:        libwnck_0003-xutils-Change-icons-to-being-cairo-surfaces_v43.1.patch
+Patch4:        libwnck_0004-icons-Mark-GdkPixbuf-icons-as-deprecated_v43.1.patch
+Patch5:        libwnck_0005-tasklist-Add-surface-loader-function_v43.1.patch
+
 BuildRequires: gcc
 BuildRequires: meson
 BuildRequires: gettext
 BuildRequires: glib2-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk3-devel
+BuildRequires: gtk-doc
 BuildRequires: libXres-devel
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -38,11 +46,11 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n %{source_name}-%{version}
+%autosetup -n %{source_name}-%{version} -p1
 
 
 %build
-%meson -Dgtk_doc=false
+%meson -Dgtk_doc=true
 %meson_build
 
 
@@ -58,7 +66,7 @@ developing applications that use %{name}.
 %files -f %{source_name}-3.0.lang
 %license COPYING
 %doc AUTHORS README NEWS
-%{_libdir}/%{source_name}-3.so.*
+%{_libdir}/%{source_name}-3.so.0*
 %{_bindir}/wnck-urgency-monitor
 %{_libdir}/girepository-1.0/Wnck-3.0.typelib
 
@@ -68,9 +76,14 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/*
 %{_includedir}/%{source_name}-3.0/
 %{_datadir}/gir-1.0/Wnck-3.0.gir
+%doc %{_datadir}/gtk-doc
 
 
 %changelog
+* Mon Nov 18 2024 Sreenivasulu Malavathula <vsmalavathu@microsoft.com> - 43.1-1
+- Update Azure-Linux import from Fedora 41 (license: LGPL-2.0-r-later).
+- License verified.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
