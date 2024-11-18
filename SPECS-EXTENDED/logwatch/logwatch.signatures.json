@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "dnf-rpm.conf": "253b40711440183eed1927873b74386b86cdc498d736176304b3acaef0eccd0c",
-  "logwatch-7.5.3.tar.gz": "1b2b96879dec01cd02754fe00f8989b11ff16158c3dc7c4aff0faa4b1d34974b"
+  "logwatch-7.11.tar.gz": "5eb42d983a9667003368b572149fce788c0d7e13daaf1f28ad1bf3a140b865cf"
  }
 }
