@@ -11541,8 +11541,8 @@
         "type": "other",
         "other": {
           "name": "libwnck3",
-          "version": "3.36.0",
-          "downloadUrl": "http://download.gnome.org/sources/libwnck/3.36/libwnck-3.36.0.tar.xz"
+          "version": "43.1",
+          "downloadUrl": "https://download.gnome.org/sources/libwnck/43/libwnck-43.1.tar.xz"
         }
       }
     },
