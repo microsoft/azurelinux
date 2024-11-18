@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,7 @@ Patch19:        Avoid_possible_double-free_in_ProcRenderAddGlyphs.patch
 Patch20:        CVE-2024-0229.patch
 Patch21:        CVE-2024-0409.patch
 Patch22:        CVE-2024-21886.patch
+Patch23:        CVE-2024-9632.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -399,6 +400,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Thu Nov 14 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.20.10-13
+- Fix for CVE-2024-9632
+
 * Tue Sep 17 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.20.10-12
 - Add patch to resolve CVE-2024-0229, CVE-2024-0409 & CVE-2024-21886.
 
