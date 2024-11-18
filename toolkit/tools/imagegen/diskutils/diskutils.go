@@ -879,8 +879,7 @@ func getMkfsOptions(fsType string) ([]string, error) {
 			return nil, err
 		}
 
-		// Feature  xfsprogs   kernel
-		// nrext64  v5.19      v5.19
+		// 'nrext64' was both added and enabled by default in xfsprogs v5.19.
 		if mkfsXfsVersion.Compare(versioncompare.New("5.19")) >= 0 {
 			// Disable feature that is not supported on older kernel.
 			options := []string{"-i", "nrext64=0"}
