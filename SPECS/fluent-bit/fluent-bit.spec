@@ -18,13 +18,13 @@ BuildRequires:  gnutls-devel
 BuildRequires:  graphviz
 BuildRequires:  libpq-devel
 BuildRequires:  libyaml-devel
+BuildRequires:  luajit-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
-BuildRequires:  luajit-devel
 
 %description
 
