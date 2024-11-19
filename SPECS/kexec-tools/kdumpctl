@@ -87,6 +87,23 @@ save_core()
 	fi
 }
 
+save_compressed_core()
+{
+	coredir="/var/crash/`date +"%Y-%m-%d-%H:%M"`"
+	mkdir -p $coredir
+	CORE_COLLECTOR=`grep ^core_collector $KDUMP_CONFIG_FILE | cut -d\  -f2`
+
+	if [[ -n $CORE_COLLECTOR ]]; then
+		# Utilize the core_collector option set in kdump.conf to produce a compressed crash dump.
+		CORE_COLLECTOR=`type -P $CORE_COLLECTOR`
+		$CORE_COLLECTOR /proc/vmcore $coredir/vmcore
+	else
+		# Resort to extracting the dmesg log from vmcore instead of compressing and filtering the vmcore.
+		# This should produce the minimum-sized output that can reliably fit in memory.
+		makedumpfile --dump-dmesg $coredir/vmcore $coredir/dmesg >/dev/null 2>&1
+	fi
+}
+
 rebuild_fadump_initrd()
 {
 	local target_initrd_tmp
@@ -243,7 +260,7 @@ check_config()
 		case "$config_opt" in
 		\#* | "")
 			;;
-		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes)
+		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes|save_core_to_ram)
 			# remove inline comments after the end of a directive.
 			[ -z "$config_val" ] && {
 				echo "Invalid kdump config value for option $config_opt."
@@ -1248,6 +1265,23 @@ main ()
 	case "$1" in
 	  start)
 		if [ -s /proc/vmcore ]; then
+			local _save_core_to_ram save_core_to_ram="0"
+			_save_core_to_ram=`grep ^save_core_to_ram $KDUMP_CONFIG_FILE 2>/dev/null`
+
+			if [ $? -eq 0 ]; then
+				save_core_to_ram=`echo $_save_core_to_ram | cut -d' '  -f2`
+
+				if [ "$save_core_to_ram" != "0" ] && [ "$save_core_to_ram" != "1" ]; then
+					echo "Error: save_core_to_ram value is invalid"
+					return 1
+				fi
+			fi
+
+			if [ "$save_core_to_ram" == "1" ]; then
+				save_compressed_core
+				exit 0
+			fi
+
 			save_core
 			reboot
 		else
