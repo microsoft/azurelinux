@@ -102,7 +102,7 @@ fi
 
 %changelog
 
-* Thu Oct 10 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.0.34-1
+* Tue Nov 18 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.0.34-1
 - Update to version 2.0.34
 - License verified
 
