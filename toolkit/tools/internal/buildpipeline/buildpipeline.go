@@ -115,13 +115,20 @@ func IsRegularBuild() bool {
 	// - If the user has set the CHROOT_DIR environment variable, then it is likely a Docker build.
 	isRegularBuild := true
 	isDockerContainer, err := checkIfContainerSystemdDetectVirt()
-	if err != nil {
-		isContainerBuild, err := checkIfContainerDockerEnvFile()
+	if err == nil {
+		isRegularBuild = !isDockerContainer
+		if !isRegularBuild {
+			logger.Log.Info("systemd-detect-virt reports that the tool is running in a container, running as a container build")
+		}
+	} else {
+		// Fallback if systemd-detect-virt isn't available.
+		isDockerContainer, err = checkIfContainerDockerEnvFile()
 		if err != nil {
 			// Log the error, but continue with the check.
 			logger.Log.Warnf("Failed to check if /.dockerenv exists: %s", err)
+		} else {
+			isRegularBuild = !isDockerContainer
 		}
-		isRegularBuild = !isContainerBuild
 		message := []string{
 			"Failed to detect if the system is running in a container using systemd-detect-virt.",
 			err.Error(),
@@ -133,11 +140,6 @@ func IsRegularBuild() bool {
 			message = append(message, "Result: Container detected.")
 		}
 		logger.PrintMessageBox(logrus.WarnLevel, message)
-	} else {
-		isRegularBuild = !isDockerContainer
-		if !isRegularBuild {
-			logger.Log.Info("systemd-detect-virt reports that the tool is running in a container, running as a container build")
-		}
 	}
 
 	// If the user set the CHROOT_DIR environment variable, but we don't detect a container, print a warning. This is
