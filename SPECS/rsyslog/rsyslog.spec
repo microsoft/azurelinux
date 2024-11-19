@@ -67,7 +67,7 @@ HTML documentation for %{name}
 %prep
 # Unpack the code source tarball
 %setup -q
-patch -p1 < %{PATCH0}
+%patch 0 -p1
 # Unpack the documentation tarball in the folder created above
 %setup -q -a 4 -T -D
 # Remove documentation sources
