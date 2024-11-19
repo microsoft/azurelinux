@@ -122,8 +122,13 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+<<<<<<< HEAD
 * Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 2.78.1-5
 - Patch CVE-2024-52533
+=======
+* Mon Nov 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.78.1-5
+- Dummy bump.
+>>>>>>> source/fasttrack/pawelwi/test_changes
 
 * Fri Apr 19 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-4
 - Update dependency on pcre2
