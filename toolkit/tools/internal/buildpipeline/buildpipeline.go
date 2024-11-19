@@ -122,6 +122,7 @@ func IsRegularBuild() bool {
 		}
 	} else {
 		// Fallback if systemd-detect-virt isn't available.
+		systemdErrMsg := err.Error()
 		isDockerContainer, err = checkIfContainerDockerEnvFile()
 		if err != nil {
 			// Log the error, but continue with the check.
@@ -131,7 +132,7 @@ func IsRegularBuild() bool {
 		}
 		message := []string{
 			"Failed to detect if the system is running in a container using systemd-detect-virt.",
-			err.Error(),
+			systemdErrMsg ,
 			"Checking if the system is running in a container by checking /.dockerenv.",
 		}
 		if isRegularBuild {
