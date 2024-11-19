@@ -12,7 +12,7 @@ Name: acpid
 Version: 2.0.34
 Release: 1%{?dist}
 License: GPLv2+
-Source: http://downloads.sourceforge.net/acpid2/%{name}-%{version}.tar.xz
+Source: https://downloads.sourceforge.net/acpid2/%{name}-%{version}.tar.xz
 Source2: acpid.video.conf
 Source3: acpid.power.conf
 Source4: acpid.power.sh
