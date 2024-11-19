@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:		CVE-2022-48303.patch
+Patch1:		CVE-2023-39804.patch
 
 %description
 Contains GNU archiving program
@@ -46,6 +47,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Tue Nov 19 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.34-3
 - Fix CVE-2022-48303 by patching
+- Fix CVE-2023-39804
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.34-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
