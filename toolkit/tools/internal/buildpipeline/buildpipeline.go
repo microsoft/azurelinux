@@ -132,7 +132,7 @@ func IsRegularBuild() bool {
 		}
 		message := []string{
 			"Failed to detect if the system is running in a container using systemd-detect-virt.",
-			systemdErrMsg ,
+			systemdErrMsg,
 			"Checking if the system is running in a container by checking /.dockerenv.",
 		}
 		if isRegularBuild {
