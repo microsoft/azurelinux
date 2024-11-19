@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -140,7 +139,10 @@ func IsRegularBuild() bool {
 		} else {
 			message = append(message, "Result: Container detected.")
 		}
-		logger.PrintMessageBox(logrus.WarnLevel, message)
+		// logger.PrintMessageBox is not available in 2.0, so print each line separately.
+		for _, line := range message {
+			logger.Log.Warn(line)
+		}
 	}
 
 	// If the user set the CHROOT_DIR environment variable, but we don't detect a container, print a warning. This is
@@ -152,7 +154,10 @@ func IsRegularBuild() bool {
 			"This is likely a misconfiguration!",
 			"**Forcing the build to run as a container build**, however chroot operations may fail.",
 		}
-		logger.PrintMessageBox(logrus.WarnLevel, message)
+		// logger.PrintMessageBox is not available in 2.0, so print each line separately.
+		for _, line := range message {
+			logger.Log.Warn(line)
+		}
 		isRegularBuild = false
 	}
 
