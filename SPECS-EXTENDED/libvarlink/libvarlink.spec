@@ -1,14 +1,15 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+# SPDX-License-Identifier: Apache-2.0 AND BSD-3-Clause
 %global _hardened_build 1
 
 Name:           libvarlink
-Version:        18
-Release:        4%{?dist}
+Version:        23
+Release:        1%{?dist}
 Summary:        Varlink C Library
-License:        ASL 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        Apache-2.0 AND BSD-3-Clause
 URL:            https://github.com/varlink/%{name}
-Source0:        https://github.com/varlink/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  meson
 BuildRequires:  gcc
 
@@ -30,7 +31,7 @@ Summary:        Varlink command line tools
 The %{name}-util package contains varlink command line tools.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 %meson
@@ -38,12 +39,17 @@ The %{name}-util package contains varlink command line tools.
 
 %check
 export LC_CTYPE=C.utf8
+# https://github.com/varlink/libvarlink/issues/63
+%ifarch ppc64le
+test_list=$(%meson_test --list) 2> /dev/null
+test_list=${test_list//test-symbols}
+%meson_test $test_list
+%else
 %meson_test
+%endif
 
 %install
 %meson_install
-
-%ldconfig_scriptlets
 
 %files
 %license LICENSE
@@ -60,6 +66,10 @@ export LC_CTYPE=C.utf8
 %{_libdir}/pkgconfig/libvarlink.pc
 
 %changelog
+* Tue Nov 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 23-1
+- Udpdate Azure-Linux import from Fedora 41 (license: Apache-2.0 AND BSD-3-Clause).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 18-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
