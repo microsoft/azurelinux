@@ -10,12 +10,13 @@ set -o pipefail
 # $3 path to find RPMs. May be in PATH/<arch>/*.rpm
 # $4 path to log directory
 
-[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir>"; exit; }
+[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./containercheck> <./log_dir>"; exit; }
 
 chroot_base=$1
 packages=$2
 rpm_path=$3
-log_path=$4
+container_check_tool=$4
+log_path=$5
 
 chroot_name="worker_chroot"
 chroot_builder_folder=$chroot_base/$chroot_name
@@ -121,8 +122,8 @@ HOME=$ORIGINAL_HOME
 
 # In case of Docker based build do not add the below folders into chroot tarball
 # otherwise safechroot will fail to "untar" the tarball
-DOCKERCONTAINERONLY=/.dockerenv
-if [[ -f "$DOCKERCONTAINERONLY" ]]; then
+if $container_check_tool; then
+    echo "Removing /dev, /proc, /run, /sys from chroot tarball for container based build." | tee -a "$chroot_log"
     rm -rf "${chroot_base:?}/$chroot_name"/dev
     rm -rf "${chroot_base:?}/$chroot_name"/proc
     rm -rf "${chroot_base:?}/$chroot_name"/run
