@@ -297,7 +297,7 @@ steps:
           - bash: |
               published_logs_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsLogsSubfolder }}"
               mkdir -p "$published_logs_dir"
-              tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+              tar -C "${{ parameters.buildRepoRoot }}/build/logs" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
               tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
               tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
             condition: always()
