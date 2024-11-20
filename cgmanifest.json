@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "go-rpm-macros",
-          "version": "3.0.9",
-          "downloadUrl": "https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz"
+          "version": "3.6.0",
+          "downloadUrl": "https://pagure.io/go-rpm-macros/archive/3.6.0/go-rpm-macros-3.6.0.tar.gz"
         }
       }
     },
