@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.93
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,7 +18,9 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
-Patch1:         remove_openssl_macro.patch
+Patch0:         remove_openssl_macro.patch
+Patch1:		CVE-2023-7256.patch
+Patch2:		CVE-2024-8006.patch
 
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
@@ -59,6 +61,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Mon Nov 18 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 7.93-3
+- Fix CVE-2023-7256 and CVE-2024-8006 
+
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 7.93-2
 - Release bump with no changes to force a rebuild and consume new libssh2 build
 
