@@ -66,7 +66,7 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of libsoup.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson \
