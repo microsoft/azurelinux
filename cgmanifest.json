@@ -1767,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.6",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
+          "version": "1.0.7",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.7.tar.gz"
         }
       }
     },
@@ -21474,8 +21474,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.13",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.13/postgresql-14.13.tar.bz2"
+          "version": "14.14",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.14/postgresql-14.14.tar.bz2"
         }
       }
     },
