@@ -16,24 +16,26 @@ import (
 
 func TestLoadOrDisableModules(t *testing.T) {
 	rootDir := filepath.Join(tmpDir, "TestLoadOrDisableModules")
-	modules := []imagecustomizerapi.Module{
-		{
-			Name:     "module1",
-			LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
-			Options:  map[string]string{"option1": "value1"},
-		},
-		{
-			Name:     "module2",
-			LoadMode: imagecustomizerapi.ModuleLoadModeDisable,
-		},
-		{
-			Name:     "module3",
-			LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
-			Options:  map[string]string{"option3_1": "value3_1", "option3_2": "value3_2"},
+	modules := imagecustomizerapi.ModuleList{
+		Modules: []imagecustomizerapi.Module{
+			{
+				Name:     "module1",
+				LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
+				Options:  map[string]string{"option1": "value1"},
+			},
+			{
+				Name:     "module2",
+				LoadMode: imagecustomizerapi.ModuleLoadModeDisable,
+			},
+			{
+				Name:     "module3",
+				LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
+				Options:  map[string]string{"option3_1": "value3_1", "option3_2": "value3_2"},
+			},
 		},
 	}
 
-	err := loadOrDisableModules(modules, rootDir)
+	err := LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
@@ -61,29 +63,33 @@ func TestLoadOrDisableModules(t *testing.T) {
 	assert.Contains(t, string(moduleOptionsContent), "option3_2=value3_2")
 
 	// Test add options for module2 which was disabled
-	modules = []imagecustomizerapi.Module{
-		{
-			Name:    "module2",
-			Options: map[string]string{"option2": "value2"},
+	modules = imagecustomizerapi.ModuleList{
+		Modules: []imagecustomizerapi.Module{
+			{
+				Name:    "module2",
+				Options: map[string]string{"option2": "value2"},
+			},
 		},
 	}
 
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.Contains(t, err.Error(), "cannot add options for disabled module (module2)")
 
 	// Test updating module2's loadmode and module3's option
-	modules = []imagecustomizerapi.Module{
-		{
-			Name:     "module2",
-			LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
-			Options:  map[string]string{"option2": "value2"},
-		},
-		{
-			Name:    "module3",
-			Options: map[string]string{"option3_1": "new_value3_1", "option3_3": "new_value3_3"},
+	modules = imagecustomizerapi.ModuleList{
+		Modules: []imagecustomizerapi.Module{
+			{
+				Name:     "module2",
+				LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
+				Options:  map[string]string{"option2": "value2"},
+			},
+			{
+				Name:    "module3",
+				Options: map[string]string{"option3_1": "new_value3_1", "option3_3": "new_value3_3"},
+			},
 		},
 	}
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleDisableContent, _ = os.ReadFile(moduleDisableFilePath)
@@ -96,15 +102,17 @@ func TestLoadOrDisableModules(t *testing.T) {
 	assert.Contains(t, string(moduleOptionsContent), "option3_3=new_value3_3")
 
 	// Test case where a module was already set to load at boot
-	modules = []imagecustomizerapi.Module{
-		{
-			Name:     "module1",
-			LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
-			Options:  map[string]string{"option1": "value1"},
+	modules = imagecustomizerapi.ModuleList{
+		Modules: []imagecustomizerapi.Module{
+			{
+				Name:     "module1",
+				LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
+				Options:  map[string]string{"option1": "value1"},
+			},
 		},
 	}
 
-	err = loadOrDisableModules(modules, rootDir)
+	err = LoadOrDisableModules(modules, rootDir)
 	assert.NoError(t, err)
 
 	moduleLoadContent, _ = os.ReadFile(moduleLoadFilePath)

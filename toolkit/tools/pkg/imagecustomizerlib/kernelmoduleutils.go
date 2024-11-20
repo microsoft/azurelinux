@@ -27,7 +27,7 @@ const (
 	moduleOptionsPath  = modprobeConfigDir + "/" + moduleOptionsFileName
 )
 
-func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) error {
+func LoadOrDisableModules(modules imagecustomizerapi.ModuleList, rootDir string) error {
 	var err error
 	var modulesToLoad []string
 	var modulesToDisable []string
@@ -36,7 +36,7 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) e
 	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
 	moduleOptionsFilePath := filepath.Join(rootDir, moduleOptionsPath)
 
-	for i, module := range modules {
+	for i, module := range modules.Modules {
 		switch module.LoadMode {
 		case imagecustomizerapi.ModuleLoadModeAlways:
 			// If a module is disabled, remove it. Add the module to modules-load.d/. Write options if provided.

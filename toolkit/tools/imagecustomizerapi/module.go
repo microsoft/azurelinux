@@ -14,6 +14,27 @@ type Module struct {
 	Options  map[string]string `yaml:"options"`
 }
 
+type ModuleList struct {
+	Modules []Module `yaml:"modules"`
+}
+
+func (m *ModuleList) IsValid() error {
+	moduleMap := make(map[string]int)
+	for i, module := range m.Modules {
+		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
+		if _, exists := moduleMap[module.Name]; exists {
+			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
+		}
+		moduleMap[module.Name] = i
+		err := module.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
+		}
+	}
+
+	return nil
+}
+
 func (m *Module) IsValid() error {
 	if err := validateModuleName(m.Name); err != nil {
 		return err

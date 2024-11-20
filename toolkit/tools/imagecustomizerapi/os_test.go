@@ -133,9 +133,11 @@ func TestOSIsValidInvalidServices(t *testing.T) {
 
 func TestOSIsValidInvalidModule(t *testing.T) {
 	os := OS{
-		Modules: []Module{
-			{
-				Name: "",
+		Modules: ModuleList{
+			Modules: []Module{
+				{
+					Name: "",
+				},
 			},
 		},
 	}
@@ -147,12 +149,14 @@ func TestOSIsValidInvalidModule(t *testing.T) {
 
 func TestOSIsValidModuleDuplicateName(t *testing.T) {
 	os := OS{
-		Modules: []Module{
-			{
-				Name: "nbd",
-			},
-			{
-				Name: "nbd",
+		Modules: ModuleList{
+			Modules: []Module{
+				{
+					Name: "nbd",
+				},
+				{
+					Name: "nbd",
+				},
 			},
 		},
 	}

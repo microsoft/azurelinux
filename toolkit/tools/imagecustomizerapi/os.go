@@ -21,7 +21,7 @@ type OS struct {
 	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
 	Users               []User              `yaml:"users"`
 	Services            Services            `yaml:"services"`
-	Modules             []Module            `yaml:"modules"`
+	Modules             ModuleList          `yaml:"modules"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
 }
 
@@ -69,17 +69,8 @@ func (s *OS) IsValid() error {
 		return err
 	}
 
-	moduleMap := make(map[string]int)
-	for i, module := range s.Modules {
-		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
-		if _, exists := moduleMap[module.Name]; exists {
-			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
-		}
-		moduleMap[module.Name] = i
-		err = module.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
-		}
+	if err := s.Modules.IsValid(); err != nil {
+		return err
 	}
 
 	if s.Overlays != nil {
