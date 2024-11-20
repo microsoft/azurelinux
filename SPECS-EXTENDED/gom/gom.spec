@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           gom
-Version:        0.4
-Release:        3%{?dist}
+Version:        0.5.3
+Release:        1%{?dist}
 Summary:        GObject to SQLite object mapper library
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/Gom
-Source0:        https://download.gnome.org/sources/gom/0.4/gom-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gom/0.5/gom-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gobject-introspection-devel
@@ -59,6 +59,9 @@ developing applications that use %{name}.
 %{_datadir}/gir-1.0/Gom-1.0.gir
 
 %changelog
+* Wed Nov 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.5.3-1
+- Update to 0.5.3 
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
