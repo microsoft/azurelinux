@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,10 @@ Patch14:        CVE-2023-27538.patch
 Patch15:        CVE-2023-27535.patch
 Patch16:        CVE-2023-23916.patch
 Patch17:        CVE-2023-46218.patch
+Patch18:        CVE-2024-2398.patch
+Patch19:        CVE-2024-28182.patch
+Patch20:        CVE-2024-7264-1.patch
+Patch21:        CVE-2024-7264-2.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -94,6 +98,10 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu Nov 21 2024 Vince Perri <viperri@microsoft.com> - 3.21.4-14
+- Patch CVE-2024-2398 and CVE-2024-7264 (bundled curl)
+- Patch CVE-2024-28182 (bundled nghttp2)
+
 * Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 3.21.4-13
 - Patch CVE-2022-43552, CVE-2023-27536, CVE-2023-27535, CVE-2023-27538, CVE-2023-23916 and CVE-2023-46218.
 
