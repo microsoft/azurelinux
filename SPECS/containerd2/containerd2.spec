@@ -19,16 +19,12 @@ Source2: containerd.toml
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang < 1.23
+BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
 Requires: runc >= 1.2.1
-
-# This package replaces the old name of moby-containerd
-Provides: moby-containerd = %{version}-%{release}
-Obsoletes: moby-containerd < %{version}-%{release}
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -85,7 +81,8 @@ fi
 
 %changelog
 * Mon Nov 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
-- Initial containerd 2.0.0 version
+- Created a standalone package for containerd 2.0.0
+- Upgraded runc to 1.2.1 and libseccomp to 2.5.5 required by containerd 2.0.0
 
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.13-4
 - Pin golang version to <= 1.22
