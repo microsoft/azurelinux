@@ -1,3 +1,5 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 #
 # spec file for package libvdpau
 #
@@ -20,77 +22,61 @@
   %define _distconfdir %{_prefix}%{_sysconfdir}
 %endif
 Name:           libvdpau
-Version:        1.4
-Release:        33%{?dist}
+Version:        1.5
+Release:        1%{?dist}
 Summary:        VDPAU wrapper and trace libraries
 License:        MIT
 Group:          Development/Libraries/C and C++
 URL:            https://www.freedesktop.org/wiki/Software/VDPAU/
-Source:         https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/%{version}/%{name}-%{version}.tar.bz2
-Source1:        https://gitlab.freedesktop.org/vdpau/vdpauinfo/-/archive/vdpauinfo-1.3/vdpauinfo-1.3.tar.bz2
-Source2:        README
-Source99:       baselibs.conf
-Source100:      %{name}-rpmlintrc
-Patch0:         n_UsrEtc.patch
-# PATCH-FIX-UPSTREAM
-Patch1:         https://gitlab.freedesktop.org/vdpau/libvdpau/-/commit/c5a8e7c6c8b4b36a0e4c9a4369404519262a3256.patch
-# PATCH-FIX-UPSTREAM
-Patch2:         https://gitlab.freedesktop.org/vdpau/libvdpau/-/commit/e82dc4bdbb0db3ffa8c78275902738eb63aa5ca8.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
+Source0:        https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/%{version}/libvdpau-%{version}.tar.bz2
+
 BuildRequires:  doxygen
-BuildRequires:  fdupes
 BuildRequires:  gcc-c++
+BuildRequires:  graphviz
+BuildRequires:  libtool
+BuildRequires:  libX11-devel
+BuildRequires:  libXext-devel
 BuildRequires:  meson
-BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(dri2proto)
-BuildRequires:  pkgconfig(x11)
-BuildRequires:  pkgconfig(xext)
+BuildRequires:  xorg-x11-proto-devel
 
 %description
-This package contains the libvdpau wrapper library and the libvdpau_trace
-debugging library, along with the header files needed to build VDPAU
-applications.  To actually use a VDPAU device, you need a vendor-specific
-implementation library.  Currently, this is always libvdpau_nvidia.  You can
-override the driver name by setting the VDPAU_DRIVER environment variable.
+VDPAU is the Video Decode and Presentation API for UNIX. It provides an
+interface to video decode acceleration and presentation hardware present in
+modern GPUs.
 
-%package -n libvdpau1
-Summary:        VDPAU wrapper library
-Group:          System/Libraries
-Provides:       libvdpau = %{version}-%{release}
-Obsoletes:      libvdpau < %{version}-%{release}
+%package        trace
+Summary:        Trace library for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+%if 0%{?fedora} > 26 || 0%{?rhel} > 7
+Supplements:    %{name}-debuginfo%{?_isa}
+%endif
 
-%description -n libvdpau1
-This package contains the libvdpau wrapper library and the libvdpau_trace
-debugging library, along with the header files needed to build VDPAU
-applications.  To actually use a VDPAU device, you need a vendor-specific
-implementation library.  Currently, this is always libvdpau_nvidia.  You can
-override the driver name by setting the VDPAU_DRIVER environment variable.
+%description    trace
+The %{name}-trace package contains trace library for %{name}.
 
-%package -n libvdpau-devel
-Summary:        VDPAU wrapper development files
-Group:          Development/Libraries/X11
-Requires:       libvdpau1 = %{version}
+%package        docs
+Summary:        Documentation for %{name}
+BuildArch:      noarch
+Provides:       libvdpau-docs = %{version}-%{release}
+Obsoletes:      libvdpau-docs < 0.6-2
 
-%description -n libvdpau-devel
-Note that this package only contains the VDPAU headers that are required to
-build applications. At runtime, the shared libraries are needed too and may
-be installed using the proprietary nVidia driver packages.
+%description    docs
+The %{name}-docs package contains documentation for %{name}.
 
-%package -n libvdpau_trace1
-Summary:        VDPAU trace library
-Group:          Development/Libraries/X11
-Requires:       libvdpau1 = %{version}
-Provides:       libvdpau_trace = %{version}-%{release}
-Obsoletes:      libvdpau_trace < %{version}-%{release}
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+#Multilibs trace
+Requires:       %{name}-trace%{?_isa} = %{version}-%{release}
+Requires:       libX11-devel%{?_isa}
+Requires:       pkgconfig
 
-%description -n libvdpau_trace1
-This package provides the library for tracing VDPAU function calls.
-Its usage is documented in the README.
+%description    devel
+The %{name}-devel package contains libraries and header files for developing
+applications that use %{name}.
 
 %prep
-%setup -q -b1
-%autopatch -p1
+%autosetup -p1
 
 %build
 %meson
@@ -98,43 +84,39 @@ Its usage is documented in the README.
 
 %install
 %meson_install
+find %{buildroot} -name '*.la' -delete
+# Let %%doc macro create the correct location in the rpm file, creates a
+# versioned docdir in <= f19 and an unversioned docdir in >= f20.
+rm -fr %{buildroot}%{_docdir}
+mv %{_vpath_builddir}/doc/html html
 
-/sbin/ldconfig -n %{buildroot}/%{_libdir}/vdpau
-rm %{buildroot}%{_libdir}/vdpau/libvdpau_trace.so
 
-pushd ../vdpauinfo-*
-autoreconf -fi
-%configure \
-VDPAU_CFLAGS=-I%{buildroot}%{_includedir} \
-VDPAU_LIBS="-L%{buildroot}/%{_libdir} -lvdpau -lX11"
+%ldconfig_scriptlets
 
-make %{?_smp_mflags}
-%make_install
-popd
 
-cp %{_sourcedir}/README .
+%files
+%doc AUTHORS
+%license COPYING
+%config(noreplace) %{_sysconfdir}/vdpau_wrapper.cfg
+%{_libdir}/*.so.*
+%dir %{_libdir}/vdpau/
 
-%post -n libvdpau1 -p /sbin/ldconfig
-%postun -n libvdpau1 -p /sbin/ldconfig
+%files trace
+%{_libdir}/vdpau/%{name}_trace.so*
 
-%files -n libvdpau1
-%dir %{_libdir}/vdpau
-%dir %{_distconfdir}
-%{_bindir}/vdpauinfo
-%{_libdir}/libvdpau.so.*
-%{_distconfdir}/vdpau_wrapper.cfg
+%files docs
+%doc html
 
-%files -n libvdpau-devel
-%dir %{_libdir}/vdpau
-%{_includedir}/vdpau
-%{_libdir}/libvdpau.so
+%files devel
+%{_includedir}/vdpau/
+%{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/vdpau.pc
 
-%files -n libvdpau_trace1
-%doc README
-%{_libdir}/vdpau/libvdpau_trace.so.*
-
 %changelog
+* Tue Nov 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.5-1
+- Updating Azure-Linux import from Fedora 41 (license: MIT)
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-33
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
