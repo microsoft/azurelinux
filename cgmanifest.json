@@ -4271,7 +4271,7 @@
         "other": {
           "name": "gh",
           "version": "2.62.0",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.43.1.tar.gz"
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.62.0.tar.gz"
         }
       }
     },
