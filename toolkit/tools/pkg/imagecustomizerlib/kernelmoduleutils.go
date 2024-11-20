@@ -36,7 +36,7 @@ func LoadOrDisableModules(modules imagecustomizerapi.ModuleList, rootDir string)
 	moduleLoadFilePath := filepath.Join(rootDir, moduleLoadPath)
 	moduleOptionsFilePath := filepath.Join(rootDir, moduleOptionsPath)
 
-	for i, module := range modules.Modules {
+	for i, module := range modules {
 		switch module.LoadMode {
 		case imagecustomizerapi.ModuleLoadModeAlways:
 			// If a module is disabled, remove it. Add the module to modules-load.d/. Write options if provided.
