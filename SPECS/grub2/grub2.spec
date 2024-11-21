@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,6 +106,10 @@ Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 # time optimizes the code incorrectly, leading to network traffic getting
 # dropped in scenarios like PXE booting.
 Patch:          disable-checksum-code-optimization.patch
+# Prevents the following error
+# "EFI stub: ERROR: FIRMWARE BUG: kernel image not aligned on 64k boundary"
+# https://bugs.launchpad.net/ubuntu/+source/grub2/+bug/1947046
+Patch:          arm64_Fix_EFI_loader_kernel_image_allocation.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -428,6 +432,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Nov 20 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.06-22
+- Add patch to fix arm64 EFI 64k page alignment issue
+
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Add Fedora SBAT entries
 
