@@ -10,7 +10,7 @@ This page lists host machine requirements for building with the Azure Linux tool
 sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
 
 # Also supported is:
-#    make -C toolkit install-azurelinux-prereqs
+#    make -C toolkit install-prereqs
 
 # Fix go 1.21 link
 sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go

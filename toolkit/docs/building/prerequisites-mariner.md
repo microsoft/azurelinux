@@ -10,7 +10,7 @@ This page lists host machine requirements for building with the Azure Linux tool
 sudo ./toolkit/docs/building/prerequisites-mariner.sh
 
 # Also supported is:
-#    make -C toolkit install-azurelinux-prereqs
+#    make -C toolkit install-prereqs
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service

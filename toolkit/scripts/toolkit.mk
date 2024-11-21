@@ -128,8 +128,8 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
 
-##help:target:install-azurelinux-prereqs=Install build prerequisites automatically.
-install-azurelinux-prereqs:
+##help:target:install-prereqs=Install build prerequisites automatically.
+install-prereqs:
 	echo "Installing build prerequisites for AzureLinux..." && \
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
