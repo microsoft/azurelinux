@@ -86,7 +86,7 @@ func hardResetBootLoader(baseConfigPath string, config *imagecustomizerapi.Confi
 }
 
 // Inserts new kernel command-line args into the grub config file.
-func AddKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
+func AddKernelCommandLine(kernelExtraArguments []string,
 	imageChroot safechroot.ChrootInterface,
 ) error {
 	var err error

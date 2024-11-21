@@ -338,7 +338,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 			Hostname:            "test",
 
 			KernelCommandLine: KernelCommandLine{
-				ExtraCommandLine: KernelExtraArguments{
+				ExtraCommandLine: []string{
 					"console=ttyS0",
 				},
 			},

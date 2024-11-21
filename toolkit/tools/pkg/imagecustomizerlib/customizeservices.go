@@ -13,7 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemd"
 )
 
-func EnableOrDisableServices(services imagecustomizerapi.Services, imageChroot safechroot.ChrootInterface) error {
+func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot safechroot.ChrootInterface) error {
 	var err error
 
 	// Handle enabling services

@@ -49,12 +49,12 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	err = EnableOrDisableServices(config.OS.Services, imageChroot)
+	err = enableOrDisableServices(config.OS.Services, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = LoadOrDisableModules(config.OS.Modules, imageChroot.RootDir())
+	err = loadOrDisableModules(config.OS.Modules, imageChroot.RootDir())
 	if err != nil {
 		return err
 	}

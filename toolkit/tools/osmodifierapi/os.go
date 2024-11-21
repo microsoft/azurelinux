@@ -17,8 +17,6 @@ type OS struct {
 	SELinux           imagecustomizerapi.SELinux           `yaml:"selinux"`
 	Users             []imagecustomizerapi.User            `yaml:"users"`
 	Overlays          *[]Overlay                           `yaml:"overlays"`
-	Services          imagecustomizerapi.Services          `yaml:"services"`
-	Modules           []imagecustomizerapi.Module          `yaml:"modules"`
 	KernelCommandLine imagecustomizerapi.KernelCommandLine `yaml:"kernelCommandLine"`
 }
 
@@ -68,21 +66,9 @@ func (s *OS) IsValid() error {
 		}
 	}
 
-	if err := s.Services.IsValid(); err != nil {
-		return err
-	}
-
-	moduleMap := make(map[string]int)
-	for i, module := range s.Modules {
-		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
-		if _, exists := moduleMap[module.Name]; exists {
-			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
-		}
-		moduleMap[module.Name] = i
-		err = module.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
-		}
+	err = s.KernelCommandLine.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid kernelCommandLine:\n%w", err)
 	}
 
 	return nil
