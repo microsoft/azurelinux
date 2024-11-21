@@ -128,13 +128,23 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
 
-##help:target:install-azurelinux-prereqs=Install build prerequisites, only supported on Mariner/AzureLinux.
+##help:target:install-azurelinux-prereqs=Install build prerequisites automatically.
 install-azurelinux-prereqs:
-	@echo "Installing build prerequisites for AzureLinux..."
+	echo "Installing build prerequisites for AzureLinux..." && \
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
-	if [ "$$current_os" != "mariner" ] && [ "$$current_os" != "azurelinux" ]; then \
-		echo "This target is only supported on Mariner/AzureLinux." && \
-		exit 1; \
+	echo "Current OS: $$current_os" && \
+	if [ "$$current_os" = "mariner" ] || [ "$$current_os" = "azurelinux" ]; then \
+		mdfile="$(toolkit_root)/docs/building/prerequisites-mariner.md" ; \
+	elif [ "$$current_os" = "ubuntu" ]; then \
+		mdfile="$(toolkit_root)/docs/building/prerequisites-ubuntu.md" ; \
+	else \
+		$(call print_error,"Unsupported OS: $$current_os") ; \
 	fi && \
-	prereqs="$$( $(SCRIPTS_DIR)/prerequisites.sh -s $(toolkit_root)/docs/building/prerequisites-src.json -d azurelinux -p )" && \
-	tdnf -y install $$prereqs
+	"$(SCRIPTS_DIR)/prerequisites.sh" -s "$(toolkit_root)/docs/building/prerequisites-src.json" -d $$current_os -a && \
+	echo "" && \
+	echo "Build prerequisites installed successfully:" && \
+	"$(SCRIPTS_DIR)/prerequisites.sh" -s "$(toolkit_root)/docs/building/prerequisites-src.json" -d $$current_os -p && \
+	echo "" && \
+	echo "**** Refer to $$mdfile for additional steps to complete the setup. ****" && \
+	echo "" || \
+	$(call print_error,Install failed)

@@ -1,6 +1,6 @@
 {
-    "_comment": "This JSON file lists the prerequisites for building the source code in the CBL-Mariner toolkit.",
-    "_comment2": "check-prerequisites.yml and 'make install-azurelinux-prereqs' use this file as the canonical truth",
+    "_comment": "This JSON file lists the prerequisites for building the source code in the Azure Linux toolkit.",
+    "_comment2": "'make install-azurelinux-prereqs' uses this file as the canonical truth via prerequisites.sh",
     "_comment3": "The 'name' field is the name of the package to install, followed by the actual package name for each supported OS",
     "packages": [
         {
@@ -36,10 +36,6 @@
             "ubuntu": "gawk"
         },
         {
-            "name": "glibc-devel",
-            "azurelinux": "glibc-devel"
-        },
-        {
             "name": "genisoimage",
             "azurelinux": "genisoimage",
             "ubuntu": "genisoimage"
@@ -48,6 +44,10 @@
             "name": "git",
             "azurelinux": "git",
             "ubuntu": "git"
+        },
+        {
+            "name": "glibc-devel",
+            "azurelinux": "glibc-devel"
         },
         {
             "name": "golang",
