@@ -18,7 +18,6 @@ Patch0:         0000-Use-system-package.patch
 Patch1:         CVE-2024-43788.patch
 Patch2:         CVE-2024-43796.patch
 Patch3:         CVE-2024-45590.patch
-Patch4:         CVE-2024-21538.patch
 
 BuildRequires:  bazel
 BuildRequires:  build-essential
@@ -65,6 +64,7 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n tensorboard-%{version}
+rm -rf tensorboard-%{version}/tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
 
 %build
 
@@ -99,7 +99,8 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 
 %changelog
 * Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 2.16.2-6
-- Patch to fix CVE-2024-21538
+- Remove npm directory before building to make sure as no nodejs vulnerability is getting through
+- It is done while fixing CVE-2024-21538
 
 * Thu Sep 26 09 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-5
 - Patch to fix CVE-2024-45590
