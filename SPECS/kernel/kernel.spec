@@ -29,7 +29,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.47.1
+Version:        6.6.57.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -43,7 +43,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Patch0:		    0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -407,6 +407,60 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
+- UKI: remove noxsaves parameter from cmdline
+
+* Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
+- Auto-upgrade to 6.6.57.1
+
+* Thu Oct 24 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-5
+- Enable Arm FF-A Support
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-4
+- Remove Amateur Radio X.25 PLP Rose for CVE-2022-2961
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-3
+- Enable Intel IFS
+
+* Tue Oct 22 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-2
+- Enable CONFIG_X86_AMD_PLATFORM_DEVICE built-in
+
+* Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.56.1-1
+- Auto-upgrade to 6.6.56.1
+
+* Thu Oct 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-5
+- Make e1000 drivers modules instead of built-in
+- Enable virtio console by default
+
+* Wed Oct 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-4
+- Enable nfsd v4 security label
+
+* Tue Sep 24 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.51.1-3
+- UKI: remove dbus from initrd
+
+* Fri Sep 20 2024 Chris Co <chrco@microsoft.com> - 6.6.51.1-2
+- Enable MLX5 TC offload
+
+* Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.51.1-1
+- Auto-upgrade to 6.6.51.1
+
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.47.1-7
+- UKI: Install binary to ESP
+
+* Fri Sep 13 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-6
+- Disable xen debugfs and I2C Baytrail configs
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
+- Build mpt2sas and mpt3sas drivers as modules
+- Build pata_legacy as module
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-4
+- Enable paravirt spinlocks
+- Enable CET and IBT
+
+* Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
+- Enable usb hiddev and serial ch341
+
 * Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
 - UKI: remove usrmount from initrd
 

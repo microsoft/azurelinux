@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.47.1
+Version:        6.6.57.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -145,6 +145,57 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
+- Bump release to match kernel
+
+* Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
+- Auto-upgrade to 6.6.57.1
+
+* Thu Oct 24 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-5
+- Bump release to match kernel
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-4
+- Bump release to match kernel
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-3
+- Bump release to match kernel
+
+* Tue Oct 22 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-2
+- Bump release to match kernel
+
+* Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.56.1-1
+- Auto-upgrade to 6.6.56.1
+
+* Thu Oct 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-5
+- Bump release to match kernel
+
+* Wed Oct 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-4
+- Bump release to match kernel
+
+* Tue Sep 24 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.51.1-3
+- Bump release to match kernel
+
+* Fri Sep 20 2024 Chris Co <chrco@microsoft.com> - 6.6.51.1-2
+- Bump release to match kernel
+
+* Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.51.1-1
+- Auto-upgrade to 6.6.51.1
+
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.47.1-7
+- Bump release to match kernel
+
+* Fri Sep 13 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-6
+- Bump release to match kernel
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-5
+- Bump release to match kernel
+
+* Thu Sep 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-4
+- Bump release to match kernel
+
+* Wed Sep 04 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.47.1-3
+- Bump release to match kernel
+
 * Thu Aug 29 2024 Jo Zzsi <jozzsicsataban@gmail.com> - 6.6.47.1-2
 - Bump release to match kernel
 

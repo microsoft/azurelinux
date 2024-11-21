@@ -1,7 +1,7 @@
 %define  debug_package %{nil}
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
-Version:        3.13.0
+Version:        3.13.7
 Release:        1%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
@@ -65,6 +65,11 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Tue Sep 17 2024 Archana Choudhary <archana1@microsoft.com> - 3.13.7-1
+- Upgrade rabbitmq-server to version 3.13.7
+- deps/jose is updated to 1.11.10
+- Fixes CVE-2023-50966
+
 * Thu Mar 28 2024 Sam Meluch <sammeluch@microsoft.com> - 3.13.0-1
 - Upgrade rabbitmq-server to version 3.13.0 for Azure Linux 3.0
 - Remove now unused vendor tarballs

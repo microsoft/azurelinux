@@ -75,6 +75,26 @@ func replaceSearchCommandAll(inputGrubCfgContent string, newSearchCommand string
 	return outputGrubCfgContent, nil
 }
 
+// Finds all command occurences and removes them.
+func removeCommandAll(inputGrubCfgContent string, command string) (outputGrubCfgContent string, err error) {
+	lines, err := findGrubCommandAll(inputGrubCfgContent, command, true /*allowMultiple*/)
+	if err != nil {
+		return "", err
+	}
+	outputGrubCfgContent = inputGrubCfgContent
+	// loop from last to first so that the captured locations from
+	// findGrubCommandAll are not invalidated as reconstructing
+	// outputGrubCfgContent.
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := lines[i]
+		start := line.Tokens[0].Loc.Start.Index
+		end := line.EndToken.Loc.Start.Index
+		outputGrubCfgContent = outputGrubCfgContent[:start] + outputGrubCfgContent[end:]
+	}
+
+	return outputGrubCfgContent, nil
+}
+
 func replaceToken(inputGrubCfgContent string, oldToken string, newToken string) (outputGrubCfgContent string, err error) {
 
 	// escape special characters that would interfer with defining the regular
@@ -126,6 +146,50 @@ func FindLinuxLine(inputGrubCfgContent string) (grub.Line, error) {
 		return grub.Line{}, err
 	}
 	return lines[0], nil
+}
+
+// Find the linux command within non-recovery mode menuentry block in the grub config file.
+func FindNonRecoveryLinuxLine(inputGrubCfgContent string) ([]grub.Line, error) {
+	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
+	if err != nil {
+		return nil, err
+	}
+
+	grubLines := grub.SplitTokensIntoLines(grubTokens)
+	var linuxLines []grub.Line
+	inMenuEntry := false
+	isRecoveryMenu := false
+
+	// Iterate over all lines to find non-recovery mode menuentry and its linux line
+	for _, line := range grubLines {
+		if len(line.Tokens) > 1 && grub.IsTokenKeyword(line.Tokens[0], "menuentry") {
+			// Found a new 'menuentry', reset flags
+			inMenuEntry = true
+			isRecoveryMenu = false
+
+			// Check if the title (second token) contains the word 'recovery'
+			if strings.Contains(line.Tokens[1].RawContent, "recovery") {
+				isRecoveryMenu = true
+			}
+
+			// If it's a recovery menuentry, ignore this block
+			if isRecoveryMenu {
+				inMenuEntry = false
+			}
+		} else if inMenuEntry {
+			// We are inside a non-recovery menuentry block
+			if len(line.Tokens) > 0 && grub.IsTokenKeyword(line.Tokens[0], "linux") {
+				// Append only lines that contain the 'linux' command
+				linuxLines = append(linuxLines, line)
+			}
+		}
+	}
+
+	if len(linuxLines) == 0 {
+		return nil, fmt.Errorf("no linux line found in non-recovery menuentry")
+	}
+
+	return linuxLines, nil
 }
 
 // Overrides the path of the kernel binary of all the linux commands within a grub config file.

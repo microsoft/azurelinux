@@ -177,8 +177,10 @@ func (b *BootCustomizer) PrepareForVerity() error {
 			return err
 		}
 
-		// For verity, the root device will always be "/dev/mapper/root"
-		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE", "/dev/mapper/root")
+		// For rootfs verity, the root device will always be "/dev/mapper/root"
+		rootDevicePath := verityDevicePathFromName(imagecustomizerapi.VerityRootDeviceName)
+		defaultGrubFileContent, err = UpdateDefaultGrubFileVariable(defaultGrubFileContent, "GRUB_DEVICE",
+			rootDevicePath)
 		if err != nil {
 			return err
 		}
@@ -208,6 +210,17 @@ func (b *BootCustomizer) WriteToFile(imageChroot safechroot.ChrootInterface) err
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (b *BootCustomizer) SetRootDevice(rootDevice string) error {
+	updatedGrubFileContent, err := UpdateDefaultGrubFileVariable(b.defaultGrubFileContent, "GRUB_DEVICE", rootDevice)
+	if err != nil {
+		return err
+	}
+
+	b.defaultGrubFileContent = updatedGrubFileContent
 
 	return nil
 }

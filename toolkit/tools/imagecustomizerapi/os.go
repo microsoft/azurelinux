@@ -17,12 +17,11 @@ type OS struct {
 	Packages            Packages            `yaml:"packages"`
 	SELinux             SELinux             `yaml:"selinux"`
 	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles     AdditionalFilesMap  `yaml:"additionalFiles"`
+	AdditionalFiles     AdditionalFileList  `yaml:"additionalFiles"`
 	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
 	Users               []User              `yaml:"users"`
 	Services            Services            `yaml:"services"`
 	Modules             []Module            `yaml:"modules"`
-	Verity              *Verity             `yaml:"verity"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
 }
 
@@ -80,13 +79,6 @@ func (s *OS) IsValid() error {
 		err = module.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
-		}
-	}
-
-	if s.Verity != nil {
-		err = s.Verity.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid verity:\n%w", err)
 		}
 	}
 

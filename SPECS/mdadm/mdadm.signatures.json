@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "mdadm-4.2.tar.gz": "c83447797cccc772d1c389b1917a2bfda59bd7545480bdccd792b57b310b428e",
+  "mdadm-4.3.tar.gz": "61a1c22477555364dea1862df7c3b4e8b9a53ee733bad320a45fda27dd0ed44f",
   "mdadm-raid-check-sysconfig": "78a8b6301ea32b28c7f1144f9123fb761043f5d37d3aec8a2deab0ebe0d59a81",
   "mdadm.conf": "6382e48282297663adbe1b1db55c1554d27badd8ab0ee5a4d2e1bbf880f62af3",
   "mdadm_event.conf": "3be891aeb2aeb7e9b5b3264b316dd618291290f359f38308c6b6b663e986f692",

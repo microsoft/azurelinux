@@ -1,12 +1,13 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        3.0.6
+Version:        3.1.9
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-34250.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -17,6 +18,7 @@ BuildRequires:  gnutls-devel
 BuildRequires:  graphviz
 BuildRequires:  libpq-devel
 BuildRequires:  libyaml-devel
+BuildRequires:  luajit-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
@@ -57,7 +59,7 @@ Development files for %{name}
     -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
     -DFLB_JEMALLOC=On \
-    -DFLB_LUAJIT=Off \
+    -DFLB_PREFER_SYSTEM_LIBS=On
 
 %cmake_build
 
@@ -65,7 +67,7 @@ Development files for %{name}
 %cmake_install
 
 %check
-%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
+%ctest --exclude-regex "flb-rt-in_podman_metrics|.*\\.sh"
 
 %files
 %license LICENSE
@@ -80,6 +82,15 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Tue Nov 05 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+- Update to 3.1.9 to enable Lua filter plugin using system luajit library.
+- Remove patches for CVE-2024-25629 and CVE-2024-28182 as they are fixed in 3.1.9.
+
+* Tue Oct 15 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0.6-2
+- CVE-2024-34250
+- CVE-2024-25629
+- CVE-2024-28182
+
 * Tue May 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.6-1
 - Update to v3.0.6 to fix CVE-2024-4323.
 

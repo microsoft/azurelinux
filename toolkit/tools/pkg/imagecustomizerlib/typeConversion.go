@@ -37,8 +37,8 @@ func diskConfigToImager(diskConfig imagecustomizerapi.Disk, fileSystems []imagec
 		return configuration.Disk{}, err
 	}
 
-	imagerMaxSize := diskConfig.MaxSize / diskutils.MiB
-	if diskConfig.MaxSize%diskutils.MiB != 0 {
+	imagerMaxSize := *diskConfig.MaxSize / diskutils.MiB
+	if *diskConfig.MaxSize%diskutils.MiB != 0 {
 		return configuration.Disk{}, fmt.Errorf("disk max size (%d) must be a multiple of 1 MiB", diskConfig.MaxSize)
 	}
 
@@ -78,17 +78,14 @@ func partitionsToImager(partitions []imagecustomizerapi.Partition, fileSystems [
 
 func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []imagecustomizerapi.FileSystem,
 ) (configuration.Partition, error) {
-	fileSystem, foundMountPoint := sliceutils.FindValueFunc(fileSystems,
+	fileSystem, _ := sliceutils.FindValueFunc(fileSystems,
 		func(fileSystem imagecustomizerapi.FileSystem) bool {
-			return fileSystem.DeviceId == partition.Id
+			return fileSystem.PartitionId == partition.Id
 		},
 	)
-	if !foundMountPoint {
-		return configuration.Partition{}, fmt.Errorf("failed to find filesystem entry with ID (%s)", partition.Id)
-	}
 
-	imagerStart := partition.Start / diskutils.MiB
-	if partition.Start%diskutils.MiB != 0 {
+	imagerStart := *partition.Start / diskutils.MiB
+	if *partition.Start%diskutils.MiB != 0 {
 		return configuration.Partition{}, fmt.Errorf("partition start (%d) must be a multiple of 1 MiB", partition.Start)
 	}
 
@@ -160,7 +157,7 @@ func partitionSettingToImager(fileSystem imagecustomizerapi.FileSystem,
 	}
 
 	imagerPartitionSetting := configuration.PartitionSetting{
-		ID:              fileSystem.DeviceId,
+		ID:              fileSystem.PartitionId,
 		MountIdentifier: imagerMountIdentifierType,
 		MountOptions:    mountOptions,
 		MountPoint:      mountPath,

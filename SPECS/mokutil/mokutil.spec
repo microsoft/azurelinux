@@ -1,7 +1,7 @@
 Summary:        Tool to manage UEFI Secure Boot MoK Keys
 Name:           mokutil
 Version:        0.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +17,6 @@ BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  which
 Conflicts:      shim < 0.8-1%{?dist}
-ExclusiveArch:  x86_64
 
 %description
 mokutil provides a tool to manage keys for Secure Boot through the MoK
@@ -43,6 +42,9 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 %{_datadir}/bash-completion/completions/mokutil
 
 %changelog
+* Thu Sep 12 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.6.0-2
+- Build mokutil for aarch64 also.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-1
 - Auto-upgrade to 0.6.0 - Azure Linux 3.0 - package upgrades
 

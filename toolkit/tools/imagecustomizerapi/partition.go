@@ -6,17 +6,16 @@ package imagecustomizerapi
 import (
 	"fmt"
 	"unicode"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 )
 
 type Partition struct {
-	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
+	// ID is used to correlate `Partition` objects with `FileSystem` objects.
 	Id string `yaml:"id"`
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
 	// Start is the offset where the partition begins (inclusive).
-	Start DiskSize `yaml:"start"`
+	// Note: When not provided, value is filled in by Disk.IsValid().
+	Start *DiskSize `yaml:"start"`
 	// End is the offset where the partition ends (exclusive).
 	End *DiskSize `yaml:"end"`
 	// Size is the size of the partition.
@@ -35,19 +34,13 @@ func (p *Partition) IsValid() error {
 		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.Id)
 	}
 
-	if (p.End != nil && p.Start >= *p.End) || (p.Size.Type == PartitionSizeTypeExplicit && p.Size.Size <= 0) {
+	if (p.End != nil && p.Start != nil && *p.Start >= *p.End) || (p.Size.Type == PartitionSizeTypeExplicit && p.Size.Size <= 0) {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
 	err = p.Type.IsValid()
 	if err != nil {
 		return err
-	}
-
-	if p.IsBiosBoot() {
-		if p.Start != diskutils.MiB {
-			return fmt.Errorf("BIOS boot partition must start at 1 MiB")
-		}
 	}
 
 	return nil
@@ -59,18 +52,10 @@ func (p *Partition) GetEnd() (DiskSize, bool) {
 	}
 
 	if p.Size.Type == PartitionSizeTypeExplicit {
-		return p.Start + p.Size.Size, true
+		return *p.Start + p.Size.Size, true
 	}
 
 	return 0, false
-}
-
-func (p *Partition) IsESP() bool {
-	return p.Type == PartitionTypeESP
-}
-
-func (p *Partition) IsBiosBoot() bool {
-	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

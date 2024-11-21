@@ -47,7 +47,7 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, imageType 
 
 	// Customize image.
 	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -104,15 +104,72 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, imageType 
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
 	assert.NoError(t, err, "check for /var/log")
 
-	partitions, err = getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
-	assert.NoError(t, err, "get disk partitions")
-
 	// Check that the fstab entries are correct.
 	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
 	verifyBootloaderConfig(t, imageConnection, "console=tty0 console=ttyS0",
 		partitions[mountPoints[1].PartitionNum],
 		partitions[mountPoints[0].PartitionNum],
 		imageVersion)
+}
+
+func TestCustomizeImagePartitionsSizeOnly(t *testing.T) {
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
+
+	testTmpDir := filepath.Join(tmpDir, "TestCustomizeImagePartitionsSizeOnly")
+	buildDir := filepath.Join(testTmpDir, "build")
+	configFile := filepath.Join(testDir, "partitions-size-only-config.yaml")
+	outImageFilePath := filepath.Join(testTmpDir, "image.raw")
+
+	// Customize image.
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	// Check output file type.
+	checkFileType(t, outImageFilePath, "raw")
+
+	mountPoints := []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+		{
+			PartitionNum:   3,
+			Path:           "/var",
+			FileSystemType: "ext4",
+		},
+	}
+
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, false /*includeDefaultMounts*/, mountPoints)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer imageConnection.Close()
+
+	// Check for key files/directories on the partitions.
+	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/usr/bin/bash"))
+	assert.NoError(t, err, "check for /usr/bin/bash")
+
+	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
+	assert.NoError(t, err, "check for /var/log")
+
+	partitions, err := getDiskPartitionsMap(imageConnection.Loopback().DevicePath())
+	assert.NoError(t, err, "get disk partitions")
+
+	// Check that the fstab entries are correct.
+	verifyFstabEntries(t, imageConnection, mountPoints, partitions)
+	verifyBootloaderConfig(t, imageConnection, "",
+		partitions[mountPoints[0].PartitionNum],
+		partitions[mountPoints[0].PartitionNum],
+		baseImageVersionDefault)
 }
 
 func TestCustomizeImagePartitionsEfiToLegacy(t *testing.T) {
@@ -145,7 +202,7 @@ func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, imageTy
 
 	// Customize image.
 	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -189,7 +246,7 @@ func testCustomizeImageKernelCommandLineHelper(t *testing.T, testName string, ba
 
 	// Customize image.
 	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -258,7 +315,7 @@ func testCustomizeImageNewUUIDsHelper(t *testing.T, testName string, imageType b
 
 	// Customize image.
 	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
