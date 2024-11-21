@@ -103,11 +103,9 @@ func AddKernelCommandLine(kernelExtraArguments []string,
 		return err
 	}
 
-	for _, arg := range kernelExtraArguments {
-		err = bootCustomizer.AddKernelCommandLine(arg)
-		if err != nil {
-			return err
-		}
+	err = bootCustomizer.AddKernelCommandLine(kernelExtraArguments)
+	if err != nil {
+		return err
 	}
 
 	err = bootCustomizer.WriteToFile(imageChroot)

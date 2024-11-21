@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
@@ -50,14 +49,14 @@ func (b *BootCustomizer) IsGrubMkconfigImage() bool {
 }
 
 // Inserts new kernel command-line args into the grub config file.
-func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
-	extraCommandLine = strings.TrimSpace(extraCommandLine)
-	if extraCommandLine == "" {
+func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine []string) error {
+	combinedArgs := GrubArgsToString(extraCommandLine)
+	if combinedArgs == "" {
 		return nil
 	}
 
 	if b.isGrubMkconfig {
-		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, extraCommandLine)
+		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, combinedArgs)
 		if err != nil {
 			return err
 		}
@@ -65,7 +64,7 @@ func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 		b.defaultGrubFileContent = defaultGrubFileContent
 	} else {
 		// Add the args directly to the /boot/grub2/grub.cfg file.
-		grubCfgContent, err := appendKernelCommandLineArgs(b.grubCfgContent, extraCommandLine)
+		grubCfgContent, err := appendKernelCommandLineArgs(b.grubCfgContent, combinedArgs)
 		if err != nil {
 			return err
 		}

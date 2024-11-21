@@ -17,5 +17,5 @@ func TestIsoIsValid(t *testing.T) {
 	}
 
 	err := iso.IsValid()
-	assert.ErrorContains(t, err, "invalid kernelCommandLine")
+	assert.NoError(t, err)
 }
