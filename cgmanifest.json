@@ -4660,8 +4660,8 @@
         "type": "other",
         "other": {
           "name": "google-api-python-client",
-          "version": "2.73.0",
-          "downloadUrl": "https://github.com/googleapis/google-api-python-client/archive/v2.73.0/google-api-python-client-2.73.0.tar.gz"
+          "version": "2.140.0",
+          "downloadUrl": "https://github.com/googleapis/google-api-python-client/archive/v2.140.0/google-api-python-client-2.140.0.tar.gz"
         }
       }
     },
