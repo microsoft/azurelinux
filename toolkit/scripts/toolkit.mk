@@ -134,17 +134,11 @@ install-azurelinux-prereqs:
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
 	if [ "$$current_os" = "mariner" ] || [ "$$current_os" = "azurelinux" ]; then \
-		mdfile="$(toolkit_root)/docs/building/prerequisites-mariner.md" ; \
+		scriptfile="$(toolkit_root)/docs/building/prerequisites-mariner.sh" ; \
 	elif [ "$$current_os" = "ubuntu" ]; then \
-		mdfile="$(toolkit_root)/docs/building/prerequisites-ubuntu.md" ; \
+		scriptfile="$(toolkit_root)/docs/building/prerequisites-ubuntu.sh" ; \
 	else \
 		$(call print_error,"Unsupported OS: $$current_os") ; \
 	fi && \
-	"$(SCRIPTS_DIR)/prerequisites.sh" -s "$(toolkit_root)/docs/building/prerequisites-src.json" -d $$current_os -a && \
-	echo "" && \
-	echo "Build prerequisites installed successfully:" && \
-	"$(SCRIPTS_DIR)/prerequisites.sh" -s "$(toolkit_root)/docs/building/prerequisites-src.json" -d $$current_os -p && \
-	echo "" && \
-	echo "**** Refer to $$mdfile for additional steps to complete the setup. ****" && \
-	echo "" || \
+	"$$scriptfile" || \
 	$(call print_error,Install failed)

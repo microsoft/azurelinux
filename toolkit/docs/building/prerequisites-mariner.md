@@ -7,7 +7,7 @@ This page lists host machine requirements for building with the Azure Linux tool
 
 ```bash
 # Install required dependencies.
-sudo ./toolkit/scripts/prerequisites.sh -s ./toolkit/docs/building/prerequisites-src.json -d "azurelinux" -a
+sudo ./toolkit/docs/building/prerequisites-mariner.sh
 
 # Also supported is:
 #    make -C toolkit install-azurelinux-prereqs
