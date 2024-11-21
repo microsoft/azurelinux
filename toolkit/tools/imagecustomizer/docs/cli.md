@@ -106,6 +106,13 @@ existing RPM repo (such as packages.microsoft.com). Using a cloned repo with
 Disable the base image's installed RPM repos as a source of RPMs during package
 installation.
 
+## --output-pxe-artifacts-dir
+
+Create a folder containing the artifacts to be used for PXE booting.
+
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
+
 ## --log-level=LEVEL
 
 Default: `info`

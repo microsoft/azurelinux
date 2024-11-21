@@ -1,0 +1,39 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Triggers controlled on the ADO side.
+trigger: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      runOnHost: true
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: InfoPublishing
+        jobs:
+          - job: PublishMergeInfo
+            pool:
+              type: linux
+
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/OB_template_complains_if_this_is_not_set"
+
+            steps:
+              - script: |
+                  set -e
+
+                  echo "##vso[build.addbuildtag]Repository.Name-$(Build.Repository.Name)"
+                  echo "##vso[build.addbuildtag]SourceBranch-$(Build.SourceBranch)"
+                  echo "##vso[build.addbuildtag]SourceVersion-$(Build.SourceVersion)"
+                displayName: "Set merge info tags"

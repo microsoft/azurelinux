@@ -3678,8 +3678,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "3.0.6",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.0.6.tar.gz"
+          "version": "3.1.9",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.1.9.tar.gz"
         }
       }
     },
@@ -10331,8 +10331,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -14292,8 +14292,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -29306,8 +29306,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.0",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.0.tar.gz"
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.1.tar.gz"
         }
       }
     },

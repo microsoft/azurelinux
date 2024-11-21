@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.16.2
+Version:        1.17.1
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Mon Nov 11 2024 Henry Li <lihl@microsoft.com> - 1.17.1-1
+- Upgrade to v1.17.1 to resolve CVE‑2024-0134
+
 * Sat Oct 05 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.16.2-1
 - Auto-upgrade to 1.16.2 - Critical vulnerability CVE-2024-0132, Medium vulnerability CVE-2024-0133
 

@@ -2,13 +2,14 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2024-52533.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -121,6 +122,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 2.78.1-5
+- Patch CVE-2024-52533
+
 * Fri Apr 19 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-4
 - Update dependency on pcre2
 

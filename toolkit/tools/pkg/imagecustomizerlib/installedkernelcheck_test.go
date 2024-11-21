@@ -20,6 +20,6 @@ func TestCustomizeImageMissingKernel(t *testing.T) {
 
 	// Customize image.
 	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.ErrorContains(t, err, "no installed kernel found")
 }

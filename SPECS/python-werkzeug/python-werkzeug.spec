@@ -4,7 +4,7 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
 Version:        3.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/w
 # Fixes PYTHONPATH handling in tests
 # Upstream: https://github.com/pallets/werkzeug/pull/2172
 Patch0:         preserve-any-existing-PYTHONPATH-in-tests.patch
+Patch1:         CVE-2024-49767.patch
 BuildArch:      noarch
 
 %description
@@ -78,6 +79,9 @@ pip3 install markupsafe
 %files -n python3-werkzeug-doc
 
 %changelog
+* Tue Nov 05 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.0.3-2
+- Patch CVE-2024-49767
+
 * Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.3-1
 - Update to version 3.0.3 to fix CVE-2024-34069.
 

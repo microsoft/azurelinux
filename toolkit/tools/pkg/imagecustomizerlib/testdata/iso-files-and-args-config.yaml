@@ -1,3 +1,5 @@
+pxe:
+  isoImageBaseUrl: http://my-pxe-server-1
 iso:
   additionalFiles:
   - source: files/a.txt
