@@ -11,7 +11,7 @@ Name:			SuperLU
 Version:		7.0.0
 Release:		1%{?dist}
 Summary:		Subroutines to solve sparse linear systems
-License:		BSD and GPLv2+
+License:		BSD-2-Clause AND GPL-2.0-or-later
 URL:			http://crd-legacy.lbl.gov/~xiaoye/SuperLU/
 
 Source0:		https://github.com/xiaoyeli/%{genname}/archive/refs/tags/v%{version}.tar.gz#/%{genname}-%{version}.tar.gz
