@@ -34,7 +34,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config_aarch64
 Source2:        sha512hmac-openssl.sh
-Source3:        cbl-mariner-ca-20211013.pem
+Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
