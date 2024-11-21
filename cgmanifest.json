@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blosc",
-          "version": "1.21.4",
-          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
+          "version": "1.21.6",
+          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.6/blosc-1.21.6.tar.gz"
         }
       }
     },
