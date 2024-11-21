@@ -56,6 +56,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %changelog
+* Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.21.2-4
+- Patch for CVE-2024-10524
+
 * Wed Jun 19 2024 Saul Paredes <saulparedes@microsoft.com> - 1.21.2-3
 - Patch for CVE-2024-38428
 
