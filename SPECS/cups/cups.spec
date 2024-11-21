@@ -659,7 +659,7 @@ rm -f %{cups_serverbin}/backend/smb
 
 %changelog
 * Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.3.3op2-9
-- Add patch for CVe-2024-35235
+- Add patch for CVE-2024-35235
 
 * Tue May 21 2024 Lanze Liu <lanzeliu@microsoft.com> - 2.3.3op2-8
 - Add patch for CVE-2022-26691.
