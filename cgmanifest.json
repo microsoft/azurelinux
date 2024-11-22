@@ -8801,8 +8801,8 @@
         "type": "other",
         "other": {
           "name": "libcdr",
-          "version": "0.1.6",
-          "downloadUrl": "http://dev-www.libreoffice.org/src/libcdr/libcdr-0.1.6.tar.xz"
+          "version": "0.1.7",
+          "downloadUrl": "https://dev-www.libreoffice.org/src/libcdr/libcdr-0.1.7.tar.xz"
         }
       }
     },
