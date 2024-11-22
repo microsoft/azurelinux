@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
 Version:        2.2.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch1:         in_emitter_fix_issue_8198.patch
 Patch2:         fix_issue_8025.patch
 Patch3:         CVE-2024-26455.patch
 Patch4:         CVE-2024-25629.patch
+Patch5:         CVE-2024-27532.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -85,6 +86,9 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Thu Nov 14 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.2.3-5
+- Backport fix for CVE-2024-27532
+
 * Tue Oct 15 2024 Chris Gunn <chrisgun@microsoft.com> - 2.2.3-4
 - CVE-2024-26455
 - CVE-2024-25629
@@ -93,7 +97,7 @@ Development files for %{name}
 - Apply patch in_emitter_fix_issue_8198.patch to fix #8198 ( Potential log loss during high load at Multiline & Rewrite Tag Filter (in_emitter) )
 - Fix issue #8025 with a patch ( in_tail: missing log for offset processing due to non-existent old inodes in sqlite )
 
-* Wed May 30 2024 Sindhu Karri <lakarri@microsoft.com> - 2.2.3-2
+* Thu May 30 2024 Sindhu Karri <lakarri@microsoft.com> - 2.2.3-2
 - Fix CVE-2024-34250 with a patch
 
 * Tue May 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.3-1
