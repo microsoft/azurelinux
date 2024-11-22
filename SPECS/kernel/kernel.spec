@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.57.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
@@ -424,9 +424,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-3
+* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
 - Make CONFIG_DRM and its dependency KConfigs as loadable modules
 - Create sub-package for AMD GPU in-tree modules to avoid conflicts with out-of-tree modules
+
+* Tue Nov 05 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-3
+- Enable kexec signature verification
+- Introduce new azurelinux-ca-20230216.pem
 
 * Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
 - UKI: remove noxsaves parameter from cmdline

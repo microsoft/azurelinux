@@ -1986,6 +1986,8 @@
                 "sgpio",
                 "shared-mime-info",
                 "sharutils",
+                "shim-unsigned-aarch64",
+                "shim-unsigned-x64",
                 "sip",
                 "sisu",
                 "skkdic",
@@ -2417,9 +2419,6 @@
                 "sdbus-cpp",
                 "sgx-backwards-compatibility",
                 "shim",
-                "shim-unsigned",
-                "shim-unsigned-aarch64",
-                "shim-unsigned-x64",
                 "skopeo",
                 "span-lite",
                 "sriov-network-device-plugin",
@@ -2434,7 +2433,6 @@
                 "usrsctp",
                 "vala",
                 "valkey",
-                "verity-read-only-root",
                 "vnstat",
                 "zstd"
             ]
