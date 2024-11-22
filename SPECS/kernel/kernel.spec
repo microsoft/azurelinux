@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.57.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -120,6 +120,15 @@ Requires:       %{name} = %{version}-%{release}
 
 %description drivers-gpu
 This package contains the Linux kernel gpu support
+
+%package drivers-intree-amdgpu
+Summary:        Kernel amdgpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-drivers-gpu = %{version}-%{release}
+
+%description drivers-intree-amdgpu
+This package contains the Linux kernel in-tree AMD gpu support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -327,6 +336,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
+%post drivers-intree-amdgpu
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -365,6 +377,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files drivers-gpu
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/gpu
+%exclude /lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
+
+%files drivers-intree-amdgpu
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
 
 %files drivers-sound
 %defattr(-,root,root)
@@ -407,6 +424,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
+- Make CONFIG_DRM and its dependency KConfigs as loadable modules
+- Create sub-package for AMD GPU in-tree modules to avoid conflicts with out-of-tree modules
+
 * Tue Nov 05 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-3
 - Enable kexec signature verification
 - Introduce new azurelinux-ca-20230216.pem
