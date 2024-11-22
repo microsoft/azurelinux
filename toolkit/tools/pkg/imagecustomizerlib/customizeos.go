@@ -39,7 +39,7 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	err = copyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
+	err = CopyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
 	}
