@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libwpe",
-          "version": "1.12.0",
-          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.12.0/libwpe-1.12.0.tar.xz"
+          "version": "1.15.2",
+          "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.15.2/libwpe-1.15.2.tar.xz"
         }
       }
     },
