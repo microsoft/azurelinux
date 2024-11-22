@@ -1,34 +1,31 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global with_python3 1
-
-%global talloc_version 2.3.4
+%global talloc_version 2.4.2
 
 Name: libtevent
-Version: 0.14.1
+Version: 0.16.1
 Release: 1%{?dist}
 Summary: The tevent library
-License: LGPLv3+
-URL: https://tevent.samba.org/
-Source0: https://samba.org/ftp/tevent/tevent-%{version}.tar.gz
-Source1: https://samba.org/ftp/tevent/tevent-%{version}.tar.asc
+License: LGPL-3.0-or-later
+URL: http://tevent.samba.org/
+Source0: http://samba.org/ftp/tevent/tevent-%{version}.tar.gz
+Source1: http://samba.org/ftp/tevent/tevent-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tevent.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
 Source2: tevent.keyring
-Source3: %{name}-LICENSE.txt
 
+# Patches
+
+BuildRequires: docbook-style-xsl
+BuildRequires: doxygen
 BuildRequires: gcc
+BuildRequires: gnupg2
 BuildRequires: libcmocka-devel >= 1.1.3
 BuildRequires: libtalloc-devel >= %{talloc_version}
-BuildRequires: doxygen
-BuildRequires: docbook-style-xsl
 BuildRequires: libxslt
-BuildRequires: gnupg2
-BuildRequires: which
-%if 0%{?with_python3}
+BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-talloc-devel >= %{talloc_version}
-%endif
 
 Provides: bundled(libreplace)
 Obsoletes: python2-tevent < 0.10.0-1
@@ -49,7 +46,6 @@ Requires: libtalloc-devel%{?_isa} >= %{talloc_version}
 Header files needed to develop programs that link against the Tevent library.
 
 
-%if 0%{?with_python3}
 %package -n python3-tevent
 Summary: Python 3 bindings for the Tevent library
 Requires: libtevent%{?_isa} = %{version}-%{release}
@@ -58,35 +54,32 @@ Requires: libtevent%{?_isa} = %{version}-%{release}
 
 %description -n python3-tevent
 Python 3 bindings for libtevent
-%endif
 
 %prep
+zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n tevent-%{version} -p1
-cp %{SOURCE3} ./LICENSE.txt
 
 %build
-zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %configure --disable-rpath \
            --bundled-libraries=NONE \
            --builtin-libraries=replace
 
-make %{?_smp_mflags} V=1
+%make_build
 
 doxygen doxy.config
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # Install API docs
 rm -f doc/man/man3/todo*
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}
-cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
+install -d -m0755 %{buildroot}%{_mandir}
+cp -a doc/man/man3 %{buildroot}%{_mandir}
 
 %files
-%license LICENSE.txt
 %{_libdir}/libtevent.so.*
 
 %files devel
@@ -95,16 +88,17 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/pkgconfig/tevent.pc
 %{_mandir}/man3/tevent*.gz
 
-%if 0%{?with_python3}
 %files -n python3-tevent
 %{python3_sitearch}/tevent.py
 %{python3_sitearch}/__pycache__/tevent.*
 %{python3_sitearch}/_tevent.cpython*.so
-%endif
 
 %ldconfig_scriptlets
 
 %changelog
+* Thu Nov 21 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.16.1-1
+- Updating Azure-Linux to import from Fedora 41 (license: MIT)
+
 * Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 0.14.1-1
 - Update to 0.14.1 to build with Python 3.12
 
