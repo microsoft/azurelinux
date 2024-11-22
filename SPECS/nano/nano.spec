@@ -24,7 +24,7 @@ Requires:       %{name} = %{version}-%{release}
 Lang for nano
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure  --enable-utf8     \
