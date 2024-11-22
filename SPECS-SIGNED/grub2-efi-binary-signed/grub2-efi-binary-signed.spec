@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%global efidir BOOT
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
@@ -12,7 +13,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +43,8 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 Requires:       grub2-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -58,6 +61,8 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 Requires:       grub2-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
@@ -68,17 +73,20 @@ specifically created for installing on %{buildarch} systems
 %build
 
 %install
-mkdir -p %{buildroot}/boot/efi/EFI/BOOT
-cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
-cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
+mkdir -p %{buildroot}/boot/efi/EFI/%{efidir}
+cp %{SOURCE2} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubefiname}
+cp %{SOURCE3} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
-/boot/efi/EFI/BOOT/%{grubefiname}
+/boot/efi/EFI/%{efidir}/%{grubefiname}
 
 %files -n grub2-efi-binary-noprefix
-/boot/efi/EFI/BOOT/%{grubpxeefiname}
+/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 %changelog
+* Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
+- Set efidir location to BOOT for eventual use in changing to "azurelinux"
+
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Bump release number to match grub release
 
