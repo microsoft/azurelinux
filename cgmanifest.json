@@ -8961,8 +8961,8 @@
         "type": "other",
         "other": {
           "name": "libdazzle",
-          "version": "3.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/libdazzle/3.36/libdazzle-3.36.0.tar.xz"
+          "version": "3.44.0",
+          "downloadUrl": "https://download.gnome.org/sources/libdazzle/3.44/libdazzle-3.44.0.tar.xz"
         }
       }
     },
