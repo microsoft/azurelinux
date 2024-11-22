@@ -3,6 +3,8 @@ Name:		exempi
 Version:	2.6.5
 Release:	1%{?dist}
 License:	BSD
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:		http://libopenraw.freedesktop.org/wiki/Exempi
 Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 
