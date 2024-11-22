@@ -2209,6 +2209,7 @@
                 "azurelinux-repos",
                 "azurelinux-rpm-macros",
                 "azurelinux-sysinfo",
+                "azurelinux-tools-packagebuild",
                 "bazel",
                 "blobfuse2",
                 "bmon",
