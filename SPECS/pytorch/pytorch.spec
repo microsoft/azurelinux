@@ -2,15 +2,13 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
-Source1:        %{name}-%{version}-submodules.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -26,6 +24,7 @@ BuildRequires:  python3-six
 
 Patch1:         CVE-2024-27318.patch
 Patch2:         CVE-2022-1941.patch
+Patch3:         CVE-2024-5187.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -59,7 +58,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1 -p 1 -n %{name}-v%{version}
+%autosetup -p 1 -n %{name}-v%{version}
 
 %build
 export USE_CUDA=0
@@ -87,6 +86,10 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Tue Nov 12 2024 Sean Dougherty <sdougherty@microsoft.com> - 2.2.2-3
+- Add patch to address CVE-2024-5187
+- Remove unnecessary double vendoring of the third_party directory. Doubling happens because the contents of the submodule tarball are pulled directly from the original source tarball and then re-uploaded as this "submodule tarball".
+
 * Tue Sep 17 2024 Archana Choudhary <archana1@microsoft.com> - 2.2.2-2
 - patch for CVE-2024-27318, CVE-2022-1941
 
