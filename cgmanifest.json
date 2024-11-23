@@ -13572,16 +13572,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mosh",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ModemManager",
           "version": "1.18.6",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.6.tar.xz"
@@ -13605,6 +13595,16 @@
           "name": "moreutils",
           "version": "0.67",
           "downloadUrl": "https://deb.debian.org/debian/pool/main/m/moreutils/moreutils_0.67.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
         }
       }
     },
@@ -18794,8 +18794,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-ScanDeps",
-          "version": "1.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.31.tar.gz"
+          "version": "1.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.35.tar.gz"
         }
       }
     },
