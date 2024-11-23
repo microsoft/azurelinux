@@ -26,6 +26,8 @@ Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/intel/multus-cni
 Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-44487.patch
+Patch1:         CVE-2023-45288.patch
 %define commit efdc0a5c7d1ea4bb236d638403420448b48782b3
 BuildRequires:  golang
 BuildRequires:  golang-packaging
