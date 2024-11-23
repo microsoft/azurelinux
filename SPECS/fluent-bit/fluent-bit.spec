@@ -8,6 +8,7 @@ Distribution:   Azure Linux
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-34250.patch
+Patch1:         CVE-2024-25431.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -82,9 +83,13 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
-* Tue Nov 05 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+* Tue Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
 - Update to 3.1.9 to enable Lua filter plugin using system luajit library.
 - Remove patches for CVE-2024-25629 and CVE-2024-28182 as they are fixed in 3.1.9.
+- [Jon Slobodzian] Reconciled with Fasttrack/3.0 on 11/23, updated Changelog date from 11/5.
+
+* Fri Nov 15 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.0.6-3
+- Address CVE-2024-25431
 
 * Tue Oct 15 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0.6-2
 - CVE-2024-34250
