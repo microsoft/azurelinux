@@ -7,7 +7,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
 Version:        6.6.57.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,7 +105,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
-* Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-2
+* Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-4
 - Original version for CBL-Mariner
-- Starting with release 2 to align with kernel release.
+- Starting with release 4 to align with kernel release.
 - License verified
