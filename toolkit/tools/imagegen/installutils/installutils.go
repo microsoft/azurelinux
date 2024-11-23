@@ -1130,7 +1130,6 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 		defaultOptions   = "defaults"
 		swapFsType       = "swap"
 		swapOptions      = "sw"
-		readOnlyOptions  = "ro"
 		defaultDump      = "0"
 		disablePass      = "0"
 		rootPass         = "1"
@@ -1141,9 +1140,6 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 
 	if mountArgs == "" {
 		options = defaultOptions
-		if diskutils.IsReadOnlyDevice(devicePath) {
-			options = fmt.Sprintf("%s,%s", options, readOnlyOptions)
-		}
 	} else {
 		options = mountArgs
 	}
@@ -1154,7 +1150,7 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 
 	// Get the block device
 	var device string
-	if diskutils.IsEncryptedDevice(devicePath) || diskutils.IsReadOnlyDevice(devicePath) || doPseudoFsMount {
+	if diskutils.IsEncryptedDevice(devicePath) || doPseudoFsMount {
 		device = devicePath
 	} else {
 		device, err = FormatMountIdentifier(identifierType, devicePath)
@@ -1222,10 +1218,9 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
-func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
-	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
-	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
-	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
+func ConfigureDiskBootloader(bootType string, encryptionEnable bool, partitionSettings []configuration.PartitionSetting,
+	kernelCommandLine configuration.KernelCommandLine, installChroot *safechroot.Chroot, diskDevPath string,
+	mountPointMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, enableGrubMkconfig bool,
 	includeLegacyGrubCfg bool,
 ) (err error) {
 	timestamp.StartEvent("configuring bootloader", nil)
@@ -1243,16 +1238,14 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	}
 	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 
-	return ConfigureDiskBootloaderWithRootMountIdType(bootType, encryptionEnable, readOnlyVerityRootEnable,
-		rootMountIdentifier, kernelCommandLine, installChroot, diskDevPath, mountPointMap, encryptedRoot, readOnlyRoot,
-		enableGrubMkconfig, includeLegacyGrubCfg)
+	return ConfigureDiskBootloaderWithRootMountIdType(bootType, encryptionEnable, rootMountIdentifier, kernelCommandLine,
+		installChroot, diskDevPath, mountPointMap, encryptedRoot, enableGrubMkconfig, includeLegacyGrubCfg)
 }
 
-func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
+func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnable bool,
 	rootMountIdentifier configuration.MountIdentifier, kernelCommandLine configuration.KernelCommandLine,
 	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
-	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
-	includeLegacyGrubCfg bool,
+	encryptedRoot diskutils.EncryptedRootDevice, enableGrubMkconfig bool, includeLegacyGrubCfg bool,
 ) (err error) {
 	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, isBootPartitionSeparate := mountPointMap[bootMountPoint]
@@ -1286,14 +1279,6 @@ func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnabl
 	if encryptionEnable {
 		// Encrypted devices don't currently support identifiers
 		rootDevice = mountPointMap[rootMountPoint]
-	} else if readOnlyVerityRootEnable {
-		var partIdentifier string
-		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
 	} else {
 		var partIdentifier string
 		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, mountPointMap[rootMountPoint])
@@ -1307,7 +1292,7 @@ func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnabl
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
 	err = InstallGrubDefaults(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
-		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate, includeLegacyGrubCfg)
+		kernelCommandLine, isBootPartitionSeparate, includeLegacyGrubCfg)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
@@ -1362,11 +1347,11 @@ func InstallGrubEnv(installRoot string) (err error) {
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
 func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
-	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool, includeLegacyCfg bool,
+	isBootPartitionSeparate bool, includeLegacyCfg bool,
 ) (err error) {
 	// Copy the bootloader's /etc/default/grub and set the file permission
 	err = installGrubTemplateFile(resources.AssetsGrubDefFile, GrubDefFile, installRoot, rootDevice, bootUUID,
-		bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		bootPrefix, encryptedRoot, kernelCommandLine, isBootPartitionSeparate)
 	if err != nil {
 		logger.Log.Warnf("Failed to install (%s): %v", GrubDefFile, err)
 		return
@@ -1375,7 +1360,7 @@ func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 	if includeLegacyCfg {
 		// Add the legacy /boot/grub2/grub.cfg file, which was used in Azure Linux 2.0.
 		err = installGrubTemplateFile(resources.AssetsGrubCfgFile, GrubCfgFile, installRoot, rootDevice, bootUUID,
-			bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+			bootPrefix, encryptedRoot, kernelCommandLine, isBootPartitionSeparate)
 		if err != nil {
 			logger.Log.Warnf("Failed to install (%s): %v", GrubCfgFile, err)
 			return
@@ -1387,7 +1372,7 @@ func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 
 func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, bootUUID, bootPrefix string,
 	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
-	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool,
+	isBootPartitionSeparate bool,
 ) (err error) {
 	installGrubDefFile := filepath.Join(installRoot, targetFile)
 
@@ -1436,12 +1421,6 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	err = setGrubCfgIMA(installGrubDefFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set ima_policy in in %s: %v", installGrubDefFile, err)
-		return
-	}
-
-	err = setGrubCfgReadOnlyVerityRoot(installGrubDefFile, readOnlyRoot)
-	if err != nil {
-		logger.Log.Warnf("Failed to set verity root in in %s: %v", installGrubDefFile, err)
 		return
 	}
 
@@ -2630,56 +2609,6 @@ func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCom
 	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
-	}
-
-	return
-}
-
-// setGrubCfgReadOnlyVerityRoot populates the arguments needed to boot with a dm-verity read-only root partition
-func setGrubCfgReadOnlyVerityRoot(grubPath string, readOnlyRoot diskutils.VerityDevice) (err error) {
-	var (
-		verityMountArg          = fmt.Sprintf("rd.verityroot.devicename=%s", readOnlyRoot.MappedName)
-		verityHashArg           = fmt.Sprintf("rd.verityroot.hashtree=/%s.hashtree", readOnlyRoot.MappedName)
-		verityRootHashArg       = fmt.Sprintf("rd.verityroot.roothashfile=/%s.roothash", readOnlyRoot.MappedName)
-		verityRootHashSigArg    = fmt.Sprintf("rd.verityroot.roothashsig=/%s.p7", readOnlyRoot.MappedName)
-		verityFECDataArg        = fmt.Sprintf("rd.verityroot.fecdata=/%s.fec", readOnlyRoot.MappedName)
-		verityFECRootsArg       = fmt.Sprintf("rd.verityroot.fecroots=%d", readOnlyRoot.FecRoots)
-		verityErrorHandling     = fmt.Sprintf("rd.verityroot.verityerrorhandling=%s", readOnlyRoot.ErrorBehavior)
-		verityValidateOnBootArg = fmt.Sprintf("rd.verityroot.validateonboot=%v", readOnlyRoot.ValidateOnBoot)
-		verityOverlaysArg       = fmt.Sprintf("rd.verityroot.overlays=\"%s\"", strings.Join(readOnlyRoot.TmpfsOverlays, " "))
-		verityOverlaySizeArg    = fmt.Sprintf("rd.verityroot.overlaysize=\"%s\"", readOnlyRoot.TmpfsOverlaySize)
-		verityDebugMountsArg    = fmt.Sprintf("rd.verityroot.overlays_debug_mount=%s", readOnlyRoot.TmpfsOverlaysDebugMount)
-		verityPattern           = "{{.ReadOnlyVerityRoot}}"
-		verityArgs              = ""
-
-		cmdline configuration.KernelCommandLine
-	)
-
-	if readOnlyRoot.MappedName != "" {
-		// Basic set of verity arguments common to all use cases
-		verityArgs = fmt.Sprintf("%s %s %s %s %s %s %s %s",
-			verityMountArg,
-			verityHashArg,
-			verityRootHashArg,
-			verityErrorHandling,
-			verityValidateOnBootArg,
-			verityOverlaysArg,
-			verityOverlaySizeArg,
-			verityDebugMountsArg,
-		)
-		// Only include the FEC arguments if we have FEC enabled
-		if readOnlyRoot.FecRoots > 0 {
-			verityArgs = fmt.Sprintf("%s %s %s", verityArgs, verityFECDataArg, verityFECRootsArg)
-		}
-		if readOnlyRoot.UseRootHashSignature {
-			verityArgs = fmt.Sprintf("%s %s", verityArgs, verityRootHashSigArg)
-		}
-	}
-
-	logger.Log.Debugf("Adding Verity Root ('%s') to %s", verityArgs, grubPath)
-	err = sed(verityPattern, verityArgs, cmdline.GetSedDelimeter(), grubPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to set grub.cfg's Verity Root setting: %v", err)
 	}
 
 	return

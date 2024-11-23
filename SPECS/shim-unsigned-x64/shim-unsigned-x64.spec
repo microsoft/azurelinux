@@ -1,80 +1,284 @@
+%global pesign_vre 0.106-1
+%global openssl_vre 1.0.2j
+
+# For prereleases, % global prerelease rc2, and downpatch Makefile
+%if %{defined prerelease}
+%global dashpre -%{prerelease}
+%global dotpre .%{prerelease}
+%global tildepre ~%{prerelease}
+%global zdpd 0%{dotpre}.
+%endif
+
+%bcond altarch 0
+
+%global efidir azurelinux
+%global shimrootdir %{_datadir}/shim/
+%global shimversiondir %{shimrootdir}/%{version}
+%global efiarch x64
+%global shimdir %{shimversiondir}/%{efiarch}
+%if %{with altarch}
+%global efialtarch ia32
+%global shimaltdir %{shimversiondir}/%{efialtarch}
+%endif
+
 %global debug_package %{nil}
-Summary:        First stage UEFI bootloader
-Name:           shim-unsigned-x64
-Version:        15.4
-Release:        3%{?dist}
-License:        BSD
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/rhboot/shim
-Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2
-Source1:        sbat.csv.in
-Source100:      cbl-mariner-ca-20211013.der
-Patch0:         Don-t-call-QueryVariableInfo-on-EFI-1.10-machines.patch
-Patch1:         Fix-handling-of-ignore_db-and-user_insecure_mode.patch
-Patch2:         Fix-a-broken-file-header-on-ia32.patch
-Patch3:         mok-allocate-MOK-config-table-as-BootServicesData.patch
-Patch4:         shim-another-attempt-to-fix-load-options-handling.patch
-Patch5:         Relax-the-check-for-import_mok_state.patch
-BuildRequires:  dos2unix
-BuildRequires:  vim-extra
-ExclusiveArch:  x86_64
+%global __debug_package 1
+%global _binaries_in_noarch_packages_terminate_build 0
+%if %{with altarch}
+%global __debug_install_post %{SOURCE100} %{efiarch} %{efialtarch}
+%else
+%global __debug_install_post %{SOURCE100} %{efiarch}
+%endif
+%undefine _debuginfo_subpackages
+
+# currently here's what's in our dbx: nothing
+%global dbxfile %{nil}
+
+Name:		shim-unsigned-%{efiarch}
+Version:	15.8
+Release:	3%{?dist}
+Summary:	First-stage UEFI bootloader
+ExclusiveArch:	x86_64
+License:	BSD
+Vendor:		Microsoft Corporation
+Distribution:	Azure Linux
+URL:		https://github.com/rhboot/shim
+Source0:	https://github.com/rhboot/shim/releases/download/%{version}%{?dashpre}/shim-%{version}%{?dotpre}.tar.bz2
+Source1:	azurelinux-ca-20230216.der
+%if 0%{?dbxfile}
+Source2:	%{dbxfile}
+%endif
+Source3:	sbat.azurelinux.csv
+Source4:	shim.patches
+
+Source100:	shim-find-debuginfo.sh
+
+%include %{SOURCE4}
+
+BuildRequires:	gcc make
+BuildRequires:	elfutils-libelf-devel
+BuildRequires:	git openssl-devel openssl
+BuildRequires:	pesign >= %{pesign_vre}
+BuildRequires:	dos2unix findutils
+BuildRequires:	vim-extra
+
+# Shim uses OpenSSL, but cannot use the system copy as the UEFI ABI is not
+# compatible with SysV (there's no red zone under UEFI) and there isn't a
+# POSIX-style C library.
+# BuildRequires:	OpenSSL
+Provides:	bundled(openssl) = %{openssl_vre}
+
+%global desc \
+Initial UEFI bootloader that handles chaining to a trusted full \
+bootloader under secure boot environments.
+%global debug_desc \
+This package provides debug information for package %{expand:%%{name}} \
+Debug information is useful when developing applications that \
+use this package or when debugging this package.
 
 %description
-shim is a trivial EFI application that, when run, attempts to open and
-execute another application.
-On systems with a TPM chip enabled and supported by the system firmware,
-shim will extend various PCRs with the digests of the targets it is
-loading.
+%desc
+
+%if %{with altarch}
+%package -n shim-unsigned-%{efialtarch}
+Summary:	First-stage UEFI bootloader (unsigned data)
+Provides:	bundled(openssl) = %{openssl_vre}
+
+%description -n shim-unsigned-%{efialtarch}
+%desc
+%endif
+
+%package debuginfo
+Summary:	Debug information for shim-unsigned-%{efiarch}
+AutoReqProv:	0
+BuildArch:	noarch
+
+%description debuginfo
+%debug_desc
+
+%if %{with altarch}
+%package -n shim-unsigned-%{efialtarch}-debuginfo
+Summary:	Debug information for shim-unsigned-%{efialtarch}
+AutoReqProv:	0
+BuildArch:	noarch
+
+%description -n shim-unsigned-%{efialtarch}-debuginfo
+%debug_desc
+%endif
+
+%package debugsource
+Summary:	Debug Source for shim-unsigned
+AutoReqProv:	0
+BuildArch:	noarch
+
+%description debugsource
+%debug_desc
 
 %prep
-%autosetup -n shim-%{version} -p1
-# shim Makefile expects vendor SBATs to be in data/sbat.<vendor>.csv
-sed -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" %{SOURCE1} > ./data/sbat.microsoft.csv
-cat ./data/sbat.microsoft.csv
+%autosetup -S git_am -n shim-%{version}
+git config --unset user.email
+git config --unset user.name
+mkdir build-%{efiarch}
+%if %{with altarch}
+mkdir build-%{efialtarch}
+%endif
+cp %{SOURCE3} data/
 
 %build
-cp %{SOURCE100} cert.der
-make shimx64.efi VENDOR_CERT_FILE=cert.der
+COMMITID=$(cat commit)
+MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
+MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim "
+MAKEFLAGS+="ENABLE_SHIM_HASH=true "
+MAKEFLAGS+="%{_smp_mflags}"
+if [ -f "%{SOURCE1}" ]; then
+	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1}"
+fi
+%if 0%{?dbxfile}
+if [ -f "%{SOURCE2}" ]; then
+	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2}"
+fi
+%endif
+
+cd build-%{efiarch}
+make ${MAKEFLAGS} \
+	DEFAULT_LOADER='\\\\grub%{efiarch}.efi' \
+	all
+cd ..
+
+%if %{with altarch}
+cd build-%{efialtarch}
+setarch linux32 -B make ${MAKEFLAGS} \
+	ARCH=%{efialtarch} \
+	DEFAULT_LOADER='\\\\grub%{efialtarch}.efi' \
+	all
+cd ..
+%endif
 
 %install
-install -vdm 755 %{buildroot}%{_datadir}/%{name}
-install -vm 644 shimx64.efi %{buildroot}%{_datadir}/%{name}/shimx64.efi
+COMMITID=$(cat commit)
+MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
+MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim "
+MAKEFLAGS+="ENABLE_SHIM_HASH=true "
+if [ -f "%{SOURCE1}" ]; then
+	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1}"
+fi
+%if 0%{?dbxfile}
+if [ -f "%{SOURCE2}" ]; then
+	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2}"
+fi
+%endif
+
+cd build-%{efiarch}
+make ${MAKEFLAGS} \
+	DEFAULT_LOADER='\\\\grub%{efiarch}.efi' \
+	DESTDIR=${RPM_BUILD_ROOT} \
+	install-as-data install-debuginfo install-debugsource
+install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimdir}/"
+cd ..
+
+%if %{with altarch}
+cd build-%{efialtarch}
+setarch linux32 make ${MAKEFLAGS} \
+	ARCH=%{efialtarch} \
+	DEFAULT_LOADER='\\\\grub%{efialtarch}.efi' \
+	DESTDIR=${RPM_BUILD_ROOT} \
+	install-as-data install-debuginfo install-debugsource
+install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimaltdir}/"
+cd ..
+%endif
 
 %check
-make VENDOR_CERT_FILE=cert.der test
+HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
+# Verify the shim hash is correct
+[[ $HASH = $(pesign -h -i %{buildroot}%{shimdir}/shim%{efiarch}.efi | cut -d ' ' -f 1) ]]
 
 %files
-%defattr(-,root,root)
 %license COPYRIGHT
-%{_datadir}/%{name}/shimx64.efi
+%dir %{shimrootdir}
+%dir %{shimversiondir}
+%dir %{shimdir}
+%{shimdir}/*.efi
+%{shimdir}/*.hash
+%{shimdir}/*.CSV
+
+%if %{with altarch}
+%files -n shim-unsigned-%{efialtarch}
+%license COPYRIGHT
+%dir %{shimrootdir}
+%dir %{shimversiondir}
+%dir %{shimaltdir}
+%{shimaltdir}/*.efi
+%{shimaltdir}/*.hash
+%{shimaltdir}/*.CSV
+%endif
+
+%files debuginfo -f build-%{efiarch}/debugfiles.list
+
+%if %{with altarch}
+%files -n shim-unsigned-%{efialtarch}-debuginfo -f build-%{efialtarch}/debugfiles.list
+%endif
+
+%files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
-* Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 15.4-3
-- Updated sbat.csv.in to reflect new distro name.
+* Thu Feb 08 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-3
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- license verified
 
-* Wed Jan 05 2022 Chris Co <chrco@microsoft.com> - 15.4-2
-- Update key
-- License verified
+* Tue Jun 07 2022 Peter Jones <pjones@redhat.com> - 15.6-1
+- Update to shim-15.6
+  Resolves: CVE-2022-28737
 
-* Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
-- Update to 15.4
-- Remove extra patches. These are incorporated into latest version
+* Thu Mar 10 2022 Peter Jones <pjones@redhat.com> - 15.5-1
+- Update to shim 15.5
+  - lots of minor fixes
 
-* Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-6
-- Apply patch files (from CentOS: shim-15-8.el7)
+* Tue Mar 30 2021 Peter Jones <pjones@redhat.com> - 15.4-1
+- Update to shim 15.4
+  - Support for revocations via the ".sbat" section and SBAT EFI variable
+  - A new unit test framework and a bunch of unit tests
+  - No external gnu-efi dependency
+  - Better CI
+  Resolves: CVE-2020-14372
+  Resolves: CVE-2020-25632
+  Resolves: CVE-2020-25647
+  Resolves: CVE-2020-27749
+  Resolves: CVE-2020-27779
+  Resolves: CVE-2021-20225
+  Resolves: CVE-2021-20233
 
-* Wed Jul 29 2020 Chris Co <chrco@microsoft.com> - 15-5
-- Update built-in cert
+* Wed Mar 24 2021 Peter Jones <pjones@redhat.com> - 15.3-0~1
+- Update to shim 15.3
+  - Support for revocations via the ".sbat" section and SBAT EFI variable
+  - A new unit test framework and a bunch of unit tests
+  - No external gnu-efi dependency
+  - Better CI
+  Resolves: CVE-2020-14372
+  Resolves: CVE-2020-25632
+  Resolves: CVE-2020-25647
+  Resolves: CVE-2020-27749
+  Resolves: CVE-2020-27779
+  Resolves: CVE-2021-20225
+  Resolves: CVE-2021-20233
 
-* Mon Jun 22 2020 Chris Co <chrco@microsoft.com> - 15-4
-- Update install path
+* Thu Apr 05 2018 Peter Jones <pjones@redhat.com> - 15-1
+- Update to shim 15
+- better checking for bad linker output
+- flicker-free console if there's no error output
+- improved http boot support
+- better protocol re-installation
+- dhcp proxy support
+- tpm measurement even when verification is disabled
+- REQUIRE_TPM build flag
+- more reproducable builds
+- measurement of everything verified through shim_verify()
+- coverity and scan-build checker make targets
+- misc cleanups
 
-* Thu May 14 2020 Chris Co <chrco@microsoft.com> - 15-3
-- Update test key
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 13-0.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
-* Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> - 15-2
-- Replace BuildArch with ExclusiveArch
-
-* Wed Apr 29 2020 Chris Co <chrco@microsoft.com> - 15-1
-- Original version for CBL-Mariner.
+* Fri Aug 18 2017 Peter Jones <pjones@redhat.com> - 13-0.1
+- Make a new shim-unsigned-x64 package like the shim-unsigned-aarch64 one.
+- This will (eventually) supersede what's in the "shim" package so we can
+  make "shim" hold the signed one, which will confuse fewer people.
