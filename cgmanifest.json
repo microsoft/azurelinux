@@ -1767,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.6",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
+          "version": "1.0.7",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.7.tar.gz"
         }
       }
     },
@@ -10351,8 +10351,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -12901,8 +12901,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.9",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.9.tar.gz"
+          "version": "10.6.20",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.20.tar.gz"
         }
       }
     },
@@ -13572,16 +13572,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mosh",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ModemManager",
           "version": "1.18.6",
           "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.6.tar.xz"
@@ -13605,6 +13595,16 @@
           "name": "moreutils",
           "version": "0.67",
           "downloadUrl": "https://deb.debian.org/debian/pool/main/m/moreutils/moreutils_0.67.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mosh",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"
         }
       }
     },
@@ -14603,8 +14603,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -18794,8 +18794,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-ScanDeps",
-          "version": "1.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.31.tar.gz"
+          "version": "1.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.35.tar.gz"
         }
       }
     },
@@ -21474,8 +21474,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.13",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.13/postgresql-14.13.tar.bz2"
+          "version": "14.14",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.14/postgresql-14.14.tar.bz2"
         }
       }
     },
@@ -29497,8 +29497,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2121",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2121.tar.gz"
+          "version": "9.1.0791",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.0791.tar.gz"
         }
       }
     },
