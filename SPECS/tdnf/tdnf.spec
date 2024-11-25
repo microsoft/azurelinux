@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -241,6 +241,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Tue Nov 19 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-6
+- Add kernel-64k installonlypkgs entry
+
 * Tue Nov 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-5
 - Add install only implementation to v3.5.8 from upstream
 
