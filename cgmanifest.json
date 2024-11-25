@@ -28236,8 +28236,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.5.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.5.1.tar.gz"
+          "version": "103.6.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.6.0.tar.gz"
         }
       }
     },
