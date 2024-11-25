@@ -2,8 +2,8 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.1.12
-Release:        2%{?dist}
+Version:        1.2.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Mon Nov 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.2-1
+- Auto-upgrade to 1.2.2 - none
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.1.12-2
 - Pin golang version to <= 1.22
 
