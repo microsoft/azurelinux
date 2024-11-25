@@ -13,7 +13,6 @@ Patch0:         CVE-2024-7592.patch
 Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
-
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
