@@ -1,8 +1,8 @@
-%define         commit_hash 51d5e94601ceffbbd85688df1c928ecccbfa4685
+%define         commit_hash 7cb363254b69e10320360b63fb73e0ffb5da7bf2
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.2.1
+Version:        1.2.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -12,7 +12,7 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang < 1.23
+BuildRequires:  golang
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -43,8 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
-* Tue Nov 05 2024 Nan Liu <liunan@microsoft.com> - 1.2.1-1
-- Bump version to 1.2.1 required by containerd 2.0.0
+* Mon Nov 25 2024 Nan Liu <liunan@microsoft.com> - 1.2.2-1
+- Bump version to 1.2.2
+- Remove the golang version constraint
 
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.1.12-2
 - Pin golang version to <= 1.22
