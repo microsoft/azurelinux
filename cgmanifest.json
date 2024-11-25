@@ -3688,8 +3688,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "3.0.6",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.0.6.tar.gz"
+          "version": "3.1.9",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.1.9.tar.gz"
         }
       }
     },
@@ -10341,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -14302,8 +14302,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.16.2.tar.gz"
+          "version": "1.17.1",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.1.tar.gz"
         }
       }
     },
@@ -21213,8 +21213,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.4",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.4/postgresql-16.4.tar.bz2"
+          "version": "16.5",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.5/postgresql-16.5.tar.bz2"
         }
       }
     },
@@ -27666,8 +27666,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },
@@ -27676,8 +27676,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },
@@ -29316,8 +29316,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.0",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.0.tar.gz"
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.1.tar.gz"
         }
       }
     },
