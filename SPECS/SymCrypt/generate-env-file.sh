@@ -73,9 +73,6 @@ fi
 echo "Tag commit is '${TAG_COMMIT}'"
 git reset --hard "${TAG_COMMIT}"
 
-# Patching the version script; will be unneeded as of v103.5.2
-git apply "${CURRENT_DIR}/add-parameter-to-version-script-to-print-the-commit-info.patch"
-
 # Call the version script to get the properly formmatted git info
 ENV_SCRIPT_FILE_NAME="symcrypt-build-environment-variables-${RELEASE_TAG}.sh"
 echo "#!/bin/bash" > "${CURRENT_DIR}/${ENV_SCRIPT_FILE_NAME}"
