@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.2.0.azl3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-
+Patch0:         CVE-2023-45288.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  golang
@@ -110,6 +110,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Nov 25 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl3-3
+- Fix CVE-2023-45288
+
 * Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
 
