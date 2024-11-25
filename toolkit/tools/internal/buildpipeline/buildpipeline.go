@@ -50,13 +50,6 @@ func checkIfContainerIgnoreDockerEnvFile() (bool, error) {
 	return ignoreDockerEnvExists, nil
 }
 
-// checkIfContainerChrootDirEnv checks if the user has set the CHROOT_DIR environment variable, which is a requirement for
-// Docker-based builds. If the variable exists, it is likely that the tool is running in a Docker container.
-func checkIfContainerChrootDirEnv() bool {
-	_, exists := os.LookupEnv(rootBaseDirEnv)
-	return exists
-}
-
 // checkIfContainerSystemdDetectVirt uses systemd-detect-virt, a tool that can be used to detect if the system is running
 // in a virtualized environment. More specifically, using '-c' flag will detect container-based virtualization only.
 func checkIfContainerSystemdDetectVirt() (bool, error) {
@@ -143,22 +136,6 @@ func IsRegularBuild() bool {
 		for _, line := range message {
 			logger.Log.Warn(line)
 		}
-	}
-
-	// If the user set the CHROOT_DIR environment variable, but we don't detect a container, print a warning. This is
-	// likely a misconfiguration, however trust the user and force the build to run as a container. If this is a mistake,
-	// the tools should fail very quickly after this point.
-	if checkIfContainerChrootDirEnv() && isRegularBuild {
-		message := []string{
-			"CHROOT_DIR is set, but the system is not detected as a container.",
-			"This is likely a misconfiguration!",
-			"**Forcing the build to run as a container build**, however chroot operations may fail.",
-		}
-		// logger.PrintMessageBox is not available in 2.0, so print each line separately.
-		for _, line := range message {
-			logger.Log.Warn(line)
-		}
-		isRegularBuild = false
 	}
 
 	// Cache the result
