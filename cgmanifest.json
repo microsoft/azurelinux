@@ -28236,8 +28236,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.5.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.5.1.tar.gz"
+          "version": "103.6.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.6.0.tar.gz"
         }
       }
     },
@@ -28246,8 +28246,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.5.1.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.6.0.tar.gz"
         }
       }
     },
