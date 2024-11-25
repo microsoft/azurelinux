@@ -58,7 +58,7 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 %{_bindir}/*
 
 %changelog
-* Fri Nov 22 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 6.0-21
+* Mon Nov 25 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 6.0-21
 - Fix CVE-2022-0529 and CVE-2022-0530
 
 * Thu Oct 06 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0-20
