@@ -14,6 +14,7 @@ Source1:      %{sourceName}-%{version}-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
+BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
 BuildRequires:  rust
@@ -50,7 +51,7 @@ popd
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
-OS_VERSION=3.0 %make_build package-confpods
+%make_build package-confpods
 popd
 
 %define kata_path     /opt/confidential-containers
@@ -136,6 +137,7 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/clean.sh
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/common.sh
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/uvm_install.sh
 
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
