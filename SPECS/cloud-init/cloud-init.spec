@@ -16,7 +16,6 @@ Patch1:         no-single-process.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
-BuildRequires:  dracut
 BuildRequires:  iproute
 BuildRequires:  azurelinux-release 
 BuildRequires:  python3
@@ -35,6 +34,7 @@ BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       dhcpcd
+Requires:       dracut
 Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
