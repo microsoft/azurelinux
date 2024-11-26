@@ -31,8 +31,7 @@ Patch16:        CVE-2023-23916.patch
 Patch17:        CVE-2023-46218.patch
 Patch18:        CVE-2024-2398.patch
 Patch19:        CVE-2024-28182.patch
-Patch20:        CVE-2024-7264-1.patch
-Patch21:        CVE-2024-7264-2.patch
+Patch20:        CVE-2024-7264.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
