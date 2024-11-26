@@ -515,6 +515,7 @@ perl-utils-5.38.2-506.azl3.noarch.rpm
 perl-vars-1.05-506.azl3.noarch.rpm
 perl-version-0.99.29-506.azl3.noarch.rpm
 perl-vmsish-1.04-506.azl3.noarch.rpm
+perl-WWW-Curl-4.17-15.azl3.x86_64.rpm
 perl-XML-Parser-2.47-1.azl3.x86_64.rpm
 perl-XML-Parser-debuginfo-2.47-1.azl3.x86_64.rpm
 pinentry-1.2.1-1.azl3.x86_64.rpm
@@ -555,9 +556,11 @@ python3-newt-0.52.23-1.azl3.x86_64.rpm
 python3-packaging-23.2-3.azl3.noarch.rpm
 python3-pip-24.2-2.azl3.noarch.rpm
 python3-pygments-2.7.4-2.azl3.noarch.rpm
+python3-pyparsing-3.1.1-1.azl3.noarch.rpm
 python3-rpm-4.18.2-1.azl3.x86_64.rpm
 python3-rpm-generators-14-11.azl3.noarch.rpm
 python3-setuptools-69.0.3-4.azl3.noarch.rpm
+python3-six-1.16.0-3.azl3.noarch.rpm
 python3-test-3.12.3-4.azl3.x86_64.rpm
 python3-tools-3.12.3-4.azl3.x86_64.rpm
 python3-wheel-0.43.0-1.azl3.noarch.rpm

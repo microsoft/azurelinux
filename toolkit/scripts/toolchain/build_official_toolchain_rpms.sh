@@ -583,7 +583,7 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 
-# ocaml and other ocmal packages require ocaml-srpm-macros 
+# ocaml and other ocmal packages require ocaml-srpm-macros
 build_rpm_in_chroot_no_install ocaml-srpm-macros
 
 build_rpm_in_chroot_no_install python-packaging
@@ -655,6 +655,12 @@ chroot_and_install_rpms gpgme
 chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
+chroot_and_install_rpms perl-FindBin
+chroot_and_install_rpms perl-Module-CoreList
+chroot_and_install_rpms perl-Module-Install
+chroot_and_install_rpms perl-YAML-Tiny
+build_rpm_in_chroot_no_install perl-WWW-Curl
+
 build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
@@ -702,6 +708,16 @@ build_rpm_in_chroot_no_install python-wheel
 build_rpm_in_chroot_no_install python-markupsafe
 chroot_and_install_rpms python3-markupsafe
 build_rpm_in_chroot_no_install python-jinja2
+
+# python-pyparsing needs python3-devel, python3-pip, python3-wheel
+# python3-flit-core, pyproject-rpm-macros are also needed but already installed
+chroot_and_install_rpms python3-devel
+chroot_and_install_rpms python3-pip
+chroot_and_install_rpms python3-wheel
+build_rpm_in_chroot_no_install python-pyparsing
+
+# python-six needs python3-devel, python3-setuptools, python3-pip, openssl-devel, curl-devel are needed but already installed
+build_rpm_in_chroot_no_install python-six
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
