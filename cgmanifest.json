@@ -9401,8 +9401,8 @@
         "type": "other",
         "other": {
           "name": "libgee",
-          "version": "0.20.3",
-          "downloadUrl": "https://download.gnome.org/sources/libgee/0.20/libgee-0.20.3.tar.xz"
+          "version": "0.20.6",
+          "downloadUrl": "https://download.gnome.org/sources/libgee/0.20/libgee-0.20.6.tar.xz"
         }
       }
     },

@@ -1,16 +1,18 @@
-Vendor:         Microsoft Corporation
+Vendor:         Microsoft Corporation                                                 
 Distribution:   Azure Linux
 Name:           libgee
-Version:        0.20.3
-Release:        2%{?dist}
+Version:        0.20.6
+Release:        8%{?dist}
 Summary:        GObject collection library
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/Libgee
 Source0:        https://download.gnome.org/sources/libgee/0.20/libgee-%{version}.tar.xz
 
-BuildRequires:  glib2-devel
-BuildRequires:  gobject-introspection-devel
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  vala
+BuildRequires:  make
 
 %description
 libgee is a collection library providing GObject-based interfaces and
@@ -62,11 +64,11 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-
+find -name '*.vala' -exec touch {} \;
 
 %build
-%configure --disable-static
-make %{?_smp_mflags}
+%configure --disable-static --enable-vala
+%make_build
 
 
 %check
@@ -77,7 +79,7 @@ make check
 %make_install \
     typelibdir=%{_libdir}/girepository-1.0 \
     girdir=%{_datadir}/gir-1.0
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -name '*.la' -delete
 
 
 %ldconfig_scriptlets
@@ -102,6 +104,48 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.6-8
+- Update to 0.20.6.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.6-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Florian Weimer <fweimer@redhat.com> - 0.20.6-5
+- Trigger Vala compilation during build, for GCC 14 compatibility
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep 19 2022 Kalev Lember <klember@redhat.com> - 0.20.6-1
+- Update to 0.20.6
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Feb 10 2022 David King <amigadave@amigadave.com> - 0.20.5-1
+- Update to 0.20.5
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Mar 18 2021 Kalev Lember <klember@redhat.com> - 0.20.4-1
+- Update to 0.20.4
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
