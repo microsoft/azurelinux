@@ -38,7 +38,8 @@ func testCustomizeImageVerityHelper(t *testing.T, testName string, imageType bas
 	configFile := filepath.Join(testDir, "verity-config.yaml")
 
 	// Customize image.
-	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "", true, false)
+	err := CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "",
+		"" /*outputPXEArtifactsDir*/, true /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -120,7 +121,7 @@ func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, 
 
 	// Customize image, shrink partitions, and split the partitions into individual files.
 	err = CustomizeImage(buildDir, testDir, &config, baseImage, nil, outImageFilePath, "", "raw",
-		true /*useBaseImageRpmRepos*/, true /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, true /*useBaseImageRpmRepos*/, true /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -157,7 +158,7 @@ func testCustomizeImageVerityShrinkExtractHelper(t *testing.T, testName string, 
 
 	// Verify that verity is configured correctly.
 	verifyVerity(t, bootMountPath, rootDevice.DevicePath(), hashDevice.DevicePath(), "PARTLABEL=root",
-		"PARTLABEL=root-hash")
+		"PARTLABEL=roothash")
 }
 
 func verifyVerity(t *testing.T, bootPath string, rootDevice string, hashDevice string, rootId string, hashId string) {

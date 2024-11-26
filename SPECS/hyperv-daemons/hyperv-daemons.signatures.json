@@ -7,6 +7,6 @@
     "hypervkvpd.service": "c1bb207cf9f388f8f3cf5b649abbf8cfe4c4fcf74538612946e68f350d1f265f",
     "hypervvss.rules": "94cead44245ef6553ab79c0bbac8419e3ff4b241f01bcec66e6f508098cbedd1",
     "hypervvssd.service": "22270d9f0f23af4ea7905f19c1d5d5495e40c1f782cbb87a99f8aec5a011078d",
-    "kernel-6.6.51.1.tar.gz": "018ece71bd3feb3f770e759c4c04a4472c72daf3a10f3f88de61083aaa6193df"
+    "kernel-6.6.57.1.tar.gz": "1b967b2dd19d13561fb28c5cf05fd35b8990a2ea70cc802c33d8dd1297a6fee3"
   }
 }

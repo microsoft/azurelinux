@@ -1,7 +1,6 @@
-%define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.4.2
+Version:        103.6.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -10,6 +9,10 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt
 Source0:        https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz#/jitterentropy-library-3.3.1.tar.gz
+Source2:        find-debuginfo
+# Use ./generate-env-file.sh --release-tag <git-version-tag> to generate this. For example:
+#   ./generate-env-file.sh --release-tag v103.5.1
+Source3:        symcrypt-build-environment-variables-v%{version}.sh
 BuildRequires:  cmake
 %ifarch aarch64
 BuildRequires:  clang >= 12.0.1-4
@@ -40,25 +43,47 @@ A core cryptographic library written by Microsoft
 %endif
 
 %prep
-%setup -q
-%setup -q -a 1
+%autosetup -a 1 -p1
 # Create a symbolic link as if jitterentropy-library has been pulled in as git submodule
 rm -rf 3rdparty/jitterentropy-library
 ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 
 %build
-SYMCRYPT_BRANCH=main \
-SYMCRYPT_COMMIT_HASH=a84ffe1 \
-SYMCRYPT_COMMIT_TIMESTAMP=2024-01-26T22:00:47-08:00 \
+source %{SOURCE3}
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DSYMCRYPT_STRIP_BINARY=OFF \
+        -DSYMCRYPT_FIPS_POSTPROCESS=OFF \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_C_COMPILER=%{symcrypt_cc} \
         -DCMAKE_CXX_COMPILER=%{symcrypt_cxx} \
         -DCMAKE_C_FLAGS="%{symcrypt_c_flags}" \
         -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
 
 cmake --build bin
+
+# Override the default find-debuginfo script to our own custom one, which is modified
+# to allow us to keep symbols.
+# Also add custom options to the call to find-debuginfo.
+%define __find_debuginfo %{SOURCE2}
+%define _find_debuginfo_opts \\\
+    --keep-symbol SymCryptVolatileFipsHmacKey \\\
+    --keep-symbol SymCryptVolatileFipsHmacKeyRva \\\
+    --keep-symbol SymCryptVolatileFipsBoundaryOffset \\\
+    --keep-symbol SymCryptVolatileFipsHmacDigest \\\
+    %{nil}
+
+# Override the default to allow us to do custom fips post-processing after debug info/stripping is done.
+# The post-processing script writes the modified file to the same location as the original file, which
+# is subject to default permissions, so we need to set permissions manually after the script.
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    mkdir -p "bin/module/generic/processing" \
+    python3 "scripts/process_fips_module.py" "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" --processing-dir "bin/module/generic/processing" --debug \
+    chmod 755 "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" \
+%{nil}
 
 %install
 mkdir -p %{buildroot}%{_libdir}
@@ -78,7 +103,16 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
-* Wed Jun 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.2-1
+* Mon Nov 25 2024 Tobias Brick <tobiasb@microsoft.com> - 103.6.0-1
+- Upgrde to 103.6.0
+
+* Mon Oct 21 2024 Tobias Brick <tobiasb@microsoft.com> - 103.5.1-1
+- Update 103.5.1
+
+* Mon Oct 14 2024 Tobias Brick <tobiasb@microsoft.com> - 103.4.2-2
+- Add debuginfo package
+
+* Wed Jun 26 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.2-1
 - Update SymCrypt to v103.4.2 for FIPS certification
 
 * Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-2

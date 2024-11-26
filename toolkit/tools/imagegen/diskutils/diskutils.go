@@ -434,8 +434,8 @@ func WaitForDevicesToSettle() error {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
-	readOnlyRootConfig configuration.ReadOnlyVerityRoot, diskKnownToBeEmpty bool,
-) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+	diskKnownToBeEmpty bool,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -489,29 +489,22 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			partedSupportsEmptyStringArgs)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
-			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
 				err = fmt.Errorf("failed to initialize encrypted root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
+				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
-		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
-			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
-			if err != nil {
-				err = fmt.Errorf("failed to initialize read only root:\n%w", err)
-				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
-			}
-			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
 		} else {
 			partDevPathMap[partition.ID] = partDevPath
 		}
@@ -682,13 +675,19 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	partitionNumberStr := strconv.Itoa(partitionNumber)
 
 	// There are two primary partition naming conventions:
-	// /dev/sdN<y> style or /dev/loopNp<x> style
+	// - /dev/sdN<y>
+	// - /dev/loopNp<x>
 	// Detect the exact one we are using.
-	// Make sure we check for /dev/loopNp<x> FIRST, since /dev/loop1 would generate /dev/loop11 as a partition
-	// device which may be a valid device. We want to select /dev/loop1p1 first.
 	testPartDevPaths := []string{
 		fmt.Sprintf("%sp%s", diskDevPath, partitionNumberStr),
-		fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr),
+	}
+
+	// If disk path ends in a digit, then the 'p<x>' style must be used.
+	// So, don't check the other style to avoid ambiguities. For example, /dev/loop1 vs. /dev/loop11.
+	// This is particularly relevant on Ubuntu, due to snap's use of loopback devices.
+	if !isDigit(diskDevPath[len(diskDevPath)-1]) {
+		devPath := fmt.Sprintf("%s%s", diskDevPath, partitionNumberStr)
+		testPartDevPaths = append(testPartDevPaths, devPath)
 	}
 
 	err = retry.Run(func() error {
@@ -757,6 +756,10 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
 	return
+}
+
+func isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
 }
 
 func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
