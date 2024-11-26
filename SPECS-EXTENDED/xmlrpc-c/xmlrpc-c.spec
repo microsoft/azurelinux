@@ -179,6 +179,9 @@ This package contains some handy XML-RPC demo applications.
 %{_bindir}/xmlrpc_dumpserver
 
 %changelog
+* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.59.03-1
+- Update to version 1.59.03
+
 * Wed Nov 16 2022 Suresh Thelkar <sthelkar@microsoft.com> - 1.54.06-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Added upstream patch to use va_args properly
