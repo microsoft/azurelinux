@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.20.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -17,6 +17,7 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         CVE-2023-21100.patch
+Patch1:         CVE-2024-21538.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -117,6 +118,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 18.20.3-2
+- Patch CVE-2024-21538
+
 * Thu Jun 13 2024 Nick Samson <nisamson@microsoft.com> - 18.20.3-1
 - Upgrade to 18.20.3-1 to fix CVE-2024-28863
 
