@@ -655,10 +655,17 @@ chroot_and_install_rpms gpgme
 chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
-chroot_and_install_rpms perl-FindBin
-chroot_and_install_rpms perl-Module-CoreList
-chroot_and_install_rpms perl-Module-Install
+chroot_and_install_rpms perl-JSON-PP
+chroot_and_install_rpms perl-Test-Simple
+build_rpm_in_chroot_no_install perl-YAML-Tiny
+
 chroot_and_install_rpms perl-YAML-Tiny
+build_rpm_in_chroot_no_install perl-Module-Install
+
+chroot_and_install_rpms perl-FindBin
+chroot_and_install_rpms perl-Module-Install
+chroot_and_install_rpms perl-Module-CoreList
+chroot_and_install_rpms perl-File-Temp
 build_rpm_in_chroot_no_install perl-WWW-Curl
 
 build_rpm_in_chroot_no_install tdnf
@@ -709,12 +716,12 @@ build_rpm_in_chroot_no_install python-markupsafe
 chroot_and_install_rpms python3-markupsafe
 build_rpm_in_chroot_no_install python-jinja2
 
-# python-pyparsing needs python3-devel, python3-pip, python3-wheel
+# pyparsing needs python3-devel, python3-pip, python3-wheel
 # python3-flit-core, pyproject-rpm-macros are also needed but already installed
 chroot_and_install_rpms python3-devel
 chroot_and_install_rpms python3-pip
 chroot_and_install_rpms python3-wheel
-build_rpm_in_chroot_no_install python-pyparsing
+build_rpm_in_chroot_no_install pyparsing
 
 # python-six needs python3-devel, python3-setuptools, python3-pip, openssl-devel, curl-devel are needed but already installed
 build_rpm_in_chroot_no_install python-six
