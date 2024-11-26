@@ -10841,8 +10841,8 @@
         "type": "other",
         "other": {
           "name": "libsecret",
-          "version": "0.20.4",
-          "downloadUrl": "https://download.gnome.org/sources/libsecret/0.20/libsecret-0.20.4.tar.xz"
+          "version": "0.21.4",
+          "downloadUrl": "https://download.gnome.org/sources/libsecret/0.21/libsecret-0.21.4.tar.xz"
         }
       }
     },
