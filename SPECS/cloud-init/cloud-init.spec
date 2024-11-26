@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,11 +9,14 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
+# This script is to prevent an intermittent issue where ephemeral disk not being formatted by cloud-init on Azure
+Source2:        module-setup.sh
 Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 Patch1:         no-single-process.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
+BuildRequires:  dracut
 BuildRequires:  iproute
 BuildRequires:  azurelinux-release 
 BuildRequires:  python3
@@ -95,6 +98,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d
 
 install -m 644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d/
 
+mkdir -p %{buildroot}%{_prefix}/lib/dracut/modules.d/99azure-cloud/
+install -m 755 %{SOURCE2} %{buildroot}%{_prefix}/lib/dracut/modules.d/99azure-cloud/module-setup.sh
+
 %check
 touch vd ud
 
@@ -137,11 +143,16 @@ make check %{?_smp_mflags}
 %{_systemdgeneratordir}/cloud-init-generator
 /usr/lib/udev/rules.d/66-azure-ephemeral.rules
 %{_datadir}/bash-completion/completions/cloud-init
+%dir %attr(0700, root, root) %{_prefix}/lib/dracut/modules.d/99azure-cloud
+%{_prefix}/lib/dracut/modules.d/99azure-cloud/module-setup.sh
 
 %files azure-kvp
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Nov 26 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-2
+- Add module-setup.sh to prevent an intermittent issue where ephemeral disk not being formatted on Azure
+
 * Tue Oct 01 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-1
 - Upgrade cloud-init to 24.3.1 to support azure-proxy-agent
 - Add upstream patch no-single-process.patch to revert a behavior change on cloud-init systemd
