@@ -3,46 +3,53 @@
 %bcond_with    cuda
 %bcond_with    gdrcopy
 %bcond_without ib
+%bcond_without knem
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
-%bcond_with    xpmem
+%bcond_without xpmem
 %bcond_with    vfs
+%bcond_with    mad
+%bcond_with    ze
+%bcond_without mlx5
 
-Summary:        UCX is a communication library implementing high-performance messaging
-Name:           ucx
-Version:        1.15.0
-Release:        1%{?dist}
-License:        BSD
+Name: ucx
+Version: 1.18.0
+Release: 3%{?dist}%{?debug:.debug}.2410068
+Summary: UCX is a communication library implementing high-performance messaging
+Group: System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Group:          System Environment/Security
-URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
+License: BSD
+URL: http://www.openucx.org
+Source: https://github.com/openucx/%{name}/releases/download/v1.18.0/ucx-1.18.0.tar.gz
 
+BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+Prefix: %{_prefix}
 
 # UCX currently supports only the following architectures
-ExclusiveArch: aarch64
-ExclusiveArch: ppc64le
-ExclusiveArch: x86_64
+ExclusiveArch: aarch64 ppc64le x86_64
 
 %if %{defined extra_deps}
 Requires: %{?extra_deps}
 %endif
 
-BuildRequires: automake
-BuildRequires: autoconf
-BuildRequires: libtool
-BuildRequires: gcc-c++
-
+BuildRequires: automake autoconf libtool gcc-c++
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
 %endif
 %if %{with gdrcopy}
 BuildRequires: gdrcopy
+BuildRequires: gdrcopy-devel
 %endif
 %if %{with ib}
 BuildRequires: libibverbs-devel
+%endif
+%if %{with mlx5}
+BuildRequires: rdma-core-devel
+%endif
+%if %{with knem}
+BuildRequires: knem
 %endif
 %if %{with rdmacm}
 BuildRequires: librdmacm-devel
@@ -56,8 +63,14 @@ BuildRequires: pkgconfig(cray-xpmem)
 %if %{with vfs}
 BuildRequires: fuse3-devel
 %endif
+%if %{with ze}
+BuildRequires: level-zero-devel
+%endif
 %if "%{debug}" == "1"
 BuildRequires: valgrind-devel
+%endif
+%if %{with mad}
+BuildRequires: libibmad-devel libibumad-devel
 %endif
 
 %description
@@ -70,11 +83,16 @@ addition, UCX provides efficient intra-node communication, by leveraging the
 following shared memory mechanisms: posix, sysv, cma, knem, and xpmem.
 The acronym UCX stands for "Unified Communication X".
 
-This package was built from '' branch, commit f086c1d.
+This package was built from '' branch, commit 152bf42.
+
+%if "%{_vendor}" == "suse"
+%debug_package
+%endif
 
 %package devel
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: Header files required for developing with UCX
+Group: Development/Libraries
 
 %description devel
 Provides header files and examples for developing with UCX.
@@ -88,7 +106,7 @@ Provides header files and examples for developing with UCX.
 %configure --disable-optimizations \
            %{!?debug:--disable-logging} \
            %{!?debug:--disable-debug} \
-           %{!?debug:--disable-assertions} \
+           %{!?debug:--disable-assertions --enable-mt} \
            %{!?debug:--disable-params-check} \
            %{?debug:--with-valgrind} \
            %{?debug:--enable-profiling} \
@@ -102,11 +120,15 @@ Provides header files and examples for developing with UCX.
            %_with_arg cuda cuda \
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
+           %_with_arg mlx5 mlx5 \
+           %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
            %_with_arg xpmem xpmem \
            %_with_arg vfs fuse3 \
            %_with_arg ugni ugni \
+           %_with_arg mad mad \
+           %_with_arg ze ze \
            %{?configure_options}
 make %{?_smp_mflags} V=1
 
@@ -121,6 +143,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %{_libdir}/lib*.so.*
 %{_bindir}/ucx_info
 %{_bindir}/ucx_perftest
+%{_bindir}/ucx_perftest_daemon
 %{_bindir}/ucx_read_profile
 %if "%{debug}" == "1"
 %{_bindir}/ucs_stats_parser
@@ -131,6 +154,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %doc README AUTHORS NEWS
 %{!?_licensedir:%global license %%doc}
 %license LICENSE
+%{_sysconfdir}/ucx/ucx.conf
 
 %files devel
 %{_includedir}/uc*
@@ -147,7 +171,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %postun -p /sbin/ldconfig
 
 %package static
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: Static libraries required for developing with UCX
 Group: Development/Libraries
 
@@ -160,11 +184,17 @@ Provides static libraries required for developing with UCX.
 %if %{with cma}
 %{_libdir}/pkgconfig/ucx-cma.pc
 %endif
+%if %{with knem}
+%{_libdir}/pkgconfig/ucx-knem.pc
+%endif
 %if %{with xpmem}
 %{_libdir}/pkgconfig/ucx-xpmem.pc
 %endif
 %if %{with ib}
 %{_libdir}/pkgconfig/ucx-ib.pc
+%endif
+%if %{with mlx5}
+%{_libdir}/pkgconfig/ucx-ib-mlx5.pc
 %endif
 %if %{with rdmacm}
 %{_libdir}/pkgconfig/ucx-rdmacm.pc
@@ -175,8 +205,9 @@ Provides static libraries required for developing with UCX.
 
 %if %{with cma}
 %package cma
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX CMA support
+Group: System Environment/Libraries
 
 %description cma
 Provides CMA (Linux cross-memory-attach) transport for UCX. It utilizes the
@@ -189,8 +220,9 @@ process.
 
 %if %{with cuda}
 %package cuda
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX CUDA support
+Group: System Environment/Libraries
 
 %description cuda
 Provide CUDA (NVIDIA GPU) support for UCX. Enables passing GPU memory pointers
@@ -205,8 +237,9 @@ technology for direct data transfer between GPU and RDMA devices.
 
 %if %{with gdrcopy}
 %package gdrcopy
-Requires: %{name}-cuda%{?_isa} = %{version}-%{release}
+Requires: %{name}-cuda = %{version}-%{release}
 Summary: UCX GDRCopy support
+Group: System Environment/Libraries
 
 %description gdrcopy
 Provide GDRCopy support for UCX. GDRCopy is a low-latency GPU memory copy
@@ -218,8 +251,9 @@ library, built on top of the NVIDIA GPUDirect RDMA technology.
 
 %if %{with ib}
 %package ib
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX RDMA support
+Group: System Environment/Libraries
 
 %description ib
 Provides support for IBTA-compliant transports for UCX. This includes RoCE,
@@ -231,10 +265,54 @@ hardware-offloaded data transfer.
 %{_libdir}/ucx/libuct_ib.so.*
 %endif
 
+%if %{with mlx5}
+%package ib-mlx5
+Requires: %{name} = %{version}-%{release}
+Summary: UCX IB MLX5 RDMA provider support
+Group: System Environment/Libraries
+
+%description ib-mlx5
+Provides support for DevX, Direct Verbs and DC transports for Infiniband
+devices.
+
+%files ib-mlx5
+%{_libdir}/ucx/libuct_ib_mlx5.so.*
+%endif
+
+%if %{with mad}
+%package mad
+Requires: %{name} = %{version}-%{release}
+Summary: UCX Infiniband MAD support
+Group: System Environment/Libraries
+
+%description mad
+Provide Infiniband MAD support for UCX. Enables running perftest using
+Infiniband datagrams for out-of-band communications.
+
+%files mad
+%{_libdir}/ucx/libucx_perftest_mad.so.*
+%endif
+
+%if %{with knem}
+%package knem
+Requires: %{name} = %{version}-%{release}
+Summary: UCX KNEM transport support
+Group: System Environment/Libraries
+
+%description knem
+Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
+kernel module that enables high-performance intra-node MPI communication
+for large messages.
+
+%files knem
+%{_libdir}/ucx/libuct_knem.so.*
+%endif
+
 %if %{with rdmacm}
 %package rdmacm
-Requires: %{name}-ib%{?_isa} = %{version}-%{release}
+Requires: %{name}-ib = %{version}-%{release}
 Summary: UCX RDMA connection manager support
+Group: System Environment/Libraries
 
 %description rdmacm
 Provides RDMA connection-manager support to UCX, which enables client/server
@@ -246,8 +324,9 @@ based connection establishment for RDMA-capable transports.
 
 %if %{with rocm}
 %package rocm
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX ROCm GPU support
+Group: System Environment/Libraries
 
 %description rocm
 Provides Radeon Open Compute (ROCm) Runtime support for UCX.
@@ -258,8 +337,9 @@ Provides Radeon Open Compute (ROCm) Runtime support for UCX.
 
 %if %{with gdrcopy}
 %package rocmgdr
-Requires: %{name}-rocm%{?_isa} = %{version}-%{release}
+Requires: %{name}-rocm = %{version}-%{release}
 Summary: UCX GDRCopy support for ROCM
+Group: System Environment/Libraries
 
 %description rocmgdr
 Provide GDRCopy support for UCX ROCM. GDRCopy is a low-latency GPU memory copy
@@ -272,8 +352,9 @@ library, built on top of the NVIDIA GPUDirect RDMA technology.
 
 %if %{with ugni}
 %package ugni
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX Gemini/Aries transport support.
+Group: System Environment/Libraries
 
 %description ugni
 Provides Gemini/Aries transport for UCX.
@@ -284,8 +365,9 @@ Provides Gemini/Aries transport for UCX.
 
 %if %{with xpmem}
 %package xpmem
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX XPMEM transport support.
+Group: System Environment/Libraries
 
 %description xpmem
 Provides XPMEM transport for UCX. XPMEM is a Linux kernel module that enables a
@@ -297,7 +379,7 @@ process to map the memory of another process into its virtual address space.
 
 %if %{with vfs}
 %package vfs
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Summary: UCX Virtual Filesystem support.
 Group: System Environment/Libraries
 
@@ -310,56 +392,51 @@ library internals, protocol objects, transports status, and more.
 %{_bindir}/ucx_vfs
 %endif
 
+%if %{with ze}
+%package ze
+Requires: %{name} = %{version}-%{release}
+Summary: UCX ZE GPU support
+Group: System Environment/Libraries
+
+%description ze
+Provides oneAPI Level Zero (ZE) Runtime support for UCX.
+
+%files ze
+%{_libdir}/ucx/libuct_ze.so.*
+%{_libdir}/ucx/libucm_ze.so.*
+%endif
+
 %changelog
-* Fri Jan 26 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
-- Update version to 1.15.0 and remove knem dependency
-
-* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
-- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
-
-* Tue Jul 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.11.0-3
-- Move from SPECS-EXTENDED to SPECS
-- License verified
-
-* Thu Aug 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-2
-- Initial CBL-Mariner import from Fedora 35 (license: MIT).
-- Remove option to build with libibcm
-
-* Mon Aug 09 2021 Yurii Shestakov <yuriis@nvidia.com> 1.11.0-1
+* Tue Nov 26 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> 1.18.0-3
+- Azure Linux update to version 1.18.0
+* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.18.0-2
+- Initial version Azure Linux
+* Fri Apr 19 2024 Yossi Itigin <yosefe@nvidia.com> 1.18.0-1
+- Bump version to 1.18.0
+* Tue Oct 31 2023 Yossi Itigin <yosefe@nvidia.com> 1.17.0-1
+- Bump version to 1.17.0
+* Fri Apr 28 2023 Yossi Itigin <yosefe@nvidia.com> 1.16.0-1
+- Bump version to 1.16.0
+* Mon Oct 24 2022 Yossi Itigin <yosefe@mellanox.com> 1.15.0-1
+- Bump version to 1.15.0
+* Sat Apr 16 2022 Yossi Itigin <yosefe@mellanox.com> 1.14.0-1
+- Bump version to 1.14.0
+* Wed Nov 10 2021 Yossi Itigin <yosefe@mellanox.com> 1.13.0-1
+- Bump version to 1.13.0
+* Wed Jun 9 2021 Yossi Itigin <yosefe@mellanox.com> 1.12.0-1
+- Bump version to 1.12.0
+* Tue Apr 27 2021 Leonid Genkin <lgenkin@nvidia.com> 1.11.0-1
+- Remove obsolete ib/cm code
+* Wed Dec 16 2020 Yossi Itigin <yosefe@mellanox.com> 1.11.0-1
+- Add VFS sub-package
+* Wed Dec 16 2020 Yossi Itigin <yosefe@mellanox.com> 1.11.0-1
 - Bump version to 1.11.0
-
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.1-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Thu May 27 2021 Yurii Shestakov <yuriis@nvidia.com> 1.10.1-2
-- Bump version to 1.10.1
-
-* Mon Apr 26 2021 Yurii Shestakov <yuriis@nvidia.com> 1.10.1-rc1
-- Bump version to 1.10.1-rc1
-
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
 * Wed Nov 11 2020 Yossi Itigin <yosefe@mellanox.com> 1.10.0-1
 - Make the RPM relocatable
-
-* Mon Nov  2 2020 Orion Poplawski <orion@nwra.com> - 1.9.0-1
-- Update to 1.9.0
-
-* Fri Oct 30 2020 Jeff Law <law@redhat.com> 1.8.1-5
-- Adjust workaround for gcc-11 diagnostic to narrow its scope
-
-* Thu Oct 29 2020 Jeff Law <law@redhat.com> 1.8.1-4
-- Disable -Warray-bounds diagnostics for gcc-11
-
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.1-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Mon Jul 20 2020 Jeff Law <law@redhat.com> 1.8.1-2
-- Fix broken configure files compromised by LTO
-
-* Wed Jul 1 2020 Yossi Itigin <yosefe@mellanox.com> 1.8.1-1
-- Bump version to 1.8.1
+* Tue Jul 07 2020 Yossi Itigin <yosefe@mellanox.com> 1.10.0-1
+- Bump version to 1.10.0
+* Mon Feb 10 2020 Yossi Itigin <yosefe@mellanox.com> 1.9.0-1
+- Bump version to 1.9.0
 * Sun Sep 22 2019 Yossi Itigin <yosefe@mellanox.com> 1.8.0-1
 - Bump version to 1.8.0
 * Sun Mar 24 2019 Yossi Itigin <yosefe@mellanox.com> 1.7.0-1
