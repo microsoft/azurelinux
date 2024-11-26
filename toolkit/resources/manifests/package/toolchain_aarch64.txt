@@ -9,9 +9,9 @@ bash-5.1.8-4.cm2.aarch64.rpm
 bash-debuginfo-5.1.8-4.cm2.aarch64.rpm
 bash-devel-5.1.8-4.cm2.aarch64.rpm
 bash-lang-5.1.8-4.cm2.aarch64.rpm
-binutils-2.37-9.cm2.aarch64.rpm
-binutils-debuginfo-2.37-9.cm2.aarch64.rpm
-binutils-devel-2.37-9.cm2.aarch64.rpm
+binutils-2.37-10.cm2.aarch64.rpm
+binutils-debuginfo-2.37-10.cm2.aarch64.rpm
+binutils-devel-2.37-10.cm2.aarch64.rpm
 bison-3.7.6-2.cm2.aarch64.rpm
 bison-debuginfo-3.7.6-2.cm2.aarch64.rpm
 bzip2-1.0.8-1.cm2.aarch64.rpm
@@ -570,8 +570,8 @@ tdnf-plugin-repogpgcheck-3.5.2-4.cm2.aarch64.rpm
 tdnf-python-3.5.2-4.cm2.aarch64.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
 texinfo-debuginfo-6.8-1.cm2.aarch64.rpm
-unzip-6.0-20.cm2.aarch64.rpm
-unzip-debuginfo-6.0-20.cm2.aarch64.rpm
+unzip-6.0-21.cm2.aarch64.rpm
+unzip-debuginfo-6.0-21.cm2.aarch64.rpm
 util-linux-2.37.4-9.cm2.aarch64.rpm
 util-linux-debuginfo-2.37.4-9.cm2.aarch64.rpm
 util-linux-devel-2.37.4-9.cm2.aarch64.rpm
