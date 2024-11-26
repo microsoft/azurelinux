@@ -22,7 +22,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License: BSD
 URL: http://www.openucx.org
-Source: https://github.com/openucx/%{name}/releases/download/v1.18.0/ucx-1.18.0.tar.gz
+Source: https://github.com/openucx/%{name}/releases/download/v1.18.0-rc1/ucx-1.18.0.tar.gz
 
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 Prefix: %{_prefix}
