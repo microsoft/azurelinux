@@ -2,10 +2,11 @@
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
 Version:        1.35
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
+Patch0:         CVE-2024-10224.patch
 URL:            http://search.cpan.org/dist/Module-ScanDeps/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,7 +40,7 @@ hash reference.  Its keys are the module names as they appear in %%INC (e.g.
 Test/More.pm).  The values are hash references.
 
 %prep
-%setup -q -n Module-ScanDeps-%{version}
+%autosetup -n Module-ScanDeps-%{version} -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
@@ -64,6 +65,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Nov 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35-2
+- Patched CVE-2024-10224.
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.35-1
 - Auto-upgrade to 1.35 - Azure Linux 3.0 - package upgrades
 
