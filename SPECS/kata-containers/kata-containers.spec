@@ -113,7 +113,7 @@ popd
 * Mon Nov 25 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl3-3
 - Fix CVE-2023-45288
 
-* Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
+* Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
 
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
