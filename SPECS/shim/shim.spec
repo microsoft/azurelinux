@@ -37,7 +37,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,13 @@ ExclusiveArch:  x86_64 aarch64
 
 Provides:       shim = %{version}-%{release}
 Obsoletes:      shim < %{version}-%{release}
+# Prior images and installations historically used "shim-unsigned" v15.4
+# in order to boot without Secure Boot enforcing.
+# To ensure a seamless upgrade experience from the older unsigned shim to
+# this new signed shim, include additional RPM dependency logic so older
+# installations will upgrade cleanly from the unsigned shim v15.4 to this new
+# signed version of the shim v15.8+
+Obsoletes:      shim-unsigned <= 15.4
 Provides:       shim-signed = %{version}-%{release}
 Provides:       shim-signed-%{efiarch} = %{version}-%{release}
 
@@ -167,7 +174,10 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
-* Wed Nov 10 2024 Chris Co <chrco@microsoft.com> - 15.8-3
+* Tue Nov 26 2024 Chris Co <chrco@microsoft.com> - 15.8-4
+- Add obsoletes for shim-unsigned v15.4 package
+
+* Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 15.8-3
 - update to 15.8
 - include mm
 - protect from dnf removal
