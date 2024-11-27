@@ -17,7 +17,7 @@
 
 Name: ucx
 Version: 1.18.0
-Release: 3%{?dist}%{?debug:.debug}.2410068
+Release: 3%{?dist}
 Summary: UCX is a communication library implementing high-performance messaging
 Group: System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -427,6 +427,16 @@ Provides oneAPI Level Zero (ZE) Runtime support for UCX.
 - Bump version to 1.13.0
 * Wed Jun 9 2021 Yossi Itigin <yosefe@mellanox.com> 1.12.0-1
 - Bump version to 1.12.0
+* Fri Jan 26 2024 Juan Camposeco <juanarturoc@microsoft.com> 1.15.0-5
+- Update version to 1.15.0 and remove knem dependency
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> 1.11.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+* Tue Jul 26 2022 Rachael Menge <rachelmenge@microsoft.com> 1.11.0-3
+- Move from SPECS-EXTENDED to SPECS
+- License verified
+* Thu Aug 26 2021 Thomas Crain <thcrain@microsoft.com> 1.11.0-2
+- Initial CBL-Mariner import from Fedora 35 (license: MIT).
+- Remove option to build with libibcm
 * Tue Apr 27 2021 Leonid Genkin <lgenkin@nvidia.com> 1.11.0-1
 - Remove obsolete ib/cm code
 * Wed Dec 16 2020 Yossi Itigin <yosefe@mellanox.com> 1.11.0-1
