@@ -13,7 +13,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      4%{?dist}
+Release:      5%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -21,6 +21,7 @@ URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      %{name}-%{version}-cargo.tar.gz
 Source2:      mariner-coco-build-uvm.sh
+Patch0:       CVE-2023-45288.patch
 
 ExclusiveArch: x86_64
 
@@ -288,6 +289,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Tue Nov 26 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl2-5
+- Add a patch for CVE-2023-45288
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-4
 - Bump release to rebuild with go 1.22.7
 
