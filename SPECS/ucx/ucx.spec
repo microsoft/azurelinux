@@ -49,7 +49,7 @@ BuildRequires: libibverbs-devel
 BuildRequires: rdma-core-devel
 %endif
 %if %{with knem}
-BuildRequires: knem
+#BuildRequires: knem
 %endif
 %if %{with rdmacm}
 BuildRequires: librdmacm-devel
@@ -185,7 +185,7 @@ Provides static libraries required for developing with UCX.
 %{_libdir}/pkgconfig/ucx-cma.pc
 %endif
 %if %{with knem}
-%{_libdir}/pkgconfig/ucx-knem.pc
+#%{_libdir}/pkgconfig/ucx-knem.pc
 %endif
 %if %{with xpmem}
 #%{_libdir}/pkgconfig/ucx-xpmem.pc
@@ -294,18 +294,18 @@ Infiniband datagrams for out-of-band communications.
 %endif
 
 %if %{with knem}
-%package knem
-Requires: %{name} = %{version}-%{release}
-Summary: UCX KNEM transport support
-Group: System Environment/Libraries
+#%package knem
+#Requires: %{name} = %{version}-%{release}
+#Summary: UCX KNEM transport support
+#Group: System Environment/Libraries
 
-%description knem
-Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
-kernel module that enables high-performance intra-node MPI communication
-for large messages.
+#%description knem
+#Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
+#kernel module that enables high-performance intra-node MPI communication
+#for large messages.
 
-%files knem
-%{_libdir}/ucx/libuct_knem.so.*
+#%files knem
+#%{_libdir}/ucx/libuct_knem.so.*
 %endif
 
 %if %{with rdmacm}
