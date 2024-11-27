@@ -663,9 +663,9 @@ build_rpm_in_chroot_no_install perl-YAML-Tiny
 chroot_and_install_rpms perl-YAML-Tiny
 build_rpm_in_chroot_no_install perl-Module-Install
 
-chroot_and_install_rpms perl-FindBin
 # Technically perl-Module-Install requires perl-Archive-Zip, however it does not appear to be important and
 # requires git to build.
+chroot_and_install_rpms perl-FindBin
 chroot_and_install_rpms perl-Module-Install
 chroot_and_install_rpms perl-Module-CoreList
 chroot_and_install_rpms perl-File-Temp
@@ -722,8 +722,6 @@ build_rpm_in_chroot_no_install python-jinja2
 # pyparsing needs python3-devel, python3-pip, python3-wheel
 # python3-flit-core, pyproject-rpm-macros are also needed but already installed
 chroot_and_install_rpms expat
-chroot_and_install_rpms expat-libs
-chroot_and_install_rpms expat-devel
 chroot_and_install_rpms python3-devel
 
 chroot_and_install_rpms python3-pip
