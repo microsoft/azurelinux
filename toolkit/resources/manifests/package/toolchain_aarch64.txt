@@ -430,6 +430,7 @@ perl-meta-notation-5.38.2-506.azl3.noarch.rpm
 perl-MIME-Base64-3.16-506.azl3.aarch64.rpm
 perl-Module-CoreList-5.20231129-506.azl3.noarch.rpm
 perl-Module-CoreList-tools-5.20231129-506.azl3.noarch.rpm
+perl-Module-Install-1.21-1.azl3.noarch.rpm
 perl-Module-Load-0.36-506.azl3.noarch.rpm
 perl-Module-Load-Conditional-0.74-506.azl3.noarch.rpm
 perl-Module-Loaded-0.08-506.azl3.noarch.rpm
@@ -510,8 +511,10 @@ perl-vars-1.05-506.azl3.noarch.rpm
 perl-version-0.99.29-506.azl3.noarch.rpm
 perl-vmsish-1.04-506.azl3.noarch.rpm
 perl-WWW-Curl-4.17-15.azl3.aarch64.rpm
+perl-WWW-Curl-debuginfo-4.17-15.azl3.aarch64.rpm
 perl-XML-Parser-2.47-1.azl3.aarch64.rpm
 perl-XML-Parser-debuginfo-2.47-1.azl3.aarch64.rpm
+perl-YAML-Tiny-1.74-1.azl3.noarch.rpm
 pinentry-1.2.1-1.azl3.aarch64.rpm
 pinentry-debuginfo-1.2.1-1.azl3.aarch64.rpm
 pkgconf-2.0.2-1.azl3.aarch64.rpm
