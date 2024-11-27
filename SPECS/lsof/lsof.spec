@@ -1,7 +1,7 @@
 Summary:        List Open Files
 Name:           lsof
 Version:        4.98.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,7 @@ Contains programs for generating Makefiles for use with Autoconf.
 
 %build
 ./Configure -n linux
-make CFGL="-L./lib -ltirpc" %{?_smp_mflags}
+make CFGL="-L./lib -ltirpc -lselinux" %{?_smp_mflags}
 
 %install
 mkdir -p %{buildroot}%{_sbindir}
@@ -35,6 +35,9 @@ install -v -m 0644 Lsof.8 %{buildroot}%{_mandir}/man8/lsof.8
 %{_mandir}/man8/*
 
 %changelog
+* Wed Nov 27 2024 Daniel McIlvaney <damcilva@microsoft.com> - 4.98.0-2
+- Enable linking against libselinux since is now found in the build environment
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.98.0-1
 - Auto-upgrade to 4.98.0 - Azure Linux 3.0 - package upgrades
 
