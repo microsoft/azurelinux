@@ -1,5 +1,4 @@
 %{!?configure_options: %global configure_options %{nil}}
-%{!?with_xpmem: %bcond_without xpmem}
 %bcond_without cma
 %bcond_with    cuda
 %bcond_with    gdrcopy
@@ -8,6 +7,7 @@
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
+%bcond_without xpmem
 %bcond_with    vfs
 %bcond_with    mad
 %bcond_with    ze
@@ -58,7 +58,7 @@ BuildRequires: librdmacm-devel
 BuildRequires: hsa-rocr-dev
 %endif
 %if %{with xpmem}
-BuildRequires: pkgconfig(cray-xpmem)
+#BuildRequires: pkgconfig(cray-xpmem)
 %endif
 %if %{with vfs}
 BuildRequires: fuse3-devel
@@ -124,6 +124,7 @@ Provides header files and examples for developing with UCX.
            %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
+           %_with_arg xpmem xpmem \
            %_with_arg vfs fuse3 \
            %_with_arg ugni ugni \
            %_with_arg mad mad \
@@ -187,7 +188,7 @@ Provides static libraries required for developing with UCX.
 %{_libdir}/pkgconfig/ucx-knem.pc
 %endif
 %if %{with xpmem}
-%{_libdir}/pkgconfig/ucx-xpmem.pc
+#%{_libdir}/pkgconfig/ucx-xpmem.pc
 %endif
 %if %{with ib}
 %{_libdir}/pkgconfig/ucx-ib.pc
@@ -363,17 +364,17 @@ Provides Gemini/Aries transport for UCX.
 %endif
 
 %if %{with xpmem}
-%package xpmem
-Requires: %{name} = %{version}-%{release}
-Summary: UCX XPMEM transport support.
-Group: System Environment/Libraries
+#%package xpmem
+#Requires: %{name} = %{version}-%{release}
+#Summary: UCX XPMEM transport support.
+#Group: System Environment/Libraries
 
-%description xpmem
-Provides XPMEM transport for UCX. XPMEM is a Linux kernel module that enables a
-process to map the memory of another process into its virtual address space.
+#%description xpmem
+#Provides XPMEM transport for UCX. XPMEM is a Linux kernel module that enables a
+#process to map the memory of another process into its virtual address space.
 
-%files xpmem
-%{_libdir}/ucx/libuct_xpmem.so.*
+#%files xpmem
+#%{_libdir}/ucx/libuct_xpmem.so.*
 %endif
 
 %if %{with vfs}
