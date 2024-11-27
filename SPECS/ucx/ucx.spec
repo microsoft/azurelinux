@@ -1,4 +1,5 @@
 %{!?configure_options: %global configure_options %{nil}}
+%{!?with_xpmem: %bcond_without xpmem}
 %bcond_without cma
 %bcond_with    cuda
 %bcond_with    gdrcopy
@@ -7,7 +8,6 @@
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
-%bcond_without xpmem
 %bcond_with    vfs
 %bcond_with    mad
 %bcond_with    ze
