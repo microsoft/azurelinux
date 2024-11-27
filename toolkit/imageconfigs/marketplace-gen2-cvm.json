@@ -5,7 +5,7 @@
             "MaxSize": 2048,
             "Artifacts": [
                 {
-                    "Name": "cvm",
+                    "Name": "cblmariner-gen2-cvm",
                     "Type": "vhd"
                 }
             ],
