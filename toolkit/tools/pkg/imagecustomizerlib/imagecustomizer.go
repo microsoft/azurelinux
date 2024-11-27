@@ -814,6 +814,12 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
+	// Refresh disk partitions so that the hash partition's UUID is correct
+	diskPartitions, err = diskutils.GetDiskPartitions(loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
 	err = updateGrubConfigForVerity(rootfsVerity, rootHash, grubCfgFullPath, partIdToPartUuid, diskPartitions)
 	if err != nil {
 		return err
