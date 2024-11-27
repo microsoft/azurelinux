@@ -22,6 +22,7 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{v
 Source1:      %{name}-%{version}-cargo.tar.gz
 Source2:      mariner-coco-build-uvm.sh
 Patch0:       CVE-2023-45288.patch
+Patch1:       CVE-2023-39325.patch
 
 ExclusiveArch: x86_64
 
@@ -290,7 +291,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %changelog
 * Tue Nov 26 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl2-5
-- Add a patch for CVE-2023-45288
+- Add patches for CVE-2023-45288, CVE-2023-39325
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-4
 - Bump release to rebuild with go 1.22.7
