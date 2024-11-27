@@ -195,7 +195,15 @@ chroot_and_print_installed_rpms () {
 # $1 is the spec name (which often matches the package name). If there is a naming conflict, $2 is the qualified package name
 # (e.g. foo.spec might produce bar-foo-1.0-1.rpm, so $2 would be bar-foo-1.0-1 while $1 would be foo). Normally $2 is not needed
 # and we will grab all RPMs that match $1.rpm.
+# If $3 is non-empty, we will skip the check for perl packages.
 chroot_and_install_rpms () {
+
+    # We install the core perl packages in a dedicated function to avoid clutter, and since they are fairly]
+    # interdependent. Print a warning and skip the install if we already did it in the bulk perl install.
+    if [[ -z $3 ]]; then
+        check_if_pkg_is_perl_core_pkg "$1" || { echo "Package $1 is a perl package!"; return 0; }
+    fi
+
     start_record_timestamp "build packages/install/$1"
     # $1 = spec name (or rpm name if $2 is omitted)
     # $2 = qualified package name
@@ -232,6 +240,218 @@ chroot_and_install_rpms () {
 
     chroot_unmount
     stop_record_timestamp "build packages/install/$1"
+}
+
+# These are all the core perl packages created by the perl.spec file.
+perl_package_array=( \
+    perl \
+    perl-Archive-Tar \
+    perl-Attribute-Handlers \
+    perl-autodie \
+    perl-AutoLoader \
+    perl-AutoSplit \
+    perl-autouse \
+    perl-B \
+    perl-base \
+    perl-Benchmark \
+    perl-bignum \
+    perl-blib \
+    perl-Carp \
+    perl-Class-Struct \
+    perl-Compress-Raw-Bzip2 \
+    perl-Compress-Raw-Zlib \
+    perl-Config-Extensions \
+    perl-Config-Perl-V \
+    perl-constant \
+    perl-CPAN \
+    perl-CPAN-Meta \
+    perl-CPAN-Meta-Requirements \
+    perl-CPAN-Meta-YAML \
+    perl-Data-Dumper \
+    perl-DBM_Filter \
+    perl-debugger \
+    perl-deprecate \
+    perl-devel \
+    perl-Devel-Peek \
+    perl-Devel-PPPort \
+    perl-Devel-SelfStubber \
+    perl-diagnostics \
+    perl-Digest \
+    perl-Digest-MD5 \
+    perl-Digest-SHA \
+    perl-DirHandle \
+    perl-doc \
+    perl-Dumpvalue \
+    perl-DynaLoader \
+    perl-Encode \
+    perl-Encode-devel \
+    perl-encoding \
+    perl-encoding-warnings \
+    perl-English \
+    perl-Env \
+    perl-Errno \
+    perl-experimental \
+    perl-Exporter \
+    perl-ExtUtils-CBuilder \
+    perl-ExtUtils-Command \
+    perl-ExtUtils-Constant \
+    perl-ExtUtils-Embed \
+    perl-ExtUtils-Install \
+    perl-ExtUtils-MakeMaker \
+    perl-ExtUtils-Manifest \
+    perl-ExtUtils-Miniperl \
+    perl-ExtUtils-MM-Utils \
+    perl-ExtUtils-ParseXS \
+    perl-Fcntl \
+    perl-fields \
+    perl-File-Basename \
+    perl-FileCache \
+    perl-File-Compare \
+    perl-File-Copy \
+    perl-File-DosGlob \
+    perl-File-Fetch \
+    perl-File-Find \
+    perl-FileHandle \
+    perl-File-Path \
+    perl-File-stat \
+    perl-File-Temp \
+    perl-filetest \
+    perl-Filter \
+    perl-Filter-Simple \
+    perl-FindBin \
+    perl-GDBM_File \
+    perl-Getopt-Long \
+    perl-Getopt-Std \
+    perl-Hash-Util \
+    perl-Hash-Util-FieldHash \
+    perl-HTTP-Tiny \
+    perl-I18N-Collate \
+    perl-I18N-Langinfo \
+    perl-I18N-LangTags \
+    perl-if \
+    perl-interpreter \
+    perl-IO \
+    perl-IO-Compress \
+    perl-IO-Socket-IP \
+    perl-IO-Zlib \
+    perl-IPC-Cmd \
+    perl-IPC-Open3 \
+    perl-IPC-SysV \
+    perl-JSON-PP \
+    perl-less \
+    perl-lib \
+    perl-libnet \
+    perl-libnetcfg \
+    perl-libs \
+    perl-locale \
+    perl-Locale-Maketext \
+    perl-Locale-Maketext-Simple \
+    perl-macros \
+    perl-Math-BigInt \
+    perl-Math-BigInt-FastCalc \
+    perl-Math-BigRat \
+    perl-Math-Complex \
+    perl-Memoize \
+    perl-meta-notation \
+    perl-MIME-Base64 \
+    perl-Module-CoreList \
+    perl-Module-CoreList-tools \
+    perl-Module-Load \
+    perl-Module-Load-Conditional \
+    perl-Module-Loaded \
+    perl-Module-Metadata \
+    perl-mro \
+    perl-NDBM_File \
+    perl-Net \
+    perl-Net-Ping \
+    perl-NEXT \
+    perl-ODBM_File \
+    perl-Opcode \
+    perl-open \
+    perl-overload \
+    perl-overloading \
+    perl-Params-Check \
+    perl-parent \
+    perl-PathTools \
+    perl-perlfaq \
+    perl-PerlIO-via-QuotedPrint \
+    perl-Perl-OSType \
+    perl-ph \
+    perl-Pod-Checker \
+    perl-Pod-Escapes \
+    perl-Pod-Functions \
+    perl-Pod-Html \
+    perl-podlators \
+    perl-Pod-Perldoc \
+    perl-Pod-Simple \
+    perl-Pod-Usage \
+    perl-POSIX \
+    perl-Safe \
+    perl-Scalar-List-Utils \
+    perl-Search-Dict \
+    perl-SelectSaver \
+    perl-SelfLoader \
+    perl-sigtrap \
+    perl-Socket \
+    perl-sort \
+    perl-Storable \
+    perl-subs \
+    perl-Symbol \
+    perl-Sys-Hostname \
+    perl-Sys-Syslog \
+    perl-Term-ANSIColor \
+    perl-Term-Cap \
+    perl-Term-Complete \
+    perl-Term-ReadLine \
+    perl-Test \
+    perl-Test-Harness \
+    perl-tests \
+    perl-Test-Simple \
+    perl-Text-Abbrev \
+    perl-Text-Balanced \
+    perl-Text-ParseWords \
+    perl-Text-Tabs+Wrap \
+    perl-Thread \
+    perl-Thread-Queue \
+    perl-threads \
+    perl-Thread-Semaphore \
+    perl-threads-shared \
+    perl-Tie \
+    perl-Tie-File \
+    perl-Tie-Memoize \
+    perl-Tie-RefHash \
+    perl-Time \
+    perl-Time-HiRes \
+    perl-Time-Local \
+    perl-Time-Piece \
+    perl-Unicode-Collate \
+    perl-Unicode-Normalize \
+    perl-Unicode-UCD \
+    perl-User-pwent \
+    perl-utils \
+    perl-vars \
+    perl-version \
+    perl-vmsish \
+)
+
+check_if_pkg_is_perl_core_pkg () {
+    pkg=$1
+    # Very noisy, so we silence the output of just this block
+    (
+        set +x
+        for perl_package in "${perl_package_array[@]}"; do
+            if [ "$pkg" == "$perl_package" ]; then
+                return 1
+            fi
+        done
+        return 0
+    )
+}
+
+chroot_and_install_all_perl_rpms () {
+    for perl_package in "${perl_package_array[@]}"; do
+        chroot_and_install_rpms "$perl_package" "" "skip_check"
+    done
 }
 
 chroot_and_run_rpmbuild () {
@@ -417,7 +637,9 @@ chroot_and_install_rpms gdbm
 chroot_and_install_rpms bzip2
 chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
-chroot_and_install_rpms perl
+
+# Perl procudes a lot of RPMs, just install them all in one go
+chroot_and_install_all_perl_rpms
 
 # perl-generators requires perl-Fedora-VSP
 # All perl packages need perl-generators to correctly
@@ -655,14 +877,17 @@ chroot_and_install_rpms gpgme
 chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
-chroot_and_install_rpms perl-JSON-PP
-chroot_and_install_rpms perl-Test-Simple
+# perl-generators is already installed
+# perl, perl-ExtUtils-MakeMaker, perl-JSON-PP, perl-Test-Simple are already installed via bulk perl install
 build_rpm_in_chroot_no_install perl-YAML-Tiny
 
+# perl-Carp, perl-Exporter, perl-Fcntl, perl-Scalar-List-Utils installed via bulk perl install
 chroot_and_install_rpms perl-YAML-Tiny
 build_rpm_in_chroot_no_install perl-Module-Install
 
 chroot_and_install_rpms perl-FindBin
+# Technically perl-Module-Install requires perl-Archive-Zip, however it does not appear to be important and
+# requires git to build.
 chroot_and_install_rpms perl-Module-Install
 chroot_and_install_rpms perl-Module-CoreList
 chroot_and_install_rpms perl-File-Temp
@@ -718,7 +943,11 @@ build_rpm_in_chroot_no_install python-jinja2
 
 # pyparsing needs python3-devel, python3-pip, python3-wheel
 # python3-flit-core, pyproject-rpm-macros are also needed but already installed
+chroot_and_install_rpms expat
+chroot_and_install_rpms expat-libs
+chroot_and_install_rpms expat-devel
 chroot_and_install_rpms python3-devel
+
 chroot_and_install_rpms python3-pip
 chroot_and_install_rpms python3-wheel
 build_rpm_in_chroot_no_install pyparsing
