@@ -196,7 +196,6 @@ chroot_and_print_installed_rpms () {
 # (e.g. foo.spec might produce bar-foo-1.0-1.rpm, so $2 would be bar-foo-1.0-1 while $1 would be foo). Normally $2 is not needed
 # and we will grab all RPMs that match $1.rpm.
 chroot_and_install_rpms () {
-
     start_record_timestamp "build packages/install/$1"
     # $1 = spec name (or rpm name if $2 is omitted)
     # $2 = qualified package name
@@ -234,7 +233,6 @@ chroot_and_install_rpms () {
     chroot_unmount
     stop_record_timestamp "build packages/install/$1"
 }
-
 
 chroot_and_run_rpmbuild () {
     # $1 = SRPM name
