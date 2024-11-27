@@ -10601,8 +10601,8 @@
         "type": "other",
         "other": {
           "name": "libproxy",
-          "version": "0.4.17",
-          "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
+          "version": "0.5.8",
+          "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.5.8.tar.gz"
         }
       }
     },
