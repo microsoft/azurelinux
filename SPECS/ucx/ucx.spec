@@ -124,7 +124,6 @@ Provides header files and examples for developing with UCX.
            %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
-           --without-xpmem \
            %_with_arg vfs fuse3 \
            %_with_arg ugni ugni \
            %_with_arg mad mad \
