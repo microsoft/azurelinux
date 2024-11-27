@@ -49,6 +49,7 @@ Source2:        50-kata
 Source3:        mariner-build-uvm.sh
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2023-39325.patch
+Patch2:         CVE-2024-24786.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -217,8 +218,8 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
-* Tue Nov 26 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl2-5
-- Add patches for CVE-2023-45288, CVE-2023-39325
+* Wed Nov 27 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl2-5
+- Add patches for CVE-2023-45288, CVE-2023-39325 and CVE-2024-24786
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-4
 - Bump release to rebuild with go 1.22.7
