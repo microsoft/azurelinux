@@ -9681,8 +9681,8 @@
         "type": "other",
         "other": {
           "name": "libgxps",
-          "version": "0.3.1",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/libgxps/0.3/libgxps-0.3.1.tar.xz"
+          "version": "0.3.2",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/libgxps/0.3/libgxps-0.3.2.tar.xz"
         }
       }
     },
