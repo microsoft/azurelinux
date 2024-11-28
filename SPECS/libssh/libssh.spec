@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libssh
 Version:        0.10.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -12,6 +12,7 @@ Source1:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz.asc
 Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
 Source3:        libssh_client.config
 Source4:        libssh_server.config
+Patch0:         CVE-2023-48795.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -144,6 +145,9 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Thu Nov 28 2024 Sumedh Sharma <sumsharma@microsoft.com> - 0.10.5-3
+- Add patch to resolve CVE-2023-48795
+
 * Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 0.10.5-2
 - License verified.
 - Switched to out-of-source build.
