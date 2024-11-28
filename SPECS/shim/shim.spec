@@ -37,7 +37,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,8 @@ ExclusiveArch:  x86_64 aarch64
 
 Provides:       shim = %{version}-%{release}
 Obsoletes:      shim < %{version}-%{release}
+Provides:       shim-signed = %{version}-%{release}
+Provides:       shim-signed-%{efiarch} = %{version}-%{release}
 # Prior images and installations historically used "shim-unsigned" v15.4
 # in order to boot without Secure Boot enforcing.
 # To ensure a seamless upgrade experience from the older unsigned shim to
@@ -54,8 +56,19 @@ Obsoletes:      shim < %{version}-%{release}
 # installations will upgrade cleanly from the unsigned shim v15.4 to this new
 # signed version of the shim v15.8+
 Obsoletes:      shim-unsigned <= 15.4
-Provides:       shim-signed = %{version}-%{release}
-Provides:       shim-signed-%{efiarch} = %{version}-%{release}
+# Unlike dnf, our current tdnf does not gracefully handle Obsoletes properly.
+# When the user runs "tdnf install shim-unsigned". The proper
+# behavior with Obsoletes only in place is for this transaction to
+# complete with nothing to do, which is what dnf does. However tdnf still
+# attempts to perform the transaction, which yields undesired results and
+# potential RPM transaction errors.
+#
+# As a workaround to tdnf's lack of correct support of Obsoletes, add an
+# additional Provides to the shim package to have it "provide" for
+# shim-unsigned as well.
+# This workaround can be removed when tdnf is updated with proper RPM
+# Obsoletes behavior.
+Provides:       shim-unsigned = %{version}-%{release}
 
 # This is when grub was updated to be signed with the newer Azure Linux certificate
 Conflicts:      grub2-efi-binary < 2.06-22
@@ -174,6 +187,9 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
+* Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
+- Add Provides for shim-unsigned
+
 * Tue Nov 26 2024 Chris Co <chrco@microsoft.com> - 15.8-4
 - Add obsoletes for shim-unsigned v15.4 package
 
