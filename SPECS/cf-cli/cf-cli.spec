@@ -45,6 +45,7 @@ The official command line client for Cloud Foundry.
 %setup -q -n cli-%{version}
 tar --no-same-owner -xf %{SOURCE1}
 %patch 0 -p1
+%patch 1 -p1
 
 %build
 export GOPATH=%{our_gopath}
