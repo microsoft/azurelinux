@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20240213
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,6 +54,7 @@ Patch3:         CVE-2024-3727.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch4:         CVE-2024-37298.patch
 Patch5:         CVE-2024-6104.patch
+Patch6:         CVE-2023-48795.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -85,6 +86,7 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 0 -p1
 %patch 1 -p1
 %patch 3 -p1
+%patch 6 -p1
 
 # copy the LICENSE file in the build root
 cd ..
@@ -181,6 +183,9 @@ fi
 %license LICENSE
 
 %changelog
+* Thu Nov 28 2024 Sumedh Sharma <sumsharma@microsoft.com> - 20240213-3
+- Address CVE-2023-48795 in vendored golang.org/x/crypto/ssh
+
 * Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 - Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
