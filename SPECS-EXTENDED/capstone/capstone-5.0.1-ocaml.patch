@@ -1,0 +1,12 @@
+diff -ru capstone-5.0.1/bindings/ocaml/Makefile capstone-5.0.1.new/bindings/ocaml/Makefile
+--- capstone-5.0.1/bindings/ocaml/Makefile	2023-08-22 18:03:55.000000000 +0200
++++ capstone-5.0.1.new/bindings/ocaml/Makefile	2023-11-12 10:28:45.320198200 +0100
+@@ -2,7 +2,7 @@
+ # By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2015
+ 
+ LIB = capstone
+-FLAGS = '-Wall -Wextra -Wwrite-strings'
++FLAGS = '-Wall -Wextra -Wwrite-strings -I ../../include -L ../../'
+ PYTHON2 ?= python
+ 
+ all: arm_const.cmxa arm64_const.cmxa m680x_const.cmxa mips_const.cmxa ppc_const.cmxa sparc_const.cmxa sysz_const.cmxa x86_const.cmxa xcore_const.cmxa arm.cmxa arm64.cmxa m680x.cmxa mips.cmxa ppc.cmxa x86.cmxa sparc.cmxa systemz.cmxa xcore.cmxa capstone.cmxa test_basic.cmx test_detail.cmx test_x86.cmx test_arm.cmx test_arm64.cmx test_mips.cmx test_ppc.cmx test_sparc.cmx test_systemz.cmx test_xcore.cmx test_m680x.cmx ocaml.o
