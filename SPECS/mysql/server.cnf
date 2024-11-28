@@ -11,8 +11,8 @@
 # instructions in http://fedoraproject.org/wiki/Systemd
 
 [mysqld]
-datadir=@MYSQL_DATADIR@
-socket=@MYSQL_UNIX_ADDR@
-log-error=@LOGFILE_RPM@
-pid-file=@PID_FILE_DIR@/@DAEMON_NO_PREFIX@.pid
+datadir= /var/lib/mysql
+socket=/var/lib/mysql/mysql.sock 
+log-error=/var/log/mysql/mysqld.log
+pid-file=/run/mysqld/mysqld.pid
 

@@ -18,7 +18,7 @@ get_mysql_option(){
 	sections="$1"
 	option_name="$2"
 	default_value="$3"
-	result=`@bindir@/my_print_defaults $my_print_defaults_extra_args $sections | sed -n "s/^--${option_name}=//p" | tail -n 1`
+	result=`/usr/bin/my_print_defaults $my_print_defaults_extra_args $sections | sed -n "s/^--${option_name}=//p" | tail -n 1`
 	if [ -z "$result" ]; then
 	    # not found, use default
 	    result="${default_value}"
@@ -48,9 +48,9 @@ done
 # must correspond with values defined in mysqld_safe script and source
 # code itself.
 
-server_sections="mysqld_safe mysqld server mysqld-@PACKAGE_VERSION@ client-server"
+server_sections="mysqld_safe mysqld server mysqld-8.4.3 client-server"
 
-get_mysql_option "$server_sections" datadir "@MYSQL_DATADIR@"
+get_mysql_option "$server_sections" datadir "/var/lib/mysql"
 datadir="$result"
 
 # if there is log_error in the my.cnf, my_print_defaults still
@@ -60,7 +60,7 @@ datadir="$result"
 get_mysql_option "$server_sections" log-error "$datadir/`hostname`.err"
 errlogfile="$result"
 
-get_mysql_option "$server_sections" socket "@MYSQL_UNIX_ADDR@"
+get_mysql_option "$server_sections" socket "/var/lib/mysql/mysql.sock"
 socketfile="$result"
 
 get_mysql_option "$server_sections" pid-file "$datadir/`hostname`.pid"

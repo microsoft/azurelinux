@@ -17,10 +17,10 @@ if [ "$status" = "unknown" ] ; then
 fi
 
 
-if [ -x @bindir@/mysql_config-$bits ] ; then
-    @bindir@/mysql_config-$bits "$@"
+if [ -x /usr/bin/mysql_config-$bits ] ; then
+    /usr/bin/mysql_config-$bits "$@"
 else
-    echo "$0: error: needed binary: @bindir@/mysql_config-$bits is missing"
+    echo "$0: error: needed binary: /usr/bin/mysql_config-$bits is missing"
     exit 1
 fi
 

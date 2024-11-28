@@ -1,1 +1,1 @@
-d @PID_FILE_DIR@ 0755 mysql mysql -
+d /run/mysqld 0755 mysql mysql -

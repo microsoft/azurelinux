@@ -27,7 +27,7 @@ else
     SERVICE_NAME="$1"
     if [ x"$SERVICE_NAME" = x ]
     then
-        SERVICE_NAME=@DAEMON_NAME@.service
+        SERVICE_NAME=mysqld.service
     fi
 
     myuser=`systemctl show -p User "${SERVICE_NAME}" |
@@ -93,12 +93,12 @@ should_initialize ()
 if should_initialize "$datadir" ; then
 
     # Now create the database
-    echo "Initializing MySQL @PACKAGE_VERSION@ database"
-    @libexecdir@/mysqld --initialize-insecure --datadir="$datadir" --user="$myuser"
+    echo "Initializing MySQL 8.4.3 database"
+    /usr/libexec/mysqld --initialize-insecure --datadir="$datadir" --user="$myuser"
     ret=$?
     if [ $ret -ne 0 ] ; then
-        echo "Initialization of MySQL @PACKAGE_VERSION@ database failed." >&2
-        echo "Perhaps @sysconfdir@/my.cnf is misconfigured." >&2
+        echo "Initialization of MySQL 8.4.3 database failed." >&2
+        echo "Perhaps /etc/my.cnf is misconfigured." >&2
         # Clean up any partially-created database files
         if [ ! -e "$datadir/mysql/user.frm" ] ; then
             rm -rf "$datadir"/*
@@ -106,7 +106,7 @@ if should_initialize "$datadir" ; then
         exit $ret
     fi
     # upgrade does not need to be run on a fresh datadir
-    echo "@PACKAGE_VERSION@" >"$datadir/mysql_upgrade_info"
+    echo "8.4.3" >"$datadir/mysql_upgrade_info"
 fi
 
 exit 0

@@ -25,7 +25,7 @@
 # Don't forget to reload systemd daemon after you change unit configuration:
 # root> systemctl --system daemon-reload
 [Unit]
-Description=MySQL @PACKAGE_VERSION@ database server
+Description=MySQL 8.4.3 database server
 After=syslog.target
 After=network.target
 
@@ -34,12 +34,12 @@ Type=notify
 User=mysql
 Group=mysql
  
-ExecStartPre=@libexecdir@/mysql-check-socket.sh --defaults-group-suffix=.%I
-ExecStartPre=@libexecdir@/mysql-prepare-db-dir.sh --defaults-group-suffix=.%I %n
+ExecStartPre=/usr/libexec/mysql-check-socket.sh --defaults-group-suffix=.%I
+ExecStartPre=/usr/libexec/mysql-prepare-db-dir.sh --defaults-group-suffix=.%I %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart=@libexecdir@/mysqld --defaults-group-suffix=.%I --basedir=@prefix@
-ExecStopPost=@libexecdir@/mysql-wait-stop.sh --defaults-group-suffix=.%I
+ExecStart=/usr/libexec/mysqld --defaults-group-suffix=.%I --basedir=/usr
+ExecStopPost=/usr/libexec/mysql-wait-stop.sh --defaults-group-suffix=.%I
  
 # Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=300
@@ -52,7 +52,7 @@ Restart=on-failure
 RestartPreventExitStatus=1
  
 # Sets open_files_limit
-LimitNOFILE = 10000
+LimitNOFILE = 20000
  
 # Set enviroment variable MYSQLD_PARENT_PID. This is required for SQL restart command.
 Environment=MYSQLD_PARENT_PID=1
