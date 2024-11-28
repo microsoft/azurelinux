@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source0:        https://github.com/lathiat/avahi/releases/download/v%{version}/%
 Patch0:         %{name}-libevent-pc-fix.patch
 Patch1:         CVE-2021-3468.patch
 Patch2:         CVE-2021-3502.patch
+Patch3:         CVE-2023-38469.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -412,6 +413,9 @@ exit 0
 - Add nopatch for CVE-2021-26720
 - Remove mono patch- we don't build with mono.
 - Remove local services patch- upstreamed
+
+*Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38469.patch with an upstream patch 
 
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
 - License verified
