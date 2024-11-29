@@ -3960,8 +3960,8 @@
         "type": "other",
         "other": {
           "name": "fuse-sshfs",
-          "version": "3.7.1",
-          "downloadUrl": "https://github.com/libfuse/sshfs/releases/download/sshfs-3.7.1/sshfs-3.7.1.tar.xz"
+          "version": "3.7.3",
+          "downloadUrl": "https://github.com/libfuse/sshfs/releases/download/sshfs-3.7.3/sshfs-3.7.3.tar.xz"
         }
       }
     },
