@@ -3658,8 +3658,8 @@
         "type": "other",
         "other": {
           "name": "flite",
-          "version": "1.3",
-          "downloadUrl": "http://www.speech.cs.cmu.edu/flite/packed/flite-1.3/flite-1.3-release.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/festvox/flite/archive/refs/tags/v2.2.tar.gz"
         }
       }
     },
