@@ -9731,8 +9731,8 @@
         "type": "other",
         "other": {
           "name": "libipt",
-          "version": "2.0.5",
-          "downloadUrl": "https://github.com/intel/libipt/archive/v2.0.5.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/intel/libipt/archive/v2.1.1.tar.gz"
         }
       }
     },
