@@ -11031,8 +11031,8 @@
         "type": "other",
         "other": {
           "name": "libssh2",
-          "version": "1.11.0",
-          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.11.0.tar.gz"
+          "version": "1.11.1",
+          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.11.1.tar.gz"
         }
       }
     },
