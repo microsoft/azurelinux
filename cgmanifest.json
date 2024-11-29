@@ -3678,8 +3678,8 @@
         "type": "other",
         "other": {
           "name": "fltk",
-          "version": "1.3.5",
-          "downloadUrl": "http://fltk.org/pub/fltk/1.3.5/fltk-1.3.5-source.tar.gz"
+          "version": "1.3.8",
+          "downloadUrl": ""https://www.fltk.org/pub/fltk/1.3.8/fltk-1.3.8-source.tar.gz
         }
       }
     },
