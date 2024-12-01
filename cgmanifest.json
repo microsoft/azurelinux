@@ -9901,8 +9901,8 @@
         "type": "other",
         "other": {
           "name": "liblockfile",
-          "version": "1.14",
-          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.14.orig.tar.gz"
+          "version": "1.17",
+          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.17.orig.tar.gz"
         }
       }
     },
