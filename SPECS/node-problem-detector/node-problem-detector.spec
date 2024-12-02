@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,6 +39,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        %{name}-%{version}-test-vendor.tar.gz
 Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
 Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
+Patch2:         CVE-2023-48795.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
@@ -59,15 +60,15 @@ Requires:       node-problem-detector
 Default configuration files for node-problem-detector
 
 %prep
-%autosetup -p1 
-
-%build
+%autosetup -N
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
 popd
+%autopatch -p1
 
+%build
 %make_build build-binaries VERSION=%{version}
 
 %install
@@ -99,6 +100,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Thu Nov 28 2024 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.15-2
+- Add patch to resolve CVE-2023-48795
+
 * Fri Feb 16 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.8.15-1
 - Upgrade to 0.8.15 for Azure Linux 3.0
 
