@@ -60,9 +60,8 @@ Requires:       node-problem-detector
 Default configuration files for node-problem-detector
 
 %prep
-%autosetup -p1 
+%autosetup -p1
 
-%build
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
 %patch 2 -p1
@@ -71,6 +70,7 @@ tar -xf %{SOURCE2} --no-same-owner
 %patch 2 -p1
 popd
 
+%build
 %make_build build-binaries VERSION=%{version}
 
 %install
