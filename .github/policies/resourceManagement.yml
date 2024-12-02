@@ -24,6 +24,13 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
+                    - SPECS-EXTENDED/
+            then:
+              - addLabel:
+                  label: specs-extended
+          - if:
+              - includesModifiedFiles:
+                  files:
                     - toolkit/docs/
             then:
               - addLabel:
@@ -69,16 +76,40 @@ configuration:
         then:
           - if:
               - targetsBranch:
-                  branch: 1.0-dev
-            then:
-              - addLabel:
-                  label: 1.0-dev
-          - if:
-              - targetsBranch:
                   branch: main
             then:
               - addLabel:
                   label: main
+          - if:
+              - targetsBranch:
+                  branch: 2.0
+            then:
+              - addLabel:
+                  label: 2.0
+          - if:
+              - targetsBranch:
+                  branch: 3.0-dev
+            then:
+              - addLabel:
+                  label: 3.0-dev
+          - if:
+              - targetsBranch:
+                  branch: 3.0
+            then:
+              - addLabel:
+                  label: 3.0
+          - if:
+              - targetsBranch:
+                  branch: fasttrack/2.0
+            then:
+              - addLabel:
+                  label: fasttrack/2.0
+          - if:
+              - targetsBranch:
+                  branch: fasttrack/3.0
+            then:
+              - addLabel:
+                  label: fasttrack/3.0
         description:
 onFailure:
 onSuccess:
