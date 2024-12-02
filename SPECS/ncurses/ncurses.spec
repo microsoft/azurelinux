@@ -233,7 +233,7 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
-* Mon Dec 01 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.4-3
+* Mon Dec 02 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.4-3
 - Update to version 6.4-20231125 to fix CVE-2023-45918 and CVE-2023-50495
 
 * Thu Nov 16 2023 Tobias Brick <tobiasb@microsoft.com> - 6.4-2
