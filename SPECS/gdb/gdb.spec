@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
