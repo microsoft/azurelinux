@@ -1,4 +1,4 @@
-%global patchlevel     20231125
+%global patchlevel     20230520
 
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
