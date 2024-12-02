@@ -33,11 +33,11 @@ libpkgconf-1.8.0-3.cm2.x86_64.rpm
 pkgconf-1.8.0-3.cm2.x86_64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.x86_64.rpm
-ncurses-6.4-2.cm2.x86_64.rpm
-ncurses-compat-6.4-2.cm2.x86_64.rpm
-ncurses-devel-6.4-2.cm2.x86_64.rpm
-ncurses-libs-6.4-2.cm2.x86_64.rpm
-ncurses-term-6.4-2.cm2.x86_64.rpm
+ncurses-6.4-3.cm2.x86_64.rpm
+ncurses-compat-6.4-3.cm2.x86_64.rpm
+ncurses-devel-6.4-3.cm2.x86_64.rpm
+ncurses-libs-6.4-3.cm2.x86_64.rpm
+ncurses-term-6.4-3.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
@@ -236,7 +236,7 @@ ca-certificates-tools-2.0.0-18.cm2.noarch.rpm
 ca-certificates-base-2.0.0-18.cm2.noarch.rpm
 ca-certificates-2.0.0-18.cm2.noarch.rpm
 dwz-0.14-2.cm2.x86_64.rpm
-unzip-6.0-20.cm2.x86_64.rpm
+unzip-6.0-21.cm2.x86_64.rpm
 python3-3.9.19-7.cm2.x86_64.rpm
 python3-devel-3.9.19-7.cm2.x86_64.rpm
 python3-libs-3.9.19-7.cm2.x86_64.rpm
