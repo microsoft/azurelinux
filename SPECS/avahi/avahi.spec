@@ -14,6 +14,7 @@ Patch1:         CVE-2021-3468.patch
 Patch2:         CVE-2021-3502.patch
 Patch3:         CVE-2023-1981.patch
 Patch4:         CVE-2023-38469.patch
+Patch5:         CVE-2023-38472.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -421,6 +422,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-4
+- Fix CVE-2023-38472 with an upstream patch
+
 * Wed Nov 27 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
 - Fix CVE-2023-38469 with an upstream patch
 
