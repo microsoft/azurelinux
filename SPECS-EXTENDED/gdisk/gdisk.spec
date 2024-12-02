@@ -1,10 +1,10 @@
 Summary:       An fdisk-like partitioning tool for GPT disks
-Vendor:        Microsoft Corporation
-Distribution:  Azure Linux
 Name:          gdisk
 Version:       1.0.10
-Release:       3%{?dist}
+Release:       1%{?dist}
 License:       GPL-2.0-only
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 URL:           http://www.rodsbooks.com/gdisk/
 Source0:       http://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz
 BuildRequires: gcc-c++
@@ -47,32 +47,8 @@ make test
 %{_mandir}/man8/fixparts.8*
 
 %changelog
-* Wed Nov 06 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.10-3
+* Wed Nov 06 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.10-1
 - Update to 1.0.10
-
-* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.10-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Tue Feb 20 2024 Terje Rosten <terje.rosten@ntnu.no> - 1.0.10-1
-- 1.0.10
-
-* Mon Feb 12 2024 Tomas Bzatek <tbzatek@redhat.com> - 1.0.9-9
-- Use a SPDX license tag
-
-* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Wed Aug 24 2022 Panu Matilainen <pmatilai@redhat.com> - 1.0.9-4
-- Fix popt API misuse (#2100391)
 
 * Wed Mar 08 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.9-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
