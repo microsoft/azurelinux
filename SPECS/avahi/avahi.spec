@@ -13,6 +13,10 @@ Patch0:         %{name}-libevent-pc-fix.patch
 Patch1:         CVE-2021-3468.patch
 Patch2:         CVE-2021-3502.patch
 Patch3:         CVE-2023-38469.patch
+Patch4:         CVE-2023-38470.patch
+Patch5:         CVE-2023-38471.patch
+Patch6:         CVE-2023-38472.patch
+Patch7:         CVE-2023-38473.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -406,6 +410,21 @@ exit 0
 %endif
 
 %changelog
+* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38473 wih an upstream patch
+
+* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38472 wih an upstream patch
+
+* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38471 wih an upstream patch
+
+* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38470 wih an upstream patch
+
+*Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
+- Fix CVE-2023-38469.patch with an upstream patch 
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
 - Upgrade to latest upstream version to fix CVE-2017-6519
 - Add upstream patch to fix CVE-2021-3502
@@ -413,9 +432,6 @@ exit 0
 - Add nopatch for CVE-2021-26720
 - Remove mono patch- we don't build with mono.
 - Remove local services patch- upstreamed
-
-*Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
-- Fix CVE-2023-38469.patch with an upstream patch 
 
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
 - License verified
