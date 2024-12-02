@@ -38,6 +38,7 @@ Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
