@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 8165feabfdfe38c65b599c4993d227328c231fca
+%define commit_hash 88c3d9bc5b5a193f40b7c14fa996d23532d6f956
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.26
-Release: 7%{?dist}
+Version: 1.6.36
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -17,8 +17,6 @@ Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
 Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
-Patch2:  fix_tests_for_golang1.21.patch
-Patch3:  CVE-2023-45288.patch
 
 %{?systemd_requires}
 
@@ -29,7 +27,7 @@ BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
-Requires: moby-runc >= 1.1.0
+Requires: moby-runc >= 1.1.14
 
 Conflicts: containerd
 Conflicts: containerd-io
@@ -92,6 +90,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Sep 24 2024 Nan Liu <liunan@microsoft.com> - 1.6.36-1
+- Bump version to 1.6.36
+- Remove unused patches
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.26-7
 - Bump release to rebuild with go 1.22.7
 
