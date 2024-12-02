@@ -65,10 +65,10 @@ Default configuration files for node-problem-detector
 %build
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
-%patch #2 -p1
+%patch 2 -p1
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
-%patch #2 -p1
+%patch 2 -p1
 popd
 
 %make_build build-binaries VERSION=%{version}
