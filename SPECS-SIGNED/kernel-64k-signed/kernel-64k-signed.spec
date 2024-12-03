@@ -106,6 +106,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-5
-- Original version for CBL-Mariner
+- Original version for Azure Linux
 - Starting with release 5 to align with kernel release.
 - License verified
