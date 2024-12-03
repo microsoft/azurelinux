@@ -15,19 +15,16 @@
 %bcond_with    ze
 %bcond_without mlx5
 
-Name: ucx
-Version: 1.18.0
-Release: 3%{?dist}
-Summary: UCX is a communication library implementing high-performance messaging
-Group: System Environment/Libraries
+Summary:        UCX is a communication library implementing high-performance messaging
+Name:           ucx
+Version:        1.18.0
+Release:        3%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-License: BSD
-URL: http://www.openucx.org
-Source: https://github.com/openucx/%{name}/releases/download/v1.18.0-rc1/ucx-1.18.0.tar.gz
-
-BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-Prefix: %{_prefix}
+Group:          System Environment/Libraries
+URL:            http://www.openucx.org
+Source:         https://github.com/openucx/%{name}/releases/download/v1.18.0-rc1/ucx-1.18.0.tar.gz
 
 # UCX currently supports only the following architectures
 ExclusiveArch: aarch64 ppc64le x86_64
@@ -108,7 +105,7 @@ Provides header files and examples for developing with UCX.
 %configure --disable-optimizations \
            %{!?debug:--disable-logging} \
            %{!?debug:--disable-debug} \
-           %{!?debug:--disable-assertions --enable-mt} \
+           %{!?debug:--disable-assertions} \
            %{!?debug:--disable-params-check} \
            %{?debug:--with-valgrind} \
            %{?debug:--enable-profiling} \
@@ -412,7 +409,7 @@ Provides oneAPI Level Zero (ZE) Runtime support for UCX.
 * Tue Nov 26 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> 1.18.0-3
 - Azure Linux update to version 1.18.0
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.18.0-2
-- Initial version Azure Linux
+- Azure Linux HPC initial update to version 1.18.0
 * Fri Apr 19 2024 Yossi Itigin <yosefe@nvidia.com> 1.18.0-1
 - Bump version to 1.18.0
 * Tue Oct 31 2023 Yossi Itigin <yosefe@nvidia.com> 1.17.0-1
