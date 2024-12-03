@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,7 @@ Patch0:         CVE-2021-4238.patch
 Patch1:         CVE-2019-0205.patch
 Patch2:         CVE-2024-6104.patch
 Patch3:         CVE-2023-45288.patch
+Patch4:         CVE-2024-24786.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -148,6 +149,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+- Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 2.7.3-7
+- Fix CVE-2024-24786
+
 * Thu Oct 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.7.3-6
 - Add patch to resolve CVE-2023-45288.
 
