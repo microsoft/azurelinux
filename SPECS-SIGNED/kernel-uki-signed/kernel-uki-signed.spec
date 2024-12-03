@@ -6,7 +6,7 @@
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
 Version:        6.6.57.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,6 +68,9 @@ popd
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Tue Dec 03 2024 aperezguevar <aperezguevar@microsoft.com> - 6.6.57.1-6
+- Enable NUMA BALANCING and UCLAMP task for HPC workloads
+
 * Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
 - Bump release to match kernel
 
