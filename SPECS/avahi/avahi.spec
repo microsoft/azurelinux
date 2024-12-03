@@ -412,17 +412,9 @@ exit 0
 %changelog
 * Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
 - Fix CVE-2023-38473 wih an upstream patch
-
-* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
 - Fix CVE-2023-38472 wih an upstream patch
-
-* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
 - Fix CVE-2023-38471 wih an upstream patch
-
-* Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
 - Fix CVE-2023-38470 wih an upstream patch
-
-*Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> -0.8-2
 - Fix CVE-2023-38469.patch with an upstream patch 
 
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
