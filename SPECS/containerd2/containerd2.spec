@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -15,6 +15,9 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+
+# Additional patches for Kata CC
+Patch10: add-tardev-support.patch
 
 %{?systemd_requires}
 
@@ -28,7 +31,7 @@ Requires: runc >= 1.2.1
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
-simplicity, robustness and portability. It is available as a daemon for Linux
+simplicity, robustness, and portability. It is available as a daemon for Linux
 and Windows, which can manage the complete container lifecycle of its host
 system: image transfer and storage, container execution and supervision,
 low-level storage and network attachments, etc.
@@ -36,8 +39,23 @@ low-level storage and network attachments, etc.
 containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
+%package -n moby-containerd-cc
+Summary: Industry-standard container runtime with Kata Containers support
+Group: Tools/Container
+Provides: moby-containerd-cc = %{version}-%{release}
+Conflicts: %{upstream_name}2
+Obsoletes: %{upstream_name}2 < %{version}-%{release}
+
+%description -n moby-containerd-cc
+This flavor of containerd includes additional patches to support Kata Containers features.
+
 %prep
 %autosetup -p1 -n %{upstream_name}-%{version}
+
+# Apply moby-containerd-cc patches conditionally
+%if "%{name}" == "moby-containerd-cc"
+%patch10 -p1
+%endif
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -79,7 +97,20 @@ fi
 %dir /opt/containerd/bin
 %dir /opt/containerd/lib
 
+%files -n moby-containerd-cc
+%license LICENSE NOTICE
+%{_bindir}/*
+%{_mandir}/*
+%config(noreplace) %{_unitdir}/containerd.service
+%config(noreplace) %{_sysconfdir}/containerd/config.toml
+%dir /opt/containerd
+%dir /opt/containerd/bin
+%dir /opt/containerd/lib
+
 %changelog
+* Mon Nov 20 2024 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-2
+- Added moby-containerd-cc subpackage with additional patches for Kata CC.
+
 * Mon Nov 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
 - Created a standalone package for containerd 2.0.0
 - Upgraded runc to 1.2.1 and libseccomp to 2.5.5 required by containerd 2.0.0
