@@ -2,7 +2,7 @@
   "Signatures": {
     "go.20230802.5.src.tar.gz": "56b9e0e0c3c13ca95d5efa6de4e7d49a9d190eca77919beff99d33cd3fa74e95",
     "go.20240206.2.src.tar.gz": "7982e0011aa9ab95fd0530404060410af4ba57326d26818690f334fdcb6451cd",
-    "go1.23.3-20241107.5.src.tar.gz": "defe7fc3c4ba4bb3cfe038bd7e3514c2b0cac5031463a647f9862f2afa6e6d44",
+    "go1.23.3-20241202.3.src.tar.gz": "7ac83f3918439205861a8ca9e10360e7a0867d9ba8327f283b411e1de077d0e2",
     "go1.4-bootstrap-20171003.tar.gz": "f4ff5b5eb3a3cae1c993723f3eab519c5bae18866b5e5f96fe1102f0cb5c3e52"
   }
 }
