@@ -3398,9 +3398,9 @@
         "type": "other",
         "other": {
           "name": "exempi",
-          "version": "2.6.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.1/exempi-2.6.1.tar.bz2"
-        }
+          "version": "2.6.5",
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"        
+	}
       }
     },
     {
