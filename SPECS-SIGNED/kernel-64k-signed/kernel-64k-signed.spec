@@ -6,8 +6,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
-Version:        6.6.57.1
-Release:        5%{?dist}
+Version:        6.6.62.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,6 +105,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Tue Dec 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.62.1-1
+- Auto-upgrade to 6.6.62.1
+
 * Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-5
 - Original version for Azure Linux
 - Starting with release 5 to align with kernel release.
