@@ -38,6 +38,7 @@ cached_file              = $(PKGBUILD_DIR)/cached_graph.dot
 preprocessed_file        = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file               = $(PKGBUILD_DIR)/built_graph.dot
 output_csv_file          = $(PKGBUILD_DIR)/build_state.csv
+test_results_file		 = $(PKGBUILD_DIR)/test_results.json
 pkg_license_summary_file = $(PKGBUILD_DIR)/license_issues.txt
 pkg_license_results_file = $(PKGBUILD_DIR)/license_issues.json
 
@@ -313,6 +314,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--ignored-tests="$(TEST_IGNORE_LIST)" \
 		--tests="$(TEST_RUN_LIST)" \
 		--rerun-tests="$(TEST_RERUN_LIST)" \
+		--test-results-file="$(test_results_file)" \
 		--license-check-mode="$(LICENSE_CHECK_MODE)" \
 		--license-check-exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
 		--license-check-name-file="$(LICENSE_CHECK_NAME_FILE)" \
