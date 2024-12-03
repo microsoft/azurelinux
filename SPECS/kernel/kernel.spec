@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.57.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -424,6 +424,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
+- Enable ICE ethernet driver
+
 * Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
 - Make CONFIG_DRM and its dependency KConfigs as loadable modules
 - Create sub-package for AMD GPU in-tree modules to avoid conflicts with out-of-tree modules

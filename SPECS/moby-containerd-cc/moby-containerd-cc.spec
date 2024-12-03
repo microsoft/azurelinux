@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,6 +19,7 @@ Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
 Patch1: CVE-2023-44487.patch
 Patch2: fix_cc_tests_for_golang1.21.patch
+Patch3: CVE-2024-24786.patch
 
 %{?systemd_requires}
 
@@ -76,6 +77,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.7.7-5
+- Fix CVE-2024-24786 by patching
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.7.7-4
 - Pin golang version to <= 1.22
 
