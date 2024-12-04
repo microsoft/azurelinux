@@ -77,7 +77,7 @@ Patch43:        php-7.4.0-phpize.patch
 Patch45:        php-7.4.0-ldap_r.patch
 # drop "Configure command" from phpinfo output
 # and only use gcc (instead of full version)
-Patch47:        php-8.1.0-phpinfo.patch
+Patch47:        php-8.3.13-phpinfo.patch
 # Upstream fixes (100+)
 # Security fixes (200+)
 # Fixes for tests (300+)

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>php-8.3.13-phpinfo.patch - rpms/php/php83.git - The master git repository for php83 RPM</title>
+<meta name='generator' content='cgit '/>
+<meta name='robots' content='index, nofollow'/>
+<link rel='stylesheet' type='text/css' href='/cgit-data/cgit.css'/>
+<link rel='shortcut icon' href='/favicon.ico'/>
+<link rel='alternate' title='Atom feed' href='https://git.remirepo.net/cgit/rpms/php/php83.git/atom/php-8.3.13-phpinfo.patch?h=master' type='application/atom+xml'/>
+<link rel='vcs-git' href='https://git.remirepo.net/git/rpms/php/php83.git' title='rpms/php/php83.git Git repository'/>
+</head>
+<body>
+<div id='cgit'><table id='header'>
+<tr>
+<td class='logo' rowspan='2'><a href='/cgit/'><img src='/top_monkey.png' alt='cgit logo'/></a></td>
+<td class='main'><a href='/cgit/'>index</a> : <a title='rpms/php/php83.git' href='/cgit/rpms/php/php83.git/'>rpms/php/php83.git</a></td><td class='form'><form method='get'>
+<select name='h' onchange='this.form.submit();'>
+<option value='master' selected='selected'>master</option>
+</select> <input type='submit' value='switch'/></form></td></tr>
+<tr><td class='sub'>The master git repository for php83 RPM</td><td class='sub right'>Remi Collet</td></tr></table>
+<table class='tabs'><tr><td>
+<a href='/cgit/rpms/php/php83.git/'>summary</a><a href='/cgit/rpms/php/php83.git/refs/'>refs</a><a href='/cgit/rpms/php/php83.git/log/php-8.3.13-phpinfo.patch'>log</a><a class='active' href='/cgit/rpms/php/php83.git/tree/php-8.3.13-phpinfo.patch'>tree</a><a href='/cgit/rpms/php/php83.git/commit/php-8.3.13-phpinfo.patch'>commit</a><a href='/cgit/rpms/php/php83.git/diff/php-8.3.13-phpinfo.patch'>diff</a><a href='/cgit/rpms/php/php83.git/stats/php-8.3.13-phpinfo.patch'>stats</a></td><td class='form'><form class='right' method='get' action='/cgit/rpms/php/php83.git/log/php-8.3.13-phpinfo.patch'>
+<select name='qt'>
+<option value='grep'>log msg</option>
+<option value='author'>author</option>
+<option value='committer'>committer</option>
+<option value='range'>range</option>
+</select>
+<input class='txt' type='search' size='10' name='q' value=''/>
+<input type='submit' value='search'/>
+</form>
+</td></tr></table>
+<div class='path'>path: <a href='/cgit/rpms/php/php83.git/tree/'>root</a>/<a href='/cgit/rpms/php/php83.git/tree/php-8.3.13-phpinfo.patch'>php-8.3.13-phpinfo.patch</a></div><div class='content'>blob: a02a2b8a9b79bbdb35fffcf0e96571798ffdec3f (<a href='/cgit/rpms/php/php83.git/plain/php-8.3.13-phpinfo.patch'>plain</a>)
+<table summary='blob content' class='blob'>
+<tr><td class='linenumbers'><pre><a id='n1' href='#n1'>1</a>
+<a id='n2' href='#n2'>2</a>
+<a id='n3' href='#n3'>3</a>
+<a id='n4' href='#n4'>4</a>
+<a id='n5' href='#n5'>5</a>
+<a id='n6' href='#n6'>6</a>
+<a id='n7' href='#n7'>7</a>
+<a id='n8' href='#n8'>8</a>
+<a id='n9' href='#n9'>9</a>
+<a id='n10' href='#n10'>10</a>
+<a id='n11' href='#n11'>11</a>
+<a id='n12' href='#n12'>12</a>
+<a id='n13' href='#n13'>13</a>
+<a id='n14' href='#n14'>14</a>
+<a id='n15' href='#n15'>15</a>
+<a id='n16' href='#n16'>16</a>
+<a id='n17' href='#n17'>17</a>
+<a id='n18' href='#n18'>18</a>
+<a id='n19' href='#n19'>19</a>
+<a id='n20' href='#n20'>20</a>
+<a id='n21' href='#n21'>21</a>
+<a id='n22' href='#n22'>22</a>
+<a id='n23' href='#n23'>23</a>
+<a id='n24' href='#n24'>24</a>
+<a id='n25' href='#n25'>25</a>
+<a id='n26' href='#n26'>26</a>
+<a id='n27' href='#n27'>27</a>
+<a id='n28' href='#n28'>28</a>
+<a id='n29' href='#n29'>29</a>
+<a id='n30' href='#n30'>30</a>
+<a id='n31' href='#n31'>31</a>
+<a id='n32' href='#n32'>32</a>
+<a id='n33' href='#n33'>33</a>
+<a id='n34' href='#n34'>34</a>
+<a id='n35' href='#n35'>35</a>
+<a id='n36' href='#n36'>36</a>
+<a id='n37' href='#n37'>37</a>
+<a id='n38' href='#n38'>38</a>
+<a id='n39' href='#n39'>39</a>
+<a id='n40' href='#n40'>40</a>
+<a id='n41' href='#n41'>41</a>
+<a id='n42' href='#n42'>42</a>
+<a id='n43' href='#n43'>43</a>
+<a id='n44' href='#n44'>44</a>
+</pre></td>
+<td class='lines'><pre><code>
+Drop "Configure Command" from phpinfo as it doesn't
+provide any useful information.
+The available extensions are not related to this command.
+
+Replace full GCC name by gcc in php -v output
+
+
+diff -up ./ext/standard/info.c.phpinfo ./ext/standard/info.c
+--- ./ext/standard/info.c.phpinfo	2020-07-21 10:49:31.000000000 +0200
++++ ./ext/standard/info.c	2020-07-21 11:41:56.295633523 +0200
+@@ -805,9 +805,6 @@ PHPAPI ZEND_COLD void php_print_info(int
+ #ifdef PHP_BUILD_ARCH
+ 		php_info_print_table_row(2, "Architecture", PHP_BUILD_ARCH);
+ #endif
+-#ifdef CONFIGURE_COMMAND
+-		php_info_print_table_row(2, "Configure Command", CONFIGURE_COMMAND );
+-#endif
+ 
+ 		if (sapi_module.pretty_name) {
+ 			php_info_print_table_row(2, "Server API", sapi_module.pretty_name );
+diff -up ./ext/standard/tests/general_functions/phpinfo.phpt.phpinfo ./ext/standard/tests/general_functions/phpinfo.phpt
+--- ./ext/standard/tests/general_functions/phpinfo.phpt.phpinfo	2020-07-21 10:49:31.000000000 +0200
++++ ./ext/standard/tests/general_functions/phpinfo.phpt	2020-07-21 11:41:56.296633522 +0200
+@@ -17,7 +17,6 @@ PHP Version =&gt; %s
+ 
+ System =&gt; %s
+ Build Date =&gt; %r(.+?)%r
+-Configure Command =&gt; %s
+ Server API =&gt; Command Line Interface
+ Virtual Directory Support =&gt; %s
+ Configuration File (php.ini) Path =&gt; %s
+diff -up ./sapi/cli/php_cli.c.phpinfo ./sapi/cli/php_cli.c
+--- ./sapi/cli/php_cli.c.phpinfo	2020-07-21 11:43:38.812475300 +0200
++++ ./sapi/cli/php_cli.c	2020-07-21 11:43:45.783464540 +0200
+@@ -645,7 +645,7 @@ static int do_cli(int argc, char **argv)
+ 					"NTS"
+ #endif
+ #ifdef PHP_BUILD_COMPILER
+-					" " PHP_BUILD_COMPILER
++					" gcc"
+ #endif
+ #ifdef PHP_BUILD_ARCH
+ 					" " PHP_BUILD_ARCH
+</code></pre></td></tr></table>
+</div> <!-- class=content -->
+<div class='footer'>generated by <a href='https://git.zx2c4.com/cgit/about/'>cgit </a> (<a href='https://git-scm.com/'>git 2.34.1</a>) at 2024-12-04 17:36:27 +0000</div>
+</div> <!-- id=cgit -->
+</body>
+</html>
