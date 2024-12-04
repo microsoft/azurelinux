@@ -38,10 +38,10 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 10. Write the `/etc/image-customizer-release` file.
 
-11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+11. If [os.bootloader.reset](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
-    If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
+    If [os.bootloader.reset](#resetbootloadertype-string) is not set, then
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 

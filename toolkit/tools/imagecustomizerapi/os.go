@@ -12,7 +12,6 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	ResetBootLoaderType ResetBootLoaderType `yaml:"resetBootLoaderType"`
 	Hostname            string              `yaml:"hostname"`
 	Packages            Packages            `yaml:"packages"`
 	SELinux             SELinux             `yaml:"selinux"`
@@ -24,7 +23,8 @@ type OS struct {
 	Modules             []Module            `yaml:"modules"`
 	Verity              *Verity             `yaml:"verity"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
-	Uki                 bool                `yaml:"uki"`
+	BootLoader          BootLoader          `yaml:"bootloader"`
+	Uki                 Uki                 `yaml:"uki"`
 }
 
 func (s *OS) IsValid() error {

@@ -69,7 +69,7 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		return err
 	}
 
-	selinuxMode, err := handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
+	selinuxMode, err := handleSELinux(config.OS.SELinux.Mode, config.OS.BootLoader.Reset,
 		imageChroot)
 	if err != nil {
 		return err
@@ -92,8 +92,6 @@ func doOsCustomizations(buildDir string, baseConfigPath string, config *imagecus
 		}
 	}
 
-	// Put UKI prepare here, the order is after enableVerityPartition, however,
-	// it may change in the future dev.
 	err = prepareUki(config.OS.Uki, imageChroot)
 	if err != nil {
 		return err
