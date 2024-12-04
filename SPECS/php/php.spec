@@ -33,9 +33,9 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.3.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
-# Zend is licensed under Zend
+# Zend is licensied under Zend
 # TSRM is licensed under BSD
 # main/snprintf.c, main/spprintf.c and main/rfc1867.c are ASL 1.0
 # ext/date/lib is MIT
@@ -82,6 +82,7 @@ Patch47:        php-8.1.0-phpinfo.patch
 # Security fixes (200+)
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
+Patch200:	CVE-2024-8932.patch
 Patch300:       php-7.4.0-datetests.patch
 # used for tests
 BuildRequires:  /bin/ps
@@ -1514,6 +1515,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Wed Dec 04 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 8.3.12-2
+- Fix CVE-2024-8932 with upstream patch
+
 * Wed Oct 16 2024 Archana Choudhary <archana1@microsoft.com> - 8.3.12-1
 - Upgarde to 8.3.12 to fix CVE-2024-8927, CVE-2024-8925
 - Refactor patch (with fuzzing) for system tzdata
