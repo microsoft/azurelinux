@@ -39,7 +39,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://github.com/Mellanox/mlnx-tools
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Mellanox/mlnx-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Obsoletes:      mlnx-ofa_kernel < 5.4
 Obsoletes:      mlnx_en-utils < 5.4
 
