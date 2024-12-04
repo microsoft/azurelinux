@@ -1,0 +1,60 @@
+From 7a36716dafb0bf414f2e9371a2eb095d5145c217 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Wed, 1 May 2024 15:11:42 -0400
+Subject: [PATCH 18/68] arch: x86: hyperv: hv_vtl: Add api to enable VTL1 for
+ secondary cpus
+
+Introduce an api to enable VTL1 (secure vtl) for secondary cpus
+piggybacking on the earlier consolidated logic to enable VTL1.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/hyperv/hv_vtl.c        | 15 +++++++++++++++
+ arch/x86/include/asm/mshyperv.h |  2 ++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+index 956b2c914440..aa82b5c3d601 100644
+--- a/arch/x86/hyperv/hv_vtl.c
++++ b/arch/x86/hyperv/hv_vtl.c
+@@ -261,6 +261,21 @@ static int hv_vtl_wakeup_secondary_cpu(int apicid, unsigned long start_eip)
+ 	return hv_vtl_bringup_vcpu(vp_id, cpu, start_eip);
+ }
+ 
++int hv_secure_vtl_enable_secondary_cpu(u32 target_vp_index)
++{
++	struct hv_enable_vp_vtl *input;
++
++	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
++	memset(input, 0, sizeof(*input));
++
++	input->partition_id = HV_PARTITION_ID_SELF;
++	input->vp_index = target_vp_index;
++	input->target_vtl.target_vtl = HV_VTL_SECURE;
++	hv_vtl_populate_vp_context(input, target_vp_index, target_vp_index);
++
++	return  __hv_vtl_enable_vcpu(input);
++}
++
+ int __init hv_vtl_early_init(u8 vtl)
+ {
+ 	/*
+diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+index 1adceaed227b..4e627e7eb523 100644
+--- a/arch/x86/include/asm/mshyperv.h
++++ b/arch/x86/include/asm/mshyperv.h
+@@ -340,9 +340,11 @@ static inline u64 hv_get_non_nested_register(unsigned int reg) { return 0; }
+ #ifdef CONFIG_HYPERV_VTL_MODE
+ void __init hv_vtl_init_platform(void);
+ int __init hv_vtl_early_init(u8 vtl);
++int hv_secure_vtl_enable_secondary_cpu(u32 target_vp_index);
+ #else
+ static inline void __init hv_vtl_init_platform(void) {}
+ static inline int __init hv_vtl_early_init(u8 vtl) { return 0; }
++static inline int hv_secure_vtl_enable_secondary_cpu(u32 target_vp_index) { return 0; }
+ #endif
+ 
+ #include <asm-generic/mshyperv.h>
+-- 
+2.43.0
+

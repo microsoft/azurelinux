@@ -1,0 +1,53 @@
+From fa62513607a3302e71e914b7683b5e806a75c4e1 Mon Sep 17 00:00:00 2001
+From: Boqun Feng <boqun.feng@gmail.com>
+Date: Mon, 27 Mar 2023 21:52:08 -0700
+Subject: [PATCH 14/68] x86: idle: Allows mshv_vtl to change the idle routine
+
+In the MSHV vtl usage, the dyntick mechanism (esp. nohz_idle) is used to
+reduce the scheduler ticks in VTL2. To do, MSHV vtl driver needs to
+change the default idle routine to use the idle thread to switch VTL0.
+
+This commit therefore expose such ability to mshv_vtl driver.
+
+Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+---
+ arch/x86/include/asm/processor.h | 4 ++++
+ arch/x86/kernel/process.c        | 7 +++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+index 67ad64efa926..1e010fc852a1 100644
+--- a/arch/x86/include/asm/processor.h
++++ b/arch/x86/include/asm/processor.h
+@@ -702,6 +702,10 @@ bool xen_set_default_idle(void);
+ #define xen_set_default_idle 0
+ #endif
+ 
++#ifdef CONFIG_HYPERV_VTL_MODE
++void hv_vtl_set_idle(void (*idle)(void));
++#endif
++
+ void __noreturn stop_this_cpu(void *dummy);
+ void microcode_check(struct cpuinfo_x86 *prev_info);
+ void store_cpu_caps(struct cpuinfo_x86 *info);
+diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
+index 5351f293f770..2e26c81cdc1b 100644
+--- a/arch/x86/kernel/process.c
++++ b/arch/x86/kernel/process.c
+@@ -793,6 +793,13 @@ bool xen_set_default_idle(void)
+ 
+ struct cpumask cpus_stop_mask;
+ 
++#ifdef CONFIG_HYPERV_VTL_MODE
++void hv_vtl_set_idle(void (*idle)(void))
++{
++	static_call_update(x86_idle, idle);
++}
++#endif
++
+ void __noreturn stop_this_cpu(void *dummy)
+ {
+ 	struct cpuinfo_x86 *c = this_cpu_ptr(&cpu_info);
+-- 
+2.43.0
+

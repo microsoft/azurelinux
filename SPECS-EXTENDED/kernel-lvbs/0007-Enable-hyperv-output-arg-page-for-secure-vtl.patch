@@ -1,0 +1,33 @@
+From 337406b6851bfac1c0a74a58b2ca2f482cf5ab71 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 17 May 2024 07:54:26 -0400
+Subject: [PATCH 07/68] Enable hyperv output arg page for secure vtl
+
+VTL1 uses get_vp_registers to read vsm specifc registers which in turn
+require hyperv output arg page. Enable the creation of this page for
+VTL1
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/hv_common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+index ffb9ee40114e..dfc7e0016bc8 100644
+--- a/drivers/hv/hv_common.c
++++ b/drivers/hv/hv_common.c
+@@ -63,7 +63,11 @@ EXPORT_SYMBOL_GPL(hyperv_pcpu_output_arg);
+  */
+ static inline bool hv_output_arg_exists(void)
+ {
++#ifdef CONFIG_HV_SECURE_VTL
++	return true;
++#else
+ 	return hv_root_partition ? true : false;
++#endif
+ }
+ 
+ static void hv_kmsg_dump_unregister(void);
+-- 
+2.43.0
+

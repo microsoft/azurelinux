@@ -1,0 +1,288 @@
+From 05669ba4b92069477f8f308fe51782f6c3dd7680 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Tue, 9 Jul 2024 12:47:34 -0500
+Subject: [PATCH 40/68] Validate VTL0 module in VTl1
+
+When a module is loaded, use a hypercall to pass the module blob and
+module contents to VTL1. This enables VTL1 to check the signature,
+generate module contents independently and validate the module contents.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ drivers/hv/hv_vsm.c      | 16 +++++++++++++++
+ drivers/hv/hv_vsm.h      |  1 +
+ include/linux/heki.h     | 23 +++++++++++++++++++++
+ include/linux/module.h   |  1 +
+ kernel/module/internal.h |  2 ++
+ kernel/module/main.c     | 30 ++++++++++++++++++++++++++-
+ virt/heki/module.c       | 44 ++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 116 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index db85e3d4c026..694ef4c99293 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -148,11 +148,27 @@ static int hv_vsm_load_kdata(phys_addr_t pa, unsigned long nranges)
+ 	return hv_vsm_vtlcall(&args);
+ }
+ 
++static long hv_vsm_validate_module(phys_addr_t pa, unsigned long nranges,
++				   unsigned long flags)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_VALIDATE_MODULE;
++	args.a1 = pa;
++	args.a2 = nranges;
++	args.a3 = flags;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
+ 	.protect_memory = hv_vsm_protect_memory,
+ 	.load_kdata = hv_vsm_load_kdata,
++	.validate_module = hv_vsm_validate_module,
+ };
+ 
+ int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 7d3b8c35181a..358c21c00ab2 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -17,6 +17,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT	0x1FFE3
+ #define VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY	0x1FFE4
+ #define VSM_VTL_CALL_FUNC_ID_LOAD_KDATA		0x1FFE5
++#define VSM_VTL_CALL_FUNC_ID_VALIDATE_MODULE	0x1FFE6
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 6e3af4b10d24..1076688675e3 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -15,9 +15,12 @@
+ #include <linux/kernel.h>
+ #include <linux/printk.h>
+ #include <linux/mm.h>
++#include <linux/module.h>
+ #include <linux/vmalloc.h>
+ #include <linux/xarray.h>
+ 
++struct load_info;
++
+ /*
+  * This structure contains a guest physical range and its attributes (e.g.,
+  * permissions (RWX)).
+@@ -51,6 +54,12 @@ enum heki_kdata_type {
+ 	HEKI_KDATA_MAX,
+ };
+ 
++/*
++ * Attribute value for module info that does not conflict with any of the
++ * values in enum mod_mem_type.
++ */
++#define MOD_ELF		MOD_MEM_NUM_TYPES
++
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+  * provide hypervisor specific functions for Heki.
+@@ -67,6 +76,13 @@ struct heki_hypervisor {
+ 
+ 	/* Load kernel data */
+ 	int (*load_kdata)(phys_addr_t pa, unsigned long nranges);
++
++	/*
++	 * Pass a module blob (ELF file) and module contents to KVM for
++	 * validation.
++	 */
++	long (*validate_module)(phys_addr_t pa, unsigned long nranges,
++				unsigned long flags);
+ };
+ 
+ /*
+@@ -132,6 +148,7 @@ void heki_add_range(struct heki_args *args, unsigned long va,
+ 		    phys_addr_t pa, phys_addr_t epa);
+ void heki_cleanup_args(struct heki_args *args);
+ void heki_load_kdata(void);
++long heki_validate_module(struct module *mod, struct load_info *info, int flags);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+@@ -143,6 +160,12 @@ static inline void heki_late_init(void)
+ {
+ }
+ 
++static inline long heki_validate_module(struct module *mod,
++					struct load_info *info, int flags)
++{
++	return 0;
++}
++
+ static void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
+ 
+ #endif /* CONFIG_HEKI */
+diff --git a/include/linux/module.h b/include/linux/module.h
+index a98e188cf37b..95e0edadef79 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -583,6 +583,7 @@ struct module {
+ #ifdef CONFIG_DYNAMIC_DEBUG_CORE
+ 	struct _ddebug_info dyndbg_info;
+ #endif
++	long heki_token;
+ } ____cacheline_aligned __randomize_layout;
+ #ifndef MODULE_ARCH_INIT
+ #define MODULE_ARCH_INIT {}
+diff --git a/kernel/module/internal.h b/kernel/module/internal.h
+index c8b7b4dcf782..e0af200676af 100644
+--- a/kernel/module/internal.h
++++ b/kernel/module/internal.h
+@@ -63,7 +63,9 @@ struct load_info {
+ 	/* pointer to module in temporary copy, freed at end of load_module() */
+ 	struct module *mod;
+ 	Elf_Ehdr *hdr;
++	Elf_Ehdr *orig_hdr;
+ 	unsigned long len;
++	unsigned long orig_len;
+ 	Elf_Shdr *sechdrs;
+ 	char *secstrings, *strtab;
+ 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index b00e31721a73..eced137a5240 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -56,6 +56,7 @@
+ #include <linux/dynamic_debug.h>
+ #include <linux/audit.h>
+ #include <linux/cfi.h>
++#include <linux/heki.h>
+ #include <linux/debugfs.h>
+ #include <uapi/linux/module.h>
+ #include "internal.h"
+@@ -1978,6 +1979,7 @@ static void free_copy(struct load_info *info, int flags)
+ 		module_decompress_cleanup(info);
+ 	else
+ 		vfree(info->hdr);
++	vfree(info->orig_hdr);
+ }
+ 
+ static int rewrite_section_headers(struct load_info *info, int flags)
+@@ -2826,6 +2828,16 @@ static int early_mod_check(struct load_info *info, int flags)
+ 	return err;
+ }
+ 
++static int save_hdr(struct load_info *info)
++{
++	info->orig_len = info->len;
++	info->orig_hdr = vmalloc(info->len);
++	if (!info->orig_hdr)
++		return -ENOMEM;
++	memcpy(info->orig_hdr, info->hdr, info->len);
++	return 0;
++}
++
+ /*
+  * Allocate and load the module: note that size of section 0 is always
+  * zero, and we rely on this for optional sections.
+@@ -2835,9 +2847,18 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ {
+ 	struct module *mod;
+ 	bool module_allocated = false;
+-	long err = 0;
++	long err = 0, token;
+ 	char *after_dashes;
+ 
++	/*
++	 * The header gets modified in this function. But the original
++	 * header needs to be passed to the hypervisor for verification
++	 * if this is a guest. So, save the original header.
++	 */
++	err = save_hdr(info);
++	if (err)
++		return err;
++
+ 	/*
+ 	 * Do the signature check (if any) first. All that
+ 	 * the signature check needs is info->len, it does
+@@ -2874,6 +2895,13 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 		goto free_copy;
+ 	}
+ 
++	token = heki_validate_module(mod, info, flags);
++	if (token < 0) {
++		err = token;
++		goto free_copy;
++	}
++	mod->heki_token = token;
++
+ 	module_allocated = true;
+ 
+ 	audit_log_kern_module(mod->name);
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index db0a73ee252c..32810997f9d3 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include <linux/heki.h>
++#include "../../kernel/module/internal.h"
+ 
+ #include "common.h"
+ 
+@@ -81,3 +82,46 @@ void heki_load_kdata(void)
+ 	heki_cleanup_args(&args);
+ 	vfree(heki_module_certs);
+ }
++
++long heki_validate_module(struct module *mod, struct load_info *info, int flags)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	struct heki_args args = {};
++	long token;
++
++	if (!hypervisor)
++		return 0;
++
++	mutex_lock(&heki.lock);
++
++	/* Load original unmodified module ELF buffer. */
++	args.attributes = MOD_ELF;
++	heki_walk((unsigned long)info->orig_hdr,
++		  (unsigned long)info->orig_hdr + info->orig_len,
++		  heki_get_ranges, &args);
++
++	/* Load module sections. */
++	for_each_mod_mem_type(type) {
++		struct module_memory *mem = &mod->mem[type];
++
++		if (!mem->size)
++			continue;
++
++		args.attributes = type;
++		heki_walk((unsigned long)mem->base,
++			  (unsigned long)mem->base + mem->size,
++			  heki_get_ranges, &args);
++	}
++
++	token = hypervisor->validate_module(args.head_pa, args.nranges, flags);
++	if (token < 0) {
++		pr_warn("Failed to validate module %s (%ld).\n",
++			info->name, token);
++	}
++
++	heki_cleanup_args(&args);
++
++	mutex_unlock(&heki.lock);
++
++	return token;
++}
+-- 
+2.43.0
+

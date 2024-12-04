@@ -1,0 +1,101 @@
+From 968bdd2f7a3e8bf9d8f18f5abf09c533cc59bc5f Mon Sep 17 00:00:00 2001
+From: Anna Trikalinou <atrikalinou@microsoft.com>
+Date: Tue, 18 Jul 2023 11:15:02 +0000
+Subject: [PATCH 01/68] Add sk-loader.bin and vmlinux.bin to VTL0 initramfs
+
+Create a hook script for mkinitramfs to add skloader.bin and vmlinux.bin to
+VTL0 initramfs.
+To load vtl1 during vtl0 boot, compile skloader.bin and vmlinux.bin from
+sk-linux repo and place both the compiled binaries in a folder say
+"out". Then
+	1. Create the hook script (have to do this just once)
+
+		sudo ./add_sk_to_initramfs.sh <path-to-out>/out
+
+2. Update initramfs (have to do this everytime there is a new skloader.bin or sk vmlinux.bin in out folder)
+
+		sudo update-initramfs -u -k $(uname -r)
+
+3. Verify skloader.bin and  vmlinux.bin is in the newly created initramfs
+
+		lsinitramfs /boot/initrd.img-$(uname -r) | grep skloader
+		lsinitramfs /boot/initrd.img-$(uname -r) | grep vmlinux
+
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Microsoft/add_sk_to_initramfs.sh | 62 ++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+ create mode 100755 Microsoft/add_sk_to_initramfs.sh
+
+diff --git a/Microsoft/add_sk_to_initramfs.sh b/Microsoft/add_sk_to_initramfs.sh
+new file mode 100755
+index 000000000000..acee435301ca
+--- /dev/null
++++ b/Microsoft/add_sk_to_initramfs.sh
+@@ -0,0 +1,62 @@
++#!/bin/bash
++
++################################################################################
++# Copyright (c) 2023 Microsoft Corporation
++################################################################################
++
++#usage: run sudo ./add_sk_to_initramfs.sh <path_to_optee> (i.e. ../optee-os)
++export OUT_DIR=$1
++export SKERNEL_LOAD_FILE="$1/skloader.bin"
++export SKERNEL_FILE="$1/vmlinux.bin"
++export SKERNEL_LOAD_FILE_ABSPATH="$(readlink -f $SKERNEL_LOAD_FILE)"
++export SKERNEL_FILE_ABSPATH="$(readlink -f $SKERNEL_FILE)"
++export SKERNEL_HOOK_FILE="/usr/share/initramfs-tools/hooks/skernel"
++
++# If skloader.bin file does not exist, exit
++if [[ ! -f $SKERNEL_LOAD_FILE ]]
++then
++   echo "Error: $SKERNEL_LOAD_FILE_ABSPATH does not exist."
++   echo "Compile skloader.bin and then re-try."
++   exit 0
++fi
++
++# If skloader.bin file does not exist, exit
++if [[ ! -f $SKERNEL_FILE ]]
++then
++   echo "Error: $SKERNEL_FILE_ABSPATH does not exist."
++   echo "Compile secure linux kernel(vmlinux.bin) and then re-try."
++   exit 0
++fi
++
++# If hook script file does not already exist, create it and set its permissions
++if [[ ! -f $SKERNEL_HOOK_FILE ]]
++then
++   touch $SKERNEL_HOOK_FILE
++   chmod 755 $SKERNEL_HOOK_FILE
++fi
++
++# Copy mkinitramfs hook script to add tee.bin to initramfs
++cat > $SKERNEL_HOOK_FILE <<EOF
++#!/bin/sh
++
++PREREQ=""
++prereqs()
++{
++   echo "\$PREREQ"
++}
++
++case \$1 in
++prereqs)
++   prereqs
++   exit 0
++   ;;
++esac
++
++. /usr/share/initramfs-tools/hook-functions
++# Begin real processing below this line
++
++cp $SKERNEL_LOAD_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
++cp $SKERNEL_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
++
++exit 0
++EOF
+-- 
+2.43.0
+

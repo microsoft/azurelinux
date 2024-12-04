@@ -1,0 +1,124 @@
+From 50ae5cbf6933a6607c37ba02841b80950c709e2f Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Tue, 9 Jul 2024 15:41:13 -0500
+Subject: [PATCH 42/68] Send kernel symbol tables to VTL1
+
+Send kernel symbol tables to VTL1. VTL1 will use the symbol tables
+to resolve VTL0 module symbols and finalize symbol addresses. This is
+in preparation for VTL0 module relocation in VTL1.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ include/linux/heki.h |  9 +++++++++
+ kernel/module/main.c | 14 +++++++-------
+ virt/heki/module.c   | 23 +++++++++++++++++++++++
+ 3 files changed, 39 insertions(+), 7 deletions(-)
+
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 9d309d84f084..42bb40b5e1ae 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -51,6 +51,8 @@ struct heki_page {
+ 
+ enum heki_kdata_type {
+ 	HEKI_MODULE_CERTS,
++	HEKI_KERNEL_INFO,
++	HEKI_KERNEL_DATA,
+ 	HEKI_KDATA_MAX,
+ };
+ 
+@@ -62,6 +64,13 @@ enum heki_kdata_type {
+ 
+ #define HEKI_MODULE_RESERVE_SIZE	0x40000000UL
+ 
++struct heki_kinfo {
++	struct kernel_symbol	*ksymtab_start;
++	struct kernel_symbol	*ksymtab_end;
++	struct kernel_symbol	*ksymtab_gpl_start;
++	struct kernel_symbol	*ksymtab_gpl_end;
++};
++
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+  * provide hypervisor specific functions for Heki.
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index c95ab1da0e98..6eb200e661c0 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2903,13 +2903,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 		goto free_copy;
+ 	}
+ 
+-	token = heki_validate_module(mod, info, flags);
+-	if (token < 0) {
+-		err = token;
+-		goto free_copy;
+-	}
+-	mod->heki_token = token;
+-
+ 	module_allocated = true;
+ 
+ 	audit_log_kern_module(mod->name);
+@@ -2957,6 +2950,13 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	if (err < 0)
+ 		goto free_modinfo;
+ 
++	token = heki_validate_module(mod, info, flags);
++	if (token < 0) {
++		err = token;
++		goto free_modinfo;
++	}
++	mod->heki_token = token;
++
+ 	err = apply_relocations(mod, info);
+ 	if (err < 0)
+ 		goto free_modinfo;
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 32810997f9d3..8dbed65eae5c 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -8,11 +8,15 @@
+ #include <linux/heki.h>
+ #include "../../kernel/module/internal.h"
+ 
++#include <asm-generic/sections.h>
++
+ #include "common.h"
+ 
+ extern __initconst const u8 system_certificate_list[];
+ extern __initconst const unsigned long module_cert_size;
+ 
++static struct heki_kinfo heki_kinfo;
++
+ static u8 *heki_module_certs;
+ static unsigned long heki_module_cert_size;
+ 
+@@ -72,6 +76,25 @@ void heki_load_kdata(void)
+ 		  (unsigned long)heki_module_certs + heki_module_cert_size,
+ 		  heki_get_ranges, &args);
+ 
++	heki_kinfo.ksymtab_start =
++			(struct kernel_symbol *)__start___ksymtab;
++	heki_kinfo.ksymtab_end =
++			(struct kernel_symbol *)__stop___ksymtab;
++	heki_kinfo.ksymtab_gpl_start =
++			(struct kernel_symbol *)__start___ksymtab_gpl;
++	heki_kinfo.ksymtab_gpl_end =
++			(struct kernel_symbol *)__stop___ksymtab_gpl;
++
++	args.attributes = HEKI_KERNEL_INFO;
++	heki_walk((unsigned long)&heki_kinfo,
++		  (unsigned long)&heki_kinfo + sizeof(heki_kinfo),
++		  heki_get_ranges, &args);
++
++	args.attributes = HEKI_KERNEL_DATA;
++	heki_walk((unsigned long)__start_rodata,
++		  (unsigned long)__end_rodata,
++		  heki_get_ranges, &args);
++
+ 	if (hypervisor->load_kdata(args.head_pa, args.nranges))
+ 		pr_warn("Failed to load kernel data.\n");
+ 	else
+-- 
+2.43.0
+

@@ -1,0 +1,178 @@
+From 5539d100e2cf2e0dc54e0c0a2725f6312a8a44c6 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Sun, 23 Jun 2024 01:44:01 -0500
+Subject: [PATCH 36/68] drivers: hv: mshv_vsm_vtl1: Add support to set EPT
+ permissions for VTL0 memory
+
+Add a new service id that enables a guest to set EPT permissions
+for guest pages.
+
+Until now, all of the guest pages are given RWX permissions in the EPT.
+In Heki, we want to restrict the permissions to what is strictly needed.
+For instance, a text page only needs R_X. A read-only data page only
+needs R__. A normal data page only needs RW_.
+
+The guest will pass a page list to the hypercall. The page list is a
+list of one or more physical pages each of which contains a array of
+guest ranges and attributes. Currently, the attributes only contain
+permissions. In the future, other attributes may be added.  The
+hypervisor will apply the specified permissions in the EPT.
+
+When a guest try to access its memory in a way which is not allowed, the
+hypervisor sends a fault to the guest.
+
+Co-developed-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Madhavan T. Venkataraman <madvenka@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 120 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 71de10635c95..a65e869e5fec 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -13,6 +13,8 @@
+ #include <linux/fs.h>
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
++#include <linux/heki.h>
++#include <linux/mem_attr.h>
+ #include <asm/mshyperv.h>
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+@@ -547,6 +549,119 @@ static int hv_modify_vtl_protection_mask(u64 start, u64 number_of_pages, u32 pag
+ 	return hv_result(status);
+ }
+ 
++/* Read in guest ranges. */
++static struct heki_range *__vsm_read_ranges(u64 pa, unsigned long nranges)
++{
++	struct heki_page *heki_page;
++	struct heki_range *ranges;
++	struct page *page;
++	unsigned long max_nranges, cur_nranges;
++	size_t size;
++	unsigned long n;
++
++	if (pa & (PAGE_SIZE - 1)) {
++		pr_warn("heki: list %llx not page aligned\n", pa);
++		return NULL;
++	}
++
++	ranges = vmalloc(sizeof(*ranges) * nranges);
++	if (!ranges) {
++		pr_warn("heki: Can't allocate %ld ranges\n", nranges);
++		return NULL;
++	}
++
++	max_nranges = (PAGE_SIZE - sizeof(*heki_page)) / sizeof(*ranges);
++
++	for (n = 0; n < nranges; n += cur_nranges) {
++		page = pfn_to_page(pa >> PAGE_SHIFT);
++		heki_page = vmap(&page, 1, VM_MAP, PAGE_KERNEL);
++
++		cur_nranges = heki_page->nranges;
++		pa = heki_page->next_pa;
++
++		if (cur_nranges > max_nranges || cur_nranges > (nranges - n)) {
++			pr_warn("%s: Too many ranges\n", __func__);
++			vfree(ranges);
++			return NULL;
++		}
++
++		size = cur_nranges * sizeof(*ranges);
++		memcpy(&ranges[n], heki_page->ranges, size);
++
++		vunmap(heki_page);
++	}
++	return ranges;
++}
++
++static int mshv_vsm_protect_memory(u64 pa, unsigned long nranges)
++{
++	struct heki_range *ranges, *range;
++	unsigned long attributes, n;
++	u32 permissions;
++	int i, err = 0;
++
++	ranges = __vsm_read_ranges(pa, nranges);
++	if (!ranges)
++		return -EINVAL;
++
++	/* Check all parameters before setting any permissions. */
++	for (i = 0; i < nranges; i++) {
++		range = &ranges[i];
++
++		if (!PAGE_ALIGNED(range->va)) {
++			pr_warn("%s: GVA not aligned: %lx\n",
++				__func__, range->va);
++			err = -EINVAL;
++			goto out;
++		}
++		if (!PAGE_ALIGNED(range->pa)) {
++			pr_warn("%s: GPA not aligned: %llx\n",
++				__func__, range->pa);
++			err = -EINVAL;
++			goto out;
++		}
++		if (!PAGE_ALIGNED(range->epa)) {
++			pr_warn("%s: GPA not aligned: %llx\n",
++				__func__, range->epa);
++			err = -EINVAL;
++			goto out;
++		}
++
++		attributes = range->attributes;
++		if (!attributes || (attributes & ~MEM_ATTR_PROT)) {
++			err = -EINVAL;
++			goto out;
++		}
++	}
++
++	/* Walk the ranges, apply the permissions for each guest page. */
++	for (i = 0; i < nranges; i++) {
++		range = &ranges[i];
++		attributes = range->attributes;
++
++		permissions = 0;
++		if (attributes & MEM_ATTR_READ) {
++			permissions |= (HV_PAGE_READABLE |
++					HV_PAGE_USER_EXECUTABLE);
++		}
++		if (attributes & MEM_ATTR_WRITE)
++			permissions |= HV_PAGE_WRITABLE;
++		if (attributes & MEM_ATTR_EXEC)
++			permissions |= HV_PAGE_EXECUTABLE;
++
++		n = (range->epa - range->pa) >> PAGE_SHIFT;
++		err = hv_modify_vtl_protection_mask(range->pa, n, permissions);
++		if (err) {
++			pr_err("%s: failed pa=0x%llx, nranges=%lu, perm=0x%x\n",
++			       __func__, range->pa, n, permissions);
++			goto out;
++		}
++	}
++out:
++	vfree(ranges);
++	return err;
++}
++
+ static void __save_vtl0_registers(void)
+ {
+ 	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
+@@ -884,6 +999,11 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		vtl0_end_of_boot = true;
+ 		status = 0;
+ 		break;
++	case VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY:
++		pr_debug("%s : VSM_PROTECT_MEMORY\n", __func__);
++		if (!vtl0_end_of_boot)
++			status = mshv_vsm_protect_memory(_vtl_params->a1, _vtl_params->a2);
++		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+ 		break;
+-- 
+2.43.0
+

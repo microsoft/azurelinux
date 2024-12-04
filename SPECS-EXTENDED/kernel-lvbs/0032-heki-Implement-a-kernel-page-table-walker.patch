@@ -1,0 +1,224 @@
+From d821490e4ff854d4e7eb639533f3cde24f5dc9aa Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Sun, 7 Jul 2024 11:58:01 -0500
+Subject: [PATCH 32/68] heki: Implement a kernel page table walker
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The Heki feature needs to do the following:
+
+- Find kernel mappings.
+
+- Determine the permissions associated with each mapping.
+
+- Send the mappings to VTL1 for establishing EPT permissions for the
+  mappings.
+
+This way, a guest physical page can reflect only the required
+permissions in the EPT.
+
+Implement a kernel page table walker that walks all of the kernel
+mappings and calls a callback function for each mapping.
+
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ include/linux/heki.h |  15 +++++
+ virt/heki/Makefile   |   1 +
+ virt/heki/walk.c     | 148 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 164 insertions(+)
+ create mode 100644 virt/heki/walk.c
+
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index aaeb8b64d221..9bf6948790ae 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -28,6 +28,21 @@ struct heki_hypervisor {
+ };
+ 
+ #ifdef CONFIG_HEKI
++/*
++ * The kernel page table is walked to locate kernel mappings. For each
++ * mapping, a callback function is called. The table walker passes information
++ * about the mapping to the callback using this structure.
++ */
++struct heki_args {
++	/* Information passed by the table walker to the callback. */
++	unsigned long va;
++	phys_addr_t pa;
++	size_t size;
++	unsigned long flags;
++};
++
++/* Callback function called by the table walker. */
++typedef void (*heki_func_t)(struct heki_args *args);
+ 
+ void heki_late_init(void);
+ void heki_register_hypervisor(struct heki_hypervisor *hypervisor);
+diff --git a/virt/heki/Makefile b/virt/heki/Makefile
+index 354e567df71c..a5daa4ff7a4f 100644
+--- a/virt/heki/Makefile
++++ b/virt/heki/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
+ obj-y += main.o
++obj-y += walk.o
+diff --git a/virt/heki/walk.c b/virt/heki/walk.c
+new file mode 100644
+index 000000000000..0ffae594428f
+--- /dev/null
++++ b/virt/heki/walk.c
+@@ -0,0 +1,148 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Kernel page table walker.
++ *
++ * Copyright © 2023 Microsoft Corporation
++ *
++ * Cf. arch/x86/mm/init_64.c
++ */
++
++#include <linux/heki.h>
++#include <linux/pgtable.h>
++
++static void heki_walk_pte(pmd_t *pmd, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
++{
++	pte_t *pte;
++	unsigned long next_va;
++
++	for (pte = pte_offset_kernel(pmd, va); va < va_end;
++	     va = next_va, pte++) {
++		next_va = (va + PAGE_SIZE) & PAGE_MASK;
++		if (next_va > va_end)
++			next_va = va_end;
++
++		if (!pte_present(*pte))
++			continue;
++
++		args->va = va;
++		args->pa = pte_pfn(*pte) << PAGE_SHIFT;
++		args->pa += va & (PAGE_SIZE - 1);
++		args->size = next_va - va;
++		args->flags = pte_flags(*pte);
++
++		func(args);
++	}
++}
++
++static void heki_walk_pmd(pud_t *pud, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
++{
++	pmd_t *pmd;
++	unsigned long next_va;
++
++	for (pmd = pmd_offset(pud, va); va < va_end; va = next_va, pmd++) {
++		next_va = pmd_addr_end(va, va_end);
++		if (next_va > va_end)
++			next_va = va_end;
++
++		if (!pmd_present(*pmd))
++			continue;
++
++		if (pmd_large(*pmd)) {
++			args->va = va;
++			args->pa = pmd_pfn(*pmd) << PAGE_SHIFT;
++			args->pa += va & (PMD_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pmd_flags(*pmd);
++
++			func(args);
++		} else {
++			heki_walk_pte(pmd, va, next_va, func, args);
++		}
++	}
++}
++
++static void heki_walk_pud(p4d_t *p4d, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
++{
++	pud_t *pud;
++	unsigned long next_va;
++
++	for (pud = pud_offset(p4d, va); va < va_end; va = next_va, pud++) {
++		next_va = pud_addr_end(va, va_end);
++		if (next_va > va_end)
++			next_va = va_end;
++
++		if (!pud_present(*pud))
++			continue;
++
++		if (pud_large(*pud)) {
++			args->va = va;
++			args->pa = pud_pfn(*pud) << PAGE_SHIFT;
++			args->pa += va & (PUD_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pud_flags(*pud);
++
++			func(args);
++		} else {
++			heki_walk_pmd(pud, va, next_va, func, args);
++		}
++	}
++}
++
++static void heki_walk_p4d(pgd_t *pgd, unsigned long va, unsigned long va_end,
++			  heki_func_t func, struct heki_args *args)
++{
++	p4d_t *p4d;
++	unsigned long next_va;
++
++	for (p4d = p4d_offset(pgd, va); va < va_end; va = next_va, p4d++) {
++		next_va = p4d_addr_end(va, va_end);
++		if (next_va > va_end)
++			next_va = va_end;
++
++		if (!p4d_present(*p4d))
++			continue;
++
++		if (p4d_large(*p4d)) {
++			args->va = va;
++			args->pa = p4d_pfn(*p4d) << PAGE_SHIFT;
++			args->pa += va & (P4D_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = p4d_flags(*p4d);
++
++			func(args);
++		} else {
++			heki_walk_pud(p4d, va, next_va, func, args);
++		}
++	}
++}
++
++void heki_walk(unsigned long va, unsigned long va_end, heki_func_t func,
++	       struct heki_args *args)
++{
++	pgd_t *pgd;
++	unsigned long next_va;
++
++	for (pgd = pgd_offset_k(va); va < va_end; va = next_va, pgd++) {
++		next_va = pgd_addr_end(va, va_end);
++		if (next_va > va_end)
++			next_va = va_end;
++
++		if (!pgd_present(*pgd))
++			continue;
++
++		if (pgd_large(*pgd)) {
++			args->va = va;
++			args->pa = pgd_pfn(*pgd) << PAGE_SHIFT;
++			args->pa += va & (PGDIR_SIZE - 1);
++			args->size = next_va - va;
++			args->flags = pgd_flags(*pgd);
++
++			func(args);
++		} else {
++			heki_walk_p4d(pgd, va, next_va, func, args);
++		}
++	}
++}
+-- 
+2.43.0
+

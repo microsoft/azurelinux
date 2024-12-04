@@ -1,0 +1,98 @@
+From 023fbab40b3d8cf69e9ac06f70fd2e332f9ca234 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 21 May 2024 12:18:18 -0400
+Subject: [PATCH 26/68] Introduce a common interrupt handler for vsm
+
+Introduce vsm_handler and setup_vsm_handler to register an api to handle
+vsm interrupts and intercepts. Assumption here is that vsm specific
+interrupts and intercepts are used only by the secure kernel running in
+VTL1. In this environment, other host interrupts and vmbus itnerrupts
+can be ignored because we are not in host mode and we do not use vmbus
+drivers in secure kernel.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/kernel/cpu/mshyperv.c | 18 +++++++++++++++++-
+ drivers/hv/mshv_vsm_vtl1.c     |  8 ++++++++
+ include/asm-generic/mshyperv.h |  1 +
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
+index bcb2d640a0cd..ebb31d2590da 100644
+--- a/arch/x86/kernel/cpu/mshyperv.c
++++ b/arch/x86/kernel/cpu/mshyperv.c
+@@ -111,6 +111,7 @@ void hv_set_register(unsigned int reg, u64 value)
+ EXPORT_SYMBOL_GPL(hv_set_register);
+ 
+ static void (*vmbus_handler)(void);
++static void (*vsm_handler)(void);
+ static void (*hv_stimer0_handler)(void);
+ static void (*hv_kexec_handler)(void);
+ static void (*hv_crash_handler)(struct pt_regs *regs);
+@@ -120,9 +121,19 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_hyperv_callback)
+ 	struct pt_regs *old_regs = set_irq_regs(regs);
+ 
+ 	inc_irq_stat(irq_hv_callback_count);
++
++	/*
++	 * If vsm handler is registered, it means we are running secure kernel
++	 * Handle the secure interrupt/intercept and return
++	 */
++	if (vsm_handler) {
++		vsm_handler();
++		goto out;
++	}
++
+ 	if (vmbus_handler)
+ 		vmbus_handler();
+-
++out:
+ 	if (ms_hyperv.hints & HV_DEPRECATING_AEOI_RECOMMENDED)
+ 		apic_eoi();
+ 
+@@ -140,6 +151,11 @@ void hv_remove_vmbus_handler(void)
+ 	vmbus_handler = NULL;
+ }
+ 
++void hv_setup_vsm_handler(void(*handler)(void))
++{
++	vsm_handler = handler;
++}
++
+ /*
+  * Routines to do per-architecture handling of stimer0
+  * interrupts when in Direct Mode
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 4ba80d68f30b..ae1a87a29754 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -219,6 +219,14 @@ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ 	return ret;
+ }
+ 
++/*
++ * This placeholder are overridden by arch specific code to allow setting up
++ * of interrupt handler for secure interrupts and intercepts
++ */
++void __weak hv_setup_vsm_handler(void (*handler)(void))
++{
++}
++
+ static int hv_modify_vtl_protection_mask(u64 start, u64 number_of_pages, u32 page_access)
+ {
+ 	struct hv_input_modify_vtl_protection_mask *hvin;
+diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
+index 430f0ae0dde2..d1e9ac849ebb 100644
+--- a/include/asm-generic/mshyperv.h
++++ b/include/asm-generic/mshyperv.h
+@@ -165,6 +165,7 @@ void hv_setup_vmbus_handler(void (*handler)(void));
+ void hv_remove_vmbus_handler(void);
+ void hv_setup_stimer0_handler(void (*handler)(void));
+ void hv_remove_stimer0_handler(void);
++void hv_setup_vsm_handler(void (*handler)(void));
+ 
+ void hv_setup_kexec_handler(void (*handler)(void));
+ void hv_remove_kexec_handler(void);
+-- 
+2.43.0
+

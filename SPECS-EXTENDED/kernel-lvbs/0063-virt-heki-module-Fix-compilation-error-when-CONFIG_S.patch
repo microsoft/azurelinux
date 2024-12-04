@@ -1,0 +1,48 @@
+From 6fc9ea5499f6abeb01b8bc8b64ca0bfd03902a0b Mon Sep 17 00:00:00 2001
+From: Angelina Vu <angelinavu@microsoft.com>
+Date: Wed, 2 Oct 2024 11:21:22 -0700
+Subject: [PATCH 63/68] virt: heki: module: Fix compilation error when
+ CONFIG_SYSTEM_REVOCATION_LIST not enabled.
+
+Do not do anything with revocation certificate list if
+CONFIG_SYSTEM_REVOCATION_LIST is not enabled.
+
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+---
+ virt/heki/module.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 6aa51be1f686..cf2770d66d8c 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -15,8 +15,10 @@
+ extern __initconst const u8 system_certificate_list[];
+ extern __initconst const unsigned long module_cert_size;
+ 
++#ifdef CONFIG_SYSTEM_REVOCATION_LIST
+ extern __initconst const u8 revocation_certificate_list[];
+ extern __initconst const unsigned long revocation_certificate_list_size;
++#endif
+ 
+ static struct heki_kinfo heki_kinfo;
+ 
+@@ -44,6 +46,7 @@ static int __init heki_copy_boot_certs(void)
+ 	 */
+ 	memcpy(heki_module_certs, system_certificate_list, module_cert_size);
+ 
++#ifdef CONFIG_SYSTEM_REVOCATION_LIST
+ 	if (revocation_certificate_list_size <= 0) {
+ 		pr_info("No revocation certificates found.\n");
+ 		return 0;
+@@ -62,6 +65,7 @@ static int __init heki_copy_boot_certs(void)
+ 	 */
+ 	memcpy(heki_revocation_certs, revocation_certificate_list,
+ 	       revocation_certificate_list_size);
++#endif
+ 	return 0;
+ }
+ core_initcall(heki_copy_boot_certs);
+-- 
+2.43.0
+

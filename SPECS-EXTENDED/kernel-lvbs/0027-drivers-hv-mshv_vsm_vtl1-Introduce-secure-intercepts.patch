@@ -1,0 +1,443 @@
+From 1438905c9acd4caf42c860c15c2783f3244f6007 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 21 May 2024 12:21:09 -0400
+Subject: [PATCH 27/68] drivers: hv: mshv_vsm_vtl1: Introduce secure intercepts
+
+Secure intercepts are raised by Hyper-V to VTL1 in event of violation of
+a set memory or register protection. Add infrastructure to handle these
+intercepts in VTL1. VTL1 as part of handling these intercepts raises
+general protection fault in VTL0 and in certain cases if the value being
+written to the register/memory is an allowed value as captured during
+initial boot, does the write and increments VTL0 instruction pointer
+register.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/include/asm/hyperv-tlfs.h |  20 ++
+ drivers/hv/mshv_vsm_vtl1.c         | 306 +++++++++++++++++++++++++++++
+ include/asm-generic/hyperv-tlfs.h  |   3 +-
+ 3 files changed, 328 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index 66e72e3afe75..73cb165e921c 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -306,8 +306,13 @@ enum hv_isolation_type {
+  * Registers are only accessible via HVCALL_GET_VP_REGISTERS hvcall and
+  * there is not associated MSR address.
+  */
++#define HV_X64_REGISTER_RIP			0x00020010
+ #define HV_X64_REGISTER_CR0			0x00040000
+ #define	HV_X64_REGISTER_CR4			0x00040003
++#define HV_X64_REGISTER_LDTR			0x00060006
++#define HV_X64_REGISTER_TR			0x00060007
++#define HV_X64_REGISTER_IDTR			0x00070000
++#define	HV_X64_REGISTER_GDTR			0x00070001
+ #define HV_X64_REGISTER_EFER			0x00080001
+ #define	HV_X64_REGISTER_APIC_BASE		0x00080003
+ #define HV_X64_REGISTER_SYSENTER_CS		0x00080005
+@@ -325,6 +330,7 @@ enum hv_isolation_type {
+ #define	HV_REGISTER_CR_INTERCEPT_CONTROL	0x000E0000
+ #define	HV_REGISTER_CR_INTERCEPT_CR0_MASK	0x000E0001
+ #define	HV_REGISTER_CR_INTERCEPT_CR4_MASK	0x000E0002
++#define HV_REGISTER_PENDING_EVENT0		0x00010004
+ #define	HV_X64_VTL_MASK			GENMASK(3, 0)
+ 
+ /* Hyper-V memory host visibility */
+@@ -891,6 +897,20 @@ union hv_cr_intercept_control {
+ 	};
+ } __packed;
+ 
++union hv_pending_exception_event {
++	u64 as_u64[2];
++	struct {
++		u64 event_pending	: 1;
++		u64 event_type		: 3;
++		u64 reserved_0		: 4;
++		u64 deliver_error_code	: 1;
++		u64 reserved_1		: 7;
++		u64 vector		: 16;
++		u64 error_code		: 32;
++		u64 exception_parameter	: 64;
++	};
++} __packed;
++
+ #include <asm-generic/hyperv-tlfs.h>
+ 
+ #endif
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index ae1a87a29754..89d1978d7b3d 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -12,6 +12,7 @@
+ #include <linux/cpuhotplug.h>
+ #include <linux/fs.h>
+ #include <linux/delay.h>
++#include <linux/interrupt.h>
+ #include <asm/mshyperv.h>
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+@@ -41,6 +42,70 @@
+ 
+ #define CR4_PIN_MASK	~((u64)(X86_CR4_MCE | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_VMXE))
+ #define CR0_PIN_MASK	((u64)(X86_CR0_PE | X86_CR0_WP | X86_CR0_PG))
++#define DEFAULT_REG_PIN_MASK	((u64)-1)
++
++#define SYNIC_INTERCEPTION_SINT		0
++
++struct hv_intercept_message_header {
++	u32 vp_index;
++	u8 instruction_length;
++	u8 intercept_access_type;
++	/* ToDo: Define union for this */
++	u16 execution_state;
++	struct hv_x64_segment_register cs_segment;
++	u64 rip;
++	u64 rflags;
++} __packed;
++
++union hv_register_access_info {
++	u64 reg_value_low;
++	u64 reg_value_high;
++	u32 reg_name;
++	u64 src_addr;
++	u64 dest_addr;
++} __packed;
++
++union hv_memory_access_info {
++	u8 as_u8;
++	struct {
++		u8 gva_valid : 1;
++		u8 gva_gpa_valid : 1;
++		u8 hypercall_op_pending : 1;
++		u8 tlb_blocked : 1;
++		u8 supervisor_shadow_stack : 1;
++		u8 verify_page_wr : 1;
++		u8 reserved : 2;
++	};
++} __packed;
++
++struct hv_intercept_message {
++	struct hv_intercept_message_header hdr;
++	u8 is_memory_op;
++	u8 reserved_0;
++	u16 reserved_1;
++	u32 reg_name;
++	union hv_register_access_info info;
++} __packed;
++
++struct hv_msr_intercept_message {
++	struct hv_intercept_message_header hdr;
++	u32 msr;
++	u32 reserved_0;
++	u64 rdx;
++	u64 rax;
++} __packed;
++
++struct hv_mem_intercept_message {
++	struct hv_intercept_message_header hdr;
++	u32 cache_type;
++	u8 instruction_byte_count;
++	union hv_memory_access_info info;
++	u8 tpr_priority;
++	u8 reserved;
++	u64 gva;
++	u64 gpa;
++	u8 instr_bytes[16];
++} __packed;
+ 
+ extern struct boot_params boot_params;
+ 
+@@ -94,6 +159,9 @@ struct hv_vsm_per_cpu {
+ 	struct hv_vtl_cpu_context cpu_context;
+ 	struct hv_vtlcall_param vtl_params;
+ 	struct task_struct *vsm_task;
++	struct tasklet_struct handle_intercept;
++	void *synic_message_page;
++//	void *synic_event_page;
+ 	u64 cr0_saved;
+ 	u64 cr4_saved;
+ 	u64 msr_lstar_saved;
+@@ -227,6 +295,193 @@ void __weak hv_setup_vsm_handler(void (*handler)(void))
+ {
+ }
+ 
++static void mshv_vsm_isr(void)
++{
++	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	void *synic_message_page;
++	struct hv_message *msg;
++	u32 message_type;
++
++	synic_message_page = per_cpu->synic_message_page;
++	if (unlikely(!synic_message_page)) {
++		pr_err("%s Error!!\n\n", __func__);
++		return;
++	}
++
++	msg = (struct hv_message *)synic_message_page + SYNIC_INTERCEPTION_SINT;
++	message_type = READ_ONCE(msg->header.message_type);
++
++	if (message_type == HVMSG_NONE)
++		return;
++
++	per_cpu->stay_in_vtl1 = true;
++	tasklet_schedule(&per_cpu->handle_intercept);
++}
++
++static void __raise_vtl0_gp_fault(void)
++{
++	union hv_pending_exception_event exception;
++	int ret;
++
++	exception.as_u64[0] = 0;
++	exception.event_pending = 0x1;
++	exception.event_type = 0;
++	exception.deliver_error_code = 1;
++	exception.vector = 0xd;
++	exception.error_code = 0;
++
++	ret = hv_vsm_set_vtl0_register(HV_REGISTER_PENDING_EVENT0, exception.as_u64[0]);
++	if (ret)
++		pr_err("%s: Error raising GP exception in VTL0\n", __func__);
++}
++
++static void __increment_vtl0_rip(struct hv_intercept_message_header *msg_hdr)
++{
++	u64 vtl0_rip;
++	int ret;
++
++	vtl0_rip = msg_hdr->rip + msg_hdr->instruction_length;
++
++	ret = hv_vsm_set_vtl0_register(HV_X64_REGISTER_RIP, vtl0_rip);
++	if (ret)
++		pr_err("%s: Error advancing instruction pointer of VTL0\n", __func__);
++}
++
++static void mshv_vsm_handle_intercept(unsigned long data)
++{
++	struct hv_vsm_per_cpu *per_cpu = (void *)data;
++	void *page_addr = per_cpu->synic_message_page;
++	struct hv_message *msg = (struct hv_message *)page_addr + SYNIC_INTERCEPTION_SINT;
++	struct hv_intercept_message_header *intercept_msg_hdr;
++	u64 value, mask, allowed_value;
++	u32 reg_name, message_type;
++	bool raise_fault = false;
++
++	pr_info("%s: cpu%d\n", __func__, smp_processor_id());
++	message_type = READ_ONCE(msg->header.message_type);
++	if (message_type == HVMSG_NONE)
++		/* We should not be here. Message corruption?? */
++		goto clear_event;
++
++	/* We handle only register and msr intercepts now */
++	if (message_type == HVMSG_X64_REGISTER_INTERCEPT) {
++		struct hv_intercept_message *intercept_msg =
++			(struct hv_intercept_message *)msg->u.payload;
++
++		reg_name = intercept_msg->reg_name;
++		value = intercept_msg->info.reg_value_low;
++		intercept_msg_hdr = &intercept_msg->hdr;
++		pr_err("%s: Register intercept on cpu%d, reg:0x%x, value:0x%llx\n",
++		       __func__, smp_processor_id(), reg_name, value);
++	} else if (message_type == HVMSG_X64_MSR_INTERCEPT) {
++		struct hv_msr_intercept_message *msr_intercept_msg =
++			(struct hv_msr_intercept_message *)msg->u.payload;
++
++		reg_name = msr_intercept_msg->msr;
++		value = (msr_intercept_msg->rdx << 32) | (msr_intercept_msg->rax & 0xFFFFFFFF);
++		intercept_msg_hdr = &msr_intercept_msg->hdr;
++		pr_err("%s: MSR intercept on cpu%d, reg:0x%x, value:0x%llx\n",
++		       __func__, smp_processor_id(), reg_name, value);
++	} else if (message_type == HVMSG_GPA_INTERCEPT) {
++		struct hv_mem_intercept_message *mem_intercept_msg =
++			(struct hv_mem_intercept_message *)msg->u.payload;
++
++		intercept_msg_hdr = &mem_intercept_msg->hdr;
++		raise_fault = true;
++		pr_err("%s: Memory intercept on cpu%d, gpa:0x%llx\n",
++		       __func__, smp_processor_id(), mem_intercept_msg->gpa);
++		goto out;
++	} else {
++		goto clear_event;
++	}
++
++	switch (reg_name) {
++	case HV_X64_REGISTER_CR0:
++		allowed_value = per_cpu->cr0_saved;
++		mask = CR0_PIN_MASK;
++		break;
++	case HV_X64_REGISTER_CR4:
++		allowed_value = per_cpu->cr4_saved;
++		mask = CR4_PIN_MASK;
++		break;
++	case HV_X64_REGISTER_GDTR:
++	case HV_X64_REGISTER_IDTR:
++	case HV_X64_REGISTER_LDTR:
++	case HV_X64_REGISTER_TR:
++		raise_fault = true;
++		break;
++	case MSR_LSTAR:
++		reg_name = HV_X64_REGISTER_LSTAR;
++		allowed_value = per_cpu->msr_lstar_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_STAR:
++		reg_name = HV_X64_REGISTER_STAR;
++		allowed_value = per_cpu->msr_star_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_CSTAR:
++		reg_name = HV_X64_REGISTER_CSTAR;
++		allowed_value = per_cpu->msr_cstar_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_IA32_APICBASE:
++		reg_name = HV_X64_REGISTER_APIC_BASE;
++		allowed_value = per_cpu->msr_apic_base_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_EFER:
++		reg_name = HV_X64_REGISTER_EFER;
++		allowed_value = per_cpu->msr_efer_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_IA32_SYSENTER_CS:
++		reg_name = HV_X64_REGISTER_SYSENTER_CS;
++		allowed_value = per_cpu->msr_sysenter_cs_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_IA32_SYSENTER_ESP:
++		reg_name = HV_X64_REGISTER_SYSENTER_ESP;
++		allowed_value = per_cpu->msr_sysenter_esp_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_IA32_SYSENTER_EIP:
++		reg_name = HV_X64_REGISTER_SYSENTER_EIP;
++		allowed_value = per_cpu->msr_sysenter_eip_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	case MSR_SYSCALL_MASK:
++		reg_name = HV_X64_REGISTER_SFMASK;
++		allowed_value = per_cpu->msr_sfmask_saved;
++		mask = DEFAULT_REG_PIN_MASK;
++		break;
++	default:
++		/* We should not be here. Do nothing */
++		goto out;
++	}
++
++	if (!raise_fault) {
++		if ((value & mask) == allowed_value) {
++			if (hv_vsm_set_vtl0_register(reg_name, value))
++				pr_err("%s: Error writing into register 0x%x of VTL0\n",
++				       __func__, reg_name);
++		} else {
++			raise_fault = true;
++		}
++	}
++
++out:
++	if (raise_fault)
++		__raise_vtl0_gp_fault();
++	else
++		__increment_vtl0_rip(intercept_msg_hdr);
++
++clear_event:
++	vmbus_signal_eom(msg, message_type);
++	/* Should interrupts be disabled ?? */
++	per_cpu->stay_in_vtl1 = false;
++}
++
+ static int hv_modify_vtl_protection_mask(u64 start, u64 number_of_pages, u32 page_access)
+ {
+ 	struct hv_input_modify_vtl_protection_mask *hvin;
+@@ -714,6 +969,45 @@ static int mshv_vsm_configure_partition(void)
+ 	return hv_vsm_set_register(HV_REGISTER_VSM_PARTITION_CONFIG, config.as_u64);
+ }
+ 
++static int mshv_vsm_per_cpu_synic_init(unsigned int cpu)
++{
++	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	union hv_synic_simp simp;
++	union hv_synic_sint sint;
++	union hv_synic_scontrol sctrl;
++
++	per_cpu->synic_message_page = (void *)get_zeroed_page(GFP_ATOMIC);
++	if (!per_cpu->synic_message_page) {
++		pr_err("%s: Unable to allocate SYNIC message page\n", __func__);
++		return -ENOMEM;
++	}
++	// ToDo: Handle nested ?
++	// Set the synic message page
++	simp.as_uint64 = hv_get_register(HV_REGISTER_SIMP);
++	simp.simp_enabled = 1;
++	simp.base_simp_gpa = virt_to_phys(per_cpu->synic_message_page) >> HV_HYP_PAGE_SHIFT;
++	hv_set_register(HV_REGISTER_SIMP, simp.as_uint64);
++
++	// Do we need synic event page as well?
++	// ToDo: per-cpu interrupt enabling for supported architectures like arm64
++
++	// Unmask SINT0 so that the cpu can receive intercepts from Hyper-V
++	sint.as_uint64 = hv_get_register(HV_REGISTER_SINT0 + SYNIC_INTERCEPTION_SINT);
++
++	sint.vector = HYPERVISOR_CALLBACK_VECTOR;
++	sint.masked = false;
++	sint.auto_eoi = !(ms_hyperv.hints & HV_DEPRECATING_AEOI_RECOMMENDED);
++	hv_set_register(HV_REGISTER_SINT0 + SYNIC_INTERCEPTION_SINT, sint.as_uint64);
++
++	/* Enable the global synic bit */
++	sctrl.as_uint64 = hv_get_register(HV_REGISTER_SCONTROL);
++	sctrl.enable = 1;
++
++	/* Enable the global synic bit */
++	hv_set_register(HV_REGISTER_SCONTROL, sctrl.as_uint64);
++	return 0;
++}
++
+ static int mshv_vsm_per_cpu_init(unsigned int cpu)
+ {
+ 	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
+@@ -725,6 +1019,15 @@ static int mshv_vsm_per_cpu_init(unsigned int cpu)
+ 
+ 	mshv_vsm_set_secure_config_vtl0();
+ 
++	/* Enable tasklet to handle the intercepts */
++	tasklet_init(&per_cpu->handle_intercept, mshv_vsm_handle_intercept,
++		     (unsigned long)per_cpu);
++
++	if (mshv_vsm_per_cpu_synic_init(cpu)) {
++		pr_err("%s: Could not init synic for cpu%d\n", __func__, cpu);
++		tasklet_kill(&per_cpu->handle_intercept);
++	}
++
+ 	per_cpu->vtl1_booted = true;
+ 	return 0;
+ }
+@@ -803,6 +1106,9 @@ static int __init mshv_vtl1_init(void)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	/* ToDo : per-cpu interrupt enabling for supported architectures like arm64 */
++	hv_setup_vsm_handler(mshv_vsm_isr);
++
+ 	/* Protect VTL1 memory from VTL0 */
+ 	e820_table = boot_params.e820_table;
+ 	permissions = HV_PAGE_ACCESS_NONE;
+diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
+index 1cff0dbb4825..e4b687e3dda4 100644
+--- a/include/asm-generic/hyperv-tlfs.h
++++ b/include/asm-generic/hyperv-tlfs.h
+@@ -289,7 +289,8 @@ enum hv_message_type {
+ 	HVMSG_X64_CPUID_INTERCEPT	= 0x80010002,
+ 	HVMSG_X64_EXCEPTION_INTERCEPT	= 0x80010003,
+ 	HVMSG_X64_APIC_EOI		= 0x80010004,
+-	HVMSG_X64_LEGACY_FP_ERROR	= 0x80010005
++	HVMSG_X64_LEGACY_FP_ERROR	= 0x80010005,
++	HVMSG_X64_REGISTER_INTERCEPT	= 0x80010006
+ };
+ 
+ /* Define synthetic interrupt controller message flags. */
+-- 
+2.43.0
+

@@ -1,0 +1,274 @@
+From 226e82b2e3799bdd38ee0b562d2269b4194e596a Mon Sep 17 00:00:00 2001
+From: Anna Trikalinou <atrikalinou@microsoft.com>
+Date: Mon, 6 Nov 2023 21:02:03 +0000
+Subject: [PATCH 17/68] drivers: hv: hv_vsm_boot: Boot secondary processors in
+ VTL1
+
+Add 2 vtlcalls to aid booting of secondary virtual processors(VPs) in
+VTL1.
+- `VSM_VTL_CALL_FUNC_ID_ENABLE_APS_VTL`: This function will use VTL0's
+  cpu_present_mask to make CPU's present in VTL1. It will also enable
+VTL1 for each CPU.
+- `VSM_VTL_CALL_FUNC_ID_BOOT_APS`: This function will use VTL0's
+  cpu_online_mask and will boot each CPU that is set.
+
+A key part of bringing up secondary processor(VPx) is that it is done in
+part by the primary cpu and in part by secondary processor.  As the
+first step the primary cpu enters VTL1 and enables VTL1 for all the
+secondary processors. Then the primary cpu enters VTL1 and initiates the
+boot process of VPx. At some point it needs to notify VPx running in
+VTL0 that it can now transition to VTL1 to continue its part of the boot
+process. This is done by using the `boot_signal` shared page between
+VTL0 and VTL1. Each secondary cpu will invokes the he vtl1 boot thread
+for the next online cpu there by not needing all the cpus to be in a
+holding pattern at boot.
+
+Co-developed-by: Thara Gopinath <tgopinath@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+---
+ drivers/hv/hv_vsm.h      |   3 +
+ drivers/hv/hv_vsm_boot.c | 183 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 185 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index f3e9f6ef79c5..92d0c00609a2 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -11,6 +11,9 @@
+ 
+ #include <linux/types.h>
+ 
++#define VSM_VTL_CALL_FUNC_ID_ENABLE_APS_VTL	0x1FFE0
++#define VSM_VTL_CALL_FUNC_ID_BOOT_APS		0x1FFE1
++
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+ extern union hv_register_vsm_code_page_offsets vsm_code_page_offsets;
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index 84a2c324cdd2..eb3dcf8d649d 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -11,8 +11,10 @@
+ #include <asm/mshyperv.h>
+ #include <linux/hyperv.h>
+ #include <linux/module.h>
++#include <linux/kthread.h>
+ #include <linux/file.h>
+ #include <linux/fs.h>
++#include <linux/slab.h>
+ #include <linux/cpumask.h>
+ #include <linux/vmalloc.h>
+ 
+@@ -59,9 +61,13 @@
+ 
+ #define HV_VTL1_ENABLE_BIT      BIT(1)
+ 
++#define VSM_BOOT_SIGNAL	0xDC
++
+ static struct file *sk_loader, *sk;
++static struct page *boot_signal_page, *cpu_online_page, *cpu_present_page;
+ static phys_addr_t vsm_skm_pa;
+ static void *vsm_skm_va;
++static u8 *boot_signal;
+ 
+ bool hv_vsm_boot_success;
+ bool hv_vsm_mbec_enabled = true;
+@@ -251,6 +257,172 @@ static __init void hv_vsm_boot_vtl1(void)
+ 	}
+ }
+ 
++static u64 hv_vsm_establish_shared_page(struct page **page)
++{
++	void *va;
++
++	*page = alloc_page(GFP_KERNEL);
++
++	if (!(*page)) {
++		pr_err("%s: Unable to establish VTL0-VTL1 shared page\n", __func__);
++		return -ENOMEM;
++	}
++
++	va = page_address(*page);
++	memset(va, 0, PAGE_SIZE);
++
++	return page_to_pfn(*page);
++}
++
++static __init int hv_vsm_enable_ap_vtl(void)
++{
++	struct hv_vtlcall_param args = {0};
++	u64 cpu_present_mask_pfn;
++	void *va;
++	int ret = 0;
++
++	/* Allocate Present Cpumask Page & Copy cpu_present_mask */
++	cpu_present_mask_pfn = hv_vsm_establish_shared_page(&cpu_present_page);
++
++	if (cpu_present_mask_pfn < 0)
++		return -ENOMEM;
++
++	va = page_address(cpu_present_page);
++	cpumask_copy((struct cpumask *)va, cpu_present_mask);
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_ENABLE_APS_VTL;
++	args.a1 = cpu_present_mask_pfn;
++
++	ret = hv_vsm_init_vtlcall(&args);
++
++	if (ret)
++		pr_err("%s: Failed to enable VTL1 for APs. Error %d", __func__, ret);
++
++	__free_page(cpu_present_page);
++	return ret;
++}
++
++struct task_struct **ap_thread;
++static __init int hv_vsm_boot_sec_vp_thread_fn(void *unused)
++{
++	struct hv_vtlcall_param args = {0};
++	unsigned long flags = 0;
++	int cpu = smp_processor_id(), next_cpu;
++	u16 vp_enabled_vtl_set = 0;
++	u8 active_mbec_enabled = 0;
++
++	/* TODO: Remove once we allow >64 CPUs in Secure Kernel */
++	if (cpu > 63) {
++		pr_err("CPU%d: Secure Kernel currently supports CPUID <= 63.", smp_processor_id());
++		return -EINVAL;
++	}
++
++	pr_info("%s: cpu%d entering vtl1 boot thread\n", __func__, cpu);
++	local_irq_save(flags);
++	while (READ_ONCE(boot_signal[cpu]) != VSM_BOOT_SIGNAL) {
++		if (kthread_should_stop()) {
++			local_irq_restore(flags);
++			goto out;
++		}
++	}
++
++	local_irq_restore(flags);
++	hv_vsm_init_vtlcall(&args);
++out:
++	next_cpu = cpumask_next(cpu, cpu_online_mask);
++	if (next_cpu > 0 && next_cpu < nr_cpu_ids) {
++		wake_up_process(ap_thread[next_cpu]);
++		pr_info("%s: cpu%d exiting vtl1 boot thread. Waking up cpu%d\n",
++			__func__, cpu, next_cpu);
++	}
++
++	hv_vsm_get_vp_status(&vp_enabled_vtl_set, &active_mbec_enabled);
++	if (!active_mbec_enabled) {
++		pr_err("Failed to enable MBEC for VP%d\n", cpu);
++		hv_vsm_mbec_enabled = false;
++	}
++	return 0;
++}
++
++static __init int hv_vsm_boot_ap_vtl(void)
++{
++	struct hv_vtlcall_param args = {0};
++	void *va;
++	u64 boot_signal_pfn, cpu_online_mask_pfn;
++	unsigned int cpu, cur_cpu = smp_processor_id(), vsm_cpus = num_possible_cpus(), next_cpu;
++	int ret;
++
++	/* Allocate & Initialize Boot Signal Page */
++	boot_signal_pfn = hv_vsm_establish_shared_page(&boot_signal_page);
++
++	if (boot_signal_pfn < 0)
++		return -ENOMEM;
++
++	va = page_address(boot_signal_page);
++	boot_signal = (u8 *)va;
++	boot_signal[0] = VSM_BOOT_SIGNAL;
++
++	/* Allocate Online Cpumask Page & Copy cpu_online_mask */
++	cpu_online_mask_pfn = hv_vsm_establish_shared_page(&cpu_online_page);
++
++	if (cpu_online_mask_pfn < 0) {
++		ret = -ENOMEM;
++		goto free_bootsignal;
++	}
++
++	va = page_address(cpu_online_page);
++	cpumask_copy((struct cpumask *)va, cpu_online_mask);
++
++	/* Create per-CPU threads to do vtlcall and complete per-CPU hotplug boot in VTL1 */
++	ap_thread = kmalloc_array(vsm_cpus, sizeof(*ap_thread), GFP_KERNEL);
++
++	if (!ap_thread) {
++		ret = -ENOMEM;
++		goto free_sharedpages;
++	}
++
++	memset(ap_thread, 0, sizeof(*ap_thread) * vsm_cpus);
++
++	for_each_online_cpu(cpu) {
++		if (cpu == cur_cpu)
++			continue;
++		ap_thread[cpu] = kthread_create(hv_vsm_boot_sec_vp_thread_fn, NULL, "ap_thread");
++
++		if (IS_ERR(ap_thread[cpu])) {
++			ret = PTR_ERR(ap_thread[cpu]);
++			goto out;
++		}
++
++		kthread_bind(ap_thread[cpu], cpu);
++		sched_set_fifo(ap_thread[cpu]);
++	}
++
++	next_cpu = cpumask_next(cur_cpu, cpu_online_mask);
++	if (next_cpu >= nr_cpu_ids)
++		goto out;
++
++	wake_up_process(ap_thread[next_cpu]);
++	args.a0 = VSM_VTL_CALL_FUNC_ID_BOOT_APS;
++	args.a1 = cpu_online_mask_pfn;
++	args.a2 = boot_signal_pfn;
++
++	ret = hv_vsm_init_vtlcall(&args);
++
++	if (ret)
++		pr_err("%s: Failed to boot APs for VTL1. Error %d", __func__, ret);
++out:
++	for_each_online_cpu(cpu) {
++		if (ap_thread[cpu])
++			kthread_stop(ap_thread[cpu]);
++	}
++	kfree(ap_thread);
++free_sharedpages:
++	__free_page(cpu_online_page);
++free_bootsignal:
++	__free_page(boot_signal_page);
++	return ret;
++}
++
+ static int __init hv_vsm_enable_partition_vtl(void)
+ {
+ 	u64 status = 0;
+@@ -769,11 +941,20 @@ static int __init hv_vsm_boot_init(void)
+ 	 * will not return from vtl1 and system will hang.
+ 	 */
+ 	hv_vsm_boot_vtl1();
+-	hv_vsm_boot_success = true;
+ 
++	/* Enable VTL1 for secondary processots */
++	ret = hv_vsm_enable_ap_vtl();
++	if (ret)
++		goto out;
++
++	/* Boot secondary processors in VTL1 */
++	ret = hv_vsm_boot_ap_vtl();
++	if (!ret)
++		hv_vsm_boot_success = true;
+ out:
+ 	set_cpus_allowed_ptr(current, mask);
+ 	free_cpumask_var(mask);
++
+ close_files:
+ 	filp_close(sk, NULL);
+ close_file:
+-- 
+2.43.0
+

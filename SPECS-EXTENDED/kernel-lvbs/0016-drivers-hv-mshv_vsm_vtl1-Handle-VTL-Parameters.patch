@@ -1,0 +1,82 @@
+From 69ee21aa015ec34dfa0518370327e83737638cc8 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 30 Apr 2024 08:34:41 -0400
+Subject: [PATCH 16/68] drivers: hv: mshv_vsm_vtl1: Handle VTL Parameters
+
+Handle vtl parameters structure to aid argument passing between
+VTL0 (guest kernel) and VTL1 (secure kernel). The arguments are
+passed in registers rdi, rsi, rdx and r8.
+
+Co-developed-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index c55ea02718d5..75d0b3407159 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -77,6 +77,7 @@ struct hv_vtl_cpu_context {
+ 
+ struct hv_vsm_per_cpu {
+ 	struct hv_vtl_cpu_context cpu_context;
++	struct hv_vtlcall_param vtl_params;
+ 	struct task_struct *vsm_task;
+ 	/* Shut down tick when exiting VTL1 */
+ 	bool suppress_tick;
+@@ -223,6 +224,15 @@ static void mshv_vsm_vtl_idle(void)
+ 	raw_local_irq_enable();
+ }
+ 
++static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
++{
++	switch (_vtl_params->a0) {
++	default:
++		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
++		break;
++	}
++}
++
+ static int mshv_vsm_vtl_task(void *unused)
+ {
+ 	struct hv_vp_assist_page *hvp;
+@@ -231,6 +241,34 @@ static int mshv_vsm_vtl_task(void *unused)
+ 		hvp = hv_vp_assist_page[smp_processor_id()];
+ 		switch (hvp->vtl_entry_reason) {
+ 		case VTL_ENTRY_REASON_LOWER_VTL_CALL:
++			struct hv_vsm_per_cpu *per_cpu;
++			struct hv_vtl_cpu_context *cpu_context;
++			struct hv_vtlcall_param *vtl_params;
++
++			/*
++			 *  VTL0 can pass four arguments to VTL1 in registers rdi,
++			 *  rsi, rdx and r8 respectively. r8 is also used to pass
++			 *  success or failure back to VTL0. Copy these arguments
++			 *  to vtl_params structure on entry. Copy vtl_params
++			 *  out to cpu_context on vtl exit so that _mshv_vtl_return
++			 *  populates these registers with return values from vtl1.
++			 */
++			per_cpu = this_cpu_ptr(&vsm_per_cpu);
++			cpu_context = &per_cpu->cpu_context;
++			vtl_params = &per_cpu->vtl_params;
++
++			vtl_params->a0 = cpu_context->rdi;
++			vtl_params->a1 = cpu_context->rsi;
++			vtl_params->a2 = cpu_context->rdx;
++			vtl_params->a3 = cpu_context->r8;
++
++			pr_debug("CPU%u: MSHV_ENTRY_REASON_LOWER_VTL_CALL\n", smp_processor_id());
++			mshv_vsm_handle_entry(vtl_params);
++
++			cpu_context->rdi = vtl_params->a0;
++			cpu_context->rsi = vtl_params->a1;
++			cpu_context->rdx = vtl_params->a2;
++			cpu_context->r8 =  vtl_params->a3;
+ 			break;
+ 		case VTL_ENTRY_REASON_INTERRUPT:
+ 			/* ToDo: Some kind of refcounting here */
+-- 
+2.43.0
+

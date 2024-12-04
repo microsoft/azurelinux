@@ -1,0 +1,29 @@
+From 67de5c8527d14be466e0734330bbb6dd7aef7b20 Mon Sep 17 00:00:00 2001
+From: Angelina Vu <angelinavu@microsoft.com>
+Date: Sat, 4 May 2024 14:35:36 -0700
+Subject: [PATCH 05/68] Temporary hack for vmap
+
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+---
+ mm/vmalloc.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index 0148be0814af..e4abb9bef02a 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -476,8 +476,11 @@ static int vmap_pages_pte_range(pmd_t *pmd, unsigned long addr,
+ 			return -EBUSY;
+ 		if (WARN_ON(!page))
+ 			return -ENOMEM;
++
++#ifndef CONFIG_HV_SECURE_VTL
+ 		if (WARN_ON(!pfn_valid(page_to_pfn(page))))
+ 			return -EINVAL;
++#endif
+ 
+ 		set_pte_at(&init_mm, addr, pte, mk_pte(page, prot));
+ 		(*nr)++;
+-- 
+2.43.0
+

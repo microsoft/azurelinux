@@ -1,0 +1,255 @@
+From 5999722b75d023f9eed5766a588e1726270abaae Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Sat, 13 Apr 2024 00:59:35 -0500
+Subject: [PATCH 22/68] virt: Introduce Hypervisor Enforced Kernel Integrity
+ (Heki)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hypervisor Enforced Kernel Integrity (Heki) is a feature that will use
+the hypervisor to enhance guest virtual machine security. Depending on
+the type of hypervisor (Type 1 vs Type 2) the feature can be extended to
+host partition as well.
+
+Implement minimal code to introduce Heki and lock critical registers
+down as the first set of guest protections. Changes involve:
+
+- Define the config option for Heki
+
+- Define a kernel command line parameter "heki" to turn the feature on
+  or off. By default, Heki is on.
+
+- Define a heki_hypervisor structure to house the API functions. A
+  hypervisor that supports Heki must instantiate a heki_hypervisor
+structure and pass it to the Heki common code. This allows the common
+code to access these functions in a hypervisor-agnostic way.
+
+- Introduce lock_crs() in heki_hypervisor that can be plugged in by
+  supporting hypervisors to hypervisoe backed enable pinning down of
+critical system regiters.
+
+- Introduce a late init hook for heki that is called that the end of
+  kernel boot before the first user space process is run. This hook in
+turn calls into hypervisor supported hooks to enforce various
+protections. Call into hyperviso lock_crs hook as the first step.  init.
+
+Co-developed-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Kconfig              |  2 ++
+ include/linux/heki.h | 42 +++++++++++++++++++++++++++++++++++++++
+ init/main.c          |  2 ++
+ virt/Makefile        |  1 +
+ virt/heki/Kconfig    | 11 +++++++++++
+ virt/heki/Makefile   |  3 +++
+ virt/heki/common.h   | 24 ++++++++++++++++++++++
+ virt/heki/main.c     | 47 ++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 132 insertions(+)
+ create mode 100644 include/linux/heki.h
+ create mode 100644 virt/heki/Kconfig
+ create mode 100644 virt/heki/Makefile
+ create mode 100644 virt/heki/common.h
+ create mode 100644 virt/heki/main.c
+
+diff --git a/Kconfig b/Kconfig
+index 745bc773f567..0c844d9bcb03 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -29,4 +29,6 @@ source "lib/Kconfig"
+ 
+ source "lib/Kconfig.debug"
+ 
++source "virt/heki/Kconfig"
++
+ source "Documentation/Kconfig"
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+new file mode 100644
+index 000000000000..e7d56d95bc31
+--- /dev/null
++++ b/include/linux/heki.h
+@@ -0,0 +1,42 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Definitions
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#ifndef __HEKI_H__
++#define __HEKI_H__
++
++#include <linux/types.h>
++#include <linux/bug.h>
++#include <linux/cache.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/printk.h>
++
++/*
++ * A hypervisor that supports Heki will instantiate this structure to
++ * provide hypervisor specific functions for Heki.
++ */
++struct heki_hypervisor {
++	/* Lock control registers. */
++	int (*lock_crs)(void);
++};
++
++#ifdef CONFIG_HEKI
++
++void heki_late_init(void);
++void heki_register_hypervisor(struct heki_hypervisor *hypervisor);
++
++#else /* !CONFIG_HEKI */
++
++static inline void heki_late_init(void)
++{
++}
++
++static void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
++
++#endif /* CONFIG_HEKI */
++
++#endif /* __HEKI_H__ */
+diff --git a/init/main.c b/init/main.c
+index c787e94cc898..61f920f1b453 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -100,6 +100,7 @@
+ #include <linux/init_syscalls.h>
+ #include <linux/stackdepot.h>
+ #include <linux/randomize_kstack.h>
++#include <linux/heki.h>
+ #include <net/net_namespace.h>
+ 
+ #include <asm/io.h>
+@@ -1451,6 +1452,7 @@ static int __ref kernel_init(void *unused)
+ 	exit_boot_config();
+ 	free_initmem();
+ 	mark_readonly();
++	heki_late_init();
+ 
+ 	/*
+ 	 * Kernel mappings are now finalized - update the userspace page-table
+diff --git a/virt/Makefile b/virt/Makefile
+index 1cfea9436af9..4550dc624466 100644
+--- a/virt/Makefile
++++ b/virt/Makefile
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ obj-y	+= lib/
++obj-$(CONFIG_HEKI) += heki/
+diff --git a/virt/heki/Kconfig b/virt/heki/Kconfig
+new file mode 100644
+index 000000000000..a5dfa605bd2d
+--- /dev/null
++++ b/virt/heki/Kconfig
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Hypervisor Enforced Kernel Integrity (Heki)
++
++config HEKI
++	bool "Hypervisor Enforced Kernel Integrity (Heki)"
++	help
++	  This feature enhances guest virtual machine security by taking
++	  advantage of security features provided by the hypervisor for guests.
++	  This feature is helpful in maintaining guest virtual machine security
++	  even after the guest kernel has been compromised.
+diff --git a/virt/heki/Makefile b/virt/heki/Makefile
+new file mode 100644
+index 000000000000..354e567df71c
+--- /dev/null
++++ b/virt/heki/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++obj-y += main.o
+diff --git a/virt/heki/common.h b/virt/heki/common.h
+new file mode 100644
+index 000000000000..5b8c2879ee50
+--- /dev/null
++++ b/virt/heki/common.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Common header
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#ifndef _HEKI_COMMON_H
++
++#ifdef pr_fmt
++#undef pr_fmt
++#endif
++
++#define pr_fmt(fmt) "heki-guest: " fmt
++
++/*
++ * If the active hypervisor supports Heki, it will plug its heki_hypervisor
++ * pointer into this heki structure.
++ */
++struct heki {
++	struct heki_hypervisor *hypervisor;
++};
++
++#endif /* _HEKI_COMMON_H */
+diff --git a/virt/heki/main.c b/virt/heki/main.c
+new file mode 100644
+index 000000000000..54422c089389
+--- /dev/null
++++ b/virt/heki/main.c
+@@ -0,0 +1,47 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Common code
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#include <linux/heki.h>
++
++#include "common.h"
++
++bool heki_enabled __ro_after_init = true;
++struct heki heki;
++
++/*
++ * Must be called after mark_readonly().
++ */
++void heki_late_init(void)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	int ret;
++
++	if (!heki_enabled || !heki.hypervisor)
++		return;
++
++	/* Locks control registers so a compromised guest cannot change them. */
++	if (hypervisor->lock_crs)
++		ret = hypervisor->lock_crs();
++
++	if (ret)
++		pr_warn("Unable to lock down control registers\n");
++	else
++		pr_warn("Control registers locked\n");
++}
++
++void heki_register_hypervisor(struct heki_hypervisor *hypervisor)
++{
++	heki.hypervisor = hypervisor;
++}
++
++static int __init heki_parse_config(char *str)
++{
++	if (kstrtobool(str, &heki_enabled))
++		pr_warn("Invalid option string for heki: '%s'\n", str);
++	return 1;
++}
++__setup("heki=", heki_parse_config);
+-- 
+2.43.0
+

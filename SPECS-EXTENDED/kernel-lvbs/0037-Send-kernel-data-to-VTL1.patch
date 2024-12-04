@@ -1,0 +1,231 @@
+From ab03c2fdf0ecd3bc19da861da3b36e8e0206ee26 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Tue, 9 Jul 2024 11:46:21 -0500
+Subject: [PATCH 37/68] Send kernel data to VTL1
+
+Kernel data needs to be sent from VTL0 to VTL1 for various purposes.
+The VTL call load_kdata() is implemented for this.
+
+For starters, send module certificates. VTL1 will create a trusted
+keyring from the module certificates.
+
+In the future, this will be used by VTL1 to verify the signature of a
+module when the module is loaded in VTL0.
+
+A kernel data structure is virtually contiguous, but not necessarily
+physically contiguous. So, multiple ranges may be sent for a single
+data structure. Also, multiple data structures can be sent in a single
+call.
+
+To manage this, assign a unique identifier to each kernel data structure.
+Set the attributes field of each range in a data structure to the
+identifier. This enables VTL0 to gather the ranges of a single data
+structure and map them in a single mapping.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ drivers/hv/hv_vsm.c  | 14 ++++++++
+ drivers/hv/hv_vsm.h  |  1 +
+ include/linux/heki.h | 10 ++++++
+ virt/heki/Makefile   |  1 +
+ virt/heki/main.c     |  1 +
+ virt/heki/module.c   | 83 ++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 110 insertions(+)
+ create mode 100644 virt/heki/module.c
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index 677d6cb07fe2..db85e3d4c026 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -135,10 +135,24 @@ static int hv_vsm_protect_memory(phys_addr_t pa, unsigned long nranges)
+ 	return hv_vsm_vtlcall(&args);
+ }
+ 
++static int hv_vsm_load_kdata(phys_addr_t pa, unsigned long nranges)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_LOAD_KDATA;
++	args.a1 = pa;
++	args.a2 = nranges;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
+ 	.protect_memory = hv_vsm_protect_memory,
++	.load_kdata = hv_vsm_load_kdata,
+ };
+ 
+ int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 32eee06788c4..7d3b8c35181a 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -16,6 +16,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_LOCK_REGS		0x1FFE2
+ #define VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT	0x1FFE3
+ #define VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY	0x1FFE4
++#define VSM_VTL_CALL_FUNC_ID_LOAD_KDATA		0x1FFE5
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index f8bb30358b26..cbfe8d3f6321 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -15,6 +15,7 @@
+ #include <linux/kernel.h>
+ #include <linux/printk.h>
+ #include <linux/mm.h>
++#include <linux/vmalloc.h>
+ #include <linux/xarray.h>
+ 
+ /*
+@@ -45,6 +46,11 @@ struct heki_page {
+ 	struct heki_range ranges[];
+ };
+ 
++enum heki_kdata_type {
++	HEKI_MODULE_CERTS,
++	HEKI_KDATA_MAX,
++};
++
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+  * provide hypervisor specific functions for Heki.
+@@ -58,6 +64,9 @@ struct heki_hypervisor {
+ 
+ 	/* Protect guest memory */
+ 	int (*protect_memory)(phys_addr_t pa, unsigned long nranges);
++
++	/* Load kernel data */
++	int (*load_kdata)(phys_addr_t pa, unsigned long nranges);
+ };
+ 
+ #ifdef CONFIG_HEKI
+@@ -110,6 +119,7 @@ void heki_protect(unsigned long va, unsigned long end, struct heki_args *args);
+ void heki_add_range(struct heki_args *args, unsigned long va,
+ 		    phys_addr_t pa, phys_addr_t epa);
+ void heki_cleanup_args(struct heki_args *args);
++void heki_load_kdata(void);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+diff --git a/virt/heki/Makefile b/virt/heki/Makefile
+index 9dc49588faa3..bcfee61a4e2a 100644
+--- a/virt/heki/Makefile
++++ b/virt/heki/Makefile
+@@ -3,3 +3,4 @@
+ obj-y += main.o
+ obj-y += walk.o
+ obj-y += protect.o
++obj-y += module.o
+diff --git a/virt/heki/main.c b/virt/heki/main.c
+index 4b51afafbafc..a5345b74437e 100644
+--- a/virt/heki/main.c
++++ b/virt/heki/main.c
+@@ -34,6 +34,7 @@ void heki_late_init(void)
+ 
+ 	mutex_init(&heki.lock);
+ 	heki_arch_init();
++	heki_load_kdata();
+ 
+ 	/*
+ 	 * Signal end of kernel boot.
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+new file mode 100644
+index 000000000000..db0a73ee252c
+--- /dev/null
++++ b/virt/heki/module.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Authentication
++ *
++ * Copyright © 2024 Microsoft Corporation
++ */
++
++#include <linux/heki.h>
++
++#include "common.h"
++
++extern __initconst const u8 system_certificate_list[];
++extern __initconst const unsigned long module_cert_size;
++
++static u8 *heki_module_certs;
++static unsigned long heki_module_cert_size;
++
++static int __init heki_copy_module_certs(void)
++{
++	heki_module_certs = vmalloc(module_cert_size);
++	if (!heki_module_certs) {
++		pr_warn("Failed to alloc module certificates.\n");
++		return -ENOMEM;
++	}
++	heki_module_cert_size = module_cert_size;
++
++	/*
++	 * Copy the module certificates because they will be freed at
++	 * the end of init.
++	 */
++	memcpy(heki_module_certs, system_certificate_list, module_cert_size);
++	return 0;
++}
++core_initcall(heki_copy_module_certs);
++
++static void heki_get_ranges(struct heki_args *args)
++{
++	phys_addr_t pa, pa_end, pa_next;
++	unsigned long va, va_end, va_next;
++
++	if (!pfn_valid(args->pa >> PAGE_SHIFT))
++		return;
++
++	va_end = args->va + args->size;
++	pa_end = args->pa + args->size;
++	for (va = args->va, pa = args->pa;
++	     pa < pa_end;
++	     va = va_next, pa = pa_next) {
++		va_next = (va & PAGE_MASK) + PAGE_SIZE;
++		pa_next = (pa & PAGE_MASK) + PAGE_SIZE;
++		if (pa_next > pa_end) {
++			va_next = va_end;
++			pa_next = pa_end;
++		}
++		heki_add_range(args, va, pa, pa_next);
++	}
++}
++
++void heki_load_kdata(void)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	struct heki_args args = {};
++
++	if (!hypervisor || !heki_module_certs)
++		return;
++
++	mutex_lock(&heki.lock);
++
++	args.attributes = HEKI_MODULE_CERTS;
++	heki_walk((unsigned long)heki_module_certs,
++		  (unsigned long)heki_module_certs + heki_module_cert_size,
++		  heki_get_ranges, &args);
++
++	if (hypervisor->load_kdata(args.head_pa, args.nranges))
++		pr_warn("Failed to load kernel data.\n");
++	else
++		pr_warn("Loaded kernel data\n");
++
++	mutex_unlock(&heki.lock);
++
++	heki_cleanup_args(&args);
++	vfree(heki_module_certs);
++}
+-- 
+2.43.0
+

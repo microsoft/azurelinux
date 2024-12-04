@@ -1,0 +1,159 @@
+From 3a9d499bd8dfe0870880c91104e6efcbe0601ba1 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Wed, 10 Jul 2024 03:21:51 -0500
+Subject: [PATCH 51/68] Unload VTL0 module
+
+When a module is unloaded in VTL0, pass the module token to VTL1 so it
+can restore default EPT permissions (RW) for module sections. Once this
+is done, the module can free its memory in VTL0.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ drivers/hv/hv_vsm.c  | 13 +++++++++++++
+ drivers/hv/hv_vsm.h  |  1 +
+ include/linux/heki.h |  5 +++++
+ kernel/module/main.c |  6 +++++-
+ virt/heki/module.c   | 19 +++++++++++++++++++
+ 5 files changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index cbe29f4469c3..edc3cca89ffb 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -175,6 +175,18 @@ static int hv_vsm_free_module_init(long token)
+ 	return hv_vsm_vtlcall(&args);
+ }
+ 
++static int hv_vsm_unload_module(long token)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_UNLOAD_MODULE;
++	args.a1 = token;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
+@@ -182,6 +194,7 @@ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.load_kdata = hv_vsm_load_kdata,
+ 	.validate_module = hv_vsm_validate_module,
+ 	.free_module_init = hv_vsm_free_module_init,
++	.unload_module = hv_vsm_unload_module,
+ };
+ 
+ int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 3ceb0768454b..eb0bcfad1b11 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -19,6 +19,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_LOAD_KDATA		0x1FFE5
+ #define VSM_VTL_CALL_FUNC_ID_VALIDATE_MODULE	0x1FFE6
+ #define VSM_VTL_CALL_FUNC_ID_FREE_MODULE_INIT	0x1FFE7
++#define VSM_VTL_CALL_FUNC_ID_UNLOAD_MODULE	0x1FFE8
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 5db875e2f3fa..24c6778dbb7b 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -102,6 +102,9 @@ struct heki_hypervisor {
+ 
+ 	/* Free module init sections. */
+ 	int (*free_module_init)(long token);
++
++	/* Unload module. */
++	int (*unload_module)(long token);
+ };
+ 
+ /*
+@@ -190,6 +193,7 @@ void heki_cleanup_args(struct heki_args *args);
+ void heki_load_kdata(void);
+ long heki_validate_module(struct module *mod, struct load_info *info, int flags);
+ void heki_free_module_init(struct module *mod);
++void heki_unload_module(struct module *mod);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+@@ -209,6 +213,7 @@ static inline long heki_validate_module(struct module *mod,
+ }
+ 
+ static inline void heki_free_module_init(struct module *mod) { }
++static inline void heki_unload_module(struct module *mod) { }
+ 
+ static void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
+ 
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 52f358adfb5e..c885bb6ebab6 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -758,6 +758,7 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
+ 	blocking_notifier_call_chain(&module_notify_list,
+ 				     MODULE_STATE_GOING, mod);
+ 	klp_module_going(mod);
++	heki_unload_module(mod);
+ 	ftrace_release_mod(mod);
+ 
+ 	async_synchronize_full();
+@@ -2712,6 +2713,7 @@ static noinline int do_init_module(struct module *mod)
+ 	blocking_notifier_call_chain(&module_notify_list,
+ 				     MODULE_STATE_GOING, mod);
+ 	klp_module_going(mod);
++	heki_unload_module(mod);
+ 	ftrace_release_mod(mod);
+ 	free_module(mod);
+ 	wake_up_all(&module_wq);
+@@ -3063,7 +3065,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	/* Finally it's fully formed, ready to start executing. */
+ 	err = complete_formation(mod, info);
+ 	if (err)
+-		goto ddebug_cleanup;
++		goto heki_unload;
+ 
+ 	err = prepare_coming_module(mod);
+ 	if (err)
+@@ -3117,6 +3119,8 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	module_bug_cleanup(mod);
+ 	mutex_unlock(&module_mutex);
+ 
++ heki_unload:
++	heki_unload_module(mod);
+  ddebug_cleanup:
+ 	ftrace_release_mod(mod);
+ 	synchronize_rcu();
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 425a6b78c42d..912f0be3d5fc 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -169,3 +169,22 @@ void heki_free_module_init(struct module *mod)
+ 
+ 	mutex_unlock(&heki.lock);
+ }
++
++void heki_unload_module(struct module *mod)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	int err;
++
++	if (!hypervisor)
++		return;
++
++	mutex_lock(&heki.lock);
++
++	err = hypervisor->unload_module(mod->heki_token);
++	if (err) {
++		pr_warn("Failed to unload module %s (%d).\n",
++			mod->name, err);
++	}
++
++	mutex_unlock(&heki.lock);
++}
+-- 
+2.43.0
+

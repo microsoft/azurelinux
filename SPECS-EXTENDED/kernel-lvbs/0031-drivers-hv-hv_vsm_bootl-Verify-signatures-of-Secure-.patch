@@ -1,0 +1,360 @@
+From be91b0b53d8828d65a64c170d557a49267dbc340 Mon Sep 17 00:00:00 2001
+From: Anna Trikalinou <atrikalinou@microsoft.com>
+Date: Sat, 23 Dec 2023 01:51:54 +0000
+Subject: [PATCH 31/68] drivers: hv: hv_vsm_bootl: Verify signatures of Secure
+ Loader and Secure Kernel
+
+Generate & verify the signature of Secure Loader and Secure Kernel.
+Certificates are standard SHA256 with RSA encryption.
+
+**One time setup**
+- Install necessary packages `sudo apt-get install openssl`
+- Generate your own public/private key pair. Make sure that you have
+  compiled the Linux kernel at least once before this step, so that you
+have the file ./certs/x509.genkey `cd <linux_root_dir>/certs/` `sudo
+openssl req -new -nodes -utf8 -sha256 -days 36500 -batch -x509 -config
+x509.genkey -outform PEM -out mykey.pem -keyout mykey_priv.key`
+- (Optional) `sudo openssl rsa -in mykey_priv.key -pubout >
+  mykey_pub.key`
+- Edit lvbs_defconfig to add the new certificate
+  CONFIG_SYSTEM_TRUSTED_KEYS="certs/mykey.pem"
+- Generate the signature files for the first time
+- Add the signature files to mkinitramfs generation `sudo
+  ./Microsoft/add_sk_to_initramfs.sh <path_to_out_dir>`
+
+**Sign files** `cd <linux_root_dir>` `sudo ./scripts/sign-file -dp
+sha256 ./certs/mykey_priv.key ./certs/mykey.pem
+./<path_to_skloader>/skloader.bin` `sudo ./scripts/sign-file -dp sha256
+./certs/mykey_priv.key ./certs/mykey.pem ./<path_to_sk>/vmlinux.bin`
+This will generate ./<path_to_skloader>/skloader.bin.p7s and
+./<path_to_sk>/vmlinux.bin.p7s Copy both .p7s files to out folder, which
+is used by add_sk_to_initramfs.sh script.
+
+Every time skloader or vmlinux are changed, the new signature for the
+corresponding file needs to be generated and added to `out` directory.
+
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Microsoft/add_sk_to_initramfs.sh |  36 +++++++-
+ drivers/hv/Kconfig               |  11 +++
+ drivers/hv/hv_vsm_boot.c         | 147 +++++++++++++++++++++++++++----
+ 3 files changed, 175 insertions(+), 19 deletions(-)
+
+diff --git a/Microsoft/add_sk_to_initramfs.sh b/Microsoft/add_sk_to_initramfs.sh
+index acee435301ca..373b0da9d91c 100755
+--- a/Microsoft/add_sk_to_initramfs.sh
++++ b/Microsoft/add_sk_to_initramfs.sh
+@@ -7,9 +7,13 @@
+ #usage: run sudo ./add_sk_to_initramfs.sh <path_to_optee> (i.e. ../optee-os)
+ export OUT_DIR=$1
+ export SKERNEL_LOAD_FILE="$1/skloader.bin"
+-export SKERNEL_FILE="$1/vmlinux.bin"
+ export SKERNEL_LOAD_FILE_ABSPATH="$(readlink -f $SKERNEL_LOAD_FILE)"
++export SKERNEL_FILE="$1/vmlinux.bin"
+ export SKERNEL_FILE_ABSPATH="$(readlink -f $SKERNEL_FILE)"
++export SKERNEL_LOAD_SIG_FILE="$1/skloader.bin.p7s"
++export SKERNEL_LOAD_SIG_FILE_ABSPATH="$(readlink -f $SKERNEL_LOAD_SIG_FILE)"
++export SKERNEL_SIG_FILE="$1/vmlinux.bin.p7s"
++export SKERNEL_SIG_FILE_ABSPATH="$(readlink -f $SKERNEL_SIG_FILE)"
+ export SKERNEL_HOOK_FILE="/usr/share/initramfs-tools/hooks/skernel"
+ 
+ # If skloader.bin file does not exist, exit
+@@ -28,6 +32,20 @@ then
+    exit 0
+ fi
+ 
++# If skloader.bin.p7s file does not exist, print warning
++if [[ ! -f $SKERNEL_LOAD_SIG_FILE ]]
++then
++   echo "Warning: $SKERNEL_LOAD_SIG_FILE_ABSPATH does not exist."
++   echo "Set kernel config CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY. Otherwise, VTL1 will not boot."
++fi
++
++# If skloader.bin.p7s file does not exist, print warning
++if [[ ! -f $SKERNEL_SIG_FILE ]]
++then
++   echo "Warning: $SKERNEL_SIG_FILE_ABSPATH does not exist."
++   echo "Set kernel config CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY. Otherwise, VTL1 will not boot."
++fi
++
+ # If hook script file does not already exist, create it and set its permissions
+ if [[ ! -f $SKERNEL_HOOK_FILE ]]
+ then
+@@ -35,7 +53,7 @@ then
+    chmod 755 $SKERNEL_HOOK_FILE
+ fi
+ 
+-# Copy mkinitramfs hook script to add tee.bin to initramfs
++# Copy mkinitramfs hook script to add binaries to initramfs
+ cat > $SKERNEL_HOOK_FILE <<EOF
+ #!/bin/sh
+ 
+@@ -58,5 +76,19 @@ esac
+ cp $SKERNEL_LOAD_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
+ cp $SKERNEL_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
+ 
++if [ -f $SKERNEL_LOAD_SIG_FILE_ABSPATH ]
++then
++    cp $SKERNEL_LOAD_SIG_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
++else
++    echo "Warning: No signature file for Secure Loader is added in the initramfs."
++fi
++
++if [ -f $SKERNEL_SIG_FILE_ABSPATH ]
++then
++    cp $SKERNEL_SIG_FILE_ABSPATH "\${DESTDIR}/lib/firmware"
++else
++    echo "Warning: No signature file for Secure Kernel is added in the initramfs."
++fi
++
+ exit 0
+ EOF
+diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
+index acbcd69392d2..ed6e18504556 100644
+--- a/drivers/hv/Kconfig
++++ b/drivers/hv/Kconfig
+@@ -58,6 +58,17 @@ config HYPERV_VSM
+ 	  establish an interface between VTL0 and VTL1 to request for
+ 	  VSM services.
+ 
++config HYPERV_VSM_DISABLE_IMG_VERIFY
++	bool "Disable Image Verification for VSM binaries"
++	depends on HYPERV_VSM
++	help
++	  Select this option to disable VSM Secure Boot.
++	  Enabling this option will disable verifying the integrity and
++	  authenticity of the VSM secure kernel and loader. Enable this
++	  option only when debugging VSM. If this option is set, the
++	  system can be vulnerable to an attacker changing/replacing the
++	  secure kernel and/or loader.
++
+ config HYPERV_TIMER
+ 	def_bool HYPERV && X86
+ 
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index d099b84b9961..d47a411cbb89 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -18,6 +18,8 @@
+ #include <linux/cpumask.h>
+ #include <linux/vmalloc.h>
+ #include <linux/vsm.h>
++#include <linux/verification.h>
++#include <crypto/pkcs7.h>
+ 
+ #include "hv_vsm.h"
+ 
+@@ -66,6 +68,9 @@
+ 
+ static struct file *sk_loader, *sk;
+ static struct page *boot_signal_page, *cpu_online_page, *cpu_present_page;
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++static struct file *sk_loader_sig, *sk_sig;
++#endif
+ static phys_addr_t vsm_skm_pa;
+ static void *vsm_skm_va;
+ static u8 *boot_signal;
+@@ -765,6 +770,30 @@ static int __init hv_vsm_enable_vp_vtl(void)
+ 	return (int)(status & HV_HYPERCALL_RESULT_MASK);
+ }
+ 
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++static int verify_vsm_signature(char *buffer, unsigned int buff_size, char *signature,
++				unsigned int sig_size)
++{
++	int ret = 0;
++	struct pkcs7_message *pkcs7;
++
++	if (!buffer || !signature)
++		return -EINVAL;
++	pkcs7 = pkcs7_parse_message(signature, sig_size);
++	if (IS_ERR(pkcs7)) {
++		pr_err("%s: pkcs7_parse_message failed. Error code: %ld", __func__, PTR_ERR(pkcs7));
++		return PTR_ERR(pkcs7);
++	}
++	ret = verify_pkcs7_signature(buffer, buff_size, signature, sig_size, NULL,
++				     VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
++	if (ret) {
++		pr_err("%s: verify_pkcs7_signature failed. Error code: %d", __func__, ret);
++		return ret;
++	}
++	return ret;
++}
++#endif
++
+ static int __init hv_vsm_load_secure_kernel(void)
+ {
+ 	/*
+@@ -773,16 +802,30 @@ static int __init hv_vsm_load_secure_kernel(void)
+ 	 */
+ 	loff_t size_skloader, size_sk;
+ 	char *skloader_buf = NULL, *sk_buf = NULL;
+-	int err;
++	int ret = 0;
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	loff_t size_skloader_sig, size_sk_sig;
++	char *skloader_sig_buf = NULL, *sk_sig_buf = NULL;
++#endif
+ 
+ 	// Find the size of skloader and sk
+ 	size_skloader = vfs_llseek(sk_loader, 0, SEEK_END);
+ 	size_sk = vfs_llseek(sk, 0, SEEK_END);
+ 
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	size_skloader_sig = vfs_llseek(sk_loader_sig, 0, SEEK_END);
++	size_sk_sig = vfs_llseek(sk_sig, 0, SEEK_END);
++#endif
++
+ 	// Seek back to the beginning of the file
+ 	vfs_llseek(sk_loader, 0, SEEK_SET);
+ 	vfs_llseek(sk, 0, SEEK_SET);
+ 
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	vfs_llseek(sk_loader_sig, 0, SEEK_SET);
++	vfs_llseek(sk_sig, 0, SEEK_SET);
++#endif
++
+ 	// Allocate memory for the buffer
+ 	skloader_buf = kvmalloc(size_skloader, GFP_KERNEL);
+ 	if (!skloader_buf) {
+@@ -792,31 +835,81 @@ static int __init hv_vsm_load_secure_kernel(void)
+ 	sk_buf = kvmalloc(size_sk, GFP_KERNEL);
+ 	if (!sk_buf) {
+ 		pr_err("%s: Unable to allocate memory for copying secure kernel\n", __func__);
+-		kvfree(skloader_buf);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto free_skl;
++	}
++
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	skloader_sig_buf = kvmalloc(size_skloader_sig, GFP_KERNEL);
++	if (!skloader_sig_buf) {
++		pr_err("%s: Unable to allocate memory for copying secure kernel\n", __func__);
++		ret = -ENOMEM;
++		goto free_sk;
++	}
++	sk_sig_buf = kvmalloc(size_sk_sig, GFP_KERNEL);
++	if (!sk_sig_buf) {
++		pr_err("%s: Unable to allocate memory for copying secure kernel\n", __func__);
++		ret = -ENOMEM;
++		goto free_skl_sig;
+ 	}
++#endif
+ 
+ 	// Read from the file into the buffer
+-	err = kernel_read(sk_loader, skloader_buf, size_skloader, &sk_loader->f_pos);
+-	if (err != size_skloader) {
++	ret = kernel_read(sk_loader, skloader_buf, size_skloader, &sk_loader->f_pos);
++	if (ret != size_skloader) {
+ 		pr_err("%s Unable to read skloader.bin file\n", __func__);
+-		kvfree(skloader_buf);
+-		kvfree(sk_buf);
+-		return -1;
++		goto free_bufs;
+ 	}
+-	err = kernel_read(sk, sk_buf, size_sk, &sk->f_pos);
+-	if (err != size_sk) {
++	ret = kernel_read(sk, sk_buf, size_sk, &sk->f_pos);
++	if (ret != size_sk) {
+ 		pr_err("%s Unable to read vmlinux.bin file\n", __func__);
+-		kvfree(skloader_buf);
+-		kvfree(sk_buf);
+-		return -1;
++		goto free_bufs;
++	}
++
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	ret = kernel_read(sk_loader_sig, skloader_sig_buf, size_skloader_sig,
++			  &sk_loader_sig->f_pos);
++	if (ret != size_skloader_sig) {
++		pr_err("%s Unable to read skloader.bin.p7s file\n", __func__);
++		goto free_bufs;
++	}
++	ret = kernel_read(sk_sig, sk_sig_buf, size_sk_sig, &sk_sig->f_pos);
++	if (ret != size_sk_sig) {
++		pr_err("%s Unable to read vmlinux.bin.p7s file\n", __func__);
++		goto free_bufs;
++	}
++
++	ret = verify_vsm_signature(skloader_buf, size_skloader, skloader_sig_buf,
++				   size_skloader_sig);
++
++	if (ret) {
++		pr_err("%s: Failed to verify Secure Loader signature.", __func__);
++		goto free_bufs;
++	}
++
++	ret = verify_vsm_signature(sk_buf, size_sk, sk_sig_buf, size_sk_sig);
++
++	if (ret) {
++		pr_err("%s: Failed to verify Secure Kernel signature.", __func__);
++		goto free_bufs;
+ 	}
++#endif
+ 
+ 	memcpy(vsm_skm_va, skloader_buf, size_skloader);
+ 	memcpy(vsm_skm_va + (2 * 1024 * 1024), sk_buf, size_sk);
+-	kvfree(skloader_buf);
++	ret = 0;
++
++free_bufs:
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	kvfree(sk_sig_buf);
++free_skl_sig:
++	kvfree(skloader_sig_buf);
++free_sk:
++#endif
+ 	kvfree(sk_buf);
+-	return 0;
++free_skl:
++	kvfree(skloader_buf);
++	return ret;
+ }
+ 
+ int __init hv_vsm_boot_init(void)
+@@ -847,9 +940,23 @@ int __init hv_vsm_boot_init(void)
+ 	if (IS_ERR(sk)) {
+ 		pr_err("%s: File usr/lib/firmware/vmlinux.bin not found\n", __func__);
+ 		ret = -ENOENT;
+-		goto close_file;
++		goto close_skl_file;
+ 	}
+ 
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	sk_loader_sig = filp_open("/usr/lib/firmware/skloader.bin.p7s", O_RDONLY, 0);
++	if (IS_ERR(sk_loader_sig)) {
++		pr_err("%s: File usr/lib/firmware/skloader.bin.p7s not found\n", __func__);
++		ret = -ENOENT;
++		goto close_sk_file;
++	}
++	sk_sig = filp_open("/usr/lib/firmware/vmlinux.bin.p7s", O_RDONLY, 0);
++	if (IS_ERR(sk_sig)) {
++		pr_err("%s: File usr/lib/firmware/vmlinux.bin.p7s not found\n", __func__);
++		ret = -ENOENT;
++		goto close_skl_sig_file;
++	}
++#endif
+ 	ret = hv_vsm_get_code_page_offsets();
+ 	if (ret) {
+ 		pr_err("%s: Unbable to retrieve vsm page offsets\n", __func__);
+@@ -959,8 +1066,14 @@ int __init hv_vsm_boot_init(void)
+ 	free_cpumask_var(mask);
+ 
+ close_files:
++#ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
++	filp_close(sk_sig, NULL);
++close_skl_sig_file:
++	filp_close(sk_loader_sig, NULL);
++close_sk_file:
++#endif
+ 	filp_close(sk, NULL);
+-close_file:
++close_skl_file:
+ 	filp_close(sk_loader, NULL);
+ free_mem:
+ 	vunmap(vsm_skm_va);
+-- 
+2.43.0
+

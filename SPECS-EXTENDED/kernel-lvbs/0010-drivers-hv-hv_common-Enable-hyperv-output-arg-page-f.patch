@@ -1,0 +1,31 @@
+From ac7b28dd42b0e0303f97bde9595aa629625a77ed Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Mon, 14 Oct 2024 14:28:18 -0400
+Subject: [PATCH 10/68] drivers: hv: hv_common: Enable hyperv output arg page
+ for VSM
+
+VSM driver uses get_vp_registers to read vsm specifc registers which in
+turn require hyperv output arg page. Enable the creation of this page for
+if VSM driver is enabled.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/hv_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+index dfc7e0016bc8..2ec92ad3bac9 100644
+--- a/drivers/hv/hv_common.c
++++ b/drivers/hv/hv_common.c
+@@ -63,7 +63,7 @@ EXPORT_SYMBOL_GPL(hyperv_pcpu_output_arg);
+  */
+ static inline bool hv_output_arg_exists(void)
+ {
+-#ifdef CONFIG_HV_SECURE_VTL
++#if defined (CONFIG_HV_SECURE_VTL) || (CONFIG_HYPERV_VSM)
+ 	return true;
+ #else
+ 	return hv_root_partition ? true : false;
+-- 
+2.43.0
+

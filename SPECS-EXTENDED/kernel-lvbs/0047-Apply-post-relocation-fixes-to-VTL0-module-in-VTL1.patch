@@ -1,0 +1,148 @@
+From 0391b3a956439948213b689a9aaa97822f72c2f9 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Wed, 10 Jul 2024 12:48:42 -0500
+Subject: [PATCH 47/68] Apply post relocation fixes to VTL0 module in VTL1
+
+Many post relocation fixups happen for modules. At this time, HEKI
+does not support all of them. Unconfigure the ones that are not
+supported. The following are supported:
+
+	- Paravirt fixups
+	- CPU alternatives
+	- SMP locks
+
+Perform these fixups for module contents independently in VTL1.
+
+Finally, compare the contents with the VTL0 module contents passed. If
+they match, then the VTL0 module contents are validated.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/kernel/paravirt.c | 14 ++++++++++++--
+ drivers/hv/mshv_vsm_vtl1.c |  4 ++++
+ include/linux/heki.h       |  2 ++
+ include/linux/sched.h      |  2 ++
+ kernel/module/main.c       | 16 ++++++++++++++++
+ 5 files changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+index 73f81685505b..aa323864bca0 100644
+--- a/arch/x86/kernel/paravirt.c
++++ b/arch/x86/kernel/paravirt.c
+@@ -11,6 +11,7 @@
+ #include <linux/export.h>
+ #include <linux/efi.h>
+ #include <linux/bcd.h>
++#include <linux/heki.h>
+ #include <linux/highmem.h>
+ #include <linux/kprobes.h>
+ #include <linux/pgtable.h>
+@@ -93,12 +94,21 @@ unsigned int paravirt_patch(u8 type, void *insn_buff, unsigned long addr,
+ 	 * corresponding structure.
+ 	 */
+ 	void *opfunc = *((void **)&pv_ops + type);
++	void *pv_bug = paravirt_BUG;
++	void *pv_nop = _paravirt_nop;
++	struct heki_kinfo *kinfo = current->kinfo;
+ 	unsigned ret;
+ 
++	if (kinfo) {
++		opfunc = *((void **)&kinfo->arch.pv_ops + type);
++		pv_bug = kinfo->arch.pv_bug;
++		pv_nop = kinfo->arch.pv_nop;
++	}
++
+ 	if (opfunc == NULL)
+ 		/* If there's no function, patch it with paravirt_BUG() */
+-		ret = paravirt_patch_call(insn_buff, paravirt_BUG, addr, len);
+-	else if (opfunc == _paravirt_nop)
++		ret = paravirt_patch_call(insn_buff, pv_bug, addr, len);
++	else if (opfunc == pv_nop)
+ 		ret = 0;
+ 	else
+ 		/* Otherwise call the function. */
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 563ef4cfba1d..889392a27a97 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -1204,6 +1204,9 @@ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 	info->len = info_mem->size;
+ 	info->trusted_keys = vtl0.trusted_keys;
+ 
++	/* Load kinfo for post-relocation fixes. */
++	current->kinfo = vtl0.mem[HEKI_KERNEL_INFO].va;
++
+ 	/*
+ 	 * The ELF buffer will be used to construct a copy of the guest module
+ 	 * in the host. The trusted keys will be used to verify the signature
+@@ -1234,6 +1237,7 @@ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 	hmod->mem[MOD_DATA].retain = true;
+ 	hmod->mem[MOD_RODATA].retain = true;
+ unmap:
++	current->kinfo = NULL;
+ 	/* Free everything that we don't need beyond this point. */
+ 	vsm_unmap_all(hmod->mem, MOD_ELF + 1);
+ 	if (err < 0)
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 0bc06a884125..e39699070678 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -23,6 +23,8 @@ struct load_info;
+ 
+ #include <asm/heki.h>
+ 
++#include <asm/heki.h>
++
+ /*
+  * This structure contains a guest physical range and its attributes (e.g.,
+  * permissions (RWX)).
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 77f01ac385f7..918c73b9ced1 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1535,6 +1535,8 @@ struct task_struct {
+ #ifdef CONFIG_USER_EVENTS
+ 	struct user_event_mm		*user_event_mm;
+ #endif
++	/* Heki kinfo */
++	void				*kinfo;
+ 
+ 	/*
+ 	 * New fields for task_struct should be added above here, so that
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 8c76060361c9..d51293f8b255 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2527,6 +2527,18 @@ static int post_relocation(struct module *mod, const struct load_info *info)
+ 	return module_finalize(info->hdr, info->sechdrs, mod);
+ }
+ 
++static int guest_post_relocation(struct module *mod,
++				 const struct load_info *info)
++{
++	int err;
++
++	/* Arch-specific module finalizing. */
++	err = module_finalize(info->hdr, info->sechdrs, mod);
++
++	module_arch_cleanup(mod);
++	return err;
++}
++
+ /* Call module constructors. */
+ static void do_mod_ctors(struct module *mod)
+ {
+@@ -3237,6 +3249,10 @@ int validate_guest_module(struct load_info *info, int flags,
+ 		goto unmap_mod;
+ 	}
+ 
++	err = guest_post_relocation(mod, info);
++	if (err)
++		goto unmap_mod;
++
+ 	/* Compare the original module contents and their copies. */
+ 	for_each_mod_mem_type(type) {
+ 		orig = mem[type].va;
+-- 
+2.43.0
+

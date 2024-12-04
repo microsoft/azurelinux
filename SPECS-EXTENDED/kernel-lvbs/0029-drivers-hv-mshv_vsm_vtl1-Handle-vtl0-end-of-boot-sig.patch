@@ -1,0 +1,47 @@
+From ea5ebacdaae1a62ea76452dab466e3cf1d18b241 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 7 Jun 2024 10:33:13 -0400
+Subject: [PATCH 29/68] drivers: hv: mshv_vsm_vtl1: Handle vtl0 end of boot
+ signal.
+
+Once the vtl0 has signalled end of boot, revoke apis for
+changing/setting up critical register pinning/monitoring and other
+VTL1 boot apis. These apis are valid only during boot of vtl0 and
+not through the runtime of the system.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 89d1978d7b3d..71de10635c95 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -46,6 +46,8 @@
+ 
+ #define SYNIC_INTERCEPTION_SINT		0
+ 
++bool vtl0_end_of_boot;
++
+ struct hv_intercept_message_header {
+ 	u32 vp_index;
+ 	u8 instruction_length;
+@@ -874,7 +876,13 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		break;
+ 	case VSM_VTL_CALL_FUNC_ID_LOCK_REGS:
+ 		pr_debug("%s : VSM_LOCK_REGS\n", __func__);
+-		status = mshv_vsm_lock_regs();
++		if (!vtl0_end_of_boot)
++			status = mshv_vsm_lock_regs();
++		break;
++	case VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT:
++		pr_debug("%s: VSM_SIGNAL_END_OF_BOOT\n", __func__);
++		vtl0_end_of_boot = true;
++		status = 0;
+ 		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+-- 
+2.43.0
+

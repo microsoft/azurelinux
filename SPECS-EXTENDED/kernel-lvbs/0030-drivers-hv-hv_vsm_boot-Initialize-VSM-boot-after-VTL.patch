@@ -1,0 +1,145 @@
+From dc42e61e322e0eddb8861c7bc6ca261947561458 Mon Sep 17 00:00:00 2001
+From: Anna Trikalinou <atrikalinou@microsoft.com>
+Date: Fri, 15 Dec 2023 23:47:38 +0000
+Subject: [PATCH 30/68] drivers: hv: hv_vsm_boot: Initialize VSM boot after
+ VTL0 initcalls
+
+During boot vsm boot driver will signature verify the secure kernel and
+loader images prior to loading them and enabling VTL1. This mean vsm
+boot can happen only after system certificates are loaded which happens
+as late initcall. Move vsm_boot_init after all init calls.
+
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/hv_vsm.c      |  3 +--
+ drivers/hv/hv_vsm.h      |  1 +
+ drivers/hv/hv_vsm_boot.c | 11 +++++------
+ include/linux/vsm.h      | 24 ++++++++++++++++++++++++
+ init/main.c              |  2 ++
+ 5 files changed, 33 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/vsm.h
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index 449de929998f..ec991930509c 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -127,11 +127,10 @@ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
+ };
+ 
+-static int __init hv_vsm_init_heki(void)
++int __init hv_vsm_init_heki(void)
+ {
+ 	if (hv_vsm_boot_success)
+ 		heki_register_hypervisor(&hyperv_heki_hypervisor);
+ 
+ 	return 0;
+ }
+-late_initcall(hv_vsm_init_heki);
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 03e73b668e4c..9a58470bb503 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -38,6 +38,7 @@ union hv_register_vsm_code_page_offsets {
+ 	};
+ } __packed;
+ 
++int __init hv_vsm_init_heki(void);
+ int __hv_vsm_get_register(u32 reg_name, u64 *result, u8 input_vtl);
+ int __hv_vsm_set_register(u32 reg_name, u64 value, u8 input_vtl);
+ int hv_vsm_get_register(u32 reg_name, u64 *result);
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index eb3dcf8d649d..d099b84b9961 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -17,6 +17,7 @@
+ #include <linux/slab.h>
+ #include <linux/cpumask.h>
+ #include <linux/vmalloc.h>
++#include <linux/vsm.h>
+ 
+ #include "hv_vsm.h"
+ 
+@@ -818,7 +819,7 @@ static int __init hv_vsm_load_secure_kernel(void)
+ 	return 0;
+ }
+ 
+-static int __init hv_vsm_boot_init(void)
++int __init hv_vsm_boot_init(void)
+ {
+ 	cpumask_var_t mask;
+ 	unsigned int boot_cpu;
+@@ -949,8 +950,10 @@ static int __init hv_vsm_boot_init(void)
+ 
+ 	/* Boot secondary processors in VTL1 */
+ 	ret = hv_vsm_boot_ap_vtl();
+-	if (!ret)
++	if (!ret) {
+ 		hv_vsm_boot_success = true;
++		hv_vsm_init_heki();
++	}
+ out:
+ 	set_cpus_allowed_ptr(current, mask);
+ 	free_cpumask_var(mask);
+@@ -964,7 +967,3 @@ static int __init hv_vsm_boot_init(void)
+ 	vsm_skm_pa = 0;
+ 	return ret;
+ }
+-
+-module_init(hv_vsm_boot_init);
+-MODULE_DESCRIPTION("Hyper-V VSM Boot VTL0 Driver");
+-MODULE_LICENSE("GPL");
+diff --git a/include/linux/vsm.h b/include/linux/vsm.h
+new file mode 100644
+index 000000000000..d15d106f228d
+--- /dev/null
++++ b/include/linux/vsm.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * VSM - Headers
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#ifndef __VSM_H__
++#define __VSM_H__
++
++#ifdef CONFIG_HYPERV_VSM
++
++int __init hv_vsm_boot_init(void);
++
++#else /* !CONFIG_HYPERV_VSM */
++
++static inline int hv_vsm_boot_init(void)
++{
++	return 0;
++}
++
++#endif /* CONFIG_HYPERV_VSM */
++
++#endif /* __VSM_H__ */
+diff --git a/init/main.c b/init/main.c
+index 61f920f1b453..7b4676e9eedc 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -102,6 +102,7 @@
+ #include <linux/randomize_kstack.h>
+ #include <linux/heki.h>
+ #include <net/net_namespace.h>
++#include <linux/vsm.h>
+ 
+ #include <asm/io.h>
+ #include <asm/setup.h>
+@@ -1553,6 +1554,7 @@ static noinline void __init kernel_init_freeable(void)
+ 	page_alloc_init_late();
+ 
+ 	do_basic_setup();
++	hv_vsm_boot_init();
+ 
+ 	kunit_run_all_tests();
+ 
+-- 
+2.43.0
+

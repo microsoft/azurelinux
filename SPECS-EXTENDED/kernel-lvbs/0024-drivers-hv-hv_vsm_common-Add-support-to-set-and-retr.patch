@@ -1,0 +1,115 @@
+From a37a4e43231ba2eee7d7110f083b3d4f97244301 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 1 Nov 2024 09:59:22 -0400
+Subject: [PATCH 24/68] drivers: hv: hv_vsm_common: Add support to set and
+ retrieve VTL0 registers from VTL1.
+
+VTL1 being higher privileged can read and write to VTL0 registers. Add
+apis to enable this. To aid this, split the exitising
+vsm_get/set_register to take input vtl as a parameter
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/hv_vsm.h        |  2 ++
+ drivers/hv/hv_vsm_common.c | 18 ++++++++++++++----
+ drivers/hv/mshv_vsm_vtl1.c | 14 ++++++++++++++
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 3381b5fec28d..e3f3231f3fb1 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -37,6 +37,8 @@ union hv_register_vsm_code_page_offsets {
+ 	};
+ } __packed;
+ 
++int __hv_vsm_get_register(u32 reg_name, u64 *result, u8 input_vtl);
++int __hv_vsm_set_register(u32 reg_name, u64 value, u8 input_vtl);
+ int hv_vsm_get_register(u32 reg_name, u64 *result);
+ int hv_vsm_set_register(u32 reg_name, u64 value);
+ int hv_vsm_get_code_page_offsets(void);
+diff --git a/drivers/hv/hv_vsm_common.c b/drivers/hv/hv_vsm_common.c
+index 2d829a675182..5e94cf6fc606 100644
+--- a/drivers/hv/hv_vsm_common.c
++++ b/drivers/hv/hv_vsm_common.c
+@@ -12,7 +12,7 @@
+ 
+ union hv_register_vsm_code_page_offsets vsm_code_page_offsets;
+ 
+-int hv_vsm_get_register(u32 reg_name, u64 *result)
++int __hv_vsm_get_register(u32 reg_name, u64 *result, u8 input_vtl)
+ {
+ 	u64 status;
+ 	unsigned long flags;
+@@ -26,7 +26,7 @@ int hv_vsm_get_register(u32 reg_name, u64 *result)
+ 
+ 	hvin->header.partitionid = HV_PARTITION_ID_SELF;
+ 	hvin->header.vpindex = HV_VP_INDEX_SELF;
+-	hvin->header.inputvtl = 0;
++	hvin->header.inputvtl = input_vtl;
+ 	hvin->element[0].name0 = reg_name;
+ 
+ 	status = hv_do_rep_hypercall(HVCALL_GET_VP_REGISTERS, 1, 0, hvin, hvout);
+@@ -39,7 +39,7 @@ int hv_vsm_get_register(u32 reg_name, u64 *result)
+ 	return 0;
+ }
+ 
+-int hv_vsm_set_register(u32 reg_name, u64 value)
++int __hv_vsm_set_register(u32 reg_name, u64 value, u8 input_vtl)
+ {
+ 	u64 status;
+ 	unsigned long flags;
+@@ -51,7 +51,7 @@ int hv_vsm_set_register(u32 reg_name, u64 value)
+ 
+ 	hvin->header.partitionid = HV_PARTITION_ID_SELF;
+ 	hvin->header.vpindex = HV_VP_INDEX_SELF;
+-	hvin->header.inputvtl = 0;
++	hvin->header.inputvtl = input_vtl;
+ 	hvin->element[0].name = reg_name;
+ 	hvin->element[0].valuelow = value;
+ 
+@@ -64,6 +64,16 @@ int hv_vsm_set_register(u32 reg_name, u64 value)
+ 	return 0;
+ }
+ 
++int hv_vsm_get_register(u32 reg_name, u64 *result)
++{
++	return __hv_vsm_get_register(reg_name, result, 0);
++}
++
++int hv_vsm_set_register(u32 reg_name, u64 value)
++{
++	return __hv_vsm_set_register(reg_name, value, 0);
++}
++
+ int hv_vsm_get_code_page_offsets(void)
+ {
+ 	u64 result;
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 09c56da19e2d..4acf108713fd 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -110,6 +110,20 @@ struct hv_input_modify_vtl_protection_mask {
+ 	__aligned(8) u64 gpa_page_list[];
+ };
+ 
++static int hv_vsm_get_vtl0_register(u32 reg_name, u64 *result)
++{
++	u8 input_vtl = 0x1 << 4;
++
++	return __hv_vsm_get_register(reg_name, result, input_vtl);
++}
++
++static int hv_vsm_set_vtl0_register(u32 reg_name, u64 value)
++{
++	u8 input_vtl = 0x1 << 4;
++
++	return __hv_vsm_set_register(reg_name, value, input_vtl);
++}
++
+ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ {
+ 	unsigned int cpu, total_cpus_enabled = 0;
+-- 
+2.43.0
+

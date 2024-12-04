@@ -1,0 +1,315 @@
+From 72bb49c044d7f53fc796c82bca2dccf287f4c476 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Wed, 10 Jul 2024 12:43:49 -0500
+Subject: [PATCH 43/68] Receive VTL0 kernel symbol tables and resolve VTL0
+ module symbols
+
+Receive VTL0 kernel symbol tables. Using the symbol tables, resolve
+VTL0 module symbols and finalize symbol addresses. This is in
+preparation for VTL0 module relocation in VTL1.
+
+The symbol resolution includes module per-cpu variables as well.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 117 ++++++++++++++++++++++++++++++++++++-
+ kernel/module/internal.h   |   7 ++-
+ kernel/module/main.c       |  72 ++++++++++++++++++++++-
+ 3 files changed, 191 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 2a84924b3029..563ef4cfba1d 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -17,6 +17,7 @@
+ #include <keys/system_keyring.h>
+ #include <linux/heki.h>
+ #include <linux/sort.h>
++#include <linux/bsearch.h>
+ #include <linux/mem_attr.h>
+ #include "../../../kernel/module/internal.h"
+ #include <asm/mshyperv.h>
+@@ -1035,6 +1036,52 @@ static int mshv_vsm_create_trusted_keys(void)
+ 	return ret;
+ }
+ 
++static void *vsm_vtl0_va_to_vtl1_va(struct heki_mem *mem, void *va)
++{
++	void *vtl0_va = (void *)mem->ranges->va;
++	unsigned long offset;
++
++	if (va >= vtl0_va && va < (vtl0_va + mem->size)) {
++		offset = va - vtl0_va;
++		return mem->va + offset;
++	}
++	return NULL;
++}
++
++static void *vsm_vtl1_va_to_vtl0_va(struct heki_mem *mem, void *va)
++{
++	void *vtl0_va = (void *)mem->ranges->va;
++	unsigned long offset;
++
++	if (va >= mem->va && va < (mem->va + mem->size)) {
++		offset = va - mem->va;
++		return vtl0_va + offset;
++	}
++	return NULL;
++}
++
++static int mshv_vsm_get_kinfo(void)
++{
++	struct heki_mem *data_mem = &vtl0.mem[HEKI_KERNEL_DATA];
++	struct heki_mem *info_mem = &vtl0.mem[HEKI_KERNEL_INFO];
++	struct heki_kinfo *kinfo = info_mem->va;
++	unsigned long nsyms;
++
++	/*
++	 * Convert VTL0 addresses to VTL1 addresses so we can access the
++	 * symbol tables.
++	 */
++	nsyms = kinfo->ksymtab_end - kinfo->ksymtab_start;
++	kinfo->ksymtab_start = vsm_vtl0_va_to_vtl1_va(data_mem, kinfo->ksymtab_start);
++	kinfo->ksymtab_end = kinfo->ksymtab_start + nsyms;
++
++	nsyms = kinfo->ksymtab_gpl_end - kinfo->ksymtab_gpl_start;
++	kinfo->ksymtab_gpl_start = vsm_vtl0_va_to_vtl1_va(data_mem, kinfo->ksymtab_gpl_start);
++	kinfo->ksymtab_gpl_end = kinfo->ksymtab_gpl_start + nsyms;
++
++	return 0;
++}
++
+ static int mshv_vsm_load_kdata(u64 pa, unsigned long nranges)
+ {
+ 	struct heki_range *ranges;
+@@ -1049,9 +1096,12 @@ static int mshv_vsm_load_kdata(u64 pa, unsigned long nranges)
+ 		goto free_ranges;
+ 
+ 	ret =  mshv_vsm_create_trusted_keys();
++	if (ret)
++		goto free_ranges;
++
++	ret = mshv_vsm_get_kinfo();
+ 
+ free_ranges:
+-	vfree(ranges);
+ 	return ret;
+ }
+ 
+@@ -1106,6 +1156,8 @@ void module_id_unmap(struct heki_mod *hmod)
+ 	}
+ }
+ 
++static void vsm_resolve_func(char *name, Elf64_Sym *sym);
++
+ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 					   int flags)
+ {
+@@ -1158,7 +1210,7 @@ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 	 * of the guest module. After the copy is created, it will be compared
+ 	 * with the module contents passed by the guest to validate them.
+ 	 */
+-	err = validate_guest_module(info, flags, hmod);
++	err = validate_guest_module(info, flags, hmod, vsm_resolve_func);
+ 	if (err) {
+ 		pr_warn("%s: Load guest module failed\n", __func__);
+ 		err = -EINVAL;
+@@ -1180,6 +1232,7 @@ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 	 *	MOD_DATA	contains the module structure (hmod->mod).
+ 	 */
+ 	hmod->mem[MOD_DATA].retain = true;
++	hmod->mem[MOD_RODATA].retain = true;
+ unmap:
+ 	/* Free everything that we don't need beyond this point. */
+ 	vsm_unmap_all(hmod->mem, MOD_ELF + 1);
+@@ -1193,6 +1246,66 @@ static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
+ 	return err;
+ }
+ 
++static int vsm_cmp_func(const void *name, const void *ksym)
++{
++	return strcmp(name, kernel_symbol_name(ksym));
++}
++
++static void vsm_resolve_func(char *name, Elf64_Sym *sym)
++{
++	struct heki_kinfo *kinfo = vtl0.mem[HEKI_KERNEL_INFO].va;
++	struct kernel_symbol *ksym;
++	struct heki_mod *hmod;
++	struct heki_mem *mem;
++	struct module *mod = NULL;
++	void *addr;
++	int offset;
++
++	/* Search the kernel symbol tables. */
++	mem = &vtl0.mem[HEKI_KERNEL_DATA];
++
++	ksym = bsearch(name, kinfo->ksymtab_start,
++		       kinfo->ksymtab_end - kinfo->ksymtab_start,
++		       sizeof(struct kernel_symbol), vsm_cmp_func);
++	if (ksym)
++		goto found;
++
++	ksym = bsearch(name, kinfo->ksymtab_gpl_start,
++		       kinfo->ksymtab_gpl_end - kinfo->ksymtab_gpl_start,
++		       sizeof(struct kernel_symbol), vsm_cmp_func);
++	if (ksym)
++		goto found;
++
++	/* Search the symbol tables of other modules. */
++	list_for_each_entry(hmod, &vtl0.modules, node) {
++		mem = &hmod->mem[MOD_RODATA];
++		mod = hmod->mod;
++
++		ksym = bsearch(name, mod->syms, mod->num_syms,
++			       sizeof(struct kernel_symbol), vsm_cmp_func);
++		if (ksym)
++			goto found;
++
++		ksym = bsearch(name, mod->gpl_syms, mod->num_gpl_syms,
++			       sizeof(struct kernel_symbol), vsm_cmp_func);
++		if (ksym)
++			goto found;
++	}
++	return;
++found:
++	offset = ksym->value_offset;
++	addr = &ksym->value_offset;
++	if (!mod) {
++		/*
++		 * Modules are mapped in VTL1 at the same addresses as the
++		 * corresponding modules in VTL0. So, there is no need to
++		 * translate for modules.
++		 */
++		addr = vsm_vtl1_va_to_vtl0_va(mem, addr);
++	}
++	sym->st_value = (unsigned long)addr + offset;
++}
++
+ /********************** Boot Secondary CPUs **********************/
+ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ 							unsigned int boot_signal_pfn)
+diff --git a/kernel/module/internal.h b/kernel/module/internal.h
+index cd3e3e5c1625..41e8092a2cf3 100644
+--- a/kernel/module/internal.h
++++ b/kernel/module/internal.h
+@@ -409,5 +409,10 @@ static inline int same_magic(const char *amagic, const char *bmagic, bool has_cr
+ }
+ #endif /* CONFIG_MODVERSIONS */
+ 
++const char *kernel_symbol_name(const struct kernel_symbol *sym);
++
++typedef void (*resolve_func)(char *name, Elf64_Sym *sym);
++
++struct heki_mod;
+ int validate_guest_module(struct load_info *info, int flags,
+-			  struct heki_mod *hmod);
++			  struct heki_mod *hmod, resolve_func resolve);
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 6eb200e661c0..e1cb486f921a 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -250,7 +250,7 @@ static __maybe_unused void *any_section_objs(const struct load_info *info,
+ #define symversion(base, idx) ((base != NULL) ? ((base) + (idx)) : NULL)
+ #endif
+ 
+-static const char *kernel_symbol_name(const struct kernel_symbol *sym)
++const char *kernel_symbol_name(const struct kernel_symbol *sym)
+ {
+ #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
+ 	return offset_to_ptr(&sym->name_offset);
+@@ -1437,6 +1437,43 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
+ 	return ret;
+ }
+ 
++static int simplify_guest_symbols(struct module *mod, struct load_info *info,
++				  resolve_func resolve)
++{
++	Elf_Shdr *symsec = &info->sechdrs[info->index.sym];
++	Elf_Sym *sym = (void *)symsec->sh_addr;
++	unsigned long nsym = symsec->sh_size / sizeof(Elf_Sym);
++	unsigned long secbase;
++	unsigned int i;
++
++	for (i = 1; i < nsym; i++) {
++		const char *name = info->strtab + sym[i].st_name;
++
++		switch (sym[i].st_shndx) {
++		case SHN_COMMON:
++		case SHN_ABS:
++			break;
++
++		case SHN_LIVEPATCH:
++			/* Livepatch is not yet supported. */
++			return -EINVAL;
++
++		case SHN_UNDEF:
++			resolve((char *)name, &sym[i]);
++			break;
++
++		default:
++			if (sym[i].st_shndx == info->index.pcpu)
++				secbase = (unsigned long)mod_percpu(mod);
++			else
++				secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
++			sym[i].st_value += secbase;
++			break;
++		}
++	}
++	return 0;
++}
++
+ static int apply_relocations(struct module *mod, const struct load_info *info)
+ {
+ 	unsigned int i;
+@@ -3085,8 +3122,24 @@ void __attribute__((weak)) module_id_unmap(struct heki_mod *hmod)
+ {
+ }
+ 
++/*
++ * From the original guest module, extract the percpu field. This enables
++ * us to resolve module per-cpu symbols. The original guest module resides
++ * in the original module's data section.
++ */
++static void get_mod_percpu(struct module *mod, struct load_info *info,
++			   struct heki_mod *hmod)
++{
++	void *data = mod->mem[MOD_DATA].base;
++	unsigned long offset = (void *)mod - data;
++	struct module *orig_mod;
++
++	orig_mod = (void *)hmod->mem[MOD_DATA].va + offset;
++	mod->percpu = orig_mod->percpu;
++}
++
+ int validate_guest_module(struct load_info *info, int flags,
+-			  struct heki_mod *hmod)
++			  struct heki_mod *hmod, resolve_func resolve)
+ {
+ 	struct heki_mem *mem = hmod->mem;
+ 	struct module *mod;
+@@ -3131,6 +3184,21 @@ int validate_guest_module(struct load_info *info, int flags,
+ 	}
+ 	hmod->mod = mod;
+ 
++	err = find_module_sections(mod, info);
++	if (err) {
++		pr_warn("%s: Module sections not found for %s\n",
++			__func__, info->name);
++		goto unmap_mod;
++	}
++	get_mod_percpu(mod, info, hmod);
++
++	err = simplify_guest_symbols(mod, info, resolve);
++	if (err < 0) {
++		pr_warn("%s: Module symbols not processed for %s\n",
++			__func__, info->name);
++		goto unmap_mod;
++	}
++
+ 	/* Compare the original module contents and their copies. */
+ 	for_each_mod_mem_type(type) {
+ 		orig = mem[type].va;
+-- 
+2.43.0
+

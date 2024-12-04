@@ -1,0 +1,95 @@
+From 122334ae4ceb44693fdeb21a2269b109ff614cfa Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Wed, 10 Jul 2024 05:05:46 -0500
+Subject: [PATCH 28/68] heki: Make the VTL0 kernel immutable after boot
+
+Inform VTL1 that the guest kernel has finished booting so that VTL1 can
+disallow certain operations after boot. E.g. all booting apis, register
+locking apis and in future requests to change ept permissions without
+authentication.
+
+Beyond this point, all changes to the EPT require some form of
+authentication. E.g., signature-based authentication for validating
+modules and setting permissions for module sections.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/hv_vsm.c  | 12 ++++++++++++
+ drivers/hv/hv_vsm.h  |  1 +
+ include/linux/heki.h |  3 +++
+ virt/heki/main.c     |  7 +++++++
+ 4 files changed, 23 insertions(+)
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index 7772e7ace68e..449de929998f 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -111,8 +111,20 @@ static int hv_vsm_lock_crs(void)
+ 	return ret;
+ }
+ 
++static int hv_vsm_signal_end_of_boot(void)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
++	.finish_boot = hv_vsm_signal_end_of_boot,
+ };
+ 
+ static int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index e3f3231f3fb1..03e73b668e4c 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -14,6 +14,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_ENABLE_APS_VTL	0x1FFE0
+ #define VSM_VTL_CALL_FUNC_ID_BOOT_APS		0x1FFE1
+ #define VSM_VTL_CALL_FUNC_ID_LOCK_REGS		0x1FFE2
++#define VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT	0x1FFE3
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index e7d56d95bc31..aaeb8b64d221 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -22,6 +22,9 @@
+ struct heki_hypervisor {
+ 	/* Lock control registers. */
+ 	int (*lock_crs)(void);
++
++	/* Signal end of kernel boot */
++	int (*finish_boot)(void);
+ };
+ 
+ #ifdef CONFIG_HEKI
+diff --git a/virt/heki/main.c b/virt/heki/main.c
+index 54422c089389..69f40cb82dae 100644
+--- a/virt/heki/main.c
++++ b/virt/heki/main.c
+@@ -31,6 +31,13 @@ void heki_late_init(void)
+ 		pr_warn("Unable to lock down control registers\n");
+ 	else
+ 		pr_warn("Control registers locked\n");
++	/*
++	 * Signal end of kernel boot.
++	 * This means all boot time lvbs protections are in place and protections on
++	 * many of the resources cannot be altered now.
++	 */
++	if (hypervisor->finish_boot)
++		hypervisor->finish_boot();
+ }
+ 
+ void heki_register_hypervisor(struct heki_hypervisor *hypervisor)
+-- 
+2.43.0
+

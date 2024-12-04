@@ -1,0 +1,309 @@
+From 43dbb2bad439eb64e310423cacfe5c717e1837e6 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Mon, 8 Jul 2024 14:14:05 -0500
+Subject: [PATCH 35/68] heki: x86: Protect guest kernel memory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Pass guest kernel pages along with their permissions to the host so
+that EPT permissions can be set for them.
+
+This is done at the end of kernel init just before kicking off the
+init process. Up to this point, the kernel is trusted.
+
+Beyond this point, any request to modify EPT permissions for guest
+pages needs to be authenticated in the host. E.g., module loading and
+unloading, text patching, eBPF JIT.
+
+This support will be implemented in the future. Until then, modules
+have to be built in and the other features have to be disabled.
+
+Co-developed-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/mm/heki.c   |   6 +++
+ drivers/hv/hv_vsm.c  |  14 +++++
+ drivers/hv/hv_vsm.h  |   1 +
+ include/linux/heki.h |  46 ++++++++++++++++
+ virt/heki/protect.c  | 122 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 189 insertions(+)
+
+diff --git a/arch/x86/mm/heki.c b/arch/x86/mm/heki.c
+index 17700b52369b..635a7e5640ba 100644
+--- a/arch/x86/mm/heki.c
++++ b/arch/x86/mm/heki.c
+@@ -49,6 +49,12 @@ void heki_arch_init(void)
+ 	heki_init_perm(kernel_va, direct_map_va, &args);
+ 	heki_init_perm(direct_map_end, kernel_end, &args);
+ 
++	/*
++	 * Pass guest pages along with their permissions to the host so EPT
++	 * permissions can be set for the pages.
++	 */
++	heki_protect(direct_map_va, direct_map_end, &args);
++
+ 	xa_destroy(&args.permissions);
+ 
+ 	mutex_unlock(&heki.lock);
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index ec991930509c..677d6cb07fe2 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -122,9 +122,23 @@ static int hv_vsm_signal_end_of_boot(void)
+ 	return hv_vsm_vtlcall(&args);
+ }
+ 
++static int hv_vsm_protect_memory(phys_addr_t pa, unsigned long nranges)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success || !hv_vsm_mbec_enabled)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY;
++	args.a1 = pa;
++	args.a2 = nranges;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
++	.protect_memory = hv_vsm_protect_memory,
+ };
+ 
+ int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 9a58470bb503..32eee06788c4 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -15,6 +15,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_BOOT_APS		0x1FFE1
+ #define VSM_VTL_CALL_FUNC_ID_LOCK_REGS		0x1FFE2
+ #define VSM_VTL_CALL_FUNC_ID_SIGNAL_END_OF_BOOT	0x1FFE3
++#define VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY	0x1FFE4
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index f3a493d5844b..f8bb30358b26 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -14,8 +14,37 @@
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/printk.h>
++#include <linux/mm.h>
+ #include <linux/xarray.h>
+ 
++/*
++ * This structure contains a guest physical range and its attributes (e.g.,
++ * permissions (RWX)).
++ */
++struct heki_range {
++	unsigned long va;
++	phys_addr_t pa;
++	phys_addr_t epa;
++	unsigned long attributes;
++};
++
++/*
++ * Guest ranges are passed to the VMM or hypervisor so they can be authenticated
++ * and their permissions can be set in the host page table. When an array of
++ * these is passed to the Hypervisor or VMM, the array must be in physically
++ * contiguous memory.
++ *
++ * This struct occupies one page. In each page, an array of guest ranges can
++ * be passed. A guest request to the VMM/Hypervisor may contain a list of
++ * these structs (linked by "next_pa").
++ */
++struct heki_page {
++	struct heki_page *next;
++	phys_addr_t next_pa;
++	unsigned long nranges;
++	struct heki_range ranges[];
++};
++
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+  * provide hypervisor specific functions for Heki.
+@@ -26,6 +55,9 @@ struct heki_hypervisor {
+ 
+ 	/* Signal end of kernel boot */
+ 	int (*finish_boot)(void);
++
++	/* Protect guest memory */
++	int (*protect_memory)(phys_addr_t pa, unsigned long nranges);
+ };
+ 
+ #ifdef CONFIG_HEKI
+@@ -52,6 +84,16 @@ struct heki_args {
+ 	size_t size;
+ 	unsigned long flags;
+ 	struct xarray permissions;
++
++	/* attributes passed to heki_add_pa_range(). */
++	unsigned long attributes;
++
++	/* Page list is built by the callback. */
++	struct heki_page *head;
++	struct heki_page *tail;
++	struct heki_range *cur;
++	unsigned long nranges;
++	phys_addr_t head_pa;
+ };
+ 
+ /* Callback function called by the table walker. */
+@@ -64,6 +106,10 @@ void heki_walk(unsigned long va, unsigned long va_end, heki_func_t func,
+ void heki_map(unsigned long va, unsigned long end);
+ void heki_init_perm(unsigned long va, unsigned long end,
+ 		    struct heki_args *args);
++void heki_protect(unsigned long va, unsigned long end, struct heki_args *args);
++void heki_add_range(struct heki_args *args, unsigned long va,
++		    phys_addr_t pa, phys_addr_t epa);
++void heki_cleanup_args(struct heki_args *args);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+diff --git a/virt/heki/protect.c b/virt/heki/protect.c
+index c66bd68543a5..8d8db3ed282e 100644
+--- a/virt/heki/protect.c
++++ b/virt/heki/protect.c
+@@ -11,6 +11,8 @@
+ 
+ #include "common.h"
+ 
++static void heki_apply_permissions(struct heki_args *args);
++
+ static void heki_init_perm_cb(struct heki_args *args)
+ {
+ 	unsigned long va;
+@@ -43,3 +45,123 @@ void heki_init_perm(unsigned long va, unsigned long end, struct heki_args *args)
+ 
+ 	heki_walk(va, end, heki_init_perm_cb, args);
+ }
++
++static void heki_protect_cb(struct heki_args *args)
++{
++	unsigned long va;
++	phys_addr_t pa, pa_end;
++	unsigned long pfn, perm, cur_perm;
++
++	if (!pfn_valid(args->pa >> PAGE_SHIFT))
++		return;
++
++	perm = heki_flags_to_permissions(args->flags);
++
++	/* Walk the leaf entries and record page permissions for each page. */
++	pa_end = args->pa + args->size;
++	for (pa = args->pa, va = args->va; pa < pa_end;
++	     pa += PAGE_SIZE, va += PAGE_SIZE) {
++
++		pfn = pa >> PAGE_SHIFT;
++		cur_perm = (unsigned long) xa_load(&args->permissions, pfn);
++
++		args->attributes = cur_perm | perm;
++		heki_add_range(args, va, pa, pa + PAGE_SIZE);
++	}
++}
++
++/* Protect guest memory in the host page table. */
++void heki_protect(unsigned long va, unsigned long end, struct heki_args *args)
++{
++	va = ALIGN_DOWN(va, PAGE_SIZE);
++	end = ALIGN(end, PAGE_SIZE);
++
++	heki_walk(va, end, heki_protect_cb, args);
++	heki_apply_permissions(args);
++}
++
++/*
++ * Build a list of guest pages with their permissions. This list will be
++ * passed to the VMM/Hypervisor to set these permissions in the host page
++ * table.
++ */
++void heki_add_range(struct heki_args *args, unsigned long va,
++		    phys_addr_t pa, phys_addr_t epa)
++{
++	struct heki_page *list = args->head;
++	struct heki_range *cur = args->cur;
++	struct heki_range *range;
++	u64 max_ranges;
++	struct page *page;
++
++	max_ranges = (PAGE_SIZE - sizeof(*list)) / sizeof(*range);
++
++	if (cur && cur->epa == pa && cur->attributes == args->attributes) {
++		cur->epa = epa;
++		return;
++	}
++
++	if (!list || list->nranges == max_ranges) {
++		page = alloc_page(GFP_KERNEL);
++		if (WARN_ON_ONCE(!page))
++			return;
++
++		list = page_address(page);
++		list->nranges = 0;
++		list->next = NULL;
++		list->next_pa = 0;
++
++		if (args->head) {
++			args->tail->next = list;
++			args->tail->next_pa = page_to_pfn(page) << PAGE_SHIFT;
++		} else {
++			args->head = list;
++			args->head_pa = page_to_pfn(page) << PAGE_SHIFT;
++		}
++		args->tail = list;
++	}
++
++	range = &list->ranges[list->nranges];
++	range->va = va;
++	range->pa = pa;
++	range->epa = epa;
++	range->attributes = args->attributes;
++	args->cur = range;
++	list->nranges++;
++	args->nranges++;
++}
++
++void heki_cleanup_args(struct heki_args *args)
++{
++	struct heki_page *list = args->head;
++	phys_addr_t list_pa = args->head_pa;
++	struct page *page;
++
++	/* Free all the pages in the page list. */
++	while (list) {
++		page = pfn_to_page(list_pa >> PAGE_SHIFT);
++		list_pa = list->next_pa;
++		list = list->next;
++		__free_pages(page, 0);
++	}
++}
++
++static void heki_apply_permissions(struct heki_args *args)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	struct heki_page *list = args->head;
++	phys_addr_t list_pa = args->head_pa;
++	int ret;
++
++	if (!list)
++		return;
++
++	/* Protect guest memory in the host page table. */
++	ret = hypervisor->protect_memory(list_pa, args->nranges);
++	if (ret) {
++		pr_warn_ratelimited("Failed to set memory permission\n");
++		return;
++	}
++
++	heki_cleanup_args(args);
++}
+-- 
+2.43.0
+
