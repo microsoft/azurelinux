@@ -14,7 +14,7 @@
 #   https://reproducible-builds.org/docs/archives/
 # - For the value of "--mtime" we use the date "2021-04-26 00:00Z" to
 #   simplify future updates.
-set -eux
+set -eu
 
 # get_spec_value extracts the parsed value of a tag from a spec file.
 # - spec: The path to the spec file.
@@ -43,53 +43,112 @@ set_signature_value() {
     mv "$signatures_tmp" "$signatures_json"
 }
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-spec_file=$(ls "$script_dir"/*.spec)
-signatures_file=$(ls "$script_dir"/*.signatures.json)
+exit_usage() {
+    echo "Usage: $0 [flags]"
+    echo ""
+    echo "Flags:"
+    echo "  --srcTarball    src tarball file. If not provided, it will be downloaded according to the spec file."
+    echo "  --outFolder     folder where to copy the new tarball(s). If not provided, the tarballs will be copied to the same folder as the script."
+    echo "  --pkgVersion    package version. If not provided, it will be extracted from the spec file."
+    echo "  --setSignature  set the signature of the tarball(s) in the signatures.json file."
+    exit 2
+}
 
-name=$(get_spec_value "$spec_file" "Name")
-if [[ -z "$name" ]]; then
+arg_out_folder=""
+arg_src_tarball=""
+arg_pkg_version=""
+arg_set_signatures=0
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            exit_usage
+            ;;
+        --outFolder)
+            # Convert to absolute path
+            arg_out_folder=$(readlink -f "$2")
+            shift
+            ;;
+        --srcTarball)
+            arg_src_tarball="$2"
+            shift
+            ;;
+        --pkgVersion)
+            arg_pkg_version="$2"
+            shift
+            ;;
+        --setSignature)
+            arg_set_signatures=1
+            ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            exit_usage
+            ;;
+        *)
+            echo "Error: Unknown argument: $1"
+            exit_usage
+            ;;
+    esac
+
+    shift
+done
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+out_folder="$arg_out_folder"
+if [[ -z "$out_folder" ]]; then
+    out_folder="$script_dir"
+elif [[ ! -d "$out_folder" ]]; then
+    echo "Error: The output folder does not exist."
+    exit 1
+fi
+
+spec_file=$(ls "$script_dir"/*.spec)
+
+src_tarball="$arg_src_tarball"
+if [[ -z "$src_tarball" ]]; then
+    src_url=$(get_spec_value "$spec_file" "Source0")
+    if [[ -z "$src_url" ]]; then
+        echo "Error: Unable to determine the source0 URL from the spec file."
+        exit 1
+    fi
+
+    src_tarball_name=$(echo "$src_url" | grep -oP '(?<=#/)[^/]+')
+    if [[ -z "$src_tarball_name" ]]; then
+        echo "Error: Unable to determine the source0 tarball name from the source URL."
+        exit 1
+    fi
+
+    src_tarball="$script_dir/$src_tarball_name"
+    if [[ ! -f "$src_tarball" ]]; then
+        wget -O "$src_tarball" "$src_url"
+    fi
+elif [[ ! -f "$src_tarball" ]]; then
+    echo "Error: The source tarball file does not exist."
+    exit 1
+fi
+
+pkg_name=$(get_spec_value "$spec_file" "Name")
+if [[ -z "$pkg_name" ]]; then
     echo "Error: Unable to determine the package name from the spec file."
     exit 1
 fi
 
-version=$(get_spec_value "$spec_file" "Version")
-if [[ -z "$version" ]]; then
-    echo "Error: Unable to determine the package version from the spec file."
-    exit 1
+pkg_version="$arg_pkg_version"
+if [[ -z "$pkg_version" ]]; then
+    pkg_version=$(get_spec_value "$spec_file" "Version")
+    if [[ -z "$pkg_version" ]]; then
+        echo "Error: Unable to determine the package version from the spec file."
+        exit 1
+    fi
 fi
 
-source_url=$(get_spec_value "$spec_file" "Source0")
-if [[ -z "$source_url" ]]; then
-    echo "Error: Unable to determine the source0 URL from the spec file."
-    exit 1
-fi
-
-source_tarball_name=$(echo "$source_url" | grep -oP '(?<=#/)[^/]+')
-if [[ -z "$source_tarball_name" ]]; then
-    echo "Error: Unable to determine the source0 tarball name from the source URL."
-    exit 1
-fi
-
-vendor_tarball_name=$(get_spec_value "$spec_file" "Source1")
-if [[ -z "$vendor_tarball_name" ]]; then
-    echo "Error: Unable to determine the source1 tarball name from the spec file."
-    exit 1
-fi
-
-source_tarball="$script_dir/$source_tarball_name"
-vendor_tarball="$script_dir/$vendor_tarball_name"
-
-# Download the source tarball and calculate its sha256 sum
-wget -O "$source_tarball" "$source_url"
-set_signature_value "$signatures_file" "$source_tarball"
-
-# Extract the source tarball and generate the vendor tarball and its sha256 sum
+# Extract the source tarball and generate the vendor tarball.
 source_dir=$(mktemp -d)
 trap "rm -rf '$source_dir'" EXIT
-tar -C "$source_dir" -xf "$source_tarball"
+tar -C "$source_dir" -xf "$src_tarball"
 cd "$source_dir"/*
 go mod vendor
+vendor_tarball="$out_folder/$pkg_name-$pkg_version-vendor.tar.gz"
 tar --sort=name \
     --mtime="2021-04-26 00:00Z" \
     --owner=0 \
@@ -99,4 +158,11 @@ tar --sort=name \
     -c \
     -f "$vendor_tarball" \
     vendor
-set_signature_value "$signatures_file" "$vendor_tarball"
+
+if [[ $arg_set_signatures -eq 1 ]]; then
+    signatures_file=$(ls "$script_dir"/*.signatures.json)
+    set_signature_value "$signatures_file" "$src_tarball"
+    set_signature_value "$signatures_file" "$vendor_tarball"
+fi
+
+echo "Vendor tarball generated: $vendor_tarball"
