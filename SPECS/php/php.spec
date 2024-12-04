@@ -1517,6 +1517,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %changelog
 * Wed Dec 04 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 8.3.12-2
 - Fix CVE-2024-8932 with upstream patch
+- Fix CVE-2024-11236 
 
 * Wed Oct 16 2024 Archana Choudhary <archana1@microsoft.com> - 8.3.12-1
 - Upgarde to 8.3.12 to fix CVE-2024-8927, CVE-2024-8925
