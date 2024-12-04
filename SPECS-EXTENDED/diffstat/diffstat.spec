@@ -46,7 +46,6 @@ make check
 
 %changelog
 * Mon Nov 04 2024 Sreenivasulu Malavathula <vsmalavathu@microsoft.com> - 1.66-1
-- Updating Azure-Linux import from Fedora 41 (license: MIT).
 - Update License to SPDX
 - License verified
 
