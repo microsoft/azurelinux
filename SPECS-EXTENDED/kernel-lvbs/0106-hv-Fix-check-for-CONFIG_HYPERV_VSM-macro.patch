@@ -1,0 +1,29 @@
+From 007e8d22378fd0b5e49e40882233257956504036 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Mon, 27 Jan 2025 11:25:26 -0800
+Subject: [PATCH 106/124] hv: Fix check for CONFIG_HYPERV_VSM macro
+
+Add missing "defined" word, as compilation will fail if CONFIG_HYPERV_VSM
+is unset.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ drivers/hv/hv_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+index 2ec92ad3bac9..43657e2936d5 100644
+--- a/drivers/hv/hv_common.c
++++ b/drivers/hv/hv_common.c
+@@ -63,7 +63,7 @@ EXPORT_SYMBOL_GPL(hyperv_pcpu_output_arg);
+  */
+ static inline bool hv_output_arg_exists(void)
+ {
+-#if defined (CONFIG_HV_SECURE_VTL) || (CONFIG_HYPERV_VSM)
++#if defined (CONFIG_HV_SECURE_VTL) || defined (CONFIG_HYPERV_VSM)
+ 	return true;
+ #else
+ 	return hv_root_partition ? true : false;
+-- 
+2.43.0
+

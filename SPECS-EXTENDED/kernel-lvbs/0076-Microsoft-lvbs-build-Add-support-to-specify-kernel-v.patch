@@ -1,0 +1,51 @@
+From c4ac3dcce095f5ed36d123804d30f35445936b68 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 7 Jan 2025 21:36:06 +0000
+Subject: [PATCH 076/124] Microsoft: lvbs-build: Add support to specify kernel
+ version
+
+Add support to specify kernel version when building images.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Microsoft/lvbs-build.sh | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Microsoft/lvbs-build.sh b/Microsoft/lvbs-build.sh
+index 47603de3a5f8..aff790d1db03 100755
+--- a/Microsoft/lvbs-build.sh
++++ b/Microsoft/lvbs-build.sh
+@@ -3,6 +3,7 @@
+ set -e
+ ARTIFACT=""
+ kernel_src_dir=""
++kernel_version=""
+ install_image=false
+ sign_image=false
+ 
+@@ -48,6 +49,10 @@ while (( "$#" )); do
+            fi
+ 	   shift 2
+ 	   ;;
++	-k | --kernel_ver)
++	   kernel_version=$2
++	   shift 2
++	   ;;
+         -h|--help)
+            help
+            exit
+@@ -67,7 +72,10 @@ then
+         exit 0;
+ fi
+ 
+-kernel_version=$( uname -r | awk -F '[.-]' '{print $1"."$2"."$3"."$4}' )
++if [ -z "$kernel_version" ];
++then
++	kernel_version=$( uname -r | awk -F '[.-]' '{print $1"."$2"."$3"."$4}' )
++fi
+ kernel_version=$kernel_version"-lvbs+"
+ echo $kernel_version
+ 
+-- 
+2.43.0
+

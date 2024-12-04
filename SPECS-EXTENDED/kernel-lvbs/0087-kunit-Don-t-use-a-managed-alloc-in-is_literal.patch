@@ -1,0 +1,70 @@
+From ef79001e225bc954f7f07cc1ea65e4fc0c898acf Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Wed, 16 Oct 2024 11:07:48 -0700
+Subject: [PATCH 087/124] kunit: Don't use a managed alloc in is_literal()
+
+There is no need to use a test-managed alloc in is_literal().
+The function frees the temporary buffer before returning.
+
+This removes the only use of the test and gfp members of
+struct string_stream outside of the string_stream implementation.
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/assert.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/lib/kunit/assert.c b/lib/kunit/assert.c
+index 05a09652f5a1..dd1d633d0fe2 100644
+--- a/lib/kunit/assert.c
++++ b/lib/kunit/assert.c
+@@ -89,8 +89,7 @@ void kunit_ptr_not_err_assert_format(const struct kunit_assert *assert,
+ EXPORT_SYMBOL_GPL(kunit_ptr_not_err_assert_format);
+ 
+ /* Checks if `text` is a literal representing `value`, e.g. "5" and 5 */
+-static bool is_literal(struct kunit *test, const char *text, long long value,
+-		       gfp_t gfp)
++static bool is_literal(const char *text, long long value)
+ {
+ 	char *buffer;
+ 	int len;
+@@ -100,14 +99,15 @@ static bool is_literal(struct kunit *test, const char *text, long long value,
+ 	if (strlen(text) != len)
+ 		return false;
+ 
+-	buffer = kunit_kmalloc(test, len+1, gfp);
++	buffer = kmalloc(len+1, GFP_KERNEL);
+ 	if (!buffer)
+ 		return false;
+ 
+ 	snprintf(buffer, len+1, "%lld", value);
+ 	ret = strncmp(buffer, text, len) == 0;
+ 
+-	kunit_kfree(test, buffer);
++	kfree(buffer);
++
+ 	return ret;
+ }
+ 
+@@ -125,14 +125,12 @@ void kunit_binary_assert_format(const struct kunit_assert *assert,
+ 			  binary_assert->text->left_text,
+ 			  binary_assert->text->operation,
+ 			  binary_assert->text->right_text);
+-	if (!is_literal(stream->test, binary_assert->text->left_text,
+-			binary_assert->left_value, stream->gfp))
++	if (!is_literal(binary_assert->text->left_text, binary_assert->left_value))
+ 		string_stream_add(stream, KUNIT_SUBSUBTEST_INDENT "%s == %lld (0x%llx)\n",
+ 				  binary_assert->text->left_text,
+ 				  binary_assert->left_value,
+ 				  binary_assert->left_value);
+-	if (!is_literal(stream->test, binary_assert->text->right_text,
+-			binary_assert->right_value, stream->gfp))
++	if (!is_literal(binary_assert->text->right_text, binary_assert->right_value))
+ 		string_stream_add(stream, KUNIT_SUBSUBTEST_INDENT "%s == %lld (0x%llx)",
+ 				  binary_assert->text->right_text,
+ 				  binary_assert->right_value,
+-- 
+2.43.0
+

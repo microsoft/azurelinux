@@ -1,0 +1,74 @@
+From 100d4b98b7b74e8c38d1172d33940ea699144d96 Mon Sep 17 00:00:00 2001
+From: Angelina Vu <angelinavu@microsoft.com>
+Date: Thu, 19 Dec 2024 17:21:49 +0000
+Subject: [PATCH 073/124] Merged PR 190: VTL0: Enable CONFIG_RETPOLINE
+
+Enable retpolines by passing VTL0 __x86_indirect_thunk_array address to VTL1 to be used for applying retpolines.
+
+Update VTL0 config so that size of struct heki_arch_kinfo matches between VTL0 and VTL1.
+
+Signed-off-by: Angelina Vu angelinavu@microsoft.com
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+New feature
+
+#### PR Summary
+This pull request enables the `CONFIG_RETPOLINE` configuration to avoid speculative indirect branches in the kernel.
+- Modified `arch/x86/Kconfig` to remove the dependency on `!HEKI` for `CONFIG_RETPOLINE`.
+- Updated `arch/x86/include/asm/heki.h` to include `retpoline_thunk_t *indirect_thunk_array_addr`.
+- Added `kallsyms.h` include and updated `heki_load_arch_kinfo` function in `arch/x86/mm/heki.c` to set `indirect_thunk_array_addr`.
+- Updated `Microsoft/lvbs.config` to disable `CONFIG_XEN_PV` and `CONFIG_X86_IOPL_IOPERM`.
+---
+ arch/x86/Kconfig            | 1 -
+ arch/x86/include/asm/heki.h | 1 +
+ arch/x86/mm/heki.c          | 3 +++
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 9ced111047c5..f57ed7fcd4a1 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2452,7 +2452,6 @@ config PAGE_TABLE_ISOLATION
+ 
+ config RETPOLINE
+ 	bool "Avoid speculative indirect branches in kernel"
+-	depends on !HEKI
+ 	select OBJTOOL if HAVE_OBJTOOL
+ 	default y
+ 	help
+diff --git a/arch/x86/include/asm/heki.h b/arch/x86/include/asm/heki.h
+index 76025d7d63fa..7d93fc53e4f8 100644
+--- a/arch/x86/include/asm/heki.h
++++ b/arch/x86/include/asm/heki.h
+@@ -8,6 +8,7 @@ struct heki_arch_kinfo {
+ 	struct paravirt_patch_template	pv_ops;
+ 	void				(*pv_bug)(void);
+ 	void				(*pv_nop)(void);
++	retpoline_thunk_t *indirect_thunk_array_addr;
+ };
+ 
+ #endif /* _ASM_X86_HEKI_H */
+diff --git a/arch/x86/mm/heki.c b/arch/x86/mm/heki.c
+index 4c2a07c948ca..42d2474c7b32 100644
+--- a/arch/x86/mm/heki.c
++++ b/arch/x86/mm/heki.c
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/heki.h>
+ #include <linux/mem_attr.h>
++#include <linux/kallsyms.h>
+ 
+ #ifdef pr_fmt
+ #undef pr_fmt
+@@ -80,4 +81,6 @@ void heki_load_arch_kinfo(struct heki_kinfo *kinfo)
+ 	arch_kinfo->pv_ops = pv_ops;
+ 	arch_kinfo->pv_bug = paravirt_BUG;
+ 	arch_kinfo->pv_nop = _paravirt_nop;
++	arch_kinfo->indirect_thunk_array_addr =
++		(retpoline_thunk_t *)kallsyms_lookup_name("__x86_indirect_thunk_array");
+ }
+-- 
+2.43.0
+
