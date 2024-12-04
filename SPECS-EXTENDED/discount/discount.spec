@@ -1,15 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: BSD
 Name:           discount
-Version:        2.2.4
-Release:        5%{?dist}
+Version:        2.2.7
+Release:        1%{?dist}
 Summary:        A command-line utility for converting Markdown files into HTML
 License:        BSD
 URL:            http://www.pell.portland.or.us/~orc/Code/%{name}
 Source0:        %{url}/%{name}-%{version}.tar.bz2
 Patch0:         discount-dont-run-ldconfig.patch
+Patch1:         define_destructor.patch
+Patch2:         set_deps.patch
+Patch3:         discount-c99.patch
 
 BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  cmake
 Requires:       libmarkdown%{?_isa} = %{version}-%{release}
 
 %description
@@ -38,7 +44,10 @@ libmarkdown.
 %prep
 %setup -q
 
-%patch 0 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
 
 
 %build
@@ -51,7 +60,7 @@ CFLAGS='%{optflags}' ./configure.sh \
     --enable-all-features \
     --with-fenced-code \
     --pkg-config
-make %{?_smp_mflags}
+%make_build %{?_smp_mflags}
 
 
 %install
@@ -103,6 +112,10 @@ make test
 
 
 %changelog
+* Wed Oct 24 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.2.7-1
+- Updating Azure-Linux import from Fedora 41 (license: BSD).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
