@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -15,6 +15,8 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+# Added patch to support tardev-snapshotter for Kata CC
+Patch0:  add-tardev-support.patch
 
 %{?systemd_requires}
 
@@ -28,7 +30,7 @@ Requires: runc >= 1.2.1
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
-simplicity, robustness and portability. It is available as a daemon for Linux
+simplicity, robustness, and portability. It is available as a daemon for Linux
 and Windows, which can manage the complete container lifecycle of its host
 system: image transfer and storage, container execution and supervision,
 low-level storage and network attachments, etc.
@@ -80,6 +82,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon Nov 20 2024 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-2
+- Added patch to support tardev-snapshotter for Kata CC.
+
 * Mon Nov 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
 - Created a standalone package for containerd 2.0.0
 - Upgraded runc to 1.2.1 and libseccomp to 2.5.5 required by containerd 2.0.0
