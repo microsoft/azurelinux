@@ -26,7 +26,7 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel
+Name:           kernel-lvbs
 Version:        6.6.64.2
 Release:        9%{?dist}
 License:        GPLv2
@@ -34,7 +34,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        kernel-lvbs-%{_arch}-normal.config
 #Source2:
 Source3:        sha512hmac-openssl.sh
