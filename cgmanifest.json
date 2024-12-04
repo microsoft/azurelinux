@@ -2608,8 +2608,8 @@
         "type": "other",
         "other": {
           "name": "diffstat",
-          "version": "1.63",
-          "downloadUrl": "ftp://ftp.invisible-island.net/pub/diffstat/diffstat-1.63.tgz"
+          "version": "1.66",
+          "downloadUrl": "https://invisible-island.net/archives/diffstat/diffstat-1.66.tgz"
         }
       }
     },
