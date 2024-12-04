@@ -16,7 +16,7 @@ Requires:       audit-libs
 Recommends:     cracklib-dicts
 
 Patch0:         CVE-2024-22365.patch
-Patch1          CVE-2024-10041.patch
+Patch1:         CVE-2024-10041.patch
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
