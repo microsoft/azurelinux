@@ -1517,7 +1517,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 %changelog
 * Wed Dec 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.31-1
-- Auto-upgrade to 8.1.31 - Fix CVE-2024-8932 for php
+- Auto-upgrade to 8.1.31 - Fix CVE-2024-8932, CVE-2024-8929, CVE-2024-11234, CVE-2024-11233, CVE-2024-11236
 
 * Mon Oct 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.30-1
 - Auto-upgrade to 8.1.30 - CVE-2024-8927, CVE-2024-8925
