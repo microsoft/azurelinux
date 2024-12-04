@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -19,6 +19,7 @@ Patch1:  enable-docker-proxy-libexec-search.patch
 Patch2:  CVE-2024-41110.patch
 Patch3:  CVE-2024-29018.patch
 Patch4:  CVE-2024-24786.patch
+Patch5:  CVE-2024-36621.patch
 
 %{?systemd_requires}
 
@@ -114,6 +115,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Wed Dec 04 2024 Adit Jha <aditjha@microsoft.com> - 25.0.3-8
+- Fix CVE-2024-36621 with patch
+
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 25.0.3-7
 - Fix CVE-2024-24786 by patching
 
