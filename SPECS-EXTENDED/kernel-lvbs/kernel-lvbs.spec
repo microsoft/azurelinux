@@ -39,8 +39,6 @@ Source1:        sha512hmac-openssl.sh
 Source2:        azurelinux-ca-20230216.pem
 Source3:        cpupower
 Source4:        cpupower.service
-Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         jent-init-fix.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
