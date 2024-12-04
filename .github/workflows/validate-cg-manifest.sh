@@ -52,6 +52,7 @@ ignore_no_source_tarball=" \
   python-rpm-generators \
   qt-rpm-macros \
   sgx-backwards-compatibility \
+  shim \
   web-assets \
   "
 
