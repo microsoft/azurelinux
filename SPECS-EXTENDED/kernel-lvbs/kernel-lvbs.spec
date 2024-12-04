@@ -39,6 +39,10 @@ Source1:        sha512hmac-openssl.sh
 Source2:        azurelinux-ca-20230216.pem
 Source3:        cpupower
 Source4:        cpupower.service
+
+Source999:      kernel-lvbs.patches
+%include %{SOURCE999}
+
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc

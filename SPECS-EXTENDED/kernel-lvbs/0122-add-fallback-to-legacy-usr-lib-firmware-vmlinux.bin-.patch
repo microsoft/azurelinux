@@ -1,0 +1,51 @@
+From ef0ee25af9297628e0f5afbbd350272864574ba5 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 21 Feb 2025 09:19:01 -0500
+Subject: [PATCH 122/124] add fallback to legacy /usr/lib/firmware/vmlinux.bin
+ path
+
+---
+ drivers/hv/hv_vsm_boot.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index a3975066b246..be59f9b21505 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -879,7 +879,7 @@ int __init hv_vsm_boot_init(void)
+ 	u16 partition_enabled_vtl_set = 0, partition_mbec_enabled_vtl_set = 0;
+ 	u16 vp_enabled_vtl_set = 0;
+ 	u8 partition_max_vtl, active_mbec_enabled = 0;
+-	int ret = 0;
++	int ret = 0, is_legacy_sk_path = 0;
+ 
+ 	if (!vsm_arch_has_vsm_access())
+ 		panic("%s: Arch does not support VSM\n", __func__);
+@@ -894,14 +894,19 @@ int __init hv_vsm_boot_init(void)
+ 	}
+ 	sk = filp_open(sk_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk)) {
+-		pr_err("%s: File %s not found\n", __func__, sk_path);
+-		ret = -ENOENT;
+-		hv_vsm_boot_panic = true;
+-		goto free_mem;
++		pr_err("%s: File %s not found, trying %s\n", __func__, sk_path, "/usr/lib/firmware/vmlinux.bin");
++		is_legacy_sk_path = 1;
++		sk = filp_open("/usr/lib/firmware/vmlinux.bin", O_RDONLY, 0);
++		if (IS_ERR(sk)) {
++			pr_err("%s: File %s not found\n", __func__, "/usr/lib/firmware/vmlinux.bin");
++			ret = -ENOENT;
++			hv_vsm_boot_panic = true;
++			goto free_mem;
++		}
+ 	}
+ 
+ #ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
+-	sk_sig_path = kasprintf(GFP_KERNEL, "%s.p7s", sk_path);
++	sk_sig_path = kasprintf(GFP_KERNEL, "%s.p7s", is_legacy_sk_path ? "/usr/lib/firmware/vmlinux.bin" : sk_path);
+ 	if (!sk_sig_path) {
+ 		ret = -ENOMEM;
+ 		goto close_sk_file;
+-- 
+2.43.0
+

@@ -1,0 +1,52 @@
+From 411bb0a17109b03bcccf2a677f110ce49449fd69 Mon Sep 17 00:00:00 2001
+From: Angelina Vu <angelinavu@microsoft.com>
+Date: Thu, 19 Dec 2024 17:44:45 +0000
+Subject: [PATCH 074/124] Merged PR 191: VTL1: Enable CONFIG_RETPOLINE
+
+Use VTL0 __x86_indirect_thunk_array address to get register needed when patching retpoline for validating VTL0 modules.
+
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+New feature
+
+#### PR Summary
+This pull request enables the `CONFIG_RETPOLINE` configuration to enhance security against speculative execution attacks.
+- `arch/x86/kernel/alternative.c`: Added support for `heki_kinfo` to determine the address of the indirect thunk array.
+- `arch/x86/kernel/alternative.c`: Included the `linux/heki.h` header file.
+---
+ arch/x86/kernel/alternative.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
+index aae7456ece07..0dfb7668b127 100644
+--- a/arch/x86/kernel/alternative.c
++++ b/arch/x86/kernel/alternative.c
+@@ -18,6 +18,7 @@
+ #include <linux/mmu_context.h>
+ #include <linux/bsearch.h>
+ #include <linux/sync_core.h>
++#include <linux/heki.h>
+ #include <asm/text-patching.h>
+ #include <asm/alternative.h>
+ #include <asm/sections.h>
+@@ -586,9 +587,13 @@ static int patch_retpoline(void *addr, struct insn *insn, u8 *bytes)
+ 	retpoline_thunk_t *target;
+ 	int reg, ret, i = 0;
+ 	u8 op, cc;
++	struct heki_kinfo *kinfo = current->kinfo;
+ 
+ 	target = addr + insn->length + insn->immediate.value;
+-	reg = target - __x86_indirect_thunk_array;
++	if (kinfo)
++		reg = target - kinfo->arch.indirect_thunk_array_addr;
++	else
++		reg = target - __x86_indirect_thunk_array;
+ 
+ 	if (WARN_ON_ONCE(reg & ~0xf))
+ 		return -1;
+-- 
+2.43.0
+

@@ -1,0 +1,95 @@
+From 31f71dda43ac6e6a8cd7a457cebd33b122abee6f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Date: Wed, 16 Oct 2024 11:34:40 -0700
+Subject: [PATCH 081/124] kunit: Add tests for fault
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add a test case to check NULL pointer dereference and make sure it would
+result as a failed test.
+
+The full kunit_fault test suite is marked as skipped when run on UML
+because it would result to a kernel panic.
+
+Tested with:
+./tools/testing/kunit/kunit.py run --arch x86_64 kunit_fault
+./tools/testing/kunit/kunit.py run --arch arm64 \
+  --cross_compile=aarch64-linux-gnu- kunit_fault
+
+Cc: Brendan Higgins <brendanhiggins@google.com>
+Cc: Rae Moar <rmoar@google.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Link: https://lore.kernel.org/r/20240408074625.65017-8-mic@digikod.net
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/kunit-test.c | 45 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/lib/kunit/kunit-test.c b/lib/kunit/kunit-test.c
+index 83d8e90ca7a2..dd87ef8a5bc0 100644
+--- a/lib/kunit/kunit-test.c
++++ b/lib/kunit/kunit-test.c
+@@ -104,6 +104,48 @@ static struct kunit_suite kunit_try_catch_test_suite = {
+ 	.test_cases = kunit_try_catch_test_cases,
+ };
+ 
++#ifndef CONFIG_UML
++
++static void kunit_test_null_dereference(void *data)
++{
++	struct kunit *test = data;
++	int *null = NULL;
++
++	*null = 0;
++
++	KUNIT_FAIL(test, "This line should never be reached\n");
++}
++
++static void kunit_test_fault_null_dereference(struct kunit *test)
++{
++	struct kunit_try_catch_test_context *ctx = test->priv;
++	struct kunit_try_catch *try_catch = ctx->try_catch;
++
++	kunit_try_catch_init(try_catch,
++			     test,
++			     kunit_test_null_dereference,
++			     kunit_test_catch);
++	kunit_try_catch_run(try_catch, test);
++
++	KUNIT_EXPECT_EQ(test, try_catch->try_result, -EINTR);
++	KUNIT_EXPECT_TRUE(test, ctx->function_called);
++}
++
++#endif /* !CONFIG_UML */
++
++static struct kunit_case kunit_fault_test_cases[] = {
++#ifndef CONFIG_UML
++	KUNIT_CASE(kunit_test_fault_null_dereference),
++#endif /* !CONFIG_UML */
++	{}
++};
++
++static struct kunit_suite kunit_fault_test_suite = {
++	.name = "kunit_fault",
++	.init = kunit_try_catch_test_init,
++	.test_cases = kunit_fault_test_cases,
++};
++
+ /*
+  * Context for testing test managed resources
+  * is_resource_initialized is used to test arbitrary resources
+@@ -659,6 +701,7 @@ static struct kunit_suite kunit_current_test_suite = {
+ 
+ kunit_test_suites(&kunit_try_catch_test_suite, &kunit_resource_test_suite,
+ 		  &kunit_log_test_suite, &kunit_status_test_suite,
+-		  &kunit_current_test_suite);
++		  &kunit_current_test_suite,
++		  &kunit_fault_test_suite);
+ 
+ MODULE_LICENSE("GPL v2");
+-- 
+2.43.0
+

@@ -1,0 +1,50 @@
+From f07ecb4ef83dbb3655000d21e34f3134770db548 Mon Sep 17 00:00:00 2001
+From: Rae Moar <rmoar@google.com>
+Date: Wed, 16 Oct 2024 10:31:23 -0700
+Subject: [PATCH 094/124] kunit: move KUNIT_TABLE out of INIT_DATA
+
+Alter the linker section of KUNIT_TABLE to move it out of INIT_DATA and
+into DATA_DATA.
+
+Data for KUnit tests does not need to be in the init section.
+
+In order to run tests again after boot the KUnit data cannot be labeled as
+init data as the kernel could write over it.
+
+Add a KUNIT_INIT_TABLE in the next patch for KUnit tests that test init
+data/functions.
+
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Rae Moar <rmoar@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ include/asm-generic/vmlinux.lds.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 7e11ca6f86dc..c24f77673cc5 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -361,7 +361,8 @@
+ 	BRANCH_PROFILE()						\
+ 	TRACE_PRINTKS()							\
+ 	BPF_RAW_TP()							\
+-	TRACEPOINT_STR()
++	TRACEPOINT_STR()						\
++	KUNIT_TABLE()
+ 
+ /*
+  * Data section helpers
+@@ -686,8 +687,7 @@
+ 	THERMAL_TABLE(governor)						\
+ 	EARLYCON_TABLE()						\
+ 	LSM_TABLE()							\
+-	EARLY_LSM_TABLE()						\
+-	KUNIT_TABLE()
++	EARLY_LSM_TABLE()
+ 
+ #define INIT_TEXT							\
+ 	*(.init.text .init.text.*)					\
+-- 
+2.43.0
+

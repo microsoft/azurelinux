@@ -1,0 +1,30 @@
+From 348c992e4dd5fd5d3526278c86291a33ce5981d8 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Mon, 27 Jan 2025 11:25:27 -0800
+Subject: [PATCH 107/124] heki: Don't allocate memory for modules certificates
+ if there are none
+
+Vmalloc call with zero size produces a warning.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ virt/heki/module.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index cf2770d66d8c..584441d699dc 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -33,6 +33,9 @@ static size_t heki_blacklist_hash_count;
+ 
+ static int __init heki_copy_boot_certs(void)
+ {
++	if (!module_cert_size)
++		return 0;
++
+ 	heki_module_certs = vmalloc(module_cert_size);
+ 	if (!heki_module_certs) {
+ 		pr_warn("Failed to alloc module certificates.\n");
+-- 
+2.43.0
+

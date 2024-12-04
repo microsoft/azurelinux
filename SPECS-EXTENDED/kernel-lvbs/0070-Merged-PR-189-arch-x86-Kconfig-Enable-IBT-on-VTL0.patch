@@ -1,0 +1,52 @@
+From 19805f6b2fece809aa44089602c23c92301bf556 Mon Sep 17 00:00:00 2001
+From: Karissa Sanchez <karsanchez@microsoft.com>
+Date: Fri, 13 Dec 2024 00:20:07 +0000
+Subject: [PATCH 070/124] Merged PR 189: arch: x86: Kconfig: Enable IBT on VTL0
+
+arch: x86: Kconfig: Enable IBT on VTL0
+
+Enable IBT in VTL0 by removing !HEKI dependency
+
+Signed-off-by: Karissa Sanchez <karsanchez@microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+Code cleanup
+
+#### PR Summary
+This pull request enables Indirect Branch Tracking (IBT) on VTL0 by modifying the Kconfig settings.
+- `arch/x86/Kconfig`: Removed the dependency on `!HEKI` for `X86_KERNEL_IBT` configuration.
+---
+ Microsoft/mshv_sk_config | 2 +-
+ arch/x86/Kconfig         | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Microsoft/mshv_sk_config b/Microsoft/mshv_sk_config
+index 348e2057d02f..71d59175717a 100644
+--- a/Microsoft/mshv_sk_config
++++ b/Microsoft/mshv_sk_config
+@@ -359,7 +359,7 @@ CONFIG_ILLEGAL_POINTER_VALUE=0xdead000000000000
+ # CONFIG_MTRR is not set
+ CONFIG_X86_UMIP=y
+ CONFIG_CC_HAS_IBT=y
+-# CONFIG_X86_KERNEL_IBT is not set
++CONFIG_X86_KERNEL_IBT=y
+ # CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS is not set
+ CONFIG_X86_INTEL_TSX_MODE_OFF=y
+ # CONFIG_X86_INTEL_TSX_MODE_ON is not set
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index dc2dd92cc8ed..9ced111047c5 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1812,7 +1812,6 @@ config X86_KERNEL_IBT
+ 	prompt "Indirect Branch Tracking"
+ 	def_bool y
+ 	depends on X86_64 && CC_HAS_IBT && HAVE_OBJTOOL
+-	depends on !HEKI
+ 	# https://github.com/llvm/llvm-project/commit/9d7001eba9c4cb311e03cd8cdc231f9e579f2d0f
+ 	depends on !LD_IS_LLD || LLD_VERSION >= 140000
+ 	select OBJTOOL
+-- 
+2.43.0
+

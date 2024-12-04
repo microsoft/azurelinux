@@ -1,0 +1,79 @@
+From 8f1cbd39c0fae17a90b235df702300f385c7ee98 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 19 Feb 2025 13:12:00 -0500
+Subject: [PATCH 121/124] change hardcoded 'firmware' location of secure kernel
+ to per-kernel namespaced location
+
+Instead of the secure kernel living in a common 'firmware' directory,
+find it in a location specific to the currently running kernel,
+i.e. /lib/modules/$(uname -r)/secure/
+---
+ drivers/hv/hv_vsm_boot.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index baf3819b9288..a3975066b246 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -16,6 +16,7 @@
+ #include <linux/fs.h>
+ #include <linux/slab.h>
+ #include <linux/cpumask.h>
++#include <linux/utsname.h>
+ #include <linux/vmalloc.h>
+ #include <linux/vsm.h>
+ #include <linux/verification.h>
+@@ -872,6 +873,7 @@ static int __init hv_vsm_load_secure_kernel(void)
+ 
+ int __init hv_vsm_boot_init(void)
+ {
++	char *sk_path = NULL, *sk_sig_path = NULL;
+ 	cpumask_var_t mask;
+ 	unsigned int boot_cpu;
+ 	u16 partition_enabled_vtl_set = 0, partition_mbec_enabled_vtl_set = 0;
+@@ -884,18 +886,29 @@ int __init hv_vsm_boot_init(void)
+ 
+ 	hv_vsm_reserve_sk_mem();
+ 
+-	sk = filp_open("/usr/lib/firmware/vmlinux.bin", O_RDONLY, 0);
++	sk_path = kasprintf(GFP_KERNEL, "/lib/modules/%s/secure/vmlinux.bin",
++			    init_utsname()->release);
++	if (!sk_path) {
++		ret = -ENOMEM;
++		goto free_mem;
++	}
++	sk = filp_open(sk_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk)) {
+-		pr_err("%s: File usr/lib/firmware/vmlinux.bin not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_path);
+ 		ret = -ENOENT;
+ 		hv_vsm_boot_panic = true;
+ 		goto free_mem;
+ 	}
+ 
+ #ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
+-	sk_sig = filp_open("/usr/lib/firmware/vmlinux.bin.p7s", O_RDONLY, 0);
++	sk_sig_path = kasprintf(GFP_KERNEL, "%s.p7s", sk_path);
++	if (!sk_sig_path) {
++		ret = -ENOMEM;
++		goto close_sk_file;
++	}
++	sk_sig = filp_open(sk_sig_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk_sig)) {
+-		pr_err("%s: File usr/lib/firmware/vmlinux.bin.p7s not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_sig_path);
+ 		ret = -ENOENT;
+ 		hv_vsm_boot_panic = true;
+ 		goto close_sk_file;
+@@ -1025,6 +1038,8 @@ int __init hv_vsm_boot_init(void)
+ free_mem:
+ 	vunmap(vsm_skm_va);
+ 	vsm_skm_pa = 0;
++	kfree(sk_sig_path);
++	kfree(sk_path);
+ 
+ 	if (hv_vsm_boot_panic)
+ 		panic("%s: VTL1 boot failure caused kernel panic; consult log for more details.\n",
+-- 
+2.43.0
+

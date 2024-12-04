@@ -1,0 +1,82 @@
+From 73b4efe202eb5c16f85dbd98db70365e9ebf3886 Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Mon, 30 Oct 2023 10:47:32 +0000
+Subject: [PATCH 093/124] kunit: debugfs: Handle errors from
+ alloc_string_stream()
+
+In kunit_debugfs_create_suite() give up and skip creating the debugfs
+file if any of the alloc_string_stream() calls return an error or NULL.
+Only put a value in the log pointer of kunit_suite and kunit_test if it
+is a valid pointer to a log.
+
+This prevents the potential invalid dereference reported by smatch:
+
+ lib/kunit/debugfs.c:115 kunit_debugfs_create_suite() error: 'suite->log'
+	dereferencing possible ERR_PTR()
+ lib/kunit/debugfs.c:119 kunit_debugfs_create_suite() error: 'test_case->log'
+	dereferencing possible ERR_PTR()
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Fixes: 05e2006ce493 ("kunit: Use string_stream for test log")
+Reviewed-by: Rae Moar <rmoar@google.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/debugfs.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/lib/kunit/debugfs.c b/lib/kunit/debugfs.c
+index 5bfc18ad5fff..382706dfb47d 100644
+--- a/lib/kunit/debugfs.c
++++ b/lib/kunit/debugfs.c
+@@ -111,14 +111,28 @@ static const struct file_operations debugfs_results_fops = {
+ void kunit_debugfs_create_suite(struct kunit_suite *suite)
+ {
+ 	struct kunit_case *test_case;
++	struct string_stream *stream;
+ 
+-	/* Allocate logs before creating debugfs representation. */
+-	suite->log = alloc_string_stream(GFP_KERNEL);
+-	string_stream_set_append_newlines(suite->log, true);
++	/*
++	 * Allocate logs before creating debugfs representation.
++	 * The suite->log and test_case->log pointer are expected to be NULL
++	 * if there isn't a log, so only set it if the log stream was created
++	 * successfully.
++	 */
++	stream = alloc_string_stream(GFP_KERNEL);
++	if (IS_ERR_OR_NULL(stream))
++		return;
++
++	string_stream_set_append_newlines(stream, true);
++	suite->log = stream;
+ 
+ 	kunit_suite_for_each_test_case(suite, test_case) {
+-		test_case->log = alloc_string_stream(GFP_KERNEL);
+-		string_stream_set_append_newlines(test_case->log, true);
++		stream = alloc_string_stream(GFP_KERNEL);
++		if (IS_ERR_OR_NULL(stream))
++			goto err;
++
++		string_stream_set_append_newlines(stream, true);
++		test_case->log = stream;
+ 	}
+ 
+ 	suite->debugfs = debugfs_create_dir(suite->name, debugfs_rootdir);
+@@ -126,6 +140,12 @@ void kunit_debugfs_create_suite(struct kunit_suite *suite)
+ 	debugfs_create_file(KUNIT_DEBUGFS_RESULTS, S_IFREG | 0444,
+ 			    suite->debugfs,
+ 			    suite, &debugfs_results_fops);
++	return;
++
++err:
++	string_stream_destroy(suite->log);
++	kunit_suite_for_each_test_case(suite, test_case)
++		string_stream_destroy(test_case->log);
+ }
+ 
+ void kunit_debugfs_destroy_suite(struct kunit_suite *suite)
+-- 
+2.43.0
+
