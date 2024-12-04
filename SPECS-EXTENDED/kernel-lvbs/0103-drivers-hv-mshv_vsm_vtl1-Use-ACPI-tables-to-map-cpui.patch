@@ -1,0 +1,128 @@
+From e8b3b3883c8c48b80c898f3efd5591314b2c739c Mon Sep 17 00:00:00 2001
+From: Femi Adeyemi <femiadeyemi@microsoft.com>
+Date: Mon, 13 Jan 2025 19:38:08 +0000
+Subject: [PATCH 103/124] drivers: hv: mshv_vsm_vtl1: Use ACPI tables to map
+ cpuid to apicid
+
+Secure kernel needs the apicid to bring  secondary CPUs online. Get
+the cpuid to apicid mapping form ACPI tables instead of assuming a
+one-to-one mapping. VMs with CPUs spanning multiple NUMA nodes
+do not always have this one-to-one mapping, and causes secure kernel
+to fail in bringing secondary CPUs online.
+
+Signed-off-by: Femi Adeyemi <femiadeyemi@microsoft.com>
+---
+ Microsoft/mshv_sk_config   | 15 ++++++++++++---
+ arch/x86/hyperv/hv_vtl.c   | 14 +++++++++++++-
+ drivers/hv/mshv_vsm_vtl1.c | 30 ------------------------------
+ 3 files changed, 25 insertions(+), 34 deletions(-)
+
+diff --git a/Microsoft/mshv_sk_config b/Microsoft/mshv_sk_config
+index 71d59175717a..a4b5ab3bc33b 100644
+--- a/Microsoft/mshv_sk_config
++++ b/Microsoft/mshv_sk_config
+@@ -349,7 +349,12 @@ CONFIG_MICROCODE=y
+ # CONFIG_X86_CPUID is not set
+ # CONFIG_X86_5LEVEL is not set
+ CONFIG_X86_DIRECT_GBPAGES=y
+-# CONFIG_NUMA is not set
++CONFIG_NUMA=y
++CONFIG_AMD_NUMA=y
++CONFIG_NODES_SHIFT=10
++CONFIG_NUMA_BALANCING=y
++CONFIG_NUMA_BALANCING_DEFAULT_ENABLED=y
++CONFIG_NUMA_KEEP_MEMINFO=y
+ CONFIG_ARCH_SPARSEMEM_ENABLE=y
+ CONFIG_ARCH_SPARSEMEM_DEFAULT=y
+ # CONFIG_ARCH_MEMORY_PROBE is not set
+@@ -419,7 +424,11 @@ CONFIG_ARCH_HAS_ADD_PAGES=y
+ # CONFIG_SUSPEND is not set
+ # CONFIG_PM is not set
+ CONFIG_ARCH_SUPPORTS_ACPI=y
+-# CONFIG_ACPI is not set
++CONFIG_ACPI=y
++CONFIG_ACPI_PROCESSOR=n
++CONFIG_ACPI_AC=n
++CONFIG_ACPI_BATTERY=n
++CONFIG_ACPI_SBS=n
+ 
+ #
+ # CPU Frequency scaling
+@@ -430,7 +439,7 @@ CONFIG_ARCH_SUPPORTS_ACPI=y
+ #
+ # CPU Idle
+ #
+-# CONFIG_CPU_IDLE is not set
++CONFIG_CPU_IDLE=n
+ # end of CPU Idle
+ # end of Power management and ACPI options
+ 
+diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+index c143497c2e2b..eb8ecd4f8bb1 100644
+--- a/arch/x86/hyperv/hv_vtl.c
++++ b/arch/x86/hyperv/hv_vtl.c
+@@ -174,7 +174,19 @@ static void hv_vtl_populate_vp_context(struct hv_enable_vp_vtl *input, u32 targe
+ 
+ static int hv_vtl1_wakeup_secondary_cpu(int apicid, unsigned long start_eip)
+ {
+-	WRITE_ONCE(hv_secure_vtl_boot_signal[apicid], HV_SECURE_VTL_BOOT_TOKEN);
++	int cpu;
++
++	/* Find the logical CPU for the APIC ID */
++	for_each_present_cpu(cpu) {
++		if (arch_match_cpu_phys_id(cpu, apicid))
++			break;
++	}
++	if (cpu >= nr_cpu_ids) {
++		pr_err("No valid CPU found: %d with APIC ID %d in VTL1...\n", cpu, apicid);
++		return -EINVAL;
++	}
++
++	WRITE_ONCE(hv_secure_vtl_boot_signal[cpu], HV_SECURE_VTL_BOOT_TOKEN);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index e92a4eaaae70..4df9f0c8cf06 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -247,36 +247,6 @@ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ 	}
+ 	cpu_present_vtl0 = (struct cpumask *)cpu_present_data;
+ 
+-	/* Loop through VTL0's present CPUs and make them present in VTL1 as well */
+-	for_each_cpu(cpu, cpu_present_vtl0) {
+-		if (!cpu_possible(cpu)) {
+-			pr_err("%s: CPU%u cannot be enabled because CPU%u is not possible",
+-			       __func__, cpu, cpu);
+-			ret = -EINVAL;
+-			goto out;
+-		}
+-
+-		if (!(cpu_present(cpu))) {
+-			ret = generic_processor_info(cpu);
+-
+-			if (ret != cpu) {
+-				pr_err("%s: Failed adding CPU%u. Error code: %d",
+-				       __func__, cpu, ret);
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-
+-			ret = arch_register_cpu(cpu);
+-
+-			if (ret) {
+-				pr_err("%s: Failed registering CPU%u. Error code: %d",
+-				       __func__, cpu, ret);
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-		}
+-	}
+-
+ 	/* Loop through present Processors and enable VTL1 in each one */
+ 	for_each_present_cpu(cpu) {
+ 		/*
+-- 
+2.43.0
+

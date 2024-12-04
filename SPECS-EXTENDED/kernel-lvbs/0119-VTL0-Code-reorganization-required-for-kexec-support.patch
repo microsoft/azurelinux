@@ -1,0 +1,217 @@
+From 775daafefbc03367ebef11e224f1f6fcfc22de80 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Tue, 11 Feb 2025 11:09:50 -0600
+Subject: [PATCH 119/124] VTL0: Code reorganization required for kexec support.
+
+- There are two APIs available to make hypercalls:
+
+	- A register-based API
+
+	- A hypercall page-based API
+
+  Currently, we use the hypercall page-based API for making VTL calls.
+
+- Currently, on a kexec, the hypercall page is de-allocated by the HyperV
+  driver during machine_shutdown() or machine_crash_shutdown(). This is
+  done before calling machine_kexec() which jumps into the new kernel.
+
+  In the future, when we add support for kexec in LVBS, we need to be able
+  to make a final call into VTL1 in machine_kexec() to restore EPT
+  permissions for all VTL0 pages, remove all register intercepts, etc. For
+  this, we need to defer the de-allocation of the hypercall page to
+  machine_kexec().
+
+  Introduce a new machine_ops function called kexec(). Override
+  machine_ops.kexec() with hv_machine_kexec() in the HyperV driver. Call
+  machine_ops.kexec() from within machine_kexec(). De-allocate the
+  hypercall page in hv_machine_kexec().
+
+- In the future, an investigation will be done to see if the register-based
+  API can be used for VTL calls instead of the hypercall page-based one. If
+  it can, then the above change can be reverted.
+
+- Currently, heki_get_ranges() is only used by the module support code.
+  This will be needed by the kexec support code in the future. So,
+  move the function to virt/heki/main.c.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/include/asm/reboot.h      |  1 +
+ arch/x86/kernel/cpu/mshyperv.c     |  8 ++++----
+ arch/x86/kernel/machine_kexec_64.c |  3 +++
+ arch/x86/kernel/reboot.c           |  5 +++++
+ include/linux/heki.h               |  1 +
+ virt/heki/main.c                   | 23 +++++++++++++++++++++++
+ virt/heki/module.c                 | 23 -----------------------
+ 7 files changed, 37 insertions(+), 27 deletions(-)
+
+diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.h
+index 6536873f8fc0..0ee8eaccbb81 100644
+--- a/arch/x86/include/asm/reboot.h
++++ b/arch/x86/include/asm/reboot.h
+@@ -13,6 +13,7 @@ struct machine_ops {
+ 	void (*shutdown)(void);
+ 	void (*crash_shutdown)(struct pt_regs *);
+ 	void (*emergency_restart)(void);
++	void (*kexec)(void);
+ };
+ 
+ extern struct machine_ops machine_ops;
+diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
+index d97dbe6e70d9..6bf9dfc883fa 100644
+--- a/arch/x86/kernel/cpu/mshyperv.c
++++ b/arch/x86/kernel/cpu/mshyperv.c
+@@ -220,10 +220,6 @@ static void hv_machine_shutdown(void)
+ 
+ 	/* The function calls stop_other_cpus(). */
+ 	native_machine_shutdown();
+-
+-	/* Disable the hypercall page when there is only 1 active CPU. */
+-	if (kexec_in_progress)
+-		hyperv_cleanup();
+ }
+ 
+ static void hv_machine_crash_shutdown(struct pt_regs *regs)
+@@ -233,7 +229,10 @@ static void hv_machine_crash_shutdown(struct pt_regs *regs)
+ 
+ 	/* The function calls crash_smp_send_stop(). */
+ 	native_machine_crash_shutdown(regs);
++}
+ 
++static void hv_machine_kexec(void)
++{
+ 	/* Disable the hypercall page when there is only 1 active CPU. */
+ 	hyperv_cleanup();
+ }
+@@ -569,6 +568,7 @@ static void __init ms_hyperv_init_platform(void)
+ #if IS_ENABLED(CONFIG_HYPERV) && defined(CONFIG_KEXEC_CORE)
+ 	machine_ops.shutdown = hv_machine_shutdown;
+ 	machine_ops.crash_shutdown = hv_machine_crash_shutdown;
++	machine_ops.kexec = hv_machine_kexec;
+ #endif
+ 	if (ms_hyperv.features & HV_ACCESS_TSC_INVARIANT) {
+ 		/*
+diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
+index 2fa12d1dc676..64e6a85636af 100644
+--- a/arch/x86/kernel/machine_kexec_64.c
++++ b/arch/x86/kernel/machine_kexec_64.c
+@@ -29,6 +29,7 @@
+ #include <asm/set_memory.h>
+ #include <asm/cpu.h>
+ #include <asm/efi.h>
++#include <asm/reboot.h>
+ 
+ #ifdef CONFIG_ACPI
+ /*
+@@ -360,6 +361,8 @@ void machine_kexec(struct kimage *image)
+ #endif
+ 	}
+ 
++	machine_ops.kexec();
++
+ 	control_page = page_address(image->control_code_page) + PAGE_SIZE;
+ 	__memcpy(control_page, relocate_kernel, KEXEC_CONTROL_CODE_MAX_SIZE);
+ 
+diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+index 830425e6d38e..668a242ad738 100644
+--- a/arch/x86/kernel/reboot.c
++++ b/arch/x86/kernel/reboot.c
+@@ -790,6 +790,10 @@ static void native_machine_power_off(void)
+ 	tboot_shutdown(TB_SHUTDOWN_HALT);
+ }
+ 
++static void native_machine_kexec(void)
++{
++}
++
+ struct machine_ops machine_ops __ro_after_init = {
+ 	.power_off = native_machine_power_off,
+ 	.shutdown = native_machine_shutdown,
+@@ -798,6 +802,7 @@ struct machine_ops machine_ops __ro_after_init = {
+ 	.halt = native_machine_halt,
+ #ifdef CONFIG_KEXEC_CORE
+ 	.crash_shutdown = native_machine_crash_shutdown,
++	.kexec = native_machine_kexec,
+ #endif
+ };
+ 
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 4cdd4ae1a7a3..b2ef39ca99bf 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -214,6 +214,7 @@ void heki_free_module_init(struct module *mod);
+ void heki_unload_module(struct module *mod);
+ void heki_copy_secondary_key(const void *data, size_t size);
+ void heki_store_blacklist_raw_hashes(const char *hash);
++void heki_get_ranges(struct heki_args *args);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+diff --git a/virt/heki/main.c b/virt/heki/main.c
+index a5345b74437e..d5441a558b70 100644
+--- a/virt/heki/main.c
++++ b/virt/heki/main.c
+@@ -57,3 +57,26 @@ static int __init heki_parse_config(char *str)
+ 	return 1;
+ }
+ __setup("heki=", heki_parse_config);
++
++void heki_get_ranges(struct heki_args *args)
++{
++	phys_addr_t pa, pa_end, pa_next;
++	unsigned long va, va_end, va_next;
++
++	if (!pfn_valid(args->pa >> PAGE_SHIFT))
++		return;
++
++	va_end = args->va + args->size;
++	pa_end = args->pa + args->size;
++	for (va = args->va, pa = args->pa;
++	     pa < pa_end;
++	     va = va_next, pa = pa_next) {
++		va_next = (va & PAGE_MASK) + PAGE_SIZE;
++		pa_next = (pa & PAGE_MASK) + PAGE_SIZE;
++		if (pa_next > pa_end) {
++			va_next = va_end;
++			pa_next = pa_end;
++		}
++		heki_add_range(args, va, pa, pa_next);
++	}
++}
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index fbbbe0ad176a..410a926222a6 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -73,29 +73,6 @@ static int __init heki_copy_boot_certs(void)
+ }
+ core_initcall(heki_copy_boot_certs);
+ 
+-static void heki_get_ranges(struct heki_args *args)
+-{
+-	phys_addr_t pa, pa_end, pa_next;
+-	unsigned long va, va_end, va_next;
+-
+-	if (!pfn_valid(args->pa >> PAGE_SHIFT))
+-		return;
+-
+-	va_end = args->va + args->size;
+-	pa_end = args->pa + args->size;
+-	for (va = args->va, pa = args->pa;
+-	     pa < pa_end;
+-	     va = va_next, pa = pa_next) {
+-		va_next = (va & PAGE_MASK) + PAGE_SIZE;
+-		pa_next = (pa & PAGE_MASK) + PAGE_SIZE;
+-		if (pa_next > pa_end) {
+-			va_next = va_end;
+-			pa_next = pa_end;
+-		}
+-		heki_add_range(args, va, pa, pa_next);
+-	}
+-}
+-
+ void heki_load_kdata(void)
+ {
+ 	struct heki_hypervisor *hypervisor = heki.hypervisor;
+-- 
+2.43.0
+

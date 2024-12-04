@@ -1,0 +1,26 @@
+From 75b98ac9d61f9fc0143b807171ce0a906ca3b98d Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Mon, 27 Jan 2025 11:25:27 -0800
+Subject: [PATCH 108/124] lvbs.config: Add CONFIG_HYPERV dependency
+
+Otherwise CONFIG_HYPERV_VSM will be disabled upon make, as it depends on
+CONFIG_HYPERV.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ Microsoft/lvbs.config | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Microsoft/lvbs.config b/Microsoft/lvbs.config
+index 9e606306c0e2..ba178b8cf172 100644
+--- a/Microsoft/lvbs.config
++++ b/Microsoft/lvbs.config
+@@ -4,4 +4,5 @@ CONFIG_DEBUG_INFO_BTF_MODULES=n
+ CONFIG_DYNAMIC_DEBUG=n
+ CONFIG_DYNAMIC_DEBUG_CORE=n
+ CONFIG_HEKI=y
++CONFIG_HYPERV=y
+ CONFIG_HYPERV_VSM=y
+-- 
+2.43.0
+

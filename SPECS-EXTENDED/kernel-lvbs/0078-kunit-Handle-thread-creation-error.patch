@@ -1,0 +1,41 @@
+From d0968275a38e7653dbf8602c67838ec4c58c3174 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Date: Wed, 16 Oct 2024 11:34:40 -0700
+Subject: [PATCH 078/124] kunit: Handle thread creation error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously, if a thread creation failed (e.g. -ENOMEM), the function was
+called (kunit_catch_run_case or kunit_catch_run_case_cleanup) without
+marking the test as failed.  Instead, fill try_result with the error
+code returned by kthread_run(), which will mark the test as failed and
+print "internal error occurred...".
+
+Cc: Brendan Higgins <brendanhiggins@google.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Rae Moar <rmoar@google.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Link: https://lore.kernel.org/r/20240408074625.65017-2-mic@digikod.net
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/try-catch.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
+index 9c9e4dcf06d9..cab8b24b5d5a 100644
+--- a/lib/kunit/try-catch.c
++++ b/lib/kunit/try-catch.c
+@@ -69,6 +69,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ 	task_struct = kthread_create(kunit_generic_run_threadfn_adapter,
+ 				     try_catch, "kunit_try_catch_thread");
+ 	if (IS_ERR(task_struct)) {
++		try_catch->try_result = PTR_ERR(task_struct);
+ 		try_catch->catch(try_catch->context);
+ 		return;
+ 	}
+-- 
+2.43.0
+

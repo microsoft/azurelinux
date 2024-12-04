@@ -1,0 +1,70 @@
+From fe6873766e2c2e80d573ee5e684c66090d419ca1 Mon Sep 17 00:00:00 2001
+From: Rae Moar <rmoar@google.com>
+Date: Wed, 16 Oct 2024 10:31:36 -0700
+Subject: [PATCH 096/124] kunit: add example suite to test init suites
+
+Add example_init_test_suite to allow for testing the feature of running
+test suites marked as init to indicate they use init data and/or
+functions.
+
+This suite should always pass and uses a simple init function.
+
+This suite can also be used to test the is_init attribute introduced in
+the next patch.
+
+Signed-off-by: Rae Moar <rmoar@google.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/kunit-example-test.c | 37 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/lib/kunit/kunit-example-test.c b/lib/kunit/kunit-example-test.c
+index 01a769f35e1d..ef7ce36a4443 100644
+--- a/lib/kunit/kunit-example-test.c
++++ b/lib/kunit/kunit-example-test.c
+@@ -286,4 +286,41 @@ static struct kunit_suite example_test_suite = {
+  */
+ kunit_test_suites(&example_test_suite);
+ 
++static int __init init_add(int x, int y)
++{
++	return (x + y);
++}
++
++/*
++ * This test should always pass. Can be used to test init suites.
++ */
++static void __init example_init_test(struct kunit *test)
++{
++	KUNIT_EXPECT_EQ(test, init_add(1, 1), 2);
++}
++
++/*
++ * The kunit_case struct cannot be marked as __initdata as this will be
++ * used in debugfs to retrieve results after test has run
++ */
++static struct kunit_case __refdata example_init_test_cases[] = {
++	KUNIT_CASE(example_init_test),
++	{}
++};
++
++/*
++ * The kunit_suite struct cannot be marked as __initdata as this will be
++ * used in debugfs to retrieve results after test has run
++ */
++static struct kunit_suite example_init_test_suite = {
++	.name = "example_init",
++	.test_cases = example_init_test_cases,
++};
++
++/*
++ * This registers the test suite and marks the suite as using init data
++ * and/or functions.
++ */
++kunit_test_init_section_suites(&example_init_test_suite);
++
+ MODULE_LICENSE("GPL v2");
+-- 
+2.43.0
+

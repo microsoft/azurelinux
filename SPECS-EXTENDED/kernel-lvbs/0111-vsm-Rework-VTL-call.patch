@@ -1,0 +1,112 @@
+From b5aa7774e7bd0f7473abc4a29dcafc07e6d7bf32 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Thu, 14 Nov 2024 18:54:26 -0800
+Subject: [PATCH 111/124] vsm: Rework VTL call
+
+Update __hv_vsm_vtlcall function to refine how registers are handled to be
+more in line with the Linux AMD64 calling convention.
+
+The changes specifically focus on ensuring that certain registers (rbx,
+rsp, rbp, r12, r13, r14, r15) are preserved according to convention, while
+also making explicit the preservation of argument register: this ensures
+that arguments are not clobbered during the VTL call.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ drivers/hv/hv_vsm.c | 70 ++++++++++++++++++++-------------------------
+ 1 file changed, 31 insertions(+), 39 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index 763f7e60d084..f5566ce610de 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -11,55 +11,47 @@
+ #include <asm/mshyperv.h>
+ #include "hv_vsm.h"
+ 
++/*
++ * This function expects the upper VTL to preserve all registers except
++ * those used by the VTL calling convention ABI (%rdi, %rsi, %rdx, %r8).
++ *
++ * VTL1 reliance means the Linux x86_64 ABI (%rbx, %r12, %r13, %r14, %r15)
++ * must be restored by the caller during bootstrapping when VTL1 is not
++ * operational.
++ *
++ * The %rcx register must be explicitly preserved as it is clobbered,
++ * causing issues if this function is inlined. %rax is not restored by the
++ * upper VTL (passed via the assist page) but is unused and can be ignored.
++ *
++ * This function preserves the args variable on the stack as it is passed
++ * via a scratch register and clobbered.
++ *
++ * Microsoft Hypervisor preserves %rsp during VTL switches.
++ */
+ static void __hv_vsm_vtlcall(struct hv_vtlcall_param *args)
+ {
++	register u64 r8 asm("r8");
+ 	u64 hcall_addr;
+ 
+ 	hcall_addr = (u64)((u8 *)hv_hypercall_pg + vsm_code_page_offsets.vtl_call_offset);
+-	register u64 hypercall_addr asm("rax") = hcall_addr;
++	r8 = args->a3;
+ 
+-	asm __volatile__ (	\
+-	/*
+-	 * Keep copies of the registers we modify.
+-	 * Everything else is saved and restored by VTL1.
+-	 */
+-		"pushq	%%rdi\n"
+-		"pushq	%%rsi\n"
+-		"pushq	%%rdx\n"
+-		"pushq	%%r8\n"
+-		"pushq	%%rcx\n"
+-		"pushq	%%rax\n"
+-	/*
+-	 * The vtlcall_param structure is in rdi, which is modified below, so copy it into a
+-	 * register that stays constant in the instructon block immediately following.
+-	 */
+-		"movq	%1, %%rcx\n"
+-	/* Copy values from vtlcall_param structure into registers used to communicate with VTL1 */
+-		"movq	0x00(%%rcx), %%rdi\n"
+-		"movq	0x08(%%rcx), %%rsi\n"
+-		"movq	0x10(%%rcx), %%rdx\n"
+-		"movq	0x18(%%rcx), %%r8\n"
++	asm volatile (
++	/* Push args to stack as %rcx is not preserved across a VTL call */
++		"pushq %[args]\n"
+ 	/* Make rcx 0 */
+ 		"xorl	%%ecx, %%ecx\n"
+ 	/* VTL call */
+ 		CALL_NOSPEC
+-	/* Restore rcx to args after VTL call */
+-		"movq	40(%%rsp),  %%rcx\n"
+-	/* Copy values from registers used to communicate with VTL1 into vtlcall_param structure */
+-		"movq	%%rdi,  0x00(%%rcx)\n"
+-		"movq	%%rsi,  0x08(%%rcx)\n"
+-		"movq	%%rdx,  0x10(%%rcx)\n"
+-		"movq	%%r8,  0x18(%%rcx)\n"
+-	/* Restore all modified registers */
+-		"popq	%%rax\n"
+-		"popq	%%rcx\n"
+-		"popq	%%r8\n"
+-		"popq	%%rdx\n"
+-		"popq	%%rsi\n"
+-		"popq	%%rdi\n"
+-		: ASM_CALL_CONSTRAINT
+-		: "D"(args), THUNK_TARGET(hypercall_addr)
+-		: "cc", "memory");
++	/* Restore args from stack */
++		"popq %[args]\n"
++		: "+D"(args->a0), "+S"(args->a1),
++		  "+d"(args->a2), "+r"(r8)
++		: [thunk_target]"a"(hcall_addr), [args]"r"(args)
++	/* See the comment above the function why %rcx if here */
++		: "cc", "memory", "rcx");
++
++	args->a3 = r8;
+ }
+ 
+ static int hv_vsm_vtlcall(struct hv_vtlcall_param *args)
+-- 
+2.43.0
+

@@ -1,0 +1,147 @@
+From 19182f5a35b2a356ca53f417374ff9ad4e86c665 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Date: Wed, 16 Oct 2024 11:34:40 -0700
+Subject: [PATCH 080/124] kunit: Print last test location on fault
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This helps identify the location of test faults with opportunistic calls
+to _KUNIT_SAVE_LOC().  This can be useful while writing tests or
+debugging them.  It is possible to call KUNIT_SUCCESS() to explicit save
+last location.
+
+Cc: Brendan Higgins <brendanhiggins@google.com>
+Cc: David Gow <davidgow@google.com>
+Cc: Rae Moar <rmoar@google.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Link: https://lore.kernel.org/r/20240408074625.65017-7-mic@digikod.net
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ include/kunit/test.h  | 24 +++++++++++++++++++++---
+ lib/kunit/try-catch.c | 10 +++++++---
+ 2 files changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 68ff01aee244..7ef770f966ad 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -302,6 +302,8 @@ struct kunit {
+ 	struct list_head resources; /* Protected by lock. */
+ 
+ 	char status_comment[KUNIT_STATUS_COMMENT_SIZE];
++	/* Saves the last seen test. Useful to help with faults. */
++	struct kunit_loc last_seen;
+ };
+ 
+ static inline void kunit_set_failure(struct kunit *test)
+@@ -560,6 +562,15 @@ void __printf(2, 3) kunit_log_append(char *log, const char *fmt, ...);
+ #define kunit_err(test, fmt, ...) \
+ 	kunit_printk(KERN_ERR, test, fmt, ##__VA_ARGS__)
+ 
++/*
++ * Must be called at the beginning of each KUNIT_*_ASSERTION().
++ * Cf. KUNIT_CURRENT_LOC.
++ */
++#define _KUNIT_SAVE_LOC(test) do {					       \
++	WRITE_ONCE(test->last_seen.file, __FILE__);			       \
++	WRITE_ONCE(test->last_seen.line, __LINE__);			       \
++} while (0)
++
+ /**
+  * KUNIT_SUCCEED() - A no-op expectation. Only exists for code clarity.
+  * @test: The test context object.
+@@ -568,7 +579,7 @@ void __printf(2, 3) kunit_log_append(char *log, const char *fmt, ...);
+  * words, it does nothing and only exists for code clarity. See
+  * KUNIT_EXPECT_TRUE() for more information.
+  */
+-#define KUNIT_SUCCEED(test) do {} while (0)
++#define KUNIT_SUCCEED(test) _KUNIT_SAVE_LOC(test)
+ 
+ void __noreturn __kunit_abort(struct kunit *test);
+ 
+@@ -594,14 +605,16 @@ void __kunit_do_failed_assertion(struct kunit *test,
+ } while (0)
+ 
+ 
+-#define KUNIT_FAIL_ASSERTION(test, assert_type, fmt, ...)		       \
++#define KUNIT_FAIL_ASSERTION(test, assert_type, fmt, ...) do {		       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	_KUNIT_FAILED(test,						       \
+ 		      assert_type,					       \
+ 		      kunit_fail_assert,				       \
+ 		      kunit_fail_assert_format,				       \
+ 		      {},						       \
+ 		      fmt,						       \
+-		      ##__VA_ARGS__)
++		      ##__VA_ARGS__);					       \
++} while (0)
+ 
+ /**
+  * KUNIT_FAIL() - Always causes a test to fail when evaluated.
+@@ -630,6 +643,7 @@ void __kunit_do_failed_assertion(struct kunit *test,
+ 			      fmt,					       \
+ 			      ...)					       \
+ do {									       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	if (likely(!!(condition_) == !!expected_true_))			       \
+ 		break;							       \
+ 									       \
+@@ -691,6 +705,7 @@ do {									       \
+ 		.right_text = #right,					       \
+ 	};								       \
+ 									       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	if (likely(__left op __right))					       \
+ 		break;							       \
+ 									       \
+@@ -751,6 +766,7 @@ do {									       \
+ 		.right_text = #right,					       \
+ 	};								       \
+ 									       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	if (likely(strcmp(__left, __right) op 0))			       \
+ 		break;							       \
+ 									       \
+@@ -784,6 +800,7 @@ do {									       \
+ 		.right_text = #right,					       \
+ 	};								       \
+ 									       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	if (likely(__left && __right))					       \
+ 		if (likely(memcmp(__left, __right, __size) op 0))	       \
+ 			break;						       \
+@@ -808,6 +825,7 @@ do {									       \
+ do {									       \
+ 	const typeof(ptr) __ptr = (ptr);				       \
+ 									       \
++	_KUNIT_SAVE_LOC(test);						       \
+ 	if (!IS_ERR_OR_NULL(__ptr))					       \
+ 		break;							       \
+ 									       \
+diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
+index 7a3910dd78a6..fa687278ccc9 100644
+--- a/lib/kunit/try-catch.c
++++ b/lib/kunit/try-catch.c
+@@ -96,9 +96,13 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ 
+ 	if (exit_code == -EFAULT)
+ 		try_catch->try_result = 0;
+-	else if (exit_code == -EINTR)
+-		kunit_err(test, "try faulted\n");
+-	else if (exit_code == -ETIMEDOUT)
++	else if (exit_code == -EINTR) {
++		if (test->last_seen.file)
++			kunit_err(test, "try faulted: last line seen %s:%d\n",
++				  test->last_seen.file, test->last_seen.line);
++		else
++			kunit_err(test, "try faulted\n");
++	} else if (exit_code == -ETIMEDOUT)
+ 		kunit_err(test, "try timed out\n");
+ 	else if (exit_code)
+ 		kunit_err(test, "Unknown error: %d\n", exit_code);
+-- 
+2.43.0
+
