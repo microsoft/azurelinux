@@ -26,7 +26,7 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel
+Name:           kernel-lpg-innovate
 Version:        6.6.82.1
 Release:        1%{?dist}
 License:        GPLv2
@@ -34,7 +34,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/lpg-innovate/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        kernel-lpg-innovate.normal.config
 #Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
@@ -171,7 +171,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-lpg-innovate-%{version}
 make mrproper
 
 cp %{SOURCE1} .config
@@ -428,6 +428,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Mar 18 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.82.1-1
+- Update to kernel-lpg-innovate source
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
 - Auto-upgrade to 6.6.82.1
 
