@@ -485,8 +485,8 @@
         "type": "other",
         "other": {
           "name": "apache-parent",
-          "version": "21",
-          "downloadUrl": "http://repo1.maven.org/maven2/org/apache/apache/21/apache-21-source-release.zip"
+          "version": "31",
+          "downloadUrl": "http://repo1.maven.org/maven2/org/apache/apache/31/apache-31-source-release.zip"
         }
       }
     },
