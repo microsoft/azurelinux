@@ -42,9 +42,10 @@ used directly by developers or end-users.
 %package -n moby-containerd-cc
 Summary: Industry-standard container runtime with Kata Containers support
 Group: Tools/Container
-Provides: moby-containerd-cc = %{version}-%{release}
+Provides:  moby-containerd-cc = %{version}-%{release}
 Conflicts: %{upstream_name}2
 Obsoletes: %{upstream_name}2 < %{version}-%{release}
+Requires:  %{name} = %{version}-%{release}
 
 %description -n moby-containerd-cc
 This flavor of containerd includes additional patches to support Kata Containers features.
