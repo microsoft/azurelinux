@@ -24,40 +24,45 @@
 # notice, one of the license notices in the documentation
 # and/or other materials provided with the distribution.
 #
+# Source tgz from https://github.com/Mellanox/mlnx-tools/archive/refs/tags/v<version>.tar.gz
 #
 
-%global         MLNX_OFED_VERSION 5.6-1.0.3.3
+%global         MLNX_OFED_VERSION 24.10.0.7.0.1
 %global         BF_VERSION 3.9.0
 
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
-Version:        5.2.0
-Release:        2%{?dist}
-License:        CPL 1.0 or BSD or GPLv2
+Version:        24.10.0
+Release:        1%{?dist}
+License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://github.com/Mellanox/mlnx-tools
-Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Obsoletes:      mlnx-ofa_kernel < 5.4
 Obsoletes:      mlnx_en-utils < 5.4
 
 %description
 Mellanox userland tools and scripts
 
-%define debug_package %{nil}
-%define __python %{_bindir}/python3
 BuildRequires: python3
+
+%define debug_package %{nil}
+
 # mlnx_tune is python2 but is not important enough to create a dependency
 # on python2 in a python3 system:
 %global __requires_exclude_from mlnx_tune
 
-%prep
-%autosetup -n %{name}-%{version}
+# This is always true for AZURELINUX
+%global PYTHON3 1
+%global python_dir %{_datadir}/%{name}/python
 
-%build
+%prep
+%setup -n %{name}-%{version}
 
 %install
+rm -rf %{buildroot}
 
 add_env()
 {
@@ -74,26 +79,34 @@ EOF
 }
 
 touch mlnx-tools-files
-mlnx_python_sitelib=%{python_sitelib}
-if [ "$(echo %{_prefix} | sed -e 's@/@@g')" != "usr" ]; then
-	mlnx_python_sitelib=$(echo %{python_sitelib} | sed -e 's@/usr@%{_prefix}@')
-fi
 export PKG_VERSION="%{version}"
-%make_install PYTHON="%__python" PYTHON_SETUP_EXTRA_ARGS="-O1 --prefix=%{buildroot}%{_prefix} --install-lib=%{buildroot}${mlnx_python_sitelib}"
+%make_install
+%if %PYTHON3
+sed -i -e '1s/python\>/python3/' %{buildroot}/usr/{s,}bin/* \
+	%{buildroot}%{python_dir}/*.py
+%endif
 
-if [ "$(echo %{_prefix} | sed -e 's@/@@g')" != "usr" ]; then
+%if "%{_prefix}" != "/usr"
 	conf_env=/etc/profile.d/mlnx-tools.sh
 	install -d %{buildroot}/etc/profile.d
-	add_env %{buildroot}$conf_env PYTHONPATH $mlnx_python_sitelib
 	add_env %{buildroot}$conf_env PATH %{_bindir}
 	add_env %{buildroot}$conf_env PATH %{_sbindir}
 	echo $conf_env >> mlnx-tools-files
-fi
-find %{buildroot}${mlnx_python_sitelib} -type f -print | sed -e 's@%{buildroot}@@' >> mlnx-tools-files
+%endif
 
+# These are delivered by mlnx-ofa_kernel, mlnx-tools should stay away
+rm -f %{buildroot}/lib/udev/{sf-rep-netdev-rename,vf-net-link-name.sh}
+
+%clean
+rm -rf %{buildroot}
+
+%if "%{_prefix}" != "/usr"
 %files -f mlnx-tools-files
+%else
+%files
+%endif
+%license LICENSE
 %doc doc/*
-%license debian/copyright
 %defattr(-,root,root,-)
 /sbin/sysctl_perf_tuning
 /sbin/mlnx_bf_configure
@@ -101,10 +114,24 @@ find %{buildroot}${mlnx_python_sitelib} -type f -print | sed -e 's@%{buildroot}@
 /sbin/mlnx-sf
 %{_sbindir}/*
 %{_bindir}/*
-%{_mandir}/man8/ib2ib_setup.8*
+%{_mandir}/man8/*.8*
+%{python_dir}/dcbnetlink.py*
+%{python_dir}/netlink.py*
+%if %(ls %{python_dir}/__pycache__/*.pyc 2> /dev/null | wc -l)
+%exclude %{python_dir}/__pycache__/*.pyc
+%endif
+/etc/modprobe.d/mlnx-bf.conf
+/lib/udev/auxdev-sf-netdev-rename
+/lib/udev/mlnx_bf_assign_ct_cores.sh
 /lib/udev/mlnx_bf_udev
+/lib/udev/rules.d/82-net-setup-link.rules
+/lib/udev/rules.d/83-mlnx-sf-name.rules
 
 %changelog
+* Tue Nov 26 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Upgrade to 24.10.0
+- Pickup source tarball from blobstore
+
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 5.2.0-2
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2).
 - Lint spec to conform to Mariner 
