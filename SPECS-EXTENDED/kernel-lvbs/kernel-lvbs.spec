@@ -330,6 +330,9 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
 objcopy -O binary -R .note -R .comment -S lvbs_secure/vmlinux %{buildroot}/lib/modules/%{uname_r}/secure/vmlinux.bin
 cp Microsoft/skloader/skloader.bin %{buildroot}/lib/modules/%{uname_r}/secure/skloader.bin
 
+install -vdm 755 %{buildroot}/etc/dracut.conf.d
+echo 'install_items+=" /lib/modules/%{uname_r}/secure/vmlinux.bin /lib/modules/%{uname_r}/secure/skloader.bin "' > %{buildroot}/etc/dracut.conf.d/10-lvbs-%{uname_r}.conf
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -379,6 +382,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
+/etc/dracut.conf.d/10-lvbs-%{uname_r}.conf
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
