@@ -1,14 +1,15 @@
-Summary:        A portable number theoretic multiple-precision integer library
-Name:           libtommath
-Version:        1.1.0
-Release:        5%{?dist}
-License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: Public Domain
+Summary:        A portable number theoretic multiple-precision integer library
+Name:           libtommath
+Version:        1.3.1~rc1
+Release:        1%{?dist}
+License:        Public Domain
 URL:            https://www.libtom.net/
-Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-36328.patch
+Source0:        https://github.com/libtom/%{name}/archive/v%{version_no_tilde}.tar.gz#/%{name}-%{version_no_tilde}.tar.gz
 
+BuildRequires:  make
 BuildRequires:  libtool
 
 %description
@@ -26,7 +27,7 @@ The %{name}-devel package contains libraries and header files for developing
 applications that use %{name}.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version_no_tilde}
 # Fix permissions on installed library
 sed -i -e 's/644 $(LIBNAME)/755 $(LIBNAME)/g' makefile.shared
 # Fix pkgconfig path
@@ -57,6 +58,10 @@ find %{buildroot} -name '*.a' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Nov 14 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.3.1~rc1-1
+- Updating Azure-Linux import from Fedora 41 (license: Public Domain).
+- License verified.
+
 * Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.1.0-5
 - Fix CVE-2023-36328
 
