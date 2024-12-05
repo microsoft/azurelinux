@@ -179,26 +179,33 @@ manipulation of eBPF programs and maps.
 CheckConfig() {
     local CONFIG_FILE=$1
 
+    export KBUILD_OUTPUT=$2
+
     make mrproper
 
-    cp $CONFIG_FILE .config
+    cp $CONFIG_FILE $KBUILD_OUTPUT/.config
     make ARCH=%{arch} olddefconfig
 
+    pushd $KBUILD_OUTPUT
     if test -f .config.old && ! diff -u .config.old .config; then
         echo "ERROR: Config $CONFIG_FILE is missing required config options shown above."
         return 1
     fi
+    popd
+
+    unset KBUILD_OUTPUT
 }
 
-CheckConfig %{SOURCE1}
+CheckConfig %{SOURCE1} lvbs_normal
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
-sed -i 's,CONFIG_SYSTEM_TRUSTED_KEYS="",CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem",' .config
+sed -i 's,CONFIG_SYSTEM_TRUSTED_KEYS="",CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem",' lvbs_normal/.config
 
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' lvbs_normal/.config
 
 %build
+export KBUILD_OUTPUT=lvbs_normal
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
@@ -213,7 +220,7 @@ make -C tools/bpf/bpftool
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
-    ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
+    $KBUILD_OUTPUT/scripts/sign-file sha512 $KBUILD_OUTPUT/certs/signing_key.pem $KBUILD_OUTPUT/certs/signing_key.x509 $MODULE \
     rm -f $MODULE.{sig,dig} \
     xz $MODULE \
     done \
@@ -229,6 +236,8 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %{nil}
 
 %install
+export KBUILD_OUTPUT=lvbs_normal
+
 install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
@@ -243,18 +252,18 @@ install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
+install -vm 600 $KBUILD_OUTPUT/arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
 %ifarch aarch64
-install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
+install -vm 600 $KBUILD_OUTPUT/arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
 # Restrict the permission on System.map-X file
-install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
-install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
+install -vm 400 $KBUILD_OUTPUT/System.map %{buildroot}/boot/System.map-%{uname_r}
+install -vm 600 $KBUILD_OUTPUT/.config %{buildroot}/boot/config-%{uname_r}
 cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+install -vm 744 $KBUILD_OUTPUT/vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
@@ -275,16 +284,16 @@ find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xa
 find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 %ifarch x86_64
 # CONFIG_STACK_VALIDATION=y requires objtool to build external modules
-install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
-install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+install -vsm 755 $KBUILD_OUTPUT/tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+install -vsm 755 $KBUILD_OUTPUT/tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
 %endif
 
-cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
+cp $KBUILD_OUTPUT/.config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
 %ifarch aarch64
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
+cp $KBUILD_OUTPUT/scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
 %endif
 
 # disable (JOBS=1) parallel build to fix this issue:
