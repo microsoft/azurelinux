@@ -36,11 +36,12 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        kernel-lvbs-%{_arch}-normal.config
-#Source2:
+Source2:        kernel-lvbs-%{_arch}-secure.config
 Source3:        sha512hmac-openssl.sh
 Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
+Source7:        kernel-lvbs-%{_arch}-secure.initrd
 
 Source999:      kernel-lvbs.patches
 %include %{SOURCE999}
@@ -197,12 +198,16 @@ CheckConfig() {
 }
 
 CheckConfig %{SOURCE1} lvbs_normal
+CheckConfig %{SOURCE2} lvbs_secure
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
 sed -i 's,CONFIG_SYSTEM_TRUSTED_KEYS="",CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem",' lvbs_normal/.config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' lvbs_normal/.config
+
+# Place the secure initrd to get built into the secure kernel
+cp %{SOURCE7} Microsoft/initrd-sk.cpio
 
 %build
 export KBUILD_OUTPUT=lvbs_normal
@@ -234,6 +239,8 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
+
+make O=lvbs_secure VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} vmlinux
 
 %install
 export KBUILD_OUTPUT=lvbs_normal
@@ -314,6 +321,9 @@ make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
+
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
+objcopy -O binary -R .note -R .comment -S lvbs_secure/vmlinux %{buildroot}/lib/modules/%{uname_r}/secure/vmlinux.bin
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
