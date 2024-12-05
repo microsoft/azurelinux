@@ -177,24 +177,15 @@ manipulation of eBPF programs and maps.
 %autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 
 CheckConfig() {
+    local CONFIG_FILE=$1
+
     make mrproper
 
-    cp $1 .config
+    cp $CONFIG_FILE .config
+    make ARCH=%{arch} olddefconfig
 
-    cp .config current_config
-    make LC_ALL=  ARCH=%{arch} oldconfig
-
-    # Verify the config files match
-    cp .config new_config
-    diff --unified new_config current_config > config_diff || true
-    if [ -s config_diff ]; then
-        printf "\n\n\n\n\n\n\n\n"
-        cat config_diff
-        printf "\n\n\n\n\n\n\n\n"
-        echo "Config file has unexpected changes"
-        echo "Update config file to set changed values explicitly"
-
-        #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    if test -f .config.old && ! diff -u .config.old .config; then
+        echo "ERROR: Config $CONFIG_FILE is missing required config options shown above."
         return 1
     fi
 }
