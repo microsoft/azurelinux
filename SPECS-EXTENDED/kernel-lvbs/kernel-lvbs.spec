@@ -46,6 +46,9 @@ Source7:        kernel-lvbs-%{_arch}-secure.initrd
 Source999:      kernel-lvbs.patches
 %include %{SOURCE999}
 
+# skloader source code
+Patch:          skloader.patch
+
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -241,6 +244,7 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %{nil}
 
 make O=lvbs_secure VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} vmlinux
+make -C Microsoft/skloader
 
 %install
 export KBUILD_OUTPUT=lvbs_normal
@@ -324,6 +328,7 @@ rm -vf %{buildroot}%{_bindir}/trace
 
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
 objcopy -O binary -R .note -R .comment -S lvbs_secure/vmlinux %{buildroot}/lib/modules/%{uname_r}/secure/vmlinux.bin
+cp Microsoft/skloader/skloader.bin %{buildroot}/lib/modules/%{uname_r}/secure/skloader.bin
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
