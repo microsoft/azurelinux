@@ -29,7 +29,6 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-net-mlx5-Support-partial-TTC-rules.patch
 Patch1:         0002-net-mlx5-Introduce-port-selection-namespace.patch
-Patch2:         0003-net-mlx5-Add-support-to-create-match-definer.patch
 Patch3:         0004-net-mlx5-Introduce-new-uplink-destination-type.patch
 Patch4:         0005-net-mlx5-Lag-move-lag-files-into-directory.patch
 Patch5:         0006-net-mlx5-Lag-set-LAG-traffic-type-mapping.patch
@@ -230,7 +229,6 @@ manipulation of eBPF programs and maps.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
