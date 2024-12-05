@@ -13,41 +13,37 @@ configuration:
           - payloadType: Pull_Request
         then:
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - SPECS/
-                    - SPECS-EXTENDED/
-                    - SPECS-SIGNED/
+              - filesMatchPattern:
+                  pattern: "^(SPECS|SPECS-EXTENDED|SPECS-SIGNED)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Packaging
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - SPECS-EXTENDED/
+              - filesMatchPattern:
+                  pattern: "^SPECS-EXTENDED/"
+                  matchAny: true
             then:
               - addLabel:
                   label: specs-extended
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/docs/
+              - filesMatchPattern:
+                  pattern: "^toolkit/docs/"
+                  matchAny: true
             then:
               - addLabel:
                   label: documentation
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/tools/
-                    - toolkit/scripts/
+              - filesMatchPattern:
+                  pattern: "^toolkit/(tools|scripts)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Tools
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/imageconfigs/
-                    - toolkit/tools/imagegen/configuration
+              - filesMatchPattern:
+                  pattern: "^toolkit/(imageconfigs|tools/imagegen/configuration)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Schema
