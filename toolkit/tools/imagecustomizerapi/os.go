@@ -24,12 +24,12 @@ type OS struct {
 	Verity              *Verity             `yaml:"verity"`
 	Overlays            *[]Overlay          `yaml:"overlays"`
 	BootLoader          BootLoader          `yaml:"bootloader"`
-	Uki                 Uki                 `yaml:"uki"`
+	Uki                 *Uki                 `yaml:"uki"`
 }
 
 func (s *OS) IsValid() error {
 	var err error
-	err = s.ResetBootLoaderType.IsValid()
+	err = s.BootLoader.Reset.IsValid()
 	if err != nil {
 		return err
 	}

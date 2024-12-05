@@ -18,7 +18,7 @@ func (b BootLoader) IsValid() error {
 		return fmt.Errorf("invalid 'type' field in BootLoader: %w", err)
 	}
 
-	err := b.Reset.IsValid()
+	err = b.Reset.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid 'reset' field in BootLoader: %w", err)
 	}
