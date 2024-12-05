@@ -35,7 +35,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        config
+Source1:        kernel-lvbs-%{_arch}-normal.config
 #Source2:
 Source3:        sha512hmac-openssl.sh
 Source4:        azurelinux-ca-20230216.pem
