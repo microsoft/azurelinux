@@ -371,7 +371,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Tue Dec 03 2024 aperezguevar <aperezguevar@microsoft.com> - 6.6.57.1-6
-- Enable NUMA BALANCING and UCLAMP task for HPC workloads
+- Bump release to match kernel
 
 * Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-5
 - Initial CBL-Mariner import from Photon (license: Apache2).

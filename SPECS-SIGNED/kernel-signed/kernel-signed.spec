@@ -146,7 +146,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Tue Dec 03 2024 aperezguevar <aperezguevar@microsoft.com> - 6.6.57.1-6
-- Enable NUMA BALANCING and UCLAMP task for HPC workloads
+- Bump release to match kernel
 
 * Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
 - Bump release to match kernel
