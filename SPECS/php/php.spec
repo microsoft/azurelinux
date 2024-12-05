@@ -1515,7 +1515,8 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 %changelog
 * Wed Dec 04 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 8.3.14-1
-- Upgrade to 8.3.14
+- Upgrade to 8.3.14 to fix CVE-2024-8932, CVE-2024-11234, CVE-2024-11233, CVE-2024-11236
+- Update patch for phpinfo
 
 * Wed Oct 16 2024 Archana Choudhary <archana1@microsoft.com> - 8.3.12-1
 - Upgarde to 8.3.12 to fix CVE-2024-8927, CVE-2024-8925
