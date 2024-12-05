@@ -175,26 +175,31 @@ manipulation of eBPF programs and maps.
 
 %prep
 %autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-make mrproper
 
-cp %{SOURCE1} .config
+CheckConfig() {
+    make mrproper
 
-cp .config current_config
-make LC_ALL=  ARCH=%{arch} oldconfig
+    cp $1 .config
 
-# Verify the config files match
-cp .config new_config
-diff --unified new_config current_config > config_diff || true
-if [ -s config_diff ]; then
-    printf "\n\n\n\n\n\n\n\n"
-    cat config_diff
-    printf "\n\n\n\n\n\n\n\n"
-    echo "Config file has unexpected changes"
-    echo "Update config file to set changed values explicitly"
+    cp .config current_config
+    make LC_ALL=  ARCH=%{arch} oldconfig
 
-#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
-fi
+    # Verify the config files match
+    cp .config new_config
+    diff --unified new_config current_config > config_diff || true
+    if [ -s config_diff ]; then
+        printf "\n\n\n\n\n\n\n\n"
+        cat config_diff
+        printf "\n\n\n\n\n\n\n\n"
+        echo "Config file has unexpected changes"
+        echo "Update config file to set changed values explicitly"
+
+        #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+        return 1
+    fi
+}
+
+CheckConfig %{SOURCE1}
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
