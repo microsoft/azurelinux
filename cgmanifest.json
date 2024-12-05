@@ -6730,8 +6730,8 @@
         "type": "other",
         "other": {
           "name": "hyphen-it",
-          "version": "0.20071127",
-          "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/hyph_it_IT.zip"
+          "version": "5.1.1",
+          "downloadUrl": "https://pagure.io/dizionario_italiano/archive/5.1.1/dizionario_italiano-5.1.1.tar.gz"
         }
       }
     },
