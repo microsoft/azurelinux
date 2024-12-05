@@ -3448,8 +3448,8 @@
         "type": "other",
         "other": {
           "name": "fabtests",
-          "version": "1.12.0",
-          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0rc1/fabtests-1.12.0rc1.tar.bz2"
+          "version": "1.18.0",
+          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.18.0/fabtests-1.18.0.tar.bz2"
         }
       }
     },
