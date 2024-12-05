@@ -39,6 +39,7 @@ Source1:        sha512hmac-openssl.sh
 Source2:        azurelinux-ca-20230216.pem
 Source3:        cpupower
 Source4:        cpupower.service
+Source5:        kernel-lvbs-%{_arch}-secure.initrd
 
 Source999:      kernel-lvbs.patches
 %include %{SOURCE999}
@@ -195,12 +196,16 @@ CheckConfig() {
 }
 
 CheckConfig Microsoft/azl3_normal_config lvbs_normal
+CheckConfig Microsoft/azl3_secure_config lvbs_secure
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's,CONFIG_SYSTEM_TRUSTED_KEYS="",CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem",' lvbs_normal/.config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' lvbs_normal/.config
+
+# Place the secure initrd to get built into the secure kernel
+cp %{SOURCE5} Microsoft/initrd-sk.cpio
 
 %build
 export KBUILD_OUTPUT=lvbs_normal
@@ -232,6 +237,8 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
+
+make O=lvbs_secure VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} vmlinux
 
 %install
 export KBUILD_OUTPUT=lvbs_normal
@@ -312,6 +319,9 @@ make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
+
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
+objcopy -O binary -R .note -R .comment -S lvbs_secure/vmlinux %{buildroot}/lib/modules/%{uname_r}/secure/vmlinux.bin
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
