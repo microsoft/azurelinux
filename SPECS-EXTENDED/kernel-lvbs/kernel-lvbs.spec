@@ -203,7 +203,7 @@ CheckConfig %{SOURCE1}
 
 # Add CBL-Mariner cert into kernel's trusted keyring
 cp %{SOURCE4} certs/mariner.pem
-sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+sed -i 's,CONFIG_SYSTEM_TRUSTED_KEYS="",CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem",' .config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 
