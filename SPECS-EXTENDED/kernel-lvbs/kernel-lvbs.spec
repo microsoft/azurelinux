@@ -17,14 +17,12 @@
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
-%define config_source %{SOURCE1}
 %endif
 
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
 %define arch arm64
 %define archdir arm64
-%define config_source %{SOURCE2}
 %endif
 
 Summary:        Linux Kernel
@@ -38,11 +36,10 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-Source2:        config_aarch64
-Source3:        sha512hmac-openssl.sh
-Source4:        azurelinux-ca-20230216.pem
-Source5:        cpupower
-Source6:        cpupower.service
+Source2:        sha512hmac-openssl.sh
+Source3:        azurelinux-ca-20230216.pem
+Source4:        cpupower
+Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
 BuildRequires:  audit-devel
@@ -91,6 +88,9 @@ Requires(postun): coreutils
 #  10. Verify the rest of the config file looks ok
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
+
+# LVBS is x86_64 only, for now
+ExclusiveArch: x86_64
 
 %description
 The kernel package contains the Linux kernel.
@@ -174,10 +174,10 @@ manipulation of eBPF programs and maps.
 %autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 make mrproper
 
-cp %{config_source} .config
+cp %{SOURCE1} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE3} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -237,9 +237,9 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -c -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
-install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
