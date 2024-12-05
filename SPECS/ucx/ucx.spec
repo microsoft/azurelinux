@@ -11,7 +11,7 @@
 %bcond_with    vfs
 %bcond_with    mad
 %bcond_with    ze
-%bcond_without mlx5
+%bcond_with    mlx5
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
