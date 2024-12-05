@@ -1239,7 +1239,7 @@ rm -f %{name}.lang
 * Thu May 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 255-13
 - Supply 10-console-messages.conf sysctl to lower the default kernel messages to the console
 
-* Thu Apr 18 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
+* Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
 - move libidn2 recommends from core package to systemd-networkd
 
 * Wed Apr 24 2024 Dan Streetman <ddstreet@microsoft.com> - 255-11
@@ -1255,7 +1255,7 @@ rm -f %{name}.lang
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-8
 - Obsolete the new systemd-bootstrap-libs subpacakge.
 
-* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
+* Thu Feb 29 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
 - remove use of %%azure (or %%azl) macro
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6
