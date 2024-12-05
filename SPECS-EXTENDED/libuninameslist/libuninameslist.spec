@@ -1,17 +1,18 @@
-Name:           libuninameslist
-Version:        20200313
-Release:        2%{?dist}
-
-Summary:        A library providing Unicode character names and annotations
-
-License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: BSD-3-Clause
+Name:           libuninameslist
+Version:        20230916
+Release:        1%{?dist}
+Summary:        A library providing Unicode character names and annotations
+License:        BSD-3-Clause
 URL:            https://github.com/fontforge/libuninameslist
-Source0:        https://github.com/fontforge/libuninameslist/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/fontforge/libuninameslist/archive/%{version}.tar.gz
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  make
 
 %description
 libuninameslist provides applications with access to Unicode name and
@@ -51,6 +52,10 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_libdir}/pkgconfig/libuninameslist.pc
 
 %changelog
+* Fri Nov 15 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.20230916-1
+- Update Azure-Linux import from Fedora 41 (license: BSD-3-Clause).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200313-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
