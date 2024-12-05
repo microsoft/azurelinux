@@ -5,8 +5,8 @@ Release:       1%{?dist}
 License:       GPL-2.0-only
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
-URL:           http://www.rodsbooks.com/gdisk/
-Source0:       http://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:           https://www.rodsbooks.com/gdisk/
+Source0:       https://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: gcc-c++
 BuildRequires: libuuid-devel
 BuildRequires: make
