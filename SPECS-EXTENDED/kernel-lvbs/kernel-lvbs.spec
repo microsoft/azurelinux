@@ -179,17 +179,11 @@ make mrproper
 
 cp %{SOURCE1} .config
 
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
-sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
-
 cp .config current_config
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
-sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
 diff --unified new_config current_config > config_diff || true
 if [ -s config_diff ]; then
     printf "\n\n\n\n\n\n\n\n"
@@ -201,6 +195,12 @@ if [ -s config_diff ]; then
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
+
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE4} certs/mariner.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 
 %build
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
