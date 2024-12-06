@@ -21,6 +21,7 @@ Patch3:  CVE-2024-29018.patch
 Patch4:  CVE-2024-24786.patch
 Patch5:  CVE-2024-36621.patch
 Patch6:  CVE-2024-36620.patch
+Patch7:  CVE-2024-36623.patch
 
 %{?systemd_requires}
 
@@ -117,7 +118,7 @@ fi
 
 %changelog
 * Wed Dec 04 2024 Adit Jha <aditjha@microsoft.com> - 25.0.3-8
-- Fix CVE-2024-36620 & CVE-2024-36621 with patches
+- Fix CVE-2024-36620, CVE-2024-36621, and CVE-2024-36623 with patches
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 25.0.3-7
 - Fix CVE-2024-24786 by patching
