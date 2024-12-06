@@ -25,6 +25,7 @@ Patch5:  enable-docker-proxy-libexec-search.patch
 Patch6:  CVE-2024-41110.patch
 Patch7:  CVE-2024-29018.patch
 Patch8:  CVE-2024-36621.patch
+Patch9:  CVE-2024-36623.patch
 
 %{?systemd_requires}
 
@@ -126,7 +127,7 @@ fi
 
 %changelog
 * Wed Dec 04 2024 Adit Jha <aditjha@microsoft.com> - 24.0.9-11
-- Patch CVE-2024-36621
+- Patch CVE-2024-36621 & CVE-2024-36623
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.9-10
 - Bump release to rebuild with go 1.22.7
