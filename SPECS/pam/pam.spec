@@ -72,10 +72,10 @@ find %{buildroot} -name "*.la" -delete -print
 %check
 install -v -m755 -d %{_sysconfdir}/pam.d
 cat > %{_sysconfdir}/pam.d/other << "EOF"
-auth     required       pam_deny.so nodns
-account  required       pam_deny.so nodns
-password required       pam_deny.so nodns
-session  required       pam_deny.so nodns
+auth     required       pam_deny.so
+account  required       pam_deny.so
+password required       pam_deny.so
+session  required       pam_deny.so
 EOF
 %make_build check
 
