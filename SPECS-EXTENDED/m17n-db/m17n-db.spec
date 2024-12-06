@@ -2,17 +2,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:       m17n-db
 Summary:    Multilingualization datafiles for m17n-lib
-Version:    1.8.0
-Release:    10%{?dist}
-License:    LGPLv2+
+Version:    1.8.9
+Release:    1%{?dist}
+License:    LGPL-2.1-or-later
 URL:        http://www.nongnu.org/m17n
 
 Source0:    http://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
-## Till the Inscript2 gets upstreamed in m17n-db, use this source
-Source1:    http://releases.pagure.org/inscript2/inscript2-20160423.tar.gz
 # Following is awaiting for upstream commit
-Source2:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
-Source3:    https://github.com/mike-fabian/m17n-db-sayura/archive/1.0.0.tar.gz#/m17n-db-sayura-1.0.0.tar.gz
+Source1:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
 
 BuildArch:  noarch
 BuildRequires: gettext
@@ -21,14 +18,6 @@ BuildRequires: gcc
 
 Obsoletes:  m17n-contrib < 1.1.14-4.fc20
 Provides:   m17n-contrib = 1.1.14-4.fc20
-
-# Fedora speicifc patches
-Patch0:     %{name}-1.6.5-bn-itrans-bug182227.patch
-Patch1:     %{name}-1.6.5-kn-itrans_key-summary_bug228806.patch
-Patch2:     %{name}-1.6.5-kn-inscript-ZWNJ-bug440007.patch
-Patch3:     %{name}-1.6.5-number_pad_itrans-222634.patch
-Patch4:     %{name}-1.7.0-fix-e-o-mappings.patch
-Patch5:     %{name}-1.8.0-inscript2-mni-sat.patch
 
 %description
 This package contains multilingualization (m17n) datafiles for m17n-lib
@@ -56,40 +45,20 @@ m17n-db development files
 %prep
 %autosetup -N
 
-##extract inscript2 maps
-tar xzf %{SOURCE1}
-##extract m17n-db-sayura
-tar xzf %{SOURCE3}
-
 %autopatch -p0
-
-# Following fixes https://bugzilla.redhat.com/show_bug.cgi?id=1487512
-sed -i 's/ ("ld" "སྡ")/ ("ld" "ལྡ")/g' MIM/bo-ewts.mim
 
 %build
 %configure
-make %{?_smp_mflags}
+%{make_build}
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
-
-# don't ship unijoy map for now
-rm %{buildroot}%{_datadir}/m17n/bn-unijoy.mim
-rm %{buildroot}%{_datadir}/m17n/icons/bn-unijoy.png
+%{make_install}
 
 #removing ispell.mim for rh#587927
 rm %{buildroot}%{_datadir}/m17n/ispell.mim
 
-#install inscript2 keymaps
-cp -p inscript2/IM/* %{buildroot}%{_datadir}/m17n/
-cp -p inscript2/icons/* %{buildroot}%{_datadir}/m17n/icons
-
 # install minglish keymap
-cp -p %{SOURCE2} %{buildroot}%{_datadir}/m17n
-
-# install si-sayura
-cp -p m17n-db-sayura-1.0.0/si-sayura.mim %{buildroot}%{_datadir}/m17n
-cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icons
+/usr/bin/install -m 644 %{SOURCE1} %{buildroot}%{_datadir}/m17n
 
 # For installing the translation files
 %find_lang %name
@@ -125,6 +94,7 @@ cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icon
 %{_datadir}/m17n/v*.mim
 %{_datadir}/m17n/y*.mim
 # icons for keymaps
+%dir %{_datadir}/m17n/icons
 %{_datadir}/m17n/icons/*.png
 %exclude %{_datadir}/m17n/zh-*.mim
 %exclude %{_datadir}/m17n/icons/zh*.png
@@ -147,6 +117,10 @@ cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icon
 %{_datadir}/pkgconfig/m17n-db.pc
 
 %changelog
+* Fri Dec 06 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.8.9-1
+- Upgraded to version 1.8.9
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
