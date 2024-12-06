@@ -22,12 +22,9 @@ BuildRequires:  kernel-headers
 Flannel is a simple and easy way to configure a layer 3 network fabric designed for Kubernetes.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -a 1
 
 %build
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-
 export GOPATH=%{our_gopath}
 export TAG=v%{version}
 %ifarch x86_64
