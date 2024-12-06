@@ -66,3 +66,4 @@ Patch: 0065-Add-config-for-secure-kernel.patch
 Patch: 0066-arch-x86-xen-enlighten_pv-Fix-compile-error.patch
 Patch: 0067-Microsoft-Add-config-fragment-to-build-lvbs-enabled-.patch
 Patch: 0068-Microsoft-Add-lvbs-build-script.patch
+Patch: 0001-change-hardcoded-firmware-location-of-sk_loader-and-.patch

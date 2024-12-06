@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-    "kernel-lvbs.patches": "764c16a4eceaaea665ce475d8811d46a209589e090de8a6443a10bb55fc20e25",
+    "kernel-lvbs.patches": "1ce6ba0938b0e7ee38584617a30c4c500a8d4f1be1e8f97e9477d60083fee290",
     "kernel-lvbs-x86_64-normal.config": "16416876577cb373ab7d9f87d74523849129cf89e9107608b25fd7bad7512f44",
     "kernel-lvbs-x86_64-secure.config": "df6a840f205558ecbfa75a27103d4e9b73de775f55dab33329af0d547c7d3130",
     "kernel-lvbs-x86_64-secure.initrd": "3ec38163899f8860cb6054274b6ab7001579cfc4ad0ce7971a59bb5fa56b386f",
