@@ -12,7 +12,19 @@ SELINUX="enforcing"
 getargbool 0 rd.live.overlay.overlayfs && overlayfs="yes"
 
 if [ -n "$overlayfs" ]; then
-    [ -e /sysroot ] && chcon -t root_t /sysroot
-    [ -e /run/overlayfs ] && chcon -t root_t /run/overlayfs
-    [ -e /run/ovlwork ] && chcon -t root_t /run/ovlwork
+
+    # Get the current root folder context
+    rootDirContext=$($NEWROOT/usr/sbin/matchpathcon -f $NEWROOT/etc/selinux/targeted/contexts/files/file_contexts -m dir /)
+
+    # Parse the context to extract the label
+    # The contextshould on the form: "/       system_u:object_r:root_t:s0"
+    IFS='\t' read -r _ selinux <<< "$rootDirContext"
+    echo "root folder context: ($selinux)"
+    IFS=':' read -r _ _ dirLabel _ <<< "$selinux"
+    echo "root folder label  : ($dirLabel)"
+
+    # Set the labels on the target files
+    [ -e /sysroot ] && chcon -t $dirLabel /sysroot
+    [ -e /run/overlayfs ] && chcon -t $dirLabel /run/overlayfs
+    [ -e /run/ovlwork ] && chcon -t $dirLabel /run/ovlwork
 fi
