@@ -2,7 +2,6 @@
 %global gopath          %{_datadir}/gocode
 %global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
 %global ms_go_revision  2
-%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -16,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.23.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -129,22 +128,12 @@ mkdir -p %{buildroot}%{gopath}/src/code.google.com/p/
 # This file is not necessary: recent Go toolsets have good defaults.
 # Keep the file, but leave it blank. This makes the upgrade path very simple.
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
-cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
-EOF
 
 %post -p /sbin/ldconfig
-
-alternatives --install %{_bindir}/go go %{goroot}/bin/go %{go_priority}
-alternatives --install %{_bindir}/gofmt gofmt %{goroot}/bin/gofmt %{go_priority}
 
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ]; then
-  # This is uninstall
-  alternatives --remove go %{goroot}/bin/go
-  alternatives --remove gofmt %{goroot}/bin/gofmt
-
-  rm %{_sysconfdir}/profile.d/go-exports.sh
   rm -rf /opt/go
   exit 0
 fi
@@ -154,7 +143,6 @@ fi
 %license LICENSE
 %exclude %{goroot}/src/*.rc
 %exclude %{goroot}/include/plan9
-%{_sysconfdir}/profile.d/go-exports.sh
 %{goroot}/*
 %{gopath}/src
 %exclude %{goroot}/src/pkg/debug/dwarf/testdata
@@ -162,6 +150,11 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Dec 06 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.3-3
+- Get rid of alternatives as we do not use that
+- Fix old changelog date
+- Drop go-exports.sh
+
 * Tue Dec 03 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-2
 - Bump version to 1.23.3-2
 
@@ -186,7 +179,7 @@ fi
 * Tue Jun 04 2024 Davis Goodin <dagood@microsoft.com> - 1.22.4-1
 - Bump version to 1.22.4-1
 
-* Tue May 07 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
+* Mon May 27 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
 - Bump version to 1.22.3-1
 
 * Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2
