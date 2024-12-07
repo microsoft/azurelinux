@@ -1,64 +1,22 @@
-From 5d7d3ac384cf2549b62ee5466bfbf6ef12b82f75 Mon Sep 17 00:00:00 2001
-From: George Mileka <gmileka@microsoft.com>
-Date: Fri, 22 Nov 2024 17:04:06 -0800
-Subject: [PATCH] Enable SELinux for the LiveOS ISO scenario.
+From 274c6b9a9c490fff2633b42f73d792274a3b6de4 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@outlook.com>
+Date: Fri, 6 Dec 2024 14:21:18 -0800
+Subject: [PATCH] Iteration 4
 
-In the LiveOS ISO scenario, the initrd is configured to run several systemd daemons,
-then pivots to the rootfs where the same daemons are re-started. When SELinux is
-enabled, the daemons fail on the second run because some of the targets (mainly
-file descriptors) are already tagged kernel_t and there is no policy to allow those
-daemons to access those targets.
-
-This fix allows this flow - which in turn allows the LiveOS ISO scenario with SELinux
-enabled.
 ---
- policy/modules/admin/cloudinit.te    |  1 +
- policy/modules/admin/rpm.te          |  1 +
  policy/modules/admin/usermanage.te   |  2 ++
  policy/modules/apps/loadkeys.te      |  2 ++
  policy/modules/kernel/devices.if     | 18 ++++++++++++++++++
  policy/modules/kernel/kernel.if      | 19 +++++++++++++++++++
  policy/modules/kernel/kernel.te      |  1 +
- policy/modules/services/chronyd.te   |  1 +
- policy/modules/services/cron.te      |  1 +
- policy/modules/services/dbus.te      |  1 +
- policy/modules/services/ssh.te       |  2 ++
  policy/modules/system/authlogin.te   |  1 +
- policy/modules/system/fstools.te     |  1 +
  policy/modules/system/getty.te       |  2 ++
- policy/modules/system/hostname.te    |  1 +
+ policy/modules/system/init.te        |  7 +++++++
  policy/modules/system/locallogin.te  |  1 +
- policy/modules/system/logging.te     |  2 ++
- policy/modules/system/mount.te       |  1 +
  policy/modules/system/selinuxutil.te |  2 ++
- policy/modules/system/systemd.te     | 14 ++++++++++++++
  policy/modules/system/udev.te        |  2 ++
- 21 files changed, 76 insertions(+)
+ 11 files changed, 57 insertions(+)
 
-diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
-index 94f7eabd2..2529970f2 100644
---- a/policy/modules/admin/cloudinit.te
-+++ b/policy/modules/admin/cloudinit.te
-@@ -50,6 +50,7 @@ dontaudit cloud_init_t self:capability { net_admin sys_admin sys_tty_config };
- allow cloud_init_t self:fifo_file rw_fifo_file_perms;
- allow cloud_init_t self:unix_dgram_socket create_socket_perms;
- allow cloud_init_t self:passwd passwd;
-+allow cloud_init_t kernel_t:fd use;
- 
- allow cloud_init_t cloud_init_log_t:file { create_file_perms append_file_perms read setattr };
- logging_log_filetrans(cloud_init_t, cloud_init_log_t, file)
-diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
-index 809e8c573..7c2f39aa2 100644
---- a/policy/modules/admin/rpm.te
-+++ b/policy/modules/admin/rpm.te
-@@ -96,6 +96,7 @@ allow rpm_t self:msgq create_msgq_perms;
- allow rpm_t self:msg { send receive };
- allow rpm_t self:file rw_file_perms;
- allow rpm_t self:netlink_kobject_uevent_socket create_socket_perms;
-+allow rpm_t kernel_t:fd use;
- 
- allow rpm_t rpm_log_t:file { append_file_perms create_file_perms setattr_file_perms };
- logging_log_filetrans(rpm_t, rpm_log_t, file)
 diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
 index 57a9848bc..ef24fb85b 100644
 --- a/policy/modules/admin/usermanage.te
@@ -152,73 +110,17 @@ index 1d696a07c..04a36152b 100644
  ## <summary>
  ##	Getattr on kernel unix datagram sockets.
 diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
-index ea08036b6..764920926 100644
+index ea08036b6..59c1afeaf 100644
 --- a/policy/modules/kernel/kernel.te
 +++ b/policy/modules/kernel/kernel.te
-@@ -285,6 +285,7 @@ kernel_request_load_module(kernel_t)
- allow unlabeled_t self:packet { forward_in forward_out };
- corenet_in_generic_if(unlabeled_t)
- corenet_in_generic_node(unlabeled_t)
+@@ -238,6 +238,7 @@ sid tcp_socket		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
+ #
+ 
+ allow kernel_t self:capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap };
 +allow kernel_t self:capability2 checkpoint_restore;
- 
- corenet_all_recvfrom_unlabeled(kernel_t)
- corenet_all_recvfrom_netlabel(kernel_t)
-diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
-index 500ce6fe2..c12ebd38a 100644
---- a/policy/modules/services/chronyd.te
-+++ b/policy/modules/services/chronyd.te
-@@ -60,6 +60,7 @@ allow chronyd_t self:shm create_shm_perms;
- allow chronyd_t self:fifo_file rw_fifo_file_perms;
- 
- allow chronyd_t chronyd_keys_t:file read_file_perms;
-+allow chronyd_t kernel_t:fd use;
- 
- manage_dirs_pattern(chronyd_t, chronyd_tmpfs_t, chronyd_tmpfs_t)
- manage_files_pattern(chronyd_t, chronyd_tmpfs_t, chronyd_tmpfs_t)
-diff --git a/policy/modules/services/cron.te b/policy/modules/services/cron.te
-index 605bd7aba..eed964e3f 100644
---- a/policy/modules/services/cron.te
-+++ b/policy/modules/services/cron.te
-@@ -64,6 +64,7 @@ type crond_exec_t;
- init_daemon_domain(crond_t, crond_exec_t)
- domain_interactive_fd(crond_t)
- domain_cron_exemption_source(crond_t)
-+allow crond_t kernel_t:fd use;
- 
- type crond_initrc_exec_t;
- init_script_file(crond_initrc_exec_t)
-diff --git a/policy/modules/services/dbus.te b/policy/modules/services/dbus.te
-index 6ae874dd7..a03c1db70 100644
---- a/policy/modules/services/dbus.te
-+++ b/policy/modules/services/dbus.te
-@@ -73,6 +73,7 @@ userdom_user_tmp_file(session_dbusd_tmp_t)
- type system_dbusd_t;
- init_system_domain(system_dbusd_t, dbusd_exec_t)
- init_named_socket_activation(system_dbusd_t, system_dbusd_runtime_t)
-+allow system_dbusd_t kernel_t:fd use;
- 
- type system_dbusd_runtime_t alias system_dbusd_var_run_t;
- files_runtime_file(system_dbusd_runtime_t)
-diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
-index f3c966ed0..10c092cf1 100644
---- a/policy/modules/services/ssh.te
-+++ b/policy/modules/services/ssh.te
-@@ -240,6 +240,7 @@ allow sshd_t self:capability dac_read_search;
- # so a tunnel can point to another ssh tunnel
- allow sshd_t self:netlink_route_socket r_netlink_socket_perms;
- allow sshd_t self:key { search link write };
-+allow sshd_t kernel_t:fd use;
- 
- allow sshd_t sshd_keytab_t:file read_file_perms;
- 
-@@ -339,6 +340,7 @@ dontaudit ssh_keygen_t self:capability sys_tty_config;
- allow ssh_keygen_t self:process { sigchld sigkill sigstop signull signal };
- 
- allow ssh_keygen_t self:unix_stream_socket create_stream_socket_perms;
-+allow ssh_keygen_t kernel_t:fd use;
- 
- allow ssh_keygen_t sshd_key_t:file manage_file_perms;
- files_etc_filetrans(ssh_keygen_t, sshd_key_t, file)
+ allow kernel_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr noatsecure siginh rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+ allow kernel_t self:shm create_shm_perms;
+ allow kernel_t self:sem create_sem_perms;
 diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
 index 9dfef7a0c..791be68c2 100644
 --- a/policy/modules/system/authlogin.te
@@ -231,18 +133,6 @@ index 9dfef7a0c..791be68c2 100644
  files_list_etc(chkpwd_t)
  
  kernel_dontaudit_search_kernel_sysctl(chkpwd_t)
-diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
-index 18a42890c..cc454bc50 100644
---- a/policy/modules/system/fstools.te
-+++ b/policy/modules/system/fstools.te
-@@ -47,6 +47,7 @@ allow fsadm_t self:shm create_shm_perms;
- allow fsadm_t self:sem create_sem_perms;
- allow fsadm_t self:msgq create_msgq_perms;
- allow fsadm_t self:msg { send receive };
-+allow fsadm_t kernel_t:fd use;
- 
- can_exec(fsadm_t, fsadm_exec_t)
- 
 diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
 index a900226bf..360f7c67f 100644
 --- a/policy/modules/system/getty.te
@@ -256,18 +146,30 @@ index a900226bf..360f7c67f 100644
  
  read_files_pattern(getty_t, getty_conf_t, getty_conf_t)
  read_lnk_files_pattern(getty_t, getty_conf_t, getty_conf_t)
-diff --git a/policy/modules/system/hostname.te b/policy/modules/system/hostname.te
-index c3f7c579b..1bf63fe48 100644
---- a/policy/modules/system/hostname.te
-+++ b/policy/modules/system/hostname.te
-@@ -20,6 +20,7 @@ allow hostname_t self:capability sys_admin;
- allow hostname_t self:process { sigchld sigkill signal signull sigstop };
- allow hostname_t self:unix_stream_socket create_stream_socket_perms;
- dontaudit hostname_t self:capability sys_tty_config;
-+allow hostname_t kernel_t:fd use;
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 9ec685c74..a1d90762b 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1542,12 +1542,19 @@ optional_policy(`
+ 	zebra_read_config(initrc_t)
+ ')
  
- kernel_list_proc(hostname_t)
- kernel_read_proc_symlinks(hostname_t)
++########################################
++#
++# Rules applied to all system processes
++#
++kernel_use_fds(systemprocess)
++
+ ########################################
+ #
+ # Rules applied to all daemons
+ #
+ 
+ domain_dontaudit_use_interactive_fds(daemon)
++kernel_use_fds(daemon)
+ 
+ # daemons started from init will
+ # inherit fds from init for the console
 diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
 index 8330be8a9..9f2f160a4 100644
 --- a/policy/modules/system/locallogin.te
@@ -280,38 +182,6 @@ index 8330be8a9..9f2f160a4 100644
  
  allow local_login_t local_login_lock_t:file manage_file_perms;
  files_lock_filetrans(local_login_t, local_login_lock_t, file)
-diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 6892a0be3..3d6acf30c 100644
---- a/policy/modules/system/logging.te
-+++ b/policy/modules/system/logging.te
-@@ -118,6 +118,7 @@ allow auditctl_t self:netlink_audit_socket nlmsg_readpriv;
- read_files_pattern(auditctl_t, auditd_etc_t, auditd_etc_t)
- allow auditctl_t auditd_etc_t:dir list_dir_perms;
- dontaudit auditctl_t auditd_etc_t:file map;
-+allow auditctl_t kernel_t:fd use;
- 
- corecmd_search_bin(auditctl_t)
- 
-@@ -173,6 +174,7 @@ allow auditd_t self:tcp_socket create_stream_socket_perms;
- allow auditd_t auditd_etc_t:dir list_dir_perms;
- allow auditd_t auditd_etc_t:file read_file_perms;
- dontaudit auditd_t auditd_etc_t:file map;
-+allow auditd_t kernel_t:fd use;
- 
- manage_files_pattern(auditd_t, auditd_log_t, auditd_log_t)
- allow auditd_t auditd_log_t:dir setattr;
-diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
-index 8cd51d563..93822e529 100644
---- a/policy/modules/system/mount.te
-+++ b/policy/modules/system/mount.te
-@@ -51,6 +51,7 @@ dontaudit mount_t self:process setrlimit;
- 
- allow mount_t mount_tmp_t:file manage_file_perms;
- allow mount_t mount_tmp_t:dir manage_dir_perms;
-+allow mount_t kernel_t:fd use;
- 
- can_exec(mount_t, mount_exec_t)
- 
 diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
 index 8e521e583..c7fb76550 100644
 --- a/policy/modules/system/selinuxutil.te
@@ -325,122 +195,6 @@ index 8e521e583..c7fb76550 100644
  
  ########################################
  #
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 3ad5bb651..120e55a8e 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -120,6 +120,7 @@ init_system_domain(systemd_generator_t, systemd_generator_exec_t)
- type systemd_homed_t;
- type systemd_homed_exec_t;
- init_daemon_domain(systemd_homed_t, systemd_homed_exec_t)
-+allow systemd_homed_t kernel_t:fd use;
- 
- type systemd_homework_t;
- type systemd_homework_exec_t;
-@@ -146,6 +147,7 @@ init_daemon_domain(systemd_hostnamed_t, systemd_hostnamed_exec_t)
- type systemd_hw_t;
- type systemd_hw_exec_t;
- init_system_domain(systemd_hw_t, systemd_hw_exec_t)
-+allow systemd_hw_t kernel_t:fd use;
- 
- type systemd_hwdb_t;
- files_type(systemd_hwdb_t)
-@@ -749,6 +751,7 @@ udev_read_runtime_files(systemd_homework_t)
- 
- allow systemd_hostnamed_t self:capability sys_admin;
- allow systemd_hostnamed_t self:process setfscreate;
-+allow systemd_hostnamed_t kernel_t:fd use;
- 
- fs_getattr_cgroup(systemd_hostnamed_t)
- fs_getattr_xattr_fs(systemd_hostnamed_t)
-@@ -830,6 +833,7 @@ seutil_read_file_contexts(systemd_hw_t)
- #
- 
- dontaudit systemd_journal_init_t self:capability net_admin;
-+allow systemd_journal_init_t kernel_t:fd use;
- 
- manage_dirs_pattern(systemd_journal_init_t, systemd_journal_t, systemd_journal_t)
- manage_files_pattern(systemd_journal_init_t, systemd_journal_t, systemd_journal_t)
-@@ -906,6 +910,7 @@ allow systemd_logind_t self:process { getcap setfscreate };
- allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
- allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
- allow systemd_logind_t self:fifo_file rw_fifo_file_perms;
-+allow systemd_logind_t kernel_t:fd use;
- 
- allow systemd_logind_t systemd_logind_var_lib_t:dir manage_dir_perms;
- allow systemd_logind_t systemd_logind_var_lib_t:file manage_file_perms;
-@@ -1233,6 +1238,7 @@ allow systemd_networkd_t self:rawip_socket create_socket_perms;
- allow systemd_networkd_t self:tun_socket { create_socket_perms relabelfrom relabelto };
- allow systemd_networkd_t self:udp_socket create_socket_perms;
- allow systemd_networkd_t self:unix_dgram_socket create_socket_perms;
-+allow systemd_networkd_t kernel_t:fd use;
- 
- manage_dirs_pattern(systemd_networkd_t, systemd_networkd_runtime_t, systemd_networkd_runtime_t)
- manage_files_pattern(systemd_networkd_t, systemd_networkd_runtime_t, systemd_networkd_runtime_t)
-@@ -1636,6 +1642,7 @@ allow systemd_resolved_t self:capability { chown net_raw setgid setpcap setuid }
- allow systemd_resolved_t self:process { getcap setcap setfscreate signal };
- allow systemd_resolved_t self:unix_stream_socket create_stream_socket_perms;
- allow systemd_resolved_t self:tcp_socket create_stream_socket_perms;
-+allow systemd_resolved_t kernel_t:fd use;
- 
- allow systemd_resolved_t systemd_networkd_runtime_t:dir watch;
- 
-@@ -1723,6 +1730,7 @@ tunable_policy(`systemd_socket_proxyd_connect_any',`
- #
- 
- allow systemd_sessions_t self:process setfscreate;
-+allow systemd_sessions_t kernel_t:fd use;
- 
- allow systemd_sessions_t systemd_sessions_runtime_t:file manage_file_perms;
- files_runtime_filetrans(systemd_sessions_t, systemd_sessions_runtime_t, file)
-@@ -1753,6 +1761,7 @@ systemd_log_parse_environment(systemd_sessions_t)
- # sys_ptrace for kernel.yama.ptrace_scope
- # net_admin for network sysctls
- allow systemd_sysctl_t self:capability { net_admin sys_admin sys_ptrace };
-+allow systemd_sysctl_t kernel_t:fd use;
- 
- kernel_read_kernel_sysctls(systemd_sysctl_t)
- kernel_request_load_module(systemd_sysctl_t)
-@@ -1776,6 +1785,7 @@ systemd_log_parse_environment(systemd_sysctl_t)
- allow systemd_sysusers_t self:capability { dac_read_search chown fsetid };
- allow systemd_sysusers_t self:process setfscreate;
- allow systemd_sysusers_t self:unix_dgram_socket sendto;
-+allow systemd_sysusers_t kernel_t:fd use;
- 
- files_manage_etc_files(systemd_sysusers_t)
- 
-@@ -1802,6 +1812,7 @@ systemd_log_parse_environment(systemd_sysusers_t)
- 
- allow systemd_tmpfiles_t self:capability { chown dac_override dac_read_search fowner fsetid mknod net_admin sys_admin };
- allow systemd_tmpfiles_t self:process { setfscreate getcap };
-+allow systemd_tmpfiles_t kernel_t:fd use;
- 
- allow systemd_tmpfiles_t systemd_coredump_var_lib_t:dir { manage_dir_perms relabel_dir_perms };
- allow systemd_tmpfiles_t systemd_coredump_var_lib_t:file manage_file_perms;
-@@ -1959,6 +1970,7 @@ optional_policy(`
- #
- 
- allow systemd_update_done_t self:process setfscreate;
-+allow systemd_update_done_t kernel_t:fd use;
- 
- allow systemd_update_done_t systemd_update_run_t:file manage_file_perms;
- 
-@@ -2062,6 +2074,7 @@ seutil_libselinux_linked(systemd_user_session_type)
- allow systemd_userdbd_t self:capability { dac_read_search sys_resource };
- allow systemd_userdbd_t self:process { getcap signal };
- allow systemd_userdbd_t self:unix_stream_socket create_stream_socket_perms;
-+allow systemd_userdbd_t kernel_t:fd use;
- 
- stream_connect_pattern(systemd_userdbd_t, systemd_homed_runtime_t, systemd_homed_runtime_t, systemd_homed_t)
- 
-@@ -2106,6 +2119,7 @@ systemd_log_parse_environment(systemd_userdbd_t)
- 
- allow systemd_user_runtime_dir_t self:capability { fowner chown sys_admin dac_read_search dac_override };
- allow systemd_user_runtime_dir_t self:process setfscreate;
-+allow systemd_user_runtime_dir_t kernel_t:fd use;
- 
- domain_obj_id_change_exemption(systemd_user_runtime_dir_t)
- 
 diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
 index 8af0d90e0..a7bb89658 100644
 --- a/policy/modules/system/udev.te
