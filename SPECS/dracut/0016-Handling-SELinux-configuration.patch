@@ -1,0 +1,22 @@
+From 35c237b9d7c0a971f655ebeedf4cfd8c201b8147 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Mon, 25 Nov 2024 16:27:41 -0800
+Subject: [PATCH] Handling SELinux configuration.
+
+---
+ modules.d/90overlayfs/module-setup.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules.d/90overlayfs/module-setup.sh b/modules.d/90overlayfs/module-setup.sh
+index dae20093..919df4f5 100755
+--- a/modules.d/90overlayfs/module-setup.sh
++++ b/modules.d/90overlayfs/module-setup.sh
+@@ -17,4 +17,5 @@ install() {
+     inst_hook pre-mount 01 "$moddir/prepare-overlayfs.sh"
+     inst_hook mount 01 "$moddir/mount-overlayfs.sh"     # overlay on top of block device
+     inst_hook pre-pivot 10 "$moddir/mount-overlayfs.sh" # overlay on top of network device (e.g. nfs)
++    inst_hook pre-pivot 70 "$moddir/azl-configure-selinux.sh"
+ }
+-- 
+2.34.1
+

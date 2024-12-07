@@ -62,7 +62,7 @@ const (
 	// customizations.
 	savedConfigsFileName = "saved-configs.yaml"
 
-	dracutConfig = `add_dracutmodules+=" dmsquash-live livenet "
+	dracutConfig = `add_dracutmodules+=" dmsquash-live livenet selinux "
 add_drivers+=" overlay "
 hostonly="no"
 `
@@ -411,12 +411,6 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(isoGrubCfgFileName string, pxeGrubCfgFi
 	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
 	if err != nil {
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
-	}
-
-	inputContentString, err = updateSELinuxCommandLineHelperAll(inputContentString, imagecustomizerapi.SELinuxModeDisabled,
-		true /*allowMultiple*/, false /*requireKernelOpts*/)
-	if err != nil {
-		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsLiveOSTemplate, liveOSDir, liveOSImage)
@@ -854,7 +848,7 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 		}
 	}
 
-	mksquashfsParams := []string{writeableRootfsDir, squashfsImagePath}
+	mksquashfsParams := []string{writeableRootfsDir, squashfsImagePath, "-xattrs"}
 	err = shell.ExecuteLive(false, "mksquashfs", mksquashfsParams...)
 	if err != nil {
 		return fmt.Errorf("failed to create squashfs:\n%w", err)
@@ -911,7 +905,8 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 			initrdPathInChroot,
 			"--kver", b.artifacts.kernelVersion,
 			"--filesystems", "squashfs",
-			"--include", artifactsSourceDir, artifactsTargetDir}
+			"--include", artifactsSourceDir, artifactsTargetDir,
+			"--include", "/usr/lib/locale", "/usr/lib/locale"}
 
 		return shell.ExecuteLive(true /*squashErrors*/, "dracut", dracutParams...)
 	})
