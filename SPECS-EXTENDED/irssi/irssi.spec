@@ -105,7 +105,7 @@ chmod -R u+w $RPM_BUILD_ROOT%{perl_vendorarch}
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.5-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.5-1
 - Update to version 1.4.5
 
 * Thu Jul  8 2021 Muhammad Falak R Wani <mwani@microsoft.com> - 1.2.2-6
