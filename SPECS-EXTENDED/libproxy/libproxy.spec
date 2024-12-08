@@ -103,7 +103,7 @@ developing applications that use %{name}.
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.5.8-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.5.8-1
 - Update to version 0.5.8
 
 * Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.17-5
