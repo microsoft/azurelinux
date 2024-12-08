@@ -27033,6 +27033,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-racc",
+          "version": "1.8.1",
+          "downloadUrl": "https://rubygems.org/gems/racc-1.8.1.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-rake",
           "version": "13.0.6",
           "downloadUrl": "https://github.com/ruby/rake/archive/refs/tags/v13.0.6.tar.gz"
