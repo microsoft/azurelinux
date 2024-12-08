@@ -51,7 +51,7 @@ make check
 %{_mandir}/man3/libspiro.3.gz
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-1
 - Update to version 20240903
 
 * Fri Oct 15 2021 Muhammad Falak <mwani@microsoft.com> - 20221101-1
