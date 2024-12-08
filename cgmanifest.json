@@ -5260,8 +5260,8 @@
         "type": "other",
         "other": {
           "name": "hiera",
-          "version": "3.7.0",
-          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
+          "version": "3.12.0",
+          "downloadUrl": "https://downloads.puppetlabs.com/hiera/hiera-3.12.0.tar.gz"
         }
       }
     },
