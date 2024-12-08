@@ -1,10 +1,10 @@
 Name:           ioping
-Version:        1.1
-Release:        7%{?dist}
+Version:        1.3
+Release:        1%{?dist}
 Summary:        Simple disk I/O latency monitoring tool
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://github.com/koct9i/ioping
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
@@ -33,6 +33,9 @@ export LDFLAGS="%{?__global_ldflags}"
 %{_mandir}/man1/ioping.1*
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.3-1
+- Update to version 1.3
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1-7
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Verified license.
