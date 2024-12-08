@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl3
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -11,6 +11,7 @@ Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
+Patch0:       CVE-2024-24786.patch
 
 ExclusiveArch: x86_64
 
@@ -148,6 +149,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Dec 06 2024 sthelkar <sthelkar@microsoft.com> - 3.2.0.azl3-2
+- Patch CVE-2024-24786
+
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
 - Upgrade to 3.2.0.azl3 release, refactor build instructions
 
