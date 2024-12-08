@@ -74,7 +74,7 @@ ruby -Ilib test/test_deep_merge.rb
 %doc %{gem_instdir}/README.md 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.2-1
+* Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.2-1
 - Update to version 1.2.2
 
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.1-2
