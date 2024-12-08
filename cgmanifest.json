@@ -3008,8 +3008,8 @@
         "type": "other",
         "other": {
           "name": "drpm",
-          "version": "0.5.0",
-          "downloadUrl": "https://github.com/rpm-software-management/drpm/releases/download/0.5.0/drpm-0.5.0.tar.bz2"
+          "version": "0.5.2",
+          "downloadUrl": "https://github.com/rpm-software-management/drpm/releases/download/0.5.2/drpm-0.5.2.tar.bz2"
         }
       }
     },
