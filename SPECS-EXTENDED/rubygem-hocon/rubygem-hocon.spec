@@ -80,7 +80,7 @@ mv %{buildroot}%{gem_instdir}/bin/hocon %{buildroot}/%{_bindir}/hocon
 %doc %{gem_instdir}/README.md
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.0-1
+* Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.0-1
 - Update to version 1.4.0
 
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.1-2
