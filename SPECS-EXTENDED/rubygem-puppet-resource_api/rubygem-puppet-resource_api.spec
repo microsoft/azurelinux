@@ -62,7 +62,7 @@ rm -rf %{buildroot}%{gem_instdir}/{.gitignore,.rubocop.yml,.travis.yml,appveyor.
 %{gem_instdir}/puppet-resource_api.gemspec
 
 %changelog
-* Mon Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.18-1
+* Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.18-1
 - Update to version 1.8.18
 
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.14-2
