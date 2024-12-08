@@ -1567,8 +1567,8 @@
         "type": "other",
         "other": {
           "name": "certmonger",
-          "version": "0.79.13",
-          "downloadUrl": "http://releases.pagure.org/certmonger/certmonger-0.79.13.tar.gz"
+          "version": "0.79.15",
+          "downloadUrl": "http://releases.pagure.org/certmonger/certmonger-0.79.15.tar.gz"
         }
       }
     },

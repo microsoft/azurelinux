@@ -12,8 +12,8 @@ Distribution:   Azure Linux
 %bcond_with xmlrpc
 
 Name:		certmonger
-Version:	0.79.13
-Release:	2%{?dist}
+Version:        0.79.15
+Release:        1%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
 License:	GPLv3+
@@ -238,6 +238,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Dec 10 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.79.15-1
+- Update to upstream 0.79.15 to fix build issues with certmonger.
+
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 0.79.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build-time requirement on systemd-devel for systemd pkgconfig files
