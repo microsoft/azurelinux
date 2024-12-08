@@ -1,0 +1,24 @@
+.TH "selinuxdefcon" "1" "7 May 2008" "dwalsh@redhat.com" "SELinux Command Line documentation"
+.SH "NAME"
+selinuxdefcon \- report default SELinux context for user 
+
+.SH "SYNOPSIS"
+.B selinuxdefcon [-l level] user fromcon
+
+.SH "DESCRIPTION"
+.B selinuxdefcon
+reports the default context for the specified user from the specified context
+
+.B \-l level
+mcs/mls level
+
+.SH EXAMPLE
+# selinuxdefcon jsmith system_u:system_r:sshd_t:s0
+.br
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+
+.SH AUTHOR	
+This manual page was written by Dan Walsh <dwalsh@redhat.com>.
+
+.SH "SEE ALSO"
+secon(8), selinuxconlist(8)

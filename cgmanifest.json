@@ -10851,8 +10851,8 @@
         "type": "other",
         "other": {
           "name": "libselinux",
-          "version": "3.6",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.6/libselinux-3.6.tar.gz"
+          "version": "3.7",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.7/libselinux-3.7.tar.gz"
         }
       }
     },

@@ -1,5 +1,9 @@
 {
  "Signatures": {
-  "libselinux-3.6.tar.gz": "ba4e0ef34b270e7672a5e5f1b523fe2beab3a40bb33d9389f4ad3a8728f21b52"
+  "bachradsusi.gpg": "73de67c522ebe3ddca72cdd447f64c26aeda5d217316b9ca7ef2356cff2a9dd3",
+  "libselinux-3.7.tar.gz": "ea03f42d13a4f95757997dba8cf0b26321fac5d2f164418b4cc856a92d2b17bd",
+  "libselinux-3.7.tar.gz.asc": "8dbd0457d227a7182b0a1f2f8659c2f4dd4ae837f5e69a17d1698f6c31c37f31",
+  "selinuxconlist.8": "df5e0b3258df0953242b19bf1712e0c9bee53badfcab9a91071c915d3edd2098",
+  "selinuxdefcon.8": "ddfbbc31f2eb107b12d2c949612b997ff7dc86aff78019493b0a3a894ff65e29"
  }
 }

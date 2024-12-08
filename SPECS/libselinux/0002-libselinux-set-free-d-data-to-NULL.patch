@@ -1,0 +1,78 @@
+From bd6a803553a82238a9f618d1bb22f288682f8195 Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <lautrbach@redhat.com>
+Date: Tue, 9 Jul 2024 21:13:36 +0200
+Subject: [PATCH] libselinux: set free'd data to NULL
+Content-type: text/plain
+
+Fixes segfault in selabel_open() on systems with SELinux disabled and without any
+SELinux policy installed introduced by commit 5876aca0484f ("libselinux: free
+data on selabel open failure"):
+
+    $ sestatus
+    SELinux status:                 disabled
+
+    $ cat /etc/selinux/config
+    cat: /etc/selinux/config: No such file or directory
+
+    $ matchpathcon /abc
+    [1]    907999 segmentation fault (core dumped)  matchpathcon /abc
+
+Signed-off-by: Petr Lautrbach <lautrbach@redhat.com>
+---
+ libselinux/src/label_backends_android.c | 1 +
+ libselinux/src/label_file.c             | 1 +
+ libselinux/src/label_media.c            | 1 +
+ libselinux/src/label_x.c                | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/libselinux/src/label_backends_android.c b/libselinux/src/label_backends_android.c
+index 49a87686de4c..5bad24f20d73 100644
+--- a/libselinux/src/label_backends_android.c
++++ b/libselinux/src/label_backends_android.c
+@@ -260,6 +260,7 @@ static void closef(struct selabel_handle *rec)
+ 		free(data->spec_arr);
+ 
+ 	free(data);
++	rec->data = NULL;
+ }
+ 
+ static struct selabel_lookup_rec *property_lookup(struct selabel_handle *rec,
+diff --git a/libselinux/src/label_file.c b/libselinux/src/label_file.c
+index 6c6fe328b353..87dbd0e90f2b 100644
+--- a/libselinux/src/label_file.c
++++ b/libselinux/src/label_file.c
+@@ -942,6 +942,7 @@ static void closef(struct selabel_handle *rec)
+ 		free(last_area);
+ 	}
+ 	free(data);
++	rec->data = NULL;
+ }
+ 
+ // Finds all the matches of |key| in the given context. Returns the result in
+diff --git a/libselinux/src/label_media.c b/libselinux/src/label_media.c
+index 852aeada8ff4..bae065c12a55 100644
+--- a/libselinux/src/label_media.c
++++ b/libselinux/src/label_media.c
+@@ -183,6 +183,7 @@ static void close(struct selabel_handle *rec)
+ 	    free(spec_arr);
+ 
+ 	free(data);
++	rec->data = NULL;
+ }
+ 
+ static struct selabel_lookup_rec *lookup(struct selabel_handle *rec,
+diff --git a/libselinux/src/label_x.c b/libselinux/src/label_x.c
+index a8decc7a0093..ddae4f6c22b6 100644
+--- a/libselinux/src/label_x.c
++++ b/libselinux/src/label_x.c
+@@ -210,6 +210,7 @@ static void close(struct selabel_handle *rec)
+ 	    free(spec_arr);
+ 
+ 	free(data);
++	rec->data = NULL;
+ }
+ 
+ static struct selabel_lookup_rec *lookup(struct selabel_handle *rec,
+-- 
+2.45.2
+
