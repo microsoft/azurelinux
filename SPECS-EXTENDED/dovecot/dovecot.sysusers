@@ -1,0 +1,9 @@
+#Type Name    ID    GECOS                       Home directory       Shell
+g     dovecot 97
+u     dovecot 97   "Dovecot IMAP server"        /usr/libexec/dovecot /sbin/nologin
+m     dovecot dovecot
+
+g     dovenull -
+u     dovenull -   "Dovecot - unauthorized user" /usr/libexec/dovecot /sbin/nologin
+m     dovenull dovenull
+
