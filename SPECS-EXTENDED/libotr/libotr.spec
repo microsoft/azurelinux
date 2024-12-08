@@ -78,7 +78,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 4.1.1-11
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 4.1.1-11
 - Added Essential patches from Fedora 41.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-10
