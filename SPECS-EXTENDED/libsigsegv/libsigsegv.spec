@@ -79,7 +79,7 @@ make check
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.14-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.14-1
 - Update to version 2.14
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-11
