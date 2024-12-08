@@ -129,7 +129,7 @@ make check|| {
 %endif
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.43-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.43-1
 - Update to version 0.43
 
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 0.30-3
