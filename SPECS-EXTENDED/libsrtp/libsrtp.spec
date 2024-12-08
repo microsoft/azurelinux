@@ -50,7 +50,7 @@ developing applications that use %{name}.
 %{_libdir}/*.so
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.6.0-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.6.0-1
 - Update to version 2.6.0
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-3
