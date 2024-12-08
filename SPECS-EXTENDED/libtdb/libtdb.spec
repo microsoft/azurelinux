@@ -92,7 +92,7 @@ zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.12-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.12-1
 - Update to version 1.4.12
 
 * Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 1.4.8-1
