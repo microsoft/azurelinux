@@ -147,7 +147,7 @@ make test
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.14.0-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.14.0-1
 - Update to version 0.14.0
 
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-4
