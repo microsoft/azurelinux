@@ -66,7 +66,7 @@ find $RPM_BUILD_ROOT -name '*.la' -print -delete
 
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.6.6-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.6.6-1
 - Update to version 3.6.6
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.3-3
