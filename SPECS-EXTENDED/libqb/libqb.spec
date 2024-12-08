@@ -87,7 +87,7 @@ This package contains a program to create nicely-formatted man pages from Doxyge
 %{_mandir}/man1/doxygen2man.1.gz
 
 %changelog
-* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.8-1
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.8-1
 - Update to version 2.0.8
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-7
