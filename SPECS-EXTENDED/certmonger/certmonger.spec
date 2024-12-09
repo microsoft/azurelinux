@@ -12,13 +12,13 @@ Distribution:   Azure Linux
 %bcond_with xmlrpc
 
 Name:		certmonger
-Version:        0.79.15
+Version:        0.79.20
 Release:        1%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
-License:	GPLv3+
+License:	GPLv3 or later (with an exception that it can be linked with OpenSSL).
 URL:		http://pagure.io/certmonger/
-Source0:	http://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
+Source0:	https://pagure.io/certmonger/archive/%{version}/certmonger-%{version}.tar.gz
 #Source1:	http://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
 
 BuildRequires:	autoconf
