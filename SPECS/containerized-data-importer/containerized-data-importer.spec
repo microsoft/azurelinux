@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,7 @@ URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-3727.patch
 Patch1:         CVE-2022-2879.patch
+Patch2:         CVE-2024-24786.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -221,6 +222,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.57.0-6
+- Fix CVE-2024-24786
+
 * Fri Sep 06 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-5
 - Statically building binaries
 
