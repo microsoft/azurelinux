@@ -86,7 +86,7 @@ Conflicts:      influxdb
 Go sources and other development files for InfluxDB
 
 %prep
-%autosetup -a 1
+%autosetup -p1 -a 1
 
 mkdir -pv static
 tar -xf %{SOURCE2} -C static/ --no-same-owner
