@@ -239,7 +239,7 @@ exit 0
 
 %changelog
 * Mon Dec 10 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.79.15-1
-- Update to upstream 0.79.15 to fix build issues with certmonger. Verified license.
+- Update to upstream 0.79.20 to fix build issues with certmonger. Verified license.
 
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 0.79.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
