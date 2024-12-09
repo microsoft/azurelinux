@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,9 @@ BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       iana-etc
+Requires:       libnftnl
+Requires(post):   %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
 # Our build tooling cannot handle this
 #Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
@@ -43,15 +46,14 @@ It contains the libraries and header files to create applications.
     --exec-prefix= \
     --with-xtlibdir=%{_libdir}/iptables \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
-    --disable-nftables \
     --enable-libipq \
     --enable-devel
 
-make V=0
+%make_build
 
 %install
 %make_install
-ln -sfv ../../sbin/xtables-multi %{buildroot}%{_libdir}/iptables-xml
+
 #   Install daemon scripts
 install -vdm755 %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
@@ -65,14 +67,40 @@ find %{buildroot} -name '*.a'  -delete
 find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
-%preun
-%systemd_preun iptables.service
+ln -sf --relative %{buildroot}%{_sbindir}/xtables-legacy-multi %{buildroot}%{_bindir}/iptables-xml
 
 %post
+for target in %{name} \
+              ip6tables \
+              ebtables \
+              arptables; do
+  %{_sbindir}/update-alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-nft 30000 \
+    --slave %{_sbindir}/${target}-save ${target}-save %{_sbindir}/${target}-nft-save \
+    --slave %{_sbindir}/${target}-restore ${target}-restore %{_sbindir}/${target}-nft-restore
+done
+
+for target in %{name} \
+              ip6tables; do
+  %{_sbindir}/update-alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-legacy 10000 \
+    --slave %{_sbindir}/${target}-save ${target}-save %{_sbindir}/${target}-legacy-save \
+    --slave %{_sbindir}/${target}-restore ${target}-restore %{_sbindir}/${target}-legacy-restore
+done
+
 /sbin/ldconfig
 %systemd_post iptables.service
 
+%preun
+%systemd_preun iptables.service
+
 %postun
+if [ $1 -eq 0 ]; then
+	%{_sbindir}/update-alternatives --remove %{name} %{_sbindir}/%{name}-nft
+	%{_sbindir}/update-alternatives --remove ip6tables %{_sbindir}/ip6tables-nft
+	%{_sbindir}/update-alternatives --remove ebtables %{_sbindir}/ebtables-nft
+	%{_sbindir}/update-alternatives --remove arptables %{_sbindir}/arptables-nft
+	%{_sbindir}/update-alternatives --remove %{name} %{_sbindir}/%{name}-legacy
+	%{_sbindir}/update-alternatives --remove ip6tables %{_sbindir}/ip6tables-legacy
+fi
 /sbin/ldconfig
 %systemd_postun_with_restart iptables.service
 
@@ -83,15 +111,18 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %{_sysconfdir}/systemd/scripts/iptables.stop
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip4save
 %config(noreplace) %{_sysconfdir}/systemd/scripts/ip6save
+%config(noreplace) %{_sysconfdir}/ethertypes
 %{_unitdir}/iptables.service
 %{_sbindir}/*
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_libdir}/iptables/*
-%{_libdir}/iptables-xml
+%{_bindir}/iptables-xml
 %{_mandir}/man1/*
 %{_mandir}/man8/*
 /usr/share/xtables/iptables.xslt
+%ghost %{_sbindir}/ip{,6}tables{,-save,-restore}
+%ghost %{_sbindir}/{eb,arp}tables{,-save,-restore}
 
 %files devel
 %{_libdir}/*.so
@@ -100,6 +131,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 12 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
+- Enable nftables and use alternatives.
+
 * Mon Mar 18 2024 Andy Zaugg <azaugg@linkedin.com> - 1.8.10-2
 - Flush raw table when restarting iptables service
 

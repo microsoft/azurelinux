@@ -1,8 +1,8 @@
 {
  "Signatures": {
-  "SymCrypt-103.5.1.tar.gz": "1c4d41972f7683cb2c053ddc58452d6f4b56c1b556b7499f9fedbd7706ccd0fe",
+  "SymCrypt-103.6.0.tar.gz": "ce03f03cfea76c38336c67f175ca316f0377b98e2617a3561e0a2dc91114e9ee",
   "find-debuginfo": "356800f19b755879993103c121c83fb4cc97d0e8656ea34d051daa310f54cedf",
   "jitterentropy-library-3.3.1.tar.gz": "4a50cb02b4836cd5550016e2fc2263e6982abaa11467a9e1cea260c1c2f7d487",
-  "symcrypt-build-environment-variables-v103.5.1.sh": "6f6e162011e8203de66be6af59c0b4511992b731370a152044b028e8075578a7"
+  "symcrypt-build-environment-variables-v103.6.0.sh": "860e849274bd742c752df74baa3fe9502101f53d43b3a72463a2ffb122221296"
  }
 }

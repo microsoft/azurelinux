@@ -13,7 +13,7 @@
 Summary:        Unified Kernel Image
 Name:           kernel-uki
 Version:        6.6.57.1
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,6 +70,15 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
+- Bump release to match kernel
+
+* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
+- Bump release to match kernel
+
+* Tue Nov 05 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-3
+- Bump release to match kernel
+
 * Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
 - Remove noxsaves parameter from cmdline
 
