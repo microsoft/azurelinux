@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         CVE-2023-48795.patch
+Patch2:         CVE-2024-24786.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
@@ -272,6 +273,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.2.0-10
+- Fix for CVE-2024-24786
+
 * Sun Oct 06 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2.0-9
 - Fix for CVE-2023-48795
 

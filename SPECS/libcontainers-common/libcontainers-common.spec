@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20240213
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,6 +54,7 @@ Patch3:         CVE-2024-3727.patch
 #Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
 Patch4:         CVE-2024-37298.patch
 Patch5:         CVE-2024-6104.patch
+Patch6:         CVE-2024-24786.patch
 
 BuildRequires:  go-go-md2man
 Requires(post): grep
@@ -72,6 +73,7 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 3 -p6
 
 %setup -q -T -D -b 1 -n storage-%{storagever}
+%patch 6 -p1
 
 %setup -q -T -D -b 7 -n podman-%{podmanver}
 %patch 0 -p1
@@ -80,11 +82,13 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 3 -p1
 %patch 4 -p1
 %patch 5 -p1
+%patch 6 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
 %patch 1 -p1
 %patch 3 -p1
+%patch 6 -p1
 
 # copy the LICENSE file in the build root
 cd ..
@@ -181,6 +185,9 @@ fi
 %license LICENSE
 
 %changelog
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 20240213-3
+- Fix CVE-2024-24786
+
 * Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
 - Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
 - Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
