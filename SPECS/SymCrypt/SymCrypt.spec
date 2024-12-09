@@ -1,6 +1,6 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.5.1
+Version:        103.6.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -13,8 +13,6 @@ Source2:        find-debuginfo
 # Use ./generate-env-file.sh --release-tag <git-version-tag> to generate this. For example:
 #   ./generate-env-file.sh --release-tag v103.5.1
 Source3:        symcrypt-build-environment-variables-v%{version}.sh
-Patch1:         0001-add-build-flags-to-prevent-stripping-and-post-proces.patch
-Patch2:         0001-add-parameter-to-process_fips_module-to-specify-the-.patch
 BuildRequires:  cmake
 %ifarch aarch64
 BuildRequires:  clang >= 12.0.1-4
@@ -105,6 +103,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Mon Nov 25 2024 Tobias Brick <tobiasb@microsoft.com> - 103.6.0-1
+- Upgrde to 103.6.0
+
 * Mon Oct 21 2024 Tobias Brick <tobiasb@microsoft.com> - 103.5.1-1
 - Update 103.5.1
 
