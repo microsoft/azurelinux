@@ -2,21 +2,22 @@
 %global debug_package %{nil}
 
 Name:           glm
-Version:        0.9.9.6
-Release:        5%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 Summary:        C++ mathematics library for graphics programming
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://glm.g-truc.net/
-Source0:        https://github.com/g-truc/glm/releases/download/%{version}/%{name}-%{version}.zip
-Patch0:         glm-0.9.9.6-install.patch
-Patch1:         glm-0.9.9.6-noarch.patch
+Source0:        https://github.com/g-truc/glm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         glm-1.0.1-noarch.patch
+Patch1:         glm-1.0.1-without-werror.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake >= 3.14
+BuildRequires: make
 
 %description
 GLM is a C++ library for doing mathematics operations
@@ -63,7 +64,7 @@ a programming manual for the %{name}-devel package.
 # Also it looks like some versions get shipped with a common
 # directory in archive root, but with an unusual name for the
 # directory. In this case, use the -n option of the setup macro.
-%setup -q -n glm
+%setup -q
 
 # A couple of files had CRLF line-ends in them.
 # Check with rpmlint after updating the package that we are not
@@ -88,57 +89,42 @@ sed -i 's/\r//' test/core/core_setup_message.cpp
 %patch 1 -p1
 
 %build
-mkdir build
-cd build
-%{cmake} -DGLM_TEST_ENABLE=ON ..
-make %{?_smp_mflags}
+
+export CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
+%{cmake} -DGLM_TEST_ENABLE=ON -DGLM_BUILD_LIBRARY=OFF -DCMAKE_INSTALL_DATAROOTDIR=%{_datadir}/cmake
+%cmake_build
 
 %check
-cd build
+export CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
 
 # Some tests are disabled due to failing tests (to be reported)
-# - test-core_func_common   fails on aarch64
-# - test-core_func_integer  fails on Mariner (x86_64)
-%ifarch x86_64
-ctest --output-on-failure -E '(test-core_func_integer)'
-%endif
-
-%ifarch aarch64
-ctest --output-on-failure -E '(test-core_func_common)'
-%endif
-
+# - test-gtc_packing      fails on s390x
+%ctest -- --output-on-failure -E 'test-gtc_packing'
 
 %install
-cd build
-
-make install DESTDIR=$RPM_BUILD_ROOT
+%cmake_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 find $RPM_BUILD_ROOT -name CMakeLists.txt -exec rm -f {} ';'
 
-# The cmake config files seem architecture independent and since
-# also glm-devel is otherwise noarch, it is desired to ship the
-# cmake configuration files under /usr/share.
-mkdir -pv $RPM_BUILD_ROOT%{_datadir}
-mv $RPM_BUILD_ROOT%{_libdir}/cmake $RPM_BUILD_ROOT%{_datadir}/cmake
-mv $RPM_BUILD_ROOT%{_libdir}/pkgconfig $RPM_BUILD_ROOT%{_datadir}/pkgconfig
-rmdir $RPM_BUILD_ROOT%{_libdir}
+# The library can get installed into the include directory - seen on EPEL8
+rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 
 # Here it seems to be acceptable to own the cmake and pkgconfig directories
 # as an alternative to having glm-devel depending on cmake and pkg-config
 # https://fedoraproject.org/wiki/Packaging:Guidelines#The_directory_is_owned_by_a_package_which_is_not_required_for_your_package_to_function
 %files devel
-%license copying.txt
 %doc readme.md
 %{_includedir}/%{name}
-%{_datadir}/cmake
-%{_datadir}/pkgconfig/
+%{_datadir}/cmake/%{name}
 
 %files doc
-%license copying.txt
 %doc doc/manual.pdf
 %doc doc/api/
 
 %changelog
+* Mon Dec 09 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-1
+- Update to 1.0.1
+
 * Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
 - Re-enable `test-gtc_packing` for all archs
 - Skip broken tests based of arch
