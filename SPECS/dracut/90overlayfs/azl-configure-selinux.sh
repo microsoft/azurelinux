@@ -16,15 +16,19 @@ if [ -n "$overlayfs" ]; then
     # Get the current root folder context
     rootDirContext=$($NEWROOT/usr/sbin/matchpathcon -f $NEWROOT/etc/selinux/targeted/contexts/files/file_contexts -m dir /)
 
-    # Parse the context to extract the label
-    # The contextshould on the form: "/       system_u:object_r:root_t:s0"
-    IFS='\t' read -r _ selinux <<< "$rootDirContext"
-    echo "root folder context: ($selinux)"
-    IFS=':' read -r _ _ dirLabel _ <<< "$selinux"
-    echo "root folder label  : ($dirLabel)"
+    # Parse the context to extract the root folder '/' context type.
+    # The line should be on the form: "/       system_u:object_r:root_t:s0"
 
-    # Set the labels on the target files
-    [ -e /sysroot ] && chcon -t $dirLabel /sysroot
-    [ -e /run/overlayfs ] && chcon -t $dirLabel /run/overlayfs
-    [ -e /run/ovlwork ] && chcon -t $dirLabel /run/ovlwork
+    # Split folder and context
+    IFS='\t' read -r _ selinuxContext <<< "$rootDirContext"
+    echo "root folder context: ($selinuxContext)"
+
+    # Split context and extract its type
+    IFS=':' read -r _ _ contextType _ <<< "$selinuxContext"
+    echo "root folder label  : ($contextType)"
+
+    # Set the type on the target folders
+    [ -e /sysroot ] && chcon -t $contextType /sysroot
+    [ -e /run/overlayfs ] && chcon -t $contextType /run/overlayfs
+    [ -e /run/ovlwork ] && chcon -t $contextType /run/ovlwork
 fi

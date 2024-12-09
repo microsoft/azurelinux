@@ -54,7 +54,7 @@ Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
 Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
 Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
-Patch:          0016-Handling-SELinux-configuration.patch
+Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -314,8 +314,8 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
-* Mon Nov 25 2024 George Mileka <gmileka@microsoft.com> - 102-8
-* Augment overlayfs with selinux handling.
+* Mon Dec 09 2024 George Mileka <gmileka@microsoft.com> - 102-8
+- Augment overlayfs with selinux handling.
 
 * Thu Oct 31 2024 George Mileka <gmileka@microsoft.com> - 102-7
 - Augment livenet module with a download daemon.
