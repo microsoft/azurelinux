@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-11-16
-%define stage0_version 1.74.0
+%define release_date 2024-10-17
+%define stage0_version 1.82.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.75.0
-Release:        11%{?dist}
+Version:        1.83.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,9 +41,6 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2024-32884.patch
-Patch2:         CVE-2024-31852.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -135,8 +132,8 @@ rm -v ./tests/rustdoc-ui/issue-98690.*
 
 %install
 USER=root SUDO_USER=root %make_install
-mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
-rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
+mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
+rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 rm %{buildroot}%{_bindir}/*.old
