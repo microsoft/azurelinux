@@ -55,8 +55,8 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
-
-Patch0: 	CVE-2024-24786.patch
+Patch0:		Removed-vendor-from-gitignore-list.patch
+Patch1: 	CVE-2024-24786.patch
 BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  kernel-headers
