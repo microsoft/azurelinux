@@ -55,7 +55,8 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 
 	// Customize image.
 	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, baseImage, nil, outImageFilePath,
-		"vhd", "", false, false)
+		"vhd", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -198,7 +199,8 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 		},
 	}
 
-	err = CustomizeImage(buildDir, buildDir, config, baseImage, nil, outImageFilePath, "raw", "", false, false)
+	err = CustomizeImage(buildDir, buildDir, config, baseImage, nil, outImageFilePath, "raw", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
