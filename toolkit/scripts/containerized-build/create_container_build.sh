@@ -84,6 +84,7 @@ script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/azl
 enable_local_repo=false
 keep_container="--rm"
+packages_to_install="azurelinux-release vim git jq"
 
 while (( "$#")); do
   case "$1" in
@@ -92,7 +93,7 @@ while (( "$#")); do
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
     -b ) build_mount_dir="$(realpath $2)"; shift 2;;
-    -ep ) extra_packages="$2"; shift 2;;
+    -ep ) packages_to_install="${packages_to_install} $2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -k ) keep_container=""; shift ;;
     -q ) STD_OUT_REDIRECT=/dev/null; shift ;;
@@ -268,7 +269,7 @@ docker build -q \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg azl_repo="$repo_path" \
                 --build-arg mode="$mode" \
-                --build-arg extra_packages="$extra_packages" \
+                --build-arg packages_to_install="$packages_to_install" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"
