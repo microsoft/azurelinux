@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.36
-Release:        1%{?dist}
+Version:        8.0.40
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,12 +9,22 @@ Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
-Patch1:         CVE-2023-46218.patch
+# Patch can be removed after upgrading MySQL to 8.4+
+# or switching to system Protobuf 3.25+ with the 'WITH_PROTOBUF=system' option.
+Patch1:         CVE-2024-2410.patch
+# AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
+# ciphers unavailable.
+Patch2:         fix-tests-for-unsupported-chacha-ciphers.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
+
 Requires(postun): shadow-utils
 Requires(pre):  shadow-utils
 
@@ -51,7 +61,13 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
-make test
+# Tests expect to be run as a non-root user.
+groupadd test
+useradd test -g test -m
+chown -R test:test .
+
+# In case of failure, print the test log.
+sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
 %pre
 getent group  mysql  >/dev/null || groupadd -r mysql
@@ -98,6 +114,18 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Oct 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-2
+- Patched CVE-2024-2410.
+
+* Fri Oct 18 2024 Sudipta Pandit <sudpandit@microsoft.com> - 8.0.40-1
+- Upgrade to 8.0.40 to fix multiple CVEs -- CVE-2024-21193, CVE-2024-21194, CVE-2024-21162, CVE-2024-21157, CVE-2024-21130,
+  CVE-2024-20996, CVE-2024-21129, CVE-2024-21159, CVE-2024-21135, CVE-2024-21173, CVE-2024-21160, CVE-2024-21125, CVE-2024-21134,
+  CVE-2024-21127, CVE-2024-21142, CVE-2024-21166, CVE-2024-21163, CVE-2024-21203, CVE-2024-21219, CVE-2024-21247, CVE-2024-21237,
+  CVE-2024-21231, CVE-2024-21213, CVE-2024-21218, CVE-2024-21197, CVE-2024-21230, CVE-2024-21207, CVE-2024-21201, CVE-2024-21198,
+  CVE-2024-21238, CVE-2024-21196, CVE-2024-21239, CVE-2024-21199, CVE-2024-21241, CVE-2024-21236, CVE-2024-21212, CVE-2024-21096,
+  CVE-2024-21171, CVE-2024-21165, CVE-2023-46219
+- Remove patch for CVE-2023-46218 (fixed in 8.0.37)
+
 * Tue Jun 18 2024 Archana Choudhary <archana1@microsoft.com> - 8.0.36-1
 - Upgrade to 8.0.36 to fix 10 CVEs
 

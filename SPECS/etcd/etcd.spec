@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.12
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,9 +14,9 @@ Source1:        etcd.service
 #   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
-Patch1:		CVE-2024-24786.patch
+Patch1:		      CVE-2024-24786.patch
 
-BuildRequires:  golang >= 1.20.13
+BuildRequires:  golang
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -119,8 +119,14 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Mon Dec 09 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.5.12-4
+* Mon Dec 09 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.5.12-6
 - Patch for CVE-2024-24786
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.12-5
+- Bump release to rebuild with go 1.22.7
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 3.5.12-4
+- Drop requirement on a specific version of golang
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.12-3
 - Bump release to rebuild with go 1.21.11

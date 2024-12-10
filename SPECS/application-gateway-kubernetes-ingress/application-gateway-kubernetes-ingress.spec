@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
-Release:        20%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,8 +29,9 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2022-21698.patch
 Patch1:         CVE-2023-44487.patch
 Patch2:         CVE-2021-44716.patch
+Patch3:         CVE-2022-32149.patch
 
-BuildRequires:  golang >= 1.13
+BuildRequires:  golang
 %if %{with_check}
 BuildRequires:  helm
 %endif
@@ -67,6 +68,15 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-23
+- Bump release to rebuild with go 1.22.7
+
+* Wed Aug 28 2024 Sindhu Karri <lakarri@microsoft.com> - 1.4.0-22
+- Fix CVE-2022-32149 with a patch
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.0-21
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-20
 - Bump release to rebuild with go 1.21.11
 

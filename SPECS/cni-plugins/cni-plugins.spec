@@ -1,7 +1,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        1.3.0
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,15 +10,16 @@ Group:          Development/Tools
 URL:            https://github.com/containernetworking/plugins
 #Source0:       https://github.com/containernetworking/plugins/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2023-3978.patch
 %define _default_cni_plugins_dir /opt/cni/bin
-BuildRequires:  golang >= 1.5
+BuildRequires:  golang
 Provides:       kubernetes-cni
 
 %description
 The CNI (Container Network Interface) project consists of a specification and libraries for writing plugins to configure network interfaces in Linux containers, along with a number of supported plugins.
 
 %prep
-%setup -q -n plugins-%{version}
+%autosetup -p1 -n plugins-%{version}
 
 %build
 ./build_linux.sh -ldflags "-X github.com/containernetworking/plugins/pkg/utils/buildversion.BuildVersion=v%{version}"
@@ -39,6 +40,15 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Thu Oct 10 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.0-6
+- Add patch to resolve CVE-2023-3978.
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-5
+- Bump release to rebuild with go 1.22.7
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.3.0-4
+- Drop requirement on a specific version of golang
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-3
 - Bump release to rebuild with go 1.21.11
 

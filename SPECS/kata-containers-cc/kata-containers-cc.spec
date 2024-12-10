@@ -13,7 +13,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      2%{?dist}
+Release:      5%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -21,6 +21,9 @@ URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      %{name}-%{version}-cargo.tar.gz
 Source2:      mariner-coco-build-uvm.sh
+Patch0:       CVE-2023-45288.patch
+Patch1:       CVE-2023-39325.patch
+Patch2:       CVE-2024-24786.patch
 
 ExclusiveArch: x86_64
 
@@ -116,7 +119,7 @@ popd
 
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} KVER=${KERNEL_MODULE_VER} install
 popd
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
@@ -288,6 +291,19 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Wed Nov 27 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2.0.azl2-5
+- Add patches for CVE-2023-45288, CVE-2023-39325 and CVE-2024-24786
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-4
+- Bump release to rebuild with go 1.22.7
+
+* Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-4
+- Call make clean with OS distro variable
+
+* Fri Jul 12 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-3
+- Adapt make install target parameters to cope with upstream
+  fork Makefile changes
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl2-2
 - Bump release to rebuild with go 1.21.11
 
