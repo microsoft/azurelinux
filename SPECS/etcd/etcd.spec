@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-24786.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -60,7 +61,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%autosetup -p1
+%autosetup -N -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
@@ -145,6 +146,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Tue Dec 03 2024 bhapathak <bhapathak@microsoft.com> - 3.5.12-2
+- Patch CVE-2024-24786
+
 * Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.12-1
 - Auto-upgrade to 3.5.12 - none
 
