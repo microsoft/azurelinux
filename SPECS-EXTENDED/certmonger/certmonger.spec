@@ -12,15 +12,15 @@ Distribution:   Azure Linux
 %bcond_with xmlrpc
 
 Name:		certmonger
-Version:	0.79.13
-Release:	2%{?dist}
+Version:	0.79.20
+Release:	1%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
-
-License:	GPLv3+
+ 
+License:	GPL-3.0-or-later
 URL:		http://pagure.io/certmonger/
 Source0:	http://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
 #Source1:	http://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
-
+ 
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	gettext-devel
@@ -29,14 +29,22 @@ BuildRequires:	openldap-devel
 BuildRequires:	krb5-devel
 BuildRequires:	libidn2-devel
 BuildRequires:	dbus-devel, nspr-devel, nss-devel, openssl-devel
+%if 0%{?fedora} >= 12 || 0%{?rhel} >= 6
 BuildRequires:	libuuid-devel
+%else
+BuildRequires:	e2fsprogs-devel
+%endif
 BuildRequires:	libtalloc-devel, libtevent-devel
+%if 0%{?rhel} >= 6 || 0%{?fedora} >= 9
 BuildRequires:	libcurl-devel
+%else
+BuildRequires:	curl-devel
+%endif
 BuildRequires:	libxml2-devel
 %if %{with xmlrpc}
-BuildRequires:	xmlrpc-c-devel
+BuildRequires:  xmlrpc-c-devel
 %endif
-BuildRequires:	jansson-devel
+BuildRequires:  jansson-devel
 %if 0%{?rhel} && 0%{?rhel} < 6
 BuildRequires:	bind-libbind-devel
 BuildRequires:	mktemp
@@ -60,19 +68,19 @@ BuildRequires:	/usr/bin/which
 #  for dbus tests
 BuildRequires:	python3-dbus
 BuildRequires:	popt-devel
-
+ 
 # we need a running system bus
 Requires:	dbus
 Requires(post):	%{_bindir}/dbus-send
-
+ 
 %if %{systemd}
 BuildRequires:	systemd-units
-BuildRequires:  systemd-devel
+BuildRequires: make
 Requires(post):	systemd-units
 Requires(preun):	systemd-units, dbus, sed
 Requires(postun):	systemd-units
 %endif
-
+ 
 %if %{systemdsysv}
 Requires(post):	systemd-sysv
 %global systemdsysvsave \
@@ -83,28 +91,30 @@ Requires(post):	systemd-sysv
 %else
 %global systemdsysvsave %{nil}
 %endif
-
+ 
 %if %{sysvinit}
 Requires(post):	/sbin/chkconfig, /sbin/service
 Requires(preun):	/sbin/chkconfig, /sbin/service, dbus, sed
 %endif
-
+ 
+%if 0%{?fedora} >= 15
 # Certain versions of libtevent have incorrect internal ABI versions.
 Conflicts: libtevent < 0.9.13
-
+%endif
+ 
 %description
 Certmonger is a service which is primarily concerned with getting your
 system enrolled with a certificate authority (CA) and keeping it enrolled.
-
+ 
 %prep
 %autosetup -p1
-
+ 
 %if 0%{?rhel} > 0
 # Enabled by default for RHEL for bug #765600, still disabled by default for
 # Fedora pending a similar bug report there.
 sed -i 's,^# chkconfig: - ,# chkconfig: 345 ,g' sysvinit/certmonger.in
 %endif
-
+ 
 %build
 autoreconf -i -f
 %configure \
@@ -119,8 +129,9 @@ autoreconf -i -f
 %endif
 	--with-homedir=/run/certmonger \
 %if %{with xmlrpc}
-	--with-xmlrpc \
+    --with-xmlrpc \
 %endif
+	--disable-dsa \
 	--with-tmpdir=/run/certmonger --enable-pie --enable-now
 %if %{with xmlrpc}
 # For some reason, some versions of xmlrpc-c-config in Fedora and RHEL just
@@ -129,17 +140,17 @@ make %{?_smp_mflags} XMLRPC_LIBS="-lxmlrpc_client -lxmlrpc_util -lxmlrpc"
 %else
 make %{?_smp_mflags}
 %endif
-
+ 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/certmonger/{cas,requests}
 install -m755 -d $RPM_BUILD_ROOT/run/certmonger
 %{find_lang} %{name}
-
+ 
 %check
 make check
-
+ 
 %post
 if test $1 -eq 1 ; then
 	%{_bindir}/dbus-send --system --type=method_call --dest=org.freedesktop.DBus / org.freedesktop.DBus.ReloadConfig 2>&1 || :
@@ -147,7 +158,7 @@ fi
 %if %{without xmlrpc}
 # remove any existing certmaster CA configuration
 if test $1 -gt 1 ; then
-	%{_bindir}/getcert remove-ca -c certmaster 2>&1 || :
+    %{_bindir}/getcert remove-ca -c certmaster 2>&1 || :
 fi
 %endif
 %if %{systemd}
@@ -158,7 +169,7 @@ fi
 %if %{sysvinit}
 /sbin/chkconfig --add certmonger
 %endif
-
+ 
 %triggerin -- certmonger < 0.58
 if test $1 -gt 1 ; then
 	# If the daemon is running, remove knowledge of the dogtag renewer.
@@ -174,7 +185,7 @@ if test $1 -gt 1 ; then
 	done
 fi
 exit 0
-
+ 
 %postun
 %if %{systemd}
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
@@ -188,7 +199,7 @@ if test $1 -gt 0 ; then
 fi
 %endif
 exit 0
-
+ 
 %preun
 %if %{systemd}
 if test $1 -eq 0 ; then
@@ -203,7 +214,7 @@ if test $1 -eq 0 ; then
 fi
 %endif
 exit 0
-
+ 
 %if %{systemd}
 %triggerun -- certmonger < 0.43
 %{systemdsysvsave}
@@ -213,7 +224,7 @@ exit 0
 /bin/systemctl try-restart certmonger.service >/dev/null 2>&1 || :
 exit 0
 %endif
-
+ 
 %files -f %{name}.lang
 %doc README.md LICENSE STATUS doc/*.txt
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/*
@@ -238,6 +249,8 @@ exit 0
 %endif
 
 %changelog
+* Mon Dec 09 2024 Akarsh chaudhary <v-akarshc@microsoft.com>-0.79.20-1
+- upgrade to version 0.79.20
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 0.79.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build-time requirement on systemd-devel for systemd pkgconfig files
