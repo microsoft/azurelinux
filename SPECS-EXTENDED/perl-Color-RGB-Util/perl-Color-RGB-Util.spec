@@ -2,8 +2,8 @@
 
 Summary:        Utilities related to RGB colors
 Name:           perl-Color-RGB-Util
-Version:        0.606
-Release:        3%{?dist}
+Version:        0.607
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,7 @@ BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
+BuildRequires:  perl(Test::RandomResult)
 BuildRequires:  perl(blib)
 
 # Missing test dependencies:
@@ -95,6 +96,10 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Dec 10 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.607-1
+- Update to 0.607-1
+- License verified.
+
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.606-3
 - Disabling missing test dependency.
 

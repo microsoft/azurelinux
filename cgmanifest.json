@@ -16443,8 +16443,8 @@
         "type": "other",
         "other": {
           "name": "perl-Color-RGB-Util",
-          "version": "0.606",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-0.606.tar.gz"
+          "version": "0.607",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-0.607.tar.gz"
         }
       }
     },
