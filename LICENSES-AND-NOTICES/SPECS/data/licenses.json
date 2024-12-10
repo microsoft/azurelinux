@@ -1513,6 +1513,7 @@
                 "perl-Test-Pod",
                 "perl-Test-Pod-Coverage",
                 "perl-Test-Portability-Files",
+                "perl-Test-RandomResult",
                 "perl-Test-Requires",
                 "perl-Test-RequiresInternet",
                 "perl-Test-Script",
