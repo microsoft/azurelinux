@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,7 @@ Patch14:        CVE-2023-4504.patch
 Patch15:        CVE-2023-32324.patch
 Patch16:        CVE-2023-34241.patch
 Patch17:        CVE-2022-26691.patch
+Patch18:	CVE-2024-35235.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -657,6 +658,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.3.3op2-9
+- Add patch for CVE-2024-35235
+
 * Tue May 21 2024 Lanze Liu <lanzeliu@microsoft.com> - 2.3.3op2-8
 - Add patch for CVE-2022-26691.
 

@@ -97,7 +97,7 @@ jobs:
           fi
           exit 0
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: linted_specs

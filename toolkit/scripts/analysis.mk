@@ -20,11 +20,15 @@ ifneq ($(build_arch),x86_64)
 # Microsoft repository only exists for x86_64 - skip that .repo file;
 # otherwise package manager will signal an error due to being unable to make contact
 SODIFF_REPO_SOURCES="mariner-official-base.repo"
+SODIFF_REPO_SOURCES_EXTENDED="mariner-official-base.repo mariner-extended.repo"
 else
 SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-microsoft.repo"
+SODIFF_REPO_SOURCES_EXTENDED="mariner-official-base.repo mariner-microsoft.repo mariner-extended.repo"
 endif
 
-SODIFF_REPO_FILE=$(SCRIPTS_DIR)/sodiff/sodiff.repo
+
+SODIFF_REPO_FILE=$(BUILD_DIR)/sodiff/sodiff.repo
+SODIFF_REPO_FILE_EXTENDED=$(BUILD_DIR)/sodiff/sodiff-extended.repo
 # An artifact containing a list of packages that need to be dash-rolled due to their dependency having a new .so version
 SODIFF_SUMMARY_FILE=$(SODIFF_OUTPUT_FOLDER)/sodiff-summary.txt
 # A script doing the sodiff work
@@ -69,8 +73,15 @@ fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
 .PHONY: sodiff-repo
 sodiff-repo: $(SODIFF_REPO_FILE)
 
-$(SODIFF_REPO_FILE):
+$(SODIFF_REPO_FILE): $(SODIFF_OUTPUT_FOLDER)
 	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
+
+# sodiff-repo-extended: Generate just the sodiff.repo file
+.PHONY: sodiff-repo-extended
+sodiff-repo-extended: $(SODIFF_REPO_FILE_EXTENDED)
+
+$(SODIFF_REPO_FILE_EXTENDED): $(SODIFF_OUTPUT_FOLDER)
+	echo $(SODIFF_REPO_SOURCES_EXTENDED) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE_EXTENDED)
 
 # sodiff-setup: populate gpg-keys from SPECS/mariner-repos for mariner official repos for ubuntu
 .PHONY: sodiff-setup
@@ -83,6 +94,6 @@ sodiff-setup:
 .SILENT .PHONY: sodiff-check
 
 sodiff-check: $(BUILT_PACKAGES_FILE) | $(SODIFF_REPO_FILE)
-	<$(BUILT_PACKAGES_FILE) $(SODIFF_SCRIPT) $(RPMS_DIR)/ $(SODIFF_REPO_FILE) $(RELEASE_MAJOR_ID) $(SODIFF_OUTPUT_FOLDER)
+	<$(BUILT_PACKAGES_FILE) $(SODIFF_SCRIPT) -r $(RPMS_DIR)/ -f $(SODIFF_REPO_FILE) -v $(RELEASE_MAJOR_ID) -o $(SODIFF_OUTPUT_FOLDER)
 
 package-toolkit: $(SODIFF_REPO_FILE)

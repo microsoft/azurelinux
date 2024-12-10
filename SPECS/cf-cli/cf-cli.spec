@@ -1,7 +1,7 @@
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 Version:        8.4.0
-Release:        17%{?dist}
+Release:        21%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,8 +29,12 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 Source1:        cli-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-44487.patch
 Patch1:         CVE-2021-44716.patch
+Patch2:         CVE-2021-43565.patch
+# Produced by git clone https://github.com/golang/text && cd text && 
+# git checkout 434eadcdbc3b0256971992e8c70027278364c72c && git format-patch -1 HEAD
+Patch3:         CVE-2022-32149.patch
 
-BuildRequires:  golang >= 1.18.3
+BuildRequires:  golang
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -63,6 +67,19 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 8.4.0-21
+- Patch CVE-2022-32149 bringing upstream patch over the vendored golang.org/x/text module
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-20
+- Bump release to rebuild with go 1.22.7
+
+* Mon Jul 22 2024 Archana Choudhary <archana1@microsoft.com> - 8.4.0-19.cm2
+- Patch CVE-2021-43565
+
+* Wed Jul 17 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 8.4.0-18
+- Drop requirement on a specific version of golang
+
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-17
 - Bump release to rebuild with go 1.21.11
 

@@ -1,7 +1,7 @@
 Summary:        A network utility to retrieve files from the Web
 Name:           wget
 Version:        1.21.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later
 URL:            https://www.gnu.org/software/wget/wget.html
 Group:          System Environment/NetworkingPrograms
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-38428.patch
+Patch1:		CVE-2024-10524.patch
 BuildRequires:  openssl-devel
 %if %{with_check}
 BuildRequires:  perl
@@ -55,6 +56,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %changelog
+* Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.21.2-4
+- Patch for CVE-2024-10524
+
 * Wed Jun 19 2024 Saul Paredes <saulparedes@microsoft.com> - 1.21.2-3
 - Patch for CVE-2024-38428
 

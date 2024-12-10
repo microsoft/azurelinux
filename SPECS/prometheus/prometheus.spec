@@ -1,10 +1,10 @@
 # When upgrading Prometheus, run `./generate_source_tarball.sh --pkgVersion <version>`
 # The script will spit out custom tarballs for `prometheus` and `promu` (More details in the script)
-%global promu_version 0.13.0
+%global promu_version 0.14.0
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
-Version:        2.37.0
-Release:        13%{?dist}
+Version:        2.37.9
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,10 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
+Patch1:         CVE-2024-6104.patch
+Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2023-39325.patch
+Patch4:         CVE-2023-45288.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  systemd-rpm-macros
@@ -131,6 +135,20 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Wed Nov 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.37.9-2
+- Patch for CVE-2023-39325 CVE-2023-45288
+- Fix previous changelog version number
+
+* Tue Oct 08 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.37.9-1
+- Bump version to patch CVE-2022-41717
+- Patch for CVE-2024-24786
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-15
+- Bump release to rebuild with go 1.22.7
+
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 2.37.0-14
+- Patch for CVE-2024-6104
+
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-13
 - Bump release to rebuild with go 1.21.11
 

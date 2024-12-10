@@ -1,7 +1,7 @@
 Summary:        Implementation of the JPEG-2000 standard, Part 1
 Name:           jasper
 Version:        2.0.32
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        JasPer
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch2:         jasper-2.0.14-rpath.patch
 # architecture related patches
 Patch100:       jasper-2.0.2-test-ppc64-disable.patch
 Patch101:       jasper-2.0.2-test-ppc64le-disable.patch
+Patch102:       CVE-2023-51257.patch
 # autoreconf
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -73,6 +74,8 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %patch101 -p1 -b .test-ppc64le-disable
 %endif
 
+%patch102 -p1 -b .cve-2023-51257.patch
+
 %build
 mkdir builder
 %cmake \
@@ -113,6 +116,9 @@ make test -C builder
 %{_libdir}/libjasper.so.4*
 
 %changelog
+* Fri Aug 23 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.32-4
+- Add patch to resolve CVE-2023-51257
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.32-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

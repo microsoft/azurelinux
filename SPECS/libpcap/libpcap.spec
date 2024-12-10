@@ -1,7 +1,7 @@
 Summary:        C/C++ library for network traffic capture
 Name:           libpcap
 Version:        1.10.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,8 @@ Group:          Networking/Libraries
 URL:            https://www.tcpdump.org/
 #Source0:       https://github.com/the-tcpdump-group/%{name}/archive/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-8006.patch
+Patch1:		CVE-2023-7256.patch
 
 %description
 Libpcap provides a portable framework for low-level network
@@ -38,7 +40,7 @@ Requires:       %{name}-devel = %{version}-%{release}
 This package contains static lib for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 %build
 %configure
@@ -77,6 +79,12 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 18 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.10.1-4
+- Fix CVE-2023-7256
+
+* Mon Oct 21 2024 Sudipta Pandit <sudpandit@microsoft.com> - 1.10.1-3
+- Backport patch for CVE-2024-8006
+
 * Wed Dec 13 2023 Zhichun Wan <zhichunwan@microsoft.com> - 1.10.1-2
 - Add static library as sub package
 
