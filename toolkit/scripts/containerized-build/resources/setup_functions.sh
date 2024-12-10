@@ -158,6 +158,20 @@ install_dependencies() {
         # Get the list of dependencies from the spec file.
         mapfile -t dep_list < <(rpmspec -q --buildrequires $spec_file)
 
+        # Replace the dependencies with the package providing them.
+        for i in "${!dep_list[@]}"
+        do
+            # if the dependency is a file, find the package that provides it
+            if [[ ${dep_list[$i]} == /* ]]; then
+                package=$(tdnf repoquery --file "${dep_list[$i]}" --json | jq -r 'map(.Name) | unique | .[]')
+                if [ -z "$package" ]; then
+                    echo "Could not find package providing '${dep_list[$i]}'." >/dev/stderr
+                    return 1
+                else
+                    dep_list[$i]=$package
+                fi
+            fi
+        done
         # Install all the dependencies.
         tdnf install -y "${dep_list[@]}" || exit_code=$?
     done
