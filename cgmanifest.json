@@ -16233,8 +16233,8 @@
         "type": "other",
         "other": {
           "name": "perl-Color-ANSI-Util",
-          "version": "0.164",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-0.164.tar.gz"
+          "version": "0.165",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-0.165.tar.gz"
         }
       }
     },
