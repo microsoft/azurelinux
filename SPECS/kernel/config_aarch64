@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.57.1 Kernel Configuration
+# Linux/arm64 6.6.62.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -527,7 +527,6 @@ CONFIG_ARM64_EPAN=y
 # end of ARMv8.7 architectural features
 
 CONFIG_ARM64_SVE=y
-CONFIG_ARM64_SME=y
 CONFIG_ARM64_PSEUDO_NMI=y
 # CONFIG_ARM64_DEBUG_PRIORITY_MASKING is not set
 CONFIG_RELOCATABLE=y
