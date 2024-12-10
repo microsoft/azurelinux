@@ -589,6 +589,14 @@ also augment the URL list.
 
 > Use the daily build sources for the given date. `lkg` will use the last known good build.
 
+##### `DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP=`**`n`** *(default)*
+
+> Delete the already downloaded toolchain RPMs and freshly download from LKG repo
+
+##### `DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP=`**`y`**
+
+> Don't delete the already download tolchain RPMs to save time. Use only if are sure about this behaviour.
+
 #### `DISABLE_UPSTREAM_REPOS=...`
 
 ##### `DISABLE_UPSTREAM_REPOS=`**`n`** *(default)*
