@@ -13,7 +13,7 @@ Source0:        https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         disable_manpage_vendor.patch
 Patch1:         CVE-2023-45288.patch
-Patch1:         CVE-2024-36623.patch
+Patch2:         CVE-2024-36623.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
 BuildRequires:  golang
