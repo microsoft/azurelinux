@@ -8,8 +8,8 @@
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.75.0
-Release:        11%{?dist}
+Version:        1.83.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,9 +41,6 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2024-32884.patch
-Patch2:         CVE-2024-31852.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -172,6 +169,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed Dec 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.83.0-1
+- Auto-upgrade to 1.83.0 - none
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.75.0-11
 - Update to build dep latest glibc-static version
 
