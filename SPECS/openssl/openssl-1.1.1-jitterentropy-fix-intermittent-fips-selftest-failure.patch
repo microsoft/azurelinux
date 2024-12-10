@@ -1,0 +1,67 @@
+From d0e139f4e697265cd693769860b20d61c89bbd96 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 3 Jul 2024 20:24:14 +0000
+Subject: [PATCH] TOBIASB: Initialize ec.mem and set minimum OSR in
+ jent_time_entropy_init
+
+Ocassionally, the jitterentropy module was failing the FIPS self-test because it was unable to create
+sufficient entropy. This was due to two main reasons:
+A memory buffer was not being initialized in the jent_time_entropy_init function. This buffer is used 
+to add variations based on memory access to the entropy pool.
+
+The OSR value was being set to 1, rather than the standard minimum of 3. Since this affects the threshold
+for number of times the allows itself to attempt to generate entropy before failing out, this made the issue
+more likely to occur.
+
+This patch initializes that buffer and enforces the standard minmum OSR value.
+
+---
+ crypto/fips/jitterentropy-base.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/fips/jitterentropy-base.c b/crypto/fips/jitterentropy-base.c
+index 9fb5b96..a5079a0 100644
+--- a/crypto/fips/jitterentropy-base.c
++++ b/crypto/fips/jitterentropy-base.c
+@@ -1265,13 +1265,27 @@ static int jent_time_entropy_init(unsigned int enable_notime)
+ 
+ 	memset(&ec, 0, sizeof(ec));
+ 
++	/* Allocate memory for adding variations based on memory
++		* access
++		*/
++	ec.mem = 
++		(unsigned char *)jent_zalloc(JENT_MEMORY_SIZE);
++	if (ec.mem == NULL) {
++		ret = EHEALTH;
++		goto out;
++	}
++
++	ec.memblocksize = JENT_MEMORY_BLOCKSIZE;
++	ec.memblocks = JENT_MEMORY_BLOCKS;
++	ec.memaccessloops = JENT_MEMORY_ACCESSLOOPS;
++
+ 	if (enable_notime) {
+ 		ec.enable_notime = 1;
+ 		jent_notime_settick(&ec);
+ 	}
+ 
+ 	/* Required for RCT */
+-	ec.osr = 1;
++	ec.osr = JENT_MIN_OSR;
+ 	if (jent_fips_enabled())
+ 		ec.fips_enabled = 1;
+ 
+@@ -1429,6 +1443,9 @@ static int jent_time_entropy_init(unsigned int enable_notime)
+ 		ret = ESTUCK;
+ 
+ out:
++	if (ec.mem != NULL)
++		jent_zfree(ec.mem, JENT_MEMORY_SIZE);
++
+ 	if (enable_notime)
+ 		jent_notime_unsettick(&ec);
+ 
+-- 
+2.39.4
+

@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        15%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,7 +55,9 @@ Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
-Patch0:		CVE-2024-24786.patch
+Patch0:         CVE-2024-6104.patch
+Patch1:         CVE-2022-32149.patch
+Patch2:		      CVE-2024-24786.patch
 BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  kernel-headers
@@ -145,8 +147,17 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Mon Dec 09 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.6.-15
+* Mon Dec 09 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.6.1-18
 - Patch for CVE-2024-24786
+
+* Tue Sep 17 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.6.1-17
+- Add patch to resolve CVE-2022-32149
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-16
+- Bump release to rebuild with go 1.22.7
+
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 2.6.1.15
+- Fix CVE 2024-6104 by patching vendor packages
 
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-14
 - Bump release to rebuild with go 1.21.11

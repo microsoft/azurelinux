@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        10%{?dist}
+Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,14 +53,23 @@ Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 # <empty>
 
 # Backports from "master" upstream:
-Patch7: CVE-2023-1594.patch
-Patch8: CVE-2023-6377.patch
-Patch9: CVE-2023-6478.patch
-Patch10: CVE-2024-21885.patch
-Patch11: CVE-2023-6816.patch
-Patch12: CVE-2023-5574.patch
-Patch13: CVE-2023-5367.patch
-Patch14: CVE-2023-5380.patch
+Patch7:         CVE-2023-1594.patch
+Patch8:         CVE-2023-6377.patch
+Patch9:         CVE-2023-6478.patch
+Patch10:        CVE-2024-21885.patch
+Patch11:        CVE-2023-6816.patch
+Patch12:        CVE-2023-5574.patch
+Patch13:        CVE-2023-5367.patch
+Patch14:        CVE-2023-5380.patch
+Patch15:        CVE-2024-31080.patch
+Patch16:        CVE-2024-31081.patch
+Patch17:        CVE-2024-31082.patch
+Patch18:        CVE-2024-31083.patch
+Patch19:        Avoid_possible_double-free_in_ProcRenderAddGlyphs.patch
+Patch20:        CVE-2024-0229.patch
+Patch21:        CVE-2024-0409.patch
+Patch22:        CVE-2024-21886.patch
+Patch23:        CVE-2024-9632.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -391,6 +400,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Thu Nov 14 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.20.10-13
+- Fix for CVE-2024-9632
+
+* Tue Sep 17 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.20.10-12
+- Add patch to resolve CVE-2024-0229, CVE-2024-0409 & CVE-2024-21886.
+
+* Tue Aug 06 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.20.10-11
+- Add patch for CVE-2024-31080, CVE-2024-31081, CVE-2024-31082 & CVE-2024-31083.
+
 * Thu Mar 28 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 1.20.10-10
 - Add patch for CVE-2023-5380
 

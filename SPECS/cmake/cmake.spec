@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        10%{?dist}
+Release:        14%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,18 @@ Patch5:         CVE-2023-35945.patch
 Patch6:         CVE-2023-38545.patch
 Patch7:         CVE-2023-38546.patch
 Patch8:         cve-2023-44487.patch
+Patch9:         CVE-2023-28320.patch
+Patch10:        CVE-2023-27533.patch
+Patch11:        CVE-2023-27534.patch
+Patch12:        CVE-2022-43552.patch
+Patch13:        CVE-2023-27536.patch
+Patch14:        CVE-2023-27538.patch
+Patch15:        CVE-2023-27535.patch
+Patch16:        CVE-2023-23916.patch
+Patch17:        CVE-2023-46218.patch
+Patch18:        CVE-2024-2398.patch
+Patch19:        CVE-2024-28182.patch
+Patch20:        CVE-2024-7264.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -85,6 +97,19 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu Nov 21 2024 Vince Perri <viperri@microsoft.com> - 3.21.4-14
+- Patch CVE-2024-2398 and CVE-2024-7264 (bundled curl)
+- Patch CVE-2024-28182 (bundled nghttp2)
+
+* Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 3.21.4-13
+- Patch CVE-2022-43552, CVE-2023-27536, CVE-2023-27535, CVE-2023-27538, CVE-2023-23916 and CVE-2023-46218.
+
+* Wed Sep 18 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.21.4-12
+- Patch CVE-2023-27533 and CVE-2023-27534
+
+* Fri Jul 26 2024 Zhichun Wan <zhichunwan@microsoft.com> - 3.21.4-11
+- Patch CVE-2023-28320.patch
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
 - Patch vendored nghttp2 for CVE-2023-44487
 

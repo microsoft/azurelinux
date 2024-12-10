@@ -1,13 +1,13 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
-Version:        2.0.32
+Version:        2.0.36
 Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
-Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
+Source0:        https://downloads.sourceforge.net/openipmi/%{name}-%{version}.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
 BuildRequires:  ncurses-devel
@@ -188,6 +188,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Mon Oct 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.36-1
+- Upgrade to 2.0.36 to fix CVE-2024-42934
+
 * Tue Feb 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.32-1
 - Upgrading to version 2.0.32.
 
