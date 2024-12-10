@@ -21503,8 +21503,8 @@
         "type": "other",
         "other": {
           "name": "puppet",
-          "version": "7.12.1",
-          "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
+          "version": "7.34.0",
+          "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.34.0.tar.gz"
         }
       }
     },
