@@ -14,7 +14,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,10 @@ popd
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
+* Wed Dec 04 2024 Aditya Dubey <adityadubey@microsoft.com> - 255-19
+- Updating to version 255-19
+- Includes patch for enhancing DNSSEC signature validation integrity
+
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Update sd-boot install location
 
