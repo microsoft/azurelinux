@@ -1,4 +1,4 @@
-From a223bb5a302aae63ecfd8728b7945c5a29ab081b Mon Sep 17 00:00:00 2001
+From 43b44054474cf139ee11afa386f0d4e5b2204a07 Mon Sep 17 00:00:00 2001
 From: George Mileka <gmileka@outlook.com>
 Date: Fri, 6 Dec 2024 14:21:18 -0800
 Subject: [PATCH] Enable LiveOS ISO Flow
@@ -61,7 +61,7 @@ index 2263e9dba..61d098341 100644
  
  init_use_fds(loadkeys_t)
 diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
-index 35e14a021..68c9b8720 100644
+index 35e14a021..13026d7a0 100644
 --- a/policy/modules/kernel/devices.if
 +++ b/policy/modules/kernel/devices.if
 @@ -2206,6 +2206,24 @@ interface(`dev_setattr_input_dev',`
@@ -83,14 +83,14 @@ index 35e14a021..68c9b8720 100644
 +		type event_device_t;
 +	')
 +
-+	allow $1 event_device_t:chr_file read;
++	allow $1 event_device_t:chr_file read_chr_file_perms;
 +')
 +
  ########################################
  ## <summary>
  ##	Read input event devices (/dev/input).
 diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
-index 1d696a07c..04a36152b 100644
+index 1d696a07c..90583facf 100644
 --- a/policy/modules/kernel/kernel.if
 +++ b/policy/modules/kernel/kernel.if
 @@ -330,6 +330,25 @@ interface(`kernel_stream_connect',`
@@ -113,7 +113,7 @@ index 1d696a07c..04a36152b 100644
 +		type kernel_t;
 +	')
 +
-+	allow $1 kernel_t:unix_stream_socket { read write };
++	allow $1 kernel_t:unix_stream_socket { rw_socket_perms };
 +')
 +
  ########################################
