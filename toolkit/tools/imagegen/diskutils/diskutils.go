@@ -32,6 +32,8 @@ var (
 	DefaultMkfsOptions = map[string][]string{
 		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
 		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
+		// grub2 doesn't recognize ext4 with metadata_csum_seed enabled
+		// ^metadata_csum_seed disables filesystem to store the metadata checksum seed in the superblock, hence disables changing uuid of mounted filesystem
 		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize,^metadata_csum_seed"},
 	}
 
