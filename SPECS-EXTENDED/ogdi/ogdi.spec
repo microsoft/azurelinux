@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		http://ogdi.sourceforge.net/
 # new project location is https://github.com/libogdi/ogdi
-Source0:	https://github.com/libogdi/ogdi/archive/%{name}_%{gittag}.tar.gz
+Source0:	https://github.com/libogdi/ogdi/archive/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:	http://ogdi.sourceforge.net/ogdi.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=1470896
 Patch0:		ogdi-4.1.0-sailer.patch
