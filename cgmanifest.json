@@ -4270,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.43.1",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.43.1.tar.gz"
+          "version": "2.62.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.62.0.tar.gz"
         }
       }
     },
@@ -25904,8 +25904,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.3",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.3.tar.gz"
+          "version": "3.3.5",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.5.tar.gz"
         }
       }
     },
