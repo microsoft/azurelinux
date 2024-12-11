@@ -6,6 +6,6 @@
  
 -use Digest::MD5;
 +use Digest::MD5 2.53;
+ use Encode;
  
  use Exporter 'import';
- 
