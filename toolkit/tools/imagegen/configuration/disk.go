@@ -19,6 +19,7 @@ import (
 type Disk struct {
 	PartitionTableType PartitionTableType `json:"PartitionTableType"`
 	MaxSize            uint64             `json:"MaxSize"`
+	BlockSize          uint32             `json:"BlockSize"`
 	TargetDisk         TargetDisk         `json:"TargetDisk"`
 	Artifacts          []Artifact         `json:"Artifacts"`
 	Partitions         []Partition        `json:"Partitions"`
@@ -81,6 +82,12 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 
 // IsValid returns an error if the PartitionTableType is not valid
 func (d *Disk) IsValid() (err error) {
+	switch d.BlockSize {
+	case 0, 512, 4096:
+		break
+	default:
+		return fmt.Errorf("invalid [BlockSize]: %d. Must be 0, 512, or 4096", d.BlockSize)
+	}
 	if err = d.PartitionTableType.IsValid(); err != nil {
 		return fmt.Errorf("invalid [PartitionTableType]: %w", err)
 	}
