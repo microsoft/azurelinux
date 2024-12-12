@@ -1,4 +1,4 @@
-# Release: March 2024
+# Release: December 2024
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -70,7 +70,7 @@ CKA_CLASS CK_OBJECT_CLASS CKO_NSS_BUILTIN_ROOT_LIST
 CKA_TOKEN CK_BBOOL CK_TRUE
 CKA_PRIVATE CK_BBOOL CK_FALSE
 CKA_MODIFIABLE CK_BBOOL CK_FALSE
-CKA_LABEL UTF8 "Microsoft Builtin Distrusted Roots"
+CKA_LABEL UTF8 "Microsoft Builtin Distrusted Certificates"
 
 #
 # Certificate "google.com"
