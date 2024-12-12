@@ -83,4 +83,4 @@ fi
 * Wed Dec 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
 - Created a standalone package for containerd 2.0.0
 - Initial CBL-Mariner import from Azure
-- Initial version
+- Initial version and License verified
