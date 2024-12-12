@@ -2223,6 +2223,7 @@
                 "cloud-hypervisor-cvm",
                 "cmake-fedora",
                 "containerd",
+                "containerd2",
                 "coredns",
                 "dcos-cli",
                 "debugedit",
