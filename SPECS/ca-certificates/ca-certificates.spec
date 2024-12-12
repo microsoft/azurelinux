@@ -6,6 +6,8 @@
 
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
 
+%define p11_format_distrusted_bundle ca-bundle.trust.distrusted.p11-kit
+
 %define p11_format_microsoft_bundle ca-bundle.trust.microsoft.p11-kit
 
 # List of packages triggering legacy certs generation if 'ca-certificates-legacy'
@@ -45,7 +47,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +71,8 @@ Source21:       certdata.base.txt
 Source22:       bundle2pem.sh
 # The certdata.microsoft.txt is provided by Microsoft's Trusted Root Program.
 Source23:       certdata.microsoft.txt
+# The certdata.distrusted.txt is provided by Microsoft's Trusted Root Program.
+Source24:       certdata.distrusted.txt
 
 BuildRequires:  /bin/ln
 BuildRequires:  asciidoc
@@ -91,7 +95,7 @@ Provides:       ca-certificates-mozilla = %{version}-%{release}
 BuildArch:      noarch
 
 %description
-The Public Key Inrastructure is used for many security issues in
+The Public Key Infrastructure is used for many security issues in
 a Linux system. In order for a certificate to be trusted, it must be
 signed by a trusted agent called a Certificate Authority (CA).
 The certificates loaded by this section are from the list of CAs trusted
@@ -146,6 +150,7 @@ cp -p %{SOURCE20} .
 
 %convert_certdata %{SOURCE21}
 %convert_certdata %{SOURCE23}
+%convert_certdata %{SOURCE24}
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
@@ -185,6 +190,9 @@ install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
 
 # Microsoft certs
 %install_bundles %{SOURCE23} %{p11_format_microsoft_bundle}
+
+# Distrusted certs
+%install_bundles %{SOURCE24} %{p11_format_distrusted_bundle}
 
 # TODO: consider to dynamically create the update-ca-trust script from within
 #       this .spec file, in order to have the output file+directory names at once place only.
@@ -307,6 +315,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{pkidir}/tls
 %dir %{pkidir}/tls/certs
 
+# Distrusted CAs
+%{_datadir}/pki/ca-trust-source/%{p11_format_distrusted_bundle}
+
 %ghost %{catrustdir}/extracted/pem/tls-ca-bundle.pem
 %ghost %{catrustdir}/extracted/pem/email-ca-bundle.pem
 %ghost %{catrustdir}/extracted/pem/objsign-ca-bundle.pem
@@ -324,6 +335,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-19
+- Update adding Microsoft distrusted CAs.
+
 * Fri Aug 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-18
 - Updating Microsoft trusted root CAs.
 
