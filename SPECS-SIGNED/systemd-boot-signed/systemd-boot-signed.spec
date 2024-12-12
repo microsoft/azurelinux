@@ -53,6 +53,9 @@ Provides: version(systemd-boot)%{_isa} = %version
 Obsoletes: systemd-udev < 252.2^
 Conflicts: grub2-efi-binary
 
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
+
 %description -n systemd-boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
