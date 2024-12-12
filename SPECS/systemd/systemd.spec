@@ -1216,7 +1216,7 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com>
+* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
 - Version bump to force signing with new Azure Linux secure boot key
 
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
