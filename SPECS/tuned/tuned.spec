@@ -13,7 +13,7 @@ Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 Source0:      https://github.com/redhat-performance/%{name}/archive/v%{version}%{?prerel2}/%{name}-%{version}%{?prerel2}.tar.gz
 Patch0:       skip-gui-files.patch
-Patch1:       CVE-2024-52336-52337.patch
+Patch1:       CVE-2024-52336.patch
 URL:          http://www.tuned-project.org/
 BuildArch:    noarch
 
