@@ -12,7 +12,7 @@
 
 # baseline variables for filename and temporary directory to avoid filenme collisions
 TEMP_TARBALL_DIR="TempRabbitmqTarball"
-VENDOR_TARBALL_NAME="rabbitmq-server-hex-vendor-3.11.11"
+VENDOR_TARBALL_NAME="rabbitmq-server-hex-vendor-3.11.24"
 
 #Create Hex Packag arrays and link
 HEX_PM_LINK="https://repo.hex.pm/tarballs"
