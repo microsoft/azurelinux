@@ -14,7 +14,6 @@ diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
      @staticmethod
      def link_rename(current_name: str, new_name: str):
          subp.subp(["ip", "link", "set", current_name, "name", new_name])
-+        subp.subp(["ip", "link", "show", new_name])
 +        time.sleep(0.5)
  
      @staticmethod
