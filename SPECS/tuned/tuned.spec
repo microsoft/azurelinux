@@ -7,12 +7,13 @@
 Summary:      A dynamic adaptive system tuning daemon
 Name:         tuned
 Version:      2.15.0
-Release:      4%{?dist}
+Release:      5%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 Source0:      https://github.com/redhat-performance/%{name}/archive/v%{version}%{?prerel2}/%{name}-%{version}%{?prerel2}.tar.gz
 Patch0:       skip-gui-files.patch
+Patch1:       CVE-2024-52336-52337.patch
 URL:          http://www.tuned-project.org/
 BuildArch:    noarch
 
@@ -407,6 +408,9 @@ fi
 %{_mandir}/man7/tuned-profiles-postgresql.7*
 
 %changelog
+* Wed Dec 11 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> 2.15.0-5
+- Fix CVEs - CVE-2024-52336 CVE-2024-52337.
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.15.0-4
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - License verified
