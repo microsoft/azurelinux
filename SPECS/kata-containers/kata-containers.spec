@@ -9,7 +9,6 @@ URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
@@ -40,9 +39,6 @@ This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE1}
-popd
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -114,6 +110,7 @@ popd
 %changelog
 * Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4.beta-1
 - Auto-upgrade to 3.2.0.azl4.beta
+- Remove cargo vendor source
 
 * Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
