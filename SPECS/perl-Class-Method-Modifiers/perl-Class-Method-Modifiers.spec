@@ -7,8 +7,8 @@
 
 Name:           perl-Class-Method-Modifiers
 Summary:        Provides Moose-like method modifiers
-Version:        2.13
-Release:        3%{?dist}
+Version:        2.15
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -87,6 +87,11 @@ make test
 %{_mandir}/man3/Class::Method::Modifiers.3*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 2.15-1
+- Promote package to Core repository.
+- License verified.
+- Update to v2.15.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

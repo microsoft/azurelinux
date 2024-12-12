@@ -1,6 +1,6 @@
 Name:           perl-Moo
-Version:        2.003006
-Release:        3%{?dist}
+Version:        2.005005
+Release:        1%{?dist}
 Summary:        Minimalist Object Orientation (with Moose compatibility)
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -98,6 +98,11 @@ not quite- two thirds of Moose.
 %{_mandir}/man3/*
 
 %changelog
+* Thu Aug 22 2024 Neha Agarwal <nehaagrwal@microsoft.com> - 2.005005-1
+- Promote package to Core repository.
+- License verified.
+- Update to v2.005005.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.003006-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
