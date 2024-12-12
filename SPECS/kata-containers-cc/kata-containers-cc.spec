@@ -43,9 +43,6 @@ This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{sourceName}-%{version}
-pushd %{_builddir}/%{sourceName}-%{version}
-tar -xf %{SOURCE1}
-popd
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
