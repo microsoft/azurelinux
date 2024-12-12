@@ -7,12 +7,13 @@
 Summary:      A dynamic adaptive system tuning daemon
 Name:         tuned
 Version:      2.21.0
-Release:      1%{?dist}
+Release:      2%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 Source0:      https://github.com/redhat-performance/%{name}/archive/v%{version}%{?prerel2}/%{name}-%{version}%{?prerel2}.tar.gz
 Patch0:       skip-gui-files.patch
+Patch1:       CVE-2024-52336-52337.patch
 URL:          http://www.tuned-project.org/
 BuildArch:    noarch
 
@@ -428,6 +429,9 @@ fi
 %{_mandir}/man7/tuned-profiles-openshift.7*
 
 %changelog
+* Wed Dec 11 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> 2.21.0-2
+- Fix CVEs - CVE-2024-52336 CVE-2024-52337
+
 * Tue Jan 16 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 2.21.0-1
 - Upgrade package version to 2.21.0
 - Modifying SPEC file to reflect upstream changes (https://github.com/redhat-performance/tuned/blob/v2.21.0/tuned.spec)
