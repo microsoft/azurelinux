@@ -1,6 +1,25 @@
+diff -ruN a/cloudinit/net/__init__.py b/cloudinit/net/__init__.py
+--- a/cloudinit/net/__init__.py	2024-09-04 12:01:58.000000000 -0700
++++ b/cloudinit/net/__init__.py	2024-12-12 15:11:50.839943511 -0800
+@@ -11,6 +11,7 @@
+ import logging
+ import os
+ import re
++import time
+ from typing import Any, Callable, Dict, List, Optional, Tuple
+ from urllib.parse import urlparse
+ 
+@@ -846,6 +847,7 @@
+         for op, mac, new_name, params in ops + ups:
+             try:
+                 opmap.get(op)(*params)
++                time.sleep(2)
+             except Exception as e:
+                 errors.append(
+                     "[unknown] Error performing %s%s for %s, %s: %s"
 diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
 --- a/cloudinit/net/netops/iproute2.py	2024-09-04 12:01:58.000000000 -0700
-+++ b/cloudinit/net/netops/iproute2.py	2024-12-11 17:00:35.590222604 -0800
++++ b/cloudinit/net/netops/iproute2.py	2024-12-12 15:12:39.452471476 -0800
 @@ -2,7 +2,7 @@
  
  from cloudinit import subp
@@ -14,7 +33,7 @@ diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
      @staticmethod
      def link_rename(current_name: str, new_name: str):
          subp.subp(["ip", "link", "set", current_name, "name", new_name])
-+        time.sleep(0.5)
++        time.sleep(1)
  
      @staticmethod
      def add_route(
