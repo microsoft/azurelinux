@@ -48,6 +48,7 @@ GitHub official command line tool.
 tar --no-same-owner -xf %{SOURCE1}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 export GOPATH=%{our_gopath}
