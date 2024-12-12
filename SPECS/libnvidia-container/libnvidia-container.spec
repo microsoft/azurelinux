@@ -1,10 +1,10 @@
-%define modprobe_version 550.54.14
+%define modprobe_version 560.35.03
 %define _major 1
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.17.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Source1:        nvidia-modprobe-%{modprobe_version}.tar.gz
 Patch0:         common.mk.patch
 Patch1:         libtirpc.patch
 Patch2:         nvidia-modprobe.patch
+Patch3:			nvidia-modprobe-version.patch
 BuildRequires:  libseccomp-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  make
@@ -32,6 +33,8 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 %setup -q
 %patch 0 -p1
 %patch 1 -p1
+%patch 3 -p1
+
 
 mkdir -p %{mod_probe_dir}
 tar -C %{mod_probe_dir} --strip-components=1 -xzf %{SOURCE1}
@@ -135,6 +138,9 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Thu Dec 12 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.17.1-2
+- Upgrade modprobe to 560.35.03
+
 * Mon Nov 11 2024 Henry Li <lihl@microsoft.com> - 1.17.1-1
 - Upgrade to v1.17.1
 
