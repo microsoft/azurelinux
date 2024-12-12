@@ -1,6 +1,6 @@
 diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
 --- a/cloudinit/net/netops/iproute2.py	2024-09-04 12:01:58.000000000 -0700
-+++ b/cloudinit/net/netops/iproute2.py	2024-12-11 16:09:24.023766325 -0800
++++ b/cloudinit/net/netops/iproute2.py	2024-12-11 17:00:35.590222604 -0800
 @@ -2,7 +2,7 @@
  
  from cloudinit import subp
@@ -10,7 +10,7 @@ diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
  
  class Iproute2(NetOps):
      @staticmethod
-@@ -30,6 +30,8 @@
+@@ -30,6 +30,7 @@
      @staticmethod
      def link_rename(current_name: str, new_name: str):
          subp.subp(["ip", "link", "set", current_name, "name", new_name])
