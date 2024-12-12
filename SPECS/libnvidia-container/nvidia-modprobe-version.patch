@@ -1,0 +1,24 @@
+From 364da012acd17214d011974f7fb859c858b3a8b0 Mon Sep 17 00:00:00 2001
+From: Zhichun Wan <zhichunwan@microsoft.com>
+Date: Thu, 12 Dec 2024 21:59:53 +0000
+Subject: [PATCH] patches
+
+---
+ /mk/nvidia-modprobe.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mk/nvidia-modprobe.mk b//mk/nvidia-modprobe.mk
+index 1633e0c..0a32813 100644
+--- a/mk/nvidia-modprobe.mk
++++ b/mk/nvidia-modprobe.mk
+@@ -6,7 +6,7 @@ include $(MAKE_DIR)/common.mk
+ 
+ ##### Source definitions #####
+ 
+-VERSION        := 550.54.14
++VERSION        := 560.35.03
+ PREFIX         := nvidia-modprobe-$(VERSION)
+ URL            := https://github.com/NVIDIA/nvidia-modprobe/archive/$(VERSION).tar.gz
+ 
+-- 
+2.45.2
