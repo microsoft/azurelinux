@@ -1,5 +1,6 @@
 {
- "Signatures": {
-  "kata-containers-3.2.0.azl4.beta2.tar.gz": "19fee7cf082d59ecc7cca730db96de5ffe620f7639fc8ec1a6446b65a767e248"
- }
+  "Signatures": {
+    "kata-containers-3.2.0.azl4.beta2.tar.gz": "774ecd81fa77ee50fde6048160715ce21236fc816d4cbf4a6d1d18016a341721",
+    "kata-containers-cc-3.2.0.azl4.beta2-cargo.tar.gz": "3acd59a94c9deeaa7027f3cbf6280d19f53f9b3b7e67d35f58e95b6d71f95a72"
+  }
 }
