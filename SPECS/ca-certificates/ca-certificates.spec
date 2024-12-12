@@ -335,7 +335,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
-* Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-19
+* Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-19
 - Update adding Microsoft distrusted CAs.
 
 * Fri Aug 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-18
