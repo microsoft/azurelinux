@@ -1,14 +1,14 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        26.2.5.6
-Release:        1%{?dist}
+Version:        26.2.3
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
-Source0:        https://github.com/erlang/otp/releases/download/OTP-%{version}/otp_src_%{version}.tar.gz
+Source0:        https://github.com/erlang/otp/releases/download/OTP-%{version}/otp_src_%{version}.tar.gz#/%{name}-%{version}.tar.gz        
 Patch0:         OTP-24-Code.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
@@ -54,9 +54,6 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
-* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.6-1
-- Auto-upgrade to 26.2.5.6 - fix cve CVE-2024-53846
-
 * Mon Apr 01 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-2
 - Add patch to fix issue when running with compiled code from OTP-24 on aarch64
 
