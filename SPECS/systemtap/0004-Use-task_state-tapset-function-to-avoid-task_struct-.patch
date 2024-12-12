@@ -1,0 +1,81 @@
+From 5ec01e15cd7e05d107483f1a1999dc03be773fbc Mon Sep 17 00:00:00 2001
+From: William Cohen <wcohen@redhat.com>
+Date: Mon, 13 Sep 2021 21:32:38 -0400
+Subject: [PATCH 4/4] Use task_state tapset function to avoid task_struct
+ changes
+
+The Linux 5.14 kernel's task_struct changed the state field to
+__state.  The task_state tapset function selects the appropriate
+version.  Make the scheduler.stp tapset and schedtimes.stp example use
+the task_state function rather than directly trying to access the
+task_struct state field (and get it wrong for newer kernels).
+---
+ tapset/linux/scheduler.stp                          | 10 +++++-----
+ testsuite/systemtap.examples/process/schedtimes.stp |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tapset/linux/scheduler.stp b/tapset/linux/scheduler.stp
+index 7338e9008..4667ab53a 100644
+--- a/tapset/linux/scheduler.stp
++++ b/tapset/linux/scheduler.stp
+@@ -138,7 +138,7 @@ probe scheduler.ctxswitch = kernel.trace("sched_switch") !,
+ 		prev_tid = $prev_p->pid
+ 		prev_task = $prev_p
+ 		prev_task_name = task_execname($prev_p)
+-		prevtsk_state = $prev_p->state
++		prevtsk_state = task_state($prev_p)
+ 	}
+ 	else {
+ 		prev_priority = $prev->prio
+@@ -146,7 +146,7 @@ probe scheduler.ctxswitch = kernel.trace("sched_switch") !,
+ 		prev_tid = $prev->pid
+ 		prev_task = $prev
+ 		prev_task_name = task_execname($prev)
+-		prevtsk_state = $prev->state
++		prevtsk_state = task_state($prev)
+ 	}
+ 
+ 	if (@defined($next)) {
+@@ -155,7 +155,7 @@ probe scheduler.ctxswitch = kernel.trace("sched_switch") !,
+ 		next_tid = $next->pid
+ 		next_task = $next
+ 		next_task_name = task_execname($next)
+-		nexttsk_state = $next->state
++		nexttsk_state = task_state($next)
+ 	}
+ 	else if (@defined($next_p)) {
+ 		next_priority = $next_p->prio
+@@ -163,7 +163,7 @@ probe scheduler.ctxswitch = kernel.trace("sched_switch") !,
+ 		next_tid = $next_p->pid
+ 		next_task = $next_p
+ 		next_task_name = task_execname($next_p)
+-		nexttsk_state = $next_p->state
++		nexttsk_state = task_state($next_p)
+ 	}
+ 	else {
+ 		next_priority = $new->prio
+@@ -171,7 +171,7 @@ probe scheduler.ctxswitch = kernel.trace("sched_switch") !,
+ 		next_tid = $new->pid
+ 		next_task = $new
+ 		next_task_name = task_execname($new)
+-		nexttsk_state = $new->state
++		nexttsk_state = task_state($new)
+ 	}
+ }
+ 
+diff --git a/testsuite/systemtap.examples/process/schedtimes.stp b/testsuite/systemtap.examples/process/schedtimes.stp
+index 4e422c893..ee1053045 100755
+--- a/testsuite/systemtap.examples/process/schedtimes.stp
++++ b/testsuite/systemtap.examples/process/schedtimes.stp
+@@ -99,7 +99,7 @@ probe kernel.trace("sched_switch")
+   // Task $prev is scheduled off this cpu
+   if (task_targeted($prev)) {
+     pid = $prev->pid
+-    state = $prev->state
++    state = task_state($prev)
+     update_times(pid, timestamp())
+ 
+     if (state > 0) {
+-- 
+2.34.1
+
