@@ -18,7 +18,6 @@ Source2: containerd.toml
 
 %{?systemd_requires}
 
-BuildRequires: git
 BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
