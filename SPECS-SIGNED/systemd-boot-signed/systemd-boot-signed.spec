@@ -95,6 +95,7 @@ popd
 %changelog
 * Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
 - Version bump to force signing with new Azure Linux secure boot key
+- Add confilcts/recommends on shim to ensure the keys match
 
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Update sd-boot install location
