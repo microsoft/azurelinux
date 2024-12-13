@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
@@ -134,16 +135,20 @@ func validatePackages(config configuration.Config) (err error) {
 		}
 
 		for _, pkg := range packageList {
-			if pkg == "kernel" {
-				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
+			// The installer tools have an undocumented feature which can support both "pkg-name" and "pkg-name=version" formats.
+			// This is in use, so we need to handle pinned versions in this check. Technically, 'tdnf' also supports "pkg-name-version" format,
+			// but it is not easily distinguishable from "long-package-name" format so it will not be supported here.
+			pkgVer, err := pkgjson.PackageStringToPackageVer(pkg)
+			if err != nil {
+				return fmt.Errorf("%s: %w", validateError, err)
 			}
-			if pkg == dracutFipsPkgName {
+			if pkgVer.Name == dracutFipsPkgName {
 				foundDracutFipsPackage = true
 			}
-			if pkg == selinuxPkgName {
+			if pkgVer.Name == selinuxPkgName {
 				foundSELinuxPackage = true
 			}
-			if pkg == userAddPkgName {
+			if pkgVer.Name == userAddPkgName {
 				foundUserAddPackage = true
 			}
 		}
