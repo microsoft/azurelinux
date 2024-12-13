@@ -23,7 +23,7 @@ BuildRequires:  clang-tools-extra
 Erlang is a programming language and runtime system for building massively scalable soft real-time systems with requirements on high availability.
 
 %prep
-%autosetup -n otp-OTP-%{version} -p1
+%autosetup -n otp_src_%{version} -p1
 
 %build
 export ERL_TOP=`pwd`
