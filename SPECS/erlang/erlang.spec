@@ -9,7 +9,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/releases/download/OTP-%{version}/otp_src_%{version}.tar.gz#/%{name}-%{version}.tar.gz        
-Patch0:         OTP-24-Code.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
