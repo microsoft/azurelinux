@@ -74,7 +74,7 @@ func TestShouldFailEmptySystemConfig(t *testing.T) {
 	assert.Equal(t, "invalid [SystemConfigs]:\nmissing [Name] field", err.Error())
 }
 
-func TestSELinuxRequiresSELinuxPacakgeInline(t *testing.T) {
+func TestSELinuxRequiresSELinuxPackageInline(t *testing.T) {
 	const (
 		configDirectory = "./testdata/"
 		targetConfig    = "test-config.json"
