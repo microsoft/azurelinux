@@ -1,6 +1,10 @@
 Summary:        GitHub official command line tool
 Name:           gh
+<<<<<<< HEAD
 Version:        2.43.1
+=======
+Version:        2.62.0
+>>>>>>> ce28288bf (Patch "gh" to fix CVE-2024-54132 (#11448))
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -28,6 +32,12 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
+<<<<<<< HEAD
+=======
+Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
+Patch1:         CVE-2024-54132.patch
+
+>>>>>>> ce28288bf (Patch "gh" to fix CVE-2024-54132 (#11448))
 BuildRequires:  golang < 1.23
 BuildRequires:  git
 Requires:       git
@@ -70,6 +80,15 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+<<<<<<< HEAD
+=======
+* Fri Dec 13 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-2
+- Patch CVE-2024-54132
+
+* Mon Nov 18 2024 Vince Perri <viperri@microsoft.com> - 2.62.0-1
+- Update to v2.62.0
+
+>>>>>>> ce28288bf (Patch "gh" to fix CVE-2024-54132 (#11448))
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 2.43.1-2
 - Pin golang version to <= 1.22
 
