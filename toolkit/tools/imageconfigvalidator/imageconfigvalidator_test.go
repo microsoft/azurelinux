@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -73,188 +74,145 @@ func TestShouldFailEmptySystemConfig(t *testing.T) {
 	assert.Equal(t, "invalid [SystemConfigs]:\nmissing [Name] field", err.Error())
 }
 
-func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
+func TestSELinuxRequiresSELinuxPacakgeInline(t *testing.T) {
 	const (
-		configDirectory string = "../../imageconfigs/"
-		targetPackage          = "core-efi.json"
+		configDirectory = "./testdata/"
+		targetConfig    = "test-config.json"
+		selinuxPkgName  = "selinux-policy"
 	)
-	configFiles, err := os.ReadDir(configDirectory)
+	configPath := filepath.Join(configDirectory, targetConfig)
+
+	config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
 	assert.NoError(t, err)
 
-	// Pick the first config file and mess something up which is deeply
-	// nested inside the json
-	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
-			configPath := filepath.Join(configDirectory, file.Name())
+	config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
 
-			fmt.Println("Corrupting ", configPath)
+	err = ValidateConfiguration(config)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to validate package lists in config: [SELinux] selected, but 'selinux-policy' package is not included in the package lists", err.Error())
 
-			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
-			assert.NoError(t, err)
+	//Add required SELinux package in the inline package definition
+	newPackagesField := []string{selinuxPkgName}
+	config.SystemConfigs[0].Packages = newPackagesField
 
-			config.Disks[0].PartitionTableType = configuration.PartitionTableType("not_a_real_partition_type")
-			err = ValidateConfiguration(config)
-			assert.Error(t, err)
-			assert.Equal(t, "invalid [Disks]:\ninvalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)", err.Error())
-
-			return
-		}
-	}
-	assert.Failf(t, "Could not find config", "Could not find image config file '%s' to test", filepath.Join(configDirectory, targetPackage))
+	err = ValidateConfiguration(config)
+	assert.NoError(t, err)
 }
 
-func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
-	const (
-		configDirectory     string = "../../imageconfigs/"
-		targetPackage              = "core-fips.json"
-		fipsPackageListFile        = "fips-packages.json"
-	)
-	configFiles, err := os.ReadDir(configDirectory)
+func TestValidationAgainstTestConfig(t *testing.T) {
+	confiDirAbsPath, err := filepath.Abs("./testdata/")
 	assert.NoError(t, err)
 
-	// Pick the core-fips config file, but remove the fips package list
-	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
-			configPath := filepath.Join(configDirectory, file.Name())
-
-			fmt.Println("Corrupting ", configPath)
-
-			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
-			assert.NoError(t, err)
-
-			newPackageList := []string{}
-			for _, pl := range config.SystemConfigs[0].PackageLists {
-				if !strings.Contains(pl, fipsPackageListFile) {
-					newPackageList = append(newPackageList, pl)
+	tests := []struct {
+		name           string
+		extraListPath  string
+		configModifier func(*configuration.Config)
+		expectedError1 string
+		expectedError2 string
+	}{
+		{
+			name:          "Deeply nested parsing error",
+			extraListPath: "",
+			configModifier: func(config *configuration.Config) {
+				config.Disks[0].PartitionTableType = configuration.PartitionTableType("not_a_real_partition_type")
+			},
+			expectedError1: "invalid [Disks]:\ninvalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)",
+			// No action is taken to fix the error, so it will still be present
+			expectedError2: "invalid [Disks]:\ninvalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)",
+		},
+		{
+			name:          "fips with  dracut-fips",
+			extraListPath: "./testdata/fips-list.json",
+			configModifier: func(config *configuration.Config) {
+				config.SystemConfigs[0].KernelCommandLine.EnableFIPS = true
+			},
+			expectedError1: "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists",
+			expectedError2: "",
+		},
+		{
+			name:          "selinux with selinux-policy",
+			extraListPath: "./testdata/selinux-policy-list.json",
+			configModifier: func(config *configuration.Config) {
+				config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
+			},
+			expectedError1: "failed to validate package lists in config: [SELinux] selected, but 'selinux-policy' package is not included in the package lists",
+			expectedError2: "",
+		},
+		{
+			name:          "user with shadowutils",
+			extraListPath: "./testdata/shadowutils-list.json",
+			configModifier: func(config *configuration.Config) {
+				config.SystemConfigs[0].Users = []configuration.User{
+					{
+						Name: "testuser",
+					},
 				}
-			}
-
-			config.SystemConfigs[0].PackageLists = newPackageList
-
-			err = ValidateConfiguration(config)
-			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists", err.Error())
-
-			return
-		}
-	}
-	assert.Fail(t, "Could not find "+targetPackage+" to test")
-}
-
-func TestShouldFailMissingSELinuxPackageWithSELinux(t *testing.T) {
-	const (
-		configDirectory   = "../../imageconfigs/"
-		targetPackage     = "core-efi.json"
-		targetPackageList = "selinux.json"
-	)
-	configFiles, err := os.ReadDir(configDirectory)
-	assert.NoError(t, err)
-
-	// Pick the core-efi config file, then enable SELinux
-	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
-			configPath := filepath.Join(configDirectory, file.Name())
-
-			fmt.Println("Corrupting ", configPath)
-
-			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
-			for i, list := range config.SystemConfigs[0].PackageLists {
-				// Delete the packagelist from the config
-				if strings.Contains(list, targetPackageList) {
-					config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists[:i], config.SystemConfigs[0].PackageLists[i+1:]...)
+			},
+			expectedError1: "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups",
+			expectedError2: "",
+		},
+		{
+			name:          "Shadowutils pinned version",
+			extraListPath: "./testdata/pinned-shadowutils-list.json",
+			configModifier: func(config *configuration.Config) {
+				config.SystemConfigs[0].Users = []configuration.User{
+					{
+						Name: "testuser",
+					},
 				}
-			}
-			assert.NoError(t, err)
-
-			config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
-
-			err = ValidateConfiguration(config)
-			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: [SELinux] selected, but 'selinux-policy' package is not included in the package lists", err.Error())
-
-			return
-		}
+			},
+			expectedError1: "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups",
+			expectedError2: "",
+		},
+		{
+			name:           "missing package list",
+			extraListPath:  "./testdata/not-a-real-list.json",
+			configModifier: func(config *configuration.Config) {},
+			expectedError1: "",
+			expectedError2: "failed to validate package lists in config: open " + path.Join(confiDirAbsPath, "not-a-real-list.json") + ": no such file or directory",
+		},
+		{
+			name:           "bad package name",
+			extraListPath:  "./testdata/bogus-list.json",
+			configModifier: func(config *configuration.Config) {},
+			expectedError1: "",
+			expectedError2: `failed to validate package lists in config: packages list entry "bad package = bad < version" does not match the '[name][optional_condition][optional_version]' format`,
+		},
 	}
-	assert.Fail(t, "Could not find "+targetPackage+" to test")
-}
 
-func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
-	const (
-		configDirectory   = "../../imageconfigs/"
-		targetPackage     = "core-efi.json"
-		targetPackageList = "selinux.json"
-		selinuxPkgName    = "selinux-policy"
-	)
-	configFiles, err := os.ReadDir(configDirectory)
-	assert.NoError(t, err)
-
-	// Pick the core-efi config file, then enable SELinux
-	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
-			configPath := filepath.Join(configDirectory, file.Name())
-
-			fmt.Println("Corrupting ", configPath)
-
-			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
-			for i, list := range config.SystemConfigs[0].PackageLists {
-				// Delete the packagelist from the config
-				if strings.Contains(list, targetPackageList) {
-					config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists[:i], config.SystemConfigs[0].PackageLists[i+1:]...)
-				}
-			}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			configPath := filepath.Join("./testdata/", "test-config.json")
+			config, err := configuration.LoadWithAbsolutePaths(configPath, "./testdata/")
 			assert.NoError(t, err)
 
-			//Add required SELinux package in the inline package definition
-			newPackagesField := []string{selinuxPkgName}
-			config.SystemConfigs[0].Packages = newPackagesField
+			// Break the config
+			tt.configModifier(&config)
 
-			config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
-
+			// Ensure the validation detects the expected failure
 			err = ValidateConfiguration(config)
-			assert.NoError(t, err)
-			return
-		}
-	}
-	assert.Fail(t, "Could not find "+targetPackage+" to test")
-}
-
-func TestShouldFailMissingShadowUtilsPackageWithUsers(t *testing.T) {
-	const (
-		configDirectory   = "../../imageconfigs/"
-		targetPackage     = "core-efi.json"
-		targetPackageList = "core-packages-image.json"
-	)
-	configFiles, err := os.ReadDir(configDirectory)
-	assert.NoError(t, err)
-
-	// Pick the core-efi config file, then add a user, then remove shadow-utils from the package list (via dropping core... its a bit hacky)
-	for _, file := range configFiles {
-		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
-			configPath := filepath.Join(configDirectory, file.Name())
-
-			fmt.Println("Corrupting ", configPath)
-
-			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
-			for i, list := range config.SystemConfigs[0].PackageLists {
-				// Delete the packagelist from the config
-				if strings.Contains(list, targetPackageList) {
-					config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists[:i], config.SystemConfigs[0].PackageLists[i+1:]...)
-				}
-			}
-			assert.NoError(t, err)
-
-			config.SystemConfigs[0].Users = []configuration.User{
-				{
-					Name: "testuser",
-				},
+			if tt.expectedError1 != "" {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError1, err.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 
+			// Fix the config by adding the package list if provided
+			if tt.extraListPath != "" {
+				replacementPackageListAbsPath, err := filepath.Abs(tt.extraListPath)
+				assert.NoError(t, err)
+				config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists, replacementPackageListAbsPath)
+			}
+
+			// Validate again
 			err = ValidateConfiguration(config)
-			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups", err.Error())
-
-			return
-		}
+			if tt.expectedError2 != "" {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError2, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
-	assert.Fail(t, "Could not find "+targetPackage+" to test")
 }
