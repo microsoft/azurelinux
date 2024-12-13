@@ -115,6 +115,7 @@ func validatePackages(config configuration.Config) (err error) {
 
 	const (
 		validateError     = "failed to validate package lists in config"
+		kernelPkgName     = "kernel"
 		dracutFipsPkgName = "dracut-fips"
 		fipsKernelCmdLine = "fips=1"
 		userAddPkgName    = "shadow-utils"
@@ -141,6 +142,10 @@ func validatePackages(config configuration.Config) (err error) {
 			pkgVer, err := pkgjson.PackageStringToPackageVer(pkg)
 			if err != nil {
 				return fmt.Errorf("%s: %w", validateError, err)
+			}
+
+			if pkgVer.Name == kernelPkgName {
+				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
 			}
 			if pkgVer.Name == dracutFipsPkgName {
 				foundDracutFipsPackage = true
