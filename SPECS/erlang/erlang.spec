@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
-Source0:        https://github.com/erlang/otp/releases/download/OTP-%{version}/otp_src_%{version}.tar.gz#/%{name}-%{version}.tar.gz        
+Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz      
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
