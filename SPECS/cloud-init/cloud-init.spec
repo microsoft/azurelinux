@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.3.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -143,7 +143,7 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed Dec 11 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-3
+* Wed Dec 11 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-2
 - Add patch to avoid cloud-init nics renaming race condition 
 
 * Tue Oct 01 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-1
