@@ -22,7 +22,7 @@ BuildRequires:  clang-tools-extra
 Erlang is a programming language and runtime system for building massively scalable soft real-time systems with requirements on high availability.
 
 %prep
-%autosetup -n otp_src_%{version} -p1
+%autosetup -n otp-OTP-%{version} -p1
 
 %build
 export ERL_TOP=`pwd`
@@ -53,8 +53,8 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
-* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.6-1
-- Auto-upgrade to 26.2.5.6 - fix cve CVE-2024-53846
+* Fri Dec 13 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 26.2.5.6-1
+- Upgrade to 26.2.5.6 - fix cve CVE-2024-53846. Removed previous patch below as vulnerability is addressed in new version
 
 * Mon Apr 01 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-2
 - Add patch to fix issue when running with compiled code from OTP-24 on aarch64
