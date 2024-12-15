@@ -14,7 +14,7 @@ Source1:        etcd.service
 #   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
-Patch1:		      CVE-2024-24786.patch
+Patch1:		    CVE-2024-24786.patch
 
 BuildRequires:  golang
 
