@@ -36,7 +36,7 @@ Patch2:         CVE-2023-49295.patch
 Patch3:         CVE-2024-22189.patch
 Patch4:         CVE-2023-45288.patch
 Patch5:         CVE-2024-0874.patch
-Patch6:		      CVE-2024-24786.patch
+Patch6:         CVE-2024-24786.patch
 
 BuildRequires:  golang
 
