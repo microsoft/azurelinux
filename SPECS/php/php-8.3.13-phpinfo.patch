@@ -25,7 +25,7 @@ diff -up ./ext/standard/tests/general_functions/phpinfo.phpt.phpinfo ./ext/stand
 @@ -17,7 +17,6 @@ PHP Version => %s
  
  System => %s
- Build Date => %s%a
+ Build Date => %r(.+?)%r
 -Configure Command => %s
  Server API => Command Line Interface
  Virtual Directory Support => %s
