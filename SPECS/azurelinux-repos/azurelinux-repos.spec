@@ -1,7 +1,7 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,8 @@ Source10:       azurelinux-official-base.repo
 Source11:       azurelinux-official-preview.repo
 Source12:       azurelinux-extended-debuginfo.repo
 Source13:       azurelinux-extended-debuginfo-preview.repo
+Source14:       azurelinux-amd.repo
+Source15:       azurelinux-amd-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -159,6 +161,14 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-base.repo
 
+%files amd
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd.repo
+
+%files amd-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd-preview.repo
+
 %files debug
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-debuginfo.repo
@@ -208,6 +218,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %changelog
+* Mon Dec 16 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
+- Add amd .repo files.
+
 * Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
 - Remove MICROSOFT-METADATA-GPG-KEY
 
