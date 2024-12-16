@@ -16,15 +16,12 @@ Distribution:   Azure Linux
 %define _kde4_buildtype release
 %define _kde4_macros_api 2
 
-%define rpm_macros_dir %{_sysconfdir}/rpm
-
 %define rpm_macros_dir %{_rpmconfigdir}/macros.d
-
 
 Summary: KDE filesystem layout
 Name: kde-filesystem
-Version: 4
-Release: 65%{?dist}
+Version: 5
+Release: 1%{?dist}
 
 License: Public Domain
 
@@ -40,28 +37,29 @@ Source2: macros.kde4
 
 Source3: applnk-hidden-directory
 
-Provides: kde4-macros(api) = %{_kde4_macros_api} 
-
 BuildRequires: gawk
 
 Requires:  filesystem
 Requires:  rpm
 
-# Help obsolete old package retirements
-
-Obsoletes: kdegraphics <= 7:4.14.3
-Obsoletes: kdegraphics-devel <= 7:4.14.3
-Obsoletes: kdegraphics-libs <= 7:4.14.3
-Obsoletes: kdenetwork <= 7:4.14.3
-Obsoletes: kdenetwork-common <= 7:4.14.3
-Obsoletes: kdenetwork-devel <= 7:4.14.3
-Obsoletes: kdesdk <= 4.14.3
-Obsoletes: kdesdk-common <= 4.14.3
-Obsoletes: kdesdk-devel <= 4.14.3
-
 
 %description
 This package provides some directories that are required/used by KDE. 
+
+%package -n kde3-filesystem
+Summary: Filesystem for KDE 3
+Requires: %{name} = %{version}-%{release}
+
+%description -n kde3-filesystem
+This package provides some directories that are required/used by KDE 3 applications.
+
+%package -n kde4-filesystem
+Summary: Filesystem and RPM macros for KDE 4
+Provides: kde4-macros(api) = %{_kde4_macros_api}
+Requires: %{name} = %{version}-%{release}
+
+%description -n kde4-filesystem
+This package provides some directories that are required/used by KDE 4 applications.
 
 
 %prep
@@ -146,53 +144,61 @@ cat %{SOURCE2} >> $RPM_BUILD_ROOT%{rpm_macros_dir}/macros.kde4
 
 ## Plasma5, forward compatibility
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/{lib,%{_lib}}/kconf_update_bin
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/kconf_update
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/knsrcfiles
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/kpackage/{genericqml,kcms}
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/solid/{actions,devices}
 
 
 %files -f %{name}.list
-# KDE3
+%{_sysconfdir}/xdg/plasma-workspace/
+%{_prefix}/lib/kconf_update_bin/
+%{_prefix}/%{_lib}/kconf_update_bin/
+%dir %{_docdir}/HTML/
+%lang(en) %{_docdir}/HTML/en/
+%{_datadir}/config.kcfg/
+%{_datadir}/emoticons/
+%{_datadir}/icons/locolor/
+%{_datadir}/kconf_update/
+%{_datadir}/knsrcfiles/
+%{_datadir}/kpackage/
+%{_datadir}/solid/
+%{_datadir}/templates/
+%{_datadir}/wallpapers/
+
+%files -n kde3-filesystem
 %{_sysconfdir}/kde/
 %{_datadir}/applications/kde/
 %{_datadir}/applnk/
 %{_datadir}/apps/
 %{_datadir}/autostart/
 %{_datadir}/config/
-%{_datadir}/config.kcfg/
-%{_datadir}/emoticons/
-%{_datadir}/icons/locolor
 %{_datadir}/mimelnk/
 %{_datadir}/services/
 %{_datadir}/servicetypes/
-%{_datadir}/templates/
 %{_prefix}/lib/kde3/
 %{_prefix}/%{_lib}/kde3/
-%dir %{_docdir}/HTML/
-%lang(en) %{_docdir}/HTML/en/
 
-# KDE4
+%files -n kde4-filesystem
 %{rpm_macros_dir}/macros.kde4
 %{_kde4_sysconfdir}/kde/
 %{_kde4_libexecdir}/
 %{_kde4_includedir}/
 %{_kde4_appsdir}/
 %{_kde4_configdir}/
-%{_kde4_sharedir}/config.kcfg/
-%{_kde4_sharedir}/emoticons/
 %{_kde4_sharedir}/kde4/
-%{_kde4_sharedir}/templates/
 %{_kde4_datadir}/applications/kde4/
 %{_kde4_datadir}/autostart/
-%{_kde4_datadir}/icons/locolor/
-%{_kde4_datadir}/wallpapers/
 %{_kde4_prefix}/lib/kde4/
 %{_kde4_prefix}/%{_lib}/kde4/
-%dir %{_kde4_docdir}/HTML/
-%lang(en) %{_kde4_docdir}/HTML/en/
-
-# Plasma5
-%{_sysconfdir}/xdg/plasma-workspace/
 
 
 %changelog
+* Mon Dec 16 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 5-1
+- Upgraded to version 5
+- License verified
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 4-65
 - License verified
 
