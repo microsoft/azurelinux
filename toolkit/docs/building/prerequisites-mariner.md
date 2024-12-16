@@ -30,6 +30,7 @@ sudo tdnf -y install \
     rpm \
     rpm-build \
     sudo \
+    systemd \
     tar \
     wget \
     xfsprogs
