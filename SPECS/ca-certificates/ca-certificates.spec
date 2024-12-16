@@ -265,13 +265,16 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh %{pkidir}/tls/certs/%{classic_tls_bundle}
 
 %files
+%defattr(-,root,root)
 # Microsoft certs bundle file with trust
 %{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
 
 %files base
+%defattr(-,root,root)
 %{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
 
 %files shared
+%defattr(-,root,root)
 %license LICENSE
 
 # symlinks for old locations
@@ -326,17 +329,20 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %ghost %{catrustdir}/extracted/edk2/cacerts.bin
 
 %files tools
+%defattr(-,root,root)
 # update/extract tool
 %{_bindir}/update-ca-trust
 
 %{_mandir}/man8/update-ca-trust.8.gz
 
 %files legacy
+%defattr(-,root,root)
 %{_bindir}/bundle2pem.sh
 
 %changelog
 * Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-19
 - Update adding Microsoft distrusted CAs.
+- Explicitly set default file ownership to root:root.
 
 * Fri Aug 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-18
 - Updating Microsoft trusted root CAs.
