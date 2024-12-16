@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.167.1
+Version:        5.15.173.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -29,7 +29,6 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-net-mlx5-Support-partial-TTC-rules.patch
 Patch1:         0002-net-mlx5-Introduce-port-selection-namespace.patch
-Patch2:         0003-net-mlx5-Add-support-to-create-match-definer.patch
 Patch3:         0004-net-mlx5-Introduce-new-uplink-destination-type.patch
 Patch4:         0005-net-mlx5-Lag-move-lag-files-into-directory.patch
 Patch5:         0006-net-mlx5-Lag-set-LAG-traffic-type-mapping.patch
@@ -230,7 +229,6 @@ manipulation of eBPF programs and maps.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
@@ -547,6 +545,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Dec 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.173.1-1
+- Auto-upgrade to 5.15.173.1
+
+* Thu Dec 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.169.1-1
+- Auto-upgrade to 5.15.169.1
+
 * Wed Sep 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.167.1-1
 - Auto-upgrade to 5.15.167.1
 
