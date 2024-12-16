@@ -28026,8 +28026,8 @@
         "type": "other",
         "other": {
           "name": "squid",
-          "version": "5.7",
-          "downloadUrl": "http://www.squid-cache.org/Versions/v5/squid-5.7.tar.xz"
+          "version": "6.12",
+          "downloadUrl": "https://www.squid-cache.org/Versions/v6/squid-6.12.tar.xz"
         }
       }
     },

@@ -1,83 +1,87 @@
 %define __perl_requires %{SOURCE98}
 Summary:        The Squid proxy caching server
 Name:           squid
-Version:        5.7
-Release:        5%{?dist}
+Version:        6.12
+Release:        1%{?dist}
 Epoch:          7
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.squid-cache.org
-Source0:        http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
-Source1:        squid.logrotate
-Source2:        squid.sysconfig
-Source3:        squid.pam
-Source4:        squid.nm
-Source5:        squid.service
-Source6:        cache_swap.sh
-Source7:        squid.sysusers
+
+Source0:        https://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz
+Source1: 	https://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz.asc
+Source2: 	https://www.squid-cache.org/pgp.asc
+Source3:        squid.logrotate
+Source4:        squid.sysconfig
+Source5:        squid.pam
+Source6:        squid.nm
+Source7:        squid.service
+Source8:        cache_swap.sh
+Source9:        squid.sysusers
 Source98:       perl-requires-squid.sh
-# Upstream patches
-# Backported patches
-Patch101:       squid-5.7-ip-bind-address-no-port.patch
-# Local patches
+
 # Applying upstream patches first makes it less likely that local patches
 # will break upstream ones.
-Patch201:       squid-4.0.11-config.patch
-Patch202:       squid-3.1.0.9-location.patch
-Patch203:       squid-3.0.STABLE1-perlpath.patch
-Patch204:       squid-3.5.9-include-guards.patch
+Patch201: squid-6.1-config.patch
+Patch202: squid-6.1-location.patch
+Patch203: squid-6.1-perlpath.patch
 # revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
 # workaround for #1934919
-Patch205:       squid-5.0.5-symlink-lang-err.patch
+Patch204: squid-6.1-symlink-lang-err.patch
+# Upstream PR: https://github.com/squid-cache/squid/pull/1442
+Patch205: squid-6.1-crash-half-closed.patch
+# Upstream PR: https://github.com/squid-cache/squid/pull/1914
+Patch206: squid-6.11-ignore-wsp-after-chunk-size.patch
+# https://bugs.squid-cache.org/show_bug.cgi?id=5214
+Patch207: squid-6.12-large-upload-buffer-dies.patch
+
+# cache_swap.sh
+Requires: bash gawk
+# for httpd conf file - cachemgr script alias        
+Requires: httpd-filesystem
+
 # required for SASL authentication
 BuildRequires:  cyrus-sasl-devel
-# ESI support requires Expat & libxml2
-BuildRequires:  expat-devel
-#ip_user helper requires
-BuildRequires:  gcc-c++
-# For verifying downloded src tarball
-BuildRequires:  gnupg2
-# squid_kerb_aut requires Kerberos development libs
-BuildRequires:  krb5-devel
-# TPROXY requires libcap, and also increases security somewhat
-BuildRequires:  libcap-devel
-# eCAP support
-BuildRequires:  libecap-devel
-# time_quota requires TrivialDB
-BuildRequires:  libtdb-devel
-BuildRequires:  libtool
-BuildRequires:  libtool-ltdl-devel
-BuildRequires:  libxml2-devel
-# squid_ldap_auth and other LDAP helpers require OpenLDAP
-BuildRequires:  make
-BuildRequires:  openldap-devel
+# squid_ldap_auth and other LDAP helpers require OpenLDAP 
+BuildRequires: make
+BuildRequires: openldap-devel
+# squid_pam_auth requires PAM development libs                
+BuildRequires: pam-devel
 # SSL support requires OpenSSL
-BuildRequires:  openssl-devel
-# squid_pam_auth requires PAM development libs
-BuildRequires:  pam-devel
-BuildRequires:  perl-generators
-BuildRequires:  pkg-config
-# systemd notify
-BuildRequires:  systemd-devel
-# for _tmpfilesdir and _unitdir macro
-# see https://docs.fedoraproject.org/en-US/packaging-guidelines/Systemd/#_packaging
-BuildRequires:  systemd-rpm-macros
+BuildRequires: openssl-devel                                                               
+# squid_kerb_aut requires Kerberos development libs
+BuildRequires: krb5-devel
+# time_quota requires TrivialDB                                                              
+BuildRequires: libtdb-devel
+# TPROXY requires libcap, and also increases security somewhat
+BuildRequires: libcap-devel                                                                   
+# eCAP support
+BuildRequires: libecap-devel
+#ip_user helper requires                                                                     
+BuildRequires: gcc-c++
+BuildRequires: libtool libtool-ltdl-devel
+BuildRequires: perl-generators                                                               
 # For test suite
-BuildRequires:  pkgconfig(cppunit)
-# cache_swap.sh
-Requires:       bash
-Requires:       gawk
-# for httpd conf file - cachemgr script alias
-Requires:       httpd-filesystem
-# Old NetworkManager expects the dispatcher scripts in a different place
-Conflicts:      NetworkManager < 1.20
+BuildRequires: pkgconfig(cppunit)
+# For verifying downloded src tarball                                                        
+BuildRequires: gnupg2
+# for _tmpfilesdir and _unitdir macro
+# see https://docs.fedoraproject.org/en-US/packaging-guidelines/Systemd/#_packaging          
+BuildRequires: systemd-rpm-macros
+# systemd notify
+BuildRequires: systemd-devel                                                                   
+
 %{?systemd_requires}
-%{?sysusers_requires_compat}
+%{?sysusers_requires_compat}                                                                   
+
+# Old NetworkManager expects the dispatcher scripts in a different place
+Conflicts: NetworkManager < 1.20
+
 
 %description
 Squid is a high-performance proxy caching server for Web clients,
-supporting FTP, gopher, and HTTP data objects. Unlike traditional
+supporting FTP and HTTP data objects. Unlike traditional
 caching software, Squid handles all requests in a single,
 non-blocking, I/O-driven process. Squid keeps meta data and especially
 hot objects cached in RAM, caches DNS lookups, supports non-blocking
@@ -88,19 +92,9 @@ lookup program (dnsserver), a program for retrieving FTP data
 (ftpget), and some management and client tools.
 
 %prep
-%setup -q
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'    
 
-# Upstream patches
-
-# Backported patches
-%patch 101 -p1 -b .ip-bind-address-no-port
-
-# Local patches
-%patch 201 -p1 -b .config
-%patch 202 -p1 -b .location
-%patch 203 -p1 -b .perlpath
-%patch 204  -b .include-guards
-%patch 205 -p1 -R -b .symlink-lang-err
+%autosetup -p1
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation
@@ -143,7 +137,7 @@ sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented
    --enable-storeio="aufs,diskd,ufs,rock" \
    --enable-diskio \
    --enable-wccpv2 \
-   --enable-esi \
+   --disable-esi \
    --enable-ecap \
    --with-aio \
    --with-default-user="squid" \
@@ -153,7 +147,8 @@ sed -i 's|@SYSCONFDIR@/squid.conf.documented|%{_pkgdocdir}/squid.conf.documented
    --disable-arch-native \
    --disable-security-cert-validators \
    --disable-strict-error-checking \
-   --with-swapdir=%{_localstatedir}/spool/squid
+   --with-swapdir=%{_localstatedir}/spool/squid \
+   --enable-translation
 
 # workaround to build squid v5
 mkdir -p src/icmp/tests
@@ -190,13 +185,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 mkdir -p %{buildroot}%{_libdir}/NetworkManager/dispatcher.d
 mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_libexecdir}/squid
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/logrotate.d/squid
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/squid
-install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/squid
-install -m 644 %{SOURCE5} %{buildroot}%{_unitdir}
-install -m 755 %{SOURCE6} %{buildroot}%{_libexecdir}/squid
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/squid
+install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/sysconfig/squid
+install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/squid
+install -m 644 %{SOURCE7} %{buildroot}%{_unitdir}
+install -m 755 %{SOURCE8} %{buildroot}%{_libexecdir}/squid
 install -m 644 %{buildroot}/squid.httpd.tmp %{buildroot}%{_sysconfdir}/httpd/conf.d/squid.conf
-install -m 755 %{SOURCE4} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d/20-squid
+install -m 755 %{SOURCE6} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d/20-squid
 mkdir -p %{buildroot}%{_localstatedir}/log/squid
 mkdir -p %{buildroot}%{_localstatedir}/spool/squid
 mkdir -p %{buildroot}/run/squid
@@ -221,7 +216,7 @@ rm -f %{buildroot}%{_sysconfdir}/squid/squid.conf.documented
 rm -f %{buildroot}/squid.httpd.tmp
 
 # sysusers.d
-install -p -D -m 0644 %{SOURCE7} %{buildroot}%{_sysusersdir}/squid.conf
+install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 
 %files
 %license COPYING
@@ -266,7 +261,7 @@ install -p -D -m 0644 %{SOURCE7} %{buildroot}%{_sysusersdir}/squid.conf
 %{_sysusersdir}/squid.conf
 
 %pre
-%{sysusers_create_compat} %{SOURCE7}
+%{sysusers_create_compat} %{SOURCE9}
 
 for i in %{_var}/log/squid %{_var}/spool/squid ; do
         if [ -d $i ] ; then
@@ -324,7 +319,12 @@ if ! getent group wbpriv >/dev/null 2>&1 ; then
 fi
 %{_sbindir}/usermod -a -G wbpriv squid >/dev/null 2>&1 || \
     chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
+
 %changelog
+* Fri Dec 06 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 7:6.12-1
+- Update to 6.12
+- License verified
+
 * Thu Feb 09 2023 Sindhu Karri <lakarri@microsoft.com> - 7:5.7-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths
