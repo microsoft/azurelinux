@@ -3091,7 +3091,8 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "python-nocaselist",
+                "trustauthority-cli"
             ]
         },
         "Sysbench source": {
