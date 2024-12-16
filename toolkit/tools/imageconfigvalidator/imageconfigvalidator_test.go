@@ -164,6 +164,20 @@ func TestValidationAgainstTestConfig(t *testing.T) {
 			expectedError1: "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups",
 			expectedError2: "",
 		},
+
+		{
+			name:          "Shadowutils pinned version with whitespace",
+			extraListPath: "./testdata/pinned-shadowutils-ws-list.json",
+			configModifier: func(config *configuration.Config) {
+				config.SystemConfigs[0].Users = []configuration.User{
+					{
+						Name: "testuser",
+					},
+				}
+			},
+			expectedError1: "failed to validate package lists in config: the 'shadow-utils' package must be included in the package lists when the image is configured to add users or groups",
+			expectedError2: "",
+		},
 		{
 			name:           "missing package list",
 			extraListPath:  "./testdata/not-a-real-list.json",
