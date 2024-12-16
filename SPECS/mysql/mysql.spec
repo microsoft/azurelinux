@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.40
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Patch0:         CVE-2012-5627.nopatch
 # AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
 # ciphers unavailable.
 Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
+Patch2:         CVE-2012-2677.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -38,14 +39,18 @@ Development headers for developing applications linking to maridb
 %prep
 %autosetup -p1
 
-# Remove unused, bundled version of protobuf.
+# Remove bundled versions of some tools to guarantee they are
+# not used by MySQL:
 # We're building with the '-DWITH_PROTOBUF=system' option.
 rm -r extra/protobuf
+# We're building with the '-DWITH_CURL=none' option.
+rm -r extra/curl
 
 %build
 cmake . \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DWITH_BOOST=boost/boost_1_77_0 \
+      -DWITH_CURL=none \
       -DWITH_PROTOBUF=system \
       -DINSTALL_MANDIR=share/man \
       -DINSTALL_DOCDIR=share/doc \
@@ -103,6 +108,12 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Nov 12 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-4
+- Patched CVE-2012-2677.
+
+* Tue Nov 05 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-3
+- Explicitly setting "WITH_CURL=none".
+
 * Mon Oct 28 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.40-2
 - Switch to ALZ version of protobuf instead of using the bundled one.
 
