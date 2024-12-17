@@ -18233,8 +18233,8 @@
         "type": "other",
         "other": {
           "name": "perl-Math-Int64",
-          "version": "0.54",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-0.54.tar.gz"
+          "version": "0.57",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-0.57.tar.gz"
         }
       }
     },
