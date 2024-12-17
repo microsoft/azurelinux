@@ -19533,8 +19533,8 @@
         "type": "other",
         "other": {
           "name": "perl-Return-MultiLevel",
-          "version": "0.05",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-0.05.tar.gz"
+          "version": "0.08",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Return-MultiLevel-0.08.tar.gz"
         }
       }
     },
