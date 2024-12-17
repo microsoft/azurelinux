@@ -68,8 +68,7 @@ Release:	 1_%{_release1}%{?_dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
-# Source:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/fwctl-24.10.tgz
-Source:		 %{_name}-%{_version}.tgz
+Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/fwctl-24.10.tgz#/%{_name}-%{_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
