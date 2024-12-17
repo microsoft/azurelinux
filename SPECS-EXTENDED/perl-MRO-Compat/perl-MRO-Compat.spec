@@ -1,39 +1,26 @@
-# MRO is part of the Perl core since 5.9.5
-
-%global mro_in_core 1
-
-Name:		perl-MRO-Compat
-Version:	0.13
-Release:	11%{?dist}
-Summary:	Mro::* interface compatibility for Perls < 5.9.5
-License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:		perl-MRO-Compat
+Version:	0.15
+Release:	11%{?dist}
+Summary:	Mro::* interface compatibility for Perls < 5.9.5
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MRO-Compat
-Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz#/perl-MRO-Compat-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
 BuildRequires:	make
-BuildRequires:	perl-interpreter
 BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
 BuildRequires:	perl(ExtUtils::MakeMaker)
 # Module
-%if ! %{mro_in_core}
-BuildRequires:	perl(Class::C3) >= 0.24
-BuildRequires:	perl(Class::C3::XS) >= 0.08
-%endif
 BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 # Test
 BuildRequires:	perl(Test::More) >= 0.47
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-%if ! %{mro_in_core}
-Requires:	perl(Class::C3) >= 0.24
-Requires:	perl(Class::C3::XS) >= 0.08
-%endif
 
 %description
 The "mro" namespace provides several utilities for dealing with method
@@ -60,7 +47,6 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
@@ -69,11 +55,16 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes README t/
 %{perl_vendorlib}/MRO/
 %{_mandir}/man3/MRO::Compat.3*
 
 %changelog
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.15-11
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
