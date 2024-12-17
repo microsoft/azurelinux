@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-String-CRC32
-Version:        1.8
-Release:        3%{?dist}
+Version:        2.100
+Release:        14%{?dist}
 Summary:        Perl interface for cyclic redundancy check generation
-License:        Public Domain
+License:        LicenseRef-Fedora-Public-Domain
 URL:            https://metacpan.org/release/String-CRC32
-Source0:        https://cpan.metacpan.org/modules/by-module/String/String-CRC32-%{version}.tar.gz#/perl-String-CRC32-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/String-CRC32-%{version}.tar.gz
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -15,17 +15,16 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Module Runtime
-BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+BuildRequires:  perl(XSLoader)
 # Test Suite
 # (no additional dependencies)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (no additional dependencies)
 
 # Avoid perl object provides
 %{?perl_default_filter}
@@ -45,12 +44,11 @@ differ from those of the programs mentioned above.
 %setup -q -n String-CRC32-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
@@ -58,17 +56,17 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
-%doc README.md
+%doc Changes README.md
 %{perl_vendorarch}/String/
 %{perl_vendorarch}/auto/String/
 %{_mandir}/man3/String::CRC32.3*
 
 %changelog
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 2.100-14
+- Initial CBL-Mariner import from Fedora 41 (license: LicenseRef-Fedora-Public-Domain).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
