@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,6 +56,7 @@ Patch34:        0034-systemd-Fix-dac_override-use-in-systemd-machine-id-s.patch
 Patch35:        0035-rpm-Run-systemd-sysctl-from-post.patch
 Patch36:        0036-fstools-Add-additional-perms-for-cloud-utils-growpar.patch
 Patch37:        0037-docker-Fix-dockerc-typo-in-container_engine_executab.patch
+Patch38:        0038-enable-liveos-iso-flow.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -327,11 +328,14 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Nov 20 2024 George Mileka <gmileka@microsoft.com> - 2.20240226-9
+- Enable SELinux for LiveOS ISO.
+
 * Wed Sep 11 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-8
 - Add additional required permissions for cloud-utils-growpart.
 - Cherry-pick upstream fix for typo in docker module.
 
-* Mon Aug 13 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-7
+* Tue Aug 13 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-7
 - Change policy composition so the base module only consits of policy modules
   that must be in the base.  This will allow dowstream users to disable or
   override the individual policy modules.
