@@ -18943,8 +18943,8 @@
         "type": "other",
         "other": {
           "name": "perl-Parallel-Iterator",
-          "version": "1.00",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AN/ANDYA/Parallel-Iterator-1.00.tar.gz"
+          "version": "1.002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AR/ARISTOTLE/Parallel-Iterator-1.002.tar.gz"
         }
       }
     },
