@@ -45,7 +45,6 @@
 %{!?KMP: %global KMP 0}
 
 # take kernel version or default to uname -r
-# %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -62,8 +61,8 @@
 %global _kmp_rel %{_release1}%{?_kmp_build_num}%{?_dist}
 
 Summary:	 %{_name} Driver
-Name:		 %{_name}
-Version:	 %{_version}
+Name:		 fwctl
+Version:	 24.10
 Release:	 1_%{_release1}%{?_dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
