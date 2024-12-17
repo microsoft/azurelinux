@@ -40,7 +40,7 @@ License:	GPL
 Group:		Networking/Admin
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# Source0:	http://www.kernel.org/pub/linux/utils/net/iproute2/%{name}-%{version}.tar.gz
+# Source0:	https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-iproute2-6.10.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 URL:		http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
 

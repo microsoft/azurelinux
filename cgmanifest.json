@@ -3999,6 +3999,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fwctl",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/fwctl-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fxload",
           "version": "2008_10_13",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fxload-2008_10_13-noa3load.tar.gz"
@@ -6979,6 +6989,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ibarr",
+          "version": "0.1.3",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/ibarr-0.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ibsim",
+          "version": "0.12",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/ibsim-0.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ibus",
           "version": "1.5.22",
           "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.22/ibus-1.5.22.tar.gz"
@@ -7503,6 +7533,26 @@
           "name": "iscsi-initiator-utils",
           "version": "2.1.9",
           "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/c26218d9f8afdca44a492a4c3811648bd2880b26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "iser",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/iser-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isert",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/isert-24.10.tgz"
         }
       }
     },
@@ -8263,6 +8313,16 @@
           "name": "kmod",
           "version": "30",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "knem",
+          "version": "1.1.4.90mlnx3",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/knem-1.1.4.90mlnx3.tar.gz"
         }
       }
     },
@@ -13030,6 +13090,56 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mft_kernel",
+          "version": "4.30.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/kernel-mft-4.30.0.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-ethtool",
+          "version": "6.9",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-ethtool-6.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-iproute2",
+          "version": "6.10.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-iproute2-6.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-nfsrdma",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-nfsrdma-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-ofa_kernel",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-ofa_kernel-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "metis",
           "version": "5.1.0",
           "downloadUrl": "http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz"
@@ -13144,6 +13254,16 @@
           "name": "mlx-bootctl",
           "version": "1.5",
           "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/SOURCES/mlx-bootctl-1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlx-steering-dump",
+          "version": "1.0.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlx-steering-dump-1.0.0.tar.gz"
         }
       }
     },
@@ -13474,6 +13594,16 @@
           "name": "mtr",
           "version": "0.95",
           "downloadUrl": "https://github.com/traviscross/mtr/archive/v0.95/mtr-0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "multiperf",
+          "version": "3.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/multiperf-3.0.tar.gz"
         }
       }
     },
@@ -25833,6 +25963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rshim",
+          "version": "2.1.5",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/rshim-2.1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rsync",
           "version": "3.2.7",
           "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.7.tar.gz"
@@ -27818,6 +27958,16 @@
           "name": "socket_wrapper",
           "version": "1.4.2",
           "downloadUrl": "https://ftp.samba.org/pub/cwrap/socket_wrapper-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sockperf",
+          "version": "3.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/sockperf-3.10.tar.gz"
         }
       }
     },
@@ -30621,6 +30771,26 @@
           "name": "xwud",
           "version": "1.0.6",
           "downloadUrl": "https://www.x.org/pub/individual/app/xwud-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xpmem-lib",
+          "version": "2.7",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/xpmem-lib-2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xpmem",
+          "version": "2.7.4",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/xpmem-2.7.4.tar.gz"
         }
       }
     },

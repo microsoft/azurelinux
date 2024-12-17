@@ -33,7 +33,7 @@ Release:	 1%{?_dist}.2410068
 License:	 GPLv2
 Url:		 https://github.com/Mellanox/mlx_steering_dump
 Group:		 Applications/System
-#		 Source: https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlx-steering-dump-1.0.0.tar.gz
+# Source:        https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlx-steering-dump-1.0.0.tar.gz
 Source:		 mlx-steering-dump-1.0.0.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
