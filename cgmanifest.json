@@ -19473,8 +19473,8 @@
         "type": "other",
         "other": {
           "name": "perl-String-CRC32",
-          "version": "1.8",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/String/String-CRC32-1.8.tar.gz"
+          "version": "2.100",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/String-CRC32-2.100.tar.gz"
         }
       }
     },
