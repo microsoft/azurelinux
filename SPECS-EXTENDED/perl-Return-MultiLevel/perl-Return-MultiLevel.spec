@@ -1,12 +1,12 @@
-Name:           perl-Return-MultiLevel
-Version:        0.05
-Release:        10%{?dist}
-Summary:        Return across multiple call levels
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Return-MultiLevel
+Version:        0.08
+Release:        10%{?dist}
+Summary:        Return across multiple call levels
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Return-MultiLevel
-Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-%{version}.tar.gz#/perl-Return-MultiLevel-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Return-MultiLevel-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -14,27 +14,21 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Find)
-BuildRequires:  perl(File::Spec)
 # Module
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(Data::Munge) >= 0.07
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Test Suite
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Data::Munge) >= 0.07
+# (none)
 # Optional Functionality
 BuildRequires:  perl(Scope::Upper) >= 0.29
 Requires:       perl(Scope::Upper) >= 0.29
-
-# Filter under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Data::Munge\\)$
 
 %description
 This module provides a way to return immediately from a deeply nested call
@@ -57,11 +51,16 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/Return/
 %{_mandir}/man3/Return::MultiLevel.3*
 
 %changelog
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 0.08-10
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.05-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
