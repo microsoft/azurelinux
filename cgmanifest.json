@@ -16973,8 +16973,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-Size",
-          "version": "0.83",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-Size-0.83.tar.gz"
+          "version": "0.84",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-Size-0.84.tar.gz"
         }
       }
     },
