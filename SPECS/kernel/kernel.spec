@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.57.1
-Release:        6%{?dist}
+Version:        6.6.64.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -424,6 +424,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.1-1
+- Auto-upgrade to 6.6.64.1
+
 * Mon Nov 25 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-6
 - Enable CONFIG_INTEL_TDX_GUEST and CONFIG_TDX_GUEST_DRIVER
 
