@@ -37,6 +37,7 @@ Patch1:         CVE-2022-3064.patch
 Patch2:         CVE-2023-49569.patch
 Patch3:         CVE-2024-6104.patch
 Patch4:         CVE-2024-24786.patch
+Patch5:         CVE-2024-45337.patch
 BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -70,6 +71,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Tue Dec 17 2024 Andrew Phelps <anphel@microsoft.com> - 1.9.5-5
+- Add patch for CVE-2024-45337
+
 * Mon Dec 09 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.9.5-4
 - Patch for CVE-2024-24786
 
