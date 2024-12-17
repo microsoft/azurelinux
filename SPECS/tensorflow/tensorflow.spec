@@ -96,7 +96,6 @@ patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
 popd
 
-
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 
