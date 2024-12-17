@@ -93,11 +93,9 @@ popd
 
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH4}
-popd
-
-pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH5}
 popd
+
 
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
