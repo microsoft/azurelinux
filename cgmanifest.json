@@ -15583,8 +15583,8 @@
         "type": "other",
         "other": {
           "name": "os-prober",
-          "version": "1.77",
-          "downloadUrl": "http://ftp.us.debian.org/debian/pool/main/o/os-prober/os-prober_1.77.tar.xz"
+          "version": "1.81",
+          "downloadUrl": "http://ftp.us.debian.org/debian/pool/main/o/os-prober/os-prober_1.81.tar.xz"
         }
       }
     },
