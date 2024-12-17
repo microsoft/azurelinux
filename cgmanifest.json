@@ -18563,8 +18563,8 @@
         "type": "other",
         "other": {
           "name": "perl-Mozilla-CA",
-          "version": "20200520",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AB/ABH/Mozilla-CA-20200520.tar.gz"
+          "version": "20240730",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LW/LWP/Mozilla-CA-20240730.tar.gz"
         }
       }
     },

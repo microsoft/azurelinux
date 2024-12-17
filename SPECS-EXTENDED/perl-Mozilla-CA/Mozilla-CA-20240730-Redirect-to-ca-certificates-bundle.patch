@@ -14,30 +14,27 @@ See <https://bugzilla.redhat.com/show_bug.cgi?id=738383> for more
 details.
 
 Signed-off-by: Petr Písař <ppisar@redhat.com>
----
- MANIFEST          | 1 -
- Makefile.PL       | 8 ++++++++
- lib/Mozilla/CA.pm | 8 +-------
- 3 files changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/MANIFEST b/MANIFEST
 index a88847b..6577ede 100644
 --- a/MANIFEST
 +++ b/MANIFEST
-@@ -1,5 +1,4 @@
+@@ -1,7 +1,6 @@
+ .editorconfig
+ Changes
  lib/Mozilla/CA.pm
 -lib/Mozilla/CA/cacert.pem
- Makefile.PL
- MANIFEST			This list of files
- README
+ maint/cacert-diff
+ maint/get-tarball-name
+ maint/make-tarball
 diff --git a/Makefile.PL b/Makefile.PL
 index 9faf720..a491813 100644
 --- a/Makefile.PL
 +++ b/Makefile.PL
-@@ -40,3 +40,11 @@ BEGIN {
-         ExtUtils::MakeMaker::WriteMakefile(%arg);
-     };
- }
+@@ -90,3 +90,11 @@
+ 
+ ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+ ## END BOILERPLATE ###########################################################
 +
 +package MY;
 +sub MY::libscan {
@@ -50,20 +47,15 @@ diff --git a/lib/Mozilla/CA.pm b/lib/Mozilla/CA.pm
 index e4a6c56..fdb3c75 100644
 --- a/lib/Mozilla/CA.pm
 +++ b/lib/Mozilla/CA.pm
-@@ -3,16 +3,10 @@ package Mozilla::CA;
- use strict;
- our $VERSION = '20200520';
+@@ -5,11 +5,9 @@
+ our $VERSION = '20240730';
  
--use Cwd ();
  use File::Spec ();
 -use File::Basename qw(dirname);
  
  sub SSL_ca_file {
 -    my $file = File::Spec->catfile(dirname(__FILE__), "CA", "cacert.pem");
--    if (!File::Spec->file_name_is_absolute($file)) {
--	$file = File::Spec->catfile(Cwd::cwd(), $file);
--    }
--    return $file;
+-    return File::Spec->rel2abs($file);
 +    return File::Spec->catfile('/etc/pki/tls/certs/ca-bundle.crt');
  }
  
