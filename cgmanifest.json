@@ -14172,8 +14172,8 @@
         "type": "other",
         "other": {
           "name": "nilfs-utils",
-          "version": "2.2.8",
-          "downloadUrl": "http://nilfs.sourceforge.net/download/nilfs-utils-2.2.8.tar.bz2"
+          "version": "2.2.11",
+          "downloadUrl": "http://nilfs.sourceforge.net/download/nilfs-utils-2.2.11.tar.bz2"
         }
       }
     },

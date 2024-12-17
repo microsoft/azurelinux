@@ -1,17 +1,18 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global _root_libdir	/%{_lib}
-%global _root_sbindir 	/sbin
 
 Name:		nilfs-utils
-Version:	2.2.8
-Release:	3%{?dist}
+Version:	2.2.11
+Release:	1%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
 URL:		http://nilfs.sourceforge.net
 Source0:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
-BuildRequires:	gcc, libuuid-devel, libmount-devel
+Source1:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2.asc
+Source2:	8B055AE86DEFF458.asc
+BuildRequires: make
+BuildRequires:	gcc, libuuid-devel, libmount-devel, gnupg2
 
 %description
 Userspace utilities for creating and mounting NILFS v2 filesystems.
@@ -29,34 +30,36 @@ filesystem-specific programs. If you install nilfs-utils-devel, you'll
 also want to install nilfs-utils.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
 
 %build
 # geez, make install is trying to run ldconfig on the system
-%configure LDCONFIG=/bin/true --disable-static --libdir %{_root_libdir}
+%configure LDCONFIG=/bin/true --disable-static
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-rm -f $RPM_BUILD_ROOT/%{_root_libdir}/libnilfs*.la
+make install DESTDIR=$RPM_BUILD_ROOT sbindir=%_sbindir root_sbindir=%_sbindir
+rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 
 %ldconfig_scriptlets
 
 %files
 %doc COPYING ChangeLog
 %config(noreplace) /etc/nilfs_cleanerd.conf
-%{_root_sbindir}/mkfs.nilfs2
-%{_root_sbindir}/mount.nilfs2
-%{_root_sbindir}/nilfs_cleanerd
-%{_root_sbindir}/umount.nilfs2
+%{_sbindir}/mkfs.nilfs2
+%{_sbindir}/mount.nilfs2
+%{_sbindir}/nilfs_cleanerd
+%{_sbindir}/umount.nilfs2
 %{_sbindir}/nilfs-tune
 %{_sbindir}/nilfs-clean
 %{_sbindir}/nilfs-resize
-%{_root_libdir}/libnilfscleaner.so.*
-%{_root_libdir}/libnilfsgc.so.*
+%{_libdir}/libnilfscleaner.so.*
+%{_libdir}/libnilfsgc.so.*
+%{_libdir}/libnilfs.so.*
 %{_bindir}/chcp
 %{_bindir}/dumpseg
 %{_bindir}/lscp
@@ -78,17 +81,19 @@ rm -f $RPM_BUILD_ROOT/%{_root_libdir}/libnilfs*.la
 %{_mandir}/man8/nilfs-tune.8.gz
 %{_mandir}/man8/nilfs-clean.8.gz
 %{_mandir}/man8/nilfs-resize.8.gz
-%{_root_libdir}/libnilfs.so.*
 
 %files devel
-%{_root_libdir}/libnilfs.so
-%{_root_libdir}/libnilfscleaner.so
-%{_root_libdir}/libnilfsgc.so
+%{_libdir}/libnilfs.so
+%{_libdir}/libnilfscleaner.so
+%{_libdir}/libnilfsgc.so
 %{_includedir}/nilfs.h
-%{_includedir}/nilfs2_fs.h
 %{_includedir}/nilfs_cleaner.h
 
 %changelog
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-1
+- Update to 2.2.11
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.8-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
