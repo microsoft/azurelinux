@@ -1,19 +1,38 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
+
 %bcond_without tests
+%if 0%{?fedora}
+%bcond_without pkcs11
+%else
+%bcond_with pkcs11
+%endif
+%if 0%{?fedora}
+%bcond_without libproxy
+%else
+%bcond_with libproxy
+%endif
+
+# Disable automatic .la file removal
+%global __brp_remove_la_files %nil
 
 Summary: An HTTP and WebDAV client library
 Name: neon
-Version: 0.31.2
-Release: 2%{?dist}
-License: LGPLv2+
+Version: 0.33.0
+Release: 1%{?dist}
+License: LGPL-2.0-or-later
 URL: https://notroj.github.io/neon/
 Source0: https://notroj.github.io/neon/neon-%{version}.tar.gz
-Patch0: neon-0.27.0-multilib.patch
-BuildRequires:  gcc-c++
-BuildRequires: expat-devel, openssl-devel, zlib-devel, krb5-devel, libproxy-devel
-BuildRequires: pkgconfig, pakchois-devel
-Requires: ca-certificates
+Patch0: neon-0.32.2-multilib.patch
+BuildRequires: expat-devel, openssl-devel, zlib-devel, krb5-devel
+BuildRequires: pkgconfig, make, gcc, xmlto
+%if %{with pkcs11}
+BuildRequires: pakchois-devel
+%endif
+%if %{with libproxy}
+BuildRequires: libproxy-devel
+%endif
 %if %{with tests}
 # SSL tests require openssl binary, PKCS#11 testing need certutil
 BuildRequires: /usr/bin/perl, /usr/bin/openssl, /usr/bin/certutil
@@ -31,29 +50,31 @@ Summary: Development libraries and C header files for the neon library
 Requires: neon = %{version}-%{release}, openssl-devel, zlib-devel, expat-devel
 Requires: pkgconfig
 # Documentation is GPLv2+
-License: LGPLv2+ and GPLv2+
+License: LGPL-2.0-or-later AND GPL-2.0-or-later
 
 %description devel
 The development library for the C language HTTP and WebDAV client library.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .multilib
+%autosetup -p1
 
 # prevent installation of HTML docs
-sed -ibak '/^install-docs/s/install-html//' Makefile.in
+sed -i '/^install-docs/s/install-html//' Makefile.in
 
 %build
-export CC="%{__cc} -pthread"
 %configure --with-expat --enable-shared --disable-static \
         --enable-warnings \
         --with-ssl=openssl --enable-threadsafe-ssl=posix \
+%if %{with libproxy}
         --with-libproxy
-make %{?_smp_mflags}
+%else
+        --without-libproxy
+%endif
+%make_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 
 sed -ri "/^dependency_libs/{s,-l[^ ']*,,g}" \
       $RPM_BUILD_ROOT%{_libdir}/libneon.la
@@ -82,6 +103,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-1
+- update to 0.33.0
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
