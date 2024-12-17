@@ -1,0 +1,38 @@
+From 6fe401628d5671cf2f7683e4e0a04b9dcefb0180 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Mon, 25 Nov 2024 16:27:41 -0800
+Subject: [PATCH] Handle SELinux configuration for overlayfs folders.
+
+When SELinux is enabled, the root folder '/' is expected to be marked
+'root_t' - otherwise, SELinux will deny access calls.
+
+When an overlay is created for the root folder, it is created using
+the lower and upper folders. The upper folder is created on tmpfs,
+and subsequently getted the 'tmpfs_t' assigned by inheritence.
+When the root overlay is created, it inherits the 'tmpfs_t'.
+
+Now, we have a conflict between what SELinux expects ('root_t') and
+what we ended-up with ('tmpfs_t') leading to denials and failing to
+complete the boot successfully.
+
+This patch injects a script ('azl-configure-sellinux.sh') that will
+run after Dracut's SELinux module runs, and assigns the right SELinux
+types (i.e. 'root_t') to the overlay folders. That way, when pivoting
+takes place, the visible root folder has the right SELinux labeling.
+---
+ modules.d/90overlayfs/module-setup.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules.d/90overlayfs/module-setup.sh b/modules.d/90overlayfs/module-setup.sh
+index dae20093..919df4f5 100755
+--- a/modules.d/90overlayfs/module-setup.sh
++++ b/modules.d/90overlayfs/module-setup.sh
+@@ -17,4 +17,5 @@ install() {
+     inst_hook pre-mount 01 "$moddir/prepare-overlayfs.sh"
+     inst_hook mount 01 "$moddir/mount-overlayfs.sh"     # overlay on top of block device
+     inst_hook pre-pivot 10 "$moddir/mount-overlayfs.sh" # overlay on top of network device (e.g. nfs)
++    inst_hook pre-pivot 70 "$moddir/azl-configure-selinux.sh"
+ }
+-- 
+2.34.1
+
