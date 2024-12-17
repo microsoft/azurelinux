@@ -2,14 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: perl-Net-Telnet
 Summary: Interact with TELNET port or other TCP ports
-Version: 3.04
-Release: 14%{?dist}
-License: GPL+ or Artistic
+Version: 3.05
+Release: 12%{?dist}
+License: GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: https://metacpan.org/release/Net-Telnet
-Source0: ftp://ftp.cpan.org/pub/CPAN/authors/id/J/JR/JROGERS/Net-Telnet-%{version}.tar.gz
+Source0: https://cpan.metacpan.org/authors/id/J/JR/JROGERS/Net-Telnet-%{version}.tar.gz
 
 # runtime depends
-Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires: perl(IO::Socket::INET)
 
 # build
@@ -17,8 +16,8 @@ BuildArch: noarch
 BuildRequires: coreutils
 BuildRequires: findutils
 BuildRequires: make
-BuildRequires: perl-interpreter
 BuildRequires: perl-generators
+BuildRequires: perl-interpreter
 BuildRequires: perl(Exporter)
 BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: perl(FileHandle)
@@ -59,6 +58,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 3.05-12
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.04-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
