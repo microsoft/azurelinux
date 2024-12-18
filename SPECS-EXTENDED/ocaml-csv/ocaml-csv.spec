@@ -1,20 +1,23 @@
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           ocaml-csv
-Version:        1.7
-Release:        17%{?dist}
+Version:        2.4
+Release:        1%{?dist}
 Summary:        OCaml library for reading and writing CSV files
-License:        LGPLv2+
+License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
 
 URL:            https://github.com/Chris00/ocaml-csv/
-Source0:        https://github.com/Chris00/ocaml-csv/files/1394287/csv-1.7.tar.gz
+Source0:        https://github.com/Chris00/ocaml-csv/archive/%{version}/%{name}-%{version}.tar.gz
+# Remove references to a bytes library for OCaml 5.0 support
+Patch0:         %{name}-bytes.patch
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-extlib-devel >= 1.5.3-2
-BuildRequires:  gawk
+BuildRequires:  ocaml >= 4.03.0
+BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-uutf-devel
+BuildRequires:  ocaml-lwt-devel
 
 
 %description
@@ -28,7 +31,7 @@ handling CSV files from shell scripts.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
 %description    devel
@@ -36,57 +39,67 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 
+%package        lwt
+Summary:        LWT bindings for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+
+%description    lwt
+The %{name}-lwt package contains LWT bindings for %{name}.
+
+
+%package        lwt-devel
+Summary:        LWT development files for %{name}
+Requires:       %{name}-lwt%{?_isa} = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-lwt-devel%{?_isa}
+
+
+%description    lwt-devel
+The %{name}-devel package contains libraries and signature files for
+developing applications that use LWT with %{name}.
+
+
 %prep
-%setup -q -n csv-%{version}
+%autosetup -p1
 
 
 %build
-ocaml setup.ml -configure --prefix %{_prefix} --destdir $RPM_BUILD_ROOT --disable-tests
-ocaml setup.ml -build
+# _smp_mflags breaks the build for some reason.
+# https://github.com/Chris00/ocaml-csv/issues/34
+%dune_build -j1
 
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR
+%dune_install -s
 
-ocaml setup.ml -install
-
-%ifarch %{ocaml_native_compiler}
-mkdir -p $DESTDIR%{_bindir}
-install -m 0755 csvtool.native $DESTDIR%{_bindir}/csvtool
-%endif
+# Remove the csvtool META file and opam project
+rm -r %{buildroot}%{ocamldir}/csvtool
 
 
-%files
-%doc LICENSE.txt
-%{_libdir}/ocaml/csv
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/csv/*.a
-%exclude %{_libdir}/ocaml/csv/*.cmxa
-%exclude %{_libdir}/ocaml/csv/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/csv/*.mli
+%files -f .ofiles-csv
+%license LICENSE.md
 %{_bindir}/csvtool
 
 
-%files devel
-%doc AUTHORS.txt LICENSE.txt README.txt
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/csv/*.a
-%{_libdir}/ocaml/csv/*.cmxa
-%{_libdir}/ocaml/csv/*.cmx
-%endif
-%{_libdir}/ocaml/csv/*.mli
+%files devel -f .ofiles-csv-devel
+%doc CHANGES.md README.md
+
+
+%files lwt -f .ofiles-csv-lwt
+
+
+%files lwt-devel -f .ofiles-csv-lwt-devel
 
 
 %changelog
+* Thu Dec 19 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4-1
+- Update to 2.4
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-17
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-
-* Fri Feb 28 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-16.1
-- OCaml 4.10.0 final (Fedora 32).
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-16
 - OCaml 4.10.0 final.
