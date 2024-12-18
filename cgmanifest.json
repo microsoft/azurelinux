@@ -3637,6 +3637,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "flashrom",
+          "version": "1.4.0",
+          "downloadUrl": "https://download.flashrom.org/releases/flashrom-1.4.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "flatbuffers",
           "version": "23.5.26",
           "downloadUrl": "https://github.com/google/flatbuffers/archive/v23.5.26/flatbuffers-23.5.26.tar.gz"
@@ -4009,6 +4019,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fwupd",
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/fwupd/fwupd/releases/download/2.0.1/fwupd-2.0.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fwupd-efi",
+          "version": "1.6",
+          "downloadUrl": "https://github.com/fwupd/fwupd-efi/releases/download/1.6/fwupd-efi-1.6.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fxload",
           "version": "2008_10_13",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fxload-2008_10_13-noa3load.tar.gz"
@@ -4282,6 +4312,16 @@
           "name": "gh",
           "version": "2.62.0",
           "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.62.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gi-docgen",
+          "version": "2024.1",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/gi-docgen/-/archive/2024.1/gi-docgen-2024.1.tar.bz2"
         }
       }
     },
@@ -8850,6 +8890,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcbor",
+          "version": "0.11.0",
+          "downloadUrl": "https://github.com/PJK/libcbor/archive/v0.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libcdio",
           "version": "2.0.0",
           "downloadUrl": "http://ftp.gnu.org/gnu/libcdio/libcdio-2.0.0.tar.gz"
@@ -9850,9 +9900,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libjaylink",
+          "version": "0.3.0",
+          "downloadUrl": "https://gitlab.zapb.de/libjaylink/libjaylink/-/archive/0.3.0/libjaylink-0.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libjcat",
           "version": "0.2.2",
-          "downloadUrl": "https://github.com/hughsie/libjcat/archive/refs/tags/0.2.2.tar.gz"
+          "downloadUrl": "https://github.com/hughsie/libjcat/releases/download/0.2.2/libjcat-0.2.2.tar.xz"
         }
       }
     },
@@ -11400,6 +11460,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libusb1",
+          "version": "1.0.27",
+          "downloadUrl": "https://github.com/libusb/libusb/releases/download/v1.0.27/libusb-1.0.27.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libusbmuxd",
           "version": "2.0.0",
           "downloadUrl": "https://github.com/libimobiledevice/libusbmuxd/archive/2.0.0.tar.gz"
@@ -11891,8 +11961,8 @@
         "type": "other",
         "other": {
           "name": "libxmlb",
-          "version": "0.3.11",
-          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.11/libxmlb-0.3.11.tar.xz"
+          "version": "0.3.21",
+          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.21/libxmlb-0.3.21.tar.xz"
         }
       }
     },
@@ -15748,6 +15818,16 @@
         }
       }
     },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "passim",
+          "version": "0.1.8",
+          "downloadUrl": "https://github.com/hughsie/passim/releases/download/0.1.8/passim-0.1.8.tar.xz"
+        }
+      }
+    },    
     {
       "component": {
         "type": "other",
@@ -22012,6 +22092,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-breathe",
+          "version": "4.35.0",
+          "downloadUrl": "https://github.com/michaeljones/breathe/archive/v4.35.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cached_property",
           "version": "1.5.2",
           "downloadUrl": "https://github.com/pydanny/cached-property/archive/1.5.2/cached-property-1.5.2.tar.gz"
@@ -22025,6 +22115,16 @@
           "name": "python-cachetools",
           "version": "5.3.3",
           "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-cbor2",
+          "version": "5.6.5",
+          "downloadUrl": "https://github.com/agronholm/cbor2/archive/5.6.5/python-cbor2-5.6.5.tar.gz"
         }
       }
     },
@@ -24532,6 +24632,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-smartypants",
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/leohemsted/smartypants.py/archive/v2.0.1/smartypants-2.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sniffio",
           "version": "1.1.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sniffio/sniffio-1.1.0.tar.gz"
@@ -24665,6 +24775,16 @@
           "name": "python-sphinxcontrib-httpdomain",
           "version": "1.7.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-httpdomain/sphinxcontrib-httpdomain-1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-jquery",
+          "version": "4.1",
+          "downloadUrl": "https://github.com/sphinx-contrib/jquery/archive/v4.1/sphinxcontrib-jquery-4.1.tar.gz"
         }
       }
     },
@@ -24972,6 +25092,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-typogrify",
+          "version": "2.0.7",
+          "downloadUrl": "https://github.com/mintchaos/typogrify/archive/refs/tags/2.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-uamqp",
           "version": "1.5.1",
           "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
@@ -25015,6 +25145,16 @@
           "name": "python-urwid",
           "version": "2.1.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/u/urwid/urwid-2.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-uswid",
+          "version": "0.5.0",
+          "downloadUrl": "https://github.com/hughsie/python-uswid/archive/0.5.0/python-uswid-0.5.0.tar.gz"
         }
       }
     },
@@ -29178,6 +29318,16 @@
           "name": "umoci",
           "version": "0.4.7",
           "downloadUrl": "https://github.com/opencontainers/umoci/archive/refs/tags/v0.4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "umockdev",
+          "version": "0.18.4",
+          "downloadUrl": "https://github.com/martinpitt/umockdev/releases/download/0.18.4/umockdev-0.18.4.tar.xz"
         }
       }
     },
