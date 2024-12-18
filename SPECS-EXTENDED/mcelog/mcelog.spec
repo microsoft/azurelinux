@@ -1,8 +1,8 @@
 Summary:	Tool to translate x86-64 CPU Machine Check Exception data
 Name:		mcelog
-Version:	168
-Release:	3%{?dist}
-License:	GPLv2
+Version:	175
+Release:	1%{?dist}
+License:	GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://github.com/andikleen/mcelog
@@ -61,6 +61,10 @@ install -p -m644 mcelog*.5 $RPM_BUILD_ROOT/%{_mandir}/man5/
 %{_mandir}/*/*
 
 %changelog
+* Tue Dec 17 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 175-1
+- Upgraded to version 175
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 168-3
 - Remove epoch
 
