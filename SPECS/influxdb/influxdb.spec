@@ -57,7 +57,7 @@ Source5:        config.yaml
 Source6:        influxdb-user.conf
 Patch0:         CVE-2024-6104.patch
 Patch1:         CVE-2022-32149.patch
-Patch2:		      CVE-2024-24786.patch
+Patch2:  CVE-2024-24786.patch
 BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  kernel-headers
