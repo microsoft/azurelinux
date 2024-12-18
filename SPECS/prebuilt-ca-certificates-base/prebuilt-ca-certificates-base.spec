@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates-base
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-8
+- Update adding Microsoft distrusted CAs.
+
 * Tue Aug 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-7
 - Making 'Release' match with 'ca-certificates'
 
