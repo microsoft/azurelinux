@@ -8180,6 +8180,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-srpm-macros",
+          "version": "1.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-srpm-macros-1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-uvm",
           "version": "6.1.58.mshv4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
