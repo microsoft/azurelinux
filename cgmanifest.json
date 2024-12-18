@@ -15603,8 +15603,8 @@
         "type": "other",
         "other": {
           "name": "parallel",
-          "version": "20190922",
-          "downloadUrl": "http://ftp.gnu.org/gnu/parallel/parallel-20190922.tar.bz2"
+          "version": "20240922",
+          "downloadUrl": "https://ftp.gnu.org/gnu/parallel/parallel-20240922.tar.bz2"
         }
       }
     },
