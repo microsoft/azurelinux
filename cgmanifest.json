@@ -12941,8 +12941,8 @@
         "type": "other",
         "other": {
           "name": "meanwhile",
-          "version": "1.1.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/meanwhile-1.1.0.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/obriencj/meanwhile/archive/refs/tags/v1.1.1.tar.gz"
         }
       }
     },
