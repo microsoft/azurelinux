@@ -26,9 +26,11 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%if 0%{azl}
+%global target_kernel_version_full f.a.k.e
+%else
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
@@ -56,8 +58,7 @@ License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
-# Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/knem-1.1.4.90mlnx3.tar.gz
-Source0:         knem-%{version}.tar.gz
+Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
 
 BuildRequires:  gcc
@@ -276,8 +277,8 @@ fi
 %endif
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor version prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Mon Mar 17 2014 Alaa Hleihel <alaa@mellanox.com>

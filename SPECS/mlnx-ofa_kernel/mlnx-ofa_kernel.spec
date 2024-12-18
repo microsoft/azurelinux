@@ -26,9 +26,11 @@
 #
 #
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%if 0%{azl}
+%global target_kernel_version_full f.a.k.e
+%else
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
@@ -100,8 +102,7 @@ Release:	 1_%{_release}%{?_dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-# Source:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-ofa_kernel-24.10.tgz
-Source:		 %{_name}-%{_version}.tgz
+Source0:          https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
@@ -733,8 +734,8 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor release prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Thu Jun 18 2015 Alaa Hleihel <alaa@mellanox.com>

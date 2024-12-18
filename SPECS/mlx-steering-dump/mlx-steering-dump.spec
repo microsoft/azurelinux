@@ -33,8 +33,7 @@ Release:	 1%{?_dist}.2410068
 License:	 GPLv2
 Url:		 https://github.com/Mellanox/mlx_steering_dump
 Group:		 Applications/System
-# Source:        https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlx-steering-dump-1.0.0.tar.gz
-Source:		 mlx-steering-dump-1.0.0.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz#/%name}-%{version}.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
@@ -72,8 +71,8 @@ install -m 755 hws/mlx_hw_steering_dump %{buildroot}/usr/bin/
 /usr/bin/mlx_hw_steering_dump
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor release prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Wed Oct 6 2021 Mohammad Kabat <mohammadkab@nvidia.com>

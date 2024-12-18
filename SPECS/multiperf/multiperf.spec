@@ -6,8 +6,7 @@ License:	 BSD 3-Clause, GPL v2 or later
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
 Group:		 Productivity/Networking/Diagnostic
-# Source:        https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/multiperf-3.0.tar.gz
-Source:		 %{name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz#/%{name}-%{version}.tar.gz
 Url:		 ""
 BuildRoot:      /var/tmp/%{name}-%{version}-build
 
@@ -36,8 +35,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor release prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Sun Feb 08 2015 - gilr@mellanox.com

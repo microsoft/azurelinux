@@ -10,8 +10,7 @@ License:	 GPLv2
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
 URL:		 https://github.com/mellanox/rshim-user-space
-# Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/rshim-2.1.5.tar.gz
-Source0:	 %{name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/rshim-2.1.5.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:	 gcc, autoconf, automake, pkgconfig, make
 BuildRequires:	 pkgconfig(libpci), pkgconfig(libusb-1.0) fuse3-devel fuse3-libs
 
@@ -97,8 +96,8 @@ fi
 %{_mandir}/man8/bf-reg.8.gz
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

@@ -8,8 +8,7 @@ Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
 URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
-#Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/mlnx-ethtool-6.9.tar.gz
-Source:		 %{name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ethtool-6.9.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
 
@@ -40,7 +39,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

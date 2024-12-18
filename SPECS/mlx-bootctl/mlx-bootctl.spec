@@ -44,7 +44,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/SOURCES/%{name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/SOURCES/%{name}-%{version}.tar.gz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 

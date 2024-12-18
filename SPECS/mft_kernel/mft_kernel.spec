@@ -1,7 +1,9 @@
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%if 0%{azl}
+%global target_kernel_version_full f.a.k.e
+%else
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
@@ -40,8 +42,7 @@ Release:	 1_%{!?source:%{krelver}%{?_dist}}%{?source:%{_release}%{?_dist}}
 License:	 Dual BSD/GPL
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
-#Source:         https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/kernel-mft-4.30.0.tgz
-Source:		 kernel-mft-%{version}.tgz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/kernel-mft-4.30.0.tgz#/kernel-mft-%{version}.tgz
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
 
@@ -226,7 +227,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor release prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

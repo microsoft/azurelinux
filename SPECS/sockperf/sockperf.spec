@@ -12,8 +12,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/mellanox/%{name}
-# Source0:	https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/sockperf-3.10.tar.gz
-Source0:	%{name}-%{version}.tar.gz
+Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/sockperf-3.10.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  doxygen
 
@@ -82,7 +81,7 @@ make install DESTDIR="%{?buildroot}"
 %{_my_pkgdocdir}
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and add minor release prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

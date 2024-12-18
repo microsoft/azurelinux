@@ -9,8 +9,7 @@ Release:	 %rel.2410068%{?dist}
 License:	 GPLv2 or BSD
 Group:		 System Environment/Libraries
 BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# Source:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/ibsim-0.12.tar.gz
-Source:		 ibsim-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibsim-0.12.tar.gz#/ibsim-%{version}.tar.gz
 Url:		 https://github.com/linux-rdma/ibsim
 
 BuildRequires: libibmad-devel
@@ -45,7 +44,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc README COPYING TODO net-examples scripts
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

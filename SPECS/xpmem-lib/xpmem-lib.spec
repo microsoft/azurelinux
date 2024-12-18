@@ -10,8 +10,7 @@ License:	 LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
-# Source:        https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/xpmem-lib-2.7.tar.gz
-Source:		 %{name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-lib-2.7.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: automake
 BuildRequires: autoconf
@@ -82,7 +81,7 @@ rm -rf ${RPM_BUILD_ROOT}/etc  # /etc/.version , udev rules
 %{_libdir}/pkgconfig/cray-xpmem.pc
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

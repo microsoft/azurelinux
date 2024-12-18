@@ -34,9 +34,11 @@
 %{!?_version: %define _version 24.10}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%if 0%{azl}
+%global target_kernel_version_full f.a.k.e
+%else
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
@@ -61,13 +63,13 @@
 %global _kmp_rel %{_release1}%{?_kmp_build_num}%{?_dist}
 
 Summary:	 %{_name} Driver
-Name:		 fwctl
+Name:		 %{_name}
 Version:	 24.10
 Release:	 1_%{_release1}%{?_dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
-Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/latest/SRPMS/fwctl-24.10.tgz#/%{_name}-%{_version}.tgz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/fwctl-24.10.tgz#/%{_name}-%{_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
@@ -244,8 +246,8 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Tue Dec  3 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to proprietary repo and adding minor version prefix
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+- Moving to core from azlinux-ai-ml repo
 
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
