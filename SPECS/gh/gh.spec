@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         fix-relative-time-search-tests.patch
 Patch1:         CVE-2021-43565.patch
 Patch2:         CVE-2022-32149.patch
+Patch3:         CVE-2024-54132.patch
 
 BuildRequires:  golang
 BuildRequires:  git
@@ -47,6 +48,7 @@ GitHub official command line tool.
 tar --no-same-owner -xf %{SOURCE1}
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 export GOPATH=%{our_gopath}
@@ -77,6 +79,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Fri Dec 13 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.13.0-23
+- Patch CVE-2024-54132
+
 * Thu Sep 19 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 2.13.0-22
 - Patch CVE-2022-32149
 
