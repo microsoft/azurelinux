@@ -3,17 +3,18 @@ Distribution:   Azure Linux
 # header-only library
 %global debug_package %{nil}
 
-%global apiversion 1.5
+%global apiversion 2.1
 
 Name: mdds
-Version: 1.5.0
-Release: 3%{?dist}
+Version: 2.1.1
+Release: 6%{?dist}
 Summary: A collection of multi-dimensional data structures and indexing algorithms
 
 License: MIT
 URL: https://gitlab.com/mdds/mdds
 Source0: http://kohei.us/files/%{name}/src/%{name}-%{version}.tar.bz2
 
+BuildRequires: make
 BuildRequires: boost-devel
 BuildRequires: gcc-c++
 BuildRequires: autoconf
@@ -63,8 +64,60 @@ make check %{?_smp_mflags}
 %license LICENSE
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 31 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.1.1-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 23 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.1.1-2
+- Sources
+
+* Wed Aug 23 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.1.1-1
+- 2.1.1
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 21 2022 David Tardon <dtardon@redhat.com> - 2.0.3-3
+- Convert license to SPDX
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed May 11 2022 Caolán McNamara <caolanm@redhat.com> - 2.0.3-1
+- latest release
+
+* Wed Feb 16 2022 Caolán McNamara <caolanm@redhat.com> - 2.0.2-1
+- latest release
+
+* Wed Feb 02 2022 Caolán McNamara <caolanm@redhat.com> - 2.0.1-1
+- new upstream release needed for libreoffice 7.3
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Sep 21 2020 Caolán McNamara <caolanm@redhat.com> - 1.7.0-1
+- new upstream release
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
