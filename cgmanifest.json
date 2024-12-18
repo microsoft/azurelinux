@@ -25773,8 +25773,8 @@
         "type": "other",
         "other": {
           "name": "recode",
-          "version": "3.7.7",
-          "downloadUrl": "https://github.com/rrthomas/recode/releases/download/v3.7.7/recode-3.7.7.tar.gz"
+          "version": "3.7.14",
+          "downloadUrl": "https://github.com/rrthomas/recode/releases/download/v3.7.14/recode-3.7.14.tar.gz"
         }
       }
     },
