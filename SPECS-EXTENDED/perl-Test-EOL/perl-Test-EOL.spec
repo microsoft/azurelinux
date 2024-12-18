@@ -1,12 +1,12 @@
-Name:		perl-Test-EOL
-Version:	2.00
-Release:	12%{?dist}
-Summary:	Check the correct line endings in your project
-License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:		perl-Test-EOL
+Version:	2.02
+Release:	13%{?dist}
+Summary:	Check the correct line endings in your project
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-EOL
-Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-EOL-%{version}.tar.gz#/perl-Test-EOL-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-EOL-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -25,13 +25,11 @@ BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(Config)
 BuildRequires:	perl(File::Temp)
-BuildRequires:	perl(Test::More)
+BuildRequires:	perl(Test::More) >= 0.88
 # Optional Tests
-%if "%{?rhel}" != "6"
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
-%endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 %description
 This module scans your project/distribution for any perl files (scripts,
@@ -54,16 +52,16 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENCE
-%else
-%doc LICENCE
-%endif
 %doc Changes CONTRIBUTING README
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::EOL.3*
 
 %changelog
+* Wed Dec 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 2.02-13
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.00-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
