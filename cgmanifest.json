@@ -18843,8 +18843,8 @@
         "type": "other",
         "other": {
           "name": "perl-Object-HashBase",
-          "version": "0.009",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Object-HashBase-0.009.tar.gz"
+          "version": "0.013",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Object-HashBase-0.013.tar.gz"
         }
       }
     },
