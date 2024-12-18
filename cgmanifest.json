@@ -13292,8 +13292,8 @@
         "type": "other",
         "other": {
           "name": "mobile-broadband-provider-info",
-          "version": "20190618",
-          "downloadUrl": "https://download.gnome.org/sources/mobile-broadband-provider-info/20190618/mobile-broadband-provider-info-20190618.tar.xz"
+          "version": "20240407",
+          "downloadUrl": "https://download.gnome.org/sources/mobile-broadband-provider-info/20240407/mobile-broadband-provider-info-20240407.tar.xz"
         }
       }
     },
