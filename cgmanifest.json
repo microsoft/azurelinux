@@ -16873,8 +16873,8 @@
         "type": "other",
         "other": {
           "name": "perl-Date-Manip",
-          "version": "6.82",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Date-Manip-6.82.tar.gz"
+          "version": "6.95",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Date-Manip-6.95.tar.gz"
         }
       }
     },
