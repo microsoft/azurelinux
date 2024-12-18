@@ -15,6 +15,7 @@ Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
 Patch4:		CVE-2020-22217.patch
 Patch5:		CVE-2024-25629.patch
+Patch6:		CVE-2024-5569.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -94,6 +95,7 @@ popd
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
+patch -p1 < %{PATCH6}
 popd
 
 export TF_PYTHON_VERSION=3.12
@@ -127,6 +129,7 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %changelog
 * Tue Dec 17 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-8
 - Patch for CVE-2020-22217 and CVE-2024-25629
+- Patch for CVE-2024-5569
 
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
 - Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
