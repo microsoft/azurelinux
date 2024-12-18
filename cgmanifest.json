@@ -20733,8 +20733,8 @@
         "type": "other",
         "other": {
           "name": "perl-XString",
-          "version": "0.002",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/XString-0.002.tar.gz"
+          "version": "0.005",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/XString-0.005.tar.gz"
         }
       }
     },
