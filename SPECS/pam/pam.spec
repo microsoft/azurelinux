@@ -16,7 +16,7 @@ Requires:       audit-libs
 Recommends:     cracklib-dicts
 
 Patch0:         CVE-2024-22365.patch
-Patch1:         CVE-2024-10041.patch
+Patch1:         CVE-2024-10963.patch
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
@@ -105,8 +105,8 @@ EOF
 %{_libdir}/pkgconfig/pamc.pc
 
 %changelog
-* Tue Dec 03 2024 Adit Jha <aditjha@microsoft.com> - 1.5.3-3
-- Patching CVE-2024-10041.
+* Fri Dec 06 2024 Adit Jha <aditjha@microsoft.com> - 1.5.3-3
+- Patching CVE-2024-10963.
 
 * Wed Oct 30 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-2
 - Patching CVE-2024-22365.
