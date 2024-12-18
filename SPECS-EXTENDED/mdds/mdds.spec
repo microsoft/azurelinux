@@ -3,11 +3,11 @@ Distribution:   Azure Linux
 # header-only library
 %global debug_package %{nil}
 
-%global apiversion 1.5
+%global apiversion 2.1
 
 Name: mdds
-Version: 1.5.0
-Release: 3%{?dist}
+Version: 2.1.1
+Release: 1%{?dist}
 Summary: A collection of multi-dimensional data structures and indexing algorithms
 
 License: MIT
@@ -63,6 +63,10 @@ make check %{?_smp_mflags}
 %license LICENSE
 
 %changelog
+* Tue Dec 17 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.1.1-1
+- Upgraded to version 2.1.1
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
