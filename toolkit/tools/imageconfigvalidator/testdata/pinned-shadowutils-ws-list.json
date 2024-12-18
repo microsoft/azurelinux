@@ -1,0 +1,5 @@
+{
+    "packages": [
+        "shadow-utils = some-version"
+    ]
+}
