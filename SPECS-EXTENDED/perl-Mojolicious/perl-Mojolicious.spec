@@ -1,10 +1,11 @@
-Name:           perl-Mojolicious
-Version:        8.57
-Release:        3%{?dist}
-Summary:        A next generation web framework for Perl
-License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Mojolicious
+Version:        9.37
+Release:        3%{?dist}
+Summary:        A next generation web framework for Perl
+License:        Artistic-2.0
+
 URL:            https://metacpan.org/release/Mojolicious
 Source0:        http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz
 
@@ -78,7 +79,6 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(IO::Socket::INET)
 BuildRequires:  perl(lib)
 # Test::Future::AsyncAwait::Awaitable not used
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Suggests:       perl(Cpanel::JSON::XS) >= 4.09
 Requires:       perl(experimental)
 Requires:       perl(FindBin)
@@ -101,7 +101,6 @@ Requires:       perl(Time::Local) >= 1.2
 
 %package -n perl-Test-Mojo
 Summary:        Test::Mojo perl Module
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 
 %description -n perl-Test-Mojo
 %{summary}
@@ -144,6 +143,10 @@ mv README.md lib/Mojolicious/
 %{perl_vendorlib}/Test
 
 %changelog
+* Wed Dec 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 9.37-3
+- Initial CBL-Mariner import from Fedora 41 (license: Artistic-2.0).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.57-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
