@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.30.1
-Release:        4%{?dist}
+Version:        1.30.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -271,6 +271,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.3-1
+- Auto-upgrade to 1.30.3 - Fix CVE-2024-10220
+
 * Tue Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.30.1-4
 - Add patch to resolve CVE-2024-28180
 
