@@ -4270,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.43.1",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.43.1.tar.gz"
+          "version": "2.62.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.62.0.tar.gz"
         }
       }
     },
@@ -10341,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.1",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.1.tar.gz"
+          "version": "1.17.3",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.3.tar.gz"
         }
       }
     },
@@ -14302,8 +14302,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.1",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.1.tar.gz"
+          "version": "1.17.3",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.3.tar.gz"
         }
       }
     },
@@ -20833,8 +20833,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.12",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.12.tar.xz"
+          "version": "8.3.14",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.14.tar.xz"
         }
       }
     },
@@ -25904,8 +25904,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.3",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.3.tar.gz"
+          "version": "3.3.5",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.5.tar.gz"
         }
       }
     },

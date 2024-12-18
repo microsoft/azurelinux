@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -23,6 +23,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{version}.tar.gz#/libarrow-%{version}.tar.gz
 Patch0001: 0001-python-pyproject.toml.patch
+Patch0002: CVE-2024-52338.patch
  
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
@@ -246,6 +247,9 @@ popd
 %{_libdir}/pkgconfig/parquet*.pc
  
 %changelog
+* Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 15.0.0-7
+- Patch to fix CVE-2024-52338
+
 * Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 15.0.0-6
 - Bump release to rebuild with latest 'abseil-cpp'.
 - Fix 'rpm' warning about macro expansion inside a comment.

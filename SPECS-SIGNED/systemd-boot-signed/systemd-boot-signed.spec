@@ -14,7 +14,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,6 +53,9 @@ Provides: version(systemd-boot)%{_isa} = %version
 Obsoletes: systemd-udev < 252.2^
 Conflicts: grub2-efi-binary
 
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
+
 %description -n systemd-boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
@@ -90,6 +93,10 @@ popd
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
+* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
+- Version bump to force signing with new Azure Linux secure boot key
+- Add confilcts/recommends on shim to ensure the keys match
+
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Update sd-boot install location
 
