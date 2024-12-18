@@ -1,44 +1,45 @@
-# This module usually ships with version numbers having two digits after the decimal point
-%global cpanversion 1.443
-
-Summary:        Test file attributes through Test::Builder
-Name:           perl-Test-File
-Version:        1.44.3
-Release:        12%{?dist}
-License:        Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://metacpan.org/release/Test-File
-Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpanversion}.tar.gz#/perl-Test-File-%{cpanversion}.tar.gz
-BuildArch:      noarch
+# This module usually ships with version numbers having two digits after the decimal point
+%global cpan_version 1.993
+%global rpm_version 1.99.3
+
+Summary:	Test file attributes through Test::Builder
+Name:		perl-Test-File
+Version:	%{rpm_version}
+Release:	8%{?dist}
+License:	Artistic-2.0
+URL:		https://metacpan.org/release/Test-File
+Source0:	https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpan_version}.tar.gz
+BuildArch:	noarch
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  make
-BuildRequires:  perl-interpreter
-BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(ExtUtils::Manifest) >= 1.21
+BuildRequires:	coreutils
+BuildRequires:	make
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:	perl(ExtUtils::Manifest) >= 1.21
 # Module Runtime
-BuildRequires:  perl(base)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(Test::Builder)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(File::Spec)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(Test::Builder)
+BuildRequires:	perl(vars)
+BuildRequires:	perl(warnings)
+BuildRequires:	perl(XSLoader)
 # Test Suite
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(Test::Builder) >= 1.001006
-BuildRequires:  perl(Test::Builder::Tester)
-BuildRequires:  perl(Test::More) >= 0.95
-BuildRequires:  perl(Test::utf8)
-BuildRequires:  perl(utf8)
+BuildRequires:	perl(Config)
+BuildRequires:	perl(Cwd)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(Test::Builder) >= 1.001006
+BuildRequires:	perl(Test::Builder::Tester)
+BuildRequires:	perl(Test::More) >= 1
+BuildRequires:	perl(utf8)
 # Optional Tests
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage)
+BuildRequires:	perl(Test::Pod) >= 1.00
+BuildRequires:	perl(Test::Pod::Coverage) >= 1.00
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This module provides a collection of test utilities for file attributes.
@@ -47,14 +48,14 @@ Some file attributes depend on the owner of the process testing the file
 in the same way the file test operators do.
 
 %prep
-%setup -q -n Test-File-%{cpanversion}
+%setup -q -n Test-File-%{cpan_version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-make %{?_smp_mflags}
+%{make_build}
 
 %install
-make install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -67,6 +68,10 @@ make test
 %{_mandir}/man3/Test::File.3*
 
 %changelog
+* Wed Dec 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 1.99.3-8
+- Initial CBL-Mariner import from Fedora 41 (license: Artistic-2.0).
+- License verified.
+
 * Thu Mar 28 2024 Andrew Phelps <anphel@microsoft.com> - 1.44.3-12
 - Remove `rpmversion` global definition due to macro conflict with rpm-4.18.2
 - Update license to Artistic-2.0
