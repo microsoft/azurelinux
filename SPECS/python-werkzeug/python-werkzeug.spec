@@ -1,7 +1,7 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
 Version:        2.3.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Patch0:         0001-enable-tests-in-rpm-env.patch
 Patch1:         0002-disable-stat-test.patch
 Patch2:         CVE-2023-46136.patch
 Patch3:         CVE-2024-34069.patch
+Patch4:         CVE-2024-49767.patch
 BuildArch:      noarch
 
 %description
@@ -71,6 +72,9 @@ pip3 install -r requirements/tests.txt
 %license LICENSE.rst
 
 %changelog
+* Tue Nov 05 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.3.7-3
+- Patch CVE-2024-49767
+
 * Tue May 14 2024 Jonathan Behrens <jbehrens@microsoft.com> - 2.3.7-2
 - Patch CVE-2024-34069
 
