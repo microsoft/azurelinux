@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Email-Address
-Version:        1.912
-Release:        7%{?dist}
+Version:        1.913
+Release:        1%{?dist}
 Summary:        RFC 2822 Address Parsing and Creation (DEPRECATED)
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Email-Address
@@ -60,6 +60,10 @@ make test
 
 
 %changelog
+* Wed Dec 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.913-1
+- Update to 1.913
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.912-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
