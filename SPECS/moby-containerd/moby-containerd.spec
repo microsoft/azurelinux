@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.26
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,6 +19,7 @@ Patch0:  Makefile.patch
 Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
 Patch2:  fix_tests_for_golang1.21.patch
 Patch3:  CVE-2023-45288.patch
+Patch4:  CVE-2024-24786.patch
 
 %{?systemd_requires}
 
@@ -92,6 +93,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Dec 05 2024 sthelkar <sthelkar@microsoft.com> - 1.6.26-8
+- Patch CVE-2024-24786
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.26-7
 - Bump release to rebuild with go 1.22.7
 
