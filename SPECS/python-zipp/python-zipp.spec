@@ -40,6 +40,7 @@ A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
+%autopatch -p1
 
 %generate_buildrequires
 %pyproject_buildrequires -r
