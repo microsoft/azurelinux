@@ -2,12 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: X.Org X11 libXss runtime library
 Name: libXScrnSaver
-Version: 1.2.3
-Release: 6%{?dist}
+Version: 1.2.4
+Release: 1%{?dist}
 License: MIT
 URL: http://www.x.org
 
-Source0: https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.bz2
+Source0: https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.xz
 
 BuildRequires: xorg-x11-util-macros
 BuildRequires: autoconf automake libtool
@@ -44,7 +44,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %ldconfig_postun
 
 %files
-%doc COPYING README ChangeLog
+%doc COPYING README.md ChangeLog
 %{_libdir}/libXss.so.1
 %{_libdir}/libXss.so.1.0.0
 
@@ -55,6 +55,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_includedir}/X11/extensions/scrnsaver.h
 
 %changelog
+* Mon Dec 09 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.4-1
+- Upgraded to version 1.2.4
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.3-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
