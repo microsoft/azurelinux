@@ -2493,6 +2493,8 @@
             "license": "[BSD](https://github.com/Mellanox/sockperf/blob/sockperf_v2/copying)",
             "specs": [
                 "sockperf"
+                "xpmem",
+                "xpmem-modules-signed"
             ]
         },
         "OpenEuler": {
