@@ -2494,7 +2494,14 @@
             "specs": [
                 "sockperf"
                 "xpmem",
+                "xpmem-lib",
                 "xpmem-modules-signed"
+            ]
+        },
+        "NVIDIA (BSD)": {
+            "license": "[BSD](https://github.com/Mellanox/sockperf/blob/sockperf_v2/copying)",
+            "specs": [
+                "sockperf"
             ]
         },
         "OpenEuler": {
