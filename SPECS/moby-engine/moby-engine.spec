@@ -129,7 +129,7 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Mon Dec 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.0.9-13
+* Thu Dec 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.0.9-13
 - Patch CVE-2024-24786
 
 * Tue Dec 17 2024 Andrew Phelps <anphel@microsoft.com> - 24.0.9-12
