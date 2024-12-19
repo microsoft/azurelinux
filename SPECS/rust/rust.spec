@@ -41,6 +41,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Patch0:		Fix-21763-ui-test.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -169,6 +170,12 @@ rm -f %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Dec 19 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -1.83.0-1
+- Upgrade to 1.83.0
+- Drop patches
+- Remove expand-yaml-anchors tool in %check
+- Add patch to fix ui-test-21763
+
 * Thu Aug 08 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.72.0-8
 - Patch CVE-2024-32884 and CVE-2024-31852
 
