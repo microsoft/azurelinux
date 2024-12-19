@@ -15783,8 +15783,8 @@
         "type": "other",
         "other": {
           "name": "perl-Algorithm-Diff",
-          "version": "1.1903",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TY/TYEMQ/Algorithm-Diff-1.1903.tar.gz"
+          "version": "1.2010",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-Diff-1.201.tar.gz"
         }
       }
     },
