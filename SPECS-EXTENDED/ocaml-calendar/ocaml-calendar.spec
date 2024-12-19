@@ -1,29 +1,40 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
+# ocaml-alcotest requires ocaml-astring, ocaml-cmdliner, ocaml-fmt, and ocaml-uutf,
+# none of which are otherwise needed for building the OCaml-dependent packages
+# found in RHEL and ELN.  We want to avoid the extra dependencies there.
+%bcond tests %[!0%{?rhel}]
+
+%global giturl  https://github.com/ocaml-community/calendar
+
+
 Name:           ocaml-calendar
-Version:        2.04
-Release:        29%{?dist}
+Epoch:          1
+Version:        3.0.0
+Release:        1%{?dist}
 Summary:        Objective Caml library for managing dates and times
-License:        LGPLv2
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
-URL:            https://github.com/ocaml-community/calendar
-Source0:        https://download.ocamlcore.org/calendar/calendar/%{version}/calendar-%{version}.tar.gz
+URL:            https://ocaml-community.github.io/calendar/
+VCS:            git:%{giturl}.git
+Source0:        %{giturl}/archive/v%{version}/calendar-%{version}.tar.gz
+#Source1:       https://github.com/ocaml-community/calendar/archive/refs/tags/v3.0.0.tar.gz#%{name}-v%{version}.tar.gz
 
-Patch1:         calendar-2.03.2-enable-debug.patch
+BuildRequires:  ocaml >= 4.03
+BuildRequires:  ocaml-dune >= 1.0
+BuildRequires:  ocaml-re-devel >= 1.7.2
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  gawk
-
-# Ignore all generated modules *except* CalendarLib, since everything
-# now appears in that namespace.
-%global __ocaml_requires_opts -i Calendar_builder -i Calendar_sig -i Date -i Date_sig -i Fcalendar -i Ftime -i Period -i Printer -i Time -i Time_sig -i Time_Zone -i Utils -i Version
-%global __ocaml_provides_opts -i Calendar_builder -i Calendar_sig -i Date -i Date_sig -i Fcalendar -i Ftime -i Period -i Printer -i Time -i Time_sig -i Time_Zone -i Utils -i Version
+%if %{with tests}
+BuildRequires:  ocaml-alcotest-devel
+%endif
 
 
 %description
@@ -32,7 +43,7 @@ Objective Caml library for managing dates and times.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 
 %description    devel
@@ -41,50 +52,44 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n calendar-%{version}
-%patch 1 -p1
+%autosetup -n calendar-%{version} -p1
 
 
 %build
-./configure --libdir=%{_libdir}
-make
-make doc
-
-mv TODO TODO.old
-iconv -f iso-8859-1 -t utf-8 < TODO.old > TODO
+%dune_build
 
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-make install
+%dune_install
 
 
-%files
-%doc CHANGES README TODO LGPL COPYING
-%{_libdir}/ocaml/calendar
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/calendar/*.cmx
+%if %{with tests}
+%check
+%dune_check
 %endif
-%exclude %{_libdir}/ocaml/calendar/*.mli
 
 
-%files devel
-%doc CHANGES README TODO LGPL COPYING calendarFAQ-2.6.txt doc/*
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/calendar/*.cmx
-%endif
-%{_libdir}/ocaml/calendar/*.mli
+%files -f .ofiles
+%doc CHANGES README.md TODO
+%license LGPL COPYING
+
+
+%files devel -f .ofiles-devel
+%doc CHANGES README.md TODO calendarFAQ-2.6.txt
+%license LGPL COPYING
 
 
 %changelog
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-1
+- Update to 3.0.0
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.04-29
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
 * Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-28.1
-- OCaml 4.10.0 final (Fedora 32).
+-- OCaml 4.10.0 final (Fedora 32).
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-28
 - OCaml 4.10.0 final.
