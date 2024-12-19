@@ -83,7 +83,7 @@ rm -rf ${RPM_BUILD_ROOT}/etc  # /etc/.version , udev rules
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
-- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- Initial Azure Linux import from NVIDIA (license: LGPLv2.1)
 - License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

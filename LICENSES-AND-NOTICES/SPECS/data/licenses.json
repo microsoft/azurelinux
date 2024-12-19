@@ -2453,12 +2453,32 @@
         "NVIDIA": {
             "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
+                "fwctl",
+                "fwctl-signed",
+                "ibarr",
+                "ibsim",
+                "iser",
+                "iser-signed",
+                "isert",
+                "isert-signed",
+                "knem",
+                "knem-modules-signed",
                 "libnvidia-container",
+                "mft_kernel-signed",
+                "mlnx-nfsrdma",
+                "mlnx-nfsrdma-signed",
+                "mlnx-ofa_kernel",
+                "mlnx-ofa_kernel-modules-signed",
                 "mlnx-tools",
                 "mlx-bootctl",
+                "mlx-steering-dump",
+                "multiperf",
                 "nvidia-container-toolkit",
                 "ofed-scripts",
-                "perftest"
+                "perftest",
+                "rshim",
+                "xpmem",
+                "xpmem-modules-signed"
             ]
         },
         "OpenEuler": {
