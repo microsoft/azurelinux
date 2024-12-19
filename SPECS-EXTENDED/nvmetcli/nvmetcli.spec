@@ -1,13 +1,26 @@
-Name:           nvmetcli
-License:        ASL 2.0
-Summary:        An adminstration shell for NVMe storage targets
-Version:        0.4
-Release:        11%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           nvmetcli
+License:        Apache-2.0
+Summary:        An adminstration shell for NVMe storage targets
+Version:        0.7
+Release:        1%{?dist}
 URL:            ftp://ftp.infradead.org/pub/nvmetcli/
 Source:         ftp://ftp.infradead.org/pub/nvmetcli/%{name}-%{version}.tar.gz
+Patch00:        0001-nvmetcli-don-t-remove-ANA-Group-1-on-clear.patch
+Patch01:        0002-README-Update-URL-for-configshell-fb.patch
+Patch02:        0003-nvmetcli-Improve-IOError-handling-on-restore.patch
+Patch03:        0004-nvme.py-Explicit-close-is-redundant.patch
+Patch04:        0005-nvme.py-Sync-the-containing-directory.patch
+Patch05:        0006-nvme.py-Make-modprobe-work-for-kmod-lib-too.patch
+Patch06:        0007-test_nvmet.py-test_invalid_input-fails-for-py3.patch
+Patch07:        0008-nvmetcli-Report-save-name-correctly.patch
+Patch08:        0009-nvmetcli-Allow-different-devices-for-make-test.patch
+Patch09:        0010-nvmetcli-Correct-xrange-usage-for-py3.patch
+Patch10:        0011-nvmetcli-add-a-tcp-example-json.patch
+Patch11:        0012-Documentation-fix-typo.patch
 BuildArch:      noarch
+BuildRequires: make
 BuildRequires:  python3-devel python3-setuptools systemd-units asciidoc xmlto
 Requires:       python3-configshell python3-kmod
 Requires(post): systemd
@@ -20,7 +33,7 @@ nvmet in the Linux kernel.  It allows configuring the nvmet interactively
 as well as saving / restoring the configuration to / from a json file.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %{__python3} setup.py build
@@ -55,6 +68,10 @@ install -m 644 Documentation/nvmetcli.8.gz %{buildroot}%{_mandir}/man8/
 %{_mandir}/man8/nvmetcli.8.gz
 
 %changelog
+* Thu Dec 19 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.7-1
+- Update to 0.7
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
