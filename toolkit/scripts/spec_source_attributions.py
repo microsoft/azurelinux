@@ -17,6 +17,7 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Fedora (ISC)":                   r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from Fedora \d+ \(license: ISC\)(\.|\n|$)',
     "Magnus Edenhill Open Source":    r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
     "NVIDIA":                         r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from NVIDIA \(license: (ASL 2\.0|GPLv2)\)(\.|\n|$)',
+    "NVIDIA (BSD)":                   r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from NVIDIA \(BSD\) \(license: (BSD)\)(\.|\n|$)',
     "OpenEuler":                      r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from OpenEuler \(license: BSD\)(\.|\n|$)',
     "OpenMamba":                      r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from OpenMamba(\.|\n|$)',
     "OpenSUSE":                       r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
