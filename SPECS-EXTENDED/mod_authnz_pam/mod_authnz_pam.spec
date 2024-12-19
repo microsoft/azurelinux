@@ -9,16 +9,16 @@ Distribution:   Azure Linux
 
 Summary: PAM authorization checker and PAM Basic Authentication provider
 Name: mod_authnz_pam
-Version: 1.2.1
-Release: 2%{?dist}
+Version: 1.2.3
+Release: 1%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_authnz_pam/
-Source0: http://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_authnz_pam/
+Source0: https://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pam-devel
 BuildRequires: pkgconfig
-Requires: httpd-mmn
+Requires: httpd-mmn = %{_httpd_mmn}
 Requires: pam
 
 # Suppres auto-provides for module DSO per
@@ -65,6 +65,10 @@ install -Dp -m 0644 authnz_pam.confx $RPM_BUILD_ROOT%{_httpd_confdir}/authnz_pam
 %{_httpd_moddir}/*.so
 
 %changelog
+* Thu Dec 19 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.3-1
+- Upgraded to version 1.2.3
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
