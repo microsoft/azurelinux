@@ -173,8 +173,16 @@ func encryptRootPartition(partDevPath string, partition configuration.Partition,
 		return
 	}
 
+	mkfsOptions, ok := DefaultMkfsOptions[partition.FsType]
+	if !ok {
+		mkfsOptions = []string{}
+	}
+	mkfsArgs := []string{"-t", partition.FsType}
+	mkfsArgs = append(mkfsArgs, mkfsOptions...)
+	mkfsArgs = append(mkfsArgs, fullMappedPath)
+
 	// Create the file system
-	_, stderr, err = shell.Execute("mkfs", "-t", partition.FsType, fullMappedPath)
+	_, stderr, err = shell.Execute("mkfs", mkfsArgs...)
 	if err != nil {
 		err = fmt.Errorf("failed to mkfs for partition (%v):\n%v\n%w", partDevPath, stderr, err)
 	}
