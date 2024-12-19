@@ -26294,8 +26294,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-flexmock",
-          "version": "2.3.6",
-          "downloadUrl": "https://github.com/doudou/flexmock/archive/refs/tags/v2.3.6.tar.gz"
+          "version": "3.0.1",
+          "downloadUrl": "https://rubygems.org/downloads/flexmock-3.0.1.gem"
         }
       }
     },

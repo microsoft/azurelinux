@@ -22,7 +22,7 @@ pushd $TMPDIR
 git clone https://github.com/doudou/flexmock.git
 
 cd flexmock
-git reset --hard $VERSION
+git reset --hard v$VERSION
 cd ..
 
 tar czf $CURDIR/flexmock-${VERSION}-test-missing-files.tar.gz flexmock/test/
