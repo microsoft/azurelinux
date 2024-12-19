@@ -16,6 +16,7 @@ Patch3:         CVE-2024-3651.patch
 Patch4:		CVE-2020-22217.patch
 Patch5:		CVE-2024-25629.patch
 Patch6:		CVE-2024-5569.patch
+Patch7:		CVE-2023-24803.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -93,9 +94,43 @@ patch -p1 < %{PATCH3}
 popd
 
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
+
 patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
 patch -p1 < %{PATCH6}
+
+pushd pypi_pip/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_aarch64-apple-darwin/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_aarch64-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_ppc64le-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_s390x-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_x86_64-apple-darwin/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_x86_64-pc-windows-msvc/Lib/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
+pushd python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH7}
+popd
+
 popd
 
 export TF_PYTHON_VERSION=3.12
