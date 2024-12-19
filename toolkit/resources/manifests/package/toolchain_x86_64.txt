@@ -12,6 +12,8 @@ automake-1.16.5-2.azl3.noarch.rpm
 azurelinux-check-macros-3.0-7.azl3.noarch.rpm
 azurelinux-repos-3.0-3.azl3.noarch.rpm
 azurelinux-repos-debug-3.0-3.azl3.noarch.rpm
+azurelinux-repos-amd-3.0-4.azl3.noarch.rpm
+azurelinux-repos-amd-preview-3.0-4.azl3.noarch.rpm
 azurelinux-repos-debug-preview-3.0-3.azl3.noarch.rpm
 azurelinux-repos-extended-3.0-3.azl3.noarch.rpm
 azurelinux-repos-extended-debug-3.0-3.azl3.noarch.rpm
