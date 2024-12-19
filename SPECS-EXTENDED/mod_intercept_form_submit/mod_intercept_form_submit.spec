@@ -9,15 +9,15 @@ Distribution:   Azure Linux
 
 Summary: Apache module to intercept login form submission and run PAM authentication
 Name: mod_intercept_form_submit
-Version: 1.1.0
-Release: 12%{?dist}
+Version: 1.2.0
+Release: 1%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_intercept_form_submit/
-Source0: http://www.adelton.com/apache/mod_intercept_form_submit/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_intercept_form_submit/
+Source0: https://www.adelton.com/apache/mod_intercept_form_submit/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pkgconfig
-Requires: httpd-mmn
+Requires: httpd-mmn = %{_httpd_mmn}
 Requires: mod_authnz_pam >= 0.7
 
 # Suppres auto-provides for module DSO per
@@ -64,6 +64,10 @@ install -Dp -m 0644 intercept_form_submit.confx $RPM_BUILD_ROOT%{_httpd_confdir}
 %{_httpd_moddir}/*.so
 
 %changelog
+* Thu Dec 19 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.0-1
+- Upgraded to version 1.2.0
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
