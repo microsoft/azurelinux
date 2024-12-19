@@ -7,9 +7,9 @@
 
 Name:           perl-Class-Method-Modifiers
 Summary:        Provides Moose-like method modifiers
-Version:        2.13
-Release:        3%{?dist}
-License:        GPL+ or Artistic
+Version:        2.15
+Release:        6%{?dist}
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Method-Modifiers
@@ -32,19 +32,14 @@ BuildRequires:  perl(Exporter)
 # Test Suite
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(if)
-BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More) >= 0.88
-BuildRequires:  perl(Test::Needs)
 # Optional Test Requirements
-%if 0%{!?perl_bootstrap:1} && %{with perl_Class_Method_Modifiers_enables_optional_test}
+%if %{with perl_Class_Method_Modifiers_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta) >= 2.120900
-BuildRequires:  perl(Moose)
 %endif
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B)
 Requires:       perl(Carp)
-Requires:       perl(Exporter)
 
 # Avoid doc-file dependencies
 %{?perl_default_filter}
@@ -87,8 +82,66 @@ make test
 %{_mandir}/man3/Class::Method::Modifiers.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  2.15-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Mar  6 2023 Paul Howarth <paul@city-fan.org> - 2.15-1
+- Update to 2.15 (rhbz#2175585)
+  - Localize $SIG{__DIE__} before calling eval (CPAN RT#146848)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 17 2023 Paul Howarth <paul@city-fan.org> - 2.14-1
+- Update to 2.14 (rhbz#2161420)
+  - Remove Test::Fatal and Test::Needs from test prereqs (GH#7, GH#8)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-12
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-11
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-8
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-7
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-4
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.13-3
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
