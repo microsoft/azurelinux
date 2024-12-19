@@ -14583,7 +14583,7 @@
         "other": {
           "name": "nvmetcli",
           "version": "0.4",
-          "downloadUrl": "ftp://ftp.infradead.org/pub/nvmetcli/nvmetcli-0.4.tar.gz"
+          "downloadUrl": "ftp://ftp.infradead.org/pub/nvmetcli/nvmetcli-0.7.tar.gz"
         }
       }
     },
