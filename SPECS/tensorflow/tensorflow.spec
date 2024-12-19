@@ -99,7 +99,7 @@ patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
 patch -p1 < %{PATCH6}
 
-pushd pypi_pip/
+pushd pypi__pip/
 patch -p1 < %{PATCH7}
 popd
 
@@ -164,7 +164,7 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %changelog
 * Tue Dec 17 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-8
 - Patch for CVE-2020-22217 and CVE-2024-25629
-- Patch for CVE-2024-5569
+- Patch for CVE-2024-5569 and CVE-2023-45803
 
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
 - Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
