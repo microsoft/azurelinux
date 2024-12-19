@@ -1,30 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           meanwhile
-Version:        1.1.0
-Release:        31%{?dist}
+Version:        1.1.1
+Release:        1%{?dist}
 Summary:        Lotus Sametime Community Client library
-License:        GPLv2+
-URL:            http://%{name}.sourceforge.net
+License:        LGPL-3.0
+URL:            https://github.com/obriencj/%{name}
 
-# The source for this package was pulled from upstream's vcs.  Use the following commands to generate the tarball:
-
-# cvs -d:pserver:anonymous@meanwhile.cvs.sourceforge.net:/cvsroot/meanwhile co -d meanwhile-1.1.0 -r meanwhile_v1_1_0 meanwhile
-# tar -cvzf meanwhile-1.1.0.tar.gz meanwhile-1.1.0
-
-Source:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
-Patch0:         %{name}-crash.patch
-Patch1:         %{name}-fix-glib-headers.patch
-Patch2:         %{name}-file-transfer.patch
-Patch3:         %{name}-status-timestamp-workaround.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1037196
-Patch4:         %{name}-format-security-fix.patch
+Source:         %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         %{name}-file-transfer.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  glib2-devel
 BuildRequires:  doxygen
 BuildRequires:  libtool
+BuildRequires:  pkgconfig(glib-2.0) >= 2.0.0
 
 %description
 The heart of the %{name} Project is the %{name} library, providing the basic
@@ -46,30 +36,22 @@ will need to install %{name}-devel.
 Summary:        Documentation for the %{name} library
 License:        GFDL
 BuildArch:      noarch
-Provides:       meanwhile-docs = %{version}-%{release}
-Obsoletes:      meanwhile-docs < 1.1.10-11
 
 %description doc
 Documentation for the %{name} library.
 
 %prep
-%setup -q
-%patch 0 -p0 -b .crash
-%patch 1 -p1 -b .fix-glib-headers
-%patch 2 -p1 -b .file-transfer
-%patch 3 -p1 -b .status-timestamp-workaround
-%patch 4 -p1 -b .format-security-fix
+%autosetup -p1
 
 %build
 export CFLAGS="%{optflags} -fno-tree-vrp"
 autoreconf -vif
 %configure --enable-doxygen
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%make_install
 find %{buildroot} -name '*.la' -delete
-find %{buildroot} -name '*.a' -delete
 
 # Prepare documents for inclusion through %%doc in the %%files section
 mkdir docs
@@ -79,8 +61,8 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %ldconfig_scriptlets libs
 
 %files
-%license COPYING LICENSE
-%doc AUTHORS ChangeLog README TODO
+%license COPYING
+%doc AUTHORS ChangeLog README TODO LICENSE
 %{_libdir}/lib%{name}.so.*
 
 %files devel
@@ -92,6 +74,10 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %doc docs/*
 
 %changelog
+* Tue Dec 17 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.1.1-1
+- Upgraded to version 1.1.1
+- License verified.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-31
 - Updating naming for 3.0 version of Azure Linux.
 
