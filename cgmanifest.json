@@ -1707,8 +1707,8 @@
         "type": "other",
         "other": {
           "name": "cim-schema",
-          "version": "2.43.0",
-          "downloadUrl": "http://www.dmtf.org/standards/cim/cim_schema_v2430/cim_schema_2.43.0Experimental-MOFs.zip"
+          "version": "2.54.1",
+          "downloadUrl": "http://www.dmtf.org/standards/cim/cim_schema_v2430/cim_schema_2.54.1Experimental-MOFs.zip"
         }
       }
     },
