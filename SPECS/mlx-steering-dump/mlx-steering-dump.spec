@@ -29,11 +29,11 @@
 Summary:	 Mellanox steering dump parser
 Name:		 mlx-steering-dump
 Version:	 1.0.0
-Release:	 1%{?_dist}.2410068
+Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 https://github.com/Mellanox/mlx_steering_dump
 Group:		 Applications/System
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz#/%name}-%{version}.tar.gz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:		 Microsoft Corporation
 Distribution:	 Azure Linux
@@ -73,6 +73,8 @@ install -m 755 hws/mlx_hw_steering_dump %{buildroot}/usr/bin/
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Wed Oct 6 2021 Mohammad Kabat <mohammadkab@nvidia.com>

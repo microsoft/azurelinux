@@ -38,7 +38,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-modules
 Version:	 2.7.4
-Release:	 1_%{_release}%{?_dist}
+Release:	 1%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:		 Microsoft Corporation
@@ -104,4 +104,5 @@ rm -rf %{buildroot}
 %changelog
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4
 - Creating signed spec
-
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified

@@ -96,9 +96,9 @@
 %global non_kmp_pname %{_name}-modules
 
 Summary:	 Infiniband HCA Driver
-Name:		 %{_name}
+Name:		 mlnx-ofa_kernel
 Version:	 %{_version}
-Release:	 1_%{_release}%{?_dist}
+Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -736,6 +736,8 @@ update-alternatives --remove \
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Thu Jun 18 2015 Alaa Hleihel <alaa@mellanox.com>

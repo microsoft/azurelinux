@@ -35,15 +35,15 @@
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
-Name:		 %{_name}
+Name:		 kernel-mft
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 %{version}
-Release:	 1_%{!?source:%{krelver}%{?_dist}}%{?source:%{_release}%{?_dist}}
+Release:	 1%{?dist}
 License:	 Dual BSD/GPL
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/kernel-mft-4.30.0.tgz#/kernel-mft-%{version}.tgz
-Vendor:		 Microsoft Corporation
+Vendor:          Microsoft Corporation
 Distribution:	 Azure Linux
 
 BuildRequires:  gcc
@@ -91,8 +91,7 @@ This package provides a %{name} kernel module for kernel.
 %package utils
 Summary: KO utils for MFT
 Group: System Environment/Kernel
-Vendor: Mellanox Technologies Ltd.
-Packager: Omer Dagan <omerd@mellanox.com>
+Vendor: Microsoft Corporation
 %description utils
 mft utils kernel module(s)
 %endif
@@ -229,5 +228,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

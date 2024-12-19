@@ -35,7 +35,7 @@
 Summary:	Advanced IP routing and network device configuration tools
 Name:		mlnx-iproute2
 Version:	6.10.0
-Release:        2.2410068
+Release:        2%{?dist}
 License:	GPL
 Group:		Networking/Admin
 Vendor:         Microsoft Corporation
@@ -111,5 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

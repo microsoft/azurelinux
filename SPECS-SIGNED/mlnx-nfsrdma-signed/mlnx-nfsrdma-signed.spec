@@ -60,7 +60,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 %{_version}
-Release:	 1_%{_release1}%{?_dist}
+Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -138,3 +138,5 @@ fi
 %changelog
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
 - Creating signed spec
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified

@@ -1,10 +1,10 @@
 Name:		ibarr
 Version:	0.1.3
-Release:        2%{?dist}.2410068
+Release:        2%{?dist}
 Summary:	Nvidia		 address and route userspace resolution services for Infiniband
 Vendor:		Microsoft Corporation
 Distribution:	Azure Linux
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibarr-0.1.3.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibarr-0.1.3.tar.gz#/%{name}-%{version}.tar.gz
 Group:		Applications/System
 License:	(GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause
 
@@ -55,5 +55,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux

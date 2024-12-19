@@ -63,9 +63,9 @@
 %global _kmp_rel %{_release1}%{?_kmp_build_num}%{?_dist}
 
 Summary:	 %{_name} Driver
-Name:		 %{_name}
+Name:		 fwctl
 Version:	 24.10
-Release:	 1_%{_release1}%{?_dist}
+Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -248,9 +248,9 @@ fi # 1 : closed
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
-
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
-
 * Mon Jul 29 2024 <mohammadkab@nvidia.com>
 - Initial packaging

@@ -36,7 +36,7 @@
 Name:		 %{_name}
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 %{version}
-Release:	 1_%{!?source:%{krelver}%{?_dist}}%{?source:%{_release}%{?_dist}}
+Release:	 1%{?dist}
 License:	 Dual BSD/GPL
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -103,3 +103,5 @@ rm -rf %{buildroot}
 %changelog
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0
 - Creating signed spec
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified

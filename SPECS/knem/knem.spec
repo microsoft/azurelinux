@@ -49,9 +49,9 @@
 %global non_kmp_pname %{_name}-modules
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
-Name:		 %{_name}
+Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 1_%{_release}%{?_dist}
+Release:	 1%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -279,6 +279,8 @@ fi
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Moving to core from azlinux-ai-ml repo
+- Initial Azure Linux import from NVIDIA (license: GPLv2)
+- License verified
 * Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
 - Initial version Azure Linux
 * Mon Mar 17 2014 Alaa Hleihel <alaa@mellanox.com>
