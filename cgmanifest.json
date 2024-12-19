@@ -16203,8 +16203,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-Singleton",
-          "version": "1.5",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHAY/Class-Singleton-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Class/Class-Singleton-1.6.tar.gz"
         }
       }
     },

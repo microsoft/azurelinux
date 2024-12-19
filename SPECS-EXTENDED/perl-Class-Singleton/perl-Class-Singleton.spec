@@ -1,26 +1,26 @@
 Name:           perl-Class-Singleton
-Version:        1.5
-Release:        16%{?dist}
+Version:        1.6
+Release:        13%{?dist}
 Summary:        Implementation of a "Singleton" class
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Singleton
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHAY/Class-Singleton-%{version}.tar.gz#/perl-Class-Singleton-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Class/Class-Singleton-%{version}.tar.gz#/perl-Class-Singleton-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
-BuildRequires:  perl-interpreter
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
 BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.64
 # Module Runtime
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Test Suite
 BuildRequires:  perl(base)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More)
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This is the Class::Singleton module. A Singleton describes an object class
@@ -40,22 +40,89 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-%{_fixperms} $RPM_BUILD_ROOT
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -delete
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
 
 %files
+%license Artistic Copying LICENCE
 %doc Changes README
 %{perl_vendorlib}/Class/
 %{_mandir}/man3/Class::Singleton.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-16
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.6-13
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.6-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.6-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec  3 2020 Paul Howarth <paul@city-fan.org> - 1.6-1
+- Update to 1.6
+  - Fixed confusing Changes entry about Perl's licensing terms (CPAN RT#132843)
+  - Added optional Changes testing (skipped unless AUTHOR_TESTING)
+  - Reformatted Changes file as per CPAN::Changes::Spec
+  - Added optional POD coverage testing (skipped unless AUTHOR_TESTING)
+  - Added optional Perl::Critic testing (skipped unless AUTHOR_TESTING)
+  - Made code Perl::Critic clean
+  - Added optional POD testing (skipped unless AUTHOR_TESTING)
+  - Included GitHub repository URLs in metadata now that source code has been
+    uploaded to GitHub (as of version 1.5)
+  - Included META.json file in addition to META.yml
+  - Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that all
+    parameters used are supported, to save jumping through hoops to support
+    earlier versions (this should not be a problem since ExtUtils::MakeMaker
+    6.64 is easily installed into Perl 5.8.1 and above, that being the whole
+    point of the new choice of minimum supported Perl version)
+  - Set minimum required Perl version to 5.8.1; this is in line with the
+    minimum requirement of the "Perl Toolchain"
+  - Corrected typo in a comment (CPAN RT#86336)
+- Use author-independent source URL
+- Specify all build dependencies
+- Drop redundant buildroot cleaning in %%install section
+- Simplify find command using -delete
+- Fix permissions verbosely
+- Package Artistic, Copying and LICENCE licence files
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.5-16
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
