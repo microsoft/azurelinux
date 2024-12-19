@@ -2,20 +2,20 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: ModSecurity Rules
 Name: mod_security_crs
-Version: 3.0.0
-Release: 11%{?dist}
-License: ASL 2.0
-URL: https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project
-Source: https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v%{version}/owasp-modsecurity-crs-%{version}.tar.gz
+Version: 4.2.0
+Release: 1%{?dist}
+License: Apache-2.0
+URL: https://coreruleset.org/
+Source: https://github.com/coreruleset/coreruleset/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
-Requires: mod_security >= 2.8.0
+Requires: mod_security >= 2.9.6
 Obsoletes: mod_security_crs-extras < 3.0.0
 
 %description
 This package provides the base rules for mod_security.
 
 %prep
-%setup -q -n owasp-modsecurity-crs-%{version}
+%autosetup -p1 -S gendiff -n coreruleset-%{version}
 
 %build
 
@@ -29,7 +29,8 @@ install -d %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules
 mv rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/activated_rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
 mv rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/activated_rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
 
-install -m0644 rules/* %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
+install -m0644 rules/*.conf %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
+install -m0644 rules/*.data %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
 mv crs-setup.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/crs-setup.conf
 
 # activate base_rules
@@ -40,12 +41,16 @@ done
 
 %files
 %license LICENSE
-%doc CHANGES README.md
+%doc CHANGES.md README.md
 %config(noreplace) %{_sysconfdir}/httpd/modsecurity.d/activated_rules/*
 %config(noreplace) %{_sysconfdir}/httpd/modsecurity.d/crs-setup.conf
 %{_datarootdir}/mod_modsecurity_crs
 
 %changelog
+* Thu Dec 19 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 4.2.0-1
+- Upgraded to version 4.2.0
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
