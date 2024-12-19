@@ -1,23 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
 
 Name:           ocaml-curses
-Version:        1.0.4
-Release:        13%{?dist}
+Version:        1.0.11
+Release:        1%{?dist}
 Summary:        OCaml bindings for ncurses
-License:        LGPLv2+
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
-URL:            http://savannah.nongnu.org/projects/ocaml-tmk/
-Source0:        http://download.savannah.gnu.org/releases/ocaml-tmk/%{name}-%{version}.tar.gz
+URL:            https://github.com/mbacarella/curses
+Source0:        %{url}/archive/%{version}/curses-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ncurses-devel
-BuildRequires:  gawk
-
-# Doesn't include a configure script, so we have to make one.
-BuildRequires:  autoconf, automake, libtool
+BuildRequires:  ocaml >= 4.02.0
+BuildRequires:  ocaml-dune >= 2.7
+BuildRequires:  ocaml-dune-configurator-devel
+BuildRequires:  pkgconfig(ncurses)
 
 
 %description
@@ -26,13 +24,8 @@ OCaml bindings for ncurses.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
-
-# On aarch64, it is reported that ncurses-devel is not pulled in
-# implicitly by ocaml (as is the case on x86-64 for some reason).  In
-# any case, it is likely that people installing ocaml-curses-devel
-# will desire ncurses-devel, hence:
-Requires:       ncurses-devel
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ncurses-devel%{?_isa}
 
 
 %description    devel
@@ -41,54 +34,35 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q
-
-autoreconf
+%autosetup -n curses-%{version}
 
 
 %build
-%configure --enable-widec
-make all
-%if %opt
-make opt
-%endif
+%dune_build
 
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-%if %opt
-ocamlfind install curses META *.cmi *.cmx *.cma *.cmxa *.a *.so *.mli
-%else
-ocamlfind install curses META *.cmi *.cma *.a *.so *.mli
-%endif
+%dune_install
 
 
-%files
-%doc COPYING
-%{_libdir}/ocaml/curses
-%if %opt
-%exclude %{_libdir}/ocaml/curses/*.a
-%exclude %{_libdir}/ocaml/curses/*.cmxa
-%exclude %{_libdir}/ocaml/curses/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/curses/*.mli
-%{_libdir}/ocaml/stublibs/*.so
-%{_libdir}/ocaml/stublibs/*.so.owner
+%check
+%dune_check
 
 
-%files devel
-%doc COPYING
-%if %opt
-%{_libdir}/ocaml/curses/*.a
-%{_libdir}/ocaml/curses/*.cmxa
-%{_libdir}/ocaml/curses/*.cmx
-%endif
-%{_libdir}/ocaml/curses/*.mli
+%files -f .ofiles
+%doc CHANGES.md README.md
+%license COPYING
+
+
+%files devel -f .ofiles-devel
+%license COPYING
 
 
 %changelog
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.11-1
+- Update to 1.0.11.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-13
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
