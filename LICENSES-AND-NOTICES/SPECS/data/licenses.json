@@ -2464,7 +2464,10 @@
                 "knem",
                 "knem-modules-signed",
                 "libnvidia-container",
+                "mft_kernel",
                 "mft_kernel-signed",
+                "mlnx-ethtool",
+                "mlnx-iproute2",
                 "mlnx-nfsrdma",
                 "mlnx-nfsrdma-signed",
                 "mlnx-ofa_kernel",
@@ -2478,7 +2481,14 @@
                 "perftest",
                 "rshim",
                 "xpmem",
+                "xpmem-lib",
                 "xpmem-modules-signed"
+            ]
+        },
+        "NVIDIA (BSD)": {
+            "license": "[BSD](https://github.com/Mellanox/sockperf/blob/sockperf_v2/copying)",
+            "specs": [
+                "sockperf"
             ]
         },
         "OpenEuler": {

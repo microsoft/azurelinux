@@ -37,7 +37,7 @@ Name:		 %{_name}
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 %{version}
 Release:	 1%{?dist}
-License:	 Dual BSD/GPL
+License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 
