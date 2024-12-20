@@ -1,6 +1,6 @@
 Name:           perl-File-ReadBackwards
-Version:        1.05
-Release:        18%{?dist}
+Version:        1.06
+Release:        1%{?dist}
 Summary:        Read a file backwards by lines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -51,6 +51,10 @@ make test
 %{_mandir}/man3/File::ReadBackwards.3pm*
 
 %changelog
+* Fri Dec 20 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.06-1
+- Update to 1.06
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.05-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
