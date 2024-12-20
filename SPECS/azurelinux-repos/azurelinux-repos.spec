@@ -30,6 +30,7 @@ BuildArch:      noarch
 %description
 Azure Linux repo files and gpg keys
 
+%ifarch x86_64
 %package amd
 Summary:        Azure Linux AMD GPU repo file.
 Group:          System Environment/Base
@@ -47,6 +48,7 @@ ExclusiveArch:  x86_64
 
 %description amd-preview
 %{summary}
+%endif
 
 %package debug
 Summary:        Azure Linux Debuginfo repo file.
@@ -162,8 +164,10 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+%ifarch x86_64
 install -m 644 %{SOURCE14} $REPO_DIRECTORY
 install -m 644 %{SOURCE15} $REPO_DIRECTORY
+%endif
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -181,6 +185,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-base.repo
 
+%ifarch x86_64
 %files amd
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd.repo
@@ -188,6 +193,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files amd-preview
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd-preview.repo
+%endif
 
 %files debug
 %defattr(-,root,root,-)
@@ -238,7 +244,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %changelog
-* Mon Dec 16 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
+* Thr Dec 19 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
 - Add amd .repo files.
 
 * Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
