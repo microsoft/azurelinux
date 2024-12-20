@@ -1,53 +1,31 @@
-diff -ruN a/cloudinit/net/__init__.py b/cloudinit/net/__init__.py
---- a/cloudinit/net/__init__.py	2024-09-04 12:01:58.000000000 -0700
-+++ b/cloudinit/net/__init__.py	2024-12-13 17:01:54.770779599 -0800
-@@ -11,6 +11,7 @@
- import logging
- import os
- import re
-+import time
- from typing import Any, Callable, Dict, List, Optional, Tuple
- from urllib.parse import urlparse
- 
-@@ -844,13 +845,20 @@
-         LOG.debug("Renamed %s with ops %s", renames, ops + ups)
- 
-         for op, mac, new_name, params in ops + ups:
-+            result_before = subp.subp(["ip", "link", "show"])
-             try:
-                 opmap.get(op)(*params)
-+                time.sleep(2)
-             except Exception as e:
-+                result_after = subp.subp(["ip", "link", "show"])
-                 errors.append(
-                     "[unknown] Error performing %s%s for %s, %s: %s"
-                     % (op, params, mac, new_name, e)
-                 )
-+                errors.append(
-+                    "ip link show before is: %s, after is: %s"
-+                    % (result_before, result_after)
-+                )
- 
-     if len(errors):
-         raise RuntimeError("\n".join(errors))
 diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
 --- a/cloudinit/net/netops/iproute2.py	2024-09-04 12:01:58.000000000 -0700
-+++ b/cloudinit/net/netops/iproute2.py	2024-12-12 15:12:39.452471476 -0800
-@@ -2,7 +2,7 @@
- 
++++ b/cloudinit/net/netops/iproute2.py	2024-12-19 18:03:05.647569819 -0800
+@@ -3,7 +3,6 @@
  from cloudinit import subp
  from cloudinit.net.netops import NetOps
--
-+import time
  
+-
  class Iproute2(NetOps):
      @staticmethod
-@@ -30,6 +30,7 @@
-     @staticmethod
-     def link_rename(current_name: str, new_name: str):
-         subp.subp(["ip", "link", "set", current_name, "name", new_name])
-+        time.sleep(1)
- 
-     @staticmethod
-     def add_route(
+     def link_up(
+diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+--- a/systemd/cloud-init-local.service.tmpl	2024-09-04 12:01:58.000000000 -0700
++++ b/systemd/cloud-init-local.service.tmpl	2024-12-19 18:00:25.209096298 -0800
+@@ -7,6 +7,7 @@
+ {% endif %}
+ Wants=network-pre.target
+ After=hv_kvp_daemon.service
++After=systemd-networkd.service
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+ Requires=dbus.socket
+ After=dbus.socket
+@@ -15,7 +16,6 @@
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+ Before=network.service
+ {% endif %}
+-Before=network-pre.target
+ Before=shutdown.target
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+ Before=firewalld.target
 
