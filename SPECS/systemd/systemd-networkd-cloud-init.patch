@@ -1,0 +1,13 @@
+diff -ruN a/units/systemd-networkd.service.in b/units/systemd-networkd.service.in
+--- a/units/systemd-networkd.service.in	2023-12-06 12:32:40.000000000 -0800
++++ b/units/systemd-networkd.service.in	2024-12-19 16:45:34.197677000 -0800
+@@ -14,7 +14,7 @@
+ ConditionCapability=CAP_NET_ADMIN
+ DefaultDependencies=no
+ # systemd-udevd.service can be dropped once tuntap is moved to netlink
+-After=systemd-networkd.socket systemd-udevd.service network-pre.target systemd-sysusers.service systemd-sysctl.service
++After=systemd-networkd.socket systemd-udevd.service network-pre.target systemd-sysusers.service systemd-sysctl.service cloud-init-local.service
+ Before=network.target multi-user.target shutdown.target initrd-switch-root.target
+ Conflicts=shutdown.target initrd-switch-root.target
+ Wants=systemd-networkd.socket network.target
+
