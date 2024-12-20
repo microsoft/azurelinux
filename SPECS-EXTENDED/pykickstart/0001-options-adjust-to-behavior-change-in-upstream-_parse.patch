@@ -1,0 +1,67 @@
+From f753d4d6ad1f4846d14735beb3d1b157b9914b51 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 2 Oct 2024 09:48:39 -0700
+Subject: [PATCH] options: adjust to behavior change in upstream
+ _parse_optional
+
+In Python 3.13 and 3.12.7, the behavior of _parse_optional has
+changed. It used to raise an error on multiple matching actions
+itself, and only ever return None or an option tuple. Now the
+"raise error on multiple matching actions" code was moved out
+into consume_optional, and _parse_optional returns either None
+or a *list* of option tuples, which contains more than one if
+multiple actions match. See:
+
+https://github.com/python/cpython/pull/124631
+https://github.com/python/cpython/issues/58573
+
+This adapts to the change in a way that should work on both older
+and newer Pythons.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ pykickstart/options.py | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/pykickstart/options.py b/pykickstart/options.py
+index 2e3a0721..ca0e18af 100644
+--- a/pykickstart/options.py
++++ b/pykickstart/options.py
+@@ -177,9 +177,23 @@ class KSOptionParser(ArgumentParser):
+         self.lineno = None
+ 
+     def _parse_optional(self, arg_string):
+-        option_tuple = ArgumentParser._parse_optional(self, arg_string)
++        # Before 3.13 and 3.12.7, this returned None or a single
++        # option tuple. From 3.13 / 3.12.7 onwards it returns None
++        # or a *list* of option tuples
++        option_tuple_or_tuples = ArgumentParser._parse_optional(self, arg_string)
++        # all we want to do here is a custom warning if the action is
++        # deprecated. we can only safely do this if there's exactly
++        # one matching action
++        if isinstance(option_tuple_or_tuples, list):
++            if len(option_tuple_or_tuples == 1):
++                option_tuple = option_tuple_or_tuples[0]
++            else:
++                return option_tuple_or_tuples
++        else:
++            option_tuple = option_tuple_or_tuples
++
+         if option_tuple is None or option_tuple[0] is None:
+-            return option_tuple
++            return option_tuple_or_tuples
+ 
+         action = option_tuple[0]
+         option = action.option_strings[0]
+@@ -191,7 +205,7 @@ class KSOptionParser(ArgumentParser):
+                             "kickstart. Please modify your kickstart file to remove this option.")
+                           % {"lineno": self.lineno, "option": option}, KickstartDeprecationWarning)
+ 
+-        return option_tuple
++        return option_tuple_or_tuples
+ 
+     def add_argument(self, *args, **kwargs):
+         if "introduced" in kwargs:
+-- 
+2.46.2
+
