@@ -242,7 +242,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %changelog
-* Thr Dec 19 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
+* Thu Dec 19 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
 - Add amd .repo files.
 
 * Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
