@@ -2,13 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Mobile broadband provider database
 Name: mobile-broadband-provider-info
-Version: 20190618
-Release: 4%{?dist}
+Version: 20240407
+Release: 1%{?dist}
 URL: https://wiki.gnome.org/Projects/NetworkManager/MobileBroadband/ServiceProviders
-License: Public Domain
+License: CC-PDDC
 Source: https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
 
 BuildArch: noarch
+
+BuildRequires: gcc
+BuildRequires: meson
 BuildRequires: /usr/bin/xmllint
 BuildRequires: /usr/bin/xsltproc
 
@@ -31,16 +34,16 @@ developing developing applications that use %{name}.
 
 
 %build
-%configure
-%make_build
+%meson
+%meson_build
 
 
 %check
-make check
+%meson_test
 
 
 %install
-%make_install
+%meson_install
 
 
 %files
@@ -48,12 +51,16 @@ make check
 %doc README
 %license COPYING
 
-	
+
 %files devel
 %{_datadir}/pkgconfig/%{name}.pc
 
 
 %changelog
+* Wed Dec 18 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 20240407-1
+- Upgraded to version 20240407
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190618-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
