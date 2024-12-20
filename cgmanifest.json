@@ -22803,8 +22803,8 @@
         "type": "other",
         "other": {
           "name": "python-IPy",
-          "version": "0.81",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/I/IPy/IPy-0.81.tar.gz"
+          "version": "1.01",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/I/IPy/IPy-1.01.tar.gz"
         }
       }
     },
