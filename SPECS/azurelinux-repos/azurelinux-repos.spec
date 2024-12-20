@@ -34,6 +34,7 @@ Azure Linux repo files and gpg keys
 Summary:        Azure Linux AMD GPU repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
+ExclusiveArch:  x86_64
 
 %description amd
 %{summary}
@@ -42,6 +43,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 Summary:        Azure Linux AMD GPU preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
+ExclusiveArch:  x86_64
 
 %description amd-preview
 %{summary}
