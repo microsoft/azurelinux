@@ -21373,7 +21373,7 @@
         "type": "other",
         "other": {
           "name": "ps_mem",
-          "version": "3.6",
+          "version": "3.14",
           "downloadUrl": "https://raw.githubusercontent.com/pixelb/ps_mem/c80287d/ps_mem.py"
         }
       }
