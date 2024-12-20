@@ -152,6 +152,7 @@ fi
 %changelog
 * Thu Dec 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4-1
 - Auto-upgrade to 3.2.0.azl4
+- Align source and cargo tarball
 
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
 - Upgrade to 3.2.0.azl3 release, refactor build instructions

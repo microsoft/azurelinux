@@ -114,6 +114,7 @@ popd
 %changelog
 * Thu Dec 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4-1
 - Auto-upgrade to 3.2.0.azl4
+- Align source and cargo tarball
 
 * Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
