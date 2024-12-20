@@ -25,8 +25,6 @@ Source15:       azurelinux-amd-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
-BuildArch:      noarch
-
 %description
 Azure Linux repo files and gpg keys
 
