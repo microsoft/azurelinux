@@ -1,6 +1,6 @@
 Name:		perl-ExtUtils-Config
-Version:	0.008
-Release:	19%{?dist}
+Version:	0.010
+Release:	1%{?dist}
 Summary:	A wrapper for perl's configuration
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -53,8 +53,13 @@ make test
 %doc Changes README
 %{perl_vendorlib}/ExtUtils/
 %{_mandir}/man3/ExtUtils::Config.3*
+%{_mandir}/man3/ExtUtils::Config::MakeMaker.3*
 
 %changelog
+* Thu Dec 19 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.010-1
+- Update to 0.010
+- License verified
+
 * Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.008-19
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified
