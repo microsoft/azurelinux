@@ -19913,8 +19913,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Inter",
-          "version": "1.09",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Test-Inter-1.09.tar.gz"
+          "version": "1.11",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SB/SBECK/Test-Inter-1.11.tar.gz"
         }
       }
     },
