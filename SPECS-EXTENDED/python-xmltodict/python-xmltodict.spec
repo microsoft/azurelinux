@@ -1,18 +1,16 @@
 %global pypi_name xmltodict
 
 Name:               python-xmltodict
-Version:            0.12.0
-Release:            15%{?dist}
+Version:            0.13.0
+Release:            6%{?dist}
 Summary:            Python to transform XML to JSON
-Vendor:		    Microsoft Corporation
-Distribution:   Azure Linux
+
 License:            MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:                https://github.com/martinblech/xmltodict
-Source0:            %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
+Source0:            %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:          noarch
-%if 0%{?with_check}
-BuildRequires:          python3-pip
-%endif
 
 %description
 xmltodict is a Python module that makes working with XML feel like you are
@@ -25,6 +23,7 @@ Summary:            %{summary}
 
 BuildRequires:      python3-devel
 BuildRequires:      python3-setuptools
+BuildRequires:      %{py3_dist pytest}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 
 %description -n python3-%{pypi_name}
@@ -43,8 +42,7 @@ Wikipedia.
 %py3_install
 
 %check
-pip3 install nose
-%{__python3} -m nose
+%pytest -v
 
 %files -n python3-%{pypi_name}
 %doc README.md
@@ -54,12 +52,45 @@ pip3 install nose
 %{python3_sitelib}/__pycache__/%{pypi_name}*
 
 %changelog
-* Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 0.12.0-15
-- Add an explicit BR on pip to enable ptest
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.13.0-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.12.0-14
-- Initial CBL-Mariner import from Fedora 35 (license: MIT)
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.13.0-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 27 2023 Alfredo Moralejo <amoralej@redhat.com> - 0.13.0-1
+- Update to 0.13.0
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.12.0-19
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.12.0-16
+- Rebuilt for Python 3.11
+
+* Wed Mar 30 2022 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.12.0-15
+- Switch tests from nose (deprecated) to pytest
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
