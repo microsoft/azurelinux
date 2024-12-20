@@ -1,26 +1,13 @@
-diff -ruN a/cloudinit/net/netops/iproute2.py b/cloudinit/net/netops/iproute2.py
---- a/cloudinit/net/netops/iproute2.py	2024-09-04 12:01:58.000000000 -0700
-+++ b/cloudinit/net/netops/iproute2.py	2024-12-19 18:03:05.647569819 -0800
-@@ -3,7 +3,6 @@
- from cloudinit import subp
- from cloudinit.net.netops import NetOps
- 
--
- class Iproute2(NetOps):
-     @staticmethod
-     def link_up(
 diff -ruN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
 --- a/systemd/cloud-init-local.service.tmpl	2024-09-04 12:01:58.000000000 -0700
-+++ b/systemd/cloud-init-local.service.tmpl	2024-12-19 18:00:25.209096298 -0800
-@@ -7,6 +7,7 @@
- {% endif %}
- Wants=network-pre.target
- After=hv_kvp_daemon.service
-+After=systemd-networkd.service
++++ b/systemd/cloud-init-local.service.tmpl	2024-12-19 18:30:58.698185195 -0800
+@@ -10,12 +10,12 @@
  {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
  Requires=dbus.socket
  After=dbus.socket
-@@ -15,7 +16,6 @@
++After=systemd-networkd.service
+ {% endif %}
+ Before=NetworkManager.service
  {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
  Before=network.service
  {% endif %}
