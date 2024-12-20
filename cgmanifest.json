@@ -26934,8 +26934,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-pkg-config",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/ruby-gnome/pkg-config/archive/refs/tags/1.4.5.tar.gz"
+          "version": "1.5.7",
+          "downloadUrl": "https://rubygems.org/downloads/pkg-config-1.5.7.gem"
         }
       }
     },
