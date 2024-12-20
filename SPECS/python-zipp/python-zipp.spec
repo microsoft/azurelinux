@@ -3,12 +3,13 @@
 Summary:        Backport of pathlib-compatible object wrapper for zip files
 Name:           python-%{pypi_name}
 Version:        3.17.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jaraco/zipp
 Source0:        %{pypi_source}
+Patch0:         CVE-2024-5569.patch
 
 BuildArch:      noarch
 
@@ -38,7 +39,7 @@ Summary:        %{summary}
 A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n %{pypi_name}-%{version} -p1
 
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -61,6 +62,9 @@ rm -rf .pyproject-builddir
 %doc README.rst
 
 %changelog
+* Wed Dec 18 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.17.0-3
+- Address CVE-2024-5569 with an upstream patch
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.17.0-2
 - Add BR for python-setuptools_scm
 
