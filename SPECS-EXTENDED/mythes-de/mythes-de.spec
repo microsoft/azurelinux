@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global upstreamid 20201226
+%global upstreamid 20240601
 
 Summary:        German thesaurus
 Name:           mythes-de
 Version:        0.%{upstreamid}
 Release:        2%{?dist}
-License:        LGPLv2+ or CC-BY-SA
+License:        LGPL-2.1-or-later OR CC-BY-SA-4.0
 URL:            https://www.openthesaurus.de/
 Source0:        https://www.openthesaurus.de/export/Deutscher-Thesaurus.oxt
 Source1:        https://www.openthesaurus.de/export/Schweizer-Thesaurus.oxt
@@ -53,10 +53,13 @@ pushd $RPM_BUILD_ROOT%{_datadir}/mythes/
 popd
 
 %files
-%license README.txt
+%doc README.txt
 %{_datadir}/mythes/*
 
 %changelog
+* Fri Dec 20 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.20240601-1
+- Upgraded to version 0.20240601
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20201226-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
