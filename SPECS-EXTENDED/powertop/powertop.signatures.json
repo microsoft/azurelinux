@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "powertop-2.13.tar.gz": "e490c82dbfa87c98430c16151081fbe86e6f45d8be3dd8c48b89e8868dda85a1",
+  "powertop-2.15.tar.gz": "e58ab3fd7b8ff5f4dd0d17f11848817e7d83c0a6918145ac81de03b5dccf8f49",
   "powertop.service": "8bf360244bac769f41f37006b06fdf67224c9c7199045817fe5c5912a8868873"
  }
 }
