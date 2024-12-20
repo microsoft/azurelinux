@@ -3,13 +3,16 @@ Distribution:   Azure Linux
 # noarch, but to avoid debug* files interfering with manifest test:
 %global debug_package %{nil}
 
+# Similarly, for package note feature
+%undefine _package_note_file
+
 Name:		perl-Test-Synopsis
-Version:	0.16
-Release:	7%{?dist}
+Version:	0.17
+Release:	12%{?dist}
 Summary:	Test your SYNOPSIS code
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Synopsis
-Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Synopsis-%{version}.tar.gz#/perl-Test-Synopsis-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/Z/ZO/ZOFFIX/Test-Synopsis-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -26,13 +29,13 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(Test::Builder::Module)
 BuildRequires:	perl(warnings)
 # Test Suite
+BuildRequires:	perl(blib)
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(IO::Handle)
 BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(Test::Builder) >= 0.34
 BuildRequires:	perl(Test::Builder::Tester)
 BuildRequires:	perl(Test::More)
-BuildRequires:	perl(blib)
 # Extra Tests; can't run these when bootstrapping or in EL since many
 # of these packages won't be available
 %if 0%{!?perl_bootstrap:1} && 0%{!?rhel:1}
@@ -51,11 +54,10 @@ BuildRequires:	perl(Test::NoTabs)
 BuildRequires:	perl(Test::Pod) >= 1.41
 BuildRequires:	perl(Test::Pod::Coverage) >= 1.08
 BuildRequires:	perl(Test::Portability::Files)
-BuildRequires:	perl(Test::Spelling) >= 0.23, hunspell-en
+BuildRequires:	perl(Test::Spelling) >= 0.12, hunspell-en
 BuildRequires:	perl(Test::Version)
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
 Requires:	perl(Test::Builder::Module)
 
 %description
@@ -85,16 +87,16 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %endif
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README README.md
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Synopsis.3*
 
 %changelog
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 0.17-12
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.16-7
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified
