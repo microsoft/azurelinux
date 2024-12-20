@@ -33,7 +33,7 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 Source1:        cli-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-39325.patch
 Patch1:         CVE-2024-24786.patch
-Patch1:         CVE-2024-45337.patch
+Patch2:         CVE-2024-45337.patch
 
 BuildRequires:  golang >= 1.18.3
 %global debug_package %{nil}
