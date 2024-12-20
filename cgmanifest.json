@@ -16123,8 +16123,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-C3-XS",
-          "version": "0.14",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Class-C3-XS-0.14.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Class/Class-C3-XS-0.15.tar.gz"
         }
       }
     },
