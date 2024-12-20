@@ -1,0 +1,12 @@
+os:
+  hostname: azure-linux
+  kernelCommandLine:
+    extraCommandLine: "console=tty0 console=ttyS0"
+  packages:
+    installLists:
+    - packagelists/qemu-guest-packages.yaml
+    - packagelists/base-image-packages.yaml
+    - packagelists/cloud-init-packages.yaml
+scripts:
+  finalizeCustomization:
+  - path: ../scripts/cleanup.sh
