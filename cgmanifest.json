@@ -20123,8 +20123,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Synopsis",
-          "version": "0.16",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Synopsis-0.16.tar.gz"
+          "version": "0.17",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/Z/ZO/ZOFFIX/Test-Synopsis-0.17.tar.gz"
         }
       }
     },
