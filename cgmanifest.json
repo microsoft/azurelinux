@@ -22943,8 +22943,8 @@
         "type": "other",
         "other": {
           "name": "python-justbytes",
-          "version": "0.11",
-          "downloadUrl": "https://pypi.io/packages/source/j/justbytes/justbytes-0.11.tar.gz"
+          "version": "0.15.2",
+          "downloadUrl": "https://pypi.io/packages/source/j/justbytes/justbytes-0.15.2.tar.gz"
         }
       }
     },
