@@ -22933,8 +22933,8 @@
         "type": "other",
         "other": {
           "name": "python-justbases",
-          "version": "0.9",
-          "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.9.tar.gz"
+          "version": "0.15.2",
+          "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.15.2.tar.gz"
         }
       }
     },
