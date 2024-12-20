@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-PAR-Dist
-Version:        0.51
-Release:        2%{?dist}
+Version:        0.53
+Release:        3%{?dist}
 Summary:        Toolkit for creating and manipulating Perl PAR distributions
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PAR-Dist
-Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/PAR-Dist-%{version}.tar.gz#/perl-PAR-Dist-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/PAR-Dist-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -17,6 +17,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(Archive::Zip)
 BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Exporter)
 # perl(ExtUtils::Install) not tested
@@ -27,14 +28,13 @@ BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
 # perl(LWP::Simple) not tested
 # perl(Module::Signature) >= 0.25 not tested
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
 BuildRequires:  perl(YAML::Tiny)
 # Tests:
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
-# Optional tests:
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       perl(Archive::Zip)
 Requires:       perl(Cwd)
 Requires:       perl(ExtUtils::Install)
@@ -42,8 +42,9 @@ Requires:       perl(ExtUtils::MY)
 Requires:       perl(File::Copy)
 Requires:       perl(File::Find)
 Requires:       perl(File::Path)
+Requires:       perl(File::Temp)
 Requires:       perl(LWP::Simple)
-Requires:       perl(Module::Signature) >= 0.25
+#Requires:       perl(Module::Signature) >= 0.25
 Requires:       perl(YAML::Tiny)
 
 %description
@@ -53,27 +54,68 @@ after their make or Build stage, a META.yml describing metadata of the
 original CPAN distribution, and a MANIFEST detailing all files within it.
 Digitally signed PAR distributions will also contain a SIGNATURE file.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n PAR-Dist-%{version}
 
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
+
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/00pod*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The easiest solution
+# is to copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
-make test PERL_TEST_POD=1
+unset PERL_TEST_POD
+make test
 
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/PAR*
+%{_mandir}/man3/PAR::Dist*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 0.53-3
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.51-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
