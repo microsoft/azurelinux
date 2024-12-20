@@ -2,12 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:      mythes
 Summary:   A thesaurus library
-Version:   1.2.4
-Release:   14%{?dist}
-# Source:  https://github.com/hunspell/mythes/archive/refs/heads/master.zip
-Source:    https://github.com/hunspell/mythes/archive/refs/heads/%{name}-%{version}.tar.gz
+Version:   1.2.5
+Release:   1%{?dist}
+Source:    https://github.com/hunspell/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 URL:       https://github.com/hunspell/mythes
-License:   BSD and MIT
+License:   BSD-3-Clause-Modification AND MIT
 BuildRequires: hunspell-devel, gcc-c++
 
 %description
@@ -27,15 +26,16 @@ Includes and definitions for developing with mythes
 
 %build
 %configure --disable-rpath --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %check
+make check
 ./example th_en_US_new.idx th_en_US_new.dat checkme.lst
 ./example morph.idx morph.dat morph.lst morph.aff morph.dic
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
@@ -55,6 +55,10 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 %{_bindir}/th_gen_idx.pl
 
 %changelog
+* Fri Dec 20 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.5-1
+- Upgraded to version 1.2.5
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
