@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary:        A console-based network monitoring utility
 Name:           iptraf-ng
-Version:        1.2.1
+Version:        1.2.2
 Release:        1%{?dist}
 Source0:        https://github.com/iptraf-ng/iptraf-ng/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-logrotate.conf
@@ -70,6 +70,9 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 %{_prefix}/lib/tmpfiles.d/%{name}.conf
 
 %changelog
+* Thu Dec 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.2.2-1
+- Upgrade to 1.2.2 to fix CVE-2024-52949
+
 * Tue Jun 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-1
 - Upgrading to fix build break and align with latest ncurses update.
 - License verified.
