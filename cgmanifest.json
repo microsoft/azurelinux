@@ -14802,8 +14802,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-libvirt",
-          "version": "0.6.1.5",
-          "downloadUrl": "http://libvirt.org/sources/ocaml/ocaml-libvirt-0.6.1.5.tar.gz"
+          "version": "0.6.1.7",
+          "downloadUrl": "http://libvirt.org/sources/ocaml/ocaml-libvirt-0.6.1.7.tar.gz"
         }
       }
     },
