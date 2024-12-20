@@ -21253,8 +21253,8 @@
         "type": "other",
         "other": {
           "name": "pps-tools",
-          "version": "1.0.2",
-          "downloadUrl": "https://github.com/redlab-i/pps-tools/archive/v1.0.2/pps-tools-1.0.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/redlab-i/pps-tools/archive/v1.0.3/pps-tools-1.0.3.tar.gz"
         }
       }
     },
