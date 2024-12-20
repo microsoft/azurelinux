@@ -21283,8 +21283,8 @@
         "type": "other",
         "other": {
           "name": "procmail",
-          "version": "3.22",
-          "downloadUrl": "ftp://ftp.ucsb.edu/pub/mirrors/procmail/procmail-3.22.tar.gz"
+          "version": "3.24",
+          "downloadUrl": "https://github.com/BuGlessRB/procmail/archive/v3.24/procmail-3.24.tar.gz"
         }
       }
     },
