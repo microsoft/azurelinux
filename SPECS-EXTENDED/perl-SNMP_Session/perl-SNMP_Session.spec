@@ -1,17 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-SNMP_Session
-Version:        1.13
-Release:        24%{?dist}
+Version:        1.16
+Release:        6%{?dist}
 Summary:        SNMP support for Perl 5
 
-License:        Artistic 2.0
-URL:            http://code.google.com/p/snmp-session/
-Source0:        http://snmp-session.googlecode.com/files/SNMP_Session-%{version}.tar.gz
+License:        Artistic-2.0
+URL:            https://github.com/sleinen/snmp-session/
+Source0:        https://cpan.metacpan.org/authors/id/S/SK/SKIM/SNMP_Session-%{version}.tar.gz
+Patch0:         SNMP_Session-1.13-fix_ivp6.patch
 BuildArch:      noarch
+BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires:  perl(Test::More)
+#Requires:       perl(IO::Socket::INET6)
+#Requires:       perl(Socket6)
 
 %description
 Pure Perl SNMP v1 and SNMP v2 support for Perl 5.
@@ -22,20 +26,19 @@ and "set", as well as trap generation and reception.
 
 %prep
 %setup -q -n SNMP_Session-%{version}
+%patch -P 0 -p1
 %{__perl} -pi -e 's{^#!/usr/local/bin/perl\b}{#!%{__perl}}' test/*
 chmod -c 644 test/*
 
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
 
 
 %check
@@ -43,11 +46,16 @@ make test
 
 
 %files
-%doc Artistic README README.SNMP_util index.html test/
+%license Artistic
+%doc README README.SNMP_util index.html test/
 %{perl_vendorlib}/*
-
+%{_mandir}/man3/*
 
 %changelog
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 1.16-6
+- Initial CBL-Mariner import from Fedora 41 (license: Artistic-2.0).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
