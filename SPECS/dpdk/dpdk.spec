@@ -106,7 +106,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %prep
-%autosetup -p1 -n dpdk-%{version}
+%autosetup -p1 -n dpdk-stable-%{version}
 
 %build
 CFLAGS="$(echo %{optflags} -fcommon)" \
