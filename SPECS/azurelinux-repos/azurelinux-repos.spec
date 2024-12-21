@@ -25,6 +25,8 @@ Source15:       azurelinux-amd-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
+# Capture the built architecture before setting noarch in order to install the
+# appropriate repos for x86_64 later in this spec
 %ifarch x86_64
 %define buildx86 1
 %endif 
