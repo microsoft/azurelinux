@@ -24514,7 +24514,7 @@
         "other": {
           "name": "python-sphinxcontrib-apidoc",
           "version": "0.2.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-apidoc/sphinxcontrib-apidoc-0.2.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-apidoc/sphinxcontrib-apidoc-0.3.0.tar.gz"
         }
       }
     },
