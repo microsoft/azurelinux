@@ -1,0 +1,1 @@
+%macro_from_B %(echo "C")
