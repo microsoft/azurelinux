@@ -25,12 +25,17 @@ Source15:       azurelinux-amd-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
+# Capture the built architecture before setting noarch in order to install the
+# appropriate repos for x86_64 later in this spec
+%ifarch x86_64
+%define buildx86 1
+%endif 
 BuildArch:      noarch
 
 %description
 Azure Linux repo files and gpg keys
 
-%ifarch x86_64
+%if %{defined buildx86}
 %package amd
 Summary:        Azure Linux AMD GPU repo file.
 Group:          System Environment/Base
@@ -162,7 +167,7 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
-%ifarch x86_64
+%if %{defined buildx86}
 install -m 644 %{SOURCE14} $REPO_DIRECTORY
 install -m 644 %{SOURCE15} $REPO_DIRECTORY
 %endif
@@ -183,7 +188,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-base.repo
 
-%ifarch x86_64
+%if %{defined buildx86}
 %files amd
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd.repo
@@ -242,7 +247,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %changelog
-* Thu Dec 19 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
+* Fri Dec 20 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
 - Add amd .repo files.
 
 * Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
