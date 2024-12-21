@@ -39,7 +39,7 @@ mkdir -p "$sodiff_out_dir"
 
 # Prepare mariner/ubuntu compatibility calls
 
-common_options="-c $repo_file_path --releasever $mariner_version"
+common_options="--disablerepo=mariner-official-base,mariner-official-extras,mariner-official-microsoft,mariner-official-extras-preview -c $repo_file_path --releasever $mariner_version"
 
 dnf_command=dnf
 # Cache RPM metadata
