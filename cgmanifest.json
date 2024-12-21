@@ -24273,8 +24273,8 @@
         "type": "other",
         "other": {
           "name": "python-rpmfluff",
-          "version": "0.5.7.1",
-          "downloadUrl": "https://pagure.io/releases/rpmfluff/rpmfluff-0.5.7.1.tar.xz"
+          "version": "0.6.5",
+          "downloadUrl": "https://pagure.io/releases/rpmfluff/rpmfluff-0.6.5.tar.xz"
         }
       }
     },
