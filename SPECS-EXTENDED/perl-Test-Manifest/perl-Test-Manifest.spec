@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        Test case module for Perl
 Name:           perl-Test-Manifest
-Version:        2.021
-Release:        8%{?dist}
-License:        Artistic 2.0
+Version:        2.024
+Release:        5%{?dist}
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-Manifest
-Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Manifest-%{version}.tar.gz#/perl-Test-Manifest-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/TestTest-Manifest-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -27,12 +27,13 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 # Test Suite
 BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(Test::More) >= 0.94
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::More) >= 1
 # Optional Tests
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Spec)
 Requires:       perl(Test::Harness)
 
@@ -65,16 +66,16 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README.pod
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Manifest.3*
 
 %changelog
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 2.024-5
+- Initial CBL-Mariner import from Fedora 41 (license: Artistic-2.0).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.021-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
