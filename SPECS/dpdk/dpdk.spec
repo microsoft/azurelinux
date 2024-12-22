@@ -29,8 +29,8 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        23.11
-Release:        2%{?dist}
+Version:        23.11.3
+Release:        1%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,7 +106,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %prep
-%autosetup -p1 -n dpdk-%{version}
+%autosetup -p1 -n dpdk-stable-%{version}
 
 %build
 CFLAGS="$(echo %{optflags} -fcommon)" \
@@ -179,6 +179,9 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Fri Dec 20 2024 Jon Slobodzian <joslobo@microsoft.com> - 23.11.3-1
+- Updgrade to 23.11.3 to resolve CVE-2024-11614.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.11-2
 - Updating naming for 3.0 version of Azure Linux.
 
