@@ -1,6 +1,6 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
-Version:        3.17
+Version:        3.18
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Sun Dec 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18-1
+- Auto-upgrade to 3.18 - CVE-2024-53580
+
 * Thu May 16 2024 Muhammad Falak <mwani@microsoft.com> - 3.17-1
 - Bump version to 3.17 to address CVE-2024-26306
 
