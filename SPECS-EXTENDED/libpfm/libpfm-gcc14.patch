@@ -1,0 +1,21 @@
+commit cb944829e0940d74009e09b8985b4f2139f5cb3b
+Author: William Cohen <wcohen@redhat.com>
+Date:   Mon Jan 29 16:23:43 2024 -0500
+
+    Correct s390x code to avoid GCC-14 -Werror=calloc-transposed-args errors
+
+diff --git a/lib/pfmlib_s390x_cpumf.c b/lib/pfmlib_s390x_cpumf.c
+index d8ce22d..718f5f8 100644
+--- a/lib/pfmlib_s390x_cpumf.c
++++ b/lib/pfmlib_s390x_cpumf.c
+@@ -216,8 +216,8 @@ static int pfm_cpumcf_init(void *this)
+ 		break;
+ 	}
+ 
+-	cpumcf_pe = calloc(sizeof(*cpumcf_pe),
+-			   cfvn_set_count + csvn_set_count + ext_set_count);
++	cpumcf_pe = calloc(cfvn_set_count + csvn_set_count + ext_set_count,
++			   sizeof(*cpumcf_pe));
+ 	if (cpumcf_pe == NULL)
+ 		return PFM_ERR_NOMEM;
+ 
