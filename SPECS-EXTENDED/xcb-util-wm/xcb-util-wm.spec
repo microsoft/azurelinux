@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		xcb-util-wm
-Version:	0.4.1
-Release:	18%{?dist}
+Version:	0.4.2
+Release:	1%{?dist}
 Summary:	Client and window-manager helper library on top of libxcb
 License:	MIT
 URL:		http://xcb.freedesktop.org
-Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
+Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:	pkgconfig(xcb-util) >= 0.3.8
 BuildRequires:	m4
@@ -32,7 +32,7 @@ Development files for xcb-util-wm.
 
 %build
 %configure --with-pic --disable-static --disable-silent-rules
-make %{?_smp_mflags}
+%make_build
 
 
 %check
@@ -40,7 +40,7 @@ make check
 
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%make_install
 rm %{buildroot}%{_libdir}/*.la
 
 
@@ -51,12 +51,12 @@ rm %{buildroot}%{_libdir}/*.la
 
 
 %files
-%doc README
+%doc README.md
 %if 0%{?_licensedir:1}
 %license COPYING
 %else
 %doc COPYING
-%endif # licensedir
+%endif
 %{_libdir}/*.so.*
 
 
@@ -68,6 +68,10 @@ rm %{buildroot}%{_libdir}/*.la
 
 
 %changelog
+* Mon Dec 23 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.4.2-1
+- Upgraded to version 0.4.2
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.1-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
