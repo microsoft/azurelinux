@@ -1,41 +1,90 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} >= 36 || 0%{?rhel} > 9
+%global dict_dirname hunspell
+%else
+%global dict_dirname myspell
+%endif
+
 Name: hunspell-mr
 Summary: Marathi hunspell dictionaries
-Version: 1.0.0
-Release: 15%{?dist}
-Source: http://anishpatil.fedorapeople.org/mr_in.%{version}.tar.gz
-URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git
-License: LGPLv2+
+Version: 14.01webext
+Release: 2%{?dist}
+Epoch: 1
+Source: https://addons.mozilla.org/firefox/downloads/file/4324409/marathi_dictionary-14.01webext.xpi
+URL: https://addons.mozilla.org/en-US/firefox/addon/marathi-dictionary/
+# license information is taken from above URL
+License: GPL-3.0-or-later
 BuildArch: noarch
 
-Requires: hunspell
+Requires: hunspell-filesystem
 Supplements: (hunspell and langpacks-mr)
 
 %description
 Marathi hunspell dictionaries.
 
 %prep
-%autosetup -c -n mr_IN
+%autosetup -c
 
 %build
 #nothing to do here
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p mr_IN/mr_IN.dic mr_IN/mr_IN.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p dictionaries/mr-IN.dic $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/mr_IN.dic
+cp -p dictionaries/mr-IN.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/mr_IN.aff
 
 %files
-%doc mr_IN/README_mr_IN.txt
-%license mr_IN/LICENCE
-%{_datadir}/myspell/*
+%{_datadir}/%{dict_dirname}/*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.0.0-15
-- Remove epoch
+* Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1:14.01webext-2
+- AzureLinux import from Fedora 41 .
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.0.0-14
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 25 2024 Parag Nemade <pnemade@fedoraproject.org> - 1:14.01webext-1
+- Move to use new upstream URL from firefox addon 14.01webext version
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Sep 10 2022 Parag Nemade <pnemade AT redhat DOT com> - 1:8.0-1
+- Update to new upstream release 8.0
+- Update license as per its SPDX expression
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Parag Nemade <pnemade AT redhat DOT com> - 1:7.0-1
+- Changed the Upstream URL and built with new tarball
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 1:1.0.0-18
+- Add conditional for new hunspell dir path and update to Requires:
+  hunspell-filesystem
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
