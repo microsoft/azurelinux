@@ -1,17 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           pkcs11-helper
-Version:        1.22
-Release:        11%{?dist}
+Version:        1.30.0
+Release:        1%{?dist}
 Summary:        A library for using PKCS#11 providers
 
-License:        GPLv2 or BSD
+License:        GPL-2 or BSD-3-Clause
 URL:            http://www.opensc-project.org/opensc/wiki/pkcs11-helper
-Source0:        http://downloads.sourceforge.net/opensc/pkcs11-helper-%{version}.tar.bz2
+Source0:        https://github.com/OpenSC/pkcs11-helper/releases/download/pkcs11-helper-%{version}/pkcs11-helper-%{version}.tar.bz2
+# https://github.com/OpenSC/pkcs11-helper/pull/4
 Patch2:         pkcs11-helper-rfc7512.patch
 
 BuildRequires:  gcc
 BuildRequires:  doxygen graphviz
+BuildRequires:  make
 BuildRequires:  openssl-devel
 
 %description
@@ -25,7 +27,7 @@ using a simple API.
 
 %package        devel
 Summary:        Development files for pkcs11-helper
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       openssl-devel
 # for /usr/share/aclocal
 Requires:       automake
@@ -36,16 +38,15 @@ programs using the pkcs11-helper library.
 
 
 %prep
-%setup -q
-%patch 2 -p1
+%autosetup -p1
 
 %build
 %configure --disable-static --enable-doc
-make %{?_smp_mflags}
+%make_build
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 
 # Use %%doc to install documentation in a standard location
 mkdir apidocdir
@@ -56,12 +57,10 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/%{name}/
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
-%ldconfig_scriptlets
-
-
 %files
-%doc AUTHORS ChangeLog COPYING* README THANKS
-%{_libdir}/libpkcs11-helper.so.*
+%license COPYING*
+%doc AUTHORS ChangeLog README THANKS
+%{_libdir}/libpkcs11-helper.so.1*
 
 
 %files devel
@@ -74,8 +73,73 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.0-1
+- Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.30.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Feb 02 2024 Kalev Lember <klember@redhat.com> - 1.30.0-1
+- Update to 1.30.0
+- Use SPDX license identifiers
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Apr 21 2022 Anthony Rabbito <hello@anthonyrabbito.com> - 1.29.0-1
+- Update to 1.29.0
+
+* Thu Apr 21 2022 Anthony Rabbito <hello@anthonyrabbito.com> - 1.28.0-3
+- Drop pkcs11-helper-openssl3.patch
+
+* Thu Apr 21 2022 Anthony Rabbito <hello@anthonyrabbito.com> - 1.28.0-2
+- Use version macro in the entire source URL.
+
+* Thu Apr 21 2022 Anthony Rabbito <hello@anthonyrabbito.com> - 1.28.0-1
+- Update to 1.28.0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.27.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 04 2021 Neal Gompa <ngompa@fedoraproject.org> - 1.27.0-6
+- Backport fix for OpenSSL 3.0 support
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1.27.0-5
+- Rebuilt with OpenSSL 3.0.0
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.27.0-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.27.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 18 2020 Kalev Lember <klember@redhat.com> - 1.27.0-2
+- Update pkcs11-helper-rfc7512.patch from
+  https://github.com/OpenSC/pkcs11-helper/pull/4 (#1849259)
+
+* Fri Nov 20 2020 Kalev Lember <klember@redhat.com> - 1.27.0-1
+- Update to 1.27.0
+- Use make_build and make_install macros
+- Tighten soname globs
+- Use license macro for COPYING*
+- Tighten requires with _isa macro
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.22-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Apr 24 2020 David Woodhouse <dwmw2@infradead.org> - 1.22-10
 - Fix serialisation of attributes with NUL bytes in (#1825496)
