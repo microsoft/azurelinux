@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -268,6 +268,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Sep 16 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - %{openssh_ver}-3
+- Dummy bump.
+
 * Fri Aug 16 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.8p1-2
 - Fixed 'openssh' ptests.
 
