@@ -424,7 +424,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Nov 25 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
+* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
 - Enable CONFIG_INTEL_TDX_GUEST and CONFIG_TDX_GUEST_DRIVER
 
 * Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
