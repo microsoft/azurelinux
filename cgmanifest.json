@@ -25293,8 +25293,8 @@
         "type": "other",
         "other": {
           "name": "python-varlink",
-          "version": "30.3.0",
-          "downloadUrl": "https://github.com/varlink/python-varlink/archive/30.3.0/python-varlink-30.3.0.tar.gz"
+          "version": "31.0.0",
+          "downloadUrl": "https://github.com/varlink/python-varlink/archive/31.0.0/python-varlink-31.0.0.tar.gz"
         }
       }
     },
