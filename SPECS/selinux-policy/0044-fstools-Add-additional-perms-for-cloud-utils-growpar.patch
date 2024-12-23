@@ -1,0 +1,133 @@
+From ed936044e2c72d8aa8c57bde4e0e4331eeddc1f8 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 6 Aug 2024 11:35:33 -0400
+Subject: [PATCH 44/44] fstools: Add additional perms for cloud-utils-growpart.
+
+Missed in previous growpart patch due to testing errors.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.if | 38 +++++++++++++++++++++++++++++++
+ policy/modules/system/fstools.fc  |  2 ++
+ policy/modules/system/fstools.te  | 16 +++++++++++--
+ policy/modules/system/udev.te     |  4 ++++
+ 4 files changed, 58 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
+index 7496b800a..131004a9d 100644
+--- a/policy/modules/admin/cloudinit.if
++++ b/policy/modules/admin/cloudinit.if
+@@ -163,6 +163,25 @@ interface(`cloudinit_getattr_state_files',`
+ 	allow $1 cloud_init_state_t:file getattr;
+ ')
+ 
++########################################
++## <summary>
++##	Create, read, write, and delete cloud-init temporary dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_manage_tmp_dirs',`
++	gen_require(`
++		type cloud_init_tmp_t;
++	')
++
++	files_search_tmp($1)
++	manage_dirs_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Write inherited cloud-init temporary files.
+@@ -219,3 +238,22 @@ interface(`cloudinit_create_tmp_files',`
+ 	files_search_tmp($1)
+ 	create_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
+ ')
++
++########################################
++## <summary>
++##	Create, read, write, and delete cloud-init temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_manage_tmp_files',`
++	gen_require(`
++		type cloud_init_tmp_t;
++	')
++
++	files_search_tmp($1)
++	manage_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
++')
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index 8fbd5ce44..375c69323 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -18,6 +18,7 @@
+ /usr/bin/findfs			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/fsck.*			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/gdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/bin/growpart		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/hdparm			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/install-mbr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/jfs_.*			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -75,6 +76,7 @@
+ /usr/sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fsck.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/gdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/sbin/growpart		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/hdparm		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/install-mbr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/jfs_.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
+index 7c2eabb41..301c8592a 100644
+--- a/policy/modules/system/fstools.te
++++ b/policy/modules/system/fstools.te
+@@ -181,8 +181,20 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
+-	cloudinit_rw_tmp_files(fsadm_t)
+-	cloudinit_create_tmp_files(fsadm_t)
++	cloudinit_manage_tmp_files(fsadm_t)
++	cloudinit_manage_tmp_dirs(fsadm_t)
++
++	fs_getattr_tmpfs(fsadm_t)
++
++	optional_policy(`
++		# cloud-utils-growpart
++		lvm_domtrans(fsadm_t)
++	')
++
++	optional_policy(`
++		# cloud-utils-growpart
++		udev_domtrans(fsadm_t)
++	')
+ ')
+ 
+ optional_policy(`
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index f6a87c767..4568a996d 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -295,6 +295,10 @@ optional_policy(`
+ 	clock_domtrans(udev_t)
+ ')
+ 
++optional_policy(`
++	cloudinit_rw_inherited_pipes(udev_t)
++')
++
+ optional_policy(`
+ 	consoletype_exec(udev_t)
+ ')
+-- 
+2.45.2
+
