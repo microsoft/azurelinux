@@ -1,27 +1,38 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global pkgname zarith
 
-Name:           ocaml-%{pkgname}
-Version:        1.9.1
-Release:        9%{?dist}
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
+Name:           ocaml-zarith
+Version:        1.14
+Release:        3%{?dist}
 Summary:        OCaml interface to GMP
 
-# The license has a static linking exception
-License:        LGPLv2 with exceptions
-URL:            https://github.com/ocaml/Zarith/
-Source0:        https://github.com/ocaml/Zarith/archive/release-%{version}.tar.gz
+License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
+URL:            https://github.com/ocaml/Zarith
+VCS:            git:%{url}.git
+Source:         %{url}/archive/release-%{version}.tar.gz
+#Source1:        https://github.com/ocaml/Zarith/archive/release-1.14.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gmp-devel
-BuildRequires:  ocaml
+BuildRequires:  make
+BuildRequires:  ocaml >= 4.04.0
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-rpm-macros
 BuildRequires:  perl-interpreter
+
+# Replace config.guess with a more up to date version which knows about POWER.
+BuildRequires:  redhat-rpm-config
+
+# Do not require ocaml-compiler-libs at runtime
+%global __ocaml_requires_opts -i Asttypes -i Build_path_prefix_map -i Cmi_format -i Env -i Ident -i Identifiable -i Load_path -i Location -i Longident -i Misc -i Outcometree -i Parsetree -i Path -i Primitive -i Shape -i Subst -i Toploop -i Type_immediacy -i Types -i Warnings
 
 %description
 This library implements arithmetic and logical operations over
-arbitrary-precision integers.  
+arbitrary-precision integers.
 
 The module is simply named "Z".  Its interface is similar to that of the
 Int32, Int64 and Nativeint modules from the OCaml standard library, with
@@ -58,9 +69,8 @@ developing applications that use %{name}.
 %autosetup -n Zarith-release-%{version}
 
 # Fix compilation flags
-sed -i "s|^ccdef=''|ccdef='%{optflags}'|" configure
-sed -ri "s/(-ccopt|-shared|-failsafe)/-g &/" project.mak
-sed -i "s/+compiler-libs/& -g/;s/\(\$(OCAMLC)\) -o/\1 -g -o/" project.mak
+sed -i "s|^ccdef=''|ccdef='%{build_cflags}'|" configure
+sed -i "s/-shared/-g &/" project.mak
 
 %build
 export CC="gcc"
@@ -71,38 +81,35 @@ make
 make doc
 
 %install
-mkdir -p %{buildroot}%{_libdir}/ocaml/stublibs
-make install INSTALLDIR=%{buildroot}%{_libdir}/ocaml
+mkdir -p %{buildroot}%{ocamldir}/stublibs
+make install INSTALLDIR=%{buildroot}%{ocamldir}
 
+# Install missing files
+cp -p {big_int_Z,q,z}.cmt zarith_version.cm{i,t} zarith_top.{cm{i,t},ml} \
+      z_mlgmpidl.mli %{buildroot}%{ocamldir}/zarith
+cp -p zarith.opam %{buildroot}%{ocamldir}/zarith/opam
+
+%ocaml_files
+
+%ifarch %{ocaml_native_compiler}
+# The tests assume the availability of ocamlopt
 %check
 export LD_LIBRARY_PATH=$PWD
 make tests
+%endif
 
-%files
+%files -f .ofiles
 %doc README.md
 %license LICENSE
-%{_libdir}/ocaml/%{pkgname}/
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/%{pkgname}/*.a
-%exclude %{_libdir}/ocaml/%{pkgname}/*.cmx
-%exclude %{_libdir}/ocaml/%{pkgname}/*.cmxa
-%endif
-%exclude %{_libdir}/ocaml/%{pkgname}/*.mli
-%exclude %{_libdir}/ocaml/%{pkgname}/*.h
-%{_libdir}/ocaml/stublibs/*.so
-%{_libdir}/ocaml/stublibs/*.so.owner
 
-%files devel
+%files devel -f .ofiles-devel
 %doc Changes html
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{pkgname}/*.a
-%{_libdir}/ocaml/%{pkgname}/*.cmx
-%{_libdir}/ocaml/%{pkgname}/*.cmxa
-%endif
-%{_libdir}/ocaml/%{pkgname}/*.mli
-%{_libdir}/ocaml/%{pkgname}/*.h
 
 %changelog
+* Mon Dec 23 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.14-3
+- Update to 1.14.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-9
 - Switching to using full number for the 'Release' tag.
 
@@ -111,7 +118,7 @@ make tests
 - Remove Red Hat guess file
 
 * Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 1.9.1-7.1
-- OCaml 4.10.0 final (Fedora 32).
+- OCaml 4.10.0 final (Fedora 32)
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 1.9.1-7
 - OCaml 4.10.0 final.
