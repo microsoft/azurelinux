@@ -10,7 +10,9 @@ URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
 Patch0:         CVE-2023-33976.patch
-Patch1:         CVE-2024-7264.patch
+
+# Patch for Source1
+Patch1000:      CVE-2024-7264.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -105,11 +107,19 @@ Requires:       python3-zipp
 Python 3 version.
 
 %prep
-%autosetup -p1
 
+# use -N to **not** apply patches, will apply patch after getting SOURCE1 in build stage
+%autosetup -N
+
+patch -p1 < %{PATCH0}
 
 %build
 tar -xf %{SOURCE1} -C /root/
+
+# Manually patch CVE-2024-7264
+pushd /root/.cache/
+patch -p1 < %{PATCH1000}
+popd
 
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
@@ -124,6 +134,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 # mv /root/cacheroot.tar.gz /usr/
 
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package pyproject-wheeldir/
+
 # --------
 
 
