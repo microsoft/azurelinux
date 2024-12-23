@@ -8971,8 +8971,8 @@
         "type": "other",
         "other": {
           "name": "libdatrie",
-          "version": "0.2.9",
-          "downloadUrl": "http://linux.thai.net/pub/thailinux/software/libthai/libdatrie-0.2.9.tar.xz"
+          "version": "0.2.13",
+          "downloadUrl": "https://linux.thai.net/pub/thailinux/software/libthai/libdatrie-0.2.13.tar.xz"
         }
       }
     },
