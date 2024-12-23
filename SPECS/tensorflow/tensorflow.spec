@@ -16,6 +16,7 @@ Patch3:         CVE-2024-3651.patch
 Patch4:         CVE-2021-3672.patch
 Patch5:         CVE-2024-35195.patch
 Patch6:         CVE-2024-31852.patch
+Patch7:         CVE-2024-7264.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -122,7 +123,7 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 
 %changelog
 * Tue Dec 17 2024 Kanishk Bansal <kanbansal@microsoft.com> - 2.16.1-8
-- Address CVE-2021-3672, CVE-2024-35195, CVE-2024-31852 with an upstream patch
+- Address CVE-2021-3672, CVE-2024-35195, CVE-2024-31852,CVE-2024-7264 with an upstream patch
 
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
 - Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
