@@ -96,6 +96,7 @@ sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_man
     --with-openssl \
     --with-gssapi \
     --with-readline \
+    --with-lz4 \
     --with-system-tzdata=%{_datadir}/zoneinfo \
     --docdir=%{_docdir}/postgresql
 make -C ./src/backend generated-headers
