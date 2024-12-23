@@ -22173,8 +22173,8 @@
         "type": "other",
         "other": {
           "name": "python-dbus-client-gen",
-          "version": "0.4",
-          "downloadUrl": "https://github.com/stratis-storage/dbus-client-gen/archive/v0.4/dbus-client-gen-0.4.tar.gz"
+          "version": "0.5.1",
+          "downloadUrl": "https://github.com/stratis-storage/dbus-client-gen/archive/refs/tags/v0.5.1.tar.gz"
         }
       }
     },
