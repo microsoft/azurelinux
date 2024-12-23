@@ -17803,8 +17803,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-AIO",
-          "version": "4.76",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-4.76.tar.gz"
+          "version": "4.81",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-4.81.tar.gz"
         }
       }
     },
