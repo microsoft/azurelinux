@@ -22043,8 +22043,8 @@
         "type": "other",
         "other": {
           "name": "python-configshell",
-          "version": "1.1.28",
-          "downloadUrl": "https://github.com/open-iscsi/configshell-fb/archive/v1.1.28/configshell-fb-1.1.28.tar.gz"
+          "version": "1.1.30",
+          "downloadUrl": "https://github.com/open-iscsi/configshell-fb/archive/v1.1.28/configshell-fb-1.1.30.tar.gz"
         }
       }
     },
