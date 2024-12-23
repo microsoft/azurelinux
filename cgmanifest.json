@@ -22193,8 +22193,8 @@
         "type": "other",
         "other": {
           "name": "python-dbus-signature-pyparsing",
-          "version": "0.03",
-          "downloadUrl": "https://github.com/stratis-storage/dbus-signature-pyparsing/archive/v0.03/dbus-signature-pyparsing-0.03.tar.gz"
+          "version": "0.4.1",
+          "downloadUrl": "https://github.com/stratis-storage/dbus-signature-pyparsing/archive/refs/tags/v0.4.1.tar.gz"
         }
       }
     },
