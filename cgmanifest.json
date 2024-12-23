@@ -17473,8 +17473,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Slurp",
-          "version": "9999.29",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Slurp-9999.29.tar.gz"
+          "version": "9999.32",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Slurp-9999.32.tar.gz"
         }
       }
     },
