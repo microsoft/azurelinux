@@ -11,8 +11,10 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 
 	"github.com/fatih/color"
@@ -35,6 +37,26 @@ type srpmTestDataContainer struct {
 	skippedSRPMsTests map[string]bool
 	passedSRPMsTests  map[string]bool
 	blockedSRPMsTests map[string]*pkggraph.PkgNode
+}
+
+type srpmTestResult string
+
+const (
+	// The test executed and passed.
+	testSucceeded srpmTestResult = "succeeded"
+	// The test executed but failed.
+	testFailed = "failed"
+	// The test could have executed but was skipped by policy.
+	testSkipped = "skipped"
+	// The test could not be run because blocked by dependencies.
+	testBlocked = "blocked"
+)
+
+type srpmTestSummary struct {
+	VersionedPkg    *pkgjson.PackageVer `json:"Package"`
+	Result          srpmTestResult      `json:"Result"`
+	ExpectedFailure bool                `json:"ExpectedFailure"`
+	LogPath         string              `json:"LogPath",omitempty`
 }
 
 // PrintBuildResult prints a build result to the logger.
@@ -83,6 +105,52 @@ func RecordLicenseSummary(licenseChecker *PackageLicenseChecker) {
 			logger.Log.Warnf("Failed to save license check results: %s", err)
 		}
 	}
+}
+
+// RecordTestSummary writes a .json file that summarizes test execution results.
+func RecordTestSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, outputPath string) error {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
+	// First look through build failures to find failed tests.
+	failedTestLogs := make(map[string]string)
+	for _, failure := range buildState.BuildFailures() {
+		if failure.Node.Type == pkggraph.TypeTest {
+			if failure.CheckFailed {
+				failedTestLogs[filepath.Base(failure.Node.SrpmPath)] = failure.LogFile
+			}
+		}
+	}
+
+	testSummariesBySRPM := make(map[string]srpmTestSummary)
+
+	// Now look through all test nodes in the graph.
+	for _, node := range pkgGraph.AllTestNodes() {
+		srpmName := filepath.Base(node.SrpmPath)
+
+		var testResult srpmTestResult
+		logPath := ""
+
+		if buildState.IsNodeCached(node) {
+			testResult = testSkipped
+		} else if failedLogPath, failed := failedTestLogs[srpmName]; failed {
+			testResult = testFailed
+			logPath = failedLogPath
+		} else if buildState.IsNodeAvailable(node) {
+			testResult = testSucceeded
+		} else {
+			testResult = testBlocked
+		}
+
+		testSummariesBySRPM[srpmName] = srpmTestSummary{
+			VersionedPkg:    node.VersionedPkg,
+			Result:          testResult,
+			ExpectedFailure: node.ExpectedToFail,
+			LogPath:         logPath,
+		}
+	}
+
+	return jsonutils.WriteJSONFile(outputPath, testSummariesBySRPM)
 }
 
 // RecordBuildSummary stores the summary in to a csv. License check failures are not included in the csv and are stored
