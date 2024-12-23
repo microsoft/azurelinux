@@ -1,12 +1,13 @@
-Name:           perl-Moo
-Version:        2.003006
-Release:        3%{?dist}
-Summary:        Minimalist Object Orientation (with Moose compatibility)
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Moo
+Version:        2.005005
+Release:        8%{?dist}
+Summary:        Minimalist Object Orientation (with Moose compatibility)
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+
 URL:            https://metacpan.org/release/Moo
-Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-%{version}.tar.gz#/perl-Moo-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl-interpreter
@@ -22,22 +23,22 @@ BuildRequires:  perl(Class::Method::Modifiers) >= 1.10
 BuildRequires:  perl(Config)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Devel::GlobalDestruction) >= 0.11
-BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(Exporter)
 # Filter::Simple not used at test-time
 BuildRequires:  perl(Import::Into) >= 1.002
 BuildRequires:  perl(Module::Runtime) >= 0.014
 BuildRequires:  perl(mro)
 # MRO::Compat not needed with modern perl
 BuildRequires:  perl(overload)
-BuildRequires:  perl(Role::Tiny) >= 2.001004
-BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Role::Tiny) >= 2.002004
+BuildRequires:  perl(Scalar::Util) >= 1.00
 BuildRequires:  perl(strictures) >= 1.004003
-BuildRequires:  perl(Sub::Defer) >= 2.003001
-BuildRequires:  perl(Sub::Quote) >= 2.003001
+BuildRequires:  perl(Sub::Defer) >= 2.006006
+BuildRequires:  perl(Sub::Quote) >= 2.006006
 # Text::Balanced not used at test-time
 # Optional run-time:
 BuildRequires:  perl(Class::XSAccessor) >= 1.18
-BuildRequires:  perl(Sub::Name)
+BuildRequires:  perl(Sub::Util)
 # lib/Moo/HandleMoose.pm requires Moose modules. Moo::HandleMoose is used only
 # if Moose has been loaded. So this is circular optional dependency definitly
 # not suitable for Moo because Moo is reimplementation of Moose:
@@ -52,12 +53,10 @@ BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 # MooX::ArrayRef is defined internally via %%INC
-BuildRequires:  perl(Test::Fatal) >= 0.003
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(threads)
 # Optional tests:
 BuildRequires:  perl(CPAN::Meta::Requirements)
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(Class::Method::Modifiers) >= 1.10
 Requires:       perl(Devel::GlobalDestruction) >= 0.11
@@ -98,6 +97,10 @@ not quite- two thirds of Moose.
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 23 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 2.005005-8
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.003006-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
