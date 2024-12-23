@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,7 +23,8 @@ Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
 # NOTE: We currently do not build with X11 support.
 # build with X11 support in the future.
-Provides:       %{name}-x11
+Provides:       %{name}-x11 = %{version}-%{release}
+Obsoletes:      %{name}-x11 <= 1.14.0-1.%{?dist}
 
 %description
 The dbus package contains dbus.
@@ -86,6 +87,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Mon Dec 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15.6-2
+- Obsolete older 'dbus-x11'.
+
 * Thu Dec 28 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.6-1
 - Update to v1.15.6 to fix CVE-2023-34969
 
