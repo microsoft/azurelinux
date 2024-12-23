@@ -6079,6 +6079,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hunspell-nl",
+          "version": "2.20.19",
+          "downloadUrl": "https://github.com/OpenTaal/opentaal-hunspell/archive/2.20.19.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hunspell-no",
           "version": "2.0.10",
           "downloadUrl": "https://alioth-archive.debian.org/releases/spell-norwegian/spell-norwegian/2.0.10/no_NO-pack2-2.0.10.zip"
