@@ -1,12 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} > 35
+%global dict_dirname hunspell 
+%else
+%global dict_dirname myspell
+%endif
 Name: hunspell-ro
 Summary: Romanian hunspell dictionaries
-Version: 3.3.7
-Release: 17%{?dist}
+Version: 3.3.10
+Release: 9%{?dist}
 Source: http://downloads.sourceforge.net/rospell/ro_RO.%{version}.zip
 URL: http://rospell.sourceforge.net/
-License: GPLv2+ or LGPLv2+ or MPLv1.1
+License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1
 BuildArch: noarch
 
 Requires: hunspell
@@ -21,17 +26,58 @@ Romanian hunspell dictionaries.
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p ro_RO.* $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p ro_RO.* $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
 
 %files
 %doc COPYING.GPL COPYING.LGPL COPYING.MPL README
-%{_datadir}/myspell/*
+%{_datadir}/%{dict_dirname}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.7-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.3.10-9
+- AzureLinux import from Fedora 41 .
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolan McNamara <caolanm@redhat.com> - 3.3.10-4
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Feb 16 2022 Caolan McNamara <caolanm@redhat.com> - 3.3.10-1
+- Resolves: rhbz#2055303 latest version
+
+* Fri Feb 11 2022 Vishal Vijayraghavan <vishalvvr@fedoraproject.org> - 3.3.7-21
+- rename install directory name from myspell to hunspell
+- https://fedoraproject.org/wiki/Changes/Hunspell_dictionary_dir_change
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
