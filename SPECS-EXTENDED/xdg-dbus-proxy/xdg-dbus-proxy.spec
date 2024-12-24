@@ -1,14 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           xdg-dbus-proxy
-Version:        0.1.2
-Release:        3%{?dist}
+Version:        0.1.6
+Release:        1%{?dist}
 Summary:        Filtering proxy for D-Bus connections
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/flatpak/xdg-dbus-proxy/
 Source0:        https://github.com/flatpak/xdg-dbus-proxy/releases/download/%{version}/%{name}-%{version}.tar.xz
 
+BuildRequires:  meson
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gcc
 BuildRequires:  pkgconfig(gio-2.0)
@@ -27,18 +28,23 @@ to facilitate using it in other contexts.
 %autosetup -p1
 
 %build
-%configure
-%make_build
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %files
+%doc NEWS README.md
 %license COPYING
 %{_bindir}/xdg-dbus-proxy
 %{_mandir}/man1/xdg-dbus-proxy.1*
 
 %changelog
+* Mon Dec 23 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.1.6-1
+- Upgraded to version 0.1.6
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
