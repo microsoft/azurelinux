@@ -1,15 +1,14 @@
-%global upstream_commit ee22323218150388abdeb36184ad5861e3669b65
-%global upstreamid 20110620
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%global upstream_commit ee22323218150388abdeb36184ad5861e3669b65
+%global upstreamid 20210322
 Name: hyphen-tk
 Summary: Turkmen hyphenation rules
 Version: 0.%{upstreamid}
-Release: 18%{?dist}
-Source: https://github.com/hyphenation/tex-hyphen/blob/%{upstream_commit}/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
+Release: 1%{?dist}
+Source: http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
 URL: http://tug.org/tex-hyphen
-License: Public Domain
+License: MIT
 BuildArch: noarch
 BuildRequires: hyphen-devel
 Requires: hyphen
@@ -22,14 +21,14 @@ Turkmen hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-tk
 cp -p %{SOURCE0} .
-%patch 0 -p0 -b .clean
+%patch -P0 -p0 -b .clean
 
 %build
 substrings.pl hyph-tk.tex hyph_tk_TM.dic UTF-8
 echo "Created with substring.pl by substrings.pl hyph-tk.tex hyph_tk_TM.dic UTF-8" > README
 echo "Original in-line credits were:" >> README
 echo "" >> README
-head -n 15 hyph-tk.tex >> README
+head -n 33 hyph-tk.tex >> README
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
@@ -37,10 +36,14 @@ cp -p hyph_tk_TM.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 
 %files
-%license README
+%doc README
 %{_datadir}/hyphen/hyph_tk_TM.dic
 
 %changelog
+* Fri Nov 08 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.20210322-1
+- Update Azure-Linux import from Fedora 41 (license: MIT).
+- License Verified.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20110620-18
 - Updating source URLs.
 - License verified.
