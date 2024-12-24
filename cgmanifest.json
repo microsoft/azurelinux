@@ -29951,8 +29951,8 @@
         "type": "other",
         "other": {
           "name": "xdg-utils",
-          "version": "1.1.3",
-          "downloadUrl": "https://people.freedesktop.org/~rdieter/xdg-utils/xdg-utils-1.1.3.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v1.2.1/xdg-utils-v1.2.1.tar.gz"
         }
       }
     },
