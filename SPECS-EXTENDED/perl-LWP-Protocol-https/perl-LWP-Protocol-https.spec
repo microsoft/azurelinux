@@ -1,21 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Perform tests that need the Internet
 %bcond_with perl_LWP_Protocol_https_enables_internet_test
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           perl-LWP-Protocol-https
-Version:        6.10
-Release:        2%{?dist}
+Version:        6.14
+Release:        1%{?dist}
 Summary:        Provide HTTPS support for LWP::UserAgent
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/LWP-Protocol-https
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/LWP-Protocol-https-%{version}.tar.gz#/perl-LWP-Protocol-https-%{version}.tar.gz
-# Fix CVE-2014-3230, bug #1094442,
-# proposed in https://github.com/libwww-perl/lwp-protocol-https/pull/14
-Patch0:         LWP-Protocol-https-6.06-Debian-746576-don-t-disale-verification-if-only-host.patch
-# Fix CVE-2014-3230, bug #1094442,
-# proposed in https://github.com/libwww-perl/lwp-protocol-https/pull/14
-Patch1:         LWP-Protocol-https-6.06-Debian-746576-fix-test-make-it-workable-for-Crypt-SS.patch
+
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -40,6 +35,7 @@ BuildRequires:  perl(IO::Socket::INET)
 BuildRequires:  perl(LWP::UserAgent) >= 6.06
 BuildRequires:  perl(Socket)
 BuildRequires:  perl(Test::More) >= 0.96
+BuildRequires:  perl(Test::Needs) >= 0.002010
 %if %{with perl_LWP_Protocol_https_enables_internet_test}
 BuildRequires:  perl(Test::RequiresInternet)
 %endif
@@ -61,12 +57,10 @@ you don't use it directly. Once the module is installed LWP is able to
 access sites using HTTP over SSL/TLS.
 
 %prep
-%setup -q -n LWP-Protocol-https-%{version}
-%patch 0 -p1
-%patch 1 -p1
+%autosetup -n LWP-Protocol-https-%{version}
 %if !%{with perl_LWP_Protocol_https_enables_internet_test}
-rm t/apache.t
-perl -i -ne 'print $_ unless m{^t/apache.t}' MANIFEST
+rm t/example.t
+perl -i -ne 'print $_ unless m{^t/example.t}' MANIFEST
 %endif
 
 %build
@@ -87,6 +81,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 6.14-1
+- Update to 6.14
+- License verified.
+
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 6.10-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove double buildrequire conditional
