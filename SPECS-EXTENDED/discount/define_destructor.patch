@@ -1,0 +1,12 @@
+diff --git a/cmake/config.h.in b/cmake/config.h.in
+index e08220d..653163b 100644
+--- a/cmake/config.h.in
++++ b/cmake/config.h.in
+@@ -8,6 +8,7 @@
+ #ifndef _CONFIG_D
+ #define _CONFIG_D 1
+ 
++#define DESTRUCTOR
+ /*
+  * `discount` feature macros - we want them all!
+  */
