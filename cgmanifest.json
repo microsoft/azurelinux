@@ -17933,8 +17933,8 @@
         "type": "other",
         "other": {
           "name": "perl-IPC-Run3",
-          "version": "0.048",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/IPC-Run3-0.048.tar.gz"
+          "version": "0.049",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/IPC-Run3-0.049.tar.gz"
         }
       }
     },
