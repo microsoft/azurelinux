@@ -1,45 +1,45 @@
 Summary:        General-purpose library for the WPE-flavored port of WebKit
 Name:           libwpe
-Version:        1.12.0
+Version:        1.15.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/WebPlatformForEmbedded/%{name}
 Source0:        https://github.com/WebPlatformForEmbedded/libwpe/releases/download/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:  cmake
+Source1:        https://github.com/WebPlatformForEmbedded/libwpe/releases/download/%{version}/%{name}-%{version}.tar.xz.asc
+# Created from https://keys.openpgp.org/vks/v1/by-fingerprint/5AA3BC334FD7E3369E7C77B291C559DBE4C9123B
+# $ gpg --import 5AA3BC334FD7E3369E7C77B291C559DBE4C9123B.asc
+# $ gpg2 --export --export-options export-minimal 5AA3BC334FD7E3369E7C77B291C559DBE4C9123B > gpgkey-5AA3BC334FD7E3369E7C77B291C559DBE4C9123B.gpg
+Source2:        gpgkey-5AA3BC334FD7E3369E7C77B291C559DBE4C9123B.gpg
+
 BuildRequires:  gcc-c++
-BuildRequires:  libxkbcommon-devel
-BuildRequires:  mesa-libEGL-devel
-Provides:       wpebackend = %{version}-%{release}
-Obsoletes:      wpebackend < 0.2.0-2
+BuildRequires:  gnupg2
+BuildRequires:  meson
+BuildRequires:  pkgconfig(egl)
+BuildRequires:  pkgconfig(xkbcommon)
 
 %description
 General-purpose library developed for the WPE-flavored port of WebKit
 
 %package       devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary:       Development files for %{name}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description   devel
 The %{name}-devel package contains libraries, build data, and header
 files for developing applications that use %{name}.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1 -n libwpe-%{version}
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  ..
-popd
-
-%make_build -C %{_target_platform}
+%meson
+%meson_build
 
 %install
-%make_install -C %{_target_platform}
+%meson_install
 
 %files
 %license COPYING
@@ -53,6 +53,9 @@ popd
 %{_libdir}/pkgconfig/wpe-1.0.pc
 
 %changelog
+* Thu Nov 22 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.15.2-1
+- Updating Azure-Linux to 1.15.2 that impprt from Fedora 40 (license: MIT).
+
 * Sat May 14 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.12.0-1
 - Update to 1.12.0
 - License verified
