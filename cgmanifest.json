@@ -16333,8 +16333,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-Data-Inheritable",
-          "version": "0.08",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.08-clean.tar.gz"
+          "version": "0.09",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.09-clean.tar.gz"
         }
       }
     },
