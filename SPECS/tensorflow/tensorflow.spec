@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.11.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
 Patch0:         CVE-2023-33976.patch
+
+# Patch for Source1
+Patch1000:      CVE-2024-7264.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -104,11 +107,17 @@ Requires:       python3-zipp
 Python 3 version.
 
 %prep
+
+tar -xf %{SOURCE1} -C /root/
+
+# Manually patch CVE-2024-7264
+pushd /root/.cache/
+patch -p1 < %{PATCH1000}
+popd
+
 %autosetup -p1
 
-
 %build
-tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
@@ -123,6 +132,7 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 # mv /root/cacheroot.tar.gz /usr/
 
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package pyproject-wheeldir/
+
 # --------
 
 
@@ -148,6 +158,9 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
 
 %changelog
+* Mon Dec 23 2024 Kanishk Bansal <kanbansal@microsoft.com> - 2.11.1-3
+- Add a patch for CVE-2024-7264 with an upstream patch
+
 * Thu Aug 15 2024 Aadhar Agarwal <aadagarwal@microsoft> - 2.11.1-2
 - Add a patch for CVE-2023-33976
 
