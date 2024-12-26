@@ -114,8 +114,7 @@ patch -p1 < %{PATCH0}
 %build
 #tar -xf %{SOURCE1} -C /root/
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
-mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
-tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
+
 
 # Manually patch CVE-2024-7264
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/curl/lib/vtls/
