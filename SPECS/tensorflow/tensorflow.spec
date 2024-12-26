@@ -118,7 +118,7 @@ mkdir -p /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 
 # Manually patch CVE-2024-7264
-pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/curl/lib/vtls/
 patch -p1 < %{PATCH1000}
 popd
 
