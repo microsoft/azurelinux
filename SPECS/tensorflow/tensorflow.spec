@@ -112,7 +112,7 @@ Python 3 version.
 patch -p1 < %{PATCH0}
 
 %build
-#tar -xf %{SOURCE1} -C /root/
+tar -xvf %{SOURCE1} -C /root/
 MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 
 
