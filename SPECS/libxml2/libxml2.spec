@@ -1,13 +1,14 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/General Libraries
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
+Patch0:         CVE-2024-40896.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -78,6 +79,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Thu Dec 26 2024 Muhammad Falak <mwani@microsoft.com> - 2.11.5-2
+- Patch CVE-2024-40896
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.5-1
 - Auto-upgrade to 2.11.5 - Azure Linux 3.0 - package upgrades
 
