@@ -24,7 +24,7 @@ Provides:       dbus-libs = %{version}-%{release}
 # NOTE: We currently do not build with X11 support.
 # build with X11 support in the future.
 Provides:       %{name}-x11 = %{version}-%{release}
-Obsoletes:      %{name}-x11 <= 1.14.0-1.%{?dist}
+Obsoletes:      %{name}-x11 <= 1.14.0-1%{?dist}
 
 %description
 The dbus package contains dbus.
