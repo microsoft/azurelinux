@@ -109,7 +109,7 @@ Python 3 version.
 %prep
 # use -N to **not** apply patches, will apply patch after getting SOURCE1 in build stage
 %autosetup -N
-%autopatch -M 999
+patch -p1 < %{PATCH0}
 
 %build
 tar -xf %{SOURCE1} -C /root/
