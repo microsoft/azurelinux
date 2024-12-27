@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0: 	https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz
 Source1: 	https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz.asc
-URL: 		http://libosinfo.org/
+URL: 		https://libosinfo.org/
 BuildRequires: 	intltool
 BuildRequires: 	osinfo-db-tools
 BuildArch: 	noarch
