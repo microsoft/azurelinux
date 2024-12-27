@@ -89,6 +89,7 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Tue 08 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0-5
 - Updating javac source and javac target from 1.6 to 1.8.
+- License verified.
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-4
 - Updating naming for 3.0 version of Azure Linux.
