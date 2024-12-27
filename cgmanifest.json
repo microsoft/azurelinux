@@ -14702,8 +14702,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-markup",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/aantron/markup.ml/archive/1.0.0/markup-1.0.0.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/aantron/markup.ml/archive/1.0.3/markup-1.0.3.tar.gz"
         }
       }
     },
