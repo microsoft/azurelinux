@@ -13,7 +13,6 @@ Patch0:         CVE-2023-33976.patch
 
 # Patch for Source1
 Patch1000:      CVE-2024-7264.patch
-Patch1001:	Fix-bazel-build.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -120,10 +119,6 @@ MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}')
 # Manually patch CVE-2024-7264
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/curl/lib/vtls/
 patch -p1 < %{PATCH1000}
-popd
-
-pushd /root/.cache/bazel/_bazel_$USER/install/c04b9c960391bacd94430ffe20db8729/embedded_tools/src/main/cpp/util/
-patch -p1 < %{PATCH1001}
 popd
 
 ln -s %{_bindir}/python3 %{_bindir}/python
