@@ -124,6 +124,7 @@ popd
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
+rm /root/.cache/bazel/_bazel_root/install/c04b9c960391bacd94430ffe20db8729
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
 # steps to create the cache tar. network connection is required to create the cache.
