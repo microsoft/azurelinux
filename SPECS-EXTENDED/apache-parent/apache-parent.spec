@@ -25,7 +25,7 @@ Summary:        Parent POM file for Apache projects
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            http://apache.org/
-Source0:        http://repo1.maven.org/maven2/org/apache/apache/%{version}/apache-%{version}-source-release.zip
+Source0:        https://repo1.maven.org/maven2/org/apache/apache/%{version}/apache-%{version}-source-release.zip
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
 BuildArch:      noarch
@@ -59,6 +59,7 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %changelog
 * Mon Dec 03 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 31-1
 - Update to 31
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 21-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
