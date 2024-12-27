@@ -33,7 +33,7 @@ Class::Singleton, your module will inherit the Singleton instantiation
 method and can implement whatever specific functionality is required.
 
 %prep
-%setup -q -n Class-Singleton-%{version}
+%autosetup -n Class-Singleton-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
