@@ -49,6 +49,7 @@ make test
 %changelog
 * Wed Nov 06 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.10-1
 - Update to 1.0.10
+- License verified
 
 * Wed Mar 08 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.9-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
