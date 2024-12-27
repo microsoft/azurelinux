@@ -34,9 +34,11 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(if)
 BuildRequires:  perl(Test::More) >= 0.88
 # Optional Test Requirements
-%if %{with perl_Class_Method_Modifiers_enables_optional_test}
+%if 0%{!?perl_bootstrap:1} && %{with perl_Class_Method_Modifiers_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta) >= 2.120900
+BuildRequires:  perl(Moose)
 %endif
+
 # Runtime
 Requires:       perl(B)
 Requires:       perl(Carp)
@@ -61,7 +63,7 @@ original method. See the 'MODIFIERS' section for more details on how the
 particular modifiers work.
 
 %prep
-%setup -q -n Class-Method-Modifiers-%{version}
+%autosetup -n Class-Method-Modifiers-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
