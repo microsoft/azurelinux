@@ -16,7 +16,7 @@ URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
 # Source0:      https://cpan.metacpan.org/modules/by-module/Class/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        Class-Data-Inheritable-%{version}-clean.tar.gz#/perl-Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:        %{_distro_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz#/perl-Class-Data-Inheritable-%{version}-clean.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
