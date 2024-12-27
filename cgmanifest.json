@@ -24513,7 +24513,7 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-apidoc",
-          "version": "0.2.1",
+          "version": "0.3.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-apidoc/sphinxcontrib-apidoc-0.3.0.tar.gz"
         }
       }
