@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           glew
 Version:        2.2.0
 Release:        1%{?dist}
