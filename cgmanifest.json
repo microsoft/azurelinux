@@ -25104,7 +25104,7 @@
         "other": {
           "name": "python-xmltodict",
           "version": "0.13.0",
-          "downloadUrl": "https://github.com/martinblech/xmltodict/archive/refs/tags/v0.13.0.tar.gz"
+          "downloadUrl": "https://github.com/martinblech/xmltodict/archive/v0.13.0/xmltodict-0.13.0.tar.gz"
         }
       }
     },
