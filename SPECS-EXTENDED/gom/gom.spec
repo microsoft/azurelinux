@@ -61,6 +61,7 @@ developing applications that use %{name}.
 %changelog
 * Wed Nov 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.5.3-1
 - Update to 0.5.3 
+- License verified.
 
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-3
 - Adding BR on '%%{_bindir}/xsltproc'.
