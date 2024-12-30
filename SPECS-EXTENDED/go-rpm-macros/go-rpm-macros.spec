@@ -170,7 +170,7 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %changelog
 * Wed Nov 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.6.0-1
 - Update to 3.6.0.
-
+- License verified
 
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-3
 - Fixing Go's linker flags.
