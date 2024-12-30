@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Name: libexttextcat
 Version: 3.4.6
 Release: 1%{?dist}
-Summary: Text categorization library
+Summary: Text categAorization library
 
 License: BSD-3-Clause
 URL: https://wiki.documentfoundation.org/Libexttextcat
@@ -66,6 +66,7 @@ make check
 %changelog
 * Mon Nov 04 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.4.6-1
 - Update to 3.4.6-1
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.5-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
