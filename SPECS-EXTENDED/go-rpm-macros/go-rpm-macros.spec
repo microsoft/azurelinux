@@ -27,8 +27,8 @@ Summary:   Build-stage rpm automation for Go packages
 
 License:   GPLv3+
 URL:       %{forgeurl}
-# Source:  https://pagure.io/go-rpm-macros/archive/3.6.0/go-rpm-macros-3.6.0.tar.gz
-Source:    %{forgesource}
+#Source:    %{forgesource}
+Source0:  https://pagure.io/go-rpm-macros/archive/3.6.0/%{name}-%{version}.tar.gz
 #Patch0:    fixing_ldflags_for_azl.patch
 
 Requires:  go-srpm-macros = %{version}-%{release}
