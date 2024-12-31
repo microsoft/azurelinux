@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libgee
 Version:        0.20.6
-Release:        8%{?dist}
+Release:        1%{?dist}
 Summary:        GObject collection library
 
 License:        LGPL-2.1-or-later
