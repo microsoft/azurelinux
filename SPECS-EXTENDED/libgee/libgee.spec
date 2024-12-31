@@ -104,7 +104,7 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.6-8
+* Tue Dec 31 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.20.6-1
 - Update to 0.20.6.
 - License verified
 
