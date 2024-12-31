@@ -124,6 +124,7 @@ rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 %changelog
 * Mon Dec 09 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-1
 - Update to 1.0.1
+- License verified
 
 * Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
 - Re-enable `test-gtc_packing` for all archs
