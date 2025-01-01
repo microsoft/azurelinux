@@ -122,7 +122,7 @@ EOF)
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
-Release%{nil}: %{release}.kver.%{krelver}
+Release: 1%{?dist}
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
 %description modules

@@ -187,7 +187,7 @@ Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Version: %{_version}
-Release: %{_release}.kver.%{krelver}
+Release: 1%{?dist}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -199,11 +199,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %package -n %{devel_pname}
 Version: %{_version}
 # build KMP rpms?
-%if "%{KMP}" == "1"
-Release: %{_release}%{?_dist}
-%else
-Release: %{_release}.kver.%{krelver}
-%endif
+Release: 1%{?dist}
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en

@@ -113,7 +113,7 @@ EOF)
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Release: %{_release}.kver.%{krelver}
+Release: 1%{?dist}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
