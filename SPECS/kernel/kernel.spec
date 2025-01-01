@@ -359,6 +359,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
+%exclude /lib/modules/%{uname_r}/kernel/drivers/accel
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
 %files docs
@@ -377,6 +378,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files drivers-gpu
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/gpu
+%ifarch x86_64
+/lib/modules/%{uname_r}/kernel/drivers/accel
+%endif
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
 
 %files drivers-intree-amdgpu
