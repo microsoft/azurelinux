@@ -34,9 +34,8 @@ inspired non-XML syntax but supports inline expressions and an optional
 sandboxed environment.
 
 %prep
-%autosetup -n Jinja2-%{version}
+%autosetup -p1 -n Jinja2-%{version}
 sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
-patch -p1 < %{PATCH0}
 
 %build
 %py3_build
