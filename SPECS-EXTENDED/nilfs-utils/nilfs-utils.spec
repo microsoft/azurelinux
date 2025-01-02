@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 
 Name:		nilfs-utils
 Version:	2.2.11
-Release:	1%{?dist}
+Release:	3%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
@@ -11,8 +11,12 @@ URL:		http://nilfs.sourceforge.net
 Source0:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
 Source1:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2.asc
 Source2:	8B055AE86DEFF458.asc
-BuildRequires: make
-BuildRequires:	gcc, libuuid-devel, libmount-devel, gnupg2
+BuildRequires:  make
+BuildRequires:	gcc
+BuildRequires:  libuuid-devel
+BuildRequires:  libmount-devel
+BuildRequires:  gnupg2
+
 
 %description
 Userspace utilities for creating and mounting NILFS v2 filesystems.
@@ -30,8 +34,7 @@ filesystem-specific programs. If you install nilfs-utils-devel, you'll
 also want to install nilfs-utils.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%setup -q
+%autosetup -n %{name}-%{version}
 
 %build
 # geez, make install is trying to run ldconfig on the system
@@ -90,8 +93,8 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 %{_includedir}/nilfs_cleaner.h
 
 %changelog
-* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-1
-- Update to 2.2.11
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.8-3
