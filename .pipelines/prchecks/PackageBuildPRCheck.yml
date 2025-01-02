@@ -108,6 +108,7 @@ extends:
                 variables:
                   ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  outputRPMsTarballName: "rpms.tar.gz"
                   toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                   toolchainTarballName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainTarballName'] ]
                 steps:
@@ -128,11 +129,14 @@ extends:
                       isUseCCache: true
                       maxCPU: "${{ configuration.maxCPUs }}"
                       outputArtifactsFolder: $(ob_outputDirectory)
+                      outputRPMsTarballName: $(outputRPMsTarballName)
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
 
-                  - script: echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
+                  - script: |
+                      echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
+                      echo "##vso[task.setvariable variable=rpmsTarballName;isOutput=true]$(outputRPMsTarballName)"
                     name: "RPMsArtifactName"
                     displayName: "Set variable for published artifact name"
 
@@ -199,8 +203,18 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
+                  inputArtifactsLocation: $(Agent.TempDirectory)
                   rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
+                  rpmsTarballName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsTarballName'] ]
                 steps:
+                  - task: DownloadPipelineArtifact@2
+                    displayName: "Download RPMs tarball"
+                    inputs:
+                      artifact: $(rpmsArtifactName)
+                      patterns: "**/$(rpmsTarballName)"
+                      targetPath: $(inputArtifactsLocation)
+
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
-                      inputArtifactName: $(rpmsArtifactName)
+                      inputArtifactsFolder: $(inputArtifactsLocation)
+                      inputRPMsTarballName: $(rpmsTarballName)
