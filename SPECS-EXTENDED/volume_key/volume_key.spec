@@ -38,11 +38,19 @@ Patch0: volume_key-0.3.12-support_LUKS2_and_more.patch
 Patch1: volume_key-0.3.12-fix_resource_leaks.patch
 
 BuildRequires: gcc
-BuildRequires: autoconf, automake, libtool
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 BuildRequires: make
 
-BuildRequires: cryptsetup-luks-devel, gettext-devel, glib2-devel, /usr/bin/gpg2
-BuildRequires: gpgme-devel, libblkid-devel, nss-devel, python3-devel
+BuildRequires: cryptsetup-luks-devel
+BuildRequires: gettext-devel
+BuildRequires: glib2-devel
+BuildRequires: /usr/bin/gpg2
+BuildRequires: gpgme-devel
+BuildRequires: libblkid-devel
+BuildRequires: nss-devel
+BuildRequires: python3-devel
 %if 0%{?drop_python2} < 1
 BuildRequires: python2-devel
 %endif
@@ -112,9 +120,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %endif
 
 %prep
-%setup -q
-%patch -P0 -p1
-%patch -P1 -p1
+%autosetup -p1
 autoreconf -fiv
 
 %build
@@ -167,8 +173,8 @@ exit 1; \
 
 %changelog
 * Wed Nov 06 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.3.12-9
-- added patch & miner fixes
-
+- added patch to fix resource leaks
+- License Verified
 
 * Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.3.12-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
