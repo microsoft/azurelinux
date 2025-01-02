@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "ansible-freeipa",
-          "version": "0.3.4",
-          "downloadUrl": "https://github.com/freeipa/ansible-freeipa/archive/v0.3.4.tar.gz"
+          "version": "1.13.2",
+          "downloadUrl": "https://github.com/freeipa/ansible-freeipa/archive/v1.13.2.tar.gz"
         }
       }
     },
