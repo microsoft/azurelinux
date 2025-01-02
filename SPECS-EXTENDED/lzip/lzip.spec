@@ -1,11 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           lzip
-Version:        1.21
-Release:        3%{?dist}
+Version:        1.24.1
+Release:        1%{?dist}
 Summary:        LZMA compressor with integrity checking
 
-License:        GPLv3+
+License:        GPL-2.0-or-later
 URL:            http://www.nongnu.org/lzip/lzip.html
 Source0:        http://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz
 Source1:        http://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz.sig
@@ -50,6 +50,10 @@ make check
 
 
 %changelog
+* Thu Nov 14 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.24.1-1
+- Updated to version 1.24.1
+- Verified license
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
