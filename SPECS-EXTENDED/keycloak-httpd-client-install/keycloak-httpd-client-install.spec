@@ -12,15 +12,13 @@ Distribution:   Azure Linux
 
 
 Name:           %{srcname}
-Version:        1.1
-Release:        6%{?dist}
+Version:        1.3
+Release:        1%{?dist}
 Summary:        %{summary}
 
-%global git_tag RELEASE_%(r=%{version}; echo $r | tr '.' '_')
-
 License:        GPLv3
-URL:            https://github.com/jdennis/keycloak-httpd-client-install
-Source0:        https://github.com/jdennis/keycloak-httpd-client-install/archive/%{git_tag}.tar.gz
+URL:            https://github.com/latchset/keycloak-httpd-client-install
+Source0:        https://github.com/latchset/keycloak-httpd-client-install/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -79,7 +77,7 @@ of a Keycloak server.
 %endif
 
 %prep
-%autosetup -n %{srcname}-%{git_tag} -p1
+%autosetup -n %{srcname}-%{version} -p1
 
 %build
 %if %{with python2}
@@ -138,6 +136,10 @@ install -c -m 644 doc/keycloak-httpd-client-install.8 %{buildroot}/%{_mandir}/ma
 %endif
 
 %changelog
+* Fri Oct 29 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.3-1
+- Upgrade kyotocabinet version from 1.1-1 to 1.3-1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
