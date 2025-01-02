@@ -1,7 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-
 %bcond_without tests
 %if 0%{?fedora}
 %bcond_without pkcs11
@@ -25,8 +24,17 @@ License: LGPL-2.0-or-later
 URL: https://notroj.github.io/neon/
 Source0: https://notroj.github.io/neon/neon-%{version}.tar.gz
 Patch0: neon-0.32.2-multilib.patch
-BuildRequires: expat-devel, openssl-devel, zlib-devel, krb5-devel
-BuildRequires: pkgconfig, make, gcc, xmlto
+BuildRequires: expat-devel
+BuildRequires: openssl-devel
+BuildRequires: zlib-devel
+BuildRequires: krb5-devel
+
+BuildRequires: pkgconfig
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: xmlto
+
+
 %if %{with pkcs11}
 BuildRequires: pakchois-devel
 %endif
@@ -103,8 +111,8 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-1
-- update to 0.33.0
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
