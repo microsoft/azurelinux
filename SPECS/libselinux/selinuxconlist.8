@@ -1,0 +1,18 @@
+.TH "selinuxconlist" "1" "7 May 2008" "dwalsh@redhat.com" "SELinux Command Line documentation"
+.SH "NAME"
+selinuxconlist \- list all SELinux context reachable for user
+.SH "SYNOPSIS"
+.B selinuxconlist [-l level] user [context]
+
+.SH "DESCRIPTION"
+.B selinuxconlist
+reports the list of context reachable for user from the current context or specified context
+
+.B \-l level
+mcs/mls level
+
+.SH AUTHOR	
+This manual page was written by Dan Walsh <dwalsh@redhat.com>.
+
+.SH "SEE ALSO"
+secon(8), selinuxdefcon(8)
