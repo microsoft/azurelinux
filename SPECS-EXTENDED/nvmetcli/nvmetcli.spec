@@ -20,7 +20,7 @@ Patch09:        0010-nvmetcli-Correct-xrange-usage-for-py3.patch
 Patch10:        0011-nvmetcli-add-a-tcp-example-json.patch
 Patch11:        0012-Documentation-fix-typo.patch
 BuildArch:      noarch
-BuildRequires: make
+BuildRequires:  make
 BuildRequires:  python3-devel python3-setuptools systemd-units asciidoc xmlto
 Requires:       python3-configshell python3-kmod
 Requires(post): systemd
@@ -68,8 +68,8 @@ install -m 644 Documentation/nvmetcli.8.gz %{buildroot}%{_mandir}/man8/
 %{_mandir}/man8/nvmetcli.8.gz
 
 %changelog
-* Thu Dec 19 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.7-1
-- Update to 0.7
+* Thu Dec 19 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.7-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-11
