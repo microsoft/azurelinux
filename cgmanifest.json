@@ -30218,7 +30218,7 @@
         "other": {
           "name": "xcb-util-wm",
           "version": "0.4.2",
-          "downloadUrl": "http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.xz"
+          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.xz"
         }
       }
     },
