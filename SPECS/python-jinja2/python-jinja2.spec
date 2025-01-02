@@ -1,13 +1,14 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://jinja.pocoo.org/
 Source0:        https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-%{version}.tar.gz
+Patch0:         CVE-2024-22195.patch
 BuildArch:      noarch
 
 %description
@@ -35,6 +36,7 @@ sandboxed environment.
 %prep
 %autosetup -n Jinja2-%{version}
 sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
+patch -p1 < %{PATCH0}
 
 %build
 %py3_build
@@ -53,6 +55,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-1
+- Address CVE-2024-22195 with an upstream patch.
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
 - Upgrade to version 3.1.2
 
