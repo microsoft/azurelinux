@@ -1,22 +1,29 @@
+%global gitver rel-2-4-19
+
 Summary: Utilities for the IBM Power Linux RAID adapters
 Name:    iprutils
-Version: 2.4.17.1
-Release: 5%{?dist}
-License: CPL
+Version: 2.4.19
+Release: 1%{?dist}
+License: Not a valid license string in legacy syntax. Pass '--verbose' to get full parser error.
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:     http://sourceforge.net/projects/iprdd/
-Source0: https://sourceforge.net/projects/iprdd/files/iprutils%20for%202.6%20kernels/2.4.17/%{name}-%{version}.tar.gz
+URL:     https://github.com/bjking1/iprutils
+Source0: https://github.com/bjking1/iprutils/archive/%{gitver}/%{name}-%{version}.tar.gz
 
 # missing man page
 Source1: iprdbg.8.gz
 
+Patch10: iprutils-2.4.19-covscan.patch
+ 
+#ExclusiveArch: ppc64le
+ 
 BuildRequires: libtool
 BuildRequires: ncurses-devel
 BuildRequires: libcap-devel
 BuildRequires: kernel-headers
 BuildRequires: systemd
 BuildRequires: zlib-devel
+BuildRequires: make
 
 
 %description
@@ -25,7 +32,7 @@ supported by the ipr SCSI storage device driver.
 
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{gitver}
 
 autoreconf -vif
 
@@ -74,6 +81,9 @@ rm %{buildroot}/%{_sysconfdir}/ha.d/resource.d/iprha
 
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.19-1
+- Update to version 2.4.19
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.17.1-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
