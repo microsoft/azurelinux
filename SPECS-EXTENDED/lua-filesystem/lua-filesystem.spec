@@ -1,85 +1,91 @@
-%{!?luaver: %global luaver %(lua -e "print(string.sub(_VERSION, 5))" || echo 0)}
-%global lualibdir %{_libdir}/lua/%{luaver}
-
-%define luacompatver 5.1
-%define luacompatlibdir %{_libdir}/lua/%{luacompatver}
-%define luacompatpkgdir %{_datadir}/lua/%{luacompatver}
-%define lua51dir %{_builddir}/lua51-%{name}-%{version}-%{release}
-
-%global commit 8014725009e195ffb502bcd65ca4e93b60a1b21c
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%{!?lua_compat_version: %global lua_compat_version 5.1}
+%{!?lua_compat_libdir: %global lua_compat_libdir %{_libdir}/lua/%{lua_compat_version}}
+%{!?lua_compat_builddir: %global lua_compat_builddir %{_builddir}/compat-lua-%{name}-%{version}-%{release}}
 
 Name:           lua-filesystem
-Version:        1.6.3
-Release:        13%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 Summary:        File System Library for the Lua Programming Language
+
+%global gitowner keplerproject
+%global gitproject luafilesystem
+%global gittag %(echo %{version} | sed -e 's/\\./_/g')
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://keplerproject.github.io/luafilesystem/
-Source0:	https://github.com/keplerproject/luafilesystem/archive/%{commit}/luafilesystem-%{version}.tar.gz
+URL:            https://%{gitowner}.github.io/%{gitproject}/
+Source0:        https://github.com/%{gitowner}/%{gitproject}/archive/v%{gittag}/%{gitproject}-%{version}.tar.gz
 
 BuildRequires:  gcc
-BuildRequires:  lua-devel >= %{luaver}
-Requires:       lua(abi) = %{luaver}
+BuildRequires:  make
+BuildRequires:  lua-devel >= 5.1
+BuildRequires:  lua-rpm-macros
+BuildRequires:  compat-lua >= %{lua_compat_version}
+BuildRequires:  compat-lua-devel >= %{lua_compat_version}
+Requires:       lua(abi) = %{lua_version}
 
-BuildRequires:  compat-lua >= %{luacompatver}, compat-lua-devel >= %{luacompatver}
-
-%description
+%global _description %{expand:
 LuaFileSystem is a Lua library developed to complement the set of functions
 related to file systems offered by the standard Lua distribution.
 
 LuaFileSystem offers a portable way to access the underlying directory
-structure and file attributes.
+structure and file attributes.}
 
-%package compat
-Summary:        File System Library for the Lua Programming Language 5.1
+%description %{_description}
 
-%description compat
-LuaFileSystem is a Lua library developed to complement the set of functions
-related to file systems offered by the standard Lua distribution.
 
-LuaFileSystem offers a portable way to access the underlying directory
-structure and file attributes.
+%package -n lua%{lua_compat_version}-filesystem
+Summary:        File System Library for the Lua Programming Language %{lua_compat_version}
+Requires:       lua(abi) = %{lua_compat_version}
+Obsoletes:      lua-filesystem-compat < 1.8.0-3
+Provides:       lua-filesystem-compat = %{version}-%{release}
+Provides:       lua-filesystem-compat%{?_isa} = %{version}-%{release}
+
+%description -n lua%{lua_compat_version}-filesystem %{_description}
 
 %prep
-%setup -q -n luafilesystem-%{commit}
+%autosetup -n %{gitproject}-%{gittag}
 
-rm -rf %{lua51dir}
-cp -a . %{lua51dir}
+rm -rf %{lua_compat_builddir}
+cp -a . %{lua_compat_builddir}
 
 %build
-make %{?_smp_mflags} PREFIX=%{_prefix} LUA_LIBDIR=%{lualibdir} CFLAGS="%{optflags} -fPIC"
+%make_build LUA_LIBDIR=%{lua_libdir} CFLAGS="%{optflags} -fPIC %{?__global_ldflags}"
 
-pushd %{lua51dir}
-make %{?_smp_mflags} PREFIX=%{_prefix} LUA_LIBDIR=%{luacompatlibdir} CFLAGS="-I%{_includedir}/lua-%{luacompatver} %{optflags} -fPIC"
+pushd %{lua_compat_builddir}
+%make_build LUA_LIBDIR=%{lua_compat_libdir} CFLAGS="-I%{_includedir}/lua-%{lua_compat_version} %{optflags} -fPIC %{?__global_ldflags}"
 popd
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install PREFIX=$RPM_BUILD_ROOT%{_prefix} LUA_LIBDIR=$RPM_BUILD_ROOT%{lualibdir}
+%make_install LUA_LIBDIR=%{lua_libdir}
 
-pushd %{lua51dir}
-make install PREFIX=$RPM_BUILD_ROOT%{_prefix} LUA_LIBDIR=$RPM_BUILD_ROOT%{luacompatlibdir}
+pushd %{lua_compat_builddir}
+%make_install LUA_LIBDIR=%{lua_compat_libdir}
 popd
 
 %check
-LUA_CPATH=$RPM_BUILD_ROOT%{lualibdir}/\?.so lua tests/test.lua
+LUA_CPATH=%{buildroot}%{lua_libdir}/\?.so lua tests/test.lua
+
+LUA_CPATH=%{buildroot}%{lua_compat_libdir}/\?.so lua-%{lua_compat_version} tests/test.lua
 
 %files
 %license LICENSE
 %doc doc/us/*
-%doc README
-%{lualibdir}/*
+%doc README.md
+%{lua_libdir}/*
 
-%files compat
+%files -n lua%{lua_compat_version}-filesystem
 %license LICENSE
 %doc doc/us/*
-%doc README
-%{luacompatlibdir}/*
+%doc README.md
+%{lua_compat_libdir}/*
 
 %changelog
+* Wed Dec 11 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.8.0-1
+- Upgraded to version 1.8.0
+- License verified.
+
 * Fri Jan 08 2021 Joe Schmitt <joschmit@microsoft.com> - 1.6.3-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora/RHEL version checks
