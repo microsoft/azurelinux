@@ -1,29 +1,27 @@
 %global glib2_version 2.45.8
-%global gtk_doc 0
+
 Summary:        Library for querying compressed XML metadata
 Name:           libxmlb
-Version:        0.3.11
-Release:        2%{?dist}
-License:        LGPLv2+
+Version:        0.3.21
+Release:        1%{?dist}
+License:        LGPL-2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/hughsie/%{name}
 Source0:        https://github.com/hughsie/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  glib2-devel >= %{glib2_version}
-%if %{with gtk_doc}
 BuildRequires:  gtk-doc
-%endif
-BuildRequires:  libstemmer-devel
 BuildRequires:  meson
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  xz-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  python3-setuptools
-%if 0%{?with_check}
+
+# needed for the self tests
 BuildRequires:  shared-mime-info
-%endif
-Requires:       glib2%{?_isa} >= %{glib2_version}
-Requires:       shared-mime-info
+
+Requires:   glib2%{?_isa} >= %{glib2_version}
+Requires:   shared-mime-info
 
 %description
 XML is slow to parse and strings inside the document cannot be memory mapped as
@@ -36,14 +34,14 @@ return some strings without actually parsing the entire document. This is all
 done using (almost) zero allocations and no actual copying of the binary data.
 
 %package devel
-Summary:        Development package for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary: Development package for %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Files for development with %{name}.
 
 %package tests
-Summary:        Files for installed tests
+Summary: Files for installed tests
 
 %description tests
 Executable and data files for installed tests.
@@ -54,7 +52,7 @@ Executable and data files for installed tests.
 %build
 
 %meson \
-    -Dgtkdoc=false \
+    -Dgtkdoc=true \
     -Dtests=true
 
 %meson_build
@@ -77,11 +75,9 @@ Executable and data files for installed tests.
 %files devel
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/Xmlb-2.0.gir
-%if %{with gtk_doc}
 %dir %{_datadir}/gtk-doc
 %dir %{_datadir}/gtk-doc/html
 %{_datadir}/gtk-doc/html/libxmlb
-%endif
 %{_includedir}/libxmlb-2
 %{_libdir}/libxmlb.so
 %{_libdir}/pkgconfig/xmlb.pc
@@ -89,11 +85,15 @@ Executable and data files for installed tests.
 %files tests
 %dir %{_libexecdir}/installed-tests/libxmlb
 %{_libexecdir}/installed-tests/libxmlb/xb-self-test
-%{_libexecdir}/installed-tests/libxmlb/test.xml.gz.gz.gz
+%{_libexecdir}/installed-tests/libxmlb/test.*
 %dir %{_datadir}/installed-tests/libxmlb
 %{_datadir}/installed-tests/libxmlb/libxmlb.test
 
 %changelog
+* Wed Nov 27 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.21-1
+- Updated to version 0.3.21
+- License verified
+
 * Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.11-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Disable gtk-doc
