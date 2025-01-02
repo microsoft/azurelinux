@@ -69,7 +69,7 @@ autoreconf --force --install --symlink
 
 %changelog
 * Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4-3
-- Update to 2.4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 - License verified
 
 * Tue Jun 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1-5
