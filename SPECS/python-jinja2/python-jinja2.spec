@@ -54,7 +54,7 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-1
+* Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-2
 - Address CVE-2024-22195 with an upstream patch.
 
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
