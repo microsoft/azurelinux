@@ -5,7 +5,7 @@ Version:       0.6.5
 Release:       4%{?dist}
 Summary:       Lightweight way of building RPMs, and sabotaging them
 
-License:       GPLv2+
+License:       GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:           https://pagure.io/rpmfluff
