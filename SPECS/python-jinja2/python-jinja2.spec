@@ -11,6 +11,7 @@ Source0:        https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-%
 Patch0:         CVE-2024-22195.patch
 Patch1:         CVE-2024-34064.patch
 Patch2:         CVE-2024-56201.patch
+Patch3:         CVE-2024-56326.patch
 BuildArch:      noarch
 
 %description
@@ -57,7 +58,7 @@ tox -e py%{python3_version_nodots}
 
 %changelog
 * Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-2
-- Address CVE-2024-22195, CVE-2024-34064, CVE-2024-56201 with an upstream patch.
+- Address CVE-2024-22195, CVE-2024-34064, CVE-2024-56201, CVE-2024-56326 with an upstream patch.
 
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
 - Upgrade to version 3.1.2
