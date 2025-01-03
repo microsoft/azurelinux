@@ -3,7 +3,7 @@
 
 Name:           glm
 Version:        1.0.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        C++ mathematics library for graphics programming
 
 License:        MIT
@@ -122,7 +122,7 @@ rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 %doc doc/api/
 
 %changelog
-* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-2
+* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-1
 - Update to 1.0.1
 - License verified
 
