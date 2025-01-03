@@ -50,14 +50,14 @@ Summary:    Conversion between character sets and surfaces
 # tests/Makefile.am:    GPLv3+
 # tests/Makefile.in:    FSFULLR and GPLv3+
 # tests/Recode.pyx:     GPLv3+
-License:    GPL-3.0-or-later AND LGPL-3.0-or-later AND BSD-2-Clause AND LicenseRef-OFSFDL
+License:    	GPL-3.0-or-later AND LGPL-3.0-or-later AND BSD-2-Clause AND LicenseRef-OFSFDL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:        https://github.com/rrthomas/recode
-Source:     %{url}/releases/download/v%{version}/recode-%{version}.tar.gz
-Patch:      recode-3.7.13-Rename-coliding-hash-functions.patch
+URL:        	https://github.com/rrthomas/recode
+Source:     	%{url}/releases/download/v%{version}/recode-%{version}.tar.gz
+Patch0:      	recode-3.7.13-Rename-coliding-hash-functions.patch
 # https://github.com/rrthomas/recode/issues/48
-Patch:      0001-src-task.c-only-close-input-stream-when-we-opened-it.patch
+Patch1:      	0001-src-task.c-only-close-input-stream-when-we-opened-it.patch
 
 
 BuildRequires:  autoconf
