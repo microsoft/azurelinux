@@ -1,15 +1,24 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# FTBFS with GCC 14 -Werror=incompatible-pointer-types
+# https://bugzilla.redhat.com/show_bug.cgi?id=2261063
+%global build_type_safety_c 2
+
 Name:           discount
-Version:        2.2.4
-Release:        5%{?dist}
+Version:        2.2.7
+Release:        10%{?dist}
 Summary:        A command-line utility for converting Markdown files into HTML
 License:        BSD
 URL:            http://www.pell.portland.or.us/~orc/Code/%{name}
-Source0:        %{url}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/Orc/%{name}/archive/v%{version}.tar.gz
 Patch0:         discount-dont-run-ldconfig.patch
+Patch1:         define_destructor.patch
+Patch2:         set_deps.patch
+Patch3: discount-c99.patch
 
 BuildRequires:  gcc
+BuildRequires: make
+BuildRequires:  cmake
 Requires:       libmarkdown%{?_isa} = %{version}-%{release}
 
 %description
@@ -38,7 +47,10 @@ libmarkdown.
 %prep
 %setup -q
 
-%patch 0 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
 
 
 %build
@@ -51,30 +63,29 @@ CFLAGS='%{optflags}' ./configure.sh \
     --enable-all-features \
     --with-fenced-code \
     --pkg-config
-make %{?_smp_mflags}
+#make
+%make_build %{?_smp_flags}
 
 
 %install
-make install.everything DESTDIR=%{buildroot}
+%make_install install.man install.samples DESTDIR=%{buildroot}
 install -D -m 644 libmarkdown.pc %{buildroot}%{_libdir}/pkgconfig/
 cp -pav libmarkdown.pc %{buildroot}%{_libdir}/pkgconfig/
 # Rename sample programs (names are too generic) and matching man1 pages
 mv %{buildroot}%{_bindir}/makepage %{buildroot}%{_bindir}/discount-makepage
 mv %{buildroot}%{_bindir}/mkd2html %{buildroot}%{_bindir}/discount-mkd2html
 mv %{buildroot}%{_bindir}/theme %{buildroot}%{_bindir}/discount-theme
-mv %{buildroot}%{_mandir}/man1/makepage.1 \
-   %{buildroot}%{_mandir}/man1/discount-makepage.1
-mv %{buildroot}%{_mandir}/man1/mkd2html.1 \
-   %{buildroot}%{_mandir}/man1/discount-mkd2html.1
-mv %{buildroot}%{_mandir}/man1/theme.1 \
-   %{buildroot}%{_mandir}/man1/discount-theme.1
-
+mv %{buildroot}%{_mandir}/man1/makepage.1 %{buildroot}%{_mandir}/man1/discount-makepage.1
+mv %{buildroot}%{_mandir}/man1/mkd2html.1 %{buildroot}%{_mandir}/man1/discount-mkd2html.1
+mv %{buildroot}%{_mandir}/man1/theme.1 %{buildroot}%{_mandir}/man1/discount-theme.1
 
 %ldconfig_scriptlets -n libmarkdown
 
 
 %check
-make test
+for x in tests/*.t; do
+	LD_LIBRARY_PATH=$(pwd) sh "${x}" || exit 1;
+done
 
 
 %files
@@ -82,10 +93,12 @@ make test
 %{_bindir}/discount-makepage
 %{_bindir}/discount-mkd2html
 %{_bindir}/discount-theme
-%{_mandir}/man1/markdown.1*
-%{_mandir}/man7/markdown.7*
 %{_mandir}/man1/discount-*.1*
-%{_mandir}/man7/mkd-*.7*
+%{_mandir}/man1/markdown.1.gz
+%{_mandir}/man3/markdown.3.gz
+%{_mandir}/man3/mkd*
+%{_mandir}/man7/markdown.7.gz
+%{_mandir}/man7/mkd-extensions.7.gz
 
 
 %files -n libmarkdown
@@ -97,14 +110,53 @@ make test
 %{_libdir}/libmarkdown.so
 %{_libdir}/pkgconfig/libmarkdown.pc
 %{_includedir}/mkdio.h
-%{_mandir}/man3/markdown.3*
-%{_mandir}/man3/mkd_*.3*
-%{_mandir}/man3/mkd-*.3*
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.4-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Oct 24 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.2.7-10
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 28 2023 Greg Hellings <greg.hellings@gmail.com> - 2.2.7-6
+- Use upstream manpage install command
+- Rename man pages whose names are bad
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 25 2022 Florian Weimer <fweimer@redhat.com> - 2.2.7-3
+- Fix building in C99 mode
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Mar 18 2022 Greg Hellings - 2.2.7-1
+- Upstream version 2.2.7
+- Add two patches
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
