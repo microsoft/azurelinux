@@ -15373,8 +15373,8 @@
         "type": "other",
         "other": {
           "name": "orc",
-          "version": "0.4.31",
-          "downloadUrl": "http://gstreamer.freedesktop.org/src/orc/orc-0.4.31.tar.xz"
+          "version": "0.4.39",
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/orc/orc-0.4.39.tar.xz"
         }
       }
     },
