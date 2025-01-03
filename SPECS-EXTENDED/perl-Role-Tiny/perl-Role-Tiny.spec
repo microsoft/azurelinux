@@ -1,12 +1,12 @@
-Name:           perl-Role-Tiny
-Version:        2.001004
-Release:        3%{?dist}
-Summary:        A nouvelle cuisine portion size slice of Moose
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Role-Tiny
+Version:        2.002004
+Release:        13%{?dist}
+Summary:        A nouvelle cuisine portion size slice of Moose
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Role-Tiny
-Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-%{version}.tar.gz#/perl-Role-Tiny-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -28,13 +28,9 @@ BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Test::More) >= 0.88
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(Class::Method::Modifiers) >= 1.05
 Requires:       perl(mro)
-
-# perl-Role-Tiny was split from perl-Moo
-Conflicts:      perl-Moo < 0.009014
 
 %description
 Role::Tiny is a minimalist role composition tool.
@@ -48,20 +44,23 @@ Role::Tiny is a minimalist role composition tool.
 
 %install
 %{make_install}
-
 %{_fixperms} -c %{buildroot}
 
 %check
 %{make_build} test
 
 %files
-%doc Changes README
 %license LICENSE
+%doc Changes README
 %{perl_vendorlib}/Role/
 %{_mandir}/man3/Role::Tiny.3*
 %{_mandir}/man3/Role::Tiny::With.3*
 
 %changelog
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 2.002004-13
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.001004-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
