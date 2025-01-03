@@ -79,33 +79,7 @@ documents using the %{name} library.
 %changelog
 * Thu Nov 28 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.3.2-10
 - Update to 0.3.2
-
-* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-9
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Feb 26 2021 Tom Hughes <tom@compton.nu> - 0.3.2-1
-- Update to 0.3.2 upstream release
+- License verified.
 
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-8
 - Bumping release to re-build with newer 'libtiff' libraries.
