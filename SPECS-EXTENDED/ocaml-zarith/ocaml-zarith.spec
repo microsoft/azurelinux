@@ -6,7 +6,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-zarith
 Version:        1.14
-Release:        %1{?dist}
+Release:        %3{?dist}
 Summary:        OCaml interface to GMP
 
 License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
@@ -105,8 +105,8 @@ make tests
 %doc Changes html
 
 %changelog
-* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.14.1-1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.14-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
 * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.14-2
