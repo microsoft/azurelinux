@@ -6,12 +6,12 @@ License: 	Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: 		https://re2c.org/
-Source: 	https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.xz
+Source: 	https://github.com/skvadrik/re2c/releases/download/%{version}/%{name}-%{version}.tar.xz
 
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: make
-BuildRequires: python3
+BuildRequires: 	gcc
+BuildRequires: 	gcc-c++
+BuildRequires: 	make
+BuildRequires: 	python3
 
 %description
 re2c is a tool for writing very fast and very flexible scanners. Unlike any
@@ -21,23 +21,18 @@ any traditional lexer offers. And Last but not least re2c generates warning
 free code that is equal to hand-written code in terms of size, speed and
 quality.
 
-
 %prep
 %setup -q
-
 
 %build
 %configure --disable-silent-rules
 %make_build
 
-
 %install
 %make_install
 
-
 %check
 make tests
-
 
 %files
 %license LICENSE
@@ -49,7 +44,6 @@ make tests
 %{_mandir}/man1/re2c.1*
 %{_mandir}/man1/re2go.1*
 %{_mandir}/man1/re2rust.1*
-
 
 %changelog
 * Wed Dec 18 2024 Akhila Guruju <v-guakhila@microsoft.com> - 3.1-4
