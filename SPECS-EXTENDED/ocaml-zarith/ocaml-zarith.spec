@@ -6,7 +6,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-zarith
 Version:        1.14
-Release:        %3{?dist}
+Release:        3%{?dist}
 Summary:        OCaml interface to GMP
 
 License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
