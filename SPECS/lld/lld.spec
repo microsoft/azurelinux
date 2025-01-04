@@ -41,8 +41,7 @@ Shared libraries for LLD.
 %build
 mkdir -p build
 cd build
-%cmake ..                                                         \
-       -G Ninja                                                   \
+%cmake \
        -DCMAKE_BUILD_TYPE=Release                                 \
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
@@ -55,11 +54,11 @@ cd build
        -Wno-dev                                                   \
        ../lld
 
-%ninja_build
+%cmake_build
 
 %install
 cd build
-%ninja_install
+%cmake_install
 
 %files
 %license LICENSE.TXT

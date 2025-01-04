@@ -19,7 +19,6 @@ BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
-BuildRequires:  binutils-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
@@ -50,7 +49,7 @@ cmake -G Ninja                              \
       -DLLVM_ENABLE_FFI=ON                  \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
-      -DLLVM_PARALLEL_LINK_JOBS=1           \
+      -DLLVM_PARALLEL_LINK_JOBS=%{?_smp_ncpus_max:%_smp_build_ncpus} \
       -DLLVM_PARALLEL_COMPILE_JOBS=%{?_smp_ncpus_max:%_smp_build_ncpus} \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
@@ -58,7 +57,6 @@ cmake -G Ninja                              \
       -DLLVM_BUILD_TESTS=ON                 \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
-      -DLLVM_ENABLE_RTTI=ON                 \
       -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev                              \
       ../llvm
