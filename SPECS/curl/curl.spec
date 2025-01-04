@@ -87,6 +87,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Fri Jan 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.11.1-1
 - Auto-upgrade to 8.11.1 - fix CVE-2024-11053
+- Remove older applied patches for CVE-2024-6197 and CVE-2024-8096 as version 8.11.1 is unaffected.
 
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-3
 - Address CVE-2024-8096
