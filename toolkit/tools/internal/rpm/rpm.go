@@ -58,6 +58,12 @@ const (
 	// Azure LinuxCCacheDefine enables ccache in the Azure Linux build system
 	AzureLinuxCCacheDefine = "ccache_enabled"
 
+	// UseLLVMClangDefine enables building packages with the LLVM/clang compiler instead of GNU/gcc
+	UseLLVMClangDefine = "use_llvm_clang"
+
+	// UseLLVMLinkerDefine enables linking packages with LLVM lld linker instead of GNU binutils ld linker
+	UseLLVMLinkerDefine = "use_llvm_linker"
+
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
 )

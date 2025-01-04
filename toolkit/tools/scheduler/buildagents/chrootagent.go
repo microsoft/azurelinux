@@ -115,6 +115,10 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-config=%s", config.CCacheConfig))
 	}
 
+	if config.UseLLVMToolchain {
+		serializedArgs = append(serializedArgs, "--use-llvm-toolchain")
+	}
+
 	for _, dependency := range dependencies {
 		serializedArgs = append(serializedArgs, fmt.Sprintf("--install-package=%s", dependency))
 	}

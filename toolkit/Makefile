@@ -73,6 +73,7 @@ RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
 IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
 CACHED_PACKAGES_ARCHIVE              ?=
 USE_CCACHE                           ?= n
+USE_LLVM_TOOLCHAIN                   ?= n
 BUILD_TOOLS_NONPROD                  ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
