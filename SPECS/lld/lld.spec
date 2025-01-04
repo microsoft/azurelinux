@@ -16,6 +16,7 @@ BuildRequires:  llvm-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3
 Requires:       %{name}-libs = %{version}-%{release}
+Patch0:         0002-PATCH-lld-Import-compact_unwind_encoding.h-from-libu.patch
 
 %package devel
 Summary:        Libraries and header files for LLD

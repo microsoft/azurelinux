@@ -51,6 +51,13 @@ libsmi-based applications.
 cp %{SOURCE2} .
 
 %build
+# "parser-sming.y:259:12: error: call to undeclared function 'timegm'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]"
+# "parser-sming.y:2164:44: error: incompatible integer to pointer conversion passing 'int' to parameter of type 'List *' (aka 'struct List *') [-Wint-conversion]"
+%if "0%{?use_llvm_clang}" != "0"
+export CFLAGS="%{optflags} -Wno-error=implicit-function-declaration -Wno-error=int-conversion"
+export CXXFLAGS="%{optflags} -Wno-error=implicit-function-declaration -Wno-error=int-conversion"
+%endif
+
 %configure \
     --enable-smi \
     --enable-sming \

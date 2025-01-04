@@ -31,8 +31,13 @@ cp -p %{SOURCE1} .
 cp -p %{SOURCE2} .
 
 %build
+%if "0%{?use_llvm_clang}" == "0"
 make CC="gcc %{optflags}"
 gcc %{optflags} sparsify.c -o sparsify -lext2fs
+%else
+make CC="clang %{optflags}"
+clang %{optflags} sparsify.c -o sparsify -lext2fs
+%endif
 
 %install
 install -D -p -m 755 zerofree %{buildroot}%{_sbindir}/zerofree
