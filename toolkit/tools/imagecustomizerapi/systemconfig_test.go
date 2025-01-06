@@ -14,15 +14,15 @@ func TestSystemConfigValidEmpty(t *testing.T) {
 }
 
 func TestSystemConfigValidHostname(t *testing.T) {
-	testValidYamlValue[*SystemConfig](t, "{ \"Hostname\": \"validhostname\" }", &SystemConfig{Hostname: "validhostname"})
+	testValidYamlValue[*SystemConfig](t, "{ \"hostname\": \"validhostname\" }", &SystemConfig{Hostname: "validhostname"})
 }
 
 func TestSystemConfigInvalidHostname(t *testing.T) {
-	testInvalidYamlValue[*SystemConfig](t, "{ \"Hostname\": \"invalid_hostname\" }")
+	testInvalidYamlValue[*SystemConfig](t, "{ \"hostname\": \"invalid_hostname\" }")
 }
 
 func TestSystemConfigInvalidAdditionalFiles(t *testing.T) {
-	testInvalidYamlValue[*SystemConfig](t, "{ \"AdditionalFiles\": { \"a.txt\": [] } }")
+	testInvalidYamlValue[*SystemConfig](t, "{ \"additionalFiles\": { \"a.txt\": [] } }")
 }
 
 func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
@@ -39,7 +39,7 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 
 	err := value.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
+	assert.ErrorContains(t, err, "duplicate partitionSettings ID")
 }
 
 func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
@@ -51,5 +51,5 @@ func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
 
 	err := value.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ExtraCommandLine")
+	assert.ErrorContains(t, err, "extraCommandLine")
 }
