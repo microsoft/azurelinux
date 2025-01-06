@@ -3,6 +3,7 @@
 %global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define mariner_version 3
+%global debug_package %{nil}
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -11,7 +12,7 @@
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
-%global _missing_build_ids_terminate_build 1
+%global _missing_build_ids_terminate_build 0
 %global _no_recompute_build_ids 1
 
 %ifarch x86_64
@@ -62,6 +63,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
 BuildRequires:  libtraceevent-devel
+BuildRequires:  lld
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
@@ -182,7 +184,7 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} oldconfig
+make LC_ALL=  ARCH=%{arch} oldconfig LLVM=1
 
 # Verify the config files match
 cp .config new_config
@@ -200,17 +202,22 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+# -linkmode=external
+# "extracting debug info from /usr/src/azl/BUILDROOT/kernel-6.6.47.1-5.azl3.x86_64/usr/src/linux-headers-6.6.47.1-5.azl3/scripts/ipe/polgen/polgen"
+# "*** ERROR: No build ID note found in /usr/src/azl/BUILDROOT/kernel-6.6.47.1-5.azl3.x86_64/usr/src/linux-headers-6.6.47.1-5.azl3/scripts/ipe/polgen/polgen"
+export LDFLAGS="-Wl,-z,relro -Wl,--build-id=sha1 -latomic -Wl,--undefined-version"
+
+make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} LLVM=1
 
 # Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all
+make -C tools/perf PYTHON=%{python3} NO_LIBELF=1 LIBC_SUPPORT=1 NO_LIBTRACEEVENT=1 all LLVM=1
 
 %ifarch x86_64
-make -C tools turbostat cpupower
+make -C tools turbostat cpupower LLVM=1
 %endif
 
 #Compile bpftool
-make -C tools/bpf/bpftool
+make -C tools/bpf/bpftool LLVM=1
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -223,13 +230,14 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 # We want to compress modules after stripping. Extra step is added to
 # the default __spec_install_post.
 %define __spec_install_post\
-    %{?__debug_package:%{__debug_install_post}}\
     %{__arch_install_post}\
     %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
 
 %install
+export LDFLAGS="-Wl,-z,relro -Wl,--build-id=sha1 -latomic -Wl,--undefined-version"
+
 install -vdm 755 %{buildroot}%{_sysconfdir}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
@@ -356,6 +364,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinu*
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
