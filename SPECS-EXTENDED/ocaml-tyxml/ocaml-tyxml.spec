@@ -7,7 +7,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-tyxml
 Version:        4.6.0
-Release:        1%{?dist}
+Release:        13%{?dist}
 Summary:        Build valid HTML and SVG documents
 
 License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
@@ -145,8 +145,9 @@ developing applications that use %{name}-ppx.
 %files ppx-devel -f .ofiles-tyxml-ppx-devel
 
 %changelog
-* Mon Dec 23 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.6.0-1
-- Update to 4.6.0.
+* Mon Dec 23 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.6.0-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
