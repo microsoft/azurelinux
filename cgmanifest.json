@@ -14173,7 +14173,7 @@
         "other": {
           "name": "nilfs-utils",
           "version": "2.2.11",
-          "downloadUrl": "http://nilfs.sourceforge.net/download/nilfs-utils-2.2.11.tar.bz2"
+          "downloadUrl": "https://nilfs.sourceforge.net/download/nilfs-utils-2.2.11.tar.bz2"
         }
       }
     },

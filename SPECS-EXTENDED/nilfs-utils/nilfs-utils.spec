@@ -7,9 +7,9 @@ Release:	3%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
-URL:		http://nilfs.sourceforge.net
-Source0:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
-Source1:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2.asc
+URL:		https://nilfs.sourceforge.net
+Source0:	https://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
+Source1:	https://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2.asc
 Source2:	8B055AE86DEFF458.asc
 BuildRequires:  make
 BuildRequires:	gcc
@@ -94,11 +94,45 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 
 %changelog
 * Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.8-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jul 09 2024 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.2.11-2
+- Rebuilt for the bin-sbin merge
+
+* Thu Apr 04 2024 Eric Sandeen <sandeen@redhat.com> 2.2.11-1
+- New upstream release
+- Add gpg verification of tarball
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 20 2022 Eric Sandeen <sandeen@redhat.com> 2.2.9-1
+- New upstream release
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
