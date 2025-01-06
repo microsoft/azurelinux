@@ -2,7 +2,7 @@
 Summary:        Open Geographic Datastore Interface
 Name:		ogdi
 Version:	4.1.1
-Release:	1%{?dist}
+Release:	3%{?dist}
 License:	BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -159,8 +159,9 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 
 
 %changelog
-* Wed Dec 11 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.1.1-1
-- Update to 4.1.1
+* Wed Dec 11 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.1.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
 
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.1.0-9
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
