@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libid3tag
 Version:        0.16.3
-Release:        1%{?dist}
+Release:        7%{?dist}
 Summary:        ID3 tag manipulation library
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
@@ -57,8 +57,9 @@ ID3 tag library development files.
 
 
 %changelog
-* Fri Oct 10 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.16.3-1
-  Update to 0.16.3.
+* Fri Oct 10 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.16.3-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
 
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
