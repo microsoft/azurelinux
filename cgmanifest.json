@@ -14803,7 +14803,7 @@
         "other": {
           "name": "ocaml-libvirt",
           "version": "0.6.1.7",
-          "downloadUrl": "http://libvirt.org/sources/ocaml/ocaml-libvirt-0.6.1.7.tar.gz"
+          "downloadUrl": "https://libvirt.org/sources/ocaml/ocaml-libvirt-0.6.1.7.tar.gz"
         }
       }
     },
