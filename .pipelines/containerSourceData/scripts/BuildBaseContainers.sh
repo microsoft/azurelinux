@@ -49,7 +49,7 @@ set -e
 #    -r "" \
 #    -q "false"
 
-while getopts ":a:c:k:l:o:p:r:q:s:t:u:v" OPTIONS; do
+while getopts ":a:c:k:l:o:p:r:q:s:t:u:v:" OPTIONS; do
     case ${OPTIONS} in
     a ) ACR=$OPTARG;;
     c ) CONTAINER_TARBALLS_DIR=$OPTARG;;
