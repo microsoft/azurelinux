@@ -4,7 +4,7 @@
 Summary:        Truly asynchronous Berkeley DB access
 Name:           perl-AnyEvent-BDB
 Version:        1.1
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,8 +25,8 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(base)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 Requires:       perl(AnyEvent) >= 3.81
 Requires:       perl(BDB) >= 1.5
 Requires:       perl(Exporter)
@@ -58,6 +58,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Jan 06 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.1 - 39
+- Rebuilt for perl-BDB dependency
+- License verified.
+
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-38
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
