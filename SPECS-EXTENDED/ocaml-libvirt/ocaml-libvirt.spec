@@ -5,7 +5,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           ocaml-libvirt
 Version:        0.6.1.7
-Release:        1%{?dist}
+Release:        13%{?dist}
 Summary:        OCaml binding for libvirt
 License:        LGPL-2.1-or-later
 
@@ -80,16 +80,107 @@ make install
 
 
 %changelog
-* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.6.1.7-1
-- Update to 0.6.1.7
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.6.1.7-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1.5-8
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-11
+- OCaml 5.2.0 ppc64le fix
 
-* Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-7.1
-- OCaml 4.10.0 final (Fedora 32).
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-10
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-7
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-6
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-5
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-3
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 0.6.1.7-2
+- OCaml 5.0.0 rebuild
+- New project URL
+- Convert License tag to SPDX
+- Fix build on bytecode-only architectures
+- Use %%license macro
+- Use new OCaml macros
+
+* Mon Feb 13 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-1
+- New upstream version 0.6.1.7
+- Do not try parallel builds.
+- Upstream now uses automake.
+
+- Remove ChangeLog file and HTML docs, dropped upstream.
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-5
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-2
+- OCaml 4.14.0 rebuild
+
+* Thu Apr 28 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-1
+- New upstream version 0.6.1.6
+- Remove patches which are all upstream.
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-20
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-18
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 14:31:55 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-16
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-14
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-13
+- OCaml 4.11.0 rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-11
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-10
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 17 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-9
+- OCaml 4.11.0 pre-release
+
+* Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-8
+- Update all OCaml dependencies for RPM 4.16.
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-7
 - OCaml 4.10.0 final.
