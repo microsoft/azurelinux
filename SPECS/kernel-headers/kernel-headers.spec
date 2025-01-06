@@ -14,7 +14,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
 Version:        6.6.64.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ done
 %endif
 
 %changelog
+* Thu Jan 15 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
+- Bump release to match kernel
+
 * Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
 - Bump release to match kernel
 
