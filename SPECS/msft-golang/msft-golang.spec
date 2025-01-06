@@ -154,7 +154,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Dec 04 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.10-1
+* Mon Jan 06 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.10-1
 - Bump version to 1.22.10-1
 
 * Thu Oct 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.8-1
