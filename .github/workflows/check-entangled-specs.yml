@@ -28,7 +28,7 @@ jobs:
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.12
 
       - name: Get Python dependencies
         run: python3 -m pip install -r toolkit/scripts/requirements.txt
