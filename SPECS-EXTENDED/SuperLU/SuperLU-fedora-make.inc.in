@@ -1,0 +1,49 @@
+############################################################################
+#
+#  Program:         SuperLU
+#
+#  Module:          make.inc
+#
+#  Purpose:         Top-level Definitions
+#
+#  Creation date:   May 10, 2015
+#
+#  Modified:	    
+#		    
+#
+############################################################################
+#
+#  The name of the libraries to be created/linked to
+#
+SuperLUroot	= ${CMAKE_SOURCE_DIR}/build
+#
+# SuperLUroot	= ${CMAKE_INSTALL_PREFIX}
+SUPERLULIB   	= $(SuperLUroot)/SRC/${PROJECT_NAME_LIB_EXPORT}
+
+#TMGLIB       	= libtmglib.a
+
+# BLASDEF 	= -DUSE_VENDOR_BLAS
+BLASLIB		= $(TPL_BLAS_LIBRARIES)
+LIBS		= $(SUPERLULIB) $(BLASLIB)
+
+#
+#  The archiver and the flag(s) to use when building archive (library)
+#  If your system has no ranlib, set RANLIB = echo.
+#
+ARCH         = @CMAKE_AR@
+ARCHFLAGS    = cr
+RANLIB       = @CMAKE_RANLIB@
+
+CC           = @CMAKE_C_COMPILER@
+CFLAGS 	     = @CMAKE_C_FLAGS_RELEASE@ @CMAKE_C_FLAGS@ 
+NOOPTS       =
+FORTRAN	     = @CMAKE_Fortran_COMPILER@
+FFLAGS       = @CMAKE_Fortran_FLAGS_RELEASE@
+
+LOADER       = $(CC)
+LOADOPTS     = $(LDFLAGS)
+
+#
+# The directory in which Matlab is installed
+#
+MATLAB	     = /Applications/MATLAB_R2015b.app
