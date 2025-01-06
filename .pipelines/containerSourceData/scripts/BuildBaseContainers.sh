@@ -92,6 +92,10 @@ function print_inputs {
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
     echo "OUTPUT_DIR                    -> $OUTPUT_DIR"
+    echo "DISTROLESS_BASE_BUILD         -> $DISTROLESS_BASE_BUILD"
+    echo "DISTROLESS_DEBUG_BUILD        -> $DISTROLESS_DEBUG_BUILD"
+    echo "DISTROLESS_MINIMAL_BUILD      -> $DISTROLESS_MINIMAL_BUILD"
+    echo "BASE_BUILD                    -> $BASE_BUILD"
 }
 
 function validate_inputs {
@@ -116,10 +120,10 @@ function validate_inputs {
     DISTROLESS_DEBUG_BUILD=${DISTROLESS_DEBUG_BUILD:-true}
     DISTROLESS_MINIMAL_BUILD=${DISTROLESS_MINIMAL_BUILD:-true}
 
-    if [[ (! -f $BASE_TARBALL) && (! $BASE_BUILD == true) || \
-        (! -f $DISTROLESS_BASE_TARBALL) && (! $DISTROLESS_BASE_BUILD == true)  || \
-        (! -f $DISTROLESS_DEBUG_TARBALL) && (! $DISTROLESS_DEBUG_BUILD == true)|| \
-        (! -f $DISTROLESS_MINIMAL_TARBALL) && (! DISTROLESS_MINIMAL_BUILD == true) ]]; then
+    if [[ (! -f $BASE_TARBALL) && ( $BASE_BUILD == true) || \
+        (! -f $DISTROLESS_BASE_TARBALL) && ( $DISTROLESS_BASE_BUILD == true)  || \
+        (! -f $DISTROLESS_DEBUG_TARBALL) && ( $DISTROLESS_DEBUG_BUILD == true)|| \
+        (! -f $DISTROLESS_MINIMAL_TARBALL) && ( DISTROLESS_MINIMAL_BUILD == true) ]]; then
         echo "Error - Missing some tarball(s) in $CONTAINER_TARBALLS_DIR"
         exit 1
     fi
