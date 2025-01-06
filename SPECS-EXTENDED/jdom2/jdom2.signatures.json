@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "generate-tarball.sh": "0840f2c0f5a2e4be6908848518126afc54dfc4deac6f81c61c8308d84f8aa3a1",
-  "jdom2-2.0.6.tar.gz": "edf120e8da15fc3a2e010ee9066ef9cd93ca86c50a88cde9dd2146b847d4ddec"
+  "bnd.properties": "1b17ed468a4071cef0f35079ba30990d9df95a4660458c330a8549471230c4da",
+  "generate-tarball.sh": "4b38f8dbd566c1a9b0d829063dcb47fb01e83ec4629e87f8f3e878d585779fde",
+  "jdom2-2.0.6.1.tar.gz": "18639399104d5c57b92fd6791823a74393651e80499b67ae3067294d62df083e"
  }
 }
