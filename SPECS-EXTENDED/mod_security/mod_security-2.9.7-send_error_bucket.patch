@@ -1,0 +1,30 @@
+From b2fa083522c70368c7ab911696dcb87dde5dc688 Mon Sep 17 00:00:00 2001
+From: Tomas Korbar <tkorbar@redhat.com>
+Date: Thu, 22 Dec 2022 14:49:34 +0100
+Subject: [PATCH] Clear original response code in send_error_bucket function
+
+If this is left intact, then apache thinks that this code
+was generated during processing of ErrorDocument and does not
+handle it properly
+
+Fix #2849
+---
+ apache2/apache2_util.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/apache2/apache2_util.c b/apache2/apache2_util.c
+index cdae2b580..520a30f2f 100644
+--- a/apache2/apache2_util.c
++++ b/apache2/apache2_util.c
+@@ -31,6 +31,11 @@ apr_status_t send_error_bucket(modsec_rec *msr, ap_filter_t *f, int status) {
+     /* Set the status line explicitly for the error document */
+     f->r->status_line = ap_get_status_line(status);
+ 
++    /* Clear previously set response code to make clear that this is
++     * not a recursive error
++     */
++    f->r->status = 200;
++
+     brigade = apr_brigade_create(f->r->pool, f->r->connection->bucket_alloc);
+     if (brigade == NULL) return APR_EGENERAL;
+ 
