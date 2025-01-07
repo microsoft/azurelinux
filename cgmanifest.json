@@ -4290,7 +4290,7 @@
         "type": "other",
         "other": {
           "name": "ghc-srpm-macros",
-          "version": "1.9.2",
+          "version": "1.9.1",
           "downloadUrl": "https://src.fedoraproject.org/rpms/ghc-srpm-macros"
         }
       }
