@@ -7,7 +7,7 @@ Summary:        Thin layer of types for graphic libraries
 
 License:        MIT
 URL:            https://github.com/ebassi/graphene
-Source:		%{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
