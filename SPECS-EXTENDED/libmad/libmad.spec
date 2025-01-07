@@ -22,9 +22,6 @@ and Layer III a.k.a. MP3) are fully implemented.
 %package        devel
 Summary:	MPEG audio decoder library development files
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-%if 0%{?el5}
-Requires:	pkgconfig
-%endif
 
 %description	devel
 %{summary}.
