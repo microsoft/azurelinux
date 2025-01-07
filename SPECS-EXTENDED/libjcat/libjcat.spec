@@ -5,11 +5,11 @@ Distribution:   Azure Linux
 
 Summary:   Library for reading Jcat files
 Name:      libjcat
-Version:   0.1.6
-Release:   3%{?dist}
-License:   LGPLv2+
+Version:   0.2.2
+Release:   1%{?dist}
+License:   LGPLv2.1+
 URL:       https://github.com/hughsie/libjcat
-Source0:   https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
+Source0:   https://github.com/hughsie/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: %{_bindir}/xsltproc
 BuildRequires: meson
@@ -88,6 +88,10 @@ Executable and data files for installed tests.
 %dir %{_datadir}/installed-tests/libjcat
 
 %changelog
+* Tue Nov 05 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.2.2-1
+- Update to 0.2.2
+- License verified.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.6-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
