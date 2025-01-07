@@ -1,20 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# ghc has been bootstrapped on all Fedora archs except aarch64.
-# The ghc interpreter ghci is only supported on a subset of archs.
 
 %global macros_dir %{_rpmconfigdir}/macros.d
 
+%global macrosfile macros.ghc-srpm
+
 Name:           ghc-srpm-macros
-Version:        1.9.2
-Release:        1%{?dist}
+Version:        1.9.1
+Release:        3%{?dist}
 Summary:        RPM macros for building Haskell source packages
 
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Url:            https://src.fedoraproject.org/rpms/ghc-srpm-macros
 BuildArch:      noarch
 
-Source0:        macros.ghc-srpm
+Source0:        %{macrosfile}
 
 %description
 Macros used when generating Haskell source RPM packages.
@@ -29,19 +29,69 @@ echo no build stage needed
 
 
 %install
-install -p -D -m 0644 %{SOURCE0} %{buildroot}/%{macros_dir}/macros.ghc-srpm
+install -p -D -m 0644 %{SOURCE0} %{buildroot}/%{macros_dir}/%{macrosfile}
 
 
 %files
-%{macros_dir}/macros.ghc-srpm
+%{macros_dir}/%{macrosfile}
 
 
 %changelog
-* Fri Oct 18 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.9.2-1
-- Upgrade to 1.9.2-1.
+* Tue Jan 07 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.9.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Mar 18 2024 Jens Petersen <petersen@redhat.com> - 1.9.1-1
+- %%haskell_setup -q replaces %%haskell_setup_quick
+- %%haskell_setup -p and -h options disable prof and doc
+
+* Thu Mar  7 2024 Jens Petersen <petersen@redhat.com> - 1.9-1
+- improve haskell_setup to undefine the old macros
+- add haskell_setup_quick for test builds
+
+* Wed Mar 06 2024 David Abdurachmanov <davidlt@rivosinc.com> - 1.8-1
+- Add riscv64
+
+* Thu Feb 29 2024 Jens Petersen <petersen@redhat.com> - 1.7-1
+- add ghc_profiling and haskell_setup macros: will replace with_ghc_prof
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Sep 21 2023 Jens Petersen <petersen@redhat.com> - 1.6.1-3
+- migrate to SPDX license tag
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jan 30 2023 Jens Petersen <petersen@redhat.com> - 1.6.1-1
+- restore ghc_devel_prof for existing ghc spec files
+
+* Sat Jan 21 2023 Jens Petersen <petersen@redhat.com> - 1.6.0-1
+- drop long unused ghc_arches_with_ghci
+- update (unused) ghc_arches
+- replace unused ghc_devel_prof with with_ghc_prof (moved from ghc-rpm-macros)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
