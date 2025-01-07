@@ -79,8 +79,10 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{_libdir}/pkgconfig/gspell-1.pc
 %{_datadir}/gir-1.0/
 %{_datadir}/vala/
-%{_datadir}/installed-tests/%{name}-1/
+%exclude %dir %{_datadir}/installed-tests/%{name}-1/
+%exclude %{_datadir}/installed-tests/%{name}-1/*
 %exclude %dir %{_libexecdir}/installed-tests/%{name}-1/
+%exclude %{_libexecdir}/installed-tests/%{name}-1/*
 
 %files doc
 %{_datadir}/gtk-doc/
