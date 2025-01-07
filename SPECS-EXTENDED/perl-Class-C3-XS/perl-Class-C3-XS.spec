@@ -62,7 +62,7 @@ make test
 %{_mandir}/man3/Class::C3::XS.3*
 
 %changelog
-* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.15 - 17
+* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.15-17
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
