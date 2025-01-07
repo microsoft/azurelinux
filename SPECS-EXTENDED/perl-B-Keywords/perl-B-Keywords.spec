@@ -117,7 +117,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.27 - 3
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.27-3
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
