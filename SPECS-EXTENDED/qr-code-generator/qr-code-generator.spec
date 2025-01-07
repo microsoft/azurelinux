@@ -5,15 +5,13 @@
 Name: 		qr-code-generator
 Version: 	1.8.0
 Release: 	12%{?dist}
-
 License: 	MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: 	High-quality QR Code generator library
 URL: 		https://github.com/nayuki/%{richname}
-Source0: 	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0: 	%{url}/archive/refs/tags/v1.8.0.tar.gz#/%{name}-%{version}.tar.gz
 Source1: 	https://github.com/EasyCoding/%{cmakename}/archive/v%{version}-%{cmakesuffix}/%{cmakename}-%{version}-%{cmakesuffix}.tar.gz
-
 BuildRequires: 	cmake
 BuildRequires: 	gcc
 BuildRequires: 	gcc-c++
