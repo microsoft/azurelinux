@@ -9,8 +9,7 @@ License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/stratis-storage/dbus-signature-pyparsing
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
-
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %global _description \
