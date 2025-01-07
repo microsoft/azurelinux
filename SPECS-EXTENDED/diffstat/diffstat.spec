@@ -1,17 +1,18 @@
-Summary: A utility which provides statistics based on the output of diff
-Name: diffstat
-Version: 1.63
-Release: 3%{?dist}
-License: MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://invisible-island.net/diffstat
-Source0: ftp://ftp.invisible-island.net/pub/diffstat/%{name}-%{version}.tgz
+Summary: A utility which provides statistics based on the output of diff
+Name: diffstat
+Version: 1.66
+Release: 3%{?dist}
+License: SMLNJ
+URL: https://invisible-island.net/diffstat
+Source0: https://invisible-mirror.net/archives/diffstat/%{name}-%{version}.tgz
 # Taken from diffstat.c.
 Source1: COPYING
 
 BuildRequires: gcc
 BuildRequires: xz
+BuildRequires: make
 
 %description
 The diff command compares files line by line.  Diffstat reads the
@@ -43,8 +44,48 @@ make check
 %{_mandir}/*/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Nov 04 2024 Sreenivasulu Malavathula <vsmalavathu@microsoft.com> - 1.66-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.66-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jan 29 2024 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 1.66-1
+- Update to 1.66 (#2260805)
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.65-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.65-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.65-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.65-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 10 2022 Tim Waugh <twaugh@redhat.com> - 1.65-1
+- Update to 1.65 (bug #2133330).
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.64-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.64-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.64-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.64-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 13 2021 Tim Waugh <twaugh@redhat.com> - 1.64-1
+- Update to 1.64.
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.63-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.63-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
