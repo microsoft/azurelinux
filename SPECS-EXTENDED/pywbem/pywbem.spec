@@ -9,7 +9,7 @@ License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pywbem/pywbem
-Source0:        https://github.com/pywbem/pywbem/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         0001-use-unittest-mock.patch
 Patch2:         0002-coverity-deadcode.patch
 Patch3:         0003-coverity-forward-null.patch
@@ -54,7 +54,6 @@ for more information about WBEM.
 
 %build
 CFLAGS="%{optflags}" %{__python3} setup.py build
-
 
 %install
 rm -rf %{buildroot}
