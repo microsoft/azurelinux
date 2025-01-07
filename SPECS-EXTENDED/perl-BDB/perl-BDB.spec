@@ -55,7 +55,7 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Mon Jan 06 2025 Jyoti kanase <v-jykanase@microsoft.com> -  1.92 - 26
+* Mon Jan 06 2025 Jyoti kanase <v-jykanase@microsoft.com> -  1.92-26
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
