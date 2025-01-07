@@ -4315,7 +4315,7 @@
           "downloadUrl": "https://gitlab.gnome.org/GNOME/gi-docgen/-/archive/2024.1/gi-docgen-2024.1.tar.bz2"
 =======
           "name": "ghc-srpm-macros",
-          "version": "1.9.2",
+          "version": "1.9.1",
           "downloadUrl": "https://src.fedoraproject.org/rpms/ghc-srpm-macros"
 >>>>>>> ea46dc8bb (ghc-srpm-macros: License verified)
         }
