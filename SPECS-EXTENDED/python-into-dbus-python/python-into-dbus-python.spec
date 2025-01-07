@@ -4,13 +4,11 @@ Name:           python-%{srcname}
 Version:        0.8.2
 Release:        8%{?dist}
 Summary:        Transformer to dbus-python types
-
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/stratis-storage/into-dbus-python
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %global _description \
