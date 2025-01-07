@@ -1077,8 +1077,8 @@
         "type": "other",
         "other": {
           "name": "beust-jcommander",
-          "version": "1.78",
-          "downloadUrl": "https://github.com/cbeust/jcommander/archive/1.78.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/cbeust/jcommander/archive/2.0.tar.gz"
         }
       }
     },
