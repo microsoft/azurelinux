@@ -68,7 +68,7 @@ popd
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
-* Thu Jan 07 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
 - Bump release to match kernel
 
 * Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7

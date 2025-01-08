@@ -370,7 +370,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Jan 07 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
 - Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
 - Bump release to match kernel
 
