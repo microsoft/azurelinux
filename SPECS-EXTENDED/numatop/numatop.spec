@@ -7,7 +7,7 @@ Summary:        Memory access locality characterization and analysis
 
 License:        BSD-3-Clause
 URL:            https://01.org/numatop
-Source:         https://github.com/intel/numatop/archive/refs/tags/v%{version}.tar.gz#/%{name}-v%{version}.tar.xz
+Source:         https://github.com/intel/numatop/archive/refs/tags/v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 
 # https://github.com/intel/numatop/pull/71
 Patch:          0001-common-Use-sym_type_t-in-elf64_binary_read-signature.patch
@@ -69,16 +69,41 @@ autoreconf --force --install --symlink
 
 %changelog
 * Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-- License verified
 
-* Tue Jun 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1-5
-- Add patch to fix format-security wanings with ncurses 6.3
-- License verified
+* Mon Mar 04 2024 Dridi Boukelmoune <dridi.boukelmoune@gmail.com> - 2.4-1
+- Bump version to 2.4
 
-* Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add patch to fix linking error
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Feb 17 2023 Dridi Boukelmoune <dridi.boukelmoune@gmail.com> - 2.3-3
+- Migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 22 2022 Dridi Boukelmoune <dridi@fedoraproject.org>- 2.3-1
+- Update to 2.3
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
