@@ -1,23 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
-ExcludeArch: %{ix86}
 
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
+%global srcname markup
 %global giturl  https://github.com/aantron/markup.ml
 
-Name:           ocaml-markup
+Name:           ocaml-%{srcname}
 Version:        1.0.3
-Release:        1%{?dist}
+Release:        18%{?dist}
 Summary:        Error-recovering streaming HTML5 and XML parsers for OCaml
 
 License:        MIT
 URL:            https://aantron.github.io/markup.ml/
-VCS:            git:%{giturl}.git
-Source:         %{giturl}/archive/%{version}/markup-%{version}.tar.gz
+Source0:        https://github.com/aantron/markup.ml/archive/%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.03.0
 BuildRequires:  ocaml-bisect-ppx-devel >= 2.5.0
@@ -101,14 +99,94 @@ sed -i '/uchar/d' markup.opam
 %files lwt-devel -f .ofiles-markup-lwt-devel
 
 %changelog
-* Tue Dec 24 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.3-1
-- Update to 1.0.3.
+* Wed Jan 08 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.3-18
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- Remove test, docs circular dependencies
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-16
+- OCaml 5.2.0 ppc64le fix
+
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-15
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-12
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-11
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-10
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-8
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 1.0.3-7
+- OCaml 5.0.0 rebuild
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-6
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 18 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-4
+- Rebuild for ocaml-lwt 5.6.1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 20 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-2
+- Use new OCaml macros
+
+* Sun Jun 19 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-2
+- OCaml 4.14.0 rebuild
+
+* Wed Apr 27 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-1
+- Version 1.0.3
+- Drop upstreamed patch for OCaml 4.13.1 compatibility
+
+* Mon Feb 28 2022 Jerry James <loganjerry@gmail.com> - 1.0.2-7
+- Rebuild for ocaml-uutf 1.0.3
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.2-6
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan  3 2022 Jerry James <loganjerry@gmail.com> - 1.0.2-4
+- Rebuild for changed ocaml-lwt hashes
+
+* Tue Oct 05 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.2-3
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul  5 2021 Jerry James <loganjerry@gmail.com> - 1.0.2-1
+- Version 1.0.2
+
+* Tue Jun 22 2021 Jerry James <loganjerry@gmail.com> - 1.0.1-1
+- Version 1.0.1
+
+* Thu Jun  3 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.0-6
+- Rebuild for new ocaml-lwt.
+
+* Mon Mar  1 21:30:59 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.0-5
+- OCaml 4.12.0 build
 
 * Mon Feb 22 2021 Jerry James <loganjerry@gmail.com> - 1.0.0-4
 - Rebuild for ocaml-lwt 5.4.0
