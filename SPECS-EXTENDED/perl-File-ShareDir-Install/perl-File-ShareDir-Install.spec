@@ -1,6 +1,6 @@
 Name:           perl-File-ShareDir-Install
-Version:        0.13
-Release:        9%{?dist}
+Version:        0.14
+Release:        1%{?dist}
 Summary:        Install shared files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -57,6 +57,10 @@ make test
 %{_mandir}/man3/File::ShareDir::Install.3*
 
 %changelog
+* Mon Dec 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.14-1
+- Updated to version 0.14
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
