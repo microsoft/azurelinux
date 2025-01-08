@@ -15074,7 +15074,7 @@
         "other": {
           "name": "opencl-headers",
           "version": "3.0",
-          "downloadUrl": "https://github.com/KhronosGroup/OpenCL-Headers/archive/8275634cf9ec31b6484c2e6be756237cb583999d/OpenCL-Headers-8275634.tar.gz"
+          "downloadUrl": "https://github.com/KhronosGroup/OpenCL-Headers/archive/4ea6df132107e3b4b9407f903204b5522fdffcd6/OpenCL-Headers-4ea6df132107e3b4b9407f903204b5522fdffcd6.tar.gz"
         }
       }
     },

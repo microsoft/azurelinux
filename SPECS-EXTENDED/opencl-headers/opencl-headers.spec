@@ -1,23 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global commit0 8275634cf9ec31b6484c2e6be756237cb583999d
-%global date 20240412
+%global commit0 4ea6df132107e3b4b9407f903204b5522fdffcd6
+%global date 20241023
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global cl_hpp_ver 2024.05.08
+%global cl_hpp_ver 2024.10.24
 
 Name:           opencl-headers
 Version:        3.0
-Release:        1%{?dist}
+Release:        32%{?dist}
 Summary:        OpenCL (Open Computing Language) header files
 
 License:        Apache-2.0
 URL:            https://www.khronos.org/registry/cl/
 
-Source0:        https://github.com/KhronosGroup/OpenCL-Headers/archive/%{commit0}/OpenCL-Headers-%{shortcommit0}.tar.gz#/OpenCL-Headers-%{shortcommit0}.tar.gz
+Source0:        https://github.com/KhronosGroup/OpenCL-Headers/archive/%{commit0}/OpenCL-Headers-%{shortcommit0}.tar.gz
 Source1:        https://github.com/KhronosGroup/OpenCL-CLHPP/archive/v%{cl_hpp_ver}/OpenCL-CLHPP-v%{cl_hpp_ver}.tar.gz
-#Source2:        https://github.com/KhronosGroup/OpenCL-Headers/archive/8275634cf9ec31b6484c2e6be756237cb583999d/OpenCL-Headers-8275634.tar.gz
-#Source3:        https://github.com/KhronosGroup/OpenCL-CLHPP/archive/refs/tags/v2024.05.08.tar.gz
 
 BuildArch:      noarch
 
@@ -65,13 +63,95 @@ sed -e 's|@CMAKE_INSTALL_PREFIX@|%{_prefix}|' -e 's|@OPENCLHPP_INCLUDEDIR_PC@|%{
 %{_datadir}/pkgconfig/OpenCL-CLHPP.pc
 
 %changelog
-* Thu Oct 24 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0-1
-- Update to 3.0
+* Tue Jan 07 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0-32
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Tue Dec 03 2024 František Zatloukal <fzatlouk@redhat.com> - 3.0-31.20241023git4ea6df1
+- Resync to 20241023
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-30.20240412git8275634
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 02 2024 František Zatloukal <fzatlouk@redhat.com> - 3.0-29.20240412git8275634
+- Fixup autorelease extra versioning
+
+* Tue Jul 02 2024 František Zatloukal <fzatlouk@redhat.com> - 3.0-28
+- Resync to 20240412
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-21.20231212git2368105
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-20.20231212git2368105
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 15 2024 Frantisek Zatloukal <fzatlouk@redhat.com> - 3.0-19.20231212git2368105
+- Resync to 20231212
+
+* Thu Oct 05 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 3.0-18.20231003git9ce9a72
+- Resync to 20231003
+
+* Fri Sep 15 2023 Dave Airlie <airlied@redhat.com> - 3.0-17.20230509gite049b16
+- SPDX license update
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-16.20230509gite049b16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 05 2023 Orion Poplawski <orion@nwra.com> - 3.0-15.20230509gite049b16
+- Resync to 20230509
+- Skip pkgconfig files (bz#2212323)
+
+* Sat Mar 18 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 3.0-14.20230201git4c82e9c
+- Resync to 20230201
+- Drop cl.hpp (CL 1.4 is provided by opencl.h according to upstream)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-13.20220510gitdef8be9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-12.20220510gitdef8be9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 01 2022 Frantisek Zatloukal <fzatlouk@redhat.com> - 3.0-11.20220510gitdef8be9
+- Resync to 20220510
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-10.20211007git1aa1139
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 13 2021 Dave Airlie <airlied@redhat.com> - 3.0-9.20211007git1aa1139
+- update for new extensions
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-8.20210216gitd1b936b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat May 01 2021 Nicolas Chauvet <kwizart@gmail.com> - 3.0-7.20210216gitd1b936b
+- Fix missing c++ header - should now use <CL/opencl.hpp>
+
+* Tue Apr 27 2021 Nicolas Chauvet <kwizart@gmail.com> - 3.0-6.20210216gitd1b936b
+- Resync to 20210216
+
+* Mon Apr 26 2021 Nicolas Chauvet <kwizart@gmail.com> - 3.0-5.20210426git1d3dc4e
+- Update latest headers
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Oct 07 2020 Dave Airlie <airlied@redhat.com> - 3.0-2git20201007gitd65bcc5
+- Update latest headers
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 24 2020 Karol Herbst <kherbst@redhat.com> - 3.0-1.20200512gitd082d42
+- Update to latest upstream, pick up new extensions for OpenCL-CTS build fix
+- Rework CLHPP handling as file is not downloadable anymore
+- Bump CLHPP version to 2.0.12
+
+* Wed May 20 2020 Karol Herbst <kherbst@redhat.com> - 3.0-0.20200512git5cc337c
+- Update to latest upstream, pick up new extensions for OpenCL-CTS build fix
+- Bump CLHPP version to 2.0.11
+
+* Fri Feb 28 2020 Karol Herbst <kherbst@redhat.com> - 2.2-7.20200218git96f5bde
+- Update to latest upstream, pick up new extensions for OpenCL-CTS build fix
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-6.20190205git49f07d3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -130,5 +210,3 @@ sed -e 's|@CMAKE_INSTALL_PREFIX@|%{_prefix}|' -e 's|@OPENCLHPP_INCLUDEDIR_PC@|%{
 
 * Wed Feb 27 2013 Dave Airlie <airlied@redhat.com> 1.2-1
 - OpenCL header files from Khronos for OpenCL 1.2
-
-## END: Generated by rpmautospec
