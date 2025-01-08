@@ -12,7 +12,7 @@ Release:	12%{?dist}
 Summary:	Test your SYNOPSIS code
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Synopsis
-Source0:	https://cpan.metacpan.org/authors/id/Z/ZO/ZOFFIX/Test-Synopsis-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/Z/ZO/ZOFFIX/Test-Synopsis-%{version}.tar.gz#/perl-Test-Synopsis-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
