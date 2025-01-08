@@ -399,20 +399,21 @@ fi
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/efadv*
+%{_mandir}/man3/hnsdv*
 %{_mandir}/man3/ibv_*
 %{_mandir}/man3/rdma*
 %{_mandir}/man3/umad*
 %{_mandir}/man3/*_to_ibv_rate.*
 %{_mandir}/man7/rdma_cm.*
+%{_mandir}/man3/manadv*
 %{_mandir}/man3/mlx5dv*
 %{_mandir}/man3/mlx4dv*
 %{_mandir}/man7/efadv*
+%{_mandir}/man7/hnsdv*
+%{_mandir}/man7/manadv*
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
 %{_mandir}/man3/ibnd_*
-# New in v49.0
-%{_mandir}/man3/manadv*
-%{_mandir}/man7/manadv*
 
 %files -n infiniband-diags-compat
 %{_sbindir}/ibcheckerrs
@@ -527,6 +528,7 @@ fi
 %dir %{_sysconfdir}/libibverbs.d
 %dir %{_libdir}/libibverbs
 %{_libdir}/libefa.so.*
+%{_libdir}/libhns.so.*
 %{_libdir}/libibverbs*.so.*
 %{_libdir}/libibverbs/*.so
 %{_libdir}/libmlx5.so.*
