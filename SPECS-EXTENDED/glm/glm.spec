@@ -3,7 +3,7 @@
 
 Name:           glm
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        C++ mathematics library for graphics programming
 
 License:        MIT
@@ -122,17 +122,60 @@ rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 %doc doc/api/
 
 %changelog
-* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-1
-- Update to 1.0.1
+* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
-- Re-enable `test-gtc_packing` for all archs
-- Skip broken tests based of arch
-- License verified
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.9.6-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Mar 02 2024 Joonas Sarajärvi <muep@iki.fi> - 1.0.1-1
+- Update to upstream GLM version 1.0.1
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Sep 30 2022 Orion Poplawski <orion@nwra.com> - 0.9.9.8-5
+- Use cmake_install/ctest macros
+- Cleanup library artifacts if they get installed (seen on EPEL8)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun Feb 07 2021 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.8-1
+- New upstream release (#1823615)
+- pkgconfig support is no longer supported in upstream and not shipped
+
+* Tue Feb 02 2021 Jeff Law <law@redhat.com> - 0.9.9.6-8
+- Disable strict aliasing due to bugs in testsuite (#1923456)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 26 2020 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.6-6
+- Fix #1863634 - FTBFS in Fedora rawhide/f33
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sat May 02 2020 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.6-3
 - Remove arch check from glmConfigVersion.cmake, fix #1758009
