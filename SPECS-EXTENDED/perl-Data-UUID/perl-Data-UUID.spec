@@ -41,9 +41,8 @@ BuildRequires:	perl(threads)
 BuildRequires:	perl(Test::Pod) >= 1.14
 BuildRequires:	perl(Test::Pod::Coverage) >= 1.06
 %endif
-# Dependencies
-# (none)
-
+# Runtime
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Avoid provides for private shared objects
 %{?perl_default_filter}
 
