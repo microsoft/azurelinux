@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,8 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
+# This script is to prevent an intermittent issue where ephemeral disk not being formatted by cloud-init on Azure
+Source2:        module-setup.sh
 Patch0:         overrideDatasourceDetection.patch
 Patch1:         exec_cmd_error_handling.patch
 Patch2:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
@@ -43,6 +45,7 @@ BuildRequires:  python3-xml
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       dhcp-client
+Requires:       dracut
 Requires:       e2fsprogs
 Requires:       iproute
 Requires:       net-tools
@@ -106,6 +109,9 @@ mkdir -p %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d
 
 install -m 644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg.d/
 
+mkdir -p %{buildroot}%{_prefix}/lib/dracut/modules.d/99azure-cloud/
+install -m 755 %{SOURCE2} %{buildroot}%{_prefix}/lib/dracut/modules.d/99azure-cloud/module-setup.sh
+
 %check
 touch vd ud
 
@@ -150,11 +156,16 @@ make check %{?_smp_mflags}
 %{_systemdgeneratordir}/cloud-init-generator
 /usr/lib/udev/rules.d/66-azure-ephemeral.rules
 %{_datadir}/bash-completion/completions/cloud-init
+%dir %attr(0700, root, root) %{_prefix}/lib/dracut/modules.d/99azure-cloud
+%{_prefix}/lib/dracut/modules.d/99azure-cloud/module-setup.sh
 
 %files azure-kvp
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Dec 10 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-6
+- Add module-setup.sh to prevent an intermittent issue where ephemeral disk not being formatted on Azure
+
 * Fri Sep 13 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-5
 - Add patche to have PPS support for azure-proxy-agent.
 
