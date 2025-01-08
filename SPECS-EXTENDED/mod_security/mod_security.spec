@@ -24,7 +24,8 @@ Patch1: modsecurity-2.9.3-apulibs.patch
 Patch2: mod_security-2.9.3-remote-rules-timeout.patch
 Patch3: mod_security-2.9.7-send_error_bucket.patch
 
-Requires: httpd httpd-mmn = %{_httpd_mmn}
+Requires: httpd 
+Provides: httpd-mmn = %{_httpd_mmn}
 Requires(pre): httpd-filesystem
 
 BuildRequires: gcc, make, autoconf, automake, libtool
