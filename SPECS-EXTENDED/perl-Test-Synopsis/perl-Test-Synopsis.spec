@@ -57,7 +57,8 @@ BuildRequires:	perl(Test::Portability::Files)
 BuildRequires:	perl(Test::Spelling) >= 0.12, hunspell-en
 BuildRequires:	perl(Test::Version)
 %endif
-# Dependencies
+# Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Test::Builder::Module)
 
 %description
