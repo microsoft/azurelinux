@@ -6,7 +6,7 @@ Version:        2.024
 Release:        5%{?dist}
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-Manifest
-Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-Manifest-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-Manifest-%{version}.tar.gz#/perl-Test-Manifest-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -34,6 +34,7 @@ BuildRequires:  perl(Test::More) >= 1
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
 # Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Spec)
 Requires:       perl(Test::Harness)
 
