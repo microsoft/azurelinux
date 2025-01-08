@@ -45,7 +45,6 @@ Requires:       cpp-hocon >= 0.2.1
 Requires:       facter >= 3.9.6
 Requires:       hiera >= 3.3.1
 Requires:       libselinux-utils
-Requires:       ruby
 Requires:       ruby-augeas >= 0.5.0
 Requires:       rubygem(concurrent-ruby) >= 1.0.5
 Requires:       rubygem(deep_merge) >= 1.0
