@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,7 @@ Patch3:         CVE-2024-6104.patch
 Patch4:         CVE-2022-32149.patch
 Patch5:         CVE-2023-4782.patch
 Patch6:         CVE-2024-24786.patch
+Patch7:         CVE-2024-45338.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -67,6 +68,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Mon Jan 06 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-21
+- Add patch for CVE-2024-45338
+
 * Wed Dec 04 2024 bhapathak <bhapathak@microsoft.com> - 1.3.2-20
 - Patch CVE-2024-24786
 
