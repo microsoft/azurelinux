@@ -26,8 +26,9 @@ Requires:       git
 GitHub official command line tool.
 
 %prep
-# Don't patch during setup to apply vendor package 'go-gh' patch CVE-2024-53859.patch
+# Don't patch during setup as we might need to apply patch to vendor package.
 %autosetup -N -n cli-%{version}
+# Untar vendor packages so that patches on the vendor packages can be applied during autopatch.
 tar --no-same-owner -xf %{SOURCE1}
 %autopatch -p1
 
