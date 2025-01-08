@@ -1,18 +1,16 @@
-# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%global pkgname zarith
 
-ExcludeArch: %{ix86}
 
-Name:           ocaml-zarith
+Name:           ocaml-%{pkgname}
 Version:        1.14
 Release:        3%{?dist}
 Summary:        OCaml interface to GMP
 
 License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/ocaml/Zarith
-VCS:            git:%{url}.git
-Source:         %{url}/archive/release-%{version}.tar.gz
+Source:         https://github.com/ocaml/Zarith/archive/release-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gmp-devel
