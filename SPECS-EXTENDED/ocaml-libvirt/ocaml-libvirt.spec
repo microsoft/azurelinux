@@ -84,6 +84,9 @@ make install
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
 * Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-11
 - OCaml 5.2.0 ppc64le fix
 
