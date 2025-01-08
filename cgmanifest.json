@@ -14942,8 +14942,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-zarith",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/ocaml/Zarith/archive/release-1.9.1.tar.gz"
+          "version": "1.14",
+          "downloadUrl": "https://github.com/ocaml/Zarith/archive/release-1.14.tar.gz"
         }
       }
     },
