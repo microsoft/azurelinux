@@ -104,7 +104,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Wed Jan 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
 - Patch CVE-2024-45337
 
 * Mon Sep 16 2024 Jiri Appl <jiria@microsoft.com> - 1.12.13-1
