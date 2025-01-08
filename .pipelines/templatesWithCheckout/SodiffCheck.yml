@@ -6,8 +6,9 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
-  - name: inputArtifactName
+  - name: inputArtifactsFolder
     type: string
+    default: "$(Agent.TempDirectory)"
 
   - name: inputRPMsTarballName
     type: string
@@ -26,19 +27,11 @@ parameters:
     default: "$(Agent.TempDirectory)/SourcesWorkspace"
 
 steps:
-  - task: DownloadPipelineArtifact@2
-    displayName: "Download sources for signing"
-    inputs:
-      artifact: ${{ parameters.inputArtifactName }}
-      patterns: |
-        **/${{ parameters.inputRPMsTarballName }}
-      targetPath: "$(Agent.TempDirectory)"
-
   - script: |
       set -e
 
       mkdir -p "${{ parameters.sourcesWorkspace }}"
-      find "$(Agent.TempDirectory)" -name "${{ parameters.inputRPMsTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
+      find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.inputRPMsTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
     displayName: "Extract sources tarball"
 
   - script: |

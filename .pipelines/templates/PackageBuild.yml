@@ -14,13 +14,9 @@ parameters:
     type: number
     default: 12
 
-  - name: customToolchainArtifactName
-    type: string
-    default: ""
-
   - name: customToolchainTarballName
     type: string
-    default: "toolchain_built_rpms_all.tar.gz"
+    default: ""
 
   - name: extraPackageRepos
     type: string
@@ -30,12 +26,16 @@ parameters:
     type: boolean
     default: true
 
-  - name: inputCacheArtifacts
+  - name: inputArtifactsFolder
+    type: string
+    default: "$(Agent.TempDirectory)"
+
+  - name: inputCacheRPMsTarballs
     type: object
     default: []
     # Sample:
-    # - name: build-artifacts
-    #   rpmsTarball: cache.tar.gz
+    #   - cache.tar.gz
+    #   - cache2.tar.gz
 
   - name: isAllowToolchainRebuilds
     type: string
@@ -160,15 +160,9 @@ steps:
           artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
         displayName: "Authenticate to custom pip artifact feeds"
 
-  - ${{ if parameters.customToolchainArtifactName }}:
-      - task: DownloadPipelineArtifact@2
-        displayName: "Download toolchain"
-        inputs:
-          artifact: "${{ parameters.customToolchainArtifactName }}"
-          patterns: "**/${{ parameters.customToolchainTarballName }}"
-
+  - ${{ if parameters.customToolchainTarballName }}:
       - script: |
-          toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
+          toolchain_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
             echo "ERROR: toolchain archive not found!" >&2
             exit 1
@@ -178,17 +172,11 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
-  - ${{ each inputCacheArtifact in parameters.inputCacheArtifacts }}:
-      - task: DownloadPipelineArtifact@2
-        displayName: "Download input cache RPM from ${{ inputCacheArtifact.name }}"
-        inputs:
-          artifact: "${{ inputCacheArtifact.name }}"
-          patterns: "**/${{ inputCacheArtifact.rpmsTarball }}"
-
+  - ${{ each inputCacheRPMsTarball in parameters.inputCacheRPMsTarballs }}:
       - script: |
-          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ inputCacheArtifact.rpmsTarball }}" -print -quit)"
+          rpms_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ inputCacheRPMsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: cache RPMs archive '${{ inputCacheArtifact.rpmsTarball }}' not found!" >&2
+            echo "ERROR: cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
             exit 1
           fi
 
@@ -200,7 +188,7 @@ steps:
         check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+      if [[ -n "${{ parameters.customToolchainTarballName }}" ]]; then
         toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
       fi
 
