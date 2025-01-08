@@ -11,9 +11,16 @@ License:        Apache-2.0
 URL:            https://icing.github.io/mod_md/
 Source0:        https://github.com/icing/mod_md/releases/download/v%{version}/mod_md-%{version}.tar.gz
 
-BuildRequires:  make, gcc
-BuildRequires:  pkgconfig, httpd-devel >= 2.4.41, openssl-devel >= 1.1.0, jansson-devel, libcurl-devel, xmlto
-Requires:       httpd-mmn = %{_httpd_mmn}, mod_ssl >= 1:2.4.41
+BuildRequires:  make
+BuildRequires:  gcc
+BuildRequires:  pkgconfig
+BuildRequires:  httpd-devel >= 2.4.41
+BuildRequires:  openssl-devel >= 1.1.0
+BuildRequires:  jansson-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  xmlto
+Requires:       mod_ssl >= 1:2.4.41
+Provides:       httpd-mmn = %{_httpd_mmn}
 Conflicts:      httpd < 2.4.39-7
 
 %description
