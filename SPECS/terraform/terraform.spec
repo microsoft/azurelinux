@@ -34,6 +34,7 @@ Patch3:         CVE-2024-6104.patch
 Patch4:         CVE-2022-32149.patch
 Patch5:         CVE-2023-4782.patch
 Patch6:         CVE-2024-24786.patch
+Patch7:         CVE-2023-0475.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
