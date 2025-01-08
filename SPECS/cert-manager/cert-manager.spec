@@ -58,8 +58,7 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-%setup -q -a 1
-%autopatch -p1
+%autosetup -p1 -q -a 1
 
 %build
 
