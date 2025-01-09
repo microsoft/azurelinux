@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.7.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2022-21698.patch
 Patch1:         CVE-2022-41273.patch
+Patch2:         CVE-2024-45338.patch
 
 BuildRequires:  golang >= 1.13
 
@@ -39,6 +40,7 @@ rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
 %patch 1 -p1 -d vendor/golang.org/x/net
+%patch 2 -p1
 
 %build
 export VERSION=%{version}
@@ -57,6 +59,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.7.2-3
+- Add patch for CVE-2024-45338
+
 * Thu Jul 11 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.7.2-2
 - Add patch for CVE-2022-21698, CVE-2022-41273
 - Move vendored tarball extraction into %prep and %changed from %autosetup to %setup
