@@ -1,7 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
-ExcludeArch: %{ix86}
 
 Name:           ocaml-curses
 Version:        1.0.11
