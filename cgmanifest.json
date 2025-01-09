@@ -19343,8 +19343,8 @@
         "type": "other",
         "other": {
           "name": "perl-Regexp-Pattern-Perl",
-          "version": "0.006",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-0.006.tar.gz"
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-0.007.tar.gz"
         }
       }
     },
