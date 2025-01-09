@@ -94,8 +94,10 @@ clean-toolchain-rpms:
 # We leave the directory structure in place since docker based builds using re-usable chroots will have mounted the
 # toolchain subdirectories into the chroots. Removing the directories would break the mounts.
 $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag $(depend_VALIDATE_TOOLCHAIN_GPG)
+ifeq ($(SKIP_TOOLCHAIN_AUTO_CLEANUP),n)
 	@echo "Daily build ID or validation mode changed, sanitizing toolchain"
 	find $(TOOLCHAIN_RPMS_DIR) -type f -name '*.rpm' -exec rm -f {} +
+endif
 	touch $@
 
 copy-toolchain-rpms:
