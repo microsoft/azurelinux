@@ -19383,8 +19383,8 @@
         "type": "other",
         "other": {
           "name": "perl-Scope-Upper",
-          "version": "0.32",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-0.32.tar.gz"
+          "version": "0.34",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-0.34.tar.gz"
         }
       }
     },
