@@ -6,7 +6,7 @@ Release:        4%{?dist}
 Summary:        Manipulate 64 bits integers in Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Math-Int64
-Source0:        https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Math/Math-Int64-%{version}.tar.gz#/perl-Math-Int64-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
@@ -37,6 +37,7 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(warnings::register)
 BuildRequires:  perl(XSLoader)
 Requires:       perl(XSLoader)
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
 This module adds support for 64 bit integers, signed and unsigned, to Perl.
