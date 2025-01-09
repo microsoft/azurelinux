@@ -71,55 +71,7 @@ tar -xvf %{SOURCE1} -C /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external
 
 #remove go_sdk and its marker file
 
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__click
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__colorama
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__importlib_metadata
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__installer
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__more_itertools
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__packaging
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__pep517
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__pip
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__pip_tools
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__pyproject_hooks
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__tomli
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi__zipp
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_absl_py
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_astunparse
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_certifi
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_charset_normalizer
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_dill
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_dm_tree
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_gast
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_grpcio
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_h5py
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_idna
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_keras
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_markdown
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_markdown_it_py
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_markupsafe
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_mdurl
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_namex
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_numpy
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_opt_einsum
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_packaging
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_portpicker
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_protobuf
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_psutil
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_pygments
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_requests
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_rich
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_setuptools
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_six
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_tblib
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_tensorboard
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_tensorboard_data_server
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_termcolor
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_tf_keras
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_typing_extensions
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_urllib3
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_werkzeug
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_wheel
-rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/pypi_wrapt
+rm -rf /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/curl
 
 
 # Need to patch CVE-2024-7592 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
