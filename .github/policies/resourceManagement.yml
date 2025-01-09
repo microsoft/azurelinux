@@ -13,34 +13,37 @@ configuration:
           - payloadType: Pull_Request
         then:
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - SPECS/
-                    - SPECS-EXTENDED/
-                    - SPECS-SIGNED/
+              - filesMatchPattern:
+                  pattern: "^(SPECS|SPECS-EXTENDED|SPECS-SIGNED)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Packaging
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/docs/
+              - filesMatchPattern:
+                  pattern: "^SPECS-EXTENDED/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: specs-extended
+          - if:
+              - filesMatchPattern:
+                  pattern: "^toolkit/docs/"
+                  matchAny: true
             then:
               - addLabel:
                   label: documentation
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/tools/
-                    - toolkit/scripts/
+              - filesMatchPattern:
+                  pattern: "^toolkit/(tools|scripts)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Tools
           - if:
-              - includesModifiedFiles:
-                  files:
-                    - toolkit/imageconfigs/
-                    - toolkit/tools/imagegen/configuration
+              - filesMatchPattern:
+                  pattern: "^toolkit/(imageconfigs|tools/imagegen/configuration)/"
+                  matchAny: true
             then:
               - addLabel:
                   label: Schema
@@ -69,16 +72,40 @@ configuration:
         then:
           - if:
               - targetsBranch:
-                  branch: 1.0-dev
-            then:
-              - addLabel:
-                  label: 1.0-dev
-          - if:
-              - targetsBranch:
                   branch: main
             then:
               - addLabel:
                   label: main
+          - if:
+              - targetsBranch:
+                  branch: 2.0
+            then:
+              - addLabel:
+                  label: 2.0
+          - if:
+              - targetsBranch:
+                  branch: 3.0-dev
+            then:
+              - addLabel:
+                  label: 3.0-dev
+          - if:
+              - targetsBranch:
+                  branch: 3.0
+            then:
+              - addLabel:
+                  label: 3.0
+          - if:
+              - targetsBranch:
+                  branch: fasttrack/2.0
+            then:
+              - addLabel:
+                  label: fasttrack/2.0
+          - if:
+              - targetsBranch:
+                  branch: fasttrack/3.0
+            then:
+              - addLabel:
+                  label: fasttrack/3.0
         description:
 onFailure:
 onSuccess:

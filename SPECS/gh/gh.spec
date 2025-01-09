@@ -15,7 +15,6 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
 Patch1:         CVE-2024-54132.patch
-
 BuildRequires:  golang < 1.23
 BuildRequires:  git
 Requires:       git
