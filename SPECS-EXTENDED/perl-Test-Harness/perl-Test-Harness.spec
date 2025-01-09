@@ -14,7 +14,7 @@ Release:        2%{?dist}
 Summary:        Run Perl standard test scripts with statistics
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Harness
-Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/perl-Test-Harness-%{version}.tar.gz
 # Remove hard-coded shell bangs
 Patch0:         Test-Harness-3.38-Remove-shell-bangs.patch
 BuildArch:      noarch
@@ -43,6 +43,7 @@ BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Text::ParseWords)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Optional run-time:
 BuildRequires:  perl(Encode)
 # Keep Pod::Usage 1.12 really optional
