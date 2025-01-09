@@ -1,4 +1,4 @@
-%global         extended_release 0.65.g9093bae.2410068
+%global         extended_release 0.65.g9093bae
 %global         MLNX_OFED_VERSION 24.10-0.7.0.0
 Summary:        IB Performance tests
 Name:           perftest
