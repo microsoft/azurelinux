@@ -1,7 +1,3 @@
-# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
-
-ExcludeArch: %{ix86}
-
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
