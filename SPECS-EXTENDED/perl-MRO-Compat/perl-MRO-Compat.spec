@@ -6,7 +6,7 @@ Release:	11%{?dist}
 Summary:	Mro::* interface compatibility for Perls < 5.9.5
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MRO-Compat
-Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz#/perl-MRO-Compat-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
@@ -21,6 +21,7 @@ BuildRequires:	perl(warnings)
 # Test
 BuildRequires:	perl(Test::More) >= 0.47
 # Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 The "mro" namespace provides several utilities for dealing with method
