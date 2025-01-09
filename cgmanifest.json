@@ -28046,8 +28046,8 @@
         "type": "other",
         "other": {
           "name": "soundtouch",
-          "version": "2.1.1",
-          "downloadUrl": "https://gitlab.com/soundtouch/soundtouch/-/archive/2.1.1/soundtouch-2.1.1.tar.gz"
+          "version": "2.3.3",
+          "downloadUrl": "https://codeberg.org/soundtouch/soundtouch/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz"
         }
       }
     },
