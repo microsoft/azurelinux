@@ -29,8 +29,6 @@ types of the OpenGL shading language.
 Summary:        C++ mathematics library for graphics programming
 BuildArch:      noarch
 
-# As required in
-# https://fedoraproject.org/wiki/Packaging:Guidelines#Packaging_Static_Libraries_2
 Provides:       %{name}-static = %{version}-%{release}
 
 %description    devel
@@ -109,9 +107,6 @@ find $RPM_BUILD_ROOT -name CMakeLists.txt -exec rm -f {} ';'
 # The library can get installed into the include directory - seen on EPEL8
 rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 
-# Here it seems to be acceptable to own the cmake and pkgconfig directories
-# as an alternative to having glm-devel depending on cmake and pkg-config
-# https://fedoraproject.org/wiki/Packaging:Guidelines#The_directory_is_owned_by_a_package_which_is_not_required_for_your_package_to_function
 %files devel
 %doc readme.md
 %{_includedir}/%{name}
