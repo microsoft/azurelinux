@@ -163,9 +163,27 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 
-* Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.1.0-9
-- Initial CBL-Mariner import from Fedora 37 (license: MIT).
-- License verified
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Feb 01 2024 Dan Horák <dan[at]danny.cz> - 4.1.1-1
+- Update to 4.1.1 (fixes rhbz#2261412)
+- Remove odbc subpackage
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Feb 05 2023 Florian Weimer <fweimer@redhat.com> - 4.1.0-10
+- Fix C99 compatibility issue
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
