@@ -2,16 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %bcond_without tests
-%if 0%{?fedora}
-%bcond_without pkcs11
-%else
+
 %bcond_with pkcs11
-%endif
-%if 0%{?fedora}
-%bcond_without libproxy
-%else
+
 %bcond_with libproxy
-%endif
 
 # Disable automatic .la file removal
 %global __brp_remove_la_files %nil
@@ -112,7 +106,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
