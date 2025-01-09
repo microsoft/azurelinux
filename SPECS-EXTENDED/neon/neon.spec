@@ -105,8 +105,8 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-2
-- Initial Azure Linux import from Fedora 41 (license: MIT)
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-1
+- Update to 0.33.0
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
