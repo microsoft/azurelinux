@@ -6,7 +6,7 @@ Version: 3.05
 Release: 12%{?dist}
 License: GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: https://metacpan.org/release/Net-Telnet
-Source0: https://cpan.metacpan.org/authors/id/J/JR/JROGERS/Net-Telnet-%{version}.tar.gz
+Source0: https://cpan.metacpan.org/authors/id/J/JR/JROGERS/Net-Telnet-%{version}.tar.gz#/perl-Net-Telnet-%{version}.tar.gz
 
 # runtime depends
 Requires: perl(IO::Socket::INET)
@@ -26,6 +26,8 @@ BuildRequires: perl(Socket)
 BuildRequires: perl(strict)
 BuildRequires: perl(Symbol)
 BuildRequires: perl(vars)
+# Runtime
+Requires:      perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
 Net::Telnet allows you to make client connections to a TCP port and do
