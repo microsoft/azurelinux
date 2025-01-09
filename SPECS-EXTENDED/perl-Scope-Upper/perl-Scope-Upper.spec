@@ -5,7 +5,7 @@ Summary:        Act on upper scopes
 Version:        0.34
 Release:        8%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
-Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-%{version}.tar.gz 
+Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-%{version}.tar.gz#/perl-Scope-Upper-%{version}.tar.gz
 URL:            https://metacpan.org/release/Scope-Upper
 # Build
 BuildRequires:  coreutils
@@ -35,6 +35,7 @@ BuildRequires:  perl(threads)
 BuildRequires:  perl(threads::shared)
 # Optional tests only
 BuildRequires:  perl(Time::HiRes)
+Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(XSLoader)
 
 %{?perl_default_filter}
