@@ -6,7 +6,7 @@ Release:        7%{?dist}
 Summary:        Simple parallel execution
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Parallel-Iterator
-Source0:        https://cpan.metacpan.org/authors/id/A/AR/ARISTOTLE/Parallel-Iterator-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AR/ARISTOTLE/Parallel-Iterator-%{version}.tar.gz#/perl-Parallel-Iterator-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -28,6 +28,7 @@ BuildRequires:  perl(Storable)
 # Tests:
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More)
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %{?perl_default_filter}
 
