@@ -7,7 +7,7 @@ Summary:        Perl extension for portable daemons
 
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Net-Daemon
-Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/Net-Daemon-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/Net-Daemon-%{version}.tar.gz#/perl-Net-Daemon-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  coreutils
@@ -20,6 +20,7 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl-Pod-Perldoc
 BuildRequires:  sed
 # Run-time:
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 BuildRequires:  perl(Config)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(Getopt::Long)
