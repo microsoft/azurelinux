@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-    "config_aarch64": "61616c62eab3efeddb1d104e6a7fc1ae5c869a8791d44c4d2ebdd935c7aae057",
+    "config_aarch64": "6f1c7d15f41c38d45b131e3fd33fa4161f732e4afa1c47fbb2aaea078fbb3183",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
