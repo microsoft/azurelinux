@@ -14693,7 +14693,7 @@
         "other": {
           "name": "ocaml-csv",
           "version": "2.4",
-          "downloadUrl": "https://github.com/Chris00/ocaml-csv/archive/2.4/ocaml-csv-2.4.tar.g"
+          "downloadUrl": "https://github.com/Chris00/ocaml-csv/archive/2.4/ocaml-csv-2.4.tar.gz"
         }
       }
     },
