@@ -18763,8 +18763,8 @@
         "type": "other",
         "other": {
           "name": "perl-Net-Telnet",
-          "version": "3.04",
-          "downloadUrl": "ftp://ftp.cpan.org/pub/CPAN/authors/id/J/JR/JROGERS/Net-Telnet-3.04.tar.gz"
+          "version": "3.05",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JR/JROGERS/Net-Telnet-3.05.tar.gz"
         }
       }
     },
