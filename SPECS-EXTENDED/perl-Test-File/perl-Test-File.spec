@@ -10,7 +10,7 @@ Version:	%{rpm_version}
 Release:	8%{?dist}
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Test-File
-Source0:	https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpan_version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpan_version}.tar.gz#/perl-Test-File-%{cpan_version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -40,6 +40,7 @@ BuildRequires:	perl(utf8)
 BuildRequires:	perl(Test::Pod) >= 1.00
 BuildRequires:	perl(Test::Pod::Coverage) >= 1.00
 # Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This module provides a collection of test utilities for file attributes.
