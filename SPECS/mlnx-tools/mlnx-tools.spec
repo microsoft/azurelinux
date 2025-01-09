@@ -31,7 +31,7 @@
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
 Version:        24.10
-Release:        1%{?_dist}
+Release:        1%{?dist}
 License:        GPLv2 or BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

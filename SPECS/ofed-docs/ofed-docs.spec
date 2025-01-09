@@ -62,6 +62,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPL).
+- License verified.
 
 * Sun Mar 25 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Changed prefix

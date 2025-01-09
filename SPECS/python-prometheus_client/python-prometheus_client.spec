@@ -74,6 +74,7 @@ sed -i -e '1{/^#!/d}' prometheus_client/__init__.py
 %changelog
 * Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 0.20.0-4
 - Initial Azure Linux import from Fedora 41 (license: Apache2)
+- License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
