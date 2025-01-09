@@ -18,7 +18,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        Apache-2.0
 URL:            https://github.com/prometheus/client_python
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0001:      0001-Remove-the-bundled-decorator-package.patch
 
 BuildArch:      noarch
