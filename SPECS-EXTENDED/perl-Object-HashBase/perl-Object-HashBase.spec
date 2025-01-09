@@ -6,7 +6,7 @@ Release:        3%{?dist}
 Summary:        Build hash-based classes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Object-HashBase
-Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Object-HashBase-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Object-HashBase-%{version}.tar.gz#/perl-Object-HashBase-%{version}.tar.gz
 # Correct shebangs
 Patch0:         Object-HashBase-0.008-Normalize-shebang.patch
 BuildArch:      noarch
@@ -43,6 +43,7 @@ also supported.
 %package tests
 Summary:        Tests for %{name}
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl-Test-Harness
 
 %description tests
