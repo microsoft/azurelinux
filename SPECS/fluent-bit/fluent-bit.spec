@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
 Version:        2.2.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,7 +64,6 @@ Development files for %{name}
     -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
     -DFLB_JEMALLOC=On \
-    -DFLB_LUAJIT=Off \
 
 %cmake_build
 
@@ -72,7 +71,7 @@ Development files for %{name}
 %cmake_install
 
 %check
-%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
+%ctest --exclude-regex "flb-rt-in_podman_metrics|.*\\.sh"
 
 %files
 %license LICENSE
@@ -81,12 +80,19 @@ Development files for %{name}
 %{_unitdir}/fluent-bit.service
 %{_bindir}/*
 %{_prefix}%{_sysconfdir}/fluent-bit/*
+%exclude %{_bindir}/luajit
+%exclude %{_libdir}/libluajit.a
 
 %files devel
 %{_includedir}/*
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Fri Jan 10 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.2.3-7
+- Enable luajit support
+- Exclude luajit binary from final package to remove conflict with luajit package
+- Exclude luajit static library from package as not needed
+
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.2.3-6
 - Backport fix for CVE-2024-27532
 
@@ -132,7 +138,7 @@ Development files for %{name}
 - Upgrade version to 1.9.6
 - Add build time dependency libyaml-devel
 
-* Thu Feb 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.8.12-2
+* Sat Feb 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.8.12-2
 - Compile with -DFLB_JEMALLOC=on.
 
 * Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8.12-1
