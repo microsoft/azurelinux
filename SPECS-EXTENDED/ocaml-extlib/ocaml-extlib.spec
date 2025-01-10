@@ -10,7 +10,7 @@ License:        LGPL-2.1-or-later with OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ygrek/ocaml-extlib
-Source0:        https://github.com/ygrek/ocaml-extlib/releases/download/%{version}/extlib-%{version}.tar.gz
+Source0:        https://github.com/ygrek/ocaml-extlib/releases/download/%{version}/extlib-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  ocaml >= 4.02
