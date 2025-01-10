@@ -221,6 +221,7 @@ mkdir -p /opt/cni/bin
 * Mon Sep 16 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-9
 - Moved autopatching step to occur after vendor tarball extraction to ensure that all CVE patches are applied
 - Update CVE-2022-1708.patch - Removed adding k8s.io/kubernetes/pkg/kubelet/util/ioutils in vendor/modules.txt since the vendor tarball already has this module added to modules list
+- Remove patches CVE-2024-21626 and CVE-2023-44487 to fix build issues
 
 * Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-8
 - Patch CVE-2022-32149
