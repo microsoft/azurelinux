@@ -8,7 +8,7 @@ License: Apache-2.0
 URL: https://coreruleset.org/
 Source: https://github.com/coreruleset/coreruleset/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
-Requires: mod_security >= 2.9.6
+Provides: mod_security >= 2.9.6
 Obsoletes: mod_security_crs-extras < 3.0.0
 
 %description
