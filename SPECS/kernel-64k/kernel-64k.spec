@@ -25,7 +25,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.57.1
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -370,6 +370,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
+- Bump release to match kernel
+
+* Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
+- Enable kexec signature verification
+
 * Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-5
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Starting with release 5 to align with kernel release.

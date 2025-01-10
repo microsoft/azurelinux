@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        7%{?dist}
+Release:        8%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -30,6 +30,7 @@ Source11:       50-noxattr.conf
 # code reviews given that they are new to Dracut.
 Source12:       90livenet/azl-liveos-artifacts-download.service
 Source13:       90livenet/azl-liveos-artifacts-download.sh
+Source14:       90overlayfs/azl-configure-selinux.sh
 
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Azure Linux team to allow skipping the user confirmation prompt during
@@ -53,6 +54,7 @@ Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
 Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
 Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
+Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -205,6 +207,8 @@ install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-noxattr.
 install -m 0644 %{SOURCE12} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.service
 install -m 0755 %{SOURCE13} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.sh
 
+install -m 0755 %{SOURCE14} %{buildroot}%{dracutlibdir}/modules.d/90overlayfs/azl-configure-selinux.sh
+
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
@@ -310,6 +314,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Mon Dec 09 2024 George Mileka <gmileka@microsoft.com> - 102-8
+- Augment overlayfs with selinux handling.
+
 * Thu Oct 31 2024 George Mileka <gmileka@microsoft.com> - 102-7
 - Augment livenet module with a download daemon.
 
