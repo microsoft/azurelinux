@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,14 +60,12 @@ Patch4:         CVE-2023-42821.patch
 Patch5:         CVE-2022-29526.patch
 Patch6:         CVE-2021-44716.patch
 Patch7:         CVE-2022-21698.patch
-Patch8:         CVE-2023-44487.patch
-Patch9:         CVE-2024-28180.patch
-Patch10:        CVE-2024-21626.patch
-Patch11:        CVE-2024-3154.patch
-Patch12:        CVE-2024-3727.patch
-Patch13:        CVE-2021-43565.patch
-Patch14:        CVE-2024-6104.patch
-Patch15:        CVE-2022-32149.patch
+Patch8:         CVE-2024-28180.patch
+Patch9:         CVE-2024-3154.patch
+Patch10:        CVE-2024-3727.patch
+Patch11:        CVE-2021-43565.patch
+Patch12:        CVE-2024-6104.patch
+Patch13:        CVE-2022-32149.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -115,8 +113,8 @@ This package provides the CRI-O container runtime configuration for kubeadm
 
 %prep
 %setup -q
-%autopatch -p1
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 
@@ -220,6 +218,11 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon Sep 16 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-9
+- Moved autopatching step to occur after vendor tarball extraction to ensure that all CVE patches are applied
+- Update CVE-2022-1708.patch - Removed adding k8s.io/kubernetes/pkg/kubelet/util/ioutils in vendor/modules.txt since the vendor tarball already has this module added to modules list
+- Remove patches CVE-2024-21626 and CVE-2023-44487 to fix build issues
+
 * Thu Sep 12 2024 Sindhu Karri <lakarri@microsoft.com> - 1.22.3-8
 - Patch CVE-2022-32149
 
