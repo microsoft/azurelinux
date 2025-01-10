@@ -106,11 +106,11 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-3
-- Patch CVE-2024-45337
-
-* Mon Jan 06 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.12.13-2
+* Fri Jan 10 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.12.13-3
 - Add patch for CVE-2024-12401
+
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
+- Patch CVE-2024-45337
 
 * Mon Sep 16 2024 Jiri Appl <jiria@microsoft.com> - 1.12.13-1
 - Upgrade to 1.12.13 which carries helm 3.14.2 to fix CVE-2024-26147 and CVE-2024-25620
