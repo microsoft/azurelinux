@@ -2480,6 +2480,7 @@
                 "ofed-scripts",
                 "perftest",
                 "rshim",
+                "srp",
                 "xpmem",
                 "xpmem-lib",
                 "xpmem-modules-signed"
