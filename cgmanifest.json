@@ -28106,8 +28106,8 @@
         "type": "other",
         "other": {
           "name": "speexdsp",
-          "version": "1.2.0",
-          "downloadUrl": "http://downloads.xiph.org/releases/speex/speexdsp-1.2.0.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://downloads.xiph.org/releases/speex/speexdsp-1.2.1.tar.gz"
         }
       }
     },
