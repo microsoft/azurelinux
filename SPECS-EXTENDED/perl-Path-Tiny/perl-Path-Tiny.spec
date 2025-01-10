@@ -1,3 +1,5 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 # Run optional test
 %if ! (0%{?rhel})
 %bcond_without perl_Path_Tiny_enables_optional_test
@@ -6,14 +8,12 @@
 %endif
 
 Name:		perl-Path-Tiny
-Version:	0.112
-Release:	2%{?dist}
+Version:	0.146
+Release:	1%{?dist}
 Summary:	File path utility
-License:	ASL 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	Apache-2.0
 URL:		https://metacpan.org/release/Path-Tiny
-Source0:	https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-%{version}.tar.gz#/perl-Path-Tiny-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -28,11 +28,11 @@ BuildRequires:	perl(Config)
 BuildRequires:	perl(constant)
 BuildRequires:	perl(Cwd)
 BuildRequires:	perl(Digest) >= 1.03
-BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(Digest::SHA) >= 5.45
 BuildRequires:	perl(Encode)
 BuildRequires:	perl(Exporter) >= 5.57
 BuildRequires:	perl(Fcntl)
+BuildRequires:	perl(File::Compare)
 BuildRequires:	perl(File::Copy)
 BuildRequires:	perl(File::Glob)
 BuildRequires:	perl(File::Path) >= 2.07
@@ -46,6 +46,7 @@ BuildRequires:	perl(warnings)
 BuildRequires:	perl(warnings::register)
 # Test Suite
 BuildRequires:	perl(blib)
+BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(File::Basename)
 BuildRequires:	perl(File::Spec::Functions)
 BuildRequires:	perl(File::Spec::Unix)
@@ -58,16 +59,15 @@ BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 BuildRequires:	perl(Test::FailWarnings)
-BuildRequires:	perl(Test::MockRandom)
+#BuildRequires:	perl(Test::MockRandom)
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
 Requires:	perl(Cwd)
 Requires:	perl(Digest) >= 1.03
-Requires:	perl(Digest::MD5)
 Requires:	perl(Digest::SHA) >= 5.45
 Requires:	perl(Encode)
 Requires:	perl(Fcntl)
+Requires:	perl(File::Compare)
 Requires:	perl(File::Copy)
 Requires:	perl(File::Glob)
 Requires:	perl(File::Path) >= 2.07
@@ -124,6 +124,10 @@ make test
 %{_mandir}/man3/Path::Tiny.3*
 
 %changelog
+* Fri Dec 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.146-1
+- Update Azure-Linux import from Fedora 41 (license: Apache-2.0).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.112-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
