@@ -7441,8 +7441,8 @@
         "type": "other",
         "other": {
           "name": "iptraf-ng",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.1.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.2.tar.gz"
         }
       }
     },
