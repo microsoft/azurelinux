@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        19%{?dist}
+Release:        20%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -1217,9 +1217,12 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Wed Dec 04 2024 Aditya Dubey <adityadubey@microsoft.com> - 255-19
+* Fri Jan 10 2025 Aditya Dubey <adityadubey@microsoft.com> - 255-20
 - adding patch for enhancing DNSSEC signature validation integrity
 - addresses CVE-2023-7008
+
+* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
+- Version bump to force signing with new Azure Linux secure boot key
 
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Install systemd-boot binary to ESP
