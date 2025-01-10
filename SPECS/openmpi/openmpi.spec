@@ -4,79 +4,155 @@
 #global _cc_name_suffix -gcc
 
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-# We set this to for convenience, since this is the unique dir we use for this
-# particular package, version, compiler
-%global namearch openmpi-%{_arch}%{?_cc_name_suffix}
+
+%if 0%{?fedora} >= 32 || 0%{?rhel} >= 8
+%bcond_with python2
+%else
+%bcond_without python2
+%endif
 
 %ifarch aarch64 ppc64le x86_64
 %bcond_without ucx
 %else
 %bcond_with ucx
 %endif
+
 # ARM 32-bit is not supported by rdma
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
-
-# enable rdma as we will only build for ARM64 and AMD64
+%ifarch %{arm}
+%bcond_with rdma
+%else
 %bcond_without rdma
+%endif
 
-# enable java openmpi subpackage by default
+# No more Java on i686
+%ifarch %{java_arches}
 %bcond_without java
+%else
+%bcond_with java
+%endif
 
-# Private openmpi libraries
-%global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
-%global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
-Summary:        Open Message Passing Interface
+%if %{defined rhel}
+%bcond_with orangefs
+%bcond_with sphinx
+%else
+%bcond_without orangefs
+%bcond_without sphinx
+%endif
+
+%ifarch x86_64
+%if 0%{?rhel} >= 10
+%bcond_with psm2
+%else
+%bcond_without psm2
+%endif
+%else
+%bcond_with psm2
+%endif
+
+# Some RCs require unreleased pmix version - at least let us test builds
+%bcond_without pmix
+
+# Run autogen - needed for some patches
+%bcond_with autogen
+
 Name:           openmpi%{?_cc_name_suffix}
-Version:        4.1.5
-Release:        1%{?dist}
-License:        BSD AND MIT
+Version:        5.0.2
+Release:        3%{?dist}
+Summary:        Open Message Passing Interface
+License:        BSD and MIT and Romio
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.open-mpi.org/
+URL:            http://www.open-mpi.org/
+ExcludeArch:    %{ix86}
+
 # We can't use %%{name} here because of _cc_name_suffix
-Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{version}.tar.bz2
+Source0:        https://www.open-mpi.org/software/ompi/v5.0/downloads/openmpi-%{version}.tar.bz2
 Source1:        openmpi.module.in
+Source2:        openmpi.pth.py2
 Source3:        openmpi.pth.py3
 Source4:        macros.openmpi
+
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
-BuildRequires:  hwloc-devel
-BuildRequires:  libevent-devel
-BuildRequires:  libfabric-devel
 BuildRequires:  make
-BuildRequires:  orangefs-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  pmix-devel
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  valgrind-devel
-BuildRequires:  zlib-devel
-BuildRequires:  perl(Getopt::Long)
-Requires:       environment(modules)
-# openmpi currently requires ssh to run
-# https://svn.open-mpi.org/trac/ompi/ticket/4228
-Requires:       openssh-clients
-Provides:       mpi
+%if %{with autogen}
 BuildRequires:  libtool
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(File::Find)
+%endif
+%ifarch %{valgrind_arches}
+BuildRequires:  valgrind-devel
+%endif
 %if %{with rdma}
-BuildRequires:  opensm-devel
+BuildRequires:  opensm-devel > 3.3.0
 BuildRequires:  rdma-core-devel
 %endif
+# Doesn't compile:
+# vt_dyn.cc:958:28: error: 'class BPatch_basicBlockLoop' has no member named 'getLoopHead'
+#                      loop->getLoopHead()->getStartAddress(), loop_stmts );
+#BuildRequires:  dyninst-devel
+BuildRequires:  hwloc-devel
+# So configure can find lstopo
+BuildRequires:  hwloc-gui
 %if %{with java}
 BuildRequires:  java-devel
 %else
 Obsoletes:      %{name}-java < %{version}-%{release}
 Obsoletes:      %{name}-java-devel < %{version}-%{release}
 %endif
-%ifarch x86_64
-BuildRequires:  infinipath-psm-devel
+# Old libevent causes issues
+%if !0%{?el7}
+BuildRequires:  libevent-devel
+%endif
+BuildRequires:  libfabric-devel
+%ifnarch s390x
+BuildRequires:  papi-devel
+%endif
+%if %{with orangefs}
+BuildRequires:  orangefs-devel
+%endif
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Getopt::Long)
+%if %{with pmix}
+BuildRequires:  pmix-devel >= 4.2.7
+%endif
+# For configure to find /usr/bin/prte
+BuildRequires:  prrte
+BuildRequires:  prrte-devel
+BuildRequires:  python%{python3_pkgversion}-devel
+%if %{with psm2}
 BuildRequires:  libpsm2-devel
 %endif
 %if %{with ucx}
 BuildRequires:  ucx-devel
 %endif
+BuildRequires:  zlib-devel
+%if !0%{?el7}
+BuildRequires:  rpm-mpi-hooks
+%endif
+%if %{with sphinx}
+# For docs
+BuildRequires:  /usr/bin/sphinx-build
+BuildRequires:  python3-recommonmark
+BuildRequires:  python3-sphinx_rtd_theme
+%endif
+
+Provides:       mpi
+%if 0%{?rhel} == 7
+# Need this for /etc/profile.d/modules.sh
+Requires:       environment-modules
+%endif
+Requires:       environment(modules)
+Requires:       prrte
+# openmpi currently requires ssh to run
+# https://svn.open-mpi.org/trac/ompi/ticket/4228
+Requires:       openssh-clients
+
+# Private openmpi libraries
+%global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
+%global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 
 %description
 Open MPI is an open source, freely available implementation of both the
@@ -88,24 +164,32 @@ software vendors, application developers, and computer science
 researchers. For more information, see http://www.open-mpi.org/ .
 
 %package devel
-Summary:        Development files for openmpi
-Requires:       %{name} = %{version}-%{release}
-Requires:       gcc-gfortran
+Summary:	Development files for openmpi
+Requires:	%{name} = %{version}-%{release}, gcc-gfortran
+Provides:	mpi-devel
+%if !0%{?el7}
+Requires:	rpm-mpi-hooks
 # Make sure this package is rebuilt with correct Python version when updating
 # Otherwise mpi.req from rpm-mpi-hooks doesn't work
 # https://bugzilla.redhat.com/show_bug.cgi?id=1705296
-Requires:       python(abi)
-Requires:       rpm-mpi-hooks
-Provides:       mpi-devel
+Requires:	(python(abi) = %{python3_version} if python3)
+%endif
 
 %description devel
 Contains development headers and libraries for openmpi.
+
+%package doc
+Summary:        HTML documentation for openmpi
+BuildArch:      noarch
+
+%description doc
+HTML documentation for openmpi.
 
 %if %{with java}
 %package java
 Summary:        Java library
 Requires:       %{name} = %{version}-%{release}
-Requires:       java
+Requires:       java-headless
 
 %description java
 Java library.
@@ -119,51 +203,73 @@ Requires:       java-devel
 Contains development wrapper for compiling Java with openmpi.
 %endif
 
+# We set this to for convenience, since this is the unique dir we use for this
+# particular package, version, compiler
+%global namearch openmpi-%{_arch}%{?_cc_name_suffix}
+
+%if %{with python2}
+%package -n python2-openmpi
+Summary:        OpenMPI support for Python 2
+BuildRequires:  python2-devel
+Requires:       %{name} = %{version}-%{release}
+Requires:       python(abi) = %{python2_version}
+
+%description -n python2-openmpi
+OpenMPI support for Python 2.
+%endif
 
 %package -n python%{python3_pkgversion}-openmpi
 Summary:        OpenMPI support for Python 3
 Requires:       %{name} = %{version}-%{release}
-Requires:       python(abi)
+Requires:       python(abi) = %{python3_version}
 
 %description -n python%{python3_pkgversion}-openmpi
 OpenMPI support for Python 3.
 
+
 %prep
-%autosetup -p1 -n openmpi-%{version}
+%autosetup -p1 -n %{name}-%{version}
+%if %{with autogen}
+./autogen.pl --force
+%endif
+
 
 %build
-%{set_build_flags}
+%set_build_flags
 ./configure --prefix=%{_libdir}/%{name} \
 	--mandir=%{_mandir}/%{namearch} \
 	--includedir=%{_includedir}/%{namearch} \
 	--sysconfdir=%{_sysconfdir}/%{namearch} \
 	--disable-silent-rules \
 	--enable-builtin-atomics \
-	--enable-mpi-cxx \
 	--enable-ipv6 \
 %if %{with java}
 	--enable-mpi-java \
-	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-17/bin \
-	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-17/include \
 %endif
 	--enable-mpi1-compatibility \
+%if %{with sphinx}
+	--enable-sphinx \
+%endif
+	--with-prrte=external \
 	--with-sge \
+%ifarch %{valgrind_arches}
 	--with-valgrind \
 	--enable-memchecker \
-	--with-hwloc=%{_prefix} \
+%endif
+	--with-hwloc=/usr \
+%if !0%{?el7}
 	--with-libevent=external \
+%if %{with pmix}
 	--with-pmix=external \
+%endif
+%endif
 
 %make_build V=1
 
 %install
 %make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot}%{_libdir}/%{name}/lib -name \*.la | xargs rm
 find %{buildroot}%{_mandir}/%{namearch} -type f | xargs gzip -9
-ln -s mpicc.1.gz %{buildroot}%{_mandir}/%{namearch}/man1/mpiCC.1.gz
-# Remove dangling symlink
-rm %{buildroot}%{_mandir}/%{namearch}/man1/mpiCC.1
-mkdir %{buildroot}%{_mandir}/%{namearch}/man{2,4,5,6,8,9,n}
 
 # Make the environment-modules file
 mkdir -p %{buildroot}%{_datadir}/modulefiles/mpi
@@ -173,7 +279,11 @@ sed 's#@LIBDIR@#%{_libdir}/%{name}#;
      s#@FMODDIR@#%{_fmoddir}/%{name}#;
      s#@INCDIR@#%{_includedir}/%{namearch}#;
      s#@MANDIR@#%{_mandir}/%{namearch}#;
+%if %{with python2}
+     s#@PY2SITEARCH@#%{python2_sitearch}/%{name}#;
+%else
      /@PY2SITEARCH@/d;
+%endif
      s#@PY3SITEARCH@#%{python3_sitearch}/%{name}#;
      s#@COMPILER@#openmpi-%{_arch}%{?_cc_name_suffix}#;
      s#@SUFFIX@#%{?_cc_name_suffix}_openmpi#' \
@@ -200,16 +310,29 @@ cd -
 # Create cmake dir
 mkdir -p %{buildroot}%{_libdir}/%{name}/lib/cmake/
 
+# Create directories for OpenMPI packages with development files
+mkdir -p %{buildroot}%{_libdir}/%{name}/lib/openmpi/cmake
+mkdir -p %{buildroot}%{_libdir}/%{name}/include
+
 # Remove extraneous wrapper link libraries (bug 814798)
 sed -i -e s/-ldl// -e s/-lhwloc// \
   %{buildroot}%{_libdir}/%{name}/share/openmpi/*-wrapper-data.txt
 
 # install .pth files
+%if %{with python2}
+mkdir -p %{buildroot}/%{python2_sitearch}/%{name}
+install -pDm0644 %{SOURCE2} %{buildroot}/%{python2_sitearch}/openmpi.pth
+%endif
 mkdir -p %{buildroot}/%{python3_sitearch}/%{name}
 install -pDm0644 %{SOURCE3} %{buildroot}/%{python3_sitearch}/openmpi.pth
 
 %check
-make check
+fail=1
+# Failing on s390x - https://github.com/open-mpi/ompi/issues/10988
+%ifarch s390x
+fail=0
+%endif
+make check || ( cat test/*/test-suite.log && exit $fail )
 
 %files
 %license LICENSE
@@ -218,53 +341,61 @@ make check
 %dir %{_libdir}/%{name}/bin
 %dir %{_libdir}/%{name}/lib
 %dir %{_libdir}/%{name}/lib/openmpi
+%dir %{_libdir}/%{name}/lib/openmpi/cmake
+%dir %{_libdir}/%{name}/include
 %dir %{_mandir}/%{namearch}
 %dir %{_mandir}/%{namearch}/man*
 %config(noreplace) %{_sysconfdir}/%{namearch}/*
 %{_libdir}/%{name}/bin/mpi[er]*
 %{_libdir}/%{name}/bin/ompi*
-%{_libdir}/%{name}/bin/orte[-dr_]*
 %if %{with ucx}
 %{_libdir}/%{name}/bin/oshmem_info
-%{_libdir}/%{name}/bin/oshrun
-%{_libdir}/%{name}/bin/shmemrun
 %endif
+%{_libdir}/%{name}/bin/oshrun
+%if %{without pmix}
+%{_libdir}/%{name}/bin/pattrs
+%{_libdir}/%{name}/bin/pctrl
+%{_libdir}/%{name}/bin/pevent
+%{_libdir}/%{name}/bin/plookup
+%{_libdir}/%{name}/bin/pmix_info
+%{_libdir}/%{name}/bin/pmixcc
+%{_libdir}/%{name}/bin/pps
+%{_libdir}/%{name}/bin/pquery
+%{_libdir}/%{name}/lib/libpmix.so.2*
+%{_libdir}/%{name}/lib/pmix/
+%{_libdir}/%{name}/share/pmix/
+%{_mandir}/%{namearch}/man1/pmix_info.1*
+%{_mandir}/%{namearch}/man5/openpmix.5*
+%endif
+%{_mandir}/%{namearch}/man7/Open-MPI.7*
 %{_libdir}/%{name}/lib/*.so.40*
-%{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
-%{_libdir}/%{name}/lib/libmca*.so.41*
-%{_libdir}/%{name}/lib/libmca*.so.50*
-%{_mandir}/%{namearch}/man1/mpi[er]*
+%{_libdir}/%{name}/lib/*.so.80*
+%if 0%{?el7}
+%{_libdir}/%{name}/lib/pmix/
+%endif
+%{_mandir}/%{namearch}/man1/mpirun.1*
+%{_mandir}/%{namearch}/man1/mpisync.1*
 %{_mandir}/%{namearch}/man1/ompi*
-%{_mandir}/%{namearch}/man1/orte[-dr_]*
 %if %{with ucx}
 %{_mandir}/%{namearch}/man1/oshmem_info*
-%{_mandir}/%{namearch}/man1/oshrun*
-%{_mandir}/%{namearch}/man1/shmemrun*
 %endif
-%{_mandir}/%{namearch}/man7/ompi_*
-%{_mandir}/%{namearch}/man7/opal_*
-%{_mandir}/%{namearch}/man7/orte*
 %{_libdir}/%{name}/lib/openmpi/*
 %{_datadir}/modulefiles/mpi/
 %dir %{_libdir}/%{name}/share
 %dir %{_libdir}/%{name}/share/openmpi
 %{_libdir}/%{name}/share/openmpi/amca-param-sets
 %{_libdir}/%{name}/share/openmpi/help*.txt
-%if %{with rdma}
-%{_libdir}/%{name}/share/openmpi/mca-btl-openib-device-params.ini
+%if 0%{?el7}
+%{_libdir}/%{name}/share/pmix/
 %endif
-
 
 %files devel
 %dir %{_includedir}/%{namearch}
-%{_libdir}/%{name}/bin/aggregate_profile.pl
 %{_libdir}/%{name}/bin/mpi[cCf]*
 %{_libdir}/%{name}/bin/opal_*
-%{_libdir}/%{name}/bin/orte[cCf]*
 %if %{with ucx}
 %{_libdir}/%{name}/bin/osh[cCf]*
 %endif
-%{_libdir}/%{name}/bin/profile2mat.pl
 %if %{with ucx}
 %{_libdir}/%{name}/bin/shmem[cCf]*
 %endif
@@ -278,6 +409,7 @@ make check
 %{_mandir}/%{namearch}/man1/mpi[cCf]*
 %if %{with ucx}
 %{_mandir}/%{namearch}/man1/osh[cCf]*
+%{_mandir}/%{namearch}/man1/oshmem-wrapper-compiler.1*
 %{_mandir}/%{namearch}/man1/shmem[cCf]*
 %endif
 %{_mandir}/%{namearch}/man1/opal_*
@@ -286,6 +418,11 @@ make check
 %{_libdir}/%{name}/share/openmpi/*-wrapper-data.txt
 %{macrosdir}/macros.%{namearch}
 
+%files doc
+%license LICENSE
+%doc %{_libdir}/%{name}/share/doc/
+%exclude %{_libdir}/%{name}/share/doc/openmpi/javadoc-openmpi
+
 %if %{with java}
 %files java
 %{_libdir}/%{name}/lib/mpi.jar
@@ -293,16 +430,73 @@ make check
 %files java-devel
 %{_libdir}/%{name}/bin/mpijavac
 %{_libdir}/%{name}/bin/mpijavac.pl
-# Currently this only contaings openmpi/javadoc
-%{_libdir}/%{name}/share/doc/
+%doc %{_libdir}/%{name}/share/doc/openmpi/javadoc-openmpi
 %{_mandir}/%{namearch}/man1/mpijavac.1.gz
+%endif
+
+%if %{with python2}
+%files -n python2-openmpi
+%dir %{python2_sitearch}/%{name}
+%{python2_sitearch}/openmpi.pth
 %endif
 
 %files -n python%{python3_pkgversion}-openmpi
 %dir %{python3_sitearch}/%{name}
 %{python3_sitearch}/openmpi.pth
 
+
 %changelog
+* Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com>
+- Upgrade package to version 5.0.2 for HPC image
+
+* Mon Mar 04 2024 David Abdurachmanov <davidlt@rivosinc.com> - 5.0.2-2
+- Add support for riscv64
+
+* Wed Feb 07 2024 Orion Poplawski <orion@nwra.com> - 5.0.2-1
+- Update to 5.0.2
+
+* Wed Jan 24 2024 Orion Poplawski <orion@nwra.com> - 5.0.1-3
+- Drop unused BR on infinipath-psm
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 21 2023 Orion Poplawski <orion@nwra.com> - 5.0.1-1
+- Update to 5.0.1
+
+* Tue Oct 31 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 5.0.0-2
+- Disable building docs in RHEL builds
+
+* Fri Oct 27 2023 Orion Poplawski <orion@nwra.com> - 5.0.0-1
+- Update to 5.0.0
+- Drops 32-bit i686 support
+- Drops C++ bindings
+- Add doc sub-package
+
+* Thu Oct 12 2023 Cristian Le <fedora@lecris.me> - 4.1.5-8
+- Added CMAKE_PREFIX_PATH to module file
+
+* Sat Sep 30 2023 Benson Muite <benson_muite@emailplus.org> - 4.1.5-7
+- Add include and cmake directories for development files for OpenMPI packages
+
+* Fri Sep 22 2023 Orion Poplawski <orion@nwra.com> - 4.1.5-6
+- Rebuild for pmix 4.1.3 (bz#2240042)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 10 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 4.1.5-4
+- Disable PSM2 in RHEL 10 builds
+
+* Thu Jun 22 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 4.1.5-3
+- Disable PSM, OrangeFS in RHEL builds
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.1.5-2
+- Rebuilt for Python 3.12
+
+* Sun Feb 26 2023 Orion Poplawski <orion@nwra.com> - 4.1.5-1
+- Update to 4.1.5
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
 - Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
 
@@ -315,6 +509,7 @@ make check
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.4-9
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
+
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.4-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
@@ -538,7 +733,7 @@ make check
 - Rebuild with new flags from redhat-rpm-config
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.1.1-9
-- Escape macros in changelog
+- Escape macros in %%changelog
 
 * Mon Feb 05 2018 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-8
 - Rebuild for rdma-core 16.2
@@ -1122,3 +1317,4 @@ make check
 
 * Fri Nov 18 2005 Ed Hill <ed@eh3.com> - 1.0-1
 - initial specfile created
+
