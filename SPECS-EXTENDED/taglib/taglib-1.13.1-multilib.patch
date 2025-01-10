@@ -1,6 +1,19 @@
---- taglib-1.13.1/taglib-config.cmake.multilib	2023-07-01 05:43:27.000000000 +0000
-+++ taglib-1.13.1/taglib-config.cmake	2023-09-19 14:08:59.831290760 +0000
-@@ -39,7 +39,7 @@ while test $# -gt 0
+diff -up taglib-1.13.1/taglib-config.cmake.multilib taglib-1.13.1/taglib-config.cmake
+--- taglib-1.13.1/taglib-config.cmake.multilib	2025-01-04 15:22:01.000000000 +0100
++++ taglib-1.13.1/taglib-config.cmake	2023-07-01 07:43:27.000000000 +0200
+@@ -23,11 +23,6 @@ if test -z "$prefix"; then
+ else
+   includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+ fi
+-if test -z "$exec_prefix"; then
+-  libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+-else
+-  libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+-fi
+
+ flags=""
+
+@@ -39,7 +34,7 @@ while test $# -gt 0
  do
    case $1 in
      --libs)
@@ -9,8 +22,10 @@
  	  ;;
      --cflags)
  	  flags="$flags -I$includedir -I$includedir/taglib"
---- taglib-1.13.1/taglib.pc.cmake..multilib	2023-07-01 05:43:27.000000000 +0000
-+++ taglib-1.13.1/taglib.pc.cmake	2023-09-19 14:08:59.835290775 +0000
+
+diff -up taglib-1.13.1/taglib.pc.cmake.multilib taglib-1.13.1/taglib.pc.cmake
+--- taglib-1.13.1/taglib.pc.cmake.multilib	2025-01-04 15:23:10.000000000 +0100
++++ taglib-1.13.1/taglib.pc.cmake	2023-07-01 07:43:27.000000000 +0200
 @@ -7,5 +7,6 @@ Name: TagLib
  Description: Audio meta-data library
  Requires:
