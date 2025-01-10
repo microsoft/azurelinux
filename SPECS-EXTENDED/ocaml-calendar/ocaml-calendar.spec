@@ -1,30 +1,23 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
-ExcludeArch: %{ix86}
-
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
 # ocaml-alcotest requires ocaml-astring, ocaml-cmdliner, ocaml-fmt, and ocaml-uutf,
 # none of which are otherwise needed for building the OCaml-dependent packages
-# found in RHEL and ELN.  We want to avoid the extra dependencies there.
 
 %global giturl  https://github.com/ocaml-community/calendar
 
-
 Name:           ocaml-calendar
-Epoch:          1
 Version:        3.0.0
 Release:        14%{?dist}
 Summary:        Objective Caml library for managing dates and times
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
 URL:            https://ocaml-community.github.io/calendar/
-VCS:            git:%{giturl}.git
-Source0:        %{giturl}/archive/v%{version}/calendar-%{version}.tar.gz
+Source0:        https://github.com/ocaml-community/calendar/archive/refs/tags/v3.0.0.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-dune >= 1.0
@@ -41,7 +34,7 @@ Objective Caml library for managing dates and times.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 
 %description    devel
