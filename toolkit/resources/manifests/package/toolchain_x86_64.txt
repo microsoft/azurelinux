@@ -19,11 +19,11 @@ bzip2-1.0.8-1.cm2.x86_64.rpm
 bzip2-debuginfo-1.0.8-1.cm2.x86_64.rpm
 bzip2-devel-1.0.8-1.cm2.x86_64.rpm
 bzip2-libs-1.0.8-1.cm2.x86_64.rpm
-ca-certificates-2.0.0-18.cm2.noarch.rpm
-ca-certificates-base-2.0.0-18.cm2.noarch.rpm
-ca-certificates-legacy-2.0.0-18.cm2.noarch.rpm
-ca-certificates-shared-2.0.0-18.cm2.noarch.rpm
-ca-certificates-tools-2.0.0-18.cm2.noarch.rpm
+ca-certificates-2.0.0-19.cm2.noarch.rpm
+ca-certificates-base-2.0.0-19.cm2.noarch.rpm
+ca-certificates-legacy-2.0.0-19.cm2.noarch.rpm
+ca-certificates-shared-2.0.0-19.cm2.noarch.rpm
+ca-certificates-tools-2.0.0-19.cm2.noarch.rpm
 ccache-4.8-1.cm2.x86_64.rpm
 ccache-debuginfo-4.8-1.cm2.x86_64.rpm
 check-0.15.2-1.cm2.x86_64.rpm
@@ -524,7 +524,7 @@ python3-Cython-0.29.33-2.cm2.x86_64.rpm
 python3-debuginfo-3.9.19-8.cm2.x86_64.rpm
 python3-devel-3.9.19-8.cm2.x86_64.rpm
 python3-gpg-1.16.0-2.cm2.x86_64.rpm
-python3-jinja2-3.0.3-4.cm2.noarch.rpm
+python3-jinja2-3.0.3-5.cm2.noarch.rpm
 python3-libcap-ng-0.8.2-2.cm2.x86_64.rpm
 python3-libs-3.9.19-8.cm2.x86_64.rpm
 python3-libxml2-2.10.4-4.cm2.x86_64.rpm
