@@ -112,7 +112,7 @@ rm -rf %{buildroot}
 /lib/udev/mlnx_bf_udev
 
 %changelog
-* Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com>
+* Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Upgrade package to version 24.10 for HPC image
 
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> 5.2.0-2
