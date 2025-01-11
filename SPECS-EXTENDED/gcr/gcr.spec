@@ -1,3 +1,5 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %ifarch %{valgrind_arches}
@@ -5,13 +7,13 @@ Distribution:   Azure Linux
 %endif
 
 Name:           gcr
-Version:        3.36.0
-Release:        3%{?dist}
+Version:        3.38.1
+Release:        1%{?dist}
 Summary:        A library for bits of crypto UI and parsing
 
 License:        GPLv2
 URL:            https://wiki.gnome.org/Projects/CryptoGlue
-Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gettext
 BuildRequires:  gtk-doc
@@ -113,6 +115,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/gcr-viewer.desktop
 %{_libdir}/libgcr-base-3.so.*
 
 %changelog
+* Mon Dec 30 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.38.1-1
+- Bump to 3.38.1 to fix missing OID header bug (GCR issue #48).
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
 - Adding BR on "python3-pygments".
 - License verified.

@@ -22,7 +22,9 @@ jobs:
     # This PR runner uses an older Ubuntu with rpm version 4.17, which doesn't understand some newer macros like %bcond
     - name: Define missing rpm macros
       run: |
-        [[ -n $(rpm --eval '%bcond test 1') ]] && echo '%bcond() %[ (%{2}) ? "%{expand:%%bcond_without %{1}}" : "%{expand:%%bcond_with %{1}}" ]' > ~/.rpmmacros
+        if [[ -n $(rpm --eval '%bcond test 1') ]]; then
+          echo '%bcond() %[ (%{2}) ? "%{expand:%%bcond_without %{1}}" : "%{expand:%%bcond_with %{1}}" ]' > ~/.rpmmacros
+        fi
 
     - name: Get base commit for PRs
       if: ${{ github.event_name == 'pull_request' }}
