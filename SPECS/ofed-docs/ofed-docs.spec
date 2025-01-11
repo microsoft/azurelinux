@@ -33,7 +33,7 @@ Summary:        OFED docs
 Name:           ofed-docs
 Version:        24.10
 Release:        1%{?dist}
-License:        GPL/BSD
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.openfabrics.org
@@ -56,12 +56,13 @@ cp -a * $RPM_BUILD_ROOT%{_defaultdocdir}/%{name}-%{version}
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%license LICENSE
 %defattr(-,root,root)
 %{_defaultdocdir}/%{name}-%{version}
 
 %changelog
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
-- Initial Azure Linux import from NVIDIA (license: GPL).
+- Initial Azure Linux import from NVIDIA (license: GPLv2).
 - License verified.
 
 * Sun Mar 25 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>

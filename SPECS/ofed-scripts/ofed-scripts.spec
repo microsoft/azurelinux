@@ -34,7 +34,7 @@ Summary:        OFED scripts
 Name:           ofed-scripts
 Version:        24.10
 Release:        1%{?dist}
-License:        GPL/BSD
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
