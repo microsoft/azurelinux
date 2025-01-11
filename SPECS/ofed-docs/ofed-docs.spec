@@ -70,5 +70,5 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Jul 27 2006 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Changed version to 1.1
 
-* Tue Jun  6 2006 Vladimir Sokolovsky <vlad@mellanox.co.il>
+* Tue Jun 06 2006 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Initial packaging
