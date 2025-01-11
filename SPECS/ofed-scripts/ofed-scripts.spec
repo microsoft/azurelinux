@@ -147,7 +147,7 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 
 %changelog
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com>
-- Upgrade version to 24.10.0 for HPC image
+- Upgrade version to 24.10.0
 
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2)
