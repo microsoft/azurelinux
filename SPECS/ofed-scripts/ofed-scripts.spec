@@ -142,6 +142,7 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 %files
 %endif
 %defattr(-,root,root)
+%license debian/copyright
 %{_prefix}/bin/*
 %{_prefix}/sbin/*
 
