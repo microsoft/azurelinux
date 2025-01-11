@@ -147,7 +147,7 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 %{_prefix}/sbin/*
 
 %changelog
-* Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com>
+* Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Upgrade version to 24.10.0
 
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
