@@ -39,7 +39,7 @@ chmod -x runme
 
 %changelog
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10.0-1
-- Upgrade version to 24.10.0 for HPC image
+- Upgrade version to 24.10.0
 
 * Wed Apr 03 2024 Juan Camposeco <juanarturoc@microsoft.com> - 24.01.0-1
 - Upgrade version to 24.01.0
