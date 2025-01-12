@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:             python-%{pypi_name}
 Version:          2.4.2
-Release:          1%{?dist}
+Release:          9%{?dist}
 Summary:          Extra features for standard library's cmd module
 
 License:          MIT
