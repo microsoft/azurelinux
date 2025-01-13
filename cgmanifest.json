@@ -29076,8 +29076,8 @@
         "type": "other",
         "other": {
           "name": "uchardet",
-          "version": "0.0.6",
-          "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.6.tar.xz"
+          "version": "0.0.8",
+          "downloadUrl": "https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.8.tar.xz"
         }
       }
     },
