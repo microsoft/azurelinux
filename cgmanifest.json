@@ -28706,8 +28706,8 @@
         "type": "other",
         "other": {
           "name": "teckit",
-          "version": "2.5.9",
-          "downloadUrl": "https://github.com/silnrsi/teckit/releases/download/v2.5.9/teckit-2.5.9.tar.gz"
+          "version": "2.5.12",
+          "downloadUrl": "https://github.com/silnrsi/teckit/releases/download/v2.5.12/teckit-2.5.12.tar.gz"
         }
       }
     },
