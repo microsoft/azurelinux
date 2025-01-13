@@ -24,6 +24,8 @@ DAILY_BUILD_ID ?=
 DAILY_BUILD_ID_UPDATE_MANIFESTS ?= y
 ##help:var:DAILY_BUILD_REPO={path to daily.repo}=Path to the daily build repo file to use.
 DAILY_BUILD_REPO ?=
+##help:var:DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP={y,n}=Skip Deleting all downloaded toolchain RPMs when using a daily build.
+DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP ?= n
 
 daily_lkg_workdir = $(BUILD_DIR)/daily_build_id
 
