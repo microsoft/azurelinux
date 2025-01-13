@@ -45,11 +45,8 @@ GitHub official command line tool.
 
 %prep
 %setup -q -n cli-%{version}
-%patch0 -p1
 tar --no-same-owner -xf %{SOURCE1}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
