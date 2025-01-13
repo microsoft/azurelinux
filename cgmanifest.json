@@ -29056,8 +29056,8 @@
         "type": "other",
         "other": {
           "name": "twolame",
-          "version": "0.3.13",
-          "downloadUrl": "http://downloads.sourceforge.net/twolame/twolame-0.3.13.tar.gz"
+          "version": "0.4.0",
+          "downloadUrl": "http://downloads.sourceforge.net/twolame/twolame-0.4.0.tar.gz"
         }
       }
     },
