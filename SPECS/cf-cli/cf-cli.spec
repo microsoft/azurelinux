@@ -1,7 +1,7 @@
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 Version:        8.4.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-24
+- Bump release to rebuild with go 1.23.4
+
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 8.4.0-23
 - Add patch for CVE-2024-45338
 
