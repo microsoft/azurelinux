@@ -6,7 +6,7 @@
 
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.45.2
+Version:        2.45.3
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -172,6 +172,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.3-1
+- Auto-upgrade to 2.45.3 - CVE-2024-50349 and CVE-2024-52006
+
 * Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.2-1
 - Auto-upgrade to 2.45.2 - none
 
