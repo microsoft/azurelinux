@@ -226,7 +226,7 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" precache -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
@@ -244,7 +244,9 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg || true
+
+      sudo ${{ parameters.buildRepoRoot }}/testcurl.sh ${{ parameters.buildRepoRoot }}/build/logs/precache/precache.log
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
