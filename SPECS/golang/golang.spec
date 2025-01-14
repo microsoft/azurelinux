@@ -156,7 +156,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Tue Jan 14 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.4-1
+* Tue Jan 14 2025 Muhammad Falak <mwani@microsoft.com> - 1.23.4-1
 - Bump version to 1.23.4
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.7-1
