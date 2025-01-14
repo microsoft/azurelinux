@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
-Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
