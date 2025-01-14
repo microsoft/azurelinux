@@ -17,6 +17,7 @@ Patch2:         CVE-2024-52338.patch
 Patch3:         CVE-2014-5461.patch
 Patch4:         CVE-2020-22217.patch
 Patch5:         CVE-2015-9251.patch
+Patch6:         CVE-2012-6708.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2011,6 +2012,7 @@ exit 0
 - Fix for CVE-2014-5461
 - Fix for CVE-2020-22217
 - Fix for CVE-2015-9251
+- Fix for CVE-2012-6708
 
 * Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
 - Based on the package build logs, opentelemetry-cpp submodule is not being built
