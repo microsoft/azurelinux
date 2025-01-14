@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -14,6 +14,7 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 Patch0:         0034-src-pybind-rbd-rbd.pyx.patch
 Patch1:         0032-cmake-modules-BuildBoost.cmake.patch
 Patch2:         CVE-2024-52338.patch
+Patch3:         CVE-2012-6708.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2000,6 +2001,9 @@ exit 0
 
 
 %changelog
+* Mon Jan 13 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-3
+- Fix for CVE-2012-6708
+
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 18.2.2-2
 - Fix for CVE-2024-52338
 
