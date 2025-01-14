@@ -44,6 +44,7 @@ BuildRequires:  perl(Test::More) >= 0.90
 # Optional tests:
 BuildRequires:  perl(Data::Dumper)
 %endif
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Suggests:       perl(bytes)
 Requires:       perl(Carp)
 Requires:       perl(Encode)
@@ -59,7 +60,6 @@ Convert::ASN1 encodes and decodes ASN.1 data structures using BER/DER rules.
 
 %package tests
 Summary:        Tests for %{name}
-Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Math::BigInt) >= 1.997
 %if %{with perl_Convert_ASN1_enables_optional_test}
