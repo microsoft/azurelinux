@@ -13,6 +13,7 @@ Patch0:         CVE-2024-7592.patch
 Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
+Patch4:         Remove-Unnecessary-Deps.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -89,6 +90,8 @@ pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-l
 patch -p1 < %{PATCH3}
 popd
 
+patch -p1 %{PATCH4}
+
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 
@@ -118,6 +121,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Mon Jan 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.16.1-8
+- Remove dependencies loading for Unnecessary Deps using patch Remove_Unnecessary_Deps.patch.
+
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
 - Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
 
