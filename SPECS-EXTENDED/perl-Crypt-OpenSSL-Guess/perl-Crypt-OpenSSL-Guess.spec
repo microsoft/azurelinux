@@ -28,6 +28,7 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(Test::More) >= 0.98
 Requires:       perl(Exporter) >= 5.57
 Recommends:     openssl
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
 
