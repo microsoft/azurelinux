@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.57.1
-Release:        6%{?dist}
+Version:        6.6.64.2
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -359,6 +359,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
+%exclude /lib/modules/%{uname_r}/kernel/drivers/accel
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
 %files docs
@@ -377,6 +378,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files drivers-gpu
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/gpu
+%ifarch x86_64
+/lib/modules/%{uname_r}/kernel/drivers/accel
+%endif
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
 
 %files drivers-intree-amdgpu
@@ -424,8 +428,20 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Nov 25 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-6
+* Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
+- Enable Intel VPU
+
+* Thu Jan 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.2-1
+- Auto-upgrade to 6.6.64.2
+
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+- Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
+
+* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
 - Enable CONFIG_INTEL_TDX_GUEST and CONFIG_TDX_GUEST_DRIVER
+
+* Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
+- Bump release to match kernel-64k
 
 * Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
 - Enable ICE ethernet driver
