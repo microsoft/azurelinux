@@ -28,7 +28,7 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" pre-cache || true
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" pre-cache REBUILD_TOOLS=y || true
       sudo ${{ parameters.buildRepoRoot }}/testcurl.sh ${{ parameters.buildRepoRoot }}/build/logs/precache/precache.log
     displayName: "Build toolchain"
 
