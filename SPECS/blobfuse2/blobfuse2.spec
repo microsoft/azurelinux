@@ -7,7 +7,7 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.2-8
+- Bump release to rebuild with go 1.23.4
+
 * Wed Dec 04 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.1.2-7
 - Patch CVE-2024-24786
 

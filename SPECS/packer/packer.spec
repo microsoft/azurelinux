@@ -5,7 +5,7 @@ Summary:        Tool for creating identical machine images for multiple platform
 Name:           packer
 Epoch:          1
 Version:        1.9.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.5-7
+- Bump release to rebuild with go 1.23.4
+
 * Thu Jan 02 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.9.5-6
 - Add patch for CVE-2024-45338.
 

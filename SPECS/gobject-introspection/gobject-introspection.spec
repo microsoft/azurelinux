@@ -2,7 +2,7 @@
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
 Version:        %{BaseVersion}.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.71.0-20
+- Bump release to rebuild with go 1.23.4
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.71.0-19
 - Bump release to rebuild with go 1.22.7
 
