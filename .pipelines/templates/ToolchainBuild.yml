@@ -27,7 +27,9 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+  - script: |
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" pre-cache || true
+      sudo ${{ parameters.buildRepoRoot }}/testcurl.sh ${{ parameters.buildRepoRoot }}/build/logs/precache/precache.log
     displayName: "Build toolchain"
 
   - bash: |
@@ -54,4 +56,3 @@ steps:
       tar -C "${{ parameters.buildRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
-
