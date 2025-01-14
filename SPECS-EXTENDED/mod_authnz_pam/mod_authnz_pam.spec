@@ -18,7 +18,7 @@ BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pam-devel
 BuildRequires: pkgconfig
-Requires: httpd-mmn = %{_httpd_mmn}
+Provides: httpd-mmn = %{_httpd_mmn}
 Requires: pam
 
 # Suppres auto-provides for module DSO per
