@@ -98,7 +98,7 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 - Upgrade to v3.7.11 to address CVE-2023-5981, CVE-2024-28835, CVE-2024-28834, CVE-2024-0553
 - Drop patches which are already included in the source.
 
-* Wed Sep 20 2023 Zhichun Wan <zhichunwan@microsoft.com> - 3.7.7-4
+* Wed Mar 13 2024 Zhichun Wan <zhichunwan@microsoft.com> - 3.7.7-4
 - Add patch to fix CVE-2024-0567
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.7-3
