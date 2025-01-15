@@ -23,8 +23,7 @@ License:        GPL-3.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.advancemame.it/
-Source0:        https://github.com/amadvance/advancecomp/archive/refs/tags/v2.6.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0:        https://github.com/amadvance/advancecomp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  dos2unix
