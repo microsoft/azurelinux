@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 
 Name:		nilfs-utils
 Version:	2.2.11
-Release:	4%{?dist}
+Release:	3%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
@@ -93,7 +93,7 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 %{_includedir}/nilfs_cleaner.h
 
 %changelog
-* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-4
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
