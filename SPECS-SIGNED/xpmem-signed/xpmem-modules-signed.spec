@@ -41,10 +41,11 @@ Version:	 2.7.4
 Release:	 1%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
+ExclusiveArch:   x86_64
 
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.

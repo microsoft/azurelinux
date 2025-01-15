@@ -149,8 +149,9 @@ Source18:       svcrdma.ko
 Source19:       xprtrdma.ko
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en

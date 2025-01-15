@@ -44,7 +44,8 @@ Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/kernel-mft-4.30.0.tgz#/kernel-mft-%{version}.tgz
 Vendor:          Microsoft Corporation
-Distribution:	 Azure Linux
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

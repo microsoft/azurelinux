@@ -82,8 +82,9 @@ Source0:	 %{name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         ib_isert.ko
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

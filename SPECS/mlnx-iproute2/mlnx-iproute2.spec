@@ -42,6 +42,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-iproute2-6.10.0.tar.gz#/%{name}-%{version}.tar.gz
 URL:		http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
+ExclusiveArch:   x86_64
 
 BuildRequires:	bison
 BuildRequires:	flex

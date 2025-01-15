@@ -57,8 +57,9 @@ Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.

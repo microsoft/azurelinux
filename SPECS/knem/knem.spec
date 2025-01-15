@@ -56,10 +56,11 @@ Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
+ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

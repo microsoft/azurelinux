@@ -40,11 +40,12 @@ Version:	 2.7.4
 Release:	 1%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/%{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 # name gets a different value in subpackages
 %global _name %{name}

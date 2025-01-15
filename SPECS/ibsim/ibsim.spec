@@ -12,7 +12,8 @@ BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibsim-0.12.tar.gz#/ibsim-%{version}.tar.gz
 Url:		 https://github.com/linux-rdma/ibsim
 Vendor:          Microsoft Corporation
-Distribution:	 Azure Linux
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 BuildRequires: libibmad-devel
 BuildRequires: libibumad-devel
@@ -50,5 +51,3 @@ rm -rf $RPM_BUILD_ROOT
 - Moving to core from azlinux-ai-ml repo
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
-- Initial version Azure Linux

@@ -4,11 +4,12 @@ Release:	 2%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
 License:	 GPLv2
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ethtool-6.9.tar.gz#/%{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  libmnl-devel
 

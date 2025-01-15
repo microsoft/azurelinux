@@ -13,6 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/mellanox/%{name}
 Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/sockperf-3.10.tar.gz#/%{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 
 BuildRequires:  doxygen
 

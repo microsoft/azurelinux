@@ -85,8 +85,9 @@ Source2:        svcrdma.ko
 Source3:        xprtrdma.ko
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

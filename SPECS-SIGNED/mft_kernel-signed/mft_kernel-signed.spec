@@ -57,8 +57,9 @@ BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+ExclusiveArch:  x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

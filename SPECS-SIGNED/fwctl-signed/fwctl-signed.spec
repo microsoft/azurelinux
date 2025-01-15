@@ -44,8 +44,6 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-# take kernel version or default to uname -r
-# %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -87,8 +85,9 @@ Source1:        fwctl.ko
 Source2:        mlx5_fwctl.ko
 
 BuildRoot:	/var/tmp/%{name}-%{version}-build
-Vendor:		Microsoft Corporation
-Distribution:	Azure Linux
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+ExclusiveArch:  x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make

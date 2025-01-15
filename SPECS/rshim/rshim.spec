@@ -7,10 +7,11 @@ Version:	 2.1.5
 Release:	 1%{?dist}
 Summary:	 User-space driver for Mellanox BlueField SoC
 License:	 GPLv2
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 URL:		 https://github.com/mellanox/rshim-user-space
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/rshim-2.1.5.tar.gz#/%{name}-%{version}.tar.gz
+ExclusiveArch:   x86_64
 BuildRequires:	 gcc, autoconf, automake, pkgconfig, make
 BuildRequires:	 pkgconfig(libpci), pkgconfig(libusb-1.0) fuse3-devel fuse3-libs
 

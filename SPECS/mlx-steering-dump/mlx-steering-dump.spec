@@ -35,8 +35,9 @@ Url:		 https://github.com/Mellanox/mlx_steering_dump
 Group:		 Applications/System
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
-Vendor:		 Microsoft Corporation
-Distribution:	 Azure Linux
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
+ExclusiveArch:   x86_64
 Requires:	 python3
 
 %description
