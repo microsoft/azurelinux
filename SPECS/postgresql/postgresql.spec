@@ -15,6 +15,7 @@ Source1:	%{name}.service
 # Common libraries needed
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  lz4-devel
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  perl
@@ -33,6 +34,7 @@ BuildRequires:  sudo
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libxml2
+Requires:       lz4
 Requires:       openldap
 Requires:       openssl
 Requires:       readline
