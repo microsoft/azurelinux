@@ -148,13 +148,18 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 	}
 
 	response, err := client.Get(url)
+
+	if response != nil {
+		//DEBUG Dump the response headers to the log
+		logger.Log.Warnf("#### DEBUG #### URL: %s, STATUS: %s, HEADER: %v", url, response.Status, response.Header)
+	} else {
+		logger.Log.Warnf("#### DEBUG #### URL: %s, STATUS: <nil>, HEADER: <nil>", url)
+	}
+
 	if err != nil {
 		return fmt.Errorf("%w:\nrequest failed:\n%w", ErrDownloadFileOther, err)
 	}
 	defer response.Body.Close()
-
-	//DEBUG Dump the response headers to the log
-	logger.Log.Warnf("#### DEBUG #### URL: %s, STATUS: %s, HEADER: %v", url, response.Status, response.Header)
 
 	if response.StatusCode != http.StatusOK {
 		return buildResponseError(response.StatusCode)
