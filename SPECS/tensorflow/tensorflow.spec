@@ -13,6 +13,7 @@ Patch0:         CVE-2024-7592.patch
 Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
+Patch4:         CVE-2024-35195.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -87,6 +88,11 @@ popd
 # Need to patch CVE-2024-3651 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/pip/_vendor/idna
 patch -p1 < %{PATCH3}
+popd
+
+# Need to patch CVE-2024-35195 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/
+patch -p1 < %{PATCH4}
 popd
 
 export TF_PYTHON_VERSION=3.12
