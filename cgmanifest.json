@@ -13673,7 +13673,7 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.10",
+          "version": "1.23.3",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
         }
       }
