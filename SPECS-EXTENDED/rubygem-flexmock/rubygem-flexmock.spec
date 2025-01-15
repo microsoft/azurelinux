@@ -8,16 +8,14 @@ License:	MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://github.com/doudou/flexmock
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Source1:	%{gem_name}-%{version}-test-missing-files.tar.gz
-# Source1 is created fron Source2
-Source2:	flexmock-create-missing-test-files.sh
+Source0:	https://github.com/doudou/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(minitest) >= 5
 BuildRequires:	rubygem(rspec) >= 3
+BuildRequires:	git
 Requires:	ruby(rubygems)
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:	noarch
@@ -34,14 +32,10 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version} -a 1
-mv ../%{gem_name}-%{version}.gemspec .
-
-find . -name \*.rb | xargs sed -i -e '\@/usr/bin/env@d'
-find . -name \*.gem -or -name \*.rb -or -name \*.rdoc | xargs chmod 0644
+%autosetup -S git -n %{gem_name}-%{version}
 
 %build
-gem build %{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
@@ -82,10 +76,11 @@ popd
 %files
 %dir	%{gem_instdir}
 %license	%{gem_instdir}/LICENSE.txt
-%doc	%{gem_instdir}/[A-CR-Z]*
+%doc	%{gem_instdir}/[A-Z]*
 
 %{gem_libdir}
 %{gem_instdir}/rakelib/
+%exclude	%{gem_cache}
 %{gem_spec}
 
 %files	doc
