@@ -153,6 +153,9 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 	}
 	defer response.Body.Close()
 
+	//DEBUG Dump the response headers to the log
+	logger.Log.Warnf("#### DEBUG #### URL: %s, STATUS: %s, HEADER: %v", url, response.Status, response.Header)
+
 	if response.StatusCode != http.StatusOK {
 		return buildResponseError(response.StatusCode)
 	}
