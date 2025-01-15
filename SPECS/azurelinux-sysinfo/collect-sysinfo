@@ -46,7 +46,6 @@ def collect_os_info():
         name, value = line.split("=", maxsplit=1)
         release_data[name] = value.strip('"')
 
-
     os_info = {
         "kernel_version": kernel_info.stdout.strip(),
         "release_version": release_data["VERSION"],
@@ -60,21 +59,21 @@ def collect_boot_info():
     print("Collecting boot info...")
     # Known issue: In SELinux enforcing mode, systemd-analyze commands are expected to fail until required policies are added.
     # In this case, the boot times will be 0 and longest running processes will be empty.
-    
+
     # Collect boot time
     result = subprocess.run(["systemd-analyze", "time"], capture_output=True, text=True)
 
     # Sample output for livecd image:
-    # Startup finished in 153ms (firmware) + 554ms (loader) + 1.413s (kernel) + 908ms (userspace) = 3.030s 
+    # Startup finished in 153ms (firmware) + 554ms (loader) + 1.413s (kernel) + 908ms (userspace) = 3.030s
     # multi-user.target reached after 897ms in userspace
     # Sample output for host images:
     # Startup finished in 12.688s (kernel) + 8.082s (initrd) + 1min 1.458s (userspace) = 1min 22.230s
     # multi-user.target reached after 1min 966ms in userspace
-    
+
     lines = result.stdout.strip().splitlines()
 
     # In a test setup on qemu, systemd-analyze returns empty
-    if len(lines) < 1 or not(lines[0].startswith("Startup finished in")):
+    if len(lines) < 1 or not (lines[0].startswith("Startup finished in")):
         boot_info = {
             "boot_time": {
                 "kernel_boot_time_secs": 0,
@@ -85,14 +84,14 @@ def collect_boot_info():
         }
         return boot_info
 
-    # Define regular expression to extract times 
+    # Define regular expression to extract times
     timeRegex = r"((?:\d+)(?:\d*min\s?)?(?:\d*\.?\d*s\s?)?(?:\d*\.?\d*ms)?)"
     # Define regular expression to extract values between parentheses
     betweenParenthesesRegex = r"\((.*?)\)"
 
     boot_time_keys = re.findall(betweenParenthesesRegex, lines[0])
     boot_times = re.findall(timeRegex, lines[0])
-    boot_times = [t.strip() for t in boot_times]    
+    boot_times = [t.strip() for t in boot_times]
     boot_times_secs = [convert_to_secs(time) for time in boot_times]
 
     boot_time = dict()
@@ -102,7 +101,7 @@ def collect_boot_info():
         bootTimeValue = boot_times_secs[i]
         boot_time[bootTimeKey] = bootTimeValue
     boot_time["total_boot_time_secs"] = boot_times_secs[-1]
-    
+
     # Collect boot time longest running processes
     top_n = 3
     result = subprocess.run(
@@ -185,7 +184,7 @@ def collect_cloud_init_info():
 
     # Collect cloud-init longest running processes
     result = subprocess.run(
-        ["cloud-init", "analyze", "blame"], capture_output=True, text=True, check=True
+        ["cloud-init", "analyze", "blame"], capture_output=True, text=True
     )
 
     lines = result.stdout.strip().splitlines()
@@ -229,10 +228,16 @@ def collect_system_info():
 
 def get_asset_id():
     print("Collecting asset id...")
-    
-    return subprocess.run(
-        ["cat", "/sys/devices/virtual/dmi/id/product_uuid"], capture_output=True, text=True
-    ).stdout.lower().strip()
+
+    return (
+        subprocess.run(
+            ["cat", "/sys/devices/virtual/dmi/id/product_uuid"],
+            capture_output=True,
+            text=True,
+        )
+        .stdout.lower()
+        .strip()
+    )
 
 
 def has_valid_schema(data):
@@ -278,7 +283,7 @@ def main():
         # Dump the data to a log file, this path is added to fluentd config
         # and will be picked up by fluentd and sent through Geneva Agents
         with open(LOG_FILE_PATH, "w") as file:
-            json.dump(data, file, separators=(',', ':'))
+            json.dump(data, file, separators=(",", ":"))
 
             # Add newline so that the fluentd tail plug-in consumes the log
             # line.
