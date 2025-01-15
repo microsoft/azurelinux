@@ -31029,8 +31029,8 @@
         "type": "other",
         "other": {
           "name": "yelp-xsl",
-          "version": "3.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/yelp-xsl/3.36/yelp-xsl-3.36.0.tar.xz"
+          "version": "42.1",
+          "downloadUrl": "https://download.gnome.org/sources/yelp-xsl/42/yelp-xsl-42.1.tar.xz"
         }
       }
     },
