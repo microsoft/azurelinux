@@ -1,7 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
-%global ms_go_revision  1
+%global ms_go_revision  2
 %global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
 %ifarch aarch64
 %global gohostarch      arm64
