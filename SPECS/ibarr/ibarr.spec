@@ -49,6 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %doc README.md
+%license COPYING.BSD_MIT
 %{_bindir}/ibarr
 # FIXME: should be in the standard directory, under _prefix.
 /lib/systemd/system/%{name}.service

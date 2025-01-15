@@ -222,7 +222,8 @@ fi
 %files
 /lib/udev/rules.d/*-xpmem.rules
 %{_prefix}/lib/modules-load.d/xpmem.conf
-%doc README AUTHORS COPYING COPYING.LESSER
+%doc README AUTHORS
+%license COPYING COPYING.LESSER
 
 %if ! %{with kernel_only}
 %files -n libxpmem

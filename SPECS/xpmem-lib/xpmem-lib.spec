@@ -71,7 +71,8 @@ rm -rf ${RPM_BUILD_ROOT}/etc  # /etc/.version , udev rules
 %endif
 
 %files -n libxpmem
-%doc README AUTHORS COPYING.LESSER
+%doc README AUTHORS
+%license COPYING COPYING.LESSER
 %{_libdir}/libxpmem.so.*
 
 %files -n libxpmem-devel

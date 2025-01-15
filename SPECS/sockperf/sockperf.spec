@@ -77,6 +77,7 @@ make install DESTDIR="%{?buildroot}"
 
 %files
 %defattr(-,root,root,-)
+%license copying
 %{_bindir}/%{name}
 %{_mandir}/man3/%{name}.3.*
 %{_my_pkgdocdir}

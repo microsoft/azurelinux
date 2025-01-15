@@ -102,6 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+%license COPYING
 %doc README README.devel
 %config(noreplace) %verify(not md5 mtime size) %{config_dir}/*
 %{_prefix}/include/*

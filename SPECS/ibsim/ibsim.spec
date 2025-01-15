@@ -44,7 +44,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/umad2sim/libumad2sim*.so*
 %{_bindir}/ibsim
 %{_bindir}/ibsim-run
-%doc README COPYING TODO net-examples scripts
+%doc README TODO net-examples scripts
+%license COPYING
 
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>

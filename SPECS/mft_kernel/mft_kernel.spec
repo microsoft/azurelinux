@@ -211,6 +211,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %if "%{KMP}" != "1"
 %files
 %defattr(-,root,root,-)
+%license source/COPYING
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}

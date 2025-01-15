@@ -36,7 +36,8 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 %{_sbindir}/ethtool
 %{_mandir}/man8/ethtool.8*
 %{_datadir}/bash-completion/completions/ethtool
-%doc AUTHORS COPYING NEWS README
+%doc AUTHORS NEWS README
+%license COPYING
 
 
 %changelog

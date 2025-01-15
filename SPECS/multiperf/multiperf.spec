@@ -32,7 +32,8 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(-, root, root)
-%doc README COPYING
+%doc README
+%license COPYING
 %_bindir/*
 
 %changelog
