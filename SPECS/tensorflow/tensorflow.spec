@@ -91,7 +91,7 @@ patch -p1 < %{PATCH3}
 popd
 
 # Need to patch CVE-2024-35195 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
-pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-linux-gnu/lib/python3.12/
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH4}
 popd
 
