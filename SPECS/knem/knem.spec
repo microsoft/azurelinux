@@ -260,6 +260,7 @@ fi
 
 %files
 %defattr(-, root, root)
+%license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /opt/knem-%{version}
 /usr/lib64/pkgconfig/knem.pc
 
@@ -279,11 +280,8 @@ fi
 
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to core from azlinux-ai-ml repo
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
-- Initial version Azure Linux
 * Mon Mar 17 2014 Alaa Hleihel <alaa@mellanox.com>
 - Use one spec for KMP and non-KMP OS's.
 * Thu Apr 18 2013 Alaa Hleihel <alaa@mellanox.com>

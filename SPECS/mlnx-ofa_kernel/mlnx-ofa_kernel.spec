@@ -676,6 +676,7 @@ update-alternatives --remove \
 
 %files -n %{utils_pname}
 %defattr(-,root,root,-)
+%license source/debian/copyright
 %doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
 %if "%{KMP}" == "1"
 %if %{IS_RHEL_VENDOR}
@@ -713,6 +714,7 @@ update-alternatives --remove \
 
 %if "%{KMP}" != "1"
 %files -n %{non_kmp_pname}
+%license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
@@ -723,20 +725,19 @@ update-alternatives --remove \
 
 %files -n %{devel_pname}
 %defattr(-,root,root,-)
+%license source/debian/copyright
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %files source
 %defattr(-,root,root,-)
+%license source/debian/copyright
 %{_prefix}/src/ofa_kernel-%version/source
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to core from azlinux-ai-ml repo
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
-- Initial version Azure Linux
 * Thu Jun 18 2015 Alaa Hleihel <alaa@mellanox.com>
 - Renamed kernel-ib package to mlnx-ofa_kernel-modules
 * Thu Apr 10 2014 Alaa Hleihel <alaa@mellanox.com>

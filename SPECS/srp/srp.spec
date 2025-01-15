@@ -245,16 +245,14 @@ fi
 %if "%{KMP}" != "1"
 %files
 %defattr(-,root,root,-)
+%license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 %endif
 
 %changelog
 * Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to core from azlinux-ai-ml repo
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
-- Initial version Azure Linux
 * Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging

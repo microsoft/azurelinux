@@ -67,16 +67,14 @@ install -m 755 hws/mlx_hw_steering_dump %{buildroot}/usr/bin/
 
 
 %files
+%license debian/copyright
 /usr/share/mlx-steering-dump/*
 /usr/bin/mlx_steering_dump
 /usr/bin/mlx_hw_steering_dump
 
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
-- Moving to core from azlinux-ai-ml repo
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Nov 07 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com>
-- Initial version Azure Linux
 * Wed Oct 6 2021 Mohammad Kabat <mohammadkab@nvidia.com>
 - Add rpm support
