@@ -23,7 +23,7 @@ RUN rm .bazelversion
 
 # create cache using fetch
 # this doesn't download all the dependencies.
-# RUN bazel --output_user_root=`pwd`/../tf_tmp fetch  //tensorflow/tools/pip_package:build_pip_package
+RUN bazel --output_user_root=`pwd`/../tf_tmp fetch  //tensorflow/tools/pip_package:build_pip_package
 
 # some of the tertiary dependencies needs build command to download.
 # As compiling start we exit the command. This indicates all the dependencies has been downloaded
