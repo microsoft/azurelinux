@@ -22,7 +22,7 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -39,6 +39,7 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        cargo_config
+Patch0:         CVE-2024-43806.patch
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  libcap-ng-devel
@@ -50,8 +51,9 @@ Provides:       vhostuser-backend(fs)
 vhost-user virtio-fs device backend written in Rust
 
 %prep
-%autosetup -n %{name}-v%{version}
+%autosetup -n %{name}-v%{version} -N
 tar -xf %{SOURCE1}
+%autopatch -p1
 install -D %{SOURCE2} .cargo/config
 
 %build
@@ -73,6 +75,9 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
+* Thu Jan 16 2025 Archana Choudhary <archana1@microsoft.com> - 1.8.0-2
+- Patch for CVE-2024-43806
+
 * Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.8.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
