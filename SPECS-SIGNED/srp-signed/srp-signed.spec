@@ -41,6 +41,14 @@ Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
+
+#
+# To populate these sources:
+#   1. Build the unsigned packages as normal
+#   2. Sign the desired binary
+#   3. Place the unsigned package and signed binary in this spec's folder
+#   4. Build this spec
+
 Source0:         %{name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         ib_srp.ko
 Source2:         scsi_transport_srp.ko

@@ -21,6 +21,13 @@ BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 ExclusiveArch:   x86_64
 
+#
+# To populate these sources:
+#   1. Build the unsigned packages as normal
+#   2. Sign the desired binary
+#   3. Place the unsigned package and signed binary in this spec's folder
+#   4. Build this spec
+
 Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        xpmem.ko
 

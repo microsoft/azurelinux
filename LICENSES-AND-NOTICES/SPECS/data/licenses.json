@@ -2484,6 +2484,7 @@
                 "perftest",
                 "rshim",
                 "srp",
+                "srp-signed",
                 "xpmem",
                 "xpmem-lib",
                 "xpmem-modules-signed"
