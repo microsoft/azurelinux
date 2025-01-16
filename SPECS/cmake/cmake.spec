@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Patch0:         0001-manually-recreating-patches.patch
 Patch1:         CVE-2024-6197.patch
 Patch2:         CVE-2024-6874.patch
 Patch3:         CVE-2024-8096.patch
+Patch4:         CVE-2024-11053.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -93,6 +94,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed Jan 15 2025 Henry Beberman <henry.beberman@microsoft.com> - 3.30.3-3
+- Patch vendored curl for CVE-2024-11053
+
 * Thu Sep 26 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-2
 - Fix CVE-2024-6197, CVE-2024-6874, and CVE-2024-8096
 
