@@ -1,6 +1,6 @@
 Name:           perl-Lingua-EN-Inflect
-Version:        1.904
-Release:        5%{?dist}
+Version:        1.905
+Release:        1%{?dist}
 Summary:        Convert singular to plural, select "a" or "an"
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -50,6 +50,10 @@ make test
 
 
 %changelog
+* Tue Dec 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.905-1
+- Update to 1.905
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.904-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
