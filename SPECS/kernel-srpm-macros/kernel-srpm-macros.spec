@@ -17,7 +17,35 @@ Conflicts:      redhat-rpm-config < 205
 # macros.kmp, kmodtool and rpmsort were moved from kernel-rpm-macros
 # to kernel-srpm-macros in 1.0-9/185-9
 Conflicts:      kernel-rpm-macros < 205
-Source0:        %{_distro_sources_url}/kernel-srpm-macros-%{version}.tar.gz
+
+# Macros
+Source0:        macros.kernel-srpm
+Source1:        macros.kmp
+
+# Dependency generator scripts
+Source100:      find-provides.ksyms
+Source101:      find-requires.ksyms
+Source102:      firmware.prov
+Source103:      modalias.prov
+Source104:      provided_ksyms.attr
+Source105:      required_ksyms.attr
+Source106:      modalias.attr
+
+# Dependency generators & their rules
+Source200:      kmod.attr
+
+# Misc helper scripts
+Source300:      kmodtool
+Source301:      rpmsort
+Source302:      symset-table
+
+# kabi provides generator
+Source400: kabi.attr
+Source401: kabi.sh
+
+# BRPs
+Source500: brp-kmod-set-exec-bit
+Source501: brp-kmod-restore-perms
 
 %global rrcdir /usr/lib/rpm/redhat
 
