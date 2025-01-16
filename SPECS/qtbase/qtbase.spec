@@ -34,7 +34,7 @@
 
 Name:         qtbase
 Summary:      Qt6 - QtBase components
-Version:      6.6.2
+Version:      6.6.3
 Release:      1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
@@ -700,6 +700,9 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
+* Wed Jan 15 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-1
+- Upgrade to version 6.6.3 to fix CVE-2024-30161
+
 * Fri May 17 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 6.6.2-1
 - Upgrade to version 6.6.2 to fix CVE-2023-51714
 
