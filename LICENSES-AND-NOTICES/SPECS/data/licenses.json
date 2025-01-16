@@ -2483,6 +2483,7 @@
                 "ofed-scripts",
                 "perftest",
                 "rshim",
+                "sockperf",
                 "srp",
                 "srp-signed",
                 "xpmem",
