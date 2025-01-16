@@ -79,7 +79,10 @@ Requires: kmod
 Macros and scripts for building kernel module packages.
 
 %prep
-tar xf %{SOURCE0} --strip-components=1
+# Not strictly necessary but allows working on file names instead
+# of source numbers in install section
+%setup -c -T
+cp -p %{sources} .
 
 %build
 # nothing to do
