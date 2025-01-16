@@ -17,11 +17,13 @@ RUN wget https://github.com/tensorflow/tensorflow/archive/refs/tags/v$TF_VERSION
 RUN mkdir -p /usr/src/azl/BUILD
 RUN tar -xvf v$TF_VERSION.tar.gz -C /usr/src/azl/BUILD
 WORKDIR /usr/src/azl/BUILD/tensorflow-$TF_VERSION
+COPY Remove-Unnecessary-Deps.patch .
+RUN patch -p1 < Remove-Unnecessary-Deps.patch
 RUN rm .bazelversion
 
 # create cache using fetch
 # this doesn't download all the dependencies.
-RUN bazel --output_user_root=`pwd`/../tf_tmp fetch  //tensorflow/tools/pip_package:build_pip_package
+# RUN bazel --output_user_root=`pwd`/../tf_tmp fetch  //tensorflow/tools/pip_package:build_pip_package
 
 # some of the tertiary dependencies needs build command to download.
 # As compiling start we exit the command. This indicates all the dependencies has been downloaded
