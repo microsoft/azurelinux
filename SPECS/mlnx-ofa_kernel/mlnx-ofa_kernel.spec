@@ -97,7 +97,7 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
-Version:	 %{_version}
+Version:	 24.10
 Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/

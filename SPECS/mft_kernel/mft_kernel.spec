@@ -37,7 +37,7 @@
 
 Name:		 kernel-mft
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 %{version}
+Version:	 4.30.0
 Release:	 1%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
@@ -223,6 +223,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %if "%{KMP}" == "1"
 %files utils
 %defattr(-,root,root,-)
+%license source/COPYING
 %endif
 %{docdir}
 %endif

@@ -239,6 +239,7 @@ fi
 %if "%{KMP}" != "1"
 %files modules
 %{moduledir}/xpmem.ko
+%license COPYING COPYING.LESSER
 %endif
 
 %changelog

@@ -270,6 +270,7 @@ fi
 
 %if "%{KMP}" != "1"
 %files -n %{non_kmp_pname}
+%license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}

@@ -61,7 +61,7 @@
 
 Summary:	 srp driver
 Name:		 srp
-Version:	 %{_version}
+Version:	 24.10
 Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com

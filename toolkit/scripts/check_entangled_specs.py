@@ -46,7 +46,44 @@ version_release_matching_groups = [
         "SPECS/shim/shim.spec",
         "SPECS/shim-unsigned-x64/shim-unsigned-x64.spec",
         "SPECS/shim-unsigned-aarch64/shim-unsigned-aarch64.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/fwctl-signed/fwctl-signed.spec",
+        "SPECS/fwctl/fwctl.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/iser-signed/iser-signed.spec",
+        "SPECS/iser/iser.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/isert-signed/isert-signed.spec",
+        "SPECS/isert/isert.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/knem-signed/knem-modules-signed.spec",
+        "SPECS/knem/knem.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/mft_kernel-signed/mft_kernel-signed.spec",
+        "SPECS/mft_kernel/mft_kernel.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/mlnx-nfsrdma-signed/mlnx-nfsrdma-signed.spec",
+        "SPECS/mlnx-nfsrdma/mlnx-nfsrdma.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/mlnx-ofa_kernel-signed/mlnx-ofa_kernel-modules-signed.spec",
+        "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/srp-signed/srp-signed.spec",
+        "SPECS/srp/srp.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/xpmem-signed/xpmem-modules-signed.spec",
+        "SPECS/xpmem/xpmem.spec"
     ])
+
 ]
 
 version_matching_groups = [
