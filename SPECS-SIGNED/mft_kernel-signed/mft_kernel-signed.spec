@@ -39,9 +39,11 @@ mft kernel module(s)
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/mst_pci.ko
 cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/mst_pciconf.ko
 
@@ -56,7 +58,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%license COPYING
+%license %{_datadir}/licenses/%{name}/COPYING
 /lib/modules/%{KVERSION}/updates/
 
 %changelog

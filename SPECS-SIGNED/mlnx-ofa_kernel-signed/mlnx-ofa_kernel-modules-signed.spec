@@ -121,9 +121,10 @@ The driver sources are located at: http://www.mellanox.com/downloads/
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/compat/mlx_compat.ko
 cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_cm.ko
 cp -r %{SOURCE3} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_core.ko
@@ -167,7 +168,7 @@ fi
 
 %files
 /lib/modules/%{KVERSION}/updates/
-%license copyright
+%license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10

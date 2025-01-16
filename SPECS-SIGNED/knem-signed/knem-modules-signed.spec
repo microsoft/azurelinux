@@ -71,9 +71,10 @@ See http://knem.gitlabpages.inria.fr for details.
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/extra/knem/knem.ko
 
 %clean
@@ -88,7 +89,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %files
-%license COPYING COPYING.BSD-3 COPYING.GPL-2
+%{_datadir}/licenses
 /lib/modules/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}

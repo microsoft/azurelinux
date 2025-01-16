@@ -72,9 +72,10 @@ fwctl signed kernel modules
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
 cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
 
@@ -92,7 +93,7 @@ fi # 1 : closed
 
 %files
 %defattr(-,root,root,-)
-%license copyright
+%license %{_datadir}/licenses/%{name}/copyright
 /lib/modules/%{KVERSION}/updates/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 

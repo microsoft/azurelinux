@@ -68,9 +68,10 @@ srp kernel modules
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
 cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
 
@@ -82,7 +83,7 @@ rm -rf %{buildroot}
 /lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
 /lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
-%license copyright
+%license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
 * Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com>

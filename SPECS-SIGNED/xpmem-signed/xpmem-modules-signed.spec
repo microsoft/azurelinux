@@ -47,9 +47,11 @@ This package includes the kernel module.
 %prep
 
 %build
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 
 %install
+rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+
 cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/xpmem.ko
 
 %clean
@@ -57,7 +59,7 @@ rm -rf %{buildroot}
 
 %files modules
 /lib/modules/%{KVERSION}/updates/xpmem.ko
-%license COPYING COPYING.LESSER
+%{_datadir}/licenses
 
 
 %changelog
