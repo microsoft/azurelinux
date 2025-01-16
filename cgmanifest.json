@@ -29086,8 +29086,8 @@
         "type": "other",
         "other": {
           "name": "units",
-          "version": "2.19",
-          "downloadUrl": "https://ftp.gnu.org/gnu/units/units-2.19.tar.gz"
+          "version": "2.23",
+          "downloadUrl": "https://ftp.gnu.org/gnu/units/units-2.23.tar.gz"
         }
       }
     },
