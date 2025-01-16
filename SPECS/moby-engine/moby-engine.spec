@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -49,7 +49,7 @@ Requires: docker-init
 Requires: iptables
 Requires: libcgroup
 Requires: libseccomp
-Requires: containerd
+Requires: containerd2
 Requires: tar
 Requires: xz
 
@@ -118,6 +118,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Thu Jan 16 2025 Nan Liu <liunan@microsoft.com> - 25.0.3-10
+- Update requires for containerd -> containerd2 rename
+
 * Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 25.0.3-9
 - Add patch for CVE-2024-45337
 
