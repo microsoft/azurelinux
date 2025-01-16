@@ -1,5 +1,7 @@
 {
     "packages": [
-        "core-packages-container"
+        "core-packages-container",
+        "runc",
+        "containerd"
     ]
 }
