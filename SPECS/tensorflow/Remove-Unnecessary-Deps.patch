@@ -1,0 +1,19 @@
+diff -ruN tensorflow-2.16.1/tensorflow/workspace0.bzl tensorflow-2.16.1/tensorflow/workspace0.bzl
+--- tensorflow-2.16.1/tensorflow/workspace0.bzl	2024-03-06 00:30:15.000000000 +0000
++++ tensorflow-2.16.1/tensorflow/workspace0.bzl	2025-01-14 22:47:28.327281068 +0000
+@@ -122,11 +122,11 @@
+     )
+ 
+     # Now, finally use the rules
+-    apple_rules_dependencies()
+-    swift_rules_dependencies()
+-    apple_support_dependencies()
++    # apple_rules_dependencies()
++    # swift_rules_dependencies()
++    # apple_support_dependencies()
+ 
+-    android_workspace()
++    # android_workspace()
+ 
+     # If a target is bound twice, the later one wins, so we have to do tf bindings
+     # at the end of the WORKSPACE file.
