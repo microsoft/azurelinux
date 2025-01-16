@@ -355,10 +355,9 @@ fi
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/ep11tok/TOK_OBJ/
 %endif
 
-
 %changelog
 * Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.24.0-3
-- Update to 3.24.0
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
 * Fri Sep 13 2024 Than Ngo <than@redhat.com> - 3.24.0-2

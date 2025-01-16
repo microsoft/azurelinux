@@ -1,0 +1,66 @@
+commit e58d2086cf9268a1dd2431c64c6bcdd74c2c3233
+Author: Ingo Franzki <ifranzki@linux.ibm.com>
+Date:   Mon Sep 16 09:16:03 2024 +0200
+
+    COMMON: Fix compile error due to incompatible pointer types
+    
+    usr/lib/common/mech_openssl.c:4751:36: error: passing argument 2 of
+    'get_sha_size' from incompatible pointer type [-Wincompatible-pointer-types]
+    4751 | rc = get_sha_size(digest_mech, &mac_len);
+    
+    usr/lib/common/mech_openssl.c:4851:36: error: passing argument 2 of
+    'get_sha_size' from incompatible pointer type [-Wincompatible-pointer-types]
+    4851 | rc = get_sha_size(digest_mech, &mac_len);
+    
+    Closes: https://github.com/opencryptoki/opencryptoki/issues/809
+    
+    Signed-off-by: Ingo Franzki <ifranzki@linux.ibm.com>
+
+diff --git a/usr/lib/common/mech_openssl.c b/usr/lib/common/mech_openssl.c
+index 296b5e0a..500b6f91 100644
+--- a/usr/lib/common/mech_openssl.c
++++ b/usr/lib/common/mech_openssl.c
+@@ -4731,6 +4731,7 @@ CK_RV openssl_specific_hmac(SIGN_VERIFY_CONTEXT *ctx, CK_BYTE *in_data,
+     CK_RV rv = CKR_OK;
+     CK_BBOOL general = FALSE;
+     CK_MECHANISM_TYPE digest_mech;
++    CK_ULONG mac_len2;
+ 
+     if (!ctx || !ctx->context) {
+         TRACE_ERROR("%s received bad argument(s)\n", __func__);
+@@ -4748,11 +4749,12 @@ CK_RV openssl_specific_hmac(SIGN_VERIFY_CONTEXT *ctx, CK_BYTE *in_data,
+         return rc;
+     }
+ 
+-    rc = get_sha_size(digest_mech, &mac_len);
++    rc = get_sha_size(digest_mech, &mac_len2);
+     if (rc != CKR_OK) {
+         TRACE_ERROR("%s get_sha_size failed\n", __func__);
+         return rc;
+     }
++    mac_len = mac_len2;
+ 
+     mdctx = (EVP_MD_CTX *) ctx->context;
+ 
+@@ -4833,6 +4835,7 @@ CK_RV openssl_specific_hmac_final(SIGN_VERIFY_CONTEXT *ctx, CK_BYTE *signature,
+     CK_RV rv = CKR_OK;
+     CK_BBOOL general = FALSE;
+     CK_MECHANISM_TYPE digest_mech;
++    CK_ULONG mac_len2;
+ 
+     if (!ctx || !ctx->context)
+         return CKR_OPERATION_NOT_INITIALIZED;
+@@ -4848,11 +4851,12 @@ CK_RV openssl_specific_hmac_final(SIGN_VERIFY_CONTEXT *ctx, CK_BYTE *signature,
+         return rc;
+     }
+ 
+-    rc = get_sha_size(digest_mech, &mac_len);
++    rc = get_sha_size(digest_mech, &mac_len2);
+     if (rc != CKR_OK) {
+         TRACE_ERROR("%s get_sha_size failed\n", __func__);
+         return rc;
+     }
++    mac_len = mac_len2;
+ 
+     if (signature == NULL) {
+         if (sign) {
