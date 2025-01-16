@@ -25844,8 +25844,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.2.7",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.7.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
         }
       }
     },
@@ -29326,8 +29326,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.1.tar.gz"
+          "version": "8.0.2",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.2.tar.gz"
         }
       }
     },
