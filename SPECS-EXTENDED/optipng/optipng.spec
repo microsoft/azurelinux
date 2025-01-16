@@ -58,7 +58,7 @@ chmod -c 755 $RPM_BUILD_ROOT%{_bindir}/optipng
 
 %changelog
 * Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.7.8-5
-- Update to 0.7.8
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - change the URL and Source0 from http to https
 - License verified
 
