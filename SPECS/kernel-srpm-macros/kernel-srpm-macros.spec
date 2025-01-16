@@ -19,8 +19,8 @@ Conflicts:      redhat-rpm-config < 205
 Conflicts:      kernel-rpm-macros < 205
 
 # Macros
-Source0:        macros.kernel-srpm
-Source1:        macros.kmp
+Source001:        macros.kernel-srpm
+Source002:        macros.kmp
 
 # Dependency generator scripts
 Source100:      find-provides.ksyms
