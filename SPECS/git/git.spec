@@ -110,6 +110,7 @@ BuildArch:      noarch
 %{py3_shebang_fix} git-p4.py
 
 %build
+make configure
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
