@@ -49,9 +49,9 @@ Requires: docker-init
 Requires: iptables
 Requires: libcgroup
 Requires: libseccomp
-Requires: containerd2
 Requires: tar
 Requires: xz
+Requires: /usr/bin/containerd
 
 Conflicts: docker
 Conflicts: docker-io
