@@ -29145,6 +29145,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ucx",
+          "version": "1.18.0",
+          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.18.0-rc3/ucx-1.18.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "udftools",
           "version": "2.1",
           "downloadUrl": "https://github.com/pali/udftools/releases/tag/2.1/udftools-2.1.tar.gz"
