@@ -52,7 +52,7 @@ Requires: libcgroup
 Requires: libseccomp
 Requires: tar
 Requires: xz
-Requires: /usr/bin/containerd
+Requires: /bin/containerd
 
 Conflicts: docker
 Conflicts: docker-io
