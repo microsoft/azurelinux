@@ -86,7 +86,7 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
-* Fri Jan 17 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.0.6-1
+* Fri Jan 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 3.0.6-1
 - Bump version to 3.0.6
 - Add patches for multiple CVEs for the current version
 - Remove patches for multiple fixes not required for this version
