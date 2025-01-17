@@ -137,6 +137,9 @@ fi
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 16 2025 Dallas Delaney <dadelan@microsoft.com> - 1.8.10-4
+- Add back kernel modules that were removed by enabling nftables
+
 * Tue Nov 12 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
 - Enable nftables and use alternatives.
 
