@@ -55,6 +55,9 @@ It contains the libraries and header files to create applications.
 %install
 %make_install
 
+# Create the /etc/modules-load.d directory if it doesn't exist
+install -vdm755 %{buildroot}/etc/modules-load.d
+
 #   Install daemon scripts
 install -vdm755 %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
