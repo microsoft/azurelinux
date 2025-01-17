@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source2:        iptables
 Source3:        iptables.stop
 Source4:        ip4save
 Source5:        ip6save
+Source6:        iptables.conf
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
@@ -62,6 +63,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/systemd/scripts
+install -m 644 %{SOURCE6} %{buildroot}/etc/modules-load.d
 
 find %{buildroot} -name '*.a'  -delete
 find %{buildroot} -type f -name "*.la" -delete -print
