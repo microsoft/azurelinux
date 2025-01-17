@@ -41,6 +41,7 @@ BuildRequires: systemd-devel
 BuildRequires: tar
 BuildRequires: golang
 BuildRequires: git
+BuildRequires: containerd2
 
 Requires: audit
 Requires: /bin/sh
