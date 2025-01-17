@@ -25,6 +25,7 @@
 # and/or other materials provided with the distribution.
 #
 #
+%global last-known-kernel 6.6.64.2
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -147,7 +148,7 @@ Requires: ofed-scripts
 BuildRequires: %kernel_module_package_buildreqs
 BuildRequires: /usr/bin/perl
 %endif
-%description 
+%description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
@@ -324,7 +325,7 @@ export NAME=%{name}
 export VERSION=%{version}
 export PREFIX=%{_prefix}
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}
-for flavor in %flavors_to_build; do 
+for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor

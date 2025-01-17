@@ -1,5 +1,7 @@
 %{!?KMP: %global KMP 0}
 
+%global last-known-kernel 6.6.64.2
+
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
 %else
@@ -248,4 +250,3 @@ fi
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-

@@ -124,6 +124,21 @@ mstflintver_matching_groups = [
     ])
 ]
 
+# OOT kernel module specs to match the `last-known-kernel` with kernel-headers `version`
+oot_kmodule_matching_groups = [
+    frozenset([
+        "SPECS/fwctl/fwctl.spec",
+        "SPECS/iser/iser.spec",
+        "SPECS/isert/isert.spec",
+        "SPECS/knem/knem.spec",
+        "SPECS/mft_kernel/mft_kernel.spec",
+        "SPECS/mlnx-nfsrdma/mlnx-nfsrdma.spec",
+        "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec",
+        "SPECS/srp/srp.spec",
+        "SPECS/xpmem/xpmem.spec"
+    ])
+]
+
 def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) -> Set[FrozenSet]:
     """Returns spec sets which violate matching rules for given tags. """
     err_groups = set()
@@ -141,6 +156,21 @@ def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) ->
     return err_groups
 
 
+def check_oot_kmodules(base_path: str, tag: str, groups: List[FrozenSet]) -> Set[FrozenSet]:
+    """Returns OOT kernel modules which violate matching with kernel-headers version. """
+    err_groups = set()
+
+    kernel_headers_spec = Spec.from_file(path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec"))
+    kernel_headers_version = get_tag_value(kernel_headers_spec, 'version')
+
+    for group in groups:
+        for spec_filename in group:
+            parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
+            tag_value = get_tag_value(parsed_spec, tag)
+            if tag_value != kernel_headers_version:
+                err_groups.add(spec_filename)
+    return err_groups
+
 def check_mstflintver_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['mstflintver'], mstflintver_matching_groups)
 
@@ -153,16 +183,23 @@ def check_version_release_match_groups(base_path: str) -> Set[FrozenSet]:
 def check_version_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['epoch', 'version'], version_matching_groups)
 
+def check_oot_kmodule_matching_groups(base_path: str) -> Set[FrozenSet]:
+    return check_oot_kmodules(base_path, 'last-known-kernel', oot_kmodule_matching_groups)
 
 def check_matches(base_path: str):
     version_match_errors = check_version_match_groups(base_path)
     version_release_match_errors = check_version_release_match_groups(base_path)
     sdkver_match_errors = check_sdkver_match_groups(base_path)
     mstflintver_match_errors = check_mstflintver_match_groups(base_path)
+    oot_kmodule_match_errors = check_oot_kmodule_matching_groups(base_path)
 
     printer = pprint.PrettyPrinter()
 
-    if len(version_match_errors) or len(version_release_match_errors) or len(sdkver_match_errors) or len(mstflintver_match_errors):
+    if len(version_match_errors) or \
+       len(version_release_match_errors) or \
+       len(sdkver_match_errors) or \
+       len(mstflintver_match_errors) or \
+       len(oot_kmodule_match_errors):
         print('The current repository state violates a spec entanglement rule!')
 
         if len(version_match_errors):
@@ -182,13 +219,19 @@ def check_matches(base_path: str):
                 '\nPlease update the following sets of specs to have the same "sdkver" global variables:')
             for e in sdkver_match_errors:
                 printer.pprint(e)
-        
+
         if len(mstflintver_match_errors):
             print(
                 '\nPlease update the following sets of specs to have the same "mstflintver" global variables:')
             for e in mstflintver_match_errors:
                 printer.pprint(e)
-                
+
+        if len(oot_kmodule_match_errors):
+            print(
+                '\nPlease update the following sets of specs to match the "last-known-kernel" global variable with kernel-headers "version":')
+            for e in oot_kmodule_match_errors:
+                printer.pprint(e)
+
         sys.exit(1)
 
 
