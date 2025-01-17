@@ -25702,6 +25702,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rdma-core",
+          "version": "55.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v55.0/rdma-core-55.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "re2",
           "version": "20240201",
           "downloadUrl": "https://github.com/google/re2/archive/refs/tags/2024-02-01.tar.gz"
