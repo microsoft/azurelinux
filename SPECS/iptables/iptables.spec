@@ -125,6 +125,7 @@ fi
 /usr/share/xtables/iptables.xslt
 %ghost %{_sbindir}/ip{,6}tables{,-save,-restore}
 %ghost %{_sbindir}/{eb,arp}tables{,-save,-restore}
+/etc/modules-load.d/iptables.conf
 
 %files devel
 %{_libdir}/*.so
