@@ -5,11 +5,9 @@ Version:        0.16.3
 Release:        7%{?dist}
 Summary:        ID3 tag manipulation library
 
-# Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
 URL:            https://codeberg.org/tenacityteam/libid3tag
-Source0:        %url/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Based on https://codeberg.org/tenacityteam/libid3tag/pulls/3
+Source0:        https://codeberg.org/tenacityteam/libid3tag/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         cmake-hook-genre.dat-and-gperf-files-generation.patch
 
 BuildRequires:  gcc-c++
@@ -21,14 +19,12 @@ BuildRequires:  zlib-devel >= 1.1.4
 libid3tag is a library for reading and (eventually) writing ID3 tags,
 both ID3v1 and the various versions of ID3v2.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 ID3 tag library development files.
-
 
 %prep
 %autosetup -p1 -n %{name}
@@ -37,10 +33,8 @@ ID3 tag library development files.
 %cmake
 %cmake_build
 
-
 %install
 %cmake_install
-
 
 %ldconfig_scriptlets
 
@@ -55,11 +49,25 @@ ID3 tag library development files.
 %{_libdir}/cmake/id3tag/
 %{_libdir}/pkgconfig/id3tag.pc
 
-
 %changelog
 * Fri Oct 10 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.16.3-7
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Apr 17 2024 Peter Lemenkov <lemenkov@gmail.com> - 0.16.3-5
+- Use autorelease macro
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 14 2023 Leigh Scott <leigh123linux@gmail.com> - 0.16.3-1
+- Update to 0.16.3
 
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
