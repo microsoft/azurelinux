@@ -228,12 +228,14 @@ fi
 %if ! %{with kernel_only}
 %files -n libxpmem
 %{_libdir}/libxpmem.so.*
+%license COPYING COPYING.LESSER
 
 %files -n libxpmem-devel
 %{_prefix}/include/xpmem.h
 %{_libdir}/libxpmem.a
 %{_libdir}/libxpmem.so
 %{_libdir}/pkgconfig/cray-xpmem.pc
+%license COPYING COPYING.LESSER
 %endif
 
 %if "%{KMP}" != "1"
