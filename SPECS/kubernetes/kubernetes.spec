@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,7 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 Patch0:         CVE-2024-28180.patch
+Patch1:         CVE-2024-45338.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-8%{?dist}
 BuildRequires:  golang
@@ -271,6 +272,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.30.3-2
+- Add patch for CVE-2024-45338
+
 * Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.3-1
 - Auto-upgrade to 1.30.3 - Fix CVE-2024-10220
 
