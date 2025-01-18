@@ -88,7 +88,7 @@ rm -rf %{buildroot}
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10
 - define mlnx_ofa_version macro
 - wrong package name in files seciont
 * Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com>

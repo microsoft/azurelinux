@@ -171,7 +171,7 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10
 - duplicate SourceNN definitions
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10
 - Creating signed spec
