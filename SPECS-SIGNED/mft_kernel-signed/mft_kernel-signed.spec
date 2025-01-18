@@ -62,7 +62,7 @@ rm -rf %{buildroot}
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0
+* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

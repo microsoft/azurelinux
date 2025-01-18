@@ -56,8 +56,8 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{version}
+Requires:       mlnx-ofa_kernel-modules  = %{version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -67,7 +67,6 @@ isert signed kernel modules
 %prep
 
 %build
-
 
 %install
 rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
@@ -92,9 +91,8 @@ fi # 1 : closed
 /lib/modules/%{KVERSION}/updates/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 
-
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - License verified
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
