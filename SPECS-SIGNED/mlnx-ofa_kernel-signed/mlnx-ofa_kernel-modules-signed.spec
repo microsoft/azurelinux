@@ -171,9 +171,7 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10
-- duplicate SourceNN definitions
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

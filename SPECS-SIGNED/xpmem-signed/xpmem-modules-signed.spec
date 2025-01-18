@@ -63,9 +63,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4
-- wrong package name in files section
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

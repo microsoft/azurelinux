@@ -32,8 +32,6 @@
 %global target_kernel_version_full f.a.k.e
 %endif
 
-%define mlnx_version 24.10
-
 %global KVERSION %{target_kernel_version_full}
 
 Summary:	 srp driver
@@ -59,8 +57,8 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
-Requires:       mlnx-ofa_kernel = %{mlnx_version}
-Requires:       mlnx-ofa_kernel-modules  = %{mlnx_version}
+Requires:       mlnx-ofa_kernel = %{version}
+Requires:       mlnx-ofa_kernel-modules  = %{version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -88,10 +86,7 @@ rm -rf %{buildroot}
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10
-- define mlnx_ofa_version macro
-- wrong package name in files seciont
-* Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
