@@ -34,13 +34,8 @@
 
 Name:         qtbase
 Summary:      Qt6 - QtBase components
-<<<<<<< HEAD
-Version:      6.6.2
-Release:      1%{?dist}
-=======
 Version:      6.6.3
 Release:      2%{?dist}
->>>>>>> 52527c46c (Added a patch to address CVE-2024-56732 for qtbase. (#11935))
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -706,15 +701,12 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
-<<<<<<< HEAD
-=======
 * Thu Jan 16 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-2
 - Added a patch for addressing CVE-2024-56732
 
 * Wed Jan 15 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-1
 - Upgrade to version 6.6.3 to fix CVE-2024-30161
 
->>>>>>> 52527c46c (Added a patch to address CVE-2024-56732 for qtbase. (#11935))
 * Fri May 17 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 6.6.2-1
 - Upgrade to version 6.6.2 to fix CVE-2023-51714
 

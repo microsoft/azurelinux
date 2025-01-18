@@ -30,6 +30,8 @@
 # SOFTWARE.
 #
 
+%global last-known-kernel 6.6.64.2
+
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}

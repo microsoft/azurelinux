@@ -548,6 +548,7 @@
                 "kata-containers",
                 "kde-filesystem",
                 "kde-settings",
+                "kernel-srpm-macros",
                 "kexec-tools",
                 "keybinder3",
                 "keycloak-httpd-client-install",
