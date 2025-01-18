@@ -32,6 +32,8 @@
 
 %global KVERSION %{target_kernel_version_full}
 
+%define mlnx_version 24.10
+
 %{!?_name: %define _name isert}
 
 Summary:	 %{_name} Driver
@@ -56,8 +58,8 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{mlnx_version}
+Requires:       mlnx-ofa_kernel-modules  = %{mlnx_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -67,7 +69,6 @@ isert signed kernel modules
 %prep
 
 %build
-
 
 %install
 rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
@@ -94,6 +95,8 @@ fi # 1 : closed
 
 
 %changelog
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+- define mlnx_ofa_version macro
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
 - Creating signed spec
 - License verified

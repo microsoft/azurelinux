@@ -91,14 +91,10 @@ fi
 %files
 %{_datadir}/licenses
 /lib/modules/
-%if %{IS_RHEL_VENDOR}
-%if ! 0%{?fedora}
-%config(noreplace) %{_sysconfdir}/depmod.d/%{_name}.conf
-%endif
-%endif
-
 
 %changelog
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+- define mlnx_ofa_version macro and remove invalid distro conditional
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 1.1.4.90mlnx3
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
