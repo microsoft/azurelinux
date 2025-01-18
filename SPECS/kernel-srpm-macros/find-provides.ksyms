@@ -1,0 +1,138 @@
+#! /bin/bash
+
+IFS=$'\n'
+export LC_ALL=C
+
+# Prevent elfutils from trying to download debuginfos
+unset DEBUGINFOD_URLS
+
+for module in $(grep -E '/lib/modules/.+\.ko(\.gz|\.bz2|\.xz|\.zst)?$') "$@"; do
+    dep_pfx="ksym"
+    # For built-in kmods, "kernel()" syntax is used instead of "ksym()"
+    printf "%s" "$module" | grep -v "^${RPM_BUILD_ROOT}/\?lib/modules/[1-9][^/]*/kernel" > /dev/null \
+        || dep_pfx="kernel"
+
+    tmpfile=""
+    if [ "x${module%.ko}" = "x${module}" ]; then
+        tmpfile=$(mktemp -t ${0##*/}.XXXXXX.ko)
+        proc_bin=
+        case "${module##*.}" in
+        zst)
+                proc_bin=zstd
+                ;;
+        xz)
+                proc_bin=xz
+                ;;
+        bz2)
+                proc_bin=bzip2
+                ;;
+        gz)
+                proc_bin=gzip
+                ;;
+        esac
+
+        [ -n "$proc_bin" ] || continue
+
+        "$proc_bin" -d -c - < "$module" > "$tmpfile" || continue
+        module="$tmpfile"
+    fi
+
+    # A modversion can be stored as an ELF symbol in various ways:
+    # - An immediate symbol whose value is available directly;  it shows up
+    #   in the nm or objdump -t output, for example:
+    #       $ nm mlx5_core_5.14.x86_64.ko | grep '__crc_' | head -n 3
+    #       0000000092f175ca A __crc_mlx5_access_reg
+    #       000000005b88c9f1 A __crc_mlx5_add_flow_rules
+    #       00000000e7c0ec8a A __crc_mlx5_alloc_bfreg
+    #       $ objdump -t lib/modules/mlx5_core_5.14.x86_64.ko | grep __crc_ | sort -k 5,5 | head -n 3
+    #       0000000092f175ca g       *ABS*	0000000000000000 __crc_mlx5_access_reg
+    #       000000005b88c9f1 g       *ABS*	0000000000000000 __crc_mlx5_add_flow_rules
+    #       00000000e7c0ec8a g       *ABS*	0000000000000000 __crc_mlx5_alloc_bfreg
+    #       $ zgrep mlx5_access_reg ./lib/modules/5.14.0-284.15.1.el9_2.x86_64/symvers.gz
+    #       0x92f175ca	mlx5_access_reg	drivers/net/ethernet/mellanox/mlx5/core/mlx5_core	EXPORT_SYMBOL_GPL
+    #   This approach was being used on x86 and arm before Linux 5.19,
+    #   for example.
+    #
+    # - A globally or locally visible symbol in a read-only (or not;
+    #   sometimes .rodata is not a read-only section, after all, as binutils
+    #   commit binutils-2_33~1385 has revealed (and binutils-2_35~1768 hasn't
+    #   concealed back)) section (historically .rodata, __kcrctab/__kcrctab_gpl
+    #   since Linux v5.19-rc1~139^2~2):
+    #       $ nm mlx5_core_5.14.s390x.ko | grep '__crc_' | head -n 3
+    #       0000000000002f7c R __crc_mlx5_access_reg
+    #       0000000000003304 R __crc_mlx5_add_flow_rules
+    #       0000000000002d2c R __crc_mlx5_alloc_bfreg
+    #   This layout is used on ppc since Linux v4.10-rc7~15^2~1, for example,
+    #   and on all architectures since Linux 5.19.  To extract the symbol
+    #   versions in this case, we get the offset and the section name
+    #   from the "objdump -t" output:
+    #       $ objdump -t lib/modules/mlx5_core_5.14.s390x.ko | grep '__crc_' | sort -k 5,5 | head -n 2
+    #       0000000000002f7c g       .rodata	0000000000000000 __crc_mlx5_access_reg
+    #       0000000000003304 g       .rodata	0000000000000000 __crc_mlx5_add_flow_rules
+    #   and the section contents from the "readelf -R" call:
+    #       $ readelf -R .rodata mlx5_core_5.14.s390x.ko
+    #       [... skipped output ...]
+    #         0x00002f70 6c6f635f 6e6f6465 00000000 ed6560a8 loc_node.....e`.
+    #                                               ^^^^^^^^
+    #   comparison with the contents
+    #   of lib/modules/5.14.0-284.15.1.el9_2.s390x/symvers.gz corroborates
+    #   its correctness:
+    #       0xed6560a8	mlx5_access_reg	drivers/net/ethernet/mellanox/mlx5/core/mlx5_core	EXPORT_SYMBOL_GPL
+    #   As mentioned earlier, for the later kernel versions, __kcrctab{,_gpl}
+    #   sections are used:
+    #       $ objdump -t lib/modules/mlx5_core_6.4.x86_64.ko | grep '__crc_' | sort -k 5,5 | head -n 2
+    #       0000000000000000 l       __kcrctab_gpl	0000000000000000 __crc_mlx5_access_reg
+    #       0000000000000090 l       __kcrctab	0000000000000000 __crc_mlx5_add_flow_rules
+    #       $ readelf -R __kcrctab_gpl mlx5_core_6.4.x86_64.ko
+    #         0x00000000 38b0d3c3 1840ce35 b99babc7 70b4700c 8....@.5....p.p.
+    #                    ^^^^^^^^
+    #   and in lib/modules/6.4.0-0.rc1.20230511git80e62bc8487b.19.eln126.x86_64/symvers.xz
+    #   we see that it is correct (when accounted for the little endianness):
+    #       0xc3d3b038	mlx5_access_reg	drivers/net/ethernet/mellanox/mlx5/core/mlx5_core	EXPORT_SYMBOL_GPL
+    #   This data, after some post-processing,  can be used in the awk script
+    #   that extracts parts of the section according to the offsets got
+    #   from the "objdump -t" output.
+    objdump -t "$module" \
+    | awk \
+      -v 'dep_pfx='"$dep_pfx" \
+      -v 'module='"$module" \
+      --non-decimal-data \
+      'BEGIN { revbytes = 0 }
+
+      function check_endianness(   t) {
+          if (revbytes) return revbytes;
+
+          revbytes = -1;
+          while (("readelf -h \"" module "\"" | getline t) > 0) {
+              if (match(t, /^  Data: *2\047s complement, little endian$/)) {
+                  revbytes = 1;
+                  break;
+              }
+          }
+
+          return revbytes;
+      }
+
+      function readsect(name,   a, t) {
+          a = "";
+          while (("readelf -R \"" name "\" \"" module "\"" | getline t) > 0) {
+              if (match(t, /^  0x[0-9a-f]{8}/))
+                  a = a substr(t, 14, 8) substr(t, 23, 8) substr(t, 32, 8) substr(t, 41, 8);
+          }
+          if (check_endianness() == 1)
+              a = gensub(/(..)(..)(..)(..)/, "\\4\\3\\2\\1", "g", a);
+          sectdata[name] = a;
+      }
+
+      match($0, /^([0-9a-f]+) [gl]...... (.*)	[0-9a-f]+ __crc_(.*)$/, a) {
+          if (a[2] == "*ABS*") {
+              printf("%s(%s) = 0x%08x\n", dep_pfx, a[3], strtonum("0x" a[1]));
+          } else {
+              if (!(a[2] in sectdata)) { readsect(a[2]) }
+              printf("%s(%s) = 0x%08s\n", dep_pfx, a[3], substr(sectdata[a[2]], (strtonum("0x" a[1]) * 2) + 1, 8))
+          }
+      }'
+
+    [ -z "$tmpfile" ] || rm -f -- "$tmpfile"
+done \
+| sort -k1,1 -u
