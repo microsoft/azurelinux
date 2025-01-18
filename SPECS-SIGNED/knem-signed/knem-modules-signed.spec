@@ -91,15 +91,9 @@ fi
 %files
 %{_datadir}/licenses
 /lib/modules/
-%if %{IS_RHEL_VENDOR}
-%if ! 0%{?fedora}
-%config(noreplace) %{_sysconfdir}/depmod.d/%{_name}.conf
-%endif
-%endif
-
 
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 1.1.4.90mlnx3
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 1.1.4.90mlnx3-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

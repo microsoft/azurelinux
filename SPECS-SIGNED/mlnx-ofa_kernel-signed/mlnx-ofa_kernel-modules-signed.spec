@@ -72,16 +72,16 @@ Source16:       ib_iser.ko
 Source17:       ib_isert.ko
 Source18:       ib_srp.ko
 Source19:       mlx5_core.ko
-Source10:       mlxfw.ko
-Source11:       mlxsw_spectrum.ko
-Source12:       nvme-rdma.ko
-Source13:       nvmet-rdma.ko
-Source14:       mlxdevm.ko
-Source15:       smc.ko
-Source16:       smc_diag.ko
-Source17:       rpcrdma.ko
-Source18:       svcrdma.ko
-Source19:       xprtrdma.ko
+Source20:       mlxfw.ko
+Source21:       mlxsw_spectrum.ko
+Source22:       nvme-rdma.ko
+Source23:       nvmet-rdma.ko
+Source24:       mlxdevm.ko
+Source25:       smc.ko
+Source26:       smc_diag.ko
+Source27:       rpcrdma.ko
+Source28:       svcrdma.ko
+Source29:       xprtrdma.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -144,16 +144,16 @@ cp -r %{SOURCE16} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniban
 cp -r %{SOURCE17} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
 cp -r %{SOURCE18} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
 cp -r %{SOURCE19} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
-cp -r %{SOURCE10} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
-cp -r %{SOURCE11} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
-cp -r %{SOURCE12} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
-cp -r %{SOURCE13} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
-cp -r %{SOURCE14} %{buildroot}/lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
-cp -r %{SOURCE15} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc.ko
-cp -r %{SOURCE16} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
-cp -r %{SOURCE17} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
-cp -r %{SOURCE18} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
-cp -r %{SOURCE19} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+cp -r %{SOURCE20} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
+cp -r %{SOURCE21} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
+cp -r %{SOURCE22} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
+cp -r %{SOURCE23} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
+cp -r %{SOURCE24} %{buildroot}/lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
+cp -r %{SOURCE25} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc.ko
+cp -r %{SOURCE26} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
+cp -r %{SOURCE27} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
+cp -r %{SOURCE28} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
+cp -r %{SOURCE29} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
 
 %clean
 rm -rf %{buildroot}
@@ -171,7 +171,7 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

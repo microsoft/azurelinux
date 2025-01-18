@@ -57,13 +57,13 @@ cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/xpmem.ko
 %clean
 rm -rf %{buildroot}
 
-%files modules
+%files
 /lib/modules/%{KVERSION}/updates/xpmem.ko
 %{_datadir}/licenses
 
 
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
