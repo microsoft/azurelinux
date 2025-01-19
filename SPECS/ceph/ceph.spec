@@ -898,6 +898,10 @@ This package provides a Ceph hardware monitoring agent.
 %autosetup -p1 
 
 %build
+pwd
+# CVE-2022-24736 and CVE-2022-24735 Remove opentelemetry-cpp which uses LUA
+# This subsystem is not getting built in ceph
+rm -rf src/jaegertracing/opentelemetry-cpp/*
 # LTO can be enabled as soon as the following GCC bug is fixed:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200
 %define _lto_cflags %{nil}
