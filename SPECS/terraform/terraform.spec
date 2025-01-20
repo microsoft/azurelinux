@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,10 +44,7 @@ BuildRequires:  golang
 Terraform is an infrastructure as code deployment management tool
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
@@ -68,6 +65,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Tue Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.3.2-22
+- Add Patch for CVE-2023-0475
+
 * Mon Jan 06 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-21
 - Add patch for CVE-2024-45338
 
