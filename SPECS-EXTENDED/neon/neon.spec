@@ -13,7 +13,7 @@ Distribution:   Azure Linux
 Summary: An HTTP and WebDAV client library
 Name: neon
 Version: 0.33.0
-Release: 1%{?dist}
+Release: 3%{?dist}
 License: LGPL-2.0-or-later
 URL: https://notroj.github.io/neon/
 Source0: https://notroj.github.io/neon/neon-%{version}.tar.gz
@@ -27,7 +27,6 @@ BuildRequires: pkgconfig
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: xmlto
-
 
 %if %{with pkcs11}
 BuildRequires: pakchois-devel
@@ -105,12 +104,82 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-1
-- Update to 0.33.0
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.33.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 30 2024 Joe Orton <jorton@redhat.com> - 0.33.0-1
+- update to 0.33.0
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Sep 29 2023 Joe Orton <jorton@redhat.com> - 0.32.5-3
+- migrated to SPDX license
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jan 23 2023 Joe Orton <jorton@redhat.com> - 0.32.5-1
+- update to 0.32.5
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep  5 2022 Joe Orton <jorton@redhat.com> - 0.32.3-1
+- update to 0.32.3
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 27 2022 Timm Bäder <tbaeder@redhat.com> - 0.32.2-4
+- Disable automatic .la file removal
+- https://fedoraproject.org/wiki/Changes/RemoveLaFiles
+
+* Thu Jan 27 2022 Joe Orton <jorton@redhat.com> - 0.32.2-3
+- strip LIBS exported by neon-config to the minimum
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 13 2022 Joe Orton <jorton@redhat.com> - 0.32.2-1
+- update to 0.32.2
+
+* Tue Sep 21 2021 Joe Orton <jorton@redhat.com> - 0.32.1-1
+- update to 0.32.1
+- add bcond for libproxy support
+
+* Mon Sep 20 2021 Joe Orton <jorton@redhat.com> - 0.32.0-1
+- update to 0.32.0
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.31.2-8
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Feb  4 2021 Joe Orton <jorton@redhat.com> - 0.31.2-6
+- add bcond for PKCS#11 support
+- use make macros
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Aug 26 2020 Joe Orton <jorton@redhat.com> - 0.31.2-4
+- fix tests with current OpenSSL (#1863681)
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jun 24 2020 Joe Orton <jorton@redhat.com> - 0.31.2-1
 - update to 0.31.2
