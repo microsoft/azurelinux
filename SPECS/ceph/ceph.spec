@@ -1,3 +1,4 @@
+#Checking build in pipeline
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
 %define _unpackaged_files_terminate_build 0 
