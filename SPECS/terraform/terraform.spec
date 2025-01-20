@@ -45,7 +45,7 @@ BuildRequires:  golang
 Terraform is an infrastructure as code deployment management tool
 
 %prep
-%autosetup -p1 -n cli-%{version} -a1
+%autosetup -p1 -n %{name}-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
