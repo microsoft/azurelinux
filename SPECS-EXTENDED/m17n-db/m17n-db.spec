@@ -42,7 +42,6 @@ Requires: %{name} = %{version}-%{release}
 %description devel
 m17n-db development files
 
-
 %prep
 %autosetup -N
 
