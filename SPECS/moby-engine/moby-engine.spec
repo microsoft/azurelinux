@@ -123,6 +123,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Tue Jan 21 2025 Muhammad Falak <mwani@microsoft.com> - 25.0.3-1
+- Bump version to 25.0.3
+
 * Thu Dec 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 24.0.9-13
 - Patch CVE-2024-24786
 
