@@ -25464,7 +25464,7 @@
         "other": {
           "name": "qhull",
           "version": "8.0.2",
-          "downloadUrl": "https://github.com/qhull/qhull/archive/refs/tags/v8.0.2.tar.gz"
+          "downloadUrl": "https://github.com/qhull/qhull/archive/v8.0.2.tar.gz"
         }
       }
     },
