@@ -88,7 +88,6 @@ cd ..
 
 chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*
 
-
 %files
 %{_pkgdocdir}
 %exclude %{_pkgdocdir}/COPYING.txt
@@ -101,18 +100,15 @@ chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*
 
 %ldconfig_scriptlets -n libqhull
 
-
 %files -n libqhull_r
 %{_libdir}/libqhull_r.so.*
 
 %ldconfig_scriptlets -n libqhull_r
 
-
 %files -n libqhull_p
 %{_libdir}/libqhull_p.so.*
 
 %ldconfig_scriptlets -n libqhull_p
-
 
 %files devel
 %{_libdir}/*.so
