@@ -1,9 +1,9 @@
-%define commit_hash fca702de7f71362c8d103073c7e4a1d0a467fadd
+%define commit_hash f417435e5f6216828dec57958c490c4f8bae4f98
 
 Summary: The open-source application container engine
 Name:    moby-engine
-Version: 24.0.9
-Release: 13%{?dist}
+Version: 25.0.3
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -13,21 +13,16 @@ Distribution: Mariner
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: docker.service
 Source2: docker.socket
-# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
-# Remove once we upgrade this package at least to version 25.0+.
-Patch1:  CVE-2024-23651.patch
-# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
-# Remove once we upgrade this package at least to version 25.0+.
-Patch2:  CVE-2024-23652.patch
-Patch3:  CVE-2023-45288.patch
-Patch4:  CVE-2023-44487.patch
-Patch5:  enable-docker-proxy-libexec-search.patch
-Patch6:  CVE-2024-41110.patch
-Patch7:  CVE-2024-29018.patch
-Patch8:  CVE-2024-36621.patch
-Patch9:  CVE-2024-36623.patch
-Patch10: CVE-2024-45337.patch
-Patch11:  CVE-2024-24786.patch
+
+Patch0:  CVE-2022-2879.patch
+Patch1:  enable-docker-proxy-libexec-search.patch
+Patch2:  CVE-2024-41110.patch
+Patch3:  CVE-2024-29018.patch
+Patch4:  CVE-2024-24786.patch
+Patch5:  CVE-2024-36621.patch
+Patch6:  CVE-2024-36620.patch
+Patch7:  CVE-2024-36623.patch
+Patch8:  CVE-2024-45337.patch
 
 %{?systemd_requires}
 
