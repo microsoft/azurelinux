@@ -46,7 +46,7 @@ make tests
 %{_mandir}/man1/re2rust.1*
 
 %changelog
-* Wed Dec 18 2024 Akhila Guruju <v-guakhila@microsoft.com> - 3.1-4
+* Thu Dec 19 2024 Akhila Guruju <v-guakhila@microsoft.com> - 3.1-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
