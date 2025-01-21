@@ -239,7 +239,7 @@ function docker_build {
     local dockerfile=$4
     local should_build=$5
 
-    if [[ ! $should_build ]]; then
+    if [[ $should_build != true ]]; then
         echo "+++ Skip building image- Fasttrack: $image_full_name"
         return
     fi
