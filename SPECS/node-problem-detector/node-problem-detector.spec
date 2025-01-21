@@ -61,12 +61,14 @@ Requires:       node-problem-detector
 Default configuration files for node-problem-detector
 
 %prep
-%autosetup -p1
+%autosetup -p1 -N
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
 %patch 2 -p1
-%patch 3 -p1
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
 %patch 2 -p1
