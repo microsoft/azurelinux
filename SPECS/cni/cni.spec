@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,7 @@ Source2:        build.sh
 Source3:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-38561.patch
 Patch1:         CVE-2022-32149.patch
+Patch2:		CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -115,6 +116,9 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Tue Jan 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.1.2-4
+- Patch CVE-2024-45338
+
 * Fri Sep 06 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.1.2-3
 - Patch CVE-2022-32149
 
