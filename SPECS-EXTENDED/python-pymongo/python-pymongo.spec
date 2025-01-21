@@ -97,7 +97,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 %{python3_sitearch}/gridfs
 
 %changelog
-* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.2.0-9
+* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.2.0-9
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
