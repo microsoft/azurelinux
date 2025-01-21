@@ -4300,8 +4300,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.39.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.39.4.tar.xz"
+          "version": "2.40.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.40.4.tar.gz"
         }
       }
     },
@@ -7381,8 +7381,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.17",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.17.tar.gz"
+          "version": "3.18",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.18.tar.gz"
         }
       }
     },
@@ -13673,8 +13673,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.8-1/go1.22.8-20241001.6.src.tar.gz"
+          "version": "1.23.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
         }
       }
     },
@@ -25845,8 +25845,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.2.5",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.5.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
         }
       }
     },
@@ -29047,8 +29047,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2024a",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024a.tar.gz"
+          "version": "2024b",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024b.tar.gz"
         }
       }
     },
