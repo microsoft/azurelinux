@@ -333,10 +333,10 @@ function save_container_image {
 
 function build_images {
     echo "+++ Build images"
-    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template"
-    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template"
+    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template" "$BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_MINIMAL_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_DEBUG_BUILD"
     docker_build_marinara
 }
 
