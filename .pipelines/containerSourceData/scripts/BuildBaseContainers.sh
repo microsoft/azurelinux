@@ -119,10 +119,10 @@ function validate_inputs {
     DISTROLESS_DEBUG_BUILD=${DISTROLESS_DEBUG_BUILD:-true}
     DISTROLESS_MINIMAL_BUILD=${DISTROLESS_MINIMAL_BUILD:-true}
 
-    if [[ ($BASE_BUILD == true && ! -f $BASE_TARBALL) || \
-      ($DISTROLESS_BASE_BUILD == true && ! -f $DISTROLESS_BASE_TARBALL) || \
-      ($DISTROLESS_DEBUG_BUILD == true && ! -f $DISTROLESS_DEBUG_TARBALL) || \
-      ($DISTROLESS_MINIMAL_BUILD == true && ! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
+    if [[ ($BASE_BUILD =~ [Tt]rue && ! -f $BASE_TARBALL) || \
+      ($DISTROLESS_BASE_BUILD =~ [Tt]rue  && ! -f $DISTROLESS_BASE_TARBALL) || \
+      ($DISTROLESS_DEBUG_BUILD =~ [Tt]rue && ! -f $DISTROLESS_DEBUG_TARBALL) || \
+      ($DISTROLESS_MINIMAL_BUILD =~ [Tt]rue && ! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
         echo "Error - Missing some tarball(s) in $CONTAINER_TARBALLS_DIR"
         exit 1
     fi
@@ -229,7 +229,7 @@ function docker_build {
     local dockerfile=$4
     local should_build=$5
 
-    if [[ $should_build != true ]]; then
+    if [[ $should_build =~ [Ff]alse ]]; then
         echo "+++ Skip building image- Fasttrack: $image_full_name"
         return
     fi
