@@ -59,7 +59,6 @@ Patch0:      	recode-3.7.13-Rename-coliding-hash-functions.patch
 # https://github.com/rrthomas/recode/issues/48
 Patch1:      	0001-src-task.c-only-close-input-stream-when-we-opened-it.patch
 
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  coreutils
@@ -389,3 +388,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Tue Nov 13 2001 Than Ngo <than@redhat.com> 3.6-1
 - initial RPM for 8.0
+
