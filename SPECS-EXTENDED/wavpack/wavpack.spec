@@ -5,8 +5,8 @@ Summary:	A completely open audiocodec
 Version:	5.7.0
 Release:	4%{?dist}
 License:	BSD-3-Clause AND BSD-2-Clause AND LicenseRef-Fedora-Public-Domain
-Url:		http://www.wavpack.com/
-Source:		http://www.wavpack.com/%{name}-%{version}.tar.bz2
+Url:		https://www.wavpack.com/
+Source:		https://www.wavpack.com/%{name}-%{version}.tar.bz2
 # For autoreconf
 BuildRequires:  autoconf
 BuildRequires:  automake
