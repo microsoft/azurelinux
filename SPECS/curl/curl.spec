@@ -16,6 +16,7 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
+Requires:       libpsl-devel
 
 %description
 The cURL package contains an utility and a library used for
@@ -53,7 +54,6 @@ This package contains minimal set of shared curl libraries.
     --with-ssl \
     --with-gssapi \
     --with-libssh2 \
-    --with-libpsl-devel \
     --with-nghttp2 \
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
