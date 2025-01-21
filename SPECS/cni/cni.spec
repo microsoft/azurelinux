@@ -51,6 +51,7 @@ Source3:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-38561.patch
 Patch1:         CVE-2022-32149.patch
 Patch2:		CVE-2024-45338.patch
+Patch3:		CVE-2022-29526.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -117,7 +118,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 
 %changelog
 * Tue Jan 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.1.2-4
-- Patch CVE-2024-45338
+- Patch CVE-2024-45338 and CVE-2022-29526
 
 * Fri Sep 06 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.1.2-3
 - Patch CVE-2022-32149
