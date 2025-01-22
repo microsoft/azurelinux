@@ -18,20 +18,40 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: '2.0-stable'
+        ref: '3.0-stable'
 
-    - name: Set up Go 1.20
+    - name: Set up Go 1.21
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: 1.21
       id: go
 
     - name: Install Remaining Prerequisites
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
-        sudo apt -y install pigz
+        sudo apt -y install \
+            acl \
+            curl \
+            gawk \
+            genisoimage \
+            git \
+            golang-1.21-go \
+            jq \
+            make \
+            parted \
+            pigz \
+            openssl \
+            systemd \
+            qemu-utils \
+            rpm \
+            tar \
+            wget \
+            xfsprogs
+
+        # Fix go 1.21 link
+        sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go
+        sudo ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
 
     - name: Download SRPMS
       run: |
@@ -47,20 +67,40 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: '2.0-stable'
+        ref: '3.0-stable'
 
-    - name: Set up Go 1.20
+    - name: Set up Go 1.21
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: 1.21
       id: go
 
     - name: Install Remaining Prerequisites
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
-        sudo apt -y install pigz
+        sudo apt -y install \
+            acl \
+            curl \
+            gawk \
+            genisoimage \
+            git \
+            golang-1.21-go \
+            jq \
+            make \
+            parted \
+            pigz \
+            openssl \
+            systemd \
+            qemu-utils \
+            rpm \
+            tar \
+            wget \
+            xfsprogs
+
+        # Fix go 1.21 link
+        sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go
+        sudo ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
 
     - name: ISO Quick Start
       run: |
@@ -75,21 +115,39 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: '2.0-stable'
+        ref: '3.0-stable'
 
-    - name: Set up Go 1.20
+    - name: Set up Go 1.21
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: 1.21
       id: go
 
     - name: Install Remaining Prerequisites
       run: |
         # Golang and docker are already installed on the agent
-        sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
-        sudo apt -y install pigz
+        sudo apt -y install \
+            acl \
+            curl \
+            gawk \
+            genisoimage \
+            git \
+            golang-1.21-go \
+            jq \
+            make \
+            parted \
+            pigz \
+            openssl \
+            systemd \
+            qemu-utils \
+            rpm \
+            tar \
+            wget \
+            xfsprogs
 
+        # Fix go 1.21 link
+        sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go
+        sudo ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
     - name: VHDX Quick Start
       run: |
         pushd toolkit
