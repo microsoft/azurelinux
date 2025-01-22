@@ -7,12 +7,12 @@
 
 %global _name kernel-mft
 
-Name:		 %{_name}
-Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.30.0
-Release:	 1%{?dist}
-License:	 Dual BSD/GPLv2
-Group:		 System Environment/Kernel
+Name:            mft_kernel
+Summary:         %{name} Kernel Module for the %{KVERSION} kernel
+Version:         4.30.0
+Release:         1%{?dist}
+License:         Dual BSD/GPLv2
+Group:           System Environment/Kernel
 
 #
 # To populate these sources:
@@ -30,6 +30,11 @@ ExclusiveArch:  x86_64
 
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
+
+# Best practice for specs mandate package name and rpm name must
+# match. Default mft_kernel spec set rpm name as kernel-mft. To
+# comply, we set Name as mft_kernel but add a Provides for kernel-mft.
+Provides:       kernel-mft
 
 %description
 mft kernel module(s)
