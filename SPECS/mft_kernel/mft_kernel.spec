@@ -26,12 +26,6 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%if "%{KMP}" == "1"
-%global _name kernel-mft-mlnx
-%else
-%global _name kernel-mft
-%endif
-
 %{!?version: %global version 4.30.0}
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}

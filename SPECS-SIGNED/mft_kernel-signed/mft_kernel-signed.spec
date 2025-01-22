@@ -5,8 +5,6 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%global _name kernel-mft
-
 Name:            mft_kernel
 Summary:         %{name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
