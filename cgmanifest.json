@@ -9362,7 +9362,7 @@
         "other": {
           "name": "libexttextcat",
           "version": "3.4.6",
-          "downloadUrl": "http://dev-www.libreoffice.org/src/libexttextcat/libexttextcat-3.4.6.tar.xz"
+          "downloadUrl": "https://dev-www.libreoffice.org/src/libexttextcat/libexttextcat-3.4.6.tar.xz"
         }
       }
     },
