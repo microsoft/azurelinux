@@ -29,10 +29,10 @@ ExclusiveArch:  x86_64
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-# Best practice for specs mandate package name and rpm name must
-# match. Default mft_kernel spec set rpm name as kernel-mft. To
-# comply, we set Name as mft_kernel but add a Provides for kernel-mft.
-Provides:       kernel-mft
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
+Provides:       kernel-mft = %{version}-%{release}
 
 %description
 mft kernel module(s)
