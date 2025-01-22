@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "moby-cli-24.0.9-govendor-v1.tar.gz": "a78e3800bab782062f5dd34fe1ea870b843d9bf801c6f686e7eef2f964a29c70",
-  "moby-cli-24.0.9.tar.gz": "be949d2b9ce549f65823e57b0a41676ae607160a21a846ff88b26f77a43f5a1a"
+  "moby-cli-25.0.3-govendor-v1.tar.gz": "c35a637cedebb192ffd4021d146680be196ce8cf2a6de14e04ea08e7996942f2",
+  "moby-cli-25.0.3.tar.gz": "04ad0cea992a65db20cb1b0dbf6d1ce32c705ce879de51b22095fe8d28030815"
  }
 }
