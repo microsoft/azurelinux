@@ -9,25 +9,7 @@ Distribution:   Azure Linux
 License:       MIT
 URL:           https://github.com/git-lfs/git-lfs
 Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz -O git-lfs-%%{version}.tar.gz
-#   2. tar -xf git-lfs-%%{version}.tar.gz
-#   3. cd git-lfs-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
-#
-#   NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:       %{name}-%{version}-vendor.tar.gz
+Source1:       %{name}-%{version}-govendor-v1.tar.gz
 
 BuildRequires: golang
 BuildRequires: which
