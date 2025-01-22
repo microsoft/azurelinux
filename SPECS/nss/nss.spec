@@ -96,7 +96,6 @@ make VERBOSE=1 BUILD_OPT=1 \
     ZLIB_LIBS=-lz \
     USE_64=1 \
     NSS_ENABLE_WERROR=0 \
-    NSS_USE_SYSTEM_SQLITE=1 \
     NSS_DISABLE_DBM=1
 popd
 
