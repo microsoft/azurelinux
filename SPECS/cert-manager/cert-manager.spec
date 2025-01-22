@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.11.2
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ Patch7:         CVE-2024-28180.patch
 Patch8:         CVE-2023-2253.patch
 Patch9:         CVE-2024-45337.patch
 Patch10:        CVE-2024-45338.patch
+Patch11:        CVE-2024-12401.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -122,6 +123,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Tue Jan 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.11.2-18
+- Add patch for CVE-2024-12401.patch
+
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.11.2-17
 - Add patch for CVE-2024-45338
 
@@ -134,7 +138,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 * Wed Aug 21 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.11.2-14
 - Patch for CVE-2023-3978, CVE-2024-24786, CVE-2024-28180, CVE-2023-2253
 
-* Mon Aug 19 2023 Bala <balakumaran.kannan@microsoft.com> - 1.11.2-13
+* Mon Aug 19 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.2-13
 - Patch for CVE-2024-6104
 
 * Wed Aug 07 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.11.2-12
@@ -152,7 +156,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-8
 - Bump release to rebuild with go 1.21.6
 
-* Fri Jan 18 2024 Tobias Brick <tobiasb@microsoft.com> - 1.11.2-7
+* Thu Jan 18 2024 Tobias Brick <tobiasb@microsoft.com> - 1.11.2-7
 - Patch for CVE-2023-48795
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-6
