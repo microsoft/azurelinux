@@ -3,7 +3,7 @@
 #
 # Workflow to automatedly verify the quickstart instructions
 
-name: Verify Quickstart 2.0
+name: Verify Quickstart 3.0
 
 on:
   workflow_dispatch:
