@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,6 @@ Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 Source4:        luaconf.h
 Patch0:         %{name}-5.4.0-beta-autotoolize.patch
 Patch1:         %{name}-5.4.6-idsize.patch
-#Patch2:        %%{name}-5.3.0-luac-shared-link-fix.patch
 Patch3:         %{name}-5.2.2-configure-linux.patch
 Patch4:         %{name}-5.3.0-configure-compat-module.patch
 %if 0%{?bootstrap}
@@ -39,6 +38,7 @@ Patch5:         %{name}-5.3.0-autotoolize.patch
 Patch6:         %{name}-5.3.5-luac-shared-link-fix.patch
 %endif
 # https://www.lua.org/bugs.html
+Patch7:         %{name}-5.4.6-CVE-2020-24371.patch
 Patch18:        %{name}-5.3.5-CVE-2020-24370.patch
 
 BuildRequires:  autoconf
@@ -212,6 +212,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Wed Jan 22 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 5.4.6-2
+- Patch CVE-2020-24371
+
 * Tue Feb 27 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.6-1
 - Upgrade to version 5.4.6
 - Disable bootstrap
