@@ -78,7 +78,6 @@ BuildArch:      noarch
 
 
 %install
-#%make install/fast DESTDIR=%{buildroot}
 %cmake_install
 %find_lang exiv2 --with-man
 
