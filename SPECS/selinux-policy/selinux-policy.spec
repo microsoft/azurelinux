@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,8 @@ Patch35:        0035-rpm-Run-systemd-sysctl-from-post.patch
 Patch36:        0036-fstools-Add-additional-perms-for-cloud-utils-growpar.patch
 Patch37:        0037-docker-Fix-dockerc-typo-in-container_engine_executab.patch
 Patch38:        0038-enable-liveos-iso-flow.patch
+Patch39:        0039-lvm-Add-fc-entries-for-veritysetup.patch
+Patch40:        0040-bootloader-Chane-efibootmgr-from-fsadm.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -328,6 +330,11 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Thu Mar 06 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-10
+- Add tmpfs fix for cloud-utils-growpart.
+- Add missing veritysetup file contexts.
+- Change efibootmgr from fsadm program to bootloader program.
+
 * Wed Nov 20 2024 George Mileka <gmileka@microsoft.com> - 2.20240226-9
 - Enable SELinux for LiveOS ISO.
 
