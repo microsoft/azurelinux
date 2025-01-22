@@ -26,17 +26,11 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%if "%{KMP}" == "1"
-%global _name kernel-mft-mlnx
-%else
-%global _name kernel-mft
-%endif
-
 %{!?version: %global version 4.30.0}
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
-Name:		 kernel-mft
+Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
 Release:	 1%{?dist}
@@ -59,6 +53,10 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
+# Best practice for specs mandate package name and rpm name must
+# match. Default mft_kernel spec set rpm name as kernel-mft. To
+# comply, we set Name as mft_kernel but add a Provides for kernel-mft.
+Provides:       kernel-mft
 
 %description
 mft kernel module(s)
