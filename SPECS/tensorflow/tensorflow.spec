@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,8 @@ Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
 Patch4:         CVE-2024-35195.patch
+Patch5:		CVE-2024-5569.patch
+Patch6:		CVE-2023-45803.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -93,6 +95,40 @@ popd
 # Need to patch CVE-2024-35195 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
 pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH4}
+patch -p1 < %{PATCH5}
+
+pushd pypi__pip/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_aarch64-apple-darwin/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_aarch64-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_ppc64le-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_s390x-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_x86_64-apple-darwin/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_x86_64-pc-windows-msvc/Lib/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
+pushd python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/
+patch -p1 < %{PATCH6}
+popd
+
 popd
 
 export TF_PYTHON_VERSION=3.12
@@ -124,6 +160,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Wed Jan 22 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-9
+- Patch CVE-2024-5569 and CVE-2023-45803
+
 * Wed Jan 15 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.16.1-8
 - Address CVE-2024-35195 with an upstream patch
 
