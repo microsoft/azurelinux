@@ -149,7 +149,7 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Wed Jan 22 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -2.6.1-20
+* Wed Jan 22 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.6.1-20
 - Patch for CVE-2024-28180
 
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 2.6.1-19
