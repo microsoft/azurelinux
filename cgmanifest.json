@@ -13373,8 +13373,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "24.0.9",
-          "downloadUrl": "https://github.com/docker/cli/archive/v24.0.9.tar.gz"
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.3.tar.gz"
         }
       }
     },
@@ -13413,8 +13413,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "24.0.9",
-          "downloadUrl": "https://github.com/moby/moby/archive/v24.0.9.tar.gz"
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/moby/moby/archive/v25.0.3.tar.gz"
         }
       }
     },
