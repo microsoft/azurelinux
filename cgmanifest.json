@@ -15482,16 +15482,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "opusfile",
-          "version": "0.12",
-          "downloadUrl": "https://downloads.xiph.org/releases/opus/opusfile-0.12.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "orangefs",
           "version": "2.9.8",
           "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
