@@ -10,7 +10,7 @@ License:        MIT
 URL:            https://github.com/taocpp/%{name}/
 Source0:        https://github.com/taocpp/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++
-BuildRequires: /usr/bin/make
+BuildRequires:  /usr/bin/make
 
 %description
 The Parsing Expression Grammar Template Library (PEGTL) is a zero-dependency
