@@ -328,6 +328,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Jan 22 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-10
+- Add tmpfs fix for cloud-utils-growpart.
+
 * Wed Nov 20 2024 George Mileka <gmileka@microsoft.com> - 2.20240226-9
 - Enable SELinux for LiveOS ISO.
 
