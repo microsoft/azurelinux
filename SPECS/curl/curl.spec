@@ -12,7 +12,6 @@ BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
 BuildRequires:  openssl-devel
-BuildRequires:  libpsl-devel
 Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
