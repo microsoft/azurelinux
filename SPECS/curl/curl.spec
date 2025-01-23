@@ -55,6 +55,7 @@ This package contains minimal set of shared curl libraries.
     --with-gssapi \
     --with-libssh2 \
     --with-nghttp2 \
+    --without-libpsl \
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
 %make_build
