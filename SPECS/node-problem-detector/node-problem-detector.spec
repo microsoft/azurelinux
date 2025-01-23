@@ -40,6 +40,7 @@ Source2:        %{name}-%{version}-test-vendor.tar.gz
 Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
 Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
 Patch2:         CVE-2024-24786.patch
+Patch3:		CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
