@@ -29,13 +29,19 @@ ExclusiveArch:  x86_64
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-# Azure Linux attempts to match the spec file name and the "Name" tag.
-# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
-# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
-Provides:       kernel-mft = %{version}-%{release}
-
 %description
 mft kernel module(s)
+
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but force a build of kernel-mft rpm and
+# prevent mft_kernel rpm. A %files section is declared for kernel-mft
+# but not for mft_kernel which is the default rpm.
+%package -n kernel-mft
+Summary: kernel-mft Kernel Module for the %{KVERSION} kernel
+
+%description -n kernel-mft
+This package provides a kernel-mft kernel module.
 
 %global debug_package %{nil}
 
@@ -59,7 +65,7 @@ rm -rf %{buildroot}
 %postun
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n kernel-mft
 %defattr(-,root,root,-)
 %license %{_datadir}/licenses/%{name}/COPYING
 /lib/modules/%{KVERSION}/updates/

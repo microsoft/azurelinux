@@ -53,13 +53,20 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-# Azure Linux attempts to match the spec file name and the "Name" tag.
-# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
-# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
-Provides:       kernel-mft = %{version}-%{release}
-
 %description
 mft kernel module(s)
+
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but force a build of kernel-mft rpm and
+# prevent mft_kernel rpm. A %files section is declared for kernel-mft
+# but not for mft_kernel which is the default rpm.
+%package -n kernel-mft
+Summary: kernel-mft Kernel Module for the %{KVERSION} kernel
+
+%description -n kernel-mft
+This package provides a kernel-mft kernel module.
+
 
 %global debug_package %{nil}
 
@@ -201,6 +208,12 @@ done
 find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discard-locals -R .comment -R .note \{\} \;
 %endif
 
+# Install licnse file to %{_defaultlicensedir}/kernel-mft for %files to pickp.
+# This is required since %license will install to %{_defaultlicensedir}/%{name}
+# and we have a different %{name}.
+mkdir -p %{buildroot}/%{_defaultlicensedir}/kernel-mft
+cp SOURCE/COPYING %{buildroot}/%{_defaultlicensedir}/kernel-mft
+
 %post
 /sbin/depmod %{KVERSION}
 
@@ -208,9 +221,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 /sbin/depmod %{KVERSION}
 
 %if "%{KMP}" != "1"
-%files
+%files -n kernel-mft
 %defattr(-,root,root,-)
-%license source/COPYING
+%{_defaultlicensedir}/kernel-mft/COPYING
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
