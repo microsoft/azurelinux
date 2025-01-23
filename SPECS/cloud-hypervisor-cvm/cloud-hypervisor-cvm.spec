@@ -13,24 +13,15 @@ Group:          Applications/System
 URL:            https://github.com/microsoft/cloud-hypervisor
 Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
-# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# Note: the %%{name}-%%{version}-vendor.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
 #   tar -xf %%{name}-%%{version}.tar.gz
 #   cd %%{name}-%%{version}
-#   patch -u -p0 < ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
 #   cargo vendor > config.toml
-#   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
-# rename the tarball to %%{name}-%%{version}-2-cargo.tar.gz when updating version
-# (feel free to drop -2 and this comment on version change)
-Source1:        %{name}-%{version}-2-cargo.tar.gz
+#   tar -czf %%{name}-%%{version}-vendor.tar.gz vendor/
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        config.toml
 %endif
-# Generated using:
-#   tar -xf %%{name}-%%{version}.tar.gz
-#   cd %%{name}-%%{version}
-#   cargo update -p openssl-src --precise 300.3.2+3.3.2
-#   diff -u ../cloud-hypervisor-msft-v38.0.72.2.backup/Cargo.lock Cargo.lock > ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
-Patch0:         upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
 
 BuildRequires:  binutils
 BuildRequires:  gcc
@@ -83,9 +74,6 @@ tar xf %{SOURCE1}
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
-# The vendored archive has been populated based on the patch, so we need to
-# repatch here as well in order to use the same versions
-%autopatch -p0
 
 %install
 install -d %{buildroot}%{_bindir}
