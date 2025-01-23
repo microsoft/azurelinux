@@ -1,12 +1,12 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2022.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            https://ostree.readthedocs.io/en/latest
+URL:            https://ostreedev.github.io/ostree/
 Source0:        https://github.com/ostreedev/ostree/releases/download/v%{version}/lib%{name}-%{version}.tar.xz
 Source1:        91-ostree.preset
 Patch0:         dualboot-support.patch
@@ -155,6 +155,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Thu Jan 23 2025 Mandeep Plaha <mandeepplaha@microsoft.com> - 2022.1-4
+- Update URL as https://ostree.readthedocs.io is now permanently removed.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2022.1-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
