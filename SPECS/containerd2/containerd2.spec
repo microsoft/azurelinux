@@ -79,7 +79,7 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Tue Jan 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.0.0-2
+* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.0.0-2
 - Fix CVE-2024-45338 by an unstream patch
 
 * Wed Dec 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
