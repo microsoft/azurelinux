@@ -113,6 +113,10 @@ tar -xf %{SOURCE1} -C /root/
 ln -s %{_bindir}/python3 %{_bindir}/python
 # Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
+
+future_date=$(date +%s -d "+10 years")
+find /root/.cache/bazel/_bazel_root/install -type f -exec touch --date=@$future_date {} +
+
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
 # steps to create the cache tar. network connection is required to create the cache.
