@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -24,6 +24,10 @@ BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
 Requires: runc >= 1.2.2
+
+# This package replaces the old name of containerd
+Provides: containerd = %{version}-%{release}
+Obsoletes: containerd < %{version}-%{release}
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -79,6 +83,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Jan 23 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-2
+- Add "Provides/Obsoletes: containerd" to shift all installs of containerd to containerd2
+
 * Wed Dec 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
 - Created a standalone package for containerd 2.0.0
 - Initial CBL-Mariner import from Azure
