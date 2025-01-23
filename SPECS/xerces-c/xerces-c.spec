@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://xml.apache.org/xerces-c/
-Source0:        https://github.com/apache/xerces-c/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/apache/xerces-c/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.xz
 Patch0:		CVE-2024-23807.patch
 BuildRequires:  dos2unix
 BuildRequires:  gcc-c++
