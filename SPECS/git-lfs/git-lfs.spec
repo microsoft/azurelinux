@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:       Git extension for versioning large files
 Name:          git-lfs
-Version:       3.4.1
+Version:       3.6.1
 Release:       1%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
@@ -77,6 +77,9 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Thu Jan 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6.1-1
+- Auto-upgrade to 3.6.1 - fix CVE-2024-53263
+
 * Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 3.4.1-1
 - Bump version to 3.4.1
 - Add BR on asciidoctor & drop un-needed BR
