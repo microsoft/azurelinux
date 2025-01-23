@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -2004,6 +2004,9 @@ exit 0
 
 
 %changelog
+* Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
+- Remove opentelemetry-cpp as it is not being built to address multiple CVEs
+
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 18.2.2-2
 - Fix for CVE-2024-52338
 
