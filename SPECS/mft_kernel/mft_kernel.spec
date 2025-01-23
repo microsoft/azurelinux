@@ -212,7 +212,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 # This is required since %license will install to %{_defaultlicensedir}/%{name}
 # and we have a different %{name}.
 mkdir -p %{buildroot}/%{_defaultlicensedir}/kernel-mft
-cp SOURCE/COPYING %{buildroot}/%{_defaultlicensedir}/kernel-mft
+cp source/COPYING %{buildroot}/%{_defaultlicensedir}/kernel-mft
 
 %post
 /sbin/depmod %{KVERSION}
