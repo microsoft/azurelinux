@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        8.8.0
-Release:        3%{?dist}
+Version:        8.11.1
+Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -87,6 +87,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Thu Jan 23 2025 Himaja Kesari <himajakesari@microsoft.com> - 8.11.1-1
+- Bump version to 8.11.1 to address CVE-2024-11053
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-3
 - Address CVE-2024-8096
 
