@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.62.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
 Patch1:         CVE-2024-54132.patch
 Patch2:         CVE-2024-45337.patch
+Patch3:         CVE-2024-45338.patch
 
 BuildRequires:  golang < 1.23
 BuildRequires:  git
@@ -58,6 +59,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
+- Add patch for CVE-2024-45338
+
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.62.0-3
 - Patch CVE-2024-45337
 

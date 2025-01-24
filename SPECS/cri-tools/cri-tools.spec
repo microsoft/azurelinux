@@ -14,6 +14,7 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-45338.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang
@@ -46,6 +47,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %changelog
 * Thu Jan 16 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.32.0-1
 - Auto-upgrade to 1.32.0 - to sync up with the latest AKS version
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.30.1-2
+- Add patch for CVE-2024-45338
 
 * Fri Jul 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.1-1
 - Auto-upgrade to 1.30.1 - Fix CVE-2023-45288, CVE-2024-21626 and CVE-2024-24786
