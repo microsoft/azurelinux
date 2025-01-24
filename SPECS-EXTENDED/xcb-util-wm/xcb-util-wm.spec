@@ -18,7 +18,6 @@ XCB util-wm module provides the following libraries:
   - ewmh: Both client and window-manager helpers for EWMH.
   - icccm: Both client and window-manager helpers for ICCCM.
 
-
 %package	devel
 Summary:	Development and header files for xcb-util-vm
 Requires:	%{name}%{?_isa} = %{version}-%{release}
@@ -26,30 +25,23 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 %description	devel
 Development files for xcb-util-wm.
 
-
 %prep
 %setup -q
-
 
 %build
 %configure --with-pic --disable-static --disable-silent-rules
 %make_build
 
-
 %check
 make check
-
 
 %install
 %make_install
 rm %{buildroot}%{_libdir}/*.la
 
-
 %ldconfig_post
 
-
 %ldconfig_postun
-
 
 %files
 %doc README.md
@@ -60,13 +52,11 @@ rm %{buildroot}%{_libdir}/*.la
 %endif
 %{_libdir}/*.so.*
 
-
 %files devel
 %doc NEWS
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
 %{_includedir}/xcb/*.h
-
 
 %changelog
 * Thu Dec 26 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.4.2-7
