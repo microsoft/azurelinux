@@ -31,8 +31,8 @@ check-debuginfo-0.15.2-1.cm2.x86_64.rpm
 chkconfig-1.20-4.cm2.x86_64.rpm
 chkconfig-debuginfo-1.20-4.cm2.x86_64.rpm
 chkconfig-lang-1.20-4.cm2.x86_64.rpm
-cmake-3.21.4-14.cm2.x86_64.rpm
-cmake-debuginfo-3.21.4-14.cm2.x86_64.rpm
+cmake-3.21.4-15.cm2.x86_64.rpm
+cmake-debuginfo-3.21.4-15.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
 coreutils-debuginfo-8.32-7.cm2.x86_64.rpm
 coreutils-lang-8.32-7.cm2.x86_64.rpm
@@ -524,7 +524,7 @@ python3-Cython-0.29.33-2.cm2.x86_64.rpm
 python3-debuginfo-3.9.19-8.cm2.x86_64.rpm
 python3-devel-3.9.19-8.cm2.x86_64.rpm
 python3-gpg-1.16.0-2.cm2.x86_64.rpm
-python3-jinja2-3.0.3-4.cm2.noarch.rpm
+python3-jinja2-3.0.3-5.cm2.noarch.rpm
 python3-libcap-ng-0.8.2-2.cm2.x86_64.rpm
 python3-libs-3.9.19-8.cm2.x86_64.rpm
 python3-libxml2-2.10.4-4.cm2.x86_64.rpm
