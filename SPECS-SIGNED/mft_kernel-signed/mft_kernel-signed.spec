@@ -5,14 +5,12 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%global _name kernel-mft
-
-Name:		 %{_name}
-Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.30.0
-Release:	 1%{?dist}
-License:	 Dual BSD/GPLv2
-Group:		 System Environment/Kernel
+Name:            mft_kernel
+Summary:         %{name} Kernel Module for the %{KVERSION} kernel
+Version:         4.30.0
+Release:         1%{?dist}
+License:         Dual BSD/GPLv2
+Group:           System Environment/Kernel
 
 #
 # To populate these sources:
@@ -21,7 +19,7 @@ Group:		 System Environment/Kernel
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        kernel-mft-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
 Vendor:         Microsoft Corporation
@@ -33,6 +31,17 @@ Requires:       kmod
 
 %description
 mft kernel module(s)
+
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but force a build of kernel-mft rpm and
+# prevent mft_kernel rpm. A %files section is declared for kernel-mft
+# but not for mft_kernel which is the default rpm.
+%package -n kernel-mft
+Summary: kernel-mft Kernel Module for the %{KVERSION} kernel
+
+%description -n kernel-mft
+This package provides a kernel-mft kernel module.
 
 %global debug_package %{nil}
 
@@ -56,9 +65,9 @@ rm -rf %{buildroot}
 %postun
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n kernel-mft
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/%{name}/COPYING
+%license %{_defaultlicensedir}/kernel-mft/COPYING
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
