@@ -4290,8 +4290,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.39.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.39.4.tar.xz"
+          "version": "2.40.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.40.4.tar.gz"
         }
       }
     },
