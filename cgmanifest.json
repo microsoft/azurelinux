@@ -3507,16 +3507,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fdk-aac-free",
-          "version": "2.0.0",
-          "downloadUrl": "https://people.freedesktop.org/~wtay/fdk-aac-free-2.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fdupes",
           "version": "2.1.2",
           "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
