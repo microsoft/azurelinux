@@ -74,6 +74,6 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
+* Fri Jan 24 2025 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
 - Original version for Azure Linux.
 - License verified

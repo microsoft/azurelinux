@@ -7,7 +7,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        5.15.157.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -136,7 +136,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
-* Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.157.mshv1-2
+* Fri Jan 24 2025 Cameron Baird <cameronbaird@microsoft.com> - 5.15.157.mshv1-3
 - Original version for Azure Linux.
 - license: MIT
 - License verified
