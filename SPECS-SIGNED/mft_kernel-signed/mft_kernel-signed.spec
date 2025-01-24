@@ -19,7 +19,7 @@ Group:           System Environment/Kernel
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        kernel-mft-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
 Vendor:         Microsoft Corporation
