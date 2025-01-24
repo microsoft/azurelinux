@@ -30,6 +30,7 @@ Patch1:         CVE-2022-2879.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45338.patch
 Patch4:         CVE-2023-39325.patch
+Patch5:         CVE-2023-44487.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -225,7 +226,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 %changelog
 * Fri Jan 24 2025 Henry Li <lihl@microsoft.com> - 1.57.0-8
-- Add patch for CVE-2023-39325
+- Add patch for CVE-2023-39325 and CVE-2023-44487
 
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.57.0-7
 - Add patch for CVE-2024-45338
