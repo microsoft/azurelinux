@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "dcos-cli-1.2.0.tar.gz": "d75c4aae6571a7d3f5a2dad0331fe3adab05a79e2966c0715409d6a2be2c6105"
+  "dcos-cli-1.2.0.tar.gz": "d75c4aae6571a7d3f5a2dad0331fe3adab05a79e2966c0715409d6a2be2c6105",
+  "dcos-cli-1.2.0-govendor-v1.tar.gz": "7131497427e059e7bdbf9c305f484d8dd79a4959a0f4b4fbd552caa4a96c0d45"
  }
 }
