@@ -10,6 +10,7 @@ URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 Patch0:         CVE-2024-40896.patch
 Patch1:		CVE-2023-45322.patch
+Patch2:		CVE-2024-34459.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -81,7 +82,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Fri Jan 24 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -2.11.5-3
-- Fix CVE-2023-45322
+- Fix CVE-2023-45322 & CVE-2024-34459
 
 * Thu Dec 26 2024 Muhammad Falak <mwani@microsoft.com> - 2.11.5-2
 - Patch CVE-2024-40896
