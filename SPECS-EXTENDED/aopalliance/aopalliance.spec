@@ -24,12 +24,12 @@ Release:        5%{?dist}
 Summary:        Java/J2EE AOP standards
 License:        Public Domain
 Group:          Development/Libraries/Java
-URL:            http://aopalliance.sourceforge.net/
+URL:            https://aopalliance.sourceforge.net/
 # cvs -d:pserver:anonymous@aopalliance.cvs.sourceforge.net:/cvsroot/aopalliance login
 # password empty
 # cvs -z3 -d:pserver:anonymous@aopalliance.cvs.sourceforge.net:/cvsroot/aopalliance export -r HEAD aopalliance
 Source0:        %{_distro_sources_url}/aopalliance-src.tar.gz
-Source1:        http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+Source1:        https://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
 Source2:        %{name}-MANIFEST.MF
 Source3:        %{name}-LICENSE.txt 
 BuildRequires:  ant
@@ -89,6 +89,7 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Tue 08 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0-5
 - Updating javac source and javac target from 1.6 to 1.8.
+- change URL and source from http to https
 - License verified.
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-4
