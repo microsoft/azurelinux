@@ -5,7 +5,7 @@ Summary:        The OpenGL Extension Wrangler Library
 License:        BSD and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://glew.sourceforge.net
+URL:            https://glew.sourceforge.net
 
 Source0:        https://sourceforge.net/projects/glew/files/glew/%{version}/glew-%{version}.tgz
 Patch0:         glew-2.1.0-install.patch
@@ -80,7 +80,9 @@ chmod 0755 $RPM_BUILD_ROOT%{_libdir}/*.so*
 %changelog
 * Tue Oct 29 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.0-1
 - Update to 2.2.0.
--
+- change http URL to https
+- License verified
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove redhat-specific config.guess seeding
