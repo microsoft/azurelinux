@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://xml.apache.org/xerces-c/
-Source0:         https://archive.apache.org/dist/xerces/c/3/sources/%{name}-%{version}.tar.xz
+Source0:        https://archive.apache.org/dist/xerces/c/3/sources/%{name}-%{version}.tar.xz
 Patch0:		CVE-2024-23807.patch
 BuildRequires:  dos2unix
 BuildRequires:  gcc-c++
