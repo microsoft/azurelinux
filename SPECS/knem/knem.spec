@@ -282,7 +282,7 @@ fi
 %endif
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 1.1.4.90mlnx3-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
 * Mon Mar 17 2014 Alaa Hleihel <alaa@mellanox.com>

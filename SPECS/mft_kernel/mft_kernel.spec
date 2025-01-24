@@ -26,17 +26,11 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%if "%{KMP}" == "1"
-%global _name kernel-mft-mlnx
-%else
-%global _name kernel-mft
-%endif
-
 %{!?version: %global version 4.30.0}
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
-Name:		 kernel-mft
+Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
 Release:	 1%{?dist}
@@ -59,9 +53,20 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-
 %description
 mft kernel module(s)
+
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but force a build of kernel-mft rpm and
+# prevent mft_kernel rpm. A %files section is declared for kernel-mft
+# but not for mft_kernel which is the default rpm.
+%package -n kernel-mft
+Summary: kernel-mft Kernel Module for the %{KVERSION} kernel
+
+%description -n kernel-mft
+This package provides a kernel-mft kernel module.
+
 
 %global debug_package %{nil}
 
@@ -209,8 +214,12 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %postun
 /sbin/depmod %{KVERSION}
 
+# Install license file to %{_defaultlicensedir}/kernel-mft for %files to pick-up
+# and set license metadata correct
+%define licensedir %{_defaultlicensedir}/kernel-mft/
+
 %if "%{KMP}" != "1"
-%files
+%files -n kernel-mft
 %defattr(-,root,root,-)
 %license source/COPYING
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
@@ -230,6 +239,6 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
