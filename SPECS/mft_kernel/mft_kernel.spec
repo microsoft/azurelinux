@@ -208,22 +208,20 @@ done
 find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discard-locals -R .comment -R .note \{\} \;
 %endif
 
-# Install licnse file to %{_defaultlicensedir}/kernel-mft for %files to pickp.
-# This is required since %license will install to %{_defaultlicensedir}/%{name}
-# and we have a different %{name}.
-mkdir -p %{buildroot}/%{_defaultlicensedir}/kernel-mft
-cp source/COPYING %{buildroot}/%{_defaultlicensedir}/kernel-mft
-
 %post
 /sbin/depmod %{KVERSION}
 
 %postun
 /sbin/depmod %{KVERSION}
 
+# Install license file to %{_defaultlicensedir}/kernel-mft for %files to pick-up
+# and set license metadata correct
+%define licensedir %{_defaultlicensedir}/kernel-mft/
+
 %if "%{KMP}" != "1"
 %files -n kernel-mft
 %defattr(-,root,root,-)
-%{_defaultlicensedir}/kernel-mft/COPYING
+%license source/COPYING
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}

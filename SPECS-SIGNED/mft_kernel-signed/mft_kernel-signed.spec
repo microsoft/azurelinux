@@ -67,7 +67,7 @@ rm -rf %{buildroot}
 
 %files -n kernel-mft
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/kernel-mft/COPYING
+%license %{_defaultlicensedir}/kernel-mft/COPYING
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
