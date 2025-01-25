@@ -70,7 +70,7 @@ index efc921c..68f88d7 100644
 +    assert utils.check_package(pkgname, version=first)
 +
 +    # upgrade to latest
-+    upgrade_version = PKG_VERSION[3]
++    upgrade_version = PKG_VERSIONS[3]
 +    utils.run(['tdnf', 'upgrade', '-y', '--nogpgcheck'])
 +    assert utils.check_package(pkgname, version=upgrade_version)
 +
