@@ -50,6 +50,7 @@ Source4:        crio.conf
 Source5:        cri-o-rpmlintrc
 Source6:        kubelet.env
 Patch0:         CVE-2023-39325.patch
+BuildRequires:	pkgconfig(libudev)
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
