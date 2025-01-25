@@ -61,7 +61,7 @@ index efc921c..68f88d7 100644
      assert utils.check_package(pkgname, version=second)
 +
 +def test_autoremove_after_upgrade(utils):
-+    pkgname = PKGSNAME
++    pkgname = PKGNAME
 +    utils.erase_package(pkgname)
 +
 +    # install first version
