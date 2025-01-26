@@ -15,9 +15,13 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+<<<<<<< HEAD
 # Added patch to support tardev-snapshotter for Kata CC
 Patch0:  add-tardev-support.patch
 
+=======
+Patch0:	CVE-2024-45338.patch
+>>>>>>> b73ab72ac (containerd2: Fix CVE-2024-45338 (#12041))
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -81,8 +85,13 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+<<<<<<< HEAD
 * Thu Jan 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-2
 - Added patch to support tardev-snapshotter for Kata CC.
+=======
+* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.0.0-2
+- Fix CVE-2024-45338 by an unstream patch
+>>>>>>> b73ab72ac (containerd2: Fix CVE-2024-45338 (#12041))
 
 * Wed Dec 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
 - Created a standalone package for containerd 2.0.0
