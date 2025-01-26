@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "cert-manager-1.12.13-vendor.tar.gz": "18894907e56205351f148a1aae828db6752d1189557d618720d782295abe4f84",
-  "cert-manager-1.12.13.tar.gz": "1bd650f7d066f98e2566397787caf938737c64ef4ab41284246acaffcdac7eb1"
- }
+  "Signatures": {
+    "cert-manager-1.12.15.tar.gz": "2c556e4c47753a5cd48510297bc5cab2b0943b7de1b3898df598a0ee969c8e72",
+    "cert-manager-1.12.15-vendor.tar.gz": "20afae660bffb8a636185aa920c1ada8bd345bae773ebe9e277b490ddc1bad49"
+  }
 }
