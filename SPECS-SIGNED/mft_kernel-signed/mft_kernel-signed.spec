@@ -5,14 +5,12 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%global _name kernel-mft
-
-Name:		 %{_name}
-Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.30.0
-Release:	 1%{?dist}
-License:	 Dual BSD/GPLv2
-Group:		 System Environment/Kernel
+Name:            mft_kernel
+Summary:         %{name} Kernel Module for the %{KVERSION} kernel
+Version:         4.30.0
+Release:         1%{?dist}
+License:         Dual BSD/GPLv2
+Group:           System Environment/Kernel
 
 #
 # To populate these sources:
@@ -30,6 +28,11 @@ ExclusiveArch:  x86_64
 
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
+
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
+Provides:       kernel-mft = %{version}-%{release}
 
 %description
 mft kernel module(s)
@@ -58,7 +61,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/%{name}/COPYING
+%license %{_defaultlicensedir}/%{name}/COPYING
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
