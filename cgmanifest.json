@@ -1557,8 +1557,8 @@
         "type": "other",
         "other": {
           "name": "cert-manager",
-          "version": "1.12.13",
-          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.13.tar.gz"
+          "version": "1.12.15",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.15.tar.gz"
         }
       }
     },
