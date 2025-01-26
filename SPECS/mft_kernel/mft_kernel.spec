@@ -53,20 +53,13 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-%description
-mft kernel module(s)
-
 # Azure Linux attempts to match the spec file name and the "Name" tag.
 # Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
-# set "Name" as mft_kernel but force a build of kernel-mft rpm and
-# prevent mft_kernel rpm. A %files section is declared for kernel-mft
-# but not for mft_kernel which is the default rpm.
-%package -n kernel-mft
-Summary: kernel-mft Kernel Module for the %{KVERSION} kernel
+# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
+Provides:       kernel-mft = %{version}-%{release}
 
-%description -n kernel-mft
-This package provides a kernel-mft kernel module.
-
+%description
+mft kernel module(s)
 
 %global debug_package %{nil}
 
@@ -214,12 +207,8 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %postun
 /sbin/depmod %{KVERSION}
 
-# Install license file to %{_defaultlicensedir}/kernel-mft for %files to pick-up
-# and set license metadata correct
-%define licensedir %{_defaultlicensedir}/kernel-mft/
-
 %if "%{KMP}" != "1"
-%files -n kernel-mft
+%files
 %defattr(-,root,root,-)
 %license source/COPYING
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
