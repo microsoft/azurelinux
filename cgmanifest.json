@@ -30152,7 +30152,7 @@
         "other": {
           "name": "xerces-c",
           "version": "3.2.4",
-          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
+          "downloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
         }
       }
     },
