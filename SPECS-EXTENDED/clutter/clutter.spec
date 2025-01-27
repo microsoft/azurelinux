@@ -1,47 +1,53 @@
+%global with_tests 1
+
 %global glib2_version 2.53.4
 %global cogl_version 1.21.2
 %global json_glib_version 0.12.0
 %global cairo_version 1.14.0
 %global libinput_version 0.19.0
-Summary:        Open Source software library for creating rich graphical user interfaces
-Name:           clutter
-Version:        1.26.4
-Release:        10%{?dist}
-License:        LGPL-2.0-or-later
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.clutter-project.org/
-Source0:        https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
-BuildRequires:  gettext
-BuildRequires:  make
-BuildRequires:  mesa-libEGL-devel
-BuildRequires:  mesa-libGL-devel
-BuildRequires:  pkgconfig
-BuildRequires:  systemd-devel
-BuildRequires:  pkgconfig(atk)
-BuildRequires:  pkgconfig(cairo-gobject) >= %{cairo_version}
-BuildRequires:  pkgconfig(cogl-1.0) >= %{cogl_version}
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
-BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
-BuildRequires:  pkgconfig(gobject-introspection-1.0) >= 1.39.0
-BuildRequires:  pkgconfig(gdk-3.0)
-BuildRequires:  pkgconfig(json-glib-1.0) >= %{json_glib_version}
-BuildRequires:  pkgconfig(pangocairo)
-BuildRequires:  pkgconfig(xcomposite)
-BuildRequires:  pkgconfig(xdamage)
-BuildRequires:  pkgconfig(xi)
-BuildRequires:  pkgconfig(gudev-1.0)
-BuildRequires:  pkgconfig(libinput) >= %{libinput_version}
-BuildRequires:  pkgconfig(wayland-client)
-BuildRequires:  pkgconfig(wayland-cursor)
-BuildRequires:  pkgconfig(wayland-server)
-BuildRequires:  pkgconfig(xkbcommon)
-Requires:       cairo%{?_isa} >= %{cairo_version}
-Requires:       cogl%{?_isa} >= %{cogl_version}
-Requires:       glib2%{?_isa} >= %{glib2_version}
-Requires:       json-glib%{?_isa} >= %{json_glib_version}
-Requires:       libinput%{?_isa} >= %{libinput_version}
-Recommends:     mesa-dri-drivers%{?_isa}
+Name:          clutter
+Version:       1.26.4
+Release:       15%{?dist}
+Summary:       Open Source software library for creating rich graphical user interfaces
+
+License:       LGPLv2+
+URL:           http://www.clutter-project.org/
+Source0:       https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
+
+BuildRequires: gettext
+BuildRequires: pkgconfig(atk)
+BuildRequires: pkgconfig(cairo-gobject) >= %{cairo_version}
+BuildRequires: pkgconfig(cogl-1.0) >= %{cogl_version}
+BuildRequires: pkgconfig(gdk-pixbuf-2.0)
+BuildRequires: pkgconfig(gio-2.0) >= %{glib2_version}
+BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.39.0
+BuildRequires: pkgconfig(gdk-3.0)
+BuildRequires: pkgconfig(json-glib-1.0) >= %{json_glib_version}
+BuildRequires: pkgconfig(pangocairo)
+BuildRequires: pkgconfig(xcomposite)
+BuildRequires: pkgconfig(xdamage)
+BuildRequires: pkgconfig(xi)
+BuildRequires: mesa-libEGL-devel
+BuildRequires: mesa-libGL-devel
+BuildRequires: systemd-devel
+BuildRequires: pkgconfig(gudev-1.0)
+BuildRequires: pkgconfig(libinput) >= %{libinput_version}
+BuildRequires: pkgconfig(wayland-client)
+BuildRequires: pkgconfig(wayland-cursor)
+BuildRequires: pkgconfig(wayland-server)
+BuildRequires: pkgconfig(xkbcommon)
+BuildRequires: make
+
+Requires:      cairo%{?_isa} >= %{cairo_version}
+Requires:      cogl%{?_isa} >= %{cogl_version}
+Requires:      glib2%{?_isa} >= %{glib2_version}
+Requires:      json-glib%{?_isa} >= %{json_glib_version}
+Requires:      libinput%{?_isa} >= %{libinput_version}
+
+Recommends:    mesa-dri-drivers%{?_isa}
 
 %description
 Clutter is an open source software library for creating fast,
@@ -49,19 +55,19 @@ visually rich graphical user interfaces. The most obvious example
 of potential usage is in media center type applications.
 We hope however it can be used for a lot more.
 
-%package        devel
-Summary:        Clutter development environment
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+%package devel
+Summary:       Clutter development environment
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
-%description    devel
+%description devel
 Header files and libraries for building a extension library for the
 clutter
 
-%package        doc
-Summary:        Documentation for %{name}
-Requires:       %{name} = %{version}-%{release}
+%package       doc
+Summary:       Documentation for %{name}
+Requires:      %{name} = %{version}-%{release}
 
-%description    doc
+%description   doc
 Clutter is an open source software library for creating fast,
 visually rich graphical user interfaces. The most obvious example
 of potential usage is in media center type applications.
@@ -69,13 +75,15 @@ We hope however it can be used for a lot more.
 
 This package contains documentation for clutter.
 
-%package        tests
-Summary:        Tests for the clutter package
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+%if 0%{?with_tests}
+%package       tests
+Summary:       Tests for the clutter package
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
-%description    tests
+%description   tests
 The clutter-tests package contains tests that can be used to verify
 the functionality of the installed clutter package.
+%endif
 
 %prep
 %autosetup -p1
@@ -84,19 +92,19 @@ the functionality of the installed clutter package.
 %configure \
 	--enable-xinput \
         --enable-gdk-backend \
-	--enable-installed-tests \
+	%{?with_tests:--enable-installed-tests} \
         --enable-egl-backend \
         --enable-evdev-input \
         --enable-wayland-backend \
         --enable-wayland-compositor
 
-%make_build
+make %{?_smp_mflags} V=1
 
 %install
 %make_install
 
 #Remove libtool archives.
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -name '*.la' -delete
 
 %find_lang clutter-1.0
 
@@ -123,14 +131,31 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %dir %{_datadir}/gtk-doc/html
 %{_datadir}/gtk-doc/html/clutter
 
+%if 0%{?with_tests}
 %files tests
 %{_libexecdir}/installed-tests/clutter
 %{_datadir}/installed-tests
+%endif
 
 %changelog
-* Thu Jan 05 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.26.4-10
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Mon Jan 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.26.4-15
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -758,6 +783,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 
 * Wed Jan 21 2009 Allisson Azevedo <allisson@gmail.com> 0.8.6-3
 - Remove noarch from doc subpackage
