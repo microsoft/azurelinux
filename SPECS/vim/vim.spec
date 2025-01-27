@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.1.0791
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-22134.patch
 
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
@@ -199,6 +200,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Jan 16 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 9.1.0791-2
+- Patch for fixing CVE-2025-22134
+
 * Thu Oct 17 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
 - Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
 - Added language configurations for Amharic and Hungarian
