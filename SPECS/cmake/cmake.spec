@@ -15,9 +15,8 @@ Patch1:         CVE-2024-6197.patch
 Patch2:         CVE-2024-6874.patch
 Patch3:         CVE-2024-8096.patch
 Patch4:         CVE-2024-11053.patch
-Patch5:         clean-up-GTime2str.patch
-Patch6:         CVE-2024-7264.patch
-Patch7:         CVE-2024-9681.patch
+Patch5:         CVE-2024-7264.patch
+Patch6:         CVE-2024-9681.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
