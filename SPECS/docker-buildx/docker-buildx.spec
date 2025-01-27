@@ -4,7 +4,7 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           docker-buildx
 # update "commit_hash" above when upgrading version
 Version:        0.14.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Mon Jan 27 2025 Osama Esmail <osamaesmail@microsoft.com> - 0.14.0-3
+- Added "generate_source_tarball.sh" and vendor tarball
+
 * Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 0.14.0-2
 - Add patch for CVE-2024-45337
 
