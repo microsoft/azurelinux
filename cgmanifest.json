@@ -29137,7 +29137,7 @@
         "other": {
           "name": "udftools",
           "version": "2.3",
-          "downloadUrl": "https://github.com/pali/udftools/releases/tag/2.3/udftools-2.3.tar.gz"
+          "downloadUrl": "https://github.com/pali/udftools/releases/download/2.3/udftools-2.3.tar.gz"
         }
       }
     },
