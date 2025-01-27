@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.12.15
-Release:        1%{?dist}
+Version:        1.12.13
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,9 +105,6 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Mon Jan 20 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.15-1
-- Auto-upgrade to 1.12.15 - none
-
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.13-3
 - Add patch for CVE-2024-45338
 
