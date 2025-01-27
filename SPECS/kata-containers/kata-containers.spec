@@ -112,6 +112,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Jan 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4-1
+- Auto-upgrade to 3.2.0.azl4
+
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 
