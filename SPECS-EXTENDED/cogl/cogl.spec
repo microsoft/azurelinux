@@ -1,47 +1,53 @@
 %global with_tests 1
-Summary:        A library for using 3D graphics hardware to draw pretty pictures
-Name:           cogl
-Version:        1.22.8
-Release:        7%{?dist}
-License:        LGPL-2.1-or-later
+
+Name:          cogl
+Version:       1.22.8
+Release:       12%{?dist}
+Summary:       A library for using 3D graphics hardware to draw pretty pictures
+
+License:       LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.clutter-project.org/
-Source0:        https://download.gnome.org/sources/cogl/1.22/%{name}-%{version}.tar.xz
+URL:           https://www.clutter-project.org/
+Source0:       https://download.gnome.org/sources/cogl/1.22/cogl-%{version}.tar.xz
+
 # Vaguely related to https://bugzilla.gnome.org/show_bug.cgi?id=772419
 # but on the 1.22 branch, and the static inline in the header is gross
 # ajax promises he'll clean this up.
-Patch0:         0001-egl-Use-eglGetPlatformDisplay-not-eglGetDisplay.patch
+Patch0: 0001-egl-Use-eglGetPlatformDisplay-not-eglGetDisplay.patch
+
 # "GL_ARB_shader_texture_lod" is used to do lod biased texturing. It
 # make achieve faster blurring of images instead of using large blur radius.
-Patch1:         0002-add-GL_ARB_shader_texture_lod-support.patch
+Patch1: 0002-add-GL_ARB_shader_texture_lod-support.patch
+
 # "copy_sub_image" is used to implement feature similar with kwin blur
 # effect by being abel to copy partial of framebuffer contents as texture
 # and do post blurring.
-Patch2:         0003-texture-support-copy_sub_image.patch
-BuildRequires:  chrpath
-BuildRequires:  make
-BuildRequires:  mesa-libEGL-devel
-BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(gbm)
-BuildRequires:  pkgconfig(cairo)
-BuildRequires:  pkgconfig(gbm)
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
-BuildRequires:  pkgconfig(gl)
-BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(gobject-introspection-1.0)
-BuildRequires:  pkgconfig(libdrm)
-BuildRequires:  pkgconfig(pango)
-BuildRequires:  pkgconfig(xcomposite)
-BuildRequires:  pkgconfig(xdamage)
-BuildRequires:  pkgconfig(xext)
-BuildRequires:  pkgconfig(xfixes)
-BuildRequires:  pkgconfig(xrandr)
-BuildRequires:  pkgconfig(wayland-server)
-BuildRequires:  pkgconfig(wayland-client)
-BuildRequires:  pkgconfig(wayland-cursor)
-BuildRequires:  pkgconfig(wayland-egl)
-BuildRequires:  pkgconfig(xkbcommon)
+Patch2: 0003-texture-support-copy_sub_image.patch
+
+BuildRequires: chrpath
+BuildRequires: pkgconfig(cairo)
+BuildRequires: mesa-libEGL-devel
+BuildRequires: pkgconfig(gbm)
+BuildRequires: pkgconfig(gdk-pixbuf-2.0)
+BuildRequires: pkgconfig(gl)
+BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(gobject-introspection-1.0)
+BuildRequires: pkgconfig(gtk-doc)
+BuildRequires: pkgconfig(libdrm)
+BuildRequires: pkgconfig(pango)
+BuildRequires: pkgconfig(xcomposite)
+BuildRequires: pkgconfig(xdamage)
+BuildRequires: pkgconfig(xext)
+BuildRequires: pkgconfig(xfixes)
+BuildRequires: pkgconfig(xrandr)
+
+BuildRequires: pkgconfig(wayland-server)
+BuildRequires: pkgconfig(wayland-client)
+BuildRequires: pkgconfig(wayland-cursor)
+BuildRequires: pkgconfig(wayland-egl)
+BuildRequires: pkgconfig(xkbcommon)
+BuildRequires: make
 
 %description
 Cogl is a small open source library for using 3D graphics hardware to draw
@@ -61,24 +67,24 @@ Having other backends, besides OpenGL, such as drm, Gallium or D3D are
 options we are interested in for the future.
 
 %package devel
-Summary:        %{name} development environment
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary:       %{name} development environment
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Header files and libraries for building and developing apps with %{name}.
 
 %package       doc
-Summary:        Documentation for %{name}
-Requires:       %{name} = %{version}-%{release}
-BuildArch:      noarch
+Summary:       Documentation for %{name}
+Requires:      %{name} = %{version}-%{release}
+BuildArch:     noarch
 
 %description   doc
 This package contains documentation for %{name}.
 
 %if 0%{?with_tests}
 %package       tests
-Summary:        Tests for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:      %{name} = %{version}-%{release}
+Summary:       Tests for %{name}
 
 %description   tests
 This package contains the installable tests for %{cogl}.
@@ -88,7 +94,7 @@ This package contains the installable tests for %{cogl}.
 %autosetup -p1
 
 %build
-CFLAGS="%{optflags} -fPIC"
+CFLAGS="$RPM_OPT_FLAGS -fPIC"
 %configure \
   --enable-cairo=yes \
   --enable-cogl-pango=yes \
@@ -102,22 +108,25 @@ CFLAGS="%{optflags} -fPIC"
   --enable-xlib-egl-platform \
   %{?with_tests:--enable-installed-tests}
 
-%make_build
+make %{?_smp_mflags} V=1
 
 %install
 %make_install
 
 #Remove libtool archives.
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -name '*.la' -delete
 
 # This gets installed by mistake
 rm %{buildroot}%{_datadir}/cogl/examples-data/crate.jpg
 
 # Remove lib64 rpaths
-chrpath --delete %{buildroot}/%{_libdir}/libcogl-path.so
-chrpath --delete %{buildroot}/%{_libdir}/libcogl-pango.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libcogl-path.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libcogl-pango.so
 
 %find_lang %{name}
+
+%check
+# make check
 
 %ldconfig_scriptlets
 
@@ -140,10 +149,25 @@ chrpath --delete %{buildroot}/%{_libdir}/libcogl-pango.so
 %endif
 
 %changelog
-* Thu Jan 05 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.22.8-7
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Tue Jan 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.22.8-12
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - Disable doc building, remove BR on gtk-doc
 - License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.8-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
