@@ -19,7 +19,7 @@ BuildRequires:  openssl-devel >= 1.1.0
 BuildRequires:  jansson-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  xmlto
-Requires:       mod_ssl >= 1:2.4.41
+Requires:       mod_ssl >= 2.4.41
 Provides:       httpd-mmn = %{_httpd_mmn}
 Conflicts:      httpd < 2.4.39-7
 
