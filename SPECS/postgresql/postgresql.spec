@@ -2,8 +2,8 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.4
-Release:        2%{?dist}
+Version:        16.5
+Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -240,6 +240,9 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Mon Nov 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.5-1
+- Auto-upgrade to 16.5 - CVE-2024-10976, CVE-2024-10977, CVE-2024-10978, CVE-2024-10979
+
 * Thu Aug 29 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.4-2
 - Add postgresql-service as a subpackage
 

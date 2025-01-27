@@ -1,0 +1,30 @@
+From 7953c2fc06bef46f09c689d972514148f6e21a7f Mon Sep 17 00:00:00 2001
+From: Allen Pais <apais@linux.microsoft.com>
+Date: Fri, 22 Nov 2024 23:40:51 +0000
+Subject: [PATCH] Increase EFI_MMAP_NR_SLACK_SLOTS for GB200
+
+Increasing EFI_MMAP_NR_SLACK_SLOTS to 32
+to provide space for more memory map modifications.
+
+Signed-off-by: Jacob Pan <panj@microsoft.com>
+Signed-off-by: Allen Pais <apais@microsoft.com>
+---
+ drivers/firmware/efi/libstub/efistub.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/efi/libstub/efistub.h b/drivers/firmware/efi/libstub/efistub.h
+index fc18fd649ed7..5ecb9d3f3e9f 100644
+--- a/drivers/firmware/efi/libstub/efistub.h
++++ b/drivers/firmware/efi/libstub/efistub.h
+@@ -171,7 +171,7 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
+  * the EFI memory map. Other related structures, e.g. x86 e820ext, need
+  * to factor in this headroom requirement as well.
+  */
+-#define EFI_MMAP_NR_SLACK_SLOTS	8
++#define EFI_MMAP_NR_SLACK_SLOTS	32
+ 
+ typedef struct efi_generic_dev_path efi_device_path_protocol_t;
+ 
+-- 
+2.46.0
+

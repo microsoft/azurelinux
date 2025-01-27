@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.0
-Release:        2%{?dist}
+Version:        8.0.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -84,6 +84,12 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Mon Jan 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.2-1
+- Auto-upgrade to 8.0.2 - Upgrade valkey to fix CVE-2024-51741 and CVE-2024-46981
+
+* Mon Nov 04 2024 Sean Dougherty <sdougherty@microsoft.com> - 8.0.1-1
+- Version bump to address CVE-2024-31449 CVE-2024-31228 and CVE-2024-31227.
+
 * Tue Oct 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 8.0.0-2
 - Add patch to remove flaky mem defrag test.
 
