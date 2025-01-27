@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,7 @@ Patch2:         CVE-2021-43565.patch
 Patch3:         CVE-2022-32149.patch
 Patch4:         CVE-2024-3727.patch
 Patch5:         podman-CVE-2024-3727.patch
+Patch6:         CVE-2023-0778.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -75,6 +76,7 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %patch 5 -p1
 %patch 1 -p1
 %patch 3 -p1
+%patch 6 -p1
 
 %setup -q -T -D -b 9 -n common-%{commonver}
 %patch 0 -p1
@@ -177,6 +179,9 @@ fi
 %license LICENSE
 
 %changelog
+* Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com>- 20210626-8
+- Backport patch for CVE-2023-0778 with an upstream patch
+
 * Thu Sep 12 2024 Sudipta Pandit <sudpandit@microsoft.com> - 20210626-7
 - Backport CVE-2024-3727 for all sources from upstream
 
