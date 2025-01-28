@@ -1,28 +1,26 @@
-From ed877340d3897eeef60cd1bccd4d1502fd276805 Mon Sep 17 00:00:00 2001
+From de3e822976773916caa913e4339a35c08a98569d Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 23 Jan 2025 11:55:10 -0800
 Subject: [PATCH] Retain installonlypkg install status on upgrade
 
-add autoremove test to multiinstall tests
 ---
- client/goal.c                      | 31 ++++++++++++++++++++++++++++++
- pytests/tests/test_multiinstall.py | 19 ++++++++++++++++++
- 2 files changed, 50 insertions(+)
+ client/goal.c                      | 30 +++++++++++++++++++++
+ pytests/tests/test_multiinstall.py | 42 ++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
 
 diff --git a/client/goal.c b/client/goal.c
-index ae5725b..f3b5b8c 100644
+index 4d95c71..f2360c4 100644
 --- a/client/goal.c
 +++ b/client/goal.c
-@@ -743,6 +743,37 @@ TDNFMarkAutoInstalled(
+@@ -754,6 +754,36 @@ TDNFMarkAutoInstalled(
                  }
              }
          }
 +        /* During upgrades, ppInfo->pPkgsToInstall contains any packages that are
-+           in the ppszInstallOnlyPkgs which are installing a new version as a
-+           part of the upgrade. This is because the they are queued up as install
-+           as opposed to an upgraded package. These packages are always defaulted
-+           to auto installed while they should maintain their previous install
-+           type.
++           being installed as a dependency automatically as well as any
++           ppszInstallOnlyPkgs which are installing a new version. The packages
++           configured as installonlypkgs need to retain to retain their previous
++           install status.
 +        */
 +        if (nFlag == 1 && pTdnf->pConf && pTdnf->pConf->ppszInstallOnlyPkgs)
 +        {
@@ -52,15 +50,15 @@ index ae5725b..f3b5b8c 100644
          {
              rc = history_set_auto_flag(pHistoryCtx, pszName, nFlag);
 diff --git a/pytests/tests/test_multiinstall.py b/pytests/tests/test_multiinstall.py
-index efc921c..68f88d7 100644
+index efc921c..e069fe1 100644
 --- a/pytests/tests/test_multiinstall.py
 +++ b/pytests/tests/test_multiinstall.py
-@@ -149,3 +149,22 @@ def test_install_reinstall(utils):
+@@ -149,3 +149,45 @@ def test_install_reinstall(utils):
      # both pkgs should remain installed:
      assert utils.check_package(pkgname, version=first)
      assert utils.check_package(pkgname, version=second)
 +
-+def test_autoremove_after_upgrade(utils):
++def test_autoremove_after_upgrade_user_installed(utils):
 +    pkgname = PKGNAME
 +    utils.erase_package(pkgname)
 +
@@ -78,6 +76,29 @@ index efc921c..68f88d7 100644
 +    # check both packages remain installed after autoremove
 +    assert utils.check_package(pkgname, version=upgrade_version)
 +    assert utils.check_package(pkgname, version=first)
++
++def test_autoremove_after_upgrade_auto_installed(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    # install first version
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    # mark package as autoinstalled
++    ret = utils.run(['tdnf', 'mark', 'remove', pkgname])
++    assert ret['retval'] == 0
++
++    # upgrade to latest
++    upgrade_version = PKG_VERSIONS[3]
++    utils.run(['tdnf', 'upgrade', '-y', '--nogpgcheck'])
++    assert utils.check_package(pkgname, version=upgrade_version)
++
++    utils.run(['tdnf', 'autoremove', '-y'])
++    # check both packages remain installed after autoremove
++    assert not utils.check_package(pkgname, version=upgrade_version)
++    assert not utils.check_package(pkgname, version=first)
 -- 
 2.34.1
 
