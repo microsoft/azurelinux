@@ -29,6 +29,8 @@ A Docker CLI plugin for extended build capabilities with BuildKit
 
 %prep
 %autosetup -p1 -n buildx-%{version}
+rm -rf vendor
+tar -xf %{SOURCE1}
 
 %build
 export CGO_ENABLED=0
