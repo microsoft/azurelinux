@@ -2005,7 +2005,15 @@ exit 0
 
 %changelog
 * Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
-- Remove opentelemetry-cpp as it is not being built to address multiple CVEs
+- Remove opentelemetry-cpp as it is not being built to address below CVEs
+- CVE-2022-24735
+- CVE-2022-24736
+- CVE-2021-44647
+- CVE-2020-24371
+- CVE-2014-5461
+- CVE-2021-43519
+- CVE-2021-44964
+- CVE-2024-31755
 
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 18.2.2-2
 - Fix for CVE-2024-52338
