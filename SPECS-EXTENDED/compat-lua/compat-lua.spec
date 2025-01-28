@@ -2,16 +2,17 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           compat-lua
 Version:        5.1.5
-Release:        17%{?dist}
+Release:        27%{?dist}
 Summary:        Powerful light-weight programming language (compat version)
 License:        MIT
-URL:            http://www.lua.org/
-Source0:        http://www.lua.org/ftp/lua-%{version}.tar.gz
+URL:            https://www.lua.org/
+Source0:        https://www.lua.org/ftp/lua-%{version}.tar.gz
 Patch0:         lua-5.1.4-autotoolize.patch
 Patch1:         lua-5.1.4-lunatic.patch
 Patch2:         lua-5.1.4-idsize.patch
 Patch3:         lua-5.1.4-pc-compat.patch
 BuildRequires:  readline-devel ncurses-devel libtool
+BuildRequires: make
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Provides:       lua = 5.1
 Provides:       lua5.1 = %{version}-%{release}
@@ -43,10 +44,10 @@ This package contains development files for compat-lua-libs.
 
 %prep
 %setup -q -n lua-%{version}
-%patch 0 -p1 -E -z .autoxxx
-%patch 1 -p0 -z .lunatic
-%patch 2 -p1 -z .idsize
-%patch 3 -p1
+%patch -P0 -p1 -E -z .autoxxx
+%patch -P1 -p0 -z .lunatic
+%patch -P2 -p1 -z .idsize
+%patch -P3 -p1
 # fix perms on auto files
 chmod u+x autogen.sh config.guess config.sub configure depcomp install-sh missing
 # Avoid make doing auto-reconf itself, killing our rpath removal in the process
@@ -105,8 +106,39 @@ mv $RPM_BUILD_ROOT%{_libdir}/pkgconfig/lua.pc \
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1.5-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jan 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 5.1.5-27
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.5-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
