@@ -8,6 +8,7 @@ Distribution:   Azure Linux
 Group:          Tools/Container
 URL:            https://github.com/cpuguy83/go-md2man
 Source0:        https://github.com/cpuguy83/go-md2man/archive/v%{version}.tar.gz#/go-md2man-%{version}.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 BuildRequires:  golang
 BuildRequires:  which
 # required packages on install
@@ -24,6 +25,7 @@ Distribution:   Azure Linux
 
 %prep
 %setup -q -n %{name}-%{version} -c
+tar -xf %{SOURCE1}
 
 %build
 export GOPATH=%{OUR_GOPATH}
