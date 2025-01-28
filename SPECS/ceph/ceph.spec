@@ -2005,7 +2005,8 @@ exit 0
 
 %changelog
 * Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
-- Remove opentelemetry-cpp as it is not being built to address below CVEs
+- Based on the package build logs, opentelemetry-cpp submodule is not being built
+- Removing opentelemetry-cpp to address below CVEs as this submodule is not relevant
 - CVE-2022-24735
 - CVE-2022-24736
 - CVE-2021-44647
