@@ -10,7 +10,6 @@ URL:		https://ogdi.sourceforge.net/
 # new project location is https://github.com/libogdi/ogdi
 Source0:	https://github.com/libogdi/ogdi/archive/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:	https://ogdi.sourceforge.net/ogdi.pdf
-# https://bugzilla.redhat.com/show_bug.cgi?id=1470896
 Patch0:		ogdi-4.1.0-sailer.patch
 
 BuildRequires:	make
@@ -38,7 +37,8 @@ data products/formats.
 Summary:	OGDI header files and documentation
 Requires:	%{name} = %{version}-%{release}
 Requires:	pkgconfig
-Requires:	zlib-devel expat-devel
+Requires:	zlib-devel
+Requires:      expat-devel
 
 %description devel
 OGDI header files and developer's documentation.
