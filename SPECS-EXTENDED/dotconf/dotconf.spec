@@ -4,11 +4,8 @@ Name:		dotconf
 Version:	1.4.1
 Release:	1%{?dist}
 Summary:	Libraries to parse configuration files
-# src/readdir* are Apache-1.1
 License:	LGPLv2.1-only AND Apache-1.1
 URL:		https://github.com/williamh/dotconf/
-# Upstream source's hash different from the Mariner one.
-# Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source: 	https://github.com/williamh/dotconf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:	autoconf
