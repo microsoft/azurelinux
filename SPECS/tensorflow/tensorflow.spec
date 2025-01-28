@@ -16,6 +16,7 @@ Patch3:         CVE-2024-3651.patch
 Patch4:         CVE-2024-35195.patch
 Patch5:		CVE-2024-5569.patch
 Patch6:		CVE-2023-45803.patch
+Patch7:		CVE-2024-6923.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -105,6 +106,10 @@ pushd python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/
 patch -p1 < %{PATCH6}
 popd
 
+pushd python_x86_64-unknown-linux-gnu/lib/python3.12/email/
+patch -p1 < %{PATCH7}
+popd
+
 popd
 
 export TF_PYTHON_VERSION=3.12
@@ -136,8 +141,8 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
-* Wed Jan 22 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-9
-- Patch CVE-2024-5569 and CVE-2023-45803
+* Tue Jan 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-9
+- Patch CVE-2024-5569 , CVE-2023-45803 and CVE-2024-6923
 
 * Wed Jan 15 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.16.1-8
 - Address CVE-2024-35195 with an upstream patch
