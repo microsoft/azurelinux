@@ -34,6 +34,8 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  libtraceevent-devel
+BuildRequires:  libtracefs-devel
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
@@ -159,13 +161,16 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-# disable (JOBS=1) parallel build to fix this issue:
-# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
-# Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} LIBTRACEEVENT_DYNAMIC=1 NO_LIBUNWIND=1 NO_GTK2=1 NO_STRLCPY=1 NO_BIONIC=1 perf_install
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
+
+# There is a bundled libtraceevent and the plugins will still be installed. When present, they'll cause
+# conflicts with the system libtracevent pulled by trace-cmd. Removing this ensures any programs linking
+# libtraceevent have no conflicts and that there's only one copy of libtraceevent shipped on the system.
+rm -rf %{buildroot}%{_libdir}/traceevent
+rm -rf %{buildroot}%{_lib64dir}/traceevent
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
@@ -211,15 +216,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
