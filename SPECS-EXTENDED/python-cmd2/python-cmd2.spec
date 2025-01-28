@@ -67,7 +67,7 @@ Requires:         /usr/bin/which
 %{python3_sitelib}/%{pypi_name}-%{version}*
 
 %changelog
-* Wed Dec 20 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.2-1
+* Wed Dec 20 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.2-9
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
