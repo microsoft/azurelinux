@@ -63,7 +63,7 @@ py.test-%{python3_version} -vk "$TEST_SELECTOR"
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.0-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.0-4
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
