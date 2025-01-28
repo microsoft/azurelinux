@@ -82,7 +82,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
-* Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.10.4-4 
+* Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.10.4-5 
 - Fix CVE-2022-49043 with an upstream patch
 
 * Tue Sep 17 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.10.4-4
