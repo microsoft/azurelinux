@@ -1557,8 +1557,8 @@
         "type": "other",
         "other": {
           "name": "cert-manager",
-          "version": "1.12.13",
-          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.13.tar.gz"
+          "version": "1.12.15",
+          "downloadUrl": "https://github.com/jetstack/cert-manager/archive/refs/tags/v1.12.15.tar.gz"
         }
       }
     },
@@ -6530,8 +6530,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
+          "version": "6.6.64.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.64.2.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
+          "version": "6.6.64.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.64.2.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
+          "version": "6.6.64.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.64.2.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.57.1.tar.gz"
+          "version": "6.6.64.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.64.2.tar.gz"
         }
       }
     },
@@ -29972,7 +29972,7 @@
         "other": {
           "name": "xerces-c",
           "version": "3.2.4",
-          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
+          "downloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
         }
       }
     },
