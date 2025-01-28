@@ -20,6 +20,8 @@ The command line for DC/OS.
 
 %prep
 %autosetup -p1
+rm -rf vendor
+tar -xf %{SOURCE1}
 
 %build
 export GOPATH=%{our_gopath}
