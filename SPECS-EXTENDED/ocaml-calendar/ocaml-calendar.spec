@@ -64,7 +64,6 @@ developing applications that use %{name}.
 %doc CHANGES README.md TODO
 %license LGPL COPYING
 
-
 %files devel -f .ofiles-devel
 %doc CHANGES README.md TODO calendarFAQ-2.6.txt
 %license LGPL COPYING
@@ -108,7 +107,6 @@ developing applications that use %{name}.
 
 * Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-2
 - OCaml 5.0 rebuild for Fedora 39
-
 
 * Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 3.0.0-1
 - Version 3.0.0
@@ -172,7 +170,7 @@ developing applications that use %{name}.
 - Update all OCaml dependencies for RPM 4.16
 
 * Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-28.1
--- OCaml 4.10.0 final (Fedora 32).
+- OCaml 4.10.0 final (Fedora 32).
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-28
 - OCaml 4.10.0 final.
