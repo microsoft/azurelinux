@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3
 # Derived from upstream patch https://github.com/pypa/virtualenv/commit/9f9dc6250fc88e92b1ca6206429966788846d696
 Patch0:         fix-plugin-attribute-name.patch
 Patch1:         pin-pytest-version.patch
+Patch2:         CVE-2024-53899.patch 
 BuildArch:      noarch
 
 %description
@@ -57,6 +58,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 20.14.0-7 
+- Fix CVE-2024-53899 with an upstream patch
+ 
 * Wed Feb 07 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-6
 - Fix pytest version to <8 for compatibility
 
