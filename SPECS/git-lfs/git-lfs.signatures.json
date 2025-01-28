@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "git-lfs-3.4.1-vendor.tar.gz": "a7b525a15b71a92ab789853a172345a4e4815de71ebe3486d5b843651b74cf1e",
-  "git-lfs-3.4.1.tar.gz": "2a36239d7968ae18e1ba2820dc664c4ef753f10bf424f98bccaf44d527f19a17"
- }
+  "Signatures": {
+    "git-lfs-3.6.1-vendor.tar.gz": "6cb4c1deda8ef0b2014c559e06808b58a4fd04f2b487ad30566e0d683889cd65",
+    "git-lfs-3.6.1.tar.gz": "062603dbef8f221d867e542314e9a6ea1970cae536b4495de2e915529b0fef8e"
+  }
 }
