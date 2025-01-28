@@ -55,7 +55,7 @@ Python 3 client library for accessing Google APIs.
 - License verified.
 
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.73.0-2
-g- Convert 'Release' tag to '[number].[distribution]' format
+- Convert 'Release' tag to '[number].[distribution]' format
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified
 
