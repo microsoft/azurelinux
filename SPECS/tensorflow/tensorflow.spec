@@ -101,30 +101,6 @@ pushd pypi__pip/
 patch -p1 < %{PATCH6}
 popd
 
-pushd python_aarch64-apple-darwin/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_aarch64-unknown-linux-gnu/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_ppc64le-unknown-linux-gnu/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_s390x-unknown-linux-gnu/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_x86_64-apple-darwin/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_x86_64-pc-windows-msvc/Lib/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
 pushd python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/
 patch -p1 < %{PATCH6}
 popd
