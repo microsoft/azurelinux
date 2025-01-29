@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -899,6 +899,10 @@ This package provides a Ceph hardware monitoring agent.
 %autosetup -p1
 
 %build
+pwd
+# CVE-2022-24736 and CVE-2022-24735 Remove opentelemetry-cpp which uses LUA
+# This subsystem is not getting built in ceph
+rm -rf src/jaegertracing/opentelemetry-cpp/*
 # LTO can be enabled as soon as the following GCC bug is fixed:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200
 %define _lto_cflags %{nil}
@@ -2001,8 +2005,20 @@ exit 0
 
 
 %changelog
-* Mon Jan 27 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-3
+* Mon Jan 27 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-4
 - Fix for CVE-2020-22217
+
+* Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
+- Based on the package build logs, opentelemetry-cpp submodule is not being built
+- Removing opentelemetry-cpp to address below CVEs as this submodule is not relevant
+- CVE-2022-24735
+- CVE-2022-24736
+- CVE-2021-44647
+- CVE-2020-24371
+- CVE-2014-5461
+- CVE-2021-43519
+- CVE-2021-44964
+- CVE-2024-31755
 
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 18.2.2-2
 - Fix for CVE-2024-52338
