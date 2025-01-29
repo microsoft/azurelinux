@@ -5,7 +5,7 @@
 Summary:        Network tool for managing many disparate systems
 Name:           puppet
 Version:        7.12.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -208,6 +208,9 @@ useradd -r -u 52 -g puppet -s /sbin/nologin \
 %ghost %attr(755, puppet, puppet) %{_rundir}/%{name}
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 7.12.1-5
+- Promote package to Mariner Base repo
+
 * Sun Apr 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12.1-4
 - Updating Ruby vendor lib path macro.
 
