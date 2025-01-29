@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,7 @@ Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45338.patch
 Patch4:         CVE-2023-39325.patch
 Patch5:         CVE-2023-44487.patch
+Patch6:         CVE-2024-28180.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -225,6 +226,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-9
+- Fix CVE-2024-28180 with an upstream patch
+
 * Fri Jan 24 2025 Henry Li <lihl@microsoft.com> - 1.57.0-8
 - Add patch for CVE-2023-39325 and CVE-2023-44487
 
