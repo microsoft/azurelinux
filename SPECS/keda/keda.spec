@@ -1,27 +1,14 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/kedacore/keda
 #Source0:       https://github.com/kedacore/%%{name}/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/kedacore/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2024-6104.patch
 Patch1:         CVE-2024-45338.patch
 BuildRequires:  golang >= 1.15
@@ -61,6 +48,10 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Wed Jan 29 2025 <osamaesmail@microsoft.com> - 2.14.1-3
+- Add "generate_source_tarball.sh"
+- Change vendor naming scheme to %%{name}-%%{version}-govendor-v%%{vendorVersion}.tar.gz
+
 * Wed Jan 08 2025 <rohitrawat@microsoft.com> - 2.14.1-2
 - Add patch for CVE-2024-45338
 

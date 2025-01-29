@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "keda-2.14.1-govendor-v1.tar.gz": "41262770c2b0996372c89168ae2d1eb7d6ee111c79154d5a0e100e46bba67346",
   "keda-2.14.1-vendor.tar.gz": "8bd0e8a26be3011de6455166874e3613ce39e99f6e7c8af49eae7cbf05d02efe",
   "keda-2.14.1.tar.gz": "5a843fccb39f23ea4de03a88a803129223baf9131ec802bbae438cb83bcf3272"
  }
