@@ -1,0 +1,18 @@
+diff -pruN paps-0.8.0.orig/scripts/src-to-paps paps-0.8.0/scripts/src-to-paps
+--- paps-0.8.0.orig/scripts/src-to-paps	2023-02-09 16:27:38.000000000 +0900
++++ paps-0.8.0/scripts/src-to-paps	2023-03-01 15:00:27.801416563 +0900
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ ######################################################################
+ #  Use GNU source-hightlight to turn source code into pango markup
+@@ -49,7 +49,7 @@ def arg_if_not_none(param_name, val):
+ # Defaults
+ 
+ # TBD - Make this a configuration variable
+-pango_outlang_path = '/usr/local/share/paps/pango_markup.outlang'
++pango_outlang_path = '/usr/share/paps/pango_markup.outlang'
+ 
+ parser = argparse.ArgumentParser(description='Process a file')
+ parser.add_argument('-o', '--output',
