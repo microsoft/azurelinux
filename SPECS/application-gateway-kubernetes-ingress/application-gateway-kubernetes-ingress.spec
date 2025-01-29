@@ -24,8 +24,6 @@ Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2022-21698.patch
-# CVE-2022-41273, CVE-2024-45338, CVE-2023-39325, CVE-2023-44487
-Patch1:         golang-x-net-updated-to-version0-34-0.patch
 
 BuildRequires:  golang >= 1.13
 
@@ -39,7 +37,6 @@ to act as the ingress for an AKS cluster.
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
-%patch 1 -p1
 
 %build
 export VERSION=%{version}
