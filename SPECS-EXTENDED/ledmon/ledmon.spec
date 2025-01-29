@@ -1,22 +1,32 @@
 Summary: Enclosure LED Utilities
 Name: ledmon
-Version: 0.92
-Release: 4%{?dist}
-License: GPLv2+
+Version: 1.1.0
+Release: 1%{?dist}
+License: GPL-2.0-only AND LGPL-2.1-or-later AND GPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: https://github.com/intel/ledmon
-Source0: https://github.com/intel/ledmon/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/intel/ledmon/archive/v%{version}/%{name}-%{version}.tar.gz
 
-Patch0: ledmon_cflags.patch
-BuildRequires: perl-interpreter perl-podlators
-BuildRequires: sg3_utils-devel
+BuildRequires: autoconf automake
+BuildRequires: autoconf-archive
 BuildRequires: gcc
+BuildRequires: libconfig-devel
+BuildRequires: libtool
+BuildRequires: pciutils-devel
+BuildRequires: sg3_utils-devel
+# Needed for pkgconfig usage.
+BuildRequires: pkgconfig
+BuildRequires: systemd
 # Needed for the udev dependency.
 BuildRequires: systemd-devel
+BuildRequires: systemd-rpm-macros
+
 Obsoletes: ledctl = 0.1-1
 Provides: ledctl = %{version}-%{release}
-Requires: sg3_utils-libs
+
+# https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
+ExcludeArch: %{ix86}
 
 %description
 The ledmon and ledctl are user space applications design to control LED
@@ -25,24 +35,66 @@ types of system: 2-LED system (Activity LED, Status LED) and 3-LED system
 (Activity LED, Locate LED, Fail LED). User must have root privileges to
 use this application.
 
+%package        libs
+Summary:        Runtime library files for %{name}
+Requires:       pciutils-libs
+Requires:       sg3_utils-libs
+
+%description    libs
+The %{name}-libs package contains runtime libraries for applications
+that use %{name}.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       pciutils-devel
+Requires:       sg3_utils-devel
+
+%description    devel
+The %{name}-devel package contains libraries and header files for
+developing applications that use %{name}.
+
 %prep
-%setup -q
-%patch 0 -p1 -b .cflags
+%autosetup -p1
+autoreconf -fiv
 
 %build
-# can't use smp_flags because -j4 makes the build fail
-make CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
+%configure --enable-systemd=yes --enable-library --disable-static
+%make_build
 
 %install
-make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUILD_ROOT/%{_sbindir} MANDIR=$RPM_BUILD_ROOT%{_mandir}
+%make_install
+
+%post
+%systemd_post ledmon.service
+
+%preun
+%systemd_preun ledmon.service
+
+%postun
+%systemd_postun_with_restart ledmon.service
 
 %files
-%doc README COPYING
+%doc README.md COPYING
 %{_sbindir}/ledctl
 %{_sbindir}/ledmon
 %{_mandir}/*/*
+%{_unitdir}/ledmon.service
+
+%files libs
+%{_libdir}/*.so.*
+%{_libdir}/libled.la
+
+%files devel
+%{_includedir}/*
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Nov 22 2024 Aninda Pradhan <v-anipradhn@microsoft.com> - 1.1.0-1
+- Updated to version 1.1.0
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.92-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
