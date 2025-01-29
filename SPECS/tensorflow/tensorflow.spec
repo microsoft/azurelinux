@@ -15,8 +15,7 @@ Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
 Patch4:         CVE-2024-35195.patch
 Patch5:		CVE-2024-5569.patch
-Patch6:		CVE-2023-45803.patch
-Patch7:		CVE-2024-6923.patch
+Patch6:		CVE-2024-6923.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -98,16 +97,8 @@ pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
 patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
 
-pushd pypi__pip/
-patch -p1 < %{PATCH6}
-popd
-
-pushd python_x86_64-unknown-linux-gnu/lib/python3.12/site-packages/
-patch -p1 < %{PATCH6}
-popd
-
 pushd python_x86_64-unknown-linux-gnu/lib/python3.12/email/
-patch -p1 < %{PATCH7}
+patch -p1 < %{PATCH6}
 popd
 
 popd
