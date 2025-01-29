@@ -12,13 +12,13 @@ Distribution:   Azure Linux
 %global lua_compat_builddir %{_builddir}/lua%{lua_compat_version}-%{lua_pkg_name}-%{version}-%{release}
 
 Name:           lua-%{lua_pkg_name}
-Version:        1.0.2
-Release:        4%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 Summary:        Parsing Expression Grammars for Lua
 
 License:        MIT
-URL:            http://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/
-Source0:        http://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/%{lua_pkg_name}-%{version}.tar.gz
+URL:            https://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/
+Source0:        https://www.inf.puc-rio.br/~roberto/%{lua_pkg_name}/%{lua_pkg_name}-%{version}.tar.gz
 Patch1:         0001-inject-ldflags.patch
 
 BuildRequires:  gcc
@@ -46,25 +46,23 @@ rm -rf %{lua_compat_builddir}
 cp -a . %{lua_compat_builddir}
 
 %build
-make %{?_smp_mflags} COPT="%{optflags}" LDFLAGS="%{build_ldflags}"
+%make_build COPT="%{optflags}" LDFLAGS="%{build_ldflags}"
 
 pushd %{lua_compat_builddir}
-make %{?_smp_mflags} COPT="-I%{_includedir}/lua-%{lua_compat_version} %{optflags}" LDFLAGS="-L%{lua_compat_libdir} %{build_ldflags}"
+%make_build COPT="-I%{_includedir}/lua-%{lua_compat_version} %{optflags}" LDFLAGS="-L%{lua_compat_libdir} %{build_ldflags}"
 popd
 
 %install
-%{__rm} -rf %{buildroot}
-
-%{__mkdir_p} %{buildroot}%{lua_libdir}
-%{__mkdir_p} %{buildroot}%{lua_pkgdir}
-%{__install} -p lpeg.so %{buildroot}%{lua_libdir}/lpeg.so.%{version}
+%{__install} -d -m 0755 %{buildroot}%{lua_libdir}
+%{__install} -d -m 0755 %{buildroot}%{lua_pkgdir}
+%{__install} -p -m 0755 lpeg.so %{buildroot}%{lua_libdir}/lpeg.so.%{version}
 %{__ln_s} lpeg.so.%{version} %{buildroot}%{lua_libdir}/lpeg.so
 %{__install} -p -m 0644 re.lua %{buildroot}%{lua_pkgdir}
 
 pushd %{lua_compat_builddir}
-%{__mkdir_p} %{buildroot}%{lua_compat_libdir}
-%{__mkdir_p} %{buildroot}%{lua_compat_pkgdir}
-%{__install} -p lpeg.so %{buildroot}%{lua_compat_libdir}/lpeg.so.%{version}
+%{__install} -d -m 0755 %{buildroot}%{lua_compat_libdir}
+%{__install} -d -m 0755 %{buildroot}%{lua_compat_pkgdir}
+%{__install} -p -m 0755 lpeg.so %{buildroot}%{lua_compat_libdir}/lpeg.so.%{version}
 %{__ln_s} lpeg.so.%{version} %{buildroot}%{lua_compat_libdir}/lpeg.so
 %{__install} -p -m 0644 re.lua %{buildroot}%{lua_compat_pkgdir}
 popd
@@ -74,18 +72,20 @@ popd
 lua test.lua
 
 %files
-%license lpeg.html re.html
-%doc HISTORY lpeg-128.gif test.lua
+%doc HISTORY lpeg.html re.html lpeg-128.gif test.lua
 %{lua_libdir}/*
 %{lua_pkgdir}/*
 
 %files -n lua%{lua_compat_version}-%{lua_pkg_name}
-%license lpeg.html re.html
 %{lua_compat_libdir}/*
 %{lua_compat_pkgdir}/*
 
 
 %changelog
+* Wed Nov 20 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.1.0-1
+- Updated to 1.1.0.
+- License verified.
+
 * Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-4
 - Fixing run-time dependencies.
 - License verified.
