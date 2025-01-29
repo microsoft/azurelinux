@@ -1,5 +1,6 @@
 {
   "Signatures": {
+    "git-lfs-3.6.1-govendor-v1.tar.gz": "cb27e19fc26ce18bb0b363df10761605ddfe4fdc6f62c0f5fc4f8d072d580cd4",
     "git-lfs-3.6.1-vendor.tar.gz": "6cb4c1deda8ef0b2014c559e06808b58a4fd04f2b487ad30566e0d683889cd65",
     "git-lfs-3.6.1.tar.gz": "062603dbef8f221d867e542314e9a6ea1970cae536b4495de2e915529b0fef8e"
   }
