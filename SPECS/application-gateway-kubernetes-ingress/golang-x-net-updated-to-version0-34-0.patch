@@ -1,0 +1,3 @@
+This patch fixes CVE-2022-41273, CVE-2024-45338, CVE-2023-39325, CVE-2023-44487 - gaswal 2025-01-28
+Updated golang.org/x/net to version 0.34.0 in vendor tarball...nothing to patch.
+---
