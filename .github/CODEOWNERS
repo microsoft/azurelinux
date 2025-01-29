@@ -11,6 +11,7 @@
 /.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
 
 /SPECS-EXTENDED/ @microsoft/cbl-mariner-devs
+cgmanifest.json @microsoft/cbl-mariner-devs
 
 # Image Customizer
 /toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
