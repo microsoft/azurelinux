@@ -72,7 +72,7 @@ version_release_matching_groups = [
         "SPECS/mlnx-nfsrdma/mlnx-nfsrdma.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/mlnx-ofa_kernel-signed/mlnx-ofa_kernel-modules-signed.spec",
+        "SPECS-SIGNED/mlnx-ofa_kernel-modules-signed/mlnx-ofa_kernel-modules-signed.spec",
         "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec"
     ]),
     frozenset([
