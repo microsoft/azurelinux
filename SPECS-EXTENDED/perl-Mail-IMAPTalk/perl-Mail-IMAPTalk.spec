@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Mail-IMAPTalk
-Version:        4.04
-Release:        12%{?dist}
+Version:        4.06
+Release:        5%{?dist}
 Summary:        IMAP client interface with lots of features
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Mail-IMAPTalk
-Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-%{version}.tar.gz#/perl-Mail-IMAPTalk-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -31,7 +31,6 @@ BuildRequires:  perl(warnings)
 # IO::Socket
 # MIME::Base64
 # Socket
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Authen::SASL)
 Requires:       perl(Encode)
 Requires:       perl(Encode::IMAPUTF7)
@@ -46,24 +45,26 @@ mapped to a method of this object.
 chmod -x lib/Mail/IMAPTalk.pm
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
 
 %files
-%license LICENSE
-%doc Changes README
+%doc Changes README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> 4.06-5
+- Initial CBL-Mariner import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.04-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
