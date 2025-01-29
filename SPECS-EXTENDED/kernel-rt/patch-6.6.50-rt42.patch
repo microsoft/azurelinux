@@ -1,4 +1,4 @@
-From c31fd57df2b7621190d30077ad57f6bb4ca387ec Mon Sep 17 00:00:00 2001
+From a8f74b4839d139608eb9416cce62d3c439eeb3aa Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:48 +0200
 Subject: [PATCH 001/200] sched: Constrain locks in sched_submit_work()
@@ -18,7 +18,7 @@ Link: https://lkml.kernel.org/r/20230908162254.999499-2-bigeasy@linutronix.de
  1 file changed, 9 insertions(+)
 
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 92e4afeb71ad..849fc7d07107 100644
+index 97571d390f18..5be4bcd14338 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -6721,11 +6721,18 @@ void __noreturn do_task_dead(void)
@@ -50,9 +50,9 @@ index 92e4afeb71ad..849fc7d07107 100644
  
  static void sched_update_worker(struct task_struct *tsk)
 -- 
-2.45.2
+2.46.0
 
-From 72f3810ae4e509f7480e115e674d04fa960710b8 Mon Sep 17 00:00:00 2001
+From 68b26c62ddb8ff358a0a9b558e4277dd51a30640 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:49 +0200
 Subject: [PATCH 002/200] locking/rtmutex: Avoid unconditional slowpath for
@@ -136,9 +136,9 @@ index d1473c624105..c7196de838ed 100644
  			ww_mutex_set_context_fastpath(lock, ww_ctx);
  		return 0;
 -- 
-2.45.2
+2.46.0
 
-From 925e452d2b87ee4ac76c3225f60384fa1b460ef4 Mon Sep 17 00:00:00 2001
+From d0a73a8555852398e54bb790cd1f4cfd8e75a962 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:50 +0200
 Subject: [PATCH 003/200] sched: Extract __schedule_loop()
@@ -155,7 +155,7 @@ Link: https://lkml.kernel.org/r/20230908162254.999499-4-bigeasy@linutronix.de
  1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 849fc7d07107..716f521d6e3e 100644
+index 5be4bcd14338..55a02e41755a 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -6771,16 +6771,21 @@ static void sched_update_worker(struct task_struct *tsk)
@@ -199,9 +199,9 @@ index 849fc7d07107..716f521d6e3e 100644
  NOKPROBE_SYMBOL(schedule_rtlock);
  #endif
 -- 
-2.45.2
+2.46.0
 
-From c3c52ffe17dd2b7862968e6921f42a3777cbb2d3 Mon Sep 17 00:00:00 2001
+From e2f31b1f5e924576621df80a0af95ac28ac7b2f0 Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:51 +0200
 Subject: [PATCH 004/200] sched: Provide rt_mutex specific scheduler helpers
@@ -275,7 +275,7 @@ index 994c25640e15..b2b9e6eb9683 100644
   * Must hold either p->pi_lock or task_rq(p)->lock.
   */
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 716f521d6e3e..c3dc0103e2f3 100644
+index 55a02e41755a..569b649b0a18 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -6724,9 +6724,6 @@ static inline void sched_submit_work(struct task_struct *tsk)
@@ -336,9 +336,9 @@ index 716f521d6e3e..c3dc0103e2f3 100644
  {
  	if (pi_task)
 -- 
-2.45.2
+2.46.0
 
-From 1714943dda97cac2e6f767914db38a7de60d3898 Mon Sep 17 00:00:00 2001
+From ec42c54a2d373362e26a76dcbf426738cb677593 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:52 +0200
 Subject: [PATCH 005/200] locking/rtmutex: Use rt_mutex specific scheduler
@@ -527,9 +527,9 @@ index 48a19ed8486d..842037b2ba54 100644
  /*
   * The common functions which get wrapped into the rwlock API.
 -- 
-2.45.2
+2.46.0
 
-From ef10de7e059aad3e8a44fa85060d9c89693ecba2 Mon Sep 17 00:00:00 2001
+From 2c2d33caf22e4cfc42950ddbf80d24a65505e8aa Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:53 +0200
 Subject: [PATCH 006/200] locking/rtmutex: Add a lockdep assert to catch
@@ -593,9 +593,9 @@ index 842037b2ba54..38e292454fcc 100644
  		rtlock_slowlock(rtm);
  }
 -- 
-2.45.2
+2.46.0
 
-From 6cde51509c49f25edd00a7b55365ef1a4c061d96 Mon Sep 17 00:00:00 2001
+From c24b3e14cda09915f6c2f4e698ce802183e6bcd9 Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 15 Sep 2023 17:19:44 +0200
 Subject: [PATCH 007/200] futex/pi: Fix recursive rt_mutex waiter state
@@ -797,9 +797,9 @@ index cba8b1a6a4cc..4c73e0b81acc 100644
  		/*
  		 * Fixup the pi_state owner and possibly acquire the lock if we
 -- 
-2.45.2
+2.46.0
 
-From 54d7bb86c6afda9a4f6420dfe10f08ed7b89a9c8 Mon Sep 17 00:00:00 2001
+From a9e4ebf0065fd7fda55dd44ea6ca7df3cfd6c9fd Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:31 +0200
 Subject: [PATCH 008/200] signal: Add proper comment about the preempt-disable
@@ -849,9 +849,9 @@ index 21903f524ef8..83865eeaadc5 100644
  	preempt_disable();
  	read_unlock(&tasklist_lock);
 -- 
-2.45.2
+2.46.0
 
-From 6eabd5ae946e572aaf30aa9db6e99cf9a165fa13 Mon Sep 17 00:00:00 2001
+From b80a02dd99f1137be600c9c6b367483cf228fde7 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:32 +0200
 Subject: [PATCH 009/200] signal: Don't disable preemption in ptrace_stop() on
@@ -902,9 +902,9 @@ index 83865eeaadc5..9f240d9cb240 100644
  	cgroup_leave_frozen(true);
  
 -- 
-2.45.2
+2.46.0
 
-From 7205a8cde8bd8e87f1c02d4f38ca4b91f40506a9 Mon Sep 17 00:00:00 2001
+From a9c1bd8fce712f7a457fe2bd56c8ff204451bd5a Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:12 +0200
 Subject: [PATCH 010/200] drm/amd/display: Remove migrate_en/dis from
@@ -993,9 +993,9 @@ index 172aa10a8800..86f4c0e04654 100644
  		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
  			disable_kernel_vsx();
 -- 
-2.45.2
+2.46.0
 
-From 48035cee8f31618a1500e94836463901ddf78dce Mon Sep 17 00:00:00 2001
+From abddc4a488d52379c9c7bc6aa03178dc5e00b69b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:13 +0200
 Subject: [PATCH 011/200] drm/amd/display: Simplify the per-CPU usage.
@@ -1125,9 +1125,9 @@ index 86f4c0e04654..8bd5926b47e0 100644
 +	preempt_enable();
  }
 -- 
-2.45.2
+2.46.0
 
-From 3dd4f1938bceeec541d5095ad8834e5e4fe376d4 Mon Sep 17 00:00:00 2001
+From 3e993f7309408e481fc93a7a0ba84b7e57c1381a Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:14 +0200
 Subject: [PATCH 012/200] drm/amd/display: Add a warning if the FPU is used
@@ -1156,9 +1156,9 @@ index 8bd5926b47e0..4ae4720535a5 100644
  	depth = __this_cpu_inc_return(fpu_recursion_depth);
  
 -- 
-2.45.2
+2.46.0
 
-From 16504f4905da1ee14eb6883b3e1ab1141ccd97b0 Mon Sep 17 00:00:00 2001
+From 4f37df5e359f9826b5530973fa37e5fb60dfe003 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:15 +0200
 Subject: [PATCH 013/200] drm/amd/display: Move the memory allocation out of
@@ -1252,9 +1252,9 @@ index c51badf7b68a..a81a0b9e6884 100644
  
  void dcn21_clk_mgr_set_bw_params_wm_table(struct clk_bw_params *bw_params);
 -- 
-2.45.2
+2.46.0
 
-From 78c8dde20d1982c88d3c428dc84fcbb25a337b71 Mon Sep 17 00:00:00 2001
+From ce548ce4c4f6a3e121db22ce0029740a95200c97 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:16 +0200
 Subject: [PATCH 014/200] drm/amd/display: Move the memory allocation out of
@@ -1382,9 +1382,9 @@ index a81a0b9e6884..b6c34198ddc8 100644
  			     struct pp_smu_wm_range_sets *ranges,
  			     struct _vcs_dpi_soc_bounding_box_st *loaded_bb);
 -- 
-2.45.2
+2.46.0
 
-From c3924b6f37744b4af19ce3819279c0b6b42890b3 Mon Sep 17 00:00:00 2001
+From 4eb0b9569b21f0870e13d919dce771d57b1f59d6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 15 Aug 2022 17:29:50 +0200
 Subject: [PATCH 015/200] net: Avoid the IPI to free the
@@ -1510,9 +1510,9 @@ index f0a9ef1aeaa2..682175af439d 100644
  
  static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
 -- 
-2.45.2
+2.46.0
 
-From d3b6df512dfe902f1d8348338c60e98dcdd7b769 Mon Sep 17 00:00:00 2001
+From ca38b214b5ec336c4ed769a63f884cf5314d3e93 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 7 Aug 2019 18:15:38 +0200
 Subject: [PATCH 016/200] x86: Allow to enable RT
@@ -1538,9 +1538,9 @@ index 82d12c93feab..231e41817ea4 100644
  	select HAVE_ARCH_SOFT_DIRTY
  	select MODULES_USE_ELF_RELA
 -- 
-2.45.2
+2.46.0
 
-From e549b0437c804a41acecb0591ba12887411e99be Mon Sep 17 00:00:00 2001
+From 22ddae3865c56e08a2df5f8ac2ace1f294fc856f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Nov 2019 17:49:20 +0100
 Subject: [PATCH 017/200] x86: Enable RT also on 32bit
@@ -1572,9 +1572,9 @@ index 231e41817ea4..fe340c07ddbf 100644
  	select ARCH_USE_MEMTEST
  	select ARCH_USE_QUEUED_RWLOCKS
 -- 
-2.45.2
+2.46.0
 
-From 07cb5b821c910fdb8193d0e4fbd2aca82dc49a05 Mon Sep 17 00:00:00 2001
+From 8280303dfdbb1ffa3c0c7927d87a5a048e417b9b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 1 Aug 2023 17:26:48 +0200
 Subject: [PATCH 018/200] sched/rt: Don't try push tasks if there are none.
@@ -1635,9 +1635,9 @@ index 4ac36eb4cdee..acd1510e8d47 100644
  		rd->rto_cpu = -1;
  
 -- 
-2.45.2
+2.46.0
 
-From 1b21c110976b90f6168e86e7bc760194bc4a7737 Mon Sep 17 00:00:00 2001
+From d021a6898b1fa1e9af504e41a3f820a8ce18ebdc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 1 Dec 2021 17:41:09 +0100
 Subject: [PATCH 019/200] softirq: Use a dedicated thread for timer wakeups.
@@ -1833,10 +1833,10 @@ index bd9716d7bb63..0e43058c2e58 100644
  }
  early_initcall(spawn_ksoftirqd);
 diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index edb0f821dcea..a7290012179a 100644
+index 57e5cb36f1bc..c4ae45701fab 100644
 --- a/kernel/time/hrtimer.c
 +++ b/kernel/time/hrtimer.c
-@@ -1809,7 +1809,7 @@ void hrtimer_interrupt(struct clock_event_device *dev)
+@@ -1812,7 +1812,7 @@ void hrtimer_interrupt(struct clock_event_device *dev)
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -1845,7 +1845,7 @@ index edb0f821dcea..a7290012179a 100644
  	}
  
  	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_HARD);
-@@ -1922,7 +1922,7 @@ void hrtimer_run_queues(void)
+@@ -1925,7 +1925,7 @@ void hrtimer_run_queues(void)
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -1868,9 +1868,9 @@ index 63a8ce7177dd..7cad6fe3c035 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From 0a0992d76d7462ceebfafc9d57215aa3f62060d6 Mon Sep 17 00:00:00 2001
+From 77cdc26a21bfe15bb108d1f5700ffd70286a84b6 Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:51 +0200
 Subject: [PATCH 020/200] rcutorture: Also force sched priority to timersd on
@@ -1918,7 +1918,7 @@ index 0efba74a835c..f459b0f27c94 100644
  extern void raise_hrtimer_softirq(void);
  
 diff --git a/kernel/rcu/rcutorture.c b/kernel/rcu/rcutorture.c
-index 781146600aa4..7ee1c84b52ee 100644
+index 46612fb15fc6..f893f4cfdd38 100644
 --- a/kernel/rcu/rcutorture.c
 +++ b/kernel/rcu/rcutorture.c
 @@ -2409,6 +2409,12 @@ static int rcutorture_booster_init(unsigned int cpu)
@@ -1948,9 +1948,9 @@ index 0e43058c2e58..63e8b9ad2727 100644
  
  static unsigned int local_pending_timers(void)
 -- 
-2.45.2
+2.46.0
 
-From 7f4ecc8e16a895bbb0f10d6d72f819152b613e10 Mon Sep 17 00:00:00 2001
+From a32793bc514afab623b272df89cea17c1a64f0fd Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:52 +0200
 Subject: [PATCH 021/200] tick: Fix timer storm since introduction of timersd
@@ -2063,9 +2063,9 @@ index 55cbc49f70d1..1a0ed106b192 100644
  
  static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 -- 
-2.45.2
+2.46.0
 
-From e14b37b3ae0c307ce0b833eb4ccab314beb2a8bf Mon Sep 17 00:00:00 2001
+From 3dc041efd26cd990e0221bba8bbf1543e3b9d035 Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Mon, 20 Feb 2023 09:12:20 +0100
 Subject: [PATCH 022/200] softirq: Wake ktimers thread also in softirq.
@@ -2112,9 +2112,9 @@ index 65477d8e00af..ea6198bf64e0 100644
  	tick_irq_exit();
  }
 -- 
-2.45.2
+2.46.0
 
-From 076ad72e50ed0c20311ba6dd11b5814c113b2e46 Mon Sep 17 00:00:00 2001
+From 5b7e8d8adbd787c8f1bf7b6bedabfab13291cd95 Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Thu, 31 Mar 2016 04:08:28 +0200
 Subject: [PATCH 023/200] zram: Replace bit spinlocks with spinlock_t for
@@ -2214,9 +2214,9 @@ index ca7a15bd4845..e64eb607eb45 100644
  	ktime_t ac_time;
  #endif
 -- 
-2.45.2
+2.46.0
 
-From b2df669c653f2acb7afd5af4509574bcb1fe126f Mon Sep 17 00:00:00 2001
+From 992e2e8e7f4b4875107423c57defb747025b1c6e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Mar 2023 16:29:38 +0100
 Subject: [PATCH 024/200] preempt: Put preempt_enable() within an
@@ -2266,9 +2266,9 @@ index 9aa6358a1a16..cd16f0330fba 100644
  
  #define preempt_check_resched() \
 -- 
-2.45.2
+2.46.0
 
-From cb6aa9b55149e7c01ef15c45c09a3873376a0d2b Mon Sep 17 00:00:00 2001
+From f393635414eb75a1830cb9c1803cf5e49af3d313 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:37 +0200
 Subject: [PATCH 025/200] sched/core: Provide a method to check if a task is
@@ -2301,7 +2301,7 @@ index 67623ffd4a8e..eab173e5d09b 100644
  extern void set_user_nice(struct task_struct *p, long nice);
  extern int task_prio(const struct task_struct *p);
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index c3dc0103e2f3..fb30aad3c1b6 100644
+index 569b649b0a18..fbc37ecd073c 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -8923,6 +8923,21 @@ static inline void preempt_dynamic_init(void) { }
@@ -2327,9 +2327,9 @@ index c3dc0103e2f3..fb30aad3c1b6 100644
   * yield - yield the current processor to other threads.
   *
 -- 
-2.45.2
+2.46.0
 
-From 1093748bae3b49d27d22a711a359cc040cc48a9e Mon Sep 17 00:00:00 2001
+From 466ac05785679941926617847a98e0365035ad37 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:38 +0200
 Subject: [PATCH 026/200] softirq: Add function to preempt serving softirqs.
@@ -2394,9 +2394,9 @@ index ea6198bf64e0..2fde8af88e48 100644
   * Invoked from ksoftirqd_run() outside of the interrupt disabled section
   * to acquire the per CPU local lock for reentrancy protection.
 -- 
-2.45.2
+2.46.0
 
-From 8330f8203d8688bb5ad6d4b8570f71680f4905eb Mon Sep 17 00:00:00 2001
+From e31ab6862bdf60374c769ff264c501a40535fa99 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:39 +0200
 Subject: [PATCH 027/200] time: Allow to preempt after a callback.
@@ -2446,9 +2446,9 @@ index 7cad6fe3c035..b3fbe97d1e34 100644
  		raw_spin_lock_irq(&base->lock);
  	}
 -- 
-2.45.2
+2.46.0
 
-From 6cbb174a00cb86a0004e040c59f3cdc9e232d448 Mon Sep 17 00:00:00 2001
+From 5bda9a88781dbb1012b7808256acf74e9aef594c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:19 +0206
 Subject: [PATCH 028/200] serial: core: Use lock wrappers
@@ -2544,9 +2544,9 @@ index 052df85dfd59..71d925e8a79b 100644
  #endif	/* CONFIG_MAGIC_SYSRQ_SERIAL */
  
 -- 
-2.45.2
+2.46.0
 
-From 6a0973155e66e0c794a9d4b836231cef07146ffc Mon Sep 17 00:00:00 2001
+From 9f621b05d0e19074dec19b4f2fc6b0ecf87b58e9 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:20 +0206
 Subject: [PATCH 029/200] serial: 21285: Use port lock wrappers
@@ -2624,9 +2624,9 @@ index d756fcc884cb..4de0c975ebdc 100644
  
  static const char *serial21285_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From deeff9a4358ee6cf3b3c8c3fec09417829e1adf6 Mon Sep 17 00:00:00 2001
+From 5f26757aaf2679e7332630cb2c9de21c39db80ab Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:21 +0206
 Subject: [PATCH 030/200] serial: 8250_aspeed_vuart: Use port lock wrappers
@@ -2690,9 +2690,9 @@ index 4a9e71b2dbbc..021949f252f8 100644
  	lsr = serial_port_in(port, UART_LSR);
  
 -- 
-2.45.2
+2.46.0
 
-From 194f8956ecc544192307e5c83848dc67aad1ba48 Mon Sep 17 00:00:00 2001
+From 8b44d16bba4b9f1600f361245f46b3748911b5c1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:22 +0206
 Subject: [PATCH 031/200] serial: 8250_bcm7271: Use port lock wrappers
@@ -2846,9 +2846,9 @@ index 9afd5979c9e0..db23b3a02aef 100644
  
  	return 0;
 -- 
-2.45.2
+2.46.0
 
-From f75ca1ee70d313783e05ce32e588ca41c1b710bf Mon Sep 17 00:00:00 2001
+From 08985f48a801c1671f5f921be9e22523737d412f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:23 +0206
 Subject: [PATCH 032/200] serial: 8250: Use port lock wrappers
@@ -3318,9 +3318,9 @@ index a17803da83f8..cba5a1b1030f 100644
  
  static unsigned int probe_baud(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 407885d0e92f662c65b27fe9c6a8bb13feeb2a6a Mon Sep 17 00:00:00 2001
+From 4c3abf178dfd443a9e83691f374b631d7a727887 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:24 +0206
 Subject: [PATCH 033/200] serial: 8250_dma: Use port lock wrappers
@@ -3403,9 +3403,9 @@ index 7fa66501792d..8b30ca8fdd3f 100644
  
  int serial8250_tx_dma(struct uart_8250_port *p)
 -- 
-2.45.2
+2.46.0
 
-From b53a2e919c22d5f7a214a068bf3262716b01e429 Mon Sep 17 00:00:00 2001
+From 1eb7cfe0b0e40a4aa5074ca97c3680a2ed3ddabd Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:25 +0206
 Subject: [PATCH 034/200] serial: 8250_dw: Use port lock wrappers
@@ -3477,9 +3477,9 @@ index 8aed33be2ebf..5367bcc6256c 100644
  		if (status & (UART_LSR_DR | UART_LSR_BI)) {
  			dw8250_writel_ext(p, RZN1_UART_RDMACR, 0);
 -- 
-2.45.2
+2.46.0
 
-From f69add349f4fb4293bee743ba58c51e5bfe52477 Mon Sep 17 00:00:00 2001
+From fd4d99ece71f45349da2dec7becc3dae5da4e6bf Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:26 +0206
 Subject: [PATCH 035/200] serial: 8250_exar: Use port lock wrappers
@@ -3534,9 +3534,9 @@ index 27430fdd9e76..17be6ad24a0f 100644
  	return serial8250_do_startup(port);
  }
 -- 
-2.45.2
+2.46.0
 
-From c1c6f640c501e1c7edff13e70dec543da53b619f Mon Sep 17 00:00:00 2001
+From d3dc038f1e46f97666fc6ea0bdb3ad5bd6c5b827 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:27 +0206
 Subject: [PATCH 036/200] serial: 8250_fsl: Use port lock wrappers
@@ -3602,9 +3602,9 @@ index 6af4e1c1210a..f522eb5026c9 100644
  	}
  
 -- 
-2.45.2
+2.46.0
 
-From 697e639468793562ed658f3c79eb26662178e439 Mon Sep 17 00:00:00 2001
+From 4130175a642d3640d640419fc08ad9bdd3b28378 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:28 +0206
 Subject: [PATCH 037/200] serial: 8250_mtk: Use port lock wrappers
@@ -3684,9 +3684,9 @@ index 28f9a2679a20..33699e86eb52 100644
  	if (tty_termios_baud_rate(termios))
  		tty_termios_encode_baud_rate(termios, baud, baud);
 -- 
-2.45.2
+2.46.0
 
-From 5102b1b22dd8465e266c8d83a3084969104c1bb9 Mon Sep 17 00:00:00 2001
+From 216788c4ebf08d308e5e93c3a3c04b4793fe679e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:29 +0206
 Subject: [PATCH 038/200] serial: 8250_omap: Use port lock wrappers
@@ -3925,9 +3925,9 @@ index 8f472a2080ff..78fc1f17d5e2 100644
  
  	priv->latency = priv->calc_latency;
 -- 
-2.45.2
+2.46.0
 
-From 17dbdf19ef2c3a2432e801de5abd82159adfc584 Mon Sep 17 00:00:00 2001
+From 73dab33c9ef822064799474f4fa3e79caa881171 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:30 +0206
 Subject: [PATCH 039/200] serial: 8250_pci1xxxx: Use port lock wrappers
@@ -3996,9 +3996,9 @@ index a3b25779d921..53e238c8cc89 100644
  	mutex_unlock(&tport->mutex);
  }
 -- 
-2.45.2
+2.46.0
 
-From 42e5a7eb488557ac2859b9700825bc1fa0696aab Mon Sep 17 00:00:00 2001
+From 30191ca82b2bb39d8a885eb479a8000d908ff2ce Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:31 +0206
 Subject: [PATCH 040/200] serial: altera_jtaguart: Use port lock wrappers
@@ -4134,9 +4134,9 @@ index 5fab4c978891..7090b251dd4d 100644
  #endif
  
 -- 
-2.45.2
+2.46.0
 
-From 5d770ede444d189adb4a6d958845ea18806f5c1d Mon Sep 17 00:00:00 2001
+From ae7f5b6030b93a314b53b34f2a5d60b452fdbef5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:32 +0206
 Subject: [PATCH 041/200] serial: altera_uart: Use port lock wrappers
@@ -4255,9 +4255,9 @@ index a9c41942190c..77835ac68df2 100644
  	if (port->irq)
  		free_irq(port->irq, port);
 -- 
-2.45.2
+2.46.0
 
-From 30e8000f988f780c233dda43feb29d47c6a398cd Mon Sep 17 00:00:00 2001
+From 6ee2bb19ba12884adb966e913f669b89494c379e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:33 +0206
 Subject: [PATCH 042/200] serial: amba-pl010: Use port lock wrappers
@@ -4372,9 +4372,9 @@ index b5a7404cbacb..eabbf8afc9b5 100644
  	}
  }
 -- 
-2.45.2
+2.46.0
 
-From b7f2ca09de1493231eb95b80e69d90112c70dd21 Mon Sep 17 00:00:00 2001
+From 2df86fc2a6fd6ff486f34ed3383f661b85b4ec05 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:34 +0206
 Subject: [PATCH 043/200] serial: amba-pl011: Use port lock wrappers
@@ -4704,9 +4704,9 @@ index 362bbcdece0d..16c770311069 100644
  
  	clk_disable(uap->clk);
 -- 
-2.45.2
+2.46.0
 
-From e20d1732179f80b9884d1487de0665b693e1da13 Mon Sep 17 00:00:00 2001
+From 0caab920206ca1ecaa068fd51449409199b3eeee Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:35 +0206
 Subject: [PATCH 044/200] serial: apb: Use port lock wrappers
@@ -4785,9 +4785,9 @@ index d3cb341f2c55..364599f256db 100644
  
  static const char *apbuart_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From a8ec3d1c3b1e39276d58d612211e05a02ff0490f Mon Sep 17 00:00:00 2001
+From f89c7b77cf854c60e6bb268e7bafdfc8f5a5126a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:36 +0206
 Subject: [PATCH 045/200] serial: ar933x: Use port lock wrappers
@@ -4934,9 +4934,9 @@ index 924c1a89347c..ffd234673177 100644
  	local_irq_restore(flags);
  }
 -- 
-2.45.2
+2.46.0
 
-From b1a800ad483c7561bc9fb462d0ccdb57c65ac5ad Mon Sep 17 00:00:00 2001
+From 24415b3192b68387ddb9c604d35201a7bef0189a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:37 +0206
 Subject: [PATCH 046/200] serial: arc_uart: Use port lock wrappers
@@ -5036,9 +5036,9 @@ index ad4ae19b6ce3..1aa5b2b49c26 100644
  
  static struct console arc_console = {
 -- 
-2.45.2
+2.46.0
 
-From ac45992a88e13249acde64b0ac9de187761a0d01 Mon Sep 17 00:00:00 2001
+From ddfa4ec01c8a2b4cc9b9b9697cf9758c4e302288 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:38 +0206
 Subject: [PATCH 047/200] serial: atmel: Use port lock wrappers
@@ -5077,7 +5077,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/tty/serial/atmel_serial.c b/drivers/tty/serial/atmel_serial.c
-index 88cdafa5ac54..1946fafc3f3e 100644
+index bcca5627afac..5a3f2fc476f9 100644
 --- a/drivers/tty/serial/atmel_serial.c
 +++ b/drivers/tty/serial/atmel_serial.c
 @@ -861,7 +861,7 @@ static void atmel_complete_tx_dma(void *arg)
@@ -5160,9 +5160,9 @@ index 88cdafa5ac54..1946fafc3f3e 100644
  	}
  }
 -- 
-2.45.2
+2.46.0
 
-From 1eb0468843659f1f21000733fc4c62d642625111 Mon Sep 17 00:00:00 2001
+From 24d4041d1fbb5a791c76a143a3a27700ae67004e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:39 +0206
 Subject: [PATCH 048/200] serial: bcm63xx-uart: Use port lock wrappers
@@ -5293,9 +5293,9 @@ index 44c27e5cefbc..b104c36ce5c0 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From d816749abf87690b8b20743c6984a4d1137e27ba Mon Sep 17 00:00:00 2001
+From a4fe8b197b63b23171c4a4f06c10fc5dfa5a8115 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:40 +0206
 Subject: [PATCH 049/200] serial: cpm_uart: Use port lock wrappers
@@ -5368,9 +5368,9 @@ index 626423022d62..be4af6eda4c2 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 39904d1806d20a7aadc74d6797d28e95b2787ab2 Mon Sep 17 00:00:00 2001
+From d3b8d74754a18e99a5f5b1496f6ad05ccfaf7fac Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:41 +0206
 Subject: [PATCH 050/200] serial: digicolor: Use port lock wrappers
@@ -5486,9 +5486,9 @@ index 128b5479e813..5004125f3045 100644
  	/* Wait for transmitter to become empty */
  	do {
 -- 
-2.45.2
+2.46.0
 
-From 5a8503bc22339f64c1c53f8e6c461685d5ad7137 Mon Sep 17 00:00:00 2001
+From a275fb7a64fb98467c4cba792a9001a10bf93295 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:42 +0206
 Subject: [PATCH 051/200] serial: dz: Use port lock wrappers
@@ -5652,9 +5652,9 @@ index 667f52e83277..6df7af9edc1c 100644
  	do {
  		trdy = dz_in(dport, DZ_CSR);
 -- 
-2.45.2
+2.46.0
 
-From 988cd7c9d13381daba433d0b0ae01cafe08f4798 Mon Sep 17 00:00:00 2001
+From bc26b51342b3b6fab376fbd19e60c67512615845 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:43 +0206
 Subject: [PATCH 052/200] serial: linflexuart: Use port lock wrappers
@@ -5800,9 +5800,9 @@ index 249cb380c3c6..7fa809a405e8 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From 563ebb00c3ca6553f80f3fd3068977e277b25515 Mon Sep 17 00:00:00 2001
+From d5ed2f7fe131ebf48dfc9d66b13d2a278ae53ac9 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:44 +0206
 Subject: [PATCH 053/200] serial: fsl_lpuart: Use port lock wrappers
@@ -5841,7 +5841,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 44 insertions(+), 44 deletions(-)
 
 diff --git a/drivers/tty/serial/fsl_lpuart.c b/drivers/tty/serial/fsl_lpuart.c
-index 385b41275e8b..71d0cbd74807 100644
+index 8bd0f8e45b14..58c2c460ccd8 100644
 --- a/drivers/tty/serial/fsl_lpuart.c
 +++ b/drivers/tty/serial/fsl_lpuart.c
 @@ -532,9 +532,9 @@ static void lpuart_dma_tx_complete(void *arg)
@@ -6143,7 +6143,7 @@ index 385b41275e8b..71d0cbd74807 100644
  }
  
  /*
-@@ -3092,7 +3092,7 @@ static int lpuart_suspend(struct device *dev)
+@@ -3093,7 +3093,7 @@ static int lpuart_suspend(struct device *dev)
  	uart_suspend_port(&lpuart_reg, &sport->port);
  
  	if (lpuart_uport_is_active(sport)) {
@@ -6152,7 +6152,7 @@ index 385b41275e8b..71d0cbd74807 100644
  		if (lpuart_is_32(sport)) {
  			/* disable Rx/Tx and interrupts */
  			temp = lpuart32_read(&sport->port, UARTCTRL);
-@@ -3104,7 +3104,7 @@ static int lpuart_suspend(struct device *dev)
+@@ -3105,7 +3105,7 @@ static int lpuart_suspend(struct device *dev)
  			temp &= ~(UARTCR2_TE | UARTCR2_TIE | UARTCR2_TCIE);
  			writeb(temp, sport->port.membase + UARTCR2);
  		}
@@ -6161,7 +6161,7 @@ index 385b41275e8b..71d0cbd74807 100644
  
  		if (sport->lpuart_dma_rx_use) {
  			/*
-@@ -3117,7 +3117,7 @@ static int lpuart_suspend(struct device *dev)
+@@ -3118,7 +3118,7 @@ static int lpuart_suspend(struct device *dev)
  			lpuart_dma_rx_free(&sport->port);
  
  			/* Disable Rx DMA to use UART port as wakeup source */
@@ -6170,7 +6170,7 @@ index 385b41275e8b..71d0cbd74807 100644
  			if (lpuart_is_32(sport)) {
  				temp = lpuart32_read(&sport->port, UARTBAUD);
  				lpuart32_write(&sport->port, temp & ~UARTBAUD_RDMAE,
-@@ -3126,11 +3126,11 @@ static int lpuart_suspend(struct device *dev)
+@@ -3127,11 +3127,11 @@ static int lpuart_suspend(struct device *dev)
  				writeb(readb(sport->port.membase + UARTCR5) &
  				       ~UARTCR5_RDMAS, sport->port.membase + UARTCR5);
  			}
@@ -6184,7 +6184,7 @@ index 385b41275e8b..71d0cbd74807 100644
  			if (lpuart_is_32(sport)) {
  				temp = lpuart32_read(&sport->port, UARTBAUD);
  				temp &= ~UARTBAUD_TDMAE;
-@@ -3140,7 +3140,7 @@ static int lpuart_suspend(struct device *dev)
+@@ -3141,7 +3141,7 @@ static int lpuart_suspend(struct device *dev)
  				temp &= ~UARTCR5_TDMAS;
  				writeb(temp, sport->port.membase + UARTCR5);
  			}
@@ -6194,9 +6194,9 @@ index 385b41275e8b..71d0cbd74807 100644
  			dmaengine_terminate_sync(sport->dma_tx_chan);
  		}
 -- 
-2.45.2
+2.46.0
 
-From 0f3ab0dac8b067770206dec4b92873e7095131c6 Mon Sep 17 00:00:00 2001
+From 49d5fceacbca222d8a7dd594eaafac79dce6d4df Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:45 +0206
 Subject: [PATCH 054/200] serial: icom: Use port lock wrappers
@@ -6350,9 +6350,9 @@ index 819f957b6b84..a75eafbcbea3 100644
  
  static const char *icom_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From c4a77c8c6b8486697fbed0702ee80e8e49d03124 Mon Sep 17 00:00:00 2001
+From e80ee00f29ff1493d4712ff8cc0a178a9afce2af Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:46 +0206
 Subject: [PATCH 055/200] serial: imx: Use port lock wrappers
@@ -6709,9 +6709,9 @@ index a5d0df2ba5c5..267c9af4bd53 100644
  
  static void imx_uart_enable_wakeup(struct imx_port *sport, bool on)
 -- 
-2.45.2
+2.46.0
 
-From d0590362c06b701fb827e819a69e90df87a6fd52 Mon Sep 17 00:00:00 2001
+From 7527bcb16f1941e6d54bf634ec845958834ce733 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:47 +0206
 Subject: [PATCH 056/200] serial: ip22zilog: Use port lock wrappers
@@ -6899,9 +6899,9 @@ index 845ff706bc59..320b29cd4683 100644
  	if (options)
  		uart_parse_options(options, &baud, &parity, &bits, &flow);
 -- 
-2.45.2
+2.46.0
 
-From 803d740abf601e7338425818456ca4364bafefa1 Mon Sep 17 00:00:00 2001
+From 9e9d2f5294ba0e9028794ad57f515a71e94b6007 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:48 +0206
 Subject: [PATCH 057/200] serial: jsm: Use port lock wrappers
@@ -7030,9 +7030,9 @@ index 222afc270c88..ce0fef7e2c66 100644
  
  static const char *jsm_tty_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 87ea771fb92e18a46a76b14f773b7d14b39b541f Mon Sep 17 00:00:00 2001
+From dd7478c6d62fcdc64377e1c52369e7dc6e17ac03 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:49 +0206
 Subject: [PATCH 058/200] serial: liteuart: Use port lock wrappers
@@ -7145,9 +7145,9 @@ index d881cdd2a58f..a25ab1efe38f 100644
  
  static int liteuart_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From e71a29106098d034f72fbfd9f305b39d1061656c Mon Sep 17 00:00:00 2001
+From e7818d22010e676a637f0c52f07e8e696bedad6d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:50 +0206
 Subject: [PATCH 059/200] serial: lpc32xx_hs: Use port lock wrappers
@@ -7298,9 +7298,9 @@ index b38fe4728c26..5149a947b7fe 100644
  	/* Don't rewrite B0 */
  	if (tty_termios_baud_rate(termios))
 -- 
-2.45.2
+2.46.0
 
-From b78d6c9bff8c679c381526ff529e8e9b19f7b59f Mon Sep 17 00:00:00 2001
+From eb1ba00c5da47c541d046754f810fcfd668e275e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:51 +0206
 Subject: [PATCH 060/200] serial: ma35d1: Use port lock wrappers
@@ -7420,9 +7420,9 @@ index 99225f1e02ac..faccd772c68c 100644
  
  static int __init ma35d1serial_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From d7cf2bde4b3aa96ec719e3494e97013ef453b54a Mon Sep 17 00:00:00 2001
+From 4c65024ab326aba4040be0b322aca6332162b5cc Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:52 +0206
 Subject: [PATCH 061/200] serial: mcf: Use port lock wrappers
@@ -7552,9 +7552,9 @@ index aea29b4e6567..ee40af20a08f 100644
  	return ret;
  }
 -- 
-2.45.2
+2.46.0
 
-From 1ff623adf2fe448750b673413099670ae19e8e8f Mon Sep 17 00:00:00 2001
+From 63b854cc9205ddcc246dab9ee6f1c8cdfc7b74a5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:53 +0206
 Subject: [PATCH 062/200] serial: men_z135_uart: Use port lock wrappers
@@ -7633,9 +7633,9 @@ index d2502aaa3e8c..8048fa542fc4 100644
  
  static const char *men_z135_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 15a6b799e3c4ebdcaec51a530c58a747e3948ccd Mon Sep 17 00:00:00 2001
+From 31f6af46aa4bf4b2677b111f36e74625b3e10f2a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:54 +0206
 Subject: [PATCH 063/200] serial: meson: Use port lock wrappers
@@ -7806,9 +7806,9 @@ index 9388b9ddea3b..4c1d2089a0bb 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From ba7be5d2c8fd68ef39507d76b4075875c944f0cf Mon Sep 17 00:00:00 2001
+From 13d1584a90a219bb95b97b1cf8ebb2a55c48ba37 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:55 +0206
 Subject: [PATCH 064/200] serial: milbeaut_usio: Use port lock wrappers
@@ -7912,9 +7912,9 @@ index 70a910085e93..db3b81f2aa57 100644
  
  static const char *mlb_usio_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 69b4c829c70cb28fc9756bbee6988c64eebcf881 Mon Sep 17 00:00:00 2001
+From deb504fd2acfd27025ca0792f3a48aa3e0fe0375 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:56 +0206
 Subject: [PATCH 065/200] serial: mpc52xx: Use port lock wrappers
@@ -8006,9 +8006,9 @@ index 916507b8f31d..a252465e745f 100644
  	return ret;
  }
 -- 
-2.45.2
+2.46.0
 
-From 522d4cf4fd7570e943aace69bd519c33bbcf3187 Mon Sep 17 00:00:00 2001
+From 199e4f7b2c8ac9456002e43cec9e6a3b2650ae01 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:57 +0206
 Subject: [PATCH 066/200] serial: mps2-uart: Use port lock wrappers
@@ -8114,9 +8114,9 @@ index ea5a7911cb15..2a4c09f3a834 100644
  	if (tty_termios_baud_rate(termios))
  		tty_termios_encode_baud_rate(termios, baud, baud);
 -- 
-2.45.2
+2.46.0
 
-From 16f935db44f676cef53c42f1e892d4d04c0a8029 Mon Sep 17 00:00:00 2001
+From 09b1213b8ab66b51e552d4b4b0a5f58af9ed3795 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:58 +0206
 Subject: [PATCH 067/200] serial: msm: Use port lock wrappers
@@ -8304,9 +8304,9 @@ index 90953e679e38..597264b546fd 100644
  	local_irq_restore(flags);
  }
 -- 
-2.45.2
+2.46.0
 
-From a66fb666a8f6237453a5617d664da08a6398f9df Mon Sep 17 00:00:00 2001
+From 6f1eabdc73b961673864875ac4ef9570ca1df977 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:59 +0206
 Subject: [PATCH 068/200] serial: mvebu-uart: Use port lock wrappers
@@ -8417,9 +8417,9 @@ index ea924e9b913b..0255646bc175 100644
  
  static int mvebu_uart_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From 4ffa7508d4399b2d555306c60e19dc61f565366a Mon Sep 17 00:00:00 2001
+From a0d999e565174584a5c3f70058ce9c7a27dc2bd0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:00 +0206
 Subject: [PATCH 069/200] serial: omap: Use port lock wrappers
@@ -8602,9 +8602,9 @@ index 135a838f517a..f4c6ff806465 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 9630af7ff10cc55d6e0858045d11f9d0825e7ded Mon Sep 17 00:00:00 2001
+From 758ac6e1d535738498727d838dcc1653d2707f0c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:01 +0206
 Subject: [PATCH 070/200] serial: owl: Use port lock wrappers
@@ -8754,9 +8754,9 @@ index e99970a9437f..919f5e5aa0f1 100644
  	local_irq_restore(flags);
  }
 -- 
-2.45.2
+2.46.0
 
-From e6a14428f084ac31998f206353bb23e6e1bdb46e Mon Sep 17 00:00:00 2001
+From dfae6e2fa207c9f62701733caf5d9fab3744f160 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:02 +0206
 Subject: [PATCH 071/200] serial: pch: Use port lock wrappers
@@ -8839,9 +8839,9 @@ index cc83b772b7ca..436cc6d52a11 100644
  		spin_unlock(&priv->lock);
  	local_irq_restore(flags);
 -- 
-2.45.2
+2.46.0
 
-From d23f03c0e7171f2eee1c1d48fa96b7aa987a396e Mon Sep 17 00:00:00 2001
+From 782f2a2d674f543283ef3a9384b55ff26cad6347 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:03 +0206
 Subject: [PATCH 072/200] serial: pic32: Use port lock wrappers
@@ -8962,9 +8962,9 @@ index e308d5022b3f..3a95bf5d55d3 100644
  
  /* serial core request to claim uart iomem */
 -- 
-2.45.2
+2.46.0
 
-From 19e7a91c43af31661bd8a489bdf4afebf3f32b3a Mon Sep 17 00:00:00 2001
+From b5404bcba52124d0a94400d6b6538065a13c2887 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:04 +0206
 Subject: [PATCH 073/200] serial: pmac_zilog: Use port lock wrappers
@@ -9199,9 +9199,9 @@ index 29bc80d39e8b..77691fbbf779 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From b8c3a70617575cb2af23756598252c8c32bcd963 Mon Sep 17 00:00:00 2001
+From 7ab9aa2847a1b2cc574efc6aa18fc13b1e4892d8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:05 +0206
 Subject: [PATCH 074/200] serial: pxa: Use port lock wrappers
@@ -9354,9 +9354,9 @@ index 73c60f5ea027..46e70e155aab 100644
  	clk_disable(up->clk);
  
 -- 
-2.45.2
+2.46.0
 
-From b44dfb541c91e86c799d9dbaa894ba78ce0ef3f4 Mon Sep 17 00:00:00 2001
+From 1572b2c01017ea266a445394b715c49889958eac Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:06 +0206
 Subject: [PATCH 075/200] serial: qcom-geni: Use port lock wrappers
@@ -9430,9 +9430,9 @@ index 2e1b1c827dfe..549909644011 100644
  	m_irq_status = readl(uport->membase + SE_GENI_M_IRQ_STATUS);
  	s_irq_status = readl(uport->membase + SE_GENI_S_IRQ_STATUS);
 -- 
-2.45.2
+2.46.0
 
-From e6264d9a7b7c1601bd9e4060d57d061a7e139ebd Mon Sep 17 00:00:00 2001
+From 8cae3a7ef20e11d50e10ede3cc12bb7c646a8340 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:07 +0206
 Subject: [PATCH 076/200] serial: rda: Use port lock wrappers
@@ -9612,9 +9612,9 @@ index be5c842b5ba9..d824c8318f33 100644
  	local_irq_restore(flags);
  }
 -- 
-2.45.2
+2.46.0
 
-From 9207d4797a8d766b4b58e0b569fd9f948528ee1b Mon Sep 17 00:00:00 2001
+From a542425cf6fc68c8f8416b390eeefaa78527167b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:08 +0206
 Subject: [PATCH 077/200] serial: rp2: Use port lock wrappers
@@ -9731,9 +9731,9 @@ index de220ac8ca54..d46a81cddfcd 100644
  
  static const char *rp2_uart_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 8808aaf47fd6a44edcbedbeff2893b9db7e2dbfc Mon Sep 17 00:00:00 2001
+From ef0fec7dda78bf0e28c232334ee1ec30791667f0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:09 +0206
 Subject: [PATCH 078/200] serial: sa1100: Use port lock wrappers
@@ -9853,9 +9853,9 @@ index ad011f1e2f4d..be7bcd75d9f4 100644
  
  static const char *sa1100_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 4fd995130780452e1048a7076b985e98108ed162 Mon Sep 17 00:00:00 2001
+From b7b8447ef50018af264ed56bc4cb14c6e55e2d32 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:10 +0206
 Subject: [PATCH 079/200] serial: samsung_tty: Use port lock wrappers
@@ -10103,9 +10103,9 @@ index 5a4d88e13471..a82b65155f6e 100644
  
  /* Shouldn't be __init, as it can be instantiated from other module */
 -- 
-2.45.2
+2.46.0
 
-From f5019cd64ad069f4fea2e33bbe0cb830f95c90b2 Mon Sep 17 00:00:00 2001
+From 1e937f2efca2abb18851bcd22d428d950bb6a5a0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:11 +0206
 Subject: [PATCH 080/200] serial: sb1250-duart: Use port lock wrappers
@@ -10193,9 +10193,9 @@ index f3cd69346482..dbec29d9a6c3 100644
  
  static int __init sbd_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From b5cc3f79e02cfd3b64ada374fc5ef957ed54c598 Mon Sep 17 00:00:00 2001
+From ce8e9b4ea35ba659d5d4d9a1ee62ef5cdb79d47f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:12 +0206
 Subject: [PATCH 081/200] serial: sc16is7xx: Use port lock wrappers
@@ -10257,9 +10257,9 @@ index 7a9924d9b294..be9ae5cdd1b8 100644
  
  static void sc16is7xx_reconf_rs485(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From 218e0456d267a57fdd8b9f187c714131d7b74aeb Mon Sep 17 00:00:00 2001
+From a39aa63bbe399a98f017fd491d8177b3e71efa03 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:13 +0206
 Subject: [PATCH 082/200] serial: tegra: Use port lock wrappers
@@ -10438,9 +10438,9 @@ index d4ec943cb8e9..6d4006b41975 100644
  
  static const char *tegra_uart_type(struct uart_port *u)
 -- 
-2.45.2
+2.46.0
 
-From ffc8ac5c464f07c9a1a84ce2a116b051c0cdc88f Mon Sep 17 00:00:00 2001
+From e2d4171646a27f8f2921f79b59fa86f1cf27f7aa Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:14 +0206
 Subject: [PATCH 083/200] serial: core: Use port lock wrappers
@@ -10480,7 +10480,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  2 files changed, 48 insertions(+), 48 deletions(-)
 
 diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-index 2eceef54e0b3..6cd64ccc2035 100644
+index ed8798fdf522..f0cd976e22e2 100644
 --- a/drivers/tty/serial/serial_core.c
 +++ b/drivers/tty/serial/serial_core.c
 @@ -79,7 +79,7 @@ static inline void uart_port_deref(struct uart_port *uport)
@@ -10548,7 +10548,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	}
  	uart_port_deref(port);
  }
-@@ -1098,9 +1098,9 @@ static int uart_tiocmget(struct tty_struct *tty)
+@@ -1106,9 +1106,9 @@ static int uart_tiocmget(struct tty_struct *tty)
  
  	if (!tty_io_error(tty)) {
  		result = uport->mctrl;
@@ -10560,7 +10560,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	}
  out:
  	mutex_unlock(&port->mutex);
-@@ -1236,16 +1236,16 @@ static int uart_wait_modem_status(struct uart_state *state, unsigned long arg)
+@@ -1244,16 +1244,16 @@ static int uart_wait_modem_status(struct uart_state *state, unsigned long arg)
  	uport = uart_port_ref(state);
  	if (!uport)
  		return -EIO;
@@ -10581,7 +10581,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  		set_current_state(TASK_INTERRUPTIBLE);
  
-@@ -1290,9 +1290,9 @@ static int uart_get_icount(struct tty_struct *tty,
+@@ -1298,9 +1298,9 @@ static int uart_get_icount(struct tty_struct *tty,
  	uport = uart_port_ref(state);
  	if (!uport)
  		return -EIO;
@@ -10593,7 +10593,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	uart_port_deref(uport);
  
  	icount->cts         = cnow.cts;
-@@ -1445,9 +1445,9 @@ static int uart_rs485_config(struct uart_port *port)
+@@ -1453,9 +1453,9 @@ static int uart_rs485_config(struct uart_port *port)
  	uart_set_rs485_termination(port, rs485);
  	uart_set_rs485_rx_during_tx(port, rs485);
  
@@ -10605,7 +10605,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	if (ret) {
  		memset(rs485, 0, sizeof(*rs485));
  		/* unset GPIOs */
-@@ -1464,9 +1464,9 @@ static int uart_get_rs485_config(struct uart_port *port,
+@@ -1472,9 +1472,9 @@ static int uart_get_rs485_config(struct uart_port *port,
  	unsigned long flags;
  	struct serial_rs485 aux;
  
@@ -10617,7 +10617,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  	if (copy_to_user(rs485, &aux, sizeof(aux)))
  		return -EFAULT;
-@@ -1494,7 +1494,7 @@ static int uart_set_rs485_config(struct tty_struct *tty, struct uart_port *port,
+@@ -1502,7 +1502,7 @@ static int uart_set_rs485_config(struct tty_struct *tty, struct uart_port *port,
  	uart_set_rs485_termination(port, &rs485);
  	uart_set_rs485_rx_during_tx(port, &rs485);
  
@@ -10626,7 +10626,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	ret = port->rs485_config(port, &tty->termios, &rs485);
  	if (!ret) {
  		port->rs485 = rs485;
-@@ -1503,7 +1503,7 @@ static int uart_set_rs485_config(struct tty_struct *tty, struct uart_port *port,
+@@ -1511,7 +1511,7 @@ static int uart_set_rs485_config(struct tty_struct *tty, struct uart_port *port,
  		if (!(rs485.flags & SER_RS485_ENABLED))
  			port->ops->set_mctrl(port, port->mctrl);
  	}
@@ -10635,7 +10635,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	if (ret) {
  		/* restore old GPIO settings */
  		gpiod_set_value_cansleep(port->rs485_term_gpio,
-@@ -1528,9 +1528,9 @@ static int uart_get_iso7816_config(struct uart_port *port,
+@@ -1536,9 +1536,9 @@ static int uart_get_iso7816_config(struct uart_port *port,
  	if (!port->iso7816_config)
  		return -ENOTTY;
  
@@ -10647,7 +10647,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  	if (copy_to_user(iso7816, &aux, sizeof(aux)))
  		return -EFAULT;
-@@ -1559,9 +1559,9 @@ static int uart_set_iso7816_config(struct uart_port *port,
+@@ -1567,9 +1567,9 @@ static int uart_set_iso7816_config(struct uart_port *port,
  		if (iso7816.reserved[i])
  			return -EINVAL;
  
@@ -10659,7 +10659,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	if (ret)
  		return ret;
  
-@@ -1778,9 +1778,9 @@ static void uart_tty_port_shutdown(struct tty_port *port)
+@@ -1786,9 +1786,9 @@ static void uart_tty_port_shutdown(struct tty_port *port)
  	if (WARN(!uport, "detached port still initialized!\n"))
  		return;
  
@@ -10671,7 +10671,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  	serial_base_port_shutdown(uport);
  	uart_port_shutdown(port);
-@@ -1795,11 +1795,11 @@ static void uart_tty_port_shutdown(struct tty_port *port)
+@@ -1803,11 +1803,11 @@ static void uart_tty_port_shutdown(struct tty_port *port)
  	/*
  	 * Free the transmit buffer.
  	 */
@@ -10685,7 +10685,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  	free_page((unsigned long)buf);
  
-@@ -1942,10 +1942,10 @@ static bool uart_carrier_raised(struct tty_port *port)
+@@ -1950,10 +1950,10 @@ static bool uart_carrier_raised(struct tty_port *port)
  	 */
  	if (WARN_ON(!uport))
  		return true;
@@ -10698,7 +10698,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  	uart_port_deref(uport);
  
  	return mctrl & TIOCM_CAR;
-@@ -2062,9 +2062,9 @@ static void uart_line_info(struct seq_file *m, struct uart_driver *drv, int i)
+@@ -2070,9 +2070,9 @@ static void uart_line_info(struct seq_file *m, struct uart_driver *drv, int i)
  		pm_state = state->pm_state;
  		if (pm_state != UART_PM_STATE_ON)
  			uart_change_pm(state, UART_PM_STATE_ON);
@@ -10710,7 +10710,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  		if (pm_state != UART_PM_STATE_ON)
  			uart_change_pm(state, pm_state);
  
-@@ -2403,9 +2403,9 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2411,9 +2411,9 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
  	 */
  	if (!console_suspend_enabled && uart_console(uport)) {
  		if (uport->ops->start_rx) {
@@ -10722,7 +10722,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  		}
  		goto unlock;
  	}
-@@ -2420,7 +2420,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2428,7 +2428,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
  		tty_port_set_suspended(port, true);
  		tty_port_set_initialized(port, false);
  
@@ -10731,7 +10731,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  		ops->stop_tx(uport);
  		if (!(uport->rs485.flags & SER_RS485_ENABLED))
  			ops->set_mctrl(uport, 0);
-@@ -2428,7 +2428,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2436,7 +2436,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
  		mctrl = uport->mctrl;
  		uport->mctrl = 0;
  		ops->stop_rx(uport);
@@ -10740,7 +10740,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  
  		/*
  		 * Wait for the transmitter to empty.
-@@ -2500,9 +2500,9 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2508,9 +2508,9 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
  			uart_change_pm(state, UART_PM_STATE_ON);
  		uport->ops->set_termios(uport, &termios, NULL);
  		if (!console_suspend_enabled && uport->ops->start_rx) {
@@ -10752,7 +10752,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  		}
  		if (console_suspend_enabled)
  			console_start(uport->cons);
-@@ -2513,10 +2513,10 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2521,10 +2521,10 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
  		int ret;
  
  		uart_change_pm(state, UART_PM_STATE_ON);
@@ -10765,7 +10765,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  		if (console_suspend_enabled || !uart_console(uport)) {
  			/* Protected by port mutex for now */
  			struct tty_struct *tty = port->tty;
-@@ -2526,11 +2526,11 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
+@@ -2534,11 +2534,11 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
  				if (tty)
  					uart_change_line_settings(tty, state, NULL);
  				uart_rs485_config(uport);
@@ -10779,7 +10779,7 @@ index 2eceef54e0b3..6cd64ccc2035 100644
  				tty_port_set_initialized(port, true);
  			} else {
  				/*
-@@ -2642,11 +2642,11 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
+@@ -2650,11 +2650,11 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
  		 * keep the DTR setting that is set in uart_set_options()
  		 * We probably don't need a spinlock around this, but
  		 */
@@ -10815,9 +10815,9 @@ index 469ad26cde48..66fd117d8aea 100644
  out:
  	pm_runtime_mark_last_busy(dev);
 -- 
-2.45.2
+2.46.0
 
-From 2c0cc57ae4876f3df16985b86f28d59cd6debfa1 Mon Sep 17 00:00:00 2001
+From f0c603820112ae28c9dcac38c0307e125625a42a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:15 +0206
 Subject: [PATCH 084/200] serial: mctrl_gpio: Use port lock wrappers
@@ -10878,9 +10878,9 @@ index 7d5aaa8d422b..e51ca593ab86 100644
  	return IRQ_HANDLED;
  }
 -- 
-2.45.2
+2.46.0
 
-From b5642ee52fdd93a6e173a0dabfcf97d9a8ba4dde Mon Sep 17 00:00:00 2001
+From 68830439c02ccd2fd5d27287bee98e1833ecb255 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:16 +0206
 Subject: [PATCH 085/200] serial: txx9: Use port lock wrappers
@@ -11017,9 +11017,9 @@ index be08fb6f749c..eaa980722455 100644
  
  static void
 -- 
-2.45.2
+2.46.0
 
-From 020380b4581e4187bff0017090c72ba499cbfa38 Mon Sep 17 00:00:00 2001
+From e39c19c5fced9f38541b75f1db7197a7bcd3374f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:17 +0206
 Subject: [PATCH 086/200] serial: sh-sci: Use port lock wrappers
@@ -11324,9 +11324,9 @@ index f793624fd501..2559c97812fa 100644
  
  static int serial_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From e6b65d1896362ed26dfbea30987d73f5fd86caa0 Mon Sep 17 00:00:00 2001
+From 0bac6eba58597660cbf9cb28888e2370778c9a58 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:18 +0206
 Subject: [PATCH 087/200] serial: sifive: Use port lock wrappers
@@ -11431,9 +11431,9 @@ index d195c5de52e7..b296e57a9dee 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From a1a589e37b39856371330f63a20174551a353690 Mon Sep 17 00:00:00 2001
+From 6878c14e3b04ddba886aed86cd7dfb6394881f4b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:19 +0206
 Subject: [PATCH 088/200] serial: sprd: Use port lock wrappers
@@ -11598,9 +11598,9 @@ index f328fa57231f..f257525f9299 100644
  
  static int sprd_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From d4f04d84765da040038e860c3a96e1bdfe6ca8fa Mon Sep 17 00:00:00 2001
+From 3babe516d056ca0bf18067125d71d834364fe6da Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:20 +0206
 Subject: [PATCH 089/200] serial: st-asc: Use port lock wrappers
@@ -11713,9 +11713,9 @@ index 92b9f6894006..a821f5d76a26 100644
  
  static int asc_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From 84fda6abeb7a2e37782a18bae510087671cdc2ce Mon Sep 17 00:00:00 2001
+From b9123f55f13520fb415f78d4eac990df3515b0fe Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:21 +0206
 Subject: [PATCH 090/200] serial: stm32: Use port lock wrappers
@@ -11903,9 +11903,9 @@ index 9ef90bb30a47..b963f9ccb070 100644
  			if (!stm32_usart_rx_dma_pause(stm32_port))
  				size += stm32_usart_receive_chars(port, true);
 -- 
-2.45.2
+2.46.0
 
-From 9a5e83c5d454e487c6d6e325b794fcffa0a77023 Mon Sep 17 00:00:00 2001
+From eb81ca734a328adea61bc88ddefbd01432dd5d20 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:22 +0206
 Subject: [PATCH 091/200] serial: sunhv: Use port lock wrappers
@@ -12057,9 +12057,9 @@ index c671d674bce4..5bfc0040f17b 100644
  
  static struct console sunhv_console = {
 -- 
-2.45.2
+2.46.0
 
-From d9343dc401de8427e23aa17f0604eadb46ef7be0 Mon Sep 17 00:00:00 2001
+From fbcafefc85a078ff75a5ca0bbc5d18a6800e181c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:23 +0206
 Subject: [PATCH 092/200] serial: sunplus-uart: Use port lock wrappers
@@ -12208,9 +12208,9 @@ index 3aacd5eb414c..4251f4e1ba99 100644
  	local_irq_restore(flags);
  }
 -- 
-2.45.2
+2.46.0
 
-From 95a1aa19ffc2b58bd4746574c2c29a9250db5010 Mon Sep 17 00:00:00 2001
+From 5ddbde2f2db64b1ff099dbab87f8bef30c14373d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:24 +0206
 Subject: [PATCH 093/200] serial: sunsab: Use port lock wrappers
@@ -12389,9 +12389,9 @@ index 40eeaf835bba..6aa51a6f8063 100644
  	return 0;
  }
 -- 
-2.45.2
+2.46.0
 
-From 8a9705c95c0cc2bdf434e8ffc655f93b009d7ab2 Mon Sep 17 00:00:00 2001
+From e096e20acee40eeee2e265138693c9c62dbba7bb Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:25 +0206
 Subject: [PATCH 094/200] serial: sunsu: Use port lock wrappers
@@ -12613,9 +12613,9 @@ index 58a4342ad0f9..1e051cc2591c 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From c38a5b5750b08e7f2c72ddf1a4ccd188ca60102c Mon Sep 17 00:00:00 2001
+From e627d84129d96554e9268d380147b0cfcf475e59 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:26 +0206
 Subject: [PATCH 095/200] serial: sunzilog: Use port lock wrappers
@@ -12829,9 +12829,9 @@ index c8c71c56264c..d3b5e864b727 100644
  #ifdef CONFIG_SERIO
  	if (up->flags & (SUNZILOG_FLAG_CONS_KEYB |
 -- 
-2.45.2
+2.46.0
 
-From 9fe33b7343a0088ba246a91d31b9ec6de40826c2 Mon Sep 17 00:00:00 2001
+From 6256fd55105d3eebc5b287564f204910c90219f0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:27 +0206
 Subject: [PATCH 096/200] serial: timbuart: Use port lock wrappers
@@ -12905,9 +12905,9 @@ index 0859394a78cd..0cc6524f5e8b 100644
  
  static const char *timbuart_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From e42612494d67b1b00e5e000c27e81f8eb6cae77b Mon Sep 17 00:00:00 2001
+From 25848165afa86915ba51bb8d1df4c6b09c89752e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:28 +0206
 Subject: [PATCH 097/200] serial: uartlite: Use port lock wrappers
@@ -13015,9 +13015,9 @@ index b225a78f6175..404c14acafa5 100644
  
  static int ulite_console_setup(struct console *co, char *options)
 -- 
-2.45.2
+2.46.0
 
-From ffdb3fbe18c229e62da57542c2cb36f32529f3d7 Mon Sep 17 00:00:00 2001
+From 8495d163d5eaf0a542330ddd1cafcb96e2a38306 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:29 +0206
 Subject: [PATCH 098/200] serial: ucc_uart: Use port lock wrappers
@@ -13079,9 +13079,9 @@ index b06661b80f41..ed7a6bb5596a 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From 7827b25208699ac01465966ec407a0f808564be0 Mon Sep 17 00:00:00 2001
+From cdd83b5c9f6ff48bc84f37afe570363fc5c19015 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:30 +0206
 Subject: [PATCH 099/200] serial: vt8500: Use port lock wrappers
@@ -13160,9 +13160,9 @@ index c5d5c2765119..78a1c1eea11b 100644
  
  static const char *vt8500_type(struct uart_port *port)
 -- 
-2.45.2
+2.46.0
 
-From e7ba1177c632219975da0c8a2acd26008ad93158 Mon Sep 17 00:00:00 2001
+From 1aeb6a6cd0a0d43d02dfd85ebd76392db4410041 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:31 +0206
 Subject: [PATCH 100/200] serial: xilinx_uartps: Use port lock wrappers
@@ -13441,9 +13441,9 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  
  	return uart_resume_port(cdns_uart->cdns_uart_driver, port);
 -- 
-2.45.2
+2.46.0
 
-From 4bc6621e9d84a9ec71c156043473f733b3fedddb Mon Sep 17 00:00:00 2001
+From 5ba135804eb6fb183d5e8c9289a3d62b80fc18a0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:00 +0206
 Subject: [PATCH 101/200] printk: Add non-BKL (nbcon) console basic
@@ -13715,9 +13715,9 @@ index 0fca282c0a25..b2c65b991e1e 100644
  
  	if (console->exit)
 -- 
-2.45.2
+2.46.0
 
-From 96e85303396861e216017a33f06b5d8a340d2c7b Mon Sep 17 00:00:00 2001
+From ab0a8153c3fcb4f7ba8d20f44e0b7af5ebc59cf2 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:01 +0206
 Subject: [PATCH 102/200] printk: nbcon: Add acquire/release logic
@@ -14427,9 +14427,9 @@ index 63d24ca62ac5..a2a354f859f9 100644
   * nbcon_init - Initialize the nbcon console specific data
   * @con:	Console to initialize
 -- 
-2.45.2
+2.46.0
 
-From 7c95cefee1f190cc26dbbf2f7a00773d96f2c05f Mon Sep 17 00:00:00 2001
+From 9fc9125afe4f18f6bd938138f543d93936ae937e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:02 +0206
 Subject: [PATCH 103/200] printk: Make static printk buffers available to nbcon
@@ -14499,9 +14499,9 @@ index b2c65b991e1e..dd68135cb371 100644
  	unsigned long flags;
  
 -- 
-2.45.2
+2.46.0
 
-From fbd8ed0a565d74d254ffb3f6fbd929d13f2d06f3 Mon Sep 17 00:00:00 2001
+From 4a4f24c2a2cc1750bff241265eef53c2bcb16d02 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:03 +0206
 Subject: [PATCH 104/200] printk: nbcon: Add buffer management
@@ -14821,9 +14821,9 @@ index dd68135cb371..58b57deb0cbe 100644
  	console_sysfs_notify();
  
 -- 
-2.45.2
+2.46.0
 
-From 335bb4eca225a1b996da6542952f77903d8aa071 Mon Sep 17 00:00:00 2001
+From e17eea5a777be77270a9b4eef11ecc24d1e60b25 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:04 +0206
 Subject: [PATCH 105/200] printk: nbcon: Add ownership state functions
@@ -15005,9 +15005,9 @@ index ba1febf15db6..98e4be5429f0 100644
   * nbcon_alloc - Allocate buffers needed by the nbcon console
   * @con:	Console to allocate buffers for
 -- 
-2.45.2
+2.46.0
 
-From 30a97741fd8343d2a76bfdecc966180ab16e72ce Mon Sep 17 00:00:00 2001
+From 33d918132a94f86a4c32227fd31768b7c7f1c55c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:05 +0206
 Subject: [PATCH 106/200] printk: nbcon: Add sequence handling
@@ -15327,9 +15327,9 @@ index 58b57deb0cbe..a1ab4760f807 100644
  				diff += seq - printk_seq;
  		}
 -- 
-2.45.2
+2.46.0
 
-From b1adce1bf70071760c47a7ea5a04d7c8dce31b11 Mon Sep 17 00:00:00 2001
+From 292cba1934b5ae19809f53b12ade07ea23290dad Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:06 +0206
 Subject: [PATCH 107/200] printk: nbcon: Add emit function and callback
@@ -15599,9 +15599,9 @@ index a1ab4760f807..70f793b392e5 100644
  	static int panic_console_dropped;
  
 -- 
-2.45.2
+2.46.0
 
-From 159433cf4a30cbfbaa5dcaf494b85e9fb3b82604 Mon Sep 17 00:00:00 2001
+From a8e2f639c4bf644907caf91dcac17a1704aba50f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:07 +0206
 Subject: [PATCH 108/200] printk: nbcon: Allow drivers to mark unsafe regions
@@ -15742,9 +15742,9 @@ index 6e05d263fd22..b96077152f49 100644
   * nbcon_emit_next_record - Emit a record in the acquired context
   * @wctxt:	The write context that will be handed to the write function
 -- 
-2.45.2
+2.46.0
 
-From 36b2fa76862f79b7a59f2cfd2f9911755d9a1df3 Mon Sep 17 00:00:00 2001
+From 500681c1d8db806df0f132452d22adeaa2a9f181 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 20 Sep 2023 17:58:38 +0206
 Subject: [PATCH 109/200] printk: fix illegal pbufs access for !CONFIG_PRINTK
@@ -15881,9 +15881,9 @@ index 70f793b392e5..3bf517ae8262 100644
   * Print out all remaining records to all consoles.
   *
 -- 
-2.45.2
+2.46.0
 
-From eb0eb4077d3a7bcd1a3de51668787a4b8a0a58f0 Mon Sep 17 00:00:00 2001
+From 1d92941263b4c52da8db046e4fe7519ec6b83278 Mon Sep 17 00:00:00 2001
 From: Petr Mladek <pmladek@suse.com>
 Date: Fri, 6 Oct 2023 10:21:51 +0200
 Subject: [PATCH 110/200] printk: Reduce pr_flush() pooling time
@@ -15988,9 +15988,9 @@ index 3bf517ae8262..a30338aca084 100644
  		last_diff = diff;
  	}
 -- 
-2.45.2
+2.46.0
 
-From cc4e3316dd0a48aa5f68b37854cbda3c13023086 Mon Sep 17 00:00:00 2001
+From d8ce204810b32467192c98990c3afa98478a243d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 6 Dec 2023 12:01:56 +0000
 Subject: [PATCH 111/200] printk: nbcon: Relocate 32bit seq macros
@@ -16136,9 +16136,9 @@ index 18cd25e489b8..b82a96dc2ea2 100644
 +
  #endif /* _KERNEL_PRINTK_RINGBUFFER_H */
 -- 
-2.45.2
+2.46.0
 
-From fbd2ede7785729e68cab93411ba74fd14b0e2f02 Mon Sep 17 00:00:00 2001
+From 34aa2ee439a190c1e8b67ad7fa4691d6f957c3a3 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Dec 2023 14:15:15 +0000
 Subject: [PATCH 112/200] printk: Adjust mapping for 32bit seq macros
@@ -16212,9 +16212,9 @@ index b82a96dc2ea2..12f60c782e46 100644
  	return seq;
  }
 -- 
-2.45.2
+2.46.0
 
-From bc804bae7f0ce67ccb4049508618650e73c0cdd4 Mon Sep 17 00:00:00 2001
+From 82e55b6354563dc187b0be770c08839c709e6078 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 16:13:37 +0000
 Subject: [PATCH 113/200] printk: Use prb_first_seq() as base for 32bit seq
@@ -16290,9 +16290,9 @@ index 12f60c782e46..ee294aaf4aeb 100644
  	return seq;
  }
 -- 
-2.45.2
+2.46.0
 
-From 753c836fb2148489d5f5060fc8ab1d3edfdd7297 Mon Sep 17 00:00:00 2001
+From 45d013851cc86aafd06678a94743d33ff6119066 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 19 Oct 2023 10:32:05 +0000
 Subject: [PATCH 114/200] printk: ringbuffer: Do not skip non-finalized records
@@ -16602,9 +16602,9 @@ index ee294aaf4aeb..2d948cc82b5b 100644
  	.text_data_ring = {									\
  		.size_bits	= (avgtextbits) + (descbits),					\
 -- 
-2.45.2
+2.46.0
 
-From 3dcec0371cd447f5a292e6abbce9e833b4d6b439 Mon Sep 17 00:00:00 2001
+From ee0f31933b91725bbc3ec48445381bdc4ba1ba9e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 11:11:05 +0000
 Subject: [PATCH 115/200] printk: ringbuffer: Clarify special lpos values
@@ -16701,9 +16701,9 @@ index 2d948cc82b5b..d49460f7578e 100644
  #define FAILED_BLK_LPOS	\
  {				\
 -- 
-2.45.2
+2.46.0
 
-From 5874c61bff77e90b46874ef15d95966f7c34023f Mon Sep 17 00:00:00 2001
+From cd675df8c91f8762e32ecbbf35615d305bf71fbd Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 14:30:49 +0000
 Subject: [PATCH 116/200] printk: Add this_cpu_in_panic()
@@ -16796,9 +16796,9 @@ index a30338aca084..2bb393009d4e 100644
   * console_lock - block the console subsystem from printing
   *
 -- 
-2.45.2
+2.46.0
 
-From 7f17488e64800f23fa6118e5569cdfcc18aa7f04 Mon Sep 17 00:00:00 2001
+From 9171d7cbf517c7a9c828cdf2180b028de7cf5170 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 15:01:58 +0000
 Subject: [PATCH 117/200] printk: ringbuffer: Cleanup reader terminology
@@ -16868,9 +16868,9 @@ index 244d991ffd73..67ee1c62fcd6 100644
  bool prb_read_valid_info(struct printk_ringbuffer *rb, u64 seq,
  			 struct printk_info *info, unsigned int *line_count)
 -- 
-2.45.2
+2.46.0
 
-From 861fd9d2154564fb9772045af0b3ca2ba629e7e7 Mon Sep 17 00:00:00 2001
+From f974854dd67567e3e4e0040765e05692d2bb0163 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 14:59:55 +0000
 Subject: [PATCH 118/200] printk: Wait for all reserved records with pr_flush()
@@ -17047,9 +17047,9 @@ index d49460f7578e..52626d0f1fa3 100644
  #ifdef CONFIG_64BIT
  
 -- 
-2.45.2
+2.46.0
 
-From ab28207bf8cca851de3071c2ef5986d7dacd6dae Mon Sep 17 00:00:00 2001
+From a0f4667bb840abac45e30eba814fdbee7e3e717f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 10:23:11 +0000
 Subject: [PATCH 119/200] printk: ringbuffer: Skip non-finalized records in
@@ -17120,9 +17120,9 @@ index b7748d7c44c1..d6ed33683b8b 100644
  	}
  
 -- 
-2.45.2
+2.46.0
 
-From 134e8c795f7a63708a6e9fb1268f83030a2f8d14 Mon Sep 17 00:00:00 2001
+From 85a8092de525be50e1c715d643891fb3e05a7563 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 20 Nov 2023 12:46:35 +0100
 Subject: [PATCH 120/200] printk: ringbuffer: Consider committed as finalized
@@ -17186,9 +17186,9 @@ index d6ed33683b8b..e7b808b829a0 100644
  	 * A descriptor in the reusable state may no longer have its data
  	 * available; report it as existing but with lost data. Or the record
 -- 
-2.45.2
+2.46.0
 
-From e5e906ec18a5725e185adac5412e6927ac795f67 Mon Sep 17 00:00:00 2001
+From 51223cf6520d9761dc83d40984d1b55afc1081c7 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:37:05 +0000
 Subject: [PATCH 121/200] printk: Avoid non-panic CPUs writing to ringbuffer
@@ -17269,9 +17269,9 @@ index 807692fd386a..7c5ab5c01abb 100644
  	if (may_suppress && suppress_message_printing(r.info->level))
  		goto out;
 -- 
-2.45.2
+2.46.0
 
-From 64eddcf7eaca7a39528875bea161dd21e3f13059 Mon Sep 17 00:00:00 2001
+From f56a1d4f5fbe10cd1e064702c3e45a24d1f7bd3d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:23:43 +0000
 Subject: [PATCH 122/200] printk: Consider nbcon boot consoles on seq init
@@ -17325,9 +17325,9 @@ index 7c5ab5c01abb..ae3bf0cf215a 100644
  			}
  
 -- 
-2.45.2
+2.46.0
 
-From 811b435ebb4bbfec1176f98b89ae3890574e8e93 Mon Sep 17 00:00:00 2001
+From 834cad8cd731ab4b10b6e82d64381346092451db Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 9 Oct 2023 13:55:19 +0000
 Subject: [PATCH 123/200] printk: Add sparse notation to console_srcu locking
@@ -17366,9 +17366,9 @@ index ae3bf0cf215a..ea13c808c282 100644
  	srcu_read_unlock_nmisafe(&console_srcu, cookie);
  }
 -- 
-2.45.2
+2.46.0
 
-From 48560f34bf90e00b03fc707cf39754c8c8dbaf77 Mon Sep 17 00:00:00 2001
+From 7171e3aabb38453d2587d3f80367dbb986689077 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:52:59 +0000
 Subject: [PATCH 124/200] printk: nbcon: Ensure ownership release on failed
@@ -17429,9 +17429,9 @@ index c8093bcc01fe..8ecd76aa22e6 100644
  	/*
  	 * Since any dropped message was successfully output, reset the
 -- 
-2.45.2
+2.46.0
 
-From 16b4c119770c1a318c76b0304519dae00799dae6 Mon Sep 17 00:00:00 2001
+From c5113045c0d94de9abdf2528a9e1e76833c26623 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 22 Sep 2023 14:58:18 +0000
 Subject: [PATCH 125/200] printk: Check printk_deferred_enter()/_exit() usage
@@ -17494,9 +17494,9 @@ index 6d10927a07d8..8d9408d653de 100644
  {
  #ifdef CONFIG_KGDB_KDB
 -- 
-2.45.2
+2.46.0
 
-From 362c2198c3365b9bcbe7c9c4b848cdaf90f8ae0d Mon Sep 17 00:00:00 2001
+From 0a9cd3ac4d261d7c38cb427b9d062213a6be20bf Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 08:35:23 +0000
 Subject: [PATCH 126/200] printk: nbcon: Implement processing in port->lock
@@ -17749,9 +17749,9 @@ index 8ecd76aa22e6..a5707fe1e95e 100644
 +}
 +EXPORT_SYMBOL_GPL(nbcon_release);
 -- 
-2.45.2
+2.46.0
 
-From 11acea9573254934d45de1e71d2e69494cc1f30d Mon Sep 17 00:00:00 2001
+From ae29f4fea02341ea1226bf00478ae8689c138fb1 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 8 Dec 2023 15:54:27 +0000
 Subject: [PATCH 127/200] printk: nbcon: Add driver_enter/driver_exit console
@@ -17796,9 +17796,9 @@ index c27bd5189660..73515c324347 100644
  	atomic_long_t		__private nbcon_seq;
  	struct printk_buffers	*pbufs;
 -- 
-2.45.2
+2.46.0
 
-From a137c4460a3f2fd6a8c109f014d981374c34b8bf Mon Sep 17 00:00:00 2001
+From 7bcfdcffdc1ea1536e5c31eeebc13f895e2a161a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:25:41 +0000
 Subject: [PATCH 128/200] printk: Make console_is_usable() available to nbcon
@@ -17906,9 +17906,9 @@ index ea13c808c282..d959be5c4102 100644
  {
  	console_locked = 0;
 -- 
-2.45.2
+2.46.0
 
-From c79fae60ccbabeb5b3c400f670967f75353bedd0 Mon Sep 17 00:00:00 2001
+From 29ef448c5d459aa88522399e1db85dc983b8451e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:53:21 +0000
 Subject: [PATCH 129/200] printk: Let console_is_usable() handle nbcon
@@ -17954,9 +17954,9 @@ index 378ccca007ca..d741d19bb9db 100644
  	/*
  	 * Console drivers may assume that per-cpu resources have been
 -- 
-2.45.2
+2.46.0
 
-From 4e7c124cd3d4ca32792c10297612a60e3f3145c0 Mon Sep 17 00:00:00 2001
+From 3f141744c3db8e9021a16a098e1c0ec28116dcad Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:45:33 +0000
 Subject: [PATCH 130/200] printk: Add @flags argument for console_is_usable()
@@ -18028,9 +18028,9 @@ index d959be5c4102..bdd3d7e40e63 100644
  
  			if (flags & CON_NBCON) {
 -- 
-2.45.2
+2.46.0
 
-From 49232f099f1b0a45f758eb79538e678c28de42f5 Mon Sep 17 00:00:00 2001
+From 039b1e41283e4f163ce37ceb8154007be689dec7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 12 Sep 2023 12:00:08 +0000
 Subject: [PATCH 131/200] printk: nbcon: Provide function to flush using
@@ -18223,9 +18223,9 @@ index bdd3d7e40e63..271865952a4d 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 33123b535b9e978d09c04debde1b7e65c00ac82f Mon Sep 17 00:00:00 2001
+From 051edd9bbc1c52b35525f4bc2d03c95b23e13dba Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 24 Oct 2023 14:13:14 +0000
 Subject: [PATCH 132/200] printk: Track registered boot consoles
@@ -18306,9 +18306,9 @@ index 271865952a4d..4185c58f7915 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 2e09f008dc17a4f0a4dbb8f0cd0ba0932b172a04 Mon Sep 17 00:00:00 2001
+From 2f3c944936e8965cb483a88d4b6c8b92e822a676 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 14:33:27 +0000
 Subject: [PATCH 133/200] printk: nbcon: Use nbcon consoles in
@@ -18488,9 +18488,9 @@ index 4185c58f7915..d6173575ea03 100644
  			if (!progress)
  				continue;
 -- 
-2.45.2
+2.46.0
 
-From dbed4f27af14cc43b8a0f645c9b18702ce19c1f5 Mon Sep 17 00:00:00 2001
+From 92f50ae09cbb74763988a467e3f926e266c6b7a4 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 14 Dec 2023 14:38:42 +0000
 Subject: [PATCH 134/200] printk: nbcon: Assign priority based on CPU state
@@ -18608,9 +18608,9 @@ index c17cf3ea6153..3e999784ba5c 100644
  void nbcon_release(struct uart_port *up)
  {
 -- 
-2.45.2
+2.46.0
 
-From b96326b72a3df7d0b6028707326d56f156bffffe Mon Sep 17 00:00:00 2001
+From 49bbfe9770c01c7d43b9379dc20efbc184b9a359 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:03:42 +0000
 Subject: [PATCH 135/200] printk: nbcon: Add unsafe flushing on panic
@@ -18713,9 +18713,9 @@ index 3e999784ba5c..1c01f88d596d 100644
  
  /**
 -- 
-2.45.2
+2.46.0
 
-From 1dc3486d1b55b454cf36b8ebf8c53ebfcea9f936 Mon Sep 17 00:00:00 2001
+From 0675b05b96f5e3eb4c1a52e8ddc00bddc3824949 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 12:44:07 +0000
 Subject: [PATCH 136/200] printk: Avoid console_lock dance if no legacy or boot
@@ -18931,9 +18931,9 @@ index d6173575ea03..e92da55b8e9f 100644
  
  void printk_trigger_flush(void)
 -- 
-2.45.2
+2.46.0
 
-From c776e58c8df743a106fa2cb407cda44a182a4498 Mon Sep 17 00:00:00 2001
+From d689e298d05117e77605fd485cb9c30c68ba715b Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:36:52 +0000
 Subject: [PATCH 137/200] printk: Track nbcon consoles
@@ -19003,9 +19003,9 @@ index e92da55b8e9f..977a97f0396b 100644
  	return res;
  }
 -- 
-2.45.2
+2.46.0
 
-From e5c811c4e055218dce49c0f7cfcf9c9e2b6b1050 Mon Sep 17 00:00:00 2001
+From 1ba07f0a85f9f634961981e907166c377abe9d8d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:56:58 +0000
 Subject: [PATCH 138/200] printk: Coordinate direct printing in panic
@@ -19146,9 +19146,9 @@ index 977a97f0396b..e8d60e29c17f 100644
  	return printed_len;
  }
 -- 
-2.45.2
+2.46.0
 
-From 2416a470cee743dfb9f6c27619d854b6fb6c2498 Mon Sep 17 00:00:00 2001
+From 9fec339f604dc45406d025df37f471e3388b7449 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:21:57 +0000
 Subject: [PATCH 139/200] printk: nbcon: Implement emergency sections
@@ -19389,9 +19389,9 @@ index e8d60e29c17f..4a0df41d32b8 100644
  	}
  
 -- 
-2.45.2
+2.46.0
 
-From 348a34e37c1d2645f63358a81e1baac16e866037 Mon Sep 17 00:00:00 2001
+From 8629efd6951a3e9e87c3684dabe07246412459f0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:04 +0000
 Subject: [PATCH 140/200] panic: Mark emergency section in warn
@@ -19432,9 +19432,9 @@ index f0e91a0c4001..147803c3a402 100644
  
  #ifdef CONFIG_BUG
 -- 
-2.45.2
+2.46.0
 
-From c50afd6369a6c7bdf39cfb5caaac8a0ebcc25fdf Mon Sep 17 00:00:00 2001
+From 19925ff8d98d93188a844b4b0ed7d01605e30c1d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 17:07:34 +0000
 Subject: [PATCH 141/200] panic: Mark emergency section in oops
@@ -19476,9 +19476,9 @@ index 147803c3a402..9215df21d8c2 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 69da3439e08fed6c879c95eef545198dbf57f15e Mon Sep 17 00:00:00 2001
+From 069590be9800f37f3fa15e969ff130f507e578f9 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:39 +0000
 Subject: [PATCH 142/200] rcu: Mark emergency section in rcu stalls
@@ -19526,9 +19526,9 @@ index 11a1fac3a589..6f085a159fca 100644
  
  static void print_cpu_stall(unsigned long gps)
 -- 
-2.45.2
+2.46.0
 
-From 924d2a3a21677de19e46f6ed2eab612066274dce Mon Sep 17 00:00:00 2001
+From fda809b93a60bd06cef49ccff931a149e7979691 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 18 Sep 2023 20:27:41 +0000
 Subject: [PATCH 143/200] lockdep: Mark emergency section in lockdep splats
@@ -19576,9 +19576,9 @@ index 151bd3de5936..5c21ba41e308 100644
  
  /*
 -- 
-2.45.2
+2.46.0
 
-From e1a16b64bf24f4a909eb3bc25c0b70935d03d2e4 Mon Sep 17 00:00:00 2001
+From e7bdd30532df8a2d0e073fb387628696b547e073 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 22 Sep 2023 14:12:21 +0000
 Subject: [PATCH 144/200] printk: nbcon: Introduce printing kthreads
@@ -20028,9 +20028,9 @@ index 4a0df41d32b8..3e307d475d23 100644
  }
  EXPORT_SYMBOL(console_start);
 -- 
-2.45.2
+2.46.0
 
-From 8075e61875d6c982f0825a0a15423c3f75c737fd Mon Sep 17 00:00:00 2001
+From 194f44876df16b601defb2278d805f9656a63a32 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 17:43:48 +0000
 Subject: [PATCH 145/200] printk: Atomic print in printk context on shutdown
@@ -20074,9 +20074,9 @@ index 3e307d475d23..2a77a4ad5619 100644
  
  	if (do_trylock_unlock) {
 -- 
-2.45.2
+2.46.0
 
-From c24387d27880e1e1d9f3cc569dbd58cebcc85aa5 Mon Sep 17 00:00:00 2001
+From 3ebfdc74c6b28c9cbc75915e1f7dca77ef73fe37 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 14:43:30 +0000
 Subject: [PATCH 146/200] printk: nbcon: Add context to console_is_usable()
@@ -20194,9 +20194,9 @@ index 2a77a4ad5619..3863e3dc3816 100644
  			if (flags & CON_NBCON) {
  				printk_seq = nbcon_seq_read(c);
 -- 
-2.45.2
+2.46.0
 
-From df86179351eceb90629fcc29db92c17c3e3f5b96 Mon Sep 17 00:00:00 2001
+From 72c4570c8c30c1a2270d6c4f7534960bdaf5ee21 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 26 Sep 2023 13:03:52 +0000
 Subject: [PATCH 147/200] printk: nbcon: Add printer thread wakeups
@@ -20369,9 +20369,9 @@ index 3863e3dc3816..3cdda6dd8941 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 378fb0e72ecd67cbc6a7ec311422bdb82b3cf04b Mon Sep 17 00:00:00 2001
+From d3b5fd2704f9f9c8c5dbee3edb9d136058f0dfdf Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:04:15 +0000
 Subject: [PATCH 148/200] printk: nbcon: Stop threads on shutdown/reboot
@@ -20434,9 +20434,9 @@ index 337ec7a10095..57ed4968a653 100644
 +}
 +device_initcall(printk_init_ops);
 -- 
-2.45.2
+2.46.0
 
-From 43af883ddf1b35861838614356ad67bfb44ba70c Mon Sep 17 00:00:00 2001
+From 2fa524034013407e498c48342a2c2f3d68ae2f7d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 5 Dec 2023 14:09:31 +0000
 Subject: [PATCH 149/200] printk: nbcon: Start printing threads
@@ -20578,9 +20578,9 @@ index 3cdda6dd8941..3722f1a66357 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From d2b2b276ef8461066e31e2a9d0e440b33d3098f7 Mon Sep 17 00:00:00 2001
+From e7b0847e9196ef89345a87bb51739eb3fe262051 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:31:00 +0000
 Subject: [PATCH 150/200] proc: Add nbcon support for /proc/consoles
@@ -20636,9 +20636,9 @@ index e0758fe7936d..2703676549f5 100644
  		seq_printf(m, " %4d:%d", MAJOR(dev), MINOR(dev));
  
 -- 
-2.45.2
+2.46.0
 
-From 4e3621466bc8ff5008683c3092f986d12c2e4830 Mon Sep 17 00:00:00 2001
+From 34e3777cf875fb060a92a24eda849ceec0f9529f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 14:31:09 +0000
 Subject: [PATCH 151/200] tty: sysfs: Add nbcon support for 'active'
@@ -20674,9 +20674,9 @@ index 493fc4742895..afa52883c498 100644
  			continue;
  		cs[i++] = c;
 -- 
-2.45.2
+2.46.0
 
-From d7bb4ca00319f2911e030ef6e377824e0d1a7d64 Mon Sep 17 00:00:00 2001
+From e976f5170928300ff560ed464f1a3d7875de35fa Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:01:58 +0000
 Subject: [PATCH 152/200] printk: nbcon: Provide function to reacquire
@@ -20773,9 +20773,9 @@ index b866d0138fe0..f843df54ee82 100644
   * nbcon_emit_next_record - Emit a record in the acquired context
   * @wctxt:	The write context that will be handed to the write function
 -- 
-2.45.2
+2.46.0
 
-From 66892b5a990b37dc9c2c2c86ab7ca105e322bd08 Mon Sep 17 00:00:00 2001
+From 608be08bf3a7e66ada570bed802e934003af0f96 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:19:18 +0000
 Subject: [PATCH 153/200] serial: core: Provide low-level functions to port
@@ -20821,9 +20821,9 @@ index 6fc2003767a9..7c861b4606aa 100644
  {
  	return up->serial_in(up, offset);
 -- 
-2.45.2
+2.46.0
 
-From f8bc4464b5e38f029a55b891309bd6ac36453cc7 Mon Sep 17 00:00:00 2001
+From 4697b471d90aeeba4cdd30c67190f3d9bb6adfc9 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 15:30:36 +0000
 Subject: [PATCH 154/200] serial: 8250: Switch to nbcon console
@@ -21165,9 +21165,9 @@ index be65de65fe61..ec46e3b49ee9 100644
  int serial8250_console_exit(struct uart_port *port);
  
 -- 
-2.45.2
+2.46.0
 
-From 62fab477292a68aba7c0150225c2c9135ce5750e Mon Sep 17 00:00:00 2001
+From a3238d260e415ba99c4de953c651aaf7d9cc1f23 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 17:35:04 +0000
 Subject: [PATCH 155/200] printk: Add kthread for all legacy consoles
@@ -21596,9 +21596,9 @@ index 3722f1a66357..4f1ca9931ddb 100644
  
  	if (pending & PRINTK_PENDING_WAKEUP)
 -- 
-2.45.2
+2.46.0
 
-From 9b1a4bb75dae029d59a2d203eee8b9cacf461f14 Mon Sep 17 00:00:00 2001
+From 0761376c30b2be0e820ba828228267cacc7c5c9a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 2 Oct 2023 15:30:43 +0000
 Subject: [PATCH 156/200] serial: 8250: revert "drop lockdep annotation from
@@ -21630,9 +21630,9 @@ index bc3ab612aec5..2d4e775cd7cb 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 25e776eb6eb155b104451f87dbbeb05ac3ab7677 Mon Sep 17 00:00:00 2001
+From 57243a16f3b6ae05cb082ef0ea52d3dd94436fd7 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:34:16 +0000
 Subject: [PATCH 157/200] printk: Avoid false positive lockdep report for
@@ -21699,9 +21699,9 @@ index 4f1ca9931ddb..249576a8c351 100644
  				printk_seq = nbcon_seq_read(con);
  			} else {
 -- 
-2.45.2
+2.46.0
 
-From 7c9f87b242a7d6237fc4e6dfbd055786274c7de7 Mon Sep 17 00:00:00 2001
+From 66c2ac662107a845ff1c28f0efb0b65af53787a3 Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 08:09:11 +0100
 Subject: [PATCH 158/200] drm/i915: Use preempt_disable/enable_rt() where
@@ -21760,9 +21760,9 @@ index f5659ebd08eb..5b6d2f55528d 100644
  	spin_unlock_irqrestore(&dev_priv->uncore.lock, irqflags);
  
 -- 
-2.45.2
+2.46.0
 
-From 3235518cd24ebb7fa1c33873b2c8f520b5787606 Mon Sep 17 00:00:00 2001
+From b71625f7e638e860a9566e6ba5c9687ff81c49b8 Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 09:01:42 +0100
 Subject: [PATCH 159/200] drm/i915: Don't disable interrupts on PREEMPT_RT
@@ -21850,9 +21850,9 @@ index cfbfbfed3f5e..da2becfbc86c 100644
  	if (intel_vgpu_active(dev_priv))
  		return;
 -- 
-2.45.2
+2.46.0
 
-From 3fe34f3023f9b22efd04685fb3f0330138d08c2d Mon Sep 17 00:00:00 2001
+From 3b30ce531af5fb5a9798cf66413a7571b26d5333 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 25 Oct 2021 15:05:18 +0200
 Subject: [PATCH 160/200] drm/i915: Don't check for atomic context on
@@ -21886,9 +21886,9 @@ index c61066498bf2..48e19e55d6b0 100644
  #else
  # define _WAIT_FOR_ATOMIC_CHECK(ATOMIC) do { } while (0)
 -- 
-2.45.2
+2.46.0
 
-From ae9c8375d1775c29e0da15dab036b2e1328db94f Mon Sep 17 00:00:00 2001
+From d01158fc8934cc485f77cdd153fe413245d4f66a Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 6 Dec 2018 09:52:20 +0100
 Subject: [PATCH 161/200] drm/i915: Disable tracing points on PREEMPT_RT
@@ -21936,9 +21936,9 @@ index ce1cbee1b39d..c54653cf72c9 100644
  #include <linux/types.h>
  #include <linux/tracepoint.h>
 -- 
-2.45.2
+2.46.0
 
-From ea5ef610350d0e531b308e4ff49a28d093cb6e4e Mon Sep 17 00:00:00 2001
+From 3fc0ecd9a2a37bd329930a53f78308ae358995fb Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 19 Dec 2018 10:47:02 +0100
 Subject: [PATCH 162/200] drm/i915: skip DRM_I915_LOW_LEVEL_TRACEPOINTS with
@@ -21970,9 +21970,9 @@ index c54653cf72c9..3c51620d011b 100644
  	     TP_PROTO(struct i915_request *rq),
  	     TP_ARGS(rq)
 -- 
-2.45.2
+2.46.0
 
-From 32f1485b7137d29b522c8e74672cd78933cedae3 Mon Sep 17 00:00:00 2001
+From 8f933a87d5edb420c2b9329c74f3763fdda43976 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 17:18:00 +0200
 Subject: [PATCH 163/200] drm/i915/gt: Queue and wait for the irq_work item.
@@ -22018,9 +22018,9 @@ index f2973cd1a8aa..aa77f8601b8a 100644
  
  void intel_breadcrumbs_free(struct kref *kref)
 -- 
-2.45.2
+2.46.0
 
-From 167c5db49060816ad61e39d58047655acc46e0fc Mon Sep 17 00:00:00 2001
+From 502435524dfb2ceedb90009427b4a609a4d7a1d1 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 19:03:41 +0200
 Subject: [PATCH 164/200] drm/i915/gt: Use spin_lock_irq() instead of
@@ -22112,9 +22112,9 @@ index 2065be5a196b..73d815fc514b 100644
  	}
  
 -- 
-2.45.2
+2.46.0
 
-From dd328d707db4264bc8d6b191bc3ef05232552a51 Mon Sep 17 00:00:00 2001
+From 6b71663de1228122a023a043778b3b0b5c7e9ff1 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 1 Oct 2021 20:01:03 +0200
 Subject: [PATCH 165/200] drm/i915: Drop the irqs_disabled() check
@@ -22156,9 +22156,9 @@ index f59081066a19..014d02029a41 100644
  
  	/*
 -- 
-2.45.2
+2.46.0
 
-From 1051a1738a9ea6ee51262268a035f57be4bac777 Mon Sep 17 00:00:00 2001
+From c2cf1cdaddfb71c344e88adcda7c696bb7d801a1 Mon Sep 17 00:00:00 2001
 From: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
 Date: Wed, 5 Jul 2023 10:30:25 +0100
 Subject: [PATCH 166/200] drm/i915: Do not disable preemption for resets
@@ -22260,9 +22260,9 @@ index 13fb8e5042c5..b51fb0c97772 100644
  		wa_14015076503_end(gt, reset_mask);
  	}
 -- 
-2.45.2
+2.46.0
 
-From 83b39907e6f7a0185cdf76443627b34377d80bab Mon Sep 17 00:00:00 2001
+From 9f058b0e03d70fae6a03ac76552b9abfdc191cfc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 3 Oct 2023 21:37:21 +0200
 Subject: [PATCH 167/200] drm/i915/guc: Consider also RCU depth in busy loop.
@@ -22294,9 +22294,9 @@ index 8dc291ff0093..5b8d084c9c58 100644
  	/*
  	 * FIXME: Have caller pass in if we are in an atomic context to avoid
 -- 
-2.45.2
+2.46.0
 
-From 18321a9c9a22bd98ac388125352f34b98c954071 Mon Sep 17 00:00:00 2001
+From ee8e524ba2f6a2f6c2276323357022362dd0bba1 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 21 Feb 2022 17:59:14 +0100
 Subject: [PATCH 168/200] Revert "drm/i915: Depend on !PREEMPT_RT."
@@ -22322,9 +22322,9 @@ index ce397a8797f7..98c3f532822d 100644
  	select INTERVAL_TREE
  	# we need shmfs for the swappable backing store, and in particular
 -- 
-2.45.2
+2.46.0
 
-From b0271319d6f5dbc9d3eeafc4d4024aa621b34a94 Mon Sep 17 00:00:00 2001
+From 2310fa8a34b00895dec21751567f10391b4eed77 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 23 Sep 2023 03:11:05 +0200
 Subject: [PATCH 169/200] sched: define TIF_ALLOW_RESCHED
@@ -22654,7 +22654,7 @@ index 9ea0b28068f4..5ded1450ac1a 100644
  
  #ifndef CONFIG_HAVE_ARCH_WITHIN_STACK_FRAMES
 diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
-index 696f8dc4aa53..e44b47305235 100644
+index cb8bd759e800..ce1fefc37cb5 100644
 --- a/include/linux/trace_events.h
 +++ b/include/linux/trace_events.h
 @@ -178,8 +178,8 @@ unsigned int tracing_gen_ctx_irq_test(unsigned int irqs_status);
@@ -22763,7 +22763,7 @@ index 2e0f75bcb7fd..d952fa5ee880 100644
  
  		if (ti_work & _TIF_NOTIFY_RESUME)
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index fb30aad3c1b6..f8ae421b2fed 100644
+index fbc37ecd073c..1a6f2a90ee13 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -897,14 +897,15 @@ static inline void hrtick_rq_init(struct rq *rq)
@@ -23144,9 +23144,9 @@ index 3b7d3e9eb6ea..5a4fefbc0856 100644
  		need_resched = 'p';
  		break;
 -- 
-2.45.2
+2.46.0
 
-From 8c7eb81022a6d981fd35666afb4cb3c713fc72fd Mon Sep 17 00:00:00 2001
+From 2c02b9e94653276d75c8422c1e7899c340a2d04d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Wed, 8 Jul 2015 17:14:48 +0200
 Subject: [PATCH 170/200] arm: Disable jump-label on PREEMPT_RT.
@@ -23185,9 +23185,9 @@ index 57c0448d017a..dea47ba6576b 100644
  	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
  	select HAVE_ARCH_KASAN if MMU && !XIP_KERNEL
 -- 
-2.45.2
+2.46.0
 
-From 3fcbe46fbc2b3de05938bd97b6f3788ea35f9c61 Mon Sep 17 00:00:00 2001
+From 9111db72b8210ec2bb492e4c254852ea39694e07 Mon Sep 17 00:00:00 2001
 From: "Yadi.hu" <yadi.hu@windriver.com>
 Date: Wed, 10 Dec 2014 10:32:09 +0800
 Subject: [PATCH 171/200] ARM: enable irq in translation/section permission
@@ -23281,9 +23281,9 @@ index fef62e4a9edd..622a30243f4a 100644
  	return 0;
  }
 -- 
-2.45.2
+2.46.0
 
-From da90c1ec4875b9c4d7ac666f0d794ac2e3354281 Mon Sep 17 00:00:00 2001
+From a0ac38b9aa6be7c088a94ffca7e979d673e22c95 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 28 Jul 2011 13:32:57 +0200
 Subject: [PATCH 172/200] tty/serial/omap: Make the locking RT aware
@@ -23329,9 +23329,9 @@ index f4c6ff806465..1097fca22307 100644
  
  static int __init
 -- 
-2.45.2
+2.46.0
 
-From 52945309b6536c556f6656536457215588042478 Mon Sep 17 00:00:00 2001
+From f95d209806c90fc092211b1b96d73a663989529a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 8 Jan 2013 21:36:51 +0100
 Subject: [PATCH 173/200] tty/serial/pl011: Make the locking work on RT
@@ -23376,9 +23376,9 @@ index 16c770311069..9cd660edb165 100644
  	clk_disable(uap->clk);
  }
 -- 
-2.45.2
+2.46.0
 
-From 31bc803789eaa693e39dc7c91ae1c314723085f7 Mon Sep 17 00:00:00 2001
+From 3592ff32be481b6f7079fc8a307201991880b222 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:29 +0200
 Subject: [PATCH 174/200] ARM: vfp: Provide vfp_lock() for VFP locking.
@@ -23456,9 +23456,9 @@ index 7e8773a2d99d..8d321cdb7ac5 100644
  EXPORT_SYMBOL(kernel_neon_end);
  
 -- 
-2.45.2
+2.46.0
 
-From a2eb8e492682a634310eba3f3830e75b70367d52 Mon Sep 17 00:00:00 2001
+From 15abfae5004b7d3d1fbb81265c4ce25dc458fc46 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:30 +0200
 Subject: [PATCH 175/200] ARM: vfp: Use vfp_lock() in vfp_sync_hwstate().
@@ -23505,9 +23505,9 @@ index 8d321cdb7ac5..3b9360bfc508 100644
  
  /* Ensure that the thread reloads the hardware VFP state on the next use. */
 -- 
-2.45.2
+2.46.0
 
-From 3baa84fe6cb61bda3caff48bfdf6184d268ebfbc Mon Sep 17 00:00:00 2001
+From 8ee7b94e600b50b8c8bc321e61ff3872d2840349 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:36:10 +0200
 Subject: [PATCH 176/200] ARM: vfp: Use vfp_lock() in vfp_support_entry().
@@ -23558,9 +23558,9 @@ index 3b9360bfc508..9543f011d0ed 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 3ae0a70861ed7d8d75b4c54ab773322e44acecd9 Mon Sep 17 00:00:00 2001
+From fb157d78a9501f1f5844d1765d978c63e0eabc1b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:39:33 +0200
 Subject: [PATCH 177/200] ARM: vfp: Move sending signals outside of
@@ -23684,9 +23684,9 @@ index 9543f011d0ed..9fde36fcb80c 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From fc0a49e37055effd8a80d99ca51fb9e91ac53b82 Mon Sep 17 00:00:00 2001
+From 4b1cd922efe82c07ec87d0c1eb9b067689772982 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:29 +0200
 Subject: [PATCH 178/200] ARM: Allow to enable RT
@@ -23720,9 +23720,9 @@ index dea47ba6576b..a154ecd2d3c3 100644
  	select HAVE_REGS_AND_STACK_ACCESS_API
  	select HAVE_RSEQ
 -- 
-2.45.2
+2.46.0
 
-From a7b8f883a99ec7c07816571b125001eae98495f8 Mon Sep 17 00:00:00 2001
+From 364724058edab439bc5e3565b996adc5fb556dd1 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:35 +0200
 Subject: [PATCH 179/200] ARM64: Allow to enable RT
@@ -23736,7 +23736,7 @@ Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index f9777ce2ccb2..9717c564daac 100644
+index 9e0c1ac3d13e..6f7960fad0df 100644
 --- a/arch/arm64/Kconfig
 +++ b/arch/arm64/Kconfig
 @@ -97,6 +97,7 @@ config ARM64
@@ -23748,9 +23748,9 @@ index f9777ce2ccb2..9717c564daac 100644
  	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION if COMPAT
  	select ARCH_WANT_DEFAULT_BPF_JIT
 -- 
-2.45.2
+2.46.0
 
-From 6f76d8b829e4350f8f42def01cb26467095c6896 Mon Sep 17 00:00:00 2001
+From 4e36f05d9388fa13d79a987560f97bb511fd8f6e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 26 Jul 2019 11:30:49 +0200
 Subject: [PATCH 180/200] powerpc: traps: Use PREEMPT_RT
@@ -23787,9 +23787,9 @@ index 2de7f6dcd32b..739f5b179a7f 100644
  	       IS_ENABLED(CONFIG_SMP) ? (" NR_CPUS=" __stringify(NR_CPUS)) : "",
  	       debug_pagealloc_enabled() ? " DEBUG_PAGEALLOC" : "",
 -- 
-2.45.2
+2.46.0
 
-From 0d276945c8ce6aa0016bbec90e20ab00f2f46001 Mon Sep 17 00:00:00 2001
+From bf9b2e079d4fc3db27bd156778a24b04494d8352 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:54 +0100
 Subject: [PATCH 181/200] powerpc/pseries/iommu: Use a locallock instead
@@ -23904,9 +23904,9 @@ index b1e6d275cda9..9a8d3970da3c 100644
  }
  
 -- 
-2.45.2
+2.46.0
 
-From 9ae50b2f3a9898f44e3518e6291effe072146961 Mon Sep 17 00:00:00 2001
+From a3c8b455d4136ec9f61259dc363f1a0304179016 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 9 Mar 2023 09:13:52 +0100
 Subject: [PATCH 182/200] powerpc/pseries: Select the generic memory allocator.
@@ -23936,9 +23936,9 @@ index 4ebf2ef2845d..381c3be3bec1 100644
  	select MPIC
  	select OF_DYNAMIC
 -- 
-2.45.2
+2.46.0
 
-From d12f74dc169aaa3661ed54e616e3e98c1e23ad2e Mon Sep 17 00:00:00 2001
+From f9e280cf1fe3b31f4cb369dd7adcd0b2e904fb0f Mon Sep 17 00:00:00 2001
 From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
 Date: Fri, 24 Apr 2015 15:53:13 +0000
 Subject: [PATCH 183/200] powerpc/kvm: Disable in-kernel MPIC emulation for
@@ -23981,9 +23981,9 @@ index 902611954200..2f188137f830 100644
  	select HAVE_KVM_IRQFD
  	select HAVE_KVM_IRQ_ROUTING
 -- 
-2.45.2
+2.46.0
 
-From f3c9904e5c191e737726498ec089842a242c3614 Mon Sep 17 00:00:00 2001
+From ffd3d8776445384b7047bc692763a139a468e454 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:29 +0100
 Subject: [PATCH 184/200] powerpc/stackprotector: work around stack-guard init
@@ -24020,9 +24020,9 @@ index 283c34647856..4727f40052dd 100644
  #ifdef CONFIG_PPC64
  	get_paca()->canary = canary;
 -- 
-2.45.2
+2.46.0
 
-From 0df0a0d051dfaed7ae0f3a03f3f2f990e5072308 Mon Sep 17 00:00:00 2001
+From 34544d34260c8c262bf74522c5d1516c5df6af1f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:41 +0200
 Subject: [PATCH 185/200] POWERPC: Allow to enable RT
@@ -24056,9 +24056,9 @@ index 2fe51e0ad637..116444551038 100644
  	select HAVE_SETUP_PER_CPU_AREA		if PPC64
  	select HAVE_SOFTIRQ_ON_OWN_STACK
 -- 
-2.45.2
+2.46.0
 
-From 1eca1d3468c701a89e28e59735189ac66ad6d2c7 Mon Sep 17 00:00:00 2001
+From f63514e64aece560322922b05cc88cfb144fd583 Mon Sep 17 00:00:00 2001
 From: Evan Green <evan@rivosinc.com>
 Date: Mon, 6 Nov 2023 14:58:55 -0800
 Subject: [PATCH 186/200] RISC-V: Probe misaligned access speed in parallel
@@ -24252,9 +24252,9 @@ index 1b8da4e40a4d..2cb5e651412c 100644
  	if (has_vector()) {
  		if (riscv_v_setup_vsize())
 -- 
-2.45.2
+2.46.0
 
-From e051b53809f795682c5608dccbfa7b41b8313fdc Mon Sep 17 00:00:00 2001
+From 03903b246a8cf7e6c36a2985ff8a188fd7f5ec93 Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:20 +0800
 Subject: [PATCH 187/200] riscv: add PREEMPT_AUTO support
@@ -24303,9 +24303,9 @@ index d18ce0113ca1..e18710fe51f0 100644
  #define _TIF_WORK_MASK \
  	(_TIF_NOTIFY_RESUME | _TIF_SIGPENDING | _TIF_NEED_RESCHED | \
 -- 
-2.45.2
+2.46.0
 
-From 585420a814687313a96fe2f48820d53b6c0810a5 Mon Sep 17 00:00:00 2001
+From 84955fe4a711c092f2aa361050fe6d8f89556514 Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:21 +0800
 Subject: [PATCH 188/200] riscv: allow to enable RT
@@ -24331,9 +24331,9 @@ index ea01aa411e2c..e05c170781c6 100644
  	select ARCH_USE_QUEUED_RWLOCKS
  	select ARCH_USES_CFI_TRAPS if CFI_CLANG
 -- 
-2.45.2
+2.46.0
 
-From 83df018e7cc966e1e46443d3073340ce16206ddc Mon Sep 17 00:00:00 2001
+From 2fc3192f21db69e41b11f7071ced1d88f460db6d Mon Sep 17 00:00:00 2001
 From: Clark Williams <williams@redhat.com>
 Date: Sat, 30 Jul 2011 21:55:53 -0500
 Subject: [PATCH 189/200] sysfs: Add /sys/kernel/realtime entry
@@ -24385,9 +24385,9 @@ index 1d4bc493b2f4..486c68c11bbe 100644
  	NULL
  };
 -- 
-2.45.2
+2.46.0
 
-From 4ab189a9e35edbb3d87000a96f48c81934cf790f Mon Sep 17 00:00:00 2001
+From abcd9495655aa6fc94fffc539b38f107d93633a6 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 5 Feb 2024 14:04:38 -0600
 Subject: [PATCH 190/200] arch/riscv: check_unaligned_acces(): don't alloc page
@@ -24420,9 +24420,9 @@ index 9d8b6b463592..dd118773e717 100644
  	dst = (void *)((unsigned long)page_address(page) | 0x1);
  	/* Unalign src as well, but differently (off by 1 + 2 = 3). */
 -- 
-2.45.2
+2.46.0
 
-From 69bf5b5f3dd79e298acc2a4b6b22140c472a6321 Mon Sep 17 00:00:00 2001
+From 93ff0279ac8e453b36284bd888e3d7f6b65253ac Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 6 Feb 2024 12:17:19 -0600
 Subject: [PATCH 191/200] Revert "preempt: Put preempt_enable() within an
@@ -24467,9 +24467,9 @@ index cd16f0330fba..9aa6358a1a16 100644
  
  #define preempt_check_resched() \
 -- 
-2.45.2
+2.46.0
 
-From 77dbb0def582e5d2d9f82185289e2fc74196ab35 Mon Sep 17 00:00:00 2001
+From 1e3c8f71843f478b75dacebdd7f5d2e96bb7b521 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Jul 2011 20:25:16 +0200
 Subject: [PATCH 192/200] Add localversion for -RT release
@@ -24488,9 +24488,9 @@ index 000000000000..483ad771f201
 @@ -0,0 +1 @@
 +-rt19
 -- 
-2.45.2
+2.46.0
 
-From a879175afc8b430c8456afedbe47e3689bb9febc Mon Sep 17 00:00:00 2001
+From 0443e28a1d03ab1d69f16220711a6031b7e2c27e Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 27 Feb 2024 17:13:28 -0600
 Subject: [PATCH 193/200] Linux 6.6.18-rt23 REBASE
@@ -24508,9 +24508,9 @@ index 483ad771f201..9a218ca23053 100644
 --rt19
 +-rt23
 -- 
-2.45.2
+2.46.0
 
-From 7d4540446deab8fbe3db82b11920b40f6e35948b Mon Sep 17 00:00:00 2001
+From b724c50e89ae9ddeb7bc02c675d7f8ed48bbfb8c Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 23 Jan 2024 12:56:21 +0100
 Subject: [PATCH 194/200] arm: Disable FAST_GUP on PREEMPT_RT if HIGHPTE is
@@ -24550,9 +24550,9 @@ index a154ecd2d3c3..e5a283851c02 100644
  	select HAVE_FUNCTION_ERROR_INJECTION
  	select HAVE_FUNCTION_GRAPH_TRACER
 -- 
-2.45.2
+2.46.0
 
-From 3259e01628d422b8949cf293be11999aaa9f101b Mon Sep 17 00:00:00 2001
+From e54899a1490a78e62f6f40878d2e649dfb0a90af Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Tue, 23 Jan 2024 13:40:32 +0800
 Subject: [PATCH 195/200] printk: nbcon: move locked_port flag to struct
@@ -24646,9 +24646,9 @@ index 1b1b585b1675..b53d93585ee7 100644
  EXPORT_SYMBOL_GPL(nbcon_release);
  
 -- 
-2.45.2
+2.46.0
 
-From 7e85381d11952023d44d5fbd03b96f4c0b33c5d2 Mon Sep 17 00:00:00 2001
+From 4faa66a53911f5166c32a98b7a09367de6624d35 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 25 Jun 2024 17:08:39 -0500
 Subject: [PATCH 196/200] Linux 6.6.35-rt34 REBASE
@@ -24666,9 +24666,9 @@ index 9a218ca23053..21988f9ad53f 100644
 --rt23
 +-rt34
 -- 
-2.45.2
+2.46.0
 
-From 3838d2044a0bee77d9ed551e7484c710014e398e Mon Sep 17 00:00:00 2001
+From 03ee4b3f18c8b8154d24c565ad25c3b99307726b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 20 Jun 2024 11:21:13 +0200
 Subject: [PATCH 197/200] prinkt/nbcon: Add a scheduling point to
@@ -24707,9 +24707,9 @@ index b53d93585ee7..b941039ee7d2 100644
  	} while (backlog);
  
 -- 
-2.45.2
+2.46.0
 
-From 9d488acbe8b345ff1f04789043498a3a9d928a08 Mon Sep 17 00:00:00 2001
+From 6ca4c84e877a89d7e13248ef0f95a863e6ad73ee Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Sun, 28 Jul 2024 15:53:21 -0500
 Subject: [PATCH 198/200] Linux 6.6.43-rt38 REBASE
@@ -24727,9 +24727,9 @@ index 21988f9ad53f..49bae8d6aa67 100644
 --rt34
 +-rt38
 -- 
-2.45.2
+2.46.0
 
-From cea05c7dc6b60be3377cb435d00464ebb1e58d3c Mon Sep 17 00:00:00 2001
+From 865226da810d48cbaeb38a7c5c60e78087236741 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 5 Aug 2024 09:48:12 -0500
 Subject: [PATCH 199/200] riscv: Add return value to check_unaligned_access().
@@ -24763,12 +24763,12 @@ index dd118773e717..347cdf56f3a1 100644
  	/* Make an unaligned destination buffer. */
  	dst = (void *)((unsigned long)page_address(page) | 0x1);
 -- 
-2.45.2
+2.46.0
 
-From 1f943bc825265e0213a171e0b60e696817796d24 Mon Sep 17 00:00:00 2001
+From dd1bba49e344a1604434da0e6739a080c6f95caa Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
-Date: Tue, 6 Aug 2024 13:36:02 -0500
-Subject: [PATCH 200/200] Linux 6.6.44-rt39 REBASE
+Date: Thu, 12 Sep 2024 15:11:42 -0500
+Subject: [PATCH 200/200] Linux 6.6.50-rt42 REBASE
 
 Signed-off-by: Clark Williams <clark.williams@gmail.com>
 ---
@@ -24776,12 +24776,12 @@ Signed-off-by: Clark Williams <clark.williams@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/localversion-rt b/localversion-rt
-index 49bae8d6aa67..5498386d0d0c 100644
+index 49bae8d6aa67..8bdfb9a04683 100644
 --- a/localversion-rt
 +++ b/localversion-rt
 @@ -1 +1 @@
 --rt38
-+-rt39
++-rt42
 -- 
-2.45.2
+2.46.0
 
