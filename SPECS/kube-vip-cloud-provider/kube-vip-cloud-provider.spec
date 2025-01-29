@@ -8,19 +8,10 @@ Group:          Applications/Text
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-#Note that the source file should be renamed to the format {name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 
-# Steps to manually create the vendor tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# Adding the vendor folder and creating a tarball
-# How to re-build this file:
-# 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
-# 2. <repo-root>/toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz
-
-Source1: %{name}-%{version}-vendor.tar.gz
-
-Patch1:        CVE-2023-47108.patch
-Patch2:        CVE-2024-45338.patch
+Patch1:         CVE-2023-47108.patch
+Patch2:         CVE-2024-45338.patch
 
 BuildRequires: golang >= 1.22
 
@@ -30,7 +21,8 @@ The Kube-Vip cloud provider functions as a general-purpose cloud provider for on
 %prep
 %autosetup -a 1 -p1
 
-%build 
+%build
+tar -xf %{SOURCE1} --no-same-owner
 go build -mod=vendor
 
 %install
