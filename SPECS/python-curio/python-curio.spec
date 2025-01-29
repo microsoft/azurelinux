@@ -1,15 +1,4 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-# what it's called on pypi
-%global srcname curio
-# what it's imported as
-%global libname curio
-# name of egg info directory
-%global eggname curio
-# package name fragment
-%global pkgname curio
+%global pypi_name curio
 
 %global _description \
 Curio is a library of building blocks for performing concurrent I/O and common\
@@ -24,32 +13,38 @@ probably find it to be a bit too-low level--it's probably best to think of it\
 as a library for building libraries.  Although you might not use it directly,\
 many of its ideas have influenced other libraries with similar functionality.
 
-
 Summary:        Building blocks for performing concurrent I/O
-Name:           python-%{pkgname}
-Version:        1.4
-Release:        5%{?dist}
+Name:           python-%{pypi_name}
+Version:        1.5
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/dabeaz/curio
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
 
-%package -n python3-%{pkgname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
+
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-sphinx
 %endif
-%{?python_provide:%python_provide python3-%{pkgname}}
+Requires:       python3
 
-%description -n python3-%{pkgname} %{_description}
+%{?python_provide:%python_provide python3-%{pypi_name}}
+
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%autosetup -n %{srcname}-%{version} -p 1
-rm -rf %{eggname}.egg-info
+%autosetup -n %{pypi_name}-%{version}
+rm -rf %{pypi_name}.egg-info
 
 %build
 %py3_build
@@ -58,17 +53,20 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 %check
-pip3 install pytest
-pip3 install .
-py.test --verbose -m 'not internet'
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
+%pytest -v tests -m "not internet"
 
-%files -n python3-%{pkgname}
+%files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Sep 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.5.0-1
+- Move from SPECS-EXTENDED to SPECS
+- Bump version to 1.5.0
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4-5
 - Drop BR on pytest & pip install latest deps
 - Use py.test instead of py.test-3 to enable ptest
