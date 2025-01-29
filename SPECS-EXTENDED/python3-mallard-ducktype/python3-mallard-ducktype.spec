@@ -4,16 +4,17 @@ Distribution:   Azure Linux
 
 Name:    python3-mallard-ducktype
 Version: 1.0.2
-Release: 6%{?dist}
+Release: 22%{?dist}
 Summary: Parse Ducktype files and convert them to Mallard
 
 License: MIT
 URL:     https://pypi.python.org/pypi/%{srcname}
 # The PyPI tarball does not have AUTHORS or COPYING.
-Source0: https://github.com/projectmallard/%{srcname}/archive/%{version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/projectmallard/%{srcname}/archive/%{version}/%{version}.tar.gz
 
 BuildArch:     noarch
 BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 
 %description
 Parse Ducktype files and convert them to Mallard.
@@ -44,8 +45,57 @@ Parse Ducktype files and convert them to Mallard.
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.0.2-22
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.0.2-20
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.0.2-16
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.0.2-13
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.0.2-10
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jun 24 2020 David King <amigadave@amigadave.com> - 1.0.2-7
+- BuildRequire python3-setuptools explicitly
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.0.2-6
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
