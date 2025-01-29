@@ -11901,8 +11901,8 @@
         "type": "other",
         "other": {
           "name": "libxmlb",
-          "version": "0.3.11",
-          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.11/libxmlb-0.3.11.tar.xz"
+          "version": "0.3.21",
+          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.21/libxmlb-0.3.21.tar.xz"
         }
       }
     },
