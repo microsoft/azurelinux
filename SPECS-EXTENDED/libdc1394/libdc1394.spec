@@ -1,28 +1,32 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-#define svn_snapshot .svn459  
-#define real_version 2.1.0
 %define svn_build %{?svn_snapshot:1}%{!?svn_snapshot:0}
+%global sover 26
 
 Summary: 1394-based digital camera control library
 Name: libdc1394
-Version: 2.2.2
-Release: 15%{?dist}
+Version: 2.2.7
+Release: 1%{?dist}
 License: LGPLv2+
-URL: http://sourceforge.net/projects/libdc1394/
-Source: http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/%{version}/libdc1394-%{version}.tar.gz
+URL: https://sourceforge.net/projects/libdc1394/
+Source: https://downloads.sourceforge.net/project/%{name}/%{name}-2/%{version}/%{name}-%{version}.tar.gz
+Patch0:     %{name}-sdl.patch
+
 ExcludeArch: s390 s390x
 
 BuildRequires:  gcc
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  make
 BuildRequires: kernel-headers
-BuildRequires: libraw1394-devel libusb1-devel
+BuildRequires: libraw1394-devel
+BuildRequires: libusb1-devel
 BuildRequires: doxygen
 BuildRequires: perl-interpreter
-BuildRequires: libX11-devel libXv-devel
-%if %{svn_build}
+BuildRequires: libX11-devel
+BuildRequires: libXv-devel
 BuildRequires: libtool
-%endif
 
 %description
 Libdc1394 is a library that is intended to provide a high level programming
@@ -54,54 +58,65 @@ This package contains tools that are useful when working and
 developing with %{name}.
 
 %prep
-%setup -q -n libdc1394-%{version}
+%autosetup -p1
 
 %build
-%if %{svn_build}
-cp /usr/share/libtool/ltmain.sh .
-aclocal
-autoheader
-autoconf
-automake --add-missing
-%endif
+autoreconf -vif
 %configure --disable-static --enable-doxygen-html --enable-doxygen-dot
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
-make doc
+%make_build
+%make_build doc
 
 %install
-%{__rm} -rf %{buildroot}
-make install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
+%make_install
+
 for p in grab_color_image grab_gray_image grab_partial_image ladybug grab_partial_pvn; do
-	%{__install} -p -m 0644 -s examples/.libs/$p %{buildroot}%{_bindir}/dc1394_$p
+	install  -p -m 0755 -s examples/.libs/$p %{buildroot}%{_bindir}/dc1394_$p
 done
-%{__install} -p -m 0644 examples/dc1394_multiview %{buildroot}%{_bindir}/dc1394_multiview
+install -p -m 0755 examples/dc1394_multiview %{buildroot}%{_bindir}/dc1394_multiview
+
 for f in grab_color_image grab_gray_image grab_partial_image; do
 	mv %{buildroot}%{_mandir}/man1/$f.1 %{buildroot}%{_mandir}/man1/dc1394_$f.1
 done
 
-%ldconfig_scriptlets
+find %{buildroot} -name "*.la" -delete
+
+%{?ldconfig_scriptlets}
 
 %files
-%doc AUTHORS ChangeLog COPYING NEWS README
-%{_libdir}/libdc1394*.so.*
+%license COPYING
+%doc AUTHORS ChangeLog NEWS README
+%{_libdir}/%{name}.so.%{sover}*
 
 %files devel
 %doc examples/*.h examples/*.c
 %{_includedir}/dc1394/
-%{_libdir}/libdc1394*.so
+%{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}-2.pc
-%exclude %{_libdir}/*.la
+
 
 %files docs
 %doc doc/html/*
 
 %files tools
-%{_bindir}/dc1394_*
-%{_mandir}/man1/dc1394_*.1.gz
+%{_bindir}/dc1394_grab_color_image
+%{_bindir}/dc1394_grab_gray_image
+%{_bindir}/dc1394_grab_partial_image
+%{_bindir}/dc1394_grab_partial_pvn
+%{_bindir}/dc1394_ladybug
+%{_bindir}/dc1394_multiview
+%{_bindir}/dc1394_reset_bus
+%{_mandir}/man1/dc1394_grab_color_image.*
+%{_mandir}/man1/dc1394_grab_gray_image.*
+%{_mandir}/man1/dc1394_grab_partial_image.*
+%{_mandir}/man1/dc1394_multiview.*
+%{_mandir}/man1/dc1394_reset_bus.*
+%{_mandir}/man1/dc1394_vloopback.*
 
 %changelog
+* Thu Nov 14 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.2.7-1
+- Update to 2.2.7
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
