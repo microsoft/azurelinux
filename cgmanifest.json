@@ -4310,8 +4310,8 @@
         "type": "other",
         "other": {
           "name": "git-lfs",
-          "version": "3.4.1",
-          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.4.1.tar.gz"
+          "version": "3.6.1",
+          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.6.1.tar.gz"
         }
       }
     },
@@ -8091,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
+          "version": "3.2.0.azl4",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl4.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl3.tar.gz"
+          "version": "3.2.0.azl4",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl4.tar.gz"
         }
       }
     },
@@ -14832,8 +14832,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-markup",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/aantron/markup.ml/archive/1.0.0/markup-1.0.0.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/aantron/markup.ml/archive/1.0.3/markup-1.0.3.tar.gz"
         }
       }
     },
@@ -17583,8 +17583,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-ShareDir-Install",
-          "version": "0.13",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-ShareDir-Install-0.13.tar.gz"
+          "version": "0.14",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-ShareDir-Install-0.14.tar.gz"
         }
       }
     },
