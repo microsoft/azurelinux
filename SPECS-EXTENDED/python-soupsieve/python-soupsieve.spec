@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %bcond_with tests
 
 Name:           python-soupsieve
-Version:        1.9.2
-Release:        5%{?dist}
+Version:        2.6
+Release:        1%{?dist}
 Summary:        CSS selector library
 
 License:        MIT
@@ -67,6 +67,9 @@ pytest-3 -v tests -k 'not test_namespace_xml_with_namespace'
 %license LICENSE.md
 
 %changelog
+* Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6-1
+- Auto-upgrade to 2.6 - test
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.2-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
