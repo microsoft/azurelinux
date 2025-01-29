@@ -1,8 +1,8 @@
 Name:           perl-File-BOM
-Version:        0.16
-Release:        5%{?dist}
+Version:        0.18
+Release:        1%{?dist}
 Summary:        Utilities for handling Byte Order Marks
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-BOM
@@ -26,6 +26,8 @@ BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(Readonly) >= 0.06
 BuildRequires:  perl(Symbol)
 # Tests only
+# Required to process t/testrules.yml
+BuildRequires:  perl(CPAN::Meta::YAML)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(POSIX)
@@ -33,7 +35,6 @@ BuildRequires:  perl(Test::Exception) >= 0.20
 BuildRequires:  perl(Test::More) >= 0.10
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(utf8)
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Encode) >= 1.99
 Requires:       perl(Readonly) >= 0.06
 
@@ -46,8 +47,6 @@ are to be found at the beginning of some files and streams.
 
 %prep
 %setup -q -n File-BOM-%{version}
-# Normalize EOLs
-sed -i -e 's/\r//' README
 
 %build
 perl Build.PL installdirs=vendor
@@ -66,6 +65,10 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 12 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.18-1
+- Upgraded to version 0.18
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
