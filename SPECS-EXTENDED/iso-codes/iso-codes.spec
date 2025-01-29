@@ -1,19 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:       iso-codes
-Summary:    ISO code lists and translations
-Version:    4.4
-Release:    3%{?dist}
-License:    LGPLv2+
-URL:        https://salsa.debian.org/iso-codes-team/iso-codes
-Source0:    https://salsa.debian.org/iso-codes-team/%{name}/-/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz
+Name:           iso-codes
+Summary:        ISO code lists and translations
+Version:        4.17.0
+Release:        1%{?dist}
+License:        LGPL-2.1-or-later
+URL:            https://salsa.debian.org/iso-codes-team/iso-codes
+Source0:        https://salsa.debian.org/iso-codes-team/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 
-BuildRequires: gettext
-BuildRequires: python3
-BuildArch: noarch
+BuildRequires:  gettext
+BuildRequires:  python3
+BuildRequires:  make
+BuildArch:      noarch
 
 # for /usr/share/xml
-Requires: xml-common
+Requires:       xml-common
 
 %description
 This package provides the ISO 639 Language code list, the ISO 4217
@@ -21,15 +22,19 @@ Currency code list, the ISO 3166 Territory code list, and ISO 3166-2
 sub-territory lists, and all their translations in gettext format.
 
 %package devel
-Summary: Files for development using %{name}
-Requires: %{name} = %{version}-%{release}
+Summary:        Files for development using %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 This package contains the pkg-config files for development
 when building programs that use %{name}.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup -n %{name}-v%{version}
+
+# The '&' character is not getting parsed using xmllint
+# Change it to "and" word
+sed -i 's/ & / and /g' data/iso_3166-2.json
 
 %build
 %configure
@@ -41,7 +46,7 @@ when building programs that use %{name}.
 %find_lang %{name} --all-name
 
 %files -f %{name}.lang
-%doc ChangeLog.md README.md
+%doc CHANGELOG.md README.md
 %license COPYING
 %dir %{_datadir}/xml/iso-codes
 %{_datadir}/xml/iso-codes/*.xml
@@ -50,7 +55,11 @@ when building programs that use %{name}.
 %files devel
 %{_datadir}/pkgconfig/iso-codes.pc
 
+
 %changelog
+* Wed oct 23 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.17.0-1
+- Update to version 4.17.0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
