@@ -94,6 +94,8 @@ make LC_ALL=  ARCH=%{arch} olddefconfig
 %build
 make VERBOSE=1 V=1 KBUILD_VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
+make -C tools/perf PYTHON=%{python3} LIBTRACEEVENT_DYNAMIC=1 NO_LIBUNWIND=1 NO_GTK2=1 NO_STRLCPY=1 NO_BIONIC=1 all
+
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
@@ -161,7 +163,7 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} LIBTRACEEVENT_DYNAMIC=1 NO_LIBUNWIND=1 NO_GTK2=1 NO_STRLCPY=1 NO_BIONIC=1 perf_install
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
