@@ -8,7 +8,7 @@
 Name:            mft_kernel
 Summary:         %{name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         1%{?dist}
+Release:         2%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-2
+- Bump release to match kernel
+
 * Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)

@@ -40,7 +40,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-modules
 Version:	 24.10
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -171,6 +171,9 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
+- Bump release to match kernel
+
 * Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)

@@ -41,7 +41,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -99,6 +99,9 @@ fi # 1 : closed
 
 
 %changelog
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
+- Bump release to match kernel
+
 * Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)

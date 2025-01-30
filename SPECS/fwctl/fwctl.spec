@@ -67,7 +67,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -250,6 +250,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
+- Bump release to match kernel
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
