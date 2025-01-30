@@ -195,7 +195,7 @@ if [ -s config_diff ]; then
     echo "Config file has unexpected changes"
     echo "Update config file to set changed values explicitly"
 
-  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
 
