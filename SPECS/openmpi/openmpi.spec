@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{
 Source1:        openmpi.module.in
 Source3:        openmpi.pth.py3
 Source4:        macros.openmpi
+Patch0:         CVE-2022-47022.patch
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  hwloc-devel
@@ -303,6 +304,9 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.1.4-12
+- Patch to fix CVE-2022-47022.
+
 * Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
 - Bump version to recompile with pmix update for CVE-2023-41915
 
