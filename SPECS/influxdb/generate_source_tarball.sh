@@ -94,7 +94,7 @@ pushd $tmpdir > /dev/null
 
 PKG_NAME="influxdb"
 NAME_VER="$PKG_NAME-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
