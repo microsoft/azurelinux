@@ -39,7 +39,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-govendor.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 # Below is a manually created tarball, no download link.
 # predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.

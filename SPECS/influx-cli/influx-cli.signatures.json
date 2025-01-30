@@ -1,6 +1,6 @@
 {
   "Signatures": {
       "influx-cli-2.7.3.tar.gz": "1be63bfdf39ee5e038c464b97994967183e9c6db05a3829172f0045b84e2b247",
-      "influx-cli-2.7.3-govendor.tar.gz": "8548981c0df5d6330c612ec9fd2aeaa8203aa2e86868087f9b9410dc1758d56b"
+      "influx-cli-2.7.3-govendor-v1.tar.gz": "8548981c0df5d6330c612ec9fd2aeaa8203aa2e86868087f9b9410dc1758d56b"
   }
 }
