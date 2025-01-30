@@ -9,20 +9,10 @@ Distribution:   Azure Linux
 Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
 Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using vendored Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/Azure/%%{name}/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-%%{release}-vendor.tar.gz vendor
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
+# Leverage the `generate_source_tarball.sh` to create the vendor sources
+# NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
+# After fixing any possible CVE for the vendored source, we must bump v1 -> v2
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2022-21698.patch
 
 BuildRequires:  golang >= 1.13

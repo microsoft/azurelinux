@@ -7,7 +7,7 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="2"
+VENDOR_VERSION="1"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
