@@ -11,11 +11,11 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
 #
-# --srcTarball  : src tarball file
-#                 this file contains the 'initial' source code of the component
-#                 and should be replaced with the new/modified src code
-# --outFolder   : folder where to copy the new tarball(s)
-# --pkgVersion  : package version
+# --srcTarball    : src tarball file
+#                   this file contains the 'initial' source code of the component
+#                   and should be replaced with the new/modified src code
+# --outFolder     : folder where to copy the new tarball(s)
+# --pkgVersion    : package version
 # --vendorVersion : vendor version
 #
 PARAMS=""
