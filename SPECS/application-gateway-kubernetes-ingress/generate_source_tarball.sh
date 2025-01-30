@@ -117,12 +117,13 @@ echo "Get vendored modules"
 go mod vendor
 
 if [ -n "$UPDATE_MODS" ]; then
-    echo "Update vendored modules"
     IFS=',' read -r -a MODS <<< "$UPDATE_MODS"
     for MODULE in "${MODS[@]}"
     do
+        echo "Updating module: $MODULE"
         go get -u $MODULE
     done
+    go mod tidy
     go mod vendor
 fi
 
