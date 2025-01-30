@@ -9,6 +9,7 @@ PKG_VERSION=""
 SRC_TARBALL=""
 VENDOR_VERSION="1"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+UPDATE_MODS=""
 
 # parameters:
 #
@@ -18,6 +19,7 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # --outFolder     : folder where to copy the new tarball(s)
 # --pkgVersion    : package version
 # --vendorVersion : vendor version
+# --updateMods    : go modules to update, comma separated list
 #
 PARAMS=""
 while (( "$#" )); do
@@ -58,6 +60,15 @@ while (( "$#" )); do
             exit 1
         fi
         ;;
+        --updateMods)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            UPDATE_MODS=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
         -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $1" >&2
         exit 1
@@ -73,6 +84,7 @@ echo "--srcTarball      -> $SRC_TARBALL"
 echo "--outFolder       -> $OUT_FOLDER"
 echo "--pkgVersion      -> $PKG_VERSION"
 echo "--vendorVersion   -> $VENDOR_VERSION"
+echo "--updateMods      -> $UPDATE_MODS"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
@@ -103,6 +115,16 @@ tar -xf $SRC_TARBALL
 cd "$NAME_VER"
 echo "Get vendored modules"
 go mod vendor
+
+if [ -n "$UPDATE_MODS" ]; then
+    echo "Update vendored modules"
+    IFS=',' read -r -a MODS <<< "$UPDATE_MODS"
+    for MODULE in "${MODS[@]}"
+    do
+        go get -u $MODULE
+    done
+    go mod vendor
+fi
 
 echo "Tar vendored modules"
 tar  --sort=name \
