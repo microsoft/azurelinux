@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.15.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -23,7 +23,7 @@ Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:       %{name}-%{version}-vendor.tar.gz
+Source1:       %{name}-%{version}-govendor-v1.tar.gz
 Patch0:        CVE-2024-45338.patch
 BuildRequires: golang
 
@@ -55,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Wed Jan 29 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.15.2-3
+- Change vendor naming convention to match other go packages.
+
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.15.2-2
 - Add patch for CVE-2024-45338
 
