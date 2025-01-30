@@ -24032,16 +24032,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pysocks",
-          "version": "1.7.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/PySocks/PySocks-1.7.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pytest-benchmark",
           "version": "4.0.0",
           "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v4.0.0.tar.gz"
