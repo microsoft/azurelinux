@@ -13101,8 +13101,8 @@
         "type": "other",
         "other": {
           "name": "metis",
-          "version": "5.1.0",
-          "downloadUrl": "http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz"
+          "version": "5.1.0.3",
+          "downloadUrl": "https://github.com/scivision/METIS/archive/refs/tags/v5.1.0.3/METIS-5.1.0.3.tar.gz"
         }
       }
     },
