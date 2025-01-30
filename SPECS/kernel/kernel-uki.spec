@@ -76,7 +76,7 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 * Sat Jan 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-4
 - Bump release to match kernel
 
-* Thu Jan 15 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
+* Thu Jan 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
 - Bump release to match kernel
 
 * Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2

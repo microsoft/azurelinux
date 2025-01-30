@@ -434,7 +434,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Sat Jan 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-4
 - Build PCI_HYPERV as builtin
 
-* Thu Jan 15 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
+* Thu Jan 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
 - Disable DEBUG_PREEMPT
 
 * Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
