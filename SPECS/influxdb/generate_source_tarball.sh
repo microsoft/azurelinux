@@ -94,7 +94,7 @@ pushd $tmpdir > /dev/null
 
 PKG_NAME="influxdb"
 NAME_VER="$PKG_NAME-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-$VENDOR_VERSION.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
@@ -112,7 +112,7 @@ tar  --sort=name \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
      -cf "$VENDOR_TARBALL" vendor
 
-STATIC_ASSETS_TARBALL="$OUT_FOLDER/$NAME_VER-static-data.tar.gz"
+STATIC_ASSETS_TARBALL="$OUT_FOLDER/$NAME_VER-static-data-v$VENDOR_VERSION.tar.gz"
 
 echo ""
 echo "========================="
