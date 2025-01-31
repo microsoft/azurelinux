@@ -9,12 +9,12 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
-BuildRequires:  SymCrypt >= 103.6.0
+BuildRequires:  SymCrypt >= 103.8.0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
 
-Requires:       SymCrypt >= 103.6.0
+Requires:       SymCrypt >= 103.8.0
 Requires:       openssl
 
 %description
