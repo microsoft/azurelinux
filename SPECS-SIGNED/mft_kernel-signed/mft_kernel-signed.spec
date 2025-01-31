@@ -8,7 +8,7 @@
 Name:            mft_kernel
 Summary:         %{name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         2%{?dist}
+Release:         3%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-3
+- Bump release to match kernel
+
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-2
 - Bump release to match kernel
 
