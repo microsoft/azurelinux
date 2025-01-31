@@ -5096,8 +5096,8 @@ CONFIG_SND_PCI=y
 # CONFIG_SND_EMU10K1X is not set
 # CONFIG_SND_ENS1370 is not set
 CONFIG_SND_ENS1371=m
-# CONFIG_SND_ENS1938 is not set
-# CONFIG_SND_ENS1968 is not set
+# CONFIG_SND_ES1938 is not set
+# CONFIG_SND_ES1968 is not set
 # CONFIG_SND_FM801 is not set
 # CONFIG_SND_HDSP is not set
 # CONFIG_SND_HDSPM is not set
