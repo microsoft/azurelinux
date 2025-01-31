@@ -116,7 +116,7 @@ EOF)
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
