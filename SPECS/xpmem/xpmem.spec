@@ -1,9 +1,10 @@
 %{!?KMP: %global KMP 0}
 
-<<<<<<< HEAD
-%global last-known-kernel 6.6.64.2-6
-=======
--1
+%global last-known-kernel 6.6.76.1-1
+
+%if 0%{azl}
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+>>>>>>> a68b087c7 (Include release number in kernel version entanglement check)
 %else
 %global target_kernel_version_full f.a.k.e
 %endif

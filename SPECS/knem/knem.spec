@@ -19,15 +19,18 @@
 # INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 # NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 # DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+-1
 -1
 %global last-known-kernel 6.6.64.2-6
 =======
 %global last-known-kernel 6.6.76.1
 >>>>>>> b34c13292 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.76.1 - branch 3.0-dev (#12277))
+=======
+# KMP is disabled by default
+%{!?KMP: %global KMP 0}
+
+%global last-known-kernel 6.6.76.1-1
+>>>>>>> a68b087c7 (Include release number in kernel version entanglement check)
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)

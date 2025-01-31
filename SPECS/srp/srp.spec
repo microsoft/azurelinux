@@ -22,15 +22,8 @@
 #
 # Redistributions in binary form must reproduce both the above copyright
 # notice, one of the license notices in the documentation
-# and/or other materials provided with the distribution.
-#
-#
 
-<<<<<<< HEAD
-%global last-known-kernel 6.6.64.2-6
-=======
-%global last-known-kernel 6.6.76.1
->>>>>>> b34c13292 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.76.1 - branch 3.0-dev (#12277))
+%global last-known-kernel 6.6.76.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
