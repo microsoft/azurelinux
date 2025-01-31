@@ -44,6 +44,7 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
+Patch3:         CVE-2024-9681.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -172,6 +173,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Fri Mar 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-13
+- Fix CVE-2024-9681
+
 * Thu Feb 27 2025 Chris Co <chrco@microsoft.com> - 1.75.0-12
 - Bump to rebuild with updated glibc
 
