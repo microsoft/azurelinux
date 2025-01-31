@@ -45,6 +45,9 @@ BuildRequires: python%{python3_pkgversion}-setuptools
 BuildRequires: python%{python3_pkgversion}-numpy
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-pytest
+%if 0%{?with_check}
+BuildRequires: python%{python3_pkgversion}-pip
+%endif
 Provides:      future-python3 = 0:%{version}-%{release}
 Provides:      future = 0:%{version}-%{release}
 Provides:      python3-%{name} = %{version}-%{release}
@@ -85,6 +88,7 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 ## This packages ships PEM certificates in future/backports/test directory.
 ## It's for testing purpose, i guess. Ignore them.
 %check
+pip3 install imp
 
 # Bugs
 # https://github.com/PythonCharmers/python-future/issues/508
