@@ -64,7 +64,7 @@
 Summary:	 %{_name} Driver
 Name:		 isert
 Version:	 24.10
-Release:	 2%{?dist}
+Release:	 3%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -247,6 +247,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-3
+- Bump release to match kernel
+
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
