@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
-Version:        1.7.2
-Release:        4%{?dist}
+Version:        1.7.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,20 +13,18 @@ Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
 # After fixing any possible CVE for the vendored source, we must bump v1 -> v2
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-Patch0:         CVE-2022-21698.patch
 
-BuildRequires:  golang >= 1.13
+BuildRequires:  golang >= 1.23
 
 %description
 This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway
 to act as the ingress for an AKS cluster.
 
 %prep
-%autosetup -N
+%autosetup
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
-%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
 
 %build
 export VERSION=%{version}
@@ -45,9 +43,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
-* Tue Jan 28 2025 Gary Swalling <gaswal@@microsoft.com> - 1.7.2-4
-- Update golang.org/x/net to 0.34.0 for CVE-2023-39325, CVE-2023-44487
-- Removed golang.org/x/net patches which are no longer needed
+* Fri Jan 31 2025 Gary Swalling <gaswal@@microsoft.com> - 1.7.7-1
+- Update to 1.7.7 with golang.org/x/net v0.33.0 for CVE-2023-39325, CVE-2023-44487
+- Removed patches which are no longer needed
 
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.7.2-3
 - Add patch for CVE-2024-45338
