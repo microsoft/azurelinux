@@ -26,7 +26,7 @@
 #
 #
 
-%global last-known-kernel 6.6.64.2-6
+%global last-known-kernel 6.6.64.2
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -65,7 +65,7 @@
 Summary:	 %{_name} Driver
 Name:		 mlnx-nfsrdma
 Version:	 24.10
-Release:	 3?dist}
+Release:	 3%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
