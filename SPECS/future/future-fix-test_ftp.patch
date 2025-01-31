@@ -1,0 +1,25 @@
+From cde06d8bbed44cd46f21802aff4b165e4c6eebe9 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Fri, 31 Jan 2025 15:34:18 -0800
+Subject: [PATCH] fix mimetype guess in test_ftp
+
+---
+ tests/test_future/test_urllib2.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_future/test_urllib2.py b/tests/test_future/test_urllib2.py
+index bd8e75c..99b1dd1 100644
+--- a/tests/test_future/test_urllib2.py
++++ b/tests/test_future/test_urllib2.py
+@@ -709,7 +709,7 @@ class HandlerTests(unittest.TestCase):
+              ["foo", "bar"], "", None),
+             ("ftp://localhost/baz.gif;type=a",
+              "localhost", ftplib.FTP_PORT, "", "", "A",
+-             [], "baz.gif", None),
++             [], "baz.gif", "image/gif"),
+             ("ftp://localhost/baz.gif",
+              "localhost", ftplib.FTP_PORT, "", "", "I",
+              [], "baz.gif", "image/gif"),
+-- 
+2.34.1
+
