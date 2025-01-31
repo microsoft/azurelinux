@@ -228,7 +228,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Fri Jan 31 2025 aperezguevar <aperezguevar@microsoft.com> - 4.30.0-4
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-4
 - Bump release to rebuild for new kernel release
 
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-3

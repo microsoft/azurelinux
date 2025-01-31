@@ -739,7 +739,7 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Fri Jan 31 2025 aperezguevar <aperezguevar@microsoft.com> - 24.10-4
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-4
 - Bump release to rebuild for new kernel release
 
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-3

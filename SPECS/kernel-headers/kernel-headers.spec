@@ -75,7 +75,7 @@ done
 %endif
 
 %changelog
-* Fri Jan 31 2025 aperezguevar <aperezguevar@microsoft.com> - 6.6.64.2-7
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-7
 - Bump release to match kernel
 
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-6
