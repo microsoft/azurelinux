@@ -40,7 +40,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-modules
 Version:	 24.10
-Release:	 2%{?dist}
+Release:	 3%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -171,6 +171,9 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-3
+- Bump release to match kernel
+
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
