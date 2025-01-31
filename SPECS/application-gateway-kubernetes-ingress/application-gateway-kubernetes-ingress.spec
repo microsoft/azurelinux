@@ -44,7 +44,7 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 
 %changelog
 * Fri Jan 31 2025 Gary Swalling <gaswal@@microsoft.com> - 1.7.7-1
-- Update to 1.7.7 with golang.org/x/net v0.33.0 for CVE-2023-39325, CVE-2023-44487
+- Upgrade to v1.7.7 with golang.org/x/net v0.33.0 for CVE-2023-39325, CVE-2023-44487
 - Removed patches which are no longer needed
 
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.7.2-3
