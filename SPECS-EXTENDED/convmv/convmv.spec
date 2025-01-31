@@ -3,18 +3,24 @@ Distribution:   Azure Linux
 Summary: Convert filename encodings
 Name: convmv
 Version: 2.05
-Release: 7%{?dist}
+Release: 18%{?dist}
 
-License: GPLv2 or GPLv3
-URL: http://j3e.de/linux/convmv
-Source0: http://j3e.de/linux/convmv/convmv-%{version}.tar.gz
+License: GPL-2.0-only OR GPL-3.0-only
+URL: https://j3e.de/linux/convmv
+Source0: https://j3e.de/linux/convmv/convmv-%{version}.tar.gz
 Patch0: convmv-2.0-preserve-timestamps.patch
 BuildArch: noarch
+BuildRequires: make
 BuildRequires: perl-generators
-BuildRequires: perl(Getopt::Long)
-%if 0%{?with_check}
+BuildRequires: perl(bytes)
+BuildRequires: perl(Cwd)
+BuildRequires: perl(Encode)
+BuildRequires: perl(File::Basename)
+BuildRequires: perl(File::Compare)
 BuildRequires: perl(File::Find)
-%endif
+BuildRequires: perl(Getopt::Long)
+BuildRequires: perl(Unicode::Normalize)
+BuildRequires: perl(utf8)
 
 %description
 This package contains the tool convmv with which you can convert the encodings
@@ -41,12 +47,45 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install
 %{_mandir}/man*/*
 
 %changelog
-* Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 2.05-7
-- Add an explicit BR on `perl(File::Find)` to enable ptest
+* Fri Jan 31 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.05-18
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon May 27 2024 Parag Nemade <pnemade AT redhat DOT com> - 2.05-16
+- Correct the SPDX license expression
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 23 2023 Parag Nemade <pnemade AT redhat DOT com> - 2.05-12
+- Migrate to SPDX license expression
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Mar 31 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.05-6
+- Specify all perl dependencies
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.05-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
