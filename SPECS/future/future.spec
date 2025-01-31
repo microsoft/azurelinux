@@ -16,7 +16,7 @@ clean Py3-style codebase, module by module.
 Name: future
 Summary: Easy, clean, reliable Python 2/3 compatibility
 Version: 0.18.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: MIT
 URL: http://python-future.org/
 Source0: https://github.com/PythonCharmers/python-future/archive/refs/tags/v%{version}/python-%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -89,10 +89,10 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 # Bugs
 # https://github.com/PythonCharmers/python-future/issues/508
 %if 0%{?python3_version_nodots} > 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace" -q
+PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace" -q
 %endif
 %if 0%{?python3_version_nodots} <= 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
+PYTHONPATH=$PWD/build/lib py.test%{python3_version}
 %endif
 
 %files -n python%{python3_pkgversion}-%{name}
@@ -111,7 +111,10 @@ PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
 %{python3_sitelib}/*.egg-info
 
 %changelog
-* Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 0.18.2-6
+* Fri Jan 31 2025 Sam Meluch <sammeluch@microsoft.com> - 0.18.3-7
+- change py.test-version to py.test to run the ptest
+
+* Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 0.18.3-6
 - License verified.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 
