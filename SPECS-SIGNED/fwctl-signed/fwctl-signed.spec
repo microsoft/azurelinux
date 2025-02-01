@@ -72,15 +72,30 @@ fwctl signed kernel modules
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
+openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
+
+openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
+openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
-cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
 
 %post
 if [ $1 -ge 1 ]; then # 1 : This package is being installed or reinstalled
