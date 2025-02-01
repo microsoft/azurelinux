@@ -3,10 +3,11 @@
 %bcond_with    cuda
 %bcond_with    gdrcopy
 %bcond_without ib
+%bcond_without knem
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
-%bcond_with    xpmem
+%bcond_without xpmem
 %bcond_with    vfs
 %bcond_with    mad
 %bcond_without mlx5
@@ -14,7 +15,7 @@
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
 Version:        1.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -354,6 +355,9 @@ library internals, protocol objects, transports status, and more.
 %endif
 
 %changelog
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 1.18.0-2
+- Enable knem and xpmem flags
+
 * Wed Jan 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 1.18.0-1
 - Bump version to 1.18.0
 
