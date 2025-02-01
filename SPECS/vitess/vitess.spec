@@ -105,7 +105,7 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
-* Fri Jan 31 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -17.0.7-4
+* Fri Jan 31 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 17.0.7-4
 - Add patch for CVE-2024-45339
 
 * Thu Jan 02 2025 Sumedh Sharma <sumsharma@microsoft.com> - 17.0.7-3
