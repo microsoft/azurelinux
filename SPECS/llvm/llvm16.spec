@@ -1,13 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm16
 Version:        16.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -52,6 +53,7 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
+      -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev ../llvm
 
 %ninja_build LLVM
@@ -89,6 +91,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Tue Apr 02 2024 Andrew Phelps <anphel@microsoft.com> - 16.0.0-4
+- Define LLVM_BINUTILS_INCDIR so that LLVMgold.so is built.
+
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-3
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 
