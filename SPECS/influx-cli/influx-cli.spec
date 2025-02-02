@@ -18,28 +18,14 @@
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
 Version:        2.7.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influx-cli
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# Use generate_source_tarbbal.sh to get this generated from a source code file.
-# How to re-build this file:
-#   1. wget https://github.com/influxdata/influx-cli/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 
@@ -81,6 +67,9 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
+* Wed Jan 29 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.3-3
+- Change vendor naming convention to match other go packages.
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 2.7.3-2
 - Remove restriction on golang BR version
 
@@ -102,7 +91,7 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-9
 - Bump release to rebuild with go 1.19.10
 
-* Thu May 25 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.6.1-8
+* Thu May 25 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-8
 - Removed bash-completion subpackage since the script produced is included in original bash-completion.
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-7
