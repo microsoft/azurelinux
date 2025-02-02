@@ -68,15 +68,24 @@ srp kernel modules
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
-cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
 
 %files
 %defattr(-,root,root,-)

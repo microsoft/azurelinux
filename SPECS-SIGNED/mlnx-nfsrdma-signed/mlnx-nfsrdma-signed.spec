@@ -71,17 +71,25 @@ mellanox rdma signed kernel modules
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
 
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/rpcrdma.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/svcrdma.ko
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/xprtrdma.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/rpcrdma.ko
-cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/svcrdma.ko
-cp -r %{SOURCE3} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/xprtrdma.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
+
 
 %post
 if [ $1 -ge 1 ]; then # This package is being installed or reinstalled
