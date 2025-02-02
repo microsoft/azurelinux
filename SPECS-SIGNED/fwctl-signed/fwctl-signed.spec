@@ -31,6 +31,9 @@
 #
 
 %global debug_package %{nil}
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
@@ -79,14 +82,8 @@ pushd rpm_contents
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
 
-openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
-openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
-
 cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
 cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
-
-openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
-openssl sha256 ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
 
 popd
 
