@@ -59,7 +59,6 @@ cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/xpmem.ko
 popd
 
 %install
-
 pushd rpm_contents
 
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
