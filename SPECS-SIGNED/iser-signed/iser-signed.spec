@@ -67,15 +67,21 @@ iser signed kernel modules
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
 
+rpm2cpio %{SOURCE0} | cpio -idmv
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/iser/ib_iser.ko
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/iser/ib_iser.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
+
 
 %post
 if [ $1 -ge 1 ]; then # 1 : This package is being installed or reinstalled

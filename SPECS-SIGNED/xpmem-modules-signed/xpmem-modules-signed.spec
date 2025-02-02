@@ -48,14 +48,24 @@ This package includes the kernel module.
 
 %build
 
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/xpmem.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/xpmem.ko
+pushd rpm_contents
 
-%clean
-rm -rf %{buildroot}
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
+
+popd
 
 %files
 /lib/modules/%{KVERSION}/updates/xpmem.ko
