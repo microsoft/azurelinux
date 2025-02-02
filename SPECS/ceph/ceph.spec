@@ -1,11 +1,11 @@
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
 %define _unpackaged_files_terminate_build 0 
- 
+
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -14,6 +14,10 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 Patch0:         0034-src-pybind-rbd-rbd.pyx.patch
 Patch1:         0032-cmake-modules-BuildBoost.cmake.patch
 Patch2:         CVE-2024-52338.patch
+Patch3:         CVE-2014-5461.patch
+Patch4:         CVE-2020-22217.patch
+Patch5:         CVE-2015-9251.patch
+Patch6:         CVE-2012-6708.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -895,7 +899,7 @@ This package provides a Ceph hardware monitoring agent.
 # common
 #################################################################################
 %prep
-%autosetup -p1 
+%autosetup -p1
 
 %build
 pwd
@@ -2004,6 +2008,12 @@ exit 0
 
 
 %changelog
+* Tue Jan 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-4
+- Fix for CVE-2014-5461
+- Fix for CVE-2020-22217
+- Fix for CVE-2015-9251
+- Fix for CVE-2012-6708
+
 * Tue Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
 - Based on the package build logs, opentelemetry-cpp submodule is not being built
 - Removing opentelemetry-cpp to address below CVEs as this submodule is not relevant
