@@ -2698,8 +2698,8 @@
         "type": "other",
         "other": {
           "name": "dmidecode",
-          "version": "3.5",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.5.tar.xz"
+          "version": "3.6",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.6.tar.xz"
         }
       }
     },
@@ -13101,8 +13101,8 @@
         "type": "other",
         "other": {
           "name": "metis",
-          "version": "5.1.0",
-          "downloadUrl": "http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz"
+          "version": "5.1.0.3",
+          "downloadUrl": "https://github.com/scivision/METIS/archive/refs/tags/v5.1.0.3/METIS-5.1.0.3.tar.gz"
         }
       }
     },
@@ -24032,16 +24032,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pysocks",
-          "version": "1.7.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/PySocks/PySocks-1.7.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pytest-benchmark",
           "version": "4.0.0",
           "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v4.0.0.tar.gz"
@@ -28426,8 +28416,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.6.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.6.0.tar.gz"
+          "version": "103.8.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.8.0.tar.gz"
         }
       }
     },
@@ -28436,8 +28426,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.6.1.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.7.0.tar.gz"
         }
       }
     },

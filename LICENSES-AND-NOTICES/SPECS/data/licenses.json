@@ -1773,7 +1773,6 @@
                 "python-pyproject-metadata",
                 "python-pyroute2",
                 "python-pyrsistent",
-                "python-pysocks",
                 "python-pytest-benchmark",
                 "python-pytest-cov",
                 "python-pytest-expect",
