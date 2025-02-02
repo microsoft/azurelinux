@@ -26,6 +26,7 @@
 #
 #
 
+%global debug_package %{nil}
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
 %else
