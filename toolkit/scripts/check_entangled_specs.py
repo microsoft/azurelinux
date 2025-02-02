@@ -162,12 +162,15 @@ def check_oot_kmodules(base_path: str, tag: str, groups: List[FrozenSet]) -> Set
 
     kernel_headers_spec = Spec.from_file(path.join(base_path, "SPECS/kernel-headers/kernel-headers.spec"))
     kernel_headers_version = get_tag_value(kernel_headers_spec, 'version')
+    kernel_headers_release = get_tag_value(kernel_headers_spec, 'release')
+    kernel_version_release = f"{kernel_headers_version}-{kernel_headers_release}"
 
     for group in groups:
         for spec_filename in group:
             parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
             tag_value = get_tag_value(parsed_spec, tag)
-            if tag_value != kernel_headers_version:
+            if tag_value != kernel_version_release:
+                print(f"kernel version mismatch: {spec_filename} {tag_value} {kernel_version_release}")
                 err_groups.add(spec_filename)
     return err_groups
 
