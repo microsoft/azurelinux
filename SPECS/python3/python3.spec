@@ -332,6 +332,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Feb 03 2024 Bala <balakumaran.kannan@microsoft.com> - 3.9.19-9
+- Address CVE-2023-27043 by patching
+
 * Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.9.19-8
 - Address CVE-2024-6923
 
