@@ -25373,8 +25373,8 @@
         "type": "other",
         "other": {
           "name": "pywbem",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/pywbem/pywbem/archive/v0.15.0/pywbem-0.15.0.tar.gz"
+          "version": "0.17.6",
+          "downloadUrl": "https://github.com/pywbem/pywbem/archive/refs/tags/0.17.6.tar.gz"
         }
       }
     },
