@@ -81,7 +81,7 @@ rm -rf %{buildroot}%{_docdir}
 %changelog
 * Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.4.0-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified
+- License verified
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
@@ -113,3 +113,4 @@ rm -rf %{buildroot}%{_docdir}
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.13-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
