@@ -7,7 +7,7 @@ Release:          1%{?dist}
 License:          BSD
 
 URL:              https://www.adobe.com/
-Source:           https://github.com/adobe-type-tools/mapping-resources-pdf/archive/%{version}.tar.gz#/mapping-resources-pdf-%{version}.tar.gz
+Source0:           https://github.com/adobe-type-tools/mapping-resources-pdf/archive/refs/tags/%{version}.tar.gz#/mapping-resources-pdf-%{version}.tar.gz
 
 BuildArch:        noarch
 BuildRequires:    git
