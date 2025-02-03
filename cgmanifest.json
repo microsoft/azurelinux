@@ -14422,8 +14422,8 @@
         "type": "other",
         "other": {
           "name": "numatop",
-          "version": "2.1",
-          "downloadUrl": "https://github.com/intel/numatop/releases/download/v2.1/numatop-v2.1.tar.xz"
+          "version": "2.4",
+          "downloadUrl": "https://github.com/intel/numatop/archive/refs/tags/v2.4.tar.gz"
         }
       }
     },
