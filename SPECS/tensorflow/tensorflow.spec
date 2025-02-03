@@ -1,14 +1,14 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache2.tar.gz
+Source1:        %{name}-%{version}-cache3.tar.gz
 Patch0:         CVE-2024-7592.patch
 Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
