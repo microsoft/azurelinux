@@ -17,6 +17,8 @@ RUN wget https://github.com/tensorflow/tensorflow/archive/refs/tags/v$TF_VERSION
 RUN mkdir -p /usr/src/azl/BUILD
 RUN tar -xvf v$TF_VERSION.tar.gz -C /usr/src/azl/BUILD
 WORKDIR /usr/src/azl/BUILD/tensorflow-$TF_VERSION
+COPY Remove-Unnecessary-Deps.patch .
+RUN patch -p1 < Remove-Unnecessary-Deps.patch
 RUN rm .bazelversion
 
 # create cache using fetch
