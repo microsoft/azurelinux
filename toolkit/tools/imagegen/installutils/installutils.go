@@ -739,6 +739,7 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		const tdnfInstallPrefix = "Installing/Updating: "
 
 		// Only process lines that match tdnfInstallPrefix
+		logger.Log.Debug(line)
 		if !strings.HasPrefix(line, tdnfInstallPrefix) {
 			return
 		}
