@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.20.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,7 @@ Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       named-chroot.files
 Patch0:         nongit-fix.patch
+Patch1:         CVE-2024-12705.patch
 
 BuildRequires:  gcc
 BuildRequires:  git
@@ -189,6 +190,7 @@ Summary:        BIND utilities
 %prep
 %setup -q
 %patch 0 -p1
+%patch 1 -p1
 
 # Copying auxiliary files with libtoolize. Some files will be replaced by libtoolize -c -f.
 # The files "compile", "depcomp", and "missing" will be deleted by this process, as some
@@ -523,6 +525,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Mon Feb 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.20.0-2
+- Address CVE-2024-12705 using an upstream patch.
+
 * Wed Jul 24 2024 Muhammad Falak <mwani@microsoft.com> - 9.20.0-1
 - Upgrade version to 9.20.0 to address CVE-CVE-2024-0760, CVE-2024-1737, CVE-2024-1975 & CVE-2024-4076
 - Refresh patches to apply cleanly
