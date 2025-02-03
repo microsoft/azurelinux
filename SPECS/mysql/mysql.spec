@@ -263,7 +263,7 @@ MySQL package.
 
 %package          libs
 Summary:          The shared libraries required for MySQL clients
-Requires:         mysql-common
+Requires:         %{name}-common = %{version}-%{release}
 
 %add_metadata libs
 
@@ -277,7 +277,7 @@ MySQL server.
 %package          errmsg
 Summary:          The error messages files required by MySQL server
 BuildArch:        noarch
-Requires:         mysql-common
+Requires:         %{name}-common = %{version}-%{release}
 %{?with_provides_community_mysql:Provides: community-mysql-errmsg = %community_mysql_version}
 %{?with_obsoletes_community_mysql:Obsoletes: community-mysql-errmsg <= %obsolete_community_mysql_version}
 
@@ -292,16 +292,16 @@ The package provides error messages files for the MySQL daemon
 %package          server
 Summary:          The MySQL server and related files
 
-Requires:         mysql
+Requires:         %{name} = %{version}-%{release}
 
-Requires:         mysql-common
+Requires:         %{name}-common = %{version}-%{release}
 %if 0%{?flatpak}
 Requires:         mariadb-connector-c-config
 %else
 Requires:         %{_sysconfdir}/my.cnf
 Requires:         %{_sysconfdir}/my.cnf.d
 %endif
-Requires:         mysql-errmsg
+Requires:         %{name}-errmsg = %{version}-%{release}
 Requires:         coreutils
 Requires(pre):    /usr/sbin/useradd
 # We require this to be present for %%{_tmpfilesdir}
@@ -339,6 +339,7 @@ the MySQL server and some accompanying files and directories.
 
 %package          devel
 Summary:          Files for development of MySQL applications
+Requires:         %{name}-libs = %{version}-%{release}
 Requires:         openssl-devel
 Requires:         zlib-devel
 Requires:         libzstd-devel
@@ -357,9 +358,10 @@ developing MySQL client applications.
 
 %package          test
 Summary:          The test suite distributed with MySQL
-Requires:         mysql
-Requires:         mysql-common
-Requires:         mysql-server%{?_isa}
+Requires:         %{name} = %{version}-%{release}
+Requires:         %{name}-common = %{version}-%{release}
+Requires:         %{name}-libs = %{version}-%{release}
+Requires:         %{name}-server = %{version}-%{release}
 Requires:         gzip
 Requires:         lz4
 Requires:         openssl
@@ -571,10 +573,7 @@ install -p -m 0644 ../mysql-test/./%{skiplist} %{buildroot}%{_datadir}/mysql-tes
 
 mkdir -p %{buildroot}%{_sysconfdir}/my.cnf.d
 
-
 %check
-
-echo "STARTCHECK"
 
 %if %runselftest
 pushd %_vpath_builddir
@@ -641,6 +640,10 @@ fi
 %postun server
 %systemd_postun_with_restart %{daemon_name}.service
 
+# Add new libraries to the cache to load libraries faster
+%post libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license LICENSE router/LICENSE.router
@@ -678,7 +681,7 @@ fi
 
 %files libs
 %dir %{_libdir}/mysql
-%{_libdir}/mysql/libmysqlclient*.so.*
+%{_libdir}/mysql/libmysqlclient*.so*
 %config(noreplace) %{_sysconfdir}/ld.so.conf.d/*
 
 %files config
@@ -849,12 +852,11 @@ fi
 %{_libdir}/mysql/plugin/test_services_*.so
 %{_libdir}/mysql/plugin/test_udf_services.so
 %{_libdir}/mysql/plugin/udf_example.so
-%{_libdir}/mysql/libmysqlclient.so
 
 %changelog
 * Mon Feb 03 2025 Betty Lakes <bettylakes@microsoft.com> - 8.4.3-1
 - Upgrade to 8.4.3
-- Add systemd
+- Add systemd client-server connection
 
 * Mon Jan 27 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.0.40-5
 - Fix CVE-2024-9681
