@@ -1,5 +1,5 @@
---- neon-0.27.0/neon-config.in.multilib
-+++ neon-0.27.0/neon-config.in
+--- neon-0.32.2/neon-config.in.multilib
++++ neon-0.32.2/neon-config.in
 @@ -5,7 +5,11 @@
  prefix=@prefix@
  exec_prefix=@exec_prefix@
@@ -22,7 +22,7 @@
      i18n [@NE_FLAG_I18N@], ts_ssl [@NE_FLAG_TS_SSL@]
  
  EOF
-@@ -69,11 +73,10 @@
+@@ -69,16 +73,11 @@
  	;;
  
      --cflags)
@@ -32,10 +32,16 @@
  
      --libs)
 -        LIBS="-lneon @NEON_LIBS@"
- 	# Don't add standard library paths
-         if test "$prefix" != "/usr"; then
-            LIBS="-L${libdir} ${LIBS}"
-@@ -93,7 +96,7 @@
+-	# Don't add standard library paths
+-        if test "$prefix" != "/usr"; then
+-           LIBS="-L${libdir} ${LIBS}"
+-        fi
+-	echo @user_LDFLAGS@ ${LIBS}
++	echo ${LIBS}
+ 	;;
+ 
+     --la-file)
+@@ -93,7 +92,7 @@
  	zlib|ZLIB) support @NE_FLAG_ZLIB@ ;;
  	ipv6|IPV6) support @NE_FLAG_IPV6@ ;;
  	dav|DAV) support @NE_FLAG_DAV@ ;;
@@ -44,8 +50,8 @@
  	i18n|I18N) support @NE_FLAG_I18N@ ;;
  	ts_ssl|TS_SSL) support @NE_FLAG_TS_SSL@ ;;
  	*) support no ;;
---- neon-0.27.0/neon.pc.in.multilib
-+++ neon-0.27.0/neon.pc.in
+--- neon-0.32.2/neon.pc.in.multilib
++++ neon-0.32.2/neon.pc.in
 @@ -2,6 +2,7 @@
  exec_prefix=@exec_prefix@
  libdir=@libdir@
