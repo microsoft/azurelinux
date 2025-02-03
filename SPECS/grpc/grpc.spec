@@ -1,14 +1,14 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-submodules.tar.gz
+Source1:        %{name}-%{version}-submodules-v1.tar.gz
 Patch0:         grpcio-cython3.patch
 Patch1:         CVE-2024-11407.patch
 BuildRequires:  abseil-cpp-devel >= 20240116.0-2
@@ -152,6 +152,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Jan 30 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.62.0-5
+- Change vendor naming convention to match other go packages.
+
 * Wed Jan 25 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.62.0-4
 - Patch CVE-2024-11407
 
