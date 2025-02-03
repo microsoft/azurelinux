@@ -114,6 +114,7 @@ _EOF
 %changelog
 * Thu Oct 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 20231115-1
 - Update to version 20231115
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20171205-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
