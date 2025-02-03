@@ -92,7 +92,7 @@ cp -pf linux/README README.Linux
 %changelog
 * Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.17.6-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified
+- License verified
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.6-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
