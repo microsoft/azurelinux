@@ -13992,8 +13992,8 @@
         "type": "other",
         "other": {
           "name": "neon",
-          "version": "0.31.2",
-          "downloadUrl": "https://notroj.github.io/neon/neon-0.31.2.tar.gz"
+          "version": "0.33.0",
+          "downloadUrl": "https://notroj.github.io/neon/neon-0.33.0.tar.gz"
         }
       }
     },
