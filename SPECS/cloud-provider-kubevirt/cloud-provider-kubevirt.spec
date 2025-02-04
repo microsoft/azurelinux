@@ -44,7 +44,7 @@ make test
 
 %files
 %defattr(-,root,root)
-%{buildroot}%{_bindir}/kubevirt-cloud-controller-manager
+%{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
 * Tue Feb 04 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 0.5.1-1
