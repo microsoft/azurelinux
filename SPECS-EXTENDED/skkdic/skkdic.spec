@@ -11,6 +11,8 @@ Summary:	Dictionaries for SKK (Simple Kana-Kanji conversion program)
 Name:		skkdic
 Version:	%{gitdate_num}
 Release:	3%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 # See Source2
 License:	GPLv2+ and CC-BY-SA and Unicode and Public Domain and MIT
 
@@ -80,9 +82,9 @@ popd
 
 %changelog
 * Thu Jan 09 2025 Archana Shettigar <v-shettigara@microsoft.com> - 20240131-3
-- Initial Azure Linux import from Fedora 41 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
-- License Verified
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- Converting the 'Release' tag to the '[number].[distribution]' format
+- License verified
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240131-2.gitb798a46b88
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
