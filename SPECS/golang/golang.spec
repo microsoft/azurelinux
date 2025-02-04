@@ -27,6 +27,7 @@ Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.t
 Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         CVE-2024-45336.patch
+Patch2:         CVE-2024-45341.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -43,6 +44,7 @@ mv -v go go-bootstrap
 
 %setup -q -n go
 %patch 1 -p1
+%patch 2 -p1
 
 %build
 # Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
@@ -159,7 +161,7 @@ fi
 
 %changelog
 * Tue Feb 04 2025 Kanishk bansal <kanbansal@microsoft.com> - 1.22.7-2
-- Address CVE-2024-45336
+- Address CVE-2024-45336, CVE-2024-45341 using an upstream patch.
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.7-1
 - Auto-upgrade to 1.22.7 - Address CVE-2024-34158, CVE-2024-34156, CVE-2024-34155 
