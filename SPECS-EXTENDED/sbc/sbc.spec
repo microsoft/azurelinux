@@ -69,7 +69,7 @@ find %{buildroot} -type f -name "*.la" -delete
 %changelog
 * Wed Jan 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.0-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified 
+- License verified 
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
