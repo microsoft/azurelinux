@@ -82,6 +82,10 @@ popd
 %dir %{tools_pkg}/tools/osbuilder
 %{tools_pkg}/tools/osbuilder/Makefile
 
+%dir %{tools_pkg}/src/tarfs
+%{tools_pkg}/src/tarfs/Makefile
+%{tools_pkg}/src/tarfs/tarfs.c
+
 %dir %{tools_pkg}/tools/osbuilder/scripts
 %{tools_pkg}/tools/osbuilder/scripts/lib.sh
 
