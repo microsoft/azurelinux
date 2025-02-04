@@ -31,6 +31,7 @@ Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         CVE-2024-45336.patch
+Patch2:         CVE-2024-45341.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -51,6 +52,7 @@ mv -v go go-bootstrap-02
 
 %setup -q -n go
 %patch 1 -p1
+%patch 2 -p1
 
 %build
 # go 1.4 bootstraps with C.
@@ -157,7 +159,7 @@ fi
 
 %changelog
 * Sat Feb 1 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.23.3-2
-- Address CVE-2024-45336 using an upstream patch.
+- Address CVE-2024-45336, CVE-2024-45341 using an upstream patch.
 
 * Wed Jan 15 2025 Muhammad Falak <mwani@microsoft.com> - 1.23.3-1
 - Bump version to 1.23.3
