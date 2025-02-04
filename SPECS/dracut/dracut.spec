@@ -55,6 +55,7 @@ Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
 Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
 Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
 Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
+Patch:          avoid-mktemp-collisions-with-find-not-path.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
