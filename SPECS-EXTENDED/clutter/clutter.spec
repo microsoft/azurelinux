@@ -13,8 +13,8 @@ Version:       1.26.4
 Release:       15%{?dist}
 Summary:       Open Source software library for creating rich graphical user interfaces
 
-License:       LGPLv2+
-URL:           http://www.clutter-project.org/
+License:       LGPL-2.0-or-later
+URL:           https://www.clutter-project.org/
 Source0:       https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
 
 BuildRequires: gettext
