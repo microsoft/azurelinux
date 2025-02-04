@@ -8,7 +8,7 @@ Name:      tn5250
 Version:   0.17.6
 Release:   4%{?dist}
 # doc/tn5250*.1 are GPLv2+
-License:   LGPL-2.1-or-later AND GPL-2.0-or-later
+License:   LGPL-2.1-or-later
 URL:       https://github.com/tn5250/tn5250
 Source:    %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:   xt5250.desktop
