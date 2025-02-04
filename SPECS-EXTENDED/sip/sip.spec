@@ -1,9 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %bcond_without python3
-%if (0%{?fedora} && 0%{?fedora} < 32) || (0%{?rhel} && 0%{?rhel} < 9)
-%bcond_without python2
-%endif
 
 %if %{with python3}
 %{!?python3_inc:%global python3_inc %(%{__python3} -c "from distutils.sysconfig import get_python_inc; print(get_python_inc(1))")}
@@ -12,12 +9,7 @@ Distribution:   Azure Linux
 %{!?python2_sitearch:%global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 %{!?python2_inc:%global python2_inc %(%{__python2} -c "from distutils.sysconfig import get_python_inc; print get_python_inc(1)")}
 
-%if 0%{?fedora} > 31 || 0%{?rhel} > 8
 %global PYINCLUDE %{_includedir}/python%{python3_version}
-%else
-%global PYINCLUDE %{_includedir}/python%{python3_version}m
-%endif
-
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
@@ -29,30 +21,19 @@ Distribution:   Azure Linux
 
 # provide non-namespace python modules
 # needed by at least some legacy/non-qt consumers, e.g. pykde4
-%if 0%{?fedora} && 0%{?fedora} < 31
-%global no_namespace 1
-%endif
 
 # Stop building siplib for wx on F34+
-%if 0%{?fedora} && 0%{?fedora} >= 34
 %global wx_siplib 0
-%else
-%global wx_siplib 1
-%endif
 
-# Stop building PyQt5.sip on F35+
-%if 0%{?fedora} && 0%{?fedora} >= 35
 %global pyqt5_sip 0
-%else
-%global pyqt5_sip 1
-%endif
+
 Summary: SIP - Python/C++ Bindings Generator
 Name: sip
 Version: 4.19.25
 Release: 13%{?dist}
 
 # sipgen/parser.{c.h} is GPLv3+ with exceptions (bison)
-License: GPLv2 or GPLv3 and (GPLv3+ with exceptions)
+License: GPL-2.0-or-later OR GPL-3.0-or-later AND (GPL-3.0-or-later with exceptions)
 Url: https://www.riverbankcomputing.com/software
 Source0: https://www.riverbankcomputing.com/static/Downloads/sip/%{version}/sip-%{version}%{?snap:.%{snap}}.tar.gz
 
@@ -484,7 +465,7 @@ popd
 %changelog
 * Thu Jan 09 2025 <v-shettigara@microsoft.com> - 4.19.25-13
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified
+- License verified
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
