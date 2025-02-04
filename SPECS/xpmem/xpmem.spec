@@ -247,7 +247,7 @@ fi
 %endif
 
 %changelog
-* Tue Feb 04 2025 aperezguevar <aperezguevar@microsoft.com> - 2.7.4-5
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.7.4-5
 - Bump release to rebuild for new kernel release
 
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.7.4-4
