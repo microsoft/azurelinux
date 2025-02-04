@@ -4,21 +4,20 @@ Distribution:   Azure Linux
 %bcond_with anthy
 
 Name:           m17n-lib
-Version:        1.8.0
-Release:        8%{?dist}
+Version:        1.8.4
+Release:        1%{?dist}
 Summary:        Multilingual text library
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            http://www.nongnu.org/m17n/
 Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 Patch0:         %{name}-1.8.0-multilib.patch
-Patch1:         Fix-segmentation-fault-when-using-ibus-m17n-with-vi-telex-in-gedit-in-wayland.patch
 
 BuildRequires:  m17n-db-devel libthai-devel
-BuildRequires:  libxml2-devel
+BuildRequires:  libxml2-devel libXft-devel
 BuildRequires:  fontconfig-devel freetype-devel
 BuildRequires:  fribidi-devel gd-devel
-BuildRequires:  libotf-devel
+BuildRequires:  libXaw-devel libotf-devel
 BuildRequires:  autoconf gettext-devel
 BuildRequires:  automake libtool
 
@@ -117,6 +116,10 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libm17n-gui.so.*
 
 %changelog
+* Tue Dec 10 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.8.4-1
+- Upgraded to version 1.8.4
+- Verified license
+
 * Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 1.8.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove x11-related depdendencies
