@@ -105,7 +105,6 @@ then
 fi
 
 cache_tarball_name="$cache_name-$PKG_VERSION-govendor-v$VENDOR_VERSION.tar.gz"
-directory_name="$cache_name"
 
 if [[ -f "$tarball_name" ]]
 then
@@ -124,7 +123,12 @@ pushd "$temp_dir" &> /dev/null
     echo "Extracting $SRC_TARBALL."
 
     tar -xf "$SRC_TARBALL"
-    
+
+    directory_name=($(ls -d */))
+
+    # assume there is only one directory in the tarball
+    directory_name=${directory_name[0]%//}
+
     pushd "$directory_name" &> /dev/null
         echo "Fetching dependencies to a temporary cache in $directory_name."
         go mod vendor
