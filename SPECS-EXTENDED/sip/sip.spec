@@ -18,7 +18,6 @@ Distribution:   Azure Linux
 %global PYINCLUDE %{_includedir}/python%{python3_version}m
 %endif
 
-
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # trim changelog included in binary rpms
@@ -46,13 +45,14 @@ Distribution:   Azure Linux
 %else
 %global pyqt5_sip 1
 %endif
+
 Summary: SIP - Python/C++ Bindings Generator
 Name: sip
 Version: 4.19.25
 Release: 13%{?dist}
 
 # sipgen/parser.{c.h} is GPLv3+ with exceptions (bison)
-License: GPLv2 or GPLv3 and (GPLv3+ with exceptions)
+License: GPL-2.0-or-later OR GPL-3.0-or-later AND (GPL-3.0-or-later with exceptions)
 Url: https://www.riverbankcomputing.com/software
 Source0: https://www.riverbankcomputing.com/static/Downloads/sip/%{version}/sip-%{version}%{?snap:.%{snap}}.tar.gz
 
@@ -484,7 +484,7 @@ popd
 %changelog
 * Thu Jan 09 2025 <v-shettigara@microsoft.com> - 4.19.25-13
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified
+- License verified
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
