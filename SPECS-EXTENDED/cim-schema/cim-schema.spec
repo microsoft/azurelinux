@@ -102,7 +102,7 @@ cp -a %{SOURCE2} $RPM_BUILD_ROOT/%{_docdir}/%{name}
 
 %changelog
 * Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.54.1-6
-- CBL-Mariner import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.54.1-5
