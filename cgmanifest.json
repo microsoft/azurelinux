@@ -3698,8 +3698,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.3.tar.gz"
+          "version": "3.0.6",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.0.6.tar.gz"
         }
       }
     },
@@ -4290,8 +4290,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.39.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.39.4.tar.xz"
+          "version": "2.40.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.40.4.tar.gz"
         }
       }
     },
@@ -25574,8 +25574,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.16",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.16.tar.gz"
+          "version": "6.2.17",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.17.tar.gz"
         }
       }
     },
@@ -30063,7 +30063,7 @@
         "other": {
           "name": "xerces-c",
           "version": "3.2.4",
-          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
+          "downloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
         }
       }
     },
