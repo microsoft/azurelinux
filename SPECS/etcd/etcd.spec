@@ -71,7 +71,6 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
-    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input %{PATCH0}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -147,7 +146,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %changelog
 * Tue Feb 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.18-1
-- Auto-upgrade to 3.5.18 - Update to fix CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
+- Auto-upgrade to 3.5.18 - Upgrade to fix CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
 
 * Tue Dec 03 2024 bhapathak <bhapathak@microsoft.com> - 3.5.12-2
 - Patch CVE-2024-24786
@@ -155,7 +154,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 * Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.12-1
 - Auto-upgrade to 3.5.12 - none
 
-* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
+* Wed Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
 - Upgrade to 3.5.9 to match version required by kubernetes
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-12
