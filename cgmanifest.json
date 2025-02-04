@@ -1796,6 +1796,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cloud-provider-kubevirt",
+          "version": "0.5.1",
+          "downloadUrl": "https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v0.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cloud-utils-growpart",
           "version": "0.33",
           "downloadUrl": "https://github.com/canonical/cloud-utils/archive/refs/tags/0.33.tar.gz"
