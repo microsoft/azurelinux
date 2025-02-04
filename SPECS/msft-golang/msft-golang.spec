@@ -50,7 +50,7 @@ tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
 
 %setup -q -n go
-%autopatch -p1
+%patch 1 -p1
 
 %build
 # go 1.4 bootstraps with C.
