@@ -94,7 +94,7 @@ cp $SRC_TARBALL $tmpdir
 pushd $tmpdir > /dev/null
 
 PKG_NAME="application-gateway-kubernetes-ingress"
-NAME-VER="$PKG_NAME-$PKG_VERSION"
+NAME_VER="$PKG_NAME-$PKG_VERSION"
 VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
