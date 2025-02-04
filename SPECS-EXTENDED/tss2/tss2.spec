@@ -83,7 +83,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1:2.3.2-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License Verified
+- License verified
 
 * Thu Aug 15 2024 Ken Goldman <kgoldman@us.ibm.com> - 1:2.3.2-1
 - Trivial fixes for Fedora 41 Openssl 3.2.2 removal of SHA-1 signing
