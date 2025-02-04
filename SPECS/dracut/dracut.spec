@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        8%{?dist}
+Release:        9%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -315,6 +315,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Feb 04 2025 Brian Fjeldstad <bfjelds@microsoft.com> - 102-9
+- Avoid mktemp folder name colliding with find filter.
+
 * Mon Dec 09 2024 George Mileka <gmileka@microsoft.com> - 102-8
 - Augment overlayfs with selinux handling.
 
