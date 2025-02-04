@@ -1,21 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global	gem_name	flexmock
 
 Summary:	Mock object library for ruby
 Name:		rubygem-%{gem_name}
-Version:	2.3.6
-Release:	8%{?dist}
+Version:	3.0.1
+Release:	2%{?dist}
 License:	MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:		https://github.com/doudou/flexmock
-Source0:	https://github.com/doudou/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/doudou/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
-BuildRequires:	git
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(minitest) >= 5
 BuildRequires:	rubygem(rspec) >= 3
+BuildRequires:	git
 Requires:	ruby(rubygems)
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:	noarch
@@ -45,15 +45,37 @@ cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
 pushd %{buildroot}%{gem_instdir}
 rm -rf \
 	.autotest .gitignore .togglerc .travis.yml .yardopts \
+	.github \
 	Gemfile \
 	Rakefile \
 	flexmock.blurb \
 	flexmock.gemspec \
-	install.rb
+	install.rb \
+	test/ \
+	%{nil}
 popd
+
+rm -f %{buildroot}%{gem_cache}
+
+%check
+cp -a flexmock/test .%{gem_instdir}
+pushd .%{gem_instdir}
+
+export RUBYOPT=-W:deprecated
+export RUBYLIB=$(pwd)/lib:$(pwd):$(pwd)/test
+ruby \
+	-e 'Dir.glob("test/*_test.rb").each {|f| require f}'
+
+# Note: exclude failing tests for now
+rspec test/rspec_integration/ \
+	--exclude-pattern 'test/rspec_integration/spy_example_spec.rb' \
+	%{nil}
+popd
+
 
 %files
 %dir	%{gem_instdir}
+%license	%{gem_instdir}/LICENSE.txt
 %doc	%{gem_instdir}/[A-Z]*
 
 %{gem_libdir}
@@ -67,12 +89,57 @@ popd
 %{gem_docdir}/
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.6-8
-- Switch to building tar.gz instead of .gem
-- License verified
+* Thu Dec 19 2024 Akhila Guruju <v-guakhila@microsoft.com> - 3.0.1-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Sep 11 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.0.1-1
+- 3.0.1
+
+* Tue Sep 03 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.0.0-1
+- 3.0.0
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Aug 14 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.3.8-1
+- 2.3.8
+
+* Tue Aug 08 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.3.6-15
+- Handle MiniTest 5.19+
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 24 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.3.6-8
+- Patch to support ruby 3.0
+  - Use binding.source_location for test
+  - Properly accept argument and keywords
+  - Relax error message on test a bit
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
