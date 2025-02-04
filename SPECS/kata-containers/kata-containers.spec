@@ -10,7 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         tardev-sandboxing.patch
 
 ExclusiveArch: x86_64
 
@@ -62,7 +61,27 @@ START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
 
+%preun
+%systemd_preun tardev-snapshotter.service
+
+%postun
+%systemd_postun tardev-snapshotter.service
+
+%post
+%systemd_post tardev-snapshotter.service
+if [ $1 -eq 1 ]; then # Package install
+	systemctl enable tardev-snapshotter.service > /dev/null 2>&1 || :
+	systemctl start tardev-snapshotter.service > /dev/null 2>&1 || :
+fi
+
+
 %files
+%files
+%{_sbindir}/mount.tar
+%{_bindir}/kata-overlay
+%{_bindir}/tardev-snapshotter
+%{_unitdir}/tardev-snapshotter.service
+
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
@@ -119,6 +138,7 @@ popd
 %changelog
 * Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-2
 - Add systemd-udev and tarfs to enable virtio-blk with pod sandboxing
+- Add tardev-snapshotter
 
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
