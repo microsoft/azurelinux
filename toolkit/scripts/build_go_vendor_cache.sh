@@ -122,7 +122,7 @@ fi
 pushd "$temp_dir" &> /dev/null
     echo "Extracting $SRC_TARBALL."
 
-    tar -xf "$SRC_TARBALL"
+    tar -xf "$tarball_name"
 
     directory_name=($(ls -d */))
 
