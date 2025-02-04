@@ -120,7 +120,7 @@ else
 fi
 
 pushd "$temp_dir" &> /dev/null
-    echo "Extracting $SRC_TARBALL."
+    echo "Extracting $tarball_name."
 
     tar -xf "$tarball_name"
 
