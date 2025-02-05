@@ -1,0 +1,32 @@
+From 019f11544ad67fe991ffe4b899eb4002d38f65ba Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 5 Feb 2025 01:17:41 +0000
+Subject: [PATCH] TEMP: allocate entropy buffer in  jitterentropy
+
+---
+ crypto/jitterentropy.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index a358418459f9..e05b0a53934b 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -632,6 +632,15 @@ int jent_entropy_init(void *hash_state)
+ 	int count_mod = 0;
+ 	int count_stuck = 0;
+ 	struct rand_data ec = { 0 };
++	unsigned char ec_mem_buffer[JENT_MEMORY_SIZE] = { 0 };
++
++	/* Allocate memory for adding variations based on memory
++		* access
++		*/
++	ec.mem = ec_mem_buffer;
++	ec.memblocksize = JENT_MEMORY_BLOCKSIZE;
++	ec.memblocks = JENT_MEMORY_BLOCKS;
++	ec.memaccessloops = JENT_MEMORY_ACCESSLOOPS;
+ 
+ 	/* Required for RCT */
+ 	ec.osr = 3;
+-- 
+2.40.4
+
