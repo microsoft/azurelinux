@@ -10,9 +10,6 @@ ARG USER
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-# workaround till binaries rename is merged
-RUN [ -f /usr/bin/virt-cdi-controller ] && mv -f /usr/bin/virt-cdi-controller /usr/bin/cdi-controller
-
 #simple smoke test
 RUN ls /usr/bin/cdi-controller
 
