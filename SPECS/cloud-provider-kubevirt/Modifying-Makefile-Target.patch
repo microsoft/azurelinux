@@ -1,37 +1,48 @@
+From c4e25ef8d5e6c80f6ab5fbe2ce36c298a0737545 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Wed, 5 Feb 2025 15:06:06 -0800
+Subject: [PATCH] Adding new Makefile target
+
+---
+ Makefile | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
 diff --git a/Makefile b/Makefile
-index 7c023dc2..f9f2dfe4 100644
+index 7c023dc2..ca9a2f71 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -11,7 +11,7 @@ export BIN_DIR := bin
  GOLANGCI_LINT_VERSION ?= v1.52.2
-
+ 
  .PHONY: all
 -all: clean test build
 +all: clean deps-update test build
-
+ 
  .PHONY: start
  start:
 @@ -29,19 +29,20 @@ clean:
-        if [ -d bin ]; then rm -r bin; fi
-        go clean -modcache -i -x ./...
-
+ 	if [ -d bin ]; then rm -r bin; fi
+ 	go clean -modcache -i -x ./...
+ 
 -.PHONY:deps-update
 +.PHONY: deps-update
  deps-update:
-        go mod tidy
-+       go mod vendor
-
+ 	go mod tidy
++	go mod vendor
+ 
  bin:
-        mkdir bin
-
+ 	mkdir bin
+ 
  .PHONY: test
 -test:
 +test: deps-update
-        go test ./pkg/...
-
+ 	go test ./pkg/...
+ 
  .PHONY: build
 -build: bin
 +build: deps-update bin
-        CGO_ENABLED=0 GOOS=linux go build -mod vendor -ldflags="-s -w" -o bin/kubevirt-cloud-controller-manager ./cmd/kubevirt-cloud-controller-manager
-
+ 	CGO_ENABLED=0 GOOS=linux go build -mod vendor -ldflags="-s -w" -o bin/kubevirt-cloud-controller-manager ./cmd/kubevirt-cloud-controller-manager
+ 
  .PHONY:image
+-- 
+2.45.2
