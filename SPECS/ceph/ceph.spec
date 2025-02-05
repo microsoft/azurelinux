@@ -22,6 +22,7 @@ Patch7:         CVE-2012-2677.patch
 Patch8:         CVE-2020-10723.patch
 Patch9:         CVE-2021-3672.patch
 Patch10:        CVE-2020-10722.patch
+Patch11:        CVE-2024-25629.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2015,6 +2016,7 @@ exit 0
 - Fix for CVE-2020-10723
 - Fix for CVE-2021-3672
 - Fix for CVE-2020-10722
+- Fix for CVE-2024-25629
 
 * Tue Jan 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-4
 - Fix for CVE-2014-5461
