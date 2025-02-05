@@ -55,7 +55,7 @@ rm -v %{buildroot}%{gem_cache}
 %changelog
 * Wed Oct 30 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.4.3-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified
+- License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
