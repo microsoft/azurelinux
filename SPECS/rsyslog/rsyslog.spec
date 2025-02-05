@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2308.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Source3:        rsyslog.conf
 # Upstream only publishes built docs for base_version.0
 Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{base_version}.0.tar.gz
 Source5:        rsyslog.logrotate
+Patch0:         issue5158.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -80,6 +81,7 @@ BuildRequires: net-snmp-devel
 %prep
 # Unpack the code source tarball
 %setup -q
+%patch 0 -p1
 # Unpack the documentation tarball in the folder created above
 %setup -q -a 4 -T -D
 # Remove documentation sources
@@ -202,6 +204,9 @@ fi
 %{_libdir}/rsyslog/omsnmp.so
 
 %changelog
+* Tue Feb 04 2025 Andrew Phelps <anphel@microsoft.com> - 8.2308.0-4
+- Add patch to fix upstream issue #5158
+
 * Thu Feb 29 2024 Henry Beberman <henry.beberman@microsoft.com> - 8.2308.0-3
 - Move snmp libraries into subpackage to remove strict dependency on net-snmp-libs/perl
 
