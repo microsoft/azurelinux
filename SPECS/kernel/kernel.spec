@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.64.2
-Release:        1004%{?dist}
+Release:        1005%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,7 @@ Patch1:         0001-TOBIASB-hard-code-osr-to-3.patch
 Patch2:         0001-TEMP-allocate-entropy-buffer-in-jitterentropy.patch
 Patch3:         0001-TOBIASB-RCT-vs-APT-failure.patch
 Patch4:         0001-TOBIASB-debug-info-for-apt-failure.patch
+Patch5:         0001-TOBIASB-heap-allocation.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -180,6 +181,7 @@ manipulation of eBPF programs and maps.
 %patch 2 -p1
 %patch 3 -p1
 %patch 4 -p1
+%patch 5 -p1
 make mrproper
 
 cp %{config_source} .config

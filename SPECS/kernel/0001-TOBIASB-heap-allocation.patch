@@ -1,0 +1,117 @@
+From 08f833f0a497a028ad7b56606342d66bff1eea25 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 5 Feb 2025 04:33:53 +0000
+Subject: [PATCH] TOBIASB: heap allocation
+
+---
+ crypto/jitterentropy.c | 53 ++++++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
+
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index f1444592be07..82283a509139 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -124,6 +124,7 @@ struct rand_data {
+ #define JENT_EHEALTH		9 /* Health test failed during initialization */
+ #define TOBIASB_JENT_RCT 10 /*TOBIASB: RCT failure*/
+ #define TOBIASB_JENT_APT 11 /*TOBIASB: APT failure*/
++#define TOBIASB_JENT_NOMEM 12 /*TOBIASB: Memory allocation failure*/
+ 
+ /*
+  * The output n bits can receive more than n bits of min entropy, of course,
+@@ -634,20 +635,24 @@ int jent_entropy_init(void *hash_state)
+ 	int time_backwards = 0;
+ 	int count_mod = 0;
+ 	int count_stuck = 0;
+-	struct rand_data ec = { 0 };
+-	unsigned char ec_mem_buffer[JENT_MEMORY_SIZE] = { 0 };
++	struct rand_data *ec = jent_entropy_collector_alloc(3, 0, hash_state);
++	if (!ec)
++		return TOBIASB_JENT_NOMEM;
++
++	// struct rand_data ec = { 0 };
++	// unsigned char ec_mem_buffer[JENT_MEMORY_SIZE] = { 0 };
+ 
+-	/* Allocate memory for adding variations based on memory
+-		* access
+-		*/
+-	ec.mem = ec_mem_buffer;
+-	ec.memblocksize = JENT_MEMORY_BLOCKSIZE;
+-	ec.memblocks = JENT_MEMORY_BLOCKS;
+-	ec.memaccessloops = JENT_MEMORY_ACCESSLOOPS;
++	// /* Allocate memory for adding variations based on memory
++	// 	* access
++	// 	*/
++	// ec.mem = ec_mem_buffer;
++	// ec.memblocksize = JENT_MEMORY_BLOCKSIZE;
++	// ec.memblocks = JENT_MEMORY_BLOCKS;
++	// ec.memaccessloops = JENT_MEMORY_ACCESSLOOPS;
+ 
+-	/* Required for RCT */
+-	ec.osr = 3;
+-	ec.hash_state = hash_state;
++	// /* Required for RCT */
++	// ec.osr = 3;
++	// ec.hash_state = hash_state;
+ 
+ 	/* We could perform statistical tests here, but the problem is
+ 	 * that we only have a few loop counts to do testing. These
+@@ -684,8 +689,8 @@ int jent_entropy_init(void *hash_state)
+ 
+ 		/* Invoke core entropy collection logic */
+ 		jent_get_nstime(&time);
+-		ec.prev_time = time;
+-		jent_condition_data(&ec, time, 0);
++		ec->prev_time = time;
++		jent_condition_data(ec, time, 0);
+ 		jent_get_nstime(&time2);
+ 
+ 		/* test whether timer works */
+@@ -700,7 +705,7 @@ int jent_entropy_init(void *hash_state)
+ 		if (!delta)
+ 			return JENT_ECOARSETIME;
+ 
+-		stuck = jent_stuck(&ec, delta);
++		stuck = jent_stuck(ec, delta);
+ 
+ 		/*
+ 		 * up to here we did not modify any variable that will be
+@@ -726,25 +731,27 @@ int jent_entropy_init(void *hash_state)
+ 			 * floor((TESTLOOPCOUNT * 0.9) / 64) == 14 times.
+ 			 */
+ 			if ((nonstuck % JENT_APT_WINDOW_SIZE) == 0) {
+-				jent_apt_reset(&ec,
++				jent_apt_reset(ec,
+ 					       delta & JENT_APT_WORD_MASK);
+ 			}
+ 		}
+ 
+ 		/* Validate health test result */
+-		if (jent_rct_failure(&ec)) {
++		if (jent_rct_failure(ec)) {
+ 			return TOBIASB_JENT_RCT;
+ 		}
+ 
+-		if (jent_apt_failure(&ec)) {
+-			pr_info("TOBIASB: jitterentropy: ec.apt_count: %u\n", ec.apt_count);
+-			pr_info("TOBIASB: jitterentropy: ec.apt_observations: %u\n", ec.apt_observations);
+-			pr_info("TOBIASB: jitterentropy: ec.osr: %u\n", ec.osr);
+-			pr_info("TOBIASB: jitterentropy: ec.mem: %p\n", ec.mem);
++		if (jent_apt_failure(ec)) {
++			pr_info("TOBIASB: jitterentropy: heap alloc\n");
++			pr_info("TOBIASB: jitterentropy: ec.apt_count: %u\n", ec->apt_count);
++			pr_info("TOBIASB: jitterentropy: ec.apt_observations: %u\n", ec->apt_observations);
++			pr_info("TOBIASB: jitterentropy: ec.osr: %u\n", ec->osr);
++			pr_info("TOBIASB: jitterentropy: ec.mem: %p\n", ec->mem);
++			jent_entropy_collector_free(ec);
+ 			return TOBIASB_JENT_APT;
+ 		}
+ 
+-		if (jent_health_failure(&ec))
++		if (jent_health_failure(ec))
+ 			return JENT_EHEALTH;
+ 
+ 		/* test whether we have an increasing timer */
+-- 
+2.40.4
+
