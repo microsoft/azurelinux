@@ -34,6 +34,7 @@ exposed through services in the UnderKube.
 
 %build
 export GOPATH=%{our_gopath}
+export GOFLAGS="-mod=mod"
 make build
 
 %install
