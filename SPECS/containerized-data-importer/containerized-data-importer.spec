@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        4%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,11 @@ URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-3727.patch
 Patch1:         CVE-2022-2879.patch
+Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2024-45338.patch
+Patch4:         CVE-2023-39325.patch
+Patch5:         CVE-2023-44487.patch
+Patch6:         CVE-2024-28180.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -115,26 +120,30 @@ tar --strip-components=1 -xf %{SOURCE0}
 %build
 
 export GOPATH=%{_builddir}/go
-export GOFLAGS+="-buildmode=pie -mod=vendor"
-env \
-CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
-CDI_GIT_COMMIT='v%{version}' \
-CDI_GIT_VERSION='v%{version}' \
-CDI_GIT_TREE_STATE="clean" \
-./hack/build/build-go.sh build \
-	cmd/cdi-apiserver \
-	cmd/cdi-cloner \
-	cmd/cdi-controller \
-	cmd/cdi-importer \
-	cmd/cdi-uploadproxy \
-	cmd/cdi-uploadserver \
-	cmd/cdi-operator \
-	tools/cdi-containerimage-server \
-	tools/cdi-image-size-detection \
-	tools/cdi-source-update-poller \
-	tools/csv-generator \
-	%{nil}
+export GOFLAGS="-mod=vendor"
+export CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)"
+export CDI_GIT_COMMIT='v%{version}'
+export CDI_GIT_VERSION='v%{version}'
+export CDI_GIT_TREE_STATE="clean"
 
+GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
+    cmd/cdi-apiserver \
+    cmd/cdi-cloner \
+    cmd/cdi-controller \
+    cmd/cdi-importer \
+    cmd/cdi-uploadproxy \
+    cmd/cdi-uploadserver \
+    cmd/cdi-operator \
+    tools/cdi-image-size-detection \
+    tools/cdi-source-update-poller \
+    tools/csv-generator \
+    %{nil}
+
+# Disable cgo to build static binaries, so they can run on scratch images
+CGO_ENABLED=0 ./hack/build/build-go.sh build \
+    tools/cdi-containerimage-server \
+    %{nil}
+ 
 ./hack/build/build-manifests.sh
 
 %install
@@ -217,6 +226,21 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-9
+- Fix CVE-2024-28180 with an upstream patch
+
+* Fri Jan 24 2025 Henry Li <lihl@microsoft.com> - 1.57.0-8
+- Add patch for CVE-2023-39325 and CVE-2023-44487
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.57.0-7
+- Add patch for CVE-2024-45338
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.57.0-6
+- Fix CVE-2024-24786
+
+* Fri Sep 06 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-5
+- Statically building binaries
+
 * Fri Jul 19 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-4
 - Building cdi tool binaries within package build
 

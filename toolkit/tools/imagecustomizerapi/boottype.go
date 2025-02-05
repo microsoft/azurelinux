@@ -10,13 +10,14 @@ import (
 type BootType string
 
 const (
+	BootTypeNone   BootType = ""
 	BootTypeEfi    BootType = "efi"
 	BootTypeLegacy BootType = "legacy"
 )
 
 func (t BootType) IsValid() error {
 	switch t {
-	case BootTypeEfi, BootTypeLegacy:
+	case BootTypeNone, BootTypeEfi, BootTypeLegacy:
 		// All good.
 		return nil
 

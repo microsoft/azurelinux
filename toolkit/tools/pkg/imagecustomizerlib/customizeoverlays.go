@@ -176,7 +176,7 @@ func addEquivalencyRules(selinuxMode imagecustomizerapi.SELinuxMode,
 
 	for _, overlay := range overlays {
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "sudo", "semanage", "fcontext", "-a", "-e", overlay.MountPoint, overlay.UpperDir)
+			return shell.ExecuteLiveWithErr(1, "semanage", "fcontext", "-a", "-e", overlay.MountPoint, overlay.UpperDir)
 		})
 		if err != nil {
 			return fmt.Errorf("failed to add equivalency rule between %s and %s:\n%w", overlay.MountPoint, overlay.UpperDir, err)

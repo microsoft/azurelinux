@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.8.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,8 @@ Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-6197.patch
+Patch1:         CVE-2024-8096.patch
+Patch2:         CVE-2024-9681.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
@@ -86,6 +88,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Fri Jan 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.8.0-4
+- Fix for CVE-2024-9681
+
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-3
+- Address CVE-2024-8096
+
 * Wed Sep 11 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 8.8.0-2
 - Patch CVE-2024-6197
 

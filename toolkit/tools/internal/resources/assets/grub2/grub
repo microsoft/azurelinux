@@ -2,9 +2,9 @@ GRUB_TIMEOUT=0
 GRUB_DISTRIBUTOR="AzureLinux"
 GRUB_DISABLE_SUBMENU=y
 GRUB_TERMINAL_OUTPUT="console"
-GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.ReadOnlyVerityRoot}} {{.SELinux}} {{.FIPS}} rd.auto=1 net.ifnames=0 lockdown=integrity {{.CGroup}}"
+GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.SELinux}} {{.FIPS}} rd.auto=1 net.ifnames=0 lockdown=integrity {{.CGroup}}"
 GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} \$kernelopts"
-    
+
 # =============================notice===============================
 # IMPORTANT: package and feature-specific behaviors are defined in
 #   /etc/default/grub.d/*.cfg. The cfg files are sourced last
@@ -13,7 +13,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} \$kernelopts"
 #   Linux commandline is:
 #     - first GRUB_CMDLINE_LINUX
 #     - then /etc/default/grub.d/*.cfg
-#     - and finally GRUB_CMDLINE_LINUX_DEFAULT 
+#     - and finally GRUB_CMDLINE_LINUX_DEFAULT
 # =============================notice===============================
 for x in /etc/default/grub.d/*.cfg ; do
     if [ -e "${x}" ]; then

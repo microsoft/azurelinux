@@ -1,8 +1,8 @@
-%define         commit_hash 51d5e94601ceffbbd85688df1c928ecccbfa4685
+%define         commit_hash 7cb363254b69e10320360b63fb73e0ffb5da7bf2
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.1.12
+Version:        1.2.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -43,6 +43,13 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Mon Nov 25 2024 Nan Liu <liunan@microsoft.com> - 1.2.2-1
+- Bump version to 1.2.2
+- Remove the golang version constraint
+
+* Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.1.12-2
+- Pin golang version to <= 1.22
+
 * Mon Feb 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.1.12-1
 - Bump version to 1.1.12
 - Drop cgroups cpuset patch because it's included upstream now

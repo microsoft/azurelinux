@@ -11,7 +11,7 @@ Distribution:  Azure Linux
 Summary:       Xwayland
 Name:          xorg-x11-server-Xwayland
 Version:       24.1.1
-Release:       2%{?dist}
+Release:       3%{?dist}
  
 License:       MIT
 URL:           http://www.x.org
@@ -20,6 +20,7 @@ Source0:       https://gitlab.freedesktop.org/xorg/%{pkgname}/-/archive/%{commit
 %else
 Source0:       https://www.x.org/pub/individual/xserver/%{pkgname}-%{version}.tar.xz
 %endif
+Patch0001:      CVE-2024-9632.patch
  
 Requires:      xkeyboard-config
 Requires:      xkbcomp
@@ -29,6 +30,7 @@ Requires:      libepoxy >= 1.5.5
 BuildRequires: gcc
 BuildRequires: git-core
 BuildRequires: meson
+BuildRequires: systemd-devel
  
 BuildRequires: wayland-devel
 BuildRequires: desktop-file-utils
@@ -136,6 +138,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/xwayland.pc
  
 %changelog
+* Thu Nov 14 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 24.1.1-3
+- Fix for CVE-2024-9632
+- Added systemd-devel build requires dependency
+
 * Wed Jul 10 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 24.1.1-2
 - Initial CBL-Mariner import from Fedora 41 (license: MIT).
 - License verified.

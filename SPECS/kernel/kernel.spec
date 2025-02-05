@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.51.1
-Release:        5%{?dist}
+Version:        6.6.64.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
@@ -120,6 +120,15 @@ Requires:       %{name} = %{version}-%{release}
 
 %description drivers-gpu
 This package contains the Linux kernel gpu support
+
+%package drivers-intree-amdgpu
+Summary:        Kernel amdgpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-drivers-gpu = %{version}-%{release}
+
+%description drivers-intree-amdgpu
+This package contains the Linux kernel in-tree AMD gpu support
 
 %package drivers-sound
 Summary:        Kernel Sound modules
@@ -327,6 +336,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
+%post drivers-intree-amdgpu
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -365,6 +377,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files drivers-gpu
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/gpu
+%exclude /lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
+
+%files drivers-intree-amdgpu
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
 
 %files drivers-sound
 %defattr(-,root,root)
@@ -407,6 +424,50 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.2-1
+- Auto-upgrade to 6.6.64.2
+
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+- Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
+
+* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
+- Enable CONFIG_INTEL_TDX_GUEST and CONFIG_TDX_GUEST_DRIVER
+
+* Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
+- Bump release to match kernel-64k
+
+* Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
+- Enable ICE ethernet driver
+
+* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
+- Make CONFIG_DRM and its dependency KConfigs as loadable modules
+- Create sub-package for AMD GPU in-tree modules to avoid conflicts with out-of-tree modules
+
+* Tue Nov 05 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-3
+- Enable kexec signature verification
+- Introduce new azurelinux-ca-20230216.pem
+
+* Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
+- UKI: remove noxsaves parameter from cmdline
+
+* Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
+- Auto-upgrade to 6.6.57.1
+
+* Thu Oct 24 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-5
+- Enable Arm FF-A Support
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-4
+- Remove Amateur Radio X.25 PLP Rose for CVE-2022-2961
+
+* Wed Oct 23 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-3
+- Enable Intel IFS
+
+* Tue Oct 22 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-2
+- Enable CONFIG_X86_AMD_PLATFORM_DEVICE built-in
+
+* Thu Oct 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.56.1-1
+- Auto-upgrade to 6.6.56.1
+
 * Thu Oct 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.51.1-5
 - Make e1000 drivers modules instead of built-in
 - Enable virtio console by default

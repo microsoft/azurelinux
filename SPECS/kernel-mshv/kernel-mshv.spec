@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.157.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -91,7 +91,7 @@ sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=%{arch} olddefconfig
 
 %build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+make VERBOSE=1 V=1 KBUILD_VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -224,6 +224,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 5.15.157.mshv1-3
+- Increase build verbosity
+
 * Mon Jul 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.157.mshv1-2
 - Update config to enable PSI for cgroup-memory-telemetry
 

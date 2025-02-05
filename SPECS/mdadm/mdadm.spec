@@ -1,163 +1,43 @@
 %bcond_with libreport
 
-Name:        mdadm
-Version:     4.2
-Release:     7%{?dist}
-Summary:     The mdadm program controls Linux md devices (software RAID arrays)
-URL:         http://www.kernel.org/pub/linux/utils/raid/mdadm/
-Vendor:      Microsoft Corporation
+Name:         mdadm
+Version:      4.3
+Release:      1%{?dist}
+Summary:      The mdadm program controls Linux md devices (software RAID arrays)
+Vendor:       Microsoft Corporation
 Distribution: Azure Linux
-License:     GPLv2+
-
-Source:      http://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}.tar.gz
-Source1:     raid-check
-Source2:     mdadm-raid-check-sysconfig
-Source3:     mdmonitor.service
-Source4:     mdadm.conf
-Source5:     mdadm_event.conf
-Source6:     raid-check.timer
-Source7:     raid-check.service
-Source8:     mdcheck
-
-Patch000:    0001-Unify-error-message.patch
-Patch001:    0002-mdadm-Fix-double-free.patch
-Patch002:    0003-Grow_reshape-Add-r0-grow-size-error-message-and-upda.patch
-Patch003:    0004-udev-adapt-rules-to-systemd-v247.patch
-Patch004:    0005-Replace-error-prone-signal-with-sigaction.patch
-Patch005:    0006-mdadm-Respect-config-file-location-in-man.patch
-Patch006:    0007-mdadm-Update-ReadMe.patch
-Patch007:    0008-mdadm-Update-config-man-regarding-default-files-and-.patch
-Patch008:    0009-mdadm-Update-config-manual.patch
-Patch009:    0010-Create-Build-use-default_layout.patch
-Patch010:    0011-mdadm-add-map_num_s.patch
-Patch011:    0012-mdadm-systemd-remove-KillMode-none-from-service-file.patch
-Patch012:    0013-mdmon-Stop-parsing-duplicate-options.patch
-Patch013:    0014-Grow-block-n-on-external-volumes.patch
-Patch014:    0015-Incremental-Fix-possible-memory-and-resource-leaks.patch
-Patch015:    0016-Mdmonitor-Fix-segfault.patch
-Patch016:    0017-Mdmonitor-Improve-logging-method.patch
-Patch017:    0018-Fix-possible-NULL-ptr-dereferences-and-memory-leaks.patch
-Patch018:    0019-imsm-Remove-possibility-for-get_imsm_dev-to-return-N.patch
-Patch019:    0020-Revert-mdadm-fix-coredump-of-mdadm-monitor-r.patch
-Patch020:    0021-util-replace-ioctl-use-with-function.patch
-Patch021:    0022-mdadm-super1-restore-commit-45a87c2f31335-to-fix-clu.patch
-Patch022:    0023-imsm-introduce-get_disk_slot_in_dev.patch
-Patch023:    0024-imsm-use-same-slot-across-container.patch
-Patch024:    0025-imsm-block-changing-slots-during-creation.patch
-Patch025:    0026-mdadm-block-update-ppl-for-non-raid456-levels.patch
-Patch026:    0027-mdadm-Fix-array-size-mismatch-after-grow.patch
-Patch027:    0028-mdadm-Remove-dead-code-in-imsm_fix_size_mismatch.patch
-Patch028:    0029-Monitor-use-devname-as-char-array-instead-of-pointer.patch
-Patch029:    0030-Monitor-use-snprintf-to-fill-device-name.patch
-Patch030:    0031-Makefile-Don-t-build-static-build-with-everything-an.patch
-Patch031:    0032-DDF-Cleanup-validate_geometry_ddf_container.patch
-Patch032:    0033-DDF-Fix-NULL-pointer-dereference-in-validate_geometr.patch
-Patch033:    0034-mdadm-Grow-Fix-use-after-close-bug-by-closing-after-.patch
-Patch034:    0035-monitor-Avoid-segfault-when-calling-NULL-get_bad_blo.patch
-Patch035:    0036-mdadm-Fix-mdadm-r-remove-option-regression.patch
-Patch036:    0037-mdadm-Fix-optional-write-behind-parameter.patch
-Patch037:    0038-tests-00raid0-add-a-test-that-validates-raid0-with-l.patch
-Patch038:    0039-tests-fix-raid0-tests-for-0.90-metadata.patch
-Patch039:    0040-tests-04update-metadata-avoid-passing-chunk-size-to-.patch
-Patch040:    0041-tests-02lineargrow-clear-the-superblock-at-every-ite.patch
-Patch041:    0042-mdadm-test-Add-a-mode-to-repeat-specified-tests.patch
-Patch042:    0043-mdadm-test-Mark-and-ignore-broken-test-failures.patch
-Patch043:    0044-tests-Add-broken-files-for-all-broken-tests.patch
-Patch044:    0045-mdadm-Replace-obsolete-usleep-with-nanosleep.patch
-Patch045:    0046-tests-00readonly-Run-udevadm-settle-before-setting-r.patch
-Patch046:    0047-tests-add-test-for-names.patch
-Patch047:    0048-mdadm-remove-symlink-option.patch
-Patch048:    0049-mdadm-move-data_offset-to-struct-shape.patch
-Patch049:    0050-mdadm-Don-t-open-md-device-for-CREATE-and-ASSEMBLE.patch
-Patch050:    0051-Grow-Split-Grow_reshape-into-helper-function.patch
-Patch051:    0052-Assemble-check-if-device-is-container-before-schedul.patch
-Patch052:    0053-super1-report-truncated-device.patch
-Patch053:    0054-mdadm-Correct-typos-punctuation-and-grammar-in-man.patch
-Patch054:    0055-Manage-Block-unsafe-member-failing.patch
-Patch055:    0056-Monitor-Fix-statelist-memory-leaks.patch
-Patch056:    0057-mdadm-added-support-for-Intel-Alderlake-RST-on-VMD-p.patch
-Patch057:    0058-mdadm-Add-Documentation-entries-to-systemd-services.patch
-Patch058:    0059-ReadMe-fix-command-line-help.patch
-Patch059:    0060-mdadm-replace-container-level-checking-with-inline.patch
-Patch060:    0061-Mdmonitor-Omit-non-md-devices.patch
-Patch061:    0062-Mdmonitor-Split-alert-into-separate-functions.patch
-Patch062:    0063-Monitor-block-if-monitor-modes-are-combined.patch
-Patch063:    0064-Update-mdadm-Monitor-manual.patch
-Patch064:    0065-Grow-fix-possible-memory-leak.patch
-Patch065:    0066-mdadm-create-ident_init.patch
-Patch066:    0067-mdadm-Add-option-validation-for-update-subarray.patch
-Patch067:    0068-Fix-update-subarray-on-active-volume.patch
-Patch068:    0069-Add-code-specific-update-options-to-enum.patch
-Patch069:    0070-super-ddf-Remove-update_super_ddf.patch
-Patch070:    0071-super0-refactor-the-code-for-enum.patch
-Patch071:    0072-super1-refactor-the-code-for-enum.patch
-Patch072:    0073-super-intel-refactor-the-code-for-enum.patch
-Patch073:    0074-Change-update-to-enum-in-update_super-and-update_sub.patch
-Patch074:    0075-Manage-Incremental-code-refactor-string-to-enum.patch
-Patch075:    0076-Change-char-to-enum-in-context-update-refactor-code.patch
-Patch076:    0077-mdmon-fix-segfault.patch
-Patch077:    0078-util-remove-obsolete-code-from-get_md_name.patch
-Patch078:    0079-mdadm-udev-Don-t-handle-change-event-on-raw-devices.patch
-Patch079:    0080-Manage-do-not-check-array-state-when-drive-is-remove.patch
-Patch080:    0081-incremental-manage-do-not-verify-if-remove-is-safe.patch
-Patch081:    0082-super-intel-make-freesize-not-required-for-chunk-siz.patch
-Patch082:    0083-manage-move-comment-with-function-description.patch
-Patch083:    0084-Revert-mdadm-systemd-remove-KillMode-none-from-servi.patch
-Patch084:    0085-Grow-fix-can-t-change-bitmap-type-from-none-to-clust.patch
-Patch085:    0086-Fix-NULL-dereference-in-super_by_fd.patch
-Patch086:    0087-Mdmonitor-Make-alert_info-global.patch
-Patch087:    0088-Mdmonitor-Pass-events-to-alert-using-enums-instead-o.patch
-Patch088:    0089-Mdmonitor-Add-helper-functions.patch
-Patch089:    0090-Add-helpers-to-determine-whether-directories-or-file.patch
-Patch090:    0091-Mdmonitor-Refactor-write_autorebuild_pid.patch
-Patch091:    0092-Mdmonitor-Refactor-check_one_sharer-for-better-error.patch
-Patch092:    0093-util.c-reorder-code-lines-in-parse_layout_faulty.patch
-Patch093:    0094-util.c-fix-memleak-in-parse_layout_faulty.patch
-Patch094:    0095-Detail.c-fix-memleak-in-Detail.patch
-Patch095:    0096-isuper-intel.c-fix-double-free-in-load_imsm_mpb.patch
-Patch096:    0097-super-intel.c-fix-memleak-in-find_disk_attached_hba.patch
-Patch097:    0098-super-ddf.c-fix-memleak-in-get_vd_num_of_subarray.patch
-Patch098:    0099-Create-goto-abort_locked-instead-of-return-1-in-erro.patch
-Patch099:    0100-Create-remove-safe_mode_delay-local-variable.patch
-Patch100:    0101-Create-Factor-out-add_disks-helpers.patch
-Patch101:    0102-mdadm-Introduce-pr_info.patch
-Patch102:    0103-mdadm-Add-write-zeros-option-for-Create.patch
-Patch103:    0104-tests-00raid5-zero-Introduce-test-to-exercise-write-.patch
-Patch104:    0105-manpage-Add-write-zeroes-option-to-manpage.patch
-Patch105:    0106-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch
-Patch106:    0107-Use-existence-of-etc-initrd-release-to-detect-initrd.patch
-Patch107:    0108-mdmon-don-t-test-both-all-and-container_name.patch
-Patch108:    0109-mdmon-change-systemd-unit-file-to-use-foreground.patch
-Patch109:    0110-mdmon-Remove-need-for-KillMode-none.patch
-Patch110:    0111-mdmon-Improve-switchroot-interactions.patch
-Patch111:    0112-mdopen-always-try-create_named_array.patch
-Patch112:    0113-Improvements-for-IMSM_NO_PLATFORM-testing.patch
-Patch113:    0114-Revert-Revert-mdadm-systemd-remove-KillMode-none-fro.patch
-Patch114:    0115-Create-Fix-checking-for-container-in-update_metadata.patch
-Patch115:    0116-Fix-null-pointer-for-incremental-in-mdadm.patch
-Patch116:    0117-super1-fix-truncation-check-for-journal-device.patch
-Patch117:    0118-Fix-some-cases-eyesore-formatting.patch
-Patch118:    0119-Bump-minimum-kernel-version-to-2.6.32.patch
-Patch119:    0120-Remove-the-config-files-in-mdcheck_start-continue-se.patch
+URL:          http://www.kernel.org/pub/linux/utils/raid/mdadm/
+License:      GPLv2+
+Source0:      https://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}.tar.gz
+Source1:      raid-check
+Source2:      mdadm-raid-check-sysconfig
+Source3:      mdmonitor.service
+Source4:      mdadm.conf
+Source5:      mdadm_event.conf
+Source6:      raid-check.timer
+Source7:      raid-check.service
+Source8:      mdcheck
 
 # Fedora customization patches
-Patch197:    mdadm-udev.patch
-Patch198:    mdadm-2.5.2-static.patch
-# Build without -Werror.
-Patch199:    disable-Werror.patch
+Patch0:       mdadm-udev.patch
+Patch1:       mdadm-2.5.2-static.patch
 
-BuildRequires: make
-BuildRequires: glibc-static >= 2.38-8%{?dist}
-BuildRequires: systemd-rpm-macros
-BuildRequires: binutils-devel
-BuildRequires: gcc
-BuildRequires: systemd-devel
+
+BuildRequires:    make
+BuildRequires:    systemd-rpm-macros
+BuildRequires:    binutils-devel
+BuildRequires:    gcc
+BuildRequires:    systemd-devel
+BuildRequires:    mandoc
 %if %{with libreport}
-Requires:       libreport-filesystem
+Requires:         libreport-filesystem
 %endif
-Requires(post): systemd coreutils
-Requires(preun): systemd
-Requires(postun): systemd coreutils
+Requires(preun):  systemd
+Requires(post):   coreutils
+Requires(post):   systemd
+Requires(postun): coreutils
+Requires(postun): systemd
+
 
 %description
 The mdadm program is used to create, manage, and monitor Linux MD (software
@@ -166,61 +46,84 @@ package.  However, mdadm is a single program, and it can perform
 almost all functions without a configuration file, though a configuration
 file can be used to help with some common tasks.
 
+
 %prep
-%autosetup -p1 -n %{name}-%{version}%{?subversion:_%{subversion}}
+%autosetup -p1
+
 
 %build
-make %{?_smp_mflags} CXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" SYSCONFDIR="%{_sysconfdir}" mdadm mdmon
+%make_build CXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" SYSCONFDIR="%{_sysconfdir}" mdadm mdmon
+
 
 %install
-make DESTDIR=%{buildroot} MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=%{_libdir}/udev/ install install-systemd
+%make_install MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=%{_prefix}/lib/udev/ install install-systemd
 install -Dp -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/raid-check
 install -Dp -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/raid-check
-mkdir -p -m 710 %{buildroot}/run/mdadm
-mkdir -p -m 700 %{buildroot}/usr/share/mdadm
-install -Dp -m 755 %{SOURCE8} %{buildroot}/usr/share/mdadm/mdcheck
+mkdir -p -m 710 %{buildroot}/run/%{name}
+mkdir -p -m 700 %{buildroot}%{_datadir}/%{name}
+install -Dp -m 755 %{SOURCE8} %{buildroot}%{_datadir}/%{name}/mdcheck
 
 # systemd
-mkdir -p %{buildroot}%{_unitdir}
-install -m644 %{SOURCE3} %{buildroot}%{_unitdir}
-install -m644 %{SOURCE6} %{buildroot}%{_unitdir}
-install -m644 %{SOURCE7} %{buildroot}%{_unitdir}
+install -Dm644 %{SOURCE3} %{buildroot}%{_unitdir}
+install -Dm644 %{SOURCE6} %{buildroot}%{_unitdir}
+install -Dm644 %{SOURCE7} %{buildroot}%{_unitdir}
 
 # tmpfile
-mkdir -p %{buildroot}%{_tmpfilesdir}
-install -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -Dm 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 mkdir -p %{buildroot}%{_localstatedir}/run/
 install -d -m 0710 %{buildroot}/run/%{name}/
 
 # abrt
-mkdir -p %{buildroot}/etc/libreport/events.d
-install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
+%if %{with libreport}
+install -Dm644 %{SOURCE5} %{buildroot}%{_sysconfdir}/libreport/events.d/%{name}_event.conf
+%endif
 
 %post
 %systemd_post mdmonitor.service raid-check.timer
+# leftover from this service removal years ago (f18 era).
+# we probably don't really need this anymore.
+# https://bugzilla.redhat.com/show_bug.cgi?id=901651
 %{_bindir}/systemctl disable mdmonitor-takeover.service  >/dev/null 2>&1 || :
+
 
 %preun
 %systemd_preun mdmonitor.service raid-check.timer
 
+
 %postun
 %systemd_postun_with_restart mdmonitor.service
+
 
 %files
 %license COPYING
 %doc mdadm.conf-example misc/*
-%{_udevrulesdir}/*
-%{_sbindir}/*
-%{_unitdir}/*
+%{_udevrulesdir}/*-md-*
+%{_sbindir}/%{name}
+%{_sbindir}/mdmon
+%{_sbindir}/raid-check
+%{_unitdir}/md*
+%{_unitdir}/raid-check.*
 %{_mandir}/man*/md*
-%{_libdir}/systemd/system-shutdown/*
-%config(noreplace) %{_sysconfdir}/sysconfig/*
-%dir /run/%{name}/
+%{_prefix}/lib/systemd/system-shutdown/mdadm.shutdown
+%config(noreplace) %{_sysconfdir}/sysconfig/raid-check
+%{_rundir}/%{name}/
 %config(noreplace) %{_tmpfilesdir}/%{name}.conf
-%{_sysconfdir}/libreport/events.d/*
-%{_datadir}/mdadm/mdcheck
+%if %{with libreport}
+%{_sysconfdir}/libreport/events.d/mdadm_event.conf
+%endif
+%{_datadir}/%{name}/
+
 
 %changelog
+* Wed Sep 11 2024 Vince Perri <viperri@microsoft.com> - 4.3-1
+- Upgrade to mdadm-4.3 using Fedora 41:
+-   Kept translation of %{with abrt} to %{with libreport}
+-   Kept removal of tar.sign and asc sources and related code
+-   Kept removing gnupg2 since it's only used to verify the tarball signature
+-   Kept requiring systmed (pre/post/postun)
+-   Kept not building raid6check and raid6check.man
+-   Otherwise minimized diff between Fedora 41 and Azure Linux
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-7
 - Add missing Vendor and Distribution tags.
 

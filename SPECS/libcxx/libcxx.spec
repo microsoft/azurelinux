@@ -9,13 +9,14 @@
 Summary:        C++ standard library targeting C++11
 Name:           libcxx
 Version:        %{maj_ver}.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0 WITH LLVM-exception OR MIT OR NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            http://libcxx.llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+Patch0:         CVE-2024-31852.patch
 
 BuildRequires:  clang
 BuildRequires:  cmake
@@ -179,6 +180,9 @@ popd
 %{_libdir}/libunwind.a
 
 %changelog
+* Wed Oct 03 2024 Henry Li <lihl@microsoft.com> - 18.1.2-3
+- Add patch to resolve CVE-2024-31852
+
 * Wed Aug 07 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-2
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified
