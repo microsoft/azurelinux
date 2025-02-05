@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.64.2
-Release:        1005%{?dist}
+Release:        2003%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,11 +44,14 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         0001-TOBIASB-hard-code-osr-to-3.patch
-Patch2:         0001-TEMP-allocate-entropy-buffer-in-jitterentropy.patch
-Patch3:         0001-TOBIASB-RCT-vs-APT-failure.patch
-Patch4:         0001-TOBIASB-debug-info-for-apt-failure.patch
-Patch5:         0001-TOBIASB-heap-allocation.patch
+# Patch1:         0001-TOBIASB-hard-code-osr-to-3.patch
+# Patch2:         0001-TEMP-allocate-entropy-buffer-in-jitterentropy.patch
+# Patch3:         0001-TOBIASB-RCT-vs-APT-failure.patch
+# Patch4:         0001-TOBIASB-debug-info-for-apt-failure.patch
+# Patch5:         0001-TOBIASB-heap-allocation.patch
+Patch1:           0001-crypto-jitter-add-RCT-APT-support-for-different-OSRs.patch
+Patch2:           0002-crypto-jitter-Allow-configuration-of-memory-size.patch
+Patch3:           0003-crypto-jitter-Allow-configuration-of-oversampling-ra.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -180,8 +183,6 @@ manipulation of eBPF programs and maps.
 %patch 1 -p1
 %patch 2 -p1
 %patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
 make mrproper
 
 cp %{config_source} .config
