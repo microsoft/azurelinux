@@ -1,0 +1,82 @@
+From 253e8abe7b83d4d8f3d8dd5f886a54f4e173cc28 Mon Sep 17 00:00:00 2001
+From: Benjamin Dauvergne <bdauvergne@entrouvert.com>
+Date: Wed, 24 Jan 2024 13:45:17 +0100
+Subject: [PATCH] xml: export lasso_get_min_signature method function (#86076)
+
+---
+ NEWS            |  3 ++-
+ lasso/xml/xml.h | 54 +++++++++++++++++++++++--------------------------
+ 2 files changed, 27 insertions(+), 30 deletions(-)
+
+diff --git a/lasso/xml/xml.h b/lasso/xml/xml.h
+index 27273693..9fb4668a 100644
+--- a/lasso/xml/xml.h
++++ b/lasso/xml/xml.h
+@@ -117,35 +117,6 @@ typedef enum {
+ 	LASSO_SIGNATURE_METHOD_LAST
+ } LassoSignatureMethod;
+ 
+-/* signature method and hash strength */
+-LassoSignatureMethod lasso_get_default_signature_method();
+-
+-void lasso_set_default_signature_method(LassoSignatureMethod meth);
+-
+-LassoSignatureMethod lasso_get_min_signature_method();
+-
+-void lasso_set_min_signature_method(LassoSignatureMethod meth);
+-
+-static inline gboolean
+-lasso_validate_signature_method(LassoSignatureMethod signature_method)
+-{
+-	return signature_method > (LassoSignatureMethod)LASSO_SIGNATURE_TYPE_NONE \
+-		&& signature_method < (LassoSignatureMethod)LASSO_SIGNATURE_METHOD_LAST;
+-}
+-
+-static inline gboolean
+-lasso_allowed_signature_method(LassoSignatureMethod signature_method)
+-{
+-	return signature_method >= lasso_get_min_signature_method();
+-}
+-
+-static inline gboolean
+-lasso_ok_signature_method(LassoSignatureMethod signature_method)
+-{
+-	return lasso_validate_signature_method(signature_method) \
+-	    && lasso_allowed_signature_method(signature_method);
+-}
+-
+ typedef struct _LassoNode LassoNode;
+ typedef struct _LassoNodeClass LassoNodeClass;
+ typedef struct _LassoNodeClassData LassoNodeClassData;
+@@ -242,6 +213,31 @@ LASSO_EXPORT LassoKeyEncryptionMethod lasso_get_default_key_encryption_method();
+ 
+ LASSO_EXPORT void lasso_set_default_key_encryption_method(LassoKeyEncryptionMethod method);
+ 
++/* signature method and hash strength */
++LASSO_EXPORT LassoSignatureMethod lasso_get_min_signature_method();
++
++void lasso_set_min_signature_method(LassoSignatureMethod meth);
++
++static inline gboolean
++lasso_validate_signature_method(LassoSignatureMethod signature_method)
++{
++	return signature_method > (LassoSignatureMethod)LASSO_SIGNATURE_TYPE_NONE \
++		&& signature_method < (LassoSignatureMethod)LASSO_SIGNATURE_METHOD_LAST;
++}
++
++static inline gboolean
++lasso_allowed_signature_method(LassoSignatureMethod signature_method)
++{
++	return signature_method >= lasso_get_min_signature_method();
++}
++
++static inline gboolean
++lasso_ok_signature_method(LassoSignatureMethod signature_method)
++{
++	return lasso_validate_signature_method(signature_method) \
++	    && lasso_allowed_signature_method(signature_method);
++}
++
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
