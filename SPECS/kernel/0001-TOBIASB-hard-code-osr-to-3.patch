@@ -1,0 +1,48 @@
+From e21c6f09ce842f8b68a9c2f3aabf56b8d23e081d Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 5 Feb 2025 00:09:11 +0000
+Subject: [PATCH] TOBIASB: hard-code osr to 3
+
+---
+ crypto/jitterentropy-kcapi.c | 2 +-
+ crypto/jitterentropy.c       | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index 7d1463a1562a..9c1eefe443fd 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -245,7 +245,7 @@ static int jent_kcapi_init(struct crypto_tfm *tfm)
+ 	crypto_shash_init(sdesc);
+ 	rng->sdesc = sdesc;
+ 
+-	rng->entropy_collector = jent_entropy_collector_alloc(1, 0, sdesc);
++	rng->entropy_collector = jent_entropy_collector_alloc(3, 0, sdesc);
+ 	if (!rng->entropy_collector) {
+ 		ret = -ENOMEM;
+ 		goto err;
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index fe9c233ec769..a358418459f9 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -604,7 +604,7 @@ struct rand_data *jent_entropy_collector_alloc(unsigned int osr,
+ 
+ 	/* verify and set the oversampling rate */
+ 	if (osr == 0)
+-		osr = 1; /* minimum sampling rate is 1 */
++		osr = 3; /* minimum sampling rate is 1 */
+ 	entropy_collector->osr = osr;
+ 
+ 	entropy_collector->hash_state = hash_state;
+@@ -634,7 +634,7 @@ int jent_entropy_init(void *hash_state)
+ 	struct rand_data ec = { 0 };
+ 
+ 	/* Required for RCT */
+-	ec.osr = 1;
++	ec.osr = 3;
+ 	ec.hash_state = hash_state;
+ 
+ 	/* We could perform statistical tests here, but the problem is
+-- 
+2.40.4
+
