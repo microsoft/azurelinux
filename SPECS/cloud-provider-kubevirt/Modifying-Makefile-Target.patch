@@ -1,0 +1,37 @@
+diff --git a/Makefile b/Makefile
+index 7c023dc2..f9f2dfe4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -11,7 +11,7 @@ export BIN_DIR := bin
+ GOLANGCI_LINT_VERSION ?= v1.52.2
+
+ .PHONY: all
+-all: clean test build
++all: clean deps-update test build
+
+ .PHONY: start
+ start:
+@@ -29,19 +29,20 @@ clean:
+        if [ -d bin ]; then rm -r bin; fi
+        go clean -modcache -i -x ./...
+
+-.PHONY:deps-update
++.PHONY: deps-update
+ deps-update:
+        go mod tidy
++       go mod vendor
+
+ bin:
+        mkdir bin
+
+ .PHONY: test
+-test:
++test: deps-update
+        go test ./pkg/...
+
+ .PHONY: build
+-build: bin
++build: deps-update bin
+        CGO_ENABLED=0 GOOS=linux go build -mod vendor -ldflags="-s -w" -o bin/kubevirt-cloud-controller-manager ./cmd/kubevirt-cloud-controller-manager
+
+ .PHONY:image

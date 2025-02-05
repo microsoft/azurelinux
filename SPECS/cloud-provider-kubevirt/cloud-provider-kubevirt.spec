@@ -9,7 +9,9 @@ Group:          System/Management
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+Patch0:         KCCM-Changes.patch
+Patch1:         Golang-Version-Upgrade.patch
+Patch2:         Modifying-Makefile-Target.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22.11
 BuildRequires:  golang-packaging
