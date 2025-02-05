@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           media-player-info
 Version:        23
-Release:        7%{?dist}
+Release:        17%{?dist}
 Summary:        Data files describing media player capabilities
 
 License:        BSD
@@ -10,9 +10,12 @@ URL:            http://www.freedesktop.org/wiki/Software/media-player-info
 Source0:        http://www.freedesktop.org/software/media-player-info/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
+BuildRequires: make
 BuildRequires:  pkgconfig(udev)
 BuildRequires:  python3
+%if %{undefined flatpak}
 Requires:       udev
+%endif
 
 %description
 media-player-info is a repository of data files describing media player
@@ -38,14 +41,45 @@ make %{?_smp_mflags}
 %files
 %license COPYING
 %doc README NEWS AUTHORS
-/usr/share/media-player-info
+%{_datadir}/media-player-info
 /usr/lib/udev/rules.d/*
 /usr/lib/udev/hwdb.d/20-usb-media-players.hwdb
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 23-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jan 05 2025 Archana Shettigar <v-shettigara@microsoft.com> - 23-17
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 23-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 23-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 23-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 23-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 23-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 23-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 23-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 23-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 23-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 23-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 23-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
