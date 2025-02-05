@@ -5,7 +5,7 @@ Version:       1.22.8
 Release:       12%{?dist}
 Summary:       A library for using 3D graphics hardware to draw pretty pictures
 
-License:       LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:           https://www.clutter-project.org/
