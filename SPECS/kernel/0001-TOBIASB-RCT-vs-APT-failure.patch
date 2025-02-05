@@ -1,0 +1,40 @@
+From e1379618ca41b803a33e8f44ecc02a5e4743e11c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 5 Feb 2025 02:47:16 +0000
+Subject: [PATCH] TOBIASB: RCT vs APT failure
+
+---
+ crypto/jitterentropy.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index e05b0a53934b..41999f8fce67 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -122,6 +122,8 @@ struct rand_data {
+ 				   * zero). */
+ #define JENT_ESTUCK		8 /* Too many stuck results during init. */
+ #define JENT_EHEALTH		9 /* Health test failed during initialization */
++#define TOBIASB_JENT_RCT 10 /*TOBIASB: RCT failure*/
++#define TOBIASB_JENT_APT 11 /*TOBIASB: APT failure*/
+ 
+ /*
+  * The output n bits can receive more than n bits of min entropy, of course,
+@@ -729,6 +731,14 @@ int jent_entropy_init(void *hash_state)
+ 		}
+ 
+ 		/* Validate health test result */
++		if (jent_rct_failure(&ec)) {
++			return TOBIASB_JENT_RCT;
++		}
++
++		if (jent_apt_failure(&ec)) {
++			return TOBIASB_JENT_APT;
++		}
++
+ 		if (jent_health_failure(&ec))
+ 			return JENT_EHEALTH;
+ 
+-- 
+2.40.4
+
