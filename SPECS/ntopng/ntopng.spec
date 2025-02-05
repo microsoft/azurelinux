@@ -2,7 +2,7 @@
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        5.2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,9 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
+* Mon Feb 03 2025 Betty Lakes <bettylakes@microsoft.com> - 5.2.1-5
+- Bump the version after mySQL upgrade
+
 * Mon Jul 08 2024 Andrew Phelps <anphel@microsoft.com> - 5.2.1-4
 - Add patches for CVE-2017-18214 and CVE-2022-33099
 
