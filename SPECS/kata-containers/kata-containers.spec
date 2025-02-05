@@ -75,8 +75,6 @@ if [ $1 -eq 1 ]; then # Package install
 	systemctl start tardev-snapshotter.service > /dev/null 2>&1 || :
 fi
 
-
-%files
 %files
 %{_sbindir}/mount.tar
 %{_bindir}/kata-overlay
