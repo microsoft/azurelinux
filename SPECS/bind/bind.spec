@@ -201,9 +201,11 @@ mv backup/* .
 rmdir backup
 
 %build
+ls -l /usr/lib/
+ls -l /usr/lib/dlz/
+
 # DLZ modules do not support oot builds. Copy files into build
 mkdir -p build/contrib/dlz
-cp -frp contrib/dlz/modules build/contrib/dlz/modules
 
 ./configure \
     --prefix=%{_prefix} \
