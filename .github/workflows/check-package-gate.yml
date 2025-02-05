@@ -43,6 +43,11 @@ jobs:
     - name: Check each spec
       run: |
 
+        if [[ -z "${{ env.updated-specs }}" ]]; then
+          echo "No spec files to validate. Exiting."
+          exit 0
+        fi
+        
         for spec in ${{ env.updated-specs }}
           do
             echo "Checking '$spec'."
