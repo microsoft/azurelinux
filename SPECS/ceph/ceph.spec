@@ -23,6 +23,7 @@ Patch8:         CVE-2020-10723.patch
 Patch9:         CVE-2021-3672.patch
 Patch10:        CVE-2020-10722.patch
 Patch11:        CVE-2024-25629.patch
+Patch12:        CVE-2021-24032.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2011,12 +2012,13 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
-* Tue Feb 04 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-5
+* Wed Feb 05 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-5
 - Fix for CVE-2012-2677
 - Fix for CVE-2020-10723
 - Fix for CVE-2021-3672
 - Fix for CVE-2020-10722
 - Fix for CVE-2024-25629
+- Fix for CVE-2021-24032
 
 * Tue Jan 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-4
 - Fix for CVE-2014-5461
