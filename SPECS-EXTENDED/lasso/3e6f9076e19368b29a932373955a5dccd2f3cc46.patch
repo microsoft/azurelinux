@@ -1,0 +1,38 @@
+From 3e6f9076e19368b29a932373955a5dccd2f3cc46 Mon Sep 17 00:00:00 2001
+From: Benjamin Dauvergne <bdauvergne@entrouvert.com>
+Date: Wed, 14 Feb 2024 12:43:15 +0100
+Subject: [PATCH] misc: move declarations of signature method setters in
+ private.h (#86867)
+
+---
+ lasso/id-ff/server.h | 1 -
+ lasso/xml/private.h  | 4 ++++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lasso/id-ff/server.h b/lasso/id-ff/server.h
+index 4eb7e361..59225179 100644
+--- a/lasso/id-ff/server.h
++++ b/lasso/id-ff/server.h
+@@ -133,7 +133,6 @@ LASSO_EXPORT gchar *lasso_server_get_endpoint_url_by_id(const LassoServer *serve
+ LASSO_EXPORT GList *lasso_server_get_filtered_provider_list(const LassoServer *server,
+ 	LassoProviderRole role, LassoMdProtocolType protocol_type, LassoHttpMethod http_method);
+ 
+-LASSO_EXPORT LassoSignatureMethod lasso_get_default_signature_method();
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
+diff --git a/lasso/xml/private.h b/lasso/xml/private.h
+index 84810d8d..8f09fa0a 100644
+--- a/lasso/xml/private.h
++++ b/lasso/xml/private.h
+@@ -354,6 +354,10 @@ gchar* lasso_xmlnode_build_deflated_query(xmlNode *xmlnode);
+ 
+ xmlTextReader *lasso_xmltextreader_from_message(const char *message, char **to_free);
+ 
++void lasso_set_default_signature_method(LassoSignatureMethod meth);
++void lasso_set_min_signature_method(LassoSignatureMethod meth);
++
++
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
