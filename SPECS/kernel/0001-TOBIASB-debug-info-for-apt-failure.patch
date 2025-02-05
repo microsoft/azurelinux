@@ -1,0 +1,35 @@
+From b80a89f9c82667f65b459e5d11343741e7655435 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 5 Feb 2025 03:48:38 +0000
+Subject: [PATCH] TOBIASB: debug info for apt failure
+
+---
+ crypto/jitterentropy.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 41999f8fce67..f1444592be07 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -142,6 +142,7 @@ struct rand_data {
+ 
+ #include <linux/fips.h>
+ #include "jitterentropy.h"
++#include <linux/printk.h>
+ 
+ /***************************************************************************
+  * Adaptive Proportion Test
+@@ -736,6 +737,10 @@ int jent_entropy_init(void *hash_state)
+ 		}
+ 
+ 		if (jent_apt_failure(&ec)) {
++			pr_info("TOBIASB: jitterentropy: ec.apt_count: %u\n", ec.apt_count);
++			pr_info("TOBIASB: jitterentropy: ec.apt_observations: %u\n", ec.apt_observations);
++			pr_info("TOBIASB: jitterentropy: ec.osr: %u\n", ec.osr);
++			pr_info("TOBIASB: jitterentropy: ec.mem: %p\n", ec.mem);
+ 			return TOBIASB_JENT_APT;
+ 		}
+ 
+-- 
+2.40.4
+
