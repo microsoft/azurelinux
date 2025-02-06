@@ -56,7 +56,7 @@ jobs:
             name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
-            if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
+            if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
               previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
@@ -75,6 +75,7 @@ jobs:
                 1>&2 echo "**** ERROR ****"
                 error_found=1
             fi
+            
           done
 
         if [[ -n $error_found ]]
