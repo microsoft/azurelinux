@@ -405,7 +405,7 @@ fi;
 %{_mandir}/man1/named-journalprint.1*
 %{_mandir}/man8/filter-aaaa.8.gz
 %{_mandir}/man8/filter-a.8.gz
-%doc CHANGES README.md named.conf.default
+%doc README.md named.conf.default
 %doc sample/
 
 %defattr(0660,root,named,01770)
@@ -440,11 +440,11 @@ fi;
 
 %files dlz-ldap
 %{_libdir}/{named,bind}/dlz_ldap_dynamic.so
-%doc contrib/dlz/modules/ldap/testing/*
+%doc build/contrib/dlz/modules/ldap/testing/*
 
 %files dlz-sqlite3
 %{_libdir}/{named,bind}/dlz_sqlite3_dynamic.so
-%doc contrib/dlz/modules/sqlite3/testing/*
+%doc build/contrib/dlz/modules/sqlite3/testing/*
 
 %files libs
 %{_libdir}/*-%{version}*.so
