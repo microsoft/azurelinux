@@ -4340,8 +4340,8 @@
         "type": "other",
         "other": {
           "name": "glew",
-          "version": "2.1.0",
-          "downloadUrl": "https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0.tgz"
+          "version": "2.2.0",
+          "downloadUrl": "https://sourceforge.net/projects/glew/files/glew/2.2.0/glew-2.2.0.tgz"
         }
       }
     },
