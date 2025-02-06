@@ -52,8 +52,9 @@ jobs:
         for spec in ${{ env.updated-specs }}
           do
             echo "Checking '$spec'."
-            name=$(grep -E "^Name:\s*(.*)" "$spec" | awk '{print $2}')
-            version=$(grep -E "^Version:\s*(.*)" "$spec" | awk '{print $2}')
+            # Expand macros if present
+            name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
+            version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
               previous_version=$(git show ${{ env.base_sha }}:"$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
@@ -66,13 +67,13 @@ jobs:
             fi
 
 
-            if [[ "$name" == "redis" && "$version" >= "7.4" ]] || \
-                [[ "$name" == "packer" && "$version" >= "1.10.0" ]] || \
-                [[ "$name" == "terraform" && "$version" >= "1.6.0" ]]; then
-            1>&2 echo "**** ERROR ****"
-            1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
-            1>&2 echo "**** ERROR ****"
-            error_found=1
+            if [[ "$name" == "redis" && "$version" -gt "7.4" ]] || \
+                [[ "$name" == "packer" && "$version" -gt "1.10.0" ]] || \
+                [[ "$name" == "terraform" && "$version" -gt "1.6.0" ]]; then
+                  1>&2 echo "**** ERROR ****"
+                  1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
+                  1>&2 echo "**** ERROR ****"
+                  error_found=1
             fi
           done
 
