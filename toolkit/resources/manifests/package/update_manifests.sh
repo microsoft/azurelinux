@@ -56,7 +56,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/createrepo_c-devel/d' $TmpPkgGen
     sed -i '/docbook-xml/d' $TmpPkgGen
     sed -i '/docbook-xsl/d' $TmpPkgGen
-    sed -i '/e2fsprogs-[0-9]/d' $TmpPkgGen
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
