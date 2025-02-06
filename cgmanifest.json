@@ -9351,8 +9351,8 @@
         "type": "other",
         "other": {
           "name": "libexttextcat",
-          "version": "3.4.5",
-          "downloadUrl": "http://dev-www.libreoffice.org/src/libexttextcat/libexttextcat-3.4.5.tar.xz"
+          "version": "3.4.6",
+          "downloadUrl": "https://dev-www.libreoffice.org/src/libexttextcat/libexttextcat-3.4.6.tar.xz"
         }
       }
     },
