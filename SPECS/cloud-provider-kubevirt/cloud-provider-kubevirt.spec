@@ -9,9 +9,23 @@ Group:          System/Management
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/helm/helm/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. Apply Golang-Version-Upgrade.patch
+#   5. go mod vendor
+#   6. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         KCCM-Changes.patch
 Patch1:         Golang-Version-Upgrade.patch
-Patch2:         Modifying-Makefile-Target.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22.11
 BuildRequires:  golang-packaging
@@ -31,10 +45,12 @@ exposed through services in the UnderKube.
 
 %prep
 %autosetup -p1
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
-export GOFLAGS="-mod=mod"
+export GOFLAGS="-mod=vendor"
 make build
 
 %install
