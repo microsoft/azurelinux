@@ -9101,8 +9101,8 @@
         "type": "other",
         "other": {
           "name": "libdeflate",
-          "version": "1.9",
-          "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/v1.9.tar.gz"
+          "version": "1.22",
+          "downloadUrl": "https://github.com/ebiggers/libdeflate/archive/refs/tags/v1.22.tar.gz"
         }
       }
     },
