@@ -61,7 +61,7 @@ jobs:
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR ****"
+                1>&2 echo "**** ERROR 1****"
                 error_found=1
               fi
             fi
