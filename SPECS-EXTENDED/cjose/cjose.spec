@@ -64,7 +64,7 @@ make check || (cat test/test-suite.log; exit 1)
 
 %changelog
 * Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.6.2.2-7
-- AzureLinux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Tue Oct 22 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.2.2-6
