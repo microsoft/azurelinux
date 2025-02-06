@@ -46,8 +46,9 @@ install -m 0644 -pD images/*.gif images/*.xbm %{buildroot}/%{tcl_sitelib}/%{name
 %doc BWman/*.html
 
 %changelog
-* tue nov 5 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.10.1-1
+* Tue nov 5 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.10.1-1
 - Upgrade to version 1.10.1
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.7-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
