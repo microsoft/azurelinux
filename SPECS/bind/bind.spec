@@ -30,6 +30,8 @@ Source11:       setup-named-chroot.sh
 Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       named-chroot.files
+Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
+
 Patch0:         nongit-fix.patch
 
 BuildRequires:  gcc
@@ -196,16 +198,17 @@ Summary:        BIND utilities
 # so we need to save a backup of these files.
 mkdir backup
 mv compile depcomp missing backup/
-libtoolize -c -f; %{_bindir}/aclocal -I m4 --force; %{_bindir}/autoconf -f 
+libtoolize -c -f; %{_bindir}/aclocal -I m4 --force; %{_bindir}/autoconf -f
 mv backup/* .
 rmdir backup
 
 %build
-ls -l /usr/lib/
-ls -l /usr/lib/dlz/
-
 # DLZ modules do not support oot builds. Copy files into build
 mkdir -p build/contrib/dlz
+pushd build/contrib/dlz
+tar --no-same-owner -xf %{SOURCE15}
+mv dlz-modules-main/modules ./
+popd
 
 ./configure \
     --prefix=%{_prefix} \
