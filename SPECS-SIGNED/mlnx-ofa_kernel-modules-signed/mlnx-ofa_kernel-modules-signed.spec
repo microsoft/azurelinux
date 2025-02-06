@@ -26,6 +26,10 @@
 #
 #
 
+%global debug_package %{nil}
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
@@ -40,7 +44,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-modules
 Version:	 24.10
-Release:	 2%{?dist}
+Release:	 5%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -121,42 +125,52 @@ The driver sources are located at: http://www.mellanox.com/downloads/
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/compat/mlx_compat.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_cm.ko
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_core.ko
+cp -rf %{SOURCE4} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_ucm.ko
+cp -rf %{SOURCE5} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_umad.ko
+cp -rf %{SOURCE6} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_uverbs.ko
+cp -rf %{SOURCE7} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/iw_cm.ko
+cp -rf %{SOURCE8} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_cm.ko
+cp -rf %{SOURCE9} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_ucm.ko
+cp -rf %{SOURCE10} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/bnxt_re/bnxt_re.ko
+cp -rf %{SOURCE11} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/efa/efa.ko
+cp -rf %{SOURCE12} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx4/mlx4_ib.ko
+cp -rf %{SOURCE13} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx5/mlx5_ib.ko
+cp -rf %{SOURCE14} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/rxe/rdma_rxe.ko
+cp -rf %{SOURCE15} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/ipoib/ib_ipoib.ko
+cp -rf %{SOURCE16} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/iser/ib_iser.ko
+cp -rf %{SOURCE17} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
+cp -rf %{SOURCE18} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
+cp -rf %{SOURCE19} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
+cp -rf %{SOURCE20} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
+cp -rf %{SOURCE21} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
+cp -rf %{SOURCE22} ./lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
+cp -rf %{SOURCE23} ./lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
+cp -rf %{SOURCE24} ./lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
+cp -rf %{SOURCE25} ./lib/modules/%{KVERSION}/updates/net/smc/smc.ko
+cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
+cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
+cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
+cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/compat/mlx_compat.ko
-cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_cm.ko
-cp -r %{SOURCE3} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_core.ko
-cp -r %{SOURCE4} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_ucm.ko
-cp -r %{SOURCE5} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_umad.ko
-cp -r %{SOURCE6} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_uverbs.ko
-cp -r %{SOURCE7} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/iw_cm.ko
-cp -r %{SOURCE8} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_cm.ko
-cp -r %{SOURCE9} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_ucm.ko
-cp -r %{SOURCE10} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/bnxt_re/bnxt_re.ko
-cp -r %{SOURCE11} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/efa/efa.ko
-cp -r %{SOURCE12} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx4/mlx4_ib.ko
-cp -r %{SOURCE13} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx5/mlx5_ib.ko
-cp -r %{SOURCE14} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/rxe/rdma_rxe.ko
-cp -r %{SOURCE15} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/ipoib/ib_ipoib.ko
-cp -r %{SOURCE16} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/iser/ib_iser.ko
-cp -r %{SOURCE17} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
-cp -r %{SOURCE18} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
-cp -r %{SOURCE19} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
-cp -r %{SOURCE20} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
-cp -r %{SOURCE21} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
-cp -r %{SOURCE22} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
-cp -r %{SOURCE23} %{buildroot}/lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
-cp -r %{SOURCE24} %{buildroot}/lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
-cp -r %{SOURCE25} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc.ko
-cp -r %{SOURCE26} %{buildroot}/lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
-cp -r %{SOURCE27} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
-cp -r %{SOURCE28} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
-cp -r %{SOURCE29} %{buildroot}/lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
+
 
 %post
 /sbin/depmod %{KVERSION}
@@ -171,6 +185,15 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-5
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-4
+- Bump release to rebuild for new kernel release
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-3
+- Bump release to match kernel
+
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 

@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "application-gateway-kubernetes-ingress",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.7.2.tar.gz"
+          "version": "1.7.7",
+          "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },
@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blosc",
-          "version": "1.21.4",
-          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
+          "version": "1.21.6",
+          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.6/blosc-1.21.6.tar.gz"
         }
       }
     },
@@ -2538,8 +2538,8 @@
         "type": "other",
         "other": {
           "name": "deltarpm",
-          "version": "3.6.2",
-          "downloadUrl": "https://github.com/rpm-software-management/deltarpm/archive/3.6.2/deltarpm-3.6.2.tar.gz"
+          "version": "3.6.5",
+          "downloadUrl": "https://github.com/rpm-software-management/deltarpm/archive/3.6.5/deltarpm-3.6.5.tar.gz"
         }
       }
     },
@@ -3368,8 +3368,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.12",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.12.tar.gz"
+          "version": "3.5.18",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.18.tar.gz"
         }
       }
     },
@@ -3458,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "fabtests",
-          "version": "1.12.0",
-          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0rc1/fabtests-1.12.0rc1.tar.bz2"
+          "version": "1.18.0",
+          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.18.0/fabtests-1.18.0.tar.bz2"
         }
       }
     },
@@ -10011,8 +10011,8 @@
         "type": "other",
         "other": {
           "name": "liblouis",
-          "version": "3.26.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.26.0/liblouis-3.26.0.tar.gz"
+          "version": "3.31.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.31.0/liblouis-3.31.0.tar.gz"
         }
       }
     },
@@ -10771,8 +10771,8 @@
         "type": "other",
         "other": {
           "name": "LibRaw",
-          "version": "0.19.5",
-          "downloadUrl": "http://www.libraw.org/data/LibRaw-0.19.5.tar.gz"
+          "version": "0.21.3",
+          "downloadUrl": "https://www.libraw.org/data/LibRaw-0.21.3.tar.gz"
         }
       }
     },
@@ -13992,8 +13992,8 @@
         "type": "other",
         "other": {
           "name": "neon",
-          "version": "0.31.2",
-          "downloadUrl": "https://notroj.github.io/neon/neon-0.31.2.tar.gz"
+          "version": "0.33.0",
+          "downloadUrl": "https://notroj.github.io/neon/neon-0.33.0.tar.gz"
         }
       }
     },
@@ -14422,8 +14422,8 @@
         "type": "other",
         "other": {
           "name": "numatop",
-          "version": "2.1",
-          "downloadUrl": "https://github.com/intel/numatop/releases/download/v2.1/numatop-v2.1.tar.xz"
+          "version": "2.4",
+          "downloadUrl": "https://github.com/intel/numatop/archive/refs/tags/v2.4.tar.gz"
         }
       }
     },
@@ -16243,8 +16243,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-C3-XS",
-          "version": "0.14",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Class-C3-XS-0.14.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Class/Class-C3-XS-0.15.tar.gz"
         }
       }
     },
@@ -22293,8 +22293,8 @@
         "type": "other",
         "other": {
           "name": "python-dbus-client-gen",
-          "version": "0.4",
-          "downloadUrl": "https://github.com/stratis-storage/dbus-client-gen/archive/v0.4/dbus-client-gen-0.4.tar.gz"
+          "version": "0.5.1",
+          "downloadUrl": "https://github.com/stratis-storage/dbus-client-gen/archive/refs/tags/v0.5.1.tar.gz"
         }
       }
     },
@@ -25373,8 +25373,8 @@
         "type": "other",
         "other": {
           "name": "pywbem",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/pywbem/pywbem/archive/v0.15.0/pywbem-0.15.0.tar.gz"
+          "version": "0.17.6",
+          "downloadUrl": "https://github.com/pywbem/pywbem/archive/refs/tags/0.17.6.tar.gz"
         }
       }
     },
@@ -25693,8 +25693,8 @@
         "type": "other",
         "other": {
           "name": "re2c",
-          "version": "2.0",
-          "downloadUrl": "https://github.com/skvadrik/re2c/releases/download/2.0/re2c-2.0.tar.xz"
+          "version": "3.1",
+          "downloadUrl": "https://github.com/skvadrik/re2c/releases/download/3.1/re2c-3.1.tar.xz"
         }
       }
     },
@@ -25733,8 +25733,8 @@
         "type": "other",
         "other": {
           "name": "recode",
-          "version": "3.7.7",
-          "downloadUrl": "https://github.com/rrthomas/recode/releases/download/v3.7.7/recode-3.7.7.tar.gz"
+          "version": "3.7.14",
+          "downloadUrl": "https://github.com/rrthomas/recode/releases/download/v3.7.14/recode-3.7.14.tar.gz"
         }
       }
     },
