@@ -1,5 +1,7 @@
+%define base_name r
+%define short_name %{base_name}ed
 Summary:        Command-line editing and history capabilities
-Name:           redis
+Name:           %{short_name}is
 Version:        7.3
 Release:        1%{?dist}
 License:        GPLv3+
