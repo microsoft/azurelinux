@@ -95,8 +95,8 @@
         "type": "other",
         "other": {
           "name": "adobe-mappings-pdf",
-          "version": "20180407",
-          "downloadUrl": "https://github.com/adobe-type-tools/mapping-resources-pdf/archive/20180407.tar.gz"
+          "version": "20230118",
+          "downloadUrl": "https://github.com/adobe-type-tools/mapping-resources-pdf/archive/refs/tags/20230118.tar.gz"
         }
       }
     },
