@@ -57,7 +57,7 @@ jobs:
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
-              previous_version=$(git show ${{ env.base_sha }}:"$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
