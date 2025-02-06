@@ -84,14 +84,9 @@ go test -v ./go/cmd/... \
            ./go/vt/topo/... \
            ./go/vt/vtctld/... \
            ./go/vt/vtgate/evalengine/... \
-           ./go/vt/vtqueryserver/... \
            ./go/vt/vttablet/endtoend/... \
            ./go/vt/vttablet/tabletmanager/... \
            ./go/vt/vttablet/tabletserver/... \
-           ./go/vt/vttablet/worker/... \
-           ./go/vt/withddl/... \
-           ./go/vt/worker/... \
-           ./go/vt/workflow/reshardingworkflowgen/... \
            ./go/vt/wrangler/... \
            ./go/vt/wrangler/testlib/... \
            ./go/vt/zkctl/... \
