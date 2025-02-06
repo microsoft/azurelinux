@@ -44,5 +44,5 @@ install -Dp -m 0644 %{name}.man.gz %{buildroot}%{_mandir}/man1/%{name}.1.gz
 
 %changelog
 * Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 20241023-1
-- AzureLinux import from Fedora 42
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified
