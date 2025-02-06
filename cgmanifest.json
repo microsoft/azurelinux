@@ -22923,8 +22923,8 @@
         "type": "other",
         "other": {
           "name": "python-into-dbus-python",
-          "version": "0.07",
-          "downloadUrl": "https://github.com/stratis-storage/into-dbus-python/archive/v0.07/into-dbus-python-0.07.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/stratis-storage/into-dbus-python/archive/refs/tags/v0.8.2.tar.gz"
         }
       }
     },
