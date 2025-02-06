@@ -1,6 +1,6 @@
 Summary:        Command-line editing and history capabilities
 Name:           redis
-Version:        7.4
+Version:        7.3
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
