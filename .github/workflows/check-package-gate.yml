@@ -58,6 +58,7 @@ jobs:
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
               # if the spec is a new addition, we want previous version to be empty
               previous_version=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null | rpmspec --parse - | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              echo "Previous version: $previous_version"
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
@@ -65,7 +66,6 @@ jobs:
                 error_found=1
               fi
             fi
-
 
             if { [[ "$name" == "redis" && "$(printf '%s\n' "$version" "7.4" | sort -V | head -n1)" == "7.4" ]] || \
             [[ "$name" == "packer" && "$(printf '%s\n' "$version" "1.10.0" | sort -V | head -n1)" == "1.10.0" ]] || \
