@@ -24,8 +24,8 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         KCCM-Changes.patch
-Patch1:         Golang-Version-Upgrade.patch
+Patch0:         Golang-Version-Upgrade.patch
+Patch1:         KCCM-Changes.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22.11
 BuildRequires:  golang-packaging
@@ -44,7 +44,7 @@ tenant cluster services of type LoadBalancer are properly
 exposed through services in the UnderKube.
 
 %prep
-%autosetup -p1
+%autosetup -N
 tar -xf %{SOURCE1} --no-same-owner
 %autopatch -p1
 
