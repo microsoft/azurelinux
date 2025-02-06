@@ -23123,8 +23123,8 @@
         "type": "other",
         "other": {
           "name": "python-kmod",
-          "version": "0.9",
-          "downloadUrl": "https://github.com/downloads/agrover/python-kmod/python-kmod-0.9.tar.gz"
+          "version": "0.9.2",
+          "downloadUrl": "https://github.com/maurizio-lombardi/python-kmod/archive/refs/tags/v0.9.2.tar.gz"
         }
       }
     },
