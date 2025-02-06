@@ -40,7 +40,7 @@ Python 3 version.
 
 %prep
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%autosetup -p0 -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 chmod -x tqdm/completion.sh
 
 # https://github.com/tqdm/tqdm/pull/1292
