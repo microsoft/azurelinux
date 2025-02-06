@@ -29937,8 +29937,8 @@
         "type": "other",
         "other": {
           "name": "xapian-core",
-          "version": "1.4.20",
-          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.20/xapian-core-1.4.20.tar.xz"
+          "version": "1.4.26",
+          "downloadUrl": "https://www.oligarchy.co.uk/xapian/1.4.26/xapian-core-1.4.26.tar.xz"
         }
       }
     },
