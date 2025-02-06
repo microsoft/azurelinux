@@ -48,7 +48,6 @@ jobs:
           exit 0
         fi
 
-
         for spec in ${{ env.updated-specs }}
           do
             echo "Checking '$spec'."
@@ -57,7 +56,8 @@ jobs:
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
-              previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              # if the spec is a new addition, we want previous version to be empty
+              previous_version=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null | rpmspec --parse - | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
