@@ -4150,8 +4150,8 @@
         "type": "other",
         "other": {
           "name": "gdisk",
-          "version": "1.0.9",
-          "downloadUrl": "https://downloads.sourceforge.net/gptfdisk/gptfdisk-1.0.9.tar.gz"
+          "version": "1.0.10",
+          "downloadUrl": "https://downloads.sourceforge.net/gptfdisk/gptfdisk-1.0.10.tar.gz"
         }
       }
     },
