@@ -46,7 +46,6 @@ exposed through services in the UnderKube.
 %prep
 %autosetup -N
 tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
