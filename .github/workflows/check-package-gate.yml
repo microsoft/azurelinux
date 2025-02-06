@@ -67,17 +67,17 @@ jobs:
             fi
 
 
-            if [[ "$name" == "redis" && "$version" -gt "7.4" ]] || \
-                [[ "$name" == "packer" && "$version" -gt "1.10.0" ]] || \
-                [[ "$name" == "terraform" && "$version" -gt "1.6.0" ]]; then
-                  1>&2 echo "**** ERROR ****"
-                  1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
-                  1>&2 echo "**** ERROR ****"
-                  error_found=1
+            if { [[ "$name" == "redis" && "$(printf '%s\n' "$version" "7.4" | sort -V | head -n1)" == "7.4" ]] || \
+            [[ "$name" == "packer" && "$(printf '%s\n' "$version" "1.10.0" | sort -V | head -n1)" == "1.10.0" ]] || \
+            [[ "$name" == "terraform" && "$(printf '%s\n' "$version" "1.6.0" | sort -V | head -n1)" == "1.6.0" ]]; }; then
+                1>&2 echo "**** ERROR ****"
+                1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
+                1>&2 echo "**** ERROR ****"
+                error_found=1
             fi
           done
 
-          if [[ -n $error_found ]]
-          then
-            exit 1
-          fi
+        if [[ -n $error_found ]]
+        then
+          exit 1
+        fi
