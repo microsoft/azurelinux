@@ -74,29 +74,29 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go test -v go/cmd \
-           go/mysql \
-           go/mysql/endtoend \
-           go/sqltypes \
-           go/vt/hook \
-           go/vt/mysqlctl \
-           go/vt/srvtopo \
-           go/vt/topo \
-           go/vt/vtctld \
-           go/vt/vtgate/evalengine \
-           go/vt/vtqueryserver \
-           go/vt/vttablet/endtoend \
-           go/vt/vttablet/tabletmanager \
-           go/vt/vttablet/tabletserver \
-           go/vt/vttablet/worker \
-           go/vt/withddl \
-           go/vt/worker \
-           go/vt/workflow/reshardingworkflowgen \
-           go/vt/wrangler \
-           go/vt/wrangler/testlib \
-           go/vt/zkctl \
-           go/json2 \
-           go/test/endtoend
+go test -v ./go/cmd/... \
+           ./go/mysql/... \
+           ./go/mysql/endtoend/... \
+           ./go/sqltypes/... \
+           ./go/vt/hook/... \
+           ./go/vt/mysqlctl/... \
+           ./go/vt/srvtopo/... \
+           ./go/vt/topo/... \
+           ./go/vt/vtctld/... \
+           ./go/vt/vtgate/evalengine/... \
+           ./go/vt/vtqueryserver/... \
+           ./go/vt/vttablet/endtoend/... \
+           ./go/vt/vttablet/tabletmanager/... \
+           ./go/vt/vttablet/tabletserver/... \
+           ./go/vt/vttablet/worker/... \
+           ./go/vt/withddl/... \
+           ./go/vt/worker/... \
+           ./go/vt/workflow/reshardingworkflowgen/... \
+           ./go/vt/wrangler/... \
+           ./go/vt/wrangler/testlib/... \
+           ./go/vt/zkctl/... \
+           ./go/json2/... \
+           ./go/test/endtoend/...
 
 %files
 %license LICENSE
