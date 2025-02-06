@@ -52,7 +52,8 @@
                 "packagelists/virt-guest-packages.json"
             ],
             "KernelCommandLine": {
-                "SELinux": "permissive"
+                "SELinux": "permissive",
+                "ExtraCommandLine": "console=ttyS0"
             },
             "KernelOptions": {
                 "default": "kernel"
