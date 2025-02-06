@@ -8811,8 +8811,8 @@
         "type": "other",
         "other": {
           "name": "libbytesize",
-          "version": "2.5",
-          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5/libbytesize-2.5.tar.gz"
+          "version": "2.11",
+          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.11/libbytesize-2.11.tar.gz"
         }
       }
     },
