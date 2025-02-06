@@ -44,7 +44,7 @@ tenant cluster services of type LoadBalancer are properly
 exposed through services in the UnderKube.
 
 %prep
-%autosetup -N
+%autosetup -p1
 tar -xf %{SOURCE1} --no-same-owner
 
 %build
