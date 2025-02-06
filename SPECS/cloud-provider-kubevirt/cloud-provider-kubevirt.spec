@@ -23,9 +23,9 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-1-vendor.tar.gz
-Patch0:         Golang-Version-Upgrade.patch
-Patch1:         KCCM-Changes.patch
+Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         KCCM-Changes.patch
+Patch1:         Golang-Version-Upgrade.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22.11
 BuildRequires:  golang-packaging
