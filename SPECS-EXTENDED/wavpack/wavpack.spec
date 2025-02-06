@@ -68,7 +68,7 @@ rm -rf %{buildroot}/%{_docdir}/
  
 %changelog
 * Fri Dec 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 5.7.0-4
-- Initial Azure Linux import from Fedora 41.
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Mon Jul 29 2024 Tomas Korbar <tkorbar@redhat.com> - 5.7.0-3
