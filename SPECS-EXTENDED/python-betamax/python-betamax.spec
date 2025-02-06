@@ -64,7 +64,7 @@ py.test-%{python3_version} -vk "$TEST_SELECTOR"
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.0-4
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-3
