@@ -51,19 +51,17 @@ jobs:
         for spec in ${{ env.updated-specs }}
           do
             echo "Checking '$spec'."
-            if [[ "$spec" =~ ^(Redis|Packer|Terraform|Fdk-aac-free|Opus)-[0-9]+.*\.spec$ ]]; then
-              name=$(grep -E "^Name:\s*(.*)" "$spec" | awk '{print $2}')
-              version=$(grep -E "^Version:\s*(.*)" "$spec" | awk '{print $2}')
-              if [[ "$name" == "Redis" && "$version" >= "7.4" ]] || \
-                 [[ "$name" == "Packer" && "$version" >= "1.10.0" ]] || \
-                 [[ "$name" == "Terraform" && "$version" >= "1.6.0" ]] || \
-                 [[ "$name" == "Fdk-aac-free" ]] || \
-                 [[ "$name" == "Opus" ]]; then
-              1>&2 echo "**** ERROR ****"
-              1>&2 echo "Spec '$spec' does not meet the required version criteria."
-              1>&2 echo "**** ERROR ****"
-              error_found=1
-              fi
+            name=$(grep -E "^Name:\s*(.*)" "$spec" | awk '{print $2}')
+            version=$(grep -E "^Version:\s*(.*)" "$spec" | awk '{print $2}')
+            if [[ "$name" == "redis" && "$version" >= "7.4" ]] || \
+                [[ "$name" == "packer" && "$version" >= "1.10.0" ]] || \
+                [[ "$name" == "terraform" && "$version" >= "1.6.0" ]] || \
+                [[ "$name" == "fdk-aac-free" ]] || \
+                [[ "$name" == "opus" ]]; then
+            1>&2 echo "**** ERROR ****"
+            1>&2 echo "Spec '$spec' does not meet the required version criteria."
+            1>&2 echo "**** ERROR ****"
+            error_found=1
             fi
           done
 
