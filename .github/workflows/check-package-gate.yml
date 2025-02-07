@@ -57,7 +57,7 @@ jobs:
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
               # get the previous spec if it exits.
-              previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null)
+              previous_spec=""
               #if the spec is a new addition, we want previous version to be empty
               previous_version=""
 
