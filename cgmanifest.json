@@ -10041,8 +10041,8 @@
         "type": "other",
         "other": {
           "name": "libmad",
-          "version": "0.15.1b",
-          "downloadUrl": "http://download.sourceforge.net/mad/libmad-0.15.1b.tar.gz"
+          "version": "0.16.4",
+          "downloadUrl": "https://codeberg.org/tenacityteam/libmad/releases/download/0.16.4/libmad-0.16.4.tar.gz"
         }
       }
     },
