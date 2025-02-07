@@ -56,19 +56,23 @@ jobs:
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
-              # get base spec if it exits.
+              # get the previous spec if it exits.
               previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null)
               #if the spec is a new addition, we want previous version to be empty
-              previous_version=$(rpmspec --parse $previous_spec 2>/dev/null | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              previous_version=""
+
+              if [[ -n "$previous_spec" ]]; then
+                previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              fi
               echo "Previous version: $previous_version"
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
-                1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR 1****"
+                1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
+                1>&2 echo "**** ERROR ****"
                 error_found=1
               fi
             fi
-            # Check if the version is greater than or equal the allowed version
+            # Check if the version is greater than the allowed version
             if { [[ "$name" == "redis" && "$(printf '%s\n' "$version" "7.4" | sort -V | head -n1)" == "7.4" ]] || \
             [[ "$name" == "packer" && "$(printf '%s\n' "$version" "1.10.0" | sort -V | head -n1)" == "1.10.0" ]] || \
             [[ "$name" == "terraform" && "$(printf '%s\n' "$version" "1.6.0" | sort -V | head -n1)" == "1.6.0" ]]; }; then
