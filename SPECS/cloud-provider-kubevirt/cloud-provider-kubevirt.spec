@@ -44,8 +44,9 @@ tenant cluster services of type LoadBalancer are properly
 exposed through services in the UnderKube.
 
 %prep
-%autosetup -p1
+%autosetup -N
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
