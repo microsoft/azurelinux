@@ -68,6 +68,7 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 %changelog
 * Wed Oct 16 2014 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.1-1
 - Update to version 1.4.1
+- License verified
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-26
 - Updating naming for 3.0 version of Azure Linux.
