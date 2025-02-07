@@ -83,6 +83,7 @@ rm %{buildroot}/%{_sysconfdir}/ha.d/resource.d/iprha
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.19-1
 - Update to version 2.4.19
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.17.1-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
