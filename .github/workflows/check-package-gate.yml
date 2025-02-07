@@ -57,12 +57,12 @@ jobs:
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
               # get the previous spec if it exits.
-              previous_spec=""
+              previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null)
               #if the spec is a new addition, we want previous version to be empty
               previous_version=""
 
               if [[ -n "$previous_spec" ]]; then
-                previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+                # previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               fi
               echo "Previous version: $previous_version"
               if [[ "$version" != "$previous_version" ]]; then
