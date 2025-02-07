@@ -1,0 +1,117 @@
+From 4d6dd3ddba5e850a42c86d8233735165a371c31c Mon Sep 17 00:00:00 2001
+From: Alex Rousskov <rousskov@measurement-factory.com>
+Date: Sun, 1 Sep 2024 00:39:34 +0000
+Subject: [PATCH] Bug 5405: Large uploads fill request buffer and die (#1887)
+
+    maybeMakeSpaceAvailable: request buffer full
+    ReadNow: ... size 0, retval 0, errno 0
+    terminateAll: 1/1 after ERR_CLIENT_GONE/WITH_CLIENT
+    %Ss=TCP_MISS_ABORTED
+
+This bug is triggered by a combination of the following two conditions:
+
+* HTTP client upload fills Squid request buffer faster than it is
+  drained by an origin server, cache_peer, or REQMOD service. The buffer
+  accumulates 576 KB (default 512 KB client_request_buffer_max_size + 64
+  KB internal "pipe" buffer).
+
+* The affected server or service consumes a few bytes after the critical
+  accumulation is reached. In other words, the bug cannot be triggered
+  if nothing is consumed after the first condition above is met.
+
+Comm::ReadNow() must not be called with a full buffer: Related
+FD_READ_METHOD() code cannot distinguish "received EOF" from "had no
+buffer space" outcomes. Server::readSomeData() tried to prevent such
+calls, but the corresponding check had two problems:
+
+* The check had an unsigned integer underflow bug[^1] that made it
+  ineffective when inBuf length exceeded Config.maxRequestBufferSize.
+  That length could exceed the limit due to reconfiguration and when
+  inBuf space size first grew outside of maybeMakeSpaceAvailable()
+  protections (e.g., during an inBuf.c_str() call) and then got filled
+  with newly read data. That growth started happening after 2020 commit
+  1dfbca06 optimized SBuf::cow() to merge leading and trailing space.
+  Prior to that commit, Bug 5405 could probably only affect Squid
+  reconfigurations that lower client_request_buffer_max_size.
+
+* The check was separated from the ReadNow() call it was meant to
+  protect. While ConnStateData was waiting for the socket to become
+  ready for reading, various asynchronous events could alter inBuf or
+  Config.maxRequestBufferSize.
+
+This change fixes both problems.
+
+This change also fixes Squid Bug 5214.
+
+[^1]: That underflow bug was probably introduced in 2015 commit 4d1376d7
+while trying to emulate the original "do not read less than two bytes"
+ConnStateData::In::maybeMakeSpaceAvailable() condition. That condition
+itself looks like a leftover from manual zero-terminated input buffer
+days that ended with 2014 commit e7287625. It is now removed.
+---
+
+diff --git a/src/servers/Server.cc b/src/servers/Server.cc
+index 70fd10b..dd20619 100644
+--- a/src/servers/Server.cc
++++ b/src/servers/Server.cc
+@@ -83,16 +83,25 @@ Server::maybeMakeSpaceAvailable()
+         debugs(33, 4, "request buffer full: client_request_buffer_max_size=" << Config.maxRequestBufferSize);
+ }
+ 
++bool
++Server::mayBufferMoreRequestBytes() const
++{
++    // TODO: Account for bodyPipe buffering as well.
++    if (inBuf.length() >= Config.maxRequestBufferSize) {
++        debugs(33, 4, "no: " << inBuf.length() << '-' << Config.maxRequestBufferSize << '=' << (inBuf.length() - Config.maxRequestBufferSize));
++        return false;
++    }
++    debugs(33, 7, "yes: " << Config.maxRequestBufferSize << '-' << inBuf.length() << '=' << (Config.maxRequestBufferSize - inBuf.length()));
++    return true;
++}
++
+ void
+ Server::readSomeData()
+ {
+     if (reading())
+         return;
+ 
+-    debugs(33, 4, clientConnection << ": reading request...");
+-
+-    // we can only read if there is more than 1 byte of space free
+-    if (Config.maxRequestBufferSize - inBuf.length() < 2)
++    if (!mayBufferMoreRequestBytes())
+         return;
+ 
+     typedef CommCbMemFunT<Server, CommIoCbParams> Dialer;
+@@ -123,7 +132,16 @@ Server::doClientRead(const CommIoCbParams &io)
+      * Plus, it breaks our lame *HalfClosed() detection
+      */
+ 
++    // mayBufferMoreRequestBytes() was true during readSomeData(), but variables
++    // like Config.maxRequestBufferSize may have changed since that check
++    if (!mayBufferMoreRequestBytes()) {
++        // XXX: If we avoid Comm::ReadNow(), we should not Comm::Read() again
++        // when the wait is over; resume these doClientRead() checks instead.
++        return; // wait for noteMoreBodySpaceAvailable() or a similar inBuf draining event
++    }
+     maybeMakeSpaceAvailable();
++    Assure(inBuf.spaceSize());
++
+     CommIoCbParams rd(this); // will be expanded with ReadNow results
+     rd.conn = io.conn;
+     switch (Comm::ReadNow(rd, inBuf)) {
+diff --git a/src/servers/Server.h b/src/servers/Server.h
+index ef105f5..6e549b3 100644
+--- a/src/servers/Server.h
++++ b/src/servers/Server.h
+@@ -119,6 +119,9 @@ protected:
+     /// abort any pending transactions and prevent new ones (by closing)
+     virtual void terminateAll(const Error &, const LogTagsErrors &) = 0;
+ 
++    /// whether client_request_buffer_max_size allows inBuf.length() increase
++    bool mayBufferMoreRequestBytes() const;
++
+     void doClientRead(const CommIoCbParams &io);
+     void clientWriteDone(const CommIoCbParams &io);
+ 
