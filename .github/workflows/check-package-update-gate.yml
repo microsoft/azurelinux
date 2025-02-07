@@ -1,0 +1,94 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Check Package Update Gate
+
+on:
+  push:
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
+  pull_request:
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
+
+jobs:
+
+  build:
+    name: Check Package Update Gate
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Get base commit for PRs
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+    - name: Get base commit for Pushes
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        git fetch origin ${{ github.event.before }}
+        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+    - name: Get the changed files
+      run: |
+        echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+        changed_specs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS.*/.*\.spec$" || test $? = 1; })
+        echo "Files to validate: '${changed_specs}'"
+        echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
+
+    - name: Check each spec
+      run: |
+
+        if [[ -z "${{ env.updated-specs }}" ]]; then
+          echo "No spec files to validate. Exiting."
+          exit 0
+        fi
+
+        for spec in ${{ env.updated-specs }}
+          do
+            echo "Checking '$spec'."
+            # Expand macros if present
+            name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
+            version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+
+            #if fdk-aac-free or opus are changed, check if the version is the same as the previous version
+            if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
+              # get the previous spec if it exits.
+              # fatally crashes if the spec is not present in the base commit
+              previous_spec=$(git show ${{ env.base_sha }}:"$spec" || true)
+              git_exit_code=$?
+              #if the spec is a new addition, we want previous version to be empty
+              previous_version=""
+
+              if [[ -n "$previous_spec" ]]; then
+                echo "Previous spec exists"
+                previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+              fi
+              echo "Previous version of $spec: $previous_version"
+              if [[ "$version" != "$previous_version" ]]; then
+                1>&2 echo "**** ERROR ****"
+                1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
+                1>&2 echo "**** ERROR ****"
+                error_found=1
+              fi
+            fi
+            # Check if the version is greater than the allowed version
+            if { [[ "$name" == "redis" && "$(printf '%s\n' "$version" "7.4" | sort -V | head -n1)" == "7.4" ]] || \
+            [[ "$name" == "packer" && "$(printf '%s\n' "$version" "1.10.0" | sort -V | head -n1)" == "1.10.0" ]] || \
+            [[ "$name" == "terraform" && "$(printf '%s\n' "$version" "1.6.0" | sort -V | head -n1)" == "1.6.0" ]]; }; then
+                1>&2 echo "**** ERROR ****"
+                1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
+                1>&2 echo "**** ERROR ****"
+                error_found=1
+            fi
+            
+          done
+
+        if [[ -n $error_found ]]
+        then
+          exit 1
+        fi
