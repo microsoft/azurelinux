@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-name: Check Package Gate
+name: Check Package Update Gate
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    name: Check Package Gate
+    name: Check Package Update Gate
     runs-on: ubuntu-latest
     steps:
 
