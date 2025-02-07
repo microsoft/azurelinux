@@ -78,6 +78,7 @@ sed -i '1s|^#!/usr/bin/python|#!%{__python3}|' examples/magFocusTracker.py
 %changelog
 * Fri Oct 25 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.46.1-1
 - Update to version 2.46.1
+- License verified
 
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
