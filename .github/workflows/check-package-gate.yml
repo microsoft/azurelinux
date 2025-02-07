@@ -62,6 +62,7 @@ jobs:
               previous_version=""
 
               if [[ -n "$previous_spec" ]]; then
+                echo "Previous spec exists"
                 # previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               fi
               echo "Previous version: $previous_version"
