@@ -238,7 +238,7 @@ function prepare_docker_directory {
 function prepare_docker_build_args {
     echo "+++ Prepare NVIDIA docker build arguments"
     KERNEL_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p $HOST_MOUNTED_DIR/RPMS/x86_64/kernel-devel*)
-    DRIVER_VERSION=$(rpm -q --qf '%{VERSION}' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE*)
+    DRIVER_VERSION=$(rpm -q --qf '%{VERSION}' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE-[0-9]*)
     DRIVER_BRANCH="${DRIVER_VERSION%%.*}"
 
     DOCKER_BUILD_ARGS="--build-arg KERNEL_VERSION=$KERNEL_VERSION --build-arg DRIVER_VERSION=$DRIVER_VERSION --build-arg AZURE_LINUX_VERSION=$AZURE_LINUX_VERSION"
