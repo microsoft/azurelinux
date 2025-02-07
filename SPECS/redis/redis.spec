@@ -2,7 +2,7 @@
 %define short_name %{base_name}ed
 Summary:        Command-line editing and history capabilities
 Name:           %{short_name}is
-Version:        7.3
+Version:        7.4
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation

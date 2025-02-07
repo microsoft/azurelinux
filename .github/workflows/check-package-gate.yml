@@ -55,7 +55,7 @@ jobs:
             name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
-            #if fdk-aac-free or opus is changed, check if the version is the same as the previous version
+            #if fdk-aac-free or opus are changed, check if the version is the same as the previous version
             if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
               # get the previous spec if it exits.
               # fatally crashes if the spec is not present in the base commit
@@ -68,7 +68,7 @@ jobs:
                 echo "Previous spec exists"
                 previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               fi
-              echo "Previous version: $previous_version"
+              echo "Previous version of $spec: $previous_version"
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
