@@ -47,6 +47,7 @@ or check the validity of an address.
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
 - Update to version 1.0.3
+- License verified
 
 * Thu Jul 08 2021 Muhammad Falak Wani <mwani@microsoft.com> - 0.4.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
