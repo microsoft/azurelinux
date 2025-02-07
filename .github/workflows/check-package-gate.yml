@@ -55,9 +55,11 @@ jobs:
             name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
-            if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
+            #if fdk-aac-free or opus is changed, check if the version is the same as the previous version
+            if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
               # get the previous spec if it exits.
-              previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null || true)
+              # fatally crashes if the spec is not present in the base commit
+              previous_spec=$(git show ${{ env.base_sha }}:"$spec" || true)
               git_exit_code=$?
               #if the spec is a new addition, we want previous version to be empty
               previous_version=""
@@ -70,7 +72,7 @@ jobs:
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR 1 ****"
+                1>&2 echo "**** ERROR ****"
                 error_found=1
               fi
             fi
