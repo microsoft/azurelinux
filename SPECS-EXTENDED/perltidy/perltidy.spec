@@ -1,6 +1,6 @@
 Name:		perltidy
 Version:	20240903
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Tool for indenting and re-formatting Perl scripts
 License:	GPL-2.0-or-later
 Vendor:         Microsoft Corporation
@@ -94,8 +94,8 @@ make test
 %{_mandir}/man3/Perl::Tidy.3*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-1
-- Azure Linux import from Fedora 41 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Tue Sep  3 2024 Paul Howarth <paul@city-fan.org> - 20240903-1
