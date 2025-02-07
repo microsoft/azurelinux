@@ -57,19 +57,20 @@ jobs:
 
             if [[ "$name" == "fdk-aac-free" || "$name" == "redis" ]]; then
               # get the previous spec if it exits.
-              previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null)
+              previous_spec=$(git show ${{ env.base_sha }}:"$spec" 2>/dev/null || true)
+              git_exit_code=$?
               #if the spec is a new addition, we want previous version to be empty
               previous_version=""
 
               if [[ -n "$previous_spec" ]]; then
                 echo "Previous spec exists"
-                # previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+                previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
               fi
               echo "Previous version: $previous_version"
               if [[ "$version" != "$previous_version" ]]; then
                 1>&2 echo "**** ERROR ****"
                 1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR ****"
+                1>&2 echo "**** ERROR 1 ****"
                 error_found=1
               fi
             fi
