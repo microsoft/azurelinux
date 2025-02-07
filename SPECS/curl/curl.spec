@@ -86,8 +86,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Thu Jan 23 2025 Himaja Kesari <himajakesari@microsoft.com> - 8.11.1-1
+* Fri Feb 07 2025 Himaja Kesari <himajakesari@microsoft.com> - 8.11.1-1
 - Bump version to 8.11.1 to address CVE-2024-11053
+
+* Fri Jan 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.8.0-4
+- Fix for CVE-2024-9681
 
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-3
 - Address CVE-2024-8096

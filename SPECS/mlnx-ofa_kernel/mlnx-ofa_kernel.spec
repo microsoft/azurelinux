@@ -99,11 +99,13 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 1%{?dist}
+Release:	 6%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:          https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
+Patch0:          001-fix-module-init-for-ibt.patch
+
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -189,7 +191,7 @@ Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Version: %{_version}
-Release: 1%{?dist}
+Release: 6%{?dist}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -201,7 +203,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %package -n %{devel_pname}
 Version: %{_version}
 # build KMP rpms?
-Release: 1%{?dist}
+Release: 6%{?dist}
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -289,6 +291,7 @@ drivers against it.
 
 %prep
 %setup -n %{_name}-%{_version}
+%patch 0 -p1
 set -- *
 mkdir source
 mv "$@" source/
@@ -736,6 +739,21 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
+- Bump release to rebuild for new kernel release
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-5
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-4
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-3
+- Bump release to match kernel
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
+- Bump release to match kernel
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

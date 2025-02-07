@@ -26,20 +26,14 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%if "%{KMP}" == "1"
-%global _name kernel-mft-mlnx
-%else
-%global _name kernel-mft
-%endif
-
 %{!?version: %global version 4.30.0}
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
-Name:		 kernel-mft
+Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 1%{?dist}
+Release:	 6%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -59,6 +53,10 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
+Provides:       kernel-mft = %{version}-%{release}
 
 %description
 mft kernel module(s)
@@ -230,6 +228,21 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 4.30.0-6
+- Bump release to rebuild for new kernel release
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-5
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-4
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-3
+- Bump release to match kernel
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-2
+- Bump release to match kernel
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

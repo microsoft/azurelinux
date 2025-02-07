@@ -1,0 +1,59 @@
+diff --git a/lib/kmip.c b/lib/kmip.c
+index dda819a..333603c 100644
+--- a/lib/kmip.c
++++ b/lib/kmip.c
+@@ -1152,6 +1152,7 @@ kmip_decode_key_value (struct kmip_decoding_state *kmip,
+       break;
+ 
+     default:
++      kmip_key_value_free (res);
+       g_return_val_if_reached (-1);
+     }
+   res->attributes = g_ptr_array_new ();
+@@ -1348,6 +1349,7 @@ kmip_decode_object_symmetric_key (struct kmip_decoding_state *kmip,
+       g_snprintf (num, sizeof (num), "%" G_GUINT32_FORMAT, res->block->type);
+       g_set_error (error, LIBVK_ERROR, LIBVK_ERROR_KMIP_UNSUPPORTED_VALUE,
+ 		   _("Unsupported symmetric key format %s"), num);
++      kmip_object_symmetric_key_free (res);
+       return -1;
+     }
+   *obj = res;
+@@ -1384,6 +1386,7 @@ kmip_decode_object_secret_data (struct kmip_decoding_state *kmip,
+       g_snprintf (num, sizeof (num), "%" G_GUINT32_FORMAT, res->block->type);
+       g_set_error (error, LIBVK_ERROR, LIBVK_ERROR_KMIP_UNSUPPORTED_VALUE,
+ 		   _("Unsupported symmetric key format %s"), num);
++      kmip_object_secret_data_free (res);
+       return -1;
+     }
+   *obj = res;
+diff --git a/lib/volume_luks.c b/lib/volume_luks.c
+index d1c5d47..4d32d9b 100644
+--- a/lib/volume_luks.c
++++ b/lib/volume_luks.c
+@@ -547,8 +547,8 @@ luks_apply_secret (struct libvk_volume *vol, const struct libvk_volume *packet,
+     }
+   g_free (last_log_entry);
+ 
+-  g_return_val_if_fail (vol->v.luks->key_bytes == packet->v.luks->key_bytes,
+-			-1);
++  if (vol->v.luks->key_bytes != packet->v.luks->key_bytes)
++    goto err_passphrase;
+   luks_replace_key (vol, packet->v.luks->key);
+   luks_replace_passphrase (vol, passphrase);
+   vol->v.luks->passphrase_slot = res;
+diff --git a/src/volume_key.c b/src/volume_key.c
+index 074b187..24b70d6 100644
+--- a/src/volume_key.c
++++ b/src/volume_key.c
+@@ -735,6 +735,11 @@ write_packet (struct packet_output_state *pos, const char *filename,
+       || g_file_set_contents (filename, packet, size, error) == FALSE)
+     {
+       g_prefix_error (error, _("Error creating `%s': "), filename);
++      if (packet != NULL) {
++        if (output_format_cleartext != 0)
++          memset (packet, 0, size);
++        g_free (packet);
++      }
+       return -1;
+     }
+   if (output_format_cleartext != 0)
