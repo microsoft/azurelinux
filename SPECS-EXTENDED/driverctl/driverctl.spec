@@ -64,6 +64,7 @@ by default.
 %changelog
 * Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.115-1
 - Update to version 0.115
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.111-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
