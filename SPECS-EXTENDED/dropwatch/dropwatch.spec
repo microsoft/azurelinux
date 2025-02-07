@@ -49,6 +49,7 @@ network packets.
 %changelog
 * Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.4-1
 - Update to version 1.5.4
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
