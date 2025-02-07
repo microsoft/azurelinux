@@ -89,6 +89,7 @@ This package contains a program to create nicely-formatted man pages from Doxyge
 %changelog
 * Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.8-1
 - Update to version 2.0.8
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
