@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.173.1
-Release:        2%{?dist}
+Version:        5.15.176.3
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.176.3-1
+- Auto-upgrade to 5.15.176.3
+
 * Thu Jan 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 5.15.173.1-2
 - Change pci_hyperv to built-in
 
