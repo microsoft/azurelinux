@@ -1,0 +1,128 @@
+#! /bin/bash -efu
+
+# heavily based upon find-suggests.ksyms by Andreas Gruenbacher <agruen@suse.de>.
+# with modifications by Michael Brown <Michael_E_Brown@dell.com>
+#
+# -- added module versioning info to modalias() symbols
+# -- removed code which inspects spec files.
+
+IFS=$'\n'
+
+#
+# Initially, dont generate modalias() lines for kernel package. This needs
+# additional discussion. Would like to eventually add them for
+# completeness, so that we can determine when drivers are folded into
+# mainline kernel.
+#
+is_kernel_package=""
+case "${1:-}" in
+kernel-module-*)    ;; # Fedora kernel module package names start with
+		       # kernel-module.
+kernel*)	   is_kernel_package=1 ;;
+esac
+
+if ! [ -z "$is_kernel_package" ]; then
+    cat > /dev/null
+    exit 0
+fi
+
+# Check for presence of the commands used.
+# "command" is a builtin, faster to use than fork+execing "which" - see
+# https://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html
+command -v /sbin/modinfo >/dev/null || exit 1
+command -v sed >/dev/null || exit 1
+command -v sort >/dev/null || exit 1
+
+print_modaliases() {
+    local class="$1" variants="$2" pos="$3"
+    if [ -n "$variants" ]; then
+	echo "${class:0:pos}[$variants]${class:pos+1}"
+    else
+	[ -z "$class" ] || echo "$class"
+    fi
+}
+
+# Try to make "provides" list a bit smaller:
+# find "mergeable" strings a-la
+# modalias(pci:v0000168Cd00000023sv*sd*bc*sc*i*)
+# modalias(pci:v0000168Cd00000024sv*sd*bc*sc*i*)
+# modalias(pci:v0000168Cd00000027sv*sd*bc*sc*i*)
+# modalias(pci:v0000168Cd00000029sv*sd*bc*sc*i*)
+# replace with
+# modalias(pci:v0000168Cd0000002[3479]sv*sd*bc*sc*i*)
+combine_modaliases() {
+    local unused_len next prev variants="" pos="" n end xc
+
+    # Due to set -e, we can exit with exitcode 1 on read EOF
+    # and this makes our caller think we failed. "|| return 0" prevents this:
+    IFS=' ' read unused_len prev || return 0
+
+    # For each line after the first...
+    while IFS=' ' read unused_len next; do
+	if [ -z "$pos" ]; then
+	    # 2nd line: after "modalias(" prefix, for each char in prev line...
+	    n=9
+	    end=${#prev}
+	    # TODO speedup? if [ $end != ${#next} ]; then line is not mergeable
+	else
+	    # 3rd+ lines: only check the char at the same position
+	    n=$pos
+	    end=$((pos + 1))
+	fi
+	# Search for aaaNbbb,aaaMbbb line pair, where N and M chars differ.
+	# sort -u guarantees there are no identical line pairs.
+	# We assume that lines will not differ only in " = version" suffix.
+	for ((; n < $end; n++)); do
+	    if [ "${prev:0:n}" != "${next:0:n}" ]; then
+		# the prefixes already aren't the same: break
+		n=$end
+		break
+	    fi
+	    # If suffixes differ, go to next char
+	    [ x"${prev:n+1}" != x"${next:n+1}" ] && continue
+	    # Found aaaNbbb,aaaMbbb. If N and M aren't special...
+	    xc=x"${prev:n:1}"
+	    [ x"[" = "$xc" -o x"]" = "$xc" ] && continue
+	    [ x"?" = "$xc" -o x"*" = "$xc" ] && continue
+	    xc=x"${next:n:1}"
+	    [ x"[" = "$xc" -o x"]" = "$xc" ] && continue
+	    [ x"?" = "$xc" -o x"*" = "$xc" ] && continue
+	    # Add M (and maybe N) to $variants, go to next line
+	    variants="${variants:-${prev:n:1}}${next:n:1}"
+	    pos=$n
+	    break
+	done
+	if [ $n -eq $end ]; then
+	    # This line is not mergeable with the previous one(s),
+	    # print collected merged line and reset the state
+	    print_modaliases "$prev" "$variants" "$pos"
+	    variants=""
+	    pos=""
+	    prev=$next
+	fi
+    done
+    # Print last collected merged line
+    print_modaliases "$prev" "$variants" "$pos"
+}
+
+for module in $(grep -E '/lib/modules/.+\.ko(\.gz|\.bz2|\.xz|\.zst)?$') "$@"; do
+    modver=$(/sbin/modinfo -F version "$module")
+    # delete possible extra lines because some modules have *two* version tags. *cough*b44*cough*
+    modver=${modver%%$'\n'*}    # using $'' bashism, avoid running "head -n1" process
+    # replace any strange chars with underscores.
+    # [!...] is glob's "match any char not in set" pattern
+    # (although bash supports [^...] too, it is not standard)
+    modver=${modver//[!0-9a-zA-Z._]/_}
+    # only add version tag if it indeed has a version
+    [ -z "$modver" ] || modver=" = $modver"
+
+    /sbin/modinfo -F alias "$module" \
+    | sed -E "s,[^][0-9a-zA-Z._:*?/-],_,g; s,(.+),modalias(\\1)$modver,"
+
+    # Below: combining code can only possibly combine lines of equal length.
+    # Prepend line lengths before sort, so that same-length lines end up next
+    # to each other. (The lengths are discarded by combine_modaliases).
+done \
+| { while read line; do echo "${#line} $line"; done } \
+| LC_ALL=C sort -u \
+| combine_modaliases
