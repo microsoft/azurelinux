@@ -2808,6 +2808,7 @@
                 "kernel",
                 "kernel-64k",
                 "kernel-headers",
+                "kernel-lpg-innovate",
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
