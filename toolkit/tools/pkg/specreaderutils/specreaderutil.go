@@ -321,6 +321,7 @@ func readSpecWorker(ctx context.Context, requests <-chan string, results chan<- 
 		providerList := []*pkgjson.Package{}
 		sourceDir := filepath.Dir(specFile)
 		testBuildRequiresList := []*pkgjson.PackageVer{}
+		testExpectedToFail := false
 
 		// Find the SRPM associated with the SPEC.
 		srpmResults, err := rpm.QuerySPEC(specFile, sourceDir, querySrpm, arch, noCheckDefines, rpm.QueryHeaderArgument)
@@ -379,6 +380,13 @@ func readSpecWorker(ctx context.Context, requests <-chan string, results chan<- 
 				sendEmptyResult(results, err)
 				continue
 			}
+
+			// Inspect the spec to see if its tests have been marked as known to fail.
+			testExpectedToFail, err = querySpecForTestFailureExpectation(specFile)
+			if err != nil {
+				sendEmptyResult(results, err)
+				continue
+			}
 		}
 
 		// Every package provided by a spec will have the same BuildRequires and SrpmPath
@@ -388,6 +396,7 @@ func readSpecWorker(ctx context.Context, requests <-chan string, results chan<- 
 			provider.SpecPath = specFile
 			provider.TestRequires = testBuildRequiresList
 			provider.RunTests = readTestDependencies
+			provider.TestExpectedToFail = testExpectedToFail
 		}
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
@@ -699,6 +708,49 @@ func readBuildRequires(specFile, sourceDir, arch string, defines map[string]stri
 	result, err = dedupPackageVersionArray(result)
 	if err != nil {
 		err = fmt.Errorf("failed to dedup build-time PackageVer array for spec (%s):\n%w", specFile, err)
+	}
+
+	return
+}
+
+func querySpecForTestFailureExpectation(specFile string) (result bool, err error) {
+	const (
+		azlDirectivePrefix        = "#!"
+		azlDirectiveTag           = "#!AZL"
+		expectedTestFailureOption = "expected-test-failure"
+	)
+
+	result = false
+
+	var lines []string
+	lines, err = file.ReadLines(specFile)
+	if err != nil {
+		return
+	}
+
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+
+		// Quickly check if this might be an AZL directive. We'll properly validate it
+		// later if it looks like it could be.
+		if !strings.HasPrefix(trimmedLine, azlDirectivePrefix) {
+			continue
+		}
+
+		fields := strings.Fields(trimmedLine)
+
+		if len(fields) < 2 {
+			continue
+		}
+
+		if fields[0] != azlDirectiveTag {
+			continue
+		}
+
+		if len(fields) >= 2 && fields[1] == expectedTestFailureOption {
+			result = true
+			break
+		}
 	}
 
 	return
