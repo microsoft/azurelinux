@@ -2807,6 +2807,7 @@
                 "kernel",
                 "kernel-64k",
                 "kernel-headers",
+                "kernel-lvbs",
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
