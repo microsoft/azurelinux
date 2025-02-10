@@ -1,30 +1,43 @@
---- libmetis/CMakeLists.orig.txt	2016-02-16 19:06:56.480139000 +0100
-+++ libmetis/CMakeLists.txt	2016-02-16 19:07:55.511134162 +0100
-@@ -3,14 +3,14 @@
+--- CMakeLists.orig.txt	2022-12-02 02:45:28.000000000 +0100
++++ CMakeLists.txt	2023-07-16 19:59:20.618931313 +0200
+@@ -48,5 +48,5 @@
+ add_subdirectory(src/libmetis)
+ add_subdirectory(src/programs)
+ 
+-add_test(NAME GraphCheck
+-COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
++add_test(NAME GraphCheck64
++COMMAND $<TARGET_FILE:graphchk64> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
+--- src/libmetis/CMakeLists.orig.txt	2016-02-16 19:06:56.480139000 +0100
++++ src/libmetis/CMakeLists.txt	2016-02-16 19:07:55.511134162 +0100
+@@ -1,16 +1,16 @@
  # Find sources.
  file(GLOB metis_sources *.c)
  # Build libmetis.
 -add_library(metis ${METIS_LIBRARY_TYPE} ${GKlib_sources} ${metis_sources})
--set_target_properties(metis PROPERTIES SOVERSION 0)
+-target_include_directories(metis PUBLIC
 +add_library(metis64 ${METIS_LIBRARY_TYPE} ${GKlib_sources} ${metis_sources})
++target_include_directories(metis64 PUBLIC
+ $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+ $<INSTALL_INTERFACE:include>
+ PRIVATE ${PROJECT_SOURCE_DIR}/src/GKlib ${PROJECT_BINARY_DIR}/src/include
+ )
+-target_link_libraries(metis PRIVATE $<$<BOOL:${UNIX}>:m>)
+-set_target_properties(metis PROPERTIES SOVERSION 0)
++target_link_libraries(metis64 PRIVATE $<$<BOOL:${UNIX}>:m>)
 +set_target_properties(metis64 PROPERTIES SOVERSION 0)
- if(UNIX)
--  target_link_libraries(metis m)
-+  target_link_libraries(metis64 m)
- endif()
  
- if(METIS_INSTALL)
--  install(TARGETS metis
-+  install(TARGETS metis64
+-install(TARGETS metis
++install(TARGETS metis64
      LIBRARY DESTINATION lib${LIB_SUFFIX}
      RUNTIME DESTINATION lib${LIB_SUFFIX}
      ARCHIVE DESTINATION lib${LIB_SUFFIX})
---- programs/CMakeLists.orig.txt	2013-03-30 17:24:45.000000000 +0100
-+++ programs/CMakeLists.txt	2016-02-16 22:42:18.625946692 +0100
-@@ -2,19 +2,19 @@
- include_directories(../libmetis)
- link_directories(/home/karypis/local/lib)
- # Build program.
+--- src/programs/CMakeLists.orig.txt	2013-03-30 17:24:45.000000000 +0100
++++ src/programs/CMakeLists.txt	2016-02-16 22:42:18.625946692 +0100
+@@ -11,14 +11,14 @@
+   endif(Subversion_FOUND)
+ endif()
+ 
 -add_executable(gpmetis gpmetis.c cmdline_gpmetis.c io.c stat.c)
 -add_executable(ndmetis ndmetis.c cmdline_ndmetis.c io.c smbfactor.c)
 -add_executable(mpmetis mpmetis.c cmdline_mpmetis.c io.c stat.c)
@@ -32,7 +45,7 @@
 -add_executable(graphchk graphchk.c io.c)
 -add_executable(cmpfillin cmpfillin.c io.c smbfactor.c)
 -foreach(prog gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
--  target_link_libraries(${prog} metis)
+-  target_link_libraries(${prog} PRIVATE metis)
 +add_executable(gpmetis64 gpmetis.c cmdline_gpmetis.c io.c stat.c)
 +add_executable(ndmetis64 ndmetis.c cmdline_ndmetis.c io.c smbfactor.c)
 +add_executable(mpmetis64 mpmetis.c cmdline_mpmetis.c io.c stat.c)
@@ -40,13 +53,14 @@
 +add_executable(graphchk64 graphchk.c io.c)
 +add_executable(cmpfillin64 cmpfillin.c io.c smbfactor.c)
 +foreach(prog gpmetis64 ndmetis64 mpmetis64 m2gmetis64 graphchk64 cmpfillin64)
-+  target_link_libraries(${prog} metis64)
++  target_link_libraries(${prog} PRIVATE metis64)
+   target_include_directories(${prog} PRIVATE
+     ${PROJECT_SOURCE_DIR}/src/GKlib
+     ${PROJECT_BINARY_DIR}/src/include
+@@ -27,5 +27,5 @@
  #  target_link_libraries(${prog} metis profiler)
  endforeach(prog)
  
- if(METIS_INSTALL)
--  install(TARGETS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin
-+  install(TARGETS gpmetis64 ndmetis64 mpmetis64 m2gmetis64 graphchk64 cmpfillin64
+-install(TARGETS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin
++install(TARGETS gpmetis64 ndmetis64 mpmetis64 m2gmetis64 graphchk64 cmpfillin64
      RUNTIME DESTINATION bin)
- endif()
- 
