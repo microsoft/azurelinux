@@ -12,11 +12,6 @@ Version:       1.42.4
 Release:       2%{?dist}
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
 
-# virt-p2v works only on x86_64 at the moment.  It requires porting
-# to properly detect the hardware on other architectures, and furthermore
-# virt-v2v requires porting too.
-ExclusiveArch: x86_64
-
 # Source and patches.
 URL:           https://libguestfs.org/
 Source0:       https://download.libguestfs.org/%{name}/%{name}-%{version}.tar.gz
