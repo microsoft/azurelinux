@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,9 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Wed Jan 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-24
+- Bump release for January 2025 Update 2
+
 * Sat Dec 21 2024 Jon Slobodzian <joslobo@microsoft.com> - 3.0-23
 - Bump release for January 2025 Update
 
