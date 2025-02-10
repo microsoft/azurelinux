@@ -1,24 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-## START: Set by rpmautospec
-## (rpmautospec version 0.7.3)
-## RPMAUTOSPEC: autorelease, autochangelog
-%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 2;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
-## END: Set by rpmautospec
 
 Name: slirp4netns
 Version: 1.3.1
-Release: %autorelease
+Release: 2%{?dist}
 License: GPL-2.0-only
 ExcludeArch: ppc64
 Summary: slirp for network namespaces
 URL: https://github.com/rootless-containers/%{name}
 # Tarball fetched from upstream
-Source0: %{url}/archive/v%{version}.tar.gz
+Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: go-md2man
