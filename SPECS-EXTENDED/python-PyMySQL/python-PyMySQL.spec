@@ -3,13 +3,13 @@ Distribution:   Azure Linux
 %global pypi_name PyMySQL
 
 Name:           python-%{pypi_name}
-Version:        0.9.3
-Release:        3%{?dist}
+Version:        1.1.1
+Release:        1%{?dist}
 Summary:        Pure-Python MySQL client library
 
 License:        MIT
 URL:            https://pypi.python.org/pypi/%{pypi_name}/
-Source0:        https://files.pythonhosted.org/packages/source/P/PyMySQL/PyMySQL-%{version}.tar.gz#/python-PyMySQL-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/b3/8f/ce59b5e5ed4ce8512f879ff1fa5ab699d211ae2495f1adaa5fbba2a1eada/pymysql-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -18,47 +18,41 @@ This package contains a pure-Python MySQL client library. The goal of PyMySQL is
 to be a drop-in replacement for MySQLdb and work on CPython, PyPy, IronPython
 and Jython.
 
-
 %package -n     python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-cryptography
-Requires:       python%{python3_pkgversion}-cryptography
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 This package contains a pure-Python MySQL client library. The goal of PyMySQL is
 to be a drop-in replacement for MySQLdb and work on CPython, PyPy, IronPython
 and Jython.
 
-
 %prep
-%setup -qn %{pypi_name}-%{version}
-rm -rf %{pypi_name}.egg-info
-# Remove tests files so they are not installed globally.
-rm -rf tests
-
+%autosetup -n pymysql-%{version}
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files pymysql
 
 %check
 # Tests cannot be launch on koji, they require a mysqldb running.
+%pyproject_check_import
 
 
-%files -n python%{python3_pkgversion}-%{pypi_name}
-%license LICENSE
-%doc README.rst
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
-%{python3_sitelib}/pymysql/
+%files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
+%doc README.md
 
 %changelog
+* Mon Feb 10 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.1-1
+- Upgrade version to 1.1.1
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
