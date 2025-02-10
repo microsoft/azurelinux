@@ -1,0 +1,43 @@
+From ec99a19c31bd7646037cacab2c767c74861996fd Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Mon, 1 Jul 2024 14:43:01 -0500
+Subject: [PATCH 44/68] Validate guest module in VTL1 after relocations
+
+Pass the module contents from VTL0 to VTL1 after applying relocations.
+Perform the same relocations on the module copy in VTL1. After that,
+compare the VTL0 and VTL1 module contents to validate the VTL0 module.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ kernel/module/main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index e1cb486f921a..3048781f688f 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2987,6 +2987,10 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	if (err < 0)
+ 		goto free_modinfo;
+ 
++	err = apply_relocations(mod, info);
++	if (err < 0)
++		goto free_modinfo;
++
+ 	token = heki_validate_module(mod, info, flags);
+ 	if (token < 0) {
+ 		err = token;
+@@ -2994,10 +2998,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	}
+ 	mod->heki_token = token;
+ 
+-	err = apply_relocations(mod, info);
+-	if (err < 0)
+-		goto free_modinfo;
+-
+ 	err = post_relocation(mod, info);
+ 	if (err < 0)
+ 		goto free_modinfo;
+-- 
+2.43.0
+

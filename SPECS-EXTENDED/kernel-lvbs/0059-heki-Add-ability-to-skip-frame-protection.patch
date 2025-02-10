@@ -1,0 +1,43 @@
+From 7573d69d7e50af0d143429db3acec37c27d714c3 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@microsoft.com>
+Date: Wed, 28 Aug 2024 16:37:02 +0000
+Subject: [PATCH 59/68] heki: Add ability to skip frame protection
+
+By default, heki tries to protect all the existent pages within the range
+provided. This might be not suitable in some cases.
+Provide a weak function, allowing to skip page protection if overwritten.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@microsoft.com>
+---
+ virt/heki/protect.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/virt/heki/protect.c b/virt/heki/protect.c
+index 8d8db3ed282e..947be4af5ec3 100644
+--- a/virt/heki/protect.c
++++ b/virt/heki/protect.c
+@@ -46,6 +46,11 @@ void heki_init_perm(unsigned long va, unsigned long end, struct heki_args *args)
+ 	heki_walk(va, end, heki_init_perm_cb, args);
+ }
+ 
++bool __weak heki_protect_pfn(unsigned long pfn)
++{
++	return true;
++}
++
+ static void heki_protect_cb(struct heki_args *args)
+ {
+ 	unsigned long va;
+@@ -63,6 +68,9 @@ static void heki_protect_cb(struct heki_args *args)
+ 	     pa += PAGE_SIZE, va += PAGE_SIZE) {
+ 
+ 		pfn = pa >> PAGE_SHIFT;
++		if (!heki_protect_pfn(pfn))
++			continue;
++
+ 		cur_perm = (unsigned long) xa_load(&args->permissions, pfn);
+ 
+ 		args->attributes = cur_perm | perm;
+-- 
+2.43.0
+

@@ -1,0 +1,99 @@
+From 7d571d86ed3c464645d86f5d4750b197f7ccacdb Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 6 Dec 2024 11:34:22 -0500
+Subject: [PATCH] change hardcoded 'firmware' location of sk_loader and sk to
+ per-kernel namespaced location
+
+Instead of the sk_loader and sk living in a common 'firmware'
+directory, find them in a location specific to the currently running
+kernel, i.e. /lib/modules/$(uname -r)/secure/
+---
+ drivers/hv/hv_vsm_boot.c | 37 +++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index c932b468f931..eef8a77d0022 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -16,6 +16,7 @@
+ #include <linux/fs.h>
+ #include <linux/slab.h>
+ #include <linux/cpumask.h>
++#include <linux/utsname.h>
+ #include <linux/vmalloc.h>
+ #include <linux/vsm.h>
+ #include <linux/verification.h>
+@@ -915,6 +916,8 @@ static int __init hv_vsm_load_secure_kernel(void)
+ 
+ int __init hv_vsm_boot_init(void)
+ {
++	char *sk_loader_path = NULL, *sk_path = NULL;
++	char *sk_loader_sig_path = NULL, *sk_sig_path = NULL;
+ 	cpumask_var_t mask;
+ 	unsigned int boot_cpu;
+ 	u16 partition_enabled_vtl_set = 0, partition_mbec_enabled_vtl_set = 0;
+@@ -931,29 +934,43 @@ int __init hv_vsm_boot_init(void)
+ 		return -ENOMEM;
+ 	}
+ 
+-	sk_loader = filp_open("/usr/lib/firmware/skloader.bin", O_RDONLY, 0);
++	sk_loader_path = kasprintf(GFP_KERNEL, "/lib/modules/%s/secure/skloader.bin",
++				   init_utsname()->release);
++	sk_path = kasprintf(GFP_KERNEL, "/lib/modules/%s/secure/vmlinux.bin",
++			    init_utsname()->release);
++	if (!sk_loader_path || !sk_path) {
++		ret = -ENOMEM;
++		goto free_mem;
++	}
++	sk_loader = filp_open(sk_loader_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk_loader)) {
+-		pr_err("%s: File usr/lib/firmware/skloader.bin not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_loader_path);
+ 		ret = -ENOENT;
+ 		goto free_mem;
+ 	}
+-	sk = filp_open("/usr/lib/firmware/vmlinux.bin", O_RDONLY, 0);
++	sk = filp_open(sk_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk)) {
+-		pr_err("%s: File usr/lib/firmware/vmlinux.bin not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_path);
+ 		ret = -ENOENT;
+ 		goto close_skl_file;
+ 	}
+ 
+ #ifndef CONFIG_HYPERV_VSM_DISABLE_IMG_VERIFY
+-	sk_loader_sig = filp_open("/usr/lib/firmware/skloader.bin.p7s", O_RDONLY, 0);
++	sk_loader_sig_path = kasprintf(GFP_KERNEL, "%s.p7s", sk_loader_path);
++	sk_sig_path = kasprintf(GFP_KERNEL, "%s.p7s", sk_path);
++	if (!sk_loader_sig_path || !sk_sig_path) {
++		ret = -ENOMEM;
++		goto close_sk_file;
++	}
++	sk_loader_sig = filp_open(sk_loader_sig_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk_loader_sig)) {
+-		pr_err("%s: File usr/lib/firmware/skloader.bin.p7s not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_loader_sig_path);
+ 		ret = -ENOENT;
+ 		goto close_sk_file;
+ 	}
+-	sk_sig = filp_open("/usr/lib/firmware/vmlinux.bin.p7s", O_RDONLY, 0);
++	sk_sig = filp_open(sk_sig_path, O_RDONLY, 0);
+ 	if (IS_ERR(sk_sig)) {
+-		pr_err("%s: File usr/lib/firmware/vmlinux.bin.p7s not found\n", __func__);
++		pr_err("%s: File %s not found\n", __func__, sk_sig_path);
+ 		ret = -ENOENT;
+ 		goto close_skl_sig_file;
+ 	}
+@@ -1079,5 +1096,9 @@ int __init hv_vsm_boot_init(void)
+ free_mem:
+ 	vunmap(vsm_skm_va);
+ 	vsm_skm_pa = 0;
++	kfree(sk_sig_path);
++	kfree(sk_loader_sig_path);
++	kfree(sk_path);
++	kfree(sk_loader_path);
+ 	return ret;
+ }
+-- 
+2.43.0
+

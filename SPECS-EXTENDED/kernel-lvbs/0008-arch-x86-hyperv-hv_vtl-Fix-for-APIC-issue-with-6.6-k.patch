@@ -1,0 +1,40 @@
+From f8a6395627fe0a561c30771bcfa6217fa6a4d5ba Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Mon, 29 Apr 2024 06:28:34 -0400
+Subject: [PATCH 08/68] arch: x86: hyperv: hv_vtl: Fix for APIC issue with 6.6
+ kernel
+
+---
+ arch/x86/hyperv/hv_vtl.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+index db22c697652d..956b2c914440 100644
+--- a/arch/x86/hyperv/hv_vtl.c
++++ b/arch/x86/hyperv/hv_vtl.c
+@@ -22,12 +22,22 @@ static bool __init hv_vtl_msi_ext_dest_id(void)
+ 	return true;
+ }
+ 
++#ifdef CONFIG_HV_SECURE_VTL
++static void __init hv_vtl1_apic_intr_mode_select(void)
++{
++	apic_intr_mode = APIC_SYMMETRIC_IO;
++}
++#endif
++
+ void __init hv_vtl_init_platform(void)
+ {
+ 	pr_info("Linux runs in Hyper-V Virtual Trust Level\n");
+ 
+ 	x86_platform.realmode_reserve = x86_init_noop;
+ 	x86_platform.realmode_init = x86_init_noop;
++#ifdef CONFIG_HV_SECURE_VTL
++	x86_init.irqs.intr_mode_select = hv_vtl1_apic_intr_mode_select;
++#endif
+ 	x86_init.irqs.pre_vector_init = x86_init_noop;
+ 	x86_init.timers.timer_init = x86_init_noop;
+ 
+-- 
+2.43.0
+

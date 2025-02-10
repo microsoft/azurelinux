@@ -1,0 +1,149 @@
+From ef478c51236be2f5e631268ef3d1e6602566d0c9 Mon Sep 17 00:00:00 2001
+From: Daniel Urbonas <t-durbonas@microsoft.com>
+Date: Fri, 16 Aug 2024 18:03:07 +0000
+Subject: [PATCH 56/68] drivers: hv: mshv_vsm_vtl1: Support to add runtime
+ secondary key in secure kernel
+
+When keys are added to the secondary keyring, send the key payload data
+to vtl1 where it is verified, and corresponding key is added to the vtl0
+trusted keyring. Add a restrict function when allocating the vtl0
+trusted keyring to ensure secondary keys are vouched for by keys already
+on vtl0 trusted keys. Config updates needed to ensure proper parsing and
+handling of key payloads.
+
+Signed-off-by: Daniel Urbonas <t-durbonas@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 78 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 76 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 5d0e4a2be3ee..73780b429268 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -15,6 +15,8 @@
+ #include <linux/interrupt.h>
+ #include <linux/key.h>
+ #include <keys/system_keyring.h>
++#include <keys/asymmetric-type.h>
++#include <crypto/pkcs7.h>
+ #include <linux/heki.h>
+ #include <linux/sort.h>
+ #include <linux/bsearch.h>
+@@ -994,11 +996,19 @@ int x509_load_certificate_list(const u8 cert_list[],
+ 			       const unsigned long list_size,
+ 			       const struct key *keyring);
+ 
++int restrict_link_by_trusted(struct key *dest_keyring, const struct key_type *type,
++			     const union key_payload *payload, struct key *restrict_key)
++{
++	/* Only keys vouched for by vtl0.trusted_keys can be added */
++	return restrict_link_by_signature(dest_keyring, type, payload, vtl0.trusted_keys);
++}
++
+ static int mshv_vsm_create_trusted_keys(void)
+ {
+ 	struct heki_mem *mem = &vtl0.mem[HEKI_MODULE_CERTS];
+ 	void *certs = mem->va;
+ 	unsigned long certs_size = mem->size;
++	struct key_restriction *restriction;
+ 	int ret = 0;
+ 
+ 	if (vtl0.trusted_keys) {
+@@ -1008,13 +1018,22 @@ static int mshv_vsm_create_trusted_keys(void)
+ 		goto unmap;
+ 	}
+ 
++	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
++	if (!restriction) {
++		pr_warn("Can't allocate secondary trusted keyring restriction\n");
++		ret = -ENOMEM;
++		goto unmap;
++	}
++	restriction->check = restrict_link_by_trusted;
++
+ 	vtl0.trusted_keys =
+ 		keyring_alloc(".guest_trusted_keys",
+ 			      GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
+ 			      ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
+-			      KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH),
++				  KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH |
++				  KEY_USR_WRITE),
+ 			      KEY_ALLOC_NOT_IN_QUOTA,
+-			      NULL, NULL);
++			      restriction, NULL);
+ 	if (!vtl0.trusted_keys) {
+ 		pr_warn("%s: Could not allocate trusted keyring\n", __func__);
+ 		ret = -ENOMEM;
+@@ -1036,6 +1055,57 @@ static int mshv_vsm_create_trusted_keys(void)
+ 	return ret;
+ }
+ 
++static int mshv_vsm_save_secondary_key(u64 pa, unsigned long nranges)
++{
++	struct heki_range *ranges;
++	struct heki_mem mem;
++	void *key_data;
++	size_t key_data_size;
++	key_ref_t key_ref;
++	int ret = 0;
++
++	if (!vtl0.trusted_keys) {
++		pr_warn("%s: VTL0 trusted keyring not initialized\n", __func__);
++		return -EINVAL;
++	}
++
++	ranges = __vsm_read_ranges(pa, nranges, true);
++	if (!ranges) {
++		pr_warn("Failed to read ranges\n");
++		return -ENOMEM;
++	}
++
++	memset(&mem, 0, sizeof(mem));
++	mem.ranges = ranges;
++	mem.nranges = nranges;
++
++	ret = vsm_map(&mem);
++	if (ret) {
++		pr_info("Failed to map ranges\n");
++		goto free_ranges;
++	}
++
++	key_data = mem.va;
++	key_data_size = mem.size;
++
++	key_ref = key_create_or_update(make_key_ref(vtl0.trusted_keys, true), "asymmetric", NULL,
++				       key_data, key_data_size, KEY_PERM_UNDEF, KEY_ALLOC_IN_QUOTA);
++
++	if (IS_ERR(key_ref)) {
++		pr_warn("Failed to add secondary key: %ld", PTR_ERR(key_ref));
++		ret = PTR_ERR(key_ref);
++	} else {
++		pr_info("Added secondary key: %d, %s\n",
++			key_ref_to_ptr(key_ref)->serial, key_ref_to_ptr(key_ref)->description);
++		key_ref_put(key_ref);
++	}
++
++	vsm_unmap(&mem);
++free_ranges:
++	vfree(ranges);
++	return ret;
++}
++
+ static void *vsm_vtl0_va_to_vtl1_va(struct heki_mem *mem, void *va)
+ {
+ 	void *vtl0_va = (void *)mem->ranges->va;
+@@ -1785,6 +1855,10 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		pr_debug("%s : VSM_UNLOAD_MODULE\n", __func__);
+ 		status = vsm_unload_guest_module(_vtl_params->a1);
+ 		break;
++	case VSM_VTL_CALL_FUNC_ID_COPY_SECONDARY_KEY:
++		pr_debug("%s : VSM_COPY_SECONDARY_KEY\n", __func__);
++		status = mshv_vsm_save_secondary_key(_vtl_params->a1, _vtl_params->a2);
++		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+ 		break;
+-- 
+2.43.0
+

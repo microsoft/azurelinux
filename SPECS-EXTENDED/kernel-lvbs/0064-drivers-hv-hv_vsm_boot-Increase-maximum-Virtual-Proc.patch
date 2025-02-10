@@ -1,0 +1,41 @@
+From e6ba4c89585381579bdcedb24a7aa3e2c3a75092 Mon Sep 17 00:00:00 2001
+From: Femi Adeyemi <femiadeyemi@microsoft.com>
+Date: Mon, 21 Oct 2024 02:23:11 +0000
+Subject: [PATCH 64/68] drivers: hv: hv_vsm_boot: Increase maximum Virtual
+ Processors on VTL1 to 96
+
+Increase maximum VPs supported in secure kernel to 96
+
+Signed-off-by: Femi Adeyemi <femiadeyemi@microsoft.com>
+---
+ drivers/hv/hv_vsm_boot.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/hv/hv_vsm_boot.c b/drivers/hv/hv_vsm_boot.c
+index d47a411cbb89..c932b468f931 100644
+--- a/drivers/hv/hv_vsm_boot.c
++++ b/drivers/hv/hv_vsm_boot.c
+@@ -65,6 +65,7 @@
+ #define HV_VTL1_ENABLE_BIT      BIT(1)
+ 
+ #define VSM_BOOT_SIGNAL	0xDC
++#define VSM_MAX_BOOT_CPUS	96
+ 
+ static struct file *sk_loader, *sk;
+ static struct page *boot_signal_page, *cpu_online_page, *cpu_present_page;
+@@ -317,9 +318,9 @@ static __init int hv_vsm_boot_sec_vp_thread_fn(void *unused)
+ 	u16 vp_enabled_vtl_set = 0;
+ 	u8 active_mbec_enabled = 0;
+ 
+-	/* TODO: Remove once we allow >64 CPUs in Secure Kernel */
+-	if (cpu > 63) {
+-		pr_err("CPU%d: Secure Kernel currently supports CPUID <= 63.", smp_processor_id());
++	if (cpu > (VSM_MAX_BOOT_CPUS - 1)) {
++		pr_err("CPU%d: Secure Kernel currently supports CPUID <= %d.",
++		       smp_processor_id(), (VSM_MAX_BOOT_CPUS - 1));
+ 		return -EINVAL;
+ 	}
+ 
+-- 
+2.43.0
+

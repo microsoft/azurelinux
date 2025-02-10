@@ -1,0 +1,157 @@
+From 3c7d4547cc095e2f5ff0147c38a95cae6bea4bd1 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Wed, 10 Jul 2024 01:08:16 -0500
+Subject: [PATCH 45/68] Pass a VTL0 module to VTL1 after post relocation fixups
+
+Move the call to validate a VTL0 module after post relocation fixes
+to just before complete_formation(). In VTL1, the same post relocation
+fixes will be applied independently and module contents will be
+validated.
+
+After that, VTL1 will set proper EPT permissions for the VTL0 module
+sections.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/Kconfig            |  2 ++
+ arch/x86/include/asm/heki.h | 13 +++++++++++++
+ arch/x86/mm/heki.c          |  9 +++++++++
+ include/linux/heki.h        |  4 ++++
+ kernel/module/main.c        | 14 +++++++-------
+ virt/heki/module.c          |  2 ++
+ 6 files changed, 37 insertions(+), 7 deletions(-)
+ create mode 100644 arch/x86/include/asm/heki.h
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index fd653f6e297f..8583750a9084 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1812,6 +1812,7 @@ config X86_KERNEL_IBT
+ 	prompt "Indirect Branch Tracking"
+ 	def_bool y
+ 	depends on X86_64 && CC_HAS_IBT && HAVE_OBJTOOL
++	depends on !HEKI
+ 	# https://github.com/llvm/llvm-project/commit/9d7001eba9c4cb311e03cd8cdc231f9e579f2d0f
+ 	depends on !LD_IS_LLD || LLD_VERSION >= 140000
+ 	select OBJTOOL
+@@ -2451,6 +2452,7 @@ config PAGE_TABLE_ISOLATION
+ 
+ config RETPOLINE
+ 	bool "Avoid speculative indirect branches in kernel"
++	depends on !HEKI
+ 	select OBJTOOL if HAVE_OBJTOOL
+ 	default y
+ 	help
+diff --git a/arch/x86/include/asm/heki.h b/arch/x86/include/asm/heki.h
+new file mode 100644
+index 000000000000..76025d7d63fa
+--- /dev/null
++++ b/arch/x86/include/asm/heki.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_HEKI_H
++#define _ASM_X86_HEKI_H
++
++#include <asm/paravirt_types.h>
++
++struct heki_arch_kinfo {
++	struct paravirt_patch_template	pv_ops;
++	void				(*pv_bug)(void);
++	void				(*pv_nop)(void);
++};
++
++#endif /* _ASM_X86_HEKI_H */
+diff --git a/arch/x86/mm/heki.c b/arch/x86/mm/heki.c
+index 635a7e5640ba..4c2a07c948ca 100644
+--- a/arch/x86/mm/heki.c
++++ b/arch/x86/mm/heki.c
+@@ -72,3 +72,12 @@ unsigned long heki_flags_to_permissions(unsigned long flags)
+ 
+ 	return permissions;
+ }
++
++void heki_load_arch_kinfo(struct heki_kinfo *kinfo)
++{
++	struct heki_arch_kinfo *arch_kinfo = &kinfo->arch;
++
++	arch_kinfo->pv_ops = pv_ops;
++	arch_kinfo->pv_bug = paravirt_BUG;
++	arch_kinfo->pv_nop = _paravirt_nop;
++}
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 42bb40b5e1ae..0bc06a884125 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -21,6 +21,8 @@
+ 
+ struct load_info;
+ 
++#include <asm/heki.h>
++
+ /*
+  * This structure contains a guest physical range and its attributes (e.g.,
+  * permissions (RWX)).
+@@ -69,6 +71,7 @@ struct heki_kinfo {
+ 	struct kernel_symbol	*ksymtab_end;
+ 	struct kernel_symbol	*ksymtab_gpl_start;
+ 	struct kernel_symbol	*ksymtab_gpl_end;
++	struct heki_arch_kinfo	arch;
+ };
+ 
+ /*
+@@ -185,6 +188,7 @@ long heki_validate_module(struct module *mod, struct load_info *info, int flags)
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+ unsigned long heki_flags_to_permissions(unsigned long flags);
++void heki_load_arch_kinfo(struct heki_kinfo *kinfo);
+ 
+ #else /* !CONFIG_HEKI */
+ 
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 3048781f688f..0cc2f411e107 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2991,13 +2991,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	if (err < 0)
+ 		goto free_modinfo;
+ 
+-	token = heki_validate_module(mod, info, flags);
+-	if (token < 0) {
+-		err = token;
+-		goto free_modinfo;
+-	}
+-	mod->heki_token = token;
+-
+ 	err = post_relocation(mod, info);
+ 	if (err < 0)
+ 		goto free_modinfo;
+@@ -3016,6 +3009,13 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	/* Ftrace init must be called in the MODULE_STATE_UNFORMED state */
+ 	ftrace_module_init(mod);
+ 
++	token = heki_validate_module(mod, info, flags);
++	if (token < 0) {
++		err = token;
++		goto ddebug_cleanup;
++	}
++	mod->heki_token = token;
++
+ 	/* Finally it's fully formed, ready to start executing. */
+ 	err = complete_formation(mod, info);
+ 	if (err)
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 8dbed65eae5c..924e050cfec3 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -85,6 +85,8 @@ void heki_load_kdata(void)
+ 	heki_kinfo.ksymtab_gpl_end =
+ 			(struct kernel_symbol *)__stop___ksymtab_gpl;
+ 
++	heki_load_arch_kinfo(&heki_kinfo);
++
+ 	args.attributes = HEKI_KERNEL_INFO;
+ 	heki_walk((unsigned long)&heki_kinfo,
+ 		  (unsigned long)&heki_kinfo + sizeof(heki_kinfo),
+-- 
+2.43.0
+

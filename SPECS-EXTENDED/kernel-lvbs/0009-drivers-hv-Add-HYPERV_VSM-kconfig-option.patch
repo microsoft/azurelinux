@@ -1,0 +1,36 @@
+From 243d2626b17488b97ff3c67ddc19f99ee7f71b08 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Thu, 10 Oct 2024 11:08:03 -0400
+Subject: [PATCH 09/68] drivers: hv: Add HYPERV_VSM kconfig option
+
+Add HYPERV_VSM kconfig option to use Hyper-V's virtual secure mode
+to harden the kernel.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/Kconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
+index 6ea7d3803c84..acbcd69392d2 100644
+--- a/drivers/hv/Kconfig
++++ b/drivers/hv/Kconfig
+@@ -49,6 +49,15 @@ config HV_SECURE_VTL
+ 	  Select this option to enable Linux kernel as secure kernel running in VTL1.
+ 	  If unsure, say N.
+ 
++config HYPERV_VSM
++	tristate "Microsoft Hyper-V VSM driver"
++	depends on HYPERV
++	help
++	  Select this option to enable Hyper-V Virtual Secure Mode.
++	  Enabling this option will load a secure kernel in VTL1 and
++	  establish an interface between VTL0 and VTL1 to request for
++	  VSM services.
++
+ config HYPERV_TIMER
+ 	def_bool HYPERV && X86
+ 
+-- 
+2.43.0
+

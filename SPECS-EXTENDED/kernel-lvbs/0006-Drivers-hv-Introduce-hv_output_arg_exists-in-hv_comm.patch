@@ -1,0 +1,65 @@
+From 1c878bbd2dd990976347592ac597edc480a94949 Mon Sep 17 00:00:00 2001
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Date: Wed, 7 Jun 2023 20:55:23 +0000
+Subject: [PATCH 06/68] Drivers: hv: Introduce hv_output_arg_exists in
+ hv_common.c
+
+This is a more flexible approach for determining whether to allocate the
+output page.
+
+Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Acked-by: Wei Liu <wei.liu@kernel.org>
+---
+ drivers/hv/hv_common.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+index ccad7bca3fd3..ffb9ee40114e 100644
+--- a/drivers/hv/hv_common.c
++++ b/drivers/hv/hv_common.c
+@@ -58,6 +58,14 @@ EXPORT_SYMBOL_GPL(hyperv_pcpu_input_arg);
+ void * __percpu *hyperv_pcpu_output_arg;
+ EXPORT_SYMBOL_GPL(hyperv_pcpu_output_arg);
+ 
++/*
++ * Determine whether output arg is needed
++ */
++static inline bool hv_output_arg_exists(void)
++{
++	return hv_root_partition ? true : false;
++}
++
+ static void hv_kmsg_dump_unregister(void);
+ 
+ static struct ctl_table_header *hv_ctl_table_hdr;
+@@ -329,8 +337,7 @@ int __init hv_common_init(void)
+ 	hyperv_pcpu_input_arg = alloc_percpu(void  *);
+ 	BUG_ON(!hyperv_pcpu_input_arg);
+ 
+-	/* Allocate the per-CPU state for output arg for root */
+-	if (hv_root_partition) {
++	if (hv_output_arg_exists()) {
+ 		hyperv_pcpu_output_arg = alloc_percpu(void *);
+ 		BUG_ON(!hyperv_pcpu_output_arg);
+ 	}
+@@ -359,7 +366,7 @@ int hv_common_cpu_init(unsigned int cpu)
+ 	void **inputarg, **outputarg;
+ 	u64 msr_vp_index;
+ 	gfp_t flags;
+-	int pgcount = hv_root_partition ? 2 : 1;
++	int pgcount = hv_output_arg_exists() ? 2 : 1;
+ 	void *mem;
+ 	int ret;
+ 
+@@ -377,7 +384,7 @@ int hv_common_cpu_init(unsigned int cpu)
+ 		if (!mem)
+ 			return -ENOMEM;
+ 
+-		if (hv_root_partition) {
++		if (hv_output_arg_exists()) {
+ 			outputarg = (void **)this_cpu_ptr(hyperv_pcpu_output_arg);
+ 			*outputarg = (char *)mem + HV_HYP_PAGE_SIZE;
+ 		}
+-- 
+2.43.0
+

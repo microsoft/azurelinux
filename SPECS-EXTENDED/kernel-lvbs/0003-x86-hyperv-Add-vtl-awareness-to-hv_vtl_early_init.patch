@@ -1,0 +1,77 @@
+From 0d0ea4737d0c9773258f9d4292c2c542071b91ab Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 3 May 2024 16:21:43 -0400
+Subject: [PATCH 03/68] x86: hyperv: Add vtl awareness to hv_vtl_early_init
+
+This is later used to register separate wakeup_secondary_cpu_64
+callbacks for VTL1 vs VTL2.
+
+Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/hyperv/hv_init.c       |  2 +-
+ arch/x86/hyperv/hv_vtl.c        | 10 ++++++++--
+ arch/x86/include/asm/mshyperv.h |  4 ++--
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+index d1e2d12279e2..cdfb22bf52fb 100644
+--- a/arch/x86/hyperv/hv_init.c
++++ b/arch/x86/hyperv/hv_init.c
+@@ -627,7 +627,7 @@ void __init hyperv_init(void)
+ 	ms_hyperv.vtl = get_vtl();
+ 
+ 	if (ms_hyperv.vtl > 0) /* non default VTL */
+-		hv_vtl_early_init();
++		hv_vtl_early_init(ms_hyperv.vtl);
+ 
+ 	return;
+ 
+diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+index 8e7948dd33e1..db22c697652d 100644
+--- a/arch/x86/hyperv/hv_vtl.c
++++ b/arch/x86/hyperv/hv_vtl.c
+@@ -251,7 +251,7 @@ static int hv_vtl_wakeup_secondary_cpu(int apicid, unsigned long start_eip)
+ 	return hv_vtl_bringup_vcpu(vp_id, cpu, start_eip);
+ }
+ 
+-int __init hv_vtl_early_init(void)
++int __init hv_vtl_early_init(u8 vtl)
+ {
+ 	/*
+ 	 * `boot_cpu_has` returns the runtime feature support,
+@@ -261,8 +261,14 @@ int __init hv_vtl_early_init(void)
+ 		panic("XSAVE has to be disabled as it is not supported by this module.\n"
+ 			  "Please add 'noxsave' to the kernel command line.\n");
+ 
++	 /* We should not be here. We do not support VTLs higher than 2 */
++	if (vtl > HV_VTL_MGMT)
++		panic("Booting in unsupported VTL\n");
++
+ 	real_mode_header = &hv_vtl_real_mode_header;
+-	apic_update_callback(wakeup_secondary_cpu_64, hv_vtl_wakeup_secondary_cpu);
++
++	if (vtl == HV_VTL_MGMT)
++		apic_update_callback(wakeup_secondary_cpu_64, hv_vtl_wakeup_secondary_cpu);
+ 
+ 	return 0;
+ }
+diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+index ec95d6e9f168..1adceaed227b 100644
+--- a/arch/x86/include/asm/mshyperv.h
++++ b/arch/x86/include/asm/mshyperv.h
+@@ -339,10 +339,10 @@ static inline u64 hv_get_non_nested_register(unsigned int reg) { return 0; }
+ 
+ #ifdef CONFIG_HYPERV_VTL_MODE
+ void __init hv_vtl_init_platform(void);
+-int __init hv_vtl_early_init(void);
++int __init hv_vtl_early_init(u8 vtl);
+ #else
+ static inline void __init hv_vtl_init_platform(void) {}
+-static inline int __init hv_vtl_early_init(void) { return 0; }
++static inline int __init hv_vtl_early_init(u8 vtl) { return 0; }
+ #endif
+ 
+ #include <asm-generic/mshyperv.h>
+-- 
+2.43.0
+

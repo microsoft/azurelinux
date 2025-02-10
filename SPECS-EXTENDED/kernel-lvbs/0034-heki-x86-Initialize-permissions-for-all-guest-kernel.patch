@@ -1,0 +1,297 @@
+From 97e2f2e0bec7f1a3d0da66e15798cf82b68d5b3a Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Mon, 8 Jul 2024 11:33:01 -0500
+Subject: [PATCH 34/68] heki: x86: Initialize permissions for all guest kernel
+ pages
+
+Walk the kernel mappings and initialize permissions for all pages that
+are mapped.
+
+Walk the direct map mappings and initialize default permissions (RW_)
+for all pages that are not mapped.
+
+In the future, these permissions will be passed on to the host to set
+the EPT permissions for the pages correctly.
+
+While walking the kernel address space, serialize page table access
+with vmap, vunmap and set_memory*() primitives.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/mm/Makefile     |  2 ++
+ arch/x86/mm/heki.c       | 68 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/heki.h     | 22 +++++++++++++
+ include/linux/mem_attr.h | 25 +++++++++++++++
+ virt/heki/Makefile       |  1 +
+ virt/heki/common.h       |  8 -----
+ virt/heki/main.c         |  4 +++
+ virt/heki/protect.c      | 45 ++++++++++++++++++++++++++
+ 8 files changed, 167 insertions(+), 8 deletions(-)
+ create mode 100644 arch/x86/mm/heki.c
+ create mode 100644 include/linux/mem_attr.h
+ create mode 100644 virt/heki/protect.c
+
+diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
+index c80febc44cd2..2998eaac0dbb 100644
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
+@@ -67,3 +67,5 @@ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_amd.o
+ 
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_identity.o
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_boot.o
++
++obj-$(CONFIG_HEKI)		+= heki.o
+diff --git a/arch/x86/mm/heki.c b/arch/x86/mm/heki.c
+new file mode 100644
+index 000000000000..17700b52369b
+--- /dev/null
++++ b/arch/x86/mm/heki.c
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Arch specific.
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#include <linux/heki.h>
++#include <linux/mem_attr.h>
++
++#ifdef pr_fmt
++#undef pr_fmt
++#endif
++
++#define pr_fmt(fmt) "heki-guest: " fmt
++
++static unsigned long kernel_va;
++static unsigned long kernel_end;
++static unsigned long direct_map_va;
++static unsigned long direct_map_end;
++
++void heki_arch_init(void)
++{
++	struct heki_args args = {};
++
++	size_t direct_map_size;
++
++	if (pgtable_l5_enabled()) {
++		kernel_va = 0xff00000000000000UL;
++		kernel_end = 0xffffffffffe00000UL;
++		direct_map_size = 0xff91000000000000UL - 0xff11000000000000UL;
++	} else {
++		kernel_va = 0xffff800000000000UL;
++		kernel_end = 0xffffffffffe00000UL;
++		direct_map_size = 0xffffc88000000000UL - 0xffff888000000000UL;
++	}
++	direct_map_va = PAGE_OFFSET;
++	direct_map_end = direct_map_va + direct_map_size;
++
++	mutex_lock(&heki.lock);
++
++	xa_init(&args.permissions);
++
++	/*
++	 * Walk all the kernel mappings and record the permissions for each
++	 * physical page. If there are multiple mappings to a page, the
++	 * permissions must be ORed.
++	 */
++	heki_init_perm(kernel_va, direct_map_va, &args);
++	heki_init_perm(direct_map_end, kernel_end, &args);
++
++	xa_destroy(&args.permissions);
++
++	mutex_unlock(&heki.lock);
++}
++
++unsigned long heki_flags_to_permissions(unsigned long flags)
++{
++	unsigned long permissions;
++
++	permissions = MEM_ATTR_READ | MEM_ATTR_EXEC;
++	if (flags & _PAGE_RW)
++		permissions |= MEM_ATTR_WRITE;
++	if (flags & _PAGE_NX)
++		permissions &= ~MEM_ATTR_EXEC;
++
++	return permissions;
++}
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 9bf6948790ae..f3a493d5844b 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -14,6 +14,7 @@
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/printk.h>
++#include <linux/xarray.h>
+ 
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+@@ -28,6 +29,17 @@ struct heki_hypervisor {
+ };
+ 
+ #ifdef CONFIG_HEKI
++
++/*
++ * If the active hypervisor supports Heki, it will plug its heki_hypervisor
++ * pointer into this heki structure.
++ */
++struct heki {
++	struct heki_hypervisor *hypervisor;
++	struct mutex lock;
++};
++
++extern struct heki heki;
+ /*
+  * The kernel page table is walked to locate kernel mappings. For each
+  * mapping, a callback function is called. The table walker passes information
+@@ -39,6 +51,7 @@ struct heki_args {
+ 	phys_addr_t pa;
+ 	size_t size;
+ 	unsigned long flags;
++	struct xarray permissions;
+ };
+ 
+ /* Callback function called by the table walker. */
+@@ -46,6 +59,15 @@ typedef void (*heki_func_t)(struct heki_args *args);
+ 
+ void heki_late_init(void);
+ void heki_register_hypervisor(struct heki_hypervisor *hypervisor);
++void heki_walk(unsigned long va, unsigned long va_end, heki_func_t func,
++	       struct heki_args *args);
++void heki_map(unsigned long va, unsigned long end);
++void heki_init_perm(unsigned long va, unsigned long end,
++		    struct heki_args *args);
++
++/* Arch-specific functions. */
++void heki_arch_init(void);
++unsigned long heki_flags_to_permissions(unsigned long flags);
+ 
+ #else /* !CONFIG_HEKI */
+ 
+diff --git a/include/linux/mem_attr.h b/include/linux/mem_attr.h
+new file mode 100644
+index 000000000000..08323c9caf54
+--- /dev/null
++++ b/include/linux/mem_attr.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Guest page permissions - Definitions.
++ *
++ * Copyright © 2023 Microsoft Corporation.
++ */
++#ifndef __MEM_ATTR_H__
++#define __MEM_ATTR_H__
++
++/* clang-format off */
++
++#define MEM_ATTR_READ			BIT(0)
++#define MEM_ATTR_WRITE			BIT(1)
++#define MEM_ATTR_EXEC			BIT(2)
++#define MEM_ATTR_IMMUTABLE		BIT(3)
++
++#define MEM_ATTR_PROT ( \
++	MEM_ATTR_READ | \
++	MEM_ATTR_WRITE | \
++	MEM_ATTR_EXEC | \
++	MEM_ATTR_IMMUTABLE)
++
++/* clang-format on */
++
++#endif /* __MEM_ATTR_H__ */
+diff --git a/virt/heki/Makefile b/virt/heki/Makefile
+index a5daa4ff7a4f..9dc49588faa3 100644
+--- a/virt/heki/Makefile
++++ b/virt/heki/Makefile
+@@ -2,3 +2,4 @@
+ 
+ obj-y += main.o
+ obj-y += walk.o
++obj-y += protect.o
+diff --git a/virt/heki/common.h b/virt/heki/common.h
+index 5b8c2879ee50..edd98fc650a8 100644
+--- a/virt/heki/common.h
++++ b/virt/heki/common.h
+@@ -13,12 +13,4 @@
+ 
+ #define pr_fmt(fmt) "heki-guest: " fmt
+ 
+-/*
+- * If the active hypervisor supports Heki, it will plug its heki_hypervisor
+- * pointer into this heki structure.
+- */
+-struct heki {
+-	struct heki_hypervisor *hypervisor;
+-};
+-
+ #endif /* _HEKI_COMMON_H */
+diff --git a/virt/heki/main.c b/virt/heki/main.c
+index 69f40cb82dae..4b51afafbafc 100644
+--- a/virt/heki/main.c
++++ b/virt/heki/main.c
+@@ -31,6 +31,10 @@ void heki_late_init(void)
+ 		pr_warn("Unable to lock down control registers\n");
+ 	else
+ 		pr_warn("Control registers locked\n");
++
++	mutex_init(&heki.lock);
++	heki_arch_init();
++
+ 	/*
+ 	 * Signal end of kernel boot.
+ 	 * This means all boot time lvbs protections are in place and protections on
+diff --git a/virt/heki/protect.c b/virt/heki/protect.c
+new file mode 100644
+index 000000000000..c66bd68543a5
+--- /dev/null
++++ b/virt/heki/protect.c
+@@ -0,0 +1,45 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Hypervisor Enforced Kernel Integrity (Heki) - Protect kernel mappings.
++ *
++ * Copyright © 2023 Microsoft Corporation
++ */
++
++#include <linux/heki.h>
++#include <linux/mem_attr.h>
++#include <linux/xarray.h>
++
++#include "common.h"
++
++static void heki_init_perm_cb(struct heki_args *args)
++{
++	unsigned long va;
++	phys_addr_t pa, pa_end;
++	unsigned long pfn, perm, cur_perm;
++
++	if (!pfn_valid(args->pa >> PAGE_SHIFT))
++		return;
++
++	perm = heki_flags_to_permissions(args->flags);
++
++	/* Walk the leaf entries and record page permissions for each page. */
++	pa_end = args->pa + args->size;
++	for (pa = args->pa, va = args->va; pa < pa_end;
++	     pa += PAGE_SIZE, va += PAGE_SIZE) {
++
++		pfn = pa >> PAGE_SHIFT;
++		cur_perm = (unsigned long) xa_load(&args->permissions, pfn);
++		if (cur_perm)
++			perm |= cur_perm;
++		xa_store(&args->permissions, pfn, (void *) perm, GFP_KERNEL);
++	}
++}
++
++/* Find the mappings in the given range and initialize permissions for them. */
++void heki_init_perm(unsigned long va, unsigned long end, struct heki_args *args)
++{
++	va = ALIGN_DOWN(va, PAGE_SIZE);
++	end = ALIGN(end, PAGE_SIZE);
++
++	heki_walk(va, end, heki_init_perm_cb, args);
++}
+-- 
+2.43.0
+

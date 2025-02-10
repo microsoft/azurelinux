@@ -1,0 +1,28 @@
+From ffe42732491bc4e5e4e6117fce7f2b3d749d4663 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Wed, 20 Nov 2024 14:13:55 +0000
+Subject: [PATCH 67/68] Microsoft: Add config fragment to build lvbs enabled
+ kernel
+
+Add config fragment enabling HEKI and VSM config options, that can be
+merged wiht the default config to enable lvbs.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Microsoft/lvbs.config | 4 ++++
+ 1 file changed, 4 insertions(+)
+ create mode 100644 Microsoft/lvbs.config
+
+diff --git a/Microsoft/lvbs.config b/Microsoft/lvbs.config
+new file mode 100644
+index 000000000000..b17c7e539b2b
+--- /dev/null
++++ b/Microsoft/lvbs.config
+@@ -0,0 +1,4 @@
++CONFIG_LOCALVERSION="-lvbs"
++CONFIG_LOCALVERSION_AUTO=n
++CONFIG_HEKI=y
++CONFIG_HYPERV_VSM=y
+-- 
+2.43.0
+

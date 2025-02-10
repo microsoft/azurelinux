@@ -1,0 +1,187 @@
+From 5a2fb166db994d7c7b2943342977ae190cd46606 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 21 May 2024 08:44:42 -0400
+Subject: [PATCH 21/68] drivers: hv: mshv_vsm_vtl1: Api to control memory
+ access permissions in EPT.
+
+Add hv_modify_vtl_protection_mask to apply permissions to memory regions
+in the extended page tables. Using this api, mark secure kernel memory
+regions as non-accessible to the kernel running in VTL0. This is the
+only memory permission policy that secure kernel makes. All other access
+restrictions to memory should be dictated by the VTL0 kernel. Secure
+kernel will just enforce the policy dictated by VTL0 kernel.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c        | 107 +++++++++++++++++++++++++++++-
+ include/asm-generic/hyperv-tlfs.h |   1 +
+ 2 files changed, 107 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index d23482381a8b..09c56da19e2d 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -16,6 +16,8 @@
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+ #include <asm/mpspec.h>
++#include <asm/bootparam.h>
++#include <asm/e820/types.h>
+ #include "hv_vsm.h"
+ 
+ #define HV_VTL1_IOCTL	0xE1
+@@ -32,6 +34,12 @@
+ #define HV_PAGE_EXECUTABLE		(HV_PAGE_KERNEL_EXECUTABLE | HV_PAGE_USER_EXECUTABLE)
+ #define HV_PAGE_FULL_ACCESS		(HV_PAGE_READABLE | HV_PAGE_WRITABLE | HV_PAGE_EXECUTABLE)
+ 
++/* Compute the address of the page at the given index with the given base */
++#define VSM_PAGE_AT(addr, idx)  ((addr) + (idx) * PAGE_SIZE)
++/* Compute the page frame number (PFN) from a page address */
++#define VSM_PAGE_TO_PFN(addr)  ((addr) >> PAGE_SHIFT)
++extern struct boot_params boot_params;
++
+ union hv_register_vsm_vp_secure_vtl_config {
+ 	u64 as_u64;
+ 	struct {
+@@ -92,6 +100,16 @@ struct hv_vsm_per_cpu {
+ 
+ static DEFINE_PER_CPU(struct hv_vsm_per_cpu, vsm_per_cpu);
+ 
++struct hv_input_modify_vtl_protection_mask {
++	u64 partition_id;
++	u32 map_flags;
++	union hv_input_vtl target_vtl;
++	u8 reserved8_z;
++	u16 reserved16_z;
++
++	__aligned(8) u64 gpa_page_list[];
++};
++
+ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ {
+ 	unsigned int cpu, total_cpus_enabled = 0;
+@@ -172,6 +190,69 @@ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ 	return ret;
+ }
+ 
++static int hv_modify_vtl_protection_mask(u64 start, u64 number_of_pages, u32 page_access)
++{
++	struct hv_input_modify_vtl_protection_mask *hvin;
++	u64 status, pages_processed, total_pages_processed;
++	unsigned long flags;
++	size_t max_pages_per_request;
++	int i;
++
++	/* Check parameters */
++	if (number_of_pages <= 0 || number_of_pages >= UINT_MAX)
++		return -EINVAL;
++
++	pr_debug("%s start = 0x%llx, page_count = %lld, perm = 0x%x\n",
++		 __func__, start, number_of_pages, page_access);
++
++	/* Compute the maximum number of pages that can be processed in one go */
++	max_pages_per_request = (PAGE_SIZE - sizeof(*hvin)) / sizeof(u64);
++
++	/* Disable interrupts */
++	local_irq_save(flags);
++
++	/* Acquire the input page */
++	hvin = (struct hv_input_modify_vtl_protection_mask *)(*this_cpu_ptr(hyperv_pcpu_input_arg));
++
++	/* Fill in the hypercall parameters */
++	hvin->partition_id = HV_PARTITION_ID_SELF;
++	hvin->target_vtl.as_uint8 = 1;
++	hvin->map_flags = page_access;
++
++	/*
++	 * Batch-process pages based on the maximum number of pages that can be
++	 * processed in a single hypercall
++	 */
++	pages_processed = 0;
++	total_pages_processed = 0;
++
++	while (total_pages_processed < number_of_pages) {
++		for (i = 0; ((i < max_pages_per_request) &&
++			     ((total_pages_processed + i) < number_of_pages)); i++)
++			hvin->gpa_page_list[i] =
++				VSM_PAGE_TO_PFN(VSM_PAGE_AT(start, total_pages_processed + i));
++
++		/* Perform the hypercall */
++		status = hv_do_rep_hypercall(HVCALL_MODIFY_VTL_PROTECTION_MASK, i, 0, hvin, NULL);
++
++		/*
++		 * Update page accounting for the next iteration, if any
++		 * N.B.: pages_processed is correct even if Hyper-V returned an error.
++		 */
++		pages_processed = hv_repcomp(status);
++		total_pages_processed += pages_processed;
++
++		/* See how things went */
++		if (!hv_result_success(status))
++			break;
++	}
++
++	/* Enable interrupts */
++	local_irq_restore(flags);
++	/* Done */
++	return hv_result(status);
++}
++
+ /********************** Boot Secondary CPUs **********************/
+ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ 							unsigned int boot_signal_pfn)
+@@ -587,7 +668,9 @@ static struct miscdevice mshv_vsm_dev = {
+ 
+ static int __init mshv_vtl1_init(void)
+ {
+-	int ret = 0;
++	int i, ret = 0;
++	struct boot_e820_entry *e820_table;
++	u32 permissions = 0;
+ 
+ 	ret = misc_register(&mshv_vsm_dev);
+ 
+@@ -611,6 +694,28 @@ static int __init mshv_vtl1_init(void)
+ 	// ToDo: Introduce clean up function
+ 	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "hyperv/vsm:init",
+ 				mshv_vsm_per_cpu_init, NULL);
++	if (ret < 0)
++		return ret;
++
++	/* Protect VTL1 memory from VTL0 */
++	e820_table = boot_params.e820_table;
++	permissions = HV_PAGE_ACCESS_NONE;
++
++	for (i = 0; i < E820_MAX_ENTRIES_ZEROPAGE; i++) {
++		if (e820_table[i].type == E820_TYPE_RAM) {
++			u64 start, end, page_count;
++
++			start = e820_table[i].addr;
++			end = e820_table[i].addr + e820_table[i].size;
++			pr_debug("VSM: Protect VTL1 memory region 0x%llx:0x%llx", start, end);
++
++			page_count = e820_table[i].size / PAGE_SIZE;
++			ret = hv_modify_vtl_protection_mask(start, page_count, permissions);
++			if (ret)
++				pr_err("Could not protect VTL1 mem addr:0x%llx, pg_count 0x%llx",
++				       start, page_count);
++		}
++	}
+ 
+ 	return ret;
+ }
+diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
+index 7ca60e416753..1cff0dbb4825 100644
+--- a/include/asm-generic/hyperv-tlfs.h
++++ b/include/asm-generic/hyperv-tlfs.h
+@@ -151,6 +151,7 @@ union hv_reference_tsc_msr {
+ #define HVCALL_ENABLE_VP_VTL			0x000f
+ #define HVCALL_NOTIFY_LONG_SPIN_WAIT		0x0008
+ #define HVCALL_SEND_IPI				0x000b
++#define HVCALL_MODIFY_VTL_PROTECTION_MASK	0x000c
+ #define HVCALL_ENABLE_PARTITION_VTL		0x000d
+ #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX	0x0013
+ #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX	0x0014
+-- 
+2.43.0
+

@@ -1,0 +1,476 @@
+From d44787d03496ae9f8450ca739f9fbe0990563bc1 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 30 May 2023 13:13:35 -0400
+Subject: [PATCH 15/68] drivers: hv: Add VSM driver to run in VTL1
+
+Add support for basic vsm driver that runs in VTL1. The driver supports
+parameter handling for cross VTL communication Saves and restores VTL0
+registers on entry into VTL1 and VTL1 registers across vtlcall and
+vtlreturn. Register ioctl to enable return to VTL0 when called from the
+userspace after boot.
+
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/include/asm/hyperv-tlfs.h |   2 +
+ drivers/hv/Makefile                |   1 +
+ drivers/hv/hv_vsm.h                |   1 +
+ drivers/hv/hv_vsm_common.c         |  25 ++
+ drivers/hv/mshv_vsm_vtl1.c         | 374 +++++++++++++++++++++++++++++
+ 5 files changed, 403 insertions(+)
+ create mode 100644 drivers/hv/mshv_vsm_vtl1.c
+
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index 2670c93f89e4..b55619946a9d 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -309,6 +309,8 @@ enum hv_isolation_type {
+ #define	HV_X64_REGISTER_VSM_VP_STATUS		0x000D0003
+ #define HV_REGISTER_VSM_CODEPAGE_OFFSETS	0x000D0002
+ #define HV_REGISTER_VSM_PARTITION_STATUS	0x000D0004
++#define HV_REGISTER_VSM_PARTITION_CONFIG	0x000D0007
++#define HV_REGISTER_VSM_VP_SECURE_CONFIG_VTL0	0x000D0010
+ #define	HV_X64_VTL_MASK			GENMASK(3, 0)
+ 
+ /* Hyper-V memory host visibility */
+diff --git a/drivers/hv/Makefile b/drivers/hv/Makefile
+index efb775e19fa4..329a773dc5cc 100644
+--- a/drivers/hv/Makefile
++++ b/drivers/hv/Makefile
+@@ -16,3 +16,4 @@ hv_utils-y := hv_util.o hv_kvp.o hv_snapshot.o hv_fcopy.o hv_utils_transport.o
+ # Code that must be built-in
+ obj-$(subst m,y,$(CONFIG_HYPERV)) += hv_common.o
+ obj-$(subst m,y,$(CONFIG_HYPERV_VSM)) += hv_vsm_securekernel.o hv_vsm_boot.o hv_vsm_common.o
++obj-$(subst m,y,$(CONFIG_HV_SECURE_VTL)) += mshv_vsm_vtl1.o hv_vsm_common.o
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index c1e6544600ae..f3e9f6ef79c5 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -34,6 +34,7 @@ union hv_register_vsm_code_page_offsets {
+ } __packed;
+ 
+ int hv_vsm_get_register(u32 reg_name, u64 *result);
++int hv_vsm_set_register(u32 reg_name, u64 value);
+ int hv_vsm_get_code_page_offsets(void);
+ 
+ #endif /* _HV_VSM_H */
+diff --git a/drivers/hv/hv_vsm_common.c b/drivers/hv/hv_vsm_common.c
+index ffa0617bc3d5..2d829a675182 100644
+--- a/drivers/hv/hv_vsm_common.c
++++ b/drivers/hv/hv_vsm_common.c
+@@ -39,6 +39,31 @@ int hv_vsm_get_register(u32 reg_name, u64 *result)
+ 	return 0;
+ }
+ 
++int hv_vsm_set_register(u32 reg_name, u64 value)
++{
++	u64 status;
++	unsigned long flags;
++	struct hv_set_vp_registers_input *hvin = NULL;
++
++	local_irq_save(flags);
++
++	hvin = *this_cpu_ptr(hyperv_pcpu_input_arg);
++
++	hvin->header.partitionid = HV_PARTITION_ID_SELF;
++	hvin->header.vpindex = HV_VP_INDEX_SELF;
++	hvin->header.inputvtl = 0;
++	hvin->element[0].name = reg_name;
++	hvin->element[0].valuelow = value;
++
++	status = hv_do_rep_hypercall(HVCALL_SET_VP_REGISTERS, 1, 0, hvin, NULL);
++	local_irq_restore(flags);
++
++	if (!hv_result_success(status))
++		return -EFAULT;
++
++	return 0;
++}
++
+ int hv_vsm_get_code_page_offsets(void)
+ {
+ 	u64 result;
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+new file mode 100644
+index 000000000000..c55ea02718d5
+--- /dev/null
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -0,0 +1,374 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2023, Microsoft Corporation.
++ *
++ */
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/tick.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
++#include <linux/kthread.h>
++#include <linux/cpuhotplug.h>
++#include <linux/fs.h>
++#include <asm/mshyperv.h>
++#include <asm/fpu/api.h>
++#include "hv_vsm.h"
++
++#define HV_VTL1_IOCTL	0xE1
++#define HV_RETURN_TO_LOWER_VTL    _IO(HV_VTL1_IOCTL, 0)
++
++#define VTL_ENTRY_REASON_LOWER_VTL_CALL     0x1
++#define VTL_ENTRY_REASON_INTERRUPT          0x2
++
++#define HV_PAGE_ACCESS_NONE		0x0
++#define HV_PAGE_READABLE		0x1
++#define HV_PAGE_WRITABLE		0x2
++#define HV_PAGE_KERNEL_EXECUTABLE	0x4
++#define HV_PAGE_USER_EXECUTABLE		0x8
++#define HV_PAGE_EXECUTABLE		(HV_PAGE_KERNEL_EXECUTABLE | HV_PAGE_USER_EXECUTABLE)
++#define HV_PAGE_FULL_ACCESS		(HV_PAGE_READABLE | HV_PAGE_WRITABLE | HV_PAGE_EXECUTABLE)
++
++union hv_register_vsm_vp_secure_vtl_config {
++	u64 as_u64;
++	struct {
++		u64 mbec_enabled : 1;
++		u64 tlb_locked : 1;
++		u64 reserved: 62;
++	};
++};
++
++union hv_register_vsm_partition_config {
++	__u64 as_u64;
++	struct {
++		__u64 enable_vtl_protection : 1;
++		__u64 default_vtl_protection_mask : 4;
++		__u64 zero_memory_on_reset : 1;
++		__u64 deny_lower_vtl_startup : 1;
++		__u64 intercept_acceptance : 1;
++		__u64 intercept_enable_vtl_protection : 1;
++		__u64 intercept_vp_startup : 1;
++		__u64 intercept_cpuid_unimplemented : 1;
++		__u64 intercept_unrecoverable_exception : 1;
++		__u64 intercept_page : 1;
++		__u64 mbz : 51;
++	};
++};
++
++struct hv_vtl_cpu_context {
++	u64 rax;
++	u64 rcx;
++	u64 rdx;
++	u64 rbx;
++	u64 rbp;
++	u64 rsi;
++	u64 rdi;
++	u64 r8;
++	u64 r9;
++	u64 r10;
++	u64 r11;
++	u64 r12;
++	u64 r13;
++	u64 r14;
++	u64 r15;
++	u64 cr2;
++	struct fxregs_state fx_state;
++};
++
++struct hv_vsm_per_cpu {
++	struct hv_vtl_cpu_context cpu_context;
++	struct task_struct *vsm_task;
++	/* Shut down tick when exiting VTL1 */
++	bool suppress_tick;
++	/* CPU should stay in VTL1 and not exit to VTL0 even if idle is invoked */
++	bool stay_in_vtl1;
++};
++
++static DEFINE_PER_CPU(struct hv_vsm_per_cpu, vsm_per_cpu);
++
++/* DO NOT MODIFY THIS FUNCTION WITHOUT DISASSEMBLING AND SEEING WHAT IS GOING ON */
++static void __mshv_vsm_vtl_return(void)
++{
++	register struct hv_vtl_cpu_context *cpu_context asm ("rcx");
++	register u64 r8 asm("r8");
++	register u64 r9 asm("r9");
++	register u64 r10 asm("r10");
++	register u64 r11 asm("r11");
++	register u64 r12 asm("r12");
++	register u64 r13 asm("r13");
++	register u64 r14 asm("r14");
++	register u64 r15 asm("r15");
++	register u64 hcall_addr asm ("rax");
++	struct hv_vp_assist_page *hvp;
++
++	hcall_addr = (u64)((u8 *)hv_hypercall_pg + vsm_code_page_offsets.vtl_return_offset);
++	/*
++	 * All VTL0 registers are saved and restored. The only exception for now is VTL0
++	 * rax and rcx. This is a non-issue if the entry reason is HvVtlEntryVtlCall since VTL0
++	 * will take care of saving an restoring rax and rcx. However if the entry reason is
++	 * HvVtlEntryInterrupt, VTL0 rax and rcx are lost. Only way to fix this is to implement
++	 * the jump into hypercall page for return to VTL0. The first part before vmcall restores
++	 * all VTL0 registers and the part after vmcall saves. For registers r8-r15 the compiler
++	 * translates the following c code into write of value in cpu_context->r# to actual cpu
++	 * register r# prior to vmcall and save the content of cpu register r# into cpu_context->r#
++	 * post vmcall.
++	 *		 register u64 r# asm("r#");
++	 *		 r# = cpu_context->r#;
++	 *		 asm __volatile(some instruction
++	 *				some instruction
++	 *				vmcall
++	 *				some instruction
++	 *				some instruction
++	 *				: +r(r#)
++	 *				:
++	 *				:);
++	 *		cpu_context->r# = r#;
++	 * For registers rdx, rbx, rdi and rsi the complier again translates the following c code
++	 * into restoring and saving of these registers from/to corresponding cpu_context-># across
++	 * the vmcall.
++	 *		 asm __volatile(some instruction
++	 *				some instruction
++	 *				vmcall
++	 *				some instruction
++	 *				some instruction
++	 *				: "+d"(cpu_context->rdx), "+b"(cpu_context->rbx),
++	 *				  "+S"(cpu_context->rsi), "+D"(cpu_context->rdi)
++	 *				:
++	 *				:);
++	 * rbp alone requires explicit restore and save which is performed in the inline
++	 * assembly code below.
++	 *
++	 * Regarding VTL1 registers only VTL1 rbp and rcx are saved and restored. rcx is
++	 * saved and restored so as to preserve pointer to cpu_context across vmcall. rbp
++	 * is weird since sometimes it gets used before the exit of __mshv_vsm_vtl_return
++	 * and not saving and restoring can lead to crashes
++	 * There is very little happening in this function post vmcall, just minimal saving
++	 * of VTL0 context into cpu_context which is stored in rax. Technically no other
++	 * VTL1 register gets used in this function post vmcall. As per x64 function calling
++	 * conventions registers rbx, rbp and r12-r15 are callee saved and hence the compiler
++	 * automatically saves and restores them across the boundary of a function call i.e.
++	 * when __mshv_vsm_vtl_return exits these registers are restored. Rest of the registers
++	 * are caller saved and the caller of __mshv_vsm_vtl_return takes care of saving and
++	 * restoring. Thus no other VTL1 register needs explicit saving and restoring.
++	 */
++	cpu_context = &this_cpu_ptr(&vsm_per_cpu)->cpu_context;
++	hvp = hv_vp_assist_page[smp_processor_id()];
++
++	hvp->vtl_ret_x64rax = cpu_context->rax;
++	hvp->vtl_ret_x64rcx = cpu_context->rcx;
++
++	asm __volatile__("pushq %%rbp\n"	// Save VTL1 rbp
++			 "pushq %%rcx\n"	// Push VTL1 rax i.e. save *cpu_context
++			 :
++			 : "c"(cpu_context)
++			 : );
++	r8 = cpu_context->r8;
++	r9 = cpu_context->r9;
++	r10 = cpu_context->r10;
++	r11 = cpu_context->r11;
++	r12 = cpu_context->r12;
++	r13 = cpu_context->r13;
++	r14 = cpu_context->r14;
++	r15 = cpu_context->r15;
++	asm __volatile__("movq %0, %%rbp\n"	// Load rbp with saved VTL0 rbp
++			 "xorl  %%ecx, %%ecx\n"	// Load return kind into rcx.
++			 CALL_NOSPEC		// VTL call
++			 "pushq %%rax\n"	// Push VTL0 rax into stack
++			 "pushq %%rcx\n"	// Push VTL0 rcx into stack to align at 16 bytes
++			 "movq 16(%%rsp), %%rcx\n" // Restore rax to *cpu_context
++			 "movq %%rbp, %0\n"	// Save VTL0 rbp
++			 "popq %1\n"	// Save VTL0 rcx
++			 "popq %2\n"	// Save VTL0 rax
++			 "movq 8(%%rsp), %%rbp\n"	// Restore VTL1 rbp
++			 "addq $16, %%rsp\n"	// Restore VTL1 stack to prior condition
++			 : "+m"(cpu_context->rbp), "=m"(cpu_context->rcx), "=m"(cpu_context->rax),
++			   "+r"(r8), "+r"(r9), "+r"(r10), "+r"(r11), "+r"(r12), "+r"(r13),
++			   "+r"(r14), "+r"(r15), "+d"(cpu_context->rdx), "+b"(cpu_context->rbx),
++			   "+S"(cpu_context->rsi), "+D"(cpu_context->rdi)
++			 : THUNK_TARGET(hcall_addr)
++			 : "memory", "cc");
++	cpu_context->r8 = r8;
++	cpu_context->r9 = r9;
++	cpu_context->r10 = r10;
++	cpu_context->r11 = r11;
++	cpu_context->r12 = r12;
++	cpu_context->r13 = r13;
++	cpu_context->r14 = r14;
++	cpu_context->r15 = r15;
++}
++
++static void mshv_vsm_vtl_idle(void)
++{
++	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
++
++	if (!per_cpu->vsm_task)
++		goto out;
++
++	if (task_is_running(per_cpu->vsm_task) || per_cpu->stay_in_vtl1)
++		goto out;
++
++	if (per_cpu->suppress_tick)
++		tick_suspend_local();
++
++	kernel_fpu_begin_mask(0);
++	__mshv_vsm_vtl_return();
++
++	kernel_fpu_end();
++	per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	if (per_cpu->suppress_tick)
++		tick_resume_local();
++	wake_up_process(per_cpu->vsm_task);
++
++out:
++	raw_local_irq_enable();
++}
++
++static int mshv_vsm_vtl_task(void *unused)
++{
++	struct hv_vp_assist_page *hvp;
++
++	while (true) {
++		hvp = hv_vp_assist_page[smp_processor_id()];
++		switch (hvp->vtl_entry_reason) {
++		case VTL_ENTRY_REASON_LOWER_VTL_CALL:
++			break;
++		case VTL_ENTRY_REASON_INTERRUPT:
++			/* ToDo: Some kind of refcounting here */
++			break;
++		default:
++			pr_err("CPU%u: Unknown entry reason: %d",
++			       smp_processor_id(), hvp->vtl_entry_reason);
++			break;
++		}
++		set_current_state(TASK_INTERRUPTIBLE);
++		schedule();
++	}
++	return 0;
++}
++
++static void mshv_vsm_set_secure_config_vtl0(void)
++{
++	union hv_register_vsm_vp_secure_vtl_config vsm_vp_secure_vtl_config;
++
++	vsm_vp_secure_vtl_config.as_u64 = 0;
++	vsm_vp_secure_vtl_config.mbec_enabled = 1;
++	vsm_vp_secure_vtl_config.tlb_locked = 0;
++	vsm_vp_secure_vtl_config.reserved = 0;
++
++	hv_vsm_set_register(HV_REGISTER_VSM_VP_SECURE_CONFIG_VTL0, vsm_vp_secure_vtl_config.as_u64);
++}
++
++static int mshv_vsm_configure_partition(void)
++{
++	union hv_register_vsm_partition_config config;
++
++	config.as_u64 = 0;
++	config.default_vtl_protection_mask = HV_PAGE_FULL_ACCESS;
++	config.enable_vtl_protection = 1;
++//	config.zero_memory_on_reset = 1;
++//	config.intercept_vp_startup = 1;
++//	config.intercept_cpuid_unimplemented = 1;
++
++//	if (mshv_vsm_capabilities.intercept_page_available) {
++//		pr_debug("%s: using intercept page", __func__);
++//		config.intercept_page = 1;
++//	}
++
++	return hv_vsm_set_register(HV_REGISTER_VSM_PARTITION_CONFIG, config.as_u64);
++}
++
++static int mshv_vsm_per_cpu_init(unsigned int cpu)
++{
++	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
++
++	memset(per_cpu, 0, sizeof(*per_cpu));
++
++	per_cpu->vsm_task = kthread_create(mshv_vsm_vtl_task, NULL, "vsm_task");
++	kthread_bind(per_cpu->vsm_task, cpu);
++
++	mshv_vsm_set_secure_config_vtl0();
++
++	return 0;
++}
++
++static bool enable_ioctl = true;
++static long mshv_vsm_vtl_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
++{
++	long ret = 0;
++	struct hv_vsm_per_cpu *per_cpu;
++
++	switch (ioctl) {
++	case HV_RETURN_TO_LOWER_VTL:
++		if (enable_ioctl) {
++			enable_ioctl = false; // IOCTL is used only once
++
++			/*
++			 * Schedule the main kthread that will deal with entry/exit from VTL1 and
++			 * put the init process to sleep.
++			 */
++			per_cpu = this_cpu_ptr(&vsm_per_cpu);
++			per_cpu->suppress_tick = true;
++			hv_vtl_set_idle(mshv_vsm_vtl_idle);
++			set_current_state(TASK_UNINTERRUPTIBLE);
++			schedule();
++		}
++		break;
++	default:
++		pr_err("%s: invalid vtl ioctl: %#x\n", __func__, ioctl);
++		ret = -ENOTTY;
++	}
++
++	return ret;
++}
++
++static const struct file_operations mshv_vtl_fops = {
++	.owner = THIS_MODULE,
++	.unlocked_ioctl = mshv_vsm_vtl_ioctl,
++};
++
++static struct miscdevice mshv_vsm_dev = {
++	.name = "mshv_vsm_dev",
++	.nodename = "mshv_vsm_dev",
++	.fops = &mshv_vtl_fops,
++	.mode = 0400,
++	.minor = MISC_DYNAMIC_MINOR,
++};
++
++static int __init mshv_vtl1_init(void)
++{
++	int ret = 0;
++
++	ret = misc_register(&mshv_vsm_dev);
++
++	if (ret) {
++		pr_err("VSM: Could not register mshv_vsm_vtl_ioctl\n");
++		return ret;
++	}
++
++	if (mshv_vsm_configure_partition()) {
++		pr_emerg("%s: VSM configuration failed !!\n", __func__);
++		return -EPERM;
++	}
++
++	if (hv_vsm_get_code_page_offsets()) {
++		pr_emerg("%s: FATAL: Could not retrieve vsm page offsets.Cannot return to VTL0\n",
++			 __func__);
++		return -EINVAL;
++	}
++
++	/* Initialize hyper-v per cpu context */
++	// ToDo: Introduce clean up function
++	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "hyperv/vsm:init",
++				mshv_vsm_per_cpu_init, NULL);
++
++	return ret;
++}
++
++static void __exit mshv_vtl1_exit(void)
++{
++	misc_deregister(&mshv_vsm_dev);
++	pr_info("mshv_vsm_dev device unregistered\n");
++}
++
++module_init(mshv_vtl1_init);
++module_exit(mshv_vtl1_exit);
+-- 
+2.43.0
+

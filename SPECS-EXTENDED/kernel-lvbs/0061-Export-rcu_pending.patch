@@ -1,0 +1,66 @@
+From 0c53b3d6f74f4f39cf4c5a82c822c5a030a6853b Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Mon, 9 Sep 2024 08:22:23 -0400
+Subject: [PATCH 61/68] Export rcu_pending
+
+With LVBS kernel, since tick is turned off on exit from VTL1 kernel to
+VTL0 kernel rcu threads do not get a chance to run if pending. Exporting
+rcu_pending api allows for checking of pending rcu prior to exit and if
+pending relevant action can be taken in form of not disabling ticks or
+brining in other cpus to VTL1 thus giving grace period thread and other
+threads a chance to complete.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ include/linux/rcutiny.h | 1 +
+ include/linux/rcutree.h | 2 ++
+ kernel/rcu/tree.c       | 3 +--
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/rcutiny.h b/include/linux/rcutiny.h
+index 7b949292908a..0432bdc4ade9 100644
+--- a/include/linux/rcutiny.h
++++ b/include/linux/rcutiny.h
+@@ -161,6 +161,7 @@ static inline bool rcu_is_watching(void) { return true; }
+ static inline void rcu_momentary_dyntick_idle(void) { }
+ static inline void kfree_rcu_scheduler_running(void) { }
+ static inline bool rcu_gp_might_be_stalled(void) { return false; }
++static inline int rcu_pending(int user) { return 0; }
+ 
+ /* Avoid RCU read-side critical sections leaking across. */
+ static inline void rcu_all_qs(void) { barrier(); }
+diff --git a/include/linux/rcutree.h b/include/linux/rcutree.h
+index 126f6b418f6a..ae1a6018ea4e 100644
+--- a/include/linux/rcutree.h
++++ b/include/linux/rcutree.h
+@@ -116,4 +116,6 @@ int rcutree_dead_cpu(unsigned int cpu);
+ int rcutree_dying_cpu(unsigned int cpu);
+ void rcu_cpu_starting(unsigned int cpu);
+ 
++int rcu_pending(int user);
++
+ #endif /* __LINUX_RCUTREE_H */
+diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+index 3d7b119f6e2a..0b21bac84240 100644
+--- a/kernel/rcu/tree.c
++++ b/kernel/rcu/tree.c
+@@ -474,7 +474,6 @@ module_param_cb(jiffies_till_next_fqs, &next_fqs_jiffies_ops, &jiffies_till_next
+ module_param(rcu_kick_kthreads, bool, 0644);
+ 
+ static void force_qs_rnp(int (*f)(struct rcu_data *rdp));
+-static int rcu_pending(int user);
+ 
+ /*
+  * Return the number of RCU GPs completed thus far for debug & stats.
+@@ -3920,7 +3919,7 @@ EXPORT_SYMBOL_GPL(cond_synchronize_rcu_full);
+  * CPU-local state are performed first.  However, we must check for CPU
+  * stalls first, else we might not get a chance.
+  */
+-static int rcu_pending(int user)
++int rcu_pending(int user)
+ {
+ 	bool gp_in_progress;
+ 	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
+-- 
+2.43.0
+

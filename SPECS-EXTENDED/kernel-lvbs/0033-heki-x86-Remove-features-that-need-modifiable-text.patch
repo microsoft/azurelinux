@@ -1,0 +1,220 @@
+From 191eac47032cfc6b8bbf9277c03d7cd83ba7641b Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Mon, 4 Mar 2024 01:08:47 -0600
+Subject: [PATCH 33/68] heki: x86: Remove features that need modifiable text
+
+HEKI currently does not address text modifications since that involves
+setting write permissions in the EPT for text pages. This will be
+addressed in the future.
+
+This means that the following features are not currently supported in
+HEKI. Disable them:
+
+	- FTrace
+	- KProbes
+	- Static Calls
+	- BPF and eBPF JIT
+	- Jump Label optimization
+
+However, disabling Static Calls causes some build errors on X86 because
+of some missing definitions for the generic case. Include those
+definitions. Also, disable RETHUNK since it has a hard dependency on
+Static Calls Inline.
+
+Finally, PARAVIRT depends on Static Calls. Remove that hard dependency
+since PARAVIRT is required for guest support.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ arch/x86/Kconfig                        | 41 +++++++++++++------------
+ arch/x86/kernel/paravirt.c              |  1 +
+ include/linux/static_call.h             |  2 ++
+ include/linux/static_call_types.h       |  1 +
+ kernel/trace/Kconfig                    |  1 +
+ tools/include/linux/static_call_types.h |  1 +
+ 6 files changed, 27 insertions(+), 20 deletions(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 82d12c93feab..fd653f6e297f 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -124,7 +124,7 @@ config X86
+ 	select ARCH_USE_QUEUED_SPINLOCKS
+ 	select ARCH_USE_SYM_ANNOTATIONS
+ 	select ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
+-	select ARCH_WANT_DEFAULT_BPF_JIT	if X86_64
++	select ARCH_WANT_DEFAULT_BPF_JIT	if X86_64 && !HEKI
+ 	select ARCH_WANTS_DYNAMIC_TASK_STRUCT
+ 	select ARCH_WANTS_NO_INSTR
+ 	select ARCH_WANT_GENERAL_HUGETLB
+@@ -174,8 +174,8 @@ config X86
+ 	select HAVE_ARCH_AUDITSYSCALL
+ 	select HAVE_ARCH_HUGE_VMAP		if X86_64 || X86_PAE
+ 	select HAVE_ARCH_HUGE_VMALLOC		if X86_64
+-	select HAVE_ARCH_JUMP_LABEL
+-	select HAVE_ARCH_JUMP_LABEL_RELATIVE
++	select HAVE_ARCH_JUMP_LABEL		if !HEKI
++	select HAVE_ARCH_JUMP_LABEL_RELATIVE	if !HEKI
+ 	select HAVE_ARCH_KASAN			if X86_64
+ 	select HAVE_ARCH_KASAN_VMALLOC		if X86_64
+ 	select HAVE_ARCH_KFENCE
+@@ -207,28 +207,28 @@ config X86
+ 	select HAVE_BUILDTIME_MCOUNT_SORT
+ 	select HAVE_DEBUG_KMEMLEAK
+ 	select HAVE_DMA_CONTIGUOUS
+-	select HAVE_DYNAMIC_FTRACE
+-	select HAVE_DYNAMIC_FTRACE_WITH_REGS
+-	select HAVE_DYNAMIC_FTRACE_WITH_ARGS	if X86_64
+-	select HAVE_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
+-	select HAVE_SAMPLE_FTRACE_DIRECT	if X86_64
+-	select HAVE_SAMPLE_FTRACE_DIRECT_MULTI	if X86_64
+-	select HAVE_EBPF_JIT
++	select HAVE_DYNAMIC_FTRACE		if !HEKI
++	select HAVE_DYNAMIC_FTRACE_WITH_REGS	if !HEKI
++	select HAVE_DYNAMIC_FTRACE_WITH_ARGS	if X86_64 && !HEKI
++	select HAVE_DYNAMIC_FTRACE_WITH_DIRECT_CALLS	if !HEKI
++	select HAVE_SAMPLE_FTRACE_DIRECT	if X86_64 && !HEKI
++	select HAVE_SAMPLE_FTRACE_DIRECT_MULTI	if X86_64 && !HEKI
++	select HAVE_EBPF_JIT			if !HEKI
+ 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	select HAVE_EISA
+ 	select HAVE_EXIT_THREAD
+ 	select HAVE_FAST_GUP
+ 	select HAVE_FENTRY			if X86_64 || DYNAMIC_FTRACE
+-	select HAVE_FTRACE_MCOUNT_RECORD
++	select HAVE_FTRACE_MCOUNT_RECORD	if !HEKI
+ 	select HAVE_FUNCTION_GRAPH_RETVAL	if HAVE_FUNCTION_GRAPH_TRACER
+ 	select HAVE_FUNCTION_GRAPH_TRACER	if X86_32 || (X86_64 && DYNAMIC_FTRACE)
+-	select HAVE_FUNCTION_TRACER
++	select HAVE_FUNCTION_TRACER		if !HEKI
+ 	select HAVE_GCC_PLUGINS
+ 	select HAVE_HW_BREAKPOINT
+ 	select HAVE_IOREMAP_PROT
+ 	select HAVE_IRQ_EXIT_ON_IRQ_STACK	if X86_64
+ 	select HAVE_IRQ_TIME_ACCOUNTING
+-	select HAVE_JUMP_LABEL_HACK		if HAVE_OBJTOOL
++	select HAVE_JUMP_LABEL_HACK		if HAVE_OBJTOOL && !HEKI
+ 	select HAVE_KERNEL_BZIP2
+ 	select HAVE_KERNEL_GZIP
+ 	select HAVE_KERNEL_LZ4
+@@ -236,8 +236,8 @@ config X86
+ 	select HAVE_KERNEL_LZO
+ 	select HAVE_KERNEL_XZ
+ 	select HAVE_KERNEL_ZSTD
+-	select HAVE_KPROBES
+-	select HAVE_KPROBES_ON_FTRACE
++	select HAVE_KPROBES			if !HEKI
++	select HAVE_KPROBES_ON_FTRACE		if !HEKI
+ 	select HAVE_FUNCTION_ERROR_INJECTION
+ 	select HAVE_KRETPROBES
+ 	select HAVE_RETHOOK
+@@ -269,9 +269,9 @@ config X86
+ 	select HAVE_SOFTIRQ_ON_OWN_STACK
+ 	select HAVE_STACKPROTECTOR		if CC_HAS_SANE_STACKPROTECTOR
+ 	select HAVE_STACK_VALIDATION		if HAVE_OBJTOOL
+-	select HAVE_STATIC_CALL
+-	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL
+-	select HAVE_PREEMPT_DYNAMIC_CALL
++	select HAVE_STATIC_CALL			if !HEKI
++	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL && !HEKI
++	select HAVE_PREEMPT_DYNAMIC_CALL	if !HEKI
+ 	select HAVE_RSEQ
+ 	select HAVE_RUST			if X86_64
+ 	select HAVE_SYSCALL_TRACEPOINTS
+@@ -304,7 +304,7 @@ config X86
+ 	select FUNCTION_ALIGNMENT_16B		if X86_64 || X86_ALIGNMENT_16
+ 	select FUNCTION_ALIGNMENT_4B
+ 	imply IMA_SECURE_AND_OR_TRUSTED_BOOT    if EFI
+-	select HAVE_DYNAMIC_FTRACE_NO_PATCHABLE
++	select HAVE_DYNAMIC_FTRACE_NO_PATCHABLE		if !HEKI
+ 
+ config INSTRUCTION_DECODER
+ 	def_bool y
+@@ -781,7 +781,6 @@ if HYPERVISOR_GUEST
+ 
+ config PARAVIRT
+ 	bool "Enable paravirtualization code"
+-	depends on HAVE_STATIC_CALL
+ 	help
+ 	  This changes the kernel so it can modify itself when it is run
+ 	  under a hypervisor, potentially improving performance significantly
+@@ -1227,6 +1226,7 @@ config X86_16BIT
+ 	bool "Enable support for 16-bit segments" if EXPERT
+ 	default y
+ 	depends on MODIFY_LDT_SYSCALL
++	depends on !HEKI
+ 	help
+ 	  This option is required by programs like Wine to run 16-bit
+ 	  protected mode legacy code on x86 processors.  Disabling
+@@ -2462,6 +2462,7 @@ config RETPOLINE
+ config RETHUNK
+ 	bool "Enable return-thunks"
+ 	depends on RETPOLINE && CC_HAS_RETURN_THUNK
++	depends on !HEKI
+ 	select OBJTOOL if HAVE_OBJTOOL
+ 	default y if X86_64
+ 	help
+diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+index 8d51c86caa41..73f81685505b 100644
+--- a/arch/x86/kernel/paravirt.c
++++ b/arch/x86/kernel/paravirt.c
+@@ -33,6 +33,7 @@
+ #include <asm/tlb.h>
+ #include <asm/io_bitmap.h>
+ #include <asm/gsseg.h>
++#include <asm/text-patching.h>
+ 
+ /*
+  * nop stub, which must not clobber anything *including the stack* to
+diff --git a/include/linux/static_call.h b/include/linux/static_call.h
+index 141e6b176a1b..c2fa4da81568 100644
+--- a/include/linux/static_call.h
++++ b/include/linux/static_call.h
+@@ -340,6 +340,8 @@ static inline int static_call_text_reserved(void *start, void *end)
+ 
+ #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
+ #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
++#define EXPORT_STATIC_CALL_TRAMP_GPL(name)				\
++	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
+ 
+ #endif /* CONFIG_HAVE_STATIC_CALL */
+ 
+diff --git a/include/linux/static_call_types.h b/include/linux/static_call_types.h
+index 5a00b8b2cf9f..1fcf682658d6 100644
+--- a/include/linux/static_call_types.h
++++ b/include/linux/static_call_types.h
+@@ -97,6 +97,7 @@ struct static_call_key {
+ 
+ #define static_call(name)						\
+ 	((typeof(STATIC_CALL_TRAMP(name))*)(STATIC_CALL_KEY(name).func))
++#define static_call_mod(name)	static_call(name)
+ 
+ #endif /* CONFIG_HAVE_STATIC_CALL */
+ 
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index bcc97f1bd383..22a65fe0c8b6 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -181,6 +181,7 @@ config TRACING_SUPPORT
+ 
+ menuconfig FTRACE
+ 	bool "Tracers"
++	depends on !HEKI
+ 	depends on TRACING_SUPPORT
+ 	default y if DEBUG_KERNEL
+ 	help
+diff --git a/tools/include/linux/static_call_types.h b/tools/include/linux/static_call_types.h
+index 5a00b8b2cf9f..1fcf682658d6 100644
+--- a/tools/include/linux/static_call_types.h
++++ b/tools/include/linux/static_call_types.h
+@@ -97,6 +97,7 @@ struct static_call_key {
+ 
+ #define static_call(name)						\
+ 	((typeof(STATIC_CALL_TRAMP(name))*)(STATIC_CALL_KEY(name).func))
++#define static_call_mod(name)	static_call(name)
+ 
+ #endif /* CONFIG_HAVE_STATIC_CALL */
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,73 @@
+From c2d78fc69f57586d16b3bd88320f172707c45790 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Wed, 10 Jul 2024 00:40:53 -0500
+Subject: [PATCH 46/68] Apply relocations on VTL0 module contents
+
+Apply relocations on the module copy in VTL1. After applying relocations,
+compare the module copy with the module passed by VTL0. If they match,
+then VTL0 module with relocations is validated.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ kernel/module/main.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 0cc2f411e107..8c76060361c9 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -1509,6 +1509,37 @@ static int apply_relocations(struct module *mod, const struct load_info *info)
+ 	return err;
+ }
+ 
++static int apply_guest_relocations(struct module *mod,
++				   const struct load_info *info)
++{
++	unsigned int i;
++	int err = 0;
++
++	/* Now do relocations. */
++	for (i = 1; i < info->hdr->e_shnum; i++) {
++		unsigned int infosec = info->sechdrs[i].sh_info;
++
++		/* Not a valid relocation section? */
++		if (infosec >= info->hdr->e_shnum)
++			continue;
++
++		/* Don't bother with non-allocated sections */
++		if (!(info->sechdrs[infosec].sh_flags & SHF_ALLOC))
++			continue;
++
++		if (info->sechdrs[i].sh_flags & SHF_RELA_LIVEPATCH)
++			continue;
++		if (info->sechdrs[i].sh_type == SHT_REL)
++			continue;
++		if (info->sechdrs[i].sh_type == SHT_RELA)
++			err = apply_relocate_add(info->sechdrs, info->strtab,
++						 info->index.sym, i, mod);
++		if (err < 0)
++			break;
++	}
++	return err;
++}
++
+ /* Additional bytes needed by arch in front of individual sections */
+ unsigned int __weak arch_mod_section_prepend(struct module *mod,
+ 					     unsigned int section)
+@@ -3199,6 +3230,13 @@ int validate_guest_module(struct load_info *info, int flags,
+ 		goto unmap_mod;
+ 	}
+ 
++	err = apply_guest_relocations(mod, info);
++	if (err < 0) {
++		pr_warn("%s: Relocations not applied for %s\n",
++			__func__, info->name);
++		goto unmap_mod;
++	}
++
+ 	/* Compare the original module contents and their copies. */
+ 	for_each_mod_mem_type(type) {
+ 		orig = mem[type].va;
+-- 
+2.43.0
+

@@ -1,0 +1,604 @@
+From 93cc2e1b902efa3edc743866d7fdeeea72872cb2 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@microsoft.com>
+Date: Wed, 10 Jul 2024 12:31:48 -0500
+Subject: [PATCH 41/68] Receive a VTL0 module and validate its contents
+
+Implement a hypercall to receive a module blob from VTL0 and
+check the module's signature against the trusted keyring in VTL1.
+
+After the signature is checked successfully, execute the steps to layout
+and allocate the module sections in VTL1 just like in VTL0.
+
+Compare the module sections constructed in VTL1 with the ones passed
+from VTL0. If they match, then the guest module contents are validated.
+
+Return an authentication token to VTL0 so VTL0 can refer to VTL1's copy
+of the module in the future.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 218 +++++++++++++++++++++++++++++++++++++
+ include/linux/heki.h       |  23 ++++
+ include/linux/vmalloc.h    |   2 +
+ kernel/module/internal.h   |   5 +
+ kernel/module/main.c       | 112 ++++++++++++++++++-
+ kernel/module/signing.c    |   5 +-
+ mm/vmalloc.c               |  13 +++
+ 7 files changed, 375 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 8594c3d6f0b1..2a84924b3029 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -18,6 +18,7 @@
+ #include <linux/heki.h>
+ #include <linux/sort.h>
+ #include <linux/mem_attr.h>
++#include "../../../kernel/module/internal.h"
+ #include <asm/mshyperv.h>
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+@@ -193,6 +194,11 @@ static DEFINE_PER_CPU(struct hv_vsm_per_cpu, vsm_per_cpu);
+ struct vtl0 {
+ 	struct heki_mem mem[HEKI_KDATA_MAX];
+ 	struct key *trusted_keys;
++	struct mutex lock;
++	struct list_head modules;
++	struct load_info info;
++	long token;
++	struct heki_mod *hmod;
+ } vtl0;
+ 
+ struct hv_input_modify_vtl_protection_mask {
+@@ -657,6 +663,62 @@ static struct heki_range *__vsm_read_ranges(u64 pa, unsigned long nranges,
+ 	return ranges;
+ }
+ 
++/*
++ * Module sections are reconstructed in VTL1 and compared with VTL0 module
++ * sections. Mapping the module sections in VTL1 at the same addresses as
++ * in VTL0 makes symbol resolutions and relocations during reconstruction
++ * simpler. We call this identity mapping.
++ */
++static int vsm_id_map(struct heki_mem *mem)
++{
++	unsigned long npages = mem->size >> PAGE_SHIFT;
++	struct page **pages;
++	int i, err = 0;
++
++	pages = kzalloc(sizeof(*pages) * npages, GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	/* Allocate pages. */
++	for (i = 0; i < npages; i++) {
++		pages[i] = alloc_page(GFP_KERNEL);
++		if (!pages[i]) {
++			err = -ENOMEM;
++			goto free_pages;
++		}
++	}
++
++	/* Map the pages into VTL1 at the same address as VTL0. */
++	err = vmap_range(mem->ranges->va, mem->ranges->va + mem->size, pages);
++	if (!err) {
++		mem->pages = pages;
++		return 0;
++	}
++
++free_pages:
++	pr_warn("%s: Identity mapping failed.\n", __func__);
++	for (i--; i >= 0; i--)
++		__free_page(pages[i]);
++	kfree(pages);
++	return err;
++}
++
++static void vsm_id_unmap(struct heki_mem *mem)
++{
++	unsigned long i, npages;
++
++	if (!mem->pages || mem->retain)
++		return;
++
++	vunmap_range(mem->ranges->va, mem->ranges->va + mem->size);
++
++	npages = mem->size >> PAGE_SHIFT;
++	for (i = 0; i < npages; i++)
++		__free_page(mem->pages[i]);
++	kfree(mem->pages);
++	mem->pages = NULL;
++}
++
+ /*
+  * Each heki_mem instance describes a single VTL0 kernel data structure.
+  * Map the data structure into VTL1 address space.
+@@ -712,6 +774,8 @@ static int vsm_map(struct heki_mem *mem)
+ 
+ static void vsm_unmap(struct heki_mem *mem)
+ {
++	vsm_id_unmap(mem);
++
+ 	if (!mem->va)
+ 		return;
+ 
+@@ -991,6 +1055,144 @@ static int mshv_vsm_load_kdata(u64 pa, unsigned long nranges)
+ 	return ret;
+ }
+ 
++void module_id_unmap(struct heki_mod *hmod);
++
++/*
++ * Module contents are reconstructed in VTL1 when a module is loaded in VTL0.
++ * Part of this is symbol resolution and module relocation. This is simpler
++ * to do if we map the module copy in VTL1 at the same exact addresses as the
++ * original module in VTL0.
++ */
++int module_id_map(struct heki_mod *hmod)
++{
++	struct module_memory *mod_mem;
++	int err;
++
++	for_each_mod_mem_type(type) {
++		if (!hmod->mem[type].size)
++			continue;
++
++		err = vsm_id_map(&hmod->mem[type]);
++		if (err)
++			goto unmap;
++	}
++
++	for_each_mod_mem_type(type) {
++		if (!hmod->mem[type].size)
++			continue;
++
++		mod_mem = &hmod->mod->mem[type];
++		mod_mem->base = (void *)hmod->mem[type].ranges->va;
++		memset(mod_mem->base, 0, hmod->mem[type].size);
++		/*
++		 * Initialize the size to 0 here. layout_sections() will
++		 * add section sizes to the size field.
++		 */
++		mod_mem->size = 0;
++	}
++
++	return 0;
++unmap:
++	module_id_unmap(hmod);
++	return err;
++}
++
++void module_id_unmap(struct heki_mod *hmod)
++{
++	for_each_mod_mem_type(type) {
++		if (!hmod->mem[type].size)
++			continue;
++		vsm_id_unmap(&hmod->mem[type]);
++	}
++}
++
++static long mshv_vsm_validate_guest_module(u64 pa, unsigned long nranges,
++					   int flags)
++{
++	struct load_info *info = &vtl0.info;
++	struct heki_mem *info_mem;
++	struct heki_mod *hmod;
++	struct heki_range *ranges;
++	long err = 0;
++
++	if (!vtl0.trusted_keys) {
++		pr_warn("%s: No trusted keys present!\n", __func__);
++		return -EINVAL;
++	}
++
++	/* Read the module content ranges. */
++	ranges = __vsm_read_ranges(pa, nranges, true);
++	if (!ranges) {
++		pr_warn("%s: Could not allocate ranges!\n", __func__);
++		return -ENOMEM;
++	}
++
++	mutex_lock(&vtl0.lock);
++
++	memset(info, 0, sizeof(*info));
++
++	/* Allocate a heki module structure. */
++	hmod = kzalloc(sizeof(*hmod), GFP_KERNEL);
++	if (!hmod) {
++		pr_warn("%s: Could not allocate heki module\n", __func__);
++		err = -ENOMEM;
++		goto unlock;
++	}
++	vtl0.hmod = hmod;
++
++	err = vsm_map_all(ranges, nranges, hmod->mem, MOD_ELF + 1);
++	if (err) {
++		pr_warn("%s: Could not map module sections\n", __func__);
++		goto unmap;
++	}
++
++	/* Load the module ELF buffer and trusted keys. */
++	info_mem = &hmod->mem[MOD_ELF];
++	info->hdr = info_mem->va;
++	info->len = info_mem->size;
++	info->trusted_keys = vtl0.trusted_keys;
++
++	/*
++	 * The ELF buffer will be used to construct a copy of the guest module
++	 * in the host. The trusted keys will be used to verify the signature
++	 * of the guest module. After the copy is created, it will be compared
++	 * with the module contents passed by the guest to validate them.
++	 */
++	err = validate_guest_module(info, flags, hmod);
++	if (err) {
++		pr_warn("%s: Load guest module failed\n", __func__);
++		err = -EINVAL;
++		goto unmap;
++	}
++
++	/*
++	 * Add the guest module to a modules list and assign an
++	 * authentication token for it. Return the token.
++	 */
++	strscpy(hmod->name, info->name, MODULE_NAME_LEN);
++	hmod->ranges = ranges;
++	hmod->token = ++vtl0.token;
++	list_add(&hmod->node, &vtl0.modules);
++	err = hmod->token;
++
++	/*
++	 * We want to retain the following until module unload.
++	 *	MOD_DATA	contains the module structure (hmod->mod).
++	 */
++	hmod->mem[MOD_DATA].retain = true;
++unmap:
++	/* Free everything that we don't need beyond this point. */
++	vsm_unmap_all(hmod->mem, MOD_ELF + 1);
++	if (err < 0)
++		kfree(hmod);
++unlock:
++	mutex_unlock(&vtl0.lock);
++
++	if (err < 0)
++		vfree(ranges);
++	return err;
++}
++
+ /********************** Boot Secondary CPUs **********************/
+ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ 							unsigned int boot_signal_pfn)
+@@ -1273,6 +1475,12 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		if (!vtl0_end_of_boot)
+ 			status = mshv_vsm_load_kdata(_vtl_params->a1, _vtl_params->a2);
+ 		break;
++	case VSM_VTL_CALL_FUNC_ID_VALIDATE_MODULE:
++		pr_debug("%s : VSM_VALIDATE_MODULE\n", __func__);
++		status = mshv_vsm_validate_guest_module(_vtl_params->a1,
++							_vtl_params->a2,
++							_vtl_params->a3);
++		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+ 		break;
+@@ -1526,6 +1734,16 @@ static int __init mshv_vtl1_init(void)
+ 		}
+ 	}
+ 
++	mutex_init(&vtl0.lock);
++	INIT_LIST_HEAD(&vtl0.modules);
++	/*
++	 * Reserve the module area so that when a VTL0 module is sent to VTL1,
++	 * we can map the module sections to the same exact addresses as in
++	 * VTL0.
++	 */
++	if (!ret && !get_module_vm_area(HEKI_MODULE_RESERVE_SIZE))
++		ret = -ENOMEM;
++
+ 	return ret;
+ }
+ 
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 1076688675e3..9d309d84f084 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -60,6 +60,8 @@ enum heki_kdata_type {
+  */
+ #define MOD_ELF		MOD_MEM_NUM_TYPES
+ 
++#define HEKI_MODULE_RESERVE_SIZE	0x40000000UL
++
+ /*
+  * A hypervisor that supports Heki will instantiate this structure to
+  * provide hypervisor specific functions for Heki.
+@@ -88,6 +90,15 @@ struct heki_hypervisor {
+ /*
+  * The ranges contain VTL0 pages. VTL0 pages are mapped into VTL1 address space
+  * so VTL1 can access VTL0 memory at va.
++ *
++ * Each module section (text, data, etc) is represented by a heki_mem. Module
++ * sections are reconstructed in VTL1 and compared with the corresponding
++ * VTL0 sections. Reconstruction involves module symbol resolution and module
++ * relocation. These steps involve symbol addresses. To make the reconstruction
++ * simpler, we map the VTL1 module sections at the same virtual addresses as
++ * their corresponding sections in VTL0. We call this identity mapping. This
++ * keeps the addresses the same in VTL0 and VTL1. A VTL1 section is accessed
++ * at ranges->va since that is the starting va for the section.
+  */
+ struct heki_mem {
+ 	void			*va;
+@@ -95,6 +106,18 @@ struct heki_mem {
+ 	long			offset;
+ 	struct heki_range	*ranges;
+ 	unsigned long		nranges;
++	struct page		**pages;
++	bool			retain;
++};
++
++/* This is created for each guest module in the host. */
++struct heki_mod {
++	struct list_head node;
++	struct heki_range *ranges;
++	char name[MODULE_NAME_LEN];
++	long token;
++	struct heki_mem mem[MOD_ELF + 1];
++	struct module *mod;
+ };
+ 
+ #ifdef CONFIG_HEKI
+diff --git a/include/linux/vmalloc.h b/include/linux/vmalloc.h
+index c720be70c8dd..6360fee7f0ee 100644
+--- a/include/linux/vmalloc.h
++++ b/include/linux/vmalloc.h
+@@ -210,6 +210,7 @@ extern struct vm_struct *__get_vm_area_caller(unsigned long size,
+ 					unsigned long flags,
+ 					unsigned long start, unsigned long end,
+ 					const void *caller);
++extern struct vm_struct *get_module_vm_area(unsigned long size);
+ void free_vm_area(struct vm_struct *area);
+ extern struct vm_struct *remove_vm_area(const void *addr);
+ extern struct vm_struct *find_vm_area(const void *addr);
+@@ -232,6 +233,7 @@ static inline bool is_vm_area_hugepages(const void *addr)
+ }
+ 
+ #ifdef CONFIG_MMU
++int vmap_range(unsigned long addr, unsigned long end, struct page **pages);
+ void vunmap_range(unsigned long addr, unsigned long end);
+ static inline void set_vm_flush_reset_perms(void *addr)
+ {
+diff --git a/kernel/module/internal.h b/kernel/module/internal.h
+index e0af200676af..cd3e3e5c1625 100644
+--- a/kernel/module/internal.h
++++ b/kernel/module/internal.h
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/elf.h>
+ #include <linux/compiler.h>
++#include <linux/heki.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/rculist.h>
+@@ -84,6 +85,7 @@ struct load_info {
+ 	struct {
+ 		unsigned int sym, str, mod, vers, info, pcpu;
+ 	} index;
++	struct key *trusted_keys;
+ };
+ 
+ enum mod_license {
+@@ -406,3 +408,6 @@ static inline int same_magic(const char *amagic, const char *bmagic, bool has_cr
+ 	return strcmp(amagic, bmagic) == 0;
+ }
+ #endif /* CONFIG_MODVERSIONS */
++
++int validate_guest_module(struct load_info *info, int flags,
++			  struct heki_mod *hmod);
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index eced137a5240..c95ab1da0e98 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -58,6 +58,7 @@
+ #include <linux/cfi.h>
+ #include <linux/heki.h>
+ #include <linux/debugfs.h>
++#include <linux/heki.h>
+ #include <uapi/linux/module.h>
+ #include "internal.h"
+ 
+@@ -2227,6 +2228,7 @@ static int move_module(struct module *mod, struct load_info *info)
+ 	void *ptr;
+ 	enum mod_mem_type t = 0;
+ 	int ret = -ENOMEM;
++	bool preallocated = false;
+ 
+ 	for_each_mod_mem_type(type) {
+ 		if (!mod->mem[type].size) {
+@@ -2234,6 +2236,10 @@ static int move_module(struct module *mod, struct load_info *info)
+ 			continue;
+ 		}
+ 		mod->mem[type].size = PAGE_ALIGN(mod->mem[type].size);
++		if (mod->mem[type].base) {
++			preallocated = true;
++			continue;
++		}
+ 		ptr = module_memory_alloc(mod->mem[type].size, type);
+ 		/*
+                  * The pointer to these blocks of memory are stored on the module
+@@ -2294,8 +2300,10 @@ static int move_module(struct module *mod, struct load_info *info)
+ 
+ 	return 0;
+ out_enomem:
+-	for (t--; t >= 0; t--)
+-		module_memory_free(mod->mem[t].base, t);
++	if (!preallocated) {
++		for (t--; t >= 0; t--)
++			module_memory_free(mod->mem[t].base, t);
++	}
+ 	return ret;
+ }
+ 
+@@ -3068,6 +3076,106 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 	return err;
+ }
+ 
++int __attribute__((weak)) module_id_map(struct heki_mod *hmod)
++{
++	return -EINVAL;
++}
++
++void __attribute__((weak)) module_id_unmap(struct heki_mod *hmod)
++{
++}
++
++int validate_guest_module(struct load_info *info, int flags,
++			  struct heki_mod *hmod)
++{
++	struct heki_mem *mem = hmod->mem;
++	struct module *mod;
++	void *orig, *copy;
++	size_t orig_size, copy_size;
++	int err;
++
++	err = module_sig_check(info, flags);
++	if (err) {
++		pr_warn("%s: Signature verification failed\n", __func__);
++		return err;
++	}
++
++	err = elf_validity_cache_copy(info, flags);
++	if (err) {
++		pr_warn("%s: ELF validity check failed\n", __func__);
++		return err;
++	}
++	/* info->name may be available after the above call. */
++
++	err = rewrite_section_headers(info, flags);
++	if (err) {
++		pr_warn("%s: Rewrite section headers for %s failed\n",
++			__func__, info->name);
++		return err;
++	}
++	hmod->mod = info->mod;
++
++	err = module_id_map(hmod);
++	if (err) {
++		pr_warn("%s: Could not map module %s\n",
++			__func__, info->name);
++		goto unmap_mod;
++	}
++
++	mod = layout_and_allocate(info, flags);
++	if (IS_ERR(mod)) {
++		pr_warn("%s: Host module not allocated for %s\n",
++			__func__, info->name);
++		err = -ENOMEM;
++		goto unmap_mod;
++	}
++	hmod->mod = mod;
++
++	/* Compare the original module contents and their copies. */
++	for_each_mod_mem_type(type) {
++		orig = mem[type].va;
++		orig_size = mem[type].size;
++		copy = mod->mem[type].base;
++		copy_size = mod->mem[type].size;
++
++		if (orig_size != copy_size) {
++			pr_warn("heki: %s: Size mismatch for %d\n",
++				info->name, type);
++			err = -EINVAL;
++			goto unmap_mod;
++		}
++
++		if (!orig_size)
++			continue;
++
++		if (type == MOD_DATA || type == MOD_INIT_DATA) {
++			/*
++			 * These sections are writable in the guest and the
++			 * EPT. So, they can be modified at any time by a
++			 * kernel actor. There is no sense in checking the
++			 * contents of these.
++			 */
++			continue;
++		}
++
++		if (memcmp(orig, copy, orig_size)) {
++			pr_warn("heki: %s: Auth memory mismatch for %d\n",
++				info->name, type);
++			err = -EINVAL;
++			goto unmap_mod;
++		}
++	}
++	pr_warn("Auth memory matched for %s\n", info->name);
++
++unmap_mod:
++	if (err) {
++		module_id_unmap(hmod);
++		hmod->mod = NULL;
++	}
++	return err;
++}
++EXPORT_SYMBOL_GPL(validate_guest_module);
++
+ SYSCALL_DEFINE3(init_module, void __user *, umod,
+ 		unsigned long, len, const char __user *, uargs)
+ {
+diff --git a/kernel/module/signing.c b/kernel/module/signing.c
+index a2ff4242e623..801b262a0e73 100644
+--- a/kernel/module/signing.c
++++ b/kernel/module/signing.c
+@@ -44,6 +44,7 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ {
+ 	struct module_signature ms;
+ 	size_t sig_len, modlen = info->len;
++	struct key *trusted_keys = info->trusted_keys;
+ 	int ret;
+ 
+ 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
+@@ -60,9 +61,11 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ 	sig_len = be32_to_cpu(ms.sig_len);
+ 	modlen -= sig_len + sizeof(ms);
+ 	info->len = modlen;
++	if (!trusted_keys)
++		trusted_keys = VERIFY_USE_SECONDARY_KEYRING;
+ 
+ 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
+-				      VERIFY_USE_SECONDARY_KEYRING,
++				      trusted_keys,
+ 				      VERIFYING_MODULE_SIGNATURE,
+ 				      NULL, NULL);
+ }
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index e4abb9bef02a..00d7812c499a 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -638,6 +638,11 @@ static int vmap_pages_range(unsigned long addr, unsigned long end,
+ 	return err;
+ }
+ 
++int vmap_range(unsigned long addr, unsigned long end, struct page **pages)
++{
++	return vmap_pages_range(addr, end, PAGE_KERNEL, pages, PAGE_SHIFT);
++}
++
+ int is_vmalloc_or_module_addr(const void *x)
+ {
+ 	/*
+@@ -2670,6 +2675,14 @@ struct vm_struct *get_vm_area_caller(unsigned long size, unsigned long flags,
+ 				  NUMA_NO_NODE, GFP_KERNEL, caller);
+ }
+ 
++struct vm_struct *get_module_vm_area(unsigned long size)
++{
++	return __get_vm_area_node(size, PAGE_SIZE, PAGE_SHIFT,
++				  VM_MAP | VM_UNINITIALIZED | VM_DEFER_KMEMLEAK,
++				  MODULES_VADDR, MODULES_END, NUMA_NO_NODE,
++				  GFP_KERNEL, __builtin_return_address(0));
++}
++
+ /**
+  * find_vm_area - find a continuous kernel virtual area
+  * @addr:	  base address
+-- 
+2.43.0
+

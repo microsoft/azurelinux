@@ -1,0 +1,134 @@
+From be8090de27cf1857f432675f5c2f45db14d2a6d3 Mon Sep 17 00:00:00 2001
+From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
+Date: Wed, 10 Jul 2024 02:41:54 -0500
+Subject: [PATCH 49/68] Free module init sections
+
+VTL0 calls this prior to freeing a module's init sections. Pass the module
+token to VTL1 so it can reset the EPT permissions for the init sections
+to RW_. Also, make the ro_after_init section read-only in the EPT.
+After this step, free module init sections in VTL1.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+---
+ drivers/hv/hv_vsm.c  | 13 +++++++++++++
+ drivers/hv/hv_vsm.h  |  1 +
+ include/linux/heki.h |  6 ++++++
+ kernel/module/main.c |  1 +
+ virt/heki/module.c   | 19 +++++++++++++++++++
+ 5 files changed, 40 insertions(+)
+
+diff --git a/drivers/hv/hv_vsm.c b/drivers/hv/hv_vsm.c
+index 694ef4c99293..cbe29f4469c3 100644
+--- a/drivers/hv/hv_vsm.c
++++ b/drivers/hv/hv_vsm.c
+@@ -163,12 +163,25 @@ static long hv_vsm_validate_module(phys_addr_t pa, unsigned long nranges,
+ 	return hv_vsm_vtlcall(&args);
+ }
+ 
++static int hv_vsm_free_module_init(long token)
++{
++	struct hv_vtlcall_param args = {0};
++
++	if (!hv_vsm_boot_success)
++		return -EINVAL;
++
++	args.a0 = VSM_VTL_CALL_FUNC_ID_FREE_MODULE_INIT;
++	args.a1 = token;
++	return hv_vsm_vtlcall(&args);
++}
++
+ static struct heki_hypervisor hyperv_heki_hypervisor = {
+ 	.lock_crs = hv_vsm_lock_crs,
+ 	.finish_boot = hv_vsm_signal_end_of_boot,
+ 	.protect_memory = hv_vsm_protect_memory,
+ 	.load_kdata = hv_vsm_load_kdata,
+ 	.validate_module = hv_vsm_validate_module,
++	.free_module_init = hv_vsm_free_module_init,
+ };
+ 
+ int __init hv_vsm_init_heki(void)
+diff --git a/drivers/hv/hv_vsm.h b/drivers/hv/hv_vsm.h
+index 358c21c00ab2..3ceb0768454b 100644
+--- a/drivers/hv/hv_vsm.h
++++ b/drivers/hv/hv_vsm.h
+@@ -18,6 +18,7 @@
+ #define VSM_VTL_CALL_FUNC_ID_PROTECT_MEMORY	0x1FFE4
+ #define VSM_VTL_CALL_FUNC_ID_LOAD_KDATA		0x1FFE5
+ #define VSM_VTL_CALL_FUNC_ID_VALIDATE_MODULE	0x1FFE6
++#define VSM_VTL_CALL_FUNC_ID_FREE_MODULE_INIT	0x1FFE7
+ 
+ extern bool hv_vsm_boot_success;
+ extern bool hv_vsm_mbec_enabled;
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index e39699070678..5db875e2f3fa 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -99,6 +99,9 @@ struct heki_hypervisor {
+ 	 */
+ 	long (*validate_module)(phys_addr_t pa, unsigned long nranges,
+ 				unsigned long flags);
++
++	/* Free module init sections. */
++	int (*free_module_init)(long token);
+ };
+ 
+ /*
+@@ -186,6 +189,7 @@ void heki_add_range(struct heki_args *args, unsigned long va,
+ void heki_cleanup_args(struct heki_args *args);
+ void heki_load_kdata(void);
+ long heki_validate_module(struct module *mod, struct load_info *info, int flags);
++void heki_free_module_init(struct module *mod);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+@@ -204,6 +208,8 @@ static inline long heki_validate_module(struct module *mod,
+ 	return 0;
+ }
+ 
++static inline void heki_free_module_init(struct module *mod) { }
++
+ static void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
+ 
+ #endif /* CONFIG_HEKI */
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index d51293f8b255..52f358adfb5e 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2663,6 +2663,7 @@ static noinline int do_init_module(struct module *mod)
+ 	/* Switch to core kallsyms now init is done: kallsyms may be walking! */
+ 	rcu_assign_pointer(mod->kallsyms, &mod->core_kallsyms);
+ #endif
++	heki_free_module_init(mod);
+ 	module_enable_ro(mod, true);
+ 	mod_tree_remove_init(mod);
+ 	module_arch_freeing_init(mod);
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 924e050cfec3..425a6b78c42d 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -150,3 +150,22 @@ long heki_validate_module(struct module *mod, struct load_info *info, int flags)
+ 
+ 	return token;
+ }
++
++void heki_free_module_init(struct module *mod)
++{
++	struct heki_hypervisor *hypervisor = heki.hypervisor;
++	int err;
++
++	if (!hypervisor)
++		return;
++
++	mutex_lock(&heki.lock);
++
++	err = hypervisor->free_module_init(mod->heki_token);
++	if (err) {
++		pr_warn("Failed to free module %s init (%d).\n",
++			mod->name, err);
++	}
++
++	mutex_unlock(&heki.lock);
++}
+-- 
+2.43.0
+

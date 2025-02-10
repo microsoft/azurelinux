@@ -1,0 +1,38 @@
+From fcf1824e3f70e4f3c87ccfb15ff2572755e0fc4d Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Tue, 8 Oct 2024 16:16:22 -0400
+Subject: [PATCH 04/68] drivers:hv: Add HV_SECURE_VTL kconfig option
+
+Add HV_SECURE_VTL kconfig option to indicate running Linux in VTL1 as
+secure kernel.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/Kconfig | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
+index b16c7701da19..6ea7d3803c84 100644
+--- a/drivers/hv/Kconfig
++++ b/drivers/hv/Kconfig
+@@ -38,6 +38,17 @@ config HYPERV_VTL_MODE
+ 
+ 	  If unsure, say N
+ 
++
++config HV_SECURE_VTL
++	bool "Microsoft Hyper-V VTL1 driver"
++	depends on !MTRR
++	depends on !X86_MPARSE
++	depends on HYPERV_VTL_MODE
++	default n
++	help
++	  Select this option to enable Linux kernel as secure kernel running in VTL1.
++	  If unsure, say N.
++
+ config HYPERV_TIMER
+ 	def_bool HYPERV && X86
+ 
+-- 
+2.43.0
+

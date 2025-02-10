@@ -1,0 +1,204 @@
+From a775ace4172af288349dc5a518fff1924d893d78 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Sun, 5 May 2024 23:47:31 -0700
+Subject: [PATCH 25/68] drivers: hv: mshv_vsm_vtl1: Lock critical registers
+
+Implement VSM_VTL_CALL_FUNC_ID_LOCK_REGS vtlcall to enable Hyper-V
+backed monitoring of system critical registers.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+---
+ arch/x86/include/asm/hyperv-tlfs.h | 47 +++++++++++++++++
+ drivers/hv/mshv_vsm_vtl1.c         | 84 ++++++++++++++++++++++++++++++
+ 2 files changed, 131 insertions(+)
+
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index b55619946a9d..66e72e3afe75 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -306,11 +306,25 @@ enum hv_isolation_type {
+  * Registers are only accessible via HVCALL_GET_VP_REGISTERS hvcall and
+  * there is not associated MSR address.
+  */
++#define HV_X64_REGISTER_CR0			0x00040000
++#define	HV_X64_REGISTER_CR4			0x00040003
++#define HV_X64_REGISTER_EFER			0x00080001
++#define	HV_X64_REGISTER_APIC_BASE		0x00080003
++#define HV_X64_REGISTER_SYSENTER_CS		0x00080005
++#define	HV_X64_REGISTER_SYSENTER_EIP		0x00080006
++#define	HV_X64_REGISTER_SYSENTER_ESP		0x00080007
++#define	HV_X64_REGISTER_STAR			0x00080008
++#define	HV_X64_REGISTER_LSTAR			0x00080009
++#define	HV_X64_REGISTER_CSTAR			0x0008000A
++#define HV_X64_REGISTER_SFMASK			0x0008000B
+ #define	HV_X64_REGISTER_VSM_VP_STATUS		0x000D0003
+ #define HV_REGISTER_VSM_CODEPAGE_OFFSETS	0x000D0002
+ #define HV_REGISTER_VSM_PARTITION_STATUS	0x000D0004
+ #define HV_REGISTER_VSM_PARTITION_CONFIG	0x000D0007
+ #define HV_REGISTER_VSM_VP_SECURE_CONFIG_VTL0	0x000D0010
++#define	HV_REGISTER_CR_INTERCEPT_CONTROL	0x000E0000
++#define	HV_REGISTER_CR_INTERCEPT_CR0_MASK	0x000E0001
++#define	HV_REGISTER_CR_INTERCEPT_CR4_MASK	0x000E0002
+ #define	HV_X64_VTL_MASK			GENMASK(3, 0)
+ 
+ /* Hyper-V memory host visibility */
+@@ -844,6 +858,39 @@ union hv_register_vsm_vp_status {
+ 	};
+ };
+ 
++/*  CR Intercept Control */
++union hv_cr_intercept_control {
++	u64 as_u64;
++	struct {
++		u64 cr0_write			: 1;
++		u64 cr4_write			: 1;
++		u64 xcr0_write			: 1;
++		u64 ia32miscenable_read		: 1;
++		u64 ia32miscenable_write	: 1;
++		u64 msr_lstar_read		: 1;
++		u64 msr_lstar_write		: 1;
++		u64 msr_star_read		: 1;
++		u64 msr_star_write		: 1;
++		u64 msr_cstar_read		: 1;
++		u64 msr_cstar_write		: 1;
++		u64 msr_apic_base_read		: 1;
++		u64 msr_apic_base_write		: 1;
++		u64 msr_efer_read		: 1;
++		u64 msr_efer_write		: 1;
++		u64 gdtr_write			: 1;
++		u64 idtr_write			: 1;
++		u64 ldtr_write			: 1;
++		u64 tr_write			: 1;
++		u64 msr_sysenter_cs_write	: 1;
++		u64 msr_sysenter_eip_write	: 1;
++		u64 msr_sysenter_esp_write	: 1;
++		u64 msr_sfmask_write		: 1;
++		u64 msr_tsc_aux_write		: 1;
++		u64 msr_sgx_launch_ctrl_write	: 1;
++		u64 reserved			: 39;
++	};
++} __packed;
++
+ #include <asm-generic/hyperv-tlfs.h>
+ 
+ #endif
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 4acf108713fd..4ba80d68f30b 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -38,6 +38,10 @@
+ #define VSM_PAGE_AT(addr, idx)  ((addr) + (idx) * PAGE_SIZE)
+ /* Compute the page frame number (PFN) from a page address */
+ #define VSM_PAGE_TO_PFN(addr)  ((addr) >> PAGE_SHIFT)
++
++#define CR4_PIN_MASK	~((u64)(X86_CR4_MCE | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_VMXE))
++#define CR0_PIN_MASK	((u64)(X86_CR0_PE | X86_CR0_WP | X86_CR0_PG))
++
+ extern struct boot_params boot_params;
+ 
+ union hv_register_vsm_vp_secure_vtl_config {
+@@ -90,6 +94,17 @@ struct hv_vsm_per_cpu {
+ 	struct hv_vtl_cpu_context cpu_context;
+ 	struct hv_vtlcall_param vtl_params;
+ 	struct task_struct *vsm_task;
++	u64 cr0_saved;
++	u64 cr4_saved;
++	u64 msr_lstar_saved;
++	u64 msr_cstar_saved;
++	u64 msr_star_saved;
++	u64 msr_apic_base_saved;
++	u64 msr_efer_saved;
++	u64 msr_sysenter_cs_saved;
++	u64 msr_sysenter_eip_saved;
++	u64 msr_sysenter_esp_saved;
++	u64 msr_sfmask_saved;
+ 	/* Shut down tick when exiting VTL1 */
+ 	bool suppress_tick;
+ 	/* CPU should stay in VTL1 and not exit to VTL0 even if idle is invoked */
+@@ -267,6 +282,71 @@ static int hv_modify_vtl_protection_mask(u64 start, u64 number_of_pages, u32 pag
+ 	return hv_result(status);
+ }
+ 
++static void __save_vtl0_registers(void)
++{
++	struct hv_vsm_per_cpu *per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	u64 result;
++
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_CR0, &result);
++	per_cpu->cr0_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_CR4, &result);
++	per_cpu->cr4_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_LSTAR, &result);
++	per_cpu->msr_lstar_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_STAR, &result);
++	per_cpu->msr_star_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_CSTAR, &result);
++	per_cpu->msr_cstar_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_APIC_BASE, &result);
++	per_cpu->msr_apic_base_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_EFER, &result);
++	per_cpu->msr_efer_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_SYSENTER_CS, &result);
++	per_cpu->msr_sysenter_cs_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_SYSENTER_ESP, &result);
++	per_cpu->msr_sysenter_esp_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_SYSENTER_EIP, &result);
++	per_cpu->msr_sysenter_eip_saved = result;
++	hv_vsm_get_vtl0_register(HV_X64_REGISTER_SFMASK, &result);
++	per_cpu->msr_sfmask_saved = result;
++}
++
++static int mshv_vsm_lock_regs(void)
++{
++	union hv_cr_intercept_control ctrl;
++	int ret;
++
++	ctrl.as_u64 = 0;
++	ctrl.cr0_write = 1;
++	ctrl.cr4_write = 1;
++	ctrl.gdtr_write = 1;
++	ctrl.idtr_write = 1;
++	ctrl.ldtr_write = 1;
++	ctrl.tr_write = 1;
++	ctrl.msr_lstar_write = 1;
++	ctrl.msr_star_write = 1;
++	ctrl.msr_cstar_write = 1;
++	ctrl.msr_apic_base_write = 1;
++	ctrl.msr_efer_write = 1;
++	ctrl.msr_sysenter_cs_write = 1;
++	ctrl.msr_sysenter_eip_write = 1;
++	ctrl.msr_sysenter_esp_write = 1;
++	ctrl.msr_sfmask_write = 1;
++
++	__save_vtl0_registers();
++
++	ret = hv_vsm_set_register(HV_REGISTER_CR_INTERCEPT_CONTROL, ctrl.as_u64);
++	if (ret)
++		return ret;
++
++	ret = hv_vsm_set_register(HV_REGISTER_CR_INTERCEPT_CR4_MASK, (u64)CR4_PIN_MASK);
++	if (ret)
++		return ret;
++
++	ret = hv_vsm_set_register(HV_REGISTER_CR_INTERCEPT_CR0_MASK, (u64)CR0_PIN_MASK);
++	return ret;
++}
++
+ /********************** Boot Secondary CPUs **********************/
+ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ 							unsigned int boot_signal_pfn)
+@@ -529,6 +609,10 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		pr_debug("%s : VSM_VTL_CALL_FUNC_ID_BOOT_APS\n", __func__);
+ 		status = mshv_vsm_boot_aps(_vtl_params->a1, _vtl_params->a2);
+ 		break;
++	case VSM_VTL_CALL_FUNC_ID_LOCK_REGS:
++		pr_debug("%s : VSM_LOCK_REGS\n", __func__);
++		status = mshv_vsm_lock_regs();
++		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+ 		break;
+-- 
+2.43.0
+

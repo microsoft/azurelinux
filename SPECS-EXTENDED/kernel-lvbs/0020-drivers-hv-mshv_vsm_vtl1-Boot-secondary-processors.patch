@@ -1,0 +1,265 @@
+From 84646492e90df4cd5575cf5ef0026a5cc2c033b9 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Thu, 5 Oct 2023 17:57:19 +0000
+Subject: [PATCH 20/68] drivers: hv: mshv_vsm_vtl1: Boot secondary processors
+
+Implement VSM_VTL_CALL_FUNC_ID_BOOT_APS vtlcall and hotplug in all the
+secondary processors that are up and running in VTL0
+
+A key part of bringing up secondary processor(VPx) is that it is
+done in part by the primary cpu and in part by secondary processor. The
+primary cpu enters VTL1 and initiates the boot process of VPx. At some
+point it needs to notify VPx running in VTL0 that it can now transition
+to VTL1 to continue its part of the boot process. This is done by using
+the `boot_signal` shared page between VTL0 and VTL1. Each secondary cpu
+will invokes the he vtl1 boot thread for the next online cpu there by
+not needing all the cpus to be in a holding pattern at boot.
+
+Signed-off-by: Anna Trikalinou <atrikalinou@microsoft.com>
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/hyperv/hv_vtl.c        |  25 +++++++
+ arch/x86/include/asm/mshyperv.h |   2 +
+ drivers/hv/mshv_vsm_vtl1.c      | 121 +++++++++++++++++++++++++++++++-
+ 3 files changed, 147 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+index aa82b5c3d601..c143497c2e2b 100644
+--- a/arch/x86/hyperv/hv_vtl.c
++++ b/arch/x86/hyperv/hv_vtl.c
+@@ -14,8 +14,11 @@
+ #include <asm/realmode.h>
+ #include <../kernel/smpboot.h>
+ 
++#define HV_SECURE_VTL_BOOT_TOKEN 0xDC
++
+ extern struct boot_params boot_params;
+ static struct real_mode_header hv_vtl_real_mode_header;
++static u8 *hv_secure_vtl_boot_signal;
+ 
+ static bool __init hv_vtl_msi_ext_dest_id(void)
+ {
+@@ -169,6 +172,25 @@ static void hv_vtl_populate_vp_context(struct hv_enable_vp_vtl *input, u32 targe
+ 	input->vp_context.tr.attributes = 0x8b;
+ }
+ 
++static int hv_vtl1_wakeup_secondary_cpu(int apicid, unsigned long start_eip)
++{
++	WRITE_ONCE(hv_secure_vtl_boot_signal[apicid], HV_SECURE_VTL_BOOT_TOKEN);
++	return 0;
++}
++
++int hv_secure_vtl_init_boot_signal_page(void *shared_data)
++{
++	if (!shared_data)
++		return -EINVAL;
++
++	hv_secure_vtl_boot_signal = (u8 *)shared_data;
++	/* VTL 0 sets the boot signal for cpu 0 and sends the page across. */
++	if (hv_secure_vtl_boot_signal[0] != HV_SECURE_VTL_BOOT_TOKEN)
++		return -EINVAL;
++	else
++		return 0;
++}
++
+ static int hv_vtl_bringup_vcpu(u32 target_vp_index, int cpu, u64 eip_ignored)
+ {
+ 	u64 status;
+@@ -292,6 +314,9 @@ int __init hv_vtl_early_init(u8 vtl)
+ 
+ 	real_mode_header = &hv_vtl_real_mode_header;
+ 
++	if (vtl == HV_VTL_SECURE)
++		apic_update_callback(wakeup_secondary_cpu_64, hv_vtl1_wakeup_secondary_cpu);
++
+ 	if (vtl == HV_VTL_MGMT)
+ 		apic_update_callback(wakeup_secondary_cpu_64, hv_vtl_wakeup_secondary_cpu);
+ 
+diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+index 4e627e7eb523..4407b36fed0d 100644
+--- a/arch/x86/include/asm/mshyperv.h
++++ b/arch/x86/include/asm/mshyperv.h
+@@ -341,10 +341,12 @@ static inline u64 hv_get_non_nested_register(unsigned int reg) { return 0; }
+ void __init hv_vtl_init_platform(void);
+ int __init hv_vtl_early_init(u8 vtl);
+ int hv_secure_vtl_enable_secondary_cpu(u32 target_vp_index);
++int hv_secure_vtl_init_boot_signal_page(void *shared_data);
+ #else
+ static inline void __init hv_vtl_init_platform(void) {}
+ static inline int __init hv_vtl_early_init(u8 vtl) { return 0; }
+ static inline int hv_secure_vtl_enable_secondary_cpu(u32 target_vp_index) { return 0; }
++static inline int hv_secure_vtl_init_boot_signal_page(void *shared_data) { return 0; }
+ #endif
+ 
+ #include <asm-generic/mshyperv.h>
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 77db55eaacad..d23482381a8b 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -11,6 +11,7 @@
+ #include <linux/kthread.h>
+ #include <linux/cpuhotplug.h>
+ #include <linux/fs.h>
++#include <linux/delay.h>
+ #include <asm/mshyperv.h>
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+@@ -86,6 +87,7 @@ struct hv_vsm_per_cpu {
+ 	/* CPU should stay in VTL1 and not exit to VTL0 even if idle is invoked */
+ 	bool stay_in_vtl1;
+ 	bool vtl1_enabled;
++	bool vtl1_booted;
+ };
+ 
+ static DEFINE_PER_CPU(struct hv_vsm_per_cpu, vsm_per_cpu);
+@@ -170,6 +172,118 @@ static int mshv_vsm_enable_aps(unsigned int cpu_present_mask_pfn)
+ 	return ret;
+ }
+ 
++/********************** Boot Secondary CPUs **********************/
++static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
++							unsigned int boot_signal_pfn)
++{
++	unsigned int cpu, present = num_present_cpus(), online = num_online_cpus(),
++		total_cpus_booted = 0;
++	struct hv_vsm_per_cpu *per_cpu;
++	const struct cpumask *cpu_online_vtl0;
++	struct page *boot_signal_page, *cpu_online_page;
++	void *boot_signal_data = NULL, *cpu_online_data = NULL;
++	cpumask_var_t cpu_online_diff;
++	int status = 0;
++
++	if (!(present - online)) {
++		pr_debug("%s: VTL1 kernel has no present CPUs that are not already online.\n", __func__);
++		return -EINVAL;
++	}
++
++	per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	per_cpu->stay_in_vtl1 = true;
++	/* Validate boot_signal_pfn parameter */
++	boot_signal_page = pfn_to_page(boot_signal_pfn);
++	boot_signal_data = vmap(&boot_signal_page, 1, VM_MAP, PAGE_KERNEL);
++	if (!boot_signal_data) {
++		pr_err("%s: Could not map shared page", __func__);
++		status = -EINVAL;
++		goto out;
++	}
++
++	status = hv_secure_vtl_init_boot_signal_page(boot_signal_data);
++	if (status) {
++		pr_err("%s: Could not initialize boot_signal", __func__);
++		goto unmap_signal;
++	}
++
++	/* Validate cpu_online_mask_pfn parameter */
++	cpu_online_page = pfn_to_page(cpu_online_mask_pfn);
++	cpu_online_data = vmap(&cpu_online_page, 1, VM_MAP, PAGE_KERNEL);
++	if (!cpu_online_data) {
++		pr_err("%s: Could not map shared page", __func__);
++		status = -EINVAL;
++		goto unmap_signal;
++	}
++	cpu_online_vtl0 = (struct cpumask *)cpu_online_data;
++
++	/* Find VTL0's Online CPUs that are not already online in VTL1 */
++	if (!alloc_cpumask_var(&cpu_online_diff, GFP_KERNEL)) {
++		pr_err("%s: Error allocating cpu_online_diff", __func__);
++		status = -ENOMEM;
++		goto unmap_online;
++	}
++	status = cpumask_andnot(cpu_online_diff, cpu_online_vtl0, cpu_online_mask);
++	if (!status) {
++		pr_err("%s: Error computing cpumask_andnot()", __func__);
++		goto free_cpumask;
++	}
++
++	/* Loop through VTL0's online CPUs that are not already online in VTL1
++	 * and bring them online
++	 */
++	for_each_cpu(cpu, cpu_online_diff) {
++		if (!cpu_present(cpu)) {
++			pr_err("%s: Cannot bring up CPU%u because CPU%u is not present",
++			       __func__, cpu, cpu);
++			status = -EINVAL;
++			goto free_cpumask;
++		}
++
++		per_cpu = per_cpu_ptr(&vsm_per_cpu, cpu);
++
++		if (!(per_cpu->vtl1_enabled)) {
++			pr_err("%s: Cannot bring up CPU%u because CPU%u is not enabled for VTL1",
++			       __func__, cpu, cpu);
++			status = -EINVAL;
++			goto free_cpumask;
++		}
++
++		per_cpu->vtl1_booted = 0;
++		pr_debug("%s: Bringing up CPU%u", __func__, cpu);
++
++		/* Bring up AP */
++		status = cpu_device_up(get_cpu_device(cpu));
++		if (status) {
++			pr_err("%s: Failed to Boot CPU%u", __func__, cpu);
++			goto free_cpumask;
++		}
++
++		total_cpus_booted++;
++	}
++
++	/* Loop through newly booted CPUs and disable tick when exiting VTL1 */
++	for_each_cpu(cpu, cpu_online_diff) {
++		per_cpu = per_cpu_ptr(&vsm_per_cpu, cpu);
++
++		while (!(per_cpu->vtl1_booted));
++		per_cpu->suppress_tick = true;
++	}
++
++	pr_debug("%s: Booted %u CPUs", __func__, total_cpus_booted);
++
++free_cpumask:
++	free_cpumask_var(cpu_online_diff);
++unmap_online:
++	vunmap(cpu_online_data);
++unmap_signal:
++	vunmap(boot_signal_data);
++out:
++	per_cpu = this_cpu_ptr(&vsm_per_cpu);
++	per_cpu->stay_in_vtl1 = false;
++	return status;
++}
++
+ /* DO NOT MODIFY THIS FUNCTION WITHOUT DISASSEMBLING AND SEEING WHAT IS GOING ON */
+ static void __mshv_vsm_vtl_return(void)
+ {
+@@ -288,7 +402,7 @@ static void mshv_vsm_vtl_idle(void)
+ 	if (!per_cpu->vsm_task)
+ 		goto out;
+ 
+-	if (task_is_running(per_cpu->vsm_task) || per_cpu->stay_in_vtl1)
++	if (task_is_running(per_cpu->vsm_task) || !(per_cpu->vtl1_booted) || per_cpu->stay_in_vtl1)
+ 		goto out;
+ 
+ 	if (per_cpu->suppress_tick)
+@@ -316,6 +430,10 @@ static void mshv_vsm_handle_entry(struct hv_vtlcall_param *_vtl_params)
+ 		pr_debug("%s : VSM_VTL_CALL_FUNC_ID_ENABLE_APS_VTL\n", __func__);
+ 		status = mshv_vsm_enable_aps(_vtl_params->a1);
+ 		break;
++	case VSM_VTL_CALL_FUNC_ID_BOOT_APS:
++		pr_debug("%s : VSM_VTL_CALL_FUNC_ID_BOOT_APS\n", __func__);
++		status = mshv_vsm_boot_aps(_vtl_params->a1, _vtl_params->a2);
++		break;
+ 	default:
+ 		pr_err("%s: Wrong Command:0x%llx sent into VTL1\n", __func__, _vtl_params->a0);
+ 		break;
+@@ -420,6 +538,7 @@ static int mshv_vsm_per_cpu_init(unsigned int cpu)
+ 
+ 	mshv_vsm_set_secure_config_vtl0();
+ 
++	per_cpu->vtl1_booted = true;
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+

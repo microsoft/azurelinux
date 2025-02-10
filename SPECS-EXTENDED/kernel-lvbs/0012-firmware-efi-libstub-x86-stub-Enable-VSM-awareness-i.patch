@@ -1,0 +1,76 @@
+From afe50715caa894fd4d06327519fdfe315646277a Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Thu, 23 Feb 2023 13:28:15 +0000
+Subject: [PATCH 12/68] firmware: efi: libstub: x86-stub: Enable VSM awareness
+ in efi os indications variable
+
+Without this we cannot enable VTL1 in linux kernel.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/firmware/efi/libstub/x86-stub.c | 35 +++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmware/efi/libstub/x86-stub.c
+index b2b06d18b7b4..49622fbe4d42 100644
+--- a/drivers/firmware/efi/libstub/x86-stub.c
++++ b/drivers/firmware/efi/libstub/x86-stub.c
+@@ -21,6 +21,13 @@
+ #include "efistub.h"
+ #include "x86-stub.h"
+ 
++#ifdef CONFIG_HYPERV_VSM
++#define HYPERV_PRIVATE_EFI_NAMESPACE_GUID \
++       EFI_GUID(0x610b9e98, 0xc6f6, 0x47f8, 0x8b, 0x47, 0x2d, 0x2d, 0xa0, 0xd5, 0x2a, 0x91)
++
++static const efi_char16_t efi_HvPrivOsloaderIndications_name[] = L"OsLoaderIndications";
++#endif
++
+ extern char _bss[], _ebss[];
+ 
+ const efi_system_table_t *efi_system_table;
+@@ -725,6 +732,29 @@ static efi_status_t exit_boot_func(struct efi_boot_memmap *map,
+ 	return EFI_SUCCESS;
+ }
+ 
++#ifdef CONFIG_HYPERV_VSM
++static void efi_set_hv_os_indications(void)
++{
++	efi_guid_t guid = HYPERV_PRIVATE_EFI_NAMESPACE_GUID;
++	efi_status_t status;
++	unsigned long size;
++	u32 attr, val;
++
++	size = sizeof(val);
++	status = get_efi_var(efi_HvPrivOsloaderIndications_name, &guid, &attr, &size, &val);
++        if (status != EFI_SUCCESS) {
++		efi_err("Could not read Hyper-V OsLoaderIndications\n");
++		return;
++	}
++	val |= 1;
++	set_efi_var(efi_HvPrivOsloaderIndications_name, &guid, attr, size, &val);
++        if (status != EFI_SUCCESS) {
++		efi_err("Could not set Hyper-V OsLoaderIndications to indicate VSM support \n");
++		return;
++	}
++}
++#endif
++
+ static efi_status_t exit_boot(struct boot_params *boot_params, void *handle)
+ {
+ 	struct setup_data *e820ext = NULL;
+@@ -739,6 +769,11 @@ static efi_status_t exit_boot(struct boot_params *boot_params, void *handle)
+ 	if (status != EFI_SUCCESS)
+ 		return status;
+ 
++#ifdef CONFIG_HYPERV_VSM
++	/* Indicate to bootloader that we will be enabling VTL1 before exiting boot services */
++	efi_set_hv_os_indications();
++#endif
++
+ 	/* Might as well exit boot services now */
+ 	status = efi_exit_boot_services(handle, &priv, exit_boot_func);
+ 	if (status != EFI_SUCCESS)
+-- 
+2.43.0
+
