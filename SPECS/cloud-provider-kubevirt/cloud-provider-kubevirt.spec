@@ -25,7 +25,6 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         KCCM-Changes.patch
-Patch1:         Golang-Version-Upgrade.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22.11
 BuildRequires:  golang-packaging
