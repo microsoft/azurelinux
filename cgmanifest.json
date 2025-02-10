@@ -8200,6 +8200,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-lvbs",
+          "version": "6.6.64.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.64.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-mshv",
           "version": "5.15.157.mshv1",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
