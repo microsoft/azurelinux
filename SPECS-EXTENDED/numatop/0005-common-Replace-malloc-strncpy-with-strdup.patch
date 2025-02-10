@@ -1,0 +1,31 @@
+From c46ebd47907a77bfbcfa5ac8dacf7536102ae3af Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:07:07 +0100
+Subject: [PATCH 5/9] common: Replace malloc()+strncpy() with strdup()
+
+This silences the stringop-truncation warning.
+---
+ common/os/os_util.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/common/os/os_util.c b/common/os/os_util.c
+index f442729..3fdb4ca 100644
+--- a/common/os/os_util.c
++++ b/common/os/os_util.c
+@@ -387,12 +387,10 @@ str_int_extract(char *str, int *arr, int arr_size, int *num)
+ 	int len = strlen(str);
+ 	boolean_t ret = B_FALSE;
+ 
+-	if ((scopy = malloc(len + 1)) == NULL) {
++	if ((scopy = strdup(str)) == NULL) {
+ 		return (B_FALSE);
+ 	}
+ 
+-	strncpy(scopy, str, len);
+-	scopy[len] = 0;
+ 	cur = scopy;
+ 
+ 	while (cur < (scopy + len)) {
+-- 
+2.44.0
+
