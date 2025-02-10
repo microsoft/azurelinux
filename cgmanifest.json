@@ -14602,8 +14602,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-calendar",
-          "version": "2.04",
-          "downloadUrl": "https://download.ocamlcore.org/calendar/calendar/2.04/calendar-2.04.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/ocaml-community/calendar/archive/refs/tags/v3.0.0.tar.gz"
         }
       }
     },
