@@ -28,6 +28,7 @@ Patch8:  CVE-2024-36621.patch
 Patch9:  CVE-2024-36623.patch
 Patch10: CVE-2024-45337.patch
 Patch11:  CVE-2024-24786.patch
+Patch12:  CVE-2024-23650.patch
 
 %{?systemd_requires}
 
