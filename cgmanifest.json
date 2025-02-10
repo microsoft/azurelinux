@@ -3409,8 +3409,8 @@
         "other": {
           "name": "exempi",
           "version": "2.6.5",
-          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"        
-	}
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"
+        }
       }
     },
     {
@@ -8091,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl4",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl4.tar.gz"
+          "version": "3.8.0.azl0.abombo",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.8.0.azl0.abombo.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl4",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl4.tar.gz"
+          "version": "3.8.0.azl0.abombo",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.8.0.azl0.abombo.tar.gz"
         }
       }
     },
