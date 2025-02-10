@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		physfs
 Version:	3.0.2
-Release:	4%{?dist}
+Release:	16%{?dist}
 License:	zlib
 Summary:	Library to provide abstract access to various archives
-URL:		http://www.icculus.org/physfs/
-Source0:	http://www.icculus.org/physfs/downloads/physfs-%{version}.tar.bz2
+URL:		https://www.icculus.org/physfs/
+Source0:	https://www.icculus.org/physfs/downloads/physfs-%{version}.tar.bz2
 BuildRequires:  gcc-c++
 BuildRequires:	doxygen, readline-devel, libtool, cmake
 # Only needed to build a test program.
@@ -39,15 +39,15 @@ This package contains the libraries and headers necessary for developing
 packages with physfs functionality.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-%cmake .
-make %{?_smp_mflags} LIBTOOL=%{_bindir}/libtool
-doxygen
+%cmake
+%cmake_build
+doxygen docs/Doxyfile
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%cmake_install
 rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man3
 install -m0644 docs/man/man3/* $RPM_BUILD_ROOT%{_mandir}/man3
@@ -78,7 +78,8 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.a
 %ldconfig_scriptlets
 
 %files
-%doc docs/CHANGELOG.txt docs/CREDITS.txt LICENSE.txt docs/TODO.txt
+%license LICENSE.txt
+%doc docs/CHANGELOG.txt docs/CREDITS.txt docs/TODO.txt
 %{_libdir}/*.so.*
 
 %files devel
@@ -90,8 +91,47 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.a
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.2-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Feb 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.0.2-16
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-8
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 10 2020 Tom Callaway <spot@fedoraproject.org> - 3.0.2-6
+- fix FTBFS, use new cmake macros
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

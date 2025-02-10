@@ -21004,7 +21004,7 @@
         "other": {
           "name": "physfs",
           "version": "3.0.2",
-          "downloadUrl": "http://www.icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2"
+          "downloadUrl": "https://www.icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2"
         }
       }
     },
