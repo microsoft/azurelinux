@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "libXaw3d-1.6.3.tar.bz2": "2dba993f04429ec3d7e99341e91bf46be265cc482df25963058c15f1901ec544",
-  "libXaw3d-1.6.3.tar.bz2.sig": "b9d970f78c9a4b279e49d44b4bba0fedc5eee34a74bf1b9bbb48b65b0cd229cd",
-  "mattst88.asc": "fea077506e27392203568df63280eed2e2fd5a50bd6df08c30819ac7b176914e"
+  "libXaw3d-1.6.6.tar.xz": "a41c3e37135ad616b1f28bbde70002afbf3cb59a30df34141f829d32eadc8646",
+  "libXaw3d-1.6.6.tar.xz.sig": "ba59884fc0ce7e48d5c35692a49d614be9241e1a585c03e3646c9ce5f075f696",
+  "alan.coopersmith.asc": "35a05973372b792db073c21163e9e4cd135bd9bb08dc4372991ae4b596b99f09"
  }
 }
