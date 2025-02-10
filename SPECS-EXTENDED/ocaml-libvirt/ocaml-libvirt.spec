@@ -1,30 +1,26 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           ocaml-libvirt
-Version:        0.6.1.5
-Release:        8%{?dist}
+Version:        0.6.1.7
+Release:        13%{?dist}
 Summary:        OCaml binding for libvirt
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 
-URL:            http://libvirt.org/ocaml/
-Source0:        http://libvirt.org/sources/ocaml/%{name}-%{version}.tar.gz
+URL:            https://ocaml.libvirt.org/
+Source0:        https://libvirt.org/sources/ocaml/%{name}-%{version}.tar.gz
 
-# Fixes build with OCaml >= 4.09.
-# Upstream commit 75b13978f85b32c7a121aa289d8ebf41ba14ee5a.
-Patch1:         0001-Make-const-the-return-value-of-caml_named_value.patch
-
-# Fixes for OCaml 4.10, sent upstream 2020-01-19.
-Patch2:         0001-block_peek-memory_peek-Use-bytes-for-return-buffer.patch
-Patch3:         0002-String_val-returns-const-char-in-OCaml-4.10.patch
-Patch4:         0003-Don-t-try-to-memcpy-into-a-String_val.patch
-
+BuildRequires:  make
 BuildRequires:  ocaml >= 3.10.0
 BuildRequires:  ocaml-ocamldoc
 BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml-rpm-macros
 
 BuildRequires:  libvirt-devel >= 0.2.1
 BuildRequires:  perl-interpreter
-BuildRequires:  gawk
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 
 
 %description
@@ -33,7 +29,7 @@ OCaml binding for libvirt.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
 %description    devel
@@ -45,13 +41,19 @@ developing applications that use %{name}.
 %setup -q
 %autopatch -p1
 
+# Fix detection of ocamlopt and ocamldoc
+# https://gitlab.com/libvirt/libvirt-ocaml/-/merge_requests/27
+sed -i '/AM_CONDITIONAL/s/"x"/"xno"/' configure.ac
+
+# Regenerate the configure script
+autoreconf -fi -I m4 .
+
 
 %build
+# Parallel builds do not work.
+unset MAKEFLAGS
 %configure
-make all doc
-%ifarch %{ocaml_native_compiler}
-make opt
-%endif
+make
 
 
 %install
@@ -60,43 +62,125 @@ export DESTDIR=$RPM_BUILD_ROOT
 export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
 mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-%ifarch %{ocaml_native_compiler}
-make install-opt
-%else
-make install-byte
-%endif
+make install
+%ocaml_files
 
 
-%files
-%doc COPYING.LIB README ChangeLog
-%{_libdir}/ocaml/libvirt
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/libvirt/*.a
-%exclude %{_libdir}/ocaml/libvirt/*.cmxa
-%exclude %{_libdir}/ocaml/libvirt/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/libvirt/*.mli
-%{_libdir}/ocaml/stublibs/*.so
-%{_libdir}/ocaml/stublibs/*.so.owner
+%files -f .ofiles
+%doc README
+%license COPYING.LIB
 
 
-%files devel
-%doc COPYING.LIB README TODO.libvirt ChangeLog html/*
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/libvirt/*.a
-%{_libdir}/ocaml/libvirt/*.cmxa
-%{_libdir}/ocaml/libvirt/*.cmx
-%endif
-%{_libdir}/ocaml/libvirt/*.mli
+%files devel -f .ofiles-devel
+%doc README TODO.libvirt
+%license COPYING.LIB
 
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1.5-8
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.6.1.7-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-7.1
-- OCaml 4.10.0 final (Fedora 32).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-11
+- OCaml 5.2.0 ppc64le fix
+
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-10
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-7
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-6
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-5
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-3
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 0.6.1.7-2
+- OCaml 5.0.0 rebuild
+- New project URL
+- Convert License tag to SPDX
+- Fix build on bytecode-only architectures
+- Use %%license macro
+- Use new OCaml macros
+
+* Mon Feb 13 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.7-1
+- New upstream version 0.6.1.7
+- Do not try parallel builds.
+- Upstream now uses automake.
+
+- Remove ChangeLog file and HTML docs, dropped upstream.
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-5
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-2
+- OCaml 4.14.0 rebuild
+
+* Thu Apr 28 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.6-1
+- New upstream version 0.6.1.6
+- Remove patches which are all upstream.
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-20
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-18
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 14:31:55 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-16
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-14
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-13
+- OCaml 4.11.0 rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1.5-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-11
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-10
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 17 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-9
+- OCaml 4.11.0 pre-release
+
+* Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-8
+- Update all OCaml dependencies for RPM 4.16.
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.5-7
 - OCaml 4.10.0 final.
