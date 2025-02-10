@@ -89,7 +89,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Sat Feb 08 2025 Kanishk Bansal <kanbansal@microsoft.com> 8.8.0-5
+* Sat Feb 08 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.8.0-5
 - Patch CVE-2025-0725
 
 * Fri Jan 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.8.0-4
