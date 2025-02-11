@@ -19,7 +19,6 @@ Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}
 Patch0:         CVE-2023-21100.patch
 Patch1:         CVE-2024-21538.patch
 Patch2:         CVE-2025-22150.patch
-Patch3:         CVE-2025-23085.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -120,8 +119,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Tue Feb 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 18.20.3-3
-- Patch CVE-2025-22150, CVE-2025-23085
+* Wed Feb 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 18.20.3-3
+- Patch CVE-2025-22150
 
 * Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 18.20.3-2
 - Patch CVE-2024-21538
