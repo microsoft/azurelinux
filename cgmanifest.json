@@ -13362,8 +13362,8 @@
         "type": "other",
         "other": {
           "name": "mod_auth_openidc",
-          "version": "2.4.14.2",
-          "downloadUrl": "https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.14.2/mod_auth_openidc-2.4.14.2.tar.gz"
+          "version": "2.4.15.7",
+          "downloadUrl": "https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.15.7/mod_auth_openidc-2.4.15.7.tar.gz"
         }
       }
     },
