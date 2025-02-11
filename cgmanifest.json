@@ -21873,8 +21873,8 @@
         "type": "other",
         "other": {
           "name": "python-astroid",
-          "version": "2.3.3",
-          "downloadUrl": "https://github.com/PyCQA/astroid/archive/ace7b2967ea762ec43fc7be8ab9c8007564d9be2/astroid-ace7b29.tar.gz"
+          "version": "3.3.8",
+          "downloadUrl": " https://github.com/pylint-dev/astroid/archive/v3.3.8/astroid-3.3.8.tar.gz"
         }
       }
     },
