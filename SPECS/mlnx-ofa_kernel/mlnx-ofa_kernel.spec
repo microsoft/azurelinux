@@ -99,7 +99,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 5%{?dist}
+Release:	 6%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -191,7 +191,7 @@ Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Version: %{_version}
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -203,7 +203,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %package -n %{devel_pname}
 Version: %{_version}
 # build KMP rpms?
-Release: 5%{?dist}
+Release: 6%{?dist}
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -739,6 +739,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-5
 - Bump release to rebuild for new kernel release
 
