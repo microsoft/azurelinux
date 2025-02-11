@@ -1,9 +1,9 @@
-%global         extended_release 0.38.gd185c9b
-%global         MLNX_OFED_VERSION 24.01-0.3.3.1
+%global         extended_release 0.65.g9093bae
+%global         MLNX_OFED_VERSION 24.10-0.7.0.0
 Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
-Version:        24.01.0
+Version:        24.10.0
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
@@ -38,6 +38,9 @@ chmod -x runme
 %_mandir/man1/*.1*
 
 %changelog
+* Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10.0-1
+- Upgrade version to 24.10.0
+
 * Wed Apr 03 2024 Juan Camposeco <juanarturoc@microsoft.com> - 24.01.0-1
 - Upgrade version to 24.01.0
 
