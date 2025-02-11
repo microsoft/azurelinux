@@ -12,13 +12,13 @@ Distribution:   Azure Linux
 %bcond_with xmlrpc
 
 Name:		certmonger
-Version:	0.79.13
-Release:	2%{?dist}
+Version:        0.79.20
+Release:        1%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
-License:	GPLv3+
+License:	GPLv3 or later (with an exception that it can be linked with OpenSSL).
 URL:		http://pagure.io/certmonger/
-Source0:	http://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
+Source0:	https://pagure.io/certmonger/archive/%{version}/certmonger-%{version}.tar.gz
 #Source1:	http://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
 
 BuildRequires:	autoconf
@@ -238,6 +238,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Dec 10 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.79.15-1
+- Update to upstream 0.79.20 to fix build issues with certmonger. Verified license.
+
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 0.79.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build-time requirement on systemd-devel for systemd pkgconfig files

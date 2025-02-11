@@ -27,7 +27,7 @@
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
-Version:        4.1.5
+Version:        4.1.7
 Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
@@ -233,6 +233,7 @@ make check
 %{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
 %{_libdir}/%{name}/lib/libmca*.so.41*
 %{_libdir}/%{name}/lib/libmca*.so.50*
+%{_libdir}/%{name}/lib/lib*
 %{_mandir}/%{namearch}/man1/mpi[er]*
 %{_mandir}/%{namearch}/man1/ompi*
 %{_mandir}/%{namearch}/man1/orte[-dr_]*
@@ -303,6 +304,9 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.1.7-1
+- Upgrade to 4.1.7 - Azure Linux 3.0 - package upgrades
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
 - Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
 
