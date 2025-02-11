@@ -548,7 +548,7 @@ python3-flit-core-3.9.0-1.azl3.noarch.rpm
 python3-gpg-1.23.2-2.azl3.x86_64.rpm
 python3-jinja2-3.1.2-2.azl3.noarch.rpm
 python3-libcap-ng-0.8.4-1.azl3.x86_64.rpm
-python3-libs-3.12.3-5.azl3.x86_64.rpm
+python3-libs-3.12.3-6.azl3.x86_64.rpm
 python3-libxml2-2.11.5-3.azl3.x86_64.rpm
 python3-lxml-4.9.3-1.azl3.x86_64.rpm
 python3-magic-5.45-1.azl3.noarch.rpm
