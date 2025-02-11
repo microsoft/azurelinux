@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,7 @@ Patch6:         fix-tests-for-azl.patch
 # Install only package configuration and implemenation
 Patch7:         tdnf-add-installonlypkgs-config.patch
 Patch8:         tdnf-installonlypkgs.patch
+Patch10:        tdnf-installonly-install-status.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -241,6 +242,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Thu Jan 23 2025 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-7
+- Fix an issue with autoremove for installonlypkgs on tdnf
+
 * Tue Nov 19 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-6
 - Add kernel-64k installonlypkgs entry
 

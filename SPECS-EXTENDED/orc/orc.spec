@@ -1,17 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:		orc
-Version:	0.4.31
-Release:	4%{?dist}
+Version:	0.4.39
+Release:	2%{?dist}
 Summary:	The Oil Run-time Compiler
 
-License:	BSD
+License:	BSD-2-Clause AND BSD-3-Clause
+Vendor:         Microsoft Corporation                              
+Distribution:   Azure Linux
 URL:		http://cgit.freedesktop.org/gstreamer/orc/
-Source0:	http://gstreamer.freedesktop.org/src/orc/%{name}-%{version}.tar.xz
+Source0:	https://gstreamer.freedesktop.org/src/orc/%{name}-%{version}.tar.xz
 
-BuildRequires:  %{_bindir}/xsltproc
+Patch0001:	0001-powerpc-fix-div255w-which-still-used-the-inexact-sub.patch
+
 BuildRequires:	meson >= 0.47.0
 BuildRequires:  gcc
+BuildRequires:	gtk-doc
 
 %description
 Orc is a library and set of tools for compiling and executing
@@ -19,6 +21,14 @@ very simple programs that operate on arrays of data.  The "language"
 is a generic assembly language that represents many of the features
 available in SIMD architectures, including saturated addition and
 subtraction, and many arithmetic operations.
+
+%package doc
+Summary:	Documentation for Orc
+Requires:	%{name} = %{version}-%{release}
+BuildArch:	noarch
+
+%description doc
+Documentation for Orc.
 
 %package devel
 Summary:	Development files and libraries for Orc
@@ -40,10 +50,10 @@ The Orc compiler, to produce optimized code.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%meson -D default_library=shared -Dgtk_doc=disabled
+%meson -D default_library=shared
 %meson_build
 
 %install
@@ -54,9 +64,7 @@ find %{buildroot}/%{_libdir} -name \*.a -delete
 rm -rf %{buildroot}/%{_libdir}/orc
 
 %check
-%ifnarch s390 s390x ppc %{power64} %{arm} i686 aarch64
 %meson_test
-%endif
 
 %ldconfig_scriptlets
 
@@ -64,29 +72,77 @@ rm -rf %{buildroot}/%{_libdir}/orc
 %files
 %license COPYING
 %doc README
-%{_libdir}/liborc-*.so.*
+%{_libdir}/liborc-0.4.so.0*
+%{_libdir}/liborc-test-0.4.so*
 %{_bindir}/orc-bugreport
+
+%files doc
+%doc %{_datadir}/gtk-doc/html/orc/
 
 %files devel
 %doc examples/*.c
 %{_includedir}/%{name}-0.4/
-%{_libdir}/liborc-*.so
+%{_libdir}/liborc-0.4.so
 %{_libdir}/pkgconfig/orc-0.4.pc
 %{_libdir}/pkgconfig/orc-test-0.4.pc
-%{_datadir}/aclocal/orc.m4
 
 %files compiler
 %{_bindir}/orcc
 
 
 %changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.31-4
-- Adding BR on '%%{_bindir}/xsltproc'.
-- Disabled gtk doc generation to remove network dependency during build-time.
+* Tue Dec 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 0.4.39-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.31-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jul 30 2024 Wim Taymans <wtaymans@redhat.com> 0.4.39-1
+- Update to 0.4.39
+- Add patch for div255w fix on ppc64le
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.38-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Mar 06 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 0.4.38-2
+- Move orc-test to main package
+
+* Tue Mar 05 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 0.4.38-1
+- Update to 0.4.38
+- Version the library to catch bumps
+- Cleanup spec, use license var
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.33-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.33-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.33-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 04 2022 Wim Taymans <wtaymans@redhat.com> 0.4.33-1
+- Update to 0.4.33
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Aug 18 2021 Vít Ondruch <vondruch@redhat.com> - 0.4.31-6
+- Fix ppc64le segfault when used via libvips.
+  Resolves: rhbz#1917540
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.31-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

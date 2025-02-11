@@ -1,8 +1,8 @@
 Summary:        High performance compressor optimized for binary data
 Name:           blosc
-Version:        1.21.4
-Release:        2%{?dist}
-License:        MIT
+Version:        1.21.6
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/Blosc/c-blosc
@@ -79,6 +79,10 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %{_includedir}/blosc-export.h
 
 %changelog
+* Wed Nov 20 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.21.6-1
+- Update to 1.21.6
+- License verified.
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 1.21.4-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

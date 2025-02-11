@@ -1,12 +1,15 @@
 Summary:        Thunderbolt device manager
 Name:           bolt
-Version:        0.9.2
-Release:        2%{?dist}
+Version:        0.9.8
+Release:        1%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/bolt/bolt
 Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
+
+Patch0:         0001-test-test-unix-skip-unix-domain-socket-test.patch
+
 BuildRequires:  asciidoc
 BuildRequires:  gcc
 BuildRequires:  libudev-devel
@@ -69,6 +72,9 @@ mentioned tasks.
 %ghost %dir %{_localstatedir}/lib/boltd
 
 %changelog
+* Mon Nov 25 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.9.8-1
+- Upgrade to version 0.9.8
+
 * Thu Jan 05 2023 Suresh Thelkar <sthelkar@microsoft.com> - 0.9.2-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

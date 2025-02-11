@@ -1,0 +1,14 @@
+#! /bin/bash -efux
+
+## A hack for making brp-strip taking into account kmod files
+
+# If using normal root, avoid changing anything.
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != "/" ] || exit 0
+
+# Checking for required programs
+which find chmod >/dev/null || exit 0
+
+find "$RPM_BUILD_ROOT" \
+	-name '*.ko' \
+	-printf '%#m %P\n' \
+	-exec chmod u+x '{}' \; > "$RPM_BUILD_ROOT/kmod-permissions.list"

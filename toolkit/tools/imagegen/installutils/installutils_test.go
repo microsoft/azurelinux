@@ -197,3 +197,50 @@ func TestAddImageIDFileGuardClause(t *testing.T) {
 	err = AddImageIDFile(chroot.RootDir(), "")
 	assert.Error(t, err)
 }
+
+func TestPackagelistContainsPackage(t *testing.T) {
+	packageList := []string{
+		"package1",
+		"package2",
+		"package3",
+	}
+
+	found, err := PackagelistContainsPackage(packageList, "package2")
+	assert.NoError(t, err)
+	assert.True(t, found)
+
+	found, err = PackagelistContainsPackage(packageList, "package4")
+	assert.NoError(t, err)
+	assert.False(t, found)
+
+	found, err = PackagelistContainsPackage(nil, "package4")
+	assert.NoError(t, err)
+	assert.False(t, found)
+
+	found, err = PackagelistContainsPackage(packageList, "")
+	assert.Error(t, err)
+	assert.False(t, found)
+}
+
+func TestPackagelistContainsPackageBadVersion(t *testing.T) {
+	packageList := []string{
+		"bad package = bad < version",
+	}
+
+	found, err := PackagelistContainsPackage(packageList, "package2")
+	assert.Error(t, err)
+	assert.False(t, found)
+}
+
+func TestPackagelistContainsPackageVersions(t *testing.T) {
+	packageList := []string{
+		"package1",
+		"package2",
+		"package3",
+		"package4 = 1.2.3",
+	}
+
+	found, err := PackagelistContainsPackage(packageList, "package4")
+	assert.NoError(t, err)
+	assert.True(t, found)
+}
