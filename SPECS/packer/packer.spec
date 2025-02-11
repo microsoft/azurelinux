@@ -3,7 +3,7 @@
 
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.10.5
+Version:        1.9.5
 Release:        5%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
