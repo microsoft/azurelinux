@@ -10,7 +10,7 @@
 Summary:        C bindings for subunit
 Name:           subunit
 Version:        1.4.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0 OR BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -198,6 +198,7 @@ touch -r c++/SubunitTestProgressListener.h \
 
 %check
 %if %{without bootstrap}
+pip3 install testtools iso8601 testscenarios fixtures
 # Run the tests for python3
 export LD_LIBRARY_PATH=$PWD/.libs
 export PYTHON=%{python3}
@@ -247,6 +248,9 @@ make check
 %{_bindir}/tap2subunit
 
 %changelog
+* Fri Jan 31 2025 Sam Meluch <sammeluch@microsoft.com> - 1.4.4-6
+- Add testtools install to %check section to fix ptest
+
 * Thu Sep 12 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.4.4-5
 - Initial Azure Linux import from Fedora 42 (license: MIT)
 - License Verified
