@@ -38,7 +38,7 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source4:        cbl-mariner-ca-20211013-20230216.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
