@@ -28836,8 +28836,8 @@
         "type": "other",
         "other": {
           "name": "tlog",
-          "version": "9",
-          "downloadUrl": "https://github.com/Scribery/tlog/releases/download/v9/tlog-9.tar.gz"
+          "version": "14",
+          "downloadUrl": "https://github.com/Scribery/tlog/releases/download/v14/tlog-14.tar.gz"
         }
       }
     },
