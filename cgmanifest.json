@@ -29006,8 +29006,8 @@
         "type": "other",
         "other": {
           "name": "tss2",
-          "version": "1331",
-          "downloadUrl": "https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss1331.tar.gz"
+          "version": "2.3.2",
+          "downloadUrl": "https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss2.3.2.tar.gz"
         }
       }
     },
