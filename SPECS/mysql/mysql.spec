@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.40
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Patch0:         CVE-2012-5627.nopatch
 Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
 Patch2:         CVE-2012-2677.patch
 Patch3:         CVE-2024-9681.patch
+Patch4:         CVE-2025-0725.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -109,6 +110,9 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Mon Feb 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.40-6
+- Patch CVE-2025-0725
+
 * Mon Jan 27 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.0.40-5
 - Fix CVE-2024-9681
 
