@@ -1,0 +1,20 @@
+# This patch is based on
+#   https://opendev.org/starlingx/kernel/raw/commit/b6f8503866c3cae009d5b2e8e8db17149c917d9c/kernel-modules/mlnx-ofa_kernel/debian/patches/0003-Fix-the-obsolete-module-init.patch
+# modified to apply cleanly with no change in logic.
+
+--- a/include/linux/compat-2.6.h
++++ b/include/linux/compat-2.6.h
+@@ -31,9 +31,11 @@
+ #define module_init(initfn)                                             \
+ 	static int __init __init_backport(void)                         \
+ 	{                                                               \
+-		mlx_backport_dependency_symbol();                           \
++		mlx_backport_dependency_symbol();                       \
+ 		return initfn();                                        \
+ 	}                                                               \
+-	int init_module(void)  __copy(initfn)  __attribute__((alias("__init_backport")));
++	int init_module(void)  __copy(initfn)                           \
++		__attribute__((alias("__init_backport")));		\
++         ___ADDRESSABLE(init_module, __initdata);
+ 
+ #endif /* LINUX_26_COMPAT_H */

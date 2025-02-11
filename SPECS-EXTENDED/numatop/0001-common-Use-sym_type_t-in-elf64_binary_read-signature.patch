@@ -1,0 +1,26 @@
+From 06c6d857654fdd4230604b4cd4cc2c127757574d Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 22:57:13 +0100
+Subject: [PATCH 1/9] common: Use sym_type_t in elf64_binary_read() signature
+
+This silences the enum-int-mismatch warning.
+---
+ common/os/sym.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/os/sym.c b/common/os/sym.c
+index 9ead1fb..f0b5706 100644
+--- a/common/os/sym.c
++++ b/common/os/sym.c
+@@ -463,7 +463,7 @@ L_EXIT:
+ }
+ 
+ static int
+-elf64_binary_read(sym_binary_t *binary, unsigned int sym_type)
++elf64_binary_read(sym_binary_t *binary, sym_type_t sym_type)
+ {
+ 	Elf64_Ehdr ehdr;
+ 	Elf64_Shdr shdr;
+-- 
+2.44.0
+
