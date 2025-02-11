@@ -1,32 +1,14 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.10.116
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/jenkins-x/jx
 Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
-#
-#   NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2023-45288.patch
 
 BuildRequires:  golang >= 1.17.1
@@ -63,6 +45,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Thu Jan 30 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.10.116-3
+- Change vendor naming convention to match other go packages.
+
 * Thu Aug 22 2024 Sumedh Sharma <sumsharma@microsoft.com> - 3.10.116-2
 - Add patch to resolve CVE-2023-45288
 
