@@ -27836,8 +27836,8 @@
         "type": "other",
         "other": {
           "name": "sip",
-          "version": "4.19.21",
-          "downloadUrl": "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.21/sip-4.19.21.tar.gz"
+          "version": "4.19.25",
+          "downloadUrl": "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.25/sip-4.19.25.tar.gz"
         }
       }
     },
