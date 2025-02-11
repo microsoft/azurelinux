@@ -1,16 +1,16 @@
---- GKlib/CMakeLists.orig.txt	2013-03-11 20:50:14.000000000 +0100
-+++ GKlib/CMakeLists.txt	2013-03-17 19:53:44.220827579 +0100
-@@ -7,7 +7,7 @@
+--- src/GKlib/CMakeLists.orig.txt	2013-03-11 20:50:14.000000000 +0100
++++ src/GKlib/CMakeLists.txt	2013-03-17 19:53:44.220827579 +0100
+@@ -6,7 +6,7 @@
+ unset(abs)
  include(GKlibSystem.cmake)
  
- include_directories(".")
 -add_library(GKlib STATIC ${GKlib_sources})
 +add_library(GKlib SHARED ${GKlib_sources})
- if(UNIX)
-   target_link_libraries(GKlib m)
- endif(UNIX)
-@@ -16,6 +16,6 @@
- add_subdirectory("test")
+ target_link_libraries(GKlib PRIVATE $<$<BOOL:${UNIX}>:m>)
+ target_include_directories(GKlib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+ 
+@@ -15,6 +15,6 @@
+ endif()
  
  install(TARGETS GKlib
 -  ARCHIVE DESTINATION lib
