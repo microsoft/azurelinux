@@ -26,9 +26,12 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 #
 # $1 - Folder path
 define create_folder
-$(eval _out := $(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -vp $1 && touch -d @0 $1 ; fi ))
+$(eval _out := $(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -vp $1 2>&1 && touch -d @0 $1 ; fi ))
 $(if $(strip $(_out)),$(info $(_out)))
 endef
+
+$(warning $(shell mount | grep "/tmp"))
+$(warning $(shell df -h /tmp))
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
 # Make will automatically create the MAKEFLAGS variable which contains each of the flags, non-build commmands will include -n
@@ -78,9 +81,9 @@ clean-variable_depends_on_phony:
 # they will alway run. Each rule will check the currently stored value in the file and only
 # update it if needed.
 
-# Generate a target which watches a variable for changes so rebuilds can be 
-# triggered if needed. Uses one file per variable. If the value of the variable 
-# is not the same as recorded in the file, update the file to match. This will 
+# Generate a target which watches a variable for changes so rebuilds can be
+# triggered if needed. Uses one file per variable. If the value of the variable
+# is not the same as recorded in the file, update the file to match. This will
 # force a rebuild of any dependent targets.
 #
 # $1 - name of the variable to watch for changes
