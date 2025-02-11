@@ -1,0 +1,25 @@
+--- LibRaw-0.21.0/libraw.pc.in~	2022-12-18 01:26:41.000000000 -0600
++++ LibRaw-0.21.0/libraw.pc.in	2022-12-19 10:27:02.793929537 -0600
+@@ -6,7 +6,9 @@
+ Name: libraw
+ Description: Raw image decoder library (non-thread-safe)
+ Requires: @PACKAGE_REQUIRES@
++Requires.private: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw@PC_OPENMP@
++Libs.private: -lstdc++
+ Libs.private: @PACKAGE_LIBS_PRIVATE@
+ Cflags: -I${includedir}/libraw -I${includedir}
+--- LibRaw-0.21.0/libraw_r.pc.in~	2022-12-18 01:26:41.000000000 -0600
++++ LibRaw-0.21.0/libraw_r.pc.in	2022-12-19 10:28:30.620571338 -0600
+@@ -6,7 +6,8 @@
+ Name: libraw
+ Description: Raw image decoder library (thread-safe)
+ Requires: @PACKAGE_REQUIRES@
++Requires.private: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw_r -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw_r@PC_OPENMP@
+ Libs.private: @PACKAGE_LIBS_PRIVATE@
+ Cflags: -I${includedir}/libraw -I${includedir}

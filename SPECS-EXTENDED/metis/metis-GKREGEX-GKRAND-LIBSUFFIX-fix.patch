@@ -1,5 +1,5 @@
---- GKlib/Makefile.orig	2013-03-11 20:50:42.000000000 +0100
-+++ GKlib/Makefile	2013-03-17 14:26:23.632867727 +0100
+--- src/GKlib/Makefile.orig	2013-03-11 20:50:42.000000000 +0100
++++ src/GKlib/Makefile	2013-03-17 14:26:23.632867727 +0100
 @@ -41,10 +41,10 @@
      CONFIG_FLAGS += -DPCRE=$(pcre)
  endif
@@ -14,8 +14,8 @@
  ifneq ($(prefix), not-set)
      CONFIG_FLAGS += -DCMAKE_INSTALL_PREFIX=$(prefix)
 
---- Makefile.origin	2013-03-30 17:24:45.000000000 +0100
-+++ Makefile	2013-04-14 20:04:38.887674462 +0200
+--- src/Makefile.origin	2013-03-30 17:24:45.000000000 +0100
++++ src/Makefile	2013-04-14 20:04:38.887674462 +0200
 @@ -9,6 +9,11 @@
  gklib_path = not-set
  shared     = not-set

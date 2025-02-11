@@ -1,15 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global modname rpmfluff
 
 Name:          python-%{modname}
-Version:       0.5.7.1
-Release:       6%{?dist}
+Version:       0.6.5
+Release:       4%{?dist}
 Summary:       Lightweight way of building RPMs, and sabotaging them
 
-License:       GPLv2+
+License:       GPL-2.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:           https://pagure.io/rpmfluff
-Source0:       https://pagure.io/releases/%{modname}/%{modname}-%{version}.tar.xz
+Source0:       https://pagure.io/releases/%{modname}/%{modname}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
 BuildArch:     noarch
 
@@ -19,7 +19,7 @@ sabotaging them so they are broken in controlled ways.\
 \
 It is intended for use when validating package analysis tools such as RPM lint.\
 It can also be used to construct test cases for package management software\
-such as rpm and yum.
+such as RPM, YUM, and DNF.
 
 %description %{_description}
 
@@ -29,6 +29,7 @@ Summary:        %{summary}
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-rpm
+BuildRequires:  python3-setuptools
 Requires:       rpm-build
 Requires:       createrepo_c
 
@@ -46,18 +47,97 @@ Python 3 version.
 %py3_install
 
 %check
-python3 %{modname}.py
+python3 -m unittest %{modname}.test
 
 %files -n python3-%{modname}
 %license LICENSE
 %doc README.md
-%{python3_sitelib}/%{modname}.py
-%{python3_sitelib}/__pycache__/%{modname}.*
-%{python3_sitelib}/%{modname}-*.egg-info
+%{python3_sitelib}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.7.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.6.5-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.6.5-2
+- Rebuilt for Python 3.13
+
+* Fri May 31 2024 Jan Hutar <jhutar@redhat.com> - 0.6.4-1
+- dshea: Explicitly disable debuginfo when not requested
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 17 2023 Jan Hutar <jhutar@redhat.com> - 0.6.3-1
+- gotmax23: remove usage of deprecated rpm.fi
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.6.2-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Oct 18 2022 Jan Hutar <jhutar@redhat.com> - 0.6.2-1
+- Change deprecated distutils to setuptools
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.6.1-6
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 0.6.1-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Aug 12 2020 Jan Hutar <jhutar@redhat.com> - 0.6.1-1
+- jhutar: Expose two more items
+
+* Fri Aug 07 2020 Jan Hutar <jhutar@redhat.com> - 0.6-1
+- jhutar: Workaround for https://github.com/rpm-software-management/rpm/issues/1301
+- msuchy: Do not write %clean by default
+- msuchy: Make build directory in /tmp
+- msuchy: Call buildArchs as named argument
+- msuchy: Do not clean install
+- msuchy: BuildRoot is ignored by rpm
+- msuchy: Remove artefacts after the test
+- msuchy: Fix various pylint warnings
+- msuchy: Break down package into several modules
+- msuchy: Remove dead code
+- msuchy: Apply 2to3 script
+- msuchy: Mention DNF in description
+- msuchy: Move rpmfluff.py to rpmfluff/__init__.py
+- dcantrell: Only write the License tag if it is set
+- jhutar: Sanitize values we use to construct file paths
+- tbaeder: Read compiler from CC environment variable
+- dcantrell: Allow setting a different spec file basename than the package name
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.7.1-8
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.7.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 0.5.7.1-6
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.7.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
