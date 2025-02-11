@@ -60,15 +60,6 @@ Requires:       systemd-udev
 %description    coco
 Metapackage to install the set of packages inside a Kata containers coco UVM
 
-%package        coco-debug
-Summary:        Metapackage to install the set of packages inside a Kata confidential containers debug UVM.
-Requires:       %{name}-debug = %{version}-%{release}
-Requires:       cifs-utils
-Requires:       device-mapper
-
-%description    coco-debug
-Metapackage to install the set of packages inside a Kata containers coco UVM, includes extra debug utilities.
-
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
@@ -120,7 +111,7 @@ Requires:       golang
 
 %changelog
 * Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
-- Introduce debug and coco-debug metapackages
+- Introduce debug metapackage
 
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
 - Add explicit make dependency for UVM build
