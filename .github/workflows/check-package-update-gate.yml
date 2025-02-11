@@ -5,9 +5,9 @@ name: Check Package Update Gate
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
 
 jobs:
 
@@ -55,37 +55,33 @@ jobs:
             name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
-            #if fdk-aac-free or opus are changed, check if the version is the same as the previous version
-            if [[ "$name" == "fdk-aac-free" || "$name" == "opus" ]]; then
-              # get the previous spec if it exits.
-              # fatally crashes if the spec is not present in the base commit
-              previous_spec=$(git show ${{ env.base_sha }}:"$spec" || true)
-              git_exit_code=$?
-              #if the spec is a new addition, we want previous version to be empty
-              previous_version=""
-
-              if [[ -n "$previous_spec" ]]; then
-                echo "Previous spec exists"
-                previous_version=$(rpmspec --parse <(git show ${{ env.base_sha }}:"$spec") | grep -E "^Version:\s*(.*)" | awk '{print $2}')
-              fi
-              echo "Previous version of $spec: $previous_version"
-              if [[ "$version" != "$previous_version" ]]; then
-                1>&2 echo "**** ERROR ****"
-                1>&2 echo "Spec '$spec' update is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR ****"
-                error_found=1
-              fi
-            fi
-            # Check if the version is greater than the allowed version
-            if { [[ "$name" == "redis" && "$(printf '%s\n' "$version" "7.4" | sort -V | head -n1)" == "7.4" ]] || \
-            [[ "$name" == "packer" && "$(printf '%s\n' "$version" "1.10.0" | sort -V | head -n1)" == "1.10.0" ]] || \
-            [[ "$name" == "terraform" && "$(printf '%s\n' "$version" "1.6.0" | sort -V | head -n1)" == "1.6.0" ]]; }; then
-                1>&2 echo "**** ERROR ****"
-                1>&2 echo "Spec '$spec' change is not allowed in Azure Linux."
-                1>&2 echo "**** ERROR ****"
-                error_found=1
-            fi
+            # Read from packagelist-gate.csv and iterate each row
+            1st column: package name
+            2nd column: condition (>=, >, =,'')
+            3rd column: version number
             
+            while IFS=, read -r package_name condition version_number; do
+              if [[ "$name" == "$package_name" ]]; then
+                  case "$condition" in
+                      ">=" | ">" | "=")
+                          if [[ ("$condition" == ">=" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" == "$version_number") ||
+                                ("$condition" == ">" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" != "$version") ||
+                                ("$condition" == "=" && "$version" == "$version_number") ]]; then
+                              1>&2 echo "**** ERROR ****"
+                              1>&2 echo "Spec '$spec' version '$version' is not allowed in Azure Linux. Error:'$spec $condition $version_number'."
+                              1>&2 echo "**** ERROR ****"
+                              error_found=1
+                          fi
+                          ;;
+                      *)
+                          1>&2 echo "**** ERROR ****"
+                          1>&2 echo "Spec $spec is not allowed in Azure Linux"
+                          1>&2 echo "**** ERROR ****"
+                          error_found=1
+                          ;;
+                  esac
+              fi
+            done < .github/workflows/packagelist-gate.csv  
           done
 
         if [[ -n $error_found ]]
