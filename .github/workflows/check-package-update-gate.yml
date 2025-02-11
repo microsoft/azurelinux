@@ -56,9 +56,9 @@ jobs:
             version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
 
             # Read from packagelist-gate.csv and iterate each row
-            1st column: package name
-            2nd column: condition (>=, >, =,'')
-            3rd column: version number
+            # 1st column: package name
+            # 2nd column: condition (>=, >, =,'')
+            # 3rd column: version number
             
             while IFS=, read -r package_name condition version_number; do
               if [[ "$name" == "$package_name" ]]; then
