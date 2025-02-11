@@ -18,7 +18,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
+Source2:        cbl-mariner-ca-20211013-20230216.pem
 Source3:        50_mariner_mshv.cfg
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel

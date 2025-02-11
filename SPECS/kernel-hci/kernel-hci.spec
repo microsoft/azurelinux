@@ -26,7 +26,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
+Source2:        cbl-mariner-ca-20211013-20230216.pem
 Patch0:         0001-net-mlx5-Support-partial-TTC-rules.patch
 Patch1:         0002-net-mlx5-Introduce-port-selection-namespace.patch
 Patch3:         0004-net-mlx5-Introduce-new-uplink-destination-type.patch
