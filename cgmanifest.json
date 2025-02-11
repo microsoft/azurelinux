@@ -13122,7 +13122,7 @@
         "other": {
           "name": "microcode_ctl",
           "version": "2.1",
-          "downloadUrl": "https://releases.pagure.org/microcode_ctl/microcode_ctl-2.1-29.tar.xz"
+          "downloadUrl": "https://releases.pagure.org/microcode_ctl/microcode_ctl-2.1-47.tar.xz"
         }
       }
     },
