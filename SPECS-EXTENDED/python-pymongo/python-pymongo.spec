@@ -57,7 +57,7 @@ GridFS is a storage specification for large objects in MongoDB.  This package
 contains the python3 version of this module.
 
 %prep
-%setup -q -n mongo-python-driver-%{version}
+%autosetup -n mongo-python-driver-%{version}
 
 %build
 %py3_build
