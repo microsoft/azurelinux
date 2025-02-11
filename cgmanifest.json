@@ -3409,8 +3409,8 @@
         "other": {
           "name": "exempi",
           "version": "2.6.5",
-          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"        
-	}
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"
+        }
       }
     },
     {
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.44.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.44.1.tar.gz"
+          "version": "6.6.74.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.74.1.tar.gz"
         }
       }
     },
