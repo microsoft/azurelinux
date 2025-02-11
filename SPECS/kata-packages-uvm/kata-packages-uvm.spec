@@ -103,6 +103,8 @@ Requires:       golang
 
 %files
 
+%files debug
+
 %files coco
 
 %files build
