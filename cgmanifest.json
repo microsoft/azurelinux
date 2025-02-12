@@ -10721,8 +10721,8 @@
         "type": "other",
         "other": {
           "name": "libqb",
-          "version": "1.0.5",
-          "downloadUrl": "https://github.com/ClusterLabs/libqb/releases/download/v1.0.5/libqb-1.0.5.tar.xz"
+          "version": "2.0.8",
+          "downloadUrl": "https://github.com/ClusterLabs/libqb/releases/download/v2.0.8/libqb-2.0.8.tar.xz"
         }
       }
     },
