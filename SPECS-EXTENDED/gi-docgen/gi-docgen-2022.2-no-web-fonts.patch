@@ -1,0 +1,239 @@
+diff -Naur gi-docgen-2022.2-original/gidocgen/templates/basic/basic.toml gi-docgen-2022.2/gidocgen/templates/basic/basic.toml
+--- gi-docgen-2022.2-original/gidocgen/templates/basic/basic.toml	2022-11-07 09:50:06.000000000 -0500
++++ gi-docgen-2022.2/gidocgen/templates/basic/basic.toml	2022-11-11 08:23:51.069820380 -0500
+@@ -42,35 +42,4 @@
+   "solarized-light.css",
+   "solarized-dark.css",
+   "search.js",
+-  "RedHatDisplay-Black.woff",
+-  "RedHatDisplay-Black.woff2",
+-  "RedHatDisplay-BlackItalic.woff",
+-  "RedHatDisplay-BlackItalic.woff2",
+-  "RedHatDisplay-Bold.woff",
+-  "RedHatDisplay-Bold.woff2",
+-  "RedHatDisplay-BoldItalic.woff",
+-  "RedHatDisplay-BoldItalic.woff2",
+-  "RedHatDisplay-Italic.woff",
+-  "RedHatDisplay-Italic.woff2",
+-  "RedHatDisplay-Medium.woff",
+-  "RedHatDisplay-Medium.woff2",
+-  "RedHatDisplay-MediumItalic.woff",
+-  "RedHatDisplay-MediumItalic.woff2",
+-  "RedHatDisplay-Regular.woff",
+-  "RedHatDisplay-Regular.woff2",
+-  "RedHatText-Bold.woff",
+-  "RedHatText-Bold.woff2",
+-  "RedHatText-BoldItalic.woff",
+-  "RedHatText-BoldItalic.woff2",
+-  "RedHatText-Italic.woff",
+-  "RedHatText-Italic.woff2",
+-  "RedHatText-Medium.woff",
+-  "RedHatText-Medium.woff2",
+-  "RedHatText-MediumItalic.woff",
+-  "RedHatText-MediumItalic.woff2",
+-  "RedHatText-Regular.woff",
+-  "RedHatText-Regular.woff2",
+-  "SourceCodePro-It.ttf.woff",
+-  "SourceCodePro-Regular.ttf.woff",
+-  "SourceCodePro-Semibold.ttf.woff",
+ ]
+diff -Naur gi-docgen-2022.2-original/gidocgen/templates/basic/fonts.css gi-docgen-2022.2/gidocgen/templates/basic/fonts.css
+--- gi-docgen-2022.2-original/gidocgen/templates/basic/fonts.css	2022-11-07 09:50:06.000000000 -0500
++++ gi-docgen-2022.2/gidocgen/templates/basic/fonts.css	2022-11-11 08:23:51.069820380 -0500
+@@ -14,9 +14,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-Regular.woff2") format("woff2"),
+-       url("RedHatDisplay-Regular.woff") format("woff");
++  src: local('RedHatDisplay-Regular');
+   font-style: normal;
+   font-weight: 400;
+   font-display: fallback;
+@@ -24,9 +22,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-RegularItalic.woff2") format("woff2"),
+-       url("RedHatDisplay-RegularItalic.woff") format("woff");
++  src: local('RedHatDisplay-RegularItalic');
+   font-style: italic;
+   font-weight: 400;
+   font-display: fallback;
+@@ -34,9 +30,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-Medium.woff2") format("woff2"),
+-       url("RedHatDisplay-Medium.woff") format("woff");
++  src: local('RedHatDisplay-Medium');
+   font-style: normal;
+   font-weight: 500;
+   font-display: fallback;
+@@ -44,9 +38,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-MediumItalic.woff2") format("woff2"),
+-       url("RedHatDisplay-MediumItalic.woff") format("woff");
++  src: local('RedHatDisplay-MediumItalic');
+   font-style: italic;
+   font-weight: 500;
+   font-display: fallback;
+@@ -54,9 +46,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-Bold.woff2") format("woff2"),
+-       url("RedHatDisplay-Bold.woff") format("woff");
++  src: local('RedHatDisplay-Bold');
+   font-style: normal;
+   font-weight: 700;
+   font-display: fallback;
+@@ -64,9 +54,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-BoldItalic.woff2") format("woff2"),
+-       url("RedHatDisplay-BoldItalic.woff") format("woff");
++  src: local('RedHatDisplay-BoldItalic');
+   font-style: italic;
+   font-weight: 700;
+   font-display: fallback;
+@@ -75,9 +63,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-Black.woff2") format("woff2"),
+-       url("RedHatDisplay-Black.woff") format("woff");
++  src: local('RedHatDisplay-Black');
+   font-style: normal;
+   font-weight: 900;
+   font-display: fallback;
+@@ -85,9 +71,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Display";
+-  src: local('RedHatDisplayWeb'),
+-       url("RedHatDisplay-BlackItalic.woff2") format("woff2"),
+-       url("RedHatDisplay-BlackItalic.woff") format("woff");
++  src: local('RedHatDisplay-BlackItalic');
+   font-style: italic;
+   font-weight: 900;
+   font-display: fallback;
+@@ -95,9 +79,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-Regular.woff2") format("woff2"),
+-       url("RedHatText-Regular.woff") format("woff");
++  src: local('RedHatText-Regular');
+   font-style: normal;
+   font-weight: 400;
+   font-display: fallback;
+@@ -105,9 +87,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-Italic.woff2") format("woff2"),
+-       url("RedHatText-Italic.woff") format("woff");
++  src: local('RedHatText-Italic');
+   font-style: italic;
+   font-weight: 400;
+   font-display: fallback;
+@@ -115,9 +95,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-Medium.woff2") format("woff2"),
+-       url("RedHatText-Medium.woff") format("woff");
++  src: local('RedHatText-Medium');
+   font-style: normal;
+   font-weight: 700;
+   font-display: fallback;
+@@ -125,9 +103,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-MediumItalic.woff2") format("woff2"),
+-       url("RedHatText-MediumItalic.woff") format("woff");
++  src: local('RedHatText-MediumItalic');
+   font-style: italic;
+   font-weight: 700;
+   font-display: fallback;
+@@ -135,9 +111,7 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-Bold.woff2") format("woff2"),
+-       url("RedHatText-Bold.woff") format("woff");
++  src: local('RedHatText-Bold');
+   font-style: normal;
+   font-weight: 900;
+   font-display: fallback;
+@@ -145,22 +119,17 @@
+ 
+ @font-face {
+   font-family: "Red Hat Text";
+-  src: local('RedHatTextWeb'),
+-       url("RedHatText-BoldItalic.woff2") format("woff2"),
+-       url("RedHatText-BoldItalic.woff") format("woff");
++  src: local('RedHatText-BoldItalic');
+   font-style: italic;
+   font-weight: 900;
+   font-display: fallback;
+ }
+ 
+-/* Do not fall back to locally installed SourceCodePro, as there are
+- * known bad copies being distributed to this day
+- */
+ @font-face {
+   font-family: 'Source Code Pro';
+   font-style: normal;
+   font-weight: 400;
+-  src: url("SourceCodePro-Regular.ttf.woff") format('woff');
++  src: local('SourceCodePro-Regular'), local('monospace');
+   font-display: swap;
+ }
+ 
+@@ -168,7 +137,7 @@
+   font-family: 'Source Code Pro';
+   font-style: italic;
+   font-weight: 400;
+-  src: url("SourceCodePro-It.ttf.woff") format('woff');
++  src: local('SourceCodePro-It'), local('monospace');
+   font-display: swap;
+ }
+ 
+@@ -176,6 +145,6 @@
+   font-family: 'Source Code Pro';
+   font-style: normal;
+   font-weight: 600;
+-  src: url("SourceCodePro-Semibold.ttf.woff") format('woff');
++  src: local('SourceCodePro-Semibold'), local('monospace');
+   font-display: swap;
+ }
+diff -Naur gi-docgen-2022.2-original/setup.cfg gi-docgen-2022.2/setup.cfg
+--- gi-docgen-2022.2-original/setup.cfg	2022-11-07 09:50:06.000000000 -0500
++++ gi-docgen-2022.2/setup.cfg	2022-11-11 08:24:25.200224213 -0500
+@@ -74,8 +74,6 @@
+   templates/basic/*.html
+   templates/basic/*.js
+   templates/basic/*.png
+-  templates/basic/*.woff2
+-  templates/basic/*.woff
+   py.typed
+ 
+ [bdist_wheel]
