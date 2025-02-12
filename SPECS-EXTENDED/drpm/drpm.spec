@@ -83,6 +83,7 @@ The drpm-devel package provides a C interface (drpm.h) for the drpm library.
 %changelog
 * Fri Oct 25 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.5.2-1
 - Update to version 0.5.2
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
