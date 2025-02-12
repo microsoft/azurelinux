@@ -47,6 +47,7 @@ and Jython.
 %pyproject_check_import
 
 %files -n python3-PyMySQL -f %{pyproject_files}
+%license LICENSE
 %doc README.md
 
 %changelog
