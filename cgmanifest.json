@@ -13583,7 +13583,7 @@
         "other": {
           "name": "mt-st",
           "version": "1.1",
-          "downloadUrl": "https://github.com/iustin/mt-st/archive/refs/tags/mt-st-1.1.tar.gz"
+          "downloadUrl": "https://github.com/iustin/mt-st/releases/download/v1.7/mt-st-1.7.tar.gz"
         }
       }
     },
