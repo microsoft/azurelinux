@@ -63,9 +63,8 @@ jobs:
             while IFS=, read -r package_name condition version_number; do
               if [[ "$name" == "$package_name" ]]; then
                   case "$condition" in
-                      ">=" | ">" | "=")
+                      ">=" | ">" )
                           if [[ ("$condition" == ">=" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" == "$version_number") ||
-                                ("$condition" == ">" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" != "$version") ||
                                 ("$condition" == "=" && "$version" == "$version_number") ]]; then
                               1>&2 echo "**** ERROR ****"
                               1>&2 echo "Spec '$spec' version '$version' is not allowed in Azure Linux. Error:'$spec $condition $version_number'."
