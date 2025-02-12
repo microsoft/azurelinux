@@ -28516,8 +28516,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootchart",
-          "version": "233",
-          "downloadUrl": "https://github.com/systemd/systemd-bootchart/releases/download/v233/systemd-bootchart-233.tar.xz"
+          "version": "235",
+          "downloadUrl": "https://github.com/systemd/systemd-bootchart/archive/v235/systemd-bootchart-235.tar.gz"
         }
       }
     },
