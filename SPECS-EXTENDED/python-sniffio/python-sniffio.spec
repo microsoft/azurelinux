@@ -46,6 +46,7 @@ BuildRequires:  %{py3_dist pytest}
 %pytest --verbose
 
 %files -n python3-sniffio -f %{pyproject_files}
+%license LICENSE LICENSE.MIT LICENSE.APACHE2
 %doc README.rst
 
 %changelog
