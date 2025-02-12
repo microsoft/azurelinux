@@ -27,7 +27,7 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 # $1 - Folder path
 define create_folder
 $(eval _out := $(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 2>&1 && touch -d @0 $1 ; fi ))
-$(if $(strip $(_out)),$(info $(_out)))
+$(if $(strip $(_out)),$(warning $(_out)))
 endef
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
