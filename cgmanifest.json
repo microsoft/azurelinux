@@ -7202,7 +7202,7 @@
         "other": {
           "name": "indent",
           "version": "2.2.13",
-          "downloadUrl": "http://ftpmirror.gnu.org/indent/indent-2.2.13.tar.xz"
+          "downloadUrl": "https://ftpmirror.gnu.org/indent/indent-2.2.13.tar.xz"
         }
       }
     },
