@@ -7391,8 +7391,8 @@
         "type": "other",
         "other": {
           "name": "ipcalc",
-          "version": "0.4.1",
-          "downloadUrl": "https://gitlab.com/ipcalc/ipcalc/-/archive/0.4.1/ipcalc-0.4.1.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://gitlab.com/ipcalc/ipcalc/-/archive/1.0.3/ipcalc-1.0.3.tar.gz"
         }
       }
     },
