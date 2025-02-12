@@ -184,6 +184,7 @@ install -d -m 0755 '%{buildroot}%{_sysconfdir}/edac/labels.d' \
 %changelog
 * Fri Oct 25 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.18-1
 - Update to version 0.18
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
