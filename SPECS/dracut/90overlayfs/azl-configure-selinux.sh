@@ -28,7 +28,8 @@ if [ -n "$overlayfs" ]; then
     echo "root folder label  : ($contextType)"
 
     # Set the type on the target folders
-    [ -e /sysroot ] && chcon -t $contextType /sysroot
-    [ -e /run/overlayfs ] && chcon -t $contextType /run/overlayfs
-    [ -e /run/ovlwork ] && chcon -t $contextType /run/ovlwork
+    CHCON_TOOL=$NEWROOT/usr/bin/chcon
+    [ -e /sysroot ] && $CHCON_TOOL -t $contextType /sysroot
+    [ -e /run/overlayfs ] && $CHCON_TOOL -t $contextType /run/overlayfs
+    [ -e /run/ovlwork ] && $CHCON_TOOL -t $contextType /run/ovlwork
 fi
