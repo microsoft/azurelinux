@@ -3,8 +3,8 @@
 
 Summary:        Common RPM Macros for building EFI-related packages
 Name:           efi-rpm-macros
-Version:        4
-Release:        6%{?dist}
+Version:        5
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86}"
 %dir /boot/efi/EFI/%{_efi_vendor_}
 
 %changelog
+* Wed Feb 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5-1
+- Auto-upgrade to 5 - Extended package upgrade
+
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4-6
 - Fixing package build by adding an explicit BR on '/etc/os-release'.
 - License verified.
