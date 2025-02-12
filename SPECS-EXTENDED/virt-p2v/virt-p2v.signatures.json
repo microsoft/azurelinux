@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "virt-p2v-1.42.0.tar.gz": "b1164bde6658646f11e8ff0da36fe5acbedde3445cc8424110c08fc144564e20"
+  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
+  "virt-p2v-1.42.4.tar.gz": "20ff7bec5ed630ae1928da026e6e6e471e8eb1869222762fd9ab4681975b98c5",
+  "virt-p2v-1.42.4.tar.gz.sig": "0c16c68cb98f14041087bbd8aa7d42ef40f81144d6877123099b30f5ca9cd776"
  }
 }
