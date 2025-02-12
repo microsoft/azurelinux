@@ -1,36 +1,37 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
 %global pypi_name dnspython
 %global py_package_name dns
-%global rctag rc1
+%global python_pkgs_extra \
+		curio \
+		trio
 
-Name:           python-%{py_package_name}
-Version:        2.1.0
-Release:        1%{?dist}
 Summary:        DNS toolkit for Python
-
+Name:           python-%{py_package_name}
+Version:        2.2.1
+Release:        1%{?dist}
 # The entire package is licensed with both licenses, see LICENSE file
 License:        ISC and MIT
 URL:            http://www.dnspython.org
-
-#Source0:       https://github.com/rthalley/%{pypi_name}/archive/v%{version}%{rctag}/%{pypi_name}-%{version}%{rctag}.tar.gz
-Source0:        https://github.com/rthalley/%{pypi_name}/archive/v%{version}%{rctag}/%{name}-%{version}%{rctag}.tar.gz
-# Fix proposed upstream: https://github.com/rthalley/dnspython/issues/610#issuecomment-734704756
-Patch0:         0001-fix-resolve-chaining.patch
+Source0:        https://github.com/rthalley/%{pypi_name}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3
 BuildRequires:  python3-cryptography
-BuildRequires:  python3-trio
 BuildRequires:  python3-curio
-BuildRequires:  python3-sniffio
+BuildRequires:  python3-devel
+BuildRequires:  python3-idna
+BuildRequires:  python3-poetry-core
 BuildRequires:  python3-requests
 BuildRequires:  python3-requests-toolbelt
-BuildRequires:  python3-idna
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-sniffio
+BuildRequires:  python3-trio
+BuildRequires:  python3-wheel
+%if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+%endif
+Requires:       python3
 
 %global _description %{expand:
 dnspython is a DNS toolkit for Python. It supports almost all record
@@ -43,43 +44,55 @@ class, and return an answer set. The low level classes allow direct
 manipulation of DNS zones, messages, names, and records.
 }
 
-%description %_description
+%description    %_description
 %package -n python3-%{py_package_name}
 Summary:        %{summary}
 
-%{?python_provide:%python_provide python3-%{py_package_name}}
-
 %description -n python3-%{py_package_name} %_description
 
-# curio extras cannot be packages because nothing provides python3.9dist(curio) >= 1.2
-%{?python_extras_subpkg:%python_extras_subpkg -n python3-dns -i %{python3_sitelib}/*.egg-info dnssec trio doh idna}
+%{?python_extras_subpkg:%python_extras_subpkg -n python3-dns -i %{python3_sitelib}/*.dist-info %{python_pkgs_extra}}
 
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}%{rctag}
-
+%autosetup -n %{pypi_name}-%{version}
 # strip exec permissions so that we don't pick up dependencies from docs
 find examples -type f | xargs chmod a-x
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files dns
 
 %check
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
 # Skipped test: https://github.com/rthalley/dnspython/issues/590#issuecomment-729644000
-%pytest -k "not test_override"
+%pytest -v -k "not test_override" tests
 
-%files -n python3-%{py_package_name}
+%files -n python3-%{py_package_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.md examples
-%{python3_sitelib}/%{py_package_name}
-%{python3_sitelib}/%{pypi_name}-*.egg-info
+#%{python3_sitelib}/%{py_package_name}
+#%{python3_sitelib}/%{pypi_name}-*.dist-info/
+
+%pycached %exclude %{python3_sitelib}/dns/_trio_backend.py
+
+%pyproject_extras_subpkg -n python3-dns dnssec idna
+
+%pyproject_extras_subpkg -n python3-dns trio
+%pycached %{python3_sitelib}/dns/_trio_backend.py
+
+%pyproject_extras_subpkg -n python3-dns curio
+%pycached %{python3_sitelib}/dns/_curio_backend.py
 
 %changelog
+* Wed Sep 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.2.1-1
+- Move from SPECS-EXTENDED to SPECS
+- Bump version to 2.2.1
+- Add extra sub-packages: trio & curio
+- License verified
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-1
 - Converting the 'Release' tag to the '[number].[distribution]' format.
-
 * Wed Dec 09 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.1.0-0.3.rc1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 * Fri Nov 27 2020 Lumír Balhar <lbalhar@redhat.com> - 2.1.0-0.2.rc1
