@@ -1,0 +1,12 @@
+diff --git a/pywbem/_cim_obj.py b/pywbem/_cim_obj.py
+index d91a2cb1..5c9a69a5 100644
+--- a/pywbem/_cim_obj.py
++++ b/pywbem/_cim_obj.py
+@@ -1954,6 +1954,7 @@ class CIMInstanceName(_CIMComparisonMixin):
+                 _format("WBEM URI has an invalid format for its keybindings: "
+                         "{0!A}", keybindings_str))
+ 
++        kb_assigns = []
+         if m.group(1):
+             kb_assigns = [m.group(1)]
+ 

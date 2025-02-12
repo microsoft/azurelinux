@@ -1,7 +1,7 @@
 Summary:        The eBPF tool and systems inspection framework for Kubernetes, containers and Linux hosts.
 Name:           ig
-Version:        0.32.0
-Release:        2%{?dist}
+Version:        0.37.0
+Release:        1%{?dist}
 License:        Apache 2.0 and GPL 2.0 for eBPF code
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ Group:          Tools/Container
 URL:            https://github.com/inspektor-gadget/inspektor-gadget
 Source0:        https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-BuildRequires:  golang < 1.23
+BuildRequires:  golang >= 1.23
 
 
 %description
@@ -18,8 +18,9 @@ Inspektor Gadget is a collection of tools (or gadgets) to debug and inspect Kube
 This package contains ig, the local CLI flavor of Inspektor Gadget.
 
 %prep
-%autosetup -n inspektor-gadget-%{version}
+%autosetup -N -n inspektor-gadget-%{version}
 %setup -q -n inspektor-gadget-%{version} -T -D -a 1
+%autopatch -p1
 
 %build
 CGO_ENABLED=0 go build \
@@ -64,6 +65,13 @@ fi
 %{_bindir}/ig
 
 %changelog
+* Mon Feb 03 2025 Francis Laniel <flaniel@linux.microsoft.com> - 0.37.0-1
+- Bump to version 0.37.0
+- Drop patch for CVE-2024-45338 as it was fixed in golang.org/x/net 0.33.0 and ig uses 0.34.0.
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.32.0-3
+- Add patch for CVE-2024-45338
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 0.32.0-2
 - Pin golang version to <= 1.22
 

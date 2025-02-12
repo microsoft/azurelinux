@@ -1,15 +1,16 @@
 Name:           python-kmod
-License:        LGPLv2+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        Python module to work with kernel modules
-Version:        0.9
-Release:        28%{?dist}
-URL:            https://github.com/agrover/python-kmod/
-Source0:        https://github.com/downloads/agrover/%{name}/%{name}-%{version}.tar.gz
+Version:        0.9.2
+Release:        7%{?dist}
+URL:            https://github.com/maurizio-lombardi/python-kmod/
+Source0:        https://github.com/maurizio-lombardi/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
-BuildRequires:  python3-devel
 BuildRequires:  python3-Cython
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  python3
 BuildRequires:  kmod-devel
 
@@ -41,8 +42,63 @@ Linux kernel modules, using libkmod.
 %doc COPYING.LESSER README
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9-28
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.9.2-7
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.9.2-5
+- Rebuilt for Python 3.13
+
+* Mon Feb 12 2024 Maurizio Lombardi <mlombard@redhat.com> - 0.9.2-4
+- migrated to SPDX license
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug 01 2023 Maurizio Lombardi - 0.9.2-1
+- Release a new version and take over maintainership upstream
+
+* Mon Jul 24 2023 Maurizio Lombardi - 0.9-39
+- Build for Cython < 3
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-38
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.9-37
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-35
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.9-34
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.9-31
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.9-28
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

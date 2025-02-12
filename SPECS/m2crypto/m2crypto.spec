@@ -1,7 +1,7 @@
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
 Version:        0.38.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/M2Crypto
 Source0:        https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-%{version}.tar.gz
 Patch0:         0001-skip-test_tls1_nok-which-cant-be-run-in-FIPS.patch
 Patch1:         CVE-2020-25657.patch
+Patch2:         CVE-2019-11358.patch
 
 %description
 M2Crypto is a crypto and SSL toolkit for Python
@@ -57,6 +58,9 @@ pip3 install parameterized
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.38.0-4
+- Fix CVE-2019-11358
+
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 0.38.0-3
 - Patch CVE-2020-25657
 

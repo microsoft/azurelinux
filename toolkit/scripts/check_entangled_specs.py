@@ -60,7 +60,7 @@ version_release_matching_groups = [
         "SPECS/isert/isert.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/knem-signed/knem-modules-signed.spec",
+        "SPECS-SIGNED/knem-modules-signed/knem-modules-signed.spec",
         "SPECS/knem/knem.spec"
     ]),
     frozenset([
@@ -72,7 +72,7 @@ version_release_matching_groups = [
         "SPECS/mlnx-nfsrdma/mlnx-nfsrdma.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/mlnx-ofa_kernel-signed/mlnx-ofa_kernel-modules-signed.spec",
+        "SPECS-SIGNED/mlnx-ofa_kernel-modules-signed/mlnx-ofa_kernel-modules-signed.spec",
         "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec"
     ]),
     frozenset([
@@ -80,7 +80,7 @@ version_release_matching_groups = [
         "SPECS/srp/srp.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/xpmem-signed/xpmem-modules-signed.spec",
+        "SPECS-SIGNED/xpmem-modules-signed/xpmem-modules-signed.spec",
         "SPECS/xpmem/xpmem.spec"
     ])
 

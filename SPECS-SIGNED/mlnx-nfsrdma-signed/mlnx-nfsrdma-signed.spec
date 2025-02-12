@@ -26,18 +26,24 @@
 #
 #
 
+%global debug_package %{nil}
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
 
 %global KVERSION %{target_kernel_version_full}
 
+%define mlnx_version 24.10
+
 %{!?_name: %define _name mlnx-nfsrdma}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 1%{?dist}
+Release:	 6%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -58,8 +64,8 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{mlnx_version}
+Requires:       mlnx-ofa_kernel-modules  = %{mlnx_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -69,17 +75,25 @@ mellanox rdma signed kernel modules
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
 
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/rpcrdma.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/svcrdma.ko
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/xprtrdma.ko
+
+popd
 
 %install
-rpm2cpio %{SOURCE0} | cpio -idmv -D %{buildroot}
+pushd rpm_contents
 
-cp -r %{SOURCE1} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/rpcrdma.ko
-cp -r %{SOURCE2} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/svcrdma.ko
-cp -r %{SOURCE3} %{buildroot}/lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/xprtrdma.ko
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%clean
-rm -rf %{buildroot}
+popd
+
 
 %post
 if [ $1 -ge 1 ]; then # This package is being installed or reinstalled
@@ -96,9 +110,23 @@ fi
 /lib/modules/%{KVERSION}/updates/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 
-
 %changelog
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10.0.6.7.1
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
+- Bump release to rebuild for new kernel release
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-5
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperez@microsoft.com> - 24.10-4
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperez@microsoft.com> - 24.10-3
+- Bump release to match kernel
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
+- Bump release to match kernel
+
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

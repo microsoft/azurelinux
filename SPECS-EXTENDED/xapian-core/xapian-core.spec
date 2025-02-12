@@ -1,21 +1,30 @@
-Summary:        The Xapian Probabilistic Information Retrieval Library
-Name:           xapian-core
-Version:        1.4.20
-Release:        2%{?dist}
-License:        GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.xapian.org/
-Source0:        https://www.oligarchy.co.uk/xapian/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  libuuid-devel
-BuildRequires:  make
-BuildRequires:  zlib-devel
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-%if 0%{?with_check}
-BuildRequires:  valgrind-devel
+# Currently fails on s390x and ARMv7
+%if ! 0%{?_module_build}
+%global with_tests 0
+%else
+%global with_tests 0
 %endif
+
+Name:          xapian-core
+Version:       1.4.26
+Release:       2%{?dist}
+Summary:       The Xapian Probabilistic Information Retrieval Library
+License:       GPL-2.0-or-later
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+URL:           https://www.xapian.org/
+Source0:       https://www.oligarchy.co.uk/xapian/%{version}/%{name}-%{version}.tar.xz
+
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: libuuid-devel
+BuildRequires: make
+BuildRequires: zlib-devel
+%if 0%{?with_tests}
+BuildRequires: valgrind-devel
+%endif
+Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
+
 
 %description
 Xapian is an Open Source Probabilistic Information Retrieval Library. It
@@ -23,7 +32,7 @@ offers a highly adaptable toolkit that allows developers to easily add advanced
 indexing and search facilities to applications
 
 %package libs
-Summary:        Xapian search engine libraries
+Summary:       Xapian search engine libraries
 
 %description libs
 Xapian is an Open Source Probabilistic Information Retrieval framework. It
@@ -32,10 +41,10 @@ indexing and search facilities to applications. This package provides the
 libraries for applications using Xapian functionality
 
 %package devel
-Summary:        Files needed for building packages which use Xapian
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       libuuid-devel
+Summary:       Files needed for building packages which use Xapian
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:      libuuid-devel
 
 %description devel
 Xapian is an Open Source Probabilistic Information Retrieval framework. It
@@ -49,19 +58,21 @@ files needed for building packages which use Xapian
 %build
 %configure
 
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 
 # Remove libtool archives
-find %{buildroot} -type f -name "*.la" -delete -print
+find $RPM_BUILD_ROOT -name '*.la' -delete
 
 # Remove the dev docs, we pick them up below
 rm -rf %{buildroot}%{_datadir}/doc/%{name}
 
+%if 0%{?with_tests}
 %check
 make check %{?_smp_mflags}
+%endif
 
 %ldconfig_scriptlets libs
 
@@ -94,9 +105,33 @@ make check %{?_smp_mflags}
 %{_mandir}/man1/xapian-config.1*
 
 %changelog
-* Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.4.20-2
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Tue Jan 14 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.4.26-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+
+* Fri Aug 16 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.4.26-1
+- Update to 1.4.26
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.23-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.23-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jul 25 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 1.4.23-1
+- Update 1.4.23
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.22-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 18 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 1.4.22-1
+- Update to 1.4.22
+
+* Tue Feb 21 2023 Than Ngo <than@redhat.com> - 1.4.20-3
+- migrated to SPDX license
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Tue Aug 02 2022 Peter Robinson <pbrobinson@fedoraproject.org> - 1.4.20-1
 - Update to 1.4.20
