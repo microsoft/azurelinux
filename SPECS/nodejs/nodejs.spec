@@ -22,6 +22,7 @@ Patch3:         CVE-2025-23083.patch
 Patch4:         CVE-2025-22150.patch
 Patch5:         CVE-2025-23085.patch
 Patch6:         CVE-2024-22020.patch
+Patch7:         CVE-2024-22195.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -134,7 +135,7 @@ make cctest
 
 %changelog
 * Tue Feb 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 20.14.0-5
-- Patch CVE-2025-22150, CVE-2025-23085, CVE-2024-22020
+- Patch CVE-2025-22150, CVE-2025-23085, CVE-2024-22020, CVE-2024-22195
 
 * Mon Jan 27 2025 Sumedh Sharma <sumsharma@microsoft.com> - 20.14.0-4
 - Patch CVE-2025-23083
