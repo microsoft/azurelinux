@@ -3,7 +3,7 @@
 Summary:        The mdadm program controls Linux md devices (software RAID arrays)
 Name:           mdadm
 Version:        4.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Patch00:        https://sources.debian.org/data/main/m/mdadm/4.1-2/debian/patche
 # Fedora customization patches, keeping in Mariner for now.
 Patch97:        mdadm-3.3-udev.patch
 Patch98:        mdadm-2.5.2-static.patch
+Patch99:	CVE-2023-28736.patch
 
 BuildRequires:  binutils-devel
 BuildRequires:  gcc
@@ -99,6 +100,9 @@ install -m644 %{SOURCE6} %{buildroot}%{_sysconfdir}/libreport/events.d
 %endif
 
 %changelog
+* Tue Feb 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.1-10
+- Patch CVE-2023-28736
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
