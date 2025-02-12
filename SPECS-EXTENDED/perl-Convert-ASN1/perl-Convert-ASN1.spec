@@ -60,6 +60,7 @@ Convert::ASN1 encodes and decodes ASN.1 data structures using BER/DER rules.
 
 %package tests
 Summary:        Tests for %{name}
+Requires:       %{name} = %{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Math::BigInt) >= 1.997
 %if %{with perl_Convert_ASN1_enables_optional_test}
