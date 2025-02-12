@@ -16533,8 +16533,8 @@
         "type": "other",
         "other": {
           "name": "perl-Convert-ASN1",
-          "version": "0.27",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GB/GBARR/Convert-ASN1-0.27.tar.gz"
+          "version": "0.34",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TIMLEGGE/Convert-ASN1-0.34.tar.gz"
         }
       }
     },
