@@ -2999,7 +2999,7 @@
         "other": {
           "name": "driverctl",
           "version": "0.115",
-          "downloadUrl": "https://gitlab.com/driverctl/driverctl/-/archive/0.115/driverctl-0.115-2ba60536eb20ca0a6a751bd8b6501dba84ec45d3.tar.gz"
+          "downloadUrl": "https://gitlab.com/driverctl/driverctl/repository/archive.tar.gz?ref=0.115"
         }
       }
     },
