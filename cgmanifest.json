@@ -8591,8 +8591,8 @@
         "type": "other",
         "other": {
           "name": "lensfun",
-          "version": "0.3.2",
-          "downloadUrl": "https://downloads.sourceforge.net/lensfun/lensfun-0.3.2.tar.gz"
+          "version": "0.3.4",
+          "downloadUrl": "https://github.com/lensfun/lensfun/archive/v0.3.4/lensfun-0.3.4.tar.gz"
         }
       }
     },
