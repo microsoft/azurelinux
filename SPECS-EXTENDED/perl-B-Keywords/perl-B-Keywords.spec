@@ -48,6 +48,7 @@ BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
 BuildRequires:  perl(Text::CSV_XS)
 %endif
 # Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 B::Keywords supplies several arrays of exportable keywords: @Scalars, @Arrays,
