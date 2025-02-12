@@ -19,8 +19,13 @@ Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2019-10906.patch
 Patch2:         CVE-2024-21538.patch
 Patch3:         CVE-2025-23083.patch
-Patch4:         CVE-2020-28493.patch
-Patch5:         CVE-2024-34064.patch
+Patch4:         CVE-2025-22150.patch
+Patch5:         CVE-2025-23085.patch
+Patch6:         CVE-2024-22020.patch
+Patch7:         CVE-2024-22195.patch
+Patch8:         CVE-2020-28493.patch
+Patch9:         CVE-2024-34064.patch
+
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -132,9 +137,12 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Wed Feb 05 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 20.14.0-5
+* Wed Feb 12 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 20.14.0-6
 - Patch CVE-2020-28493
 - Patch CVE-2024-34064
+
+* Tue Feb 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 20.14.0-5
+- Patch CVE-2025-22150, CVE-2025-23085, CVE-2024-22020, CVE-2024-22195
 
 * Mon Jan 27 2025 Sumedh Sharma <sumsharma@microsoft.com> - 20.14.0-4
 - Patch CVE-2025-23083
