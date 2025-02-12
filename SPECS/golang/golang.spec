@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
+%global ms_go_filename  go1.23.6-20250211.6.src.tar.gz
 %global ms_go_revision  2
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.23.3
-Release:        3%{?dist}
+Version:        1.23.6
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -154,6 +154,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Feb 12 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.6-1
+- Bump version to 1.23.6-2
+
 * Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.23.3-3
 - Fix post scriptlet
 - Remove calls to alternatives
