@@ -1,6 +1,6 @@
 Summary:        High performance compressor optimized for binary data
 Name:           blosc
-Version:        1.21.6
+Version:        1.21.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -79,6 +79,9 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %{_includedir}/blosc-export.h
 
 %changelog
+* Wed Feb 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.4-1
+- Auto-upgrade to 1.21.4 - Latest version upgrade
+
 * Wed Nov 20 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.21.6-1
 - Update to 1.21.6
 - License verified.
