@@ -68,6 +68,7 @@ find $RPM_BUILD_ROOT -name '*.la' -print -delete
 %changelog
 * Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.6.6-1
 - Update to version 3.6.6
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
