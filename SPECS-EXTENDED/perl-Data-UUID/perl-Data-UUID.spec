@@ -1,10 +1,13 @@
 Name:		perl-Data-UUID
-Version:	1.224
-Release:	5%{?dist}
+Version:	1.227
+Release:	4%{?dist}
 Summary:	Globally/Universally Unique Identifiers (GUIDs/UUIDs)
-# Upstream says BSD but LICENSE file looks more like MIT
-# https://lists.fedoraproject.org/pipermail/legal/2013-August/002226.html
-License:	BSD and MIT
+# Makefile.PL says BSD but LICENSE file is HP-1989
+# LICENSE: HP-1989
+# source/ptable.h: GPL-1.0-or-later OR Artistic-1.0-Perl
+# Issue for license clarification
+# https://github.com/bleargh45/Data-UUID/issues/26
+License:	HP-1989 AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Data-UUID
@@ -24,6 +27,7 @@ BuildRequires:	perl(Getopt::Long)
 BuildRequires:	perl(Pod::Usage)
 BuildRequires:	perl(warnings)
 # Module Runtime
+BuildRequires:	perl(blib)
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(DynaLoader)
@@ -39,7 +43,6 @@ BuildRequires:	perl(Test::Pod::Coverage) >= 1.06
 %endif
 # Runtime
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-
 # Avoid provides for private shared objects
 %{?perl_default_filter}
 
@@ -91,8 +94,71 @@ perl smp-test/collision.t
 %{_mandir}/man3/Data::UUID.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.224-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.227-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.227-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1.227-2
+- Perl 5.40 rebuild
+
+* Tue Mar 19 2024 Paul Howarth <paul@city-fan.org> - 1.227-1
+- Update to 1.227
+  - New maintainer, GTERMARS
+  - Add basic GitHub Actions setup for testing
+  - Typo corrections in POD
+  - Eliminated use of state/node files in temp directory (CVE-2013-4184)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug 29 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1.226-14
+- Update license to SPDX format
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1.226-12
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.226-9
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Dec 16 2021 Paul Howarth <paul@city-fan.org> - 1.226-7
+- BR: perl(blib) for smp-test/collision.t
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.226-5
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.226-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.226-2
+- Perl 5.32 rebuild
+
+* Sun Apr 12 2020 Paul Howarth <paul@city-fan.org> - 1.226-1
+- Update to 1.226
+  - Set umask before fopen in destructor (GH#35)
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.224-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
