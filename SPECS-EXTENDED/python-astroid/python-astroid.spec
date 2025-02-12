@@ -62,9 +62,8 @@ rm -rf %{buildroot}%{python3_sitelib}/tests
 %changelog
 * Tue Feb 11 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.3.8-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
-- Added 'BuildRequires: python3-pip python3-wheel'
 - License verified.
+- Added 'BuildRequires: python3-pip python3-wheel'
 
 * Mon Dec 30 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.8-1
 - 3.3.8
