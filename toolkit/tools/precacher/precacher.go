@@ -263,6 +263,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		return err
 	}, noCancel)
 	if err != nil {
+		logger.Log.Warnf("Failed to download '%s' from '%s': %s", fileName, url, err)
 		return
 	}
 
