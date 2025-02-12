@@ -10942,7 +10942,7 @@
         "other": {
           "name": "libsmbios",
           "version": "2.4.3",
-          "downloadUrl": "https://github.com/dell/libsmbios/archive/v2.4.3/libsmbios-2.4.3.tar.gz  "
+          "downloadUrl": "https://github.com/dell/libsmbios/archive/v2.4.3/libsmbios-2.4.3.tar.gz"
         }
       }
     },
