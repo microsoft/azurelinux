@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary: Command-line tools and library for transforming PDF files
 Name:    qpdf
-Version: 10.1.0
-Release: 2%{?dist}
+Version: 11.9.1
+Release: 1%{?dist}
 # MIT: e.g. libqpdf/sha2.c
 # upstream uses ASL 2.0 now, but he allowed other to distribute qpdf under
 # old license (see README)
@@ -150,6 +150,9 @@ make check
 
 
 %changelog
+* Wed Feb 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 11.9.1-1
+- Auto-upgrade to 11.9.1 - Upgrade extended package
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
