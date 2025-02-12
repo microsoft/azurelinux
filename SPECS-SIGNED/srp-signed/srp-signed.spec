@@ -41,7 +41,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 6%{?dist}
+Release:	 7%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -99,6 +99,9 @@ popd
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-7
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
 - Bump release to rebuild for new kernel release
 
