@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.2.0.azl4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -11,6 +11,7 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         tardev.patch
+Patch1:         tardev2.patch
 
 ExclusiveArch: x86_64
 
@@ -136,6 +137,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Feb 12 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-3
+- shared_fs=none
+
 * Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-2
 - Add systemd-udev and tarfs to enable virtio-blk with pod sandboxing
 - Add tardev-snapshotter
