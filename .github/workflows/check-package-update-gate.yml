@@ -57,13 +57,13 @@ jobs:
 
             # Read from packagelist-gate.csv and iterate each row
             # 1st column: package name
-            # 2nd column: condition (>=, >, =,'')
+            # 2nd column: condition (>=, =,'')
             # 3rd column: version number
             
             while IFS=, read -r package_name condition version_number; do
               if [[ "$name" == "$package_name" ]]; then
                   case "$condition" in
-                      ">=" | ">" )
+                      ">=" | "=" )
                           if [[ ("$condition" == ">=" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" == "$version_number") ||
                                 ("$condition" == "=" && "$version" == "$version_number") ]]; then
                               1>&2 echo "**** ERROR ****"
