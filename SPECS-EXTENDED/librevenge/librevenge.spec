@@ -114,6 +114,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PA
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.5-1
 - Update to version 0.0.5
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.4-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
