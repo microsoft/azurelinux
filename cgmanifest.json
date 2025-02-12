@@ -21363,8 +21363,8 @@
         "type": "other",
         "other": {
           "name": "powertop",
-          "version": "2.13",
-          "downloadUrl": "http://github.com/fenrus75/powertop/archive/v2.13/powertop-2.13.tar.gz"
+          "version": "2.15",
+          "downloadUrl": "http://github.com/fenrus75/powertop/archive/v2.15/powertop-2.15.tar.gz"
         }
       }
     },
