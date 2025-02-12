@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch07:        CVE-2023-45288.patch
 Patch08:        CVE-2022-32149.patch
 Patch09:        CVE-2023-26484.patch
 Patch10:        CVE-2024-45338.patch
+Patch11:        CVE-2023-3978.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
@@ -219,6 +220,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Feb 05 2025 Sudipta Pandit <sudpandit@microsoft.com> - 0.59.0-24
+- Backport patch for CVE-2023-3978
+
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-23
 - Add patch to fix CVE-2024-45338
 
