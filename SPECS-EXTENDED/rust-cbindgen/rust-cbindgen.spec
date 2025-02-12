@@ -2,7 +2,7 @@
 Summary:        Tool for generating C bindings to Rust code
 Name:           rust-cbindgen
 Version:        0.24.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ Source:         %{url}/archive/refs/tags/v0.24.3.tar.gz#/%{name}-%{version}.tar.
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
 #
-Source1:        cbindgen-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-cargovendor-v1.tar.gz
 Source2:        cargo_config
 %global rustflags '-Clink-arg=-Wl,-z,relro,-z,now'
 %global _description %{expand:
@@ -96,6 +96,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %endif
 
 %changelog
+* Tue Feb 11 2025 Osama Esmail <osamaesmail@microsoft.com> - 0.24.3-2
+- Adding the vendor script and tarball name
+
 * Mon Sep 25 2023 Shweta Bindal <shwetabindal@microsoft.com> - 0.24.3-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified

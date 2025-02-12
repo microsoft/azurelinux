@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
 #
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-cargovendor-v1.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
 Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
@@ -139,6 +139,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Tue Feb 11 2025 Osama Esmail <osamaesmail@microsoft.com> - 0.194.5-2
+- Updating the vendor script and tarball name
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
 
