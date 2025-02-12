@@ -201,6 +201,7 @@ rename %{pot_file}.mo %{lang_dom}.mo $(find %{buildroot}/%{_datadir} -name %{pot
 %changelog
 * Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.3-1
 - Update to version 2.4.3
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
