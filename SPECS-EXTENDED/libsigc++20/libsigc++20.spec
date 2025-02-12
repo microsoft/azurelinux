@@ -83,6 +83,7 @@ chmod -x NEWS
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.12.1-1
 - Update to version 2.12.1
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.10.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
