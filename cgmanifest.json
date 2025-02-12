@@ -13582,7 +13582,7 @@
         "type": "other",
         "other": {
           "name": "mt-st",
-          "version": "1.1",
+          "version": "1.7",
           "downloadUrl": "https://github.com/iustin/mt-st/releases/download/v1.7/mt-st-1.7.tar.gz"
         }
       }
