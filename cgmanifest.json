@@ -24823,8 +24823,8 @@
         "type": "other",
         "other": {
           "name": "python-testpath",
-          "version": "0.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/testpath/testpath-0.5.0.tar.gz"
+          "version": "0.6.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/testpath/testpath-0.6.0.tar.gz"
         }
       }
     },
