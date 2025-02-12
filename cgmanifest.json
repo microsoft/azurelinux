@@ -16653,8 +16653,8 @@
         "type": "other",
         "other": {
           "name": "perl-Crypt-OpenSSL-Guess",
-          "version": "0.11",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AK/AKIYM/Crypt-OpenSSL-Guess-0.11.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AK/AKIYM/Crypt-OpenSSL-Guess-0.15.tar.gz"
         }
       }
     },
