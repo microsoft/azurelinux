@@ -28,7 +28,7 @@ Distribution:   Azure Linux
 Group:          Productivity/Text/Utilities
 URL:            https://github.com/BurntSushi/ripgrep
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.xz
+Source1:        %{name}-%{version}-cargovendor-v1.tar.gz
 Source2:        cargo_config
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.31
@@ -104,6 +104,9 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %{_datadir}/zsh
 
 %changelog
+* Tue Feb 11 2025 Osama Esmail <osamaesmail@microsoft.com> - 13.0.0-6
+- Adding the vendor script and tarball name
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 13.0.0-5
 - Bump package to rebuild with rust 1.72.0
 

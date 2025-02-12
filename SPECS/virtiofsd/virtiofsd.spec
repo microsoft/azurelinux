@@ -22,7 +22,7 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -37,7 +37,7 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 #   cargo vendor
 #   tar -cf %{name}-%{version}-vendor.tar.gz vendor/
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-cargovendor-v1.tar.gz
 Source2:        cargo_config
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -73,11 +73,15 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
+* Tue Feb 11 2025 Osama Esmail <osamaesmail@microsoft.com> - 1.8.0-2
+- Adding the vendor script and tarball name
+
 * Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.8.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
 - Remove build dependencies on cargo-packaging
 - Include vendored sources tarball
+
 * Tue Jan 30 2024 caleb.crane@suse.com
 - Fix CVE-2023-50711: vmm-sys-util: out of bounds memory accesses (bsc#1218502, bsc#1218500)
 - Update to version 1.10.1:
@@ -89,6 +93,7 @@ cargo test --release
   * Bump version to v1.9.0
 - Spec: switch to using the upstream virtio-fs config file for qemu
 - Spec: switch back to greedy cargo updates of vendored dependencies
+
 * Thu Aug 31 2023 Caleb Crane <caleb.crane@suse.com>
 - Update to upstream version v1.7.2 (jsc#4980)
   - Add supplementary group extension support
@@ -98,12 +103,15 @@ cargo test --release
   - Allow to provide the same argument multiple times
   - Add the -V/--version options
 - Upgrade vendored dependencies
+
 * Fri Jun  2 2023 Caleb Crane <caleb.crane@suse.com>
 - Add qemu config file to ensure qemu is aware of the virtiofsd executable
 - https://www.reddit.com/r/suse/comments/13xmote/vm_with_virtiofs_does_not_start_unable_to_find_a/
+
 * Thu May 25 2023 Caleb Crane <caleb.crane@suse.com>
 - Remove exclusive arch, only disable for 32-bit archs (i586 and armv7l)
 - Add package conflict with the previous implementation of virtiofsd inside
   older versions of the qemu-tools package (qemu-tools < 8)
+
 * Tue May 23 2023 Caleb Crane <caleb.crane@suse.com>
 - Initial release of virtiofsd v1.6.1
