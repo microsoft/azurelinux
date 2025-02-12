@@ -90,7 +90,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %changelog
 * Tue Dec 10 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.02-1
-- Update to 1.02
+- Upgrade to 1.02
 - License verified
 
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 1.01-3
