@@ -6,8 +6,8 @@ Distribution:   Mariner
 %global port_version 0.12.0
 
 Name:           libgphoto2
-Version:        2.5.27
-Release:        2%{?dist}
+Version:        2.5.31
+Release:        1%{?dist}
 Summary:        Library for accessing digital cameras
 # GPLV2+ for the main lib (due to exif.c) and most plugins, some plugins GPLv2
 License:        GPLv2+ and GPLv2
@@ -158,6 +158,9 @@ rm -rf %{buildroot}%{_datadir}/libgphoto2_port/*/vcamera/
 %{_mandir}/man3/%{name}_port.3*
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.31-1
+- Auto-upgrade to 2.5.31 - Extended package upgrade to IDC
+
 * Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 2.5.27-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - systemd-devel contains the .pc file to provide pkgconfig variables
