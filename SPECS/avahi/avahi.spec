@@ -427,7 +427,7 @@ exit 0
 
 %changelog
 * Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-5
-- Fix CVE-2024-52616 with an upstream patche
+- Fix CVE-2024-52616 with an upstream patch
 
 * Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
 - Fix CVE-2023-38471 with an upstream patch
