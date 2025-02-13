@@ -1,7 +1,7 @@
 Summary:        High performance compressor optimized for binary data
 Name:           blosc
-Version:        1.21.4
-Release:        2%{?dist}
+Version:        1.21.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -79,6 +79,9 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %{_includedir}/blosc-export.h
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.6-1
+- Auto-upgrade to 1.21.6 - Extended package upgrade to IDC
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 1.21.4-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
