@@ -1,17 +1,19 @@
+Name:    startup-notification
+Version: 0.12
+Release: 31%{?dist}
+Summary: Library for tracking application startup
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary: Library for tracking application startup
-Name: startup-notification
-Version: 0.12
-Release: 20%{?dist}
-URL: http://www.freedesktop.org/software/startup-notification/
-#VCS: git:git://git.freedesktop.org/git/startup-notification
-Source0: http://www.freedesktop.org/software/startup-notification/releases/%{name}-%{version}.tar.gz
-License: LGPLv2
-BuildRequires:  gcc
+
+License: LGPL-2.0-or-later
+URL:     https://www.freedesktop.org/wiki/Software/startup-notification/
+Source0: https://www.freedesktop.org/software/startup-notification/releases/%{name}-%{version}.tar.gz
+
+BuildRequires: gcc
 BuildRequires: libX11-devel
 BuildRequires: libXt-devel
-BuildRequires: xcb-util-devel
+BuildRequires: make
+BuildRequires: pkgconfig(xcb-event)
 
 %description
 This package contains libstartup-notification which implements a
@@ -21,43 +23,76 @@ feedback such as a busy cursor, among other features.
 
 %package devel
 Summary: Development portions of startup-notification
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libX11-devel
-Requires: pkgconfig
 
 %description devel
 Header files and static libraries for libstartup-notification.
 
 %prep
-%setup -q
+%autosetup
 mkdir examples
 cp -p test/*.c test/*.h examples
 
 %build
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-/bin/rm -f $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
+%make_install
 
 %ldconfig_scriptlets
 
 %files
 %doc doc/startup-notification.txt
-%doc AUTHORS COPYING ChangeLog NEWS
-%{_libdir}/lib*.so.*
+%doc AUTHORS ChangeLog NEWS
+%license COPYING
+%{_libdir}/libstartup-notification-1.so.0{,.*}
+%{_libdir}/libstartup-notification-1.la
 
 %files devel
 %doc examples 
-%{_libdir}/lib*.so
-%{_libdir}/pkgconfig/*
-%{_includedir}/*
+%{_libdir}/libstartup-notification-1.so
+%{_libdir}/libstartup-notification-1.la
+%{_libdir}/pkgconfig/libstartup-notification-1.0.pc
+%{_includedir}/startup-notification-1.0/
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-20
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Feb 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.12-31
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Dec 22 2023 Adam Williamson <awilliam@redhat.com> - 0.12-28
+- Fix a typo in -27 which made it uninstallable (missing %)
+
+* Fri Dec 22 2023 David King <amigadave@amigadave.com> - 0.12-27
+- Use SPDX for license field
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
