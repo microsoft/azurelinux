@@ -1,0 +1,29 @@
+path_classifiers:
+  library:
+    # Treat source files for all compiled languages in the specs directories
+    # as 3rd party library sources because they are not owned by us.
+    #
+    # Extensions from https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/.
+    - "SPECS*/**/*.c"
+    - "SPECS*/**/*.c++"
+    - "SPECS*/**/*.cc"
+    - "SPECS*/**/*.cpp"
+    - "SPECS*/**/*.cs"
+    - "SPECS*/**/*.cshtml"
+    - "SPECS*/**/*.csproj"
+    - "SPECS*/**/*.cts"
+    - "SPECS*/**/*.cxx"
+    - "SPECS*/**/*.go"
+    - "SPECS*/**/*.h"
+    - "SPECS*/**/*.h++"
+    - "SPECS*/**/*.hh"
+    - "SPECS*/**/*.hpp"
+    - "SPECS*/**/*.hxx"
+    - "SPECS*/**/*.java"
+    - "SPECS*/**/*.kt"
+    - "SPECS*/**/*.mts"
+    - "SPECS*/**/*.sln"
+    - "SPECS*/**/*.swift"
+    - "SPECS*/**/*.ts"
+    - "SPECS*/**/*.tsx"
+    - "SPECS*/**/*.xaml"
