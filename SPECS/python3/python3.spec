@@ -30,7 +30,7 @@ Patch6:         CVE-2024-4032.patch
 Patch7:         CVE-2024-11168.patch
 Patch8:         CVE-2024-6923.patch
 Patch9:         CVE-2023-27043.patch
-Patch10:         CVE-2025-0938.patch
+Patch10:        CVE-2025-0938.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
