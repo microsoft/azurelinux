@@ -3,7 +3,7 @@ Distribution:   Mariner
 %global __cmake_in_source_build 1
 
 Name: libipt
-Version: 2.0.5
+Version: 2.1.1
 Release: 1%{?dist}
 Summary: Intel Processor Trace Decoder Library
 License: BSD
@@ -71,6 +71,9 @@ ctest -V %{?_smp_mflags}
 %endif
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.1-1
+- Auto-upgrade to 2.1.1 - Extended package upgrade to IDC
+
 * Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.5-1
 - Updating to version 2.0.5 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
