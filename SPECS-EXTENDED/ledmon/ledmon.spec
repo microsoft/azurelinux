@@ -1,7 +1,7 @@
 Summary: Enclosure LED Utilities
 Name: ledmon
-Version: 0.92
-Release: 4%{?dist}
+Version: 1.1.0
+Release: 1%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 %{_mandir}/*/*
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.0-1
+- Auto-upgrade to 1.1.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.92-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
