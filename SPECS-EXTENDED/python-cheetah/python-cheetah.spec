@@ -1,8 +1,8 @@
 %bcond_with python2
 
 Name:           python-cheetah
-Version:        3.2.4
-Release:        4%{?dist}
+Version:        3.2.6.post1
+Release:        1%{?dist}
 Summary:        Template engine and code generator
 
 License:        MIT
@@ -102,6 +102,9 @@ export PYTHONPATH="%{buildroot}/%{python3_sitearch}"
 %{python3_sitearch}/Cheetah*.egg-info
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.6.post1-1
+- Auto-upgrade to 3.2.6.post1 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.4-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

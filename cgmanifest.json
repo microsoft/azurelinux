@@ -22164,8 +22164,8 @@
         "type": "other",
         "other": {
           "name": "python-cheetah",
-          "version": "3.2.4",
-          "downloadUrl": "https://github.com/CheetahTemplate3/cheetah3/archive/3.2.4/python-cheetah-3.2.4.tar.gz"
+          "version": "3.2.6.post1",
+          "downloadUrl": "https://github.com/CheetahTemplate3/cheetah3/archive/3.2.6.post1/python-cheetah-3.2.6.post1.tar.gz"
         }
       }
     },
