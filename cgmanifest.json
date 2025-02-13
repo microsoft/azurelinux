@@ -3698,8 +3698,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.3.tar.gz"
+          "version": "3.0.6",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.0.6.tar.gz"
         }
       }
     },
@@ -4090,8 +4090,8 @@
         "type": "other",
         "other": {
           "name": "gcr",
-          "version": "3.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/gcr/3.36/gcr-3.36.0.tar.xz"
+          "version": "3.38.1",
+          "downloadUrl": "https://download.gnome.org/sources/gcr/3.38/gcr-3.38.1.tar.xz"
         }
       }
     },
