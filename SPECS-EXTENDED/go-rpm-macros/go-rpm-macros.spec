@@ -4,7 +4,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global forgeurl  https://pagure.io/go-rpm-macros
-Version:   3.0.9
+Version:   3.6.0
 %forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
@@ -22,7 +22,7 @@ Version:   3.0.9
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
 Name:      go-rpm-macros
-Release:   3%{?dist}
+Release:   1%{?dist}
 Summary:   Build-stage rpm automation for Go packages
 
 License:   GPLv3+
@@ -170,6 +170,9 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %{_spectemplatedir}/*.spec
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6.0-1
+- Auto-upgrade to 3.6.0 - Extended package upgrade to IDC
+
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-3
 - Fixing Go's linker flags.
 - License verified.
