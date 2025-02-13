@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary: Utilities for working with md5sum implanted in ISO images
 Name:    isomd5sum
-Version: 1.2.3
-Release: 10%{?dist}
+Version: 1.2.5
+Release: 1%{?dist}
 License: GPLv2+1.25.12-4
 
 Url:     https://github.com/rhinstaller/isomd5sum
@@ -64,6 +64,9 @@ PYTHON=%{__python3} make DESTDIR=$RPM_BUILD_ROOT install-bin install-devel insta
 %{python3_sitearch}/pyisomd5sum.so
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.5-1
+- Auto-upgrade to 1.2.5 - Extended package upgrade to IDC
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.2.3-10
 - Remove epoch
 
