@@ -23854,8 +23854,8 @@
         "type": "other",
         "other": {
           "name": "python-PyMySQL",
-          "version": "0.9.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/PyMySQL/PyMySQL-0.9.3.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/b3/8f/ce59b5e5ed4ce8512f879ff1fa5ab699d211ae2495f1adaa5fbba2a1eada/pymysql-1.1.1.tar.gz"
         }
       }
     },

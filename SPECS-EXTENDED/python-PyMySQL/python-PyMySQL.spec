@@ -3,8 +3,8 @@ Distribution:   Mariner
 %global pypi_name PyMySQL
 
 Name:           python-%{pypi_name}
-Version:        0.9.3
-Release:        3%{?dist}
+Version:        1.1.1
+Release:        1%{?dist}
 Summary:        Pure-Python MySQL client library
 
 License:        MIT
@@ -59,6 +59,9 @@ rm -rf tests
 %{python3_sitelib}/pymysql/
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-1
+- Auto-upgrade to 1.1.1 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
