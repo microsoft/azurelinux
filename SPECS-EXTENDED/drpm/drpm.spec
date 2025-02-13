@@ -8,8 +8,8 @@ Distribution:   Mariner
 %endif
 
 Name:           drpm
-Version:        0.5.0
-Release:        2%{?dist}
+Version:        0.5.2
+Release:        1%{?dist}
 Summary:        A library for making, reading and applying deltarpm packages
 # the entire source code is LGPLv2+, except src/drpm_diff.c and src/drpm_search.c which are BSD
 License:        LGPLv2+ and BSD
@@ -94,6 +94,9 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.2-1
+- Auto-upgrade to 0.5.2 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
