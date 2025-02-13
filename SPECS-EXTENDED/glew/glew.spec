@@ -1,6 +1,6 @@
 Name:           glew
-Version:        2.1.0
-Release:        7%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 Summary:        The OpenGL Extension Wrangler Library
 License:        BSD and MIT
 Vendor:         Microsoft Corporation
@@ -74,6 +74,9 @@ chmod 0755 $RPM_BUILD_ROOT%{_libdir}/*.so*
 %doc doc/*
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.0-1
+- Auto-upgrade to 2.2.0 - Extended package upgrade to IDC
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove redhat-specific config.guess seeding
