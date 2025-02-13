@@ -3,17 +3,26 @@ Distribution:   Azure Linux
 %global mod_name blinker
 
 Name:           python-blinker
-Version:        1.4
-Release:        10%{?dist}
+Version:        1.7.0
+Release:        4%{?dist}
 Summary:        Fast, simple object-to-object and broadcast signaling
 
 License:        MIT
-URL:            https://pythonhosted.org/blinker/
-Source0:        http://pypi.python.org/packages/source/b/%{mod_name}/%{mod_name}-%{version}.tar.gz
+URL:            https://github.com/pallets-eco/blinker
+Source0:        %{url}/archive/%{version}/%{mod_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python3-pip
+BuildRequires:  python3-flit-core
+
+# Tests
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3-pytest-asyncio
+BuildRequires:  python-tox
+BuildRequires:  python3dist(tox-current-env)
+BuildRequires:  python-filelock
+BuildRequires:  python-toml
 
 %global _description\
 Blinker provides a fast dispatching system that allows any number\
@@ -26,29 +35,93 @@ Summary:        Fast, simple object-to-object and broadcast signaling
 %{?python_provide:%python_provide python3-blinker}
 
 %description -n python3-blinker
-Blinker provides a fast dispatching system that allows any number 
+Blinker provides a fast dispatching system that allows any number
 of interested parties to subscribe to events, or "signals".
 
 %prep
-%setup -q -n %{mod_name}-%{version}
+%autosetup -n %{mod_name}-%{version}
 
+%generate_buildrequires
+# requirements in tests.txt are way too tight
+%pyproject_buildrequires requirements/tests.in
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{mod_name}
 
- 
-%files -n python3-blinker
-%doc docs/ CHANGES LICENSE README.md PKG-INFO
-%{python3_sitelib}/*.egg-info
-%{python3_sitelib}/%{mod_name}
+%check
+%tox
+
+%files -n python3-blinker -f %{pyproject_files}
+%doc CHANGES.rst LICENSE.rst README.rst
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Feb 12 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.7.0-4
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+- Added additional dependencies for successful build and test
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.7.0-2
+- Rebuilt for Python 3.13
+
+* Mon Feb  5 2024 José Matos <jamatos@fedoraproject.org> - 1.7.0-1
+- Update to 1.7.0
+
+* Mon Feb  5 2024 José Matos <jamatos@fedoraproject.org> - 1.6.3-1
+- Update to 1.6.3
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 1.6.2-2
+- Rebuilt for Python 3.12
+
+* Wed May 10 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 1.6.2-1
+- Bump to blinker 1.6.2 (fixes RHBZ#2183824 )
+- Convert spec to pyproject
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Frantisek Zatloukal <fzatlouk@redhat.com> - 1.5-1
+- Bump to blinker 1.5 (fixes python 3.11 support)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.4-16
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1.4-13
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1.4-10
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

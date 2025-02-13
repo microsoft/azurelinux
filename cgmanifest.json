@@ -21983,8 +21983,8 @@
         "type": "other",
         "other": {
           "name": "python-blinker",
-          "version": "1.4",
-          "downloadUrl": "http://pypi.python.org/packages/source/b/blinker/blinker-1.4.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/pallets-eco/blinker/archive/1.7.0/blinker-1.7.0.tar.gz"
         }
       }
     },
