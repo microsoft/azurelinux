@@ -27,7 +27,6 @@ Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{na
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-45288.patch
 
 BuildRequires:  golang >= 1.17.1
 %global debug_package %{nil}
