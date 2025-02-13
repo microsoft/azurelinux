@@ -12,8 +12,8 @@ Distribution:   Mariner
 
 
 Name:           jsoncpp
-Version:        1.9.2
-Release:        3%{?dist}
+Version:        1.9.5
+Release:        1%{?dist}
 Summary:        JSON library implemented in C++
 
 License:        Public Domain or MIT
@@ -130,6 +130,9 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.5-1
+- Auto-upgrade to 1.9.5 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
