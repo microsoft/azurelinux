@@ -3,8 +3,8 @@ Distribution:   Mariner
 %{!?python3_sitearch: %global python_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
 Name:     libplist
-Version:  2.1.0
-Release:  4%{?dist}
+Version:  2.3.0
+Release:  1%{?dist}
 Summary:  Library for manipulating Apple Binary and XML Property Lists
 
 License:  LGPLv2+
@@ -93,6 +93,9 @@ make check
 %{python3_sitearch}/plist*
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.0-1
+- Auto-upgrade to 2.3.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
