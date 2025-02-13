@@ -3,8 +3,8 @@ Distribution:   Mariner
 %global mod_name blinker
 
 Name:           python-blinker
-Version:        1.4
-Release:        10%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 Summary:        Fast, simple object-to-object and broadcast signaling
 
 License:        MIT
@@ -47,6 +47,9 @@ of interested parties to subscribe to events, or "signals".
 
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.0-1
+- Auto-upgrade to 1.7.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

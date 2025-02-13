@@ -22064,8 +22064,8 @@
         "type": "other",
         "other": {
           "name": "python-blinker",
-          "version": "1.4",
-          "downloadUrl": "http://pypi.python.org/packages/source/b/blinker/blinker-1.4.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a1/13/6df5fc090ff4e5d246baf1f45fe9e5623aa8565757dfa5bd243f6a545f9e/blinker-1.7.0.tar.gz"
         }
       }
     },
