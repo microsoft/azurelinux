@@ -5,8 +5,8 @@ Distribution:   Mariner
 %bcond_without tests
 
 Name:           python-%{pypi_name}
-Version:        3.0.0
-Release:        18%{?dist}
+Version:        4.0.1
+Release:        1%{?dist}
 Summary:        Fixtures, reusable state for writing clean tests and more
 
 License:        ASL 2.0 or BSD
@@ -70,6 +70,9 @@ contract in unit test compatible test cases easy and straight forward.
 %{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.1-1
+- Auto-upgrade to 4.0.1 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
