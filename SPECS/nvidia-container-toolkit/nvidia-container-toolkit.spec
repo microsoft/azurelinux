@@ -88,8 +88,8 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
-* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.17.4-1
-- Auto-upgrade to 1.17.4 - Fix CVE-2025-23359 in nvidia-container-toolkit
+* Thu Feb 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.17.4-1
+- Upgrade to v1.17.4 to resolve CVE-2025-23359
 
 * Thu Dec 05 2024 Henry Li <lihl@microsoft.com> - 1.17.3-1
 - Upgrade to v1.17.3
