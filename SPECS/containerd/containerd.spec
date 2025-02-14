@@ -20,6 +20,7 @@ Patch2:	 CVE-2023-44487.patch
 Patch3:  CVE-2023-47108.patch
 Patch4:  CVE-2024-24786.patch
 Patch5:  CVE-2024-28180.patch
+Patch6:  CVE-2023-45288.patch
 
 %{?systemd_requires}
 
@@ -89,8 +90,8 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Fri Jan 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.13-6
-- Fix CVE-2024-28180 with an upstream patch
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.13-6
+- Fix CVE-2024-28180, CVE-2023-45288
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.7.13-5
 - Fix CVE-2024-24786
