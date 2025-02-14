@@ -7,7 +7,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://cheetahtemplate.org/
-Source:         https://github.com/CheetahTemplate3/cheetah3/archive/%{version}/Cheetah3-%{version}.tar.gz
+Source:         https://github.com/CheetahTemplate3/cheetah3/archive/%{version}/Cheetah3-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Instead of playing Whac-A-Mole and adding more and more basepythons,
 # e.g. in https://github.com/CheetahTemplate3/cheetah3/commit/6be6bc10a4,
@@ -25,6 +25,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 # for tests
+%if 0%{?with_check}
 BuildRequires:  python3-tox
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-py
@@ -32,6 +33,7 @@ BuildRequires:  python3-filelock
 BuildRequires:  python3-toml
 BuildRequires:  python3-six
 BuildRequires:  python3-tox-current-env
+%endif
 
 %global _description %{expand:
 Cheetah3 is a free and open source template engine and code generation tool.
