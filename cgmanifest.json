@@ -10411,8 +10411,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
         }
       }
     },
