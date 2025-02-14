@@ -3,7 +3,7 @@
 Summary:        The open-source application container engine client.
 Name:           docker-cli
 Version:        25.0.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         disable_manpage_vendor.patch
 Patch1:         CVE-2024-24786.patch
 Patch2:         CVE-2024-36623.patch
+Patch3:         CVE-2023-45288.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
 BuildRequires:  golang
@@ -82,6 +83,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 25.0.3-4
+- Address CVE-2023-45288
+
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 25.0.3-3
 - Fix CVE-2024-36623 with patch
 
