@@ -30,6 +30,8 @@ Patch0:         go14_bootstrap_aarch64.patch
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 # bootstrap 02
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
+# bootstrap 03
+Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -50,6 +52,9 @@ mv -v go go-bootstrap-01
 
 tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
+
+tar xf %{SOURCE4} --no-same-owner
+mv -v go go-bootstrap-03
 
 %setup -q -n go
 
@@ -84,6 +89,7 @@ function go_bootstrap() {
 go_bootstrap 00
 go_bootstrap 01
 go_bootstrap 02
+go_bootstrap 03
 
 # Build current go version
 export GOHOSTOS=linux
