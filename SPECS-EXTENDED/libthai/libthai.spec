@@ -5,7 +5,7 @@ Name: libthai
 Version: 0.1.29
 Release: 10%{?dist}
 License: LGPL-2.1-or-later
-Source: http://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
+Source0: https://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
 Patch0: libthai-0.1.9-multilib.patch
 URL: http://linux.thai.net
 

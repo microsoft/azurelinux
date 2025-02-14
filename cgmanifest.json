@@ -11132,7 +11132,7 @@
         "other": {
           "name": "libthai",
           "version": "0.1.29",
-	  "downloadUrl": "http://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz"
+	  "downloadUrl": "https://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz"
         }
       }
     },
