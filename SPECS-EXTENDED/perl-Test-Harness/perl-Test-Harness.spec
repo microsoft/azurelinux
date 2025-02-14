@@ -8,13 +8,12 @@ Distribution:   Azure Linux
 %endif
 
 Name:           perl-Test-Harness
-Epoch:          1
 Version:        3.50
 Release:        2%{?dist}
 Summary:        Run Perl standard test scripts with statistics
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Harness
-Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/perl-Test-Harness-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove hard-coded shell bangs
 Patch0:         Test-Harness-3.38-Remove-shell-bangs.patch
 BuildArch:      noarch
@@ -161,7 +160,7 @@ make test
 %changelog
 
 %changelog
-* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1:3.50-2
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.50-2
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
