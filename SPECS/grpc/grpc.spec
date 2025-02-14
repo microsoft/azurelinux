@@ -11,6 +11,7 @@ Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{versi
 Source1:        %{name}-%{version}-submodules.tar.gz
 
 Patch0:         CVE-2023-32067.patch
+Patch1:         CVE-2023-31130.patch
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -151,6 +152,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Wed Jan 25 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.62.0-4
+- Patch CVE-2023-31130
+
 * Mon Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.42.0-8
 - Address CVE-2023-32067 in the grpc submodules package
 
