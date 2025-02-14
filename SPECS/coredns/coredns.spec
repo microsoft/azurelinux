@@ -2,8 +2,8 @@
 
 Summary:        Fast and flexible DNS server
 Name:           coredns
-Version:        1.11.1
-Release:        3%{?dist}
+Version:        1.11.4
+Release:        1%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.4-1
+- Auto-upgrade to 1.11.4 - fix CVE-2023-44487
+
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
 - Fix CVE-2024-24786
 
