@@ -9942,7 +9942,7 @@
         "other": {
           "name": "liblqr-1",
           "version": "0.4.3",
-          "downloadUrl": "http://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.3.tar.bz2"
+          "downloadUrl": "https://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.3.tar.bz2"
         }
       }
     },
