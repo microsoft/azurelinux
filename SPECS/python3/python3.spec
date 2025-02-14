@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,7 @@ Patch5:         CVE-2024-8088.patch
 Patch6:         CVE-2024-4032.patch
 Patch7:         CVE-2024-11168.patch
 Patch8:         CVE-2024-6923.patch
+Patch9:         CVE-2023-27043.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
@@ -175,6 +176,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -330,6 +332,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Feb 03 2024 Bala <balakumaran.kannan@microsoft.com> - 3.9.19-9
+- Address CVE-2023-27043 by patching
+
 * Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.9.19-8
 - Address CVE-2024-6923
 
