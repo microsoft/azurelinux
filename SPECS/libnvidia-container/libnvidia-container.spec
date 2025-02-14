@@ -136,7 +136,7 @@ This package contains command-line tools that facilitate using the library.
 
 %changelog
 * Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.17.4-1
-- Auto-upgrade to 1.17.4 - Upgrade to stay in sync with nvidia-container-toolkit
+- Upgrade to version 1.17.4 to stay in sync with nvidia-container-toolkit
 
 * Thu Dec 05 2024 Henry Li <lihl@microsoft.com> - 1.17.3-1
 - Upgrade to v1.17.3
