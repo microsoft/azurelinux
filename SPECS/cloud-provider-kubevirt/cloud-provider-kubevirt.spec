@@ -23,12 +23,11 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-2-vendor.tar.gz
+Source1:        %{name}-%{version}-5-vendor.tar.gz
 Patch0:         KCCM-Changes.patch
 Patch1:         Golang-Version-Upgrade.patch
 %global debug_package %{nil}
-BuildRequires:  golang >= 1.22.11
-BuildRequires:  golang-packaging
+BuildRequires:  golang >= 1.22
 
 %define our_gopath %{_topdir}/.gopath
 
@@ -45,12 +44,15 @@ exposed through services in the UnderKube.
 
 %prep
 %autosetup -N
+rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 %autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
+echo "Waiting..."
+sleep 3600
 make build
 
 %install
