@@ -3409,8 +3409,8 @@
         "other": {
           "name": "exempi",
           "version": "2.6.5",
-          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"        
-	}
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"
+        }
       }
     },
     {
@@ -4602,6 +4602,16 @@
           "name": "golang",
           "version": "1.23.3",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.24.0",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.0-1/go1.24.0-20250212.5.src.tar.gz"
         }
       }
     },
