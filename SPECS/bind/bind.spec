@@ -9,7 +9,7 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.20.0
+Version:        9.20.5
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
@@ -30,6 +30,8 @@ Source11:       setup-named-chroot.sh
 Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       named-chroot.files
+Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
+
 Patch0:         nongit-fix.patch
 
 BuildRequires:  gcc
@@ -196,14 +198,17 @@ Summary:        BIND utilities
 # so we need to save a backup of these files.
 mkdir backup
 mv compile depcomp missing backup/
-libtoolize -c -f; %{_bindir}/aclocal -I m4 --force; %{_bindir}/autoconf -f 
+libtoolize -c -f; %{_bindir}/aclocal -I m4 --force; %{_bindir}/autoconf -f
 mv backup/* .
 rmdir backup
 
 %build
 # DLZ modules do not support oot builds. Copy files into build
 mkdir -p build/contrib/dlz
-cp -frp contrib/dlz/modules build/contrib/dlz/modules
+pushd build/contrib/dlz
+tar --no-same-owner -xf %{SOURCE15}
+mv dlz-modules-main/modules ./
+popd
 
 ./configure \
     --prefix=%{_prefix} \
@@ -400,7 +405,7 @@ fi;
 %{_mandir}/man1/named-journalprint.1*
 %{_mandir}/man8/filter-aaaa.8.gz
 %{_mandir}/man8/filter-a.8.gz
-%doc CHANGES README.md named.conf.default
+%doc README.md named.conf.default
 %doc sample/
 
 %defattr(0660,root,named,01770)
@@ -435,11 +440,11 @@ fi;
 
 %files dlz-ldap
 %{_libdir}/{named,bind}/dlz_ldap_dynamic.so
-%doc contrib/dlz/modules/ldap/testing/*
+%doc build/contrib/dlz/modules/ldap/testing/*
 
 %files dlz-sqlite3
 %{_libdir}/{named,bind}/dlz_sqlite3_dynamic.so
-%doc contrib/dlz/modules/sqlite3/testing/*
+%doc build/contrib/dlz/modules/sqlite3/testing/*
 
 %files libs
 %{_libdir}/*-%{version}*.so
@@ -523,6 +528,10 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Tue Feb 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.5-1
+- Auto-upgrade to 9.20.5 - to fix CVE-2024-12705 & CVE-2024-11187
+- Refresh nongit-fix patch to apply cleanly.
+
 * Wed Jul 24 2024 Muhammad Falak <mwani@microsoft.com> - 9.20.0-1
 - Upgrade version to 9.20.0 to address CVE-CVE-2024-0760, CVE-2024-1737, CVE-2024-1975 & CVE-2024-4076
 - Refresh patches to apply cleanly
