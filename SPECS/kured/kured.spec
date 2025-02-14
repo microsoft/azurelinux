@@ -48,6 +48,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         kured-imagePullPolicy.patch
+Patch1:         CVE-2023-45288.patch
 BuildRequires:  fdupes
 BuildRequires:  go-go-md2man
 BuildRequires:  golang
