@@ -61,7 +61,7 @@ mv mt-st mt
 
 %changelog
 * Wed Feb 12 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Upgrade to version 1.7
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-27
