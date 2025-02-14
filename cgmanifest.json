@@ -4871,7 +4871,7 @@
         "other": {
           "name": "gsl",
           "version": "2.8",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz"
         }
       }
     },
