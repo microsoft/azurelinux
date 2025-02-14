@@ -51,8 +51,6 @@ tar -xf %{SOURCE1} --no-same-owner
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
-echo "Waiting..."
-sleep 3600
 make build
 
 %install
