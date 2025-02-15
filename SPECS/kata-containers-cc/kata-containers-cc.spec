@@ -2,8 +2,8 @@
 %define sourceName kata-containers
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl4
-Release:      2%{?dist}
+Version:      3.2.0.azl5mh
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -150,6 +150,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Sat Feb 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl5mh-1
+- Auto-upgrade to 3.2.0.azl5mh
+
 * Sat Feb 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4-2
 - Auto-upgrade to 3.2.0.azl4
 
