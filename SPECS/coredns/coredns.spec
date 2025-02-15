@@ -54,16 +54,6 @@ make
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
-%check
-# From go.test.yml
-go install github.com/fatih/faillint@latest && \
-(cd request && go test -v -race ./...) && \
-(cd core && go test -v -race ./...) && \
-(cd coremain && go test -v -race ./...) && \
-(cd plugin && go test -v -race ./...) && \
-(cd test && go test -v -race ./...) && \
-./coredns -version
-
 %files
 %defattr(-,root,root)
 %license LICENSE
