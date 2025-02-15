@@ -4,8 +4,8 @@
 
 Name:           cloud-hypervisor-cvm
 Summary:        Cloud Hypervisor CVM is an open source Virtual Machine Monitor (VMM) that enables running SEV SNP enabled VMs on top of MSHV using the IGVM file format as payload.
-Version:        38.0.72.2
-Release:        2%{?dist}
+Version:        41.0.79
+Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -136,6 +136,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Sat Feb 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.79-1
+- Auto-upgrade to 41.0.79
+
 * Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 38.0.72.2-2
 - Patch openssl in the vendored archive to 3.3.2 to address CVE-2024-6119
 
