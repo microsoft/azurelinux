@@ -131,8 +131,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %{_libdir}/cloud-hypervisor/static/ch-remote
 %caps(cap_net_admim=ep) %{_libdir}/cloud-hypervisor/static/cloud-hypervisor
 %endif
-%license LICENSE-APACHE
-%license LICENSE-BSD-3-Clause
+%license LICENSES/Apache-2.0.txt
+%license LICENSES/BSD-3-Clause.txt
+%license LICENSES/CC-BY-4.0.txt
 
 %changelog
 * Sat Jan 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.79-1
