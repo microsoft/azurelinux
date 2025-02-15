@@ -17,8 +17,7 @@ BuildRequires: golang
 Provides a way for the Kubernetes users to utilize the local storage in each node. 
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1
 
 %build
 export CGO_ENABLED=0
