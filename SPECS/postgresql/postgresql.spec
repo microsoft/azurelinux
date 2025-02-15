@@ -1,13 +1,14 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        14.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2025-1094.patch
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -191,6 +192,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 14.14-2
+- Address CVE-2025-1094
+
 * Mon Nov 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.14-1
 - Auto-upgrade to 14.14 - CVE-2024-10976, CVE-2024-10977, CVE-2024-10978, CVE-2024-10979
 
