@@ -32,7 +32,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
-Patch0:         coredns-example-net-test.patch
+
 BuildRequires:  golang >= 1.23
 
 %description
