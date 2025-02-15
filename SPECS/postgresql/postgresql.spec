@@ -244,7 +244,7 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
-* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 16.5-2
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 16.5-3
 - Address CVE-2025-1094
 
 * Mon Jan 15 2025 Uri Smiley <udsmicrosoft@microsoft.com> - 16.5-2
