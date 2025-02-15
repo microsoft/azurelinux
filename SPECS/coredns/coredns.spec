@@ -30,13 +30,6 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         makefile-buildoption-commitnb.patch
-Patch1:         CVE-2023-44487.patch
-Patch2:         CVE-2023-49295.patch
-Patch3:         CVE-2024-22189.patch
-Patch4:         CVE-2023-45288.patch
-Patch5:         CVE-2024-0874.patch
-Patch6:         CVE-2024-24786.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -66,7 +59,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
 %changelog
 * Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.4-1
-- Auto-upgrade to 1.11.4 - fix CVE-2023-44487
+- Auto-upgrade to 1.11.4 to fix CVE-2023-44487
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
 - Fix CVE-2024-24786
