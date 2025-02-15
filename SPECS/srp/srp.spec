@@ -26,7 +26,11 @@
 #
 #
 
+<<<<<<< HEAD
 %global last-known-kernel 6.6.64.2-6
+=======
+%global last-known-kernel 6.6.76.1
+>>>>>>> b34c13292 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.76.1 - branch 3.0-dev (#12277))
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -64,7 +68,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 6%{?dist}
+Release:	 7%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -93,11 +97,7 @@ Requires:       kmod
 %description
 %{name} kernel modules
 
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -s -C %{1} kernelrelease M=$PWD)
-BuildRequires: %kernel_module_package_buildreqs
-%(mkdir -p %{buildroot})
+BuildRequires: %kernel_module_package_buildreqs-1
 %(echo '%defattr (-,root,root)' > %{buildroot}/file_list)
 %(echo '/lib/modules/%2-%1' >> %{buildroot}/file_list)
 %(echo '%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*-%1.conf' >> %{buildroot}/file_list)
@@ -253,6 +253,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-7
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
 - Bump release to rebuild for new kernel release
 

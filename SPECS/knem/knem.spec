@@ -23,10 +23,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
-
+-1
 %global last-known-kernel 6.6.64.2-6
+=======
+%global last-known-kernel 6.6.76.1
+>>>>>>> b34c13292 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.76.1 - branch 3.0-dev (#12277))
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -53,7 +54,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 6%{?dist}
+Release:	 7%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -116,7 +117,7 @@ EOF)
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -282,6 +283,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-7
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 1.1.4.90mlnx3-6
 - Bump release to rebuild for new kernel release
 

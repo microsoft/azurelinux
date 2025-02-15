@@ -1,4 +1,4 @@
-%global last-known-kernel 6.6.64.2-6
+%global last-known-kernel 6.6.76.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -33,7 +33,7 @@
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 6%{?dist}
+Release:	 7%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -228,6 +228,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-7
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 4.30.0-6
 - Bump release to rebuild for new kernel release
 
