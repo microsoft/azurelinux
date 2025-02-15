@@ -3,14 +3,15 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        16.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
-Source1:	%{name}.service
+Source1:        %{name}.service
+Patch0:         CVE-2025-1094.patch
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -243,6 +244,9 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 16.5-2
+- Address CVE-2025-1094
+
 * Mon Jan 15 2025 Uri Smiley <udsmicrosoft@microsoft.com> - 16.5-2
 - Add LZ4 option to enable TOAST compression
 
