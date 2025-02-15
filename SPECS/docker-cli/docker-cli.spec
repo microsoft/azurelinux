@@ -2,8 +2,8 @@
 %define OUR_GOPATH  %{_topdir}/.gopath
 Summary:        The open-source application container engine client.
 Name:           docker-cli
-Version:        25.0.3
-Release:        3%{?dist}
+Version:        25.0.7
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,6 +82,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Sat Feb 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.0.7-1
+- Auto-upgrade to 25.0.7 - to fix CVE-2023-45288 [High]
+
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 25.0.3-3
 - Fix CVE-2024-36623 with patch
 
