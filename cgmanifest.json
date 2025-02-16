@@ -25423,8 +25423,8 @@
         "type": "other",
         "other": {
           "name": "qhull",
-          "version": "7.2.1",
-          "downloadUrl": "https://github.com/qhull/qhull/archive/v7.2.1.tar.gz"
+          "version": "8.0.2",
+          "downloadUrl": "https://github.com/qhull/qhull/archive/v8.0.2.tar.gz"
         }
       }
     },
