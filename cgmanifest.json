@@ -27584,8 +27584,8 @@
         "type": "other",
         "other": {
           "name": "sdparm",
-          "version": "1.11",
-          "downloadUrl": "http://sg.danny.cz/sg/p/sdparm-1.11.tgz"
+          "version": "1.12",
+          "downloadUrl": "https://sg.danny.cz/sg/p/sdparm-1.12.tgz"
         }
       }
     },
