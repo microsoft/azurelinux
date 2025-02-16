@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "fuse-overlayfs",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/containers/fuse-overlayfs/archive/v1.4.0.tar.gz"
+          "version": "1.14",
+          "downloadUrl": "https://github.com/containers/fuse-overlayfs/archive/v1.14.tar.gz"
         }
       }
     },
