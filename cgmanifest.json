@@ -4650,8 +4650,8 @@
         "type": "other",
         "other": {
           "name": "gom",
-          "version": "0.4",
-          "downloadUrl": "https://download.gnome.org/sources/gom/0.4/gom-0.4.tar.xz"
+          "version": "0.5.3",
+          "downloadUrl": "https://download.gnome.org/sources/gom/0.5/gom-0.5.3.tar.xz"
         }
       }
     },
