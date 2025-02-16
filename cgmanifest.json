@@ -16773,8 +16773,8 @@
         "type": "other",
         "other": {
           "name": "perl-Data-UUID",
-          "version": "1.224",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Data/Data-UUID-1.224.tar.gz"
+          "version": "1.227",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Data/Data-UUID-1.227.tar.gz"
         }
       }
     },
