@@ -11361,8 +11361,8 @@
         "type": "other",
         "other": {
           "name": "libuninameslist",
-          "version": "20200313",
-          "downloadUrl": "https://github.com/fontforge/libuninameslist/archive/20200313.tar.gz"
+          "version": "20230916",
+          "downloadUrl": "https://github.com/fontforge/libuninameslist/archive/20230916.tar.gz"
         }
       }
     },
