@@ -11481,8 +11481,8 @@
         "type": "other",
         "other": {
           "name": "libverto",
-          "version": "0.3.0",
-          "downloadUrl": "https://github.com/latchset/libverto/releases/download/0.3.0/libverto-0.3.0.tar.gz"
+          "version": "0.3.2",
+          "downloadUrl": "https://github.com/latchset/libverto/releases/download/0.3.2/libverto-0.3.2.tar.gz"
         }
       }
     },
