@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 
 Name:           ps_mem
 Version:        3.14
-Release:        1%{?dist}
+Release:        9%{?dist}
 Summary:        Memory profiling tool
 License:        LGPL-2.1-only
 URL:            https://github.com/pixelb/ps_mem
@@ -48,7 +48,7 @@ install -Dpm644 %{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
 
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.14-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.14-9
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
