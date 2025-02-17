@@ -21,8 +21,8 @@ It is a collection of functions/decorators which is used to signal a user when \
 * further customizing the emitted messages
 
 Name:        python-%{pypi_name}
-Version:     1.22.0
-Release:     4%{?dist}
+Version:     3.0.0
+Release:     1%{?dist}
 Summary:     A collection of Python deprecation patterns and strategies
 
 License:     ASL 2.0
@@ -101,6 +101,9 @@ rm -fr doc/build/html/.buildinfo
 %endif
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-1
+- Auto-upgrade to 3.0.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

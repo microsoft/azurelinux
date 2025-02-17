@@ -22343,8 +22343,8 @@
         "type": "other",
         "other": {
           "name": "python-debtcollector",
-          "version": "1.22.0",
-          "downloadUrl": "https://tarballs.openstack.org/debtcollector/debtcollector-1.22.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://tarballs.openstack.org/debtcollector/debtcollector-3.0.0.tar.gz"
         }
       }
     },
