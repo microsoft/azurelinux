@@ -45,7 +45,7 @@ sed -r -i "s/'pyparsing.*'/'pyparsing'/" setup.py
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.1.30-1
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.30-8
