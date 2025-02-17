@@ -324,7 +324,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
-* Mon Feb 16 2025 Sindhu Karri <lakarri@microsoft.com> - 2.41-3
+* Mon Feb 17 2025 Sindhu Karri <lakarri@microsoft.com> - 2.41-3
 - Fix CVE-2025-1176, CVE-2025-1181, CVE-2025-1182
 
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.41-2
