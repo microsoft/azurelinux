@@ -1,6 +1,6 @@
 Name:		perl-XString
 Version:	0.005
-Release:	1%{?dist}
+Release:	15%{?dist}
 Summary:	Isolated String helpers from B
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
@@ -58,7 +58,7 @@ make test
 %{_mandir}/man3/XString.3*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.005-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.005-15
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
