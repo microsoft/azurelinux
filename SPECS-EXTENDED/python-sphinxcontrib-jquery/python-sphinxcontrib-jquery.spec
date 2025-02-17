@@ -9,8 +9,8 @@ Summary:        Extension to include jQuery on newer Sphinx releases
 # _sphinx_javascript_frameworks_compat.js is BSD-2-Clause
 # jquery-3.6.0.js and jquery.js are MIT
 License:        0BSD AND BSD-2-Clause AND MIT
-URL:            https://github.com/sphinx-contrib/jquery/
-Source:         %{url}/archive/v%{version}/sphinxcontrib-jquery-%{version}.tar.gz
+URL:            https://github.com/sphinx-contrib/jquery
+Source:         %{url}/archive//sphinxcontrib-jquery-%{version}.tar.gz
  
 # Make the tests pass with Sphinx 7.1+
 # Based on the original work in https://github.com/sphinx-contrib/jquery/pull/26
