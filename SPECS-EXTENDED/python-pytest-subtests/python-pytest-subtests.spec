@@ -9,8 +9,8 @@
 
 Summary:        Support for unittest subTest() and subtests fixture
 Name:           python-%{pypi_name}
-Version:        0.3.1
-Release:        4%{?dist}
+Version:        0.12.1
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/pytest-dev/pytest-subtests
 #Source0:       https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
@@ -58,6 +58,9 @@ PYTHONDONTWRITEBYTECODE=1 pytest -v tests \
 %{python3_sitelib}/pytest_subtests-%{version}-py*.egg-info/
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.1-1
+- Auto-upgrade to 0.12.1 - Extended package upgrade to IDC
+
 * Thu Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.3.1-4
 - Drop BR on pytest & pip install latest deps to enable ptest
 - License verified
