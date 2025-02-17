@@ -52,7 +52,7 @@ BuildRequires:  python3-pip
 
 
 %changelog
-* Thu Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.0-12
+* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.0-12
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
