@@ -33,8 +33,9 @@ Patch0:         export-demangle-header.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
 Patch1:         disable_gold_test.patch
 Patch2:         CVE-2025-1176.patch
-Patch3:         CVE-2025-1181.patch
-Patch4:         CVE-2025-1182.patch
+Patch3:         CVE-2025-1178.patch
+Patch4:         CVE-2025-1181.patch
+Patch5:         CVE-2025-1182.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
