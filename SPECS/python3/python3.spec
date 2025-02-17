@@ -5,8 +5,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.12.3
-Release:        6%{?dist}
+Version:        3.12.9
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -244,6 +244,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.9-1
+- Auto-upgrade to 3.12.9 - to fix CVE-2025-0938 & CVE-2024-4032
+
 * Thu Jan 30 2025 Bala <balakumaran.kannan@microsoft.com> - 3.12.3-6
 - Patch CVE-2023-27043
 
