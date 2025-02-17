@@ -7,7 +7,7 @@ Version: 2.14
 Release: 1%{?dist}
 License: GPL-2.0-or-later
 URL:     https://www.gnu.org/software/libsigsegv/
-Source0: http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
+Source0: https://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
 Patch0:  configure.patch
 
 BuildRequires: automake libtool
