@@ -21803,8 +21803,8 @@
         "type": "other",
         "other": {
           "name": "python-aiodns",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/saghul/aiodns/archive/aiodns-2.0.0.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/saghul/aiodns/archive/v3.2.0.tar.gz"
         }
       }
     },
