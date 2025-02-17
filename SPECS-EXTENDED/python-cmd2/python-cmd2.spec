@@ -1,4 +1,4 @@
-/Vendor:         Microsoft Corporation
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %global pypi_name cmd2
