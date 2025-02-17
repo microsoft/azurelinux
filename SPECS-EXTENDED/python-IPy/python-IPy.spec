@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 Summary:        Python module for handling IPv4 and IPv6 Addresses and Networks
 Name:           python-%{oname}
 Version:        1.01
-Release:        1%{?dist}
+Release:        13%{?dist}
 URL:            https://github.com/haypo/python-ipy
 Source0:        https://files.pythonhosted.org/packages/source/I/IPy/IPy-%{version}.tar.gz
 License:        BSD
@@ -58,7 +58,7 @@ PYTHONPATH=$PWD %{__python3} test/test_IPy.py
 
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.01-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.01-13
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
