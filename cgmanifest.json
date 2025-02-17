@@ -22603,8 +22603,8 @@
         "type": "other",
         "other": {
           "name": "python-flask",
-          "version": "1.1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/F/Flask/Flask-1.1.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/41/e1/d104c83026f8d35dfd2c261df7d64738341067526406b40190bc063e829a/flask-3.0.3.tar.gz"
         }
       }
     },

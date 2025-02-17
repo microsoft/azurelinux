@@ -4,8 +4,8 @@ Distribution:   Azure Linux
 %global srcname Flask
 
 Name:           python-%{modname}
-Version:        1.1.1
-Release:        4%{?dist}
+Version:        3.0.3
+Release:        1%{?dist}
 Summary:        A micro-framework for Python based on Werkzeug, Jinja 2 and good intentions
 
 License:        BSD
@@ -84,6 +84,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-3 -v -k "not test_send_from_dir
 %doc examples
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.3-1
+- Auto-upgrade to 3.0.3 - Extended package upgrade to IDC
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.1.1-4
 - Remove epoch
 
