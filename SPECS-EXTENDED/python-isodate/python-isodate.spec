@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global srcname isodate
 
 Name:           python-%{srcname}
-Version:        0.6.0
-Release:        6%{?dist}
+Version:        0.6.1
+Release:        1%{?dist}
 Summary:        An ISO 8601 date/time/duration parser and formatter
 License:        BSD
 URL:            https://pypi.org/project/isodate/
@@ -71,6 +71,9 @@ mv %{SOURCE1} ./LICENSE.txt
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-1
+- Auto-upgrade to 0.6.1 - Extended package upgrade to IDC
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
 - License verified
 
