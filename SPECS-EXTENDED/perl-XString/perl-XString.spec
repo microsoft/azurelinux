@@ -29,6 +29,8 @@ BuildRequires:	perl(Test::More) >= 0.88
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 # Dependencies
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 Requires:	perl(XSLoader)
 
 %description
