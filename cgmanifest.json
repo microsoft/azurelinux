@@ -23873,8 +23873,8 @@
         "type": "other",
         "other": {
           "name": "python-pycares",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/saghul/pycares/archive/pycares-3.1.1.tar.gz"
+          "version": "4.3.0",
+          "downloadUrl": "https://github.com/saghul/pycares/archive/pycares-4.3.0.tar.gz"
         }
       }
     },
