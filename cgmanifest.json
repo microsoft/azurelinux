@@ -15453,8 +15453,8 @@
         "type": "other",
         "other": {
           "name": "openwsman",
-          "version": "2.6.8",
-          "downloadUrl": "https://github.com/Openwsman/openwsman/archive/v2.6.8.tar.gz"
+          "version": "2.7.2",
+          "downloadUrl": "https://github.com/Openwsman/openwsman/archive/v2.7.2.tar.gz"
         }
       }
     },
