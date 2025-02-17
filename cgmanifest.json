@@ -24843,8 +24843,8 @@
         "type": "other",
         "other": {
           "name": "python-testresources",
-          "version": "1.0.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/t/testresources/testresources-1.0.0.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/9d/57/8e3986cd95a80dd23195f599befa023eb85d031d2d870c47124fa5ccbf06/testresources-2.0.1.tar.gz"
         }
       }
     },
