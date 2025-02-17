@@ -7282,7 +7282,7 @@
         "other": {
           "name": "intel-cmt-cat",
           "version": "24.05",
-          "downloadUrl": "https://github.com/01org/intel-cmt-cat/archive/v24.05.tar.gz"
+          "downloadUrl": "https://github.com/intel/intel-cmt-cat/archive/v24.05/intel-cmt-cat-24.05.tar.gz"
         }
       }
     },
