@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 # NOTE: tests are disabled since should_be has not yet been packaged.
 
 Name:           python-gssapi
-Version:        1.6.1
-Release:        6%{?dist}
+Version:        1.7.3
+Release:        1%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
 
 License:        ISC
@@ -62,6 +62,9 @@ find %{buildroot}%{python3_sitearch}/gssapi -name '*.so' \
 %{python3_sitearch}/*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-1
+- Auto-upgrade to 1.7.3 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
