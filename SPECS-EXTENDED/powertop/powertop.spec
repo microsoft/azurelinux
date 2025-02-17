@@ -1,6 +1,6 @@
 Name:             powertop
 Version:          2.15
-Release:          1%{?dist}
+Release:          10%{?dist}
 Summary:          Power consumption monitor
 
 License:          gpl-2.0-only AND lgpl-2.1-only AND isc
@@ -79,7 +79,7 @@ touch %{_localstatedir}/cache/powertop/{saved_parameters.powertop,saved_results.
 %{_datadir}/bash-completion/completions/powertop
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.15-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.15-10
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
