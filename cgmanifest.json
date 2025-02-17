@@ -23573,8 +23573,8 @@
         "type": "other",
         "other": {
           "name": "python-openstackdocstheme",
-          "version": "1.29.0",
-          "downloadUrl": "https://pypi.io/packages/source/o/openstackdocstheme/openstackdocstheme-1.29.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a6/c4/5331c57ec06a7dae9c6bd9526ee05ff3849588fc21c6b75678e39f8b728f/openstackdocstheme-3.0.0.tar.gz"
         }
       }
     },
