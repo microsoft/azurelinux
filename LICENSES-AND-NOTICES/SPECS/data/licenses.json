@@ -1826,6 +1826,7 @@
                 "python-sphinxcontrib-devhelp",
                 "python-sphinxcontrib-htmlhelp",
                 "python-sphinxcontrib-httpdomain",
+                "python-sphinxcontrib-jquery",
                 "python-sphinxcontrib-jsmath",
                 "python-sphinxcontrib-qthelp",
                 "python-sphinxcontrib-serializinghtml",
