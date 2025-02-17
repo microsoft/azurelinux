@@ -3179,7 +3179,7 @@
         "other": {
           "name": "efi-rpm-macros",
           "version": "5",
-          "downloadUrl": "https://github.com/rhboot/%{name}/releases/download/%{version}/%{name}-5.tar.bz2"
+          "downloadUrl": "https://github.com/rhboot/efi-rpm-macros/releases/download/5/efi-rpm-macros-5.tar.bz2"
         }
       }
     },
