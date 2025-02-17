@@ -6,7 +6,7 @@ Name:           python-%{oname}
 Version:        1.01
 Release:        13%{?dist}
 URL:            https://github.com/haypo/python-ipy
-Source0:        https://files.pythonhosted.org/packages/source/I/IPy/IPy-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/I/IPy/IPy-%{version}.tar.gz#/python-IPy-%{version}.tar.gz
 License:        BSD
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
