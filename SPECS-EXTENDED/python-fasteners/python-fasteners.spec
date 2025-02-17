@@ -5,8 +5,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           python-fasteners
-Version:        0.18
-Release:        2%{?dist}
+Version:        0.19
+Release:        1%{?dist}
 Summary:        A python package that provides useful locks
 License:        Apache-2.0
 URL:            https://github.com/harlowja/fasteners
@@ -83,6 +83,9 @@ sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19-1
+- Auto-upgrade to 0.19 - Extended package upgrade to IDC
+
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.18-2
 - Convert 'Release' tag to '[number].[distribution]' format
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
