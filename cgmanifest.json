@@ -24682,6 +24682,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sphinxcontrib-jquery",
+          "version": "4.1",
+          "downloadUrl": "https://github.com/sphinx-contrib/jquery/archive/v4.1/sphinxcontrib-jquery-4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinxcontrib-jsmath",
           "version": "1.0.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-jsmath/sphinxcontrib-jsmath-1.0.1.tar.gz"
