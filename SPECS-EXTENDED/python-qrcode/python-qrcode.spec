@@ -5,8 +5,8 @@ Distribution:   Azure Linux
 %global pkgname qrcode
 
 Name:           python-%{pkgname}
-Version:        6.1
-Release:        6%{?dist}
+Version:        7.4.2
+Release:        1%{?dist}
 Summary:        Python QR Code image generator
 
 License:        BSD
@@ -112,6 +112,9 @@ done
 %{python3_sitelib}/%{pkgname}/image/__pycache__/base.*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.4.2-1
+- Auto-upgrade to 7.4.2 - Extended package upgrade to IDC
+
 * Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disabling optional dependency on "python-pillow".
