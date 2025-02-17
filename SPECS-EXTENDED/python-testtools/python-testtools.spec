@@ -26,8 +26,8 @@ framework.}
 %bcond_without docs
 
 Name:           python-%{pkgname}
-Version:        2.4.0
-Release:        9%{?dist}
+Version:        2.7.1
+Release:        1%{?dist}
 Summary:        Extensions to the Python unit testing framework
 License:        MIT
 URL:            https://launchpad.net/testtools
@@ -107,6 +107,9 @@ make PYTHON=%{__python3} check
 %endif
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.1-1
+- Auto-upgrade to 2.7.1 - Extended package upgrade to IDC
+
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-9
 - Release bump to fix package information.
 - License verified.
