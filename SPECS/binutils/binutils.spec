@@ -326,7 +326,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Mon Feb 17 2025 Sindhu Karri <lakarri@microsoft.com> - 2.41-3
-- Fix CVE-2025-1176, CVE-2025-1181, CVE-2025-1182
+- Fix CVE-2025-1176, CVE-2025-1178, CVE-2025-1181, CVE-2025-1182
 
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.41-2
 - Add the cross-compilation subpackage for aarch64.
