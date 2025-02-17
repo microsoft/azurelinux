@@ -16063,8 +16063,8 @@
         "type": "other",
         "other": {
           "name": "perl-B-Keywords",
-          "version": "1.21",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/B/B-Keywords-1.21.tar.gz"
+          "version": "1.27",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/B/B-Keywords-1.27.tar.gz"
         }
       }
     },
