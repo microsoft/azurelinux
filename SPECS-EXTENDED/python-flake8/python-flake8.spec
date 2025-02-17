@@ -8,8 +8,8 @@ Distribution:   Azure Linux
 %global mccabe_dep      >= 0.6.0
 
 Name:             python-%{modname}
-Version:          3.7.7
-Release:          9%{?dist}
+Version:          6.1.0
+Release:          1%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
 
 License:          MIT
@@ -95,6 +95,9 @@ pip3 install .
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.0-1
+- Auto-upgrade to 6.1.0 - Extended package upgrade to IDC
+
 * Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.7.7-9
 - Drop BR on `pytest` and add an explict BR pip
 - pip install latest deps to enable ptest

@@ -22593,8 +22593,8 @@
         "type": "other",
         "other": {
           "name": "python-flake8",
-          "version": "3.7.7",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/flake8/flake8-3.7.7.tar.gz"
+          "version": "6.1.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/cf/f8/bbe24f43695c0c480181e39ce910c2650c794831886ec46ddd7c40520e6a/flake8-6.1.0.tar.gz"
         }
       }
     },
