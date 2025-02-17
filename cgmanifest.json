@@ -10912,7 +10912,7 @@
         "other": {
           "name": "libsigsegv",
           "version": "2.14",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.14.tar.gz "
+          "downloadUrl": "https://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.14.tar.gz"
         }
       }
     },
