@@ -284,7 +284,7 @@ fi
 %config(noreplace) %{_sysconfdir}/my.cnf.d/hashicorp_key_management.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/provider_bzip2.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/provider_lzma.cnf
-%dir %attr(0750,mysql,mysql) %{_sharedstatedir}/mysql
+%dir %attr(0755,mysql,mysql) %{_sharedstatedir}/mysql
 %{_libdir}/mysql/plugin*
 %{_bindir}/aria_chk
 %{_bindir}/aria_dump_log
@@ -469,6 +469,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Feb 17 2025 Mayank Singh <mayansingh@microsoft.com> - 10.11.10-2
+- Fix mariadb package installation by updating the /var/lib/mysql dir permission
+
 * Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
 - Auto-upgrade to 10.11.10 - to address CVE-2024-21096
 
