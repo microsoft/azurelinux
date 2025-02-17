@@ -8,9 +8,9 @@ Distribution:   Azure Linux
 Name:		python-%{srcname}
 
 # WARNING: Check if an update does not break flake8!
-Version:	0.3
+Version:	0.4
 
-Release:	6%{?dist}
+Release:	1%{?dist}
 Summary:	%{sum}
 
 # license clarification issue opened upstream
@@ -79,6 +79,9 @@ popd
 %license LICENSE
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4-1
+- Auto-upgrade to 0.4 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
