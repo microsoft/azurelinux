@@ -24103,8 +24103,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-relaxed",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/bitprophet/pytest-relaxed/archive/refs/tags/2.0.0.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://github.com/bitprophet/pytest-relaxed/archive/refs/tags/2.0.2.tar.gz"
         }
       }
     },

@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           python-pytest-relaxed
-Version:        2.0.0
+Version:        2.0.2
 Release:        1%{?dist}
 Summary:        Relaxed test discovery/organization for pytest
 License:        BSD-2-Clause
@@ -59,6 +59,9 @@ sed -i 's/decorator>=4,<5/decorator>=4,<6/' setup.py
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.2-1
+- Auto-upgrade to 2.0.2 - Extended package upgrade to IDC
+
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.0.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Bump version to 2.0.0
