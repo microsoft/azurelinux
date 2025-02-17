@@ -4,7 +4,7 @@ Summary:       Python module for GNU parted
 Name:          pyparted
 Epoch:         1
 Version:       3.13.0
-Release:       1%{?dist}
+Release:       8%{?dist}
 License:       GPL-2.0-or-later
 URL:           https://github.com/dcantrell/pyparted
 
@@ -57,7 +57,7 @@ make test
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.13.0-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.13.0-8
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
