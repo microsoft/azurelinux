@@ -6,7 +6,7 @@
 Summary:       Python bindings for CUPS
 Name:          python-cups
 Version:       2.0.4
-Release:       1%{?dist}
+Release:       4%{?dist}
 # older URL, but still with useful information about pycups
 #URL:           http://cyberelk.net/tim/software/pycups/
 Vendor:         Microsoft Corporation
@@ -77,7 +77,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %doc examples html
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.4-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.4-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
