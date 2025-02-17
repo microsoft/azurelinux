@@ -59,7 +59,7 @@ PYTHONPATH=$PWD %{__python3} test/test_IPy.py
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.01-13
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-12
