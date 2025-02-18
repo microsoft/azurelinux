@@ -29286,8 +29286,8 @@
         "type": "other",
         "other": {
           "name": "uriparser",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.7/uriparser-0.9.7.tar.bz2"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.8/uriparser-0.9.8.tar.bz2"
         }
       }
     },

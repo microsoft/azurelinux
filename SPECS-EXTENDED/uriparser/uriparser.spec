@@ -1,12 +1,18 @@
-Summary:        URI parsing library - RFC 3986
-Name:           uriparser
-Version:        0.9.7
-Release:        2%{?dist}
-License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%bcond_with mingw
+
+Name:           uriparser
+Version:        0.9.8
+Release:        3%{?dist}
+Summary:        URI parsing library - RFC 3986
+
+# /test/ is under LGPL-2.1-or-later but not included in RPM
+# /doc/rfc* are under LicenseRef-scancode-iso-8879, LicenseRef-scancode-ietf, LicenseRef-scancode-ietf-trust but not included in RPM
+License:        BSD-3-Clause
 URL:            https://uriparser.github.io/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
@@ -14,6 +20,15 @@ BuildRequires:  gmock-devel
 BuildRequires:  graphviz
 BuildRequires:  gtest-devel
 BuildRequires:  make
+
+%if %{with mingw}
+BuildRequires:  mingw32-filesystem >= 95
+BuildRequires:  mingw32-gcc-c++
+
+BuildRequires:  mingw64-filesystem >= 95
+BuildRequires:  mingw64-gcc-c++
+%endif
+
 
 %description
 Uriparser is a strictly RFC 3986 compliant URI parsing library written
@@ -35,6 +50,28 @@ BuildArch:      noarch
 %description doc
 The %{name}-doc package contains HTML documentation files for %{name}.
 
+
+%if %{with mingw}
+%package -n mingw32-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+
+%description -n mingw32-%{name}
+MinGW Windows %{name} library.
+
+
+%package -n mingw64-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+
+%description -n mingw64-%{name}
+MinGW Windows %{name} library.
+
+
+%{?mingw_debug_package}
+%endif
+
+
 %prep
 %autosetup -p1
 
@@ -46,10 +83,19 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 # Native build
 %cmake
 %cmake_build
+%if %{with mingw}
+# MinGW build
+%mingw_cmake -DURIPARSER_BUILD_TESTS=OFF -DURIPARSER_BUILD_DOCS=OFF
+%mingw_make_build
+%endif
 
 
 %install
 %cmake_install
+%if %{with mingw}
+%mingw_make_install
+%mingw_debug_install_post
+%endif
 
 
 %check
@@ -61,18 +107,42 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 %license COPYING
 %{_bindir}/uriparse
 %{_libdir}/lib%{name}.so.1*
-%{_libdir}/cmake/%{name}-%{version}/
 
 %files devel
 %{_includedir}/%{name}/
 %{_libdir}/lib%{name}.so
+%{_libdir}/cmake/%{name}-%{version}/
 %{_libdir}/pkgconfig/lib%{name}.pc
 
 %files doc
 %license COPYING
 %doc %{_docdir}/%{name}/html
 
+%if %{with mingw}
+%files -n mingw32-%{name}
+%license COPYING
+%{mingw32_bindir}/uriparse.exe
+%{mingw32_bindir}/lib%{name}-1.dll
+%{mingw32_includedir}/%{name}/
+%{mingw32_libdir}/lib%{name}.dll.a
+%{mingw32_libdir}/pkgconfig/lib%{name}.pc
+%{mingw32_libdir}/cmake/%{name}-%{version}/
+ 
+%files -n mingw64-%{name}
+%license COPYING
+%{mingw64_bindir}/uriparse.exe
+%{mingw64_includedir}/%{name}/
+%{mingw64_bindir}/lib%{name}-1.dll
+%{mingw64_libdir}/lib%{name}.dll.a
+%{mingw64_libdir}/pkgconfig/lib%{name}.pc
+%{mingw64_libdir}/cmake/%{name}-%{version}/
+%endif
+
 %changelog
+* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.8-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
 * Wed Aug 16 2023 Archana Choudhary <archana1@microsoft.com> - 0.9.7-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
