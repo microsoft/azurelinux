@@ -24903,8 +24903,8 @@
         "type": "other",
         "other": {
           "name": "python-tornado",
-          "version": "6.2.0",
-          "downloadUrl": "https://github.com/tornadoweb/tornado/archive/refs/tags/v6.2.0.tar.gz"
+          "version": "6.3.3",
+          "downloadUrl": "https://github.com/tornadoweb/tornado/archive/v6.3.3/tornado-6.3.3.tar.gz"
         }
       }
     },
