@@ -108,7 +108,7 @@ cd build
 
 %install
 cd build
-make VERBOSE=1 DESTDIR=$RPM_BUILD_ROOT install
+%cmake_install
 cd ..
 
 install -m 0644 %{name}-%{version}-doc/%{name}-manual.pdf %{buildroot}/%{_pkgdocdir}/%{name}-manual.pdf
