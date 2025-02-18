@@ -6,8 +6,8 @@ Distribution:   Azure Linux
 %global srcname Genshi
 
 Name:           python-genshi
-Version:        0.7.5
-Release:        4%{?dist}
+Version:        0.7.9
+Release:        1%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
 
 License:        BSD
@@ -70,6 +70,9 @@ rm %{buildroot}%{python3_sitelib}/genshi/*.c
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.9-1
+- Auto-upgrade to 0.7.9 - Extended package upgrade to IDC
+
 * Wed Mar 24 2021 Henry Li <lihl@microsoft.com> - 0.7.5-4
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Disable debuginfo 
