@@ -1,0 +1,105 @@
+From 84f5b742e39ba3e375bac9144e0243b7331f4019 Mon Sep 17 00:00:00 2001
+From: Arun Raghavan <arun@asymptotic.io>
+Date: Fri, 22 Mar 2024 09:31:48 -0400
+Subject: [PATCH] tests: Don't run volume tests with impossible alignments
+
+This worked so far somehow, but we were sending in some samples at
+unrealistic alignments (given that pa_memblockq will be frame-aligned,
+and we expect all operations to occur per-frame as well).
+
+Fixes: https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/3803
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/812>
+---
+ src/tests/cpu-volume-test.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/src/tests/cpu-volume-test.c b/src/tests/cpu-volume-test.c
+index c7d73be04..24811ead0 100644
+--- a/src/tests/cpu-volume-test.c
++++ b/src/tests/cpu-volume-test.c
+@@ -43,6 +43,7 @@ static void run_volume_test(
+         int channels,
+         bool correct,
+         bool perf) {
++    fail_unless(align % channels == 0);
+ 
+     PA_DECLARE_ALIGNED(8, int16_t, s[SAMPLES]) = { 0 };
+     PA_DECLARE_ALIGNED(8, int16_t, s_ref[SAMPLES]) = { 0 };
+@@ -56,8 +57,6 @@ static void run_volume_test(
+     samples_ref = s_ref + (8 - align);
+     samples_orig = s_orig + (8 - align);
+     nsamples = SAMPLES - (8 - align);
+-    if (nsamples % channels)
+-        nsamples -= nsamples % channels;
+     size = nsamples * sizeof(int16_t);
+ 
+     pa_random(samples, size);
+@@ -119,12 +118,12 @@ START_TEST (svolume_mmx_test) {
+ 
+     pa_log_debug("Checking MMX svolume");
+     for (i = 1; i <= 3; i++) {
+-        for (j = 0; j < 7; j++)
+-            run_volume_test(mmx_func, orig_func, j, i, true, false);
++        for (j = 0; j <= 7; j += i)
++            run_volume_test(mmx_func, orig_func, j, i, true, j == 0);
+     }
+     run_volume_test(mmx_func, orig_func, 7, 1, true, true);
+-    run_volume_test(mmx_func, orig_func, 7, 2, true, true);
+-    run_volume_test(mmx_func, orig_func, 7, 3, true, true);
++    run_volume_test(mmx_func, orig_func, 6, 2, true, true);
++    run_volume_test(mmx_func, orig_func, 6, 3, true, true);
+ }
+ END_TEST
+ 
+@@ -146,12 +145,12 @@ START_TEST (svolume_sse_test) {
+ 
+     pa_log_debug("Checking SSE2 svolume");
+     for (i = 1; i <= 3; i++) {
+-        for (j = 0; j < 7; j++)
+-            run_volume_test(sse_func, orig_func, j, i, true, false);
++        for (j = 0; j < 7; j += i)
++            run_volume_test(sse_func, orig_func, j, i, true, j == 0);
+     }
+     run_volume_test(sse_func, orig_func, 7, 1, true, true);
+-    run_volume_test(sse_func, orig_func, 7, 2, true, true);
+-    run_volume_test(sse_func, orig_func, 7, 3, true, true);
++    run_volume_test(sse_func, orig_func, 6, 2, true, true);
++    run_volume_test(sse_func, orig_func, 6, 3, true, true);
+ }
+ END_TEST
+ #endif /* defined (__i386__) || defined (__amd64__) */
+@@ -175,12 +174,12 @@ START_TEST (svolume_arm_test) {
+ 
+     pa_log_debug("Checking ARM svolume");
+     for (i = 1; i <= 3; i++) {
+-        for (j = 0; j < 7; j++)
+-            run_volume_test(arm_func, orig_func, j, i, true, false);
++        for (j = 0; j < 7; j += i)
++            run_volume_test(arm_func, orig_func, j, i, true, j == 0);
+     }
+     run_volume_test(arm_func, orig_func, 7, 1, true, true);
+-    run_volume_test(arm_func, orig_func, 7, 2, true, true);
+-    run_volume_test(arm_func, orig_func, 7, 3, true, true);
++    run_volume_test(arm_func, orig_func, 6, 2, true, true);
++    run_volume_test(arm_func, orig_func, 6, 3, true, true);
+ }
+ END_TEST
+ #endif /* defined (__arm__) && defined (__linux__) */
+@@ -207,11 +206,11 @@ START_TEST (svolume_orc_test) {
+ 
+     pa_log_debug("Checking Orc svolume");
+     for (i = 1; i <= 2; i++) {
+-        for (j = 0; j < 7; j++)
+-            run_volume_test(orc_func, orig_func, j, i, true, false);
++        for (j = 0; j < 7; j += i)
++            run_volume_test(orc_func, orig_func, j, i, true, j == 0);
+     }
+     run_volume_test(orc_func, orig_func, 7, 1, true, true);
+-    run_volume_test(orc_func, orig_func, 7, 2, true, true);
++    run_volume_test(orc_func, orig_func, 6, 2, true, true);
+ }
+ END_TEST
+ 
+-- 
+2.45.0
+

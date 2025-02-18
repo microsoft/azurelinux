@@ -2,19 +2,17 @@
 %bcond_without perl_DateTime_TimeZone_enables_optional_test
 
 # Regenerate Perl library code from upstream Olson database of this date
-%global tzversion 2020a
+%global tzversion 2025a
 
 Name:           perl-DateTime-TimeZone
-Version:        2.39
-Release:        2%{?dist}
+Version:        2.64
+Release:        1%{?dist}
 Summary:        Time zone object base class and factory
-# tzdata%%{tzversion}.tar.gz archive:   Public Domain
-# other files:                          GPL+ or Artistic
+# tzdata%%{tzversion}.tar.gz archive:   LicenseRef-Fedora-Public-Domain
+# other files:                          GPL-1.0-or-later OR Artistic-1.0-Perl
 # Some other files are generated from tzdata%%{tzversion}.tar.gz content by
-# upstream or locally:                  Public Domain
-License:        (GPL+ or Artistic) and Public Domain
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# upstream or locally:                  LicenseRef-Fedora-Public-Domain
+License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND LicenseRef-Fedora-Public-Domain
 URL:            https://metacpan.org/release/DateTime-TimeZone
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-%{version}.tar.gz
 %if %{defined tzversion}
@@ -25,9 +23,11 @@ Source1:        ftp://ftp.iana.org/tz/releases/tzdata%{tzversion}.tar.gz
 Patch0:         DateTime-TimeZone-2.04-Parse-etc-localtime-by-DateTime-TimeZone-Tzfile.patch
 BuildArch:      noarch
 # Build
+BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
@@ -89,7 +89,6 @@ BuildRequires:  perl(DateTime) >= 0.1501
 BuildRequires:  perl(Test::Output)
 BuildRequires:  perl(Test::Taint)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(File::Basename)
 Requires:       perl(File::Compare)
 Requires:       perl(File::Find)
@@ -110,17 +109,40 @@ Provides:       bundled(tzdata)
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(DateTime::Duration\\)
 %endif
 
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(T::RequireDateTime\\)
+
 %description
 This class is the base class for all time zone objects. A time zone is
 represented internally as a set of observances, each of which describes the
 offset from GMT for a given time period.
+
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+%if %{with perl_DateTime_TimeZone_enables_optional_test}
+Requires:       perl(Test::Output)
+Requires:       perl(Test::Taint)
+%endif
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
 
 %prep
 %if !%{defined perl_bootstrap} && %{defined tzversion}
 %setup -q -T -a 1 -c -n tzdata-%{tzversion}
 %endif
 %setup -q -T -b 0 -n DateTime-TimeZone-%{version}
-%patch 0 -p1
+%patch -P0 -p1
+
+# Help generators to recognize Perl scripts
+for F in t/*.t t/*.pl; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 %if !%{defined perl_bootstrap} && %{defined tzversion}
@@ -128,14 +150,24 @@ JOBS=$(printf '%%s' "%{?_smp_mflags}" | sed 's/.*-j\([0-9][0-9]*\).*/\1/')
 perl tools/parse_olson --dir ../tzdata-%{tzversion} --version %{tzversion} \
     --jobs $JOBS --clean
 %endif
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
@@ -144,9 +176,139 @@ make test
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.39-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 20 2025 Jitka Plesnikova <jplesnik@redhat.com> - 2.64-1
+- 2.64 bump (2025a Olson database) - rhbz#2338569
+
+* Tue Sep 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.63-1
+- 2.63 bump (2024b Olson database) - rhbz#2310650
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.62-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.62-3
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.62-2
+- Perl 5.40 rebuild
+
+* Mon Feb 05 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.62-1
+- 2.62 bump (2024a Olson database) - rhbz#2262363
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.61-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.61-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 03 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.61-1
+- 2.61 bump (2023d Olson database) - rhbz#2256272
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.60-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.60-3
+- Perl 5.38 re-rebuild of bootstrapped packages
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.60-2
+- Perl 5.38 rebuild
+
+* Wed Mar 29 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.60-1
+- 2.60 bump (2023c Olson database)
+
+* Mon Mar 27 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.59-1
+- 2.59 bump (2023b Olson database)
+
+* Thu Mar 23 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.58-1
+- 2.58 bump (2023a Olson database)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.57-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 16 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.57-1
+- 2.57 bump (2022g Olson database)
+
+* Mon Oct 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.56-1
+- 2.56 bump (2022f Olson database)
+
+* Wed Oct 12 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.55-1
+- 2.55 bump (2022e Olson database)
+
+* Mon Sep 26 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.54-1
+- 2.54 bump (2022d Olson database)
+
+* Mon Aug 15 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.53-1
+- 2.53 bump (2022b Olson database)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.52-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.52-3
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.52-2
+- Perl 5.36 rebuild
+
+* Thu Mar 24 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.52-1
+- 2.52 bump (2022a Olson database)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.51-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 25 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.51-1
+- 2.51 bump (2021e Olson database)
+
+* Sun Oct 17 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.50-1
+- 2.50 bump (2021d Olson database)
+
+* Sun Oct 03 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.49-1
+- 2.49 bump (2021c Olson database)
+
+* Thu Sep 30 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.48-1
+- 2.48 bump (2021b Olson database)
+- Package tests
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.47-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.47-3
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.47-2
+- Perl 5.34 rebuild
+
+* Tue Jan 26 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.47-1
+- 2.47 bump (2021a Olson database)
+
+* Mon Jan 04 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.46-1
+- 2.46 bump (2020e Olson database)
+
+* Tue Dec 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.45-1
+- 2.45 bump
+
+* Mon Nov 09 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.44-1
+- 2.44 bump
+
+* Thu Oct 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.43-1
+- 2.43 bump (2020d Olson database)
+
+* Mon Oct 19 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.42-1
+- 2.42 bump (2020c Olson database)
+
+* Thu Oct 08 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.41-1
+- 2.41 bump (2020b Olson database)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.39-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.39-3
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.39-2
+- Perl 5.32 rebuild
 
 * Mon Apr 27 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.39-1
 - 2.39 bump (2020a Olson database)

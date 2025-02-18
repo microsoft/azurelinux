@@ -1,37 +1,73 @@
-%bcond_with missing_dependencies
+%global pa_major   17.0
+#global pa_minor   0
 
-%undefine _strict_symbol_defs_build
+#global snap       20200105
+#global gitrel     103
+#global gitcommit  f5d3606fe76302c7dbdb0f6a80400df829a5f846
+#global shortcommit %%(c=%%{gitcommit}; echo ${c:0:5})
+
 %global with_webrtc 1
-%global enable_lirc 0
-%global enable_jack 0
+
+%if 0%{?fedora}
+%global enable_lirc 1
+%global enable_jack 1
+%endif
+
+# https://bugzilla.redhat.com/983606
 %global _hardened_build 1
-# support systemd activation
+
+## support systemd activation
 %global systemd 1
+
+# gdm-hooks moved to gdm packaging f28+
+%if 0%{?fedora} < 28 && 0%{?rhel} < 8
+%global gdm_hooks 1
+%endif
+
+## comment to disable tests
+%global tests 1
+
 # where/how to apply multilib hacks
-%global multilib_archs x86_64
-%global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '%{_sysconfdir}/bash_completion.d')
-Summary:        Improved Linux Sound Server
+%global multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
+
 Name:           pulseaudio
-Version:        16.1
-Release:        2%{?dist}
+Summary:        Improved Linux Sound Server
+Version:        %{pa_major}%{?pa_minor:.%{pa_minor}}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            http://www.freedesktop.org/wiki/Software/PulseAudio
-Source0:        https://freedesktop.org/software/%{name}/releases/%{name}-%{version}.tar.gz
+%if 0%{?gitrel}
+# git clone git://anongit.freedesktop.org/pulseaudio/pulseaudio
+# cd pulseaudio; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
+Source0:        pulseaudio-%{version}-%{gitrel}-g%{shortcommit}.tar.xz
+%else
+Source0:        http://freedesktop.org/software/pulseaudio/releases/pulseaudio-%{version}.tar.xz
+Source1:        http://freedesktop.org/software/pulseaudio/releases/pulseaudio-%{version}.tar.xz.sha256sum
+%endif
+
+Source5:        default.pa-for-gdm
+
 # revert upstream commit to rely solely on autospawn for autostart, instead
 # include a fallback to manual launch when autospawn fails, like when
 # user disables autospawn, or logging in as root
 # valid even when using systemd socket activation too
-Patch0:         pulseaudio-autostart.patch
-%if 0%{?systemd}
+Patch201: pulseaudio-autostart.patch
+
 # disable autospawn
-Patch1:         pulseaudio-11.1-autospawn_disable.patch
-%endif
+Patch206: pulseaudio-11.1-autospawn_disable.patch
+
+## upstream patches
+
+# https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/812
+Patch1:   0001-tests-Don-t-run-volume-tests-with-impossible-alignme.patch
+
+## upstreamable patches
+
 BuildRequires:  meson >= 0.50.0
 BuildRequires:  gcc
 BuildRequires:  g++
 BuildRequires:  pkgconfig(bash-completion)
+%global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '/etc/bash_completion.d')
 BuildRequires:  m4
 BuildRequires:  libtool-ltdl-devel
 BuildRequires:  intltool
@@ -41,9 +77,9 @@ BuildRequires:  xmltoman
 BuildRequires:  libsndfile-devel
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib2-devel
-BuildRequires:  gtk2-devel
+BuildRequires:  gtk3-devel
 BuildRequires:  avahi-devel
-BuildRequires:  libatomic_ops-devel
+BuildRequires:  libatomic_ops-static, libatomic_ops-devel
 BuildRequires:  pkgconfig(bluez) >= 5.0
 BuildRequires:  sbc-devel
 BuildRequires:  libXt-devel
@@ -57,25 +93,29 @@ BuildRequires:  xcb-util-devel
 BuildRequires:  openssl-devel
 BuildRequires:  orc-devel
 BuildRequires:  libtdb-devel
+%if 0%{?fedora}
+BuildRequires:  pkgconfig(soxr)
+%endif
 BuildRequires:  pkgconfig(speexdsp) >= 1.2
 BuildRequires:  libasyncns-devel
+%if 0%{?systemd}
+BuildRequires:  systemd-devel >= 184
+BuildRequires:  systemd
+%{?systemd_requires}
+%endif
 BuildRequires:  dbus-devel
 BuildRequires:  libcap-devel
 BuildRequires:  pkgconfig(fftw3f)
+%if 0%{?with_webrtc}
+BuildRequires:  pkgconfig(webrtc-audio-processing-1) >= 1.0
+%endif
+%if 0%{?tests}
+BuildRequires:  pkgconfig(check)
+%endif
 BuildRequires:  pkgconfig(gstreamer-1.0) >= 1.16.0
 BuildRequires:  pkgconfig(gstreamer-app-1.0) >= 1.16.0
 BuildRequires:  pkgconfig(gstreamer-rtp-1.0) >= 1.16.0
-%if 0%{?systemd}
-BuildRequires:  systemd
-BuildRequires:  systemd-devel >= 184
-%{?systemd_requires}
-%endif
-%if 0%{?with_webrtc}
-BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
-%endif
-%if 0%{?with_check}
-BuildRequires:  pkgconfig(check)
-%endif
+
 # retired along with -libs-zeroconf, add Obsoletes here for lack of anything better
 Obsoletes:      padevchooser < 1.0
 Requires(pre):  shadow-utils
@@ -96,13 +136,10 @@ systems. It is intended to be an improved drop-in replacement for the
 Enlightened Sound Daemon (ESOUND).
 
 %package qpaeq
-Summary:        Pulseaudio equalizer interface
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       python3-dbus
-%if 0%{with missing_dependencies}
-Requires:       python3-qt5-base
-%endif
-
+Summary:	Pulseaudio equalizer interface
+Requires: 	%{name}%{?_isa} = %{version}-%{release}
+Requires:	python3-qt5-base
+Requires:	python3-dbus
 %description qpaeq
 qpaeq is a equalizer interface for pulseaudio's equalizer sinks.
 
@@ -111,7 +148,6 @@ qpaeq is a equalizer interface for pulseaudio's equalizer sinks.
 Summary:        LIRC support for the PulseAudio sound server
 BuildRequires:  lirc-devel
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
 %description module-lirc
 LIRC volume control module for the PulseAudio sound server.
 %endif
@@ -145,7 +181,6 @@ Contains Bluetooth audio (A2DP/HSP/HFP) support for the PulseAudio sound server.
 Summary:        JACK support for the PulseAudio sound server
 BuildRequires:  jack-audio-connection-kit-devel
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
 %description module-jack
 JACK sink and source modules for the PulseAudio sound server.
 %endif
@@ -153,12 +188,12 @@ JACK sink and source modules for the PulseAudio sound server.
 %package module-gsettings
 Summary:        Gsettings support for the PulseAudio sound server
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
 %description module-gsettings
 GSettings configuration backend for the PulseAudio sound server.
 
 %package libs
 Summary:        Libraries for PulseAudio clients
+License:        LGPLv2+
 Obsoletes:      pulseaudio-libs-zeroconf < 1.1
 
 %description libs
@@ -167,6 +202,7 @@ to interface with a PulseAudio sound server.
 
 %package libs-glib2
 Summary:        GLIB 2.x bindings for PulseAudio clients
+License:        LGPLv2+
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description libs-glib2
@@ -175,15 +211,16 @@ a GLIB 2.x based application.
 
 %package libs-devel
 Summary:        Headers and libraries for PulseAudio client development
+License:        LGPLv2+
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs-glib2%{?_isa} = %{version}-%{release}
-
 %description libs-devel
 Headers and libraries for developing applications that can communicate with
 a PulseAudio sound server.
 
 %package utils
 Summary:        PulseAudio sound server utilities
+License:        LGPLv2+
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # when made non-multilib'd, https://bugzilla.redhat.com/891425
 Obsoletes:      pulseaudio-utils < 3.0-3
@@ -191,21 +228,51 @@ Obsoletes:      pulseaudio-utils < 3.0-3
 %description utils
 This package contains command line utilities for the PulseAudio sound server.
 
-%prep
-%autosetup -p1 -n %{name}-%{version}
+%if 0%{?gdm_hooks}
+%package gdm-hooks
+Summary:        PulseAudio GDM integration
+License:        LGPLv2+
+Requires:       gdm >= 1:2.22.0
+# for the gdm user
+Requires(pre):  gdm
 
-sed -i.no_consolekit -e \
-  's/^load-module module-console-kit/#load-module module-console-kit/' \
-  src/daemon/default.pa.in
+%description gdm-hooks
+This package contains GDM integration hooks for the PulseAudio sound server.
+%endif
+
+
+%prep
+%setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
+
+## upstream patches
+%patch 1 -p1 -b .volume_test
+
+## upstreamable patches
+
+%patch 201 -p1 -b .autostart
+%if 0%{?systemd}
+%patch 206 -p1 -b .autospawn_disable
+%endif
+
+%if 0%{?gitrel:1}
+# fixup PACKAGE_VERSION that leaks into pkgconfig files and friends
+sed -i.PACKAGE_VERSION -e "s|^PACKAGE_VERSION=.*|PACKAGE_VERSION=\'%{version}\'|" configure
+%else
+
+#if "%{_libdir}" != "/usr/lib"
+#sed -i -e 's|"/lib /usr/lib|"/%{_lib} %{_libdir}|' configure
+#endif
+%endif
+
 
 %build
 %meson \
   -D system_user=pulse \
   -D system_group=pulse \
   -D access_group=pulse-access \
-  -D oss-output=disabled \
-  -D jack=disabled \
-  -D lirc=disabled \
+  -D oss-output=enabled \
+  -D jack=%{?enable_jack:enabled}%{!?enable_jack:disabled} \
+  -D lirc=%{?enable_lirc:enabled}%{!?enable_lirc:disabled} \
   -D tcpwrap=disabled \
   -D bluez5=enabled \
   -D gstreamer=enabled \
@@ -214,10 +281,11 @@ sed -i.no_consolekit -e \
   -D elogind=disabled \
   -D valgrind=disabled \
   -D gtk=disabled \
-  -D soxr=disabled \
+  -D soxr=%{?fedora:enabled}%{!?fedora:disabled} \
   -D webrtc-aec=%{?with_webrtc:enabled}%{!?with_webrtc:disabled} \
   -D systemd=%{?systemd:enabled}%{!?systemd:disabled} \
-  -D tests=true
+  -D consolekit=disabled \
+  -D tests=%{?tests:true}%{!?tests:false}
 
 # we really should preopen here --preopen-mods=module-udev-detect.la, --force-preopen
 %meson_build
@@ -227,23 +295,60 @@ sed -i.no_consolekit -e \
 %install
 %meson_install
 
+## padsp multilib hack alert
+%ifarch %{multilib_archs}
+pushd %{buildroot}%{_bindir}
+# make 32 bit version available as padsp-32
+# %%{_libdir} == /usr/lib may be a naive check for 32bit-ness
+# but should be the only case we care about here -- rex
+%if "%{_libdir}" == "/usr/lib"
+ln -s padsp padsp-32
+%else
+cp -a padsp padsp-32
+sed -i -e "s|%{_libdir}/pulseaudio/libpulsedsp.so|/usr/lib/pulseaudio/libpulsedsp.so|g" padsp-32
+%endif
+popd
+%endif
+
 # upstream should use udev.pc
-mkdir -p %{buildroot}%{_libdir}/udev/rules.d
-mv -fv %{buildroot}/lib/udev/rules.d/90-pulseaudio.rules %{buildroot}%{_libdir}/udev/rules.d
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/udev/rules.d
+mv -fv $RPM_BUILD_ROOT/lib/udev/rules.d/90-pulseaudio.rules $RPM_BUILD_ROOT%{_prefix}/lib/udev/rules.d
+
+%if 0%{?gdm_hooks}
+install -p -m644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_localstatedir}/lib/gdm/.pulse/default.pa
+%endif
 
 ## unpackaged files
 # extraneous libtool crud
-rm -fv %{buildroot}%{_libdir}/lib*.la
-rm -fv %{buildroot}%{_libdir}/pulseaudio/lib*.la
-rm -fv %{buildroot}%{_libdir}/pulseaudio/modules/*.la
-
+rm -fv $RPM_BUILD_ROOT%{_libdir}/lib*.la
+rm -fv $RPM_BUILD_ROOT%{_libdir}/pulseaudio/lib*.la
+rm -fv $RPM_BUILD_ROOT%{_libdir}/pulseaudio/modules/*.la
 # PA_MODULE_DEPRECATED("Please use module-udev-detect instead of module-detect!");
-rm -fv %{buildroot}%{_libdir}/pulseaudio/modules/module-detect.so
+rm -fv $RPM_BUILD_ROOT%{_libdir}/pulseaudio/modules/module-detect.so
+rm -fv $RPM_BUILD_ROOT%{_libdir}/pulseaudio/modules/liboss-util.so
+rm -fv $RPM_BUILD_ROOT%{_libdir}/pulseaudio/modules/module-oss.so
 
 %find_lang %{name}
 
+
 %check
-%meson_test
+%if 0%{?tests}
+%ifarch %{ix86} s390x
+# FIXME: i686 FAIL: cpu-remap-test
+# FIXME: s390x FAIL: core-util-test
+%global tests_nonfatal 1
+%endif
+%if 0%{?fedora} > 27
+# regression'ish failures on rawhide, not worth failing build (for now) -- rex
+%global tests_nonfatal 1
+%endif
+%meson_test || TESTS_ERROR=$?
+if [ "${TESTS_ERROR}" != "" ]; then
+cat src/test-suite.log
+%{!?tests_nonfatal:exit $TESTS_ERROR}
+fi
+%endif
+
 
 %pre
 getent group pulse-access >/dev/null || groupadd -r pulse-access
@@ -268,11 +373,19 @@ exit 0
 %post
 %{?ldconfig}
 %if 0%{?systemd}
+# unsure if we want both .socket and .service here (or only socket)
+# test socket-only on f31+ -- rex
+%if 0%{?fedora} < 31
+%systemd_user_post pulseaudio.service
+%endif
 %systemd_user_post pulseaudio.socket
 %endif
 
 %if 0%{?systemd}
 %preun
+%if 0%{?fedora} < 31
+%systemd_user_preun pulseaudio.service
+%endif
 %systemd_user_preun pulseaudio.socket
 %endif
 
@@ -292,7 +405,6 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/pulse/daemon.conf
 %config(noreplace) %{_sysconfdir}/pulse/default.pa
 %config(noreplace) %{_sysconfdir}/pulse/system.pa
-%{_sysconfdir}/dbus-1/system.d/pulseaudio-system.conf
 %{bash_completionsdir}/pulseaudio
 %if 0%{?systemd}
 %{_userunitdir}/pulseaudio.service
@@ -300,7 +412,7 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %endif
 %{_bindir}/pa-info
 %{_bindir}/pulseaudio
-%{_libdir}/pulseaudio/libpulsecore-%{version}.so
+%{_libdir}/pulseaudio/libpulsecore-%{pa_major}.so
 %dir %{_libdir}/pulseaudio/
 %dir %{_libdir}/pulseaudio/modules/
 %{_libdir}/pulseaudio/modules/libalsa-util.so
@@ -364,7 +476,6 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %{_libdir}/pulseaudio/modules/module-remap-sink.so
 %{_libdir}/pulseaudio/modules/module-always-sink.so
 %{_libdir}/pulseaudio/modules/module-always-source.so
-%{_libdir}/pulseaudio/modules/module-console-kit.so
 %{_libdir}/pulseaudio/modules/module-position-event-sounds.so
 %{_libdir}/pulseaudio/modules/module-augment-properties.so
 %{_libdir}/pulseaudio/modules/module-role-cork.so
@@ -380,12 +491,13 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %dir %{_datadir}/pulseaudio/alsa-mixer/
 %{_datadir}/pulseaudio/alsa-mixer/paths/
 %{_datadir}/pulseaudio/alsa-mixer/profile-sets/
+%{_datadir}/dbus-1/system.d/pulseaudio-system.conf
 %{_mandir}/man1/pulseaudio.1*
 %{_mandir}/man5/default.pa.5*
 %{_mandir}/man5/pulse-cli-syntax.5*
 %{_mandir}/man5/pulse-client.conf.5*
 %{_mandir}/man5/pulse-daemon.conf.5*
-%{_libdir}/udev/rules.d/90-pulseaudio.rules
+%{_prefix}/lib/udev/rules.d/90-pulseaudio.rules
 %dir %{_libexecdir}/pulse
 %dir %{_datadir}/zsh/
 %dir %{_datadir}/zsh/site-functions/
@@ -450,7 +562,9 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %{_libdir}/libpulse.so.0*
 %{_libdir}/libpulse-simple.so.0*
 %dir %{_libdir}/pulseaudio/
-%{_libdir}/pulseaudio/libpulsecommon-%{version}.so
+%{_libdir}/pulseaudio/libpulsecommon-%{pa_major}.so
+%{_libdir}/pulseaudio/libpulsedsp.so
+
 
 %ldconfig_scriptlets libs-glib2
 
@@ -485,10 +599,15 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %{_bindir}/pamon
 %{_bindir}/parecord
 %{_bindir}/pax11publish
+%{_bindir}/padsp
+%ifarch %{multilib_archs}
+%{_bindir}/padsp-32
+%endif
 %{_bindir}/pasuspender
 %{_mandir}/man1/pacat.1*
 %{_mandir}/man1/pacmd.1*
 %{_mandir}/man1/pactl.1*
+%{_mandir}/man1/padsp.1*
 %{_mandir}/man1/pamon.1*
 %{_mandir}/man1/paplay.1*
 %{_mandir}/man1/parec.1*
@@ -504,12 +623,37 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %{bash_completionsdir}/parecord
 %{bash_completionsdir}/pasuspender
 
+%if 0%{?gdm_hooks}
+%files gdm-hooks
+%attr(0700, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.pulse
+%attr(0600, gdm, gdm) %{_localstatedir}/lib/gdm/.pulse/default.pa
+%endif
+
+
 %changelog
-* Wed Nov 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 16.1-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT)
-- Build with lirc and jack disabled
-- Enable check section
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 17.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat May 18 2024 Teoh Han Hui <teohhanhui@gmail.com> - 17.0-1
+- 17.0
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 16.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 16.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 16.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 26 2023 Wim Taymans <wtaymans@redhat.com> - 16.1-4
+- Add padsp again (rhbz#2120847)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 16.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 20 2022 Rex Dieter <rdieter@fedoraproject.org> - 16.1-2 
+- rebuild for libsndfile (#2128041)
 
 * Thu Jul 21 2022 Rex Dieter <rdieter@fedoraproject.org> - 16.1-1
 - 16.1

@@ -1,22 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 #
 # Copyright (C) 2011-2017 Red Hat, Inc
 #
+%bcond_without check
+%global debug_package %{nil}
+
+#%%global version_suffix -rc2
+#%%global release_suffix .test3
 
 Summary: Device-mapper Persistent Data Tools
 Name: device-mapper-persistent-data
-Version: 0.8.5
-Release: 6%{?dist}
-License: GPLv3+
-URL: https://github.com/jthornber/thin-provisioning-tools
-# Upstream source's hash is different from the Mariner one.
-# Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz
-Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
-Patch0: device-mapper-persistent-data-avoid-strip.patch
+Version: 1.0.12
+Release: 3%{?dist}%{?release_suffix}
+License: GPL-3.0-only AND (0BSD OR MIT OR Apache-2.0) AND Apache-2.0 AND (Apache-2.0 OR MIT) AND (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT) AND BSD-3-Clause AND MIT AND (MIT OR Apache-2.0) AND (MIT OR Zlib OR Apache-2.0) AND (Unlicense OR MIT) AND (Zlib OR Apache-2.0 OR MIT)
 
-BuildRequires: autoconf, expat-devel, libaio-devel, libstdc++-devel, boost-devel, gcc-c++
-Requires: expat
+#ExcludeArch: %%{ix86}
+URL: https://github.com/jthornber/thin-provisioning-tools
+#Source0: https://github.com/jthornber/thin-provisioning-tools/archive/thin-provisioning-tools-%%{version}.tar.gz
+Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}%{?version_suffix}.tar.gz
+Source1: dmpd1012-vendor.tar.gz
+Patch1: 0001-Tweak-cargo.toml-to-work-with-vendor-directory.patch
+Patch2: 0002-tests-Explicitly-set-the-pipe-size-for-triggering-EP.patch
+Patch3: 0003-tests-Fix-closing-the-pipe-fd-twice.patch
+
+%if %{defined rhel}
+BuildRequires: rust-toolset
+%else
+BuildRequires: rust-packaging
+BuildRequires: rust >= 1.35
+BuildRequires: cargo
+%endif
+BuildRequires: make
 
 %description
 thin-provisioning-tools contains check,dump,restore,repair,rmap
@@ -27,21 +40,34 @@ are included and era check, dump, restore and invalidate to manage
 snapshot eras
 
 %prep
-%setup -q -n thin-provisioning-tools-%{version}
-%patch 0 -p1 -b .avoid_strip
+%autosetup -p1 -n thin-provisioning-tools-%{version}%{?version_suffix} -a1
+%cargo_prep -v vendor
 echo %{version}-%{release} > VERSION
 
+%generate_buildrequires
+
 %build
-autoconf
-%configure --with-optimisation=
-make %{?_smp_mflags} V=
+#make %{?_smp_mflags} V=
+%cargo_build
+%cargo_license_summary
+%{cargo_license} > LICENSE.dependencies
+%cargo_vendor_manifest
 
 %install
-make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
+# TODO: Check that MANDIR is unused and remove
+%make_install MANDIR=%{_mandir} BINDIR=%{buildroot}%{_sbindir}
+
+%if %{with check}
+%check
+%cargo_test
+#cargo test --test thin_shrink -- --nocapture --test-threads=1
+%endif
 
 %files
-%license COPYING
 %doc README.md
+%license COPYING
+%license LICENSE.dependencies
+%license cargo-vendor.txt
 %{_mandir}/man8/cache_check.8.gz
 %{_mandir}/man8/cache_dump.8.gz
 %{_mandir}/man8/cache_metadata_size.8.gz
@@ -61,6 +87,8 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 %{_mandir}/man8/thin_restore.8.gz
 %{_mandir}/man8/thin_rmap.8.gz
 %{_mandir}/man8/thin_trim.8.gz
+%{_mandir}/man8/thin_metadata_pack.8.gz
+%{_mandir}/man8/thin_metadata_unpack.8.gz
 %{_sbindir}/pdata_tools
 %{_sbindir}/cache_check
 %{_sbindir}/cache_dump
@@ -81,18 +109,96 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 %{_sbindir}/thin_restore
 %{_sbindir}/thin_rmap
 %{_sbindir}/thin_trim
+%{_sbindir}/thin_metadata_pack
+%{_sbindir}/thin_metadata_unpack
 #% {_sbindir}/thin_show_duplicates
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-6
-- Updating naming for 3.0 version of Azure Linux.
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-5
-- Updating source URLs.
-- License verified.
+* Tue Jul 09 2024 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.0.12-2
+- Rebuilt for the bin-sbin merge
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Feb 27 2024 Marian Csontos <mcsontos@redhat.com> - 1.0.12-1
+- Update to latest upstream release 1.0.12.
+
+* Tue Feb 13 2024 Marian Csontos <mcsontos@redhat.com> - 1.0.11-4
+- Add licenses for statically linked libraries.
+
+* Tue Feb 13 2024 Marian Csontos <mcsontos@redhat.com> - 1.0.11-3
+- SPDX migration
+
+* Thu Feb 08 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 1.0.11-2
+- Update Rust macro usage
+
+* Thu Feb 08 2024 Marian Csontos <mcsontos@redhat.com> - 1.0.11-1
+- Update to latest upstream release 1.0.11.
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 11 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.9-1
+- Update to latest upstream release 1.0.9.
+
+* Thu Aug 31 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.6-2
+- Fix broken installation on ppc64le caused by incorrect ioctl call.
+
+* Wed Aug 09 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.6-1
+- Update to latest upstream release 1.0.6.
+
+* Thu Jul 27 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.5-1
+- Update to latest upstream release 1.0.5.
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May 30 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.0.4-2
+- Use rust-toolset in RHEL builds
+
+* Fri Apr 28 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.4-1
+- Update to latest upstream release 1.0.4.
+
+* Wed Mar 22 2023 Marian Csontos <mcsontos@redhat.com> - 1.0.3-1
+- Update to latest upstream release 1.0.3.
+
+* Sun Feb 05 2023 Fabio Valentini <decathorpe@gmail.com> - 0.9.0-10
+- Rebuild for fixed frame pointer compiler flags in Rust RPM macros.
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Marian Csontos <mcsontos@redhat.com> - 0.9.0-6
+- Fix rust-1.53 compilation issues.
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 10 2021 Marian Csontos <mcsontos@redhat.com> - 0.9.0-4
+- Fix gating test syntax.
+- Fix important issues found by static analysis.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Sep 21 2020 Marian Csontos <mcsontos@redhat.com> - 0.9.0-2
+- Update crc32c to version 0.5 supporting non x86 architectures
+
+* Thu Sep 17 2020 Marian Csontos <mcsontos@redhat.com> - 0.9.0-1
+- Update to latest upstream version
+- New tools thin_metadata_pack and thin_metadata_unpack
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

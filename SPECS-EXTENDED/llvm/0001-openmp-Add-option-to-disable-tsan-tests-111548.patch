@@ -1,0 +1,62 @@
+From b2edeb58b8cb3268acee425cd52b406eb60a8095 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Wed, 9 Oct 2024 11:29:30 +0200
+Subject: [PATCH] [openmp] Add option to disable tsan tests (#111548)
+
+This adds a OPENMP_TEST_ENABLE_TSAN option that allows to override
+whether tests using tsan will be enabled. The option defaults to the
+existing auto-detection.
+
+The background here is
+https://github.com/llvm/llvm-project/issues/111492, where we have some
+systems where tsan doesn't work, but we do still want to build it and
+run tests that don't use tsan.
+---
+ openmp/cmake/OpenMPTesting.cmake          | 3 +++
+ openmp/tools/archer/tests/CMakeLists.txt  | 2 +-
+ openmp/tools/archer/tests/lit.site.cfg.in | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/openmp/cmake/OpenMPTesting.cmake b/openmp/cmake/OpenMPTesting.cmake
+index c67ad8b1cbd9..14cc5c67d84c 100644
+--- a/openmp/cmake/OpenMPTesting.cmake
++++ b/openmp/cmake/OpenMPTesting.cmake
+@@ -163,6 +163,9 @@ else()
+   set(OPENMP_TEST_COMPILER_HAS_OMIT_FRAME_POINTER_FLAGS 1)
+ endif()
+ 
++set(OPENMP_TEST_ENABLE_TSAN "${OPENMP_TEST_COMPILER_HAS_TSAN_FLAGS}" CACHE BOOL
++    "Whether to enable tests using tsan")
++
+ # Function to set compiler features for use in lit.
+ function(update_test_compiler_features)
+   set(FEATURES "[")
+diff --git a/openmp/tools/archer/tests/CMakeLists.txt b/openmp/tools/archer/tests/CMakeLists.txt
+index 5de91148fa4b..412c7d63725e 100644
+--- a/openmp/tools/archer/tests/CMakeLists.txt
++++ b/openmp/tools/archer/tests/CMakeLists.txt
+@@ -28,7 +28,7 @@ macro(pythonize_bool var)
+ endmacro()
+ 
+ pythonize_bool(LIBARCHER_HAVE_LIBATOMIC)
+-pythonize_bool(OPENMP_TEST_COMPILER_HAS_TSAN_FLAGS)
++pythonize_bool(OPENMP_TEST_ENABLE_TSAN)
+ 
+ set(ARCHER_TSAN_TEST_DEPENDENCE "")
+ if(TARGET tsan)
+diff --git a/openmp/tools/archer/tests/lit.site.cfg.in b/openmp/tools/archer/tests/lit.site.cfg.in
+index 55edfde9738e..ddcb7b8bc3a5 100644
+--- a/openmp/tools/archer/tests/lit.site.cfg.in
++++ b/openmp/tools/archer/tests/lit.site.cfg.in
+@@ -12,7 +12,7 @@ config.omp_library_dir = "@LIBOMP_LIBRARY_DIR@"
+ config.omp_header_dir = "@LIBOMP_INCLUDE_DIR@"
+ config.operating_system = "@CMAKE_SYSTEM_NAME@"
+ config.has_libatomic = @LIBARCHER_HAVE_LIBATOMIC@
+-config.has_tsan = @OPENMP_TEST_COMPILER_HAS_TSAN_FLAGS@
++config.has_tsan = @OPENMP_TEST_ENABLE_TSAN@
+ 
+ config.test_archer_flags = "@LIBARCHER_TEST_FLAGS@"
+ config.libarcher_obj_root = "@CMAKE_CURRENT_BINARY_DIR@"
+-- 
+2.46.0
+

@@ -1,0 +1,33 @@
+commit 2f37f74ea25f850835b22fa617938264bd158134
+Author: William Cohen <wcohen@redhat.com>
+Date:   Thu Apr 25 10:55:36 2024 -0400
+
+    SDE_LIB: Build libsde.so.1.0 with the CFLAGS and LDFLAGS passed in
+    
+    A recent annocheck of the papi RPMS showed that libsde.so.1.0 was not
+    built with the expected flags passed into the RPM build.  Minor
+    changes were made to src/sde_lib/Makefile to use the CFLAGS and
+    LDFLAGS passed in.
+
+diff --git a/src/sde_lib/Makefile b/src/sde_lib/Makefile
+index 67ef5987..8518f92e 100644
+--- a/src/sde_lib/Makefile
++++ b/src/sde_lib/Makefile
+@@ -1,7 +1,7 @@
+ CC ?= gcc
+ SDE_INC = -I. -I..
+ SDE_LD = -ldl -pthread
+-CFLAGS = -Wextra -Wall -O2
++CFLAGS += -Wextra -Wall -O2
+ 
+ %_d.o: %.c
+ 		$(CC) -c -Bdynamic -fPIC -shared -fvisibility=hidden $(CFLAGS) $(SDE_INC) $< -o $@
+@@ -14,7 +14,7 @@ SOBJS=$(patsubst %.c,%_s.o,$(wildcard *.c))
+ all: dynamic static
+ 
+ dynamic: $(DOBJS)
+-	$(CC) -Bdynamic -fPIC -shared -Wl,-soname -Wl,libsde.so -fvisibility=hidden $(CFLAGS) $(DOBJS) -lrt -ldl -pthread -o libsde.so.1.0
++	$(CC) $(LDFLAGS) -Bdynamic -fPIC -shared -Wl,-soname -Wl,libsde.so -fvisibility=hidden $(CFLAGS) $(DOBJS) -lrt -ldl -pthread -o libsde.so.1.0
+ 	rm -f *_d.o
+ 
+ static: $(SOBJS)

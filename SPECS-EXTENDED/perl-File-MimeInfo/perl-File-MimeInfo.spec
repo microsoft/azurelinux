@@ -4,61 +4,74 @@
 %else
 %{bcond_with perl_File_MimeInfo_enables_optional_test}
 %endif
-# Require shared-mime-info to suppress warnings about missing
-# /usr/share/mime/globs
-%{bcond_without perl_File_MimeInfo_enables_shared_mime_info}
+# Use IO::Scalar to support processing a standard input in a mimetype tool
+%{bcond_without perl_File_MimeInfo_enables_stdin}
+# Use Pod::Usage to support printing a usage text by a mimetype tool
+%{bcond_without perl_File_MimeInfo_enables_usage}
 
 Name:           perl-File-MimeInfo
-Version:        0.29
-Release:        7%{?dist}
+Version:        0.35
+Release:        2%{?dist}
 Summary:        Determine file type and open application
-License:        GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-MimeInfo
-Source0:        https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-%{version}.tar.gz#/perl-File-MimeInfo-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  findutils
+BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(bytes)
 BuildRequires:  perl(Carp)
+BuildRequires:  perl(Encode)
+BuildRequires:  perl(Encode::Locale)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(File::BaseDir) >= 0.03
 BuildRequires:  perl(File::DesktopEntry) >= 0.04
 BuildRequires:  perl(File::Spec)
+# Optional run-time:
+%if %{with perl_File_MimeInfo_enables_stdin}
+BuildRequires:  perl(IO::Scalar)
+%endif
+%if %{with perl_File_MimeInfo_enables_usage}
+BuildRequires:  perl(Pod::Usage)
+%endif
 # Tests:
 BuildRequires:  perl(FindBin)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(Test::More) >= 0.88
+# Needed for creating of mimeinfo.cache in tests
+BuildRequires:  desktop-file-utils
+# t/11mimeinfo.t executes ./mimetype that returns an unexpected MIME type
+# without shared-mime-info database
+BuildRequires:  shared-mime-info 
 %if %{with perl_File_MimeInfo_enables_optional_test}
 # Optional tests:
 %if !%{defined perl_bootstrap}
 # Break build cycle: perl-Path-Tiny → perl-Unicode-UTF8 →
-# perl-Module-Install-ReademFromPod → perl-IO-All → perl-File-MimeInfo
+# perl-Module-Install-ReadmeFromPod → perl-IO-All → perl-File-MimeInfo
 BuildRequires:  perl(Path::Tiny)
 %endif
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
-%if %{with perl_File_MimeInfo_enables_shared_mime_info}
-# needed for some tests otherwise there are warnings
-BuildRequires:  shared-mime-info 
+# Test::Pod::No404s not used
 %endif
-%endif
-%if %{with perl_File_MimeInfo_enables_shared_mime_info}
-# there is also a mimeinfo.cache file created by desktop-file-utils
-# needed. It won't be there if building in a chroot, even if 
-# desktop-file-utils is installed if desktop-file-utils was never run.
-Requires:       shared-mime-info
-%endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::BaseDir) >= 0.03
 Requires:       perl(File::DesktopEntry) >= 0.04
+%if %{with perl_File_MimeInfo_enables_stdin}
+Recommends:     perl(IO::Scalar)
+%endif
+%if %{with perl_File_MimeInfo_enables_usage}
+Recommends:     perl(Pod::Usage)
+%endif
+# It's optional, but without it File::MimeInfo produces an annoying warning
+# about a missing /usr/share/mime/globs and returns inaccurate results.
+Recommends:     shared-mime-info
 
 # Filter under-specified dependencies
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((File::BaseDir|File::DesktopEntry)\\)$
@@ -67,19 +80,48 @@ Requires:       perl(File::DesktopEntry) >= 0.04
 This module can be used to determine the mime type of a file. It tries to
 implement the freedesktop specification for a shared MIME database.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       desktop-file-utils
+Requires:       perl-Test-Harness
+Requires:       shared-mime-info
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n File-MimeInfo-%{version}
+# Remove test, which tests tool app in different place.
+rm -f t/11mimeinfo.t
+# Fix permissions
+chmod -x t/default/binary_file
+chmod -x t/magic/application_x-executable
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
+unset EXTENDED_TESTING
 make test
 
 %files
@@ -90,9 +132,79 @@ make test
 %{_mandir}/man1/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.29-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.35-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Apr 26 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.35-1
+- 0.35 bump (rhbz#2277224)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 04 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.34-1
+- 0.34 bump (rhbz#2252645)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 13 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.33-1
+- 0.33 bump
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.32-3
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.32-2
+- Perl 5.36 rebuild
+
+* Mon Mar 07 2022 Michal Josef Špaček <mspacek@redhat.com> - 0.32-1
+- 0.32 bump
+- Package tests
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 06 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.31-1
+- 0.31 bump
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-4
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Oct 27 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-1
+- 0.30 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.29-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.29-9
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.29-8
+- Perl 5.32 rebuild
+
+* Tue Jun 23 2020 Petr Pisar <ppisar@redhat.com> - 0.29-7
+- Specify all dependencies
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.29-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

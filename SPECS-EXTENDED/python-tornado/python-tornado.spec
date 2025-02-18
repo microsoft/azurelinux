@@ -1,90 +1,171 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+## START: Set by rpmautospec
+## (rpmautospec version 0.6.5)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 8;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 %global srcname tornado
+%global common_description %{expand:
+Tornado is an open source version of the scalable, non-blocking web
+server and tools.
+
+The framework is distinct from most mainstream web server frameworks
+(and certainly most Python frameworks) because it is non-blocking and
+reasonably fast. Because it is non-blocking and uses epoll, it can
+handle thousands of simultaneous standing connections, which means it is
+ideal for real-time web services.}
 
 Name:           python-%{srcname}
-Version:        6.2.0
-Release:        1%{?dist}
+Version:        6.3.3
+Release:        %autorelease
 Summary:        Scalable, non-blocking web server and tools
 
-License:        ASL 2.0
-URL:            http://www.tornadoweb.org
-Source0:        https://github.com/tornadoweb/%{srcname}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+License:        Apache-2.0 
+URL:            https://www.tornadoweb.org
+Source0:        https://github.com/tornadoweb/tornado/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 # Do not turn DeprecationWarning in tornado module into Exception
 # fixes FTBFS with Python 3.8
 Patch1:         Do-not-turn-DeprecationWarning-into-Exception.patch
+# Fixes for Python 3.12 - rebased
+# https://github.com/tornadoweb/tornado/pull/3288
+Patch2:         python-tornado-Python-3.12.patch
+
+# Compatibility with pytest 8
+Patch3:         https://github.com/tornadoweb/tornado/pull/3374.patch
 
 BuildRequires:  gcc
+BuildRequires:  python3-devel
 
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-devel
+%description %{common_description}
 
-%description
-Tornado is an open source version of the scalable, non-blocking web
-server and tools.
+%package -n python3-%{srcname}
+Summary:        %{summary}
 
-The framework is distinct from most mainstream web server frameworks
-(and certainly most Python frameworks) because it is non-blocking and
-reasonably fast. Because it is non-blocking and uses epoll, it can
-handle thousands of simultaneous standing connections, which means it is
-ideal for real-time web services.
-
-%package -n python%{python3_pkgversion}-%{srcname}
-Summary:        Scalable, non-blocking web server and tools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-Requires:       python%{python3_pkgversion}-pycurl
-
-%description -n python%{python3_pkgversion}-%{srcname}
-Tornado is an open source version of the scalable, non-blocking web
-server and tools.
-
-The framework is distinct from most mainstream web server frameworks
-(and certainly most Python frameworks) because it is non-blocking and
-reasonably fast. Because it is non-blocking and uses epoll, it can
-handle thousands of simultaneous standing connections, which means it is
-ideal for real-time web services.
+%description -n python3-%{srcname} %{common_description}
 
 %package doc
-Summary:        Examples for python-tornado
-Obsoletes:      python%{python3_pkgversion}-%{srcname}-doc < 4.2.1-3
-Provides:       python%{python3_pkgversion}-%{srcname}-doc = %{version}-%{release}
+Summary:        Examples for %{name}
 
-%description doc
-Tornado is an open source version of the scalable, non-blocking web
-server and and tools. This package contains some example applications.
+%description doc %{common_description}
 
-%prep 
+This package contains some example applications.
+
+%prep
 %autosetup -p1 -n %{srcname}-%{version}
-# remove shebang from files
-%{__sed} -i.orig -e '/^#!\//, 1d' *py tornado/*.py tornado/*/*.py
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 %check
-export ASYNC_TEST_TIMEOUT=10
-%{__python3} -m tornado.test.runtests --verbose
+# Skip the same timing-related tests that upstream skips when run in Travis CI.
+# https://github.com/tornadoweb/tornado/commit/abc5780a06a1edd0177a399a4dd4f39497cb0c57
+export TRAVIS=true
 
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE
+# Increase timeout for tests on riscv64
+%ifarch riscv64
+export ASYNC_TEST_TIMEOUT=80
+%endif
+
+%{py3_test_envvars} %{python3} -m tornado.test
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.rst
-%{python3_sitearch}/%{srcname}/
-%{python3_sitearch}/%{srcname}-*.egg-info
 
 %files doc
+%license LICENSE
 %doc demos
 
 %changelog
-* Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-1
-- Bump version
-- License verified
+## START: Generated by rpmautospec
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.3.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.0.3-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 6.3.3-7
+- Rebuilt for Python 3.13
+
+* Thu May 09 2024 Tomáš Hrnčiar <thrnciar@redhat.com> - 6.3.3-6
+- Backport upstream patch needed for compatibility with pytest 8
+
+* Sat Feb 24 2024 David Abdurachmanov <davidlt@rivosinc.com> - 6.3.3-5
+- Increase timeout for tests on riscv64
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.3.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Aug 11 2023 Gwyn Ciesla <gwync@protonmail.com> - 6.3.3-1
+- 6.3.3
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.3.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 22 2023 Orion Poplawski <orion@nwra.com> - 6.3.2-4
+- Add upstream patch for Python 3.12 support
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 6.3.2-3
+- Rebuilt for Python 3.12
+
+* Tue May 23 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 6.3.2-2
+- Avoid tox dependency
+
+* Tue May 16 2023 Orion Poplawski <orion@nwra.com> - 6.3.2-1
+- Update to 6.3.2
+
+* Wed Mar 08 2023 Gwyn Ciesla <gwync@protonmail.com> - 6.2.0-4
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 07 2022 Carl George <carl@george.computer> - 6.2.0-1
+- Latest upstream, resolves rhbz#1883858
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 6.1.0-7
+- Rebuilt for Python 3.11
+
+* Tue Feb 08 2022 Carl George <carl@george.computer> - 6.1.0-6
+- Convert to pyproject macros
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 6.1.0-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Nov 03 2020 Fabian Affolter <mail@fabian-affolter.ch> -6.1.0-1
+- Update to latest upstream release 6.1.0 (#1883858)
+
+* Sun Sep 13 2020 Fabian Affolter <mail@fabian-affolter.ch> - 6.0.4-1
+- Update to latest upstream release 6.0.3 (#1809858)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 6.0.3-2
+- Rebuilt for Python 3.9
 
 * Mon Feb 24 2020 Peter Robinson <pbrobinson@fedoraproject.org> - 6.0.3-1
 - Update to 6.0.3
@@ -307,3 +388,4 @@ export ASYNC_TEST_TIMEOUT=10
 * Thu Sep 10 2009 Ionuț Arțăriși <mapleoin@lavabit.com> - 0.1-1
 - Initial release
 
+## END: Generated by rpmautospec

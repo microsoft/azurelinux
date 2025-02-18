@@ -1,0 +1,555 @@
+From a1a78e31b1a577263df6634d9ba906e790409802 Mon Sep 17 00:00:00 2001
+From: Jarek Prokop <jprokop@redhat.com>
+Date: Fri, 9 Feb 2024 16:42:39 +0100
+Subject: [PATCH] Set CA:TRUE for ca-cert.pem used in SSL tests.
+
+Since OpenSSL 3.2, setting CA:TRUE seems to be required, otherwise
+we will get an error when trying to use CA file without the field.
+Example of such error using the openssl verify command:
+
+```
+$ openssl verify -CAfile ca-cert.pem client-cert.pem
+CN=ca_mysql2gem
+error 79 at 1 depth lookup: invalid CA certificate
+error client-cert.pem: verification failed
+```
+---
+ spec/ssl/ca-cert.pem          | 31 ++++++++++----------
+ spec/ssl/ca-key.pem           | 55 ++++++++++++++++++-----------------
+ spec/ssl/ca.cnf               |  4 +++
+ spec/ssl/cert.cnf             |  4 +++
+ spec/ssl/client-cert.pem      | 26 ++++++++---------
+ spec/ssl/client-key.pem       | 55 ++++++++++++++++++-----------------
+ spec/ssl/client-req.pem       | 24 +++++++--------
+ spec/ssl/gen_certs.sh         |  6 +++-
+ spec/ssl/pkcs8-client-key.pem | 52 ++++++++++++++++-----------------
+ spec/ssl/pkcs8-server-key.pem | 52 ++++++++++++++++-----------------
+ spec/ssl/server-cert.pem      | 26 ++++++++---------
+ spec/ssl/server-key.pem       | 55 ++++++++++++++++++-----------------
+ spec/ssl/server-req.pem       | 24 +++++++--------
+ 13 files changed, 215 insertions(+), 199 deletions(-)
+
+diff --git a/spec/ssl/ca-cert.pem b/spec/ssl/ca-cert.pem
+index cf9b8d511..632cdeb71 100644
+--- a/spec/ssl/ca-cert.pem
++++ b/spec/ssl/ca-cert.pem
+@@ -1,17 +1,18 @@
+ -----BEGIN CERTIFICATE-----
+-MIICqjCCAZICCQDbDS+Z2mpWkDANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxj
+-YV9teXNxbDJnZW0wHhcNMTUwOTA5MDQ1NzIxWhcNMjUwNzE4MDQ1NzIxWjAXMRUw
+-EwYDVQQDDAxjYV9teXNxbDJnZW0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+-AoIBAQDFnpc22lPFtdPELsIffsDt8cD2Hkt47nGMcKQ9n4U98yAg+fodipyP1Bn0
+-2OeaONqpttJIET7HxlGrtugPtV/O8XZHlhfAHrRUDMFZJhgnnqK+c/7fRGeB0Eqw
+-ljBlRD/dDL3bFq5hVBC9QsGi5k03r+xLPKm5ccAr4WtofcoKXqEbSO6koTSrsGG5
+-7inlldM2AVzrY2kXbe0jAyNvYmDL2ycN8G2wObogPWDfITQRhOxfkzKIQiEhQF2Y
+-/DlhT7IbIarBIm6abf6JxZ6/Sm5XyVNEWOnryXM6rKyVeGktCxLHNmxx5eKYs440
+-8hNgURa8pB+aZaiokkwhM1+jmE83AgMBAAEwDQYJKoZIhvcNAQELBQADggEBACrQ
+-umqygXkkbff5Jqf6AYi30U3c+byX+IButRKXN9Ete2LPcT76o/snS9Lexf3KQsIy
+-a2Tcc9adak7pBf7FgHdiZkWiQp3MDgx2gJu6Uu6TNzfT8jy2JrHyBWw4ydEvhyA8
+-cgelTHSaudafKeQgU4KYc8bqafYFILkWxPzgtwitENIDfx/SHt65BWaQZjYJlFou
+-zPZXeoT3lAwKGYqIvwPvBTC23cXg/Swt/mcKe3/Xxjx85Dw/9vi6a9+VQwlOojgd
+-w2o07xkIcJcI0Oxyp3mD0U5wAmBQGI76Yi9ZDROHF65KEXfQ3tYKl2vR7CXpcJ4+
+-7+fVsE8+dADJdZIiuaA=
++MIIC7jCCAdagAwIBAgIUf1RggahC+P3zuvdDnArIrPylegwwDQYJKoZIhvcNAQEL
++BQAwFzEVMBMGA1UEAwwMY2FfbXlzcWwyZ2VtMB4XDTI0MDIwOTE1NDkyOFoXDTMz
++MTIxODE1NDkyOFowFzEVMBMGA1UEAwwMY2FfbXlzcWwyZ2VtMIIBIjANBgkqhkiG
++9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuEAFH4rhTMGs1bIHJgWvbsgNZBc2TrjPX0Jf
++3kdHvq1u0bHuaYFUyY/yXoOchHbDvRYx1WL2jSkJuc2JMYN1V+j4EUtG9KAt4dqx
++LNTy6SxpQeMKEqtiTNc9aMR8cAxliSZSj/Qn6JpcSJPE/loIPdEC/MTo7ONcJ0xQ
++5LymZqnuKZGw8L2UzZ+Zof3cYr2nPLoZDGtBsDDf5W184nl0MqTonu6/+raL/4C+
++3Smy/5IOcJzRfvw6Nc/bvi9eWkypNZzG3XaSO6K5d399KLn0mf9ZbXy5bq9klCUI
++seIhmA77vzaBOwdQUJKKijKGqlTahfoAiUV3AgcoxAnytKraVwIDAQABozIwMDAP
++BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBScsUBgsDMWnhPO1njE2uD6P7gr9TAN
++BgkqhkiG9w0BAQsFAAOCAQEAQbKVJ2eDt/99lnHGr3uFgVzWr26QomGfWysHhwHf
++9pgS2KKbT7u/MGgWMi2jpXAJFCeRD2v/b5lRpeI03ZGuTJ0zqlItXzlBY6bND3KB
++AyJ5orfJu0NVwhjFZdnGH1IQVWjMW8pt8WzopYRyyfnqpbwE2e8wJUgOo9LDgJm8
++mK4bcpRVbvS2fo+g+CZ9HXzOXpL0m4gbsnPjeulmtSTXFX1/t00Hw+Gt2POB2A0h
++VNFKxS08uohPq49+MNeaTA0CjQdpG09lh7Cua/mSgzmYvWF9iYJpsBggzDUi7hab
++T07GzSz0fpfb35RAtsghgCyxaW7M3fAaztVJaKPDB4SfUw==
+ -----END CERTIFICATE-----
+diff --git a/spec/ssl/ca-key.pem b/spec/ssl/ca-key.pem
+index bbdadb7cf..5deca5740 100644
+--- a/spec/ssl/ca-key.pem
++++ b/spec/ssl/ca-key.pem
+@@ -1,27 +1,28 @@
+------BEGIN RSA PRIVATE KEY-----
+-MIIEpQIBAAKCAQEAxZ6XNtpTxbXTxC7CH37A7fHA9h5LeO5xjHCkPZ+FPfMgIPn6
+-HYqcj9QZ9NjnmjjaqbbSSBE+x8ZRq7boD7VfzvF2R5YXwB60VAzBWSYYJ56ivnP+
+-30RngdBKsJYwZUQ/3Qy92xauYVQQvULBouZNN6/sSzypuXHAK+FraH3KCl6hG0ju
+-pKE0q7Bhue4p5ZXTNgFc62NpF23tIwMjb2Jgy9snDfBtsDm6ID1g3yE0EYTsX5My
+-iEIhIUBdmPw5YU+yGyGqwSJumm3+icWev0puV8lTRFjp68lzOqyslXhpLQsSxzZs
+-ceXimLOONPITYFEWvKQfmmWoqJJMITNfo5hPNwIDAQABAoIBAQClkmtFRQVdKCum
+-Ojrg4nVIpv2x983qI3U1YobpLocXUWVA29BIAgOMqfuZXkYlu67Q9OEYCoLcJHf2
+-88dYqfD81OfxsHpzuAYESa+RPs6MG2hlQ5BuhcRnShnZ++vOXLFZRjynnEg8OY/Q
+-0makUmqt1pKWstvNCNYmrbYtFP87UXQCF06zkhM0cZJvVt0gPZGUituWI0uAoE51
+-U8+WSwD/T761BHM6BuMn56mfZkP5jeVIFl0iFha9rGR0Z6K8mVQAYQAUtUx9tN/3
+-a8fEOcYulq/9R5tMRWtsF8LD8DGQBNkY3e/WKDuZtLw2Dl3L09gxVH9DXCLiYU5d
+-OG3JmqDpAoGBAP08yq143H4n6yGT9DC8YjaLgN0VoenK21CEqhwtGWipc/kbGooe
+-/jaHl6bo9v1GOGlJieqSUqsXNltS7FOLhGFAQFwMYZ3V/h15Vx23Z+xkCCHIB6HH
+-YJZqkQY7Jt86wXcaLU5j9fxM+BY+8Ets4bVhZN9Ai6AnlTz0+d8UJG+bAoGBAMfG
+-efYrdjTKI5eK9aiVJyoh57BEPOsTsave2U+R8Q+fErQ0QD0UmbWgwYGgkPuDrFYT
+-owg09EEz88KONv18VZ+mB1qfyQUoOL6rWIGxXC08upy2i9100PaBFiYlkLNoK7yJ
+-bze0rFSiFclJJXZGzEaVvcEdKnXxfhttaJwQGK6VAoGBAOQEUvJzuwWU5/CqCdvA
+-JCa84eEv00RxtZwAeDM6oIBO4+/O6cyoL3nmCTTu20YebjjPUHF4IxuOoREFz2lC
+-XIY8ljbLpzG5N0BOu5Q0SkzdnTzdoZGXtm55se+MX2nsu7qERXsqIpl0rIVLUo53
+-kZwCABPNSGuCeKwUYNDukAg1AoGBALiHHSqEVKhIOn4FDgqM0uM49CA9t6NPyqI9
+-sq6r2GWcgpNPXDLPL3e0KGlK3gBkTLApbULsXt1HVpZT9HlJ+nD/0/UieHS6BUgh
+-Txxkrgbe/GQ6vZBuEYJQFBxiQHlm9Fcu/zsOOMvn94W4edD5bkCYmfChtxHAYcKF
+-2cWlnJbNAoGAWMV4GIY2DYlztXdyMVuPwsjPcSPMmL8Nc2ATWYRfcoG0Zl0yvwPh
+-2VOu7Q/7bNF2LOe6lPe1hoeB6rT44IYZaWMo3ikY8xW9RztOLSv8E9uE1K9yq8OA
+-P8QzXmr1Lga+hoEmMHc2biEJNeF6iAcAFfrHj9Sr7w5PC8g4A3PlCvU=
+------END RSA PRIVATE KEY-----
++-----BEGIN PRIVATE KEY-----
++MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC4QAUfiuFMwazV
++sgcmBa9uyA1kFzZOuM9fQl/eR0e+rW7Rse5pgVTJj/Jeg5yEdsO9FjHVYvaNKQm5
++zYkxg3VX6PgRS0b0oC3h2rEs1PLpLGlB4woSq2JM1z1oxHxwDGWJJlKP9CfomlxI
++k8T+Wgg90QL8xOjs41wnTFDkvKZmqe4pkbDwvZTNn5mh/dxivac8uhkMa0GwMN/l
++bXzieXQypOie7r/6tov/gL7dKbL/kg5wnNF+/Do1z9u+L15aTKk1nMbddpI7orl3
++f30oufSZ/1ltfLlur2SUJQix4iGYDvu/NoE7B1BQkoqKMoaqVNqF+gCJRXcCByjE
++CfK0qtpXAgMBAAECggEAM5T8ujFr1MzN4b+m/66MyDNqiFB1TEGyEKWo6DZFcCzm
++vv8U02W5QnqxrGMlMPJ85xVtGyPLCYbpKaLQm1OFyPg4ZsMP2NF1Nus+OeJeJQhh
++aWgx/DsN2JxTnV6Qxd+6l1RqvdFpUNXSKyFvf5PeBcxbjT9lRFh8hqX3aaok3c2P
++Z4sROHNqgXe/mnCXv3nkUQXct7oFgdeMR6Zy8GFNxMaxvFhCmT+Q0NFf0hqp6/at
++b/P0+tZYjp7PkvCkCo2Z7MCdsnI1BNn5ggtdqhLs9tu1f6iwMH0z3tKkWXkX1dJC
++Ad0G30qfv6A9IOEWevwJyuVcp9onRmcUaaVNSascbQKBgQD4ITxJcIE3MAtK1W7q
++vvEm64i2ay5XfBhoi2oik3+MVlzY2dRiGOEffvysK1Xls8VlLT/RSZVWLjJ+EvrH
++DJZmbl972UFvYt5JGEv53YYD0kJ1fQvkLA9//Xkg6Wdac+7BzHxc09fV1k2mUvpH
++jJs7JSgLDwVvvU9+vs3eFWWAiwKBgQC+GBgARwb2NKEfXRtyT+X7Z0jmQoQCJDr7
++34D7p5u6lRShlzZNFvwbc5YAIXNNuveqTsrKL57yo4vzNHpDzpXj+kdFIKGAXzXN
++BoohGCtIQrrXYGONUubvk3njlOrppdD9kMN+ioHVp/Gm9Dxrn+0HKtzALn7pgZa7
++IzA/3Mpa5QKBgEOfozOMotqskFdLxdfaRBTMWk0E9vNG0cwkOr/DnR5dJx6+dyBp
++EWmpDSnLAbUBgomphFwAht+e5YnwmEIJTzAJYqJ5OlkmA9i9827cjbqa4hvtAYGk
++9HB4Xzu2AMHpGKfemAIghhE0P6NVt/op+uBqpvgkluG2IWU0kRy2jhwzAoGAbWl+
++vwIirqkiJ+Q2PPhh3e7X1bhpNLZXwMsm+THCf4T5J/zZw0s8dix0JMUcEZxQmpTZ
++QcBhEzUxAx2sVcTdHyfZx579dd7XH5fo/x1jJCdMVVTkV95kj3ZpzKTVBQBsptWg
++v//GtQwCGd8vu56EFgEEqBTa9VmiQToCtm9FhUUCgYEAwMtvoKM7N9WawAVEeUWG
++oDoJhhbnCHvg7ohNEymfsfHaHNUs/WXgk9mHTqY9lkMrnEmO71z8LPw0q67UbiIx
++58MWCpDcOzzNrmXKEbZQ380qYezOFffuvkDKAAl2OmxSAbKLvV/5/vAAEXyBJe2u
++brUtxFuKTvZbuCZU+L04y8I=
++-----END PRIVATE KEY-----
+diff --git a/spec/ssl/ca.cnf b/spec/ssl/ca.cnf
+index 07374ad3e..6e98bd981 100644
+--- a/spec/ssl/ca.cnf
++++ b/spec/ssl/ca.cnf
+@@ -6,6 +6,10 @@ default_startdate = 2015010360000Z
+ [ req ]
+ distinguished_name = req_distinguished_name
+ 
++# Root CA certificate extensions
++[ v3_ca ]
++basicConstraints = critical, CA:true
++
+ [ req_distinguished_name ]
+ # If this isn't set, the error is error, no objects specified in config file
+ commonName = Common Name (hostname, IP, or your name)
+diff --git a/spec/ssl/cert.cnf b/spec/ssl/cert.cnf
+index ca1dce701..832ec1197 100644
+--- a/spec/ssl/cert.cnf
++++ b/spec/ssl/cert.cnf
+@@ -6,6 +6,10 @@ default_startdate = 2015010360000Z
+ [ req ]
+ distinguished_name = req_distinguished_name
+ 
++# Root CA certificate extensions
++[ v3_ca ]
++basicConstraints = critical, CA:true
++
+ [ req_distinguished_name ]
+ # If this isn't set, the error is error, no objects specified in config file
+ commonName = Common Name (hostname, IP, or your name)
+diff --git a/spec/ssl/client-cert.pem b/spec/ssl/client-cert.pem
+index 3887246fe..6c46e2d7c 100644
+--- a/spec/ssl/client-cert.pem
++++ b/spec/ssl/client-cert.pem
+@@ -1,17 +1,17 @@
+ -----BEGIN CERTIFICATE-----
+ MIICqzCCAZMCAQEwDQYJKoZIhvcNAQELBQAwFzEVMBMGA1UEAwwMY2FfbXlzcWwy
+-Z2VtMB4XDTE1MDkwOTA0NTcyMVoXDTI1MDcxODA0NTcyMVowIDEeMBwGA1UEAwwV
++Z2VtMB4XDTI0MDIwOTE1NDkyOFoXDTMzMTIxODE1NDkyOFowIDEeMBwGA1UEAwwV
+ bXlzcWwyZ2VtLmV4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+-CgKCAQEA1ZuBf1FVJqil7/LvnXqPd43ujo0xqbFy7QrqmM5U/UM3ggMCf2Gr2/Wo
+-ZJGPTk1NFaiUyM5mhSlgi0/SGPEp9JMUuH+Uiv9UwmOFl9Em3FXQQ8SG7fV7651u
+-AUskNgfEqoy+f+uvi1P155rHNDx7Yw6i+wwfpLGTU0boMnLL6cO/KcIbZlx4/2Lq
+-r5sYbpIqhz46bbG+fIhvepruH9h7WVWqAibTqymYrA3T03O/HWTOqfq03gM7Oe3t
+-JvJbqX2LecQvi2SbQoX8c2MrQ6X7xDe2Ajh7Yx9DQ1gqClTglbPFHNiWPcGACg+W
+-2ptCY/Q2SdP5h1dtj5Sw5VwL3dvCjQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQA2
+-qTbfgDm0IG8x1qP61ztT9F2WRwG7cp6qHT5oB5wDcOUFes9QJjeB8RoIkB+hRlqG
+-J6/Tbxs49d7oKhOQ0UaTnfIKC5m0UFYFGc3lUcwxQyggOWx9XV5ZmGb48+RLFnDV
+-Gfcs/hvfem6Xfpgzr8bGs2ZM9x1j9YnXNJVePmKwktjCPnXPOeHyxNZPA+CWHed/
+-dNg1IWuQnnp20LgNRARCTgR/ONAJNUfh2GqRLq2JOf0cyhNlsKQ3epkeUyc72knI
+-oWVxPluQYvFHN+xif0FMGVLM8lz0b+6uPJDA2Km70B/iorMRVb0vbMeFrMmQ5UgM
+-4tplX52P2vb6JNnektfR
++CgKCAQEAnaBhN4wLvmzVFg91HZH2PmacZVpb3I51qoiGQS7i8oiLAyvqCIjJVoCG
++CWfBk8s6WNAPiE9pqvKyUXTfpvZBlW9t4hwQImRD15Sr55/yWWnKO7SwHhY8BTeo
++QVlSBrfPnKMIjByudi/G7fR9naXoeQREAP2hl8h/gh7UBAm6kNTFxxD/1Byal/iW
++BwoYqQQYVUuYThdI0C17qYn7dthtjjGRbexouVRwN446qR9dC71A27VgNUmlFb/E
++ygmfEFPhJRNf9fSVAABkNHPhHtg5tURjcZi9ldZMr8o6643hY1kW1xyS3VFLIcP6
++2Cing0f0/Cjh5jg4l5uEcN/AUpbw+QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQA2
++4Hh2Qf3eDcKZCvjHmwgCXkhFpZtgpBTgEyPfl0UKwrgkdBiqGY6jywCIsDvp0DrN
++OL7Ybk+tdDE95HUfC4W7MBa2wS5WCksIjq+8N4Q61np8gine01IUofjeBSlkNgkF
++phtOVeadCky3UlBBGXBSwaPC+uyHlXEOlmfm1YOP0QboqzMorEl4ZECxFVtkyKbu
++tud9BDitIcb7x2JjrLlmnltE3JQ+WI9iyL0EAXDloIPUkeyf123lFGNSXDCEj2Ru
++8wzQjNDGYiMrwYFib+6d0UE1ED2KLn7TN5lHhgC/H3RUv3dAIgciuysqepTC25DV
++soLMzebCsw4UprXFCUbz
+ -----END CERTIFICATE-----
+diff --git a/spec/ssl/client-key.pem b/spec/ssl/client-key.pem
+index d75294225..ad4af278c 100644
+--- a/spec/ssl/client-key.pem
++++ b/spec/ssl/client-key.pem
+@@ -1,27 +1,28 @@
+------BEGIN RSA PRIVATE KEY-----
+-MIIEowIBAAKCAQEA1ZuBf1FVJqil7/LvnXqPd43ujo0xqbFy7QrqmM5U/UM3ggMC
+-f2Gr2/WoZJGPTk1NFaiUyM5mhSlgi0/SGPEp9JMUuH+Uiv9UwmOFl9Em3FXQQ8SG
+-7fV7651uAUskNgfEqoy+f+uvi1P155rHNDx7Yw6i+wwfpLGTU0boMnLL6cO/KcIb
+-Zlx4/2Lqr5sYbpIqhz46bbG+fIhvepruH9h7WVWqAibTqymYrA3T03O/HWTOqfq0
+-3gM7Oe3tJvJbqX2LecQvi2SbQoX8c2MrQ6X7xDe2Ajh7Yx9DQ1gqClTglbPFHNiW
+-PcGACg+W2ptCY/Q2SdP5h1dtj5Sw5VwL3dvCjQIDAQABAoIBAEWhGjZZWctvQCAW
+-bbtEv012a6P2LJEnMdJJM6253IRuC8MKnh7NxMq/qjOWK0OX+R+tQ0qt1Udk9H6U
+-92SAAHAkHaYCmHYywvtWm66gU+2Q34Gnp2AcHFfyinBLgTNHlvkNRe/G8QMWzFrB
+-3luNt57Tn5b8Hbh+1gpYW8pOF2BMgIsLRK+8b26TKUWrSCc/ZxOSY4wmrNybxkgr
+-HGt27lwIN0cvJZbmQvHevNzzCn+bYoo2K1MQj34xHbZ2NLqKqFVlSJtr9+BHffAc
+-fkcf+V+D+FkitUVkha9qXa02wtLzYSF+Q5Ef3kQQs6hs/HOdN16g17l9QC6Mk1vm
+-a9yV5CECgYEA/9FglQmFimwBCOWEvjkZzoXFusuvRWRgAPU/1c9DAYRS2GfOkjlH
+-RPAltczdXh4EQ0NkCqHH7JWgrdXGonKg4fcITumdwcYKV5QfmKBO4onAboEM0Wq7
+-wjifuga7npQhPnGvkXFDamVz5McQPObvV42VAUwk1N00gOYw/46ryLkCgYEA1cJv
+-jHAq0DKlUGXKyZ+ixsogRpwTQvND/qUquSLgD/KgfeT+70AnsEF6DbVLKoaJ35CF
+-ju83VYLfeBljq+E/lgmAyaChplORRXcu+xPQE4rbp0MbsoBOYGNWLFAw3twGsQf9
+-iuAtCVxij/hhj4FWRebYHMnV6Min2VPbZdASNnUCgYBIiX8gY3XJPTzB4ArWwWwu
+-4kGh6NWHEKIkQ2ZZYw615GZ1VGH/llw+EPYwaamvYUWGKRq55QvCat8Hy6EqOOSj
+-jh99+MIxyszt7mNTLMmRdMvqyY7v5prcxJ+N6RDUM16FzUiiLgKWrbPCACv7iOP+
+-6HeCyat77ElR73OfUz4kiQKBgH+2r9cEnU/PMp4ac1KLokGLOkV1srxpg9J89E2w
+-3JYqrGELlJV1i0DvnfDaxJIf1/hO7L09h537l3C2Gqry5X7LJrtQ0cQCYeVTFCrG
+-56cFa78/hSjdJ/bG4xGOx+QfKZBT6dQzpDTXkbva9s86w0T4a16n6LowSLi8NXVb
+-H8aRAoGBAKzlt6deB+ASIrGH6mM0eLxF1OcNTB+rE4AJxoUyO1oAmCv9UeK3IzwP
+-ohhmo/kEOSCVG6WE+6+r9mojcoHu3ZrobVKl59R7KMdzunMXqxZcXeTqjvqdTtV7
+-rWuEz/TKIe7o0Tx19XVGuNftyx2pLuspSAAbZ+YAQJtzmLzsGkss
+------END RSA PRIVATE KEY-----
++-----BEGIN PRIVATE KEY-----
++MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdoGE3jAu+bNUW
++D3UdkfY+ZpxlWlvcjnWqiIZBLuLyiIsDK+oIiMlWgIYJZ8GTyzpY0A+IT2mq8rJR
++dN+m9kGVb23iHBAiZEPXlKvnn/JZaco7tLAeFjwFN6hBWVIGt8+cowiMHK52L8bt
++9H2dpeh5BEQA/aGXyH+CHtQECbqQ1MXHEP/UHJqX+JYHChipBBhVS5hOF0jQLXup
++ift22G2OMZFt7Gi5VHA3jjqpH10LvUDbtWA1SaUVv8TKCZ8QU+ElE1/19JUAAGQ0
++c+Ee2Dm1RGNxmL2V1kyvyjrrjeFjWRbXHJLdUUshw/rYKKeDR/T8KOHmODiXm4Rw
++38BSlvD5AgMBAAECggEABwUuaexqq3uqY+CisoNJMySby5HM1z5gXuIqDzt42nIa
++tYnzqEH7VvHDcSYgriXrfoAfE6RBzF4hyKn1ZLjBWVf3Tg46PmXhIE1b+KVxhD+c
++xQWk9boUyJYJgDDrtnviRb4nHSJmjMH6UKfGc8qArOnJOOgS6zEqqKTEhDzbWnmQ
++Q5GjZGKjTMfbC6u9r6nwcAlPax2tzRmPNtQFYMSjcHmvN0IuhwVlZlULsdPnpDpS
++3LeR8b/75Og8BbqXJNdLAXQq3Athu9ADuxfS/rOBxWwEKElV80gFMo/qiWZ/DVqw
++UUExYuDAx8Jnf4j8Vb2UcY2bpxvGHLrD10gRJmUxLwKBgQDLzd95e0SXxuWEHBdA
++oHfermVwUzs1aa5zqs/KJEICmFE94bJbWQKbW1TDQggIr45XylQNsQuh0RS1USsd
++YweA7z00HPcj5ON7O+5tKwfP+C+jl1s1yfYPvaSiRKwLde6DdVGos29C5OpoIQ+E
++hjC02n2d84F/lrjfHn3MQH/2vwKBgQDF/u6jNwfHsfgOnKGJv9BKfmLg4saYUvMv
++bclkQS0qrSgrloMSZs1QcpZJWneiO0vjsxoTeLcUIcsuhfxpMsN60nb/QncB749C
++ts9SuV9Rdv4+7U1tqg2ZQ52zjMliZvEDriPZ40vhONBXYyKtx1HZ9OexDOLKUzzY
++c1MMobj+RwKBgBFWPwdvhANBSS720MePnwLTZQ+sFOJTTiLKyghRE0hzOp4AABMj
++PESI/WnqyRIsFPjE3meXwvyN86wE7pz+WpoOP++Z8zAbfXpzO7IPsgdv/mV1L64g
++swzdvg6LtvL2okaOiVbHhNR08rfO8Cn+3E/WMk9ocoCvCqT4TA0/A2OzAoGBAILO
++TpgzxgcPM6NrpWkc+R4N64NJLwz5WEJQVMnQKWfVaAGL+WIR2ri4S0OA6iKa7CMt
++cx/EE6fQP6ynxj8102F0ZDt1jKwRuWLI5aVwZGGsrIGkQxAdVciYnDo/29gPzFCz
++HmpXuQy9fR8Olp2aXiARpXQZ4EbswPj7D7X7rf0HAoGAQhhg0xfIuOrLRXrhfFEg
++NzASVKvtCEMDbJD4mWCOuqe7Jlvi/qmXZ9YnuKOmGukGV0/ePtLI1+Hcstr4kexb
++lUJYZQlB9e0Ft87UD16TuGHAMBKdtXQKuBjMeI0C43kSBq0XuiyY9b44ADH/up07
++vkqwfAOUVKCHp4KOOruW9cc=
++-----END PRIVATE KEY-----
+diff --git a/spec/ssl/client-req.pem b/spec/ssl/client-req.pem
+index fc077486b..38774a53e 100644
+--- a/spec/ssl/client-req.pem
++++ b/spec/ssl/client-req.pem
+@@ -1,15 +1,15 @@
+ -----BEGIN CERTIFICATE REQUEST-----
+ MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVbXlzcWwyZ2VtLmV4YW1wbGUuY29tMIIB
+-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1ZuBf1FVJqil7/LvnXqPd43u
+-jo0xqbFy7QrqmM5U/UM3ggMCf2Gr2/WoZJGPTk1NFaiUyM5mhSlgi0/SGPEp9JMU
+-uH+Uiv9UwmOFl9Em3FXQQ8SG7fV7651uAUskNgfEqoy+f+uvi1P155rHNDx7Yw6i
+-+wwfpLGTU0boMnLL6cO/KcIbZlx4/2Lqr5sYbpIqhz46bbG+fIhvepruH9h7WVWq
+-AibTqymYrA3T03O/HWTOqfq03gM7Oe3tJvJbqX2LecQvi2SbQoX8c2MrQ6X7xDe2
+-Ajh7Yx9DQ1gqClTglbPFHNiWPcGACg+W2ptCY/Q2SdP5h1dtj5Sw5VwL3dvCjQID
+-AQABoAAwDQYJKoZIhvcNAQELBQADggEBAB05YaBSyAKCgHfBWhpZ1+OOVp1anr2v
+-TkStnqmNrNM2qBJXjfrythPTX4EJAt7+eNdH/6IVA93qKC/EUQVuMjgfMmMUaM+m
+-5pqfAo95w7vUY147U9nbC+EIo2u1KOVTNTgl45H372/1vCwTHZYu2atCk4tN3ueO
+-0O2XW89Kq94/7PDAExN2PhZdeATVX9dPNT+7ZUDNe8cuq9v0YCHy+2JN2WkplxcG
+-kMyCE3YYLnd96YtWiS9DOUib3+b7FwyGe0dXeLVw1br3NZGCZrybyfmnAQfiouAF
+-9nMxKIpWFSx00ubGrUefOQqp6nuk27n+scgr4+d6dBXz9efEEvTbLKA=
++IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnaBhN4wLvmzVFg91HZH2Pmac
++ZVpb3I51qoiGQS7i8oiLAyvqCIjJVoCGCWfBk8s6WNAPiE9pqvKyUXTfpvZBlW9t
++4hwQImRD15Sr55/yWWnKO7SwHhY8BTeoQVlSBrfPnKMIjByudi/G7fR9naXoeQRE
++AP2hl8h/gh7UBAm6kNTFxxD/1Byal/iWBwoYqQQYVUuYThdI0C17qYn7dthtjjGR
++bexouVRwN446qR9dC71A27VgNUmlFb/EygmfEFPhJRNf9fSVAABkNHPhHtg5tURj
++cZi9ldZMr8o6643hY1kW1xyS3VFLIcP62Cing0f0/Cjh5jg4l5uEcN/AUpbw+QID
++AQABoAAwDQYJKoZIhvcNAQELBQADggEBACPgLE417R3dHf9eiwVtoOSzm8ltNBbz
++5dRqiHDMEXuH+aGiNtTI1BI9akXrgjyN+nXWK09jZsWJ/+8mj+NcGS8JfdQdVn0c
++Ov/kmxoVwNEzj3mboL0amM7kQv6zRa1hKk7l5ZE+5G/EvWU2xF0qrHvGLvphgL0D
+++/PBJomMHAMYF5MUEOLtnwdslMS0OyAQCHu/swDhIj8jSCkoz4M8gpB2cV+VOHCG
++hW2sxlF67cgXLBXCgU0TP6bZbByPb8pEVax2808+wl3fCiM2IwcRtM3WTkSbESuN
++CjFO7OeUq4o1Dtiw2uBfNpe+dviGvDeyIBfUmkzqJH3BBpQyGHWU9YE=
+ -----END CERTIFICATE REQUEST-----
+diff --git a/spec/ssl/gen_certs.sh b/spec/ssl/gen_certs.sh
+index 3d48da014..4996b845d 100644
+--- a/spec/ssl/gen_certs.sh
++++ b/spec/ssl/gen_certs.sh
+@@ -10,6 +10,10 @@ default_startdate = 2015010360000Z
+ [ req ]
+ distinguished_name = req_distinguished_name
+ 
++# Root CA certificate extensions
++[ v3_ca ]
++basicConstraints = critical, CA:true
++
+ [ req_distinguished_name ]
+ # If this isn't set, the error is "error, no objects specified in config file"
+ commonName = Common Name (hostname, IP, or your name)
+@@ -35,7 +39,7 @@ commonName_default             = mysql2gem.example.com
+ 
+ # Generate a set of certificates
+ openssl genrsa -out ca-key.pem 2048
+-openssl req -new -x509 -nodes -days 3600 -key ca-key.pem -out ca-cert.pem -batch -config ca.cnf
++openssl req -new -x509 -nodes -extensions v3_ca -days 3600 -key ca-key.pem -out ca-cert.pem -batch -config ca.cnf
+ openssl req -newkey rsa:2048 -days 3600 -nodes -keyout pkcs8-server-key.pem -out server-req.pem -batch -config cert.cnf
+ openssl x509 -req -in server-req.pem -days 3600 -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
+ openssl req -newkey rsa:2048 -days 3600 -nodes -keyout pkcs8-client-key.pem -out client-req.pem -batch -config cert.cnf
+diff --git a/spec/ssl/pkcs8-client-key.pem b/spec/ssl/pkcs8-client-key.pem
+index a4858b4a0..ad4af278c 100644
+--- a/spec/ssl/pkcs8-client-key.pem
++++ b/spec/ssl/pkcs8-client-key.pem
+@@ -1,28 +1,28 @@
+ -----BEGIN PRIVATE KEY-----
+-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDVm4F/UVUmqKXv
+-8u+deo93je6OjTGpsXLtCuqYzlT9QzeCAwJ/Yavb9ahkkY9OTU0VqJTIzmaFKWCL
+-T9IY8Sn0kxS4f5SK/1TCY4WX0SbcVdBDxIbt9XvrnW4BSyQ2B8SqjL5/66+LU/Xn
+-msc0PHtjDqL7DB+ksZNTRugycsvpw78pwhtmXHj/YuqvmxhukiqHPjptsb58iG96
+-mu4f2HtZVaoCJtOrKZisDdPTc78dZM6p+rTeAzs57e0m8lupfYt5xC+LZJtChfxz
+-YytDpfvEN7YCOHtjH0NDWCoKVOCVs8Uc2JY9wYAKD5bam0Jj9DZJ0/mHV22PlLDl
+-XAvd28KNAgMBAAECggEARaEaNllZy29AIBZtu0S/TXZro/YskScx0kkzrbnchG4L
+-wwqeHs3Eyr+qM5YrQ5f5H61DSq3VR2T0fpT3ZIAAcCQdpgKYdjLC+1abrqBT7ZDf
+-gaenYBwcV/KKcEuBM0eW+Q1F78bxAxbMWsHeW423ntOflvwduH7WClhbyk4XYEyA
+-iwtEr7xvbpMpRatIJz9nE5JjjCas3JvGSCsca3buXAg3Ry8lluZC8d683PMKf5ti
+-ijYrUxCPfjEdtnY0uoqoVWVIm2v34Ed98Bx+Rx/5X4P4WSK1RWSFr2pdrTbC0vNh
+-IX5DkR/eRBCzqGz8c503XqDXuX1ALoyTW+Zr3JXkIQKBgQD/0WCVCYWKbAEI5YS+
+-ORnOhcW6y69FZGAA9T/Vz0MBhFLYZ86SOUdE8CW1zN1eHgRDQ2QKocfslaCt1cai
+-cqDh9whO6Z3BxgpXlB+YoE7iicBugQzRarvCOJ+6BruelCE+ca+RcUNqZXPkxxA8
+-5u9XjZUBTCTU3TSA5jD/jqvIuQKBgQDVwm+McCrQMqVQZcrJn6LGyiBGnBNC80P+
+-pSq5IuAP8qB95P7vQCewQXoNtUsqhonfkIWO7zdVgt94GWOr4T+WCYDJoKGmU5FF
+-dy77E9ATitunQxuygE5gY1YsUDDe3AaxB/2K4C0JXGKP+GGPgVZF5tgcydXoyKfZ
+-U9tl0BI2dQKBgEiJfyBjdck9PMHgCtbBbC7iQaHo1YcQoiRDZlljDrXkZnVUYf+W
+-XD4Q9jBpqa9hRYYpGrnlC8Jq3wfLoSo45KOOH334wjHKzO3uY1MsyZF0y+rJju/m
+-mtzEn43pENQzXoXNSKIuApats8IAK/uI4/7od4LJq3vsSVHvc59TPiSJAoGAf7av
+-1wSdT88ynhpzUouiQYs6RXWyvGmD0nz0TbDcliqsYQuUlXWLQO+d8NrEkh/X+E7s
+-vT2HnfuXcLYaqvLlfssmu1DRxAJh5VMUKsbnpwVrvz+FKN0n9sbjEY7H5B8pkFPp
+-1DOkNNeRu9r2zzrDRPhrXqfoujBIuLw1dVsfxpECgYEArOW3p14H4BIisYfqYzR4
+-vEXU5w1MH6sTgAnGhTI7WgCYK/1R4rcjPA+iGGaj+QQ5IJUbpYT7r6v2aiNyge7d
+-muhtUqXn1Hsox3O6cxerFlxd5OqO+p1O1Xuta4TP9Moh7ujRPHX1dUa41+3LHaku
+-6ylIABtn5gBAm3OYvOwaSyw=
++MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdoGE3jAu+bNUW
++D3UdkfY+ZpxlWlvcjnWqiIZBLuLyiIsDK+oIiMlWgIYJZ8GTyzpY0A+IT2mq8rJR
++dN+m9kGVb23iHBAiZEPXlKvnn/JZaco7tLAeFjwFN6hBWVIGt8+cowiMHK52L8bt
++9H2dpeh5BEQA/aGXyH+CHtQECbqQ1MXHEP/UHJqX+JYHChipBBhVS5hOF0jQLXup
++ift22G2OMZFt7Gi5VHA3jjqpH10LvUDbtWA1SaUVv8TKCZ8QU+ElE1/19JUAAGQ0
++c+Ee2Dm1RGNxmL2V1kyvyjrrjeFjWRbXHJLdUUshw/rYKKeDR/T8KOHmODiXm4Rw
++38BSlvD5AgMBAAECggEABwUuaexqq3uqY+CisoNJMySby5HM1z5gXuIqDzt42nIa
++tYnzqEH7VvHDcSYgriXrfoAfE6RBzF4hyKn1ZLjBWVf3Tg46PmXhIE1b+KVxhD+c
++xQWk9boUyJYJgDDrtnviRb4nHSJmjMH6UKfGc8qArOnJOOgS6zEqqKTEhDzbWnmQ
++Q5GjZGKjTMfbC6u9r6nwcAlPax2tzRmPNtQFYMSjcHmvN0IuhwVlZlULsdPnpDpS
++3LeR8b/75Og8BbqXJNdLAXQq3Athu9ADuxfS/rOBxWwEKElV80gFMo/qiWZ/DVqw
++UUExYuDAx8Jnf4j8Vb2UcY2bpxvGHLrD10gRJmUxLwKBgQDLzd95e0SXxuWEHBdA
++oHfermVwUzs1aa5zqs/KJEICmFE94bJbWQKbW1TDQggIr45XylQNsQuh0RS1USsd
++YweA7z00HPcj5ON7O+5tKwfP+C+jl1s1yfYPvaSiRKwLde6DdVGos29C5OpoIQ+E
++hjC02n2d84F/lrjfHn3MQH/2vwKBgQDF/u6jNwfHsfgOnKGJv9BKfmLg4saYUvMv
++bclkQS0qrSgrloMSZs1QcpZJWneiO0vjsxoTeLcUIcsuhfxpMsN60nb/QncB749C
++ts9SuV9Rdv4+7U1tqg2ZQ52zjMliZvEDriPZ40vhONBXYyKtx1HZ9OexDOLKUzzY
++c1MMobj+RwKBgBFWPwdvhANBSS720MePnwLTZQ+sFOJTTiLKyghRE0hzOp4AABMj
++PESI/WnqyRIsFPjE3meXwvyN86wE7pz+WpoOP++Z8zAbfXpzO7IPsgdv/mV1L64g
++swzdvg6LtvL2okaOiVbHhNR08rfO8Cn+3E/WMk9ocoCvCqT4TA0/A2OzAoGBAILO
++TpgzxgcPM6NrpWkc+R4N64NJLwz5WEJQVMnQKWfVaAGL+WIR2ri4S0OA6iKa7CMt
++cx/EE6fQP6ynxj8102F0ZDt1jKwRuWLI5aVwZGGsrIGkQxAdVciYnDo/29gPzFCz
++HmpXuQy9fR8Olp2aXiARpXQZ4EbswPj7D7X7rf0HAoGAQhhg0xfIuOrLRXrhfFEg
++NzASVKvtCEMDbJD4mWCOuqe7Jlvi/qmXZ9YnuKOmGukGV0/ePtLI1+Hcstr4kexb
++lUJYZQlB9e0Ft87UD16TuGHAMBKdtXQKuBjMeI0C43kSBq0XuiyY9b44ADH/up07
++vkqwfAOUVKCHp4KOOruW9cc=
+ -----END PRIVATE KEY-----
+diff --git a/spec/ssl/pkcs8-server-key.pem b/spec/ssl/pkcs8-server-key.pem
+index c803fba65..95eeb77c6 100644
+--- a/spec/ssl/pkcs8-server-key.pem
++++ b/spec/ssl/pkcs8-server-key.pem
+@@ -1,28 +1,28 @@
+ -----BEGIN PRIVATE KEY-----
+-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCtyxWYD01zMQby
+-RwzqzrGypf/x/rhNUT70HChE9TpojPmCe9e38eSvz1+0kGWb4VGKB705mPsY8yry
+-IO/T2StZI11Ddh7qGbiXJFFeU3s4lrcis3qZTZNvui8hPVmGRjn6TRe6FkX0B/lF
+-Ip0TV3X2aSAIU7oZpn6qmn4WZFFKgy/EVuDzeaf/RvTrfhnOhbBwhX+93WXt50fK
+-73YFBEUJ4hOO0VoB34O/555OHY4/FRjTWTusL2LgxcTcE/GRGk9BPBN4cfhmlJHB
+-hTSiXkGOyLGv8kbrYffockDhkiPJbMSdWIRV+ZpQX3YXf2y3lGOGbWptgMi3ttzh
+-6RaKmoZJAgMBAAECggEAFhAyLZvDuVwABcH/Yc/bv1JTq+UqgKZP1627bwWy5JMB
+-Gg+e0ztiTO+GtuWeAKwaLevNmgJR3lkAmryTtdFcL3TN4kKcqhuZ05ZIvjDa89Qu
+-a7ldVxkCHq0ETrP7KZDAy4X9/SHWv6RDgQNj7ZCs6RtvdZ8rgRYh/oaeezlBGLRZ
+-OIeWWHTYk8CMhu+tzR+BHZdXUEHo/sZHwmpdhQQ0HtXs87Eo51waVwHL0BgXT+ak
+-v7pbhe6sGgNgoix59Lu9WbazxXIyRYDMkZfg0fCauRMG05Wvaeuonk/zlC88Eg3M
+-yQIW8+Boe7M2yI+egRYeM2TCBnr2B7n8fTG/xQEKAQKBgQDe+hgYWboh6ejCarAB
+-UOd90D//aLtbyu0HBQ6YNiPPUvVmEMfDVscxw6BXTtRWpHYSxsPV+IpUM73St/cu
+-RmrP1DOTT4sJJf9lvNg35+OceGHRe0hVUU9mVqBMbLz5NOPwxWlq4eSgK+cAKq3g
+-5lp47IFxX0R+g+dvk7YhSy4+rwKBgQDHiEBLjZahY100PffLygIwvwbTyoK9UMjS
+-On1sGqOf9aF79zQIIRhEmPN/je9jqnAcf8+ivS1dLYoUboosm7215349Uw6S9C43
+-RIn1iLZRGO7Beq3KOrdp4NFnh3QsgoH4jp1gp4w6QyBC2uYBdQXA9GpUR2+Y45BI
+-KVSHQV4IhwKBgQDQLig48+04pK9QdVOGpwa7DKfzytDCzx+mIi6SJlogw4+ij6Ay
+-3N51s/QMD+loS3yB41oMeFSOcRCVoHUDm3M2PyU4MFfbXsKpNjuZVsPH3w1VDAlo
+-vtWm8tIPCKcW9S6sKWRXCjju4o52NWLKS8fEhuwD8bJ9fKGkJwEw7IRsuQKBgQCU
+-D4feSI+I7InB9WXGI/1iHK49RJ2lS6fpUBu3t0DJtuSAb5x9l8lBRdoSQclsxJFy
+-pGj4Erbx2JQIu0nu9hZdQA1OBi7fXzBYNJTGzQ60uPKaQaVqVg26FGhvEXVkfedi
+-ALnJeiq1JRBwa6yXUjXVy8iHB4dJBTwQQBMIVronSwKBgQDOPYklqdzRv+u4XukW
+-WsvK7GLj9huwdH0NI5gouGMb5OTgfVo66+urq4qYcHRN4vcdxbP9KoJPBvKhdx+D
+-A36I2ERs//92gIz6lcNsqmdAzHAX1yzp4IyFGsjzaKibnQrft7hb9Kfg9VypBb/G
+-31x7mm+gZm4RP3jbcBPDn0xU/w==
++MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrvY7yq+BT9ZSP
++9yOdAVfgx12f3lwcO/m6F+R/Z+0bVSvVtbYiO1xn+3l8rz8wT6+fBVVrIxpupFUP
++Zalb0BP07jmqhC7YgBjgad0vkUph1peCJ+ntJYtixpAZOZj70aT/2CKjuGkmWFnL
++ryrxBmpplHea1BwLJtrWgQEJcaFqiJ1lbGjinudo8dY5tZ7iyyZ+dk8+TKDsV/1p
++yuAOemKYDY34jUf1LE525pSR/BcDGYCdzpBsOLsqRKf+5d8cZK05I6oYYKkAwoM3
++QwmwpLSm9poFUlo83uMDU5FH76hWFwkd5PE8oSbdKcp6d0AMh/L0TS6V9lGM58jW
++9g71/v2LAgMBAAECggEAOnxjBox26FDNR5vb4neXJELwxOVWS/02xeOmGqdbTYAb
++Xfu0a4L4rKas0EPkCoFQpyCLXuGE+mH3X7d4zf4WFcbdF49NXsh88EvNGgpqINiS
++Hy6VkP/EsJ47a4O8cCGMhd5mqYe/M2JKLj3Yq11KdusrMiyC4l9Yjk0/e6ZZWKxe
++/htw3fMPnHOMfoUB9jPy+SrhbFt42bZ7+JA2Aihf8RCUb/R7OjhASKeRLPkefJTA
++Z6kJUoXoCBogjdkLCuVw1zjXF92R5gy+i5o9VhELHpg1D2If7CmeEM2FfVDfWjlF
++iYlIR750OsKaeWB0LVKwh+07oyIlmO1TOECXEKt+gQKBgQDpdUfImWMrrkJ5AeCL
++0NmO0JIZciGFBDTHRLOdzQiWKdq87i6/LWStK/gT+eb8WVLJ8vk5KrXFIy7TpYce
++4jRr9u9MG14hjVemLMMoLhPkruPoulIp+Aj0mnhKephpJQ+Khd77g/GT6ZAqxkxi
++drhTfKlSou0oEEd34ZuK7d6mCwKBgQC8UrbCErc+r4Ff48/0BfbJWZ7sN/HP/QtI
++R2V9v3VpGqMX93v+YhQepxpd4PSkxluEmbbwYkA81un1ot7ndNkLIN0x59P9tVR0
++ghXuLmLwxExM5ekrfPt7gbkhwUCwRTogjocm6VoF541tn+ll724XtBdewhyXEUm7
++IG0/tLU2gQKBgQCx3avaNprq7bIxVW/Jtk361AdroZvOJx068KnUQSEYnzzLEsDE
++4QXCNiyks5H7kuZTfG3K0zJ3xs1nbMacjgUYeKNqnbNC5tfvgE0TsL9xTJnRdxsg
++ZJwWGBYr0GmMOjMz+7iecbE9WwZ+wGPz5LWcze6HSiBblMOOn3GNEJvAbwKBgHXS
++3ksgAIv0rGH9Gz9Wd+fT7Y1nFyCE9gkbulDpd6DxrHazPV2TqXjgHav8sbNh8yJM
++NdvB7OTjpW8snn97aMwAnMO7grOqPpPCS8xAM2Dlv8Mg2Th/Mqw8JkMLMNjYBx0V
++b1OWDd/B1odu1E0VdvDXmQONOOv/Qf0UtaV0/yeBAoGAaUO9xrblsqEmP+2lqsiv
++qwNLk5PICaoXwIacFdhc8YhC5OoXxRmLlyJmz72aKLTnNH+ZYsNYcJlhexhxpxq5
++vsxdk7rO741EDuFAk1Hsx1Q2G2+q6VWIWQhsn5eTGdas2qdNrKoNwN3wuALPPeeQ
++l7yIJxi7Qn24xh+Bjdp1CDU=
+ -----END PRIVATE KEY-----
+diff --git a/spec/ssl/server-cert.pem b/spec/ssl/server-cert.pem
+index 9ec690dd3..746bd5446 100644
+--- a/spec/ssl/server-cert.pem
++++ b/spec/ssl/server-cert.pem
+@@ -1,17 +1,17 @@
+ -----BEGIN CERTIFICATE-----
+ MIICqzCCAZMCAQEwDQYJKoZIhvcNAQELBQAwFzEVMBMGA1UEAwwMY2FfbXlzcWwy
+-Z2VtMB4XDTE1MDkwOTA0NTcyMVoXDTI1MDcxODA0NTcyMVowIDEeMBwGA1UEAwwV
++Z2VtMB4XDTI0MDIwOTE1NDkyOFoXDTMzMTIxODE1NDkyOFowIDEeMBwGA1UEAwwV
+ bXlzcWwyZ2VtLmV4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+-CgKCAQEArcsVmA9NczEG8kcM6s6xsqX/8f64TVE+9BwoRPU6aIz5gnvXt/Hkr89f
+-tJBlm+FRige9OZj7GPMq8iDv09krWSNdQ3Ye6hm4lyRRXlN7OJa3IrN6mU2Tb7ov
+-IT1ZhkY5+k0XuhZF9Af5RSKdE1d19mkgCFO6GaZ+qpp+FmRRSoMvxFbg83mn/0b0
+-634ZzoWwcIV/vd1l7edHyu92BQRFCeITjtFaAd+Dv+eeTh2OPxUY01k7rC9i4MXE
+-3BPxkRpPQTwTeHH4ZpSRwYU0ol5Bjsixr/JG62H36HJA4ZIjyWzEnViEVfmaUF92
+-F39st5Rjhm1qbYDIt7bc4ekWipqGSQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBB
+-PtRuVmOHiRPH3PmsZPtkgVagznojO+r0GDTxys5bxof8+HcokL6gbb4bRqzUQTdC
+-98RTsuFPnd/I8FbbaL+UyeXeKjjOEBPFyllOdykmpd67mHCA89574y7Ib7lkvtr1
+-nQFMbeKmcz4uLm1vAi/aOdAIA2de4yJU2XnOkVLDgYnQxpWR451WKqt/FtiuCzpQ
+-E3peEemM2XVxvCMmfBAaroAyLYFrWOhNA7UoWVsubp7Ypf7SYuOh+sU6JLsYSadQ
+-XVqgvIKG4deUpdl7oUBRz79spAi1OpHWiNmW3b+8nKJoHTfYkKzCebeLdI++xSjX
+-jXNryv5xK88LFIPKL/7e
++CgKCAQEAq72O8qvgU/WUj/cjnQFX4Mddn95cHDv5uhfkf2ftG1Ur1bW2IjtcZ/t5
++fK8/ME+vnwVVayMabqRVD2WpW9AT9O45qoQu2IAY4GndL5FKYdaXgifp7SWLYsaQ
++GTmY+9Gk/9gio7hpJlhZy68q8QZqaZR3mtQcCyba1oEBCXGhaoidZWxo4p7naPHW
++ObWe4ssmfnZPPkyg7Ff9acrgDnpimA2N+I1H9SxOduaUkfwXAxmAnc6QbDi7KkSn
++/uXfHGStOSOqGGCpAMKDN0MJsKS0pvaaBVJaPN7jA1ORR++oVhcJHeTxPKEm3SnK
++endADIfy9E0ulfZRjOfI1vYO9f79iwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBc
++sRGEk10OWCm8MlfyWLmj3dAokO/LC1Ya6wP9gCtepvkum4hISKFmJpLYokUXpyOa
++GnUJ96eyHVg5OKz2r1rEra2E6oiP6FW6WCe8tVQEfsV6B7LkJ0O2X5us1kY+gmo6
++ch2/BDWROhjV5LgSPkuCNfNS2mkKo0vEg3xovYBNlqBveyrRnkPcR1qANt3RV3JR
++ADfqPGNU6IFoKiFZhK5wjwjUl2p1a12aw6C3e/O2UeJDsSEucN6yjEa/KZhlBfpH
++4RSSRpSuWeGu2ndSaVwFYX44//v8vnW7+pFDWB0LFbv+Jd9qji0chaFWh3jJKNas
++vALqzCG44enapVb/7m4i
+ -----END CERTIFICATE-----
+diff --git a/spec/ssl/server-key.pem b/spec/ssl/server-key.pem
+index 8bc45372b..95eeb77c6 100644
+--- a/spec/ssl/server-key.pem
++++ b/spec/ssl/server-key.pem
+@@ -1,27 +1,28 @@
+------BEGIN RSA PRIVATE KEY-----
+-MIIEpQIBAAKCAQEArcsVmA9NczEG8kcM6s6xsqX/8f64TVE+9BwoRPU6aIz5gnvX
+-t/Hkr89ftJBlm+FRige9OZj7GPMq8iDv09krWSNdQ3Ye6hm4lyRRXlN7OJa3IrN6
+-mU2Tb7ovIT1ZhkY5+k0XuhZF9Af5RSKdE1d19mkgCFO6GaZ+qpp+FmRRSoMvxFbg
+-83mn/0b0634ZzoWwcIV/vd1l7edHyu92BQRFCeITjtFaAd+Dv+eeTh2OPxUY01k7
+-rC9i4MXE3BPxkRpPQTwTeHH4ZpSRwYU0ol5Bjsixr/JG62H36HJA4ZIjyWzEnViE
+-VfmaUF92F39st5Rjhm1qbYDIt7bc4ekWipqGSQIDAQABAoIBABYQMi2bw7lcAAXB
+-/2HP279SU6vlKoCmT9etu28FsuSTARoPntM7YkzvhrblngCsGi3rzZoCUd5ZAJq8
+-k7XRXC90zeJCnKobmdOWSL4w2vPULmu5XVcZAh6tBE6z+ymQwMuF/f0h1r+kQ4ED
+-Y+2QrOkbb3WfK4EWIf6Gnns5QRi0WTiHllh02JPAjIbvrc0fgR2XV1BB6P7GR8Jq
+-XYUENB7V7POxKOdcGlcBy9AYF0/mpL+6W4XurBoDYKIsefS7vVm2s8VyMkWAzJGX
+-4NHwmrkTBtOVr2nrqJ5P85QvPBINzMkCFvPgaHuzNsiPnoEWHjNkwgZ69ge5/H0x
+-v8UBCgECgYEA3voYGFm6IenowmqwAVDnfdA//2i7W8rtBwUOmDYjz1L1ZhDHw1bH
+-McOgV07UVqR2EsbD1fiKVDO90rf3LkZqz9Qzk0+LCSX/ZbzYN+fjnHhh0XtIVVFP
+-ZlagTGy8+TTj8MVpauHkoCvnACqt4OZaeOyBcV9EfoPnb5O2IUsuPq8CgYEAx4hA
+-S42WoWNdND33y8oCML8G08qCvVDI0jp9bBqjn/Whe/c0CCEYRJjzf43vY6pwHH/P
+-or0tXS2KFG6KLJu9ted+PVMOkvQuN0SJ9Yi2URjuwXqtyjq3aeDRZ4d0LIKB+I6d
+-YKeMOkMgQtrmAXUFwPRqVEdvmOOQSClUh0FeCIcCgYEA0C4oOPPtOKSvUHVThqcG
+-uwyn88rQws8fpiIukiZaIMOPoo+gMtzedbP0DA/paEt8geNaDHhUjnEQlaB1A5tz
+-Nj8lODBX217CqTY7mVbDx98NVQwJaL7VpvLSDwinFvUurClkVwo47uKOdjViykvH
+-xIbsA/GyfXyhpCcBMOyEbLkCgYEAlA+H3kiPiOyJwfVlxiP9YhyuPUSdpUun6VAb
+-t7dAybbkgG+cfZfJQUXaEkHJbMSRcqRo+BK28diUCLtJ7vYWXUANTgYu318wWDSU
+-xs0OtLjymkGlalYNuhRobxF1ZH3nYgC5yXoqtSUQcGusl1I11cvIhweHSQU8EEAT
+-CFa6J0sCgYEAzj2JJanc0b/ruF7pFlrLyuxi4/YbsHR9DSOYKLhjG+Tk4H1aOuvr
+-q6uKmHB0TeL3HcWz/SqCTwbyoXcfgwN+iNhEbP//doCM+pXDbKpnQMxwF9cs6eCM
+-hRrI82iom50K37e4W/Sn4PVcqQW/xt9ce5pvoGZuET9423ATw59MVP8=
+------END RSA PRIVATE KEY-----
++-----BEGIN PRIVATE KEY-----
++MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrvY7yq+BT9ZSP
++9yOdAVfgx12f3lwcO/m6F+R/Z+0bVSvVtbYiO1xn+3l8rz8wT6+fBVVrIxpupFUP
++Zalb0BP07jmqhC7YgBjgad0vkUph1peCJ+ntJYtixpAZOZj70aT/2CKjuGkmWFnL
++ryrxBmpplHea1BwLJtrWgQEJcaFqiJ1lbGjinudo8dY5tZ7iyyZ+dk8+TKDsV/1p
++yuAOemKYDY34jUf1LE525pSR/BcDGYCdzpBsOLsqRKf+5d8cZK05I6oYYKkAwoM3
++QwmwpLSm9poFUlo83uMDU5FH76hWFwkd5PE8oSbdKcp6d0AMh/L0TS6V9lGM58jW
++9g71/v2LAgMBAAECggEAOnxjBox26FDNR5vb4neXJELwxOVWS/02xeOmGqdbTYAb
++Xfu0a4L4rKas0EPkCoFQpyCLXuGE+mH3X7d4zf4WFcbdF49NXsh88EvNGgpqINiS
++Hy6VkP/EsJ47a4O8cCGMhd5mqYe/M2JKLj3Yq11KdusrMiyC4l9Yjk0/e6ZZWKxe
++/htw3fMPnHOMfoUB9jPy+SrhbFt42bZ7+JA2Aihf8RCUb/R7OjhASKeRLPkefJTA
++Z6kJUoXoCBogjdkLCuVw1zjXF92R5gy+i5o9VhELHpg1D2If7CmeEM2FfVDfWjlF
++iYlIR750OsKaeWB0LVKwh+07oyIlmO1TOECXEKt+gQKBgQDpdUfImWMrrkJ5AeCL
++0NmO0JIZciGFBDTHRLOdzQiWKdq87i6/LWStK/gT+eb8WVLJ8vk5KrXFIy7TpYce
++4jRr9u9MG14hjVemLMMoLhPkruPoulIp+Aj0mnhKephpJQ+Khd77g/GT6ZAqxkxi
++drhTfKlSou0oEEd34ZuK7d6mCwKBgQC8UrbCErc+r4Ff48/0BfbJWZ7sN/HP/QtI
++R2V9v3VpGqMX93v+YhQepxpd4PSkxluEmbbwYkA81un1ot7ndNkLIN0x59P9tVR0
++ghXuLmLwxExM5ekrfPt7gbkhwUCwRTogjocm6VoF541tn+ll724XtBdewhyXEUm7
++IG0/tLU2gQKBgQCx3avaNprq7bIxVW/Jtk361AdroZvOJx068KnUQSEYnzzLEsDE
++4QXCNiyks5H7kuZTfG3K0zJ3xs1nbMacjgUYeKNqnbNC5tfvgE0TsL9xTJnRdxsg
++ZJwWGBYr0GmMOjMz+7iecbE9WwZ+wGPz5LWcze6HSiBblMOOn3GNEJvAbwKBgHXS
++3ksgAIv0rGH9Gz9Wd+fT7Y1nFyCE9gkbulDpd6DxrHazPV2TqXjgHav8sbNh8yJM
++NdvB7OTjpW8snn97aMwAnMO7grOqPpPCS8xAM2Dlv8Mg2Th/Mqw8JkMLMNjYBx0V
++b1OWDd/B1odu1E0VdvDXmQONOOv/Qf0UtaV0/yeBAoGAaUO9xrblsqEmP+2lqsiv
++qwNLk5PICaoXwIacFdhc8YhC5OoXxRmLlyJmz72aKLTnNH+ZYsNYcJlhexhxpxq5
++vsxdk7rO741EDuFAk1Hsx1Q2G2+q6VWIWQhsn5eTGdas2qdNrKoNwN3wuALPPeeQ
++l7yIJxi7Qn24xh+Bjdp1CDU=
++-----END PRIVATE KEY-----
+diff --git a/spec/ssl/server-req.pem b/spec/ssl/server-req.pem
+index 94675507d..1600bfe65 100644
+--- a/spec/ssl/server-req.pem
++++ b/spec/ssl/server-req.pem
+@@ -1,15 +1,15 @@
+ -----BEGIN CERTIFICATE REQUEST-----
+ MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVbXlzcWwyZ2VtLmV4YW1wbGUuY29tMIIB
+-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArcsVmA9NczEG8kcM6s6xsqX/
+-8f64TVE+9BwoRPU6aIz5gnvXt/Hkr89ftJBlm+FRige9OZj7GPMq8iDv09krWSNd
+-Q3Ye6hm4lyRRXlN7OJa3IrN6mU2Tb7ovIT1ZhkY5+k0XuhZF9Af5RSKdE1d19mkg
+-CFO6GaZ+qpp+FmRRSoMvxFbg83mn/0b0634ZzoWwcIV/vd1l7edHyu92BQRFCeIT
+-jtFaAd+Dv+eeTh2OPxUY01k7rC9i4MXE3BPxkRpPQTwTeHH4ZpSRwYU0ol5Bjsix
+-r/JG62H36HJA4ZIjyWzEnViEVfmaUF92F39st5Rjhm1qbYDIt7bc4ekWipqGSQID
+-AQABoAAwDQYJKoZIhvcNAQELBQADggEBAInWIFsq14b8PhDroMMvi1ma30xyQGjg
+-KObIxakwXkliSxmCdVqV4+MV6w8hK3z0q7H+NzRFByjo1PnU8BCIa058m5uvbjmM
+-wGQvpcxmpm1p8VKKoeTqvE8OelbrqHrmyNIq7E/S3UZelVt+HOIPJOOs/aqEzaEg
+-VL1u+4kCMbHM2rG8dii060oZ5i/gUtMn2TQWcNjSQBvaVztW5FOL74bYkoq0zIwd
+-MFl2BoYyAnERJEcBmh1f+D7MuxPaqTUKjUmfDbHCMAAyTS1FHr9AnIN0/C2Mxywl
+-H/zL9/DkfR53KZjITkf2gTH5D/N5oDUwmgCg6UZ0MeTOP27jvgcvb/k=
++IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq72O8qvgU/WUj/cjnQFX4Mdd
++n95cHDv5uhfkf2ftG1Ur1bW2IjtcZ/t5fK8/ME+vnwVVayMabqRVD2WpW9AT9O45
++qoQu2IAY4GndL5FKYdaXgifp7SWLYsaQGTmY+9Gk/9gio7hpJlhZy68q8QZqaZR3
++mtQcCyba1oEBCXGhaoidZWxo4p7naPHWObWe4ssmfnZPPkyg7Ff9acrgDnpimA2N
+++I1H9SxOduaUkfwXAxmAnc6QbDi7KkSn/uXfHGStOSOqGGCpAMKDN0MJsKS0pvaa
++BVJaPN7jA1ORR++oVhcJHeTxPKEm3SnKendADIfy9E0ulfZRjOfI1vYO9f79iwID
++AQABoAAwDQYJKoZIhvcNAQELBQADggEBAIAzuYloX5Pwi+5n73yhaw5V+jMABiuw
++rYI2LziLBqw4vuvjEqvyr80Y9H2fLHOfVRaFnU6PaMkkH/p8d8YBD4/ZRGSd3oHX
++hlNltqyTCx1LNIUCXkl18jfPK3sVwwC07cLqSxQP8diauaDE59F6lsP3L0Gbwntd
++brSVJcY+5JGuWMx2BDXECxu6E7D/8drvPQa6EXDJjk1WVF/69I3TWhfX4/a5zIrc
++bJDTRBl5yQA0dpPmr/d8Di4mqAqeecVPNXi/CWkDQl3PoBp7O69T6VG3R00krgQr
++rXzbPJsEDLm7ynu/TWMamSCOUiMH5CBVBVXJSTVevGFK+gdjXf8LJ/0=
+ -----END CERTIFICATE REQUEST-----

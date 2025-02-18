@@ -1,51 +1,55 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %define use_systemd (0%{?fedora} && 0%{?fedora} >= 18) || (0%{?rhel} && 0%{?rhel} >= 7)
-%if !%{use_systemd}
-%global __python2 %{__python}
-%global python2_sitelib %{python_sitelib}
-%endif
 
-%define use_python3 1
+%define use_python3 0%{?fedora} || (0%{?rhel} && 0%{?rhel} > 7)
 %if %{use_python3}
 %global python_ver python3
 %global python_exec %{__python3}
 %global python_sitelib %{python3_sitelib}
 %else
+%if !%{use_systemd}
+%global __python2 %{__python}
+%global python2_sitelib %{python_sitelib}
+%endif
 %global python_ver python
 %global python_exec %{__python2}
 %global python_sitelib %{python2_sitelib}
 %endif
+%global release_number 1
+
+%global git_tag %{name}-%{version}-%{release_number}
+
 
 Name:           virt-who
-Version:        0.24.2
-Release:        4%{?dist}
+Version:        1.31.26
+Release:        %{release_number}%{?dist}.3
+
 Summary:        Agent for reporting virtual guest IDs to subscription-manager
-License:        GPLv2+
+
+Group:          System Environment/Base
+# GPL for virt-who proper and LGPL for incorporated suds
+License:        GPL-2.0-or-later AND LGPL-3.0-or-later
 URL:            https://github.com/candlepin/virt-who
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+
 BuildArch:      noarch
 BuildRequires:  %{python_ver}-devel
 BuildRequires:  %{python_ver}-setuptools
-# rhel 8 has different naming going forward
-%if (0%{?rhel} && 0%{?rhel} >= 8)
-Requires:      platform-python-setuptools
-%else
+BuildRequires:  %{python_ver}-pyyaml
+
 Requires:      %{python_ver}-setuptools
-%endif
 # libvirt python required for libvirt support
-
+%if (0%{?rhel} && 0%{?rhel} > 7 || 0%{?fedora})
 Requires:       %{python_ver}-libvirt
-
+%else
+Requires:       libvirt-python
+%endif
 # python-rhsm 1.20 has the M2Crypto wrappers needed to replace M2Crypto
 # with the python standard libraries where plausible
 %if %{use_python3}
-Requires:       python3-subscription-manager-rhsm
+Requires:       python3-subscription-manager-rhsm > 1.25.6
 %else
-Requires:       subscription-manager-rhsm
+Requires:       subscription-manager-rhsm > 1.25.6
 %endif
-# python-suds is required for vSphere support
-Requires:       %{python_ver}-suds
 # m2crypto OR python3-cryptography is required for Hyper-V support
 %if %{use_python3}
 Requires:       python3-cryptography
@@ -57,6 +61,7 @@ Requires:       %{python_ver}-six
 # python-argparse is required for Python 2.6 on EL6
 %{?el6:Requires: python-argparse}
 Requires:       openssl
+Requires:       %{python_ver}-pyyaml
 
 %if %{use_systemd}
 %if %{use_python3}
@@ -74,6 +79,7 @@ Requires(preun): chkconfig
 # This is for /sbin/service
 Requires(preun): initscripts
 %endif
+Provides: bundled(python-suds) = 0.8.4
 
 %description
 Agent that collects information about virtual guests present in the system and
@@ -83,7 +89,7 @@ report them to the subscription manager.
 %setup -q
 
 %build
-%{python_exec} setup.py build
+%{python_exec} setup.py build --rpm-version=%{version}-%{release_number}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -104,12 +110,17 @@ install -m 644 virt-who-zsh %{buildroot}/%{_datadir}/zsh/site-functions/_virt-wh
 
 # Don't run test suite in check section, because it need the system to be
 # registered to subscription-manager server
+
 %post
 %if %{use_systemd}
 %systemd_post virt-who.service
 %else
 # This adds the proper /etc/rc*.d links for the script
 /sbin/chkconfig --add virt-who
+%endif
+# This moves parameters from old config to remaining general config file
+%if (0%{?fedora} > 33 || 0%{?rhel} > 8)
+%{python_exec} %{python_sitelib}/virtwho/migrate/migrateconfiguration.py
 %endif
 
 %preun
@@ -131,9 +142,9 @@ if [ "$1" -ge "1" ] ; then
 fi
 %endif
 
+
 %files
-%license LICENSE
-%doc README.md README.hyperv
+%doc README.md LICENSE README.hyperv
 %{_bindir}/virt-who
 %{_bindir}/virt-who-password
 %{python_sitelib}/*
@@ -142,7 +153,6 @@ fi
 %else
 %{_sysconfdir}/rc.d/init.d/virt-who
 %endif
-%attr(600, root, root) %config(noreplace) %{_sysconfdir}/sysconfig/virt-who
 %attr(700, root, root) %dir %{_sysconfdir}/virt-who.d
 %{_mandir}/man8/virt-who.8.gz
 %{_mandir}/man8/virt-who-password.8.gz
@@ -153,36 +163,325 @@ fi
 %{_sysconfdir}/virt-who.d/template.conf
 %attr(600, root, root) %config(noreplace) %{_sysconfdir}/virt-who.conf
 
+
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-4
-- Updating naming for 3.0 version of Azure Linux.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.31.26-1.3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.24.2-3
-- Update Source0
-- Improve formatting
-- License verified.
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.31.26-1.2
+- Rebuilt for Python 3.13
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-2
-- Switching to using full number for the 'Release' tag.
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.31.26-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Mon Jun 28 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-1.6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Switching to building with Python 3.
+* Wed Feb 01 2023 Jiri Hnidek <jhnidek@redhat.com> 1.31.26-1
+- Fix stylish issue in migrateconfiguration.py (jhnidek@redhat.com)
+- Added next rhel-9.x subversion to releasers.conf file. (jhnidek@redhat.com)
+- 2158710: Migrated virt-who.conf, when necessary (jhnidek@redhat.com)
+- Added documentation for the 'rhsm_insecure' option, for insecure connections
+  (fernandez.santos.d@gmail.com)
+- Added configuration for rhel-9.x into releasers.conf (jhnidek@redhat.com)
 
-* Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.2-1.5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+* Thu Oct 06 2022 William Poteat <wpoteat@redhat.com> 1.31.25-1
+- 2099925: Drop support for RHEVM on RHEL 9 (jhnidek@redhat.com)
+- Update virt-who-config.5 (s10w.1ife.31@gmail.com)
+- Big optimization and refactoring of Nutanix code (jhnidek@redhat.com)
 
-* Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.24.2-1.4
-- Rebuilt for Python 3.8.0rc1 (#1748018)
+* Thu Sep 01 2022 William Poteat <wpoteat@redhat.com> 1.31.24-1
+- 2118253: Nutanix: Gather information about VMs correctly (jhnidek@redhat.com)
 
-* Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 0.24.2-1.3
-- Rebuilt for Python 3.8
+* Thu Apr 21 2022 William Poteat <wpoteat@redhat.com> 1.31.23-1
+- 2054504: Use usedforsecurity=False for md5() calls to make suds work on FIPS
+  enabled systems (oalbrigt@redhat.com)
 
-* Sat Jul 27 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.2-1.2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+* Wed Mar 16 2022 William Poteat <wpoteat@redhat.com> 1.31.22-1
+- 2060949: Indicate that virt-who provides python-suds in the spec file
+  (wpoteat@redhat.com)
+- Run complex tests as forked for consistent results (wpoteat@redhat.com)
+- Update releasers for current needs (wpoteat@redhat.com)
 
-* Sun Feb 03 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.2-1.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+* Tue Feb 08 2022 William Poteat <wpoteat@redhat.com> 1.31.21-1
+- 1987247: The connection value shows null for kubevirt mode in virt-who status
+  json (wpoteat@redhat.com)
+- Addition of LGPLv3 license file from suds (wpoteat@redhat.com)
+- 2000415: Nutanix config needs to handle bad server value (wpoteat@redhat.com)
+- 1996942: Use cluster name instead of UUID for fabric consistency
+  (wpoteat@redhat.com)
+- 1990758: Virt-who always prints YAMLLoadWarning for kubevirt mode
+  (wpoteat@redhat.com)
+- 1990563: Move progress bar to stderr to keep stdout clean
+  (wpoteat@redhat.com)
+
+* Tue Feb 08 2022 William Poteat <wpoteat@redhat.com>
+- 1987247: The connection value shows null for kubevirt mode in virt-who status
+  json (wpoteat@redhat.com)
+- Addition of LGPLv3 license file from suds (wpoteat@redhat.com)
+- 2000415: Nutanix config needs to handle bad server value (wpoteat@redhat.com)
+- 1996942: Use cluster name instead of UUID for fabric consistency
+  (wpoteat@redhat.com)
+- 1990758: Virt-who always prints YAMLLoadWarning for kubevirt mode
+  (wpoteat@redhat.com)
+- 1990563: Move progress bar to stderr to keep stdout clean
+  (wpoteat@redhat.com)
+
+* Mon Jan 10 2022 William Poteat <wpoteat@redhat.com> 1.31.19-1
+- 1990562: Remove the redundant 'update_interval' option from ahv config
+  (wpoteat@redhat.com)
+- 1990561: rename configuration entry to show ahv specificity
+  (wpoteat@redhat.com)
+
+* Thu Dec 16 2021 William Poteat <wpoteat@redhat.com> 1.31.18-1
+- 2000019: Convert non-latin1 username/password to bytes (jhnidek@redhat.com)
+- 2018052: Fix virt-who -s, when Hyper-V with new API is used
+  (jhnidek@redhat.com)
+- ENT-4511: Remove six package from requirements (mhorky@redhat.com)
+- ENT-4511: Drop Python 2 only tests (mhorky@redhat.com)
+- ENT-4511: Drop six usage in suds tests (mhorky@redhat.com)
+- ENT-4511: Drop six usage in tests (mhorky@redhat.com)
+- ENT-4511: Drop six usage in virt-who code (mhorky@redhat.com)
+- ENT-4511: Drop OrderedDict implementation (mhorky@redhat.com)
+- Update for deprecation of MutableMapping (wpoteat@redhat.com)
+- Only query the VM related taks in AHV hypervisors. (amir.eibagi@nutanix.com)
+- Remove unused NTLM code as only basic auth is used (wpoteat@redhat.com)
+
+* Tue Sep 14 2021 William Poteat <wpoteat@redhat.com> 1.31.17-1
+- Bypass stylish check on suds code (wpoteat@redhat.com)
+- 2000922: Add the suds code to virt-who in place of python3-suds package
+  (wpoteat@redhat.com)
+- ENT-4004: Fix flake8 issues for test files (mhorky@redhat.com)
+- ENT-4004: Use four spaces for indentation (mhorky@redhat.com)
+- ENT-4004: Fix flake8 issues (mhorky@redhat.com)
+- ENT-4004: Add stylish tests (mhorky@redhat.com)
+- Cannot use ESX where python3-suds is not available (wpoteat@redhat.com)
+- 1981249: Stop using NTLM which requires MD4 (OpenSSL 3.0)
+  (csnyder@redhat.com)
+- 1989877: Status command does not reach actual credentials checking
+  (wpoteat@redhat.com)
+- Make changes to follow Conscious language initiative (mhorky@redhat.com)
+
+* Fri Aug 06 2021 William Poteat <wpoteat@redhat.com> 1.31.16-1
+- 1990550: Add the description for nutanix mode in man virt-who and man virt-
+  who-config (wpoteat@redhat.com)
+- 1990337: The guest state in mapping should be uniform with other hypervisors
+  1990338: The guest shows wrong active value "0" in mapping when it's running
+  (wpoteat@redhat.com)
+- 1989646:  Get UnboundLocalError when configured hypervisor_id=hwuuid
+  (wpoteat@redhat.com)
+- 1989645: Add dmi.system.uuid to ahv facts (wpoteat@redhat.com)
+- 1974624: proxy error with https (wpoteat@redhat.com)
+
+* Tue Aug 03 2021 William Poteat <wpoteat@redhat.com> 1.31.15-1
+- 1986973: Take out AHV removal patch mechanism (wpoteat@redhat.com)
+- Update AHV patch (wpoteat@redhat.com)
+
+* Fri Jul 16 2021 William Poteat <wpoteat@redhat.com> 1.31.14-1
+- Merge run data into report (wpoteat@redhat.com)
+- Update the man page for the status mode (wpoteat@redhat.com)
+- Status execution (wpoteat@redhat.com)
+- Record last dates of succcess for sources and destinations
+  (wpoteat@redhat.com)
+- Update certs for complex tests (wpoteat@redhat.com)
+
+* Thu Jun 03 2021 William Poteat <wpoteat@redhat.com> 1.31.13-1
+- 1965320: Clear previous report hash when hypervisor count is zero
+  (wpoteat@redhat.com)
+- Added support for Packit service (jhnidek@redhat.com)
+- Convert CI from Travis to Jenkins (wpoteat@redhat.com)
+
+* Fri May 21 2021 William Poteat <wpoteat@redhat.com> 1.31.12-1
+- 1951347: Update patch for xen removal (wpoteat@redhat.com)
+
+* Thu May 20 2021 William Poteat <wpoteat@redhat.com> 1.31.11-1
+- 1951347: Remove Xen from hypervisor types (wpoteat@redhat.com)
+- Releaser for Centos (wpoteat@redhat.com)
+
+* Mon May 17 2021 William Poteat <wpoteat@redhat.com> 1.31.10-1
+- 1920322: Uncomment section header on migrate (wpoteat@redhat.com)
+- Update CI link to use branch name main (wpoteat@redhat.com)
+- Fedora master branch name changed to main (wpoteat@redhat.com)
+
+* Thu Feb 18 2021 William Poteat <wpoteat@redhat.com> 1.31.9-1
+- Man page update to describe the migration script (wpoteat@redhat.com)
+- 1924572: Add insecure option to config template (wpoteat@redhat.com)
+- Add Fedora 34 to releaser list (wpoteat@redhat.com)
+
+* Thu Jan 28 2021 William Poteat <wpoteat@redhat.com> 1.31.8-1
+- Update AHV patch for Kubevirt change (wpoteat@redhat.com)
+
+* Mon Jan 25 2021 William Poteat <wpoteat@redhat.com> 1.31.7-1
+- 1917645: handle not running vms (piotr.kliczewski@gmail.com)
+- Fedora 31 is no longer a build target (wpoteat@redhat.com)
+
+* Fri Jan 15 2021 William Poteat <wpoteat@redhat.com> 1.31.6-1
+- 1910020: replace deprecated call (wpoteat@redhat.com)
+
+* Mon Jan 04 2021 William Poteat <wpoteat@redhat.com> 1.31.5-1
+- 1909145: [RFE] Use single json format for input/output data
+  (wpoteat@redhat.com)
+- 1855550: [Remote Libvirt] The Name in Stage Candlepin cannot update based on
+  hypervisor_id configuration (wpoteat@redhat.com)
+- 1879329: List possible values for type in man page (wpoteat@redhat.com)
+
+* Tue Dec 08 2020 William Poteat <wpoteat@redhat.com> 1.31.4-1
+- 1899652: Install script error when file does not exist (wpoteat@redhat.com)
+
+* Fri Dec 04 2020 William Poteat <wpoteat@redhat.com> 1.31.3-1
+- 1899652: Update to ahv patch file (wpoteat@redhat.com)
+
+* Wed Dec 02 2020 William Poteat <wpoteat@redhat.com> 0.31.2-1
+- 1896652: platform-python-setuptools is not in RHEL9 (wpoteat@redhat.com)
+
+* Tue Nov 17 2020 William Poteat <wpoteat@redhat.com> 0.31.1-1
+- 1658440: Remove the use of environment variables for configuration
+  (wpoteat@redhat.com)
+- Do not use deprecated isAlive() but use is_alive() (jhnidek@redhat.com)
+- 1890421: New section of virt-who.conf file for environment variables
+  (wpoteat@redhat.com)
+
+* Thu Oct 22 2020 William Poteat <wpoteat@redhat.com> 0.31.0-1
+- 1876927: virt-who fails to parse output from hypervisor (wpoteat@redhat.com)
+- Additional copy of patch file needed for build Update of Fedora versions in
+  releaser file (wpoteat@redhat.com)
+- Correction in patch builder for directory location (wpoteat@redhat.com)
+- Update releasers (wpoteat@redhat.com)
+- 1878136: Deprecation comment in config file (wpoteat@redhat.com)
+- 1854829: rhsm_port and rhsm_password are missing in template.conf
+  (wpoteat@redhat.com)
+
+* Thu Oct 01 2020 William Poteat <wpoteat@redhat.com> 0.30.0-1
+- Add patch to remove AHV bits for RHEL builds (wpoteat@redhat.com)
+- 1878136: Deprecation warning for environment variables (wpoteat@redhat.com)
+- 184506: virt-who should send its version in the User-Agent header
+  (wpoteat@redhat.com)
+- 1806572: RHEVM API url needs version specified (wpoteat@redhat.com)
+- 1847792: [ESX] Virt-who is failed when run with
+  "filter/exclude_host_parents=" option (wpoteat@redhat.com)
+- 1809098: Convert UUID to big-endian for certain esx hardware versions
+  (wpoteat@redhat.com)
+- 1835132: support milicpus (piotr.kliczewski@gmail.com)
+
+* Thu May 21 2020 William Poteat <wpoteat@redhat.com> 0.29.2-1
+- NTLM: Fix compatibility issue with Python3.8 (jhnidek@redhat.com)
+- 1806572: RHEVM should only use version 4 (wpoteat@redhat.com)
+- Update to tests to match changes in Subscription Manager (jhnidek@redhat.com)
+- 1461272: Filter virt-who hosts based on host_parents using wildcard
+  (wpoteat@redhat.com)
+
+* Fri May 08 2020 William Poteat <wpoteat@redhat.com> 0.29.1-1
+- 1806572: virt-who using V3 APIs for communication with RHEVM which is
+  deprecated (wpoteat@redhat.com)
+- Update Fedora releases (wpoteat@redhat.com)
+
+* Fri Apr 03 2020 William Poteat <wpoteat@redhat.com> 0.29.0-1
+- Update releasers for RHEL-8.3 (wpoteat@redhat.com)
+- 1775535: config option to override api version (piotr.kliczewski@gmail.com)
+- 1780467: Validate rhevm password when unicode is not allowed
+  (wpoteat@redhat.com)
+- 1727203: Validate server name for ASCII only in ESX (wpoteat@redhat.com)
+- 1757985: better behavior of --config option; ENT-1713 (jhnidek@redhat.com)
+- 1751441: Add command line path parameter (piotr.kliczewski@gmail.com)
+- 1762780: fix bug, when reporter_id is empty; ENT-1706 (jhnidek@redhat.com)
+- 1759869: Version file needs updating on rpm (wpoteat@redhat.com)
+- 1776084 - Failed to run virt-who with Hyper-V (wpoteat@redhat.com)
+- Proper placeholder (wpoteat@redhat.com)
+- 1751441: remove strict need for kubeconfig (piotr.kliczewski@gmail.com)
+- Update for 8.2 (wpoteat@redhat.com)
+- 1748677: Improved timeout for esx (wpoteat@redhat.com)
+- 1727130: Correct man page for default interval (wpoteat@redhat.com)
+- 1743589: Content type header null coverage (wpoteat@redhat.com)
+- 1751624: Allow unicode username only if python-requests allows it
+  (wpoteat@redhat.com)
+- 1745768: Make message unicode safe (wpoteat@redhat.com)
+- 1516209: Proper handling for empty server entry (wpoteat@redhat.com)
+- 1733286: add connection/request timeout (piotr.kliczewski@gmail.com)
+- Remove vdsm capability (wpoteat@redhat.com)
+- 1720048: Template for general configuration not properly formatted
+  (wpoteat@redhat.com)
+- Add AHV v3 lenght and offset for the API calls. (amir.eibagi@nutanix.com)
+- 1530254: Update checking on environment variables (wpoteat@redhat.com)
+- 1714456: Update description of 'print_' config option (wpoteat@redhat.com)
+- 1499679: Check for duplicates in conf file; ENT-249 (jhnidek@redhat.com)
+- 1720154: Provide SYSTEM_UUID_FACT (piotr.kliczewski@gmail.com)
+- 1516120: Handling for incorrect config section headers (wpoteat@redhat.com)
+- 1722560: Make heartbeat more robust (jhnidek@redhat.com)
+- Update spec for build system (wpoteat@redhat.com)
+- 1416298: Use unique guest attribute for state tracking (wpoteat@redhat.com)
+
+* Wed Jun 12 2019 William Poteat <wpoteat@redhat.com> 0.25.4-1
+- 1718304: Fix issue when instance["BIOSGUID"] returns None
+  (phess@users.noreply.github.com)
+- 1652549: Add heartbeat call to virt-who cycle (wpoteat@redhat.com)
+- 1472727: Log error, when encrypted password is missing; ENT-1344
+  (jhnidek@redhat.com)
+- 1714133: can't set data property (piotr.kliczewski@gmail.com)
+- Add Nutanix AHV support for RHSS + UTs. (amir00018@gmail.com)
+
+* Fri May 24 2019 William Poteat <wpoteat@redhat.com> 0.25.3-1
+- 1530290: Remove enviroment as an input variable for the hypervisor check in
+  (wpoteat@redhat.com)
+- 1523482: 1519704: Interval value set to empty string will revert to default
+  value (wpoteat@redhat.com)
+- 1522384: Log at debug level when config uses default entries
+  (wpoteat@redhat.com)
+- 1708524: update man page with kubevirt backend information
+  (piotr.kliczewski@gmail.com)
+- 1708534: add kubeconfig to template (piotr.kliczewski@gmail.com)
+- 1516209: Configuration should be deemed invalid when server is not specified
+  (wpoteat@redhat.com)
+- 1640967: Add xen type listing in /etc/virt-who.d/template.conf
+  (wpoteat@redhat.com)
+
+* Tue May 14 2019 William Poteat <wpoteat@redhat.com> 0.25.2-1
+- Update to spec for pyyaml package (wpoteat@redhat.com)
+
+* Tue May 14 2019 William Poteat <wpoteat@redhat.com>
+- Update to spec for pyyaml package (wpoteat@redhat.com)
+
+* Mon May 13 2019 William Poteat <wpoteat@redhat.com> 0.25.0-1
+- Update releasers (wpoteat@redhat.com)
+- 1641953: Virt-who fails if one hypervisor has wrong encrypted password
+  (wpoteat@redhat.com)
+- 1506167: Ignore new SIGHUP signals during signal handling
+  (jhnidek@redhat.com)
+- 1522661: Constrict is_hypervisor field to fake virt (wpoteat@redhat.com)
+- 1695538: Provide support for hypervisor_id option
+  (piotr.kliczewski@gmail.com)
+- 1695519: use correct uuid in kubevirt report (piotr.kliczewski@gmail.com)
+
+* Mon May 13 2019 William Poteat <wpoteat@redhat.com>
+- Update releasers (wpoteat@redhat.com)
+- 1641953: Virt-who fails if one hypervisor has wrong encrypted password
+  (wpoteat@redhat.com)
+- 1506167: Ignore new SIGHUP signals during signal handling
+  (jhnidek@redhat.com)
+- 1522661: Constrict is_hypervisor field to fake virt (wpoteat@redhat.com)
+- 1695538: Provide support for hypervisor_id option
+  (piotr.kliczewski@gmail.com)
+- 1695519: use correct uuid in kubevirt report (piotr.kliczewski@gmail.com)
+
+* Wed Apr 03 2019 William Poteat <wpoteat@redhat.com> 0.24.4-1
+- 1667522: Omit ESX host from report when no hostname is present
+  (wpoteat@redhat.com)
+- 1693858: Send hardware uuid on every check in for system reconcilliation
+  (wpoteat@redhat.com)
+- kubevirt: provide user authentication (piotr.kliczewski@gmail.com)
+- 1486270: pass no_proxy from config files (wpoteat@redhat.com)
+- kubevirt: drop kubernetes and kubevirt dependencies
+  (piotr.kliczewski@gmail.com)
+- 1638250: Improved fix for http proxy issue (wpoteat@redhat.com)
+- Update releaser (wpoteat@redhat.com)
+
+* Wed Apr 03 2019 William Poteat <wpoteat@redhat.com>
+- 1667522: Omit ESX host from report when no hostname is present
+  (wpoteat@redhat.com)
+- 1693858: Send hardware uuid on every check in for system reconcilliation
+  (wpoteat@redhat.com)
+- kubevirt: provide user authentication (piotr.kliczewski@gmail.com)
+- 1486270: pass no_proxy from config files (wpoteat@redhat.com)
+- kubevirt: drop kubernetes and kubevirt dependencies
+  (piotr.kliczewski@gmail.com)
+- 1638250: Improved fix for http proxy issue (wpoteat@redhat.com)
+- Update releaser (wpoteat@redhat.com)
 
 * Fri Dec 21 2018 William Poteat <wpoteat@redhat.com> 0.24.2-1
 - 1657104: Remove references to removed command line options

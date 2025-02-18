@@ -1,0 +1,6 @@
+[Unit]
+Description=Update ReaR rescue image
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rear checklayout || /usr/sbin/rear mkrescue

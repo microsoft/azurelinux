@@ -1,0 +1,79 @@
+## <summary>WS-Management Server</summary>
+
+########################################
+## <summary>
+##	Execute openwsman in the openwsman domin.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`openwsman_domtrans',`
+	gen_require(`
+		type openwsman_t, openwsman_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, openwsman_exec_t, openwsman_t)
+')
+########################################
+## <summary>
+##	Execute openwsman server in the openwsman domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`openwsman_systemctl',`
+	gen_require(`
+		type openwsman_t;
+		type openwsman_unit_file_t;
+	')
+
+	systemd_exec_systemctl($1)
+	init_reload_services($1)
+    systemd_read_fifo_file_passwd_run($1)
+	allow $1 openwsman_unit_file_t:file read_file_perms;
+	allow $1 openwsman_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, openwsman_t)
+')
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an openwsman environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`openwsman_admin',`
+	gen_require(`
+		type openwsman_t;
+	    type openwsman_unit_file_t;
+	')
+
+	allow $1 openwsman_t:process { signal_perms };
+	ps_process_pattern($1, openwsman_t)
+
+    tunable_policy(`deny_ptrace',`',`
+        allow $1 openwsman_t:process ptrace;
+    ')
+
+	openwsman_systemctl($1)
+	admin_pattern($1, openwsman_unit_file_t)
+	allow $1 openwsman_unit_file_t:service all_service_perms;
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

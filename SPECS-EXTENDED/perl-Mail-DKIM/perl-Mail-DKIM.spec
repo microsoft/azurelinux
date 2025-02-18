@@ -1,36 +1,39 @@
-Summary:        Sign and verify Internet mail with DKIM/DomainKey signatures
 Name:           perl-Mail-DKIM
-Version:        0.58
-Release:        4%{?dist}
-License:        GPL+ OR Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://dkimproxy.sourceforge.net/
-Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Version:        1.20240619
+Release:        2%{?dist}
+Summary:        Sign and verify Internet mail with DKIM/DomainKey signatures
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:            http://dkimproxy.sourceforge.net/
+Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-%{version}.tar.gz
+BuildArch:      noarch
+# build requirements
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+# runtime requirements
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Crypt::OpenSSL::RSA) >= 0.24
-BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(Crypt::PK::Ed25519)
 BuildRequires:  perl(Digest::SHA)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(MIME::Base64)
 BuildRequires:  perl(Mail::Address)
-BuildRequires:  perl(Mail::AuthenticationResults)
+BuildRequires:  perl(Mail::AuthenticationResults::Header::AuthServID)
+BuildRequires:  perl(Mail::AuthenticationResults::Parser)
 BuildRequires:  perl(Net::DNS)
+BuildRequires:  perl(base)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+# test requirements
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(Net::DNS::Resolver)
 BuildRequires:  perl(Net::DNS::Resolver::Mock)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::RequiresInternet)
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(YAML::XS)
-BuildRequires:  perl(base)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{_bindir}/perl -V:version`"; echo $version))
-BuildArch:      noarch
 
 %description
 This module implements the various components of the DKIM and DomainKeys
@@ -41,37 +44,112 @@ It is required if you wish to enable DKIM checking in SpamAssassin via the
 Mail::SpamAssassin::Plugin::DKIM plugin.
 
 %prep
-%autosetup -n Mail-DKIM-%{version}
+%setup -q -n Mail-DKIM-%{version}
 # Make the example scripts non-executable
 chmod -x scripts/*.pl
 # Use the real path in the shebang
-perl -pi -e 's|^#!%{_bindir}/env perl|#!%{_bindir}/perl|' scripts/arcverify.pl
+/usr/bin/perl -pi -e 's|^#!/usr/bin/env perl|#!/usr/bin/perl|' scripts/arcverify.pl
 # Remove dos-type line endings
-perl -pi -e 's/\r//' doc/qp1.txt
+/usr/bin/perl -pi -e 's/\r//' doc/qp1.txt
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
+
 
 %install
-%make_install
-%{_fixperms} %{buildroot}/*
+%{make_install}
+%{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
-%make_build test
+%{make_build} test
 
 %files
-%license README.md
-%doc ChangeLog Changes doc HACKING.DKIM TODO scripts/*.pl
+%doc Changes doc HACKING.DKIM README.md TODO scripts/*.pl
+%license LICENSE
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 
 %changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 0.58-4
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.20240619-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.58-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sun Jun 23 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20240619-1
+- Update to 1.20240619
+
+* Sat Jan 27 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20240124-1
+- Update to 1.20240124
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.20230911-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.20230911-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Sep 11 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20230911-1
+- Update to 1.20230911
+
+* Mon Jul 24 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20230630-1
+- Update to 1.20230630
+- Reorder dependencies
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.20230212-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 07 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.20230212-2
+- Update license to SPDX format
+
+* Sun Feb 19 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20230212-1
+- Update to 1.20230212
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.20220520-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.20220520-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.20220520-2
+- Perl 5.36 rebuild
+
+* Sun May 22 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20220520-1
+- Update to 1.20220520
+
+* Sun Apr 10 2022 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20220408-1
+- Update to 1.20220408
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.20200907-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20200907-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.20200907-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20200907-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Sep 13 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20200907-1
+- Update to 1.20200907
+
+* Sun Aug 30 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20200824-1
+- Update to 1.20200824
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.20200724-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun Jul 26 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20200724-1
+- Update to 1.20200724
+
+* Sun Jul 12 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20200708-1
+- Update to 1.20200708
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.20200513.1-2
+- Perl 5.32 rebuild
+
+* Sun May 17 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 1.20200513.1-1
+- Update to 1.20200513.1
+- Tage LICENSE as %%license
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.58-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -227,3 +305,4 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 * Tue Jun 17 2008 Kyle VanderBeek <kylev@kylev.com> - 0.32-1
 - Initial version.
+

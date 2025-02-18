@@ -1,0 +1,40 @@
+From 54e7eaf002a2b07cd5571b5d3374eb760d727381 Mon Sep 17 00:00:00 2001
+From: Ming-Hung Tsai <mtsai@redhat.com>
+Date: Tue, 27 Feb 2024 01:24:01 +0800
+Subject: [PATCH] [tests] Fix closing the pipe fd twice
+
+The duct::Expression::stdout_file() takes the ownership of the
+passed-in file descriptor, thus the caller doesn't need to close
+the fd afterward. Closing a fd twice in tests might inadvertently
+closing the fd recently opened by other test threads, leading to
+unexpected bugs.
+
+(cherry picked from commit 3b378b0e39a7ae111a81d394f8721bae89f9ca37)
+---
+ tests/thin_dump.rs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tests/thin_dump.rs b/tests/thin_dump.rs
+index 9eade06e..caae31ef 100644
+--- a/tests/thin_dump.rs
++++ b/tests/thin_dump.rs
+@@ -161,7 +161,7 @@ fn test_no_stderr_on_broken_pipe(extra_args: &[&std::ffi::OsStr]) -> Result<()>
+     args.extend_from_slice(extra_args);
+     let cmd = thin_dump_cmd(args)
+         .to_expr()
+-        .stdout_file(pipefd[1])
++        .stdout_file(pipefd[1]) // this transfers ownership of the fd
+         .stderr_capture();
+     let handle = cmd.unchecked().start()?;
+ 
+@@ -169,7 +169,6 @@ fn test_no_stderr_on_broken_pipe(extra_args: &[&std::ffi::OsStr]) -> Result<()>
+     std::thread::sleep(std::time::Duration::from_millis(1000));
+ 
+     unsafe {
+-        libc::close(pipefd[1]); // close the unused write-end
+         libc::close(pipefd[0]); // causing broken pipe
+     }
+ 
+-- 
+2.43.0
+

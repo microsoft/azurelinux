@@ -1,97 +1,242 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Summary: PostScript Utilities
-Name:    psutils
-Version: 1.23
-Release: 20%{?dist}
-License: psutils
+# Unbundle gnulib
+%bcond psutils_enables_unbundling_gnulib %{undefined rhel}
 
-# We can't follow https://fedoraproject.org/wiki/Packaging:SourceURL#Github
-# and use upstream tarball for building because ./bootstrap downloads gnulib.
-# wget https://github.com/rrthomas/psutils/archive/master.zip && unzip master.zip && cd psutils-master/
-# ./bootstrap && autoreconf -vfi && ./configure && make dist-xz
-Source: %{_distro_sources_url}/psutils-%{version}.tar.xz
-URL:    https://github.com/rrthomas/psutils
-
-# BZ#1072371
-# https://github.com/rrthomas/psutils/commit/cca570c806bf4bde07f400b2bab9266e02998145
-Patch0: psutils-paperconf.patch
-
+Name:       psutils
+Version:    2.10
+Release:    7%{?dist}
+Summary:    PostScript utilities
+# COPYING:          GPLv3 text
+# epsffit.1:        GPLv3+
+# epsffit.in.in:    GPLv3+
+# extractres.in.in: psutils
+# includeres.in.in: psutils
+# psbook.1:         GPLv3+
+# psbook.in.in:     GPLv3+
+# psjoin.1:         GPLv3+
+# psjoin.in.in:     GPLv3+
+# psnup.in.in:      GPLv3+
+# psresize.1:       GPLv3+
+# psresize.in.in:   GPLv3+
+# psselect.1:       GPLv3+
+# psselect.in.in:   GPLv3+
+# pstops.1:         GPLv3+
+# pstops.in.in:     GPLv3+
+# PSUtils.pm:       GPLv3+
+# README:           GPLv3+
+## In tests subpackage
+# aclocal.m4:       FSFULLR
+# build-aux/compile:        GPLv2+ with Autoconf exception
+# build-aux/config.guess:   GPLv3+ with Autoconf exception
+# build-aux/config.sub:     GPLv3+ with Autoconf exception
+# build-aux/depcomp:        GPLv2+ with Autoconf exception
+# build-aux/install-sh:     MIT
+# build-aux/missing:        GPLv2+ with Autoconf exception
+# build-aux/mdate-sh:       GPLv2+ with Autoconf exception
+# build-aux/test-driver:    GPLv2+ with Autoconf exception
+# build-aux/texinfo.tex:    GPLv3+ with TeX exception
+# configure:                FSFULLR
+# m4/00gnulib.m4:           FSFULLR
+# m4/ax_check_gnu_make.m4:  FSFAP
+# m4/gnulib-common.m4:      FSFULLR
+# m4/gnulib-comp.m4:        GPLv3+ with Autoconf exception
+# m4/relocatable-lib.m4:    FSFULLR
+# Makefile.in:              FSFULLR
+## Not in any binary package
+# INSTALL:                  FSFAP
+# old-scripts/fixwfwps:     See LICENSE
+# pre-inst-env.in:          GPLv2+
+License:    GPL-3.0-or-later
+URL:        https://github.com/rrthomas/%{name}
+Source:     %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+BuildArch:      noarch
+BuildRequires:  autoconf
+BuildRequires:  automake >= 1.11
+BuildRequires:  bash
+# coreutils for chmod in Makefile.am
+BuildRequires:  coreutils
+# gcc is a default autoconf dependency and populates EXEEXT variable used in
+# Makefile.am.
 BuildRequires:  gcc
+%if %{with psutils_enables_unbundling_gnulib}
+BuildRequires:  gnulib-devel
+%endif
+BuildRequires:  grep
+BuildRequires:  make
 BuildRequires:  perl-generators
+BuildRequires:  sed
+# Run-time:
+BuildRequires:  paper
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(:VERSION) >= 5.14
+BuildRequires:  perl(base)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(File::Basename)
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IPC::Run3)
+BuildRequires:  perl(List::Util)
+BuildRequires:  perl(POSIX)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+# Tests:
+BuildRequires:  diffutils
+# Only for building
+Provides:       bundled(gnulib)%(perl -ne 'if($. == 1 and /\A(\d+)-(\d+)-(\d+)/) {print qq{ = $1$2$3}}' %{_defaultdocdir}/gnulib/ChangeLog 2>/dev/null)
+# psutils-perl was merged into psutils-2.03-1.fc34
+Provides:       %{name}-perl = %{version}-%{release}
+Obsoletes:      %{name}-perl < %{version}-%{release}
+Requires:       paper
 
-Requires: /usr/bin/paperconf
-
-# copylib - https://fedorahosted.org/fpc/ticket/174
-Provides: bundled(gnulib)
+# Filter private modules
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(PSUtils\\)
+%global __provides_exclude %{?__provides_exclude:%{__provides_exclude}|}^perl\\(PSUtils\\)
 
 %description
 Utilities for manipulating PostScript documents.
 Page selection and rearrangement are supported, including arrangement into
 signatures for booklet printing, and page merging for n-up printing.
 
-%package perl
-Summary: psutils scripts requiring perl
-BuildArch: noarch
+%package tests
+Summary:        Tests for %{name}
+License:        GPLv3+ and FSFULLR and MIT and FSFAP
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       coreutils
+Requires:       diffutils
+Requires:       make
 
-%description perl
-Various scripts from the psutils distribution that require perl.
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q
-
-%patch 0 -p1 -b .paperconf
-# Use /usr/bin/perl instead of /usr/bin/env perl
-sed -i -e 's,/usr/bin/env perl,%{__perl},' \
-  extractres psjoin
+%if %{with psutils_enables_unbundling_gnulib}
+gnulib-tool --import --no-changelog relocatable-perl
+%endif
+autoreconf -fi
 
 %build
-%configure
-%{__make} %{?_smp_mflags}
+%configure --disable-relocatable
+%{make_build}
  
 %install
-%{__make} install DESTDIR=%{buildroot}
+%{make_install}
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a aclocal.m4 build-aux config.status configure configure.ac m4 Makefile* tests %{buildroot}%{_libexecdir}/%{name}
+printf '#!/bin/sh\nexec "$@"\n' > %{buildroot}%{_libexecdir}/%{name}/pre-inst-env
+chmod +x %{buildroot}%{_libexecdir}/%{name}/pre-inst-env
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Makefile writes into CWD
+DIR=$(mktemp -d)
+cp -a %{_libexecdir}/%{name}/* "$DIR"
+pushd "$DIR"
+unset PSUTILS_UNINSTALLED
+make -j "$(getconf _NPROCESSORS_ONLN)" check-TESTS
+popd
+rm -r "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
+%check
+unset PSUTILS_UNINSTALLED
+make check %{?_smp_mflags}
 
 %files
-%doc README LICENSE
+%license COPYING
+# ChangeLog is not helpful
+# old-scripts excluded intentionally
+%doc README
 %{_bindir}/epsffit
+%{_bindir}/extractres
+%{_bindir}/includeres
 %{_bindir}/psbook
+%{_bindir}/psjoin
 %{_bindir}/psnup
 %{_bindir}/psresize
 %{_bindir}/psselect
 %{_bindir}/pstops
+%{_datadir}/%{name}
 %{_mandir}/man1/epsffit.1*
+%{_mandir}/man1/extractres.1*
+%{_mandir}/man1/includeres.1*
 %{_mandir}/man1/psbook.1*
+%{_mandir}/man1/psjoin.1*
 %{_mandir}/man1/psnup.1*
 %{_mandir}/man1/psresize.1*
 %{_mandir}/man1/psselect.1*
 %{_mandir}/man1/pstops.1*
 %{_mandir}/man1/psutils.1*
 
-%files perl
-%doc LICENSE
-%{_bindir}/extractres
-%{_bindir}/includeres
-%{_bindir}/psjoin
-%{_mandir}/man1/extractres.1*
-%{_mandir}/man1/includeres.1*
-%{_mandir}/man1/psjoin.1*
-
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-20
-- Updating naming for 3.0 version of Azure Linux.
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.23-19
-- Updated source URL.
-- License verified.
+* Wed Jul 03 2024 Ondřej Pohořelský <opohorel@redhat.com> - 2.10-6
+- Don't copy configure~ into psutils-tests package
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-18
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed May 15 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 2.10-5
+- Use bundled gnulib on RHEL
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Feb 28 2023 Ondřej Pohořelský <opohorel@redhat.com> - 2.10-1
+- 2.10 bump
+- resolves: rhbz#2173614
+
+* Fri Jan 20 2023 Ondřej Pohořelský <opohorel@redhat.com> - 2.09-1
+- 2.09 bump
+- resolves: rhbz#2035916
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.07-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.07-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.07-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Oct 26 2021 Ondřej Pohořelský <opohorel@redhat.com> - 2.07-1
+- 2.07 bump
+- Resolves: rhbz#2012555
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.06-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 01 2021 Ondřej Pohořelský <opohorel@redhat.com> - 2.06-1
+- 2.06 bump
+
+* Tue Apr 06 2021 Petr Pisar <ppisar@redhat.com> - 2.05-1
+- 2.05 bump
+- Package tests
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Nov 18 2020 Petr Pisar <ppisar@redhat.com> - 2.04-1
+- 2.04 bump
+
+* Fri Oct 02 2020 Petr Pisar <ppisar@redhat.com> - 2.03-1
+- 2.03 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.23-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.23-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

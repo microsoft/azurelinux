@@ -1,7 +1,7 @@
-From e951a8a7edc87dbd608043f8aab67ef12979e3ca Mon Sep 17 00:00:00 2001
+From dff26dea758535a1f5e0cb3279ddc1d5a6191b56 Mon Sep 17 00:00:00 2001
 From: Sahana Prasad <sahana@redhat.com>
 Date: Mon, 12 Sep 2022 11:07:38 +0200
-Subject: [PATCH 6/8] Apply patch stunnel-5.56-curves-doc-update.patch
+Subject: [PATCH 5/5] Apply patch stunnel-5.56-curves-doc-update.patch
 
 Patch-name: stunnel-5.56-curves-doc-update.patch
 Patch-id: 6
@@ -16,12 +16,12 @@ From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
  6 files changed, 12 insertions(+)
 
 diff --git a/doc/stunnel.8.in b/doc/stunnel.8.in
-index a56f0b7..977a1a4 100644
+index e74e174..03b503b 100644
 --- a/doc/stunnel.8.in
 +++ b/doc/stunnel.8.in
-@@ -475,6 +475,8 @@ This file contains multiple CRLs, used with the \fIverifyChain\fR and
+@@ -490,6 +490,8 @@ This file contains multiple CRLs, used with the \fIverifyChain\fR and
  .IX Item "curves = list"
- \&\s-1ECDH\s0 curves separated with ':'
+ ECDH curves separated with ':'
  .Sp
 +Note: This option is supported for server mode sockets only.
 +.Sp
@@ -29,10 +29,10 @@ index a56f0b7..977a1a4 100644
  .Sp
  To get a list of supported curves use:
 diff --git a/doc/stunnel.html.in b/doc/stunnel.html.in
-index 608afa9..cecc81a 100644
+index df0efdd..385ac8d 100644
 --- a/doc/stunnel.html.in
 +++ b/doc/stunnel.html.in
-@@ -570,6 +570,8 @@
+@@ -596,6 +596,8 @@
  
  <p>ECDH curves separated with &#39;:&#39;</p>
  
@@ -42,12 +42,12 @@ index 608afa9..cecc81a 100644
  
  <p>To get a list of supported curves use:</p>
 diff --git a/doc/stunnel.pl.8.in b/doc/stunnel.pl.8.in
-index e2e6622..eae88f8 100644
+index 4efe602..9683b4c 100644
 --- a/doc/stunnel.pl.8.in
 +++ b/doc/stunnel.pl.8.in
-@@ -492,6 +492,8 @@ przez opcje \fIverifyChain\fR i \fIverifyPeer\fR.
+@@ -494,6 +494,8 @@ przez opcje \fIverifyChain\fR i \fIverifyPeer\fR.
  .IX Item "curves = lista"
- krzywe \s-1ECDH\s0 odddzielone ':'
+ krzywe ECDH odddzielone ':'
  .Sp
 +Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.
 +.Sp
@@ -55,10 +55,10 @@ index e2e6622..eae88f8 100644
  .Sp
  Listę dostępnych krzywych można uzyskać poleceniem:
 diff --git a/doc/stunnel.pl.html.in b/doc/stunnel.pl.html.in
-index 7be87f1..7fd7a7c 100644
+index 8e40042..3025e9f 100644
 --- a/doc/stunnel.pl.html.in
 +++ b/doc/stunnel.pl.html.in
-@@ -568,6 +568,8 @@
+@@ -586,6 +586,8 @@
  
  <p>krzywe ECDH odddzielone &#39;:&#39;</p>
  
@@ -68,10 +68,10 @@ index 7be87f1..7fd7a7c 100644
  
  <p>List&#x119; dost&#x119;pnych krzywych mo&#x17C;na uzyska&#x107; poleceniem:</p>
 diff --git a/doc/stunnel.pl.pod.in b/doc/stunnel.pl.pod.in
-index dc6b255..712f751 100644
+index 4419f9f..c48387a 100644
 --- a/doc/stunnel.pl.pod.in
 +++ b/doc/stunnel.pl.pod.in
-@@ -516,6 +516,8 @@ przez opcje I<verifyChain> i I<verifyPeer>.
+@@ -535,6 +535,8 @@ przez opcje I<verifyChain> i I<verifyPeer>.
  
  krzywe ECDH odddzielone ':'
  
@@ -81,10 +81,10 @@ index dc6b255..712f751 100644
  
  Listę dostępnych krzywych można uzyskać poleceniem:
 diff --git a/doc/stunnel.pod.in b/doc/stunnel.pod.in
-index 840c708..85cc199 100644
+index 1a49d42..7a92697 100644
 --- a/doc/stunnel.pod.in
 +++ b/doc/stunnel.pod.in
-@@ -501,6 +501,8 @@ I<verifyPeer> options.
+@@ -533,6 +533,8 @@ I<verifyPeer> options.
  
  ECDH curves separated with ':'
  
@@ -94,5 +94,5 @@ index 840c708..85cc199 100644
  
  To get a list of supported curves use:
 -- 
-2.37.3
+2.46.0
 

@@ -1,12 +1,11 @@
-diff -urN xalan-j_2_7_2.old/build.xml xalan-j_2_7_2/build.xml
---- xalan-j_2_7_2.old/build.xml	2014-06-23 09:21:30.815410307 +0200
-+++ xalan-j_2_7_2/build.xml	2014-06-23 09:25:00.547429701 +0200
-@@ -616,7 +616,7 @@
+--- build.xml.orig	2007-11-22 23:44:01.000000000 +0200
++++ build.xml	2010-04-07 13:32:31.878542610 +0300
+@@ -683,7 +683,7 @@ $Id: build.xml 563656 2007-08-07 21:12:1
    <!-- =================================================================== -->
-   <!-- Creates the xsltc jar including all support jars                    -->
+   <!-- Creates one big xalan jar (Xalan interpretive + XSLTC + support jars) -->
    <!-- =================================================================== -->
--  <target name="xsltc.jar" depends="xsltc.compile,xsltc.copy-deps-jars"
-+  <target name="xsltc.jar" depends="xsltc.compile"
-      description="Jar xsltc,xml,BCEL,JLex,java_cup,runtime and jakarta regexp">
- 
-     <!-- create new META-INF dir w/ transformer factory default -->
+-  <target name="jar" depends="xalan-interpretive.compile,xsltc.compile,xsltc.copy-deps-jars"
++  <target name="jar" depends="xalan-interpretive.compile,xsltc.compile"
+     description="Jar up everything (Xalan, XSLTC and XSLTC dependencies)" >
+     
+     <!-- Copy over the manifest, with filtering (for version number) -->

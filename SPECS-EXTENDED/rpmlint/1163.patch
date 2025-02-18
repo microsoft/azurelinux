@@ -1,0 +1,71 @@
+From 50a33b41c67342c4b0817670a184c0ba263e77b5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20Garc=C3=ADa=20Moreno?= <dani@danigm.net>
+Date: Wed, 3 Jan 2024 15:00:55 +0100
+Subject: [PATCH] lint: Reset all checks for each package
+
+Some check classes keep state during checking and this cause problems
+when checking several files with the same call.
+
+This patch resets all the checks for each package to check. This is a
+quick solution, maybe the best way to handle this is to reset the state
+for each check in with a common method in the AbstractCheck, a common
+way to handle and reset the state to avoid this problem in the future.
+
+Fix https://github.com/rpm-software-management/rpmlint/issues/1161
+---
+ rpmlint/lint.py  | 10 ++++++++++
+ test/test_cli.py |  9 +++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/rpmlint/lint.py b/rpmlint/lint.py
+index 5372e749c..b00937ca2 100644
+--- a/rpmlint/lint.py
++++ b/rpmlint/lint.py
+@@ -224,6 +224,7 @@ def _print_header(self):
+     def validate_installed_packages(self, packages):
+         for pkg in packages:
+             self.run_checks(pkg, pkg == packages[-1])
++            self.reset_checks()
+ 
+     def validate_files(self, files):
+         """
+@@ -243,6 +244,7 @@ def validate_files(self, files):
+         packages = sorted(packages)
+         for pkg in packages:
+             self.validate_file(pkg, pkg == packages[-1])
++            self.reset_checks()
+ 
+     def _expand_filelist(self, files):
+         packages = []
+@@ -331,6 +333,14 @@ def load_checks(self):
+             if not selected_checks or check in selected_checks:
+                 self.checks[check] = self.load_check(check)
+ 
++    def reset_checks(self):
++        """
++        Reset all check objects to set to the default state
++        """
++        to_reset = self.checks.keys()
++        for check in to_reset:
++            self.checks[check] = self.load_check(check)
++
+     def load_check(self, name):
+         """Load a (check) module by its name, unless it is already loaded."""
+         module = importlib.import_module(f'.{name}', package='rpmlint.checks')
+diff --git a/test/test_cli.py b/test/test_cli.py
+index 2f0c55f08..03aea43a1 100644
+--- a/test/test_cli.py
++++ b/test/test_cli.py
+@@ -83,3 +83,12 @@ def test_parsing_fedora_conf(test_arguments):
+         if score_key.startswith('percent-in-'):
+             continue
+         assert score_key in checks
++
++
++def test_reset_check():
++    files = ['test/spec/SpecCheck2.spec', 'test/spec/SpecCheck3.spec']
++    options = process_lint_args(['--checks', 'SpecCheck'] + files)
++    lint = Lint(options)
++    lint.run()
++    out = lint.output.print_results(lint.output.results, lint.config)
++    assert 'more-than-one-%changelog-section' not in out

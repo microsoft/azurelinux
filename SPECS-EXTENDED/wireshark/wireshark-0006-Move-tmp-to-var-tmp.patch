@@ -18,27 +18,6 @@ to use different directory on different filesystem.
  create mode 100644 wsutil/wstmpdir.c
  create mode 100644 wsutil/wstmpdir.h
 
-diff --git a/ui/qt/about_dialog.cpp b/ui/qt/about_dialog.cpp
-index 752b669ac4..42c2be0fca 100644
---- a/ui/qt/about_dialog.cpp
-+++ b/ui/qt/about_dialog.cpp
-@@ -14,6 +14,7 @@
- 
- #include "main_application.h"
- #include <wsutil/filesystem.h>
-+#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
- 
- #include <QDesktopServices>
- #include <QUrl>
-@@ -185,7 +186,7 @@ FolderListModel::FolderListModel(QObject * parent):
-     appendRow(QStringList() << tr("\"File\" dialogs") << get_last_open_dir() << tr("capture files"));
- 
-     /* temp */
--    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : g_get_tmp_dir()) << tr("untitled capture files"));
-+    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : get_tmp_dir()) << tr("untitled capture files"));
- 
-     /* pers conf */
-     appendRow(QStringList() << tr("Personal configuration")
 diff --git a/ui/qt/iax2_analysis_dialog.cpp b/ui/qt/iax2_analysis_dialog.cpp
 index 07b9b42e01..fb09de989b 100644
 --- a/ui/qt/iax2_analysis_dialog.cpp
@@ -86,15 +65,19 @@ index 591a63bbf3..203f5c5286 100644
      } else {
          sample_file_ = new QBuffer(this);
 diff --git a/wsutil/tempfile.c b/wsutil/tempfile.c
-index f93f96d538..73964a1def 100644
+index 531ed91..bd6fd60 100644
 --- a/wsutil/tempfile.c
 +++ b/wsutil/tempfile.c
-@@ -14,10 +14,12 @@
+@@ -10,6 +10,8 @@
  
+ #include "config.h"
  #include "tempfile.h"
- #include "file_util.h"
 +#include <wsutil/file_util.h>
 +#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
+ 
+ #include <errno.h>
+ 
+@@ -39,7 +41,7 @@ sanitize_prefix(const char *prefix)
  
   /**
   * Create a tempfile with the given prefix (e.g. "wireshark"). The path
@@ -103,18 +86,17 @@ index f93f96d538..73964a1def 100644
   *
   * @param tempdir [in] If not NULL, the directory in which to create the file.
   * @param namebuf [in,out] If not NULL, receives the full path of the temp file.
-@@ -33,6 +33,9 @@ create_tempfile(const char *tempdir, gchar **namebuf, const char *pfx, const cha
+@@ -55,13 +57,25 @@ create_tempfile(const char *tempdir, char **namebuf, const char *pfx, const char
  {
    int fd;
-   gchar *safe_pfx = NULL;
+   char *safe_pfx = sanitize_prefix(pfx);
 +  gchar *tmp_file;
 +  const char *tmp_dir;
 +  int old_mask;
  
-   if (pfx) {
-     /* The characters in "delimiters" come from:
-@@ -54,7 +57,16 @@ create_tempfile(const char *tempdir, gchar **namebuf, const char *pfx, const cha
-     gchar* filetmpl = ws_strdup_printf("%sXXXXXX%s", safe_pfx ? safe_pfx : "", sfx ? sfx : "");
+   if (tempdir == NULL || tempdir[0] == '\0') {
+     /* Use OS default tempdir behaviour */
+     char* filetmpl = ws_strdup_printf("%sXXXXXX%s", safe_pfx ? safe_pfx : "", sfx ? sfx : "");
      g_free(safe_pfx);
  
 -    fd = g_file_open_tmp(filetmpl, namebuf, err);
@@ -269,3 +251,24 @@ index 0000000000..07ac5837ac
 -- 
 2.37.3
 
+diff --git a/ui/qt/about_dialog.cpp b/ui/qt/about_dialog.cpp
+index ea11122..982ba1a 100644
+--- a/ui/qt/about_dialog.cpp
++++ b/ui/qt/about_dialog.cpp
+@@ -14,6 +14,7 @@
+ 
+ #include "main_application.h"
+ #include <wsutil/filesystem.h>
++#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
+ 
+ #include <QDesktopServices>
+ #include <QUrl>
+@@ -204,7 +205,7 @@ FolderListModel::FolderListModel(QObject * parent):
+     appendRow(QStringList() << tr("\"File\" dialog location") << get_open_dialog_initial_dir() << tr("Capture files"));
+ 
+     /* temp */
+-    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : g_get_tmp_dir())
++    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : get_tmp_dir())
+                             << tr("Untitled capture files"));
+ 
+     /* pers conf */

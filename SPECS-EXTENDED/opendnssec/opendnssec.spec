@@ -1,15 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-#global prever rcX
 %global _hardened_build 1
 
 Summary: DNSSEC key and zone management software
 Name: opendnssec
-Version: 2.1.7
-Release: 5%{?dist}
-License: BSD
+Version: 2.1.14
+Release: 1%{?dist}
+License: BSD-2-Clause
 Url: http://www.opendnssec.org/
-Source0: http://www.opendnssec.org/files/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz
+Source0: https://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz
+Source10: https://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz.sig
 Source1: ods-enforcerd.service
 Source2: ods-signerd.service
 Source3: ods.sysconfig
@@ -18,9 +16,16 @@ Source5: tmpfiles-opendnssec.conf
 Source6: opendnssec.cron
 Source7: opendnssec-2.1.sqlite_convert.sql
 Source8: opendnssec-2.1.sqlite_rpmversion.sql
+Source9: %{name}-sysusers.conf
+Patch1: 0001-Pass-right-remaining-buffer-size-in-hsm_hex_unparse-.patch
+Patch2: opendnssec-configure-c99.patch
+Patch3: opendnssec-2.1.14rc1-gcc14.patch
+Patch4: opendnssec-c99-2.patch
+Patch5: opendnssec-implicit-declarations.patch
 
 Requires: opencryptoki, softhsm >= 2.5.0 , systemd-units
 Requires: libxml2, libxslt sqlite
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: ldns-devel >= 1.6.12, sqlite-devel >= 3.0.0, openssl-devel
 BuildRequires: libxml2-devel CUnit-devel, doxygen
@@ -36,7 +41,10 @@ Requires(preun): systemd-units
 Requires(postun): systemd-units
 %if 0%{?prever:1}
 # For building development snapshots
-Buildrequires: autoconf, automake, libtool, java
+Buildrequires: autoconf, automake, libtool
+%ifarch %{java_arches}
+Buildrequires: java
+%endif
 %endif
 
 %description
@@ -46,16 +54,25 @@ name server. It requires a PKCS#11 crypto module library, such as softhsm
 
 %prep
 %setup -q -n %{name}-%{version}%{?prever}
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+
+# Prevent re-running autoconf.
+touch -r aclocal.m4 configure* m4/*
+
 # bump default policy ZSK keysize to 2048
 sed -i "s/1024/2048/" conf/kasp.xml.in
 
 %build
-export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/azl/default-hardened-ld"
+export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/redhat/redhat-hardened-ld"
 export CFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wextra -Wformat -Wformat-nonliteral -Wformat-security"
 export CXXFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wformat-nonliteral -Wformat-security"
 %if 0%{?prever:1}
 # for development snapshots
-sh ./autogen.sh
+autoreconf
 %endif
 %configure --with-ldns=%{_libdir}
 %make_build
@@ -77,6 +94,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/
 install -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/sysconfig/ods
 install -m 0644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/opendnssec/
+install -D %{SOURCE9} %{buildroot}%{_sysusersdir}/%{name}.conf
 mkdir -p %{buildroot}%{_tmpfilesdir}/
 install -m 0644 %{SOURCE5} %{buildroot}%{_tmpfilesdir}/opendnssec.conf
 mkdir -p %{buildroot}%{_localstatedir}/run/opendnssec
@@ -114,13 +132,11 @@ sed -i "s:sqlite_convert.sql:%{_datadir}/opendnssec/migration/1.4-2.0_db_convert
 %{_bindir}/*
 %attr(0755,root,root) %dir %{_datadir}/opendnssec
 %{_datadir}/opendnssec/*
+%{_sysusersdir}/%{name}.conf
 
 %pre
-getent group ods >/dev/null || groupadd -r ods
-getent passwd ods >/dev/null || \
-useradd -r -g ods -d /etc/opendnssec -s /usr/sbin/nologin \
--c "opendnssec daemon account" ods
-exit 0
+
+%sysusers_create_package %{name} %{SOURCE9}
 
 %post
 # Initialise a slot on the softhsm on first install
@@ -179,16 +195,68 @@ ods-enforcer update all >/dev/null 2>/dev/null ||:
 %systemd_postun_with_restart ods-signerd.service
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-5
-- Updating naming for 3.0 version of Azure Linux.
-- License verified.
+* Tue Jan 21 2025 Rafel Jeffman <rjeffman@redhat.com> - 2.1.14-1
+- Upstream release 2.1.14
+- Use systemd-sysusers
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-4
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.14-0.2rc1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-3
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Making binaries paths compatible with CBL-Mariner's paths.
+* Thu Feb 08 2024 Alexander Bokovoy <abokovoy@redhat.com> - 2.1.14-0.1rc1
+- Upstream release 2.1.14RC1
+- Fix build with gcc 14
+- Resolves: rhbz#2261421
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Feb 24 2023 Florian Weimer <fweimer@redhat.com> - 2.1.10-6
+- Port to C99
+
+* Mon Jan 30 2023 Alexander Bokovoy <abokovoy@redhat.com> - 2.1.10-5
+- Fix fortification issues leading to crash in FreeIPA setup
+  Upstream PR: https://github.com/opendnssec/opendnssec/pull/842
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 18 2021 François Cami <fcami@redhat.com> - 2.1.10-1
+- Update to 2.1.10 (rhbz#2003250).
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.1.9-3
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jul 06 2021 François Cami <fcami@redhat.com> - 2.1.9-1
+- Update to 2.1.9 (rhbz#1956561). Solves OPENDNSSEC-955 and OPENDNSSEC-956.
+- Known issue: OPENDNSSEC-957: Signer daemon stops with failure exit code even when no error occured.
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.1.8-2
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Sat Feb 20 2021 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 2.1.8-1
+- Update to 2.1.8 (#1931143)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Dec 19 10:13:50 PST 2020 awilliam@redhat.com - 2.1.7-3
+- Rebuild for libldns soname bump
 
 * Tue Dec  8 21:09:23 EST 2020 Paul Wouters <pwouters@redhat.com> - 2.1.7-2
 - Resolves rhbz#1826233 ods-enforcerd.service should wait until socket is ready

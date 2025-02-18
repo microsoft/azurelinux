@@ -1,9 +1,10 @@
-diff -ru noto-emoji-d5e261484286d33a1fe8a02676f5907ecc02106f.orig/Makefile noto-emoji-d5e261484286d33a1fe8a02676f5907ecc02106f/Makefile
---- noto-emoji-d5e261484286d33a1fe8a02676f5907ecc02106f.orig/Makefile	2020-07-23 18:53:36.935321925 +0200
-+++ noto-emoji-d5e261484286d33a1fe8a02676f5907ecc02106f/Makefile	2020-07-23 19:05:20.380141144 +0200
-@@ -15,10 +15,10 @@
- EMOJI = NotoColorEmoji
- font: $(EMOJI).ttf
+Index: noto-emoji-c05b4b47c8250ccd232780cae46d66a8179e77ab/Makefile
+===================================================================
+--- noto-emoji-c05b4b47c8250ccd232780cae46d66a8179e77ab.orig/Makefile
++++ noto-emoji-c05b4b47c8250ccd232780cae46d66a8179e77ab/Makefile
+@@ -16,10 +16,10 @@ EMOJI = NotoColorEmoji
+ EMOJI_WINDOWS = NotoColorEmoji_WindowsCompatible
+ all: $(EMOJI).ttf $(EMOJI_WINDOWS).ttf
  
 -CFLAGS = -std=c99 -Wall -Wextra `pkg-config --cflags --libs cairo`
 +CFLAGS = $(OPT_CFLAGS) -Wextra `pkg-config --cflags --libs cairo`
@@ -14,7 +15,7 @@ diff -ru noto-emoji-d5e261484286d33a1fe8a02676f5907ecc02106f.orig/Makefile noto-
  PYTHON = python3
  PNGQUANTFLAGS = --speed 1 --skip-if-larger --quality 85-95 --force
  BODY_DIMENSIONS = 136x128
-@@ -87,9 +87,9 @@
+@@ -88,9 +88,9 @@ ifeq (,$(shell which $(ZOPFLIPNG)))
    endif
  endif
  

@@ -1,184 +1,709 @@
-diff -urNp old/userguide/avstopam.html new/userguide/avstopam.html
---- old/userguide/avstopam.html	2017-09-05 13:58:08.338559550 +0200
-+++ new/userguide/avstopam.html	2017-09-05 14:00:27.371039472 +0200
-@@ -1,8 +1,7 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
--<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-+<html>
- <head>
- <title>Avstopam User Manual</title>
--<meta http-equiv="content-type" content="text/html; charset=us-ascii" />
- </head>
- 
+diff -urNp a/userguide/avstopam.html b/userguide/avstopam.html
+--- a/userguide/avstopam.html	2025-02-04 10:47:27.823451565 +0100
++++ b/userguide/avstopam.html	2025-02-04 17:49:34.981978989 +0100
+@@ -2,9 +2,9 @@
+ <html><head><title>Avstopam User Manual</title></head>
  <body>
-diff -urNp old/userguide/escp2topbm.html new/userguide/escp2topbm.html
---- old/userguide/escp2topbm.html	2017-09-05 13:58:08.335559561 +0200
-+++ new/userguide/escp2topbm.html	2017-09-05 14:01:20.226842694 +0200
-@@ -6,6 +6,7 @@ Updated: 14 July 2015
- <BR>
- <A HREF="#index">Table Of Contents</A>
+ <h1>avstopam</h1>
+-Updated: 07 February 2010
+-<br>
+-<a href="#index">Table Of Contents</a>
++<p>Updated: 07 February 2010</p>
++
++<p><a href="#index">Table Of Contents</a></p>
+ <h2>NAME</h2>
  
-+<H2>NAME</H2>
- escp2topbm - convert an ESC/P2 printer file to a PBM image
+ <p>avstopam - convert an AVS X image to a Netpbm image
+@@ -16,40 +16,40 @@ Updated: 07 February 2010
  
- <H2 id="synopsis">SYNOPSIS</H2>
-diff -urNp old/userguide/faxformat.html new/userguide/faxformat.html
---- old/userguide/faxformat.html	2017-09-05 13:58:08.337559553 +0200
-+++ new/userguide/faxformat.html	2017-09-05 14:02:33.322571279 +0200
+ <h2 id="description">DESCRIPTION</h2>
+ 
+-<p>This program is part of <a href="index.html">Netpbm</a>.
++<p>This program is part of <a href="index.html">Netpbm</a>.</p>
+ 
+ <p><b>avstopam</b> reads a Stardent <abbr title="Application
+ Visualization System">AVS</abbr> X image as input and produces a Netpbm
+-image as output.
++image as output.</p>
+ 
+ <p><i>avsfile</i> is the input file, which defaults to Standard Input.
+-Output is always on Standard Output.
++Output is always on Standard Output.</p>
+ 
+ <h2 id="options">OPTIONS</h2>
+ 
+ <p>There are no command line options defined specifically
+ for <b>avstopam</b>, but it recognizes the options common to all
+ programs based on libnetpbm (See <a href="index.html#commonoptions">
+-Common Options</a>.)
++Common Options</a>.)</p>
+ 
+ <h2 id="author">AUTHOR</h2>
+ 
+ <p>Copyright&nbsp;&copy; 2010 Scott Pakin,
+-<a href="mailto:scott+pbm@pakin.org">scott+pbm@pakin.org</a>
++<a href="mailto:scott+pbm@pakin.org">scott+pbm@pakin.org</a></p>
+ 
+ <h2 id="seealso">SEE ALSO</h2>
+ 
+-<p><a href="pamtoavs.html">pamtoavs</a>, <a href="pam.html">pam</a>
++<p><a href="pamtoavs.html">pamtoavs</a>, <a href="pam.html">pam</a></p>
+ 
+ <hr>
+ 
+ <h2 id="index">Table Of Contents</h2>
+ <ul>
+-<li><a href="#synopsis">SYNOPSIS</a>
+-<li><a href="#description">DESCRIPTION</a>
+-<li><a href="#options">OPTIONS</a>
+-<li><a href="#author">AUTHOR</a>
+-<li><a href="#seealso">SEE ALSO</a>
++<li><a href="#synopsis">SYNOPSIS</a></li>
++<li><a href="#description">DESCRIPTION</a></li>
++<li><a href="#options">OPTIONS</a></li>
++<li><a href="#author">AUTHOR</a></li>
++<li><a href="#seealso">SEE ALSO</a></li>
+ </ul>
+ </body>
+ </html>
+diff -urNp a/userguide/faxformat.html b/userguide/faxformat.html
+--- a/userguide/faxformat.html	2025-02-04 10:47:27.824451560 +0100
++++ b/userguide/faxformat.html	2025-02-04 17:50:41.300631089 +0100
 @@ -5,10 +5,11 @@
  Updated: 03 December 2008
- <BR>
+ <br>
  
-+<H2>SYNOPSIS</H2>
++<h2>SYNOPSIS</h2>
  <p>This page, part of the <a href="index.html">Netpbm user's guide</a>,
  describes FAX formats in relation to Netpbm facilities.
  
 -
-+<H2>DESCRIPTION</H2>
++<h2>DESCRIPTION</h2>
  <p>The ITU (formerly CCITT) publishes standards for operation of fax machines
  (the idea is to provide a way to be sure that a fax machine is able to receive
  a fax sent by another).  These standards incidentally specify graphics file
-diff -urNp old/userguide/pampaintspill.html new/userguide/pampaintspill.html
---- old/userguide/pampaintspill.html	2017-09-05 13:58:08.338559550 +0200
-+++ new/userguide/pampaintspill.html	2017-09-05 14:03:32.625351620 +0200
-@@ -1,8 +1,7 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
--<html xmlns="http://www.w3.org/1999/xhtml">
-+<html>
- <head>
- <title>Pampaintspill User Manual</title>
--<meta http-equiv="content-type" content="text/html; charset=us-ascii" />
- </head>
+diff -urNp a/userguide/libnetpbm_ug.html b/userguide/libnetpbm_ug.html
+--- a/userguide/libnetpbm_ug.html	2025-02-04 10:47:27.824451560 +0100
++++ b/userguide/libnetpbm_ug.html	2025-02-04 17:52:02.045207328 +0100
+@@ -374,7 +374,7 @@ plain format.
+ <h2 id="reference">Reference</h2>
  
+ <p>The <a href="libnetpbm_image.html">Libnetpbm Netpbm Image
+-Processing Manual</a> describes the the <b>libnetpbm</b> functions for
++Processing Manual</a> describes the <b>libnetpbm</b> functions for
+ processing image data.
+ 
+ <p>The <a href="libpm.html">Libnetpbm Utility Manual</a>
+diff -urNp a/userguide/pamfunc.html b/userguide/pamfunc.html
+--- a/userguide/pamfunc.html	2025-02-04 10:47:27.823451565 +0100
++++ b/userguide/pamfunc.html	2025-02-04 17:52:19.661114878 +0100
+@@ -60,7 +60,7 @@ output image.
+ and bit string (such as and with 01001000).  For the arithmetic functions, the
+ function arguments and results are the fraction that a sample is of the
+ maxval, i.e. normal interpretation of PAM tuples.  But for the bit string
+-functions, the value is the the bit string whose value as a binary cipher is
++functions, the value is the bit string whose value as a binary cipher is
+ the sample value, and the maxval indicates the width of the bit string.
+ 
+ <h4>Arithmetic functions</h4>
+diff -urNp a/userguide/pammixmulti.html b/userguide/pammixmulti.html
+--- a/userguide/pammixmulti.html	2025-02-04 10:47:27.820451577 +0100
++++ b/userguide/pammixmulti.html	2025-02-04 17:56:58.538651212 +0100
+@@ -7,8 +7,8 @@ Updated: 18 December 2024
+ <a href="#index">Table Of Contents</a>
+   
+ 
+-<h2>NAME</h2>
+-<p>pammixmulti - blend together multiple PAM images
++<h2 id="name">NAME</h2>
++<p>pammixmulti - blend together multiple PAM images</p>
+ 
+ 
+ <h2 id="synopsis">SYNOPSIS</h2>
+@@ -17,19 +17,19 @@ Updated: 18 December 2024
+   [<b>-maskfile</b>=<i>filename</i>]
+   [<b>-stdev</b>=<i>number</i>]
+   [<b>-randomseed</b> <i>integer</i>]
+-  <i>filename</i> ...
++  <i>filename</i> ...</p>
+ 
+ <p>Minimum unique abbreviation of an option is acceptable. You can use double
+ hyphen instead of a single hyphen to denote options. You can use white
+ space in place of the equals sign to separate an option name from its
+-value.
++value.</p>
+ 
+ 
+ <h2 id="description">DESCRIPTION</h2>
+-<p>This file is part of <a href="index.html">Netpbm</a>.
++<p>This file is part of <a href="index.html">Netpbm</a>.</p>
+ 
+ <p><b>pammixmulti</b> mixes two or more images to produce a new image. The
+-program provides multiple ways to interpret "mix."
++program provides multiple ways to interpret "mix."</p>
+ 
+ 
+ <h2 id="options">OPTIONS</h2>
+@@ -37,7 +37,7 @@ program provides multiple ways to interp
+ <p>In addition to the options common to all programs based on libnetpbm
+ (most notably <b>-quiet</b>, see <a href="index.html#commonoptions">
+ Common Options</a>), <b>pammixmulti</b> recognizes the following
+-command line options:
++command line options:</p>
+ 
+ <dl compact>
+ <dt><b>-blend</b>=average|alpha-weighted|random|mask</dt>
+@@ -55,8 +55,8 @@ of the input images, chosen at random on
+ With <b>-blend</b>=<code>mask</code>, each pixel in the output is
+ produced by a weighted average of the corresponding pixels from all
+ the input images based on the grayscale level of an additional mask
+-image.
+-<p><b>-alpha-weighted</b> was new in Netpbm 11.09 (December 2024).
++image.</p>
++<p><b>-alpha-weighted</b> was new in Netpbm 11.09 (December 2024).</p>
+ </dd>
+ 
+ <dt><b>-maskfile</b>=<i>filename</i></dt>
+@@ -66,7 +66,7 @@ grayscale mask file to control the blend
+ not grayscale, the first channel is treated as gray).  Where the mask file is
+ black, the first image is selected. Where the mask file is white, the last
+ image is selected.  Intermediate levels of gray select intermediate
+-images.
++images.</p>
+ </dd>
+ 
+ <dt><b>-stdev</b>=<i>number</i></dt>
+@@ -83,7 +83,7 @@ that includes roughly equal amounts of t
+ and 2 but less of the corresponding pixel from image 3.  As <i>number</i>
+ tends towards the number of input images (going beyond that has diminishing
+ impact), the output tends to look more
+-like <b>-blend</b>=average. <i>number</i> defaults to 0.25.
++like <b>-blend</b>=average. <i>number</i> defaults to 0.25.</p>
+ </dd>
+ 
+ <dt><b>-randomseed</b> <i>integer</i>
+@@ -91,45 +91,45 @@ like <b>-blend</b>=average. <i>number</i
+ <dd>This is the seed for the random number generator used with
+ <b>-blend=random</b>
+ 
+-<p>Use this to ensure you get the same image on separate invocations.
++<p>Use this to ensure you get the same image on separate invocations.</p>
+ 
+ </dl>
+ 
+ <h2 id="arguments">ARGUMENTS</h2>
+ 
+-<p>You supply the names of the files to mix as non-option arguments.
++<p>You supply the names of the files to mix as non-option arguments.</p>
+ 
+ 
+ <h2 id="examples">EXAMPLES</h2>
+ 
+-<p>Average a bunch of PPM images to produce a new PAM image:
++<p>Average a bunch of PPM images to produce a new PAM image:</p>
+ <pre><code>
+     pammixmulti input*.ppm &gt;output.ppm
+ </code></pre>
+ 
+ <p>Mix these same images by taking each pixel from a randomly selected input
+-image:
++image:</p>
+ 
+ <pre><code>
+     pammixmulti -blend=random input*.ppm &gt;output.ppm
+ </code></pre>
+ 
+ <p>Use a mask image to control the fading among input images on a
+-pixel-by-pixel basis:
++pixel-by-pixel basis:</p>
+ 
+ <pre><code>
+     pammixmulti -blend=mask -maskfile=mask.pgm &gt;output.pam \
+        one.pam two.pam three.pam four.pam
+ </code></pre>
+ 
+-<p>Do the same but with more abrupt transitions:
++<p>Do the same but with more abrupt transitions:</p>
+ 
+ <pre><code>
+     pammixmulti -blend=mask -maskfile=mask.pgm -stdev=0.0 &gt;output.pam \
+        one.pam two.pam three.pam four.pam
+ </code></pre>
+ 
+-<p>and now with more gradual transitions:
++<p>and now with more gradual transitions:</p>
+ 
+ <pre><code>
+     pammixmulti -blend=mask -maskfile=mask.pgm -stdev=1.0 &gt;output.pam \
+@@ -139,12 +139,12 @@ pixel-by-pixel basis:
+ 
+ <h2 id="history">HISTORY</h2>
+ 
+-<p><b>pammixmulti</b> was new in Netpbm 10.85 (December 2018).
++<p><b>pammixmulti</b> was new in Netpbm 10.85 (December 2018).</p>
+ 
+ 
+ <h2 id="author">AUTHOR</h2>
+ 
+-<p>Copyright 2018&ndash;2024 Scott Pakin, scott+pbm@pakin.org.
++<p>Copyright 2018&ndash;2024 Scott Pakin, scott+pbm@pakin.org.</p>
+ 
+ <h2 id="seealso">SEE ALSO</h2>
+ 
+@@ -152,20 +152,20 @@ pixel-by-pixel basis:
+ <a href="ppmmix.html">ppmmix</a>,
+ <a href="pamarith.html">pamarith</a>,
+ <a href="pnm.html">pnm</a>,
+-<a href="pam.html">pam</a>
++<a href="pam.html">pam</a></p>
+ 
+ 
+ <h2 id="index">Table Of Contents</h2>
+ 
+ <ul>
+-<li><a href="#synopsis">SYNOPSIS</a>
+-<li><a href="#description">DESCRIPTION</a>
+-<li><a href="#options">OPTIONS</a>
+-<li><a href="#arguments">ARGUMENTS</a>
+-<li><a href="#examples">EXAMPLES</a>
+-<li><a href="#history">HISTORY</a>
+-<li><a href="#author">AUTHOR</a>
+-<li><a href="#seealso">SEE ALSO</a>
++<li><a href="#synopsis">SYNOPSIS</a></li>
++<li><a href="#description">DESCRIPTION</a></li>
++<li><a href="#options">OPTIONS</a></li>
++<li><a href="#arguments">ARGUMENTS</a></li>
++<li><a href="#examples">EXAMPLES</a></li>
++<li><a href="#history">HISTORY</a></li>
++<li><a href="#author">AUTHOR</a></li>
++<li><a href="#seealso">SEE ALSO</a></li>
+ </ul>
+ 
+ </body>
+diff -urNp a/userguide/pampaintspill.html b/userguide/pampaintspill.html
+--- a/userguide/pampaintspill.html	2025-02-04 10:47:27.823451565 +0100
++++ b/userguide/pampaintspill.html	2025-02-04 18:01:50.746117598 +0100
+@@ -7,7 +7,7 @@ Updated: 02 November 2021
+ <a href="#index">Table Of Contents</a>
+ 
+ <h2>NAME</h2>
+-pampaintspill - smoothly spill colors into the background
++<p>pampaintspill - smoothly spill colors into the background</p>
+ 
+ <h2 id="synopsis">SYNOPSIS</h2>
+ 
+@@ -19,48 +19,48 @@ pampaintspill - smoothly spill colors in
+ [<b>--downsample</b>=<i>number</i>]
+ [<b>--near</b>=<i>number</i>]
+ [<b>--power</b>=<i>number</i>] [<i>filename</i>]
+-[<b>-randomseed=</b><i>integer</i>]
++[<b>-randomseed=</b><i>integer</i>]</p>
+ 
+ 
+ <p>Minimum unique abbreviations of option are acceptable.  You may use
+ double hyphens instead of single hyphen to denote options.  You may use
+ white space in place of the equals sign to separate an option name
+-from its value.
++from its value.</p>
+ 
+ <h2 id="description">DESCRIPTION</h2>
+ 
+-<p>This program is part of <a href="index.html">Netpbm</a>.
++<p>This program is part of <a href="index.html">Netpbm</a>.</p>
+ 
+ <p><b>pampaintspill</b> produces a smooth color gradient from all of the
+ non-background-colored pixels in an input image, effectively "spilling
+ paint" onto the background.  <b>pampaintspill</b> is similar to
+-<b>pamgradient</b> but differs in the following characteristics:
++<b>pamgradient</b> but differs in the following characteristics:</p>
+ 
+ <ul>
+   <li><b>pampaintspill</b> accepts any number of paint
+       sources (non-background-colored pixels), which can lie anywhere
+       on the canvas.  <b>pamgradient</b> accepts exactly
+-      four paint sources, one in each corner of the image.
++      four paint sources, one in each corner of the image.</li>
+ 
+   <li><b>pampaintspill</b> requires an input image while
+       <b>pamgradient</b> generates a new image from
+-      scratch.
++      scratch.</li>
+ 
+   <li><b>pampaintspill</b> can produce tileable output and
+       can control how tightly the gradient colors bind to their source
+-      pixels.
++      pixels.</li>
+ </ul>
+ 
+ <p>Results are generally best when the input image contains just a few, crisp
+ spots of color. Use your drawing program's pencil tool &mdash; as opposed to a
+-paintbrush or airbrush tool &mdash; with a small nib.
++paintbrush or airbrush tool &mdash; with a small nib.</p>
+ 
+ <h2 id="options">OPTIONS</h2>
+ 
+ <p>In addition to the options common to all programs based on libnetpbm
+ (most notably <b>-quiet</b>, see <a href="index.html#commonoptions">
+ Common Options</a>), <b>pampaintspill</b> recognizes the following
+-command line options:
++command line options:</p>
+ 
+ <dl>
+   <dt><b>--bgcolor</b>=<i>color</i></dt>
+@@ -117,45 +117,45 @@ command line options:
+       gradients away from them.</dd>
+ 
+   <dt><b>-randomseed=</b><i>integer</i>
+-  <dd>This is the seed for the random number generator that generates the
+-  pixels.
++  <dd>This is the seed fodr the random number generator that generates the
++  pixels.</dd>
+ 
+-  <p>Use this to ensure you get the same image on separate invocations.
++  <p>Use this to ensure you get the same image on separate invocations.</p>
+ 
+-  <p>This option was new in Netpbm 10.94 (March 2021).</dd>
++  <p>This option was new in Netpbm 10.94 (March 2021).</p>
+ </dl>
+ 
+ 
+ <h2 id="seealso">SEE ALSO</h2>
+ 
+ <ul>
+-<li><a href="pamgradient.html"><b>pamgradient</b></a>
+-<li><a href="ppmmake.html"><b>ppmmake</b></a>,
+-<li><a href="ppmrainbow.html"><b>ppmrainbow</b></a>,
+-<li><a href="pgmramp.html"><b>pgmramp</b></a>,
+-<li><a href="ppmpat.html"><b>ppmpat</b></a>,
+-<li><a href="pam.html"><b>pam</b></a>
++<li><a href="pamgradient.html"><b>pamgradient</b></a></li>
++<li><a href="ppmmake.html"><b>ppmmake</b></a>,</li>
++<li><a href="ppmrainbow.html"><b>ppmrainbow</b></a>,</li>
++<li><a href="pgmramp.html"><b>pgmramp</b></a>,</li>
++<li><a href="ppmpat.html"><b>ppmpat</b></a>,</li>
++<li><a href="pam.html"><b>pam</b></a></li>
+ </ul>
+ 
+ <h2 id="history">HISTORY</h2>
+ 
+-<p><b>pampaintspill</b> was new in Netpbm 10.50 (March 2010).
++<p><b>pampaintspill</b> was new in Netpbm 10.50 (March 2010).</p>
+ 
+ 
+ <h2 id="copyright">COPYRIGHT</h2>
+ 
+ <p>Copyright&nbsp;&copy; 2010&ndash;2021 Scott Pakin,
+-<a href="mailto:scott+pbm@pakin.org"><i>scott+pbm@pakin.org</i></a>.
++<a href="mailto:scott+pbm@pakin.org"><i>scott+pbm@pakin.org</i></a>.</p>
+ 
+ <h2 id="index">Table Of Contents</h2>
+ 
+ <ul>
+-<li><a href="#synopsis">SYNOPSIS</a>
+-<li><a href="#description">DESCRIPTION</a>
+-<li><a href="#options">OPTIONS</a>
+-<li><a href="#seealso">SEE ALSO</a>
+-<li><a href="#history">HISTORY</a>
+-<li><a href="#copyright">COPYRIGHT</a>
++<li><a href="#synopsis">SYNOPSIS</a></li>
++<li><a href="#description">DESCRIPTION</a></li>
++<li><a href="#options">OPTIONS</a></li>
++<li><a href="#seealso">SEE ALSO</a></li>
++<li><a href="#history">HISTORY</a></li>
++<li><a href="#copyright">COPYRIGHT</a></li>
+ </ul>
+ 
+ </body>
+diff -urNp a/userguide/pamrecolor.html b/userguide/pamrecolor.html
+--- a/userguide/pamrecolor.html	2025-02-04 10:47:27.823451565 +0100
++++ b/userguide/pamrecolor.html	2025-02-04 18:10:00.968545076 +0100
+@@ -2,9 +2,9 @@
+ <html><head><title>Pamrecolor User Manual</title></head>
  <body>
-@@ -11,6 +10,7 @@
+ <h1>pamrecolor</h1>
+-Updated: 31 July 2010
++<p>Updated: 31 July 2010
+ <br>
+-<a href="#index">Table Of Contents</a>
++<a href="#index">Table Of Contents</a></p>
  
- <p><a href="#index">Table Of Contents</a></p>
+ <h2>NAME</h2>
+ pamrecolor - alter colors without affecting luminance
+@@ -22,15 +22,15 @@ pamrecolor - alter colors without affect
+ [<b>-randomseed=</b><i>integer</i>]
  
-+<H2>NAME</H2>
- <p>pampaintspill - smoothly spill colors into the background</p>
+ [<i>infile</i>]
+-
++</p>
  
- <h2><a name="synopsis">SYNOPSIS</a></h2>
-diff -urNp old/userguide/pamrecolor.html new/userguide/pamrecolor.html
---- old/userguide/pamrecolor.html	2017-09-05 13:58:08.336559557 +0200
-+++ new/userguide/pamrecolor.html	2017-09-05 14:04:34.714122098 +0200
-@@ -1,8 +1,7 @@
--<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
-+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
- <html>
- <head>
- <title>Pamrecolor User Manual</title>
--<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
- </head>
+ <p>Minimum unique abbreviation of option is acceptable.  You may use double
+ hyphens instead of single hyphen to denote options.  You may use white
+-space in place of the equals sign to separate an option name from its value.
++space in place of the equals sign to separate an option name from its value.</p>
  
- <body>
-@@ -11,7 +10,7 @@
+ <h2 id="description">DESCRIPTION</h2>
  
- <p>Updated: 31 July 2010</p>
+-<p>This program is part of <a href="index.html">Netpbm</a>.
++<p>This program is part of <a href="index.html">Netpbm</a>.</p>
  
--<p><a href="#contents">Table Of Contents</a></p>
-+<p><a href="#index">Table Of Contents</a></p>
+ <p><b>pamrecolor</b> changes an image's colors to be as close as
+ possible to given target colors but with the constraint that the
+@@ -39,17 +39,17 @@ image will look identical if both are co
+ (e.g. with
+ <a href="ppmtopgm.html">ppmtopgm</a>).  You can have <b>pamrecolor</b> select
+ target colors randomly, specify a single hue for the entire image, or take the
+-target colors from a target image.
++target colors from a target image.</p>
  
+ <p>In addition to real Netpbm images, <b>pamrecolor</b> works on pseudo-Netpbm
+ images based on arbitrary color spaces.  You can define the color space
+-explicitly or choose one of many that <b>pamrecolor</b> knows by name.
++explicitly or choose one of many that <b>pamrecolor</b> knows by name.</p>
  
- <h2 id="name">NAME</h2>
-diff -urNp old/userguide/pamsistoaglyph.html new/userguide/pamsistoaglyph.html
---- old/userguide/pamsistoaglyph.html	2017-09-05 13:58:08.334559565 +0200
-+++ new/userguide/pamsistoaglyph.html	2017-09-05 14:05:25.865944327 +0200
-@@ -1,8 +1,7 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
--<html xmlns="http://www.w3.org/1999/xhtml">
-+<html>
- <head>
- <title>Pamsistoaglyph User Manual</title>
--<meta http-equiv="content-type" content="text/html; charset=us-ascii" />
- </head>
- 
- <body>
-diff -urNp old/userguide/pamstereogram.html new/userguide/pamstereogram.html
---- old/userguide/pamstereogram.html	2017-09-05 13:58:08.337559553 +0200
-+++ new/userguide/pamstereogram.html	2017-09-05 14:13:28.523959069 +0200
-@@ -1,5 +1,5 @@
--<!DOCTYPE html>
--<html xmlns="http://www.w3.org/1999/xhtml">
-+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
-+<html>
- <head>
- <title>Pamstereogram User Manual</title>
- </head>
-@@ -10,7 +10,7 @@
- 
- <p>Updated: 19 June 2015</p>
- 
--<p><a href="#contents">Table Of Contents</a></p>
-+<p><a href="#index">Table Of Contents</a></p>
+ <p>The output is a PAM image on standard output.  Options control the
+ exact format of the PAM.  If you want a PNM (PBM, PGM, or PPM) image,
+ use <a href="pamtopnm.html">pamtopnm</a> on the output.  There is no
+ need to convert if you will use the image as input to a current Netpbm
+-program, but many other programs don't know what a PAM is.
++program, but many other programs don't know what a PAM is.</p>
  
  
- <h2 id="name">NAME</h2>
-diff -urNp old/userguide/pamtoavs.html new/userguide/pamtoavs.html
---- old/userguide/pamtoavs.html	2017-09-05 13:58:08.329559583 +0200
-+++ new/userguide/pamtoavs.html	2017-09-05 14:05:49.299863901 +0200
-@@ -1,5 +1,5 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
--<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-+<html>
- <head>
- <title>Pamtoavs User Manual</title>
- <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
-diff -urNp old/userguide/pamtooctaveimg.html new/userguide/pamtooctaveimg.html
---- old/userguide/pamtooctaveimg.html	2017-09-05 13:58:08.335559561 +0200
-+++ new/userguide/pamtooctaveimg.html	2017-09-05 14:06:21.825752356 +0200
-@@ -1,8 +1,7 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
--<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-+<html>
- <head>
- <title>Pamtooctaveimg User Manual</title>
--<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- </head>
+ <h2 id="options">OPTIONS</h2>
+@@ -57,7 +57,7 @@ program, but many other programs don't k
+ <p>In addition to the options common to all programs based on libnetpbm
+ (most notably <b>-quiet</b>, see <a href="index.html#commonoptions">
+ Common Options</a>), <b>pamrecolor</b> recognizes the following
+-command line options:
++command line options:</p>
  
- <body>
-diff -urNp old/userguide/pnmflip.html new/userguide/pnmflip.html
---- old/userguide/pnmflip.html	2017-09-05 13:58:08.336559557 +0200
-+++ new/userguide/pnmflip.html	2017-09-05 14:07:15.065963977 +0200
-@@ -4,9 +4,11 @@
- <BODY>
- <H1>pnmflip</H1>
- <BR>
-+<H2>NAME</H2>
- <p><b>pnmflip</b> was replaced in Netpbm 10.13 (December 2002) by
- <b><a href="pamflip.html">pamflip</a></b>.
+ <dl>
  
-+<H2>DESCRIPTION</H2>
- <P><B>pamflip</b> is mostly backward compatible with <b>pnmflip</b>,
- but works on PAM images too.
+@@ -67,7 +67,7 @@ to luminance of each of the red, green,
+ example, in the SMPTE-C color space an RGB color is converted to
+ grayscale by multiplying the red channel by 0.2124132, the green
+ channel by 0.7010437, and the blue channel by 0.0865432 and summing
+-the resulting three products.
++the resulting three products.</dd>
  
-diff -urNp old/userguide/pnmmercator.html new/userguide/pnmmercator.html
---- old/userguide/pnmmercator.html	2017-09-05 13:58:08.334559565 +0200
-+++ new/userguide/pnmmercator.html	2017-09-05 14:08:08.305214742 +0200
-@@ -1,7 +1,6 @@
--<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
- <html>
- <head>
--<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
- <title>PnmMercator User Manual</title>
- </head>
- <body>
-diff -urNp old/userguide/ppmtogif.html new/userguide/ppmtogif.html
---- old/userguide/ppmtogif.html	2017-09-05 13:58:08.337559553 +0200
-+++ new/userguide/ppmtogif.html	2017-09-05 14:09:51.450583126 +0200
-@@ -4,11 +4,14 @@
- <BODY>
- <H1>ppmtogif</H1>
- <BR>
-+<H2>NAME</H2>
+ <p>When you use this option, the input and output images are not true Netpbm
+ images, because the Netpbm image format specifies a particular color space.
+@@ -76,9 +76,9 @@ the raster have different meaning.  Many
+ images actually use a variation with a different color space.  For example,
+ <a href="http://www.gimp.org/">GIMP</a> uses sRGB internally and if you
+ have GIMP generate a Netpbm image file, it really generates a variation of
+-the format that uses sRGB.
++the format that uses sRGB.</p>
+ 
+-<p><b>pamrecolor</b> knows the following color spaces (<i>name</i> values):
++<p><b>pamrecolor</b> knows the following color spaces (<i>name</i> values):</p>
+ 
+   <dl>
+   <dt>adobe</dt>
+@@ -109,12 +109,12 @@ the format that uses sRGB.
+ <p>The default is "ntsc" because this is the color space that the Netpbm
+ formats and many graphics utilities use.  As a counterexample,
+ <a href="http://www.gimp.org/">GIMP</a> uses sRGB as its native color
+-space.
++space.</p>
+ 
+ <p>The luminance values <b>pamrecolor</b> uses for each of the above come from
+ Bruce Lindbloom's
+ <a href="http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html">
+-Computing RGB-to-XYZ and XYZ-to-RGB matrices</a> page.</dd>
++Computing RGB-to-XYZ and XYZ-to-RGB matrices</a> page.</p>
+ 
+ <dt><b>--rmult</b>=<i>fraction</i></dt>
+ <dt><b>--gmult</b>=<i>fraction</i></dt>
+@@ -133,15 +133,13 @@ image.  <b>pamrecolor</b> will make each
+ to <i>color</i> subject to the constraint that the luminance must stay the
+ same as in the original image.  Specify <i>color</i> as in
+ the <a href="libnetpbm_image.html#colorname">argument of the <b>pnm_parsecolor()</b>
+-library routine</a> (e.g.,&nbsp;"hotpink" or "#ff69b4").
++library routine</a> (e.g.,&nbsp;"hotpink" or "#ff69b4").</dd>
+ 
+ <p>If you specify neither <b>--targetcolor</b> nor
+ <b>--colorfile</b>, <b>pamrecolor</b> will randomly select a target color for
+-each pixel of the input image.
+-
+-<p>You may not specify both <b>-targetcolor</b> and <b>-colorfile</b>.
++each pixel of the input image.</p>
+ 
+-</dd>
++<p>You may not specify both <b>-targetcolor</b> and <b>-colorfile</b>.</p>
+ 
+ <dt><b>--colorfile</b>=<i>file</i></dt>
+ <dd>Take per-pixel target colors from Netpbm file <i>file</i> instead
+@@ -150,40 +148,38 @@ of using a single target color for the e
+ If the image in the file wider or taller than the input image,
+ <b>pamrecolor</b> uses only the left and top part of it.
+ If the image is narrower or shorter, <b>pamrecolor</b> considers the
+-image to be repeated in a tile pattern.
++image to be repeated in a tile pattern.</dd>
+ 
+ <p>If you specify neither <b>--targetcolor</b> nor
+ <b>--colorfile</b>, <b>pamrecolor</b> will randomly select a target color for
+-each pixel of the input image.
++each pixel of the input image.</p>
+ 
+-<p>You may not specify both <b>-targetcolor</b> and <b>-colorfile</b>.
++<p>You may not specify both <b>-targetcolor</b> and <b>-colorfile</b>.</p>
+ 
+-<dt><b>-randomseed=</b><i>integer</i>
++<dt><b>-randomseed=</b><i>integer</i></dt>
+ 
+ <dd>This is the seed for the random number generator that generates the
+-pixels.
++pixels.</dd>
+ 
+-<p>Use this to ensure you get the same image on separate invocations.
++<p>Use this to ensure you get the same image on separate invocations.</p>
+ 
+ <p>By default, <b>pamrecolor</b> uses a seed derived from the time of day
+ and process ID, which gives you fairly uncorrelated results in multiple
+-invocations.
+-
+-<p>This option was new in Netpbm 10.61 (December 2012).
++invocations.</p>
+ 
+-</dl>
++<p>This option was new in Netpbm 10.61 (December 2012).</p>
+ 
+ 
+ <h2 id="examples">EXAMPLES</h2>
+ 
+-<p>This command tints an image yellow:
++<p>This command tints an image yellow:</p>
+ 
+ <pre>
+     pamrecolor --targetcolor=yellow colorpic.pam &gt; yellowpic.pam
+ </pre>
+ 
+ <p>This command takes the colors from <b>colorpicture.ppm</b> and applies
+-them to <b>graypicture.pgm</b>:
++them to <b>graypicture.pgm</b>:</p>
+ 
+ <pre>
+     pamrecolor --colorfile=colorpic.ppm graypic.pgm &gt; colorizedpic.pam
+@@ -192,52 +188,52 @@ them to <b>graypicture.pgm</b>:
+ <p>The grayscale version of <b>colorizedpic.pam</b> will look just like
+ graypic.pgm.  Note that if you use a non-Netpbm tool to do the conversion to
+ grayscale, you may additionally need to specify an
+-appropriate <b>--colorspace</b> value for your conversion tool.
++appropriate <b>--colorspace</b> value for your conversion tool.</p>
+ 
+ 
+ <h2 id="notes">NOTES</h2>
+ 
+ <p>Here are a couple of fun special effects you can produce with
+-<b>pamrecolor</b>:
++<b>pamrecolor</b>:</p>
+ 
+ <ul>
+ <li>Specify a color file that is identical to the input image but with
+ some large, colored text added to it.  The text will "magically"
+-vanish when the image is converted to grayscale.
++vanish when the image is converted to grayscale.</li>
+ 
+ <li>Provide a low-contrast grayscale image &mdash; perhaps a secret
+ message written in similar shades of gray &mdash; as the input file and
+ a colorful but completely different image as the color file.  If done
+ carefully, the grayscale image can be hidden by the colorful image.
+ Only people who know to convert the result to grayscale can recover
+-the original grayscale image.
++the original grayscale image.</li>
+ 
+ <li>Use <b>--targetcolor</b>=tan to make an image look like an
+ old-timey photograph (or, more precisely, a
+ <a href="http://en.wikipedia.org/wiki/Photographic_print_toning">sepia-toned
+-photograph</a> of the late 1800s).
++photograph</a> of the late 1800s).</li>
+ </ul>
+ 
+ 
+ <h2 id="history">HISTORY</h2>
+ 
+-<p>Scott Pakin wrote <b>pamrecolor</b> in July 2010.
++<p>Scott Pakin wrote <b>pamrecolor</b> in July 2010.</p>
+ 
+-<p><b>pamrecolor</b> was new in Netpbm 10.52 (September 2010).
++<p><b>pamrecolor</b> was new in Netpbm 10.52 (September 2010).</p>
+ 
+ 
+ <h2 id="author">AUTHOR</h2>
+ 
+ <p>Copyright (C) 2010 Scott
+-Pakin, <a href="mailto:scott+pbm@pakin.org">scott+pbm@pakin.org</a>
++Pakin, <a href="mailto:scott+pbm@pakin.org">scott+pbm@pakin.org</a></p>
+ 
+ 
+ <h2 id="seealso">SEE ALSO</h2>
+ 
+ <ul>
+-<li><a href="ppmtopgm.html"><b>ppmtopgm</b></a>
+-<li><a href="ppmchange.html"><b>ppmchange</b></a>
+-<li><a href="pnmremap.html"><b>pnmremap</b></a>
++<li><a href="ppmtopgm.html"><b>ppmtopgm</b></a></li>
++<li><a href="ppmchange.html"><b>ppmchange</b></a></li>
++<li><a href="pnmremap.html"><b>pnmremap</b></a></li>
+ </ul>
+ 
+ 
+@@ -246,14 +242,14 @@ Pakin, <a href="mailto:scott+pbm@pakin.o
+ <h2 id="index">Table Of Contents</h2>
+ 
+ <ul>
+-<li><a href="#synopsis">SYNOPSIS</a>
+-<li><a href="#description">DESCRIPTION</a>
+-<li><a href="#options">OPTIONS</a>
+-<li><a href="#examples">EXAMPLES</a>
+-<li><a href="#notes">NOTES</a>
+-<li><a href="#history">HISTORY</a>
+-<li><a href="#author">AUTHOR</a>
+-<li><a href="#seealso">SEE ALSO</a>
++<li><a href="#synopsis">SYNOPSIS</a></li>
++<li><a href="#description">DESCRIPTION</a></li>
++<li><a href="#options">OPTIONS</a></li>
++<li><a href="#examples">EXAMPLES</a></li>
++<li><a href="#notes">NOTES</a></li>
++<li><a href="#history">HISTORY</a></li>
++<li><a href="#author">AUTHOR</a></li>
++<li><a href="#seealso">SEE ALSO</a></li>
+ </ul>
+ 
+ </body>
+diff -urNp a/userguide/pbmtog3.html b/userguide/pbmtog3.html
+--- a/userguide/pbmtog3.html	2025-02-04 10:47:27.827451549 +0100
++++ b/userguide/pbmtog3.html	2025-02-04 18:10:55.328259786 +0100
+@@ -80,7 +80,7 @@ You cannot specify both.
+ <h2 id="history">HISTORY</h2>
+ 
+ <p>Before Netpbm 10.79 (June 2017), there was a different program by the same
+-name in Netpbm, which was written by by Paul Haeberli
++name in Netpbm, which was written by Paul Haeberli
+ &lt;<a href="mailto:paul@manray.sgi.com">paul@manray.sgi.com</a>&gt; in 1989
+ and then modified extensively by others.
+ 
+diff -urNp a/userguide/ppmtogif.html b/userguide/ppmtogif.html
+--- a/userguide/ppmtogif.html	2025-02-04 10:47:27.828451545 +0100
++++ b/userguide/ppmtogif.html	2025-02-04 18:12:39.950710820 +0100
+@@ -5,17 +5,17 @@
+ 
+ <h2>NAME</h2>
+ 
+-ppmtogif - replaced by pamtogif
+-
+-<h2>DESCRIPTION</h2>
++<p>ppmtogif - replaced by pamtogif</p>
+ 
+ <p>This program is part of <a href="index.html">Netpbm</a>.
+ 
++<h2>SYNOPSIS</h2>
  <p><b>ppmtogif</b> was replaced in Netpbm 10.37 (December 2006) by
  <b><a href="pamtogif.html">pamtogif</a></b>.
  
-+<H2>SYNOPSIS</H2>
- <P><B>pamtogif</b> is mostly backward compatible with <b>ppmtogif</b>.
+ <p><b>pamtogif</b> is mostly backward compatible with <b>ppmtogif</b>.
  
-+<H2>DESCRIPTION</H2>
- <P>One way <b>pamtogif</b> is not backward compatible with <b>ppmtogif</b>
++<h2>DESCRIPTION</h2>
+ <p>One way <b>pamtogif</b> is not backward compatible with <b>ppmtogif</b>
  is that to specify a transparency (alpha) mask with <b>ppmtogif</b>, you
  supply the transparency as a separate pseudo-PGM image and use the

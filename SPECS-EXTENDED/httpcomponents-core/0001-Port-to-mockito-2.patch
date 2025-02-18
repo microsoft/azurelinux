@@ -1,0 +1,341 @@
+From 85107ca9057cda2ed4d72ba1fd3c2c09be404af6 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Fri, 7 Dec 2018 19:50:08 +0000
+Subject: [PATCH] Port to mockito 2
+
+For details, see:
+https://github.com/mockito/mockito/wiki/What%27s-new-in-Mockito-2#incompatible
+---
+ .../impl/nio/pool/TestBasicNIOConnPool.java   |  2 +-
+ .../apache/http/nio/pool/TestNIOConnPool.java | 68 +++++++++----------
+ .../nio/protocol/TestHttpAsyncService.java    |  8 +--
+ 3 files changed, 39 insertions(+), 39 deletions(-)
+
+diff --git a/httpcore-nio/src/test/java/org/apache/http/impl/nio/pool/TestBasicNIOConnPool.java b/httpcore-nio/src/test/java/org/apache/http/impl/nio/pool/TestBasicNIOConnPool.java
+index 25e2781cf..ee277c69d 100644
+--- a/httpcore-nio/src/test/java/org/apache/http/impl/nio/pool/TestBasicNIOConnPool.java
++++ b/httpcore-nio/src/test/java/org/apache/http/impl/nio/pool/TestBasicNIOConnPool.java
+@@ -115,7 +115,7 @@ public void testTimeoutOnLeaseRelease() throws Exception {
+         Mockito.when(sessionRequest.getAttachment()).thenReturn(host);
+         Mockito.when(reactor.connect(
+                 Matchers.any(SocketAddress.class),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.eq(host),
+                 Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest);
+diff --git a/httpcore-nio/src/test/java/org/apache/http/nio/pool/TestNIOConnPool.java b/httpcore-nio/src/test/java/org/apache/http/nio/pool/TestNIOConnPool.java
+index 9672db6db..20f230acb 100644
+--- a/httpcore-nio/src/test/java/org/apache/http/nio/pool/TestNIOConnPool.java
++++ b/httpcore-nio/src/test/java/org/apache/http/nio/pool/TestNIOConnPool.java
+@@ -176,7 +176,7 @@ public void testSuccessfulConnect() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.any(SocketAddress.class),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest);
+         final LocalSessionPool pool = new LocalSessionPool(ioReactor, 2, 10);
+@@ -209,7 +209,7 @@ public void testFailedConnect() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.any(SocketAddress.class),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest);
+         final LocalSessionPool pool = new LocalSessionPool(ioReactor, 2, 10);
+@@ -246,7 +246,7 @@ public void testCencelledConnect() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.any(SocketAddress.class),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest);
+         Mockito.when(ioReactor.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
+@@ -285,7 +285,7 @@ public void testTimeoutConnect() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.any(SocketAddress.class),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest);
+         final LocalSessionPool pool = new LocalSessionPool(ioReactor, 2, 10);
+@@ -350,12 +350,12 @@ public void testLeaseRelease() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest2);
+ 
+@@ -424,12 +424,12 @@ public void testMaxLimits() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest2);
+ 
+@@ -482,7 +482,7 @@ public void testMaxLimits() throws Exception {
+         Assert.assertFalse(future9.isDone());
+ 
+         Mockito.verify(ioReactor, Mockito.times(3)).connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.release(entry4, true);
+@@ -494,7 +494,7 @@ public void testMaxLimits() throws Exception {
+         Assert.assertTrue(future9.isDone());
+ 
+         Mockito.verify(ioReactor, Mockito.times(4)).connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+     }
+ 
+@@ -523,12 +523,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1, sessionRequest2, sessionRequest1);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest3, sessionRequest4, sessionRequest3);
+ 
+@@ -544,12 +544,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioReactor, Mockito.never()).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.requestCompleted(sessionRequest1);
+@@ -575,12 +575,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.requestCompleted(sessionRequest3);
+@@ -603,12 +603,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.release(entry3, true);
+@@ -616,12 +616,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+ 
+         Mockito.verify(ioReactor, Mockito.times(3)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.requestCompleted(sessionRequest1);
+@@ -643,12 +643,12 @@ public void testConnectionRedistributionOnTotalMaxLimit() throws Exception {
+ 
+         Mockito.verify(ioReactor, Mockito.times(3)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("otherhost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         totals = pool.getTotalStats();
+@@ -677,7 +677,7 @@ public void testStatefulConnectionRedistributionOnPerRouteMaxLimit() throws Exce
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1, sessionRequest2, sessionRequest3);
+ 
+@@ -690,7 +690,7 @@ public void testStatefulConnectionRedistributionOnPerRouteMaxLimit() throws Exce
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.requestCompleted(sessionRequest1);
+@@ -725,7 +725,7 @@ public void testStatefulConnectionRedistributionOnPerRouteMaxLimit() throws Exce
+ 
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.release(entry3, true);
+@@ -742,7 +742,7 @@ public void testStatefulConnectionRedistributionOnPerRouteMaxLimit() throws Exce
+ 
+         Mockito.verify(ioReactor, Mockito.times(3)).connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         Mockito.verify(ioSession2).close();
+@@ -765,7 +765,7 @@ public void testCreateNewIfExpired() throws Exception {
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+                 Matchers.eq(InetSocketAddress.createUnresolved("somehost", 80)),
+-                Matchers.any(SocketAddress.class),
++                Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+ 
+@@ -774,7 +774,7 @@ public void testCreateNewIfExpired() throws Exception {
+         final Future<LocalPoolEntry> future1 = pool.lease("somehost", null);
+ 
+         Mockito.verify(ioReactor, Mockito.times(1)).connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         pool.requestCompleted(sessionRequest1);
+@@ -794,7 +794,7 @@ public void testCreateNewIfExpired() throws Exception {
+ 
+         Mockito.verify(ioSession1).close();
+         Mockito.verify(ioReactor, Mockito.times(2)).connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class));
+ 
+         final PoolStats totals = pool.getTotalStats();
+@@ -823,7 +823,7 @@ public void testCloseExpired() throws Exception {
+ 
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1, sessionRequest2);
+ 
+@@ -879,7 +879,7 @@ public void testCloseIdle() throws Exception {
+ 
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1, sessionRequest2);
+ 
+@@ -944,7 +944,7 @@ public void testLeaseRequestTimeout() throws Exception {
+ 
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+ 
+@@ -1048,7 +1048,7 @@ public void testLeaseRequestCanceled() throws Exception {
+ 
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+         Mockito.when(ioReactor.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
+@@ -1082,7 +1082,7 @@ public void testLeaseRequestCanceledWhileConnecting() throws Exception {
+ 
+         final ConnectingIOReactor ioReactor = Mockito.mock(ConnectingIOReactor.class);
+         Mockito.when(ioReactor.connect(
+-                Matchers.any(SocketAddress.class), Matchers.any(SocketAddress.class),
++                Matchers.any(SocketAddress.class), Matchers.<SocketAddress>isNull(),
+                 Matchers.any(), Matchers.any(SessionRequestCallback.class))).
+                 thenReturn(sessionRequest1);
+         Mockito.when(ioReactor.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
+diff --git a/httpcore-nio/src/test/java/org/apache/http/nio/protocol/TestHttpAsyncService.java b/httpcore-nio/src/test/java/org/apache/http/nio/protocol/TestHttpAsyncService.java
+index dcb92a629..947b05fa9 100644
+--- a/httpcore-nio/src/test/java/org/apache/http/nio/protocol/TestHttpAsyncService.java
++++ b/httpcore-nio/src/test/java/org/apache/http/nio/protocol/TestHttpAsyncService.java
+@@ -502,8 +502,8 @@ public void testEntityEnclosingRequestContinueWithoutVerification() throws Excep
+         Mockito.verify(this.conn).submitResponse(Matchers.argThat(new ArgumentMatcher<HttpResponse>() {
+ 
+             @Override
+-            public boolean matches(final Object argument) {
+-                final int status = ((HttpResponse) argument).getStatusLine().getStatusCode();
++            public boolean matches(final HttpResponse argument) {
++                final int status = argument.getStatusLine().getStatusCode();
+                 return status == 100;
+             }
+ 
+@@ -1019,8 +1019,8 @@ public void testResponseContinue() throws Exception {
+         Mockito.verify(this.conn).submitResponse(Matchers.argThat(new ArgumentMatcher<HttpResponse>() {
+ 
+             @Override
+-            public boolean matches(final Object argument) {
+-                final int status = ((HttpResponse) argument).getStatusLine().getStatusCode();
++            public boolean matches(final HttpResponse argument) {
++                final int status = argument.getStatusLine().getStatusCode();
+                 return status == 100;
+             }
+ 
+-- 
+2.21.0
+

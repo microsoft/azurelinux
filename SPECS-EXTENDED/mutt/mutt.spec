@@ -14,61 +14,62 @@
 %bcond_with gdbm
 %bcond_without gpgme
 %bcond_without sidebar
+
+%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+
+Summary: A text mode mail user agent
+Name: mutt
+Version: 2.2.13
+Release: 3%{?dist}
+Epoch: 5
+# The entire source code is GPLv2+ except
+# pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
+License: GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
+# hg snapshot created from http://dev.mutt.org/hg/mutt
+Source: ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
+Source1: mutt_ldap_query
+Patch1: mutt-1.10.0-muttrc.patch
+Patch2: mutt-1.8.0-cabundle.patch
+# https://dev.mutt.org/trac/ticket/3569
+Patch3: mutt-1.7.0-syncdebug.patch
+# FIXME make it to upstream
+Patch8: mutt-1.5.23-system_certs.patch
+Patch9: mutt-1.9.0-ssl_ciphers.patch
+Patch10: mutt-1.9.4-lynx_no_backscapes.patch
+Patch12: mutt-1.9.5-nodotlock.patch
+Patch13: mutt-1.12.1-optusegpgagent.patch
+Patch14: mutt-configure-c99.patch
+
+Url: http://www.mutt.org
+Requires: mailcap, urlview
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: ncurses-devel, gettext, automake
+# manual generation
+BuildRequires: /usr/bin/xsltproc, docbook-style-xsl, perl-interpreter
+BuildRequires: perl-generators
+BuildRequires: lynx
+
 %if %{with hcache}
 %{?with_tokyocabinet:BuildRequires: tokyocabinet-devel}
 %{?with_bdb:BuildRequires: db4-devel}
 %{?with_qdbm:BuildRequires: qdbm-devel}
 %{?with_gdbm:BuildRequires: gdbm-devel}
 %endif
+
 %if %{with imap} || %{with pop} || %{with smtp}
 %{?with_gnutls:BuildRequires: gnutls-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
 %endif
+
 %if %{with imap}
 %{?with_gss:BuildRequires: krb5-devel}
 %endif
-Summary:        A text mode mail user agent
-Name:           mutt
-Version:        2.2.12
-Release:        1%{?dist}
-# The entire source code is GPLv2+ except
-# pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
-License:        GPLv2+ AND Public Domain
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.mutt.org
-# hg snapshot created from http://dev.mutt.org/hg/mutt
-Source:         ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
-Source1:        mutt_ldap_query
-Patch1:         mutt-1.10.0-muttrc.patch
-Patch2:         mutt-1.8.0-cabundle.patch
-# https://dev.mutt.org/trac/ticket/3569
-Patch3:         mutt-1.7.0-syncdebug.patch
-# FIXME make it to upstream
-Patch8:         mutt-2.2.12-system_certs.patch
-Patch9:         mutt-1.9.0-ssl_ciphers.patch
-Patch10:        mutt-2.2.12-lynx_no_backscapes.patch
-Patch12:        mutt-1.9.5-nodotlock.patch
-Patch13:        mutt-1.12.1-optusegpgagent.patch
-Patch14:        mutt_disable_ssl_enforce.patch
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+
 %{?with_idn:BuildRequires: libidn-devel}
 %{?with_idn2:BuildRequires: libidn2-devel}
 %{?with_gpgme:BuildRequires: gpgme-devel}
-# manual generation
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  automake
-BuildRequires:  docbook-style-xsl
-BuildRequires:  docbook2X
-BuildRequires:  gcc
-BuildRequires:  gettext
-BuildRequires:  lynx
-BuildRequires:  make
-BuildRequires:  ncurses-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-Requires:       mailcap
-Requires:       urlview
+
 
 %description
 Mutt is a small but very powerful text-based MIME mail client.  Mutt
@@ -77,22 +78,23 @@ advanced features like key bindings, keyboard macros, mail threading,
 regular expression searches and a powerful pattern matching language
 for selecting groups of messages.
 
+
 %prep
 # unpack; cd
 %setup -q
 # do not run ./prepare -V, because it also runs ./configure
 
-%patch 10 -p1 -b .lynx_no_backscapes
-%patch 12 -p1 -b .nodotlock
+%patch -P10 -p1 -b .lynx_no_backscapes
+%patch -P12 -p1 -b .nodotlock
+%patch -P14 -p1
 
 autoreconf --install
-%patch 1 -p1 -b .muttrc
-%patch 2 -p1 -b .cabundle
-%patch 3 -p1 -b .syncdebug
-%patch 8 -p1 -b .system_certs
-%patch 9 -p1 -b .ssl_ciphers
-%patch 13 -p1 -b .optusegpgagent
-%patch 14 -p1
+%patch -P1 -p1 -b .muttrc
+%patch -P2 -p1 -b .cabundle
+%patch -P3 -p1 -b .syncdebug
+%patch -P8 -p1 -b .system_certs
+%patch -P9 -p1 -b .ssl_ciphers
+%patch -P13 -p1 -b .optusegpgagent
 
 sed -i -r 's/`$GPGME_CONFIG --libs`/"\0 -lgpg-error"/' configure
 
@@ -149,6 +151,11 @@ rm -f mutt_ssl.c
 # remove unique id in manual.html because multilib conflicts
 sed -i -r 's/<a id="id[a-z0-9]\+">/<a id="id">/g' doc/manual.html
 
+# fix the shebang in mutt_oauth2.py & preserve the time stamp
+oauth2_script="contrib/mutt_oauth2.py"
+t=$(stat -c %y "${oauth2_script}")
+sed -i "s:^#\!/usr/bin/env\s\+python3\s\?$:#!%{python3}:" "${oauth2_script}"
+touch -d "$t" "${oauth2_script}"
 
 %install
 %make_install
@@ -194,6 +201,7 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 %{!?_licensedir:%global license %doc}
 %license COPYRIGHT GPL
 %doc ChangeLog NEWS README* UPDATING mutt_ldap_query
+%doc contrib/mutt_oauth2.py contrib/mutt_oauth2.py.README
 %doc contrib/*.rc contrib/sample.* contrib/colors.*
 %doc doc/manual.html doc/manual.txt doc/smime-notes.txt
 %config(noreplace) %{_sysconfdir}/Muttrc
@@ -209,33 +217,110 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 %{_mandir}/man5/muttrc.*
 %{_infodir}/mutt.info.*
 
+
 %changelog
-* Wed Sep 20 2023 Archana Choudhary <archana1@microsoft.com> - 2.2.12-1
-- Upgrade to 2.2.12 -  CVE-2022-1328 CVE-2023-4875  CVE-2023-4874
-- Update Patches
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.13-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Sep 15 2023 Henry Li <lihl@microsoft.com> - 2.0.5-5
-- Add patch to resolve CVE-2023-4874
+* Sat Jun 22 2024 Ondrej Sloup <osloup@redhat.com> -  5:2.2.13-2
+- Remove docbookX2 BuildRequire dependency as it is being deprecated
 
-* Tue Nov 29 2022 Muhammad Falak <mwani@microsoft.com> - 2.0.5-4
-- Patch CVE-2021-32055
-- License verified
+* Wed Mar 20 2024 Matej Mužila <mmuzila@redhat.com> - 5:2.2.13-1
+- Upgrade to 2.2.13
+- Resolves: #2268671
 
-* Fri Oct 29 2021 Muhammad Falak <mwani@microsoft.com> - 2.0.5-3
-- Remove epoch
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Thu Jul 8 2021 Muhammad Falak R Wani <mwani@microsoft.com> -5:2.0.5-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix bogus date in changelog
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec  7 2023 Florian Weimer <fweimer@redhat.com> - 5:2.2.12-2
+- Fix C99 compatibility issue
+
+* Mon Nov 13 2023 Matej Mužila <mmuzila@redhat.com> - 5:2.2.12-1
+- Upgrade to 2.2.12
+- Resolves: #2232712
+
+* Tue Sep 05 2023 Matej Mužila <mmuzila@redhat.com> - 5:2.2.11-1
+- Upgrade to 2.2.11
+- Resolves: #2232712
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Apr 17 2023 Matej Mužila <mmuzila@redhat.com> - 5:2.2.10-1
+- Upgrade to 2.2.10
+- Resolves: #2181780
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 23 2022  Matej Mužila <mmuzila@redhat.com> - 5:2.2.9-1
+- Upgrade to 2.2.9
+- Resolves: 2140353
+
+* Thu Aug 11 2022  Matej Mužila <mmuzila@redhat.com> - 5:2.2.7-1
+- Upgrade to 2.2.7
+- Resolves: 2116172
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.2.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 15 2022  Matej Mužila <mmuzila@redhat.com> - 5:2.2.6-1
+- Upgrade to 2.2.6
+- Resolves: 2093746
+
+* Mon May 30 2022  Matej Mužila <mmuzila@redhat.com> - 5:2.2.5-1
+- Upgrade to 2.2.5
+- Resolves: 2068653
+
+* Thu Apr 21 2022 Matej Mužila <mmuzila@redhat.com> - 5:2.2.3-1
+- Upgrade to 2.2.3
+  Resolves: CVE-2022-1328
+
+* Mon Mar 28 2022 Matej Mužila <mmuzila@redhat.com> - 5:2.2.2-1
+- Upgrade to 2.2.2
+  Resolves: #2068653
+
+* Tue Feb 22 2022 Matej Mužila <mmuzila@redhat.com> - 5:2.2.1-1
+- Upgrade to 2.2.1
+  Resolves: #2053874
+
+* Wed Feb 16 2022 Matej Mužila <mmuzila@redhat.com> - 5:2.2.0-1
+- Upgrade to 2.2.0
+  Resolves: #2053874
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.1.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 03 2022 Matej Mužila <mmuzila@redhat.com> - 5:2.1.5-1
+- Upgrade to 2.1.5
+
+* Mon Oct 25 2021 Matej Mužila <mmuzila@redhat.com> - 5:2.1.3-1
+- Upgrade to 2.1.3
+
+* Tue Aug 10 2021 Matej Mužila <mmuzila@redhat.com> - 5:2.1.1-1
+- Upgrade to 2.1.1
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.0.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May  7 2021 Dan Čermák <dan.cermak@cgc-instruments.com> - 5:2.0.7-2
+- Ship the mutt_oauth2.py script as well
+
+* Thu May 6 2021 Filip Januš <fjanus@redhat.com> 5:2.0.7-1
+-Rebase to v2.0.7
+
+* Mon Mar 22 2021 Filip Januš <fjanus@redhat.com> 5:2.0.6-1
+- Rebase to upstream version 2.0.6
 
 * Mon Feb 1 2021 Filip Januš <fjanus@redhat.com> -5:2.0.5-1
 - Rebase to upstream version 2.0.5
 - Fix CVE-2021-3181
 
-* Tue Jan 19 2021 Filip Januš <fjanus@redhat.com> - 5:2.0.2-2
-- Add patch for remove enforcing ssl
-- Patch is based on upstream commit
-  https://gitlab.com/muttmua/mutt/-/commit/9204b24e99767ae06b5df25eca55c028d702528b
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5:2.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Tue Dec 01 2020 Matej Mužila <mmuzila@redhat.com> - 5:2.0.2-1
 - Upgrade to 2.0.2
@@ -246,6 +331,9 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 
 * Mon Aug 31 2020 Matej Mužila <mmuzila@redhat.com> - 5:1.14.7-1
 - Upgrade to 1.14.7
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5:1.14.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jul 22 2020 Fabio Alessandro Locati <fale@fedoraproject.org> - 5:1.14.6-1
 - Upgrade to 1.14.6

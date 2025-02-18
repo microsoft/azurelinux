@@ -1,51 +1,38 @@
-%bcond_with selinux
-%bcond_with systemd
-
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
-%if %{with selinux}
 %global selinuxtype targeted
-%endif
-
 %global moduletype contrib
-%define semodule_version 0.0.4
+%define semodule_version 0.0.5
 
 Name:           usbguard
-Version:        1.1.0
-Release:        1%{?dist}
+Version:        1.1.3
+Release:        2%{?dist}
 Summary:        A tool for implementing USB device usage policy
-License:        GPLv2+
+License:        GPL-2.0-or-later
 ## Not installed
 # src/ThirdParty/Catch: Boost Software License - Version 1.0
 URL:            https://usbguard.github.io/
 Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-%if %{with selinux}
-Source1:        https://github.com/USBGuard/usbguard/releases/download/%{name}-selinux-%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
-%endif
+Source1:        https://github.com/USBGuard/usbguard-selinux/archive/refs/tags/v%{semodule_version}.tar.gz#/%{name}-selinux-%{semodule_version}.tar.gz
 Source2:        usbguard-daemon.conf
 
-%if %{with systemd}
 Requires: systemd
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-%endif
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if %{with selinux}
-Recommends: %{name}-selinux
-%endif
+
+Requires: (%{name}-selinux if selinux-policy-%{selinuxtype})
 Obsoletes: %{name}-applet-qt < 0.7.6
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: libqb-devel
 BuildRequires: libgcrypt-devel
 BuildRequires: libstdc++-devel
-BuildRequires: protobuf-devel
+BuildRequires: protobuf-devel protobuf-compiler
 BuildRequires: PEGTL-static
-BuildRequires: catch-devel
+BuildRequires: catch1-devel
 BuildRequires: autoconf automake libtool
 BuildRequires: bash-completion
 BuildRequires: asciidoc
@@ -53,7 +40,7 @@ BuildRequires: audit-libs-devel
 # For `pkg-config systemd` only
 BuildRequires: systemd
 
-Patch1: usbguard-0.7.6-libqb.patch
+Patch1: usbguard-revert-catch.patch
 
 %description
 The USBGuard software framework helps to protect your computer against rogue USB
@@ -65,7 +52,6 @@ Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig
 Requires:       libstdc++-devel
-
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -79,12 +65,10 @@ Requires:       %{name} = %{version}-%{release}
 The %{name}-tools package contains optional tools from the USBGuard
 software framework.
 
-
 # dbus
 %package        dbus
 Summary:        USBGuard D-Bus Service
 Requires:       %{name} = %{version}-%{release}
-BuildRequires:	dbus-glib-devel
 BuildRequires:	dbus-devel
 BuildRequires:	glib2-devel
 BuildRequires:	polkit-devel
@@ -97,12 +81,12 @@ Requires:       polkit
 The %{name}-dbus package contains an optional component that provides
 a D-Bus interface to the USBGuard daemon component.
 
-%if %{with selinux}
 %package        selinux
 Summary:        USBGuard selinux
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
-BuildRequires:  selinux-policy
+Requires:       selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype}
 BuildRequires:  selinux-policy-devel
 BuildArch: noarch
 %{?selinux_requires}
@@ -110,22 +94,18 @@ BuildArch: noarch
 %description    selinux
 The %{name}-selinux package contains selinux policy for the USBGuard
 daemon.
-%endif
 
 # usbguard
 %prep
 %setup -q
 
-%if %{with selinux}
 # selinux
 %setup -q -D -T -a 1
-%endif
 
-%patch 1 -p1 -b .libqb
+%patch -P 1 -p1 -b .catch
 
 # Remove bundled library sources before build
 rm -rf src/ThirdParty/{Catch,PEGTL}
-
 
 %build
 mkdir -p ./m4
@@ -134,69 +114,53 @@ autoreconf -i -v --no-recursive ./
     --disable-silent-rules \
     --without-bundled-catch \
     --without-bundled-pegtl \
-%if %{with systemd}
     --enable-systemd \
-%else
-    --disable-systemd \
-%endif
     --with-dbus \
     --with-polkit \
     --with-crypto-library=gcrypt
 
 make %{?_smp_mflags}
 
-%if %{with selinux}
 # selinux
 pushd %{name}-selinux-%{semodule_version}
 make
 popd
-%endif
 
 %check
 make check
 
-
-%if %{with selinux}
 # selinux
 %pre selinux
 %selinux_relabel_pre -s %{selinuxtype}
-%endif
 
 %install
 make install INSTALL='install -p' DESTDIR=%{buildroot}
 
 # Overwrite configuration with distribution defaults
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard
+mkdir -p %{buildroot}%{_sysconfdir}/usbguard/rules.d
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/IPCAccessControl.d
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
 
-%if %{with selinux}
 # selinux
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m 0644 %{name}-selinux-%{semodule_version}/%{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -d -p %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}
 install -p -m 644 %{name}-selinux-%{semodule_version}/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
-%endif
 
 # Cleanup
 find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 
-%if %{with systemd}
 %preun
 %systemd_preun usbguard.service
-%endif
 
 %post
 %{?ldconfig}
-%if %{with systemd}
 %systemd_post usbguard.service
-%endif
 
 %postun
 %{?ldconfig}
-%if %{with systemd}
 %systemd_postun usbguard.service
-%endif
 
 %files
 %doc README.adoc CHANGELOG.md
@@ -206,17 +170,16 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_bindir}/usbguard
 %dir %{_localstatedir}/log/usbguard
 %dir %{_sysconfdir}/usbguard
+%dir %{_sysconfdir}/usbguard/rules.d/
 %dir %{_sysconfdir}/usbguard/IPCAccessControl.d
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/usbguard-daemon.conf
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/rules.conf
+%{_unitdir}/usbguard.service
 %{_datadir}/man/man8/usbguard-daemon.8.gz
 %{_datadir}/man/man5/usbguard-daemon.conf.5.gz
 %{_datadir}/man/man5/usbguard-rules.conf.5.gz
 %{_datadir}/man/man1/usbguard.1.gz
 %{_datadir}/bash-completion/completions/usbguard
-%if %{with systemd}
-%{_unitdir}/usbguard.service
-%endif
 
 %files devel
 %{_includedir}/*
@@ -232,12 +195,9 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/dbus-1/system-services/org.usbguard1.service
 %{_datadir}/dbus-1/system.d/org.usbguard1.conf
 %{_datadir}/polkit-1/actions/org.usbguard1.policy
-%{_mandir}/man8/usbguard-dbus.8.gz
-%if %{with systemd}
 %{_unitdir}/usbguard-dbus.service
-%endif
+%{_mandir}/man8/usbguard-dbus.8.gz
 
-%if %{with systemd}
 %preun dbus
 %systemd_preun usbguard-dbus.service
 
@@ -246,12 +206,10 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 
 %postun dbus
 %systemd_postun_with_restart usbguard-dbus.service
-%endif
 
-%if %{with selinux}
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
+%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 %{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
 
 %post selinux
@@ -264,19 +222,80 @@ fi
 
 %posttrans selinux
 %selinux_relabel_post -s %{selinuxtype}
-%endif
+
 
 %changelog
-* Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 1.1.0-1
-- Upgrade to 1.1.0 - CVE-2019-25058
-- Update build requirement catch1 -> catch
-- License verified
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Disabling the 'selinux' subpackage to remove BR on 'policy-selinux'.
-- Disabling building with systemd.
-- Removing BR on 'protobuf-compiler'.
+* Fri Jun 07 2024 Attila Lakatos <alakatos@redhat.com> - 1.1.3-1
+- Rebase to 1.1.3
+Resolves: rhbz#2290724
+- selinux package policy update
+Resolves: rhbz#2271330
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 27 2023 Attila Lakatos <alakatos@redhat.com> - 1.1.2-1
+- Rebase to 1.1.2
+Resolves: rhbz#2064543
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed May 10 2023 Tomas Popela <tpopela@redhat.com> - 1.1.0-7
+- Drop BR on dbus-glib as the requirement was dropped in 0.7.7
+
+* Mon Feb 20 2023 Attila Lakatos <alakatos@redhat.com> - 1.1.0-6
+- Rebuild
+Resolves: rhbz#2171749
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Mar 29 2022 Radovan Sroka <rsroka@redhat.com> - 1.1.0-3
+- usbguard requires selinux subpackage
+- this ensures that the selinux package and all its dependencies are
+  not pulled into containers and other systems that do not use SELinux
+
+* Tue Mar 15 2022 Radovan Sroka <rsroka@redhat.com> - 1.1.0-2
+- selinux: allow policykit dbus comunnication
+- restore support for access control filenames without a group
+
+* Thu Mar 03 2022 Radovan Sroka <rsroka@redhat.com> - 1.1.0-1
+- rebase to 1.1.0
+Resolves: rhbz#2058450
+- fixed CVE-2019-25058 usbguard: Fix unauthorized access via D-Bus
+Resolves: rhbz#2058466
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Nov 06 2021 Adrian Reber <adrian@lisas.de> - 1.0.0-8
+- Rebuilt for protobuf 3.19.0
+
+* Mon Oct 25 2021 Adrian Reber <adrian@lisas.de> - 1.0.0-7
+- Rebuilt for protobuf 3.18.1
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Mar 31 2021 Jonathan Wakely <jwakely@redhat.com> - 1.0.0-5
+- Rebuilt for removed libstdc++ symbols (#1937698)
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.0.0-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 16 12:49:32 CET 2021 Adrian Reber <adrian@lisas.de> - 1.0.0-2
+- Rebuilt for protobuf 3.14
 
 * Thu Jan 14 2021 Zoltan Fridrich <zfridric@redhat.com> - 1.0.0-1
 - rebase usbguard to 1.0.0
@@ -286,15 +305,30 @@ Resolves: rhbz#1916039
 Resolves: rhbz#1861330
 Resolves: rhbz#1905257
 
+* Wed Jan 13 14:43:57 CET 2021 Adrian Reber <adrian@lisas.de> - 0.7.8-6
+- Rebuilt for protobuf 3.14
+
+* Thu Sep 24 2020 Adrian Reber <adrian@lisas.de> - 0.7.8-5
+- Rebuilt for protobuf 3.13
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Wed Jun 24 2020 Radovan Sroka <rsroka@redhat.com> - 0.7.8-3
-- rebase usbguard to 0.7.8
 - rebase selinux tarball to v0.0.4
 - enable forking style in unit file
-- added rules.d/ directory
 - set DevicePolicy to closed in unit file
 - usbguard prevented from writing conf via dontaudit rule
 Resolves: rhbz#1804713
 Resolves: rhbz#1789923
+
+* Sun Jun 14 2020 Adrian Reber <adrian@lisas.de> - 0.7.8-2
+- Rebuilt for protobuf 3.12
+
+* Tue May 19 2020 Radovan Sroka <rsroka@redhat.com> - 0.7.8-1
+- rebase usbguard to 0.7.8
+- rebase usbguard-selinux to 0.0.3
+- added rules.d/ directory
 Resolves: rhbz#1808527
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.6-8

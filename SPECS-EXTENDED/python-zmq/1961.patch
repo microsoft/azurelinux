@@ -1,0 +1,29 @@
+From 82831563d02f0c1cc4887173c00fd04308bb4804 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 11 Mar 2024 09:54:57 +0100
+Subject: [PATCH] Don't fail when logging.Logger.warn is not available
+
+Python 3.13 removed it.
+
+See https://github.com/python/cpython/issues/105376
+---
+ zmq/log/handlers.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/zmq/log/handlers.py b/zmq/log/handlers.py
+index 841d80524..88fe571ca 100644
+--- a/zmq/log/handlers.py
++++ b/zmq/log/handlers.py
+@@ -218,7 +218,11 @@ def log(self, level, topic, msg, *args, **kwargs):
+ # Generate the methods of TopicLogger, since they are just adding a
+ # topic prefix to a message.
+ for name in "debug warn warning error critical fatal".split():
+-    meth = getattr(logging.Logger, name)
++    try:
++        meth = getattr(logging.Logger, name)
++    except AttributeError:
++        # some methods are missing, e.g. Logger.warn was removed from Python 3.13
++        continue
+     setattr(
+         TopicLogger,
+         name,

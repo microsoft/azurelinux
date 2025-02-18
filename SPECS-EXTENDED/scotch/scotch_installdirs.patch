@@ -1,0 +1,123 @@
+diff -rupN --no-dereference scotch-v7.0.4/src/CMakeLists.txt scotch-v7.0.4-new/src/CMakeLists.txt
+--- scotch-v7.0.4/src/CMakeLists.txt	2023-08-15 16:47:40.000000000 +0200
++++ scotch-v7.0.4-new/src/CMakeLists.txt	2023-08-16 23:05:54.675961985 +0200
+@@ -183,8 +183,8 @@ add_subdirectory(check)
+ # See https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html
+ include(CMakePackageConfigHelpers)
+ 
+-set(INCLUDE_INSTALL_DIR "include/" CACHE STRING "Where to install headers relative to prefix")
+-set(LIBRARY_INSTALL_DIR "lib/" CACHE STRING "Where to install libraries relative to prefix")
++set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE STRING "Where to install headers relative to prefix")
++set(LIBRARY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Where to install libraries relative to prefix")
+ 
+ configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/SCOTCHConfig.cmake.in
+   ${CMAKE_CURRENT_BINARY_DIR}/SCOTCHConfig.cmake
+diff -rupN --no-dereference scotch-v7.0.4/src/esmumps/CMakeLists.txt scotch-v7.0.4-new/src/esmumps/CMakeLists.txt
+--- scotch-v7.0.4/src/esmumps/CMakeLists.txt	2023-08-15 16:47:40.000000000 +0200
++++ scotch-v7.0.4-new/src/esmumps/CMakeLists.txt	2023-08-16 23:05:54.675961985 +0200
+@@ -125,13 +125,13 @@ add_dependencies(test_fax scotch_h)
+ install(EXPORT esmumpsTargets
+   FILE esmumpsTargets.cmake
+   NAMESPACE SCOTCH::
+-  DESTINATION lib/cmake/scotch)
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/scotch)
+ 
+ install(TARGETS esmumps
+   EXPORT esmumpsTargets
+-  ARCHIVE DESTINATION lib
+-  LIBRARY DESTINATION lib
+-  PUBLIC_HEADER DESTINATION include)
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ 
+ # Dummy PTEsMUMPS library file
+ add_library(ptesmumps ${esmumps_src} ${esmumps_headers})
+@@ -154,10 +154,10 @@ add_dependencies(ptesmumps scotch_h)
+ install(EXPORT ptesmumpsTargets
+   FILE ptesmumpsTargets.cmake
+   NAMESPACE SCOTCH::
+-  DESTINATION lib/cmake/scotch)
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/scotch)
+ 
+ install(TARGETS ptesmumps
+   EXPORT ptesmumpsTargets
+-  ARCHIVE DESTINATION lib
+-  LIBRARY DESTINATION lib
+-  PUBLIC_HEADER DESTINATION include)
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+diff -rupN --no-dereference scotch-v7.0.4/src/libscotch/CMakeLists.txt scotch-v7.0.4-new/src/libscotch/CMakeLists.txt
+--- scotch-v7.0.4/src/libscotch/CMakeLists.txt	2023-08-15 16:47:40.000000000 +0200
++++ scotch-v7.0.4-new/src/libscotch/CMakeLists.txt	2023-08-16 23:05:54.676962014 +0200
+@@ -809,11 +809,11 @@ foreach(_target ${TARGETS_LIST})
+   install(EXPORT ${_target}Targets
+     FILE ${_target}Targets.cmake
+     NAMESPACE SCOTCH::
+-    DESTINATION lib/cmake/scotch)
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/scotch)
+ 
+   install(TARGETS ${_target}
+     EXPORT ${_target}Targets
+-    ARCHIVE DESTINATION lib
+-    LIBRARY DESTINATION lib
+-    PUBLIC_HEADER DESTINATION include)
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ endforeach()
+diff -rupN --no-dereference scotch-v7.0.4/src/libscotchmetis/CMakeLists.txt scotch-v7.0.4-new/src/libscotchmetis/CMakeLists.txt
+--- scotch-v7.0.4/src/libscotchmetis/CMakeLists.txt	2023-08-15 16:47:40.000000000 +0200
++++ scotch-v7.0.4-new/src/libscotchmetis/CMakeLists.txt	2023-08-16 23:05:54.676962014 +0200
+@@ -114,18 +114,18 @@ foreach(version 3 5)
+   install(EXPORT scotchmetisTargets
+     FILE scotchmetisTargets.cmake
+     NAMESPACE SCOTCH::
+-    DESTINATION lib/cmake/scotch)
++    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/scotch)
+   if(INSTALL_METIS_HEADERS)
+     install(TARGETS scotchmetisv${version}
+       EXPORT scotchmetisTargets
+-      ARCHIVE DESTINATION lib
+-      LIBRARY DESTINATION lib
+-      PUBLIC_HEADER DESTINATION include)
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+   else()
+     install(TARGETS scotchmetisv${version}
+       EXPORT scotchmetisTargets
+-      ARCHIVE DESTINATION lib
+-      LIBRARY DESTINATION lib)
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   endif()
+ endforeach(version 3 5)
+ 
+@@ -183,19 +183,19 @@ if(BUILD_PTSCOTCH)
+     install(EXPORT ptscotchparmetisTargets
+       FILE ptscotchparmetisTargets.cmake
+       NAMESPACE SCOTCH::
+-      DESTINATION lib/cmake/scotch)
++      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/scotch)
+ 
+     if(INSTALL_METIS_HEADERS)
+       install(TARGETS ptscotchparmetisv${version}
+         EXPORT ptscotchparmetisTargets
+-        ARCHIVE DESTINATION lib
+-        LIBRARY DESTINATION lib
+-        PUBLIC_HEADER DESTINATION include)
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+     else()
+       install(TARGETS ptscotchparmetisv${version}
+         EXPORT ptscotchparmetisTargets
+-        ARCHIVE DESTINATION lib
+-        LIBRARY DESTINATION lib)
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+     endif()
+   endforeach(version 3)
+ endif(BUILD_PTSCOTCH)

@@ -1,0 +1,93 @@
+Backport of https://github.com/lincolnloop/python-qrcode/pull/338
+
+diff --git a/qrcode/main.py b/qrcode/main.py
+index 0ac91bb..53f2ab2 100644
+--- a/qrcode/main.py
++++ b/qrcode/main.py
+@@ -16,7 +16,6 @@ from typing_extensions import Literal
+ 
+ from qrcode import constants, exceptions, util
+ from qrcode.image.base import BaseImage
+-from qrcode.image.pure import PyPNGImage
+ 
+ ModulesType = List[List[Optional[bool]]]
+ # Cache modules generated just based on the QR Code version
+@@ -360,7 +359,11 @@ class QRCode(Generic[GenericImage]):
+                 from qrcode.image.pil import Image, PilImage
+ 
+                 # Use PIL by default if available, otherwise use PyPNG.
+-                image_factory = PilImage if Image else PyPNGImage
++                if Image is not None:
++                    image_factory = PilImage
++                else:
++                    from qrcode.image.pure import PyPNGImage
++                    image_factory = PyPNGImage
+ 
+         im = image_factory(
+             self.border,
+diff --git a/qrcode/tests/test_qrcode.py b/qrcode/tests/test_qrcode.py
+index 5c1ea35..24c36f8 100644
+--- a/qrcode/tests/test_qrcode.py
++++ b/qrcode/tests/test_qrcode.py
+@@ -5,18 +5,21 @@ import warnings
+ from tempfile import mkdtemp
+ from unittest import mock
+ 
+-import png
+-
+ import qrcode
+ import qrcode.util
+ from qrcode.compat.pil import Image as pil_Image
+ from qrcode.exceptions import DataOverflowError
+ from qrcode.image.base import BaseImage
+-from qrcode.image.pure import PyPNGImage
+ from qrcode.image.styledpil import StyledPilImage
+ from qrcode.image.styles import colormasks, moduledrawers
+ from qrcode.util import MODE_8BIT_BYTE, MODE_ALPHA_NUM, MODE_NUMBER, QRData
+ 
++try:
++    import png
++    from qrcode.image.pure import PyPNGImage
++except ImportError:
++    PyPNGImage = None
++
+ UNICODE_TEXT = "\u03b1\u03b2\u03b3"
+ WHITE = (255, 255, 255)
+ BLACK = (0, 0, 0)
+@@ -175,6 +178,7 @@ class QRCodeTests(unittest.TestCase):
+         self.assertTrue(MockFactory.new_image.called)
+         self.assertTrue(MockFactory.drawrect.called)
+ 
++    @unittest.skipIf(not PyPNGImage, "Requires pypng")
+     def test_render_pypng(self):
+         qr = qrcode.QRCode()
+         qr.add_data(UNICODE_TEXT)
+@@ -184,6 +188,7 @@ class QRCodeTests(unittest.TestCase):
+         print(img.width, img.box_size, img.border)
+         img.save(io.BytesIO())
+ 
++    @unittest.skipIf(not PyPNGImage, "Requires pypng")
+     def test_render_pypng_to_str(self):
+         qr = qrcode.QRCode()
+         qr.add_data(UNICODE_TEXT)
+diff --git a/setup.cfg b/setup.cfg
+index 3aff842..c17189b 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -30,7 +30,6 @@ packages = find:
+ install_requires = 
+ 	colorama;platform_system=="Windows"
+ 	typing_extensions
+-	pypng
+ python_requires = >= 3.7
+ 
+ [options.extras_require]
+@@ -45,6 +44,8 @@ test =
+ 	pytest
+ pil = 
+ 	pillow>=9.1.0
++png = 
++	pypng
+ all = 
+ 	zest.releaser[recommended]
+ 	tox

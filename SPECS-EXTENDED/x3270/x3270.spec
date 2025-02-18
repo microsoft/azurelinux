@@ -1,30 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global catalogue /etc/X11/fontpath.d
 
-%global majorver 3.6
+%global majorver 4.3
 Summary: An X Window System based IBM 3278/3279 terminal emulator
 Name: x3270
-Version: 3.6ga10
+Version: 4.3ga8
 Release: 2%{?dist}
-License: BSD
-URL: http://x3270.sourceforge.net/
+License: BSD-3-Clause AND HPND-sell-variant AND MIT AND Apache-2.0
+URL: https://x3270.miraheze.org/wiki/Main_Page
 Source0: http://downloads.sourceforge.net/%{name}/suite3270-%{version}-src.tgz
 Source1: x3270.png
 Source2: x3270.desktop
 Patch0: x3270-3.5-paths.patch
-Patch1: x3270-3.5-ibmhostpath.patch
 
+BuildRequires: make
 BuildRequires: ncurses-devel
 BuildRequires: readline-devel
 BuildRequires: openssl-devel
 BuildRequires: libtool
 BuildRequires: desktop-file-utils
-BuildRequires: fontpackages-devel
+BuildRequires: fonts-rpm-macros
 
 %package x11
 Summary: IBM 3278/3279 terminal emulator for the X Window System
-BuildRequires: xorg-x11-font-utils
+BuildRequires: mkfontdir bdftopcf
 BuildRequires: libXaw-devel
 Requires: %{name} = %{version}
 
@@ -59,23 +57,12 @@ Install the %{name}-text package if you need to access IBM hosts using an IBM
 
 
 %prep
-%setup -q -n suite3270-%{majorver}
-%patch 0 -p1 -b .paths
-%patch 1 -p1 -b .ibmhosts
-
-for d in c3270 pr3287 s3270 x3270; do
-    for f in LICENSE README html; do
-        mv $d/$f $f.$d
-    done
-done
+%autosetup -p1 -n suite3270-%{majorver}
 
 
 %build
-%configure --enable-x3270 --enable-c3270 --enable-s3270 --enable-pr3287
+%configure --enable-x3270 --enable-c3270 --enable-s3270 --enable-pr3287 --enable-playback
 make %{?_smp_mflags} CCOPTIONS="$RPM_OPT_FLAGS" LIBX3270DIR=%{_sysconfdir}
-
-# build playback tool
-( cd Playback; make CFLAGS="$RPM_OPT_FLAGS $RPM_LD_FLAGS" )
 
 
 %install
@@ -85,8 +72,8 @@ make install.man DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{catalogue}
 ln -sf %{_fontdir} $RPM_BUILD_ROOT%{catalogue}/x3270
 
-install -p -m755 Playback/playback $RPM_BUILD_ROOT%{_bindir}
-install -p -m644 Playback/playback.man $RPM_BUILD_ROOT%{_mandir}/man1/playback.1
+install -p -m755 "$(find ./obj -type f -name playback -print -quit)" $RPM_BUILD_ROOT%{_bindir}
+install -p -m644 playback/playback.man $RPM_BUILD_ROOT%{_mandir}/man1/playback.1
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/48x48/apps
 install -p -m644 %{SOURCE1} ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps
@@ -98,23 +85,22 @@ desktop-file-install \
 
 
 %files
-%doc LICENSE.s3270 README.s3270 html.s3270
-%doc LICENSE.pr3287 README.pr3287 html.pr3287
+%doc README.md
 %{_bindir}/s3270
 %{_bindir}/pr3287
+%{_bindir}/prtodir
 %{_bindir}/x3270if
 %{_bindir}/playback
 %{_mandir}/man1/s3270.1*
 %{_mandir}/man1/pr3287.1*
 %{_mandir}/man1/x3270if.1*
-%{_mandir}/man1/x3270-script.1*
 %{_mandir}/man1/playback.1*
 %{_mandir}/man5/ibm_hosts.5*
 %config(noreplace) %{_sysconfdir}/ibm_hosts
 
 %files x11
-%doc LICENSE.x3270 README.x3270 html.x3270
 %{_bindir}/x3270
+%{_bindir}/x3270a
 %{_fontdir}/
 %{catalogue}/x3270
 %{_mandir}/man1/x3270.1*
@@ -122,14 +108,119 @@ desktop-file-install \
 %{_datadir}/applications/x3270.desktop
 
 %files text
-%doc LICENSE.c3270 README.c3270 html.c3270
 %{_bindir}/c3270
 %{_mandir}/man1/c3270.1*
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6ga10-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.3ga8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Apr 08 2024 Jakub Čajka <jcajka@redhat.com> 4.3ga8-1
+- updated to 4.3ga8(rhbz#2272416)
+
+* Mon Mar 25 2024 Jakub Čajka <jcajka@redhat.com> 4.3ga7-1
+- updated to 4.3ga7(rhbz#2270739)
+
+* Tue Mar 05 2024 Jakub Čajka <jcajka@redhat.com> 4.3ga6-1
+- updated to 4.3ga6(#2267465)
+
+* Mon Feb 19 2024 Jakub Čajka <jcajka@redhat.com> 4.3ga5-1
+- updated to 4.3ga5(#2264784)
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.3ga4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Oct 16 2023 Jakub Čajka <jcajka@redhat.com> 4.3ga4-1
+- updated to 4.3ga4(#2244223)
+
+* Fri Sep 08 2023 Jakub Čajka <jcajka@redhat.com> 4.3ga3-1
+- updated to 4.3ga3(#2237932)
+
+* Tue Aug 01 2023 Jakub Čajka <jcajka@redhat.com> 4.3beta1-1
+- updated to 4.3beta2(#2227482)
+- converted to the SPDX
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.3beta1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May 30 2023 Jakub Čajka <jcajka@redhat.com> 4.3beta1-1
+- updated to 4.3beta1(#2210893)
+
+* Thu Mar 09 2023 Jakub Čajka <jcajka@redhat.com> 4.2ga9-1
+- updated to 4.2ga9 (#2175581)
+
+* Thu Feb 09 2023 Jakub Čajka <jcajka@redhat.com> 4.2ga8-1
+- updated to 4.2ga8 (#2165415)
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2ga7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 05 2023 Jakub Čajka <jcajka@redhat.com> 4.2ga7-1
+- updated to 4.2ga7 (#2156835)
+
+* Fri Sep 30 2022 Jakub Čajka <jcajka@redhat.com> 4.2ga6-1
+- updated to 4.2ga6 (#2130398)
+
+* Tue Sep 06 2022 Jakub Čajka <jcajka@redhat.com> 4.2ga5-1
+- updated to 4.2ga5 (#2124138)
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.1ga13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 02 2022 Jakub Čajka <jcajka@redhat.com> 4.1ga13-1
+- updated to 4.1ga13 (#2068796)
+
+* Thu Feb 24 2022 Jakub Čajka <jcajka@redhat.com> 4.1ga12-1
+- updated to 4.1ga12 (#2057250)
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.1ga11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 03 2022 Jakub Čajka <jcajka@redhat.com> 4.1ga11-1
+- updated to 4.1ga11 (#2034061)
+
+* Mon Nov 01 2021 Dan Horák <dan[at]danny.cz> - 4.1ga10-1
+- updated to 4.1ga10 (#2018771)
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 4.0ga14-4
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.0ga14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar 01 2021 Dan Horák <dan[at]danny.cz> - 4.0ga14-2
+- update BRs (#1933647)
+
+* Mon Feb 01 2021 Dan Horák <dan[at]danny.cz> - 4.0ga14-1
+- updated to 4.0ga14 (#1922848)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.0ga13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 04 2021 Dan Horák <dan[at]danny.cz> - 4.0ga13-1
+- updated to 4.0ga13 (#1911117)
+
+* Mon Sep 28 2020 Dan Horák <dan[at]danny.cz> - 4.0ga12-1
+- updated to 4.0ga12 (#1882956)
+
+* Tue Aug 18 2020 Dan Horák <dan[at]danny.cz> - 4.0ga11-1
+- updated to 4.0ga11 (#1869461)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.0ga10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Dan Horák <dan[at]danny.cz> - 4.0ga10-1
+- updated to 4.0ga10 (#1860639)
+
+* Fri May 29 2020 Dan Horák <dan[at]danny.cz> - 4.0ga9-1
+- updated to 4.0ga9 (#1840492)
+
+* Sat Apr 11 2020 Dan Horák <dan[at]danny.cz> - 3.6ga12-1
+- updated to 3.6ga12 (#1823121)
+
+* Tue Mar 17 2020 Dan Horák <dan[at]danny.cz> - 3.6ga11-1
+- updated to 3.6ga11 (#1814079)
 
 * Mon Feb 24 2020 Dan Horák <dan[at]danny.cz> - 3.6ga10-1
 - updated to 3.6ga10 (#1806341)

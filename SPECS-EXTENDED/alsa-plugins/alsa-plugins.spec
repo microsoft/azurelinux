@@ -1,19 +1,27 @@
+%if 0%{?rhel}
+%bcond_with avtp
 %bcond_with jack
-Summary:        The Advanced Linux Sound Architecture (ALSA) Plugins
+%bcond_with ffmpeg
+%else
+%bcond_without avtp
+%bcond_without jack
+%bcond_without ffmpeg
+%endif
+
 Name:           alsa-plugins
-Version:        1.2.7.1
+Version:        1.2.12
 Release:        3%{?dist}
-# All packages are LGPLv2+ with the exception of samplerate which is GPLv2+
-# pph plugin is BSD-like licensed
-License:        GPLv2+ AND LGPLv2+ AND BSD
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.alsa-project.org/
-Source0:        https://github.com/alsa-project/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Summary:        The Advanced Linux Sound Architecture (ALSA) Plugins
+# All packages are LGPL-2.1-or-later with the exception of samplerate
+# which is GPL-2.0-or-later, pph plugin is BSD-3-Clause licensed
+License:        GPL-2.0-or-later and LGPL-2.1-or-later and BSD-3-Clause
+URL:            http://www.alsa-project.org/
+Source0:        ftp://ftp.alsa-project.org/pub/plugins/%{name}-%{version}.tar.bz2
+Patch0:         alsa-git.patch
+
+BuildRequires:  autoconf automake libtool
+BuildRequires:  make
 BuildRequires:  alsa-lib-devel
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
 
 %description
 The Advanced Linux Sound Architecture (ALSA) provides audio and MIDI
@@ -23,11 +31,10 @@ This package includes plugins for ALSA.
 
 %if %{with jack}
 %package jack
-Summary:        Jack PCM output plugin for ALSA
-License:        LGPLv2+
+Recommends:     jack-audio-connection-kit
 BuildRequires:  jack-audio-connection-kit-devel
-Requires:       alsa-utils
-Requires:       jack-audio-connection-kit
+Summary:        Jack PCM output plugin for ALSA
+License:        LGPL-2.1-or-later
 
 %description jack
 This plugin converts the ALSA API over JACK (Jack Audio Connection
@@ -38,9 +45,7 @@ This plugin provides the PCM type "jack"
 
 %package oss
 Summary:        Oss PCM output plugin for ALSA
-License:        LGPLv2+
-BuildRequires:  alsa-lib-devel
-Requires:       alsa-utils
+License:        LGPL-2.1-or-later
 
 %description oss
 This plugin converts the ALSA API over OSS API.  With this plugin,
@@ -49,11 +54,10 @@ ALSA native apps can run on OSS drivers.
 This plugin provides the PCM type "oss".
 
 %package pulseaudio
-Summary:        Alsa to PulseAudio backend
-License:        LGPLv2+
+Recommends:     pulseaudio-daemon
 BuildRequires:  pulseaudio-libs-devel
-Requires:       alsa-utils
-Requires:       pulseaudio-daemon
+Summary:        Alsa to PulseAudio backend
+License:        LGPL-2.1-or-later
 
 %description pulseaudio
 This plugin allows any program that uses the ALSA API to access a PulseAudio
@@ -62,20 +66,18 @@ sound across a network. There are two plugins in the suite, one for PCM and
 one for mixer control.
 
 %package samplerate
-Summary:        External rate converter plugin for ALSA
-License:        GPLv2+
 BuildRequires:  libsamplerate-devel
-Requires:       alsa-utils
+Summary:        External rate converter plugin for ALSA
+License:        GPL-2.0-or-later
 
 %description samplerate
 This plugin is an external rate converter using libsamplerate by Erik de
 Castro Lopo.
 
 %package upmix
-Summary:        Upmixer channel expander plugin for ALSA
-License:        LGPLv2+
 BuildRequires:  libsamplerate-devel
-Requires:       alsa-utils
+Summary:        Upmixer channel expander plugin for ALSA
+License:        LGPL-2.1-or-later
 
 %description upmix
 The upmix plugin is an easy-to-use plugin for upmixing to 4 or
@@ -83,10 +85,9 @@ The upmix plugin is an easy-to-use plugin for upmixing to 4 or
 by the slave PCM or explicitly via channel option.
 
 %package vdownmix
-Summary:        Downmixer to stereo plugin for ALSA
-License:        LGPLv2+
 BuildRequires:  libsamplerate-devel
-Requires:       alsa-utils
+Summary:        Downmixer to stereo plugin for ALSA
+License:        LGPL-2.1-or-later
 
 %description vdownmix
 The vdownmix plugin is a downmixer from 4-6 channels to 2-channel
@@ -96,7 +97,7 @@ surround".
 
 %package usbstream
 Summary:        USB stream plugin for ALSA
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 
 %description usbstream
 The usbstream plugin is for snd-usb-us122l driver. It converts PCM
@@ -104,19 +105,17 @@ stream to USB specific stream.
 
 %package arcamav
 Summary:        Arcam AV amplifier plugin for ALSA
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 
 %description arcamav
 This plugin exposes the controls for an Arcam AV amplifier
 (see: http://www.arcam.co.uk/) as an ALSA mixer device.
 
 %package speex
+Requires:       speex speexdsp
+BuildRequires:  speex-devel speexdsp-devel
 Summary:        Rate Converter Plugin Using Speex Resampler
-License:        LGPLv2+
-BuildRequires:  speex-devel
-BuildRequires:  speexdsp-devel
-Requires:       speex
-Requires:       speexdsp
+License:        LGPL-2.1-or-later
 
 %description speex
 The rate plugin is an external rate converter using the Speex resampler
@@ -124,17 +123,49 @@ The rate plugin is an external rate converter using the Speex resampler
 pre-processing of a mono stream like denoise using libspeex DSP API.
 
 %package maemo
-Summary:        Maemo plugin for ALSA
-License:        LGPLv2+
 BuildRequires:  dbus-devel
-BuildRequires:  make
+Summary:        Maemo plugin for ALSA
+License:        LGPL-2.1-or-later
 
 %description maemo
 This plugin converts the ALSA API over PCM task nodes protocol. In this way,
 ALSA native applications can run over DSP Gateway and use DSP PCM task nodes.
 
+%if %{with avtp}
+%package avtp
+BuildRequires:  libavtp-devel
+Summary:        Audio Video Transport Protocol (AVTP) plugin for ALSA
+License:        LGPL-2.1-or-later
+
+%description avtp
+This plugin supports Audio Video Transport Protocol (AVTP) as specified in
+IEEE 1722-2016 spec. AVTP is part of the Audio/Video Broadcast using TSN.
+%endif
+
+%if %{with ffmpeg}
+%package a52
+BuildRequires:  ffmpeg-free-devel
+Obsoletes:      alsa-plugins-freeworld-a52 <= %{version}-%{release}
+Summary:        A52 output plugin for ALSA using libavcodec
+License:        LGPL-2.1-or-later
+
+%description a52
+This plugin converts S16 linear format to A52 compressed stream and
+send to an SPDIF output.  It requires libavcodec for encoding the
+audio stream.
+
+%package lavrate
+BuildRequires:  ffmpeg-free-devel
+Obsoletes:      alsa-plugins-freeworld-lavrate <= %{version}-%{release}
+Summary:        Rate converter plugin for ALSA using libavcodec
+License:        LGPL-2.1-or-later
+
+%description lavrate
+The plugin uses ffmpeg audio resample library to convert audio rates.
+%endif
+
 %prep
-%autosetup -p1
+%autosetup -n %{name}-%{version}%{?prever} -p1
 
 %build
 autoreconf -vif
@@ -150,15 +181,14 @@ autoreconf -vif
 mv %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf.example \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf
 
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -name "*.la" -delete
 
-%files
-%license COPYING COPYING.GPL
 
 %if %{with jack}
 %files jack
 %license COPYING COPYING.GPL
 %doc doc/README-jack
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-jack.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -170,6 +200,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files oss
 %license COPYING COPYING.GPL
 %doc doc/README-pcm-oss
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-oss.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -185,6 +216,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/alsa-lib/libasound_module_pcm_pulse.so
 %{_libdir}/alsa-lib/libasound_module_ctl_pulse.so
 %{_libdir}/alsa-lib/libasound_module_conf_pulse.so
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pulseaudio.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf
@@ -194,6 +226,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files samplerate
 %license COPYING COPYING.GPL
 %doc doc/samplerate.txt
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/10-samplerate.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -208,6 +241,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files upmix
 %license COPYING COPYING.GPL
 %doc doc/upmix.txt
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/60-upmix.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -218,6 +252,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files vdownmix
 %license COPYING COPYING.GPL
 %doc doc/vdownmix.txt
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/60-vdownmix.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -227,6 +262,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files usbstream
 %license COPYING COPYING.GPL
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/98-usb-stream.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -237,6 +273,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files arcamav
 %license COPYING COPYING.GPL
 %doc doc/README-arcam-av
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-arcam-av-ctl.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -247,6 +284,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files speex
 %license COPYING COPYING.GPL
 %doc doc/speexdsp.txt doc/speexrate.txt
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/10-speexrate.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/60-speex.conf
@@ -262,6 +300,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files maemo
 %license COPYING COPYING.GPL
 %doc doc/README-maemo
+%dir %{_sysconfdir}/alsa
 %dir %{_sysconfdir}/alsa/conf.d
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/98-maemo.conf
 %dir %{_datadir}/alsa/alsa.conf.d
@@ -270,11 +309,76 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/alsa-lib/libasound_module_ctl_dsp_ctl.so
 %{_libdir}/alsa-lib/libasound_module_pcm_alsa_dsp.so
 
+%if %{with avtp}
+%files avtp
+%license COPYING COPYING.GPL
+%{_libdir}/alsa-lib/libasound_module_pcm_aaf.so
+%endif
+
+%if %{with ffmpeg}
+%files a52
+%license COPYING COPYING.GPL
+%doc doc/a52.txt
+%dir %{_sysconfdir}/alsa
+%dir %{_sysconfdir}/alsa/conf.d
+%config(noreplace) %{_sysconfdir}/alsa/conf.d/60-a52-encoder.conf
+%dir %{_datadir}/alsa/alsa.conf.d
+%{_datadir}/alsa/alsa.conf.d/60-a52-encoder.conf
+%dir %{_libdir}/alsa-lib
+%{_libdir}/alsa-lib/libasound_module_pcm_a52.so
+
+%files lavrate
+%license COPYING COPYING.GPL
+%doc doc/lavrate.txt
+%dir %{_sysconfdir}/alsa
+%dir %{_sysconfdir}/alsa/conf.d
+%config(noreplace) %{_sysconfdir}/alsa/conf.d/10-rate-lav.conf
+%dir %{_datadir}/alsa/alsa.conf.d
+%{_datadir}/alsa/alsa.conf.d/10-rate-lav.conf
+%dir %{_libdir}/alsa-lib
+%{_libdir}/alsa-lib/libasound_module_rate_lavrate.so
+%{_libdir}/alsa-lib/libasound_module_rate_lavrate_fast.so
+%{_libdir}/alsa-lib/libasound_module_rate_lavrate_faster.so
+%{_libdir}/alsa-lib/libasound_module_rate_lavrate_high.so
+%{_libdir}/alsa-lib/libasound_module_rate_lavrate_higher.so
+%endif
+
 %changelog
-* Tue Dec 20 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.7.1-3
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- Disable 'jack' support in build
-- License Verified
+* Mon Sep 23 2024 Fabio Valentini <decathorpe@gmail.com> - 1.2.12-3
+- Rebuild for ffmpeg 7
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 11 2024 Jaroslav Kysela <perex@perex.cz> - 1.2.12-1
+- Updated to 1.2.12
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Aug 25 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.2.7.1-8
+- Disable avtp plugin in RHEL builds
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun  6 2023 Jaroslav Kysela <perex@perex.cz> - 1.2.7.1-6
+- change to SPDX licenses
+
+* Sun Mar 12 2023 Neal Gompa <ngompa@fedoraproject.org> - 1.2.7.1-5
+- Rebuild for ffmpeg 6.0
+
+* Mon Mar  6 2023 Jaroslav Kysela <perex@perex.cz> - 1.2.7.1-4
+- Enable avtp plugin - Peter Robinson <pbrobinson@fedoraproject.org>
+- Enable a52 and lavrate plugins - Yaakov Selkowitz <yselkowi@redhat.com>
+- Remove or soften excess dependendencies - Yaakov Selkowitz <yselkowi@redhat.com>
+- CI test & RHEL cleanups
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

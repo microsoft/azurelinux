@@ -1,0 +1,60 @@
+From 4b30dd33332f79c71697c8a9bdbf39d74fb06c4a Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 5 Nov 2019 12:14:08 +0100
+Subject: [PATCH 3/3] Drop support for JAXB
+
+---
+ xmlunit-core/src/main/java/org/xmlunit/builder/Input.java  | 4 ++--
+ .../src/test/java/org/xmlunit/builder/InputTest.java       | 7 -------
+ 2 files changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/xmlunit-core/src/main/java/org/xmlunit/builder/Input.java b/xmlunit-core/src/main/java/org/xmlunit/builder/Input.java
+index a7a23ee..6f91f32 100644
+--- a/xmlunit-core/src/main/java/org/xmlunit/builder/Input.java
++++ b/xmlunit-core/src/main/java/org/xmlunit/builder/Input.java
+@@ -162,8 +162,8 @@ public class Input {
+      * @param jaxbObject the object to use as source
+      * @return a new builder
+      */
+-    public static JaxbBuilder fromJaxb(Object jaxbObject) {
+-        return JaxbBuilderFactoryLocator.getFactory().create(jaxbObject);
++    public static Builder fromJaxb(Object jaxbObject) {
++        throw new RuntimeException("This implementation has JAXB support removed");
+     }
+ 
+     /**
+diff --git a/xmlunit-core/src/test/java/org/xmlunit/builder/InputTest.java b/xmlunit-core/src/test/java/org/xmlunit/builder/InputTest.java
+index e767f38..98e3fe7 100644
+--- a/xmlunit-core/src/test/java/org/xmlunit/builder/InputTest.java
++++ b/xmlunit-core/src/test/java/org/xmlunit/builder/InputTest.java
+@@ -31,7 +31,6 @@ import org.w3c.dom.Document;
+ import org.xmlunit.NullNode;
+ import org.xmlunit.TestResources;
+ import org.xmlunit.XMLUnitException;
+-import org.xmlunit.builder.jaxb.ComplexNode;
+ import org.xmlunit.util.Convert;
+ import org.xmlunit.xpath.JAXPXPathEngine;
+ 
+@@ -132,10 +131,6 @@ public class InputTest {
+         allIsWellFor(s, "furry");
+     }
+ 
+-    @Test public void shouldParseJaxbObject() throws Exception {
+-        allIsWellFor(Input.fromJaxb(new ComplexNode()).build(), "complexNode");
+-    }
+-
+     @Test public void shouldParseUnknownToSource() throws Exception {
+         // from Source
+         allIsWellFor(Input.from(Input.fromByteArray(readTestFile()).build()).build());
+@@ -153,8 +148,6 @@ public class InputTest {
+         allIsWellFor(Input.from(new URI("file:" + TestResources.ANIMAL_FILE)).build());
+         // from URL
+         allIsWellFor(Input.from(new URL("file:" + TestResources.ANIMAL_FILE)).build());
+-        // from Jaxb-Object
+-        allIsWellFor(Input.from(new ComplexNode()).build(), "complexNode");
+         // from InputStream
+         try (FileInputStream is = new FileInputStream(TestResources.ANIMAL_FILE)) {
+             allIsWellFor(Input.from(is).build());
+-- 
+2.44.0
+

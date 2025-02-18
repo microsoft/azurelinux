@@ -1,7 +1,21 @@
-diff -urNp old/userguide/cameratopam.html new/userguide/cameratopam.html
---- old/userguide/cameratopam.html	2017-09-05 09:05:16.000000000 +0200
-+++ new/userguide/cameratopam.html	2017-09-05 13:16:33.622352535 +0200
-@@ -25,10 +25,10 @@ cameratopam - convert raw camera image t
+diff --git a/converter/pbm/pbmtoepson.c b/converter/pbm/pbmtoepson.c
+index 122a438..5d67746 100644
+--- a/converter/pbm/pbmtoepson.c
++++ b/converter/pbm/pbmtoepson.c
+@@ -75,7 +75,7 @@ parseCommandLine(int                  argc,
+             &dpiSpec,                         0);
+     OPTENT3(0, "adjacent",     OPT_FLAG,     NULL,
+             &adjacentSpec,                    0);
+-    OPTENT3(0, "nonadjacent",  OPT_FLAG,     NULL,
++    OPTENT3(0, "noadjacent",  OPT_FLAG,     NULL,
+             &nonadjacentSpec,                 0);
+ 
+     opt.opt_table = option_def;
+diff --git a/userguide/cameratopam.html b/userguide/cameratopam.html
+index b50bfeb..3af9008 100644
+--- a/userguide/cameratopam.html
++++ b/userguide/cameratopam.html
+@@ -24,10 +24,10 @@ cameratopam - convert raw camera image to PAM
  [<b>-balance_camera</b>]
  [<b>-red_scale=</b><i>float</i>]
  [<b>-blue_scale=</b><i>float</i>]
@@ -14,7 +28,7 @@ diff -urNp old/userguide/cameratopam.html new/userguide/cameratopam.html
  [<b>-linear</b>]
  [<b>-verbose</b>]
  
-@@ -106,7 +106,7 @@ the default.
+@@ -110,7 +110,7 @@ the default.
  <dd>Further adjust the color balance by multiplying the red and blue
  channels by these values.  Both default to 1.0.
  
@@ -23,7 +37,7 @@ diff -urNp old/userguide/cameratopam.html new/userguide/cameratopam.html
  
  <dd>Change the output brightness.  Default is 1.0.
  
-@@ -114,14 +114,14 @@ channels by these values.  Both default
+@@ -118,14 +118,14 @@ channels by these values.  Both default to 1.0.
  
  <dd>By default, <b>cameratoapm</b> clips all colors to prevent pink
  hues in the highlights.  Combine this option with
@@ -40,47 +54,49 @@ diff -urNp old/userguide/cameratopam.html new/userguide/cameratopam.html
  
  <dd>For cameras based on the Fuji Super CCD SR, this option causes
  <b>cameratopam</b> to use the secondary sensors, in effect
-diff -urNp old/userguide/fiascotopnm.html new/userguide/fiascotopnm.html
---- old/userguide/fiascotopnm.html	2017-09-05 09:05:16.000000000 +0200
-+++ new/userguide/fiascotopnm.html	2017-09-05 13:32:51.810458154 +0200
-@@ -51,7 +51,7 @@ the output file(s) are written to the fi
+diff --git a/userguide/fiascotopnm.html b/userguide/fiascotopnm.html
+index c33f701..fa84441 100644
+--- a/userguide/fiascotopnm.html
++++ b/userguide/fiascotopnm.html
+@@ -56,7 +56,7 @@ the output file(s) are written to the first (writable) directory of
  this list. Otherwise, the current directory is used to store the
  output file(s).
  
--<DT><B>-z</B>, <B>--fast</B>
-+<DT><B>-r</B>, <B>--fast</B>
- <DD>
+-<dt><b>-z</b>, <b>--fast</b>
++<dt><b>-r</b>, <b>--fast</b>
+ <dd>
  Decompress images in the 4:2:0 format; i.e., each chroma channel is
  decompressed to an image of halved width and height. Use this option
-@@ -83,7 +83,7 @@ given amount <I>N</I>. <I>N</I> is 1 (mi
- is 70. When <I>N</I>=0, then the smoothing amount specified in the
+@@ -88,7 +88,7 @@ given amount <i>N</i>. <i>N</i> is 1 (minimum) to 100 (maximum); default
+ is 70. When <i>N</i>=0, then the smoothing amount specified in the
  FIASCO file is used (defined by the FIASCO coder).
  
--<DT><B>-F</B> <I>N</I>, <B>--fps=</B><I>N</I>
-+<DT><B>-F</B> <I>N</I>, <B>--framerate=</B><I>N</I>
- <DD>
- Set number of frames per second to <I>N</I>. When using this option,
+-<dt><b>-F</b> <i>N</i>, <b>--fps=</b><i>N</i>
++<dt><b>-F</b> <i>N</i>, <b>--framerate=</b><i>N</i>
+ <dd>
+ Set number of frames per second to <i>N</i>. When using this option,
  the frame rate specified in the FIASCO file is overridden.
-@@ -113,13 +113,8 @@ following methods (in the specified orde
- <LI>--config=<I>name</I>
- </OL>
+@@ -118,13 +118,8 @@ following methods (in the specified order):
+ <li>--config=<i>name</i>
+ </ol>
  
--<DT><B>-h</B>, <B>--info</B>
--<DD>
+-<dt><b>-h</b>, <b>--info</b>
+-<dd>
 -Print brief help, then exit.
 -
--<DT><B>-H</B>, <B>--help</B>
--<DD>
+-<dt><b>-H</b>, <b>--help</b>
+-<dd>
 -Print detailed help, then exit.
-+<DT><B>-h</B>, <B>--help</B>
++<dt><b>-h</b>, <b>--help</b>
 +Print help, then exit.
  
- </DL>
+ </dl>
  
-diff -urNp old/userguide/pamperspective.html new/userguide/pamperspective.html
---- old/userguide/pamperspective.html	2017-09-05 09:05:16.000000000 +0200
-+++ new/userguide/pamperspective.html	2017-09-05 13:23:15.869997105 +0200
-@@ -220,7 +220,7 @@ default rectangle as the "frame." The vi
+diff --git a/userguide/pamperspective.html b/userguide/pamperspective.html
+index 018f18a..13073d2 100644
+--- a/userguide/pamperspective.html
++++ b/userguide/pamperspective.html
+@@ -223,7 +223,7 @@ default rectangle as the "frame." The visible part is always
  a rectangle the axes of which are parallel to those of the frame.
  
  <p>The frame options are additive.  All the parts of the image
@@ -89,31 +105,20 @@ diff -urNp old/userguide/pamperspective.html new/userguide/pamperspective.html
  <b>--include</b> (or their defaults) are in the visible part.  The
  visible part is the smallest possible rectangle that contains the
  parts specified those three ways.
-diff -urNp old/converter/pbm/pbmtoepson.c new/converter/pbm/pbmtoepson.c
---- old/converter/pbm/pbmtoepson.c	2018-01-04 14:26:14.740024843 +0100
-+++ new/converter/pbm/pbmtoepson.c	2018-01-04 14:28:47.970518766 +0100
-@@ -75,7 +75,7 @@ parseCommandLine(int                  ar
-             &dpiSpec,                         0);
-     OPTENT3(0, "adjacent",     OPT_FLAG,     NULL,
-             &adjacentSpec,                    0);
--    OPTENT3(0, "nonadjacent",  OPT_FLAG,     NULL,
-+    OPTENT3(0, "noadjacent",  OPT_FLAG,     NULL,
-             &nonadjacentSpec,                 0);
- 
-     opt.opt_table = option_def;
-diff -urNp old/userguide/pbmtoepson.html new/userguide/pbmtoepson.html
---- old/userguide/pbmtoepson.html	2018-01-04 14:26:14.586024719 +0100
-+++ new/userguide/pbmtoepson.html	2018-01-04 14:27:56.466847698 +0100
-@@ -18,7 +18,7 @@ pbmtoepson - convert a PBM image into Ep
+diff --git a/userguide/pbmtoepson.html b/userguide/pbmtoepson.html
+index baacf7b..e74a7fe 100644
+--- a/userguide/pbmtoepson.html
++++ b/userguide/pbmtoepson.html
+@@ -16,7 +16,7 @@ pbmtoepson - convert a PBM image into Epson printer graphics
  [<b>-dpi=</b><i>n</i>]
- [<b>-protocol=</b>{<b>escp9</b>|<B>escp</B>}]
+ [<b>-protocol=</b>{<b>escp9</b>|<b>escp</b>}]
  [<b>-adjacent</b>]
 -[<b>-nonadjacent</b>]
 +[<b>-noadjacent</b>]
  
- [<I>pbmfile</I>]
+ [<i>pbmfile</i>]
  
-@@ -74,7 +74,7 @@ print density for you consistent with yo
+@@ -75,7 +75,7 @@ print density for you consistent with your other options.
  <p>This option was new in Netpbm 10.23 (July 2004).     
  
  <dt><b>-adjacent</b>

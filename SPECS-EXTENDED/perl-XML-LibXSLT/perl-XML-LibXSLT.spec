@@ -1,66 +1,115 @@
-Summary:        Perl module for interfacing to GNOME's libxslt
-Name:           perl-XML-LibXSLT
+%global cpan_version 2.003000
+
+Name:       perl-XML-LibXSLT
 # NOTE: also update perl-XML-LibXML to a compatible version.  See below why.
-# https://bugzilla.redhat.com/show_bug.cgi?id=469480
-Version:        1.99
-Release:        4%{?dist}
-License:        GPL+ OR Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://metacpan.org/release/XML-LibXSLT
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Version:    %(echo '%{cpan_version}' | sed 's/\(\....\)\(.\)/\1.\2/')
+Release:    2%{?dist}
+Summary:    Perl module for interfacing to GNOME's libxslt
+# lib/XML/LibXSLT.pm: GPL-1.0-or-later OR Artistic-1.0-Perl
+# lib/XML/LibXSLT/Quick.pm: MIT
+License:    ( GPL-1.0-or-later OR Artistic-1.0-Perl ) AND MIT
+URL:        https://metacpan.org/release/XML-LibXSLT
+Source0:    https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXSLT-%{cpan_version}.tar.gz
 BuildRequires:  coreutils
+BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  pkgconfig
-BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Cwd)
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Devel::Peek)
-BuildRequires:  perl(DynaLoader)
-BuildRequires:  perl(Encode)
-BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(File::Path) >= 2.06
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+# Run-time
+BuildRequires:  perl(autodie)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(DynaLoader)
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(IO::Socket::INET)
-BuildRequires:  perl(Symbol)
-BuildRequires:  perl(Test)
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(XML::LibXML) >= %{version}
+# the package shares code with perl-XML-LibXML, we have to require a compatible version
+# see https://bugzilla.redhat.com/show_bug.cgi?id=469480
+# for testing is needed the same version of XML::LibXML
+# BUT XML::LibXML has new bugfix releases, but XML::LibXSLT not
 BuildRequires:  perl(XML::LibXML::Boolean)
 BuildRequires:  perl(XML::LibXML::Literal)
 BuildRequires:  perl(XML::LibXML::NodeList)
 BuildRequires:  perl(XML::LibXML::Number)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
+BuildRequires:  perl(XML::LibXML) >= %{version}
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libxslt) >= 1.1.28
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(XML::LibXML) >= %{version}
+# Tests
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(Devel::Peek)
+BuildRequires:  perl(Encode)
+BuildRequires:  perl(IO::Socket::INET)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
+Requires:   perl(DynaLoader)
+Requires:   perl(Exporter)
+Requires:   perl(XML::LibXML) >= %{version}
 
 %description
 This module is a fast XSLT library, based on the Gnome libxslt engine
 that you can find at http://www.xmlsoft.org/XSLT/
 
+%package tests
+Summary:        Tests for %{name}
+License:        ( GPL-1.0-or-later OR Artistic-1.0-Perl ) AND MIT
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %{?perl_default_filter}
 
 %prep
-%autosetup -n XML-LibXSLT-%{version}
+%autosetup -p1 -n XML-LibXSLT-%{cpan_version}
+
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 OPTIMIZE="%{optflags}" NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t example %{buildroot}%{_libexecdir}/%{name}
+# Remove release tests
+rm %{buildroot}%{_libexecdir}/%{name}/t/cpan-changes.t
+rm %{buildroot}%{_libexecdir}/%{name}/t/pod.t
+rm %{buildroot}%{_libexecdir}/%{name}/t/style-trailing-space.t
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The easiest solution
+# is to copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
@@ -70,12 +119,74 @@ make test
 %{perl_vendorarch}/XML
 %{_mandir}/man3/*.3*
 
-%changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 1.99-4
-- License verified
+%files tests
+%{_libexecdir}/%{name}
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.99-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+%changelog
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.003.000-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 21 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.003.000-1
+- 2.003000 bump (rhbz#2291310)
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.002.001-6
+- Perl 5.40 rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.002.001-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.002.001-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.002.001-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.002.001-2
+- Perl 5.38 rebuild
+
+* Mon Feb 13 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.002.001-1
+- 2.002001 bump
+- Update license to SPDX format
+
+* Thu Feb 09 2023 Florian Weimer <fweimer@redhat.com> - 2.002.000-5
+- Port configure stage to C99
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.002.000-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.002.000-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.002.000-2
+- Perl 5.36 rebuild
+
+* Wed May 18 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.002.000-1
+- 2.002000 bump
+
+* Mon May 16 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.001.000-1
+- 2.001000 bump
+
+* Mon Apr 11 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.000.000-1
+- 2.000000 bump
+- Package tests
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.99-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.99-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.99-6
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.99-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.99-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.99-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.99-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

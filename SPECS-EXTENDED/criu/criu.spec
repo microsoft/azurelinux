@@ -1,58 +1,54 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
 %global py_prefix python3
 %global py_binary %{py_prefix}
-
-
-
-
 
 # With annobin enabled, CRIU does not work anymore. It seems CRIU's
 # parasite code breaks if annobin is enabled.
 %undefine _annotated_build
 
+# Disable automatic call to the set_build_flags macro
+# at the beginning of the build, check, and install.
+# This change was introduced in Fedora 36.
+%undefine _auto_set_build_flags
+
 Name: criu
-Version: 3.15
-Release: 3%{?dist}
-Provides: crtools = %{version}-%{release}
-Obsoletes: crtools <= 1.0-2
+Version: 4.0
+Release: 2%{?dist}
 Summary: Tool for Checkpoint/Restore in User-space
-License: GPLv2
+License: GPL-2.0-only AND LGPL-2.1-only AND MIT
 URL: http://criu.org/
-Source0: http://download.openvz.org/criu/criu-%{version}.tar.bz2
+Source0: https://github.com/checkpoint-restore/criu/archive/v%{version}/criu-%{version}.tar.gz
 
-Patch0: unifying_struct_names.patch
+# Add protobuf-c as a dependency.
+# We use this patch because the protobuf-c package name
+# in RPM and DEB is different.
+Patch99: criu.pc.patch
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires: perl
-# RHEL has no asciidoc; take man-page from Fedora 26
-# zcat /usr/share/man/man8/criu.8.gz > criu.8
-Source1: criu.8
-Source2: crit.1
-Source3: compel.1
-# The patch aio-fix.patch is needed as RHEL7
-# doesn't do "nr_events *= 2" in ioctx_alloc().
-Patch100: aio-fix.patch
-%endif
+Patch100: Makefile.config-set-CR_PLUGIN_DEFAULT-variable.patch
 
-Source4: criu-tmpfiles.conf
+Source5: criu-tmpfiles.conf
 
 BuildRequires: gcc
 BuildRequires: systemd
 BuildRequires: libnet-devel
 BuildRequires: protobuf-devel protobuf-c-devel %{py_prefix}-devel libnl3-devel libcap-devel
-
-BuildRequires: asciidoc xmlto
+BuildRequires: %{py_prefix}-pip
+BuildRequires: %{py_prefix}-setuptools
+BuildRequires: %{py_prefix}-wheel
+BuildRequires: %{py_prefix}-protobuf
+BuildRequires: asciidoctor
 BuildRequires: perl-interpreter
 BuildRequires: libselinux-devel
 BuildRequires: gnutls-devel
-BuildRequires: nftables-devel
-BuildRequires: git
+BuildRequires: libdrm-devel
 # Checkpointing containers with a tmpfs requires tar
 Recommends: tar
+# CRIU requires some version of iptables-restore for network locking
+Recommends: iptables
+%if 0%{?fedora}
 BuildRequires: libbsd-devel
-
+BuildRequires: nftables-devel
+%endif
+BuildRequires: make
 
 # user-space and kernel changes are only available for x86_64, arm,
 # ppc64le, aarch64 and s390x
@@ -64,10 +60,10 @@ criu is the user-space part of Checkpoint/Restore in User-space
 (CRIU), a project to implement checkpoint/restore functionality for
 Linux in user-space.
 
-
 %package devel
 Summary: Header files and libraries for %{name}
 Requires: %{name} = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
 
 %description devel
 This package contains header files and libraries for %{name}.
@@ -79,17 +75,24 @@ Requires: %{name} = %{version}-%{release}
 %description libs
 This package contains the libraries for %{name}
 
+%package amdgpu-plugin
+Summary: AMD GPU plugin for %{name}
+Requires: %{name} = %{version}-%{release}
+
+%description amdgpu-plugin
+This package contains the AMD GPU plugin for %{name}
+
+%package cuda-plugin
+Summary: CUDA plugin for %{name}
+Requires: %{name} = %{version}-%{release}
+
+%description cuda-plugin
+This package contains the CUDA plugin for %{name}
 
 %package -n %{py_prefix}-%{name}
 %{?python_provide:%python_provide %{py_prefix}-%{name}}
 Summary: Python bindings for %{name}
-%if 0%{?rhel} && 0%{?rhel} <= 7
-Requires: protobuf-python
-Requires: %{name} = %{version}-%{release} %{py_prefix}-ipaddr
-%else
-Requires: protobuf-%{py_prefix}
-Obsoletes: python2-criu < 3.10-1
-%endif
+Requires: %{py_prefix}-protobuf
 
 %description -n %{py_prefix}-%{name}
 %{py_prefix}-%{name} contains Python bindings for %{name}.
@@ -102,51 +105,46 @@ Requires: %{py_prefix}-%{name} = %{version}-%{release}
 crit is a tool designed to decode CRIU binary dump files and show
 their content in human-readable form.
 
+%package -n criu-ns
+Summary: Tool to run CRIU in different namespaces
+Requires: %{name} = %{version}-%{release}
+
+%description -n criu-ns
+The purpose of the criu-ns wrapper script is to enable restoring a process
+tree that might require a specific PID that is already used on the system.
+This script can help to workaround the so called "PID mismatch" problem.
 
 %prep
 %setup -q
-%patch 0 -p1
+%patch -P 99 -p1
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%patch 100 -p1
-%endif
+%patch -P 100 -p1
 
 %build
-# A small part of the build makes direct calls to "ld" instead of GCC and "LDFLAGS-MASK"
-# is used to cut out parts of "LDFLAGS", which "ld" doesn't understand.
-# "LDFLAGS-MASK" didn't expect the "-specs" argument Mariner contains
-# in the hardening flags and all direct calls to "ld" were crashing.
-sed -i -E "s/(LDFLAGS-MASK.*:= -Wl,%)/\1 -specs=%/" scripts/nmk/scripts/build.mk
-CFLAGS=`echo "$CFLAGS" | sed -e 's,-fstack-protector\S*,,g'` %make_build V=1 WERROR=0 RUNDIR=/run/criu PYTHON=%{py_binary}
+# This package calls LD directly without specifying the LTO plugins.  Until
+# that is fixed, disable LTO.
+%define _lto_cflags %{nil}
 
+# %{?_smp_mflags} does not work
+# -fstack-protector breaks build
+CFLAGS+=`echo %{optflags} | sed -e 's,-fstack-protector\S*,,g'` make V=1 WERROR=0 PREFIX=%{_prefix} RUNDIR=/run/criu PYTHON=%{py_binary} PLUGINDIR=%{_libdir}/criu
+make V=1 WERROR=0 PREFIX=%{_prefix} PLUGINDIR=%{_libdir}/criu amdgpu_plugin
 make docs V=1
 
 
-
 %install
+sed -e "s,--upgrade --ignore-installed,--no-index --no-deps -v --no-build-isolation,g" -i lib/Makefile -i crit/Makefile
 make install-criu DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}
-make install-lib DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PYTHON=%{py_binary}
-
-# only install documentation on Fedora as it requires asciidoc,
-# which is not available on RHEL7
+make install-lib DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
+make install-amdgpu_plugin DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
+make install-cuda_plugin DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
+make install-crit DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
 make install-man DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}
-
-
-
-
-
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/compel.1
 
 mkdir -p %{buildroot}%{_tmpfilesdir}
-install -m 0644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -m 0644 %{SOURCE5} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 install -d -m 0755 %{buildroot}/run/%{name}/
-
-%if 0%{?rhel}
-# remove devel and libs packages
-rm -rf $RPM_BUILD_ROOT%{_includedir}/criu
-rm $RPM_BUILD_ROOT%{_libdir}/*.so*
-rm -rf $RPM_BUILD_ROOT%{_libdir}/pkgconfig
-rm -rf $RPM_BUILD_ROOT%{_libexecdir}/%{name}
-%endif
 
 # remove static lib
 rm -f $RPM_BUILD_ROOT%{_libdir}/libcriu.a
@@ -154,14 +152,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libcriu.a
 %files
 %{_sbindir}/%{name}
 %doc %{_mandir}/man8/criu.8*
-%doc %{_mandir}/man1/compel.1*
-
 %{_libexecdir}/%{name}
-
 %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
 %doc README.md COPYING
-
 
 %files devel
 %{_includedir}/criu
@@ -171,30 +165,165 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libcriu.a
 %files libs
 %{_libdir}/*.so.*
 
+%files amdgpu-plugin
+%{_libdir}/%{name}/amdgpu_plugin.so
+%doc %{_mandir}/man1/criu-amdgpu-plugin.1*
+
+%files cuda-plugin
+%{_libdir}/%{name}/cuda_plugin.so
+%doc plugins/cuda/README.md
 
 %files -n %{py_prefix}-%{name}
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%{python2_sitelib}/pycriu/*
-%{python2_sitelib}/*egg-info
-%else
-%{python3_sitelib}/pycriu/*
-%{python3_sitelib}/*egg-info
-%endif
+%{python3_sitelib}/pycriu*
 
 %files -n crit
 %{_bindir}/crit
+%{python3_sitelib}/crit-%{version}.dist-info/
+%{python3_sitelib}/crit
 %doc %{_mandir}/man1/crit.1*
 
+%files -n criu-ns
+%{_sbindir}/criu-ns
+%doc %{_mandir}/man1/criu-ns.1*
+
+%post
+%tmpfiles_create %{name}.conf
 
 %changelog
-* Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.15-3
-- Added a patch to fix build errors by unifying struct names across the source code.
-- Removed the "-fstack-protector" flag breaking the build.
+* Thu Oct 17 2024 Adrian Reber <adrian@lisas.de> - 4.0-2
+- Recommends: iptables
 
-* Thu Jun 17 2021 Muhammad Falak Wani <mwani@microsoft.com> - 3.15-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Reintroduce %{?_smp_mflags} & `-fstack-protector`
-- Modify 'LDFLAGS' using 'LDFLAGS-MASK' to enable build
+* Thu Sep 26 2024 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 4.0-1
+- Update to 4.0
+- Add package for cuda-plugin
+- Run pip install without internet access
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.19-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 09 2024 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.19-6
+- Add package for amdgpu-plugin
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 3.19-5
+- Rebuilt for Python 3.13
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.19-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 28 2023 Adrian Reber <adrian@lisas.de> - 3.19-2
+- Fix test setup
+
+* Tue Nov 28 2023 Adrian Reber <adrian@lisas.de> - 3.19-1
+- Update to 3.19
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.18-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 06 2023 Adrian Reber <adrian@lisas.de> - 3.18-3
+- migrated to SPDX license
+- remove RHEL 7 conditionals
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.18-2
+- Rebuilt for Python 3.12
+
+* Tue Apr 25 2023 Adrian Reber <adrian@lisas.de> - 3.18-1
+- Update to 3.18
+- Apply patch from upstream to support newer CPUs
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec  2 2022 Florian Weimer <fweimer@redhat.com> - 3.17.1-4
+- Fix FTBFS with glibc 2.36
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 08 2022 Adrian Reber <adrian@lisas.de> - 3.17.1-2
+- Rebuilt to pick up glibc rseq() changes
+
+* Mon Jun 27 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.17.1-1
+- Update to release version 3.17.1
+
+* Mon Jun 20 2022 Adrian Reber <adrian@lisas.de> - 3.17-4
+- Apply upstream patch to fix mount v2 errors
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.17-3
+- Rebuilt for Python 3.11
+
+* Thu May 19 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.17-2
+- Use mntns-compat-mode as a temporary fix for runc
+
+* Fri May 6 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.17-1
+- Update to release version 3.17
+- Do not install compel and amdgpu_plugin man pages
+
+* Tue Apr 5 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.16.1-12
+- Update rseq patches
+
+* Tue Apr 5 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.16.1-11
+- Update rseq patches
+
+* Tue Apr 5 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.16.1-10
+- Update fixup patch
+
+* Tue Apr 5 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.16.1-9
+- Update rseq support patches
+
+* Fri Feb 18 2022 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 3.16.1-8
+- rebuilt
+
+* Tue Feb 8 2022 Radostin Stoyanov <radostin@redhat.com> - 3.16.1-7
+- Drop global -ffreestanding
+
+* Mon Jan 31 2022 Radostin Stoyanov <radostin@redhat.com> - 3.16.1-6
+- Fix typo in changelog
+- Replace `asciidoc` and `xmlto` with `asciidoctor`
+- Enable initial rseq support
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.16.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Nov 06 2021 Adrian Reber <adrian@lisas.de> - 3.16.1-4
+- Rebuilt for protobuf 3.19.0
+
+* Mon Oct 25 2021 Adrian Reber <adrian@lisas.de> - 3.16.1-3
+- Rebuilt for protobuf 3.18.1
+
+* Tue Oct 19 2021 Radostin Stoyanov <radostin@redhat.com> - 3.16.1-2
+- Update protobuf-c to libprotobuf-c requirement
+
+* Thu Oct 14 2021 Radostin Stoyanov <radostin@redhat.com> - 3.16.1-1
+- Update to 3.16.1
+- Add protobuf-c as required dependency (#2013775)
+
+* Tue Oct 05 2021 Adrian Reber <adrian@lisas.de> - 3.16-3
+- Fix build on RHEL 8
+
+* Thu Sep 23 2021 Adrian Reber <adrian@lisas.de> - 3.16-2
+- Include criu-ns sub package
+- Use new github Source0 location
+
+* Wed Sep 22 2021 Adrian Reber <adrian@lisas.de> - 3.16-1
+- Update to 3.16
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.15-5
+- Rebuilt for Python 3.10
+
+* Fri Apr 09 2021 Adrian Reber <adrian@lisas.de> - 3.15-4
+- Test for testing
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 13 2021 Adrian Reber <adrian@lisas.de> - 3.15-2
+- Rebuilt for protobuf 3.14
 
 * Wed Nov 04 2020 Adrian Reber <adrian@lisas.de> - 3.15-1
 - Update to 3.15

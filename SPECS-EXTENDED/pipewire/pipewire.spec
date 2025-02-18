@@ -1,39 +1,92 @@
-%global majorversion 0
-%global minorversion 3
-%global microversion 60
+%global majorversion 1
+%global minorversion 2
+%global microversion 7
+
 %global apiversion   0.3
 %global spaversion   0.2
 %global soversion    0
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
-%global ms_version   0.4.1
+%global ms_version   0.4.2
+
+# For rpmdev-bumpspec and releng automation
+%global baserelease 1
+
+#global snapdate   20210107
+#global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
+#global shortcommit %(c=%{gitcommit}; echo ${c:0:7})
+
+# https://bugzilla.redhat.com/983606
 %global _hardened_build 1
+
 # where/how to apply multilib hacks
-%global multilib_archs x86_64 %{ix86}
+%global multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
+
 # Build conditions for various features
 %bcond_without alsa
 %bcond_without vulkan
-%bcond_without media_session
-%bcond_without libusb
-%bcond_without v4l2
-Summary:        Media Sharing Server
-Name:           pipewire
-Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://pipewire.org/
-Source0:        https://github.com/PipeWire/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%if %{with media_session}
-Source1:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{ms_version}/media-session-%{ms_version}.tar.gz
-Patch0:      0001-Build-media-session-from-local-tarbal.patch
+
+# Features disabled for RHEL 8
+%if 0%{?rhel} && 0%{?rhel} < 9
+%bcond_with pulse
+%bcond_with jack
+%else
+%bcond_without pulse
+%bcond_without jack
 %endif
+
+# Features disabled for RHEL
+%if 0%{?rhel}
+%bcond_with jackserver_plugin
+%bcond_with libmysofa
+%bcond_with lv2
+%bcond_with roc
+%else
+%bcond_without jackserver_plugin
+%bcond_without libmysofa
+%bcond_without lv2
+%bcond_without roc
+%endif
+
+%if 0%{?rhel} || ("%{_arch}" == "s390x")
+%bcond_with ffado
+%else
+%bcond_without ffado
+%endif
+
+# Disabled for RHEL < 11 and Fedora < 36
+%if (0%{?rhel} && 0%{?rhel} < 11) || (0%{?fedora} && 0%{?fedora} < 36) || ("%{_arch}" == "s390x") || ("%{_arch}" == "ppc64le")
+%bcond_with libcamera_plugin
+%else
+%bcond_without libcamera_plugin
+%endif
+
+%bcond_without v4l2
+
+Name:           pipewire
+Summary:        Media Sharing Server
+Version:        %{majorversion}.%{minorversion}.%{microversion}
+Release:        %{baserelease}%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+License:        MIT
+URL:            https://pipewire.org/
+%if 0%{?snapdate}
+Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{gitcommit}/pipewire-%{shortcommit}.tar.gz
+%else
+Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
+%endif
+Source1:        pipewire.sysusers
+
+## upstream patches
+
+## upstreamable patches
+
+## fedora patches
+
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.59.0
 BuildRequires:  gcc
 BuildRequires:  g++
 BuildRequires:  pkgconfig
-#BuildRequires:  pkgconfig(libudev)
+BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.32
 BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.32
@@ -42,31 +95,39 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
-BuildRequires:  pkgconfig(fdk-aac)
-%if %{with vulkan}
-BuildRequires:  pkgconfig(vulkan)
+# libldac is not built on x390x, see rhbz#1677491
+%ifnarch s390x
+BuildRequires:  pkgconfig(ldacBT-enc)
+BuildRequires:  pkgconfig(ldacBT-abr)
 %endif
+BuildRequires:  pkgconfig(fdk-aac)
 BuildRequires:  pkgconfig(bluez)
-#BuildRequires:  systemd
+BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
 BuildRequires:  doxygen
+BuildRequires:  python-docutils
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
+BuildRequires:  liblc3-devel
 BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
+%if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
+BuildRequires:  pkgconfig(webrtc-audio-processing-1)
+%else
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
-%if %{with libusb}
-BuildRequires:  libusb-devel
 %endif
+BuildRequires:  libusb1-devel
 BuildRequires:  readline-devel
-BuildRequires:  lilv-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcanberra-devel
-BuildRequires:  python3-docutils
+BuildRequires:  libuv-devel
+BuildRequires:  speexdsp-devel
+BuildRequires:  systemd-rpm-macros
+%{?sysusers_requires_compat}
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -76,6 +137,8 @@ Requires:       rtkit
 Requires:       pipewire-session-manager
 # Prefer WirePlumber for session manager
 Suggests:       wireplumber
+# Bring in libcamera plugin for MIPI / complex camera support
+Recommends:     pipewire-plugin-libcamera
 
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
@@ -83,6 +146,7 @@ systems.
 
 %package libs
 Summary:        Libraries for PipeWire clients
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-libpulse < %{version}-%{release}
 
@@ -92,8 +156,9 @@ to interface with a PipeWire media server.
 
 %package gstreamer
 Summary:        GStreamer elements for PipeWire
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description gstreamer
 This package contains GStreamer elements to interface with a
@@ -101,71 +166,154 @@ PipeWire media server.
 
 %package devel
 Summary:        Headers and libraries for PipeWire client development
+License:        MIT
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-
 %description devel
 Headers and libraries for developing applications that can communicate with
 a PipeWire media server.
 
 %package doc
 Summary:        PipeWire media server documentation
+License:        MIT
 
 %description doc
 This package contains documentation for the PipeWire media server.
 
 %package utils
 Summary:        PipeWire media server utilities
+License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
-%if %{with media_session}
-%package media-session
-Summary:        PipeWire Media Session Manager
-Recommends:     %{name}%{?_isa} = %{version}-%{release}
-# before 0.3.30-5 the session manager was in the main pipewire package
-Conflicts:      %{name}%{?_isa} < 0.3.30-5
-Conflicts:      pipewire-session-manager
-Obsoletes:      %{name}-libpulse < %{version}-%{release}
-# Virtual Provides to support swapping between PipeWire session manager implementations
-Provides:       pipewire-session-manager
-
-%description media-session
-This package contains the reference Media Session Manager for the
-PipeWire media server.
-%endif
-
 %if %{with alsa}
 %package alsa
 Summary:        PipeWire media server ALSA support
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
 # Ensure this is provided by default to route all audio
 Supplements:    %{name} = %{version}-%{release}
 # Replace PulseAudio and JACK ALSA plugins with PipeWire
 ## N.B.: If alsa-plugins gets updated in F33, this will need to be bumped
 Obsoletes:      alsa-plugins-jack < 1.2.2-5
 Obsoletes:      alsa-plugins-pulseaudio < 1.2.2-5
+%endif
 
 %description alsa
 This package contains an ALSA plugin for the PipeWire media server.
 %endif
 
-%package pulseaudio
-Summary:        PipeWire PulseAudio implementation
-BuildRequires:  pulseaudio-libs
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       pulseaudio-utils
+%if %{with jack}
+%package jack-audio-connection-kit-libs
+Summary:        PipeWire JACK implementation libraries
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+%if 0%{?rhel}
+Requires:       %{name}-jack-audio-connection-kit%{?_isa} = %{version}-%{release}
+%endif
+# Fixed jack subpackages
+Conflicts:      %{name}-libjack < 0.3.13-6
+Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
+# Replaces libjack subpackage
+Obsoletes:      %{name}-libjack < 0.3.19-2
+Provides:       %{name}-libjack = %{version}-%{release}
+Provides:       %{name}-libjack%{?_isa} = %{version}-%{release}
+
+%description jack-audio-connection-kit-libs
+This package provides a JACK implementation libraries based on PipeWire
+
+%package jack-audio-connection-kit
+Summary:        PipeWire JACK implementation
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-jack-audio-connection-kit-libs%{?_isa} = %{version}-%{release}
+Conflicts:      jack-audio-connection-kit
+Conflicts:      jack-audio-connection-kit-dbus
+# Replaces libjack subpackage
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
 # Ensure this is provided by default to route all audio
 Supplements:    %{name} = %{version}-%{release}
+# Replace JACK with PipeWire-JACK
+## N.B.: If jack gets updated in F33, this will need to be bumped
+Obsoletes:      jack-audio-connection-kit < 1.9.16-2
+# Fix upgrade path to f38, see #2203789
+Obsoletes:      jack-audio-connection-kit-example-clients < 1.9.22
+%endif
+
+%description jack-audio-connection-kit
+This package provides a JACK implementation based on PipeWire
+
+%package jack-audio-connection-kit-devel
+Summary:        Development files for %{name}-jack-audio-connection-kit
+License:        MIT
+Requires:       %{name}-jack-audio-connection-kit-libs%{?_isa} = %{version}-%{release}
+Conflicts:      jack-audio-connection-kit-devel
+Enhances:       %{name}-jack-audio-connection-kit-libs
+
+%description jack-audio-connection-kit-devel
+This package provides development files for building JACK applications
+using PipeWire's JACK library.
+%endif
+
+%if %{with jackserver_plugin}
+%package plugin-jack
+Summary:        PipeWire media server JACK support
+License:        MIT
+BuildRequires:  jack-audio-connection-kit-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-jack-audio-connection-kit-libs = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       jack-audio-connection-kit
+
+%description plugin-jack
+This package contains the PipeWire spa plugin to connect to a JACK server.
+%endif
+
+%if %{with libcamera_plugin}
+%package plugin-libcamera
+Summary:        PipeWire media server libcamera support
+License:        MIT
+BuildRequires:  libcamera-devel
+BuildRequires:  libdrm-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       libcamera
+Requires:       libdrm
+
+%description plugin-libcamera
+This package contains the PipeWire spa plugin to access cameras through libcamera.
+%endif
+
+%if %{with vulkan}
+%package plugin-vulkan
+Summary:        PipeWire media server vulkan support
+License:        MIT
+BuildRequires:  pkgconfig(vulkan)
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description plugin-vulkan
+This package contains the PipeWire spa plugin for vulkan.
+%endif
+
+%if %{with pulse}
+%package pulseaudio
+Summary:        PipeWire PulseAudio implementation
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Conflicts:      pulseaudio
 # Fixed pulseaudio subpackages
 Conflicts:      %{name}-libpulse < 0.3.13-6
 Conflicts:      %{name}-pulseaudio < 0.3.13-6
-Conflicts:      pulseaudio
-Conflicts:      pulseaudio-daemon
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
+# Ensure this is provided by default to route all audio
+Supplements:    %{name} = %{version}-%{release}
 # Replace PulseAudio with PipeWire-PulseAudio
 ## N.B.: If pulseaudio gets updated in F33, this will need to be bumped
 Obsoletes:      pulseaudio < 14.2-3
@@ -178,29 +326,115 @@ Obsoletes:      pulseaudio-module-lirc < 14.2-3
 Obsoletes:      pulseaudio-module-x11 < 14.2-3
 Obsoletes:      pulseaudio-module-zeroconf < 14.2-3
 Obsoletes:      pulseaudio-qpaeq < 14.2-3
+%endif
+
 # Virtual Provides to support swapping between PipeWire-PA and PA
 Provides:       pulseaudio-daemon
+Conflicts:      pulseaudio-daemon
 Provides:       pulseaudio-module-bluetooth
 Provides:       pulseaudio-module-jack
 
 %description pulseaudio
 This package provides a PulseAudio implementation based on PipeWire
+%endif
 
 %if %{with v4l2}
 %package v4l2
 Summary:        PipeWire media server v4l2 LD_PRELOAD support
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description v4l2
 This package contains an LD_PRELOAD library that redirects v4l2 applications to
 PipeWire.
 %endif
 
-%prep
-%autosetup -p1 -n %{name}-%{version}
+%package module-x11
+Summary:        PipeWire media server x11 support
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
-%if %{with media_session}
+%description module-x11
+This package contains X11 bell support for PipeWire.
+
+%if %{with ffado}
+%package module-ffado
+Summary:        PipeWire media server ffado support
+License:        MIT
+BuildRequires:  libffado-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description module-ffado
+This package contains the FFADO support for PipeWire.
+%endif
+
+%if %{with roc}
+%package module-roc
+Summary:        PipeWire media server ROC support
+License:        MIT
+BuildRequires:  roc-toolkit-devel
+BuildRequires:  libunwind-devel
+BuildRequires:  openfec-devel
+BuildRequires:  sox-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description module-roc
+This package contains the ROC support for PipeWire.
+%endif
+
+%if %{with libmysofa}
+%package module-filter-chain-sofa
+Summary:        PipeWire media server sofa filter-chain support
+License:        MIT
+BuildRequires:  libmysofa-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description module-filter-chain-sofa
+This package contains the mysofa support for PipeWire filter-chain.
+%endif
+
+%if %{with lv2}
+%package module-filter-chain-lv2
+Summary:        PipeWire media server lv2 filter-chain support
+License:        MIT
+BuildRequires:  lilv-devel
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description module-filter-chain-lv2
+This package contains the mysofa support for PipeWire filter-chain.
+%endif
+
+%package config-rates
+Summary:        PipeWire media server multirate configuration
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description config-rates
+This package contains the configuration files to support multiple
+sample rates.
+
+%package config-upmix
+Summary:        PipeWire media server upmixing configuration
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description config-upmix
+This package contains the configuration files to support upmixing.
+
+
+%prep
+%autosetup -p1 %{?snapdate:-n %{name}-%{gitcommit}}
+
+
+%if %{with media-session}
 mkdir subprojects/packagefiles
 cp %{SOURCE1} subprojects/packagefiles/
 %endif
@@ -208,34 +442,44 @@ cp %{SOURCE1} subprojects/packagefiles/
 %build
 %meson \
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
-    -D gstreamer-device-provider=disabled -D sdl2=disabled 			\
+    -D sdl2=disabled 								\
     -D audiotestsrc=disabled -D videotestsrc=disabled				\
-    -D volume=disabled -D bluez5-codec-aptx=disabled -D roc=disabled 		\
-    -D bluez5-codec-lc3plus=disabled						\
+    -D volume=disabled -D bluez5-codec-aptx=disabled 		  		\
+    -D bluez5-codec-lc3plus=disabled -D bluez5-codec-lc3=enabled		\
+%ifarch s390x
     -D bluez5-codec-ldac=disabled						\
-    -D bluez5-codec-opus=disabled                                               \
-    -D x11-xfixes=disabled                                                      \
-%if %{with media_session}
-    -D session-managers="media-session" 	         			\
-%else
-    -D session-managers=[]                           				\
 %endif
+    -D session-managers=[] 							\
+    -D rtprio-server=60 -D rtprio-client=55 -D rlimits-rtprio=70		\
+    -D snap=disabled								\
     %{!?with_jack:-D pipewire-jack=disabled} 					\
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
     %{!?with_libcamera_plugin:-D libcamera=disabled} 				\
     %{?with_jack:-D jack-devel=true} 						\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}						\
-    %{!?with_libusb:-D libusb=disabled}
+    %{!?with_libmysofa:-D libmysofa=disabled}					\
+    %{!?with_lv2:-D lv2=disabled}						\
+    %{!?with_roc:-D roc=disabled}						\
+    %{!?with_ffado:-D libffado=disabled}					\
+    %{nil}
 %meson_build
 
 %install
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/pipewire.conf
 %meson_install
 
+# Own this directory so add-ons can use it
+install -d -m 0755 %{buildroot}%{_datadir}/pipewire/pipewire.conf.d/
+install -d -m 0755 %{buildroot}%{_datadir}/pipewire/client.conf.d/
+install -d -m 0755 %{buildroot}%{_datadir}/pipewire/client-rt.conf.d/
+
+%if %{with jack}
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
+echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
+%else
 rm %{buildroot}%{_datadir}/pipewire/jack.conf
 
-%if %{with media_session}
-rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-jack
 %endif
 
 %if %{with alsa}
@@ -244,39 +488,49 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-%if %{with media_session}
-touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
-%endif
 
 %endif
+
+%if ! %{with pulse}
+# If the PulseAudio replacement isn't being offered, delete the files
+rm %{buildroot}%{_bindir}/pipewire-pulse
+rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
+rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
+
+%endif
+
+%if %{with pulse}
+# Own this directory so add-ons can use it
+install -d -m 0755 %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf.d/
+
+ln -s ../pipewire-pulse.conf.avail/20-upmix.conf \
+		%{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf.d/20-upmix.conf
+%endif
+
+# rates config
+ln -s ../pipewire.conf.avail/10-rates.conf \
+		%{buildroot}%{_datadir}/pipewire/pipewire.conf.d/10-rates.conf
+
+# upmix config
+ln -s ../pipewire.conf.avail/20-upmix.conf \
+		%{buildroot}%{_datadir}/pipewire/pipewire.conf.d/20-upmix.conf
+ln -s ../client.conf.avail/20-upmix.conf \
+		%{buildroot}%{_datadir}/pipewire/client.conf.d/20-upmix.conf
+ln -s ../client-rt.conf.avail/20-upmix.conf \
+		%{buildroot}%{_datadir}/pipewire/client-rt.conf.d/20-upmix.conf
+
 
 %find_lang %{name}
-%if %{with media_session}
-%find_lang media-session
-%endif
-
-# upstream should use udev.pc
-mkdir -p %{buildroot}%{_libdir}/udev/rules.d
-mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_libdir}/udev/rules.d
-
-# AMD64-Build-Fix:
-# Build requires pkg "gstreamer1" installs fileattrs to provide rpm dependency generation
-# macros for shared libraries installed under "%{_libdir}/gstreamer-1.0/" path.
-# However, the generator script gstreamer1.prov is stuck when generating the provides list
-# causing the build to hang when building in amd64 docker enviroment.
-# The plugin loader helper binary "gst-plugin-scanner" causes this hang issue.
-# Disabling the binary fixes the hang and gst-inspect-1.0 binary successfully parses the
-# plugin and generates the rpm provides information.
-rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
 
 %check
-%meson_test
+%meson_test || TESTS_ERROR=$?
+if [ "${TESTS_ERROR}" != "" ]; then
+echo "test failed"
+%{!?tests_nonfatal:exit $TESTS_ERROR}
+fi
 
 %pre
-getent group pipewire >/dev/null || groupadd -r pipewire
-getent passwd pipewire >/dev/null || \
-    useradd -r -g pipewire -d %{_localstatedir}/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
-exit 0
+%sysusers_create_compat %{SOURCE1}
 
 %post
 %systemd_user_post pipewire.service
@@ -288,59 +542,87 @@ exit 0
 # Remove before F33.
 systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
+%if %{with pulse}
 %post pulseaudio
 %systemd_user_post pipewire-pulse.service
 %systemd_user_post pipewire-pulse.socket
-
-%if %{with media_session}
-%post media-session
-%systemd_user_post pipewire-media-session.service
 %endif
 
 %files
 %license LICENSE COPYING
-%doc README.md
+%doc README.md NEWS
 %{_userunitdir}/pipewire.*
 %{_userunitdir}/filter-chain.*
 %{_bindir}/pipewire
 %{_bindir}/pipewire-avb
+%{_bindir}/pipewire-aes67
+%{_bindir}/pipewire-vulkan
 %{_mandir}/man1/pipewire.1*
 %dir %{_datadir}/pipewire/
+%dir %{_datadir}/pipewire/pipewire.conf.d/
 %{_datadir}/pipewire/pipewire.conf
+%{_datadir}/pipewire/pipewire.conf.avail/10-rates.conf
+%{_datadir}/pipewire/pipewire.conf.avail/20-upmix.conf
 %{_datadir}/pipewire/minimal.conf
 %{_datadir}/pipewire/filter-chain.conf
 %{_datadir}/pipewire/filter-chain/*.conf
 %{_datadir}/pipewire/pipewire-avb.conf
+%{_datadir}/pipewire/pipewire-aes67.conf
+%{_datadir}/pipewire/pipewire-vulkan.conf
 %{_mandir}/man5/pipewire.conf.5*
-
-%if %{with media_session}
-%files media-session -f media-session.lang
-%{_bindir}/pipewire-media-session
-%{_userunitdir}/pipewire-media-session.service
-%dir %{_datadir}/pipewire/media-session.d/
-%{_datadir}/pipewire/media-session.d/alsa-monitor.conf
-%{_datadir}/pipewire/media-session.d/bluez-monitor.conf
-%{_datadir}/pipewire/media-session.d/media-session.conf
-%{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
-
-%if %{with alsa}
-%{_datadir}/pipewire/media-session.d/with-alsa
-%endif
-%{_datadir}/pipewire/media-session.d/with-pulseaudio
-%endif
+%{_mandir}/man5/pipewire-filter-chain.conf.5*
+%config(noreplace) %{_sysconfdir}/security/limits.d/*.conf
+%{_sysusersdir}/pipewire.conf
 
 %files libs -f %{name}.lang
 %license LICENSE COPYING
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
-%{_libdir}/pipewire-%{apiversion}/libpipewire-*.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-access.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-adapter.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-avb.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-client-device.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-client-node.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-combine-stream.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-echo-cancel.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-fallback-sink.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-filter-chain.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-link-factory.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-loopback.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-metadata.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-netjack2-driver.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-netjack2-manager.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-parametric-equalizer.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-pipe-tunnel.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-portal.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-profiler.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-protocol-native.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-protocol-simple.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-pulse-tunnel.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-raop-discover.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-raop-sink.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rtkit.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rtp-sap.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rtp-session.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rtp-sink.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rtp-source.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-rt.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-session-manager.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-snapcast-discover.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-spa-device-factory.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-spa-device.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-spa-node-factory.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-spa-node.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-vban-send.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-vban-recv.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-zeroconf-discover.so
 %dir %{_datadir}/alsa-card-profile/
 %dir %{_datadir}/alsa-card-profile/mixer/
 %{_datadir}/alsa-card-profile/mixer/paths/
 %{_datadir}/alsa-card-profile/mixer/profile-sets/
 %dir %{_datadir}/spa-0.2/
 %{_datadir}/spa-0.2/bluez5/bluez-hardware.conf
-%{_libdir}/udev/rules.d/90-pipewire-alsa.rules
+%{_prefix}/lib/udev/rules.d/90-pipewire-alsa.rules
 %dir %{_libdir}/spa-%{spaversion}
 %{_libdir}/spa-%{spaversion}/aec/
 %{_libdir}/spa-%{spaversion}/alsa/
@@ -352,11 +634,59 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/support/
 %{_libdir}/spa-%{spaversion}/v4l2/
 %{_libdir}/spa-%{spaversion}/videoconvert/
-%if %{with vulkan}
-%{_libdir}/spa-%{spaversion}/vulkan/
-%endif
 %{_datadir}/pipewire/client.conf
+%dir %{_datadir}/pipewire/client.conf.d/
+%{_datadir}/pipewire/client.conf.avail/20-upmix.conf
 %{_datadir}/pipewire/client-rt.conf
+%dir %{_datadir}/pipewire/client-rt.conf.d/
+%{_datadir}/pipewire/client-rt.conf.avail/20-upmix.conf
+%{_mandir}/man5/pipewire-client.conf.5.gz
+%{_mandir}/man7/pipewire-props.7.gz
+%{_mandir}/man7/libpipewire-module-access.7.gz
+%{_mandir}/man7/libpipewire-module-adapter.7.gz
+%{_mandir}/man7/libpipewire-module-avb.7.gz
+%{_mandir}/man7/libpipewire-module-client-device.7.gz
+%{_mandir}/man7/libpipewire-module-client-node.7.gz
+%{_mandir}/man7/libpipewire-module-combine-stream.7.gz
+%{_mandir}/man7/libpipewire-module-echo-cancel.7.gz
+%{_mandir}/man7/libpipewire-module-example-filter.7.gz
+%{_mandir}/man7/libpipewire-module-example-sink.7.gz
+%{_mandir}/man7/libpipewire-module-example-source.7.gz
+%{_mandir}/man7/libpipewire-module-fallback-sink.7.gz
+%{_mandir}/man7/libpipewire-module-ffado-driver.7.gz
+%{_mandir}/man7/libpipewire-module-filter-chain.7.gz
+%{_mandir}/man7/libpipewire-module-jack-tunnel.7.gz
+%{_mandir}/man7/libpipewire-module-jackdbus-detect.7.gz
+%{_mandir}/man7/libpipewire-module-link-factory.7.gz
+%{_mandir}/man7/libpipewire-module-loopback.7.gz
+%{_mandir}/man7/libpipewire-module-metadata.7.gz
+%{_mandir}/man7/libpipewire-module-netjack2-driver.7.gz
+%{_mandir}/man7/libpipewire-module-netjack2-manager.7.gz
+%{_mandir}/man7/libpipewire-module-parametric-equalizer.7.gz
+%{_mandir}/man7/libpipewire-module-pipe-tunnel.7.gz
+%{_mandir}/man7/libpipewire-module-portal.7.gz
+%{_mandir}/man7/libpipewire-module-profiler.7.gz
+%{_mandir}/man7/libpipewire-module-protocol-native.7.gz
+%{_mandir}/man7/libpipewire-module-protocol-pulse.7.gz
+%{_mandir}/man7/libpipewire-module-protocol-simple.7.gz
+%{_mandir}/man7/libpipewire-module-pulse-tunnel.7.gz
+%{_mandir}/man7/libpipewire-module-raop-discover.7.gz
+%{_mandir}/man7/libpipewire-module-raop-sink.7.gz
+%{_mandir}/man7/libpipewire-module-roc-sink.7.gz
+%{_mandir}/man7/libpipewire-module-roc-source.7.gz
+%{_mandir}/man7/libpipewire-module-rt.7.gz
+%{_mandir}/man7/libpipewire-module-rtp-sap.7.gz
+%{_mandir}/man7/libpipewire-module-rtp-session.7.gz
+%{_mandir}/man7/libpipewire-module-rtp-sink.7.gz
+%{_mandir}/man7/libpipewire-module-rtp-source.7.gz
+%{_mandir}/man7/libpipewire-module-session-manager.7.gz
+%{_mandir}/man7/libpipewire-module-snapcast-discover.7.gz
+%{_mandir}/man7/libpipewire-module-vban-recv.7.gz
+%{_mandir}/man7/libpipewire-module-vban-send.7.gz
+%{_mandir}/man7/libpipewire-module-x11-bell.7.gz
+%{_mandir}/man7/libpipewire-module-zeroconf-discover.7.gz
+%{_mandir}/man7/libpipewire-modules.7.gz
+
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
@@ -369,35 +699,49 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pkgconfig/libspa-%{spaversion}.pc
 
 %files doc
+%doc README.md NEWS
 %{_datadir}/doc/pipewire/html
 
 %files utils
-%{_bindir}/pw-mon
-%{_bindir}/pw-metadata
+%{_bindir}/pw-cat
+%{_bindir}/pw-cli
+%{_bindir}/pw-config
+%{_bindir}/pw-container
+%{_bindir}/pw-dot
 %{_bindir}/pw-dsdplay
+%{_bindir}/pw-dump
+%{_bindir}/pw-encplay
+%{_bindir}/pw-link
+%{_bindir}/pw-loopback
+%{_bindir}/pw-metadata
 %{_bindir}/pw-mididump
 %{_bindir}/pw-midiplay
 %{_bindir}/pw-midirecord
-%{_bindir}/pw-cli
-%{_bindir}/pw-dot
-%{_bindir}/pw-cat
-%{_bindir}/pw-dump
-%{_bindir}/pw-link
-%{_bindir}/pw-loopback
+%{_bindir}/pw-mon
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
 %{_bindir}/pw-reserve
 %{_bindir}/pw-top
-%{_mandir}/man1/pw-mon.1*
-%{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
+%{_mandir}/man1/pw-cli.1*
+%{_mandir}/man1/pw-config.1*
+%{_mandir}/man1/pw-container.1*
 %{_mandir}/man1/pw-dot.1*
+%{_mandir}/man1/pw-dump.1*
 %{_mandir}/man1/pw-link.1*
+%{_mandir}/man1/pw-loopback.1*
 %{_mandir}/man1/pw-metadata.1*
 %{_mandir}/man1/pw-mididump.1*
+%{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-profiler.1*
+%{_mandir}/man1/pw-reserve.1*
 %{_mandir}/man1/pw-top.1*
+%{_mandir}/man1/spa-acp-tool.1*
+%{_mandir}/man1/spa-inspect.1*
+%{_mandir}/man1/spa-json-dump.1*
+%{_mandir}/man1/spa-monitor.1*
+%{_mandir}/man1/spa-resample.1*
 
 %{_bindir}/spa-acp-tool
 %{_bindir}/spa-inspect
@@ -415,40 +759,407 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 %endif
 
+%if %{with jack}
+%files jack-audio-connection-kit-libs
+%{_bindir}/pw-jack
+%{_mandir}/man1/pw-jack.1*
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.*
+%{_datadir}/pipewire/jack.conf
+%{_mandir}/man5/pipewire-jack.conf.5*
+
+%files jack-audio-connection-kit
+%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
+
+%files jack-audio-connection-kit-devel
+%{_includedir}/jack/
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so
+%{_libdir}/pkgconfig/jack.pc
+%endif
+
+%if %{with jackserver_plugin}
+%files plugin-jack
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-jack-tunnel.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-jackdbus-detect.so
+%{_libdir}/spa-%{spaversion}/jack/
+%endif
+
+%if %{with libcamera_plugin}
+%files plugin-libcamera
+%{_libdir}/spa-%{spaversion}/libcamera/
+%endif
+
+%if %{with vulkan}
+%files plugin-vulkan
+%{_libdir}/spa-%{spaversion}/vulkan/
+%endif
+
+%if %{with pulse}
 %files pulseaudio
 %{_bindir}/pipewire-pulse
-%{_mandir}/man1/pipewire-pulse.1*
 %{_userunitdir}/pipewire-pulse.*
 %{_datadir}/pipewire/pipewire-pulse.conf
+%dir %{_datadir}/pipewire/pipewire-pulse.conf.d/
+%{_datadir}/pipewire/pipewire-pulse.conf.avail/20-upmix.conf
+%{_datadir}/glib-2.0/schemas/org.freedesktop.pulseaudio.gschema.xml
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-protocol-pulse.so
+%{_mandir}/man1/pipewire-pulse.1*
+%{_mandir}/man5/pipewire-pulse.conf.5.gz
+%{_mandir}/man7/pipewire-pulse-module-alsa-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-alsa-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-always-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-combine-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-device-manager.7.gz
+%{_mandir}/man7/pipewire-pulse-module-device-restore.7.gz
+%{_mandir}/man7/pipewire-pulse-module-echo-cancel.7.gz
+%{_mandir}/man7/pipewire-pulse-module-gsettings.7.gz
+%{_mandir}/man7/pipewire-pulse-module-jackdbus-detect.7.gz
+%{_mandir}/man7/pipewire-pulse-module-ladspa-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-ladspa-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-loopback.7.gz
+%{_mandir}/man7/pipewire-pulse-module-native-protocol-tcp.7.gz
+%{_mandir}/man7/pipewire-pulse-module-null-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-pipe-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-pipe-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-raop-discover.7.gz
+%{_mandir}/man7/pipewire-pulse-module-remap-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-remap-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-roc-sink-input.7.gz
+%{_mandir}/man7/pipewire-pulse-module-roc-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-roc-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-rtp-recv.7.gz
+%{_mandir}/man7/pipewire-pulse-module-rtp-send.7.gz
+%{_mandir}/man7/pipewire-pulse-module-simple-protocol-tcp.7.gz
+%{_mandir}/man7/pipewire-pulse-module-stream-restore.7.gz
+%{_mandir}/man7/pipewire-pulse-module-switch-on-connect.7.gz
+%{_mandir}/man7/pipewire-pulse-module-tunnel-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-tunnel-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-virtual-sink.7.gz
+%{_mandir}/man7/pipewire-pulse-module-virtual-source.7.gz
+%{_mandir}/man7/pipewire-pulse-module-x11-bell.7.gz
+%{_mandir}/man7/pipewire-pulse-module-zeroconf-discover.7.gz
+%{_mandir}/man7/pipewire-pulse-module-zeroconf-publish.7.gz
+%{_mandir}/man7/pipewire-pulse-modules.7.gz
+%endif
 
 %if %{with v4l2}
 %files v4l2
 %{_bindir}/pw-v4l2
 %{_libdir}/pipewire-%{apiversion}/v4l2/libpw-v4l2.so
+%{_mandir}/man1/pw-v4l2.1*
+%endif
+
+%files module-x11
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-x11-bell.so
+
+%if %{with ffado}
+%files module-ffado
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-ffado-driver.so
+%endif
+
+%if %{with roc}
+%files module-roc
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-roc-sink.so
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-roc-source.so
+%endif
+
+%if %{with libmysofa}
+%files module-filter-chain-sofa
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-filter-chain-sofa.so
+%endif
+
+%if %{with lv2}
+%files module-filter-chain-lv2
+%{_libdir}/pipewire-%{apiversion}/libpipewire-module-filter-chain-lv2.so
+%endif
+
+%files config-rates
+%{_datadir}/pipewire/pipewire.conf.d/10-rates.conf
+
+%files config-upmix
+%{_datadir}/pipewire/pipewire.conf.d/20-upmix.conf
+%{_datadir}/pipewire/client.conf.d/20-upmix.conf
+%{_datadir}/pipewire/client-rt.conf.d/20-upmix.conf
+%if %{with pulse}
+%{_datadir}/pipewire/pipewire-pulse.conf.d/20-upmix.conf
 %endif
 
 %changelog
-* Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- Build with features disabled: jack, jackserver-plugin and libcamera-plugin
-- Enable check section
-- License verified
+* Tue Nov 26 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.7-1
+- Update version to 1.2.7
+
+* Wed Oct 23 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.6-1
+- Update version to 1.2.6
+
+* Fri Sep 27 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.5-1
+- Update version to 1.2.5
+- Add config packages
+
+* Thu Sep 19 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.4-1
+- Update version to 1.2.4
+- Add Recommends: pipewire-plugin-libcamera for MIPI camera support
+
+* Thu Aug 22 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.3-1
+- Update version to 1.2.3
+
+* Sun Aug 04 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 1.2.1-3
+- pipewire-jack-libs Requires pipewire-jack on RHEL
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jul 12 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.1-1
+- Update version to 1.2.1
+
+* Mon Jul 1 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.0-3
+- Add patch for Ardour export regresssion.
+
+* Mon Jul 1 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.0-2
+- Add patch for KODI regresssion.
+
+* Thu Jun 27 2024 Wim Taymans <wtaymans@redhat.com> - 1.2.0-1
+- Update version to 1.2.0
+
+* Tue Jun 18 2024 Wim Taymans <wtaymans@redhat.com> - 1.1.83-1
+- Update version to 1.1.83
+
+* Fri May 24 2024 Wim Taymans <wtaymans@redhat.com> - 1.1.82-1
+- Update version to 1.1.82
+
+* Thu May 23 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.1.81-2
+- Rebuild for libcamera 0.3
+
+* Thu May 16 2024 Wim Taymans <wtaymans@redhat.com> - 1.1.81-1
+- Update version to 1.1.81
+
+* Thu May 09 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.6-1
+- Update version to 1.0.6
+
+* Tue Apr 23 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.5-2
+- Enable ROC again
+
+* Mon Apr 15 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.5-1
+- Update version to 1.0.5
+
+* Wed Mar 13 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.4-2
+- Configure server, client and rlimit priorities to be the same as JACK.
+
+* Wed Mar 13 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.4-1
+- Update version to 1.0.4
+
+* Tue Feb 13 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 1.0.3-2
+- Use webrtc-audio-processing-1 on F40 and RHEL 10
+
+* Fri Feb 02 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.3-1
+- Update version to 1.0.3
+
+* Wed Jan 31 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.2-1
+- Update version to 1.0.2
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jan 11 2024 Wim Taymans <wtaymans@redhat.com> - 1.0.1-1
+- Update version to 1.0.1
+- Add patch to support libcamera 0.2
+
+* Thu Dec 14 2023 Wim Taymans <wtaymans@redhat.com> - 1.0.0-2
+- Add patch to avoid crash in deviceprovider.
+
+* Sun Nov 26 2023 Wim Taymans <wtaymans@redhat.com> - 1.0.0-1
+- Update version to 1.0.0
+- Disable ROC until updated in Fedora.
+
+* Thu Nov 16 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.85-1
+- Update version to 0.3.85
+
+* Wed Nov 15 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.84-5
+- Disable libcamera in RHEL 10
+
+* Tue Nov 14 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 0.3.84-4
+- Enable support for the lc3 bluetooth codec
+
+* Thu Nov 09 2023 Hector Martin <marcan@fedoraproject.org> - 0.3.84-3
+- Create and own /usr/share/pipewire/pipewire-pulse.conf.d
+
+* Mon Nov 06 2023 Hector Martin <marcan@fedoraproject.org> - 0.3.84-2
+- Create and own /usr/share/pipewire/pipewire.conf.d
+
+* Thu Nov 02 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.84-1
+- Update version to 0.3.84
+
+* Mon Oct 23 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.83-2
+- Apply patches to fix openal delay and echo-cancel distortion
+
+* Thu Oct 19 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.83-1
+- Update version to 0.3.83
+
+* Mon Oct 16 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.82-2
+- Add patch for device detection for asahi linux.
+- Add patch to avoid crash in ALSA.
+
+* Fri Oct 13 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.82-1
+- Update version to 0.3.82
+
+* Fri Oct 6 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.81-1
+- Update version to 0.3.81
+
+* Thu Sep 14 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.80-1
+- Update version to 0.3.80
+- Revert webrtc echo-cancel updates until fedora has newer version.
+
+* Tue Aug 29 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.79-1
+- Update version to 0.3.79
+
+* Tue Aug 22 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.78-1
+- Update version to 0.3.78
+
+* Tue Aug 08 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.77-3
+- Add patch to avoid duplicate sinks and sources.
+
+* Mon Aug 07 2023 Sandro Bonazzola <sbonazzo@redhat.com> - 0.3.77-2
+- Explicitly require pipewire-jack-audio-connection-kit-libs for pipewire-plugin-jack
+
+* Fri Aug 04 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.77-1
+- Update version to 0.3.77
+
+* Sun Jul 30 2023 Javier Martinez Canillas <javierm@redhat.com>  0.3.76-2
+- Rebuild for libcamera 0.1.0 bump
+
+* Fri Jul 28 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.76-1
+- Update version to 0.3.76
+
+* Fri Jul 21 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.75-1
+- Update version to 0.3.75
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.74-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.74-1
+- Update version to 0.3.74
+
+* Thu Jul 06 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.73-1
+- Update version to 0.3.73
+- Fixes rhbz#2156003 Split out lv2 and sofa filter-chain packages.
+- Split out vulkan plugin and roc module
+
+* Thu Jun 29 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.72-2
+- Move the ffado driver to module-ffado
+  Fixes rhbz#2218481
+
+* Mon Jun 26 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.72-1
+- Update version to 0.3.72
+- The jack libraries and ld.so override were split so that jack can
+  be installed together with the pipewire-jack libraries and pw-jack.
+
+* Thu Jun 15 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.3.71-4
+- Disable libmysofa, lv2, roc in RHEL builds
+
+* Tue May 23 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.3.71-3
+- Move JACK modules to plugin-jack subpackage
+
+* Thu May 18 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.71-2
+- Add patch to fix JACK buffersize updates
+
+* Wed May 17 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.71-1
+- Update version to 0.3.71
+
+* Thu Apr 20 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.70-1
+- Update version to 0.3.70
+
+* Tue Apr 18 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.69-2
+- Add 3 useful patches.
+
+* Thu Apr 13 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.69-1
+- Update version to 0.3.69
+
+* Tue Apr 11 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.68-2
+- Add 2 patches for some critical bugs.
+
+* Thu Apr 6 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.68-1
+- Update version to 0.3.68
+- Enable gstreamer-device-provider (rhbz#2183691)
+
+* Thu Mar 9 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.67-1
+- Update version to 0.3.67
+
+* Thu Feb 16 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.66-1
+- Update version to 0.3.66
+
+* Sat Jan 28 2023 Stefan Bluhm <stefan.bluhm@clacee.eu> - 0.3.65-3
+- Added missing build dependency
+
+* Thu Jan 26 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.65-2
+- Add NEWS file (rhbz#2032237)
+
+* Thu Jan 26 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.65-1
+- Update version to 0.3.65
+
+* Thu Jan 19 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.64-3
+- Add patch to avoid DSP mixing issues with AVX in filter-chain.
+- Add patch to revert API breakage with deprecated symbols.
+- Add patch to fix scaling overflow that could cause stuttering.
+
+* Tue Jan 17 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.64-2
+- Re-enabled roc-toolkit support.
+
+* Thu Jan 12 2023 Wim Taymans <wtaymans@redhat.com> - 0.3.64-1
+- Update version to 0.3.64
+- Disable ROC again until 0.2 support is merged in fedora.
+
+* Sun Jan 01 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.3.63-2
+- Rebuild for new libcamera again
+
+* Thu Dec 15 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.63-1
+- Update version to 0.3.63
+
+* Tue Dec 13 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.62-3
+- Add patch to fix distorted sound on AVX2 in some cases.
+
+* Mon Dec 12 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.62-2
+- Package X11 bell support separately
+  Fixes rhbz#2152385
+
+* Fri Dec 09 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.62-1
+- Update version to 0.3.62
+
+* Wed Dec 07 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.3.61-2
+- Rebuild for new libcamera
+
+* Thu Nov 24 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.61-1
+- Update version to 0.3.61
+
+* Thu Nov 17 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.60-5
+- Add patch to fix sound in qemu.
+
+* Tue Nov 15 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.60-4
+- Add patch to avoid crashes when switching profiles
+
+* Thu Nov 10 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.60-3
+- Add patch to make Telegram playback work again
+
+* Thu Nov 10 2022 Neal Gompa <ngompa@fedoraproject.org> - 0.3.60-2
+- Restore libusb support
 
 * Thu Nov 10 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.60-1
 - Update version to 0.3.60
 
-* Fri Oct 21 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.59-4
+* Mon Oct 24 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 0.3.59-3
+- Enabled roc-toolkit support
+  Resolves: rhbz#2041189
+
+* Fri Oct 21 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.59-2
 - Add a patch to fix midi processing in some cases.
 - Add a patch to fix crash when exiting some JACK apps such as
   Ardour7.
 - Add a patch to fix a crash when switching bluetooth profiles.
 - Add a patch to fix bluetooth source switching between drivers.
-
-* Thu Oct 06 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.59-3
-- Rebuild with new libcamera.
-
-* Tue Oct 04 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.59-2
-- Rebuild with new libcamera.
 
 * Fri Sep 30 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.59-1
 - Update version to 0.3.59
@@ -465,6 +1176,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 * Fri Sep 2 2022 Wim Taymans <wtaymans@redhat.com> - 0.3.57-1
 - Update version to 0.3.57
 - Add systemd BuildRequires
+- Fix lv2 include path
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.56-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

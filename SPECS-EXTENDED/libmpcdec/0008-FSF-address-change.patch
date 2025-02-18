@@ -1,0 +1,372 @@
+From 6338c003f2c0a0a2c1f774607c6ced28864182e1 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Mon, 21 Oct 2013 21:21:51 +0000
+Subject: [PATCH 08/19] FSF address change
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@484 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ common/fastmath.c        | 3 +--
+ include/mpc/datatypes.h  | 3 +--
+ include/mpc/minimax.h    | 3 +--
+ include/mpc/mpcmath.h    | 3 +--
+ libmpcenc/analy_filter.c | 3 +--
+ libmpcenc/bitstream.c    | 3 +--
+ libmpcenc/encode_sv7.c   | 3 +--
+ libmpcenc/huffsv7.c      | 3 +--
+ libmpcenc/libmpcenc.h    | 3 +--
+ libmpcenc/quant.c        | 3 +--
+ libmpcpsy/ans.c          | 3 +--
+ libmpcpsy/cvd.c          | 3 +--
+ libmpcpsy/fft4g.c        | 3 +--
+ libmpcpsy/fft_routines.c | 3 +--
+ libmpcpsy/libmpcpsy.h    | 3 +--
+ libmpcpsy/profile.c      | 3 +--
+ libmpcpsy/psy.c          | 3 +--
+ libmpcpsy/psy_tab.c      | 3 +--
+ mpcenc/config.h          | 3 +--
+ mpcenc/mpcenc.c          | 3 +--
+ mpcenc/mpcenc.h          | 3 +--
+ mpcenc/predict.h         | 3 +--
+ mpcenc/wave_in.c         | 3 +--
+ mpcenc/winmsg.c          | 3 +--
+ 24 files changed, 24 insertions(+), 48 deletions(-)
+
+diff --git a/common/fastmath.c b/common/fastmath.c
+index 518b22c..9a5bb6a 100644
+--- a/common/fastmath.c
++++ b/common/fastmath.c
+@@ -13,8 +13,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "mpc/mpcmath.h"
+diff --git a/include/mpc/datatypes.h b/include/mpc/datatypes.h
+index 608ecfa..7e6c5fc 100644
+--- a/include/mpc/datatypes.h
++++ b/include/mpc/datatypes.h
+@@ -12,8 +12,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #pragma once
+diff --git a/include/mpc/minimax.h b/include/mpc/minimax.h
+index 1192626..5351a21 100644
+--- a/include/mpc/minimax.h
++++ b/include/mpc/minimax.h
+@@ -13,8 +13,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #pragma once
+diff --git a/include/mpc/mpcmath.h b/include/mpc/mpcmath.h
+index 3b42a45..9372d4b 100644
+--- a/include/mpc/mpcmath.h
++++ b/include/mpc/mpcmath.h
+@@ -12,8 +12,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include <math.h>
+diff --git a/libmpcenc/analy_filter.c b/libmpcenc/analy_filter.c
+index fa8e0ff..d9cc814 100644
+--- a/libmpcenc/analy_filter.c
++++ b/libmpcenc/analy_filter.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include <string.h>
+diff --git a/libmpcenc/bitstream.c b/libmpcenc/bitstream.c
+index 0650ee2..4865ce9 100644
+--- a/libmpcenc/bitstream.c
++++ b/libmpcenc/bitstream.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #ifdef _WIN32
+diff --git a/libmpcenc/encode_sv7.c b/libmpcenc/encode_sv7.c
+index 68de5ae..cb7704f 100644
+--- a/libmpcenc/encode_sv7.c
++++ b/libmpcenc/encode_sv7.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include <stdlib.h>
+diff --git a/libmpcenc/huffsv7.c b/libmpcenc/huffsv7.c
+index dd13f8e..ea5c948 100644
+--- a/libmpcenc/huffsv7.c
++++ b/libmpcenc/huffsv7.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "libmpcenc.h"
+diff --git a/libmpcenc/libmpcenc.h b/libmpcenc/libmpcenc.h
+index e9d5f19..5228856 100644
+--- a/libmpcenc/libmpcenc.h
++++ b/libmpcenc/libmpcenc.h
+@@ -12,8 +12,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #pragma once
+diff --git a/libmpcenc/quant.c b/libmpcenc/quant.c
+index 4cad889..9eeb98a 100644
+--- a/libmpcenc/quant.c
++++ b/libmpcenc/quant.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "libmpcenc.h"
+diff --git a/libmpcpsy/ans.c b/libmpcpsy/ans.c
+index cf2e0c3..3204f2d 100644
+--- a/libmpcpsy/ans.c
++++ b/libmpcpsy/ans.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ /*
+diff --git a/libmpcpsy/cvd.c b/libmpcpsy/cvd.c
+index 9377dab..4e3bae6 100644
+--- a/libmpcpsy/cvd.c
++++ b/libmpcpsy/cvd.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include <string.h>
+diff --git a/libmpcpsy/fft4g.c b/libmpcpsy/fft4g.c
+index 8efc2b6..e2f6c94 100644
+--- a/libmpcpsy/fft4g.c
++++ b/libmpcpsy/fft4g.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "libmpcpsy.h"
+diff --git a/libmpcpsy/fft_routines.c b/libmpcpsy/fft_routines.c
+index eadc9ac..e656ca5 100644
+--- a/libmpcpsy/fft_routines.c
++++ b/libmpcpsy/fft_routines.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include <string.h>
+diff --git a/libmpcpsy/libmpcpsy.h b/libmpcpsy/libmpcpsy.h
+index bc24c98..2763646 100644
+--- a/libmpcpsy/libmpcpsy.h
++++ b/libmpcpsy/libmpcpsy.h
+@@ -12,8 +12,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ // psy_tab.h
+diff --git a/libmpcpsy/profile.c b/libmpcpsy/profile.c
+index abc9b72..48dd350 100644
+--- a/libmpcpsy/profile.c
++++ b/libmpcpsy/profile.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "libmpcpsy.h"
+diff --git a/libmpcpsy/psy.c b/libmpcpsy/psy.c
+index 8c5b9f7..062a3b7 100644
+--- a/libmpcpsy/psy.c
++++ b/libmpcpsy/psy.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ /*
+diff --git a/libmpcpsy/psy_tab.c b/libmpcpsy/psy_tab.c
+index 35c56ac..f04369f 100644
+--- a/libmpcpsy/psy_tab.c
++++ b/libmpcpsy/psy_tab.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "libmpcpsy.h"
+diff --git a/mpcenc/config.h b/mpcenc/config.h
+index 0ab13aa..5efe178 100644
+--- a/mpcenc/config.h
++++ b/mpcenc/config.h
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ /* Test the fast float-to-int rounding trick works */
+diff --git a/mpcenc/mpcenc.c b/mpcenc/mpcenc.c
+index cd1b902..df3453d 100644
+--- a/mpcenc/mpcenc.c
++++ b/mpcenc/mpcenc.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ /* overflow of subband-samples */
+diff --git a/mpcenc/mpcenc.h b/mpcenc/mpcenc.h
+index 46f1ba0..66ba74f 100644
+--- a/mpcenc/mpcenc.h
++++ b/mpcenc/mpcenc.h
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #ifndef MPCENC_MPCENC_H
+diff --git a/mpcenc/predict.h b/mpcenc/predict.h
+index f568832..83cd913 100644
+--- a/mpcenc/predict.h
++++ b/mpcenc/predict.h
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "mpcenc.h"
+diff --git a/mpcenc/wave_in.c b/mpcenc/wave_in.c
+index 27aa233..b20f97e 100644
+--- a/mpcenc/wave_in.c
++++ b/mpcenc/wave_in.c
+@@ -14,8 +14,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ # include <string.h>
+diff --git a/mpcenc/winmsg.c b/mpcenc/winmsg.c
+index 1d248da..e393301 100644
+--- a/mpcenc/winmsg.c
++++ b/mpcenc/winmsg.c
+@@ -13,8 +13,7 @@
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ * License along with this library; If not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #include "mpcenc.h"
+-- 
+2.46.0
+

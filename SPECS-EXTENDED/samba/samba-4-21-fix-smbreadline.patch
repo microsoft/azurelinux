@@ -1,0 +1,112 @@
+From 36e3944418789f5d2018063fa3988c318baa0a35 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Tue, 21 Jan 2025 17:59:12 +0100
+Subject: [PATCH 1/2] lib:replace: Remove trailing spaces from readline.h
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15788
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Alexander Bokovoy <ab@samba.org>
+(cherry picked from commit dbff53f77680f0ccd022f2d864ba6ae7585a34b7)
+---
+ lib/replace/system/readline.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/replace/system/readline.h b/lib/replace/system/readline.h
+index 29379626e0d..9a9af266ca6 100644
+--- a/lib/replace/system/readline.h
++++ b/lib/replace/system/readline.h
+@@ -1,14 +1,14 @@
+ #ifndef _system_readline_h
+ #define _system_readline_h
+-/* 
++/*
+    Unix SMB/CIFS implementation.
+ 
+    Readline wrappers
+-   
++
+      ** NOTE! The following LGPL license applies to the replace
+      ** library. This does NOT imply that all of Samba is released
+      ** under the LGPL
+-   
++
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+-- 
+2.48.1
+
+
+From 6944f700dcd4ad795652070dfb04135d602622a2 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Tue, 21 Jan 2025 17:59:27 +0100
+Subject: [PATCH 2/2] lib:replace: Don't use deprecated readline CPPFunction
+ cast
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+HAVE_RL_COMPLETION_FUNC_T was unused and not checking for the right
+function.
+
+libcli/smbreadline/smbreadline.c: In function ‘smb_readline’:
+libcli/smbreadline/smbreadline.c:139:17: warning: ‘CPPFunction’ is deprecated [-Wdeprecated-declarations]
+  139 |                 rl_attempted_completion_function = RL_COMPLETION_CAST completion_fn;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+libcli/smbreadline/smbreadline.c:139:50: error: assignment to ‘char ** (*)(const char *, int,  int)’ from incompatible pointer type ‘char ** (*)(void)’ [-Wincompatible-pointer-types]
+  139 |                 rl_attempted_completion_function = RL_COMPLETION_CAST completion_fn;
+      |                                                  ^
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15788
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Alexander Bokovoy <ab@samba.org>
+
+Autobuild-User(master): Andreas Schneider <asn@cryptomilk.org>
+Autobuild-Date(master): Tue Jan 21 19:38:37 UTC 2025 on atb-devel-224
+
+(cherry picked from commit 9aa5c43315d83c19514251a11c4fba5a137f2821)
+---
+ lib/replace/system/readline.h        | 4 +++-
+ libcli/smbreadline/wscript_configure | 8 +++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/lib/replace/system/readline.h b/lib/replace/system/readline.h
+index 9a9af266ca6..ac3604fc12e 100644
+--- a/lib/replace/system/readline.h
++++ b/lib/replace/system/readline.h
+@@ -46,7 +46,9 @@
+ #endif
+ 
+ #ifdef HAVE_NEW_LIBREADLINE
+-#ifdef HAVE_CPPFUNCTION
++#if defined(HAVE_RL_COMPLETION_FUNC_T)
++#  define RL_COMPLETION_CAST (rl_completion_func_t *)
++#elif defined(HAVE_CPPFUNCTION)
+ #  define RL_COMPLETION_CAST (CPPFunction *)
+ #elif defined(HAVE_RL_COMPLETION_T)
+ #  define RL_COMPLETION_CAST (rl_completion_t *)
+diff --git a/libcli/smbreadline/wscript_configure b/libcli/smbreadline/wscript_configure
+index 912ff53a150..f5a401ebae0 100644
+--- a/libcli/smbreadline/wscript_configure
++++ b/libcli/smbreadline/wscript_configure
+@@ -51,10 +51,12 @@ conf.CHECK_CODE('''
+ #    endif
+ #  endif
+ #endif
+-int main(void) {rl_completion_t f; return 0;}
++int main(void) {rl_completion_func_t f; return 0;}
+ ''',
+-'HAVE_RL_COMPLETION_FUNC_T', execute=False, addmain=False,
+-msg='Checking for rl_completion_t')
++                'HAVE_RL_COMPLETION_FUNC_T',
++                execute=False,
++                addmain=False,
++                msg='Checking for rl_completion_func_t')
+ 
+ conf.CHECK_CODE('''
+ #ifdef HAVE_READLINE_READLINE_H
+-- 
+2.48.1
+

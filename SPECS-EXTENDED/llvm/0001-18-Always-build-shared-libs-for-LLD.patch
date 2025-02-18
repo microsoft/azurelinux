@@ -1,0 +1,29 @@
+From b1c60d7fa322a2d208556087df9e7ef94bfbffb8 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Wed, 8 May 2024 12:30:36 +0900
+Subject: [PATCH] Always build shared libs for LLD
+
+We don't want to enable BUILD_SHARED_LIBS for the whole build,
+but we do want to build lld libraries.
+---
+ lld/cmake/modules/AddLLD.cmake | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/lld/cmake/modules/AddLLD.cmake b/lld/cmake/modules/AddLLD.cmake
+index 2ee066b41535..270c03f096ac 100644
+--- a/lld/cmake/modules/AddLLD.cmake
++++ b/lld/cmake/modules/AddLLD.cmake
+@@ -7,9 +7,8 @@ macro(add_lld_library name)
+     ""
+     ""
+     ${ARGN})
+-  if(ARG_SHARED)
+-    set(ARG_ENABLE_SHARED SHARED)
+-  endif()
++  # Always build shared libs for LLD.
++  set(ARG_ENABLE_SHARED SHARED)
+   llvm_add_library(${name} ${ARG_ENABLE_SHARED} ${ARG_UNPARSED_ARGUMENTS})
+   set_target_properties(${name} PROPERTIES FOLDER "lld libraries")
+ 
+-- 
+2.44.0

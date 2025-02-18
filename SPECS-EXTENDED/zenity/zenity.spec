@@ -1,21 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:          zenity
-Version:       3.32.0
-Release:       4%{?dist}
+Version:       4.0.3
+Release:       1%{?dist}
 Summary:       Display dialog boxes from shell scripts
 
-License:       LGPLv2+
+License:       LGPL-2.1-or-later
 URL:           https://wiki.gnome.org/Projects/Zenity
-Source:        https://download.gnome.org/sources/%{name}/3.32/%{name}-%{version}.tar.xz
+Source:        https://download.gnome.org/sources/%{name}/4.0/%{name}-%{version}.tar.xz
 
-BuildRequires:  gcc
-BuildRequires: pkgconfig(gtk+-3.0) >= 3.0.0
-BuildRequires: pkgconfig(libnotify) >= 0.6.1
-BuildRequires: which
+BuildRequires: pkgconfig(libadwaita-1) >= 1.2
+BuildRequires: /usr/bin/help2man
+BuildRequires: desktop-file-utils
+BuildRequires: gcc
 BuildRequires: gettext
-BuildRequires: intltool
 BuildRequires: itstool
+BuildRequires: meson
+BuildRequires: which
+# Tests
+BuildRequires: xwayland-run
+BuildRequires: mutter
+BuildRequires: mesa-dri-drivers
 
 %description
 Zenity lets you display Gtk+ dialog boxes from the command line and through
@@ -23,34 +26,132 @@ shell scripts. It is similar to gdialog, but is intended to be saner. It comes
 from the same family as dialog, Xdialog, and cdialog.
 
 %prep
-%setup -q
+%autosetup -p1
 
 
 %build
-%configure --disable-webkitgtk
-make V=1 %{?_smp_mflags}
+%meson
+# Man page generation requires running the in-tree zenity command.
+%{shrink:xwfb-run -c mutter -w 10 -- %meson_build}
 
 
 %install
-%make_install
+%meson_install
 
 # we don't want a perl dependency just for this
-rm $RPM_BUILD_ROOT%{_bindir}/gdialog
+rm -f %{buildroot}/%{_bindir}/gdialog
 
 %find_lang zenity --with-gnome
+
+%check
+desktop-file-validate %{buildroot}%{_datadir}/applications/org.gnome.Zenity.desktop
 
 
 %files -f zenity.lang
 %license COPYING
-%doc AUTHORS NEWS THANKS README
+%doc AUTHORS NEWS README.md
 %{_bindir}/zenity
-%{_datadir}/zenity
+%{_datadir}/applications/org.gnome.Zenity.desktop
+%{_datadir}/icons/hicolor/48*48/apps/zenity.png
 %{_mandir}/man1/zenity.1*
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.32.0-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Oct 24 2024 David King <amigadave@amigadave.com> - 4.0.3-1
+- Update to 4.0.3
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jul 05 2024 David King <amigadave@amigadave.com> - 4.0.2-1
+- Update to 4.0.2
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jan 11 2024 Kalev Lember <klember@redhat.com> - 4.0.1-1
+- Update to 4.0.1
+
+* Sat Dec 09 2023 Kalev Lember <klember@redhat.com> - 4.0.0-1
+- Update to 4.0.0
+
+* Wed Dec 06 2023 Kalev Lember <klember@redhat.com> - 3.99.91-1
+- Update to 3.99.91
+
+* Wed Nov 22 2023 Kalev Lember <klember@redhat.com> - 3.99.90-1
+- Update to 3.99.90
+
+* Thu Sep 21 2023 Kalev Lember <klember@redhat.com> - 3.99.2-1
+- Update to 3.99.2
+
+* Mon Aug 14 2023 Kalev Lember <klember@redhat.com> - 3.99.1-1
+- Update to 3.99.1
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.99.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 19 2023 Kalev Lember <klember@redhat.com> - 3.99.0-1
+- Update to 3.99.0
+
+* Mon May 08 2023 Adam Williamson <awilliam@redhat.com> - 3.92.0-2
+- Backport two patches from upstream to hopefully really fix crashes (#2177287)
+
+* Tue May 02 2023 David King <amigadave@amigadave.com> - 3.92.0-1
+- Update to 3.92.0
+
+* Thu Apr 20 2023 Adam Williamson <awilliam@redhat.com> - 3.91.0-3
+- Backport MRs #26 and #27 to fix bugs in tree views (#2184783)
+- Backport MR #28 to fix some console error spam
+
+* Thu Apr 20 2023 Adam Williamson <awilliam@redhat.com> - 3.91.0-2
+- Backport MR #25 for crash when --no-cancel and/or --auto-close are used (#2177287)
+
+* Tue Mar 07 2023 David King <amigadave@amigadave.com> - 3.91.0-1
+- Update to 3.91.0
+
+* Mon Feb 06 2023 David King <amigadave@amigadave.com> - 3.90.0-1
+- Update to 3.90.0
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.43.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.43.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jul 17 2022 Honore Doktorr <hdfssk@gmail.com> - 3.43.0-2
+- Add missing BuildRequires for pkgconfig(libnotify)
+- enable libnotify option for meson build
+
+* Thu Jul 07 2022 David King <amigadave@amigadave.com> - 3.43.0-1
+- Update to 3.43.0
+
+* Wed Apr 27 2022 David King <amigadave@amigadave.com> - 3.42.1-1
+- Update to 3.42.1
+
+* Fri Apr 01 2022 David King <amigadave@amigadave.com> - 3.42.0-1
+- Update to 3.42.0
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.41.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 06 2021 Kalev Lember <klember@redhat.com> - 3.41.0-2
+- Fix eln build
+
+* Mon Aug 23 2021 Kalev Lember <klember@redhat.com> - 3.41.0-1
+- Update to 3.41.0
+- Switch to meson build system
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Mar 04 2021 David King <amigadave@amigadave.com> - 3.32.0-6
+- Use make macros
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

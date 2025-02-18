@@ -1,39 +1,45 @@
-%define majmin %(echo %{version} | cut -d. -f1-2)
-
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %ifarch %{valgrind_arches}
 %global has_valgrind 1
 %endif
 
 Name:           gcr
-Version:        3.38.1
-Release:        1%{?dist}
+Version:        4.3.0
+Release:        3%{?dist}
 Summary:        A library for bits of crypto UI and parsing
 
-License:        GPLv2
-URL:            https://wiki.gnome.org/Projects/CryptoGlue
-Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
+# gck/pkcs11n.h is MPL 1.1/GPL 2.0/LGPL 2.1
+# gck/pkcs11x.h is FSFULLRWD
+# ui/icons/render-icons.py is LGPL-3.0-or-later OR CC-BY-SA-3.0
+# docs/COPYING is GCR-docs
+License:        LGPL-2.1-or-later AND FSFULLRWD AND (LGPL-3.0-or-later OR CC-BY-SA-3.0) AND (MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later) AND GCR-docs
+URL:            https://gitlab.gnome.org/GNOME/gcr
+Source0:        https://download.gnome.org/sources/%{name}/4.2/%{name}-%{version}.tar.xz
 
 BuildRequires:  gettext
-BuildRequires:  gtk-doc
 BuildRequires:  meson
+BuildRequires:  pkgconfig(gi-docgen)
 BuildRequires:  pkgconfig(gio-unix-2.0)
+BuildRequires:  pkgconfig(gnutls)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-BuildRequires:  pkgconfig(gtk+-3.0)
+BuildRequires:  pkgconfig(gtk4)
+BuildRequires:  pkgconfig(libsecret-1)
+BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  pkgconfig(p11-kit-1)
-BuildRequires:  python3-pygments
-BuildRequires:  docbook-style-xsl
-BuildRequires:  libgcrypt-devel
-BuildRequires:  desktop-file-utils
+BuildRequires:  pkgconfig(systemd)
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  vala
 %if 0%{?has_valgrind}
 BuildRequires:  valgrind-devel
 %endif
 BuildRequires:  /usr/bin/gpg2
-BuildRequires:  /usr/bin/valac
+BuildRequires:  /usr/bin/ssh-add
+BuildRequires:  /usr/bin/ssh-agent
 BuildRequires:  /usr/bin/xsltproc
-Requires: %{name}-base%{?_isa} = %{version}-%{release}
+
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: /usr/bin/gpg2
+Requires: /usr/bin/ssh-add
+Requires: /usr/bin/ssh-agent
 
 %description
 gcr is a library for displaying certificates, and crypto UI, accessing
@@ -42,88 +48,160 @@ desktop.
 
 gck is a library for accessing PKCS#11 modules like smart cards.
 
-%package devel
-Summary: Development files for gcr
-Requires: %{name}%{?_isa} = %{version}-%{release}
+%package        libs
+Summary:        gcr and gck libraries
+# Renamed in F37
+Obsoletes:      %{name}-base < 3.92.0-1
+Provides:       %{name}-base = %{version}-%{release}
+Provides:       %{name}-base%{?_isa} = %{version}-%{release}
+# Dropped in F37
+Obsoletes:      %{name}-gtk3 < 3.92.0-1
+Obsoletes:      %{name}-gtk4 < 3.92.0-1
 
-%description devel
-The gcr-devel package includes the header files for the gcr library.
+%description    libs
+The %{name}-libs package contains the gcr and gck shared libraries.
 
-%package base
-Summary: Library files for gcr
-Conflicts: %{name} < 3.28.1-3
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+# Dropped in F37
+Obsoletes:      %{name}-gtk3-devel < 3.92.0-1
+Obsoletes:      %{name}-gtk4-devel < 3.92.0-1
 
-%description base
-The gcr-base package includes the gcr-base library.
+%description    devel
+The %{name}-devel package contains libraries and header files for
+developing applications that use %{name}.
 
 %prep
 %autosetup -p1
 
 %build
-%meson
+%meson -Dcrypto=gnutls
 %meson_build
-
 
 %install
 %meson_install
-%find_lang %{name}
+%find_lang gcr-4
 
+%post
+%systemd_user_post gcr-ssh-agent.service
 
-%check
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/gcr-viewer.desktop
+%preun
+%systemd_user_preun gcr-ssh-agent.service
 
+%postun
+%systemd_user_postun_with_restart gcr-ssh-agent.service
 
-%files -f %{name}.lang
-%doc README NEWS
+%files
+%doc NEWS README.md
+%{_bindir}/gcr-viewer-gtk4
+%{_libexecdir}/gcr-ssh-agent
+%{_libexecdir}/gcr4-ssh-askpass
+%{_userunitdir}/gcr-ssh-agent.service
+%{_userunitdir}/gcr-ssh-agent.socket
+
+%files libs -f gcr-4.lang
 %license COPYING
-%{_bindir}/gcr-viewer
-%{_datadir}/applications/gcr-viewer.desktop
-%dir %{_datadir}/GConf
-%dir %{_datadir}/GConf/gsettings
-%{_datadir}/GConf/gsettings/org.gnome.crypto.pgp.convert
-%{_datadir}/GConf/gsettings/org.gnome.crypto.pgp_keyservers.convert
-%{_datadir}/glib-2.0/schemas/org.gnome.crypto.pgp.gschema.xml
-%{_libdir}/girepository-1.0
-%{_libdir}/libgcr-ui-3.so.*
-%{_datadir}/icons/hicolor/*/apps/*
-%{_datadir}/mime/packages/gcr-crypto-types.xml
-%{_libexecdir}/gcr-prompter
-%{_libexecdir}/gcr-ssh-askpass
-%{_datadir}/dbus-1/services/org.gnome.keyring.PrivatePrompter.service
-%{_datadir}/dbus-1/services/org.gnome.keyring.SystemPrompter.service
-%{_datadir}/applications/gcr-prompter.desktop
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/Gck-2.typelib
+%{_libdir}/girepository-1.0/Gcr-4.typelib
+%{_libdir}/libgck-2.so.2*
+%{_libdir}/libgcr-4.so.4*
 
 %files devel
-%{_includedir}/gck-1
-%{_includedir}/gcr-3
-%{_libdir}/libgck-1.so
-%{_libdir}/libgcr-base-3.so
-%{_libdir}/libgcr-ui-3.so
-%{_libdir}/pkgconfig/gck-1.pc
-%{_libdir}/pkgconfig/gcr-3.pc
-%{_libdir}/pkgconfig/gcr-base-3.pc
-%{_libdir}/pkgconfig/gcr-ui-3.pc
-%{_datadir}/gir-1.0
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/gck
-%{_datadir}/gtk-doc/html/gcr
-%{_datadir}/vala/
-
-%files base
-%{_libdir}/libgck-1.so.*
-%{_libdir}/libgcr-base-3.so.*
+%{_includedir}/gck-2/
+%{_includedir}/gcr-4/
+%{_libdir}/libgck-2.so
+%{_libdir}/libgcr-4.so
+%{_libdir}/pkgconfig/gck-2.pc
+%{_libdir}/pkgconfig/gcr-4.pc
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/Gck-2.gir
+%{_datadir}/gir-1.0/Gcr-4.gir
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/gck-2.deps
+%{_datadir}/vala/vapi/gck-2.vapi
+%{_datadir}/vala/vapi/gcr-4.deps
+%{_datadir}/vala/vapi/gcr-4.vapi
+%doc %{_datadir}/doc/gck-2/
+%doc %{_datadir}/doc/gcr-4/
 
 %changelog
-* Mon Dec 30 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.38.1-1
-- Bump to 3.38.1 to fix missing OID header bug (GCR issue #48).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
-- Adding BR on "python3-pygments".
-- License verified.
+* Wed Apr 17 2024 David King <amigadave@amigadave.com> - 4.3.0-2
+- Use gnutls instead of libgcrypt
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Apr 17 2024 Daiki Ueno <dueno@redhat.com> - 4.3.0-1
+- Update to 4.3.0
+
+* Fri Mar 08 2024 David King <amigadave@amigadave.com> - 4.2.1-1
+- Update to 4.2.1
+
+* Wed Feb 14 2024 David King <amigadave@amigadave.com> - 4.2.0-1
+- Update to 4.2.0
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 19 2023 Kalev Lember <klember@redhat.com> - 4.1.0-1
+- Update to 4.1.0
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.92.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep 26 2022 Kalev Lember <klember@redhat.com> - 3.92.0-1
+- Update to 3.92.0
+- Remove gtk3 and gtk4 subpackages as the gcr gtk3 and gtk4 libraries are gone
+- Rename gcr-base to gcr-libs
+- Fix gir and vala directory ownership
+- Misc packaging cleanup
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.90.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 19 2022 Milan Crha <mcrha@redhat.com> - 3.90.0-1
+- Update to 3.90.0
+- Split subpackages for gtk3 and gtk4
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.41.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 30 2021 Kalev Lember <klember@redhat.com> - 3.41.0-1
+- Update to 3.41.0
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.40.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Mar 27 2021 Kalev Lember <klember@redhat.com> - 3.40.0-1
+- Update to 3.40.0
+- Tighten soname globs
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.38.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 16 2021 Kalev Lember <klember@redhat.com> - 3.38.1-1
+- Update to 3.38.1
+
+* Mon Sep 28 2020 Kalev Lember <klember@redhat.com> - 3.38.0-2
+- Avoid BuildRequiring vala twice
+
+* Mon Sep 28 2020 Kalev Lember <klember@redhat.com> - 3.38.0-1
+- Update to 3.38.0
+
+* Sun Sep 20 2020 Kalev Lember <klember@redhat.com> - 3.37.91-1
+- Update to 3.37.91
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Mar 11 2020 Kalev Lember <klember@redhat.com> - 3.36.0-1
 - Update to 3.36.0

@@ -1,11 +1,4 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# Enable python3 build by default
-%bcond_without python3
-# Disable python2 build by default
-%bcond_with python2
-
-%if 0%{?rhel} >= 8
+%if %{defined el8}
 # Disable tests on epel8 - dependencies dont exist.
 %bcond_with tests
 %else
@@ -13,169 +6,126 @@ Distribution:   Azure Linux
 %endif
 
 Name:           python-requests-mock
-Version:        1.7.0
-Release:        4%{?dist}
-Summary:        A requests mocking tool for python
-
-License:        ASL 2.0
+Version:        1.12.1
+Release:        1%{?dist}
+Summary:        Mock out responses from the requests package
+License:        Apache-2.0
 URL:            https://requests-mock.readthedocs.io/
-Source0:        https://pypi.io/packages/source/r/requests-mock/requests-mock-%{version}.tar.gz#/python-requests-mock-%{version}.tar.gz
-
-Patch0:         0002-Use-system-urllib3-package.patch
-Patch1:         0003-Allow-skipping-purl-tests-if-it-is-not-present.patch
-Patch2:         0001-tox-add-py39-environment.patch
-
+Source:         %{pypi_source requests-mock}
+Patch:          0003-Allow-skipping-purl-tests-if-it-is-not-present.patch
 BuildArch:      noarch
 
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
-
-%description
-requests-mock provides a simple way to do HTTP mocking at the
-python-requests layer.
-
-%if %{with python2}
-%package -n python2-requests-mock
-Summary:        A requests mocking tool for python
-
-Requires:       python2-requests
-Requires:       python2-six
-
-# This {?fedora:2} syntax is because it's python2- on f28+ but just python- on
-# epel still. Hopefully this can be removed when epel is fixed.
-BuildRequires:  python%{?fedora:2}-urllib3
-
-# standard requirements needed for testing
-BuildRequires:  python2-requests
-BuildRequires:  python2-six
-
-BuildRequires:  python2-devel
-BuildRequires:  python2-pbr
-BuildRequires:  python2-setuptools
-
-%if 0%{?rhel} && 0%{?rhel} <= 6
-BuildRequires:  python-discover
-%endif
-
+BuildRequires:  python3-devel
 %if %{with tests}
-BuildRequires:  python2-mock
-BuildRequires:  python2-pytest
-BuildRequires:  python%{?fedora:2}-fixtures
-BuildRequires:  python%{?fedora:2}-testtools
+BuildRequires:  python3-pytest
+BuildRequires:  python3-requests-futures
 %endif
 
-
-%{?python_provide:%python_provide python2-requests-mock}
-
-
-%description -n python2-requests-mock
-requests-mock provides a simple way to do HTTP mocking at the
-python-requests layer.
-%endif
+%global _description %{expand:
+requests-mock provides a building block to stub out the HTTP requests portions
+of your testing code. You should checkout the docs for more information.}
 
 
-%if %{with python3}
-%package -n python%{python3_pkgversion}-requests-mock
-Summary:        A requests mocking tool for python
-
-Requires:       python%{python3_pkgversion}-requests
-Requires:       python%{python3_pkgversion}-six
-
-# standard requirements needed for testing
-BuildRequires:  python%{python3_pkgversion}-requests
-BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-urllib3
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-pbr
-BuildRequires:  python%{python3_pkgversion}-setuptools
-
-%{?python_provide:%python_provide python3-requests-mock}
-
-%if %{with tests}
-BuildRequires:  python%{python3_pkgversion}-fixtures
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-testtools
-BuildRequires:  python%{python3_pkgversion}-pytest
-%endif
+%description %_description
 
 
-%description -n python%{python3_pkgversion}-requests-mock
-requests-mock provides a simple way to do HTTP mocking at the
-python-requests layer.
-%endif
+%package -n python3-requests-mock
+Summary:        %{summary}
+
+
+%description -n python3-requests-mock %_description
 
 
 %prep
-%setup -q -n requests-mock-%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
+%autosetup -n requests-mock-%{version} -p 1
 
-# Remove bundled egg-info
-rm -rf requests_mock.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-x fixture}
 
 
 %build
-%if %{with python2}
-%py2_build
-%endif
-
-%if %{with python3}
-%py3_build
-%endif
+%pyproject_wheel
 
 
 %install
-%if %{with python2}
-%py2_install
-%endif
-
-%if %{with python3}
-%py3_install
-%endif
+%pyproject_install
+%pyproject_save_files requests_mock
 
 
 %check
 %if %{with tests}
-%if %{with python2}
-%{__python2} -m testtools.run discover
-%{__python2} -m pytest tests/pytest
-%endif
-
-%if %{with python3}
-%{__python3} -m pip install tox==3.25.1
-tox -e py%{python3_version_nodots}
-%endif
+%pytest -v tests/pytest
+%else
+%pyproject_check_import -e requests_mock.contrib.fixture
 %endif
 
 
-%if %{with python2}
-%files -n python2-requests-mock
-%license LICENSE
-%doc README.rst ChangeLog
-%{python2_sitelib}/requests_mock
-%{python2_sitelib}/requests_mock-%{version}-py%{python2_version}.egg-info
-%endif
-
-
-%if %{with python3}
-%files -n python%{python3_pkgversion}-requests-mock
-%license LICENSE
-%doc README.rst ChangeLog
-%{python3_sitelib}/requests_mock
-%{python3_sitelib}/requests_mock-%{version}-py%{python3_version}.egg-info
-%endif
+%files -n python3-requests-mock -f %{pyproject_files}
+%doc README.rst
 
 
 %changelog
-* Tue Jul 26 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.0-4
-- Introduce patch to test using tox
-- License verified
+* Wed Sep 25 2024 Christoph Erhardt <fedora@sicherha.de> - 1.12.1-1
+- Update to 1.12.1 (#2213553)
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.10.0-8
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 1.10.0-4
+- Rebuilt for Python 3.12
+
+* Wed Feb 15 2023 Carl George <carl@george.computer> - 1.10.0-3
+- Convert to pyproject macros
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 15 2022 Joel Capitao <jcapitao@redhat.com> - 1.10.0-1
+- Update to 1.10.0
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 1.9.3-2
+- Rebuilt for Python 3.11
+
+* Wed Feb 23 2022 Karolina Kula <kkula@redhat.com> - 1.9.3-1
+- Update to 1.9.3
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.8.0-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 15 2020 Joel Capitao <jcapitao@redhat.com> - 1.8.0-1
+- Update to 1.8.0
+- Remove Python 2 subpackage
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.7.0-3
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

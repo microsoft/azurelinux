@@ -13,9 +13,9 @@ diff --git a/tests/test_adapter.py b/tests/test_adapter.py
 index 70d0752..b6aa845 100644
 --- a/tests/test_adapter.py
 +++ b/tests/test_adapter.py
-@@ -13,7 +13,11 @@
- import json
+@@ -16,7 +16,11 @@
  import re
+ import urllib.parse
 
 -import purl
 +try:
@@ -24,9 +24,9 @@ index 70d0752..b6aa845 100644
 +    purl = None
 +
  import requests
- import six
- from six.moves.urllib import parse as urlparse
-@@ -329,6 +333,9 @@ class SessionAdapterTests(base.TestCase):
+ from urllib3 import HTTPResponse
+
+@@ -346,6 +350,9 @@ class SessionAdapterTests(base.TestCase):
              self.assertEqual('resp', resp.text)
 
      def test_with_purl(self):

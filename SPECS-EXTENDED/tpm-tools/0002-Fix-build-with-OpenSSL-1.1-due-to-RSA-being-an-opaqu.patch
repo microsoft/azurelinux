@@ -1,0 +1,192 @@
+From 72fe7011fe981f90a04a62a3fb6ad33037390dff Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 20 Feb 2017 10:43:10 +0100
+Subject: [PATCH 2/3] Fix build with OpenSSL 1.1 due to RSA being an opaque
+ struct
+
+RSA is an opaque struct in OpenSSL 1.1. New getter functions must be
+used to access the key components. The functions were not present in
+OpenSSL 1.0, so add a compat header with the implementation of the
+needed functions as suggested by the OpenSSL wiki [1] in order to allow
+building tpm-tools with any version of OpenSSL.
+
+[1] https://wiki.openssl.org/index.php/1.1_API_Changes
+---
+ src/data_mgmt/Makefile.am      |  3 ++-
+ src/data_mgmt/data_import.c    | 52 ++++++++++++++++++++++---------------
+ src/data_mgmt/openssl_compat.h | 58 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+), 21 deletions(-)
+ create mode 100644 src/data_mgmt/openssl_compat.h
+
+diff --git a/src/data_mgmt/Makefile.am b/src/data_mgmt/Makefile.am
+index de505e48ef..9457618ab9 100644
+--- a/src/data_mgmt/Makefile.am
++++ b/src/data_mgmt/Makefile.am
+@@ -32,7 +32,8 @@ noinst_HEADERS =	data_common.h \
+ 			data_init.h \
+ 			data_object.h \
+ 			data_passwd.h \
+-			data_protect.h
++			data_protect.h \
++			openssl_compat.h
+ 
+ #
+ # Common build flags
+diff --git a/src/data_mgmt/data_import.c b/src/data_mgmt/data_import.c
+index d4d2052bc6..532543f7d3 100644
+--- a/src/data_mgmt/data_import.c
++++ b/src/data_mgmt/data_import.c
+@@ -39,6 +39,7 @@
+ #include <openssl/evp.h>
+ #include <openssl/err.h>
+ 
++#include "openssl_compat.h"
+ 
+ /*
+  * Global variables
+@@ -691,8 +692,11 @@ createRsaPubKeyObject( RSA               *a_pRsa,
+ 
+ 	int  rc = -1;
+ 
+-	int  nLen = BN_num_bytes( a_pRsa->n );
+-	int  eLen = BN_num_bytes( a_pRsa->e );
++	const BIGNUM *rsa_n, *rsa_e;
++	RSA_get0_key( a_pRsa, &rsa_n, &rsa_e, NULL );
++
++	int  nLen = BN_num_bytes( rsa_n );
++	int  eLen = BN_num_bytes( rsa_e );
+ 
+ 	CK_RV  rv;
+ 
+@@ -732,8 +736,8 @@ createRsaPubKeyObject( RSA               *a_pRsa,
+ 	}
+ 
+ 	// Get binary representations of the RSA key information
+-	BN_bn2bin( a_pRsa->n, n );
+-	BN_bn2bin( a_pRsa->e, e );
++	BN_bn2bin( rsa_n, n );
++	BN_bn2bin( rsa_e, e );
+ 
+ 	// Create the RSA public key object
+ 	rv = createObject( a_hSession, tAttr, ulAttrCount, a_hObject );
+@@ -760,14 +764,22 @@ createRsaPrivKeyObject( RSA               *a_pRsa,
+ 
+ 	int  rc = -1;
+ 
+-	int  nLen = BN_num_bytes( a_pRsa->n );
+-	int  eLen = BN_num_bytes( a_pRsa->e );
+-	int  dLen = BN_num_bytes( a_pRsa->d );
+-	int  pLen = BN_num_bytes( a_pRsa->p );
+-	int  qLen = BN_num_bytes( a_pRsa->q );
+-	int  dmp1Len = BN_num_bytes( a_pRsa->dmp1 );
+-	int  dmq1Len = BN_num_bytes( a_pRsa->dmq1 );
+-	int  iqmpLen = BN_num_bytes( a_pRsa->iqmp );
++	const BIGNUM *rsa_n, *rsa_e, *rsa_d;
++	const BIGNUM *rsa_p, *rsa_q;
++	const BIGNUM *rsa_dmp1, *rsa_dmq1, *rsa_iqmp;
++
++	RSA_get0_key( a_pRsa, &rsa_n, &rsa_e, &rsa_d );
++	RSA_get0_factors( a_pRsa, &rsa_p, &rsa_q );
++	RSA_get0_crt_params( a_pRsa, &rsa_dmp1, &rsa_dmq1, &rsa_iqmp );
++
++	int  nLen = BN_num_bytes( rsa_n );
++	int  eLen = BN_num_bytes( rsa_e );
++	int  dLen = BN_num_bytes( rsa_d );
++	int  pLen = BN_num_bytes( rsa_p );
++	int  qLen = BN_num_bytes( rsa_q );
++	int  dmp1Len = BN_num_bytes( rsa_dmp1 );
++	int  dmq1Len = BN_num_bytes( rsa_dmq1 );
++	int  iqmpLen = BN_num_bytes( rsa_iqmp );
+ 
+ 	CK_RV  rv;
+ 
+@@ -821,14 +833,14 @@ createRsaPrivKeyObject( RSA               *a_pRsa,
+ 	}
+ 
+ 	// Get binary representations of the RSA key information
+-	BN_bn2bin( a_pRsa->n, n );
+-	BN_bn2bin( a_pRsa->e, e );
+-	BN_bn2bin( a_pRsa->d, d );
+-	BN_bn2bin( a_pRsa->p, p );
+-	BN_bn2bin( a_pRsa->q, q );
+-	BN_bn2bin( a_pRsa->dmp1, dmp1 );
+-	BN_bn2bin( a_pRsa->dmq1, dmq1 );
+-	BN_bn2bin( a_pRsa->iqmp, iqmp );
++	BN_bn2bin( rsa_n, n );
++	BN_bn2bin( rsa_e, e );
++	BN_bn2bin( rsa_d, d );
++	BN_bn2bin( rsa_p, p );
++	BN_bn2bin( rsa_q, q );
++	BN_bn2bin( rsa_dmp1, dmp1 );
++	BN_bn2bin( rsa_dmq1, dmq1 );
++	BN_bn2bin( rsa_iqmp, iqmp );
+ 
+ 	// Create the RSA private key object
+ 	rv = createObject( a_hSession, tAttr, ulAttrCount, a_hObject );
+diff --git a/src/data_mgmt/openssl_compat.h b/src/data_mgmt/openssl_compat.h
+new file mode 100644
+index 0000000000..2a60fdf492
+--- /dev/null
++++ b/src/data_mgmt/openssl_compat.h
+@@ -0,0 +1,58 @@
++/*
++ * Getter functions for OpenSSL < 1.1 compatibility. Based on code from:
++ * https://wiki.openssl.org/index.php/1.1_API_Changes#Adding_forward-compatible_code_to_older_versions
++ * and therefore:
++ * Copyright OpenSSL 2016
++ * Contents licensed under the terms of the OpenSSL license
++ * See http://www.openssl.org/source/license.html for details
++ */
++
++#ifndef __OPENSSL_COMPAT_H
++#define __OPENSSL_COMPAT_H
++
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
++
++#include <openssl/engine.h>
++
++static inline void
++RSA_get0_key( const RSA *r,
++              const BIGNUM **n,
++              const BIGNUM **e,
++              const BIGNUM **d ) {
++
++	if ( n )
++		*n = r->n;
++	if ( e )
++		*e = r->e;
++	if ( d )
++		*d = r->d;
++}
++
++static inline void
++RSA_get0_factors( const RSA *r,
++                  const BIGNUM **p,
++                  const BIGNUM **q ) {
++
++	if ( p )
++		*p = r->p;
++	if ( q )
++		*q = r->q;
++}
++
++static inline void
++RSA_get0_crt_params( const RSA *r,
++                     const BIGNUM **dmp1,
++                     const BIGNUM **dmq1,
++                     const BIGNUM **iqmp ) {
++
++	if ( dmp1 )
++		*dmp1 = r->dmp1;
++	if ( dmq1 )
++		*dmq1 = r->dmq1;
++	if ( iqmp )
++		*iqmp = r->iqmp;
++}
++
++#endif /* OPENSSL_VERSION_NUMBER */
++
++#endif /* __OPENSSL_COMPAT_H */
+-- 
+2.9.3
+

@@ -1,55 +1,22 @@
-From: Jan Safranek <jsafrane@redhat.com>
-Date: Fri, 26 Nov 2010 14:30:45 +0300
-Subject: [PATCH] Customize 'permission denied' error.
-
-Add Fedora-specific message to error output when dumpcap cannot be started
-because of permissions.
-
-Signed-off-by: Jan Safranek <jsafrane@redhat.com>
-
 diff --git a/capture/capture_sync.c b/capture/capture_sync.c
-index 47a30a70c4..84d19568b0 100644
+index af08b32..2e0fcb7 100644
 --- a/capture/capture_sync.c
 +++ b/capture/capture_sync.c
-@@ -336,6 +336,7 @@ sync_pipe_start(capture_options *capture_opts, GPtrArray *capture_comments,
-     gchar *signal_pipe_name;
- #else
-     char errmsg[1024+1];
-+    const char *securitymsg = "";
-     int sync_pipe[2];                       /* pipe used to send messages from child to parent */
-     enum PIPES { PIPE_READ, PIPE_WRITE };   /* Constants 0 and 1 for PIPE_READ and PIPE_WRITE */
- #endif
-@@ -741,8 +742,10 @@ sync_pipe_start(capture_options *capture_opts, GPtrArray *capture_comments,
-         dup2(sync_pipe[PIPE_WRITE], 2);
-         ws_close(sync_pipe[PIPE_READ]);
-         execv(argv[0], argv);
--        snprintf(errmsg, sizeof errmsg, "Couldn't run %s in child process: %s",
--                   argv[0], g_strerror(errno));
-+        if (errno == EPERM || errno == EACCES)
-+            securitymsg = "\nAre you a member of the 'wireshark' group? Try running\n'usermod -a -G wireshark _your_username_' as root.";
-+        snprintf(errmsg, sizeof errmsg, "Couldn't run %s in child process: %s%s",
-+                   argv[0], g_strerror(errno), securitymsg);
-         sync_pipe_errmsg_to_parent(2, errmsg, "");
- 
-         /* Exit with "_exit()", so that we don't close the connection
-@@ -846,6 +849,7 @@ sync_pipe_open_command(char* const argv[], int *data_read_fd,
-     int i;
- #else
-     char errmsg[1024+1];
-+    const char *securitymsg = "";
-     int sync_pipe[2];                       /* pipe used to send messages from child to parent */
-     int data_pipe[2];                       /* pipe used to send data from child to parent */
- #endif
-@@ -994,8 +998,10 @@ sync_pipe_open_command(char* const argv[], int *data_read_fd,
-         ws_close(sync_pipe[PIPE_READ]);
-         ws_close(sync_pipe[PIPE_WRITE]);
-         execv(argv[0], argv);
--        snprintf(errmsg, sizeof errmsg, "Couldn't run %s in child process: %s",
--                   argv[0], g_strerror(errno));
-+        if (errno == EPERM || errno == EACCES)
-+            securitymsg = "\nAre you a member of the 'wireshark' group? Try running\n'usermod -a -G wireshark _your_username_' as root.";
-+        snprintf(errmsg, sizeof errmsg, "Couldn't run %s in child process: %s%s",
-+                   argv[0], g_strerror(errno), securitymsg);
-         sync_pipe_errmsg_to_parent(2, errmsg, "");
- 
-         /* Exit with "_exit()", so that we don't close the connection
+@@ -1825,8 +1832,16 @@ sync_pipe_input_cb(GIOChannel *pipe_io, capture_session *cap_session)
+         if (!ws_strtoi32(buffer, NULL, &exec_errno)) {
+             ws_warning("Invalid errno: %s", buffer);
+         }
+-        primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s",
++        if (exec_errno == EPERM || exec_errno == EACCES) {
++            const char *securitymsg = "\nAre you a member of the 'wireshark' group? Try running\n'usermod -a -G wireshark _your_username_' as root.";
++            primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s%s",
++                                       g_strerror(exec_errno), securitymsg);
++        }
++        else {
++            primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s",
+                                        g_strerror(exec_errno));
++        }
++
+         cap_session->error(cap_session, primary_msg, NULL);
+         /* the capture child will close the sync_pipe, nothing to do for now */
+         /* (an error message doesn't mean we have to stop capturing) */

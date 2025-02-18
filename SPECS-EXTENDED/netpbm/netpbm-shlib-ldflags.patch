@@ -1,0 +1,13 @@
+diff --git a/config.mk.in b/config.mk.in
+index 50687ba..d35c982 100644
+--- a/config.mk.in
++++ b/config.mk.in
+@@ -250,7 +250,7 @@ EXE =
+ 
+ # Here, $(SONAME) resolves to the soname for the shared library being created.
+ # The following are gcc options.  This works on GNU libc systems.
+-LDSHLIB = -shared -Wl,-soname,$(SONAME)
++LDSHLIB = $(LDFLAGS) -shared -Wl,-soname,$(SONAME)
+ # You need -nostart instead of -shared on BeOS.  Though the BeOS compiler is
+ # ostensibly gcc, it has the -nostart option, which is not mentioned in gcc
+ # documentation and doesn't exist in at least one non-BeOS installation.

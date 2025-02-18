@@ -1,0 +1,20 @@
+--- cbindgen-0.27.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cbindgen-0.27.0/Cargo.toml	2024-10-09T17:50:19.136975+00:00
+@@ -63,7 +63,7 @@
+ optional = true
+ 
+ [dependencies.heck]
+-version = "0.4"
++version = "0.5"
+ 
+ [dependencies.indexmap]
+ version = "2.1.0"
+@@ -107,7 +107,7 @@
+ version = "1.4.0"
+ 
+ [dev-dependencies.serial_test]
+-version = "2.0.0"
++version = "3.1"
+ default-features = false
+ 
+ [features]

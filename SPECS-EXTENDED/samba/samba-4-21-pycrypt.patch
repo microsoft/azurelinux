@@ -1,0 +1,943 @@
+From 07fe7b437c695c7a715418d4414c930b72758dab Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Thu, 5 Dec 2024 16:35:51 +1300
+Subject: [PATCH 01/11] util: add a crypt wrapper, derived from
+ dsdb:password_hash
+
+This is going to be used by the dsdb password_hash module, and exposed
+to Python via pyglue.
+
+We're doing this because Python 3.13 has dropped crypt from the Python
+standard library.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 833455c7f9f71583d567e3a53e854567cd8c3b0b)
+---
+ lib/util/util_crypt.c  | 90 ++++++++++++++++++++++++++++++++++++++++++
+ lib/util/util_crypt.h  |  5 +++
+ lib/util/wscript_build |  6 +++
+ 3 files changed, 101 insertions(+)
+ create mode 100644 lib/util/util_crypt.c
+ create mode 100644 lib/util/util_crypt.h
+
+diff --git a/lib/util/util_crypt.c b/lib/util/util_crypt.c
+new file mode 100644
+index 00000000000..0f7b2d0fd31
+--- /dev/null
++++ b/lib/util/util_crypt.c
+@@ -0,0 +1,90 @@
++#include <replace.h>
++#include "data_blob.h"
++#include <talloc.h>
++#include <crypt.h>
++#include "util_crypt.h"
++
++
++static int crypt_as_best_we_can(const char *phrase,
++				const char *setting,
++				const char **hashp)
++{
++	int ret = 0;
++	const char *hash = NULL;
++
++#if defined(HAVE_CRYPT_R) || defined(HAVE_CRYPT_RN)
++	struct crypt_data crypt_data = {
++		.initialized = 0        /* working storage used by crypt */
++	};
++#endif
++
++	/*
++	 * crypt_r() and crypt() may return a null pointer upon error
++	 * depending on how libcrypt was configured, so we prefer
++	 * crypt_rn() from libcrypt / libxcrypt which always returns
++	 * NULL on error.
++	 *
++	 * POSIX specifies returning a null pointer and setting
++	 * errno.
++	 *
++	 * RHEL 7 (which does not use libcrypt / libxcrypt) returns a
++	 * non-NULL pointer from crypt_r() on success but (always?)
++	 * sets errno during internal processing in the NSS crypto
++	 * subsystem.
++	 *
++	 * By preferring crypt_rn we avoid the 'return non-NULL but
++	 * set-errno' that we otherwise cannot tell apart from the
++	 * RHEL 7 behaviour.
++	 */
++	errno = 0;
++
++#ifdef HAVE_CRYPT_RN
++	hash = crypt_rn(phrase, setting,
++			&crypt_data,
++			sizeof(crypt_data));
++#elif HAVE_CRYPT_R
++	hash = crypt_r(phrase, setting, &crypt_data);
++#else
++	/*
++	 * No crypt_r falling back to crypt, which is NOT thread safe
++	 * Thread safety MT-Unsafe race:crypt
++	 */
++	hash = crypt(phrase, setting);
++#endif
++	/*
++	* On error, crypt() and crypt_r() may return a null pointer,
++	* or a pointer to an invalid hash beginning with a '*'.
++	*/
++	ret = errno;
++	errno = 0;
++	if (hash == NULL || hash[0] == '*') {
++		if (ret == 0) {
++			/* this is annoying */
++			ret = ENOTRECOVERABLE;
++		}
++	}
++
++	*hashp = hash;
++	return ret;
++}
++
++
++int talloc_crypt_blob(TALLOC_CTX *mem_ctx,
++		      const char *phrase,
++		      const char *setting,
++		      DATA_BLOB *blob)
++{
++	const char *hash = NULL;
++	int ret = crypt_as_best_we_can(phrase, setting, &hash);
++	if (ret != 0) {
++		blob->data = NULL;
++		blob->length = 0;
++		return ret;
++	}
++	blob->length = strlen(hash);
++	blob->data = talloc_memdup(mem_ctx, hash, blob->length);
++	if (blob->data == NULL) {
++		return ENOMEM;
++	}
++	return 0;
++}
+diff --git a/lib/util/util_crypt.h b/lib/util/util_crypt.h
+new file mode 100644
+index 00000000000..8c289e489e8
+--- /dev/null
++++ b/lib/util/util_crypt.h
+@@ -0,0 +1,5 @@
++
++int talloc_crypt_blob(TALLOC_CTX *mem_ctx,
++		      const char *phrase,
++		      const char *cmd,
++		      DATA_BLOB *blob);
+diff --git a/lib/util/wscript_build b/lib/util/wscript_build
+index b4fcfeaba07..7de9c0b7b17 100644
+--- a/lib/util/wscript_build
++++ b/lib/util/wscript_build
+@@ -253,6 +253,12 @@ else:
+                       private_library=True,
+                       local_include=False)
+ 
++    bld.SAMBA_LIBRARY('util_crypt',
++                      source='util_crypt.c',
++                      deps='talloc crypt',
++                      private_library=True,
++                      local_include=False)
++
+ 
+     bld.SAMBA_SUBSYSTEM('UNIX_PRIVS',
+                         source='unix_privs.c',
+-- 
+2.48.1
+
+
+From adf180613e4172292090d4c3573a439388a09788 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 14:29:21 +1300
+Subject: [PATCH 02/11] dsdb:password_hash: move hash_blob allocation up
+
+This will make the next patch simpler.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 1edb12f79593d0b2aac36d5acdaaae6f495772f6)
+---
+ source4/dsdb/samdb/ldb_modules/password_hash.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/source4/dsdb/samdb/ldb_modules/password_hash.c b/source4/dsdb/samdb/ldb_modules/password_hash.c
+index 1d1267624e2..c1902126a72 100644
+--- a/source4/dsdb/samdb/ldb_modules/password_hash.c
++++ b/source4/dsdb/samdb/ldb_modules/password_hash.c
+@@ -1649,6 +1649,13 @@ static int setup_primary_userPassword_hash(
+ 		}
+ 	}
+ 
++	hash_blob = talloc_zero(ctx, DATA_BLOB);
++
++	if (hash_blob == NULL) {
++		TALLOC_FREE(frame);
++		return ldb_oom(ldb);
++	}
++
+ 	/*
+ 	 * Relies on the assertion that cleartext_utf8->data is a zero
+ 	 * terminated UTF-8 string
+@@ -1712,15 +1719,10 @@ static int setup_primary_userPassword_hash(
+ 			scheme,
+ 			reason);
+ 		TALLOC_FREE(frame);
++		TALLOC_FREE(hash_blob);
+ 		return LDB_ERR_OPERATIONS_ERROR;
+ 	}
+ 
+-	hash_blob = talloc_zero(ctx, DATA_BLOB);
+-
+-	if (hash_blob == NULL) {
+-		TALLOC_FREE(frame);
+-		return ldb_oom(ldb);
+-	}
+ 
+ 	*hash_blob =  data_blob_talloc(hash_blob,
+ 				       (const uint8_t *)hash,
+-- 
+2.48.1
+
+
+From 9d43e4d649db23549bbb230ed60426fa286b7ab7 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Thu, 12 Dec 2024 11:16:22 +1300
+Subject: [PATCH 03/11] dsdb:password_hash: use talloc_crypt_blob()
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit c7597380b479208e33a403211cec9b3c7bd3f034)
+---
+ .../dsdb/samdb/ldb_modules/password_hash.c    | 68 ++++---------------
+ .../samdb/ldb_modules/wscript_build_server    |  2 +-
+ 2 files changed, 13 insertions(+), 57 deletions(-)
+
+diff --git a/source4/dsdb/samdb/ldb_modules/password_hash.c b/source4/dsdb/samdb/ldb_modules/password_hash.c
+index c1902126a72..7a7114c1caa 100644
+--- a/source4/dsdb/samdb/ldb_modules/password_hash.c
++++ b/source4/dsdb/samdb/ldb_modules/password_hash.c
+@@ -51,6 +51,7 @@
+ #include "auth/common_auth.h"
+ #include "lib/messaging/messaging.h"
+ #include "lib/param/loadparm.h"
++#include "lib/util/util_crypt.h"
+ 
+ #include "lib/crypto/gnutls_helpers.h"
+ #include <gnutls/crypto.h>
+@@ -1592,16 +1593,11 @@ static int setup_primary_userPassword_hash(
+ 	struct ldb_context *ldb = ldb_module_get_ctx(io->ac->module);
+ 	const char *salt = NULL;        /* Randomly generated salt */
+ 	const char *cmd = NULL;         /* command passed to crypt */
+-	const char *hash = NULL;        /* password hash generated by crypt */
+ 	int algorithm = 0;              /* crypt hash algorithm number */
+ 	int rounds = 0;                 /* The number of hash rounds */
++	int ret;
+ 	DATA_BLOB *hash_blob = NULL;
+ 	TALLOC_CTX *frame = talloc_stackframe();
+-#if defined(HAVE_CRYPT_R) || defined(HAVE_CRYPT_RN)
+-	struct crypt_data crypt_data = {
+-		.initialized = 0        /* working storage used by crypt */
+-	};
+-#endif
+ 
+ 	/* Generate a random password salt */
+ 	salt = generate_random_str_list(frame,
+@@ -1660,52 +1656,20 @@ static int setup_primary_userPassword_hash(
+ 	 * Relies on the assertion that cleartext_utf8->data is a zero
+ 	 * terminated UTF-8 string
+ 	 */
+-
+-	/*
+-	 * crypt_r() and crypt() may return a null pointer upon error
+-	 * depending on how libcrypt was configured, so we prefer
+-	 * crypt_rn() from libcrypt / libxcrypt which always returns
+-	 * NULL on error.
+-	 *
+-	 * POSIX specifies returning a null pointer and setting
+-	 * errno.
+-	 *
+-	 * RHEL 7 (which does not use libcrypt / libxcrypt) returns a
+-	 * non-NULL pointer from crypt_r() on success but (always?)
+-	 * sets errno during internal processing in the NSS crypto
+-	 * subsystem.
+-	 *
+-	 * By preferring crypt_rn we avoid the 'return non-NULL but
+-	 * set-errno' that we otherwise cannot tell apart from the
+-	 * RHEL 7 behaviour.
+-	 */
+-	errno = 0;
+-
+-#ifdef HAVE_CRYPT_RN
+-	hash = crypt_rn((char *)io->n.cleartext_utf8->data,
+-			cmd,
+-			&crypt_data,
+-			sizeof(crypt_data));
+-#elif HAVE_CRYPT_R
+-	hash = crypt_r((char *)io->n.cleartext_utf8->data, cmd, &crypt_data);
+-#else
+-	/*
+-	 * No crypt_r falling back to crypt, which is NOT thread safe
+-	 * Thread safety MT-Unsafe race:crypt
+-	 */
+-	hash = crypt((char *)io->n.cleartext_utf8->data, cmd);
+-#endif
+-	/*
+-	* On error, crypt() and crypt_r() may return a null pointer,
+-	* or a pointer to an invalid hash beginning with a '*'.
+-	*/
+-	if (hash == NULL || hash[0] == '*') {
++	ret = talloc_crypt_blob(hash_blob,
++				(char *)io->n.cleartext_utf8->data,
++				cmd,
++				hash_blob);
++	if (ret != 0) {
+ 		char buf[1024];
+ 		const char *reason = NULL;
+-		if (errno == ERANGE) {
++		if (ret == ERANGE) {
+ 			reason = "Password exceeds maximum length allowed for crypt() hashing";
++		} else if (ret == ENOTRECOVERABLE) {
++			/* probably weird RHEL7 crypt, see talloc_crypt_blob() */
++			reason = "Unknown error";
+ 		} else {
+-			int err = strerror_r(errno, buf, sizeof(buf));
++			int err = strerror_r(ret, buf, sizeof(buf));
+ 			if (err == 0) {
+ 				reason = buf;
+ 			} else {
+@@ -1723,14 +1687,6 @@ static int setup_primary_userPassword_hash(
+ 		return LDB_ERR_OPERATIONS_ERROR;
+ 	}
+ 
+-
+-	*hash_blob =  data_blob_talloc(hash_blob,
+-				       (const uint8_t *)hash,
+-				       strlen(hash));
+-	if (hash_blob->data == NULL) {
+-		TALLOC_FREE(frame);
+-		return ldb_oom(ldb);
+-	}
+ 	hash_value->value = hash_blob;
+ 	TALLOC_FREE(frame);
+ 	return LDB_SUCCESS;
+diff --git a/source4/dsdb/samdb/ldb_modules/wscript_build_server b/source4/dsdb/samdb/ldb_modules/wscript_build_server
+index 9c1eb12a7c2..16d9b31a982 100644
+--- a/source4/dsdb/samdb/ldb_modules/wscript_build_server
++++ b/source4/dsdb/samdb/ldb_modules/wscript_build_server
+@@ -195,7 +195,7 @@ bld.SAMBA_MODULE('ldb_password_hash',
+ 	init_function='ldb_password_hash_module_init',
+ 	module_init_name='ldb_init_module',
+ 	internal_module=False,
+-	deps='talloc samdb LIBCLI_AUTH NDR_DRSBLOBS authkrb5 krb5 gpgme DSDB_MODULE_HELPERS crypt db-glue'
++	deps='talloc samdb LIBCLI_AUTH NDR_DRSBLOBS authkrb5 krb5 gpgme DSDB_MODULE_HELPERS util_crypt db-glue'
+ 	)
+ 
+ 
+-- 
+2.48.1
+
+
+From 1c94645881bd5130c67bfee96aa463f360df300a Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 14:30:04 +1300
+Subject: [PATCH 04/11] util: add a crypt strerror helper
+
+This will be used by Python also.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 5f365e71c1fa8cdc533159283a5977164b5d39f2)
+---
+ lib/util/util_crypt.c                         | 24 +++++++++++++++++++
+ lib/util/util_crypt.h                         |  2 ++
+ .../dsdb/samdb/ldb_modules/password_hash.c    | 16 +------------
+ 3 files changed, 27 insertions(+), 15 deletions(-)
+
+diff --git a/lib/util/util_crypt.c b/lib/util/util_crypt.c
+index 0f7b2d0fd31..09cd47597d1 100644
+--- a/lib/util/util_crypt.c
++++ b/lib/util/util_crypt.c
+@@ -88,3 +88,27 @@ int talloc_crypt_blob(TALLOC_CTX *mem_ctx,
+ 	}
+ 	return 0;
+ }
++
++
++char *talloc_crypt_errstring(TALLOC_CTX *mem_ctx, int error)
++{
++	char buf[1024];
++	int err;
++	if (error == ERANGE) {
++		return talloc_strdup(
++			mem_ctx,
++			"Password exceeds maximum length allowed for crypt() hashing");
++	}
++	if (error == ENOTRECOVERABLE) {
++		/* probably weird RHEL7 crypt, see crypt_as_best_we_can() */
++		goto unknown;
++	}
++
++	err = strerror_r(error, buf, sizeof(buf));
++	if (err != 0) {
++		goto unknown;
++	}
++	return talloc_strndup(mem_ctx, buf, sizeof(buf));
++unknown:
++	return talloc_strdup(mem_ctx, "Unknown error");
++}
+diff --git a/lib/util/util_crypt.h b/lib/util/util_crypt.h
+index 8c289e489e8..ca1a58e922c 100644
+--- a/lib/util/util_crypt.h
++++ b/lib/util/util_crypt.h
+@@ -3,3 +3,5 @@ int talloc_crypt_blob(TALLOC_CTX *mem_ctx,
+ 		      const char *phrase,
+ 		      const char *cmd,
+ 		      DATA_BLOB *blob);
++
++char *talloc_crypt_errstring(TALLOC_CTX *mem_ctx, int error);
+diff --git a/source4/dsdb/samdb/ldb_modules/password_hash.c b/source4/dsdb/samdb/ldb_modules/password_hash.c
+index 7a7114c1caa..6949a92fc3e 100644
+--- a/source4/dsdb/samdb/ldb_modules/password_hash.c
++++ b/source4/dsdb/samdb/ldb_modules/password_hash.c
+@@ -1661,21 +1661,7 @@ static int setup_primary_userPassword_hash(
+ 				cmd,
+ 				hash_blob);
+ 	if (ret != 0) {
+-		char buf[1024];
+-		const char *reason = NULL;
+-		if (ret == ERANGE) {
+-			reason = "Password exceeds maximum length allowed for crypt() hashing";
+-		} else if (ret == ENOTRECOVERABLE) {
+-			/* probably weird RHEL7 crypt, see talloc_crypt_blob() */
+-			reason = "Unknown error";
+-		} else {
+-			int err = strerror_r(ret, buf, sizeof(buf));
+-			if (err == 0) {
+-				reason = buf;
+-			} else {
+-				reason = "Unknown error";
+-			}
+-		}
++		const char *reason = talloc_crypt_errstring(frame, ret);
+ 		ldb_asprintf_errstring(
+ 			ldb,
+ 			"setup_primary_userPassword: generation of a %s "
+-- 
+2.48.1
+
+
+From ce70e852783ec69104d274def931e7d39f17576a Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 14:30:15 +1300
+Subject: [PATCH 05/11] pyglue: add crypt() function
+
+This wraps talloc_crypt_blob() from lib/util/util_crypt.c which in
+turn wraps the system crypt[_r[n]].
+
+We want this because the Python standard library crypt module is going
+away. That one also wrapped the system crypt or crypt_r, so there
+should be no change.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(backported from commit 88e3c82d88a68cf972f8189e1c3718698b49974a)
+---
+ python/pyglue.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ python/wscript  |  1 +
+ 2 files changed, 42 insertions(+)
+
+diff --git a/python/pyglue.c b/python/pyglue.c
+index 042bf9e14f3..fcccb849f5e 100644
+--- a/python/pyglue.c
++++ b/python/pyglue.c
+@@ -18,6 +18,7 @@
+ */
+ 
+ #include "lib/replace/system/python.h"
++#include "pyerrors.h"
+ #include "python/py3compat.h"
+ #include "includes.h"
+ #include "python/modules.h"
+@@ -25,6 +26,7 @@
+ #include "param/pyparam.h"
+ #include "lib/socket/netif.h"
+ #include "lib/util/debug.h"
++#include "lib/util/util_crypt.h"
+ #include "librpc/ndr/ndr_private.h"
+ #include "lib/cmdline/cmdline.h"
+ #include "lib/crypto/gkdi.h"
+@@ -519,6 +521,42 @@ static PyObject *py_get_burnt_commandline(PyObject *self, PyObject *args)
+ 	return ret;
+ }
+ 
++static PyObject *py_crypt(PyObject *self, PyObject *args)
++{
++	PyObject *py_hash = NULL;
++	char *phrase = NULL;
++	char *setting = NULL;
++	TALLOC_CTX *frame = NULL;
++	int ret;
++	DATA_BLOB hash = {};
++
++	if (!PyArg_ParseTuple(args, "ss", &phrase, &setting)) {
++		TALLOC_FREE(frame);
++		return NULL;
++	}
++	frame = talloc_stackframe();
++	ret = talloc_crypt_blob(frame, phrase, setting, &hash);
++	if (ret != 0) {
++		const char *errstr = talloc_crypt_errstring(frame, ret);
++		if (ret == EINVAL || ret == ERANGE || ret == ENOTRECOVERABLE) {
++			PyErr_Format(PyExc_ValueError,
++				     "could not crypt(): %s",
++				     errstr);
++		} else {
++			PyErr_Format(PyExc_OSError,
++				     "could not crypt(): %s",
++				     errstr);
++		}
++		TALLOC_FREE(frame);
++		return NULL;
++	}
++
++	py_hash = PyUnicode_FromStringAndSize((char *)hash.data, hash.length);
++	TALLOC_FREE(frame);
++	return py_hash;
++}
++
++
+ static PyMethodDef py_misc_methods[] = {
+ 	{ "generate_random_str", (PyCFunction)py_generate_random_str, METH_VARARGS,
+ 		"generate_random_str(len) -> string\n"
+@@ -580,6 +618,9 @@ static PyMethodDef py_misc_methods[] = {
+ 		METH_NOARGS, "How many NDR internal tokens is too many for this build?" },
+ 	{ "get_burnt_commandline", (PyCFunction)py_get_burnt_commandline,
+ 		METH_VARARGS, "Return a redacted commandline to feed to setproctitle (None if no redaction required)" },
++	{ "crypt", (PyCFunction)py_crypt,
++		METH_VARARGS,
++		"encrypt as phrase, per crypt(3), as determined by setting." },
+ 	{0}
+ };
+ 
+diff --git a/python/wscript b/python/wscript
+index 3e6439930e9..7c17e390dc7 100644
+--- a/python/wscript
++++ b/python/wscript
+@@ -119,6 +119,7 @@ def build(bld):
+                               ndr
+                               cmdline
+                               gkdi
++                              util_crypt
+                               %s
+                               ''' % (pyparam_util, pytalloc_util),
+                      realname='samba/_glue.so')
+-- 
+2.48.1
+
+
+From 9a0dc2db7cde22f36583159c0d697a3de6640990 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Thu, 12 Dec 2024 10:44:07 +1300
+Subject: [PATCH 06/11] pytest: test that _glue.crypt works
+
+The test vectors were generated via Python 3.10 crypt module, which
+directly wraps crypt(3), which in this case is from glibc 2.39-0ubuntu8.3.
+
+We mainly test the sha256 and sha512 vectors, which seems to be all we
+use, and which are said to be widely supported.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 5636d30c0959fd4a211ee7b8d1b267dcdbf0b963)
+---
+ python/samba/tests/glue.py | 65 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/python/samba/tests/glue.py b/python/samba/tests/glue.py
+index ac504b3f366..824f5ca0c81 100644
+--- a/python/samba/tests/glue.py
++++ b/python/samba/tests/glue.py
+@@ -88,3 +88,68 @@ class GlueTests(samba.tests.TestCase):
+         self.assertEqual(_glue.strstr_m(string, '_'), '_string_num__one')
+         self.assertEqual(_glue.strstr_m(string, '__'), '__one')
+         self.assertEqual(_glue.strstr_m(string, 'ring'), 'ring_num__one')
++
++    def test_crypt(self):
++        # We hopefully only use schemes 5 and 6 (sha256 and sha512),
++        # which are OK and also quite widely supported according to
++        # https://en.wikipedia.org/wiki/Crypt_(C)
++        for phrase, setting, expected in [
++                ("a", "$5$aaaaaa",
++                 "$5$aaaaaa$F4lxguL7mZR7TGlvukPTJIxoRhVmHMZs8ZdH8oDP0.6"),
++                # with scheme 5, 5000 rounds is default, so hash is the same as above
++                ('a', '$5$rounds=5000$aaaaaa',
++                 '$5$rounds=5000$aaaaaa$F4lxguL7mZR7TGlvukPTJIxoRhVmHMZs8ZdH8oDP0.6'),
++                ('a',
++                 '$5$rounds=4999$aaaaaa',
++                 '$5$rounds=4999$aaaaaa$FiP70gtxOJUFLokUJvET06E7jbL6aNmF6Wtv2ddzjY8'),
++                ('a', '$5$aaaaab',
++                 '$5$aaaaab$e9qR2F833/JyuMu.nkQc9kn184vBWLo0ODqnCe./mj0'),
++
++                ('', '$5$aaaaaa', '$5$aaaaaa$5B4WTdWp5n/v/aNUw2N8RsEitqvlZJEaAKhH/pOkGg4'),
++
++                ("a", "$6$aaaaaa",
++                 "$6$aaaaaa$KHs/Ez7X/I5/K.V8FR7kEsx9rOvjXnEDUmGC.dLBWP87XWy.oUEAM7QYcZQRVhiDwGepOF2pKrCVETYLyASh60"),
++
++                ('', '$5$', '$5$$3c2QQ0KjIU1OLtB29cl8Fplc2WN7X89bnoEjaR7tWu.'),
++
++                # scheme 1 (md5) should be supported if not used
++                ('a', '$1$aaaaaa',
++                 '$1$aaaaaa$MUMWPbGfzrHFCNm7ZHg31.'),
++
++                ('', '$6$',
++                 '$6$$/chiBau24cE26QQVW3IfIe68Xu5.JQ4E8Ie7lcRLwqxO5cxGuBhqF2HmTL.zWJ9zjChg3yJYFXeGBQ2y3Ba1d1'),
++                (' ',
++                 '$6$6',
++                 '$6$6$asLnbxf0obyuv3ybNvDE9ZcdwGFkDhLe7uW.wzdOdKCm4/M3vGFKq4Ttk1tBQrOn4wALZ3tj1L8IarIu5i8hR/'),
++
++                # original DES scheme, 12 bits of salt
++                ("a", "lalala", "laKGbFzgh./R2"),
++                ("a", "lalalaLALALAla", "laKGbFzgh./R2"),
++                ("a", "arrgh", "ar7VUiUvDhX2c"),
++                ("a", "arrggghhh", "ar7VUiUvDhX2c"),
++                ]:
++            hash = _glue.crypt(phrase, setting)
++            self.assertEqual(hash, expected)
++
++    def test_crypt_bad(self):
++        # We can't be too strident in our assertions, because every
++        # system allows a different set of algorithms, and some have
++        # different ideas of how to parse.
++        for phrase, setting, exception in [
++                ("a", "$5", ValueError),
++                ("a", "$0$", ValueError),
++                ("a", None, TypeError),
++                (None, "", TypeError),
++                ('a', '$66$', ValueError),
++                ('a', '$$', ValueError),
++                ('a', '*0', ValueError),
++                ('a', '*', ValueError),
++                ('a', '++', ValueError),
++                # this next one is too long, except on Rocky Linux 8.
++                #('a' * 10000, '$5$5', ValueError),
++                # this is invalid, except on Debian 11.
++                # (' ', '$6$ ', ValueError),
++                ]:
++            with self.assertRaises(exception,
++                                   msg=f"crypt({phrase!r}, {setting!r}) didn't fail"):
++                _glue.crypt(phrase, setting)
+-- 
+2.48.1
+
+
+From 6425e2514052027ee2269e15e0e0dff1686fa34e Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 15:54:48 +1300
+Subject: [PATCH 07/11] samba-tool user: use _glue.crypt, not crypt.crypt
+
+Because we know we have _glue.crypt, and we know it raises exceptions
+rather than returning None, we can simplify the checks.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 405187d2ef4920a9a284649c9c3287f5844d5180)
+---
+ .../samba/netcmd/user/readpasswords/common.py | 21 ++++++-------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
+
+diff --git a/python/samba/netcmd/user/readpasswords/common.py b/python/samba/netcmd/user/readpasswords/common.py
+index 7944d4e1682..68befb3f356 100644
+--- a/python/samba/netcmd/user/readpasswords/common.py
++++ b/python/samba/netcmd/user/readpasswords/common.py
+@@ -37,6 +37,7 @@ from samba.netcmd import Command, CommandError
+ from samba.samdb import SamDB
+ from samba.nt_time import timedelta_from_nt_time_delta, nt_time_from_datetime
+ from samba.gkdi import MAX_CLOCK_SKEW
++from samba._glue import crypt
+ 
+ # python[3]-gpgme is abandoned since ubuntu 1804 and debian 9
+ # have to use python[3]-gpg instead
+@@ -132,9 +133,7 @@ def get_crypt_value(alg, utf8pw, rounds=0):
+     else:
+         crypt_salt = "$%s$%s$" % (alg, b64salt)
+ 
+-    crypt_value = crypt.crypt(utf8pw, crypt_salt)
+-    if crypt_value is None:
+-        raise NotImplementedError("crypt.crypt(%s) returned None" % (crypt_salt))
++    crypt_value = crypt(utf8pw, crypt_salt)
+     expected_len = len(crypt_salt) + algs[alg]["length"]
+     if len(crypt_value) != expected_len:
+         raise NotImplementedError("crypt.crypt(%s) returned a value with length %d, expected length is %d" % (
+@@ -156,21 +155,13 @@ except ImportError as e:
+ 
+ for (alg, attr) in [("5", "virtualCryptSHA256"), ("6", "virtualCryptSHA512")]:
+     try:
+-        import crypt
+         get_crypt_value(alg, "")
+-        virtual_attributes[attr] = {
+-        }
+-    except ImportError as e:
+-        reason = "crypt"
+-        reason += " required"
+-        disabled_virtual_attributes[attr] = {
+-            "reason": reason,
+-        }
+-    except NotImplementedError as e:
+-        reason = "modern '$%s$' salt in crypt(3) required" % (alg)
++    except (ValueError, OSError):
+         disabled_virtual_attributes[attr] = {
+-            "reason": reason,
++            "reason": f"modern '${alg}$' salt in crypt(3) required"
+         }
++        continue
++    virtual_attributes[attr] = {}
+ 
+ # Add the wDigest virtual attributes, virtualWDigest01 to virtualWDigest29
+ for x in range(1, 30):
+-- 
+2.48.1
+
+
+From a2a04286e13676177c952e67363fc7502f544861 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 15:56:20 +1300
+Subject: [PATCH 08/11] samba-tool user: hashlib.sha1 is always present
+
+We maybe thought we were checking that sha1 was in hashlib, but we were
+only checking that hashlib is in the Python library (`hashlib.sha1()`
+would not raise ImportError).
+
+The documentation says hashlib always contains sha1 -- if that
+changes, it is better we know by failing noisily with the import error
+at the top of the file.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 4af4dd8135e8edbe2a16cfdfc7ded8c145c82e98)
+---
+ python/samba/netcmd/user/readpasswords/common.py | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/python/samba/netcmd/user/readpasswords/common.py b/python/samba/netcmd/user/readpasswords/common.py
+index 68befb3f356..3043525874e 100644
+--- a/python/samba/netcmd/user/readpasswords/common.py
++++ b/python/samba/netcmd/user/readpasswords/common.py
+@@ -26,6 +26,7 @@ import datetime
+ import errno
+ import io
+ import os
++from hashlib import sha1
+ 
+ import ldb
+ from samba import credentials, nttime2float
+@@ -141,17 +142,8 @@ def get_crypt_value(alg, utf8pw, rounds=0):
+     return crypt_value
+ 
+ 
+-try:
+-    import hashlib
+-    hashlib.sha1()
+-    virtual_attributes["virtualSSHA"] = {
+-    }
+-except ImportError as e:
+-    reason = "hashlib.sha1()"
+-    reason += " required"
+-    disabled_virtual_attributes["virtualSSHA"] = {
+-        "reason": reason,
+-    }
++
++virtual_attributes["virtualSSHA"] = {}
+ 
+ for (alg, attr) in [("5", "virtualCryptSHA256"), ("6", "virtualCryptSHA512")]:
+     try:
+@@ -736,7 +728,7 @@ class GetPasswordCommand(Command):
+                 if u8 is None:
+                     continue
+                 salt = os.urandom(4)
+-                h = hashlib.sha1()
++                h = sha1()
+                 h.update(u8)
+                 h.update(salt)
+                 bv = h.digest() + salt
+-- 
+2.48.1
+
+
+From e9a8748f3cc4ba74f8b0d75e7a01866e7c12a0a4 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Thu, 12 Dec 2024 10:46:16 +1300
+Subject: [PATCH 09/11] pytest: password_hash uses internal _glue.crypt
+
+This will remove an external dependency.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 552053b6445611ecef6ac4c11c55ebf92f03571d)
+---
+ python/samba/tests/password_hash.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/python/samba/tests/password_hash.py b/python/samba/tests/password_hash.py
+index 1b7af7de7b8..39ef13fd7b2 100644
+--- a/python/samba/tests/password_hash.py
++++ b/python/samba/tests/password_hash.py
+@@ -30,11 +30,11 @@ from samba.dcerpc.samr import DOMAIN_PASSWORD_STORE_CLEARTEXT
+ from samba.dsdb import UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED
+ from samba.tests import delete_force
+ from samba.tests.password_test import PasswordCommon
++from samba._glue import crypt
+ import ldb
+ import samba
+ import binascii
+ from hashlib import md5
+-import crypt
+ 
+ 
+ USER_NAME = "PasswordHashTestUser"
+@@ -321,7 +321,7 @@ class PassWordHashTests(TestCase):
+                 cmd = "$%s$rounds=%d$%s" % (alg, rounds, data[3])
+ 
+             # Calculate the expected hash value
+-            expected = crypt.crypt(USER_PASS, cmd)
++            expected = crypt(USER_PASS, cmd)
+             self.assertEqual(expected, up.hashes[i].value.decode('utf8'))
+             i += 1
+ 
+-- 
+2.48.1
+
+
+From 0e01dc4f1fabfd2c3f21f724c05d94227a278b20 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 11 Dec 2024 14:31:18 +1300
+Subject: [PATCH 10/11] util:datablob: data_blob_pad checks its alignment
+ assumption
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15756
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+
+Autobuild-User(master): Andreas Schneider <asn@cryptomilk.org>
+Autobuild-Date(master): Fri Dec 20 07:59:51 UTC 2024 on atb-devel-224
+
+(cherry picked from commit 8b84282008dc372d67ba01c8fe256ef756c3dcfb)
+---
+ lib/util/data_blob.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/util/data_blob.c b/lib/util/data_blob.c
+index b5b78bc7a8a..0522e7755af 100644
+--- a/lib/util/data_blob.c
++++ b/lib/util/data_blob.c
+@@ -286,7 +286,7 @@ _PUBLIC_ bool data_blob_pad(TALLOC_CTX *mem_ctx, DATA_BLOB *blob,
+ 	size_t old_len = blob->length;
+ 	size_t new_len = (old_len + pad - 1) & ~(pad - 1);
+ 
+-	if (new_len < old_len) {
++	if (new_len < old_len || (pad & (pad - 1)) != 0) {
+ 		return false;
+ 	}
+ 
+-- 
+2.48.1
+
+
+From 8cfae9f33fb1c170c3fe937be200490597e9e4c2 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 17 Jan 2025 13:28:30 +0100
+Subject: [PATCH 11/11] lib:util: Fix stack-use-after-return in
+ crypt_as_best_we_can()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15784
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Pavel Filipenský <pfilipensky@samba.org>
+
+Autobuild-User(master): Douglas Bagnall <dbagnall@samba.org>
+Autobuild-Date(master): Fri Jan 17 23:21:13 UTC 2025 on atb-devel-224
+
+(cherry picked from commit 6cd9849b58ec653cbffc602e3c96996a082faf53)
+---
+ lib/util/util_crypt.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/lib/util/util_crypt.c b/lib/util/util_crypt.c
+index 09cd47597d1..9ac6e1cfd0e 100644
+--- a/lib/util/util_crypt.c
++++ b/lib/util/util_crypt.c
+@@ -1,11 +1,13 @@
+ #include <replace.h>
+ #include "data_blob.h"
++#include "discard.h"
+ #include <talloc.h>
+ #include <crypt.h>
+ #include "util_crypt.h"
+ 
+ 
+-static int crypt_as_best_we_can(const char *phrase,
++static int crypt_as_best_we_can(TALLOC_CTX *mem_ctx,
++				const char *phrase,
+ 				const char *setting,
+ 				const char **hashp)
+ {
+@@ -63,8 +65,14 @@ static int crypt_as_best_we_can(const char *phrase,
+ 			ret = ENOTRECOVERABLE;
+ 		}
+ 	}
++	if (ret != 0) {
++		return ret;
++	}
+ 
+-	*hashp = hash;
++	*hashp = talloc_strdup(mem_ctx, hash);
++	if (*hashp == NULL) {
++		ret = -1;
++	}
+ 	return ret;
+ }
+ 
+@@ -75,14 +83,14 @@ int talloc_crypt_blob(TALLOC_CTX *mem_ctx,
+ 		      DATA_BLOB *blob)
+ {
+ 	const char *hash = NULL;
+-	int ret = crypt_as_best_we_can(phrase, setting, &hash);
++	int ret = crypt_as_best_we_can(mem_ctx, phrase, setting, &hash);
+ 	if (ret != 0) {
+ 		blob->data = NULL;
+ 		blob->length = 0;
+ 		return ret;
+ 	}
+ 	blob->length = strlen(hash);
+-	blob->data = talloc_memdup(mem_ctx, hash, blob->length);
++	blob->data = discard_const_p(uint8_t, hash);
+ 	if (blob->data == NULL) {
+ 		return ENOMEM;
+ 	}
+-- 
+2.48.1
+

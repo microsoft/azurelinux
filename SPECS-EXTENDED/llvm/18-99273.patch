@@ -1,0 +1,893 @@
+From 91052169960477fbc39169c10f9fae3bec732510 Mon Sep 17 00:00:00 2001
+From: Carl Ritson <carl.ritson@amd.com>
+Date: Wed, 17 Jul 2024 15:07:42 +0900
+Subject: [PATCH 1/3] [AMDGPU] Implement workaround for GFX11.5 export priority
+
+On GFX11.5 shaders having completed exports need to execute/wait
+at a lower priority than shaders still executing exports.
+Add code to maintain normal priority of 2 for shaders that export
+and drop to priority 0 after exports.
+---
+ llvm/lib/Target/AMDGPU/AMDGPU.td              |  15 +-
+ .../lib/Target/AMDGPU/GCNHazardRecognizer.cpp | 112 ++++++
+ llvm/lib/Target/AMDGPU/GCNHazardRecognizer.h  |   1 +
+ llvm/lib/Target/AMDGPU/GCNSubtarget.h         |   3 +
+ .../AMDGPU/required-export-priority.ll        | 344 ++++++++++++++++++
+ .../AMDGPU/required-export-priority.mir       | 293 +++++++++++++++
+ 6 files changed, 765 insertions(+), 3 deletions(-)
+ create mode 100644 llvm/test/CodeGen/AMDGPU/required-export-priority.ll
+ create mode 100644 llvm/test/CodeGen/AMDGPU/required-export-priority.mir
+
+diff --git a/llvm/lib/Target/AMDGPU/AMDGPU.td b/llvm/lib/Target/AMDGPU/AMDGPU.td
+index dfc8eaea66f7b..14fcf6a210a78 100644
+--- a/llvm/lib/Target/AMDGPU/AMDGPU.td
++++ b/llvm/lib/Target/AMDGPU/AMDGPU.td
+@@ -947,6 +947,12 @@ def FeatureHasRestrictedSOffset : SubtargetFeature<"restricted-soffset",
+   "Has restricted SOffset (immediate not supported)."
+ >;
+ 
++def FeatureRequiredExportPriority : SubtargetFeature<"required-export-priority",
++  "HasRequiredExportPriority",
++  "true",
++  "Export priority must be explicitly manipulated on GFX11.5"
++>;
++
+ //===------------------------------------------------------------===//
+ // Subtarget Features (options and debugging)
+ //===------------------------------------------------------------===//
+@@ -1597,14 +1603,16 @@ def FeatureISAVersion11_5_0 : FeatureSet<
+   !listconcat(FeatureISAVersion11_Common.Features,
+     [FeatureSALUFloatInsts,
+      FeatureDPPSrc1SGPR,
+-     FeatureVGPRSingleUseHintInsts])>;
++     FeatureVGPRSingleUseHintInsts,
++     FeatureRequiredExportPriority])>;
+ 
+ def FeatureISAVersion11_5_1 : FeatureSet<
+   !listconcat(FeatureISAVersion11_Common.Features,
+     [FeatureSALUFloatInsts,
+      FeatureDPPSrc1SGPR,
+      FeatureVGPRSingleUseHintInsts,
+-     FeatureGFX11FullVGPRs])>;
++     FeatureGFX11FullVGPRs,
++     FeatureRequiredExportPriority])>;
+ 
+ def FeatureISAVersion12 : FeatureSet<
+   [FeatureGFX12,
+diff --git a/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.cpp b/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.cpp
+index a402fc6d7e611..a8b171aa82840 100644
+--- a/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.cpp
++++ b/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.cpp
+@@ -14,6 +14,7 @@
+ #include "GCNSubtarget.h"
+ #include "MCTargetDesc/AMDGPUMCTargetDesc.h"
+ #include "SIMachineFunctionInfo.h"
++#include "llvm/CodeGen/MachineFrameInfo.h"
+ #include "llvm/CodeGen/MachineFunction.h"
+ #include "llvm/CodeGen/ScheduleDAG.h"
+ #include "llvm/TargetParser/TargetParser.h"
+@@ -1104,6 +1105,7 @@ void GCNHazardRecognizer::fixHazards(MachineInstr *MI) {
+   fixWMMAHazards(MI);
+   fixShift64HighRegBug(MI);
+   fixVALUMaskWriteHazard(MI);
++  fixRequiredExportPriority(MI);
+ }
+ 
+ bool GCNHazardRecognizer::fixVcmpxPermlaneHazards(MachineInstr *MI) {
+@@ -2895,3 +2897,113 @@ bool GCNHazardRecognizer::fixVALUMaskWriteHazard(MachineInstr *MI) {
+ 
+   return true;
+ }
++
++static bool ensureEntrySetPrio(MachineFunction *MF, int Priority,
++                               const SIInstrInfo &TII) {
++  MachineBasicBlock &EntryMBB = MF->front();
++  if (EntryMBB.begin() != EntryMBB.end()) {
++    auto &EntryMI = *EntryMBB.begin();
++    if (EntryMI.getOpcode() == AMDGPU::S_SETPRIO &&
++        EntryMI.getOperand(0).getImm() >= Priority)
++      return false;
++  }
++
++  BuildMI(EntryMBB, EntryMBB.begin(), DebugLoc(), TII.get(AMDGPU::S_SETPRIO))
++      .addImm(Priority);
++  return true;
++}
++
++bool GCNHazardRecognizer::fixRequiredExportPriority(MachineInstr *MI) {
++  if (!ST.hasRequiredExportPriority())
++    return false;
++
++  // Assume the following shader types will never have exports,
++  // and avoid adding or adjusting S_SETPRIO.
++  MachineBasicBlock *MBB = MI->getParent();
++  MachineFunction *MF = MBB->getParent();
++  auto CC = MF->getFunction().getCallingConv();
++  switch (CC) {
++  case CallingConv::AMDGPU_CS:
++  case CallingConv::AMDGPU_CS_Chain:
++  case CallingConv::AMDGPU_CS_ChainPreserve:
++  case CallingConv::AMDGPU_KERNEL:
++    return false;
++  default:
++    break;
++  }
++
++  const int MaxPriority = 3;
++  const int NormalPriority = 2;
++  const int PostExportPriority = 0;
++
++  auto It = MI->getIterator();
++  switch (MI->getOpcode()) {
++  case AMDGPU::S_ENDPGM:
++  case AMDGPU::S_ENDPGM_SAVED:
++  case AMDGPU::S_ENDPGM_ORDERED_PS_DONE:
++  case AMDGPU::SI_RETURN_TO_EPILOG:
++    // Ensure shader with calls raises priority at entry.
++    // This ensures correct priority if exports exist in callee.
++    if (MF->getFrameInfo().hasCalls())
++      return ensureEntrySetPrio(MF, NormalPriority, TII);
++    return false;
++  case AMDGPU::S_SETPRIO: {
++    // Raise minimum priority unless in workaround.
++    auto &PrioOp = MI->getOperand(0);
++    int Prio = PrioOp.getImm();
++    bool InWA = (Prio == PostExportPriority) &&
++                (It != MBB->begin() && TII.isEXP(*std::prev(It)));
++    if (InWA || Prio >= NormalPriority)
++      return false;
++    PrioOp.setImm(std::min(Prio + NormalPriority, MaxPriority));
++    return true;
++  }
++  default:
++    if (!TII.isEXP(*MI))
++      return false;
++    break;
++  }
++
++  // Check entry priority at each export (as there will only be a few).
++  // Note: amdgpu_gfx can only be a callee, so defer to caller setprio.
++  bool Changed = false;
++  if (CC != CallingConv::AMDGPU_Gfx)
++    Changed = ensureEntrySetPrio(MF, NormalPriority, TII);
++
++  auto NextMI = std::next(It);
++  bool EndOfShader = false;
++  if (NextMI != MBB->end()) {
++    // Only need WA at end of sequence of exports.
++    if (TII.isEXP(*NextMI))
++      return Changed;
++    // Assume appropriate S_SETPRIO after export means WA already applied.
++    if (NextMI->getOpcode() == AMDGPU::S_SETPRIO &&
++        NextMI->getOperand(0).getImm() == PostExportPriority)
++      return Changed;
++    EndOfShader = NextMI->getOpcode() == AMDGPU::S_ENDPGM;
++  }
++
++  const DebugLoc &DL = MI->getDebugLoc();
++
++  // Lower priority.
++  BuildMI(*MBB, NextMI, DL, TII.get(AMDGPU::S_SETPRIO))
++      .addImm(PostExportPriority);
++
++  if (!EndOfShader) {
++    // Wait for exports to complete.
++    BuildMI(*MBB, NextMI, DL, TII.get(AMDGPU::S_WAITCNT_EXPCNT))
++        .addReg(AMDGPU::SGPR_NULL)
++        .addImm(0);
++  }
++
++  BuildMI(*MBB, NextMI, DL, TII.get(AMDGPU::S_NOP)).addImm(0);
++  BuildMI(*MBB, NextMI, DL, TII.get(AMDGPU::S_NOP)).addImm(0);
++
++  if (!EndOfShader) {
++    // Return to normal (higher) priority.
++    BuildMI(*MBB, NextMI, DL, TII.get(AMDGPU::S_SETPRIO))
++        .addImm(NormalPriority);
++  }
++
++  return true;
++}
+diff --git a/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.h b/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.h
+index 3ccca527c626b..f2a64ab48e180 100644
+--- a/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.h
++++ b/llvm/lib/Target/AMDGPU/GCNHazardRecognizer.h
+@@ -107,6 +107,7 @@ class GCNHazardRecognizer final : public ScheduleHazardRecognizer {
+   bool fixWMMAHazards(MachineInstr *MI);
+   bool fixShift64HighRegBug(MachineInstr *MI);
+   bool fixVALUMaskWriteHazard(MachineInstr *MI);
++  bool fixRequiredExportPriority(MachineInstr *MI);
+ 
+   int checkMAIHazards(MachineInstr *MI);
+   int checkMAIHazards908(MachineInstr *MI);
+diff --git a/llvm/lib/Target/AMDGPU/GCNSubtarget.h b/llvm/lib/Target/AMDGPU/GCNSubtarget.h
+index e5817594a4521..def89c785b855 100644
+--- a/llvm/lib/Target/AMDGPU/GCNSubtarget.h
++++ b/llvm/lib/Target/AMDGPU/GCNSubtarget.h
+@@ -238,6 +238,7 @@ class GCNSubtarget final : public AMDGPUGenSubtargetInfo,
+   bool HasVOPDInsts = false;
+   bool HasVALUTransUseHazard = false;
+   bool HasForceStoreSC0SC1 = false;
++  bool HasRequiredExportPriority = false;
+ 
+   // Dummy feature to use for assembler in tablegen.
+   bool FeatureDisable = false;
+@@ -1282,6 +1283,8 @@ class GCNSubtarget final : public AMDGPUGenSubtargetInfo,
+ 
+   bool hasRestrictedSOffset() const { return HasRestrictedSOffset; }
+ 
++  bool hasRequiredExportPriority() const { return HasRequiredExportPriority; }
++
+   /// \returns true if the target uses LOADcnt/SAMPLEcnt/BVHcnt, DScnt/KMcnt
+   /// and STOREcnt rather than VMcnt, LGKMcnt and VScnt respectively.
+   bool hasExtendedWaitCounts() const { return getGeneration() >= GFX12; }
+diff --git a/llvm/test/CodeGen/AMDGPU/required-export-priority.ll b/llvm/test/CodeGen/AMDGPU/required-export-priority.ll
+new file mode 100644
+index 0000000000000..377902f3f0d1a
+--- /dev/null
++++ b/llvm/test/CodeGen/AMDGPU/required-export-priority.ll
+@@ -0,0 +1,344 @@
++; NOTE: Assertions have been autogenerated by utils/update_llc_test_checks.py UTC_ARGS: --version 5
++; RUN: llc -mtriple=amdgcn -mcpu=gfx1150 -amdgpu-enable-vopd=0 -verify-machineinstrs < %s | FileCheck -check-prefix=GCN %s
++
++define amdgpu_ps void @test_export_zeroes_f32() #0 {
++; GCN-LABEL: test_export_zeroes_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    v_mov_b32_e32 v0, 0
++; GCN-NEXT:    exp mrt0 off, off, off, off
++; GCN-NEXT:    exp mrt0 off, off, off, off done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 0, float 0.0, float 0.0, float 0.0, float 0.0, i1 false, i1 false)
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 0, float 0.0, float 0.0, float 0.0, float 0.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_ps void @test_export_en_src0_f32() #0 {
++; GCN-LABEL: test_export_en_src0_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    v_mov_b32_e32 v0, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v1, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v2, 2.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 1.0
++; GCN-NEXT:    exp mrt0 v3, off, off, off done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 1, float 1.0, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_gs void @test_export_gs() #0 {
++; GCN-LABEL: test_export_gs:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    v_mov_b32_e32 v0, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v1, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v2, 2.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 1.0
++; GCN-NEXT:    exp mrt0 off, v2, off, off done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 2, float 1.0, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_hs void @test_export_hs() #0 {
++; GCN-LABEL: test_export_hs:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    v_mov_b32_e32 v0, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v1, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v2, 2.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 1.0
++; GCN-NEXT:    exp mrt0 off, v2, off, off done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 2, float 1.0, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_gfx void @test_export_gfx(float %v) #0 {
++; GCN-LABEL: test_export_gfx:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
++; GCN-NEXT:    v_mov_b32_e32 v1, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v2, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v3, 2.0
++; GCN-NEXT:    exp mrt0 off, v3, off, off done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_waitcnt expcnt(0)
++; GCN-NEXT:    s_setpc_b64 s[30:31]
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 2, float %v, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_cs void @test_export_cs() #0 {
++; GCN-LABEL: test_export_cs:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    v_mov_b32_e32 v0, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v1, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v2, 2.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 1.0
++; GCN-NEXT:    exp mrt0 off, v2, off, off done
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 2, float 1.0, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_kernel void @test_export_kernel() #0 {
++; GCN-LABEL: test_export_kernel:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    v_mov_b32_e32 v0, 4.0
++; GCN-NEXT:    v_mov_b32_e32 v1, 0.5
++; GCN-NEXT:    v_mov_b32_e32 v2, 2.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 1.0
++; GCN-NEXT:    exp mrt0 off, v2, off, off done
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 2, float 1.0, float 2.0, float 0.5, float 4.0, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_gfx void @test_no_export_gfx(float %v) #0 {
++; GCN-LABEL: test_no_export_gfx:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
++; GCN-NEXT:    s_setpc_b64 s[30:31]
++  ret void
++}
++
++define amdgpu_ps void @test_no_export_ps(float %v) #0 {
++; GCN-LABEL: test_no_export_ps:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_endpgm
++  ret void
++}
++
++define amdgpu_ps void @test_if_export_f32(i32 %flag, float %x, float %y, float %z, float %w) #0 {
++; GCN-LABEL: test_if_export_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_mov_b32 s0, exec_lo
++; GCN-NEXT:    v_cmpx_ne_u32_e32 0, v0
++; GCN-NEXT:    s_cbranch_execz .LBB9_2
++; GCN-NEXT:  ; %bb.1: ; %exp
++; GCN-NEXT:    exp mrt0 v1, v2, v3, v4
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:  .LBB9_2: ; %end
++; GCN-NEXT:    s_endpgm
++  %cc = icmp eq i32 %flag, 0
++  br i1 %cc, label %end, label %exp
++
++exp:
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 15, float %x, float %y, float %z, float %w, i1 false, i1 false)
++  br label %end
++
++end:
++  ret void
++}
++
++define amdgpu_ps void @test_if_export_vm_f32(i32 %flag, float %x, float %y, float %z, float %w) #0 {
++; GCN-LABEL: test_if_export_vm_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_mov_b32 s0, exec_lo
++; GCN-NEXT:    v_cmpx_ne_u32_e32 0, v0
++; GCN-NEXT:    s_cbranch_execz .LBB10_2
++; GCN-NEXT:  ; %bb.1: ; %exp
++; GCN-NEXT:    exp mrt0 v1, v2, v3, v4
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:  .LBB10_2: ; %end
++; GCN-NEXT:    s_endpgm
++  %cc = icmp eq i32 %flag, 0
++  br i1 %cc, label %end, label %exp
++
++exp:
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 15, float %x, float %y, float %z, float %w, i1 false, i1 true)
++  br label %end
++
++end:
++  ret void
++}
++
++define amdgpu_ps void @test_if_export_done_f32(i32 %flag, float %x, float %y, float %z, float %w) #0 {
++; GCN-LABEL: test_if_export_done_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_mov_b32 s0, exec_lo
++; GCN-NEXT:    v_cmpx_ne_u32_e32 0, v0
++; GCN-NEXT:    s_cbranch_execz .LBB11_2
++; GCN-NEXT:  ; %bb.1: ; %exp
++; GCN-NEXT:    exp mrt0 v1, v2, v3, v4 done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:  .LBB11_2: ; %end
++; GCN-NEXT:    s_endpgm
++  %cc = icmp eq i32 %flag, 0
++  br i1 %cc, label %end, label %exp
++
++exp:
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 15, float %x, float %y, float %z, float %w, i1 true, i1 false)
++  br label %end
++
++end:
++  ret void
++}
++
++define amdgpu_ps void @test_if_export_vm_done_f32(i32 %flag, float %x, float %y, float %z, float %w) #0 {
++; GCN-LABEL: test_if_export_vm_done_f32:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_mov_b32 s0, exec_lo
++; GCN-NEXT:    v_cmpx_ne_u32_e32 0, v0
++; GCN-NEXT:    s_cbranch_execz .LBB12_2
++; GCN-NEXT:  ; %bb.1: ; %exp
++; GCN-NEXT:    exp mrt0 v1, v2, v3, v4 done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:  .LBB12_2: ; %end
++; GCN-NEXT:    s_endpgm
++  %cc = icmp eq i32 %flag, 0
++  br i1 %cc, label %end, label %exp
++
++exp:
++  call void @llvm.amdgcn.exp.f32(i32 0, i32 15, float %x, float %y, float %z, float %w, i1 true, i1 true)
++  br label %end
++
++end:
++  ret void
++}
++
++define amdgpu_ps void @test_export_pos_before_param_across_load(i32 %idx) #0 {
++; GCN-LABEL: test_export_pos_before_param_across_load:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    buffer_load_b32 v0, v0, s[0:3], 0 offen
++; GCN-NEXT:    v_mov_b32_e32 v1, 0
++; GCN-NEXT:    v_mov_b32_e32 v2, 1.0
++; GCN-NEXT:    v_mov_b32_e32 v3, 0.5
++; GCN-NEXT:    s_waitcnt vmcnt(0)
++; GCN-NEXT:    exp pos0 v1, v1, v1, v0 done
++; GCN-NEXT:    exp invalid_target_32 v2, v2, v2, v2
++; GCN-NEXT:    exp invalid_target_33 v2, v2, v2, v3
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  call void @llvm.amdgcn.exp.f32(i32 32, i32 15, float 1.0, float 1.0, float 1.0, float 1.0, i1 false, i1 false)
++  call void @llvm.amdgcn.exp.f32(i32 33, i32 15, float 1.0, float 1.0, float 1.0, float 0.5, i1 false, i1 false)
++  %load = call float @llvm.amdgcn.raw.ptr.buffer.load.f32(ptr addrspace(8) undef, i32 %idx, i32 0, i32 0)
++  call void @llvm.amdgcn.exp.f32(i32 12, i32 15, float 0.0, float 0.0, float 0.0, float %load, i1 true, i1 false)
++  ret void
++}
++
++define amdgpu_ps void @test_export_across_store_load(i32 %idx, float %v) #0 {
++; GCN-LABEL: test_export_across_store_load:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    v_mov_b32_e32 v2, 24
++; GCN-NEXT:    v_cmp_eq_u32_e32 vcc_lo, 1, v0
++; GCN-NEXT:    s_delay_alu instid0(VALU_DEP_2)
++; GCN-NEXT:    v_cndmask_b32_e64 v0, v2, 8, vcc_lo
++; GCN-NEXT:    v_mov_b32_e32 v2, 0
++; GCN-NEXT:    scratch_store_b32 v0, v1, off
++; GCN-NEXT:    scratch_load_b32 v0, off, off
++; GCN-NEXT:    v_mov_b32_e32 v1, 1.0
++; GCN-NEXT:    exp pos0 v2, v2, v2, v1 done
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_waitcnt_expcnt null, 0x0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_waitcnt vmcnt(0)
++; GCN-NEXT:    exp invalid_target_32 v0, v2, v1, v2
++; GCN-NEXT:    exp invalid_target_33 v0, v2, v1, v2
++; GCN-NEXT:    s_setprio 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_nop 0
++; GCN-NEXT:    s_endpgm
++  %data0 = alloca <4 x float>, align 8, addrspace(5)
++  %data1 = alloca <4 x float>, align 8, addrspace(5)
++  %cmp = icmp eq i32 %idx, 1
++  %data = select i1 %cmp, ptr addrspace(5) %data0, ptr addrspace(5) %data1
++  store float %v, ptr addrspace(5) %data, align 8
++  call void @llvm.amdgcn.exp.f32(i32 12, i32 15, float 0.0, float 0.0, float 0.0, float 1.0, i1 true, i1 false)
++  %load0 = load float, ptr addrspace(5) %data0, align 8
++  call void @llvm.amdgcn.exp.f32(i32 32, i32 15, float %load0, float 0.0, float 1.0, float 0.0, i1 false, i1 false)
++  call void @llvm.amdgcn.exp.f32(i32 33, i32 15, float %load0, float 0.0, float 1.0, float 0.0, i1 false, i1 false)
++  ret void
++}
++
++define amdgpu_ps void @test_export_in_callee(float %v) #0 {
++; GCN-LABEL: test_export_in_callee:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_getpc_b64 s[0:1]
++; GCN-NEXT:    s_add_u32 s0, s0, test_export_gfx@gotpcrel32@lo+4
++; GCN-NEXT:    s_addc_u32 s1, s1, test_export_gfx@gotpcrel32@hi+12
++; GCN-NEXT:    v_add_f32_e32 v0, 1.0, v0
++; GCN-NEXT:    s_load_b64 s[0:1], s[0:1], 0x0
++; GCN-NEXT:    s_mov_b32 s32, 0
++; GCN-NEXT:    s_waitcnt lgkmcnt(0)
++; GCN-NEXT:    s_swappc_b64 s[30:31], s[0:1]
++; GCN-NEXT:    s_endpgm
++  %x = fadd float %v, 1.0
++  call void @test_export_gfx(float %x)
++  ret void
++}
++
++define amdgpu_ps void @test_export_in_callee_prio(float %v) #0 {
++; GCN-LABEL: test_export_in_callee_prio:
++; GCN:       ; %bb.0:
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_mov_b32 s32, 0
++; GCN-NEXT:    v_add_f32_e32 v0, 1.0, v0
++; GCN-NEXT:    s_setprio 2
++; GCN-NEXT:    s_getpc_b64 s[0:1]
++; GCN-NEXT:    s_add_u32 s0, s0, test_export_gfx@gotpcrel32@lo+4
++; GCN-NEXT:    s_addc_u32 s1, s1, test_export_gfx@gotpcrel32@hi+12
++; GCN-NEXT:    s_load_b64 s[0:1], s[0:1], 0x0
++; GCN-NEXT:    s_waitcnt lgkmcnt(0)
++; GCN-NEXT:    s_swappc_b64 s[30:31], s[0:1]
++; GCN-NEXT:    s_endpgm
++  %x = fadd float %v, 1.0
++  call void @llvm.amdgcn.s.setprio(i16 0)
++  call void @test_export_gfx(float %x)
++  ret void
++}
++
++declare void @llvm.amdgcn.exp.f32(i32, i32, float, float, float, float, i1, i1) #1
++declare void @llvm.amdgcn.exp.i32(i32, i32, i32, i32, i32, i32, i1, i1) #1
++declare float @llvm.amdgcn.raw.ptr.buffer.load.f32(ptr addrspace(8), i32, i32, i32) #2
++declare void @llvm.amdgcn.s.setprio(i16)
++
++attributes #0 = { nounwind }
++attributes #1 = { nounwind inaccessiblememonly }
++attributes #2 = { nounwind readnone }
+diff --git a/llvm/test/CodeGen/AMDGPU/required-export-priority.mir b/llvm/test/CodeGen/AMDGPU/required-export-priority.mir
+new file mode 100644
+index 0000000000000..eee04468036e5
+--- /dev/null
++++ b/llvm/test/CodeGen/AMDGPU/required-export-priority.mir
+@@ -0,0 +1,293 @@
++# NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 5
++# RUN: llc -mtriple=amdgcn -mcpu=gfx1150 -mattr=-wavefrontsize32,+wavefrontsize64 -run-pass=post-RA-hazard-rec -verify-machineinstrs  %s -o - | FileCheck -check-prefixes=GFX1150 %s
++
++--- |
++  define amdgpu_ps void @end_of_shader() {
++    ret void
++  }
++  define amdgpu_ps void @end_of_shader_return_to_epilogue() {
++    ret void
++  }
++  define amdgpu_ps void @end_of_block() {
++    ret void
++  }
++  define amdgpu_ps void @start_of_block() {
++    ret void
++  }
++  define amdgpu_ps void @block_of_exports() {
++    ret void
++  }
++  define amdgpu_ps void @sparse_exports() {
++    ret void
++  }
++  define amdgpu_ps void @existing_setprio_1() {
++    ret void
++  }
++  define amdgpu_ps void @existing_setprio_2() {
++    ret void
++  }
++...
++
++---
++name: end_of_shader
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  bb.0:
++    liveins: $vgpr0
++    ; GFX1150-LABEL: name: end_of_shader
++    ; GFX1150: liveins: $vgpr0
++    ; GFX1150-NEXT: {{  $}}
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_ENDPGM 0
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    S_ENDPGM 0
++...
++
++---
++name: end_of_shader_return_to_epilogue
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  bb.0:
++    liveins: $vgpr0
++    ; GFX1150-LABEL: name: end_of_shader_return_to_epilogue
++    ; GFX1150: liveins: $vgpr0
++    ; GFX1150-NEXT: {{  $}}
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_WAITCNT_EXPCNT $sgpr_null, 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: SI_RETURN_TO_EPILOG $vgpr0
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    SI_RETURN_TO_EPILOG $vgpr0
++...
++
++---
++name: end_of_block
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  ; GFX1150-LABEL: name: end_of_block
++  ; GFX1150: bb.0:
++  ; GFX1150-NEXT:   successors: %bb.1(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT:   EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++  ; GFX1150-NEXT:   S_SETPRIO 0
++  ; GFX1150-NEXT:   S_WAITCNT_EXPCNT $sgpr_null, 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.1:
++  ; GFX1150-NEXT:   S_ENDPGM 0
++  bb.0:
++    liveins: $vgpr0
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++
++  bb.1:
++    S_ENDPGM 0
++...
++
++---
++name: start_of_block
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  ; GFX1150-LABEL: name: start_of_block
++  ; GFX1150: bb.0:
++  ; GFX1150-NEXT:   successors: %bb.1(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.1:
++  ; GFX1150-NEXT:   successors: %bb.2(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++  ; GFX1150-NEXT:   S_SETPRIO 0
++  ; GFX1150-NEXT:   S_WAITCNT_EXPCNT $sgpr_null, 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.2:
++  ; GFX1150-NEXT:   S_ENDPGM 0
++  bb.0:
++    liveins: $vgpr0
++
++  bb.1:
++    liveins: $vgpr0
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++
++  bb.2:
++    S_ENDPGM 0
++...
++
++---
++name: block_of_exports
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  bb.0:
++    liveins: $vgpr0
++    ; GFX1150-LABEL: name: block_of_exports
++    ; GFX1150: liveins: $vgpr0
++    ; GFX1150-NEXT: {{  $}}
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: EXP 2, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_ENDPGM 0
++    EXP 2, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    S_ENDPGM 0
++...
++
++---
++name: sparse_exports
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  bb.0:
++    liveins: $vgpr0
++    ; GFX1150-LABEL: name: sparse_exports
++    ; GFX1150: liveins: $vgpr0
++    ; GFX1150-NEXT: {{  $}}
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: EXP 2, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_WAITCNT_EXPCNT $sgpr_null, 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: $vgpr0 = V_AND_B32_e32 1, $vgpr0, implicit $exec
++    ; GFX1150-NEXT: EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_WAITCNT_EXPCNT $sgpr_null, 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: $vgpr0 = V_OR_B32_e32 2, $vgpr0, implicit $exec
++    ; GFX1150-NEXT: EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_ENDPGM 0
++    EXP 2, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    $vgpr0 = V_AND_B32_e32 1, $vgpr0, implicit $exec
++    EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    $vgpr0 = V_OR_B32_e32 2, $vgpr0, implicit $exec
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    S_ENDPGM 0
++...
++
++---
++name: existing_setprio_1
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  ; GFX1150-LABEL: name: existing_setprio_1
++  ; GFX1150: bb.0:
++  ; GFX1150-NEXT:   successors: %bb.1(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT:   $vgpr0 = V_AND_B32_e32 1, $vgpr0, implicit $exec
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.1:
++  ; GFX1150-NEXT:   successors: %bb.2(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   S_SETPRIO 3
++  ; GFX1150-NEXT:   $vgpr0 = V_OR_B32_e32 2, $vgpr0, implicit $exec
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.2:
++  ; GFX1150-NEXT:   successors: %bb.3(0x80000000)
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   S_SETPRIO 3
++  ; GFX1150-NEXT:   $vgpr0 = V_OR_B32_e32 3, $vgpr0, implicit $exec
++  ; GFX1150-NEXT:   S_SETPRIO 2
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT: bb.3:
++  ; GFX1150-NEXT:   liveins: $vgpr0
++  ; GFX1150-NEXT: {{  $}}
++  ; GFX1150-NEXT:   EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++  ; GFX1150-NEXT:   EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++  ; GFX1150-NEXT:   S_SETPRIO 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_NOP 0
++  ; GFX1150-NEXT:   S_ENDPGM 0
++  bb.0:
++    liveins: $vgpr0
++    $vgpr0 = V_AND_B32_e32 1, $vgpr0, implicit $exec
++
++  bb.1:
++    liveins: $vgpr0
++    S_SETPRIO 3
++    $vgpr0 = V_OR_B32_e32 2, $vgpr0, implicit $exec
++    S_SETPRIO 0
++
++  bb.2:
++    liveins: $vgpr0
++    S_SETPRIO 1
++    $vgpr0 = V_OR_B32_e32 3, $vgpr0, implicit $exec
++    S_SETPRIO 0
++
++  bb.3:
++    liveins: $vgpr0
++    EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    S_ENDPGM 0
++...
++
++---
++name: existing_setprio_2
++tracksRegLiveness: true
++liveins:
++  - { reg: '$vgpr0' }
++body: |
++  bb.0:
++    liveins: $vgpr0
++    ; GFX1150-LABEL: name: existing_setprio_2
++    ; GFX1150: liveins: $vgpr0
++    ; GFX1150-NEXT: {{  $}}
++    ; GFX1150-NEXT: S_SETPRIO 3
++    ; GFX1150-NEXT: EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    ; GFX1150-NEXT: S_SETPRIO 0
++    ; GFX1150-NEXT: S_WAITCNT_EXPCNT $sgpr_null, 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_NOP 0
++    ; GFX1150-NEXT: S_SETPRIO 2
++    ; GFX1150-NEXT: S_SETPRIO 3
++    ; GFX1150-NEXT: S_ENDPGM 0
++    S_SETPRIO 3
++    EXP 1, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    EXP_DONE 0, $vgpr0, $vgpr0, $vgpr0, $vgpr0, -1, -1, 15, implicit $exec
++    S_SETPRIO 3
++    S_ENDPGM 0
++...
+
+From 8ea44e65f2c19facff751aeb2ac960f907fb210f Mon Sep 17 00:00:00 2001
+From: Carl Ritson <carl.ritson@amd.com>
+Date: Wed, 17 Jul 2024 16:18:02 +0900
+Subject: [PATCH 2/3] Remove -verify-machineinstrs from test.
+
+---
+ llvm/test/CodeGen/AMDGPU/required-export-priority.ll | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/test/CodeGen/AMDGPU/required-export-priority.ll b/llvm/test/CodeGen/AMDGPU/required-export-priority.ll
+index 377902f3f0d1a..ebc209bd4d451 100644
+--- a/llvm/test/CodeGen/AMDGPU/required-export-priority.ll
++++ b/llvm/test/CodeGen/AMDGPU/required-export-priority.ll
+@@ -1,5 +1,5 @@
+ ; NOTE: Assertions have been autogenerated by utils/update_llc_test_checks.py UTC_ARGS: --version 5
+-; RUN: llc -mtriple=amdgcn -mcpu=gfx1150 -amdgpu-enable-vopd=0 -verify-machineinstrs < %s | FileCheck -check-prefix=GCN %s
++; RUN: llc -mtriple=amdgcn -mcpu=gfx1150 -amdgpu-enable-vopd=0 < %s | FileCheck -check-prefix=GCN %s
+ 
+ define amdgpu_ps void @test_export_zeroes_f32() #0 {
+ ; GCN-LABEL: test_export_zeroes_f32:

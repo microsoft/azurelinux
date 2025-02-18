@@ -1,0 +1,11 @@
+%clang_major_version @@CLANG_MAJOR_VERSION@@
+%clang_minor_version @@CLANG_MINOR_VERSION@@
+%clang_patch_version @@CLANG_PATCH_VERSION@@
+
+%clang_version %{clang_major_version}.%{clang_minor_version}.%{clang_patch_version}
+
+# This is the path to the clang resource directory that has clang's internal
+# headers and libraries.  This path should be used by packages that need to
+# install files into this directory.  This macro's value changes every time
+# clang's version changes.
+%clang_resource_dir %{_prefix}/lib/clang/%{clang_major_version}

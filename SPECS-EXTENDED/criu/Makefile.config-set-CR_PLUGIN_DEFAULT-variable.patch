@@ -1,0 +1,49 @@
+From bb35901e78216917ce8066fa805ce27f273d76a2 Mon Sep 17 00:00:00 2001
+From: Radostin Stoyanov <rstoyanov@fedoraproject.org>
+Date: Thu, 26 Sep 2024 10:59:32 +0100
+Subject: [PATCH] Makefile.config: set CR_PLUGIN_DEFAULT variable
+
+By default, CRIU uses the path "/usr/lib/criu" to install and load
+plugins at runtime. This path is defined by the `PLUGINDIR` variable
+in Makefile.install and `CR_PLUGIN_DEFAULT` in `criu/include/plugin.h`.
+However, some distribution packages might install the CRIU plugins at
+"/usr/lib64/criu" instead. This patch updates the makefile to align
+the path defined by `CR_PLUGIN_DEFAULT` with the value of `PLUGINDIR`.
+
+Signed-off-by: Radostin Stoyanov <rstoyanov@fedoraproject.org>
+---
+ Makefile.config         | 4 ++++
+ plugins/amdgpu/Makefile | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.config b/Makefile.config
+index 52c250b21..5ab689d41 100644
+--- a/Makefile.config
++++ b/Makefile.config
+@@ -59,6 +59,10 @@ endif
+ 
+ export LIBS += $(LIBS_FEATURES)
+ 
++ifneq ($(PLUGINDIR),)
++                FEATURE_DEFINES	+= -DCR_PLUGIN_DEFAULT="\"$(PLUGINDIR)\""
++endif
++
+ CONFIG_FILE = .config
+ 
+ $(CONFIG_FILE):
+diff --git a/plugins/amdgpu/Makefile b/plugins/amdgpu/Makefile
+index 7d3388b80..a20d1d163 100644
+--- a/plugins/amdgpu/Makefile
++++ b/plugins/amdgpu/Makefile
+@@ -15,7 +15,7 @@ DEPS_NOK 		:= ;
+ __nmk_dir ?= ../../scripts/nmk/scripts/
+ include $(__nmk_dir)msg.mk
+ 
+-PLUGIN_CFLAGS  		:= -g -Wall -Werror -D _GNU_SOURCE -shared -nostartfiles -fPIC -DCR_PLUGIN_DEFAULT="$(PLUGINDIR)"
++PLUGIN_CFLAGS  		:= -g -Wall -Werror -D _GNU_SOURCE -shared -nostartfiles -fPIC
+ PLUGIN_LDFLAGS		:= -lpthread -lrt -ldrm -ldrm_amdgpu
+ 
+ ifeq ($(CONFIG_AMDGPU),y)
+-- 
+2.46.1
+

@@ -1,21 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global maj 0
 
 Name:           serd
-Version:        0.30.2
-Release:        3%{?dist}
+Version:        0.32.4
+Release:        1%{?dist}
 Summary:        A lightweight C library for RDF syntax
 
 License:        ISC
-URL:            https://drobilla.net/software/serd
-Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
+URL:            https://drobilla.net/software/%{name}.html
+Source0:        https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:        https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:        https://drobilla.net/drobilla.gpg
 
+BuildRequires:  meson
 BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  glib2-devel
 BuildRequires:  python3
 BuildRequires:  gcc
+BuildRequires:  gnupg2
+BuildRequires:  python3-sphinx
+BuildRequires:  python3-sphinx_lv2_theme
+BuildRequires:  python-sphinxygen
 
 %description
 %{name} is a lightweight C library for RDF syntax which supports reading and 
@@ -36,47 +40,87 @@ writing Turtle, TRiG, NTriples, and NQuads.
 This package contains the headers and development libraries for %{name}.
 
 %prep
-%setup -q
-# we'll run ldconfig, well not any more, see
-# https://fedoraproject.org/wiki/Changes/Removing_ldconfig_scriptlets
-sed -i -e 's|bld.add_post_fun(autowaf.run_ldconfig)||' wscript
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%autosetup -p1
 
 %build
-%set_build_flags
-python3 waf configure \
-    --prefix=%{_prefix} \
-    --libdir=%{_libdir} \
-    --mandir=%{_mandir} \
-    --datadir=%{_datadir} \
-    --docdir=%{_docdir} \
-    --test \
-    --docs 
-python3 waf build -v %{?_smp_mflags}
+%meson -Dman_html=disabled
+%meson_build
 
 %install
-DESTDIR=%{buildroot} python3 waf install
-chmod +x %{buildroot}%{_libdir}/lib%{name}-%{maj}.so.*
+%meson_install
 # Move devel docs to the right directory
-install -d %{buildroot}%{_docdir}/%{name}/%{name}-%{maj}
-mv %{buildroot}%{_docdir}/%{name}-%{maj}/html %{buildroot}%{_docdir}/%{name}/%{name}-%{maj}/html
+install -d %{buildroot}%{_docdir}/%{name}
+mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
+
+%check
+%meson_test
 
 %files
 %license COPYING
 %doc AUTHORS NEWS README.md
 %doc %{_mandir}/man1/serdi.1*
-%{_libdir}/lib%{name}-%{maj}.so.*
+%{_libdir}/lib%{name}-%{maj}.so.%{maj}*
 %{_bindir}/serdi
 
 %files devel
-%doc %{_mandir}/man3/serd.3*
 %doc %{_docdir}/%{name}/%{name}-%{maj}/
 %{_libdir}/lib%{name}-%{maj}*.so
 %{_libdir}/pkgconfig/%{name}*.pc
 %{_includedir}/%{name}-%{maj}/
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30.2-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sun Jan 19 2025 Guido Aulisi <guido.aulisi@inps.it> - 0.32.4-1
+- Update to 0.32.4
+
+* Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 09 2024 Guido Aulisi <guido.aulisi@gmail.com> - 0.32.2-1
+- Update to 0.32.2
+- Verify sources
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.16-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jan 31 2023 Guido Aulisi <guido.aulisi@gmail.com> - 0.30.16-1
+- Update to 0.30.16
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 15 2022 Guido Aulisi <guido.aulisi@gmail.com> - 0.30.12-1
+- Update to 0.30.12
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 24 2021 Guido Aulisi <guido.aulisi@gmail.com> - 0.30.10-1
+- Update to 0.30.10
+
+* Sun Oct 04 2020 Guido Aulisi <guido.aulisi@gmail.com> - 0.30.6-1
+- Update to 0.30.6
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun Jul 12 2020 Guido Aulisi <guido.aulisi@gmail.com> - 0.30.4-1
+- Update to 0.30.4
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

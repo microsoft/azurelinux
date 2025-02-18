@@ -1,102 +1,237 @@
+%global run_tests 1
+
 %global bashcompletiondir %(pkg-config --variable=compatdir bash-completion)
-%global cpuarch 64
+
+# We have multilib triage
+%if "%{_lib}" == "lib"
+  %global cpuarch 32
+%else
+  %global cpuarch 64
+%endif
+
+
+%if 0%{?bootstrap}
 %global with_mysql 0
 %global mysql --without-mysql
 %global with_poppler 0
 %global poppler --without-poppler
 %global with_spatialite 0
 %global spatialite --without-spatialite
-%global with_python3 1
-%global python3 --with-python3
-%global with_java 0
-%global java --without-java
+%else
+# https://bugzilla.redhat.com/show_bug.cgi?id=1490492
+%global with_mysql 1
+%global mysql --with-mysql
+# https://bugzilla.redhat.com/show_bug.cgi?id=1490492
+%global with_poppler 1
+%global poppler --with-poppler
+%global with_spatialite 1
+%global spatialite "--with-spatialite"
+%endif
 
-Summary:        GIS file format library
+%bcond_without python3
+# No complete java yet in EL8
+%if 0%{?rhel} == 8
+%bcond_with java
+%else
+%ifarch %{java_arches}
+%bcond_without java
+%else
+%bcond_with java
+%endif
+%endif
+
+%if 0%{?fedora}
+%bcond_without mingw
+%else
+%bcond_with mingw
+%endif
+
 #global pre rc1
-Name:           gdal
-Version:        3.6.3
-Release:        2%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.gdal.org
-Source0:        https://github.com/OSGeo/gdal/releases/download/v3.6.3/%{name}-%{version}.tar.gz
-Source1:        %{name}autotest-%{version}.tar.gz
-# Multilib compatible cpl-config.h header
-Source2:        cpl-config.h
-# Multilib compatible gdal-config script
-Source3:        gdal-config
-# Add some utils to the default install target
-Patch0:         gdal_utils.patch
 
-BuildRequires:  CharLS-devel
-BuildRequires:  bison
-BuildRequires:  cfitsio-devel
-BuildRequires:  cmake
-BuildRequires:  curl-devel
-BuildRequires:  expat-devel
-BuildRequires:  freexl-devel
-BuildRequires:  gcc-c++
-BuildRequires:  geos-devel
-BuildRequires:  giflib-devel
-BuildRequires:  gtest-devel
-BuildRequires:  hdf-devel
-BuildRequires:  hdf5-devel
-BuildRequires:  json-c-devel
-BuildRequires:  libdap-devel
-BuildRequires:  libgeotiff-devel
-BuildRequires:  libgta-devel
-BuildRequires:  libjpeg-devel
-BuildRequires:  libkml-devel
-BuildRequires:  liblerc-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libpq-devel
-BuildRequires:  libtiff-devel
-BuildRequires:  libtirpc-devel
-BuildRequires:  libwebp-devel
-BuildRequires:  libzstd-devel
-BuildRequires:  netcdf-devel
-BuildRequires:  ogdi-devel
-BuildRequires:  openexr-devel
-BuildRequires:  openjpeg2-devel
-BuildRequires:  pcre2-devel
-BuildRequires:  proj >= 5.2.0
-BuildRequires:  proj-devel >= 5.2.0
-BuildRequires:  qhull-devel
-BuildRequires:  sqlite-devel
-BuildRequires:  swig
-BuildRequires:  unixODBC-devel
-BuildRequires:  xerces-c-devel
-BuildRequires:  xz-devel
-BuildRequires:  zlib-devel
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-# Run time dependency for gpsbabel driver
-Requires:       gpsbabel
+
+Name:          gdal
+Version:       3.9.3
+Release:       1%{?dist}
+Summary:       GIS file format library
+License:       MIT
+URL:           http://www.gdal.org
+# Source0:   http://download.osgeo.org/gdal/%%{version}/gdal-%%{version}.tar.xz
+# See PROVENANCE.TXT-fedora and the cleaner script for details!
+
+Source0:       %{name}-%{version}%{?pre:%pre}-fedora.tar.xz
+Source1:       http://download.osgeo.org/%{name}/%{version}/%{name}autotest-%{version}%{?pre:%pre}.tar.gz
+# Multilib compatible cpl-config.h header
+Source2:       cpl-config.h
+# Multilib compatible gdal-config script
+Source3:       gdal-config
+Source4:       PROVENANCE.TXT-fedora
+
+# Cleaner script for the tarball
+Source5:       %{name}-cleaner.sh
+
+# Add some utils to the default install target
+Patch0:        gdal_utils.patch
+# Fix passing incompatible pointer type
+Patch1:        gdal_incompatible-pointer-types.patch
+
+BuildRequires: cmake
+BuildRequires: gcc-c++
+
+BuildRequires: armadillo-devel
+BuildRequires: bison
+BuildRequires: cfitsio-devel
+BuildRequires: CharLS-devel
+BuildRequires: curl-devel
+BuildRequires: expat-devel
+BuildRequires: freexl-devel
+BuildRequires: geos-devel
+BuildRequires: giflib-devel
+BuildRequires: gtest-devel
+BuildRequires: hdf-devel
+BuildRequires: hdf5-devel
+BuildRequires: json-c-devel
+BuildRequires: libarchive-devel
+%ifnarch %{ix86} %{arm}
+BuildRequires: libarrow-devel
+BuildRequires: libarrow-dataset-devel
+%endif
+BuildRequires: libdap-devel
+BuildRequires: libdeflate-devel
+BuildRequires: libgeotiff-devel
+BuildRequires: libgta-devel
+BuildRequires: libjpeg-devel
+BuildRequires: libkml-devel
+BuildRequires: liblerc-devel
+BuildRequires: libpng-devel
+BuildRequires: libpq-devel
 %if %{with_spatialite}
-BuildRequires:  libspatialite-devel
+BuildRequires: libspatialite-devel
 %endif
+BuildRequires: libtiff-devel
+BuildRequires: libtirpc-devel
+BuildRequires: libwebp-devel
+BuildRequires: libzstd-devel
 %if 0%{?with_mysql}
-BuildRequires:  mariadb-connector-c-devel
+BuildRequires: mariadb-connector-c-devel
 %endif
+BuildRequires: netcdf-devel
+BuildRequires: ogdi-devel
+BuildRequires: openexr-devel
+BuildRequires: openjpeg2-devel
+BuildRequires: openssl-devel-engine
+%ifnarch %{ix86} %{arm}
+BuildRequires: parquet-libs-devel
+%endif
+BuildRequires: pcre2-devel
 %if 0%{?with_poppler}
-BuildRequires:  poppler-devel
+BuildRequires: poppler-devel
 %endif
+BuildRequires: proj-devel >= 5.2.0
+BuildRequires: qhull-devel
+BuildRequires: sqlite-devel
+BuildRequires: swig
+BuildRequires: unixODBC-devel
+BuildRequires: xerces-c-devel
+BuildRequires: xz-devel
+BuildRequires: zlib-devel
+
+%if %{with mingw}
+BuildRequires: mingw32-filesystem >= 102
+BuildRequires: mingw32-gcc-c++
+BuildRequires: mingw32-cfitsio
+BuildRequires: mingw32-curl
+BuildRequires: mingw32-dlfcn
+BuildRequires: mingw32-expat
+BuildRequires: mingw32-freexl
+BuildRequires: mingw32-geos
+BuildRequires: mingw32-giflib
+BuildRequires: mingw32-libarchive
+BuildRequires: mingw32-libgeotiff
+BuildRequires: mingw32-libgta
+BuildRequires: mingw32-libjpeg-turbo
+BuildRequires: mingw32-libkml
+BuildRequires: mingw32-liblerc
+BuildRequires: mingw32-libpng
+BuildRequires: mingw32-libspatialite
+BuildRequires: mingw32-libtiff
+BuildRequires: mingw32-libwebp
+BuildRequires: mingw32-openexr
+BuildRequires: mingw32-openjpeg2
+BuildRequires: mingw32-pcre2
+BuildRequires: mingw32-poppler
+BuildRequires: mingw32-postgresql
+BuildRequires: mingw32-proj
+BuildRequires: mingw32-sqlite
+BuildRequires: mingw32-xerces-c
+BuildRequires: mingw32-xz-libs
+BuildRequires: mingw32-zlib
+BuildRequires: mingw32-zstd
+
+BuildRequires: mingw64-filesystem >= 102
+BuildRequires: mingw64-gcc-c++
+BuildRequires: mingw64-cfitsio
+BuildRequires: mingw64-curl
+BuildRequires: mingw64-dlfcn
+BuildRequires: mingw64-expat
+BuildRequires: mingw64-freexl
+BuildRequires: mingw64-geos
+BuildRequires: mingw64-giflib
+BuildRequires: mingw64-libarchive
+BuildRequires: mingw64-libgeotiff
+BuildRequires: mingw64-libgta
+BuildRequires: mingw64-libjpeg-turbo
+BuildRequires: mingw64-libkml
+BuildRequires: mingw64-liblerc
+BuildRequires: mingw64-libpng
+BuildRequires: mingw64-libspatialite
+BuildRequires: mingw64-libtiff
+BuildRequires: mingw64-libwebp
+BuildRequires: mingw64-openexr
+BuildRequires: mingw64-openjpeg2
+BuildRequires: mingw64-pcre2
+BuildRequires: mingw64-poppler
+BuildRequires: mingw64-postgresql
+BuildRequires: mingw64-proj
+BuildRequires: mingw64-sqlite
+BuildRequires: mingw64-xerces-c
+BuildRequires: mingw64-xz-libs
+BuildRequires: mingw64-zlib
+BuildRequires: mingw64-zstd
+%endif
+
 # Python
-%if 0%{?with_python3}
-BuildRequires:  python3-devel
-BuildRequires:  python3-numpy
-BuildRequires:  python3-setuptools
-BuildRequires:  python3dist(lxml) >= 4.5.1
-BuildRequires:  python3dist(pytest) >= 3.6
+%if %{with python3}
+BuildRequires: python3-devel
+BuildRequires: python3-filelock
+BuildRequires: python3-numpy
+BuildRequires: python3-setuptools
+BuildRequires: python3dist(pytest) >= 3.6
+BuildRequires: python3dist(lxml) >= 4.5.1
+
+%if %{with mingw}
+BuildRequires: mingw32-python3
+BuildRequires: mingw32-python3-numpy
+BuildRequires: mingw32-python3-setuptools
+
+BuildRequires: mingw64-python3
+BuildRequires: mingw64-python3-numpy
+BuildRequires: mingw64-python3-setuptools
 %endif
+%endif
+
 # Java
-%if 0%{?with_java}
+%if %{with java}
 # For 'mvn_artifact' and 'mvn_install'
-BuildRequires:  ant
-BuildRequires:  java-devel >= 1:1.6.0
-BuildRequires:  javapackages-local
-BuildRequires:  jpackage-utils
+BuildRequires: ant
+BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: javapackages-local
+BuildRequires: jpackage-utils
 %endif
+
+# Run time dependency for gpsbabel driver
+Requires:      gpsbabel
+Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
+
 
 %description
 Geospatial Data Abstraction Library (GDAL/OGR) is a cross platform
@@ -108,31 +243,75 @@ useful commandline utilities for data translation and processing.
 It provides the primary data access engine for many applications.
 GDAL/OGR is the most widely used geospatial data access library.
 
+
 %package devel
-Summary:        Development files for the GDAL file format library
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:       Development files for the GDAL file format library
+Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains development files for GDAL.
 
+
 %package libs
-Summary:        GDAL file format library
+Summary:       GDAL file format library
 # See frmts/grib/degrib/README.TXT
-Provides:       bundled(g2lib) = 1.6.0
-Provides:       bundled(degrib) = 2.14
+Provides:      bundled(g2lib) = 1.6.0
+Provides:      bundled(degrib) = 2.14
 
 %description libs
 This package contains the GDAL file format library.
 
+%if %{with mingw}
+%package -n mingw32-%{name}
+Summary:       MinGW Windows GDAL library
+# GDAL bundles a modified copy of g2clib and degrib
+# See frmts/grib/degrib/README.TXT
+Provides:      bundled(g2lib) = 1.6.0
+Provides:      bundled(degrib) = 2.14
+BuildArch:     noarch
+
+%description -n mingw32-%{name}
+MinGW Windows GDAL library.
+
+
+%package -n mingw32-%{name}-tools
+Summary:       MinGW Windows GDAL library tools
+BuildArch:     noarch
+
+%description -n mingw32-%{name}-tools
+MinGW Windows GDAL library tools.
+
+
+%package -n mingw64-%{name}
+Summary:       MinGW Windows GDAL library
+# GDAL bundles a modified copy of g2clib and degrib
+# See frmts/grib/degrib/README.TXT
+Provides:      bundled(g2lib) = 1.6.0
+Provides:      bundled(degrib) = 2.14
+BuildArch:     noarch
+
+%description -n mingw64-%{name}
+MinGW Windows GDAL library.
+
+
+%package -n mingw64-%{name}-tools
+Summary:       MinGW Windows GDAL library tools
+BuildArch:     noarch
+
+%description -n mingw64-%{name}-tools
+MinGW Windows GDAL library tools.
+%endif
+
 # No complete java yet in EL8
-%if 0%{?with_java}
+%if %{with java}
 %package java
 Summary:        Java modules for the GDAL file format library
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       jpackage-utils
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description java
 The GDAL Java modules provide support to handle multiple GIS file formats.
+
 
 %package javadoc
 Summary:        Javadocs for %{name}
@@ -144,15 +323,16 @@ This package contains the API documentation for %{name}.
 %endif
 
 
-%if 0%{?with_python3}
+%if %{with python3}
 %package -n python3-gdal
-Summary:        Python modules for the GDAL file format library
 %{?python_provide:%python_provide python3-gdal}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Python modules for the GDAL file format library
 Requires:       python3-numpy
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description -n python3-gdal
 The GDAL Python 3 modules provide support to handle multiple GIS file formats.
+
 
 %package python-tools
 Summary:        Python tools for the GDAL file format library
@@ -162,13 +342,33 @@ Requires:       python3-gdal
 The GDAL Python package provides number of tools for programming and
 manipulating GDAL file format library
 
+
+%if %{with mingw}
+%package -n mingw32-python3-%{name}
+Summary:       MinGW Windows Python3 GDAL bindings
+
+%description -n mingw32-python3-%{name}
+MinGW Windows Python3 GDAL bindings.
+
+
+%package -n mingw64-python3-%{name}
+Summary:       MinGW Windows Python3 GDAL bindings
+
+%description -n mingw64-python3-%{name}
+MinGW Windows Python3 GDAL bindings.
+%endif
+
 # We don't want to provide private Python extension libs
 %global __provides_exclude_from ^%{python3_sitearch}/.*\.so$
 %endif
 
 
+%if %{with mingw}
+%{?mingw_debug_package}
+%endif
+
 %prep
-%autosetup -N -p1 -n %{name}-%{version}
+%autosetup -N -p1 -n %{name}-%{version}-fedora
 
 # Delete bundled libraries
 rm -rf frmts/zlib
@@ -188,17 +388,38 @@ mv %{name}autotest-%{version} autotest
 # Need to patch autotest
 %autopatch -p1
 
+# Copy in PROVENANCE.TXT-fedora
+cp -a %{SOURCE4} .
+
 
 %build
 %cmake \
   -DCMAKE_INSTALL_INCLUDEDIR=include/gdal \
   -DGDAL_JAVA_INSTALL_DIR=%{_jnidir}/%{name} \
+  -DGDAL_JAVA_JNI_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
+  -DENABLE_DEFLATE64=OFF
 %cmake_build
+
+%if %{with mingw}
+%mingw_cmake \
+  -DBUILD_TESTING=OFF \
+  -DCMAKE_INSTALL_INCLUDEDIR=include/gdal \
+  -DGDAL_USE_JPEG12_INTERNAL=OFF \
+  -DENABLE_DEFLATE64=OFF
+%mingw_make_build
+%endif
+
 
 %install
 %cmake_install
 
+%if %{with mingw}
+%mingw_make_install
+# Delete data from cross packages
+rm -r %{buildroot}%{mingw32_datadir}
+rm -r %{buildroot}%{mingw64_datadir}
+%endif
 
 # List of manpages for python scripts
 for file in %{buildroot}%{_bindir}/*.py; do
@@ -216,39 +437,67 @@ cp -a %{SOURCE2} %{buildroot}%{_includedir}/%{name}/cpl_config.h
 mv %{buildroot}%{_bindir}/%{name}-config %{buildroot}%{_bindir}/%{name}-config-%{cpuarch}
 cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 
+
+%if %{with mingw}
+%mingw_debug_install_post
+%endif
+
+
+%if 0%{run_tests}
 %check
-ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
+%ctest || :
+%endif
 
 
 %files -f gdal_python_manpages_excludes.txt
 %{_bindir}/8211*
+%{_bindir}/gdal2tiles
+%{_bindir}/gdal2xyz
+%{_bindir}/gdaladdo
+%{_bindir}/gdalattachpct
+%{_bindir}/gdalbuildvrt
+%{_bindir}/gdal_calc
+%{_bindir}/gdalcompare
 %{_bindir}/gdal_contour
 %{_bindir}/gdal_create
-%{_bindir}/gdal_grid
-%{_bindir}/gdal_rasterize
-%{_bindir}/gdal_translate
-%{_bindir}/gdal_viewshed
-%{_bindir}/gdaladdo
-%{_bindir}/gdalbuildvrt
 %{_bindir}/gdaldem
+%{_bindir}/gdal_edit
 %{_bindir}/gdalenhance
+%{_bindir}/gdal_fillnodata
+%{_bindir}/gdal_footprint
+%{_bindir}/gdal_grid
 %{_bindir}/gdalinfo
 %{_bindir}/gdallocationinfo
 %{_bindir}/gdalmanage
 %{_bindir}/gdalmdiminfo
 %{_bindir}/gdalmdimtranslate
+%{_bindir}/gdal_merge
+%{_bindir}/gdalmove
+%{_bindir}/gdal_pansharpen
+%{_bindir}/gdal_polygonize
+%{_bindir}/gdal_proximity
+%{_bindir}/gdal_rasterize
+%{_bindir}/gdal_retile
+%{_bindir}/gdal_sieve
 %{_bindir}/gdalsrsinfo
 %{_bindir}/gdaltindex
 %{_bindir}/gdaltransform
+%{_bindir}/gdal_translate
+%{_bindir}/gdal_viewshed
 %{_bindir}/gdalwarp
 %{_bindir}/gnmanalyse
 %{_bindir}/gnmmanage
 %{_bindir}/nearblack
 %{_bindir}/ogr2ogr
 %{_bindir}/ogrinfo
+%{_bindir}/ogr_layer_algebra
 %{_bindir}/ogrlineref
+%{_bindir}/ogrmerge
 %{_bindir}/ogrtindex
+%{_bindir}/pct2rgb
+%{_bindir}/rgb2pct
 %{_bindir}/s57dump
+%{_bindir}/sozip
 %{_datadir}/bash-completion/completions/*
 %exclude %{_datadir}/bash-completion/completions/*.py
 %{_mandir}/man1/*
@@ -257,9 +506,9 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 %files libs
 %license LICENSE.TXT
-%doc NEWS.md PROVENANCE.TXT COMMITTERS
-%{_libdir}/libgdal.so.32
-%{_libdir}/libgdal.so.32.*
+%doc NEWS.md PROVENANCE.TXT COMMITTERS PROVENANCE.TXT-fedora
+%{_libdir}/libgdal.so.35
+%{_libdir}/libgdal.so.35.*
 %{_datadir}/%{name}/
 %{_libdir}/gdalplugins/
 
@@ -272,7 +521,71 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 %{_libdir}/pkgconfig/%{name}.pc
 %{_mandir}/man1/gdal-config.1*
 
-%if 0%{?with_python3}
+%if %{with mingw}
+%files -n mingw32-%{name}
+%license LICENSE.TXT
+%{mingw32_bindir}/libgdal-35.dll
+%{mingw32_bindir}/gdal-config
+%{mingw32_libdir}/libgdal.dll.a
+%{mingw32_libdir}/cmake/gdal/
+%{mingw32_libdir}/pkgconfig/gdal.pc
+%{mingw32_libdir}/gdalplugins/
+%{mingw32_includedir}/%{name}/
+
+%files -n mingw32-%{name}-tools
+%{mingw32_bindir}/*.exe
+%{mingw32_bindir}/gdal2tiles
+%{mingw32_bindir}/gdal2xyz
+%{mingw32_bindir}/gdal_calc
+%{mingw32_bindir}/gdal_edit
+%{mingw32_bindir}/gdal_fillnodata
+%{mingw32_bindir}/gdal_merge
+%{mingw32_bindir}/gdal_pansharpen
+%{mingw32_bindir}/gdal_polygonize
+%{mingw32_bindir}/gdal_proximity
+%{mingw32_bindir}/gdal_retile
+%{mingw32_bindir}/gdal_sieve
+%{mingw32_bindir}/gdalattachpct
+%{mingw32_bindir}/gdalcompare
+%{mingw32_bindir}/gdalmove
+%{mingw32_bindir}/ogr_layer_algebra
+%{mingw32_bindir}/ogrmerge
+%{mingw32_bindir}/pct2rgb
+%{mingw32_bindir}/rgb2pct
+
+%files -n mingw64-%{name}
+%license LICENSE.TXT
+%{mingw64_bindir}/libgdal-35.dll
+%{mingw64_bindir}/gdal-config
+%{mingw64_libdir}/libgdal.dll.a
+%{mingw64_libdir}/cmake/gdal/
+%{mingw64_libdir}/pkgconfig/gdal.pc
+%{mingw64_libdir}/gdalplugins/
+%{mingw64_includedir}/%{name}/
+
+%files -n mingw64-%{name}-tools
+%{mingw64_bindir}/*.exe
+%{mingw64_bindir}/gdal2tiles
+%{mingw64_bindir}/gdal2xyz
+%{mingw64_bindir}/gdal_calc
+%{mingw64_bindir}/gdal_edit
+%{mingw64_bindir}/gdal_fillnodata
+%{mingw64_bindir}/gdal_merge
+%{mingw64_bindir}/gdal_pansharpen
+%{mingw64_bindir}/gdal_polygonize
+%{mingw64_bindir}/gdal_proximity
+%{mingw64_bindir}/gdal_retile
+%{mingw64_bindir}/gdal_sieve
+%{mingw64_bindir}/gdalattachpct
+%{mingw64_bindir}/gdalcompare
+%{mingw64_bindir}/gdalmove
+%{mingw64_bindir}/ogr_layer_algebra
+%{mingw64_bindir}/ogrmerge
+%{mingw64_bindir}/pct2rgb
+%{mingw64_bindir}/rgb2pct
+%endif
+
+%if %{with python3}
 %files -n python3-gdal
 %doc swig/python/README.rst
 %{python3_sitearch}/GDAL-%{version}-py*.egg-info/
@@ -300,9 +613,22 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 %{_bindir}/rgb2pct.py
 %{_datadir}/bash-completion/completions/*.py
 
+%if %{with mingw}
+%files -n mingw32-python3-%{name}
+%{mingw32_bindir}/*.py
+%{mingw32_python3_sitearch}/GDAL-%{version}-py%{mingw32_python3_version}.egg-info/
+%{mingw32_python3_sitearch}/osgeo/
+%{mingw32_python3_sitearch}/osgeo_utils/
+
+%files -n mingw64-python3-%{name}
+%{mingw64_bindir}/*.py
+%{mingw64_python3_sitearch}/GDAL-%{version}-py%{mingw32_python3_version}.egg-info/
+%{mingw64_python3_sitearch}/osgeo/
+%{mingw64_python3_sitearch}/osgeo_utils/
+%endif
 %endif
 
-%if 0%{?with_java}
+%if %{with java}
 %files java
 %{_jnidir}/%{name}/gdal-%{version}-sources.jar
 %{_jnidir}/%{name}/gdal-%{version}.jar
@@ -315,12 +641,137 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
-* Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
-- Initial CBL-Mariner import from Fedora 38 (license: MIT).
-- License verified.
-- Excludes osr test suite as the test file incorrectly replaces assertion
-- Excludes gcore test suite as 'tmp_path' fixture not present
-- Excludes alg and gdrivers test suite due to TypeError in pluggy requirement
+* Tue Oct 15 2024 Sandro Mani <manisandro@gmail.com> - 3.9.3-1
+- Update to 3.9.3
+
+* Mon Sep 16 2024 Sandro Mani <manisandro@gmail.com> - 3.9.2-4
+- Rebuild (proj)
+
+* Fri Aug 23 2024 Sandro Mani <manisandro@gmail.com> - 3.9.2-3
+- Rebuild (mingw-poppler)
+
+* Thu Aug 22 2024 Marek Kasik <mkasik@redhat.com> - 3.9.2-2
+- Rebuild for poppler 24.08.0
+
+* Sat Aug 17 2024 Sandro Mani <manisandro@gmail.com> - 3.9.2-1
+- Update to 3.9.2
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 26 2024 Sandro Mani <manisandro@gmail.com> - 3.9.1-1
+- Update to 3.9.1
+
+* Sun Jun 09 2024 Python Maint <python-maint@redhat.com> - 3.9.0-4
+- Rebuilt for Python 3.13
+
+* Wed May 15 2024 Sandro Mani <manisandro@gmail.com> - 3.9.0-3
+- Rebuild (libarrow)
+
+* Tue May 14 2024 Sandro Mani <manisandro@gmail.com> - 3.9.0-2
+- BR: libarrow-dataset-devel
+
+* Sat May 11 2024 Sandro Mani <manisandro@gmail.com> - 3.9.0-1
+- Update to 3.9.0
+
+* Wed Apr 24 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.8.5-4
+- Rebuilt for openexr 3.2.4
+
+* Tue Apr 23 2024 Sandro Mani <manisandro@gmail.com> - 3.8.5-3
+- Rebuild (libarrow)
+
+* Sun Apr 14 2024 Sandro Mani <manisandro@gmail.com> - 3.8.5-2
+- BR: parquet-libs-devel
+
+* Mon Apr 08 2024 Sandro Mani <manisandro@gmail.com> - 3.8.5-1
+- Update to 3.8.5
+
+* Thu Mar 21 2024 Sandro Mani <manisandro@gmail.com> - 3.8.4-5
+- Rebuild (libarrow)
+
+* Tue Mar 19 2024 Sandro Mani <manisandro@gmail.com> - 3.8.4-4
+- Rebuild (libarrow)
+
+* Tue Mar 05 2024 Sandro Mani <manisandro@gmail.com> - 3.8.4-3
+- Rebuild (proj)
+
+* Mon Feb 26 2024 Sandro Mani <manisandro@gmail.com> - 3.8.4-2
+- BR: libarchive
+
+* Sun Feb 18 2024 Sandro Mani <manisandro@gmail.com> - 3.8.4-1
+- Update to 3.8.4
+
+* Fri Feb 02 2024 Sandro Mani <manisandro@gmail.com> - 3.8.3-5
+- Rebuild (poppler)
+
+* Sat Jan 27 2024 Sandro Mani <manisandro@gmail.com> - 3.8.3-4
+- Enable libarrow, libdeflate
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 08 2024 Sandro Mani <manisandro@gmail.com> - 3.8.3-1
+- Update to 3.8.3
+
+* Thu Dec 21 2023 Sandro Mani <manisandro@gmail.com> - 3.8.2-2
+- Rebuild (armadillo)
+
+* Wed Dec 20 2023 Sandro Mani <manisandro@gmail.com> - 3.8.2-1
+- Update to 3.8.2
+
+* Wed Dec 20 2023 Sandro Mani <manisandro@gmail.com> - 3.8.1-2
+- Rebuild (armadillo)
+
+* Thu Nov 30 2023 Sandro Mani <manisandro@gmail.com> - 3.8.1-1
+- Update to 3.8.1
+
+* Tue Nov 14 2023 Sandro Mani <manisandro@gmail.com> - 3.8.0-1
+- Update to 3.8.0
+
+* Fri Nov 03 2023 Sandro Mani <manisandro@gmail.com> - 3.7.3-1
+- Update to 3.7.3
+
+* Wed Sep 13 2023 Sandro Mani <manisandro@gmail.com> - 3.7.2-1
+- Update to 3.7.2
+
+* Sun Sep 03 2023 Sandro Mani <manisandro@gmail.com> - 3.7.1-7
+- Rebuild (proj)
+
+* Tue Aug 15 2023 Sandro Mani <manisandro@gmail.com> - 3.7.1-6
+- Rebuild (libspatialite)
+
+* Mon Aug 14 2023 Sandro Mani <manisandro@gmail.com> - 3.7.1-5
+- Rebuild (mingw-poppler)
+
+* Wed Aug  9 2023 Tom Callaway <spot@fedoraproject.org> - 3.7.1-4
+- rebuild for new qhull
+
+* Mon Aug 07 2023 Marek Kasik <mkasik@redhat.com> - 3.7.1-3
+- Rebuild for poppler 23.08.0
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 18 2023 Sandro Mani <manisandro@gmail.com> - 3.7.1-1
+- Update to 3.7.1
+
+* Mon Jul 03 2023 Python Maint <python-maint@redhat.com> - 3.7.0-2
+- Rebuilt for Python 3.12
+
+* Thu May 11 2023 Sandro Mani <manisandro@gmail.com> - 3.7.0-1
+- Update to 3.7.0
+
+* Tue May 09 2023 Markus Neteler <neteler@mundialis.de> - 3.6.4-3
+- SPDX migration
+
+* Tue May 02 2023 Sandro Mani <manisandro@gmail.com> - 3.6.4-2
+- Drop unused librx BR
+
+* Sat Apr 22 2023 Sandro Mani <manisandro@gmail.com> - 3.6.4-1
+- Update to 3.6.4
 
 * Tue Mar 14 2023 Sandro Mani <manisandro@gmail.com> - 3.6.3-1
 - Update to 3.6.3
@@ -580,7 +1031,6 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 - Update to 3.1.0
 
 * Sat May 09 2020 Markus Neteler <neteler@mundialis.de> - 3.0.4-5
-
 * disabled JAVA and LaTeX support for EPEL8, due to (yet) missing dependencies
 
 * Wed Apr 22 2020 Björn Esser <besser82@fedoraproject.org> - 3.0.4-4
@@ -1241,7 +1691,7 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 - Added jnis
 - Patches updated with proper version info
 - Added suggestions from Ralph Apel <r.apel@r-apel.de>
-	+ Versionless symlink for gdal.jar
-	+ Maven2 pom
-	+ JPP-style depmap
-	+ Use -f XX.files for ruby and python
+  + Versionless symlink for gdal.jar
+  + Maven2 pom
+  + JPP-style depmap
+  + Use -f XX.files for ruby and python

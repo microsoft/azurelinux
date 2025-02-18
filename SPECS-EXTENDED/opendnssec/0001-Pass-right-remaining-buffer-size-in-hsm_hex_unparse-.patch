@@ -1,0 +1,35 @@
+From 4d87db0f11bcdd5c54fadb92351b603bd07f76f8 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 30 Jan 2023 11:44:49 +0200
+Subject: [PATCH] Pass right remaining buffer size in hsm_hex_unparse to handle
+ string fortification
+
+When string fortification is in use (-DFORTIFY_SOURCE=3), GCC and glibc
+will cut few bytes off the string buffer for prevention of buffer
+overruns. As a result, hsm_hex_unparse() will call into snprintf() with
+a buffer length bigger than the size of the buffer as seen by the
+GCC/glibc pair.
+
+See also: https://pagure.io/freeipa/issue/9312
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ libhsm/src/lib/libhsm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libhsm/src/lib/libhsm.c b/libhsm/src/lib/libhsm.c
+index 88dc79e31..8f1e0c3bc 100644
+--- a/libhsm/src/lib/libhsm.c
++++ b/libhsm/src/lib/libhsm.c
+@@ -1382,7 +1382,7 @@ hsm_hex_unparse(char *dst, const unsigned char *src, size_t len)
+     size_t i;
+ 
+     for (i = 0; i < len; i++) {
+-        snprintf(dst + (2*i), dst_len, "%02x", src[i]);
++        snprintf(dst + (2*i), dst_len - (2*i), "%02x", src[i]);
+     }
+     dst[len*2] = '\0';
+ }
+-- 
+2.39.0
+

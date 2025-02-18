@@ -1,0 +1,29 @@
+From 2a3a7ffa38a2e8ed7f9e89920deabd797ed961d5 Mon Sep 17 00:00:00 2001
+From: Marian Csontos <mcsontos@redhat.com>
+Date: Thu, 27 Jul 2023 11:37:01 +0200
+Subject: [PATCH] Tweak cargo.toml to work with vendor directory
+
+Mock works offline, cargo would try to download the files from github.
+So cargo vendor has to be run first, and then change the Cargo.toml to
+make mock happy.
+---
+ Cargo.toml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index b33b0a4b..2a87e432 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -33,7 +33,8 @@ quick-xml = "0.31"
+ rand = "0.8"
+ rangemap = "1.5"
+ roaring = "0.10"
+-rio = { git = "https://github.com/jthornber/rio", branch = "master", optional = true }
++#rio = { git = "https://github.com/jthornber/rio", branch = "master", optional = true }
++rio = { version = "0.9.4", optional = true }
+ safemem = "0.3"
+ threadpool = "1.8"
+ thiserror = "1.0"
+-- 
+2.43.0
+

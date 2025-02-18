@@ -1,33 +1,33 @@
-%global gittag 1_8_0
+Name:          gpsbabel
+Version:       1.9.0
+Release:       7%{?dist}
+Summary:       A tool to convert between various formats used by GPS devices
 
-Summary:        A tool to convert between various formats used by GPS devices
-Name:           gpsbabel
-Version:        1.8.0
-Release:        4%{?dist}
-License:        GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.gpsbabel.org
+License:       GPL-2.0-or-later
+URL:           http://www.gpsbabel.org
 # Upstream's website hides tarball behind some ugly php script
 # Original repo is at https://github.com/gpsbabel/gpsbabel
-Source0:        https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_1_8_0.tar.gz#/%{name}-%{version}.tar.gz
-Source2:        %{name}.png
-# No automatic phone home by default (RHBZ 668865)
-Patch1:         0002-No-solicitation.patch
+Source0:       gpsbabel-%{version}.tar.gz
+Source2:       %{name}.png
 
+# No automatic phone home by default (RHBZ 668865)
+Patch2:        0002-No-solicitation.patch
+
+BuildRequires: libusb1-devel
+BuildRequires: zlib-devel
+BuildRequires: desktop-file-utils
+BuildRequires: shapelib-devel
+BuildRequires: cmake
+
+BuildRequires: qt5-qtbase-devel
+BuildRequires: qt5-qtserialport-devel
 %ifarch %{qt5_qtwebengine_arches}
 # HACK: Don't build GUI on archs not supported by qtwebengine
 %global build_gui 1
-BuildRequires:  qt5-qtwebchannel-devel
-BuildRequires:  qt5-qtwebengine-devel
+BuildRequires: qt5-qtwebchannel-devel
+BuildRequires: qt5-qtwebengine-devel
+BuildRequires: qt5-qttranslations
 %endif
-BuildRequires:  cmake
-BuildRequires:  desktop-file-utils
-BuildRequires:  libusb1-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtserialport-devel
-BuildRequires:  shapelib-devel
-BuildRequires:  zlib-devel
 
 %description
 Converts GPS waypoint, route, and track data from one format type
@@ -36,40 +36,40 @@ to another.
 %if 0%{?build_gui}
 %package gui
 Summary:        Qt GUI interface for GPSBabel
+License:        GPL-2.0-or-later
 Requires:       %{name} = %{version}-%{release}
+# pull-in qt5 standard translations.
+# Otherwise items such as "Close", "Open" won't be translated
+Requires:       qt5-qttranslations
 
 %description gui
 Qt GUI interface for GPSBabel
 %endif
 
 %prep
-%autosetup -n %{name}-%{name}_%{gittag} -p1
+%setup -q -n %{name}-%{version}
+
+%patch -P 2 -p1
 
 %build
 %cmake \
+  -DGPSBABEL_WITH_LIBUSB=pkgconfig \
   -DGPSBABEL_WITH_ZLIB=pkgconfig \
-  -DGPS_BABEL_WITH_SHAPE_LIB=pkgconfig \
   -DGPSBABEL_WITH_SHAPELIB=pkgconfig \
   %{?!build_gui:-DGPSBABEL_MAPPREVIEW=OFF} \
-  .
+  ..
 %cmake_build
 
 
 %install
 %cmake_install
 
-install -m 0755 -d %{buildroot}/%{_bindir}
-install -m 0755 -p gpsbabel %{buildroot}/%{_bindir}
+install -m 0755 -d %{buildroot}%{_bindir}/
+install -m 0755 -p %{_vpath_builddir}/gpsbabel %{buildroot}%{_bindir}/
 
 %if 0%{?build_gui}
 install -m 0755 -d %{buildroot}%{_bindir}/
 install -m 0755 -p %{_vpath_builddir}/gui/GPSBabelFE/gpsbabelfe %{buildroot}%{_bindir}/
-
-install -m 0755 -d %{buildroot}%{_qt5_translationdir}/
-install -m 0644 -p gui/gpsbabelfe_*.qm     %{buildroot}%{_qt5_translationdir}/
-
-install -m 0755 -d %{buildroot}%{_qt5_translationdir}/
-install -m 0644 -p gui/coretool/gpsbabel_*.qm %{buildroot}%{_qt5_translationdir}/
 
 install -m 0755 -d %{buildroot}%{_datadir}/gpsbabel
 install -m 0644 -p gui/gmapbase.html %{buildroot}%{_datadir}/gpsbabel
@@ -80,12 +80,7 @@ desktop-file-install \
 
 install -m 0755 -d            %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/
 install -m 0644 -p %{SOURCE2} %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/
-
-%find_lang %{name} --with-qt --all-name
 %endif
-
-%check
-make check
 
 %files
 %doc README* AUTHORS
@@ -93,7 +88,7 @@ make check
 %{_bindir}/gpsbabel
 
 %if 0%{?build_gui}
-%files gui -f %{name}.lang
+%files gui
 %doc gui/{AUTHORS,README*,TODO}
 %license gui/COPYING*
 %{_bindir}/gpsbabelfe
@@ -103,10 +98,37 @@ make check
 %endif
 
 %changelog
-* Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.8.0-4
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- License verified
-- Add check section
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Dec 24 2023 Sandro Mani <manisandro@gmail.com> - 1.9.0-4
+- Rebuild (shapelib)
+
+* Fri Oct 27 2023 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.9.0-3
+- Add -DGPSBABEL_WITH_LIBUSB=pkgconfig.
+- Remove -DGPS_BABEL_WITH_SHAPE_LIB=pkgconfig.
+
+* Fri Oct 27 2023 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.9.0-2
+- Do not install *.qm (tstevens4).
+- Add R/BR: qt5-qttranslations.
+
+* Sun Oct 22 2023 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.9.0-1
+- Upstream update.
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 15 2022 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.8.0-4
+- Convert license to SPDX.
 
 * Tue Aug 02 2022 Fedora Release Engineering <corsepiu@fedoraproject.org> - 1.8.0-3
 - Build against libusb1 instead of libusb (F37FTBS, RHBZ#2113432).

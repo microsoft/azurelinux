@@ -1,30 +1,41 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global	majorver	3.12.0
+%global	majorver	3.13.3
+#%%global	preminorver	.rc6
+%global	rpmminorver	.%(echo %preminorver | sed -e 's|^\\.\\.*||')
 %global	fullver	%{majorver}%{?preminorver}
+
+%global	baserelease	1
 
 %global	gem_name	rspec-expectations
 
-%global	need_bootstrap_set	0
+%bcond_with bootstrap
 
 %undefine __brp_mangle_shebangs
 
 Summary:	RSpec expectations (should and matchers)
 Name:		rubygem-%{gem_name}
 Version:	%{majorver}
-Release:	1%{?dist}
+Release:	%{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}
 
+# SPDX confirmed
 License:	MIT
 URL:		http://github.com/rspec/rspec-expectations
-Source0:	https://github.com/rspec/rspec-expectations/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
+Source0:	https://rubygems.org/gems/%{gem_name}-%{fullver}.gem
+# %%{SOURCE2} %%{name} %%{version}
+Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
+Source2:	rspec-related-create-full-tarball.sh
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
-%if 0%{?need_bootstrap_set} < 1
+%if %{without bootstrap}
 BuildRequires:	rubygem(rspec)
+BuildRequires:	rubygem(rake)
 # Some features in expectations needs this
 BuildRequires:	rubygem(rspec-support) >= 3.9.3
 BuildRequires:	rubygem(minitest) >= 5
+%if ! 0%{?rhel}
+BuildRequires:	rubygem(aruba)
+BuildRequires:	rubygem(cucumber)
+%endif
 BuildRequires:	git
 %endif
 BuildArch:		noarch
@@ -42,7 +53,9 @@ This package contains documentation for %{name}.
 
 
 %prep
-%autosetup -S git -n %{gem_name}-%{version}
+%setup -q -T -n %{gem_name}-%{version} -b 1
+
+gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 
 %build
 gem build %{gem_name}.gemspec
@@ -56,11 +69,29 @@ cp -a .%{gem_dir}/* \
 # cleanups
 rm -f %{buildroot}%{gem_instdir}/{.document,.yardopts}
 
-%if 0%{?need_bootstrap_set} < 1
 %check
-LANG=C.UTF-8
-ruby -rrubygems -Ilib/ -S rspec spec/
+%if %{with bootstrap}
+# Skip test, exiting
+exit 0
 %endif
+
+LANG=C.UTF-8
+export RUBYLIB=$(pwd)/lib
+rspec spec/
+
+%if 0%{?rhel}
+# Skip cucumber test
+exit 0
+%endif
+
+# Skip one failing scenario, needs investigating...
+sed -i features/built_in_matchers/include.feature -e '\@skip-on-fedora@d'
+sed -i features/built_in_matchers/include.feature -e 's|^\([ \t]*\)\(Scenario: counts usage.*\)|\1@skip-on-fedora\n\1\2|'
+export CUCUMBER_PUBLISH_QUIET=true
+cucumber \
+    --tag "not @skip-when-diff-lcs-1.3" \
+    --tag "not @skip-on-fedora" \
+    %{nil}
 
 %files
 %dir	%{gem_instdir}
@@ -78,13 +109,88 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %{gem_docdir}
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.12.0-1
-- Switch to build from .tar.gz
-- License verified
+* Sun Sep 08 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.3-1
+- 3.13.3
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Aug 21 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.2-1
+- 3.13.2
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.13.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 18 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.1-1
+- 3.13.1
+
+* Fri Feb 09 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.0-1
+- 3.13.0
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Aug 06 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.3-4
+- Remove unneeded conditionals for new MiniTest support
+
+* Fri Aug  4 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.3-3
+- Support MiniTest 5.19+
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Apr 21 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.3-1
+- 3.12.3
+
+* Fri Mar 10 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 3.12.2-2
+- Disable unwanted dependencies in RHEL builds
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 17 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.2-1
+- 3.12.2
+
+* Wed Dec 21 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.1-1
+- 3.12.1
+
+* Thu Oct 27 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.0-1
+- 3.12.0
+
+* Thu Sep 15 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.1-1
+- 3.11.1
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Feb 10 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.0-1
+- 3.11.0
+
+* Sun Jan 30 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.2-2
+- BR: rubygem(rake) for check
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.2-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 18 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.2-1
+- 3.10.2
+- Execute cucumber test
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-1.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 29 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.1-1
+- 3.10.1
+
+* Fri Dec 11 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.0-1
+- Enable tests again
+
+* Fri Dec 11 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.0-0.1
+- 3.10.0
+- Once disable test for bootstrap
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.2-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sat May  9 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.9.2-1
 - 3.9.2

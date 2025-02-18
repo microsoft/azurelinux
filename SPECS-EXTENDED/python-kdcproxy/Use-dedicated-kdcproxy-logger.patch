@@ -1,0 +1,71 @@
+From 99babf4ba3ce4d1f5bb893e7678df44d16b74d03 Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Mon, 18 Nov 2024 10:01:16 +0100
+Subject: [PATCH] Use dedicated "kdcproxy" logger
+
+Signed-off-by: Julien Rische <jrische@redhat.com>
+(cherry picked from commit c8a69dbc0777579ba3bf3d156baed0966327ebc2)
+---
+ kdcproxy/__init__.py        | 7 +++++--
+ kdcproxy/config/__init__.py | 7 +++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/kdcproxy/__init__.py b/kdcproxy/__init__.py
+index d0ca43e..ce96a0c 100644
+--- a/kdcproxy/__init__.py
++++ b/kdcproxy/__init__.py
+@@ -38,6 +38,9 @@ else:
+     import httplib
+     import urlparse
+ 
++logging.basicConfig()
++logger = logging.getLogger('kdcproxy')
++
+ 
+ class HTTPException(Exception):
+ 
+@@ -327,8 +330,8 @@ class Application:
+                         fail_socktype = self.addr2socktypename(fail_addr)
+                         fail_ip = fail_addr[4][0]
+                         fail_port = fail_addr[4][1]
+-                        logging.warning("Exchange with %s:[%s]:%d failed: %s",
+-                                        fail_socktype, fail_ip, fail_port, e)
++                        logger.warning("Exchange with %s:[%s]:%d failed: %s",
++                                       fail_socktype, fail_ip, fail_port, e)
+                     if reply is not None:
+                         break
+ 
+diff --git a/kdcproxy/config/__init__.py b/kdcproxy/config/__init__.py
+index a1435b7..8e17c5b 100644
+--- a/kdcproxy/config/__init__.py
++++ b/kdcproxy/config/__init__.py
+@@ -32,6 +32,9 @@ except ImportError:  # Python 2.x
+ import dns.rdatatype
+ import dns.resolver
+ 
++logging.basicConfig()
++logger = logging.getLogger('kdcproxy')
++
+ 
+ class IResolver(object):
+ 
+@@ -60,14 +63,14 @@ class KDCProxyConfig(IConfig):
+         try:
+             self.__cp.read(filenames)
+         except configparser.Error:
+-            logging.error("Unable to read config file(s): %s", filenames)
++            logger.error("Unable to read config file(s): %s", filenames)
+ 
+         try:
+             mod = self.__cp.get(self.GLOBAL, "configs")
+             try:
+                 importlib.import_module("kdcproxy.config." + mod)
+             except ImportError as e:
+-                logging.log(logging.ERROR, "Error reading config: %s" % e)
++                logger.log(logging.ERROR, "Error reading config: %s" % e)
+         except configparser.Error:
+             pass
+ 
+-- 
+2.46.0
+

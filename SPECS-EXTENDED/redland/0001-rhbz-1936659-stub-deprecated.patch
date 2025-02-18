@@ -1,0 +1,69 @@
+diff -ru redland-1.0.17.orig/src/rdf_uri.c redland-1.0.17/src/rdf_uri.c
+--- redland-1.0.17.orig/src/rdf_uri.c	2021-03-22 09:02:42.420115182 +0000
++++ redland-1.0.17/src/rdf_uri.c	2021-03-22 09:06:54.432694225 +0000
+@@ -358,32 +358,14 @@
+  * @world: #librdf_world object
+  * @uri: #librdf_uri object
+  *
+- * Get a digest for the URI.
+- * 
+- * Generates a digest object for the URI.  The digest factory used is
+- * determined at class initialisation time by librdf_init_uri().
+- * 
+- * Return value: new #librdf_digest object or NULL on failure.
++ * exported public in error but never usable
++ *
++ * Return value: NULL.
+  **/
+ librdf_digest*
+ librdf_uri_get_digest(librdf_world* world, librdf_uri* uri)
+ {
+-  librdf_digest* d;
+-  unsigned char *str;
+-  size_t len;
+-  
+-  LIBRDF_ASSERT_OBJECT_POINTER_RETURN_VALUE(uri, librdf_uri, NULL);
+-
+-  d = librdf_new_digest_from_factory(world, world->digest_factory);
+-  if(!d)
+-    return NULL;
+-
+-  str = librdf_uri_as_counted_string(uri, &len);
+-  
+-  librdf_digest_update(d, str, len);
+-  librdf_digest_final(d);
+-  
+-  return d;
++  return NULL;
+ }
+ 
+ 
+@@ -536,7 +518,6 @@
+ {
+   const unsigned char *hp_string=(const unsigned char*)"http://purl.org/net/dajobe/";
+   librdf_uri *uri1, *uri2, *uri3, *uri4, *uri5, *uri6, *uri7, *uri8, *uri9;
+-  librdf_digest *d;
+   const char *program=librdf_basename((const char*)argv[0]);
+   const char *file_string="/big/long/directory/file";
+   const unsigned char *file_uri_string=(const unsigned char*)"file:///big/long/directory/file";
+@@ -571,18 +552,11 @@
+   librdf_uri_print(uri2, stderr);
+   fputs("\n", stderr);
+ 
+-  
+-  fprintf(stderr, "%s: Getting digest for URI\n", program);
+-  d = librdf_uri_get_digest(world, uri2);
+-  if(!d) {
+-    fprintf(stderr, "%s: Failed to get digest for URI %s\n", program, 
++  if(librdf_uri_get_digest(world, uri2)) {
++    fprintf(stderr, "%s: Didn't fail to get digest for URI %s\n", program, 
+ 	    librdf_uri_as_string(uri2));
+     return(1);
+   }
+-  fprintf(stderr, "%s: Digest is: ", program);
+-  librdf_digest_print(d, stderr);
+-  fputs("\n", stderr);
+-  librdf_free_digest(d);
+ 
+   uri3=librdf_new_uri(world, (const unsigned char*)"file:/big/long/directory/");
+   uri4=librdf_new_uri(world, (const unsigned char*)"http://somewhere/dir/");

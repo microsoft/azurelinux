@@ -1,0 +1,67 @@
+From e20a29e689eab30408ccf495590d74c207092e3d Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 9 Sep 2022 15:08:45 +0200
+Subject: [PATCH 1/2] Disable tests requiring network access
+
+---
+ .../java/org/custommonkey/xmlunit/test_AbstractNodeTester.java  | 2 +-
+ .../java/org/custommonkey/xmlunit/test_DifferenceEngine.java    | 2 +-
+ .../java/org/custommonkey/xmlunit/test_NewDifferenceEngine.java | 2 +-
+ .../src/test/java/org/custommonkey/xmlunit/test_Validator.java  | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_AbstractNodeTester.java b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_AbstractNodeTester.java
+index 3a8ac80..df02659 100644
+--- a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_AbstractNodeTester.java
++++ b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_AbstractNodeTester.java
+@@ -176,7 +176,7 @@ public class test_AbstractNodeTester extends TestCase {
+     }
+ 
+     // never called as NodeTest directly jumps to the document element
+-    public void testDocumentType() throws Exception {
++    public void no_testDocumentType() throws Exception {
+         AbstractNodeTester t = new AbstractNodeTester() { };
+         DocumentType n = XMLUnit
+             .buildControlDocument("<!DOCTYPE Book PUBLIC \"XMLUNIT/TEST/PUB1\" \"../test-resources/Book.dtd\">"
+diff --git a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_DifferenceEngine.java b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_DifferenceEngine.java
+index 344d66c..35220b8 100644
+--- a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_DifferenceEngine.java
++++ b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_DifferenceEngine.java
+@@ -1020,7 +1020,7 @@ public class test_DifferenceEngine extends TestCase implements DifferenceConstan
+                     listener.different);
+     }
+ 
+-    public void testDoctypeDifferences() throws Exception {
++    public void no_testDoctypeDifferences() throws Exception {
+         String control = "<?xml version = \"1.0\" encoding = \"UTF-8\"?>"
+             + "<!DOCTYPE Book PUBLIC \"XMLUNIT/TEST/PUB1\" \"../test-resources/Book.dtd\">"
+             + "<Book/>";
+diff --git a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_NewDifferenceEngine.java b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_NewDifferenceEngine.java
+index 0e23767..526be89 100644
+--- a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_NewDifferenceEngine.java
++++ b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_NewDifferenceEngine.java
+@@ -567,7 +567,7 @@ public class test_NewDifferenceEngine extends TestCase implements DifferenceCons
+                     listener.different);
+     }
+ 
+-    public void testDoctypeDifferences() throws Exception {
++    public void no_testDoctypeDifferences() throws Exception {
+         String control = "<?xml version = \"1.0\" encoding = \"UTF-8\"?>"
+             + "<!DOCTYPE Book PUBLIC \"XMLUNIT/TEST/PUB1\" \"../test-resources/Book.dtd\">"
+             + "<Book/>";
+diff --git a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_Validator.java b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_Validator.java
+index ad63592..cfcc5e2 100644
+--- a/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_Validator.java
++++ b/xmlunit-legacy/src/test/java/org/custommonkey/xmlunit/test_Validator.java
+@@ -57,7 +57,7 @@ public class test_Validator extends XMLTestCase {
+     private Validator validator;
+     private File tempDTDFile;
+ 
+-    public void testXSchema() throws Exception{
++    public void no_testXSchema() throws Exception{
+         File xsdFile = new File(test_Constants.TEST_RESOURCE_DIR + "Book.xsd");
+         assertTrue("xsdFile " + xsdFile.getAbsolutePath() + " exists",
+                    xsdFile.exists());
+-- 
+2.37.3
+

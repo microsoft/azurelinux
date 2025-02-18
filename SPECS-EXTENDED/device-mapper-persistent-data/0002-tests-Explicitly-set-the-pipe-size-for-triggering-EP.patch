@@ -1,0 +1,25 @@
+From 9e55217135b7543f13a5801aafda0fe0a1fb363a Mon Sep 17 00:00:00 2001
+From: Ming-Hung Tsai <mtsai@redhat.com>
+Date: Mon, 26 Feb 2024 21:11:27 +0800
+Subject: [PATCH] [tests] Explicitly set the pipe size for triggering EPIPE
+
+(cherry picked from commit 0b3c80efd7c627ce7d75397452f496b6329a90c0)
+---
+ tests/thin_dump.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/thin_dump.rs b/tests/thin_dump.rs
+index 81982188..9eade06e 100644
+--- a/tests/thin_dump.rs
++++ b/tests/thin_dump.rs
+@@ -154,6 +154,7 @@ fn test_no_stderr_on_broken_pipe(extra_args: &[&std::ffi::OsStr]) -> Result<()>
+     let mut pipefd = [0i32; 2];
+     unsafe {
+         ensure!(libc::pipe2(pipefd.as_mut_slice().as_mut_ptr(), libc::O_CLOEXEC) == 0);
++        ensure!(libc::fcntl(pipefd[0], libc::F_SETPIPE_SZ, 65536) == 65536);
+     }
+ 
+     let mut args = args![&md].to_vec();
+-- 
+2.43.0
+

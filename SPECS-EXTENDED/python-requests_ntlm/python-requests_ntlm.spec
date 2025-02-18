@@ -1,12 +1,10 @@
 %global srcname requests_ntlm
-%define debug_package %{nil}
 
 Name:           python-%{srcname}
-Version:        1.1.0
-Release:        18%{?dist}
-Summary:        NTLM module for python requests
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Version:        1.2.0
+Release:        5%{?dist}
+Summary:        NTLM module for python requests (requires md4, thus legacy OpenSSL settings)
+
 License:        ISC
 URL:            https://pypi.python.org/pypi/requests_ntlm
 Source0:        https://github.com/requests/requests-ntlm/archive/v%{version}/%{srcname}-%{version}.tar.gz
@@ -14,7 +12,10 @@ BuildArch:      noarch
 
 %global _description %{expand:
 This package allows Python clients running on any operating system to provide
-NTLM authentication to a supporting server.}
+NTLM authentication to a supporting server.
+
+With OpenSSL 3 or above, this needs to set the legacy OpenSSL provider in
+order to support md4 in Python.}
 
 %description %{_description}
 
@@ -26,6 +27,7 @@ BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(requests) >= 2
 BuildRequires:  python3dist(ntlm-auth) >= 1.0.2
 BuildRequires:  python3dist(cryptography) >= 1.3
+BuildRequires:  python3dist(pyspnego) >= 0.1.6
 BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(flask)
 
@@ -43,9 +45,28 @@ Python 3 version.
 %py3_install
 
 %check
-# Disable tests as it hangs the pipeline infinitely
-#%python3 -m tests.test_server &
-#%python3 -m pytest --ignore=tests/functional/test_functional.py --ignore=tests/test_server.py -vv
+%python3 -m tests.test_server &
+%python3 -m pytest --ignore=tests/functional/test_functional.py --ignore=tests/test_server.py -vv -k 'not (TestRequestsNtlm and not username)'
+
+# see https://github.com/jborean93/ntlm-auth/issues/22
+cat > openssl.cnf << EOF
+openssl_conf = openssl_init
+
+[openssl_init]
+providers = provider_sect
+
+[provider_sect]
+default = default_sect
+legacy = legacy_sect
+
+[default_sect]
+activate = 1
+
+[legacy_sect]
+activate = 1
+EOF
+export OPENSSL_CONF=${PWD}/openssl.cnf
+%python3 -m pytest --ignore=tests/functional/test_functional.py --ignore=tests/test_server.py -vv -k '(TestRequestsNtlm and not username)'
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -54,12 +75,38 @@ Python 3 version.
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
-* Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.0-18
-- Disable tests as they hang the ptest pipeline
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.0-17
-- Initial CBL-Mariner import from Fedora 35 (license: MIT)
-- License verified
+* Sun Jun 09 2024 Python Maint <python-maint@redhat.com> - 1.2.0-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Aug 13 2023 Orion Poplawski <orion@nwra.com> - 1.2.0-1
+- Update to 1.2.0
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 16 2023 Python Maint <python-maint@redhat.com> - 1.1.0-21
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jun 16 2022 Python Maint <python-maint@redhat.com> - 1.1.0-18
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

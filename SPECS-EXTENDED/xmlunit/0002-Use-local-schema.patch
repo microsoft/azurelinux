@@ -1,0 +1,50 @@
+From 4d3f414382866e26eac672026cb294e5250375b4 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 26 Sep 2022 12:28:11 +0200
+Subject: [PATCH 2/2] Use local schema
+
+---
+ test-resources/BookXsdGenerated.xml            | 2 +-
+ test-resources/BookXsdGeneratedWithComment.xml | 2 +-
+ test-resources/invalidBook.xml                 | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test-resources/BookXsdGenerated.xml b/test-resources/BookXsdGenerated.xml
+index 1f55b93..2f09a58 100644
+--- a/test-resources/BookXsdGenerated.xml
++++ b/test-resources/BookXsdGenerated.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema" xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing https://www.xmlunit.org/test-support/Book.xsd">
++<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema" xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing Book.xsd">
+     <Title>Chicken Soup for the Soul</Title>
+     <Author>Jack Canfield</Author>
+     <Author>Mark Victor Hansen</Author>
+diff --git a/test-resources/BookXsdGeneratedWithComment.xml b/test-resources/BookXsdGeneratedWithComment.xml
+index e6f0364..d64500d 100644
+--- a/test-resources/BookXsdGeneratedWithComment.xml
++++ b/test-resources/BookXsdGeneratedWithComment.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!-- this is a comment -->
+-<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema" xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing https://raw.githubusercontent.com/xmlunit/test-resources/main/Book.xsd">
++<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema" xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing Book.xsd">
+     <Title>Chicken Soup for the Soul</Title>
+     <Author>Jack Canfield</Author>
+     <Author>Mark Victor Hansen</Author>
+diff --git a/test-resources/invalidBook.xml b/test-resources/invalidBook.xml
+index 1d50d5c..5858d00 100644
+--- a/test-resources/invalidBook.xml
++++ b/test-resources/invalidBook.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema" 
+-    xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing https://raw.githubusercontent.com/xmlunit/test-resources/main/Book.xsd">
++<Book xmlns:xsd="http://www.w3.org/2000/10/XMLSchema"
++    xmlns="https://www.xmlunit.org/publishing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.xmlunit.org/publishing Book.xsd">
+     <Title>Chicken Soup for the Soul</Title>
+     <Author>Jack Canfield</Author>
+     <Author>Mark Victor Hansen</Author>
+-- 
+2.37.3
+

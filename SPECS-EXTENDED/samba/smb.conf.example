@@ -281,7 +281,7 @@
 
 [printers]
 	comment = All Printers
-	path = /var/spool/samba
+	path = /var/tmp
 	browseable = no
 	guest ok = no
 	writable = no

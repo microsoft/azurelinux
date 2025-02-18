@@ -1,33 +1,41 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           switcheroo-control
-Version:        2.4
-Release:        3%{?dist}
+Version:        2.6
+Release:        6%{?dist}
 Summary:        D-Bus service to check the availability of dual-GPU
 
 License:        GPLv3
 URL:            https://gitlab.freedesktop.org/hadess/switcheroo-control/
 # URL from https://gitlab.freedesktop.org/hadess/switcheroo-control/-/releases
-Source0:        https://gitlab.freedesktop.org/hadess/switcheroo-control/uploads/accd4a9492979bfd91b587ae7e18d3a2/switcheroo-control-2.4.tar.xz
+Source0:        https://gitlab.freedesktop.org/hadess/switcheroo-control/uploads/86ea54ac7ddb901b6bf6e915209151f8/switcheroo-control-2.6.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  systemd
-BuildRequires:	systemd-devel
+BuildRequires:  python3-dbusmock
+BuildRequires:  umockdev
 
 %{?systemd_requires}
 
 %description
 D-Bus service to check the availability of dual-GPU.
 
+%package docs
+Summary:        Documentation for %{name}
+BuildArch:      noarch
+
+%description docs
+
+This package contains the documentation for %{name}.
+
 %prep
 %autosetup
 
 
 %build
-%meson -Dgtk_doc=false
+%meson -Dgtk_doc=true
 %meson_build
 
 
@@ -52,23 +60,60 @@ fi
 %license COPYING
 %doc NEWS README.md
 %{_bindir}/switcherooctl
-%{_sysconfdir}/dbus-1/system.d/net.hadess.SwitcherooControl.conf
+%{_datadir}/dbus-1/system.d/net.hadess.SwitcherooControl.conf
 %{_unitdir}/switcheroo-control.service
 %{_libexecdir}/switcheroo-control
 %{_udevhwdbdir}/30-pci-intel-gpu.hwdb
+%{_mandir}/man1/switcherooctl.1*
+
+%files docs
+%dir %{_datadir}/gtk-doc/
+%dir %{_datadir}/gtk-doc/html/
+%{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4-3
-- Removing gtk-docs since they require a network connection.
-- License verified.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.4-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add BR:systemd-devel for pkgconfig files
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 01 2022 Bastien Nocera <bnocera@redhat.com> - 2.6-1
++ switcheroo-control-2.6-1
+- Update to 2.6
+
+* Fri Apr 29 2022 Bastien Nocera <bnocera@redhat.com> - 2.5-1
++ switcheroo-control-2.5-1
+- Update to 2.5
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.4-3
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Jan 04 2021 Bastien Nocera <bnocera@redhat.com> - 2.4-1
 + switcheroo-control-2.4-1
 - Update to 2.4
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Apr 27 2020 Bastien Nocera <bnocera@redhat.com> - 2.2-1
 + switcheroo-control-2.2-1

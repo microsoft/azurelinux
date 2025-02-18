@@ -1,24 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global modname flake8
-
-%global entrypoints_dep >= 0.3
-%global pyflakes_dep    >= 2.1.0
-%global pycodestyle_dep >= 2.5.0
-%global mccabe_dep      >= 0.6.0
-
-Name:             python-%{modname}
-Version:          3.7.7
-Release:          9%{?dist}
+Name:             python-flake8
+Version:          6.1.0
+Release:          3%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
 
 License:          MIT
-URL:              https://gitlab.com/pycqa/flake8
-Source0:          https://files.pythonhosted.org/packages/source/f/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
+URL:              https://github.com/PyCQA/flake8
+Source:           %{url}/archive/%{version}/flake8-%{version}.tar.gz
+
 BuildArch:        noarch
-%if 0%{?with_check}
-BuildRequires:    python3-pip
-%endif
+
+BuildRequires:    python%{python3_pkgversion}-devel
+
+# tox config mixes coverage and tests, so we specify this manually instead
+BuildRequires:    python%{python3_pkgversion}-pytest
 
 %description
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
@@ -31,25 +25,10 @@ issue warnings, Git and Mercurial hooks are included, a McCabe
 complexity checker is included, and it is extendable through
 flake8.extension entry points.
 
-%package -n python%{python3_pkgversion}-%{modname}
-Summary:        Python code checking using pyflakes, pycodestyle, and mccabe
+%package -n python%{python3_pkgversion}-flake8
+Summary:          %{summary}
 
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
-
-Requires:         python%{python3_pkgversion}-setuptools
-Requires:         python%{python3_pkgversion}-mccabe %{mccabe_dep}
-Requires:         python%{python3_pkgversion}-pycodestyle %{pycodestyle_dep}
-Requires:         python%{python3_pkgversion}-pyflakes %{pyflakes_dep}
-
-BuildRequires:    python%{python3_pkgversion}-devel
-BuildRequires:    python%{python3_pkgversion}-setuptools
-BuildRequires:    python%{python3_pkgversion}-entrypoints %{entrypoints_dep}
-BuildRequires:    python%{python3_pkgversion}-mccabe %{mccabe_dep}
-BuildRequires:    python%{python3_pkgversion}-pycodestyle %{pycodestyle_dep}
-BuildRequires:    python%{python3_pkgversion}-pyflakes %{pyflakes_dep}
-BuildRequires:    python%{python3_pkgversion}-mock
-
-%description -n python%{python3_pkgversion}-%{modname}
+%description -n python%{python3_pkgversion}-flake8
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
 script. It runs all the tools by launching the single flake8 script,
 and displays the warnings in a per-file, merged output.
@@ -61,47 +40,111 @@ complexity checker is included, and it is extendable through
 flake8.extension entry points.
 
 %prep
-%autosetup -p1 -n %{modname}-%{version}
+%autosetup -p1 -n flake8-%{version}
 
-# we have 0.3, that is not deemed >= 0.3.0 by RPM
-sed -i 's/entrypoints >= 0.3.0/entrypoints >= 0.3/' setup.py
+%generate_buildrequires
+%pyproject_buildrequires
 
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files flake8
+
+# Backwards-compatibility symbolic links from when we had both Python 2 and 3
 ln -s flake8 %{buildroot}%{_bindir}/flake8-3
 ln -s flake8 %{buildroot}%{_bindir}/flake8-%{python3_version}
 ln -s flake8 %{buildroot}%{_bindir}/python3-flake8
 
 
 %check
-pip3 install pytest
-pip3 install .
-%{__python3} -m pytest tests -v
+%pytest -v
 
 
-%files -n python%{python3_pkgversion}-%{modname}
-%license LICENSE
+%files -n python%{python3_pkgversion}-flake8 -f %{pyproject_files}
 %doc README.rst CONTRIBUTORS.txt
 %{_bindir}/flake8
 %{_bindir}/flake8-3
 %{_bindir}/flake8-%{python3_version}
 %{_bindir}/python3-flake8
-%{python3_sitelib}/%{modname}*
 
 
 %changelog
-* Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.7.7-9
-- Drop BR on `pytest` and add an explict BR pip
-- pip install latest deps to enable ptest
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.7-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 6.1.0-2
+- Rebuilt for Python 3.13
+
+* Sat Feb 17 2024 Ali Erdinc Koroglu <aekoroglu@fedoraproject.org> - 6.1.0-1
+- Update to 6.1.0 (RHBZ #2227450)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 13 2023 Adam Williamson <awilliam@redhat.com> - 6.0.0-1
+- New release 6.0.0, rebuilt for Python 3.12 with fixes
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Aug 02 2022 Ali Erdinc Koroglu <aekoroglu@fedoraproject.org> - 5.0.3-1
+- Update to 5.0.3 (RHBZ #2112594)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.0.1-4
+- Rebuilt for Python 3.11
+
+* Tue Feb 22 2022 Miro Hrončok <mhroncok@redhat.com> - 4.0.1-3
+- Match runtime- and buildtime- requirements
+- Drop redundant requirement of python3-mock
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 13 2021 Matthias Runge <mrunge@redhat.com> - 4.0.1-1
+- rebase to work with upgraded pycodestyle (rhbz#2013271)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 05 2021 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 3.9.2-1
+- Update to 3.9.2
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.8.4-2
+- Rebuilt for Python 3.10
+
+* Mon Feb 01 2021 Matthias Runge <mrunge@redhat.com> - 3.8.4-1
+- update to 3.8.4 (rhbz#1884848)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 10 2020 Miro Hrončok <mhroncok@redhat.com> - 3.8.3-3
+- Fix compatibility with pytest 6
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 09 2020 Matthias Runge <mrunge@redhat.com> - 3.8.3-1
+- update to 3.8.3 (rhbz#1845273)
+
+* Sun May 31 2020 Miro Hrončok <mhroncok@redhat.com> - 3.8.2-1
+- Update to 3.8.2 (#1727999)
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 3.7.7-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.7-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

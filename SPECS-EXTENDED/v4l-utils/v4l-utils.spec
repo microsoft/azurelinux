@@ -1,32 +1,47 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%bcond qt %[%{undefined rhel} || 0%{?rhel} < 10]
+
+# Currently broken without DVB due to a bunch of random bits
+# being built/installed even though they're DVB specific
+%define with_dvb 1
+
 Name:           v4l-utils
-Version:        1.22.1
+Version:        1.28.1
 Release:        1%{?dist}
 Summary:        Utilities for video4linux and DVB devices
-# libdvbv5, dvbv5 utils, ir-keytable and v4l2-sysfs-path are GPLv2 only
-License:        GPLv2+ and GPLv2
-URL:            https://www.linuxtv.org/downloads/v4l-utils/
+# libdvbv5, dvbv5 utils, ir-keytable are GPL-2.0-only
+# e.g. utils/cec-follower/cec-follower.cpp is (GPL-2.0-only OR BSD-3-Clause) 
+# utils/qvidcap/capture.cpp, paint.cpp are LicenseRef-Fedora-Public-Domain
+# utils/v4l2-sysfs-path/v4l2-sysfs-path.c is HPND-sell-variant
+License:        GPL-2.0-or-later AND GPL-2.0-only AND (GPL-2.0-only OR BSD-3-Clause) AND LicenseRef-Fedora-Public-Domain AND HPND-sell-variant
+URL:            http://www.linuxtv.org/downloads/v4l-utils/
 
-Source0:        https://www.linuxtv.org/downloads/%{name}/%{name}-%{version}.tar.bz2
-Patch0:         0001-utils-v4l2-TPG-Update-use-of-typeof.patch
+Source0:        http://linuxtv.org/downloads/v4l-utils/v4l-utils-%{version}.tar.xz
+# TODO: submit upstream
+Patch0:         sbin-location.diff
 
 BuildRequires:  alsa-lib-devel
-BuildRequires:  desktop-file-utils
 BuildRequires:  doxygen
 BuildRequires:  gettext
+BuildRequires:  json-c-devel
 BuildRequires:  kernel-headers
 BuildRequires:  libjpeg-devel
-BuildRequires:  make
+BuildRequires:  meson >= 0.56
+%if %{with qt}
+BuildRequires:  desktop-file-utils
+%if 0%{?fedora} < 41 || 0%{?rhel}
 BuildRequires:  qt5-qtbase-devel
-BuildRequires:  systemd-devel
-
-# BPF decoder dependencies
-%define with_bpf 1
-
-%if %{with_bpf}
-BuildRequires:  elfutils-libelf-devel clang
+%else
+BuildRequires:  qt6-qtbase-devel
+BuildRequires:  qt6-qt5compat-devel
 %endif
+%endif
+BuildRequires:  systemd-devel
+# For /usr/share/pkgconfig/udev.pc
+BuildRequires:  systemd
+# BPF decoder dependencies
+BuildRequires:  clang
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  libbpf-devel
 
 # For /lib/udev/rules.d ownership
 Requires:       systemd-udev
@@ -38,30 +53,12 @@ main v4l-utils package contains cx18-ctl, ir-keytable, ivtv-ctl, v4l2-ctl and
 v4l2-sysfs-path.
 
 
-%package        devel-tools
-Summary:        Utilities for v4l2 / DVB driver development and debugging
-# decode_tm6000 is GPLv2 only
-License:        GPLv2+ and GPLv2
-Requires:       libv4l%{?_isa} = %{version}-%{release}
-
-%description    devel-tools
-Utilities for v4l2 / DVB driver authors: decode_tm6000, v4l2-compliance and
-v4l2-dbg.
-
-
-%package -n     qv4l2
-Summary:        QT v4l2 test control and streaming test application
-License:        GPLv2+
-Requires:       libv4l%{?_isa} = %{version}-%{release}
-
-%description -n qv4l2
-QT v4l2 test control and streaming test application.
-
-
 %package -n     libv4l
 Summary:        Collection of video4linux support libraries 
-# Some of the decompression helpers are GPLv2, the rest is LGPLv2+
-License:        LGPLv2+ and GPLv2
+# Some of the decompression helpers are GPL-2.0-or-later, the rest is LGPL-2.1-or-later
+# lib/libv4lconvert/jidctflt.c and jpeg_memsrcdest.c are IJG-short
+# lib/libv4lconvert/helper-funcs.h and libv4lsyscall-priv.h are BSD-2-Clause
+License:        LGPL-2.1-or-later AND GPL-2.0-or-later AND IJG-short AND BSD-2-Clause
 URL:            http://hansdegoede.livejournal.com/3636.html
 
 %description -n libv4l
@@ -82,16 +79,9 @@ libv4l2 offers the v4l2 API on top of v4l2 devices, while adding for the
 application transparent libv4lconvert conversion where necessary.
 
 
-%package -n     libdvbv5
-Summary:        Libraries to control, scan and zap on Digital TV channels
-License:        GPLv2
-
-%description -n libdvbv5
-Libraries to control, scan and zap on Digital TV channels
-
 %package -n     libv4l-devel
 Summary:        Development files for libv4l
-License:        LGPLv2+
+License:        LGPL-2.1-or-later AND GPL-2.0-or-later AND IJG-short AND BSD-2-Clause
 URL:            http://hansdegoede.livejournal.com/3636.html
 Requires:       libv4l%{?_isa} = %{version}-%{release}
 
@@ -100,9 +90,50 @@ The libv4l-devel package contains libraries and header files for
 developing applications that use libv4l.
 
 
+%package        devel-tools
+Summary:        Utilities for v4l2 / DVB driver development and debugging
+License:        GPL-2.0-or-later AND GPL-2.0-only
+Requires:       libv4l%{?_isa} = %{version}-%{release}
+
+%description    devel-tools
+Utilities for v4l2 driver authors: v4l2-compliance and
+v4l2-dbg.
+
+
+%if %{with qt}
+%package -n     qv4l2
+Summary:        QT v4l2 test control and streaming test application
+# utils/qv4l2/qv4l2.svg is CC-BY-SA-3.0
+License:        GPL-2.0-or-later AND CC-BY-SA-3.0
+Requires:       libv4l%{?_isa} = %{version}-%{release}
+
+%description -n qv4l2
+QT v4l2 test control and streaming test application.
+%endif
+
+
+%if %{with dvb}
+%package -n     libdvbv5
+Summary:        Libraries to control, scan and zap on Digital TV channels
+# /lib/include/libdvbv5/dvb-frontend.h is LGPL-2.1-or-later WITH Linux-syscall-note
+License:        LGPL-2.1-or-later AND LGPL-2.1-or-later WITH Linux-syscall-note
+
+%description -n libdvbv5
+Libraries to control, scan and zap on Digital TV channels
+
+
+%package -n libdvbv5-gconv
+Summary:        Gconv files with the charsets For Digital TV.
+License:        LGPL-2.1-or-later
+
+%description -n libdvbv5-gconv
+Some digital TV standards define their own charsets. Add library
+support for them: EN 300 468 and ARIB STD-B24
+
+
 %package -n     libdvbv5-devel
 Summary:        Development files for libdvbv5
-License:        GPLv2
+License:        LGPL-2.1-or-later AND LGPL-2.1-or-later WITH Linux-syscall-note
 Requires:       libdvbv5%{?_isa} = %{version}-%{release}
 
 %description -n libdvbv5-devel
@@ -110,85 +141,118 @@ The libdvbv5-devel package contains libraries and header
 files for developing applications that use libdvbv5.
 
 
+%package        -n dvb-tools
+Summary:        Utilities for DVB driver
+License:        GPL-2.0-or-later AND GPL-2.0-only
+Requires:       libdvbv5%{?_isa} = %{version}-%{release}
+Requires:       libv4l%{?_isa} = %{version}-%{release}
+Requires:       v4l-utils%{?_isa} = %{version}-%{release}
+
+%description    -n dvb-tools
+Utilities and tools for DVB receivers.
+%endif
+
+
 %prep
 %autosetup -p1
 
 %build
-export CXXFLAGS="$CXXFLAGS -std=c++14"
-%configure --disable-static --enable-libdvbv5 --enable-doxygen-man
-# Don't use rpath!
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%make_build
-make doxygen-run
+%meson -Dbpf=auto -Ddoxygen-man=true -Ddoxygen-html=false \
+  %{!?with_dvb:-Dlibdvbv5=disabled} \
+  %{!?with_qt:-Dqv4l2=disabled -Dqvidcap=disabled}
 
+%meson_build
 
 %install
-%make_install
+%meson_install
+
 find $RPM_BUILD_ROOT -name '*.la' -delete
+# Driver removed from upstream
+rm -f $RPM_BUILD_ROOT%{_bindir}/decode_tm6000
 rm -f $RPM_BUILD_ROOT%{_libdir}/{v4l1compat.so,v4l2convert.so}
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man3/
-cp -arv %{_builddir}/%{name}-%{version}/doxygen-doc/man/man3 $RPM_BUILD_ROOT%{_mandir}/
-rm $RPM_BUILD_ROOT%{_mandir}/man3/_*3
+mkdir $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.d
+mv $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules $RPM_BUILD_ROOT%{_libdir}/gconv/gconv-modules.d/libdvbv5.conf
+
+%if %{with qt}
 desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
+desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qvidcap.desktop
+%endif
+
 %find_lang %{name}
 %find_lang libdvbv5
+
 
 %ldconfig_scriptlets -n libv4l
 
 %ldconfig_scriptlets -n libdvbv5
 
 %files -f %{name}.lang
-%doc README
+%doc README.md
 %dir %{_sysconfdir}/rc_keymaps
 %config(noreplace) %{_sysconfdir}/rc_maps.cfg
 %{_udevrulesdir}/70-infrared.rules
 %{_udevrulesdir}/../rc_keymaps/*
-%{_bindir}/cx18-ctl
-%{_bindir}/cec*
-%{_bindir}/dvb*
+%{_bindir}/cec-ctl
+%{_bindir}/cec-follower
 %{_bindir}/ir-ctl
 %{_bindir}/ir-keytable
-%{_bindir}/ivtv-ctl
 %{_bindir}/media-ctl
 %{_bindir}/rds-ctl
 %{_bindir}/v4l2-ctl
 %{_bindir}/v4l2-sysfs-path
-%{_mandir}/man1/*.1*
-%{_mandir}/man5/*.5*
-%exclude %{_mandir}/man1/qv4l2.1*
+%{_bindir}/v4l2-tracer
+%{_mandir}/man1/cec-ctl*.1*
+%{_mandir}/man1/cec-follower*.1*
+%{_mandir}/man1/ir*.1*
+%{_mandir}/man1/v4l*.1*
+%{_mandir}/man5/rc_keymap*.5*
 %exclude %{_mandir}/man1/v4l2-compliance.1*
 
 %files devel-tools
-%doc README
-%{_bindir}/decode_tm6000
+%doc README.md
+%{_bindir}/cec-compliance
 %{_bindir}/v4l2-compliance
+%{_mandir}/man1/cec-compliance.1*
 %{_mandir}/man1/v4l2-compliance.1*
 %{_sbindir}/v4l2-dbg
 
-%files -n qv4l2
-%doc README
-%{_bindir}/qv4l2
-%{_datadir}/applications/qv4l2.desktop
-%{_datadir}/icons/hicolor/*/apps/qv4l2.*
-%{_mandir}/man1/qv4l2.1*
-
 %files -n libv4l
-%doc ChangeLog README.libv4l TODO
 %license COPYING.libv4l COPYING
-%{_libdir}/libv4l
+%doc README.libv4l
+%dir %{_libdir}/libv4l
+%{_libdir}/libv4l/v4l*
+%{_libdir}/libv4l/plugins
 %{_libdir}/libv4l*.so.*
 
 %files -n libv4l-devel
-%doc README.lib-multi-threading
+%doc README.lib-multi-threading ChangeLog TODO
 %{_includedir}/libv4l*.h
 %{_libdir}/libv4l*.so
+%{_libdir}/libv4l/ov*
 %{_libdir}/pkgconfig/libv4l*.pc
 
+%if %{with qt}
+%files -n qv4l2
+%doc README.md
+%{_bindir}/qv4l2
+%{_bindir}/qvidcap
+%{_datadir}/applications/qv4l2.desktop
+%{_datadir}/applications/qvidcap.desktop
+%{_datadir}/icons/hicolor/*/apps/qv4l2.*
+%{_datadir}/icons/hicolor/*/apps/qvidcap.*
+%{_mandir}/man1/qv4l2.1*
+%{_mandir}/man1/qvidcap.1*
+%endif
+
+%if %{with dvb}
 %files -n libdvbv5 -f libdvbv5.lang
-%doc ChangeLog lib/libdvbv5/README
-%license COPYING
+%license COPYING.libdvbv5 COPYING
+%doc lib/libdvbv5/README
 %{_libdir}/libdvbv5*.so.*
+
+%files -n libdvbv5-gconv
+%{_libdir}/gconv/*.so
+%{_libdir}/gconv/gconv-modules.d/libdvbv5.conf
 
 %files -n libdvbv5-devel
 %{_includedir}/libdvbv5/*.h
@@ -196,15 +260,82 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 %{_libdir}/pkgconfig/libdvbv5*.pc
 %{_mandir}/man3/*.3*
 
+%files -n dvb-tools
+%{_bindir}/cx18-ctl
+%{_bindir}/dvb*
+%{_bindir}/ivtv-ctl
+%{_mandir}/man1/dvb*.1*
+%endif
+
 
 %changelog
-* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.1-1
-- Fixing building with GCC 11 using Fedora 36 spec (license: MIT) for guidance.
-- License verified.
+* Thu Jul 25 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.28.1-1
+- Update to 1.28.1
+- Build f41+ with QT6
 
-* Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 1.18.0-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove qvidap binaries which depend on graphics related components
+* Mon Jul 22 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.28.0-1
+- Update to 1.28.0
+- spec file cleanups, fixes, minor reorg
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 09 2024 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.26.1-5
+- Rebuilt for the bin-sbin merge
+
+* Wed Apr 24 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.26.1-4
+- Fix location of gconv conflicts
+
+* Tue Apr 23 2024 Peter Robinson <pbrobinson@fedoraproject.org> - 1.26.1-3
+- Split dvb tools to it's own sub package
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 13 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 1.26.1-1
+- Update to 1.26.1
+
+* Mon Dec 04 2023 Peter Robinson <pbrobinson@fedoraproject.org> - 1.26.0-1
+- Update to 1.26.0
+
+* Wed Aug 16 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.25.0-4
+- Disable qv4l2 in RHEL 10 builds
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.25.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Mar 20 2023 Mauro Carvalho Chehab <mchehab+samsung@kernel.org> 1.25.0-1
+- Updated to latest development branch
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Oct 23 2022 Hans de Goede <hdegoede@redhat.com> - 1.22.1-4
+- Fix libv4lconvert issues when stride > width (with some formats)
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Dec 08 2021 Peter Robinson <pbrobinson@fedoraproject.org> - 1.22.1-1
+- Update to 1.22.1
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Aug 18 2020 Jeff Law <law@redhat.com> - 1.20.0-2
+- Force C++14 as this code is not C++17 ready
+
+* Wed Aug 12 2020 Peter Robinson <pbrobinson@fedoraproject.org> - 1.20.0-1
+- Update to 1.20.0
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.18.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Feb 25 2020 Than Ngo <than@redhat.com> - 1.18.0-4
 - Fixed FTBFS

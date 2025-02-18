@@ -1,34 +1,39 @@
-%bcond_with mpich
-%bcond_with mpi
-Summary:        Graph, mesh and hypergraph partitioning library
-Name:           scotch
-Version:        6.1.2
-Release:        3%{?dist}
-License:        CeCILL-C
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://gitlab.inria.fr/scotch/scotch
-Source0:        https://gitlab.inria.fr/scotch/scotch/-/archive/v%{version}/scotch-v%{version}.tar.bz2
-Source1:        scotch-Makefile.shared.inc.in
-# Make shared libraries link properly with -Wl,--as-needed
-Patch0:         scotch-ldflags.patch
-# Ensure gfortran is used as fortran compiler
-Patch1:         scotch-gfortran.patch
-%global openmpidir %{_builddir}/ptscotch-openmpi-%{version}-%{release}
-%global mpichdir %{_builddir}/ptscotch-mpich-%{version}-%{release}
-# Shared library versioning:
-# Increment if interface is changed in an incompatible way
-%global so_maj 1
-# Increment if interface is extended
-%global so_min 3
-BuildRequires:  bison
-BuildRequires:  bzip2-devel
-BuildRequires:  flex
-BuildRequires:  gcc
-BuildRequires:  gcc-gfortran
-BuildRequires:  make
-BuildRequires:  xz-devel
-BuildRequires:  zlib-devel
+%bcond mpich %{undefined flatpak}
+%if 0%{?fedora} >= 40
+%ifarch %{ix86}
+%bcond openmpi 0
+%else
+%bcond openmpi %{undefined flatpak}
+%endif
+%else
+%bcond openmpi %{undefined flatpak}
+%endif
+%bcond metis 1
+
+# This flag prevents internal links
+%undefine _ld_as_needed
+
+Name:          scotch
+Summary:       Graph, mesh and hypergraph partitioning library
+Version:       7.0.4
+Release:       5%{?dist}
+
+License:       CeCILL-C
+URL:           https://gitlab.inria.fr/scotch/scotch
+Source0:       https://gitlab.inria.fr/scotch/scotch/-/archive/v%{version}/scotch-v%{version}.tar.bz2
+
+# Use CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR
+Patch0:        scotch_installdirs.patch
+
+BuildRequires: bison
+BuildRequires: bzip2-devel
+BuildRequires: cmake
+BuildRequires: flex
+BuildRequires: gcc-c++
+BuildRequires: gcc-gfortran
+BuildRequires: make
+BuildRequires: xz-devel
+BuildRequires: zlib-devel
 
 %description
 Scotch is a software package for graph and mesh/hypergraph partitioning and
@@ -36,15 +41,27 @@ sparse matrix ordering. The parallel scotch libraries are packaged in the
 ptscotch sub-packages.
 
 %package devel
-Summary:        Development libraries for scotch
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary:       Development libraries for scotch
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains development libraries for scotch.
 
+
+%if %{with metis}
+%package devel-metis
+Summary:       Metis compatibility header
+Requires:      %{name}-devel%{?_isa} = %{version}-%{release}
+
+%description devel-metis
+This header is a drop-in replacement for the original metis.h header
+to build against the scotch.
+%endif
+
+
 %package doc
-Summary:        Documentations and example for scotch and ptscotch
-BuildArch:      noarch
+Summary:       Documentations and example for scotch and ptscotch
+BuildArch:     noarch
 
 %description doc
 Contains documentations and example for scotch and ptscotch
@@ -53,226 +70,261 @@ Contains documentations and example for scotch and ptscotch
 
 %if %{with mpich}
 %package -n ptscotch-mpich
-Summary:        PT-Scotch libraries compiled against mpich
-BuildRequires:  mpich-devel
+Summary:       PT-Scotch libraries compiled against mpich
+BuildRequires: mpich-devel
 
 %description -n ptscotch-mpich
 Scotch is a software package for graph and mesh/hypergraph partitioning and
 sparse matrix ordering. This sub-package provides parallelized scotch libraries
 compiled with mpich.
 
+
 %package -n ptscotch-mpich-devel
-Summary:        Development libraries for PT-Scotch (mpich)
-Requires:       pt%{name}-mpich%{?_isa} = %{version}-%{release}
+Summary:       Development libraries for PT-Scotch (mpich)
+Requires:      pt%{name}-mpich%{?_isa} = %{version}-%{release}
 
 %description -n ptscotch-mpich-devel
 This package contains development libraries for PT-Scotch, compiled against
 mpich.
 
+
+%if %{with metis}
 %package -n ptscotch-mpich-devel-parmetis
-Summary:        Parmetis compatibility header for scotch
-Requires:       pt%{name}-mpich-devel%{?_isa} = %{version}-%{release}
+Summary:       Parmetis compatibility header
+Requires:      pt%{name}-mpich-devel%{?_isa} = %{version}-%{release}
 
 %description -n ptscotch-mpich-devel-parmetis
-This package contains the parmetis compatibility header for scotch.
-
+This header is a drop-in replacement for the original parmetis.h header
+to build against the scotch.
 %endif
+%endif
+
 ###############################################################################
-%if %{with mpi}
+
+%if %{with openmpi}
 %package -n ptscotch-openmpi
-Summary:        PT-Scotch libraries compiled against openmpi
-BuildRequires:  openmpi-devel
+Summary:       PT-Scotch libraries compiled against openmpi
+BuildRequires: openmpi-devel
 
 %description -n ptscotch-openmpi
 Scotch is a software package for graph and mesh/hypergraph partitioning and
 sparse matrix ordering. This sub-package provides parallelized scotch libraries
 compiled with openmpi.
 
+
 %package -n ptscotch-openmpi-devel
-Summary:        Development libraries for PT-Scotch (openmpi)
-Requires:       pt%{name}-openmpi%{?_isa} = %{version}-%{release}
+Summary:       Development libraries for PT-Scotch (openmpi)
+Requires:      pt%{name}-openmpi%{?_isa} = %{version}-%{release}
 
 %description -n ptscotch-openmpi-devel
 This package contains development libraries for PT-Scotch, compiled against
 openmpi.
 
+
+%if %{with metis}
 %package -n ptscotch-openmpi-devel-parmetis
-Summary:        Parmetis compatibility header for scotch
-Requires:       pt%{name}-openmpi-devel%{?_isa} = %{version}-%{release}
+Summary:       Parmetis compatibility header
+Requires:      pt%{name}-openmpi-devel%{?_isa} = %{version}-%{release}
 
 %description -n ptscotch-openmpi-devel-parmetis
-This package contains the parmetis compatibility header for scotch.
+This header is a drop-in replacement for the original parmetis.h header
+to build against the scotch.
 %endif
+%endif
+
+
 ###############################################################################
 
 %prep
-%autosetup -p1 -n %{name}-v%{version}
+%autosetup -N -n %{name}-v%{version}
 
-cp -a %{SOURCE1} src/Makefile.inc
+%patch 0 -p1 -b .backup
 
 # Convert the license files to utf8
 for file in doc/CeCILL-C_V1-en.txt doc/CeCILL-C_V1-fr.txt; do
     iconv -f iso8859-1 -t utf-8 $file > $file.conv && mv -f $file.conv $file
 done
 
-%if %{with mpich}
-cp -a . %{openmpidir}
-%endif
-
-%if %{with mpi}
-cp -a . %{mpichdir}
-%endif
 
 %build
-pushd src/
-make scotch esmumps CFLAGS="%{optflags}" LDFLAGS="%{?__global_ldflags}" SOMAJ="%{so_maj}"
-popd
+%define _vpath_builddir %{_target_platform}
+%cmake -DBUILD_PTSCOTCH=OFF \
+    -DCOMMON_PTHREAD:BOOL=ON \
+    -DSCOTCH_PTHREAD:BOOL=ON \
+    -DCOMMON_PTHREAD_AFFINITY_LINUX:BOOL=ON \
+%if %{with metis}
+    -DBUILD_LIBSCOTCHMETIS=ON \
+    -DSCOTCH_METIS_VERSION=5 \
+%else
+    -DBUILD_LIBSCOTCHMETIS=OFF \
+%endif
+    -DCMAKE_INSTALL_BINDIR=%{_bindir} \
+    -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+    -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/scotch \
+%cmake_build
 
 %if %{with mpich}
 %{_mpich_load}
-pushd %{mpichdir}/src/
-make ptscotch ptesmumps CFLAGS="%{optflags}" LDFLAGS="%{?__global_ldflags} -L%{_libdir}/mpich/lib -lmpi" SOMAJ="%{so_maj}"
-popd
+%define _vpath_builddir %{_target_platform}-mpich
+%cmake -DBUILD_PTSCOTCH=ON \
+    -DCOMMON_PTHREAD:BOOL=ON \
+    -DSCOTCH_PTHREAD:BOOL=ON \
+    -DCOMMON_PTHREAD_AFFINITY_LINUX:BOOL=ON \
+%if %{with metis}
+    -DBUILD_LIBSCOTCHMETIS=ON \
+    -DSCOTCH_PARMETIS_VERSION=3 \
+%else
+    -DBUILD_LIBSCOTCHMETIS=OFF \
+%endif
+    -DCMAKE_INSTALL_BINDIR=$MPI_BIN \
+    -DCMAKE_INSTALL_LIBDIR=$MPI_LIB \
+    -DCMAKE_INSTALL_INCLUDEDIR=$MPI_INCLUDE/scotch
+%cmake_build
 %{_mpich_unload}
 %endif
 
-%if %{with mpi}
+%if %{with openmpi}
 %{_openmpi_load}
-pushd %{openmpidir}/src/
-make ptscotch ptesmumps CFLAGS="%{optflags}" LDFLAGS="%{?__global_ldflags} -L%{_libdir}/openmpi/lib -lmpi" SOMAJ="%{so_maj}"
-popd
+%define _vpath_builddir %{_target_platform}-openmpi
+%cmake -DBUILD_PTSCOTCH=ON \
+    -DCOMMON_PTHREAD:BOOL=ON \
+    -DSCOTCH_PTHREAD:BOOL=ON \
+    -DCOMMON_PTHREAD_AFFINITY_LINUX:BOOL=ON \
+%if %{with metis}
+    -DBUILD_LIBSCOTCHMETIS=ON \
+    -DSCOTCH_PARMETIS_VERSION=3 \
+%else
+    -DBUILD_LIBSCOTCHMETIS=OFF \
+%endif
+    -DCMAKE_INSTALL_BINDIR=$MPI_BIN \
+    -DCMAKE_INSTALL_LIBDIR=$MPI_LIB \
+    -DCMAKE_INSTALL_INCLUDEDIR=$MPI_INCLUDE/scotch
+%cmake_build
 %{_openmpi_unload}
 %endif
+
 
 %install
-%define doinstall() \
-make install prefix=%{buildroot}${MPI_HOME} libdir=%{buildroot}${MPI_LIB} includedir=%{buildroot}${MPI_INCLUDE} mandir=%{buildroot}${MPI_MAN} bindir=%{buildroot}${MPI_BIN} \
-# Fix debuginfo packages not finding sources (See libscotch/Makefile) \
-ln -s parser_ll.c libscotch/lex.yy.c \
-ln -s parser_yy.c libscotch/y.tab.c \
-ln -s parser_ly.h libscotch/y.tab.h \
-\
-pushd %{buildroot}${MPI_LIB}; \
-for lib in *.so; do \
-    chmod 755 $lib \
-    mv $lib $lib.%{so_maj}.%{so_min} && ln -s $lib.%{so_maj}.%{so_min} $lib && ln -s $lib.%{so_maj}.%{so_min} $lib.%{so_maj} \
-done \
-popd \
-\
-pushd %{buildroot}${MPI_BIN} \
-for prog in *; do \
-    mv $prog scotch_${prog} \
-    chmod 755 scotch_$prog \
-done \
-popd \
-\
-pushd %{buildroot}${MPI_MAN}/man1/ \
-for man in *; do \
-    mv ${man} scotch_${man} \
-done \
-# Cleanup man pages (some pages are only relevant for ptscotch packages, and vice versa) \
-for man in *; do \
-  if [ ! -f %{buildroot}${MPI_BIN}/${man/.1/} ]; then \
-    rm -f $man \
-  fi \
-done \
-popd
+%define _vpath_builddir %{_target_platform}
+%cmake_install
 
-###############################################################################
+%if %{with metis}
+# Default to the v5 API for the metis compat library
+ln -s libscotchmetisv5.so %{buildroot}%{_libdir}/libscotchmetis.so
+# Rename include files to avoid conflicts with original Metis
+mv %{buildroot}%{_includedir}/scotch/metis.h %{buildroot}%{_includedir}/scotch/scotchmetis.h
+mv %{buildroot}%{_includedir}/scotch/metisf.h %{buildroot}%{_includedir}/scotch/scotchmetisf.h
+%endif
+cp -p %{buildroot}%{_libdir}/libesmumps.so %{buildroot}%{_libdir}/libesmumps.so.%{version}
+ln -sf libesmumps.so.%{version} %{buildroot}%{_libdir}/libesmumps.so
+ln -sf libesmumps.so.%{version} %{buildroot}%{_libdir}/libptesmumps.so
 
-export MPI_HOME=%{_prefix}
-export MPI_LIB=%{_libdir}
-export MPI_INCLUDE=%{_includedir}
-export MPI_MAN=%{_mandir}
-export MPI_BIN=%{_bindir}
-pushd src
-%doinstall
-popd
-
-###############################################################################
+##############
 %if %{with mpich}
 %{_mpich_load}
-pushd %{mpichdir}/src
-%doinstall
-install -m644 libscotchmetis/parmetis.h %{buildroot}${MPI_INCLUDE}
-popd
+%define _vpath_builddir %{_target_platform}-mpich
+%cmake_install
+
+# Compat symlink to ptesmumps.so
+cp -p %{buildroot}$MPI_LIB/libptesmumps.so %{buildroot}$MPI_LIB/libptesmumps.so.%{version}
+ln -sf libptesmumps.so.%{version} %{buildroot}$MPI_LIB/libptesmumps.so
+
+%if %{with metis}
+# Default to the v5 API for the metis compat library
+ln -s libscotchmetisv5.so %{buildroot}$MPI_LIB/libscotchmetis.so
+# Only the ParMeTiS v3 API is available
+ln -s libptscotchparmetisv3.so %{buildroot}$MPI_LIB/libparmetis.so
+ln -s libptscotchparmetisv3.so %{buildroot}$MPI_LIB/libptscotchparmetis.so
+# Rename include files to avoid conflicts with original Metis
+mv %{buildroot}$MPI_INCLUDE/scotch/metis.h %{buildroot}$MPI_INCLUDE/scotch/scotchmetis.h
+mv %{buildroot}$MPI_INCLUDE/scotch/metisf.h %{buildroot}$MPI_INCLUDE/scotch/scotchmetisf.h
+%endif
 %{_mpich_unload}
 %endif
-###############################################################################
-%if %{with mpi}
+################
+
+################
+%if %{with openmpi}
 %{_openmpi_load}
-pushd %{openmpidir}/src
-%doinstall
-install -m644 libscotchmetis/parmetis.h %{buildroot}${MPI_INCLUDE}
-popd
+%define _vpath_builddir %{_target_platform}-openmpi
+%cmake_install
+
+# Compat symlink to ptesmumps.so
+cp -p %{buildroot}$MPI_LIB/libptesmumps.so %{buildroot}$MPI_LIB/libptesmumps.so.%{version}
+ln -sf libptesmumps.so.%{version} %{buildroot}$MPI_LIB/libptesmumps.so
+
+%if %{with metis}
+# Default to the v5 API for the metis compat library
+ln -s libscotchmetisv5.so %{buildroot}$MPI_LIB/libscotchmetis.so
+# Only the ParMeTiS v3 API is available
+ln -s libptscotchparmetisv3.so %{buildroot}$MPI_LIB/libparmetis.so
+ln -s libptscotchparmetisv3.so %{buildroot}$MPI_LIB/libptscotchparmetis.so
+# Rename include files to avoid conflicts with original Metis
+mv %{buildroot}$MPI_INCLUDE/scotch/metis.h %{buildroot}$MPI_INCLUDE/scotch/scotchmetis.h
+mv %{buildroot}$MPI_INCLUDE/scotch/metisf.h %{buildroot}$MPI_INCLUDE/scotch/scotchmetisf.h
+%endif
 %{_openmpi_unload}
 %endif
-###############################################################################
+##################
+
+# Don't install executables
+rm -f %{buildroot}%{_bindir}/*
+rm -rf %{buildroot}%{_prefix}/man/*
 
 
 %check
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} make -C src/check
-
-
-%ldconfig_scriptlets
+%define _vpath_builddir %{_target_platform}
+%ctest || :
 
 %if %{with mpich}
-%ldconfig_scriptlets -n ptscotch-mpich
+%{_mpich_load}
+%define _vpath_builddir %{_target_platform}-mpich
+%ctest || :
+%{_mpich_unload}
 %endif
 
-%if %{with mpi}
-%ldconfig_scriptlets -n ptscotch-openmpi
+%if %{with openmpi}
+%{_openmpi_load}
+%define _vpath_builddir %{_target_platform}-openmpi
+%ctest || :
+%{_openmpi_unload}
 %endif
 
-%{!?_licensedir:%global license %%doc}
 
 %files
 %license doc/CeCILL-C_V1-en.txt
-%{_bindir}/*
-%{_libdir}/libscotch*.so.1*
-%{_libdir}/libesmumps*.so.1*
-%{_mandir}/man1/*
+%{_libdir}/libscotch.so.7.0.4
+%{_libdir}/libesmumps.so.7.0.4
+%if %{with metis}
+%{_libdir}/libscotchmetisv3.so
+%{_libdir}/libscotchmetisv5.so
+%endif
+%{_libdir}/libscotcherr.so
+%{_libdir}/libscotcherrexit.so
 
 %files devel
-%{_libdir}/libscotch*.so
-%{_libdir}/libesmumps*.so
-%{_includedir}/*scotch*.h
-%{_includedir}/*esmumps*.h
+%dir %{_includedir}/scotch
+%{_includedir}/scotch/scotch.h
+%{_includedir}/scotch/scotchf.h
+%{_includedir}/scotch/esmumps.h
+%{_libdir}/libesmumps.so
+%{_libdir}/libptesmumps.so
+%{_libdir}/libscotch.so
+%dir %{_libdir}/cmake/scotch/
+%{_libdir}/cmake/scotch/ptesmumpsTargets*
+%{_libdir}/cmake/scotch/esmumpsTargets*
+%{_libdir}/cmake/scotch/SCOTCH*
+%{_libdir}/cmake/scotch/scotchTargets*
+%{_libdir}/cmake/scotch/scotcherrTargets*
+%{_libdir}/cmake/scotch/scotcherrexitTargets*
 
-%if %{with mpich}
-%files -n ptscotch-mpich
-%license doc/CeCILL-C_V1-en.txt
-%{_libdir}/mpich/lib/lib*scotch*.so.1*
-%{_libdir}/mpich/lib/lib*esmumps*.so.1*
-%{_libdir}/mpich/bin/*
-%{_mandir}/mpich*/*
-
-%files -n ptscotch-mpich-devel
-%{_includedir}/mpich*/*scotch*.h
-%{_includedir}/mpich*/*esmumps*.h
-%{_libdir}/mpich/lib/lib*scotch*.so
-%{_libdir}/mpich/lib/lib*esmumps*.so
-
-%files -n ptscotch-mpich-devel-parmetis
-%{_includedir}/mpich*/parmetis.h
-%endif
-
-%if %{with mpich}
-%files -n ptscotch-openmpi
-%license doc/CeCILL-C_V1-en.txt
-%{_libdir}/openmpi/lib/lib*scotch*.so.1*
-%{_libdir}/openmpi/lib/lib*esmumps*.so.1*
-%{_libdir}/openmpi/bin/*
-%{_mandir}/openmpi*/*
-
-%files -n ptscotch-openmpi-devel
-%{_includedir}/openmpi*/*scotch*.h
-%{_includedir}/openmpi*/*esmumps*.h
-%{_libdir}/openmpi/lib/lib*scotch*.so
-%{_libdir}/openmpi/lib/lib*esmumps*.so
-
-%files -n ptscotch-openmpi-devel-parmetis
-%{_includedir}/openmpi*/parmetis.h
+%if %{with metis}
+%files devel-metis
+%dir %{_includedir}/scotch
+%{_includedir}/scotch/scotchmetis.h
+%{_includedir}/scotch/scotchmetisf.h
+%{_libdir}/libscotchmetis.so
+%{_libdir}/cmake/scotch/scotchmetisTargets*
 %endif
 
 %files doc
@@ -280,11 +332,146 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} make -C src/check
 %doc doc/*.pdf
 %doc doc/scotch_example.f
 
+%if %{with mpich}
+%files -n ptscotch-mpich
+%license doc/CeCILL-C_V1-en.txt
+%{_libdir}/mpich/lib/libptscotch.so.7.0.4
+%{_libdir}/mpich/lib/libptesmumps.so.7.0.4
+%{_libdir}/mpich/lib/libscotch.so.7.0.4
+%if %{with metis}
+%{_libdir}/mpich/lib/libscotchmetisv3.so
+%{_libdir}/mpich/lib/libscotchmetisv5.so
+%{_libdir}/mpich/lib/libptscotchparmetisv3.so
+%endif
+%{_libdir}/mpich/lib/libptscotcherr.so
+%{_libdir}/mpich/lib/libptscotcherrexit.so
+%{_libdir}/mpich/lib/libscotcherr.so
+%{_libdir}/mpich/lib/libscotcherrexit.so
+
+%files -n ptscotch-mpich-devel
+%dir %{_includedir}/mpich*/scotch
+%{_includedir}/mpich*/scotch/ptscotch.h
+%{_includedir}/mpich*/scotch/ptscotchf.h
+%{_includedir}/mpich*/scotch/scotch.h
+%{_includedir}/mpich*/scotch/scotchf.h
+%{_includedir}/mpich*/scotch/esmumps.h
+%{_libdir}/mpich/lib/libptscotch.so
+%{_libdir}/mpich/lib/libscotch.so
+%{_libdir}/mpich/lib/libesmumps.so
+%{_libdir}/mpich/lib/libptesmumps.so
+%dir %{_libdir}/mpich/lib/cmake/scotch/
+%{_libdir}/mpich/lib/cmake/scotch/ptesmumpsTargets*
+%{_libdir}/mpich/lib/cmake/scotch/SCOTCHConfig.cmake
+%{_libdir}/mpich/lib/cmake/scotch/SCOTCHConfigVersion.cmake
+%{_libdir}/mpich/lib/cmake/scotch/esmumpsTargets*
+%{_libdir}/mpich/lib/cmake/scotch/ptscotchTargets*
+%{_libdir}/mpich/lib/cmake/scotch/ptscotcherrTargets*
+%{_libdir}/mpich/lib/cmake/scotch/ptscotcherrexitTargets*
+%{_libdir}/mpich/lib/cmake/scotch/scotchTargets*
+%{_libdir}/mpich/lib/cmake/scotch/scotcherrTargets*
+%{_libdir}/mpich/lib/cmake/scotch/scotcherrexitTargets*
+
+%if %{with metis}
+%files -n ptscotch-mpich-devel-parmetis
+%dir %{_includedir}/mpich*/scotch
+%{_includedir}/mpich*/scotch/scotchmetis.h
+%{_includedir}/mpich*/scotch/scotchmetisf.h
+%{_includedir}/mpich*/scotch/parmetis.h
+%{_libdir}/mpich/lib/libparmetis.so
+%{_libdir}/mpich/lib/libptscotchparmetis.so
+%{_libdir}/mpich/lib/libscotchmetis.so
+%{_libdir}/mpich/lib/cmake/scotch/ptscotchparmetisTargets*
+%{_libdir}/mpich/lib/cmake/scotch/scotchmetisTargets*
+%endif
+%endif
+
+
+%if %{with openmpi}
+%files -n ptscotch-openmpi
+%license doc/CeCILL-C_V1-en.txt
+%{_libdir}/openmpi/lib/libptscotch.so.7.0.4
+%{_libdir}/openmpi/lib/libptesmumps.so.7.0.4
+%{_libdir}/openmpi/lib/libscotch.so.7.0.4
+%if %{with metis}
+%{_libdir}/openmpi/lib/libscotchmetisv3.so
+%{_libdir}/openmpi/lib/libscotchmetisv5.so
+%{_libdir}/openmpi/lib/libptscotchparmetisv3.so
+%endif
+%{_libdir}/openmpi/lib/libptscotcherr.so
+%{_libdir}/openmpi/lib/libptscotcherrexit.so
+%{_libdir}/openmpi/lib/libscotcherr.so
+%{_libdir}/openmpi/lib/libscotcherrexit.so
+
+%files -n ptscotch-openmpi-devel
+%dir %{_includedir}/openmpi*/scotch
+%{_includedir}/openmpi*/scotch/ptscotch.h
+%{_includedir}/openmpi*/scotch/ptscotchf.h
+%{_includedir}/openmpi*/scotch/scotch.h
+%{_includedir}/openmpi*/scotch/scotchf.h
+%{_includedir}/openmpi*/scotch/esmumps.h
+%{_libdir}/openmpi/lib/libptscotch.so
+%{_libdir}/openmpi/lib/libscotch.so
+%{_libdir}/openmpi/lib/libesmumps.so
+%{_libdir}/openmpi/lib/libptesmumps.so
+%dir %{_libdir}/openmpi/lib/cmake/scotch/
+%{_libdir}/openmpi/lib/cmake/scotch/ptesmumpsTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/SCOTCHConfig.cmake
+%{_libdir}/openmpi/lib/cmake/scotch/SCOTCHConfigVersion.cmake
+%{_libdir}/openmpi/lib/cmake/scotch/esmumpsTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/ptscotchTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/ptscotcherrTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/ptscotcherrexitTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/scotchTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/scotcherrTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/scotcherrexitTargets*
+
+%if %{with metis}
+%files -n ptscotch-openmpi-devel-parmetis
+%dir %{_includedir}/openmpi*/scotch
+%{_includedir}/openmpi*/scotch/scotchmetis.h
+%{_includedir}/openmpi*/scotch/scotchmetisf.h
+%{_includedir}/openmpi*/scotch/parmetis.h
+%{_libdir}/openmpi/lib/libparmetis.so
+%{_libdir}/openmpi/lib/libptscotchparmetis.so
+%{_libdir}/openmpi/lib/libscotchmetis.so
+%{_libdir}/openmpi/lib/cmake/scotch/ptscotchparmetisTargets*
+%{_libdir}/openmpi/lib/cmake/scotch/scotchmetisTargets*
+%endif
+%endif
+
+
 %changelog
-* Fri Jan 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 6.1.2-3
-- Initial CBL-Mariner import from Fedora 36 (license: MIT)
-- Made changes to build only non MPI packages for now
-- License verified
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu May 02 2024 Sandro Mani <manisandro@gmail.com> - 7.0.4-4
+- Fix libscotcherr, libscotcherrexit which should not be in -devel
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Oct 29 2023 Orion Poplawski <orion@nwra.com> - 7.0.4-2
+- Rebuild for openmpi 5.0.0, drops support for i686
+
+* Wed Aug 16 2023 Sandro Mani <manisandro@gmail.com> - 7.0.4-1
+- Update to 7.0.4
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 13 2023 Antonio Trande <sagitter@fedoraproject.org> - 7.0.3-2
+- Undefine _ld_as_needed
+
+* Thu Apr 13 2023 Antonio Trande <sagitter@fedoraproject.org> - 7.0.3-1
+- Update to 7.0.3
+- Patch0 updated
+- Rename internal Metis include files to avoid conflicts
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild

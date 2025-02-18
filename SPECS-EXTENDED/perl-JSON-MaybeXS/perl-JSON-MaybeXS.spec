@@ -5,53 +5,57 @@
 # involve modifications to the back-end packages, but it also makes for
 # consistent results as we're always using the same, most-tested
 # back-end.
-Summary:        Use Cpanel::JSON::XS with a fallback to JSON::XS and JSON::PP
-Name:           perl-JSON-MaybeXS
-Version:        1.004003
-Release:        5%{?dist}
-License:        GPL+ OR Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://metacpan.org/release/JSON-MaybeXS
-Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
 
-BuildArch:      noarch
-
+Name:		perl-JSON-MaybeXS
+Summary:	Use Cpanel::JSON::XS with a fallback to JSON::XS and JSON::PP
+Version:	1.004008
+Release:	2%{?dist}
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:		https://metacpan.org/release/JSON-MaybeXS
+Source0:	https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
+BuildArch:	noarch
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  make
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  perl(Carp)
+BuildRequires:	coreutils
+BuildRequires:	make
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:	perl(lib)
+BuildRequires:	perl(Text::ParseWords)
 # Dependencies of bundled ExtUtils::HasCompiler
-BuildRequires:  perl(Config)
-BuildRequires:  perl(Cpanel::JSON::XS) >= 2.3310
-BuildRequires:  perl(DynaLoader)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(ExtUtils::Mksymlists)
-BuildRequires:  perl(File::Basename)
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(Text::ParseWords)
+BuildRequires:	perl(Config)
+BuildRequires:	perl(DynaLoader)
+BuildRequires:	perl(ExtUtils::Mksymlists)
+BuildRequires:	perl(File::Basename)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(File::Temp)
 # Module Runtime
-BuildRequires:  perl(base)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
-BuildRequires:  perl(JSON::PP) >= 2.27300
-BuildRequires:  perl(JSON::XS) >= 3.0
-BuildRequires:  perl(Test::More) >= 0.88
-BuildRequires:  perl(Test::Needs) >= 0.002006
-BuildRequires:  perl(if)
+BuildRequires:	perl(base)
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(constant)
+%if 0%{?fedora} > 36 || 0%{?rhel} > 9
+BuildRequires:	perl(Cpanel::JSON::XS) >= 4.38
+BuildRequires:	perl(experimental)
+%else
+BuildRequires:	perl(Cpanel::JSON::XS) >= 2.3310
 %endif
-
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Cpanel::JSON::XS) >= 2.3310
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(if)
+BuildRequires:	perl(Scalar::Util)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(warnings)
+# Test Suite
+BuildRequires:	perl(JSON::PP) >= 2.27300
+BuildRequires:	perl(JSON::XS) >= 3.0
+BuildRequires:	perl(Test::More) >= 0.88
+BuildRequires:	perl(Test::Needs) >= 0.002006
+# Dependencies
+%if 0%{?fedora} > 36 || 0%{?rhel} > 9
+Requires:	perl(Cpanel::JSON::XS) >= 4.38
+Requires:	perl(experimental)
+%else
+Requires:	perl(Cpanel::JSON::XS) >= 2.3310
+%endif
 
 %description
 This module first checks to see if either Cpanel::JSON::XS or JSON::XS
@@ -72,10 +76,10 @@ mutators, so we provide our own "new" method that supports that.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -88,9 +92,50 @@ make test
 %{_mandir}/man3/JSON::MaybeXS.3*
 
 %changelog
-* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.004003-5
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
+* Tue Aug 13 2024 Paul Howarth <paul@city-fan.org> - 1.004008-2
+- Fix runtime dependency on Cpanel::JSON::XS 4.38 (rhbz#2304277)
+
+* Sun Aug 11 2024 Paul Howarth <paul@city-fan.org> - 1.004008-1
+- Update to 1.004008
+  - Improved boolean testing
+
+* Sun Aug  4 2024 Paul Howarth <paul@city-fan.org> - 1.004007-1
+- Update to 1.004007
+  - is_bool() now recognizes core booleans (perl 5.36+); note that JSON::PP
+   4.11 and Cpanel::JSON::XS 4.38 are required to properly encode them
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.004005-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.004005-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.004005-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.004005-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Apr 30 2023 Paul Howarth <paul@city-fan.org> - 1.004005-1
+- Update to 1.004005
+  - to_json and from_json are now documented (GH#2)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.004004-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 20 2022 Paul Howarth <paul@city-fan.org> - 1.004004-1
+- Update to 1.004004
+  - Slight speed optimization for is_bool()
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.004003-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.004003-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.004003-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.004003-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

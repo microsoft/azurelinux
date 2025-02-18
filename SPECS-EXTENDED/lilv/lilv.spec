@@ -1,35 +1,45 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 2;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 %global maj 0
-%bcond_with docs
-Summary:        An LV2 Resource Description Framework Library
-Name:           lilv
-Version:        0.24.14
-Release:        4%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://drobilla.net/software/lilv
-Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
+
+Name:       lilv
+Version:    0.24.26
+Release:    %autorelease
+Summary:    An LV2 Resource Description Framework Library
+
+License:    MIT
+URL:        https://drobilla.net/software/lilv
+Source0:    https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:    https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:    https://drobilla.net/drobilla.gpg
+
+BuildRequires:  gnupg2
+BuildRequires:  meson
 BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  sord-devel >= 0.14.0
-BuildRequires:  sratom-devel >= 0.4.4
-BuildRequires:  lv2-devel >= 1.18.0
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  swig
-BuildRequires:  serd-devel >= 0.30.0
+BuildRequires:  pkgconfig(sord-0) >= 0.16.16
+BuildRequires:  pkgconfig(sratom-0) >= 0.6.10
+BuildRequires:  pkgconfig(lv2) >= 1.18.2
+BuildRequires:  pkgconfig(python3)
+BuildRequires:  pkgconfig(serd-0) >= 0.30.10
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  libsndfile-devel >= 1.0.0
-%if %{with docs}
+BuildRequires:  pkgconfig(sndfile) >= 1.0.0
+BuildRequires:  pkgconfig(zix-0) >= 0.6.0
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
-%endif
-Requires:       lv2 >= 1.18.0
-%if 0%{?with_check}
-BuildRequires:  lcov
-%endif
+BuildRequires:  python3-sphinxygen
+
+Requires:       lv2 >= 1.18.2
 
 # To try and deal with multilib issues from the -libs split:
 # https://bugzilla.redhat.com/show_bug.cgi?id=2052588
@@ -40,8 +50,9 @@ Obsoletes:      lilv < 0.24.12-2
 for applications. Lilv is the successor to SLV2, rewritten to be significantly
 faster and have minimal dependencies.
 
-%package        libs
-Summary:        Libraries for %{name}
+%package libs
+Summary:    Libraries for %{name}
+Obsoletes:  lilv < 0.24.12-2
 
 %description libs
 %{name} is a lightweight C library for Resource Description Syntax which
@@ -50,8 +61,8 @@ supports reading and writing Turtle and NTriples.
 This package contains the libraries for %{name}.
 
 %package devel
-Summary:        Development libraries and headers for %{name}
-Requires:       %{name}-libs%{_isa} = %{version}-%{release}
+Summary:    Development libraries and headers for %{name}
+Requires:   %{name}-libs%{_isa} = %{version}-%{release}
 
 %description devel
 %{name} is a lightweight C library for Resource Description Syntax which
@@ -61,8 +72,8 @@ This package contains the headers and development libraries for %{name}.
 
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-%{name}}
-Summary:        Python bindings for %{name}
-Requires:       %{name}-libs%{_isa} = %{version}-%{release}
+Summary:    Python bindings for %{name}
+Requires:   %{name}-libs%{_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
 %{name} is a lightweight C library for Resource Description Syntax which
@@ -71,38 +82,25 @@ supports reading and writing Turtle and NTriples.
 This package contains the python libraries for %{name}.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
-# Do not run ld config
-sed -i -e 's|bld.add_post_fun(autowaf.run_ldconfig)||' wscript
-# for packagers sake, build the tests with debug symbols
-sed -i -e "s|'-ftest-coverage'\]|\
- '-ftest-coverage' \] + '%{optflags}'.split(' ')|" wscript
 
 %build
-%{set_build_flags}
-export LINKFLAGS="%{__global_ldflags}"
-%{python3} waf configure -v --prefix=%{_prefix} \
- --libdir=%{_libdir} --configdir=%{_sysconfdir} --mandir=%{_mandir} \
- --docdir=%{_pkgdocdir} \
-%if %{with docs}
- --docs \
-%endif
- --test --dyn-manifest
-
-%{python3} waf -v build %{?_smp_mflags}
+%meson
+%meson_build
 
 %install
-%{python3} waf -v install --destdir=%{buildroot}
-chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
+%meson_install
+
+# Move devel docs to the right directory
+install -d %{buildroot}%{_docdir}/%{name}
+mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
 
 %check
-%{python3} waf test
+%meson_test
 
 %files
-%if %{with docs}
 %exclude %{_pkgdocdir}/%{name}-%{maj}/
-%endif
-%{_bindir}/lilv-bench
 %{_bindir}/lv2info
 %{_bindir}/lv2ls
 %{_bindir}/lv2bench
@@ -119,20 +117,49 @@ chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
 %{_libdir}/lib%{name}-%{maj}.so
 %{_libdir}/pkgconfig/%{name}-%{maj}.pc
 %{_includedir}/%{name}-%{maj}/
-%if %{with docs}
 %{_pkgdocdir}/%{name}-%{maj}/
-%endif
 
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}.*
 %{python3_sitelib}/__pycache__/*
 
 %changelog
-* Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.24.14-4
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- Disable subpackage doc
-- Enable check section
-- License verified
+## START: Generated by rpmautospec
+* Wed Feb 05 2025 Nils Philippsen <nils@tiptoe.de> - 0.24.26-1
+- Update to 0.24.26
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.24-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 09 2024 Nils Philippsen <nils@tiptoe.de> - 0.24.24-1
+- Update to 0.24.24
+
+* Sun Jun 16 2024 Python Maint <python-maint@redhat.com> - 0.24.20-4
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.20-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Sep 18 2023 Guido Aulisi <guido.aulisi@gmail.com> - 0.24.20-1
+- Update to 0.24.20
+
+* Sun Sep 17 2023 Guido Aulisi <guido.aulisi@gmail.com> - 0.24.18-1
+- Update to 0.24.18
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.14-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 0.24.14-5
+- Rebuilt for Python 3.12
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.14-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -325,3 +352,5 @@ chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
 
 * Fri Dec 23 2011 Brendan Jones <brendan.jones.it@gmail.com> - 0.5.0-1
 - Initial build
+
+## END: Generated by rpmautospec

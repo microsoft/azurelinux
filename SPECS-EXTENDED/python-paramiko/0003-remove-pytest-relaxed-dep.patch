@@ -1,34 +1,24 @@
 --- a/dev-requirements.txt
 +++ b/dev-requirements.txt
 @@ -2,7 +2,6 @@
- invoke==1.6.0
- invocations==2.6.0
- pytest==4.4.2
--pytest-relaxed==1.1.5
+ invoke>=2.0
+ invocations>=3.2
+ # Testing!
+-pytest-relaxed>=2
  # pytest-xdist for test dir watching and the inv guard task
- pytest-xdist==1.28.0
- mock==2.0.0
---- a/pytest.ini
-+++ b/pytest.ini
-@@ -1,7 +1,4 @@
- [pytest]
--# We use pytest-relaxed just for its utils at the moment, so disable it at the
--# plugin level until we adapt test organization to really use it.
--addopts = -p no:relaxed
- # Loop on failure
- looponfailroots = tests paramiko
- # Ignore some warnings we cannot easily handle.
+ pytest-xdist>=3
+ # Linting!
 --- a/tests/test_client.py
 +++ b/tests/test_client.py
-@@ -34,7 +34,6 @@ import weakref
+@@ -33,7 +33,6 @@ import weakref
  from tempfile import mkstemp
  
  import pytest
 -from pytest_relaxed import raises
- from mock import patch, Mock
+ from unittest.mock import patch, Mock
  
  import paramiko
-@@ -787,11 +786,11 @@ class PasswordPassphraseTests(ClientTest
+@@ -799,11 +798,11 @@ class PasswordPassphraseTests(ClientTest
  
      # TODO: more granular exception pending #387; should be signaling "no auth
      # methods available" because no key and no password
@@ -43,14 +33,14 @@
  
      @requires_sha1_signing
      def test_passphrase_kwarg_used_for_key_passphrase(self):
-@@ -811,15 +810,15 @@ class PasswordPassphraseTests(ClientTest
+@@ -823,15 +822,15 @@ class PasswordPassphraseTests(ClientTest
              password="television",
          )
  
 -    @raises(AuthenticationException)  # TODO: more granular
      @requires_sha1_signing
      def test_password_kwarg_not_used_for_passphrase_when_passphrase_kwarg_given(  # noqa
-         self
+         self,
      ):
          # Sanity: if we're given both fields, the password field is NOT used as
          # a passphrase.

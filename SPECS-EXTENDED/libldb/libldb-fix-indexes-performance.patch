@@ -1,0 +1,221 @@
+From 1944fcf4b7e5ab4cf580e17031918ba5f441902b Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Wed, 26 Jun 2024 11:05:49 +1200
+Subject: [PATCH 1/2] ldb_kv_index: dn_list load sub transaction can re-use
+ keys
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We don't want to modify the original list, but we can reuse the keys
+if we treat them as immutable and don't free them. That makes it a lot
+quicker if there are many keys (i.e. where an index is useful) and may
+sub-transactions. In particular, it avoids O(n²) talloc_memdups.
+
+A removed comment that says "We have to free the top level index
+memory otherwise we would leak", and this will be addressed in the
+next commit.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15590
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
+(cherry picked from commit 5f0198d69843c864f2b98a7c0c6305ad789a68a0)
+---
+ lib/ldb/ldb_key_value/ldb_kv_index.c | 96 +++++++++++++++++-----------
+ 1 file changed, 57 insertions(+), 39 deletions(-)
+
+diff --git a/lib/ldb/ldb_key_value/ldb_kv_index.c b/lib/ldb/ldb_key_value/ldb_kv_index.c
+index 3f1a847f2b6..fed1033f492 100644
+--- a/lib/ldb/ldb_key_value/ldb_kv_index.c
++++ b/lib/ldb/ldb_key_value/ldb_kv_index.c
+@@ -446,34 +446,39 @@ static int ldb_kv_dn_list_load(struct ldb_module *module,
+ 	 * There is an active index sub transaction, and the record was
+ 	 * found in the primary index transaction cache.  A copy of the
+ 	 * record needs be taken to prevent the original entry being
+-	 * altered, until the index sub transaction is committed.
++	 * altered, until the index sub transaction is committed, but we
++	 * don't copy the actual values, just the array of struct ldb_val
++	 * that points to the values (which are offsets into a GUID array).
++	 *
++	 * As a reminder, our primary cache is an in-memory tdb that
++	 * maps attributes to struct dn_list objects, which point to
++	 * the actual index, which is an array of struct ldb_val, the
++	 * contents of which are {.data = <binary GUID>, .length =
++	 * 16}. The array is sorted by GUID data, and these GUIDs are
++	 * used to look up index entries in the main database. There
++	 * are more layers of indirection than necessary, but what
++	 * makes the index useful is we can use a binary search to
++	 * find if the array contains a GUID.
++	 *
++	 * What we do in a sub-transaction is make a copy of the struct
++	 * dn_list and the array of struct ldb_val, but *not* of the
++	 * .data that they point to. This copy is put into a new
++	 * in-memory tdb which masks the primary cache for the duration
++	 * of the sub-transaction.
++	 *
++	 * In an add operation in a sub-transaction, the new ldb_val
++	 * is a child of the sub-transaction dn_list, which will
++	 * become the main dn_list if the transaction succeeds.
++	 *
++	 * These acrobatics do not affect read-only operations.
+ 	 */
+-
+-	{
+-		struct ldb_val *dns = NULL;
+-		size_t x = 0;
+-
+-		dns = talloc_array(
+-			list,
+-			struct ldb_val,
+-			list2->count);
+-		if (dns == NULL) {
+-			return LDB_ERR_OPERATIONS_ERROR;
+-		}
+-		for (x = 0; x < list2->count; x++) {
+-			dns[x].length = list2->dn[x].length;
+-			dns[x].data = talloc_memdup(
+-				dns,
+-				list2->dn[x].data,
+-				list2->dn[x].length);
+-			if (dns[x].data == NULL) {
+-				TALLOC_FREE(dns);
+-				return LDB_ERR_OPERATIONS_ERROR;
+-			}
+-		}
+-		list->dn = dns;
+-		list->count = list2->count;
++	list->dn = talloc_memdup(list,
++				 list2->dn,
++				 talloc_get_size(list2->dn));
++	if (list->dn == NULL) {
++		return LDB_ERR_OPERATIONS_ERROR;
+ 	}
++	list->count = list2->count;
+ 	return LDB_SUCCESS;
+ 
+ 	/*
+@@ -3852,9 +3857,7 @@ int ldb_kv_reindex(struct ldb_module *module)
+  * Copy the contents of the nested transaction index cache record to the
+  * transaction index cache.
+  *
+- * During this 'commit' of the subtransaction to the main transaction
+- * (cache), care must be taken to free any existing index at the top
+- * level because otherwise we would leak memory.
++ * This is a 'commit' of the subtransaction to the main transaction cache.
+  */
+ static int ldb_kv_sub_transaction_traverse(
+ 	struct tdb_context *tdb,
+@@ -3883,8 +3886,7 @@ static int ldb_kv_sub_transaction_traverse(
+ 
+ 	/*
+ 	 * Do we already have an entry in the primary transaction cache
+-	 * If so free it's dn_list and replace it with the dn_list from
+-	 * the secondary cache
++	 * If so replace dn_list with the one from the subtransaction.
+ 	 *
+ 	 * The TDB and so the fetched rec contains NO DATA, just a
+ 	 * pointer to data held in memory.
+@@ -3897,21 +3899,37 @@ static int ldb_kv_sub_transaction_traverse(
+ 			abort();
+ 		}
+ 		/*
+-		 * We had this key at the top level.  However we made a copy
+-		 * at the sub-transaction level so that we could possibly
+-		 * roll back.  We have to free the top level index memory
+-		 * otherwise we would leak
++		 * We had this key at the top level, and made a copy
++		 * of the dn list for this sub-transaction level that
++		 * borrowed the top level GUID data. We can't free the
++		 * original dn list just yet.
++		 *
++		 * In this diagram, ... is the C pointer structure
++		 * and --- is the talloc structure (::: is both).
++		 *
++		 *   index_in_top_level ::: dn orig ..............
++		 *	|			|		  :
++		 *	|			`--GUID array	  :
++		 *	|				   |----- val1 data
++		 * ldb_kv				   `----- val2 data
++		 *	|					  :
++		 *   index_in_subtransaction :: dn copy ..........:
++		 *				|		  :
++		 *				`------------ new val3 data
++		 *
++		 * So we don't free the index_in_top_level dn list yet,
++		 * because we are (probably) borrowing most of its
++		 * children.
+ 		 */
+-		if (index_in_top_level->count > 0) {
+-			TALLOC_FREE(index_in_top_level->dn);
+-		}
+ 		index_in_top_level->dn
+ 			= talloc_steal(index_in_top_level,
+ 				       index_in_subtransaction->dn);
+ 		index_in_top_level->count = index_in_subtransaction->count;
+ 		return 0;
+ 	}
+-
++	/*
++	 * We found no top level index in the cache, so we put one in.
++	 */
+ 	index_in_top_level = talloc(ldb_kv->idxptr, struct dn_list);
+ 	if (index_in_top_level == NULL) {
+ 		ldb_kv->idxptr->error = LDB_ERR_OPERATIONS_ERROR;
+-- 
+2.46.0
+
+
+From 70d8b1b2f87cbb16b671d334e46244ba001fbd31 Mon Sep 17 00:00:00 2001
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Date: Mon, 22 Jul 2024 22:22:15 +1200
+Subject: [PATCH 2/2] ldb:kv_index: realloc away old dn list
+
+We can't just free it, because has the GUID index list as a child, and
+these are shared by the new dn list (from the subtransaction we are
+committing). But if the dn list is long and the main transaction is
+long-lived, we can save a lot of memory by turning this dn list into
+an almost empty node in the talloc tree. This returns us to roughly
+the situation we had prior to the last commit.
+
+For example, with the repro.sh script on bug 15590 in indexes mode
+with 10000 rules, The last 3 commits use this much memory at the end
+of an unusually large transaction:
+
+full talloc report on 'struct ldb_context' (total 4012222 bytes in 90058 blocks)
+full talloc report on 'struct ldb_context' (total 2405482219 bytes in 90058 blocks)
+full talloc report on 'struct ldb_context' (total 4282195 bytes in 90058 blocks)
+
+That is, the last commit increased usage 500 fold, and this commit
+brings it back to normal.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15590
+
+Signed-off-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Reviewed-by: Stefan Metzmacher <metze@samba.org>
+(cherry picked from commit 1bf9ede94f0a6b41fb18e880e59a8e390f8c21d3)
+---
+ lib/ldb/ldb_key_value/ldb_kv_index.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/ldb/ldb_key_value/ldb_kv_index.c b/lib/ldb/ldb_key_value/ldb_kv_index.c
+index fed1033f492..11bdf00dc08 100644
+--- a/lib/ldb/ldb_key_value/ldb_kv_index.c
++++ b/lib/ldb/ldb_key_value/ldb_kv_index.c
+@@ -3919,8 +3919,12 @@ static int ldb_kv_sub_transaction_traverse(
+ 		 *
+ 		 * So we don't free the index_in_top_level dn list yet,
+ 		 * because we are (probably) borrowing most of its
+-		 * children.
++		 * children. But we can save memory by discarding the
++		 * values and keeping it as an almost empty talloc
++		 * node.
+ 		 */
++		talloc_realloc(index_in_top_level,
++			       index_in_top_level->dn, struct ldb_val *, 1);
+ 		index_in_top_level->dn
+ 			= talloc_steal(index_in_top_level,
+ 				       index_in_subtransaction->dn);
+-- 
+2.46.0
+

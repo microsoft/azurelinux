@@ -1,0 +1,41 @@
+From 73d3b4047d757ef35850e2cef38285b96be82f0f Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Tue, 23 May 2023 12:17:29 +0200
+Subject: [PATCH] [Driver] Give devtoolset path precedence over InstalledDir
+
+This is a followup to the change from c5fe10f365247c3dd9416b7ec8bad73a60b5946e.
+While that commit correctly adds the bindir from devtoolset to the
+path, the driver dir / install dir still comes first. This means
+we'll still end up picking /usr/bin/ld rather than the one from
+devtoolset.
+
+Unfortunately, I don't see any way to test this. In the environment
+the tests are run, this would only result in a behavior difference
+if there is an ld binary present in the LLVM build directory, which
+isn't the case.
+
+Differential Revision: https://reviews.llvm.org/D151203
+---
+ clang/lib/Driver/ToolChains/Linux.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
+index 853ff99d9fe5..aecabb46d4b9 100644
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -244,9 +244,9 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+     // With devtoolset on RHEL, we want to add a bin directory that is relative
+     // to the detected gcc install, because if we are using devtoolset gcc then
+     // we want to use other tools from devtoolset (e.g. ld) instead of the
+-    // standard system tools.
+-    PPaths.push_back(Twine(GCCInstallation.getParentLibPath() +
+-                     "/../bin").str());
++    // standard system tools. This should take precedence over InstalledDir.
++    PPaths.insert(PPaths.begin(),
++                  Twine(GCCInstallation.getParentLibPath() + "/../bin").str());
+ 
+   if (Arch == llvm::Triple::arm || Arch == llvm::Triple::thumb)
+     ExtraOpts.push_back("-X");
+-- 
+2.40.1
+

@@ -9,13 +9,13 @@ wget "https://github.com/jhy/${name}/archive/${name}-${version}.tar.gz" -O "${na
 
 rm -rf tarball-tmp
 mkdir tarball-tmp
-cd tarball-tmp
-tar xf "../${name}-${version}.orig.tar.gz"
+pushd tarball-tmp
+tar -xf "../${name}-${version}.orig.tar.gz"
 
 # CLEAN TARBALL
 # contains scraped news articles (non-free)
-rm -r */src/test/resources
+rm -r "${name}-${name}-${version}/src/test/resources"
 
-tar czf "../${name}-${version}.tar.gz" *
-cd ..
+tar -czf "../${name}-${version}.tar.gz" *
+popd
 rm -r tarball-tmp "${name}-${version}.orig.tar.gz"

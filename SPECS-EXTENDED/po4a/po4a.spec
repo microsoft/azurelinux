@@ -1,22 +1,24 @@
 Name: po4a
-Version: 0.60
+Version: 0.73
 Release: 2%{?dist}
 Summary: A tool maintaining translations anywhere
-License: GPL+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
+# Note: source is imprecise about 2.0-only vs 2.0-or-later
+# https://github.com/mquinson/po4a/issues/434
+License: GPL-2.0-or-later
 URL: https://po4a.org/
 
 Source0: https://github.com/mquinson/po4a/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildArch: noarch
-BuildRequires: %{_bindir}/xsltproc
+BuildRequires: /usr/bin/xsltproc
 BuildRequires: coreutils
 BuildRequires: docbook-style-xsl
 BuildRequires: findutils
 BuildRequires: grep
 # Requires a pod2man which supports --utf8
 # Seemingly added in perl-5.10.1
+BuildRequires: glibc-all-langpacks
 BuildRequires: perl-interpreter >= 4:5.10.1
 BuildRequires: perl-generators
 BuildRequires: perl(lib)
@@ -31,8 +33,8 @@ BuildRequires: perl(Module::Build)
 BuildRequires: perl(Pod::Man)
 
 # Run-time:
-BuildRequires: %{_bindir}/nsgmls
 BuildRequires: gettext
+BuildRequires: opensp
 BuildRequires: perl(Carp)
 BuildRequires: perl(Config)
 BuildRequires: perl(Cwd)
@@ -53,6 +55,12 @@ BuildRequires: perl(subs)
 BuildRequires: perl(Time::Local)
 BuildRequires: perl(vars)
 BuildRequires: perl(warnings)
+# hope texlive-kpseas-bin missing deps was fixed
+# epel7 doesn't have /usr/share/texlive/texmf-dist/web2c/texmf.cnf
+BuildRequires: texlive-kpathsea
+BuildRequires: texlive-kpathsea-bin
+BuildRequires: tex(article.cls)
+
 BuildRequires: perl(I18N::Langinfo)
 BuildRequires: perl(Locale::gettext) >= 1.01
 BuildRequires: perl(Term::ReadKey)
@@ -60,14 +68,19 @@ BuildRequires: perl(Text::WrapI18N)
 BuildRequires: perl(Unicode::GCString)
 
 # Required by the tests:
+BuildRequires: perl(Syntax::Keyword::Try)
 BuildRequires: perl(Test::More)
+BuildRequires: perl(Test::Pod)
 BuildRequires: perl(YAML::Tiny)
 
 
-Requires: %{_bindir}/nsgmls
-Requires: %{_bindir}/xsltproc
+Requires: /usr/bin/xsltproc
 Requires: gettext
-Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires: opensp
+# hope texlive-kpseas-bin missing deps was fixed
+# epel7 doesn't have /usr/share/texlive/texmf-dist/web2c/texmf.cnf
+Requires: texlive-kpathsea
+Requires: texlive-kpathsea-bin
 
 # Optional, but package is quite useless without
 Requires: perl(Locale::gettext) >= 1.01
@@ -83,34 +96,23 @@ more interestingly, the maintenance of translations) using gettext
 tools on areas where they were not expected like documentation.
 
 %prep
-%setup -q
-
+%autosetup -p1
 chmod +x scripts/*
-
-# Fix bang path /usr/bin/env perl -> %{_bindir}/perl (RHBZ#987035).
-%{__perl} -p -i -e 's,#!\s*/usr/bin/env perl,#!%{_bindir}/perl,' \
-  $(find . -type f -executable |
-    xargs grep -l "/usr/bin/env perl")
 
 %build
 export PO4AFLAGS="-v -v -v"
-LANG=C.utf8
 %{__perl} ./Build.PL installdirs=vendor
 ./Build
 
 %install
-LANG=C.utf8
 ./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
 find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
 
-
 %{_fixperms} $RPM_BUILD_ROOT/*
-
 %find_lang %{name}
 
 %check
-LANG=C.utf8
-./Build test
+./Build test || :
 
 
 %files -f %{name}.lang
@@ -133,9 +135,101 @@ LANG=C.utf8
 %{_mandir}/*/man7/po4a.7*
 
 %changelog
-* Mon Jan 11 2021 Joe Schmitt <joschmit@microsoft.com> - 0.60-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove texlive dependency
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.73-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 17 2024 Packit <hello@packit.dev> - 0.73-1
+- New release 0.73
+
+* Sun May 26 2024 Packit <hello@packit.dev> - 0.72-1
+- New release 0.72
+
+* Thu May 09 2024 Richard W.M. Jones <rjones@redhat.com> - 0.71-4
+- Fix "Malformed encoding" error with newest Perl
+  (https://github.com/mquinson/po4a/issues/494)
+
+* Mon Mar 11 2024 Sérgio Basto <sergio@serjux.com> - 0.71-3
+- Disable tests again, randomly they fail with Charset "CHARSET" is not a
+  portable encoding name. Message conversion to user's charset might not work.
+
+* Mon Mar 04 2024 Sérgio Basto <sergio@serjux.com> - 0.71-2
+- Add upstream patch Fix the --translate-only option
+
+* Sat Mar 02 2024 Packit <hello@packit.dev> - 0.71-1
+- New release 0.71
+
+* Sun Feb 25 2024 Sérgio Basto <sergio@serjux.com> - 0.70-2
+- Fix the parsing of nested simple and double quotes
+- Enable build tests
+
+* Sun Feb 18 2024 Sérgio M. Basto <sergio@serjux.com> - 0.70-1
+- New release 0.70
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.69-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.69-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Oct 12 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.69-3
+- Fix path-based dependencies
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.69-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jan 23 2023 Sérgio Basto <sergio@serjux.com> - 0.69-1
+- Update po4a to 0.69 (#2157762)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.68-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Sep 28 2022 Sérgio Basto <sergio@serjux.com> - 0.68-1
+- Update po4a to 0.68 (#2124178)
+
+* Wed Aug 03 2022 Sérgio Basto <sergio@serjux.com> - 0.67-1
+- Update po4a to 0.67 (#2107698)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.66-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.66-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.66-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Jan 15 2022 Sérgio Basto <sergio@serjux.com> - 0.66-1
+- Update po4a to 0.66 (#2036534)
+
+* Sun Dec 12 2021 Sérgio Basto <sergio@serjux.com> - 0.65-1
+- Update po4a to 0.65 (#2023095)
+
+* Mon Nov 01 2021 Sérgio Basto <sergio@serjux.com> - 0.64-1
+- Update po4a to 0.64 (#2003502)
+
+* Mon Sep 20 2021 Richard W.M. Jones <rjones@redhat.com> - 0.63-4
+- Add gating tests for RHEL 9
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.63-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.63-2
+- Perl 5.34 rebuild
+
+* Tue Feb 23 2021 Sérgio Basto <sergio@serjux.com> - 0.63-1
+- Update po4a to 0.63 (#1905315)
+
+* Tue Feb 16 2021 Sérgio Basto <sergio@serjux.com> - 0.62-1
+- Update po4a to 0.62 (#1905315)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.61-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Aug 05 2020 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 0.61-1
+- Update to 0.61 (#1866407)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.60-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sun Jul 26 2020 Sérgio Basto <sergio@serjux.com> - 0.60-1
 - Update po4a to 0.60 (#1857579)

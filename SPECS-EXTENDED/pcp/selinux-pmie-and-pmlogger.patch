@@ -1,0 +1,24 @@
+diff --git a/src/selinux/pcp.te b/src/selinux/pcp.te
+index 46d921b5c..c03d03674 100644
+--- a/src/selinux/pcp.te
++++ b/src/selinux/pcp.te
+@@ -906,6 +906,9 @@ allow pcp_pmlogger_t etc_t:dir { add_name read remove_name write };
+ allow pcp_pmlogger_t etc_t:file { create unlink write };
+ allow pcp_pmlogger_t cgroup_t:file { getattr read open append write };
+ 
++allow pcp_pmlogger_t fixed_disk_device_t:blk_file getattr;
++allow pcp_pmlogger_t sysfs_t:lnk_file read;
++
+ #============= pcp_pmie_t ==============
+ # type=AVC msg=audit(N): avc: denied { execute execute_no_trans getattr open read } for pid=PID comm="pmdaX" name="/" dev="tracefs" ino=INO scontext=system_u:system_r:pcp_pmie_t:s0 tcontext=system_u:object_r:hostname_exec_t:s0 tclass=file permissive=0
+ allow pcp_pmie_t hostname_exec_t:file { execute execute_no_trans getattr open read };
+@@ -940,6 +943,9 @@ allow pcp_pmie_t etc_t:dir { add_name read remove_name write };
+ allow pcp_pmie_t etc_t:file { create unlink write };
+ allow pcp_pmie_t cgroup_t:file { getattr read open append write };
+ 
++allow pcp_pmie_t fixed_disk_device_t:blk_file getattr;
++allow pcp_pmie_t sysfs_t:lnk_file read;
++
+ #============= pmda-lio ==============
+ # type=AVC msg=audit(N): avc: denied { open read search write } for  pid=PID comm="pmdaX" name="/" dev="tracefs" ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=system_u:object_r:configfs_t:s0 tclass=dir permissive=0
+ allow pcp_pmcd_t configfs_t:dir { open read search write };

@@ -1,31 +1,54 @@
+%global commit 5bc6841351a71569889e11f443a7948cb3ca64f0
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+%global with_tests 1
+
+Name:           python-webtest
+Version:        3.0.1
+Release:        1%{?dist}
+Summary:        Helper to test WSGI applications
+
+License:        MIT
+URL:            https://github.com/Pylons/webtest
+Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz
+#Source0:        https://github.com/Pylons/webtest/archive/%%{commit}/%%{name}-%%{shortcommit}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+
+%if 0%{?with_tests}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-beautifulsoup4
+BuildRequires:  python3-paste-deploy
+BuildRequires:  python3-pyquery
+BuildRequires:  python3-waitress
+BuildRequires:  python3-webob
+# only require legacy-cgi on on systems where it's present
+%if 0%{?fedora} > 40 || 0%{?rhel} > 9
+BuildRequires:  python3dist(legacy-cgi)
+%endif
+BuildRequires:  python3-WSGIProxy2
+# there is no sphinx-themes for rhel9, but it's not required to build
+%if 0%{?fedora} >= 33 || 0%{?rhel} > 9
+BuildRequires:  python3-pylons-sphinx-themes
+%endif
+%endif
+
 %global _description\
 WebTest wraps any WSGI application and makes it easy to send test\
 requests to that application, without starting up an HTTP server.\
 \
 This provides convenient full-stack testing of applications written\
 with any WSGI-compatible framework.
-%global srcname webtest
-Summary:        Helper to test WSGI applications
-Name:           python-%{srcname}
-Version:        3.0.0
-Release:        5%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/Pylons/webtest
-Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildArch:      noarch
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-%endif
 
-%description %{_description}
+%description %_description
 
 %package -n python3-webtest
 Summary:        Helper to test WSGI applications
+
 Requires:       python3-beautifulsoup4
 Requires:       python3-waitress
 Requires:       python3-webob
@@ -37,8 +60,11 @@ requests to that application, without starting up an HTTP server.
 This provides convenient full-stack testing of applications written
 with any WSGI-compatible framework.
 
+
 %prep
-%autosetup -n %{srcname}-%{version}
+%setup -q -n webtest-%{version}
+#%%autosetup -n webtest-%%{commit}
+
 # Remove bundled egg info if it exists.
 rm -rf *.egg-info
 
@@ -46,25 +72,56 @@ rm -rf *.egg-info
 %py3_build
 # remove files not needed in documentation
 rm -f docs/Makefile docs/conf.py docs/changelog.rst
-cp -a CHANGELOG.rst docs/
+#cp -a CHANGELOG.rst docs/
 
 %install
+%{__rm} -rf %{buildroot}
 %py3_install
 
+
+%if 0%{?with_tests}
 %check
-%{python3} -m pip install pytest-cov beautifulsoup4 PasteDeploy pyquery waitress webob WSGIProxy2
 %pytest
+%endif
 
 %files -n python3-webtest
-%license license.rst
 %doc docs/* CHANGELOG.rst
 %{python3_sitelib}/webtest
-%{python3_sitelib}/*.egg-info
+%{python3_sitelib}/WebTest-*.egg-info
 
 %changelog
-* Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.0.0-5
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- license verified
+* Tue Sep 03 2024 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 3.0.1-1
+- Update to upstream.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 16 2024 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 3.0.0-13
+- Add buildrequires on legacy-cgi module
+
+* Fri Jun 14 2024 Python Maint <python-maint@redhat.com> - 3.0.0-12
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 28 2023 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 3.0.0-8
+- Update to latest git commit, which fixes python 3.12 unittests
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 3.0.0-7
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 18 2023 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 3.0.0-5
+- Do not use glob on python sitelib
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

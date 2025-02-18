@@ -1,0 +1,39 @@
+diff -up ./configure.ac.uthash ./configure.ac
+--- ./configure.ac.uthash	2022-09-27 16:34:59.000000000 +0200
++++ ./configure.ac	2022-09-29 11:57:26.297879027 +0200
+@@ -162,10 +162,6 @@ AC_CHECK_HEADER(sys/fanotify.h, , [AC_MS
+ ["Couldn't find sys/fanotify.h...your kernel might not be new enough"] )])
+ AC_CHECK_FUNCS(fexecve, [], [])
+ AC_CHECK_FUNCS([gettid])
+-AC_CHECK_HEADER(uthash.h, , [AC_MSG_ERROR(
+-["Couldn't find uthash.h...uthash-devel is missing"] )])
+-
+-
+ echo .
+ echo Checking for required libraries
+ AC_CHECK_LIB(udev, udev_device_get_devnode, , [AC_MSG_ERROR([libudev not found])], -ludev)
+diff -up ./src/library/rpm-backend.c.uthash ./src/library/rpm-backend.c
+--- ./src/library/rpm-backend.c.uthash	2022-09-29 11:57:26.297879027 +0200
++++ ./src/library/rpm-backend.c	2022-09-29 11:58:45.470119807 +0200
+@@ -33,7 +33,7 @@
+ #include <rpm/rpmpgp.h>
+ #include <fnmatch.h>
+ 
+-#include <uthash.h>
++#include "uthash.h"
+ 
+ #include "message.h"
+ #include "gcc-attributes.h"
+diff -up ./src/Makefile.am.uthash ./src/Makefile.am
+--- ./src/Makefile.am.uthash	2022-09-27 16:34:59.000000000 +0200
++++ ./src/Makefile.am	2022-09-29 11:57:26.297879027 +0200
+@@ -5,6 +5,9 @@ AM_CPPFLAGS = \
+ 	-I${top_srcdir} \
+ 	-I${top_srcdir}/src/library
+ 
++AM_CPPFLAGS += \
++	-I${top_srcdir}/uthash-2.3.0/include
++
+ sbin_PROGRAMS = fapolicyd fapolicyd-cli
+ lib_LTLIBRARIES= libfapolicyd.la
+ 

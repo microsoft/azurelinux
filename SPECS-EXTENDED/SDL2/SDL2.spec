@@ -1,20 +1,27 @@
-%bcond_with jack
-Summary:        Cross-platform multimedia library
+# For the generated library symbol suffix
+%if 0%{?__isa_bits} == 32
+%global libsymbolsuffix %{nil}
+%else
+%global libsymbolsuffix ()(%{__isa_bits}bit)
+%endif
+
+# For declaring rich dependency on libdecor
+%global libdecor_majver 0
+
 Name:           SDL2
-Version:        2.24.0
-Release:        2%{?dist}
-License:        zlib AND MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.libsdl.org/
-Source0:        https://www.libsdl.org/release/%{name}-%{version}.tar.gz
+Version:        2.30.11
+Release:        1%{?dist}
+Summary:        Cross-platform multimedia library
+License:        Zlib AND MIT AND Apache-2.0 AND (Apache-2.0 OR MIT)
+URL:            http://www.libsdl.org/
+Source0:        http://www.libsdl.org/release/%{name}-%{version}.tar.gz
 Source1:        SDL_config.h
 Source2:        SDL_revision.h
+
 Patch0:         multilib.patch
-# ptrdiff_t is not the same as khronos defines on 32bit arches
-Patch1:         SDL2-2.0.9-khrplatform.patch
 # Prefer Wayland by default
-Patch2:         SDL2-2.0.22-prefer-wayland.patch
+Patch1:         SDL2-2.30.1-prefer-wayland.patch
+
 BuildRequires:  git-core
 BuildRequires:  cmake
 BuildRequires:  make
@@ -30,17 +37,16 @@ BuildRequires:  libX11-devel
 BuildRequires:  libXi-devel
 BuildRequires:  libXrandr-devel
 BuildRequires:  libXrender-devel
-BuildRequires:  libXScrnSaver-devel
+# While SDL2 supports this, Xwayland does not expose XScrnSaver.
+# BuildRequires:  libXScrnSaver-devel
 BuildRequires:  libXinerama-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  systemd-devel
 BuildRequires:  pkgconfig(libusb-1.0)
 # PulseAudio
 BuildRequires:  pkgconfig(libpulse-simple)
-%if %{with jack}
 # Jack
 BuildRequires:  pkgconfig(jack)
-%endif
 # PipeWire
 BuildRequires:  pkgconfig(libpipewire-0.3)
 # D-Bus
@@ -48,6 +54,7 @@ BuildRequires:  pkgconfig(dbus-1)
 # IBus
 BuildRequires:  pkgconfig(ibus-1.0)
 # Wayland
+BuildRequires:  pkgconfig(libdecor-%{libdecor_majver})
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-egl)
 BuildRequires:  pkgconfig(wayland-cursor)
@@ -60,6 +67,9 @@ BuildRequires:  vulkan-devel
 BuildRequires:  mesa-libgbm-devel
 BuildRequires:  libdrm-devel
 
+# Ensure libdecor is pulled in when libwayland-client is (rhbz#1992804)
+Requires:       (libdecor-%{libdecor_majver}.so.%{libdecor_majver}%{libsymbolsuffix} if libwayland-client)
+
 %description
 Simple DirectMedia Layer (SDL) is a cross-platform multimedia library designed
 to provide fast access to the graphics frame buffer and audio device.
@@ -67,9 +77,9 @@ to provide fast access to the graphics frame buffer and audio device.
 %package devel
 Summary:        Files needed to develop Simple DirectMedia Layer applications
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libX11-devel%{?_isa}
 Requires:       mesa-libEGL-devel%{?_isa}
 Requires:       mesa-libGLES-devel%{?_isa}
+Requires:       libX11-devel%{?_isa}
 # Conflict with versions before libSDLmain moved here
 Conflicts:      %{name}-static < 2.0.18-4
 
@@ -90,14 +100,13 @@ Conflicts:      %{name}-devel < 2.0.18-4
 Static libraries for SDL2.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -S git
+#autopatch 0
 sed -i -e 's/\r//g' TODO.txt README.md WhatsNew.txt BUGS.txt LICENSE.txt CREDITS.txt README-SDL.txt
 
 %build
 # Deal with new CMake policy around whitespace in LDFLAGS...
 export LDFLAGS="%{shrink:%{build_ldflags}}"
-
-mkdir -p buildDir
 
 %cmake \
     -DSDL_DLOPEN=ON \
@@ -106,24 +115,24 @@ mkdir -p buildDir
     -DSDL_ESD=OFF \
     -DSDL_NAS=OFF \
     -DSDL_PULSEAUDIO_SHARED=ON \
-%if %{with jack}
     -DSDL_JACK_SHARED=ON \
-%else
-    -DSDL_JACK=OFF \
-%endif
     -DSDL_PIPEWIRE_SHARED=ON \
     -DSDL_ALSA=ON \
     -DSDL_VIDEO_WAYLAND=ON \
+    -DSDL_LIBDECOR_SHARED=ON \
     -DSDL_VIDEO_VULKAN=ON \
     -DSDL_SSE3=OFF \
     -DSDL_RPATH=OFF \
     -DSDL_STATIC=ON \
-    -DSDL_STATIC_PIC=ON -B ./buildDir
+    -DSDL_STATIC_PIC=ON \
+%ifarch ppc64le
+    -DSDL_ALTIVEC=OFF \
+%endif
 
-cmake --build buildDir %{?_smp_mflags} --verbose
+%cmake_build
 
 %install
-DESTDIR=%{buildroot} cmake --install buildDir
+%cmake_install
 
 # Rename SDL_config.h to SDL_config-<arch>.h to avoid file conflicts on
 # multilib systems and install SDL_config.h wrapper
@@ -151,6 +160,7 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 %{_libdir}/cmake/SDL2/SDL2Config*.cmake
 %{_libdir}/cmake/SDL2/SDL2Targets*.cmake
 %{_libdir}/cmake/SDL2/SDL2mainTargets*.cmake
+%{_libdir}/cmake/SDL2/sdlfind.cmake
 %{_includedir}/SDL2
 %{_datadir}/aclocal/*
 %{_libdir}/libSDL2_test.a
@@ -162,10 +172,54 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 %{_libdir}/cmake/SDL2/SDL2staticTargets*.cmake
 
 %changelog
-* Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- Build with feature disabled: jack
-- License verified
+* Thu Jan 02 2025 Ding-Yi Chen <dchen@fedoraproject.org> - 2.30.11-1
+- Update to 2.30.11
+
+* Thu Nov 21 2024 Jeremy Newton <mystro256@fedoraproject.org> - 2.30.9-1
+- update to 2.30.9
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.30.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun May 19 2024 Tom Callaway <spot@fedoraproject.org> - 2.30.3-1
+- update to 2.30.3
+- drop BR on libXScrnSaver (thanks to Niels De Graef)
+
+* Mon Mar 25 2024 Ding-Yi Chen <dchen@fedoraproject.org> - 2.30.1-1
+- Update to 2.30.1
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.28.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.28.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Nov  5 2023 Tom Callaway <spot@fedoraproject.org> - 2.28.5-1
+- update to 2.28.5
+
+* Mon Oct  2 2023 Tom Callaway <spot@fedoraproject.org> - 2.28.4-1
+- update to 2.28.4
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.26.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon May  1 2023 Tom Callaway <spot@fedoraproject.org> - 2.26.5-1
+- update to 2.26.5
+
+* Tue Mar 14 2023 Tom Callaway <spot@fedoraproject.org> - 2.26.4-1
+- update to 2.26.4
+
+* Wed Feb  8 2023 Tom Callaway <spot@fedoraproject.org> - 2.26.3-1
+- update to 2.26.3
+
+* Sat Jan 21 2023 Tom Callaway <spot@fedoraproject.org> - 2.26.2-1
+- update to 2.26.2
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.26.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 22 2022 Neal Gompa <ngompa@fedoraproject.org> - 2.26.0-1
+- Update to 2.26.0
 
 * Fri Aug 19 2022 Neal Gompa <ngompa@fedoraproject.org> - 2.24.0-1
 - Update to 2.24.0

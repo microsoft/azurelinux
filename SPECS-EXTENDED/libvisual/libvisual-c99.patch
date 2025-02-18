@@ -1,0 +1,33 @@
+Include "lv_cpu.h" for the visual_cpu_initialize, visual_cpu_get_sse,
+visual_cpu_get_3dnow functions.  Add a prototype for
+visual_transform_init, so that it can be called before it is defined.
+
+Submitted upstream to the 0.4.x branch:
+
+  <https://github.com/Libvisual/libvisual/pull/220>
+
+diff --git a/libvisual/lv_libvisual.c b/libvisual/lv_libvisual.c
+index 8de03ebad7d499bb..e7ef768d421aa7fa 100644
+--- a/libvisual/lv_libvisual.c
++++ b/libvisual/lv_libvisual.c
+@@ -30,6 +30,7 @@
+ #include <gettext.h>
+ 
+ #include "lvconfig.h"
++#include "lv_cpu.h"
+ #include "lv_plugin.h"
+ #include "lv_actor.h"
+ #include "lv_input.h"
+diff --git a/libvisual/lv_transform.c b/libvisual/lv_transform.c
+index c763768c0fbb757a..58fe15fa57d2e783 100644
+--- a/libvisual/lv_transform.c
++++ b/libvisual/lv_transform.c
+@@ -35,6 +35,8 @@
+ #include "lv_transform.h"
+ #include "lv_mem.h"
+ 
++int visual_transform_init (VisTransform *transform, const char *transformname);
++
+ extern VisList *__lv_plugins_transform;
+ 
+ static int transform_dtor (VisObject *object);

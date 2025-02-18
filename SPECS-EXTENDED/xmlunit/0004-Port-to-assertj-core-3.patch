@@ -1,0 +1,31 @@
+From 7077eac701bca8e63d16aede77a73474d5fe79af Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 26 Sep 2022 13:53:53 +0200
+Subject: [PATCH] Port to assertj-core 3
+
+---
+ .../src/test/java/org/xmlunit/assertj3/ValueAssertTest.java  | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xmlunit-assertj3/src/test/java/org/xmlunit/assertj3/ValueAssertTest.java b/xmlunit-assertj3/src/test/java/org/xmlunit/assertj3/ValueAssertTest.java
+index fa12a7f..6e7bb55 100644
+--- a/xmlunit-assertj3/src/test/java/org/xmlunit/assertj3/ValueAssertTest.java
++++ b/xmlunit-assertj3/src/test/java/org/xmlunit/assertj3/ValueAssertTest.java
+@@ -283,10 +283,13 @@ public class ValueAssertTest {
+ 
+         thrown.expectAssertionErrorPattern(".*("
+             // AssertJ 3.18.1
+-            + Pattern.quote("expected:<\"[something]\"> but was:<\"[abc]\">")
++            + Pattern.quote("expected: \"something\"\nbut was : \"abc\"")
+             + "|"
+             // AssertJ 3.19.0+
+             + Pattern.quote("Expecting:\n <\"abc\">\nto be equal to:\n <\"something\">\nbut was not.")
++            + "|"
++            // AssertJ 3.23.0+
++            + Pattern.quote("[XPath \"//a/b/@attr\" evaluated to value] \nexpected: \"something\"\n but was: \"abc\"")
+             + ")");
+ 
+         String xml = "<a><b attr=\"abc\"></b></a>";
+-- 
+2.37.3
+

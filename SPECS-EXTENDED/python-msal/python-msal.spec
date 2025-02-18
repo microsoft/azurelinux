@@ -1,58 +1,74 @@
-%global         srcname         msal
-%global         forgeurl        https://github.com/AzureAD/microsoft-authentication-library-for-python/
-%global         pypi_version    1.18.0b1
-%global         tag             %{pypi_version}
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
-# Most of the tests require network access, so they are disabled by default.
-%bcond_with     tests
+%bcond tests 1
+# For testing/development purposes, it could make sense to do a mock build with
+# --with network_tests --enable-network.
+%bcond network_tests 0
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Version:        1.18.0~b1
-Name:           python-%{srcname}
-Release:        3%{?dist}
+Name:           python-msal
+Version:        1.31.1
+Release:        %autorelease
 Summary:        Microsoft Authentication Library (MSAL) for Python
 
+# SPDX
 License:        MIT
-URL:            %forgeurl
-Source0:        https://github.com/AzureAD/microsoft-authentication-library-for-python/archive/%{pypi_version}/microsoft-authentication-library-for-python-%{pypi_version}.tar.gz#/%{name}-%{pypi_version}.tar.gz
+URL:            https://github.com/AzureAD/microsoft-authentication-library-for-python
+Source:         %{url}/archive/%{version}/microsoft-authentication-library-for-python-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python3-packaging
-BuildRequires:  python3-requests
-BuildRequires:  python3-wheel
 
-%if 0%{?with_check}
+%if %{with tests}
 BuildRequires:  python3dist(pytest)
 %endif
 
 %global _description %{expand:
-The Microsoft Authentication Library for Python
-enables applications to integrate with the Microsoft identity platform. It
-allows you to sign in users or apps with Microsoft identities (Azure AD,
-Microsoft Accounts and Azure AD B2Caccounts) and obtain tokens to call Microsoft
-APIs such as Microsoft Graph or your own APIs registered with the Microsoft
-identity platform. It is built using industry standard OAuth2 and OpenID Connect
-protocols.}
+The Microsoft Authentication Library for Python enables applications to
+integrate with the Microsoft identity platform. It allows you to sign in users
+or apps with Microsoft identities (Azure AD, Microsoft Accounts and Azure AD
+B2C accounts) and obtain tokens to call Microsoft APIs such as Microsoft Graph
+or your own APIs registered with the Microsoft identity platform. It is built
+using industry standard OAuth2 and OpenID Connect protocols.}
 
 %description %{_description}
 
 
-%package -n python3-%{srcname}
+%package -n python3-msal
 Summary:        %{summary}
-%description -n python3-%{srcname} %{_description}
+%description -n python3-msal %{_description}
+
+
+%pyproject_extras_subpkg -n python3-msal broker
 
 
 %prep
-%autosetup -p1 -n microsoft-authentication-library-for-python-%{pypi_version}
+%autosetup -n microsoft-authentication-library-for-python-%{version}
+
+# - We can’t generate BR’s from a requirements file with “-e .” in it.
+# - We don’t need or want to run benchmarks (tests/test_benchmark.py), so don’t
+#   generate benchmarking dependencies.
+# - We don’t need python-dotenv if we aren’t running network tests (and on some
+#   older releases, it is too old.)
+sed -r \
+    -e 's/^\-e/# &/' \
+    -e 's/^(pytest-benchmark|perf_baseline)\b/# &/' \
+%if %{without network_tests} || 0%{?fc37} || 0%{?el9}
+    -e 's/^(python-dotenv)\b/# &/' \
+%endif
+    requirements.txt | tee requirements-filtered.txt
 
 
 %generate_buildrequires
-%pyproject_buildrequires -r
+%pyproject_buildrequires -r requirements-filtered.txt
 
 
 %build
@@ -61,91 +77,226 @@ Summary:        %{summary}
 
 %install
 %pyproject_install
-%pyproject_save_files msal
+%pyproject_save_files -l msal
 
 
 %check
-%pytest --disable-warnings tests
+%if %{with tests}
+%if %{without network_tests}
+# All of the following require network access:
+k="${k-}${k+ and }not TestClientApplicationAcquireTokenSilentErrorBehaviors"
+k="${k-}${k+ and }not TestClientApplicationAcquireTokenSilentFociBehaviors"
+k="${k-}${k+ and }not TestClientApplicationForAuthorityMigration"
+k="${k-}${k+ and }not TestTelemetryMaintainingOfflineState"
+k="${k-}${k+ and }not TestClientApplicationWillGroupAccounts"
+k="${k-}${k+ and }not TestClientCredentialGrant"
+k="${k-}${k+ and }not TestScopeDecoration"
+k="${k-}${k+ and }not (TestAuthority and test_unknown_host_wont_pass_instance_discovery)"
+k="${k-}${k+ and }not (TestAuthority and test_wellknown_host_and_tenant)"
+k="${k-}${k+ and }not (TestAuthority and test_wellknown_host_and_tenant_using_new_authority_builder)"
+k="${k-}${k+ and }not TestAuthorityInternalHelperUserRealmDiscovery"
+k="${k-}${k+ and }not TestCcsRoutingInfoTestCase"
+k="${k-}${k+ and }not TestApplicationForRefreshInBehaviors"
+k="${k-}${k+ and }not TestTelemetryOnClientApplication"
+k="${k-}${k+ and }not TestTelemetryOnPublicClientApplication"
+k="${k-}${k+ and }not TestTelemetryOnConfidentialClientApplication"
+k="${k-}${k+ and }not TestRemoveTokensForClient"
+# Without network access, these even error during test collection!
+ignore="${ignore-} --ignore=tests/test_cryptography.py"
+ignore="${ignore-} --ignore=tests/test_e2e.py"
+%else
+# This test requires browser interaction.
+k="${k-}${k+ and }not (SshCertTestCase and test_ssh_cert_for_user_should_work_with_any_account)"
+# Obviously, the python-cryptography package may sometimes lag upstream.
+k="${k-}${k+ and }not (CryptographyTestCase and test_should_be_run_with_latest_version_of_cryptography)"
+%if 0%{?fc37} || 0%{?epel9}
+# python-dotenv is too old
+ignore="${ignore-} --ignore=tests/test_e2e.py"
+%endif
+%endif
+
+# We don’t need or want to run benchmarks.
+ignore="${ignore-} --ignore=tests/test_benchmark.py"
+
+%pytest --disable-warnings tests ${ignore-} -k "${k-}" -v
+
+%else
+# The msal.broker module requires pymsalruntime, which is provided on Windows
+# when the broker extra is installed, but which is not available at all
+# otherwise.
+%pyproject_check_import -e msal.broker
+%endif
 
 
-%files -n python3-%{srcname} -f %{pyproject_files}
+%files -n python3-msal -f %{pyproject_files}
 %doc README.md
 
 
 %changelog
-* Wed Mar 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-3
-- Rename Source0 to `%{name}-%{version}.extension
+## START: Generated by rpmautospec
+* Mon Nov 18 2024 Packit <hello@packit.dev> - 1.31.1-1
+- Update to 1.31.1 upstream release
+- Resolves: rhbz#2326970
 
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-2
-- Convert 'Release' tag to '[number].[distribution]' format
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified
+* Fri Sep 06 2024 Packit <hello@packit.dev> - 1.31.0-1
+- Update to 1.31.0 upstream release
+- Resolves: rhbz#2310536
 
-* Tue May 24 2022 Major Hayden <major@mhtx.net> 1.18.0~b1-1
+* Wed Jul 17 2024 Packit <hello@packit.dev> - 1.30.0-1
+- Update to 1.30.0 upstream release
+- Resolves: rhbz#2293739
+
+* Wed Jun 12 2024 Packit <hello@packit.dev> - 1.28.1-1
+- Update to 1.28.1 upstream release
+- Resolves: rhbz#2291295
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.28.0-2
+- Rebuilt for Python 3.13
+
+* Wed Apr 03 2024 Packit <hello@packit.dev> - 1.28.0-1
+- [packit] 1.28.0 upstream release
+- Resolves rhbz#2270234
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 02 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 1.26.0-2
+- Assert %%pyproject_files contains a license file
+
+* Tue Dec 05 2023 Packit <hello@packit.dev> - 1.26.0-1
+- [packit] 1.26.0 upstream release
+- Resolves rhbz#2252935
+
+* Sat Nov 04 2023 Packit <hello@packit.dev> - 1.25.0-1
+- [packit] 1.25.0 upstream release
+- Resolves rhbz#2247876
+
+* Fri Sep 29 2023 Major Hayden <major@redhat.com> - 1.24.1-2
+- Add packit config
+
+* Fri Sep 29 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.1-1
+- Update to 1.24.1 (close RHBZ#2241303)
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-9
+- Do not number the sole Source
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-8
+- Reflow the description text
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-7
+- Confirm the License is SPDX MIT
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-6
+- Simplify macro usage: drop srcname and “forge” macros
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-5
+- Drop -r option to pyproject_buildrequires (now the default)
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-4
+- Run an import-only “smoke test” if tests are disabled
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-3
+- Use new (rpm 4.17.1+) bcond style
+
+* Wed Aug 09 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 1.24.0~b1-2
+- Do run tests that can be run offline
+
+* Thu Aug 03 2023 Major Hayden <major@redhat.com> - 1.24.0~b1-1
+- Update to 1.24.0b1
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 06 2023 Major Hayden <major@redhat.com> - 1.22.0-1
+- Update to 1.22.0 rhbz#2219715
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 1.20.0-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 01 2022 Major Hayden <major@redhat.com> - 1.20.0-1
+- Update to 1.20.0
+
+* Fri Oct 14 2022 Major Hayden <major@redhat.com> - 1.20.0~b1-1
+- Update to 1.20.0b1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.18.0~b1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 1.18.0~b1-2
+- Rebuilt for Python 3.11
+
+* Tue May 24 2022 Major Hayden <major@mhtx.net> - 1.18.0~b1-1
 - Update to 1.18.0~b1
 
-* Fri Feb 11 2022 Major Hayden <major@mhtx.net> 1.17.0-1
+* Fri Feb 11 2022 Major Hayden <major@mhtx.net> - 1.17.0-1
 - Update to 1.17.0
 
-* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> 1.16.0-2
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.16.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
-* Wed Dec 15 2021 Major Hayden <major@mhtx.net> 1.16.0-1
+* Wed Dec 15 2021 Major Hayden <major@mhtx.net> - 1.16.0-1
 - Update to 1.16.0
 
-* Fri Nov 12 2021 Major Hayden <major@mhtx.net> 1.15.0-2
+* Fri Nov 12 2021 Major Hayden <major@mhtx.net> - 1.15.0-2
 - Remove docs
 
-* Mon Oct 04 2021 Major Hayden <major@mhtx.net> 1.15.0-1
+* Mon Oct 04 2021 Major Hayden <major@mhtx.net> - 1.15.0-1
 - 🚀 Update to 1.15.0
 
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> 1.13.0-2
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.13.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
-* Wed Jul 21 2021 Major Hayden <major@mhtx.net> 1.13.0-1
+* Wed Jul 21 2021 Major Hayden <major@mhtx.net> - 1.13.0-1
 - Update to 1.13.0
 
-* Tue Jul 06 2021 Major Hayden <major@mhtx.net> 1.12.0-4
+* Tue Jul 06 2021 Major Hayden <major@mhtx.net> - 1.12.0-4
 - Fix lato font requirement
 
-* Thu Jun 10 2021 Stephen Gallagher <sgallagh@redhat.com> 1.12.0-3
+* Thu Jun 10 2021 Stephen Gallagher <sgallagh@redhat.com> - 1.12.0-3
 - Fix conditional to work when %%fedora is not defined
 
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> 1.12.0-2
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.12.0-2
 - Rebuilt for Python 3.10
 
-* Fri Jun 04 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.12.0-1
+* Fri Jun 04 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.12.0-1
 - Update to 1.12.0
 
-* Sun Mar 21 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.10.0-2
+* Sun Mar 21 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.10.0-2
 - Fix doc. build + disable online unit tests
 
-* Sun Mar 21 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.10.0-1
+* Sun Mar 21 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.10.0-1
 - Update to 1.10.0
 
-* Mon Feb 15 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.8.0-1
+* Mon Feb 15 2021 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.8.0-1
 - Update to 1.8.0
 
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> 1.4.3-4
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
-* Fri Jan 08 2021 Tom Stellard <tstellar@redhat.com> 1.4.3-3
+* Fri Jan 08 2021 Tom Stellard <tstellar@redhat.com> - 1.4.3-3
 - Add BuildRequires: make
 
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> 1.4.3-2
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Sat Jul 25 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.4.3-1
+* Sat Jul 25 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.4.3-1
 - Update to 1.4 3
 
-* Fri Jul 24 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.4.2-1
+* Fri Jul 24 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.4.2-1
 - Update to 1.4.2
 
-* Sat Jun 27 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.4.1-1
+* Sat Jun 27 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.4.1-1
 - Update to 1.4.1
 
-* Sun May 31 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.3.0-2
+* Sun May 31 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.3.0-2
 - Rebuild for Python 3.9
 
-* Fri May 29 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.3.0-1
+* Fri May 29 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.3.0-1
 - First import
+## END: Generated by rpmautospec

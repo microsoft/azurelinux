@@ -1,0 +1,49 @@
+From f4589f1d836716df737bc2d5bbef82ab9879120c Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Tue, 14 May 2024 11:59:23 +0200
+Subject: [PATCH] Treat methodName="runTest" similar to unittest.TestCase
+
+pytest 8.2 relies on a feature of `unittest.TestCase` where the
+initialization of it with the default `methodName="runTest"` is treated
+specially, allowing it to insantiate even without `runTest` method
+actually existing.
+
+See under "Changed in Python 3.2" in unittest.TestCase docs
+
+This fixes the error with pytest 8.2:
+  AttributeError: 'TestUtil' object has no attribute 'runTest'. Did you mean: 'subTest'?
+
+Fixes: https://github.com/testing-cabal/testtools/issues/372
+ref: https://docs.python.org/3/library/unittest.html#unittest.TestCase
+ref: https://github.com/python/cpython/blob/51aefc5bf907ddffaaf083ded0de773adcdf08c8/Lib/unittest/case.py#L419-L426
+ref: https://github.com/pytest-dev/pytest/issues/12263#issuecomment-2081434468
+---
+ testtools/testcase.py | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/testtools/testcase.py b/testtools/testcase.py
+index 004fdb5..c175937 100644
+--- a/testtools/testcase.py
++++ b/testtools/testcase.py
+@@ -693,7 +693,17 @@ class TestCase(unittest.TestCase):
+ 
+     def _get_test_method(self):
+         method_name = getattr(self, '_testMethodName')
+-        return getattr(self, method_name)
++        try:
++            m = getattr(self, method_name)
++        except AttributeError:
++            if method_name != "runTest":
++                # We allow instantiation with no explicit method name
++                # but not an *incorrect* or missing method name.
++                raise ValueError(
++                    "no such test method in %s: %s" % (self.__class__, method_name)
++                )
++        else:
++            return m
+ 
+     def _run_test_method(self, result):
+         """Run the test method for this test.
+-- 
+2.44.0
+

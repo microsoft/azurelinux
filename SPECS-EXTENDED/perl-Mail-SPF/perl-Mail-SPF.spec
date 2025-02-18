@@ -1,98 +1,178 @@
-Summary:        Object-oriented implementation of Sender Policy Framework
 Name:           perl-Mail-SPF
-Version:        2.9.0
-Release:        23%{?dist}
-License:        BSD
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Version:        3.20240923
+Release:        1%{?dist}
+Summary:        Object-oriented implementation of Sender Policy Framework
+License:        BSD-3-Clause
 URL:            https://metacpan.org/release/Mail-SPF
-Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
-# Fix broken POD (CPAN RT#86060)
-Patch0:         Mail-SPF-v2.8.0-POD.patch
-# Work around test suite failures with Net::DNS ≥ 0.68 (CPAN RT#78214)
-Patch1:         Mail-SPF-v2.8.0-testsuite.patch
+Source0:        https://cpan.metacpan.org/modules/by-module/Mail/Mail-SPF-%{version}.tar.gz
+BuildArch:      noarch
+# Build
 BuildRequires:  coreutils
+BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Error)
-BuildRequires:  perl(Module::Build)
-BuildRequires:  perl(Net::DNS) >= 0.62
-BuildRequires:  perl(Net::DNS::RR)
-BuildRequires:  perl(Net::DNS::Resolver)
-BuildRequires:  perl(Net::DNS::Resolver::Programmable) >= 0.003
-BuildRequires:  perl(NetAddr::IP) >= 4
-BuildRequires:  perl(Sys::Hostname)
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(URI) >= 1.13
-BuildRequires:  perl(URI::Escape)
-BuildRequires:  perl(base)
-BuildRequires:  perl(blib)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(overload)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
-BuildRequires:  perl(utf8)
-BuildRequires:  perl(version)
 BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
+# Runtime
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(Error)
+BuildRequires:  perl(Net::DNS) >= 0.62
+BuildRequires:  perl(Net::DNS::Resolver)
+BuildRequires:  perl(NetAddr::IP) >= 4
+BuildRequires:  perl(overload)
+BuildRequires:  perl(Sys::Hostname)
+BuildRequires:  perl(URI::Escape) >= 1.13
+BuildRequires:  perl(utf8)
+# Tests only
+BuildRequires:  perl(blib)
+BuildRequires:  perl(Net::DNS::Resolver::Programmable) >= 0.003
+BuildRequires:  perl(Net::DNS::RR)
+BuildRequires:  perl(Test::More)
 Requires:       perl(Net::DNS) >= 0.62
 Requires:       perl(URI) >= 1.13
+
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
-BuildArch:      noarch
 
 %description
 Mail::SPF is an object-oriented implementation of Sender Policy Framework
 (SPF). See http://www.openspf.org for more information about SPF.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
-%autosetup -n Mail-SPF-v%{version} -p0
-chmod -x bin/* sbin/*
+%setup -q -n Mail-SPF-%{version}
+chmod -x bin/*
+
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Build.PL installdirs=vendor
-./Build
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-./Build install destdir=%{buildroot} create_packlist=0
+%{make_install}
 %{_fixperms} %{buildroot}/*
 # The spfquery and spfd will use alternatives
-mv -f %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfquery.%{name}
-mv -f %{buildroot}%{_sbindir}/spfd %{buildroot}%{_bindir}/spfd.%{name}
-mv -f %{buildroot}%{_mandir}/man1/spfquery.1 %{buildroot}%{_mandir}/man1/spfquery-%{name}.1
+%{__mv} -f %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfquery.%{name}
+%{__mv} -f %{buildroot}%{_bindir}/spfd %{buildroot}%{_bindir}/spfd.%{name}
+%{__mv} -f %{buildroot}%{_mandir}/man1/spfquery.1 %{buildroot}%{_mandir}/man1/spfquery-%{name}.1
 touch %{buildroot}%{_bindir}/spfquery %{buildroot}%{_bindir}/spfd %{buildroot}%{_mandir}/man1/spfquery.1.gz
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/90-author*
+for F in `ls %{buildroot}%{_libexecdir}/%{name}/t/*`; do
+    perl -i -ne 'print $_ unless m{^use blib}' $F
+done
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
-./Build test
+make test
 
 %post
 %{_sbindir}/update-alternatives --install %{_bindir}/spfquery spf %{_bindir}/spfquery.%{name} 10 \
-	--slave %{_bindir}/spfd spf-daemon %{_bindir}/spfd.%{name} \
-	--slave %{_mandir}/man1/spfquery.1.gz spfquery-man-page %{_mandir}/man1/spfquery-%{name}.1.gz
+       --slave %{_bindir}/spfd spf-daemon %{_bindir}/spfd.%{name} \
+       --slave %{_mandir}/man1/spfquery.1.gz spfquery-man-page %{_mandir}/man1/spfquery-%{name}.1.gz
 
 %postun
 if [ $1 -eq 0 ] ; then
-	%{_sbindir}/update-alternatives --remove spf %{_bindir}/spfquery.%{name}
+       %{_sbindir}/update-alternatives --remove spf %{_bindir}/spfquery.%{name}
 fi
 
 %files
 %license LICENSE
-%doc CHANGES README TODO bin/ sbin/
-%{perl_vendorlib}/*
-%{_mandir}/man1/*
-%{_mandir}/man3/*
+%doc Changes README TODO bin/
+%{perl_vendorlib}/Mail/SPF*
+%{_mandir}/man1/spf*
+%{_mandir}/man3/Mail::SPF*
 %ghost %{_bindir}/spfquery
 %ghost %{_bindir}/spfd
 %ghost %{_mandir}/man1/spfquery.1.gz
 %{_bindir}/spfquery.%{name}
 %{_bindir}/spfd.%{name}
 
-%changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 2.9.0-23
-- License verified
+%files tests
+%{_libexecdir}/%{name}
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.0-22
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+%changelog
+* Mon Sep 23 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.20240923-1
+- 3.20240923 bump (rhbz#2314156)
+
+* Wed Aug 28 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.20240827-1
+- 3.20240827 bump (rhbz#2308077)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.20240617-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 21 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.20240617-1
+- 3.20240617 bump (rhbz#2292629)
+
+* Tue Feb 06 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.20240206-1
+- 3.20240206 bump (rhbz#2262902)
+
+* Mon Feb 05 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.20240205-1
+- 3.20240205 bump (rhbz#2262786)
+- Package tests
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 07 2023 Michal Josef Špaček <mspacek@redhat.com> - 2.9.0-31
+- Fix %patch macro
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.9.0-28
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.9.0-25
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.9.0-22
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.0-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

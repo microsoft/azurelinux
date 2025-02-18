@@ -1,0 +1,36 @@
+From 07134b9581e27db1fbf44495c05f7e4a57a82be3 Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Mon, 29 Jan 2024 22:05:11 -0700
+Subject: [PATCH] Fix some variable types.  Resolves #2849
+
+---
+ libhdf4/hdf4file.c | 2 +-
+ ncgen/ncgen.h      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libhdf4/hdf4file.c b/libhdf4/hdf4file.c
+index 3fd198a375..7fb0b3d103 100644
+--- a/libhdf4/hdf4file.c
++++ b/libhdf4/hdf4file.c
+@@ -485,7 +485,7 @@ hdf4_read_var(NC_FILE_INFO_T *h5, int v)
+     int32 sdsid;
+     int contiguous;
+     int d, a;
+-    int flag;
++    int32 flag;
+     char name[NC_MAX_HDF4_NAME+1];
+     int xtype;
+     char type_name[NC_MAX_NAME + 1];
+diff --git a/ncgen/ncgen.h b/ncgen/ncgen.h
+index 765543d043..f7f901671d 100644
+--- a/ncgen/ncgen.h
++++ b/ncgen/ncgen.h
+@@ -173,7 +173,7 @@ typedef struct Typeinfo {
+ 	int             hasvlen;  /* 1 => this type contains a vlen*/
+ 	nc_type         typecode;
+         unsigned long   offset;   /* fields in struct*/
+-        unsigned long   alignment;/* fields in struct*/
++        size_t          alignment;/* fields in struct*/
+         NCConstant*     econst;   /* for enum values*/
+         Dimset          dimset;     /* for NC_VAR/NC_FIELD/NC_ATT*/
+         size_t   size;     /* for opaque, compound, etc.*/

@@ -1,57 +1,128 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+%global source_version %%(echo "%version" | tr '~' '-')
 
-%global with_kde5 1
+# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_3
+%if (0%{?fedora} > 29 || 0%{?rhel} > 7)
+%global with_python2 0
+%else
+%global with_python2 1
+%endif
+
+%global with_pkg_config %(pkg-config --version >/dev/null 2>&1 && echo -n "1" || echo -n "0")
 
 %global ibus_api_version 1.0
+%global pkgcache /var/cache/%name
 
 # for bytecompile in %%{_datadir}/ibus/setup
 %global __python %{__python3}
 
+# No gtk2 in RHEL 10
+%if 0%{?rhel} > 9
+%bcond_with    gtk2
+%bcond_with    xinit
+%else
+%bcond_without gtk2
+%bcond_without xinit
+%endif
+
+%if (0%{?fedora} > 33 || 0%{?rhel} > 8)
+%bcond_without gtk4
+%else
+%bcond_with    gtk4
+%endif
+
+%global ibus_xinit_condition %ibus_panel_condition
+# FIXME: How to write a condition with multiple lines
+%global ibus_panel_condition (%pcd1 or %pcd2 or %pcd3)
+%global pcd1 budgie-desktop or cinnamon or deepin-desktop or i3
+%global pcd2 lxqt-session or lxsession or mate-panel or phosh
+%global pcd3 plasma-workspace or sugar or xfce4-session
+
+%if %with_pkg_config
+%if %{with gtk2}
+%{!?gtk2_binary_version: %global gtk2_binary_version %(pkg-config  --variable=gtk_binary_version gtk+-2.0)}
+%else
+%{!?gtk2_binary_version: %global gtk2_binary_version ?.?.?}
+%endif
+%{!?gtk3_binary_version: %global gtk3_binary_version %(pkg-config  --variable=gtk_binary_version gtk+-3.0)}
+%if %{with gtk4}
+%{!?gtk4_binary_version: %global gtk4_binary_version %(pkg-config  --variable=gtk_binary_version gtk4)}
+%else
+%{!?gtk4_binary_version: %global gtk4_binary_version ?.?.?}
+%endif
+%global glib_ver %([ -a %{_libdir}/pkgconfig/glib-2.0.pc ] && pkg-config --modversion glib-2.0 | cut -d. -f 1,2 || echo -n "999")
+%else
+%{!?gtk2_binary_version: %global gtk2_binary_version ?.?.?}
+%{!?gtk3_binary_version: %global gtk3_binary_version ?.?.?}
+%{!?gtk4_binary_version: %global gtk4_binary_version ?.?.?}
+%global glib_ver 0
+%endif
+
 %global dbus_python_version 0.83.0
 
 Name:           ibus
-Version:        1.5.22
-Release:        9%{?dist}
+Version:        1.5.31
+# https://github.com/fedora-infra/rpmautospec/issues/101
+Release:        1%{?dist}
 Summary:        Intelligent Input Bus for Linux OS
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/ibus/%name/wiki
-Source0:        https://github.com/ibus/%name/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-xinput
-Source2:        %{name}.conf.5
+Source0:        https://github.com/ibus/%name/releases/download/%{source_version}/%{name}-%{source_version}.tar.gz
+Source1:        https://github.com/ibus/%name/releases/download/%{source_version}/%{name}.tar.gz.sum
+Source2:        %{name}-xinput
+Source3:        %{name}.conf.5
 # Patch0:         %%{name}-HEAD.patch
-Patch0:         %{name}-HEAD.patch
 # Under testing #1349148 #1385349 #1350291 #1406699 #1432252 #1601577
 Patch1:         %{name}-1385349-segv-bus-proxy.patch
 
+# autoreconf requires autopoint but not po.m4
 BuildRequires:  gettext-devel
 BuildRequires:  libtool
 # for gtkdoc-fixxref
 BuildRequires:  glib2-doc
-BuildRequires:  dbus-glib-devel
+%if %{with gtk2}
+BuildRequires:  gtk2-devel
+%endif
+BuildRequires:  gtk3-devel
+%if %{with gtk4}
+BuildRequires:  gtk4-devel
+%endif
 BuildRequires:  dbus-python-devel >= %{dbus_python_version}
 BuildRequires:  desktop-file-utils
 BuildRequires:  gtk-doc
 BuildRequires:  dconf-devel
+BuildRequires:  dbus-x11
 BuildRequires:  python3-devel
 BuildRequires:  python3-gobject
+%if %with_python2
+# https://bugzilla.gnome.org/show_bug.cgi?id=759334
+# Need python2 for gsettings-schema-convert
+BuildRequires:  python2-devel
+# for AM_GCONF_SOURCE_2 in configure.ac
+BuildRequires:  GConf2-devel
+BuildRequires:  intltool
+%endif
 BuildRequires:  git
 BuildRequires:  vala
 BuildRequires:  iso-codes-devel
 BuildRequires:  libnotify-devel
 BuildRequires:  wayland-devel
-%if %with_kde5
-BuildRequires:  qt5-qtbase-devel
-%endif
 BuildRequires:  cldr-emoji-annotation
 BuildRequires:  unicode-emoji
 BuildRequires:  unicode-ucd
+BuildRequires:  systemd
 
 Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+%if %{with gtk2}
+Requires:      (%{name}-gtk2%{?_isa}   = %{version}-%{release} if gtk2)
+%endif
+Requires:       %{name}-gtk3%{?_isa}   = %{version}-%{release}
 Requires:       %{name}-setup          = %{version}-%{release}
+%if 0%{?fedora}
+Requires:      (%{name}-panel%{?_isa}  = %{version}-%{release} if %ibus_panel_condition)
+%endif
+%if %{with xinit}
+Requires:      (%{name}-xinit          = %{version}-%{release} if %ibus_xinit_condition)
+%endif
 
 Requires:       iso-codes
 Requires:       dconf
@@ -73,11 +144,6 @@ Requires:               %{_sbindir}/alternatives
 Requires(post):         %{_sbindir}/alternatives
 Requires(postun):       %{_sbindir}/alternatives
 
-# Obsoletes ibus-xkbc by ibus xkb engine
-Provides: ibus-xkbc = 1.3.4
-Obsoletes: ibus-xkbc < 1.3.4
-
-
 %global _xinputconf %{_sysconfdir}/X11/xinit/xinput.d/ibus.conf
 
 %description
@@ -87,16 +153,50 @@ IBus means Intelligent Input Bus. It is an input framework for Linux OS.
 Summary:        IBus libraries
 
 Requires:       dbus >= 1.2.4
-Requires:       glib2
+Requires:       glib2 >= %{glib_ver}
 # Owner of %%{_libdir}/girepository-1.0
 Requires:       gobject-introspection
-
-
-
-
+%if (0%{?fedora} > 28 || 0%{?rhel} > 7)
+%else
+Conflicts:      %{name}%{?_isa} < %{version}
+%endif
 
 %description libs
 This package contains the libraries for IBus
+
+%if %{with gtk2}
+%package gtk2
+Summary:        IBus IM module for GTK2
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+Requires:       glib2 >= %{glib_ver}
+Requires(post): glib2 >= %{glib_ver}
+# Added for upgrade el6 to el7
+Provides:       ibus-gtk = %{version}-%{release}
+Obsoletes:      ibus-gtk < %{version}-%{release}
+
+%description gtk2
+This package contains IBus IM module for GTK2
+%endif
+
+%package gtk3
+Summary:        IBus IM module for GTK3
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+Requires:       glib2 >= %{glib_ver}
+Requires(post): glib2 >= %{glib_ver}
+
+%description gtk3
+This package contains IBus IM module for GTK3
+
+%if %{with gtk4}
+%package gtk4
+Summary:        IBus IM module for GTK4
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+Requires:       glib2 >= %{glib_ver}
+Requires(post): glib2 >= %{glib_ver}
+
+%description gtk4
+This package contains IBus IM module for GTK4
+%endif
 
 %package setup
 Summary:        IBus setup utility
@@ -104,11 +204,80 @@ Requires:       %{name} = %{version}-%{release}
 %{?__python3:Requires: %{__python3}}
 Requires:       python3-gobject
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  pygobject3-devel
+BuildRequires:  python3-gobject-devel
+BuildRequires:  make
 BuildArch:      noarch
 
 %description setup
 This is a setup utility for IBus.
+
+%if %with_python2
+%package pygtk2
+Summary:        IBus PyGTK2 library
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+Requires:       dbus-python >= %{dbus_python_version}
+%else
+Requires:       python2-dbus >= %{dbus_python_version}
+%endif
+Requires:       python2
+Requires:       pygtk2
+BuildArch:      noarch
+
+%description pygtk2
+This is a PyGTK2 library for IBus. Now major IBus engines use PyGObject3
+and this package will be deprecated.
+%endif
+
+%package py2override
+Summary:        IBus Python2 override library
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+# Owner of %%python2_sitearch/gi/overrides
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+Requires:       pygobject3-base
+%else
+Requires:       python2-gobject-base
+%endif
+Requires:       python2
+
+%description py2override
+This is a Python2 override library for IBus. The Python files override
+some functions in GObject-Introspection.
+
+%package wayland
+Summary:        IBus IM module for Wayland
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+
+%description wayland
+This package contains IBus IM module for Wayland
+
+%package panel
+Summary:        IBus Panel icon
+Requires:       %{name}%{?_isa}        = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+%if %{with xinit}
+# setxkbmap can change XKB options for Xorg desktop sessions
+Requires:       setxkbmap
+%endif
+BuildRequires:  libdbusmenu-gtk3-devel
+
+%description panel
+This package contains IBus Panel icon using GtkStatusIcon or AppIndicator
+in non-GNOME desktop sessions likes XFCE or Plasma because gnome-shell
+shows the IBus Icon. This package depends on libdbusmenu-gtk3 for Wayland
+desktop sessions.
+
+%package xinit
+Summary:        IBus Xinit
+Requires:       %{name} = %{version}-%{release}
+%if %{with xinit}
+# Owner of %%{_sysconfdir}/X11/xinit
+Requires:       xorg-x11-xinit
+%endif
+BuildArch:      noarch
+
+%description xinit
+This package includes xinit scripts to set environment variables of IBus
+for Xorg desktop sessions and this is not needed by Wayland desktop sessions.
 
 %package devel
 Summary:        Development tools for ibus
@@ -116,7 +285,7 @@ Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
 Requires:       dbus-devel
 Requires:       glib2-devel
 # for %%{_datadir}/gettext/its
-Requires:       gettext
+Requires:       gettext-runtime
 
 %description devel
 The ibus-devel package contains the header files and developer
@@ -129,44 +298,113 @@ BuildArch:      noarch
 %description devel-docs
 The ibus-devel-docs package contains developer documentation for IBus
 
+%package desktop-testing
+Summary:        Wrapper of InstalledTests Runner for IBus
+Requires:       %{name} = %{version}-%{release}
+%if 0%{?fedora:1}%{?rhel:0}
+# Use no-overview mode in CI to get input focus
+BuildRequires:  gnome-shell-extension-no-overview
+Requires:       gnome-shell-extension-no-overview
+%endif
+BuildArch:      noarch
+
+%description desktop-testing
+GNOME desktop testing runner implements the InstalledTests specification
+and IBus also needs focus events to enable input contexts on text widgets.
+The wrapper script runs gnome-session for the focus events and GNOME
+desktop testing runner internally.
+
+%package  tests
+Summary:        Tests for the %{name} package
+Requires:       %{name}%{?_isa}        = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+
+%description tests
+The %{name}-tests package contains tests that can be used to verify
+the functionality of the installed %{name} package.
+
+
 %prep
-%autosetup -S git
+SAVED_SUM=$(grep sha512sum %SOURCE1 | awk '{print $2}')
+MY_SUM=$(sha512sum %SOURCE0 | awk '{print $1}')
+if test x"$SAVED_SUM" != x"$MY_SUM" ; then
+    abort
+fi
+%autosetup -S git -n %{name}-%{source_version}
 # cp client/gtk2/ibusimcontext.c client/gtk3/ibusimcontext.c || :
+# cp client/gtk2/ibusim.c client/gtk3/ibusim.c || :
+# cp client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c || :
+cp client/gtk2/ibusimcontext.c client/gtk3/ibusimcontext.c || :
+cp client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c || :
+
+
+# prep test
+for f in ibusimcontext.c ibusim.c
+do
+    diff client/gtk2/$f client/gtk3/$f
+    if test $? -ne 0 ; then
+        echo "Have to copy $f into client/gtk3"
+        abort
+    fi
+done
+diff client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c
+if test $? -ne 0 ; then
+    echo "Have to copy ibusimcontext.c into client/gtk4"
+    abort
+fi
 
 %build
 #autoreconf -f -i -v
 #make -C ui/gtk3 maintainer-clean-generic
 #make -C tools maintainer-clean-generic
+#make -C src/compose maintainer-clean-generic
 autoreconf -f -i -v
 %configure \
     --disable-static \
+%if %{with gtk2}
+    --enable-gtk2 \
+%else
     --disable-gtk2 \
-    --disable-gtk3 \
-    --disable-xim \
-    --enable-gtk-doc=yes \
-    --enable-gtk-doc-html=no \
+%endif
+    --enable-gtk3 \
+%if %{with gtk4}
+    --enable-gtk4 \
+%endif
+    --enable-xim \
+    --enable-gtk-doc \
     --enable-surrounding-text \
     --with-python=python3 \
-    --disable-ui \
-    --enable-vala=no \
-    --disable-tests \
+%if ! %with_python2
     --disable-python2 \
-%if ! %with_kde5
-    --disable-appindicator \
+%else
+    --enable-python-library \
 %endif
+    --with-python-overrides-dir=%{python3_sitearch}/gi/overrides \
+    --enable-wayland \
     --enable-introspection \
     --enable-install-tests \
     %{nil}
-
 make -C ui/gtk3 maintainer-clean-generic
+
 %make_build
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
 rm -f $RPM_BUILD_ROOT%{_libdir}/libibus-*%{ibus_api_version}.la
+%if %{with gtk2}
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-2.0/%{gtk2_binary_version}/immodules/im-ibus.la
+%endif
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-3.0/%{gtk3_binary_version}/immodules/im-ibus.la
+%if %{with gtk4}
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-4.0/%{gtk4_binary_version}/immodules/libim-ibus.la
+%endif
+%if %{without xinit}
+# setxkbmap is not available in RHEL10
+rm -f $RPM_BUILD_ROOT%{_datadir}/installed-tests/ibus/xkb-latin-layouts.test
+%endif
 
 # install man page
-for S in %{SOURCE2}
+for S in %{SOURCE3}
 do
   cp $S .
   MP=`basename $S` 
@@ -175,11 +413,28 @@ do
 done
 
 # install xinput config file
-install -pm 644 -D %{SOURCE1} $RPM_BUILD_ROOT%{_xinputconf}
+install -pm 644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_xinputconf}
+
+install -m 755 -d $RPM_BUILD_ROOT%pkgcache/bus
+# `rpm -Vaq ibus` compare st_mode of struct stat with lstat(2) and
+# st_mode of the RPM cache and if the file does not exist, st_mode of
+# RPM cache is o0100000 while the actual st_mode is o0100644.
+touch $RPM_BUILD_ROOT%pkgcache/bus/registry
 
 # install .desktop files
+%if %with_python2
+echo "NoDisplay=true" >> $RPM_BUILD_ROOT%{_datadir}/applications/ibus-setup.desktop
+%else
 echo "NoDisplay=true" >> $RPM_BUILD_ROOT%{_datadir}/applications/org.freedesktop.IBus.Setup.desktop
+%endif
 #echo "X-GNOME-Autostart-enabled=false" >> $RPM_BUILD_ROOT%%{_sysconfdir}/xdg/autostart/ibus.desktop
+
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/ibus
+cp src/compose/sequences-* $RPM_BUILD_ROOT%{_libdir}/ibus
+
+HAS_PREFIX=$(grep prefix $RPM_BUILD_ROOT%{_bindir}/ibus-setup | wc -l)
+[ x"$HAS_PREFIX" == x1 ] && \
+  sed -i -e '/prefix/d' $RPM_BUILD_ROOT%{_bindir}/ibus-setup
 
 desktop-file-install --delete-original          \
   --dir $RPM_BUILD_ROOT%{_datadir}/applications \
@@ -190,32 +445,39 @@ desktop-file-install --delete-original          \
 
 %check
 make check \
-    DISABLE_GUI_TESTS="ibus-compose ibus-keypress test-stress" \
+    DISABLE_GUI_TESTS="ibus-compose ibus-keypress test-stress xkb-latin-layouts" \
     VERBOSE=1 \
     %{nil}
 
-%post
+%post xinit
 %{_sbindir}/alternatives --install %{_sysconfdir}/X11/xinit/xinputrc xinputrc %{_xinputconf} 83 || :
 
 %postun
 if [ "$1" -eq 0 ]; then
-  %{_sbindir}/alternatives --remove xinputrc %{_xinputconf} || :
-  # if alternative was set to manual, reset to auto
-  [ -L %{_sysconfdir}/alternatives/xinputrc -a "`readlink %{_sysconfdir}/alternatives/xinputrc`" = "%{_xinputconf}" ] && %{_sbindir}/alternatives --auto xinputrc || :
-
   # 'dconf update' sometimes does not update the db...
   dconf update || :
   [ -f %{_sysconfdir}/dconf/db/ibus ] && \
       rm %{_sysconfdir}/dconf/db/ibus || :
-  # 'ibus write-cache --system' updates the system cache.
-  [ -f /var/cache/ibus/bus/registry ] && \
-      rm /var/cache/ibus/bus/registry || :
+fi
+
+%postun xinit
+if [ "$1" -eq 0 ]; then
+  %{_sbindir}/alternatives --remove xinputrc %{_xinputconf} || :
+  # if alternative was set to manual, reset to auto
+  [ -L %{_sysconfdir}/alternatives/xinputrc -a "`readlink %{_sysconfdir}/alternatives/xinputrc`" = "%{_xinputconf}" ] && %{_sbindir}/alternatives --auto xinputrc || :
 fi
 
 %posttrans
 dconf update || :
+
+%transfiletriggerin -- %{_datadir}/ibus/component
 [ -x %{_bindir}/ibus ] && \
   %{_bindir}/ibus write-cache --system &>/dev/null || :
+
+%transfiletriggerpostun -- %{_datadir}/ibus/component
+[ -x %{_bindir}/ibus ] && \
+  %{_bindir}/ibus write-cache --system &>/dev/null || :
+
 
 %ldconfig_scriptlets libs
 
@@ -225,53 +487,116 @@ dconf update || :
 %dir %{_datadir}/ibus/
 %{_bindir}/ibus
 %{_bindir}/ibus-daemon
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Emojier.desktop
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Extension.Gtk3.desktop
 %{_datadir}/bash-completion/completions/ibus.bash
 %{_datadir}/dbus-1/services/*.service
+%dir %{_datadir}/GConf
+%dir %{_datadir}/GConf/gsettings
 %{_datadir}/GConf/gsettings/*
 %{_datadir}/glib-2.0/schemas/*.xml
 %{_datadir}/ibus/component
 %{_datadir}/ibus/dicts
-%{_datadir}/ibus/engine
+%dir %{_datadir}/ibus/engine
 %{_datadir}/ibus/keymaps
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/man/man1/ibus.1.gz
 %{_datadir}/man/man1/ibus-daemon.1.gz
+%{_datadir}/man/man7/ibus-emoji.7.gz
 %{_datadir}/man/man5/00-upstream-settings.5.gz
 %{_datadir}/man/man5/ibus.5.gz
-%{_datadir}/man/man5/ibus.conf.5.gz
 %{_libexecdir}/ibus-engine-simple
 %{_libexecdir}/ibus-dconf
 %{_libexecdir}/ibus-portal
+%{_libexecdir}/ibus-extension-gtk3
+%{_libexecdir}/ibus-ui-emojier
+%{_libexecdir}/ibus-x11
 %{_sysconfdir}/dconf/db/ibus.d
 %{_sysconfdir}/dconf/profile/ibus
+%dir %{_sysconfdir}/xdg/Xwayland-session.d
+%{_sysconfdir}/xdg/Xwayland-session.d/10-ibus-x11
+%dir %{_prefix}/lib/systemd/user/gnome-session.target.wants
+%{_prefix}/lib/systemd/user/gnome-session.target.wants/*.service
+%{_prefix}/lib/systemd/user/org.freedesktop.IBus.session.*.service
 %python3_sitearch/gi/overrides/__pycache__/*.py*
 %python3_sitearch/gi/overrides/IBus.py
-# ibus owns xinput.d because gnome does not like to depend on imsettings.
-%dir %{_sysconfdir}/X11/xinit/xinput.d
-# Do not use %%config(noreplace) to always get the new keywords in _xinputconf
-# For user customization, $HOME/.xinputrc can be used instead.
-%config %{_xinputconf}
+%verify(not mtime) %dir %pkgcache
+%verify(not mtime) %dir %pkgcache/bus
+# 'ibus write-cache --system' updates the system cache.
+%ghost %pkgcache/bus/registry
 
 %files libs
 %{_libdir}/libibus-*%{ibus_api_version}.so.*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/IBus*-1.0.typelib
 
+%if %{with gtk2}
+%files gtk2
+%{_libdir}/gtk-2.0/%{gtk2_binary_version}/immodules/im-ibus.so
+%endif
+
+%files gtk3
+%{_libdir}/gtk-3.0/%{gtk3_binary_version}/immodules/im-ibus.so
+
+%if %{with gtk4}
+%files gtk4
+%dir %{_libdir}/gtk-4.0/%{gtk4_binary_version}/immodules
+%{_libdir}/gtk-4.0/%{gtk4_binary_version}/immodules/libim-ibus.so
+%endif
+
 # The setup package won't include icon files so that
 # gtk-update-icon-cache is executed in the main package only one time.
 %files setup
 %{_bindir}/ibus-setup
+%if %with_python2
+%{_datadir}/applications/ibus-setup.desktop
+%else
 %{_datadir}/applications/org.freedesktop.IBus.Setup.desktop
+%endif
 %{_datadir}/ibus/setup
 %{_datadir}/man/man1/ibus-setup.1.gz
 
+%if %with_python2
+%files pygtk2
+%dir %{python2_sitelib}/ibus
+%{python2_sitelib}/ibus/*
+%endif
+
+%if %with_python2
+%files py2override
+%python2_sitearch/gi/overrides/IBus.py*
+%endif
+
+%files wayland
+%{_libexecdir}/ibus-wayland
+
+%files panel
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Wayland.Gtk3.desktop
+%{_libexecdir}/ibus-ui-gtk3
+
+%files xinit
+%{_datadir}/man/man5/ibus.conf.5.gz
+%if %{without xinit}
+# ibus owns xinit directory without xorg-x11-xinit package
+%dir %{_sysconfdir}/X11/xinit
+%dir %{_sysconfdir}/X11/xinit/xinput.d
+%endif
+# Do not use %%config(noreplace) to always get the new keywords in _xinputconf
+# For user customization, $HOME/.xinputrc can be used instead.
+%config %{_xinputconf}
+
 %files devel
+%{_libdir}/ibus
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
 %{_includedir}/*
 %{_datadir}/gettext/its/ibus.*
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/IBus*-1.0.gir
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/ibus-*1.0.vapi
+%{_datadir}/vala/vapi/ibus-*1.0.deps
 
 %files devel-docs
 # Own html dir since gtk-doc is heavy.
@@ -279,18 +604,472 @@ dconf update || :
 %dir %{_datadir}/gtk-doc/html
 %{_datadir}/gtk-doc/html/*
 
-%changelog
-* Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.22-9
-- Remove python2 support
-- Remove build-time dependency version checking
+%files desktop-testing
+%{_bindir}/ibus-desktop-testing-runner
+%{_datadir}/ibus/tests
+%{_libexecdir}/ibus-desktop-testing-autostart
+%{_libexecdir}/ibus-desktop-testing-module
 
-* Wed Mar 17 2021 Henry Li <lihl@microsoft.com> - 1.5.22-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix distro checking to remove conditions not applying to Mariner
-- Remove x11 or graphics related dependencies
-- Modify configuration to disable gtk, wayland, xim and test because they depend on 
-  x11 or graphics components
-- Remove subpackages (test, vala, etc.) and binaries that depend on x11 or graphics
+%files tests
+%dir %{_libexecdir}/installed-tests
+%{_libexecdir}/installed-tests/ibus
+%dir %{_datadir}/installed-tests
+%{_datadir}/installed-tests/ibus
+
+%changelog
+* Fri Nov 08 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31-1
+- Bump to 1.5.31
+
+* Thu Oct 31 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~rc1-2
+- Resolves #2321990 Move xinit post scripts
+
+* Wed Oct 23 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~rc1-1
+- Update compose tables
+- Fix Unicode logic
+- Update translations
+
+* Fri Oct 04 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta2-3
+- Add --with-python-overrides-dir configure option for Flatpak
+- Use va_marshaller to avoid GValue boxing
+
+* Tue Sep 24 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta2-2
+- Resolves #2310892 Show Emojier dialog from menu item
+
+* Sun Aug 25 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta2-1
+- Bump to 1.5.31-beta2
+
+* Wed Aug 14 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-12
+- Revert to fix typing freeze with barcode reader
+
+* Mon Jul 29 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-11
+- Disable ibus-panel rich condition in RHEL
+- Delete ibus-xx-desktop-testing-mutter.patch
+- Delete libXtst-devel dependency
+
+* Sat Jul 27 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-10
+- Replace GNOME Xorg with GNOME Wayland in CI
+- Replace STI with TMT in CI
+
+* Sat Jul 27 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-9
+- Update CI for RHEL packages
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.31~beta1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 18 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-7
+- Resolves #2297147 Add directory datadir/GConf/gsettings
+- Resolves #2297735 Move ibus.conf to ibus-xinit sub package
+- Fix memory leaks in error handlings
+
+* Fri Jul 12 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.31~beta1-6
+- Bump to 1.5.31-beta1
+
+* Mon Jun 10 2024 Python Maint <python-maint@redhat.com> - 1.5.30-6
+- Rebuilt for Python 3.13
+
+* Sat Jun 08 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30-5
+- Resolves #2290842 Fix Super-space in Wayland
+- Fix compose sequences beyond U10000
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.5.30-4
+- Rebuilt for Python 3.13
+
+* Sat Jun 01 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30-3
+- Resolve #2284094 Fix preedit in Flatpak with new DBus unique name
+- Add directory %%{_prefix}/lib/systemd/user/gnome-session.target.wants
+- Add directory %%{_libdir}/gtk-4.0/%{gtk4_binary_version}/immodules
+
+* Fri May 24 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30-2
+- Resolve #2252227 Fix display buffer overflow
+- Change IBus unique name to :1.0 from IBUS_SERVICE_IBUS
+
+* Thu May 02 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30-1
+- Bump to 1.5.30
+
+* Fri Apr 12 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~rc3-2
+- New sub package ibus-xinit for RHEL not to depend on xorg-x11-xinit
+
+* Tue Apr 02 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~rc3-1
+- Delete upstreamed patches
+
+* Mon Mar 25 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~rc2-2
+- Fix Super modifier in IBusEngine
+- Replace deprecated pygobject3-devel with python3-gobject-devel
+
+* Fri Mar 22 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~rc2-1
+- Add some bug fixes & translation updates
+
+* Wed Feb 28 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~rc1-1
+- Add some bug fixes & translation updates
+
+* Tue Feb 13 2024 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.30~beta1-1
+- Implement ibus start/restart for Plasma Wayland
+- Show preferences menu item in activate menu in Plasma Wayland
+- Fix typing freeze with barcode reader
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.29~rc2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.29~rc2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 21 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-6
+- Fix game control keys with language layout
+
+* Fri Dec 15 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-5
+- Refactor object initialization
+- Fix some warnings
+
+* Tue Dec 05 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-4
+- Complete preedit signals for PostProcessKeyEvent
+
+* Sat Nov 25 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-3
+- Resolve #2188800 Error handling with display == null
+- Enhance #2237486 Implement preedit color in Plasma Wayland
+
+* Wed Nov 15 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-2
+- Call strdup() after g_return_if_fail() in im-ibus.so
+
+* Thu Nov 09 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc2-1
+- Bump to 1.5.29-rc2
+
+* Wed Oct 25 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-6
+- Add preedit D-Bus signals to PostProcessKeyEvent
+
+* Mon Oct 23 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-5
+- Add DeleteSurroundingText to PostProcessKeyEvent
+
+* Sat Sep 30 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-4
+- Enhance #2237486 Implement preedit color in Plasma Wayland
+- Part-of #2240490 Eacute with CapsLock in Plasma Wayland only
+- Revert dnf5 to dnf in autogen
+- Test fix #2239633 g_list_remove() in ibus-portal SIGSEGV
+
+* Thu Sep 07 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-3
+- Resolves #2237486 Implement preedit color in Plasma Wayland
+
+* Tue Aug 22 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-2
+- Resolves #2233527 Add IMSETTINGS_IGNORE_SESSION=KDE-wayland in ibus.conf
+
+* Tue Aug 22 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~rc1-1
+- Bump to 1.5.29-rc1
+
+* Mon Aug 21 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~beta2-3
+- Add ibus_panel_condition
+
+* Fri Aug 18 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~beta2-2
+- Separate ibus-ui-gtk3 as ibus-panel sub package depended on libdbusmenu
+- Update autogen.sh for Fedora 39
+- Fix cursor position with GTK4 in Xorg
+
+* Tue Aug 08 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~beta2-1
+- Distinguish Arabic XKB and Keypad XKB options
+
+* Thu Aug 03 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~beta1-2
+- Fix some source tests
+- Fix configure --disable-appindicator
+- Fix typo in src/ibusservice.h
+
+* Fri Jul 28 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.29~beta1-1
+- Implement Plasma Wayland
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.28-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-13
+- Fix sync ibus_input_context_process_key_event() #3
+
+* Sun Jul 09 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-12
+- Fix sync ibus_input_context_process_key_event() #2
+
+* Fri Jul 07 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-11
+- Fix sync ibus_input_context_process_key_event()
+
+* Wed Jul 05 2023 Python Maint <python-maint@redhat.com> - 1.5.28-10
+- Rebuilt for Python 3.12
+
+* Wed Jul 05 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-9
+- Delete upstreamed ibus-xx-cross-compile.patch
+- Fix alive ibus-x11 with `Xephyr -query`
+- Fix missing ibusenumtypes.h with parallel build
+- Fix to build libibus-1.0.la twice
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.5.28-8
+- Rebuilt for Python 3.12
+
+* Sun Jun 11 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-7
+- Delete GZipped man files
+- Resolves #2213145 Unselect Add button in Select Input Method dialog in setup
+- Fix unaligned accesses in ibuscomposetable
+
+* Fri May 26 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-6
+- Resolves: #2195895 ibus_input_context_set_cursor_location(): ibus-x11 SIGSEGV
+
+* Fri May 12 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-5
+- Fix cross compiling with gen-internal-compose-table
+
+* Wed May 10 2023 Tomas Popela <tpopela@redhat.com> - 1.5.28-5
+- Drop BR on dbus-glib as the project is using already GDBus
+
+* Tue May 02 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-4
+- Migrate some upstream patches
+
+* Fri Mar 17 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-3
+- Resolves: #2178178 Fix emoji lookup table only but emojier GUI left
+
+* Wed Mar 15 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-2
+- Fix Key typing order in ibus-x11
+- Disable while loop before call ForwardEventMessageProc() in ibus-x11
+
+* Tue Feb 21 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.28-1
+- Bump to 1.5.28
+
+* Fri Feb 17 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-15
+- Resolves: #2169205 Return error if D-Bus set/get property method is failed
+
+* Wed Jan 25 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-14
+- Add active-surrounding-text property to IBusEngine
+- Refactor surrounding text warning & free focus-id tables
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.27-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 17 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-12
+- Resolves: #2160957 Fix st_mode in struct stat of registry file with rpm -Va
+
+* Thu Jan 12 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-11
+- Refactor surrounding text warning
+
+* Fri Jan 06 2023 Tomas Popela <tpopela@redhat.com> - 1.5.27-10
+- Don't build GTK 2 content for RHEL 10 as GTK 2 won't be there
+
+* Thu Jan 05 2023 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-9
+- Convert gtk_compose_seqs_compact to GResource
+
+* Wed Dec 07 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-8
+- Resolved: #2151344 SEGV with portal_context->owner in name_owner_changed()
+
+* Fri Dec 02 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-7
+- Add GitHub action patches
+
+* Thu Nov 24 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-6
+-  Implement new process_key_event for ibus-x11
+
+* Wed Nov 16 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-5
+- Migrate license tag to SPDX
+
+* Thu Nov 03 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-4
+- Resolves: #2081055 Avoid to unref m_engines with double run
+
+* Mon Sep 19 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-3
+- Update ibus_input_context_set_surrounding_text for a global IC
+- Fix CI
+
+* Fri Sep 16 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-2
+- Resolves: #2093313 Stop many warnings of surrounding text
+- Fix other surrounding text issues
+
+* Tue Aug 23 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.27-1
+- Bump to 1.5.27
+
+* Thu Aug 18 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-17
+- Resolves: #2119020 Require gettext-runtime instead of gettext for ibus-devel
+
+* Fri Aug 12 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-16
+- Revert Emoji shortcut key to Super-period
+
+* Fri Jul 29 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-15
+- Enhance Xutf8TextListToTextProperty in ibus-x11
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.26-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 07 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-13
+- Add IBUS_CAP_OSK to IBusCapabilite
+- Update ibus restart for --service-file option
+- Update manpage for ibus im-module command
+- Implement new process_key_event for GTK4
+- Add focus_in_id()/focus_out_id() class methods in IBusEngine
+
+* Wed Jun 29 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-12
+- Add ibus im-module command
+
+* Sat Jun 25 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-11
+- Enable custome theme
+- Fix ibus restart for GNOME desktop
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.5.26-10
+- Rebuilt for Python 3.11
+
+* Sat Jun 11 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-9
+- Resolves: #2088656 Revise XKB engine panel menu in Plasma Wayland
+
+* Thu Jun 02 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-8
+- Resolves: #2088656 Hide XKB engine but enable it in Plasma Wayland
+
+* Wed May 25 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-7
+- Update xkb-latin-layouts gsettings
+
+* Mon May 23 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-6
+- Resolves: #1936777 abrt ibus_bus_connect_async(): ibus-x11
+
+* Wed Apr 20 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-4
+- Resolves: #2076596 Disable XKB engines in Plasma Wayland
+
+* Thu Mar 31 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-3
+- Fix refcounting issues in IBusText & IBusProperty
+
+* Mon Mar 28 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-2
+- Update ibus-desktop-testing-runner to always run ibus-daemon directly
+
+* Mon Mar 14 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.26-1
+- Bump to 1.5.26
+- Revert CCedilla change for pt-BR
+
+* Fri Mar 04 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-13
+- Check XDG_SESSION_DESKTOP for Plasma desktop
+
+* Tue Mar 01 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-12
+- Fix algorithm dead keys
+
+* Mon Feb 21 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-11
+- Fix forwarding keycode in GTK4
+
+* Fri Feb 11 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-10
+- Do not mkdir abstract unix socket
+- Fix IBus.key_event_from_string
+- Add systemd unit file
+
+* Thu Feb 03 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-9
+- Change XKB layout string color in panel
+- Add Ctrl-semicolon to Emoji shortcut key
+- Fix unref problems with floating references
+- Update man page for Emoji shortcut key
+- Add IBUS_INPUT_HINT_PRIVATE for browser private mode
+- mkdir socket dirs instead of socket paths
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.25-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 18 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-7
+- Update and fix typo in autostart scripts
+
+* Fri Dec 03 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-6
+- Check mtime of entity compose file instead of one of symlink file
+- Disable emoji shortcut key with no-emoji hint
+- Resolves: #2026540 Own %%pkgcache directory
+
+* Fri Oct 29 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-5
+- Resolves: #1942970 Clear Emoijer preedit/lookup popup between applications
+
+* Mon Sep 06 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-4
+- Clear preedit with mouse click and GTK4 applications
+
+* Wed Sep 01 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-3
+- Fix wrong cursor location in gtk3
+
+* Fri Aug 27 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-2
+- Add --screendump option in ibus-desktop-testing-runner
+
+* Fri Aug 20 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.25-1
+- Bump to 1.5.25
+
+* Mon Aug 09 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-13
+- Enable sync process in GTK4
+
+* Mon Jul 26 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-12
+- Search language name in engine list in ibus-setup
+- Set Multi_key to 0xB7 in compose preedit
+- Make Compose preedit less intrusive
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.24-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-10
+- Support include directive in user compose file
+- Set Ctrl-period to default Emoji shortcut key
+
+* Tue Jun 29 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-9
+- Delete G_MESSAGES_DEBUG for gsettings output
+
+* Mon Jun 28 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-8
+- Depend on gnome-shell-extension-no-overview for CI
+
+* Thu Jun 17 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-7
+- Use transfiletriggerin and transfiletriggerpostun
+- Change mutter to no-overview gnome-shell in CI
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.5.24-6
+- Rebuilt for Python 3.10
+
+* Wed May 26 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-5
+- Fix minor covscan reviews
+
+* Fri May 21 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-4
+- Fix covscan reviews
+- Implement ibus_im_context_set_surrounding_with_selection()
+
+* Sat Mar 20 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-3
+- Don't output FAIL if the actual failure is 0 for Fedora CI
+
+* Sat Mar 20 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-2
+- Change default session to mutter from gnome in desktop-testing
+
+* Mon Feb 22 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.24-1
+- Bump to 1.5.24
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.23-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 20 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.23-3
+- Enable IM gtk4 module
+- Fix to rename xkb:de::ger to sync xkeyboard-config
+- Enhance ibus-setup search engine
+
+* Fri Nov 20 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.23-2
+- Bug 1898065 - Fix build failure of emoji-*.dict with CLDR 38
+- Fix build failure with Vala 0.50
+- Add IBUS_INPUT_PURPOSE_TERMINAL
+
+* Tue Sep 29 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.23-1
+- Bump to 1.5.23
+
+* Tue Sep 15 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-17
+- Update po files
+
+* Wed Sep 09 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-16
+- Bug 1876877 - Fix to pull the correct language with no iso639 variants
+- Accept xdigits only for Unicode typing
+
+* Thu Aug 27 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-15
+- Rename simple.xml to simple.xml.in
+
+* Thu Aug 27 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-14
+- Update ibusunicodegen.h with latest unicode-ucd
+- Update simple.xml with latest xkeyboard-config
+- Fix gvfsd-fuse to unbind directory
+- Update translations
+
+* Fri Aug 21 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-13
+- Update simple.xml with layout_variant
+
+* Fri Aug 21 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-12
+- Generate simple.xml with denylist
+- Tell Pango about the engine language in the candidate panel
+- Add file list in registry file for Silverblue
+
+* Tue Jul 28 2020 Adam Jackson <ajax@redhat.com> - 1.5.22-11
+- Require setxkbmap not xorg-x11-xkb-utils
+
+* Tue Jul 28 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-10
+- Delete _python_bytecompile_extra
+- Update CI from ibus-typing-booster
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.22-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.5.22-8
+- Rebuilt for Python 3.9
 
 * Fri May 15 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.22-7
 - Resolves #1797726 bus_engine_proxy_new_internal() SIGTRAP

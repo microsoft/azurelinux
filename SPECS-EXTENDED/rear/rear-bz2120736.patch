@@ -1,0 +1,18 @@
+diff --git a/usr/share/rear/conf/default.conf b/usr/share/rear/conf/default.conf
+index b14525da..23a83b71 100644
+--- a/usr/share/rear/conf/default.conf
++++ b/usr/share/rear/conf/default.conf
+@@ -2483,10 +2483,10 @@ OBDR_BLOCKSIZE=2048
+ # BACKUP=NBU (Symantec/Veritas NetBackup)
+ ##
+ #
+-COPY_AS_IS_NBU=( /usr/openv/bin/vnetd /usr/openv/bin/vopied /usr/openv/lib /usr/openv/netbackup /usr/openv/var/auth/[mn]*.txt /opt/VRTSpbx /etc/vx/VxICS /etc/vx/vrtslog.conf )
+-COPY_AS_IS_EXCLUDE_NBU=( /usr/openv/netbackup/logs "/usr/openv/netbackup/bin/bpjava*" /usr/openv/netbackup/bin/xbp /usr/openv/netbackup/bin/private /usr/openv/lib/java /usr/openv/lib/shared/vddk /usr/openv/netbackup/baremetal )
++COPY_AS_IS_NBU=( /usr/openv/bin/vnetd /usr/openv/bin/vopied /usr/openv/lib /usr/openv/netbackup /usr/openv/var/auth/[mn]*.txt  /usr/openv/var/vxss /usr/openv/var/webtruststore /usr/openv/resources/nbpxyhelper /opt/VRTSpbx /etc/vx/VxICS /etc/vx/vrtslog.conf /var/log/VRTSpbx )
++COPY_AS_IS_EXCLUDE_NBU=( "/usr/openv/netbackup/logs/*" "/usr/openv/netbackup/bin/bpjava*" /usr/openv/netbackup/bin/xbp /usr/openv/netbackup/bin/private /usr/openv/lib/java "/usr/openv/lib/*-plugins" /usr/openv/lib/shared/vddk /usr/openv/netbackup/baremetal "/var/log/VRTSpbx/*" )
+ # See https://github.com/rear/rear/issues/2105 why /usr/openv/netbackup/sec/at/lib/ is needed:
+-NBU_LD_LIBRARY_PATH="/usr/openv/lib:/usr/openv/netbackup/sec/at/lib/"
++NBU_LD_LIBRARY_PATH="/usr/openv/lib:/usr/openv/netbackup/sec/at/lib/:/usr/openv/lib/boost"
+ PROGS_NBU=( )
+ ####
+ 

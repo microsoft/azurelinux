@@ -1,9 +1,10 @@
---- netpbm-10.35/converter/other/pnmtotiffcmyk.c.glibc	2006-09-18 12:20:06.000000000 +0200
-+++ netpbm-10.35/converter/other/pnmtotiffcmyk.c	2007-08-23 09:18:30.000000000 +0200
-@@ -974,8 +974,8 @@ int main( int argc, char **argv ) {
+diff -urNp a/converter/other/pnmtotiffcmyk.c b/converter/other/pnmtotiffcmyk.c
+--- a/converter/other/pnmtotiffcmyk.c	2025-02-04 10:47:27.858451429 +0100
++++ b/converter/other/pnmtotiffcmyk.c	2025-02-04 11:04:46.118394226 +0100
+@@ -989,8 +989,8 @@ int main( int argc, char **argv ) {
  
    if ( (err = parseOpts( argc, argv, rt )) ) goto exit ;
-   
+ 
 -  if ( (err = rt->in->open( rt->in, rt )) ) goto exit ;
 -  if ( (err = rt->out->open( rt->out, rt )) ) goto exit ;
 +  if ( (err = (rt->in->open)( rt->in, rt )) ) goto exit ;

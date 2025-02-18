@@ -4,7 +4,7 @@ Bundle-SymbolicName: org.apache.xml.serializer
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-Localization: plugin
-Bundle-Version: 2.7.2
+Bundle-Version: 2.7.1.v200806030322
 Bundle-Vendor: %Bundle-Vendor.0
 Export-Package: org.apache.xml.serializer,org.apache.xml.serializer.do
  m3

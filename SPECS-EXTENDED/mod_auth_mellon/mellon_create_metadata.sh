@@ -55,9 +55,9 @@ echo
 umask 0077
 
 TEMPLATEFILE="$(mktemp -t mellon_create_sp.XXXXXXXXXX)"
+ERRORFILE="$(mktemp -t mellon_create_err.XXXXXXXXXX)"
 
 cat >"$TEMPLATEFILE" <<EOF
-RANDFILE           = /dev/urandom
 [req]
 default_bits       = 2048
 default_keyfile    = privkey.pem
@@ -68,9 +68,14 @@ policy             = policy_anything
 commonName         = $HOST
 EOF
 
-openssl req -utf8 -batch -config "$TEMPLATEFILE" -new -x509 -days 3652 -nodes -out "$OUTFILE.cert" -keyout "$OUTFILE.key" 2>/dev/null
+openssl req -utf8 -batch -config "$TEMPLATEFILE" -new -x509 -days 3652 -nodes -out "$OUTFILE.cert" -keyout "$OUTFILE.key" 2>"$ERRORFILE" || (
+    echo "Failed to generate certificate!" >&2
+    cat "$ERRORFILE" >&2;
+    rm -f "$TEMPLATEFILE" "$ERRORFILE"
+    exit 1
+)
 
-rm -f "$TEMPLATEFILE"
+rm -f "$TEMPLATEFILE" "$ERRORFILE"
 
 CERT="$(grep -v '^-----' "$OUTFILE.cert")"
 

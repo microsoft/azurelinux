@@ -1,19 +1,32 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%global gitver 0
+
+%if 0%{?gitver}
+%global  commit      f0a089a12dca9e2fd9543c8e8086ac70f7058513
+%global  date        .20210630git
+%global  shortcommit %(c=%{commit}; echo ${c:0:8})
+%else
+%global  commit      %{nil}
+%global  date        %{nil}
+%global  shortcommit %{nil}
+%endif
+
 Name: python-dmidecode
 Summary: Python module to access DMI data
-Version: 3.12.2
-Release: 20%{?dist}
-License: GPLv2
+Version: 3.12.3
+Release: 9%{date}%{shortcommit}%{?dist}
+License: GPL-2.0-only
 URL: https://github.com/nima/python-dmidecode
-# source0: https://github.com/nima/python-dmidecode/archive/refs/tags/v3.12.2.tar.gz
-Source0: https://github.com/nima/python-dmidecode/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0: %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  gcc
+Patch0: python-dmidecode-rhbz2154949.patch
+
+BuildRequires: make
+BuildRequires: gcc
 BuildRequires: libxml2-devel
-
 BuildRequires: python3-devel
 BuildRequires: libxml2-python3
+BuildRequires: python3-setuptools
+BuildRequires: python-distutils-extra
 
 %global _description\
 python-dmidecode is a python extension module that uses the\
@@ -32,37 +45,96 @@ Requires: libxml2-python3
 
 
 %prep
-%setup -q
-sed -i 's/python2/python3/g' Makefile unit-tests/Makefile
-
+%autosetup -n %{name}-%{version} -N
+%patch 0 -p1 -b .backup
 
 %build
-# Not to get undefined symbol: dmixml_GetContent
-export CFLAGS="${CFLAGS-} -std=gnu89"
-make build
+# -std=gnu89 is there to avoid `undefined symbol: dmixml_GetContent`
+export PYTHON_BIN=%{__python3}
+export CFLAGS="%{build_cflags} -std=gnu89"
+export CXXFLAGS="%{build_cxxflags} -std=gnu89"
+export CC=gcc
+export CXX=g++
+%make_build
 
 %install
 %{__python3} src/setup.py install --root %{buildroot} --prefix=%{_prefix}
 
 
 %check
-pushd unit-tests
-make
-popd
+export PYTHONPATH=%{buildroot}%{python3_sitearch}
+export PYTHON_BIN=%{__python3}
+make -C unit-tests
 
 
 %files -n python3-dmidecode
-%license doc/LICENSE doc/AUTHORS doc/AUTHORS.upstream
-%doc README doc/README.upstream
+%license doc/LICENSE
+%doc README doc/AUTHORS doc/AUTHORS.upstream
 %{python3_sitearch}/dmidecodemod.cpython-%{python3_version_nodots}*.so
-%{python3_sitearch}/__pycache__/dmidecode.cpython-%{python3_version_nodots}*.py[co]
-%{python3_sitearch}/dmidecode.py
+%pycached %{python3_sitearch}/dmidecode.py
 %{python3_sitearch}/*.egg-info
-%{_datadir}/python-dmidecode/
+%{_datadir}/%{name}/
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12.2-20
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.12.3-8
+- Rebuilt for Python 3.13
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Lichen Liu <lichliu@redhat.com> - 3.12.3-6
+- Use SPDX identifiers for license
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.12.3-4
+- Rebuilt for Python 3.12
+
+* Sat May 20 2023 Antonio Trande <sagitter@fedoraproject.org> - 3.12.3-3
+- Fix BuildRequires packages for Python-3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Dec 25 2022 Antonio Trande <sagitter@fedoraproject.org> - 3.12.3-1
+- Release 3.12.3
+- Temporary fix for rhbz#2154949
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-29.20210630gitf0a089a1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.12.2-28.20210630gitf0a089a1
+- Rebuilt for Python 3.11
+
+* Sun Apr 24 2022 Antonio Trande <sagitter@fedoraproject.org> - 3.12.2-27.20210630gitf0a089a1
+- Build commit #f0a089a1 (include covscan error fixes)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-25
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.12.2-24
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 26 2020 Antonio Trande <sagitter@fedoraproject.org> - 3.12.2-22
+- Refresh SPEC file
+- Fixed for Python-3.10 (rhbz#1898981)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 3.12.2-20
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.2-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

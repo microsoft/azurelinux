@@ -1,359 +1,595 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-#
-# spec file for package xalan-j2
-#
-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
-
-
-%define cvs_version 2_7_2
 Name:           xalan-j2
-Version:        2.7.2
-Release:        10%{?dist}
+Version:        2.7.3
+Release:        5%{?dist}
 Summary:        Java XSLT processor
-License:        Apache-2.0
-Group:          Development/Libraries/Java
-Url:            http://xalan.apache.org/index.html
-Source0:        http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_%{cvs_version}-src.tar.gz
-Source1:        http://repo1.maven.org/maven2/xalan/xalan/%{version}/xalan-%{version}.pom
-Source2:        http://repo1.maven.org/maven2/xalan/serializer/%{version}/serializer-%{version}.pom
-Source3:        xsltc-%{version}.pom
-Source4:        xalan-j2-serializer-MANIFEST.MF
+# src/org/apache/xpath/domapi/XPathStylesheetDOM3Exception.java is W3C
+License:        Apache-2.0 AND W3C
+URL:            http://xalan.apache.org/
+
+# ./generate-tarball.sh
+Source0:        %{name}-%{version}.tar.gz
+Source1:        xalan-j2-serializer-MANIFEST.MF
+Source2:        https://repo1.maven.org/maven2/xalan/xalan/%{version}/xalan-%{version}.pom
+Source3:        https://repo1.maven.org/maven2/xalan/serializer/%{version}/serializer-%{version}.pom
+Source4:        xsltc-%{version}.pom
 Source5:        xalan-j2-MANIFEST.MF
-Source6:        optional-xerces-req.patch
-# OSGi manifests
-Patch0:         %{name}-noxsltcdeps.patch
-Patch1:         %{name}-manifest.patch
-Patch2:         %{name}-crosslink.patch
-Patch3:         openjdk-build.patch
-BuildRequires:  ant
-BuildRequires:  bcel
-BuildRequires:  dos2unix
-BuildRequires:  fdupes
-BuildRequires:  java-cup-bootstrap
-BuildRequires:  java-devel >= 1.6
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  jlex
-BuildRequires:  servletapi5
-BuildRequires:  xml-commons-apis-bootstrap
-Requires:       jaxp_parser_impl
-Requires(post): update-alternatives
-Requires(postun): update-alternatives
-Provides:       jaxp_transform_impl
-Conflicts:      %{name}-bootstrap
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+# Remove bundled binaries which cannot be easily verified for licensing
+Source6:        generate-tarball.sh
+
+Patch0:         xalan-j2-noxsltcdeps.patch
+
 BuildArch:      noarch
-#!BuildIgnore:  xerces-j2 xml-commons xml-commons-resolver xml-commons-apis java-cup
-#!BuildIgnore:  xml-commons-jaxp-1.3-apis
+ExclusiveArch:  %{java_arches} noarch
+
+BuildRequires:  javapackages-local
+BuildRequires:  ant
+BuildRequires:  apache-parent
+BuildRequires:  bcel
+BuildRequires:  java_cup
+BuildRequires:  regexp
+BuildRequires:  sed
+BuildRequires:  xerces-j2 >= 0:2.7.1
+BuildRequires:  xml-commons-apis >= 0:1.3
+
+Requires:       xerces-j2
+
+Provides:       jaxp_transform_impl
 
 %description
 Xalan is an XSLT processor for transforming XML documents into HTML,
-text, or other XML document types. It implements the W3C
-Recommendations for XSL Transformations (XSLT) and the XML Path
-Language (XPath). It can be used from the command line, in an applet or
-a servlet, or as a module in other program.
-
-%package        bootstrap
-Summary:        Bootstrap Java XSLT processor
-Group:          Development/Libraries/Java
-Conflicts:      %{name}
-BuildRequires:  ant
-BuildRequires:  bcel
-BuildRequires:  dos2unix
-BuildRequires:  fdupes
-BuildRequires:  java-cup-bootstrap
-BuildRequires:  java-devel >= 1.6
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  jlex
-BuildRequires:  servletapi5
-BuildRequires:  xml-commons-apis-bootstrap
-Requires(post): update-alternatives
-Requires(postun): update-alternatives
-
-%description bootstrap
-This is a bootstrap version of Xalan.
-Xalan is an XSLT processor for transforming XML documents into HTML,
-text, or other XML document types. It implements the W3C
-Recommendations for XSL Transformations (XSLT) and the XML Path
-Language (XPath). It can be used from the command line, in an applet or
-a servlet, or as a module in other program.
-
+text, or other XML document types. It implements the W3C Recommendations
+for XSL Transformations (XSLT) and the XML Path Language (XPath). It can
+be used from the command line, in an applet or a servlet, or as a module
+in other program.
 
 %package        xsltc
-Summary:        Java XSLT compiler
-Group:          Development/Libraries/Java
-Requires:       bcel
+Summary:        XSLT compiler
+License:        Apache-2.0
 Requires:       java_cup
-Requires:       jaxp_parser_impl
-Requires:       jlex
+Requires:       bcel
 Requires:       regexp
+Requires:       xerces-j2
 
 %description    xsltc
-The XSLT Compiler is a Java-based tool for compiling XSLT stylesheets
-into lightweight and portable Java byte codes called translets.
+The XSLT Compiler is a Java-based tool for compiling XSLT stylesheets into
+lightweight and portable Java byte codes called translets.
 
 %package        manual
-Summary:        Manual for xalan-j2
-Group:          Development/Libraries/Java
+Summary:        Manual for %{name}
+License:        Apache-2.0
 
 %description    manual
-Xalan is an XSLT processor for transforming XML documents into HTML,
-text, or other XML document types. It implements the W3C
-Recommendations for XSL Transformations (XSLT) and the XML Path
-Language (XPath). It can be used from the command line, in an applet or
-a servlet, or as a module in other program.
-
-This package contains the manual for Xalan.
-
-%package        demo
-Summary:        Demonstration and samples for xalan-j2
-Group:          Development/Libraries/Java
-Requires:       %{name} = %{version}-%{release}
-Requires:       servlet
-
-%description    demo
-Xalan is an XSLT processor for transforming XML documents into HTML,
-text, or other XML document types. It implements the W3C
-Recommendations for XSL Transformations (XSLT) and the XML Path
-Language (XPath). It can be used from the command line, in an applet or
-a servlet, or as a module in other program.
-
-This package contains demonstration and sample files for Xalan.
+Documentation for %{name}.
 
 %prep
-%setup -q -n xalan-j_%{cvs_version}
-patch -u %{SOURCE5} -i %{SOURCE6}
+%setup -q
+%patch 0 -p0
 
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-# Remove all binary libs, except ones needed to build docs and N/A elsewhere.
-for j in $(find . -name "*.jar"); do
-        mv $j $j.no
-done
-mv tools/xalan2jdoc.jar.no tools/xalan2jdoc.jar
-mv tools/xalan2jtaglet.jar.no tools/xalan2jtaglet.jar
-dos2unix KEYS LICENSE.txt NOTICE.txt xdocs/sources/xsltc/README.xsltc xdocs/sources/xsltc/README.xslt
+sed -i '/<bootclasspath/d' build.xml
+
+# Remove classpaths from manifests
+sed -i '/class-path/I d' $(find -iname '*manifest*')
+
+# Convert CR-LF to LF-only
+sed -i 's/\r//' KEYS LICENSE.txt NOTICE.txt xdocs/style/resources/script.js \
+    xdocs/sources/xsltc/README* `find -name '*.sh'`
+
+%mvn_file :xalan %{name} jaxp_transform_impl
+%mvn_file :serializer %{name}-serializer
+%mvn_file :xsltc xsltc
+%mvn_package :xsltc xsltc
 
 %build
-if [ ! -e "$JAVA_HOME" ] ; then export JAVA_HOME="%{java_home}" ; fi
-pushd lib
-ln -sf $(build-classpath java_cup-runtime) runtime.jar
-ln -sf $(build-classpath bcel) BCEL.jar
-ln -sf $(build-classpath regexp) regexp.jar
-ln -sf $(build-classpath xerces-j2) xercesImpl.jar
-ln -sf $(build-classpath xml-commons-apis) xml-apis.jar
-popd
-pushd tools
-ln -sf $(build-classpath java_cup) java_cup.jar
-ln -sf $(build-classpath ant) ant.jar
-ln -sf $(build-classpath jlex) JLex.jar
-ln -sf $(build-classpath stylebook) stylebook-1.0-b3_xalan-2.jar
-popd
-ant \
-  -Dservlet-api.jar=$(build-classpath servletapi5) \
-  -Dcompiler.source=1.6 -Dcompiler.target=1.6 \
+%ant \
+  -Dcompiler.source=1.8 \
+  -Dcompiler.target=1.8 \
   -Djava.awt.headless=true \
-  -Dapi.j2se=%{_javadocdir}/java \
   -Dbuild.xalan-interpretive.jar=build/xalan-interpretive.jar \
-  xalan-interpretive.jar\
+  -Dxmlapis.jar=$(build-classpath xml-commons-apis) \
+  -Dparser.jar=$(build-classpath xerces-j2) \
+  -Dbcel.jar=$(build-classpath bcel) \
+  -Druntime.jar=$(build-classpath java_cup-runtime) \
+  -Dregexp.jar=$(build-classpath regexp) \
+  -Djava_cup.jar=$(build-classpath java_cup) \
+  xalan-interpretive.jar \
   xsltc.unbundledjar \
-  docs \
-  xsltc.docs \
-  samples \
-  servlet
+  docs
 
 # inject OSGi manifests
-jar ufm build/serializer.jar %{SOURCE4}
+jar ufm build/serializer.jar %{SOURCE1}
 jar ufm build/xalan-interpretive.jar %{SOURCE5}
 
+%mvn_artifact %{SOURCE2} build/xalan-interpretive.jar
+%mvn_artifact %{SOURCE3} build/serializer.jar
+%mvn_artifact %{SOURCE4} build/xsltc.jar
+
 %install
-# jars
-install -d -m 755 %{buildroot}%{_javadir}
-install -p -m 644 build/xalan-interpretive.jar \
-  %{buildroot}%{_javadir}/%{name}-%{version}.jar
-install -p -m 644 build/xsltc.jar \
-  %{buildroot}%{_javadir}/xsltc-%{version}.jar
-install -p -m 644 build/serializer.jar \
-  %{buildroot}%{_javadir}/%{name}-serializer-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -p -m 644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
-%add_maven_depmap %{name}-%{version}.pom %{name}-%{version}.jar
-install -p -m 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-serializer-%{version}.pom
-%add_maven_depmap %{name}-serializer-%{version}.pom %{name}-serializer-%{version}.jar
-install -p -m 644 %{SOURCE3}  %{buildroot}%{_mavenpomdir}/xsltc-%{version}.pom
-%add_maven_depmap xsltc-%{version}.pom xsltc-%{version}.jar -f xsltc
+%mvn_install
 
-# demo
-install -d -m 755 %{buildroot}%{_datadir}/%{name}
-install -p -m 644 build/xalansamples.jar \
-  %{buildroot}%{_datadir}/%{name}/%{name}-samples.jar
-install -p -m 644 build/xalanservlet.war \
-  %{buildroot}%{_datadir}/%{name}/%{name}-servlet.war
-cp -pr samples %{buildroot}%{_datadir}/%{name}
-%fdupes -s %{buildroot}%{_datadir}/%{name}
+%files -f .mfiles
+%license LICENSE.txt NOTICE.txt
+%doc KEYS README
 
-# alternatives
-mkdir -p %{buildroot}%{_sysconfdir}/alternatives
-ln -sf %{_sysconfdir}/alternatives/jaxp_transform_impl.jar %{buildroot}%{_javadir}/jaxp_transform_impl.jar
-
-# bnc#485299
-install -d -m 0755 %{buildroot}/%{_sysconfdir}/ant.d/
-echo xalan-j2-serializer > %{buildroot}/%{_sysconfdir}/ant.d/serializer
-
-%post
-update-alternatives --install %{_javadir}/jaxp_transform_impl.jar \
-  jaxp_transform_impl %{_javadir}/%{name}.jar 30
-
-%preun
-{
-  [ $1 = 0 ] || exit 0
-  update-alternatives --remove jaxp_transform_impl %{_javadir}/%{name}.jar
-} >/dev/null 2>&1 || :
-
-%files
-%defattr(0644,root,root,0755)
-%doc KEYS LICENSE.txt NOTICE.txt
-%{_javadir}/%{name}-%{version}.jar
-%{_javadir}/%{name}.jar
-%{_javadir}/%{name}-serializer-%{version}.jar
-%{_javadir}/%{name}-serializer.jar
-%config %{_sysconfdir}/ant.d/serializer
-%ghost %{_sysconfdir}/alternatives/jaxp_transform_impl.jar
-%{_javadir}/jaxp_transform_impl.jar
-%{_mavenpomdir}/%{name}*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
-
-%files bootstrap
-%defattr(0644,root,root,0755)
-%doc KEYS LICENSE.txt NOTICE.txt
-%{_javadir}/%{name}-%{version}.jar
-%{_javadir}/%{name}.jar
-%{_javadir}/%{name}-serializer-%{version}.jar
-%{_javadir}/%{name}-serializer.jar
-%config %{_sysconfdir}/ant.d/serializer
-%ghost %{_sysconfdir}/alternatives/jaxp_transform_impl.jar
-%{_javadir}/jaxp_transform_impl.jar
-%{_mavenpomdir}/%{name}*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
-
-%files xsltc
-%defattr(0644,root,root,0755)
-%{_javadir}/xsltc-%{version}.jar
-%{_javadir}/xsltc.jar
-%{_mavenpomdir}/xsltc*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}-xsltc
-%else
-%{_datadir}/maven-metadata/%{name}-xsltc.xml*
-%endif
+%files xsltc -f .mfiles-xsltc
+%license LICENSE.txt NOTICE.txt
 
 %files manual
-%defattr(0644,root,root,0755)
+%license LICENSE.txt NOTICE.txt
 %doc build/docs/*
 
-%files demo
-%defattr(0644,root,root,0755)
-%{_datadir}/%{name}
-
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.2-10
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.7.2-9.6
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Add a bootstrap package for xerces-j2 to build with.
-- Use javapackages-local-bootstrap to avoid build cycle.
-- Apply patch to set osgi xerces requirement optional.
+* Fri Jun 07 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.3-4
+- Remove proprietary data from source RPM
 
-* Fri Feb  1 2019 Fridrich Strba <fstrba@suse.com>
-- Add xalan-j2-serializer-MANIFEST.MF and xalan-j2-MANIFEST.MF
-  * Contain OSGi metadata required by Eclipse
-* Sun Nov 18 2018 Fridrich Strba <fstrba@suse.com>
-- Add maven pom file for xsltc
-* Wed Nov  7 2018 Fridrich Strba <fstrba@suse.com>
-- Add maven pom files for xalan-j2 and the serializer
-* Tue Oct  3 2017 fstrba@suse.com
-- Added patch:
-  * openjdk-build.patch
-    + Fix build with different versions of OpenJDK
-- Do not require gcc-java any more
-- Run fdupes
-* Mon Dec  8 2014 tchvatal@suse.com
-- Revert last commit, causes cycles.
-* Fri Dec  5 2014 p.drouand@gmail.com
-- Replace java-1_5_0-gcj-compat-devel with javapackages-tools
-* Mon Jul 21 2014 tchvatal@suse.com
-- Update-alternatives love.
-* Mon Jun 23 2014 tchvatal@suse.com
-- Cleanup with spec-cleaner.
-* Mon Jun 23 2014 tchvatal@suse.com
-- Version bump to 2.7.2 release:
-  * various small fixes
-  * Fix security bnc#870082 CVE-2014-0107
-- Fix few rpmlint warnings
-- Deleted xalan-j2-java14compat.patch patch as we don't bother
-  with 1.4 java anymore
-- Rebased patches on new code:
-  * xalan-j2-crosslink.patch
-  * xalan-j2-manifest.patch
-  * xalan-j2-noxsltcdeps.patch
-* Wed Aug 28 2013 mvyskocil@suse.com
-- mark all files related to update-alternatives as ghost
-- reformat header of spec a bit
-* Fri Aug 23 2013 mvyskocil@suse.com
-- drop javadoc package
-* Mon Jan  7 2013 mvyskocil@suse.com
-- remove xerces-j2-bootstrap depenency (bnc#789163)
-* Mon Nov  8 2010 mvyskocil@suse.cz
-- ignore xml-commons-jaxp-1.3-apis
-* Mon May  4 2009 mvyskocil@suse.cz
-- build with java-cup-bootstrap instead obsolete java_cup
-* Wed Mar 18 2009 mvyskocil@suse.cz
-- bnc#485299: Ant <xslt> tasks fail with NoClassDefFoundError:
-  org/apache/xml/serializer/SerializerTrace
-* Mon Jul 28 2008 ro@suse.de
-- use xml-commons-apis-bootstrap instead of xml-commons-apis
-* Mon Jul 28 2008 coolo@suse.de
-- buildignore xml-commons (ant works without it)
-* Mon Jul 21 2008 coolo@suse.de
-- build against gcj to avoid bootstrap problems
-* Thu Sep 21 2006 skh@suse.de
-- update to version 2.7.0 from jpackage.org
-- don't use icecream
-- use target="1.4" for build with java 1.5
-* Wed Jan 25 2006 mls@suse.de
-- converted neededforbuild to BuildRequires
-* Fri Jul 29 2005 jsmeix@suse.de
-- Adjustments in the spec file.
-* Wed Jul 20 2005 jsmeix@suse.de
-- Current version 2.6.0 from JPackage.org
-* Mon Jul 18 2005 jsmeix@suse.de
-- Current version 2.6.0 from JPackage.org
-* Thu Sep 16 2004 skh@suse.de
-- Fix prerequires
-* Thu Sep  2 2004 skh@suse.de
-- Initial package created with version 2.6.0 (JPackage 1.5)
+* Fri May 31 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.3-3
+- Switch to a newer patch macro syntax
+
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 2.7.3-2
+- Rebuilt for java-21-openjdk as system jdk
+
+* Fri Feb 02 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.3-1
+- Update to upstream version 2.7.3
+- Remove alternatives post striplet
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Sep 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.2-16
+- Convert License tag to SPDX format
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 2.7.2-12
+- Rebuilt for java-17-openjdk as system jdk
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 02 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.2-10
+- Bump Java compiler source/target levels to 1.7
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 28 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.2-8
+- Build with OpenJDK 11
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat Jul 11 2020 Jiri Vanek <jvanek@redhat.com> - 0:2.7.2-5
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Mon Jun 29 2020 Mat Booth <mat.booth@redhat.com> - 0:2.7.2-4
+- Peg to Java 8 due to build issues on Java 11
+
+* Fri Jun 19 2020 Mat Booth <mat.booth@redhat.com> - 0:2.7.2-3
+- Allow building against Java 11
+
+* Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Tue Nov 05 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.2-2
+- Mass rebuild for javapackages-tools 201902
+
+* Wed Oct 16 2019 Fabio Valentini <decathorpe@gmail.com> - 0:2.7.2-1
+- Update to version 2.7.2.
+
+* Wed Jul 31 2019 Marian Koncek <mkoncek@redhat.com> - 2.7.2-1
+- Update to upstream version 2.7.2
+
+* Sat Jul 27 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-40
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Fri May 24 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.7.1-39
+- Mass rebuild for javapackages-tools 201901
+
+* Sun Feb 03 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-39
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Tue Aug 07 2018 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-38
+- Update license of subpackages
+
+* Tue Jul 31 2018 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-37
+- Remove BR on xml-stylebook
+
+* Tue Jul 31 2018 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-36
+- Repack the tarball without binaries
+
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-35
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Mon Sep 25 2017 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:2.7.1-33
+- Elimitate race condition when injecting JAR manifest
+- Resolves: rhbz#1495250
+
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Wed Mar 08 2017 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-31
+- Fix missing jaxp_transformer_impl symlink after upgrade
+
+* Thu Feb 23 2017 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-30
+- Install with XMvn
+- Remove alternatives
+
+* Tue Feb 07 2017 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-29
+- Build against glassfish-servlet-api
+
+* Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0:2.7.1-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Wed Mar 4 2015 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-26
+- Move to Servlet 3.1.
+
+* Thu Feb 12 2015 Michael Simacek <msimacek@redhat.com> - 0:2.7.1-25
+- Remove bundled JARs
+- Remove unused patch
+- Fix end-of-line issues
+
+* Wed Feb 11 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:2.7.1-24
+- Update to current packaging guidelines
+
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Thu Mar 27 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:2.7.1-22
+- Add patch to fix remote code execution vulnerability
+- Resolves: CVE-2014-0107
+
+* Mon Aug 19 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:2.7.1-21
+- Move depmaps to appropriate packages
+- Resolves: rhbz#998594
+
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Wed Jul 10 2013 Krzysztof Daniel <kdaniel@redhat.com> 0:2.7.1-19
+- Add export packages from Eclipse orbit.
+- Restore dependency to system.bundle.
+
+* Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Fri Oct 12 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:2.7.1-17
+- Remove classpaths from manifests, resolves: rhbz#575635
+- Remove jlex from classpath
+- Fix source URL to archive.apache.org
+- Don't mix spaces and tabs in spec file
+- Fix end-of-line encoding of some documentation files
+
+* Fri Aug 24 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0:2.7.1-16
+- No more ASL 1.1 code present in the package, fix license
+
+* Thu Aug 23 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0:2.7.1-15
+- Add NOTICE.txt file to subpackages
+- Remove bundled sources of other packages used to build javadocs
+
+* Thu Aug 16 2012 Andy Grimm <agrimm@gmail.com> - 0:2.7.1-14
+- Remove osgi(system.bundle) requirement
+
+* Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Thu Jul 12 2012 Andy Grimm <agrimm@gmail.com> - 0:2.7.1-12
+- Change javax.servlet requirement to use tomcat 7
+
+* Mon Jul 02 2012 Gerard Ryan <galileo@fedoraproject.org> - 0:2.7.1-11
+- Fix Requires for javax.servlet to geronimo-osgi-support
+
+* Sun Jun 24 2012 Gerard Ryan <galileo@fedoraproject.org> - 0:2.7.1-10
+- Inject OSGI Manifest for xalan-j2.jar
+
+* Tue May 29 2012 Andy Grimm <agrimm@gmail.com> - 0:2.7.1-9
+- Follow new guidelines for EE API deps (#819546)
+
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Mon Oct 10 2011 Andy Grimm <agrimm@gmail.com> 0:2.7.1-7
+- add POM files
+
+* Wed Aug 10 2011 Andrew Overholt <overholt@redhat.com> 0:2.7.1-6
+- Fix filename of serializer.jar in xalan-j2's MANIFEST.MF
+- https://bugzilla.redhat.com/show_bug.cgi?id=718738
+
+* Tue Jul 26 2011 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-5
+- Remove old commented parts.
+- Fix rpmlint warnings.
+
+* Tue Jun 28 2011 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-4
+- Fix FTBFS.
+
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Thu Dec 16 2010 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-2
+- Update to current guidelines.
+
+* Wed Apr 7 2010 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.1-1
+- Update to 2.7.1.
+- Drop gcj_support.
+
+* Mon Jul 27 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.0-9.5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:2.7.0-8.5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Tue Feb 3 2009 Alexander Kurtakov <akurtako@redhat.com> 0:2.7.0-7.5
+- Add osgi manifest.
+
+* Sat Sep  6 2008 Tom "spot" Callaway <tcallawa@redhat.com> 0:2.7.0-7.4
+- fix license tag
+
+* Thu Jul 10 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0:2.7.0-7.3
+- drop repotag
+- fix license tag
+
+* Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0:2.7.0-7jpp.2
+- Autorebuild for GCC 4.3
+
+* Fri Apr 20 2007 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-6jpp.2.fc7
+- Rebuild to fix incomplete .db/so files due to broken aot-compile-rpm
+
+* Fri Aug 18 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-6jpp.1
+- Resync with latest from JPP.
+
+* Fri Aug 11 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-5jpp.3
+- Rebuild.
+
+* Thu Aug 10 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-5jpp.2
+- Rebuild.
+
+* Thu Aug 10 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-5jpp.1
+- Resync with latest from JPP.
+- Partially adopt new naming convention (.1 suffix).
+- Use ln and rm explicitly instead of core-utils in Requires(x).
+
+* Thu Aug 10 2006 Karsten Hopp <karsten@redhat.de> 2.7.0-4jpp_5fc
+- Requires(post):     coreutils
+
+* Wed Jul 26 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-4jpp_4fc
+- Extend patch to cover all applicable MANIFEST files in src directory.
+
+* Wed Jul 26 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-4jpp_3fc
+- Apply patch to replace serializer.jar in MANIFEST file with
+  xalan-j2-serializer.jar.
+
+* Sat Jul 22 2006 Jakub Jelinek <jakub@redhat.com> - 0:2.7.0-4jpp_2fc
+- Rebuilt
+
+* Fri Jul 21 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-4jpp_1fc
+- Resync with latest JPP version.
+
+* Wed Jul 19 2006 Vivek Lakshmanan <vivekl@redhat.com> - 0:2.7.0-3jpp_1fc
+- Merge with latest version from jpp.
+- Undo ExcludeArch since eclipse available for all arch-es.
+- Remove jars from sources for new upstream version.
+- Purge unused patches from previous release.
+- Conditional native compilation with GCJ.
+- Use NVR macros wherever possible.
+
+* Wed Mar  8 2006 Rafael Schloming <rafaels@redhat.com> - 0:2.6.0-3jpp_10fc
+- excluded s390[x] and ppc64 due to eclipse
+
+* Mon Mar  6 2006 Jeremy Katz <katzj@redhat.com> - 0:2.6.0-3jpp_9fc
+- stop scriptlet spew
+
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 0:2.6.0-3jpp_8fc
+- bump again for double-long bug on ppc(64)
+
+* Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 0:2.6.0-3jpp_7fc
+- rebuilt for new gcc4.1 snapshot and glibc changes
+
+* Wed Dec 21 2005 Jesse Keating <jkeating@redhat.com> 0:2.6.0-3jpp_6fc
+- rebuild again
+
+* Tue Dec 13 2005 Jesse Keating <jkeating@redhat.com> 0:2.6.0-3jpp_5fc.3
+- patch to not use target= in build.xml
+
+* Tue Dec 13 2005 Jesse Keating <jkeating@redhat.com> 0:2.6.0-3jpp_5fc.1
+- rebuild again with gcc-4.1
+
+* Fri Dec 09 2005 Warren Togami <wtogami@redhat.com> 0:2.6.0-3jpp_5fc
+- rebuild with gcc-4.1
+
+* Tue Nov  1 2005 Archit Shah <ashah at redhat.com> 0:2.6.0-3jpp_4fc
+- Exclude war which blocks aot compilation of main jar (#171005).
+
+* Tue Jul 19 2005 Gary Benson <gbenson at redhat.com> 0:2.6.0-3jpp_3fc
+- Build on ia64, ppc64, s390 and s390x.
+- Switch to aot-compile-rpm (also BC-compiles xsltc and samples).
+
+* Tue Jun 28 2005 Gary Benson <gbenson at redhat.com> 0:2.6.0-3jpp_2fc
+- Remove a tarball from the tarball too.
+- Fix demo subpackage's dependencies.
+
+* Wed Jun 15 2005 Gary Benson <gbenson at redhat.com> 0:2.6.0-3jpp_1fc
+- Remove jarfiles from the tarball.
+
+* Fri May 27 2005 Gary Benson <gbenson at redhat.com> 0:2.6.0-3jpp
+- Add NOTICE file as per Apache License version 2.0.
+- Build with servletapi5.
+
+* Fri May 27 2005 Gary Benson <gbenson@redhat.com> 0:2.6.0-2jpp_3fc
+- Remove now-unnecessary workaround for #130162.
+- Rearrange how BC-compiled stuff is built and installed.
+
+* Tue May 24 2005 Gary Benson <gbenson@redhat.com> 0:2.6.0-2jpp_2fc
+- Add DOM3 stubs to classes that need them (#152255).
+- BC-compile the main jarfile.
+
+* Fri Apr  1 2005 Gary Benson <gbenson@redhat.com>
+- Add NOTICE file as per Apache License version 2.0.
+
+* Wed Jan 12 2005 Gary Benson <gbenson@redhat.com> 0:2.6.0-2jpp_1fc
+- Sync with RHAPS.
+
+* Mon Nov 15 2004 Fernando Nasser <fnasser@redhat.com> 0:2.6.0-2jpp_1rh
+- Merge with latest community release
+
+* Thu Nov  4 2004 Gary Benson <gbenson@redhat.com> 0:2.6.0-1jpp_2fc
+- Build into Fedora.
+
+* Thu Aug 26 2004 Ralph Apel <r.ape at r-apel.de> 0:2.6.0-2jpp
+- Build with ant-1.6.2
+- Try with -Djava.awt.headless=true
+
+* Mon Jul 26 2004 Fernando Nasser <fnasser@redhat.com> 0:2.6.0-1jpp_1rh
+- Merge with latest community version
+
+* Fri Mar 26 2004 Frank Ch. Eigler <fche@redhat.com> 0:2.5.2-1jpp_2rh
+- add RHUG upgrade cleanup
+
+* Tue Mar 23 2004 Kaj J. Niemi <kajtzu@fi.basen.net> 0:2.6.0-1jpp
+- Updated to 2.6.0
+- Patches supplied by <aleksander.adamowski@altkom.pl>
+
+* Thu Mar  4 2004 Frank Ch. Eigler <fche@redhat.com> - 0:2.5.2-1jpp_1rh
+- RH vacuuming
+
+* Sat Nov 15 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:2.5.2-1jpp
+- Update to 2.5.2.
+- Re-enable javadocs, new style versionless symlink handling, crosslink
+  with local J2SE javadocs.
+- Spec cleanups.
+
+* Sat Jun  7 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:2.5.1-1jpp
+- Update to 2.5.1.
+- Fix jpackage-utils version in BuildRequires, add xerces-j2.
+- Non-versioned javadoc symlinking.
+- Add one missing epoch.
+- Clean up manifests from Class-Path's and other stuff we don't include.
+- xsltc no longer provides a jaxp_transform_impl because of huge classpath
+  and general unsuitablity for production-use, system-installed transformer.
+- Own (ghost) %%{_javadir}/jaxp_transform_impl.jar.
+- Remove alternatives in preun instead of postun.
+- Disable javadoc subpackage for now:
+  <http://issues.apache.org/bugzilla/show_bug.cgi?id=20572>
+
+* Thu Mar 27 2003 Nicolas Mailhot <Nicolas.Mailhot@One2team.com> 0:2.5.0.d1-1jpp
+- For jpackage-utils 1.5
+
+* Wed Jan 22 2003 Ville Skyttä <ville.skytta at iki.fi> - 2.4.1-2jpp
+- bsf -> oldbsf.
+- Use non-versioned jar in alternative, don't remove it on upgrade.
+- Remove hardcoded packager tag.
+
+* Mon Nov 04 2002 Henri Gomez <hgomez@users.sourceforge.net> 2.4.1-1jpp
+- 2.4.1
+
+* Tue Sep 10 2002 Ville Skyttä <ville.skytta at iki.fi> 2.4.0-1jpp
+- 2.4.0.
+
+* Thu Aug 22 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.4-0.D1.3jpp
+- corrected case for Group tag
+- fixed servlet classpath
+
+* Tue Aug 20 2002 Ville Skyttä <ville.skytta at iki.fi> 2.4-0.D1.2jpp
+- Remove xerces-j1 runtime dependency.
+- Add bcel, jlex, regexp to xsltc runtime requirements:
+  <http://xml.apache.org/xalan-j/xsltc_usage.html>
+- Build with -Dbuild.compiler=modern (IBM 1.3.1) to avoid stylebook errors.
+- XSLTC now provides jaxp_transform_impl too.
+- Earlier changes by Henri, from unreleased 2.4-D1.1jpp:
+    Mon Jul 15 2002 Henri Gomez <hgomez@users.sourceforge.net> 2.4-D1.1jpp
+  - 2.4D1
+  - use the jlex 1.2.5-5jpp (patched by Xalan/XSLTC team) rpm
+  - use the stylebook-1.0-b3_xalan-2.jar included in source file till it will
+    be packaged in jpackage
+  - use jaxp_parser_impl (possibly xerces-j2) instead of xerces-j1 for docs
+    generation, since it's tuned for stylebook-1.0-b3_xalan-2.jar
+  - build and provide xsltc in a separate rpm
+
+* Mon Jul 01 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.3.1-2jpp
+- provides jaxp_transform_impl
+- requires jaxp_parser_impl
+- stylebook already requires xml-commons-apis
+- jaxp_parser_impl already requires xml-commons-apis
+- use sed instead of bash 2.x extension in link area to make spec compatible with distro using bash 1.1x
+
+* Wed Jun 26 2002 Henri Gomez <hgomez@users.sourceforge.net> 2.3.1-2jpp
+- fix built classpath (bsf, bcel are existing jpackage rpms),
+- add buildrequires for javacup and JLex
+
+* Wed May 08 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.3.1-1jpp
+- 2.3.1
+- vendor, distribution, group tags
+
+* Mon Mar 18 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.3.0-2jpp
+- generic servlet support
+
+* Wed Feb 20 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.3.0-1jpp
+- 2.3.0
+- no more compat jar
+
+* Sun Jan 27 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.0-2jpp
+- adaptation to new stylebook1.0b3 package
+- used source tarball
+- section macro
+
+* Fri Jan 18 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.0-1jpp
+- 2.2.0 final
+- versioned dir for javadoc
+- no dependencies for manual and javadoc packages
+- stricter dependency for compat and demo packages
+- fixed package confusion
+- adaptation for new servlet3 package
+- requires xerces-j1 instead of jaxp_parser
+- xml-apis jar now in required xml-commons-apis external package
+
+* Wed Dec 5 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D14-1jpp
+- 2.2.D14
+- javadoc into javadoc package
+- compat.jar into compat package
+- compat javadoc into compat-javadoc package
+
+* Wed Nov 21 2001 Christian Zoffoli <czoffoli@littlepenguin.org> 2.2.D13-2jpp
+- changed extension to jpp
+- prefixed xml-apis
+
+* Tue Nov 20 2001 Christian Zoffoli <czoffoli@littlepenguin.org> 2.2.D13-1jpp
+- 2.2.D13
+- removed packager tag
+
+* Sat Oct 6 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D11-1jpp
+- 2.2.D11
+
+* Sun Sep 30 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D10-2jpp
+- first unified release
+- s/jPackage/JPackage
+
+* Fri Sep 14 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D10-1mdk
+- cvs references
+- splitted demo package
+- moved demo files to %%{_datadir}/%%{name}
+- only manual package requires stylebook-1.0b3
+- only demo package requires servletapi3
+
+* Wed Aug 22 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D9-1mdk
+- 2.2.9
+- used new source packaging policy
+- added samples data
+
+* Wed Aug 08 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 2.2.D6-1mdk
+- first Mandrake release

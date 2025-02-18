@@ -1,26 +1,40 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%global	majorver	3.13.2
+#%%global	preminorver	.rc6
+%global	rpmminorver	.%(echo %preminorver | sed -e 's|^\\.\\.*||')
+%global	fullver	%{majorver}%{?preminorver}
+
+%global	baserelease	1
 
 %global	gem_name	rspec-mocks
 
-%global	need_bootstrap_set	0
+%bcond_with bootstrap
 
 %undefine __brp_mangle_shebangs
 
 Summary:	RSpec's 'test double' framework (mocks and stubs)
 Name:		rubygem-%{gem_name}
-Version:	3.12.1
-Release:	1%{?dist}
+Version:	%{majorver}
+Release:	%{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}
 
+# SPDX confirmed
 License:	MIT
 URL:		http://github.com/rspec/rspec-mocks
-Source0:	https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
+Source0:	https://rubygems.org/gems/%{gem_name}-%{fullver}.gem
+# %%{SOURCE2} %%{name} %%{version}
+Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
+Source2:	rspec-related-create-full-tarball.sh
 
-#BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
-%if 0%{?need_bootstrap_set} < 1
+%if %{without bootstrap}
+# rspec
 BuildRequires:	rubygem(rspec)
-BuildRequires:	rubygem(thread_order)
+BuildRequires:	rubygem(rake)
+%if %{undefined rhel}
+# cucumber
+BuildRequires:	rubygem(aruba)
+BuildRequires:	rubygem(cucumber)
+BuildRequires:	rubygem(minitest)
+%endif
 BuildRequires:	git
 %endif
 BuildArch:	noarch
@@ -38,8 +52,15 @@ This package contains documentation for %{name}.
 
 
 %prep
-%autosetup -S git -n %{gem_name}-%{version}
+gem unpack %{SOURCE0}
 
+%setup -q -D -T -n  %{gem_name}-%{version} -b 1
+
+# Cucumber 7 syntax change
+sed -i cucumber.yml -e "s|~@wip|not @wip|"
+sed -i features/support/disallow_certain_apis.rb -e "s|~@allow-old-syntax|not @allow-old-syntax|"
+
+gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 
 %build
 gem build %{gem_name}.gemspec
@@ -53,12 +74,33 @@ cp -a .%{gem_dir}/* \
 # cleanups
 rm -f %{buildroot}%{gem_instdir}/{.document,.yardopts}
 
-%if 0%{?need_bootstrap_set} < 1
 %check
+%if %{with bootstrap}
+# Don't do actual check
+exit 0
+%endif
+
+%if %{defined rhel}
+# avoid aruba dep on RHEL, but tests fail if files are removed entirely
+echo -n > spec/integration/rails_support_spec.rb
+echo -n > spec/support/aruba.rb
+%else
+# Don't call bundler
+sed -i spec/integration/rails_support_spec.rb \
+	-e 's|bundle exec rspec|rspec|'
+%endif
+
 # library_wide_checks.rb needs UTF-8
 LANG=C.UTF-8
-ruby -rrubygems -Ilib/ -S rspec spec/
+export RUBYLIB=$(pwd)/lib
+rspec spec/
+
+%if 0%{?rhel}
+# Don't do cucumber test
+exit 0
 %endif
+export CUCUMBER_PUBLISH_QUIET=true
+cucumber
 
 %files
 %dir	%{gem_instdir}
@@ -76,13 +118,100 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %{gem_docdir}
 
 %changelog
-* Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 3.12.1-1
-- Switch to build from .tar.gz
-- License verified
+* Thu Oct 03 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.2-1
+- 3.13.2
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.1-2
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.13.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu May 09 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.1-1
+- 3.13.1
+
+* Thu Apr 18 2024 Jun Aruga <jaruga@redhat.com> - 3.13.0-2
+- Remove unused thread_order build dependency
+
+* Fri Feb 09 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.0-1
+- 3.13.0
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jul 16 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.6-1
+- 3.12.6
+
+* Sat Apr  1 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.5-1
+- 3.12.5
+
+* Tue Mar 14 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.4-1
+- 3.12.4
+
+* Thu Mar 09 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 3.12.3-2
+- Disable unwanted dependencies in RHEL builds
+
+* Thu Feb 16 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.3-1
+- 3.12.3
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.0-3.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec  2 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.0-3
+- Backport upstream reviewing patch for ruby32 ruby2_keywords treatment change
+
+* Thu Nov  3 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.0-2
+- On Fedora 37, remove "Display keyword hashes" feature for now
+  (On Fedora 38, this is effective)
+
+* Thu Oct 27 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.12.0-1
+- 3.12.0
+
+* Wed Oct 26 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.2-1
+- 3.11.2
+
+* Mon Oct  3 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.1-2
+- Backport upstream patch for ruby32 wrt method reference changes
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.1-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Apr  7 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.1-1
+- 3.11.1
+
+* Thu Feb 10 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.11.0-1
+- 3.11.0
+
+* Sun Jan 30 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.3-1
+- 3.10.3
+
+* Sun Jan 30 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.2-3
+- BR: rubygem(rake) for check
+
+* Thu Jan 20 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.2-2
+- Execute cucumber test
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.2-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Feb  1 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.2-1
+- 3.10.2
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 29 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.1-1
+- 3.10.1
+
+* Fri Dec 11 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.0-1
+- Enable tests again
+
+* Fri Dec 11 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.10.0-0.1
+- 3.10.0
+- Once disable test for bootstrap
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.1-1.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.1-1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

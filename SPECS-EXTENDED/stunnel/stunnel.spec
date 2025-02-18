@@ -1,55 +1,84 @@
-%bcond_with libwrap
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 # Do not generate provides for private libraries
 %global __provides_exclude_from ^%{_libdir}/stunnel/.*$
 
-Summary:        A TLS-encrypting socket wrapper
-Name:           stunnel
-Version:        5.70
-Release:        1%{?dist}
-License:        GPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            http://www.stunnel.org/
-Source0:        https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
-Source2:        Certificate-Creation
-Source3:        sfinger.xinetd
-Source4:        stunnel-sfinger.conf
-Source5:        pop3-redirect.xinetd
-Source6:        stunnel-pop3s-client.conf
-Source7:        stunnel@.service
-Patch0:         stunnel-5.50-authpriv.patch
-Patch1:         stunnel-5.61-systemd-service.patch
+%if 0%{?fedora} || 0%{?rhel} > 7
+%bcond_with libwrap
+%else
+%bcond_without libwrap
+%endif
+
+%if 0%{?rhel} >= 10
+%bcond openssl_engine 0
+%else
+%bcond openssl_engine 1
+%endif
+
+Summary: A TLS-encrypting socket wrapper
+Name: stunnel
+Version: 5.74
+Release: %autorelease
+License: GPL-2.0-or-later WITH stunnel-exception AND MIT
+URL: https://www.stunnel.org/
+Source0: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
+Source1: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz.asc
+Source2: Certificate-Creation
+Source3: sfinger.xinetd
+Source4: stunnel-sfinger.conf
+Source5: pop3-redirect.xinetd
+Source6: stunnel-pop3s-client.conf
+Source7: stunnel@.service
+# Upstream release signing key
+# Upstream source is https://www.stunnel.org/pgp.asc; using a local URL because
+# the remote one makes packit source-git choke.
+Source99: pgp.asc
+# Apply patch stunnel-5.50-authpriv.patch
+Patch0:   stunnel-5.50-authpriv.patch
+# Apply patch stunnel-5.61-systemd-service.patch
+Patch1:   stunnel-5.61-systemd-service.patch
 # Use cipher configuration from crypto-policies
-#
+# 
 # On Fedora, CentOS and RHEL, the system's crypto policies are the best
 # source to determine which cipher suites to accept in TLS. On these
 # platforms, OpenSSL supports the PROFILE=SYSTEM setting to use those
 # policies. Change stunnel to default to this setting.
-Patch3:         stunnel-5.69-system-ciphers.patch
-Patch4:         stunnel-5.56-coverity.patch
-Patch5:         stunnel-5.69-default-tls-version.patch
-Patch6:         stunnel-5.56-curves-doc-update.patch
-# Limit curves defaults in FIPS mode
-Patch8:         stunnel-5.62-disabled-curves.patch
-# build test requirements
-BuildRequires:  %{_bindir}/nc
-BuildRequires:  %{_bindir}/pod2html
-BuildRequires:  %{_bindir}/pod2man
-BuildRequires:  %{_sbindir}/lsof
-BuildRequires:  /bin/ps
-BuildRequires:  autoconf
-BuildRequires:  automake
+Patch3:   stunnel-5.69-system-ciphers.patch
+# Use TLS version f/crypto-policies unless specified
+# 
+# Do not explicitly set the TLS version and rely on the defaults from
+# crypto-policies unless a TLS minimum or maximum version are explicitly
+# specified in the stunnel configuration.
+Patch5:   stunnel-5.72-default-tls-version.patch
+# Apply patch stunnel-5.56-curves-doc-update.patch
+Patch6:   stunnel-5.56-curves-doc-update.patch
 # util-linux is needed for rename
-BuildRequires:  gcc
-BuildRequires:  libtool
-BuildRequires:  openssl-devel
-BuildRequires:  pkgconfig
-BuildRequires:  systemd
-BuildRequires:  util-linux
-%{?systemd_requires}
-%if %{with libwrap}
-BuildRequires:  tcp_wrappers-devel
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: gnupg2
+BuildRequires: openssl-devel, pkgconfig, util-linux
+%if %{with openssl_engine} && 0%{?fedora} >= 41
+BuildRequires: openssl-devel-engine
 %endif
+BuildRequires: autoconf automake libtool
+%if %{with libwrap}
+Buildrequires: tcp_wrappers-devel
+%endif
+BuildRequires: /usr/bin/pod2man
+BuildRequires: /usr/bin/pod2html
+# build test requirements
+BuildRequires: /usr/bin/nc, /usr/bin/lsof, /usr/bin/ps
+BuildRequires: python3 python3-cryptography openssl
+BuildRequires: systemd systemd-devel
+%{?systemd_requires}
 
 %description
 Stunnel is a socket wrapper which can provide TLS/SSL
@@ -58,28 +87,29 @@ to ordinary applications. For example, it can be used in
 conjunction with imapd to create a TLS secure IMAP server.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE99}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -S gendiff -p1
-
-# Fix the configure script output for FIPS mode and stack protector flag
-# sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
-
-# Fix a testcase with system-ciphers support
-# sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
 
 %build
 #autoreconf -v
-CFLAGS="%{optflags} -fPIC"; export CFLAGS
+CFLAGS="$RPM_OPT_FLAGS -fPIC"; export CFLAGS
 if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
 	LDFLAGS="`pkg-config --libs-only-L openssl`"; export LDFLAGS
 fi
+
+CPPFLAGS_NO_ENGINE=""
+%if !%{with openssl_engine}
+	CPPFLAGS_NO_ENGINE="-DOPENSSL_NO_ENGINE"
+%endif
 %configure --enable-fips --enable-ipv6 --with-ssl=%{_prefix} \
 %if %{with libwrap}
 --enable-libwrap \
 %else
 --disable-libwrap \
 %endif
-	CPPFLAGS="-UPIDFILE -DPIDFILE='\"%{_localstatedir}/run/stunnel.pid\"'"
+	--with-bashcompdir=%{_datadir}/bash-completion/completions \
+	CPPFLAGS="-UPIDFILE -DPIDFILE='\"%{_localstatedir}/run/stunnel.pid\"' $CPPFLAGS_NO_ENGINE"
 make V=1 LDADD="-pie -Wl,-z,defs,-z,relro,-z,now"
 
 %install
@@ -94,22 +124,18 @@ for lang in pl ; do
 done
 mkdir srpm-docs
 cp %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} srpm-docs
-
 mkdir -p %{buildroot}%{_unitdir}
-cp %{buildroot}%{_docdir}/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
+cp %{buildroot}%{_datadir}/doc/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 
-
 %check
-# For unknown reason the 042_inetd test fails in Koji. The failure is not reproducible
-# in local build.
-rm tests/recipes/042_inetd
-# We override the security policy as it is too strict for the tests.
-OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
-export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
-OPENSSL_CONF=
-export OPENSSL_CONF
-make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
+if ! make test; then
+	for i in tests/logs/*.log; do
+		echo "$i":
+		cat "$i"
+	done
+	exit 1
+fi
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -121,15 +147,15 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %lang(pl) %doc doc/pl/*
 %{_bindir}/stunnel
 %exclude %{_bindir}/stunnel3
-%exclude %{_docdir}/stunnel
+%exclude %{_datadir}/doc/stunnel
 %{_libdir}/stunnel
 %exclude %{_libdir}/stunnel/libstunnel.la
 %{_mandir}/man8/stunnel.8*
 %lang(pl) %{_mandir}/pl/man8/stunnel.8*
 %dir %{_sysconfdir}/%{name}
 %exclude %{_sysconfdir}/stunnel/*
-
 %{_unitdir}/%{name}*.service
+%{_datadir}/bash-completion/completions/%{name}.bash
 
 %post
 /sbin/ldconfig
@@ -143,15 +169,99 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %systemd_postun_with_restart %{name}.service
 
 %changelog
-* Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 5.70-1
-- Upgrade version to address CVE-2021-20230
-- Lint spec
-- Verified License
+## START: Generated by rpmautospec
+* Mon Dec 16 2024 Clemens Lang <cllang@redhat.com> - 5.74-1
+- New upstream release 5.74
 
-* Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 5.56-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Change /usr/bin/lsof to /usr/sbin/lsof
-- Change /usr/bin/ps to /bin/ps
+* Tue Sep 10 2024 Clemens Lang <cllang@redhat.com> - 5.73-1
+- New upstream release 5.73
+  Resolves: rhbz#2310893
+
+* Mon Jul 01 2024 Clemens Lang <cllang@redhat.com> - 5.72-2
+- Do not build OpenSSL ENGINE support on RHEL >= 10
+  Resolves: RHEL-33749
+
+* Mon Feb 05 2024 Clemens Lang <cllang@redhat.com> - 5.72-1
+- New upstream release 5.72
+  Resolves: rhbz#2262756
+
+* Thu Oct 5 2023 Clemens Lang <cllang@redhat.com> - 5.71-1
+- New upstream release 5.71
+  Resolves: rhbz#2239740
+
+* Wed Aug 30 2023 Clemens Lang <cllang@redhat.com> - 5.70-3
+- migrated to SPDX license
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.70-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 13 2023 Clemens Lang <cllang@redhat.com> - 5.70-1
+- New upstream release 5.70
+  Resolves: rhbz#2222467
+
+* Fri May 12 2023 Paul Wouters <paul.wouters@aiven.io - 5.69-2
+- rebuilt with socket activation support
+
+* Mon Mar 06 2023 Clemens Lang <cllang@redhat.com> - 5.69-1
+- New upstream release 5.69
+  Resolves: rhbz#2139207
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.66-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep 12 2022 Clemens Lang <cllang@redhat.com> - 5.66-1
+- New upstream release 5.66
+  Resolves: rhbz#2125932
+
+* Sat Jul 23 2022 Todd Zullinger <tmz@pobox.com> - 5.62-5
+- verify upstream source in %%prep
+- clean up stale conditionals
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.62-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Feb 04 2022 Clemens Lang <cllang@redhat.com> - 5.62-3
+- Fix stunnel in FIPS mode (with upcoming OpenSSL changes)
+  Related: rhbz#2050617
+- Fail build if tests fail
+  Related: rhbz#2051083
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.62-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 18 2022 Clemens Lang <cllang@redhat.com> - 5.62-1
+- New upstream release 5.62
+
+* Mon Jan 10 2022 Clemens Lang <cllang@redhat.com> - 5.61-1
+- New upstream release 5.61
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 5.58-4
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.58-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 5.58-2
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Mon Feb 22 2021 Sahana Prasad <sahana@redhat.com> - 5.58-1
+- New upstream release 5.58
+
+* Wed Feb 10 2021 Sahana Prasad <sahana@redhat.com> - 5.57-1
+- New upstream release 5.57
+- Fixes #1925229 - client certificate not correctly verified
+  when redirect and verifyChain options are used
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.56-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.56-9
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.56-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Apr 16 2020 Sahana Prasad <sahana@redhat.com> - 5.56-7
 - Updates documentation to specify that the option "curves" can be used in server mode only.
@@ -744,3 +854,5 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 
 * Sat Nov 28 1998 Damien Miller <dmiller@ilogic.com.au>
 - Initial RPMification
+
+## END: Generated by rpmautospec

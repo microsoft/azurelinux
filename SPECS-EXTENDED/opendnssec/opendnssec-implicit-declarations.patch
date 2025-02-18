@@ -1,0 +1,48 @@
+From 7060607ef359162d5b0aef62a4b8440fd42c9d28 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Tue, 26 Dec 2023 14:09:12 -0500
+Subject: [PATCH] Fix implicit function declarations
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+utils/kaspcheck.c:101:33: error: implicit declaration of function ‘exit’
+utils/kaspcheck.c:136:17: error: implicit declaration of function ‘free’
+utils/kc_helper.c:47:40: error: implicit declaration of function ‘free’
+utils/kc_helper.c:519:85: error: implicit declaration of function ‘atoi’
+utils/kc_helper.c:569:83: error: implicit declaration of function ‘malloc’
+utils/kc_helper.c:1122:28: error: implicit declaration of function ‘strtol’
+utils/kc_helper.c:1274:25: error: implicit declaration of function ‘exit’
+utils/kc_helper.c:1375:21: error: implicit declaration of function ‘calloc’
+---
+ enforcer/src/utils/kaspcheck.c | 1 +
+ enforcer/src/utils/kc_helper.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/enforcer/src/utils/kaspcheck.c b/enforcer/src/utils/kaspcheck.c
+index 9bac3b796..b3b808598 100644
+--- a/enforcer/src/utils/kaspcheck.c
++++ b/enforcer/src/utils/kaspcheck.c
+@@ -26,6 +26,7 @@
+ #define _GNU_SOURCE
+ #include <stdio.h>
+ #include <getopt.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>
+ 
+diff --git a/enforcer/src/utils/kc_helper.c b/enforcer/src/utils/kc_helper.c
+index 89e56c61e..e1704f6f9 100644
+--- a/enforcer/src/utils/kc_helper.c
++++ b/enforcer/src/utils/kc_helper.c
+@@ -27,6 +27,7 @@
+ #include <syslog.h>
+ #include <stdarg.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <sys/stat.h>
+ #include <errno.h>
+-- 
+2.43.0
+

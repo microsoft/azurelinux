@@ -1,19 +1,16 @@
 Summary:         A library for handling different graphics file formats
 Name:            netpbm
-Version:         10.90.00
-Release:         6%{?dist}
+Version:         11.09.00
+Release:         2%{?dist}
 # See copyright_summary for details
-License:         BSD and GPLv2 and IJG and MIT and Public Domain
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:         BSD-3-Clause AND GPL-2.0-only AND LGPL-2.1-or-later AND GPL-3.0-or-later AND IJG AND MIT AND NTP AND PostgreSQL AND LicenseRef-MIT-CRL-Xim AND LicenseRef-Fedora-Public-Domain
 URL: http://netpbm.sourceforge.net/
 # Source0 is prepared by
 # svn checkout https://svn.code.sf.net/p/netpbm/code/advanced netpbm-%%{version}
 # svn checkout https://svn.code.sf.net/p/netpbm/code/userguide netpbm-%%{version}/userguide
 # svn checkout https://svn.code.sf.net/p/netpbm/code/trunk/test netpbm-%%{version}/test
 # and removing the .svn directories ( find -name "\.svn" -type d -print0 | xargs -0 rm -rf )
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.xz
-Patch0:          netpbm-security-scripts.patch
+Source0:         netpbm-%{version}.tar.xz
 Patch1:          netpbm-security-code.patch
 Patch2:          netpbm-ppmfadeusage.patch
 Patch3:          netpbm-CVE-2017-2587.patch
@@ -26,20 +23,23 @@ Patch9:          netpbm-xwdfix.patch
 Patch10:         netpbm-multilib.patch
 Patch11:         netpbm-glibc.patch
 Patch12:         netpbm-docfix.patch
-Patch13:         netpbm-fiasco-overflow.patch
-Patch14:         netpbm-cmuwtopbm.patch
-Patch15:         netpbm-pamtojpeg2k.patch
-Patch16:         netpbm-manfix.patch
-Patch17:         netpbm-manual-pages.patch
-Patch18:         netpbm-jasper.patch
-Patch19:	 netpbm-userguide.patch
-Patch20:	 netpbm-libdir-so.patch
-Patch21:         disable-pamx-build.patch
+Patch13:         netpbm-pamtojpeg2k.patch
+Patch14:         netpbm-manfix.patch
+Patch15:         netpbm-jasper.patch
+Patch16:         netpbm-libdir-so.patch
+Patch17:         netpbm-c99.patch
+Patch18:         netpbm-shlib-ldflags.patch
 
+BuildRequires:   make
 BuildRequires:   libjpeg-devel, libpng-devel, libtiff-devel, flex, gcc, jbigkit-devel
-BuildRequires:   perl-generators, python3, jasper-devel, libxml2-devel
+BuildRequires:   libX11-devel, perl-generators, python3, jasper-devel, libxml2-devel
 BuildRequires:   perl(Config), perl(Cwd), perl(English), perl(Fcntl), perl(File::Basename)
 BuildRequires:   perl(strict)
+%if (0%{?fedora} && 0%{?fedora} < 28) || (0%{?rhel} || 0%{?rhel} <= 7)
+BuildRequires:   ghostscript-core
+%else
+BuildRequires:   ghostscript
+%endif
 
 %description
 The netpbm package contains a library of functions which support
@@ -62,6 +62,7 @@ to have the netpbm package installed.
 
 %package progs
 Summary:         Tools for manipulating graphics files in netpbm supported formats
+Requires:        ghostscript
 Requires:        netpbm = %{version}-%{release}
 
 %description progs
@@ -91,6 +92,7 @@ rm -rf converter/other/jpeg2000/libjasper/
 rm -rf converter/other/jbig/libjbig/
 
 %build
+%set_build_flags
 ./configure <<EOF
 
 
@@ -117,18 +119,19 @@ TOP=`pwd`
 
 make \
 	CC="%{__cc}" \
-	LDFLAGS="$RPM_LD_FLAGS -L$TOP/pbm -L$TOP/pgm -L$TOP/pnm -L$TOP/ppm" \
-	CFLAGS="$RPM_OPT_FLAGS -fPIC -flax-vector-conversions -fno-strict-aliasing" \
-	CFLAGS_CONFIG="$RPM_OPT_FLAGS" \
+	LDFLAGS="$LDFLAGS -L$TOP/pbm -L$TOP/pgm -L$TOP/pnm -L$TOP/ppm" \
+	CFLAGS="$CFLAGS -fPIC -flax-vector-conversions -fno-strict-aliasing" \
+	CFLAGS_CONFIG="$CFLAGS" \
 	LADD="-lm" \
-	JPEGINC_DIR=%{_includedir} \
-	PNGINC_DIR=%{_includedir} \
-	TIFFINC_DIR=%{_includedir} \
-	JPEGLIB_DIR=%{_libdir} \
-	JBIGLIB=%{_libdir}/libjbig.so.2.1 \
-	PNGLIB_DIR=%{_libdir} \
-	TIFFLIB_DIR=%{_libdir} \
+	JPEGINC_DIR=%{_usr}/include \
+	PNGINC_DIR=%{_usr}/include \
+	TIFFINC_DIR=%{_usr}/include \
+	JPEGLIB_DIR=%{_usr}/%{_lib} \
+	JBIGLIB=%{_usr}/%{_lib}/libjbig.so.2.1 \
+	PNGLIB_DIR=%{_usr}/%{_lib} \
+	TIFFLIB_DIR=%{_usr}/%{_lib} \
 	LINUXSVGALIB="NONE" \
+	X11LIB=%{_usr}/%{_lib}/libX11.so \
 	XML2LIBS="NONE"
 
 # prepare man files
@@ -146,13 +149,15 @@ done
 
 
 %install
-make package pkgdir=%{buildroot}/usr LINUXSVGALIB="NONE" XML2LIBS="NONE"
+make package pkgdir=%{buildroot}%{_prefix} LINUXSVGALIB="NONE" XML2LIBS="NONE"
 
 # Ugly hack to have libs in correct dir on 64bit archs.
 mkdir -p %{buildroot}%{_libdir}
-if [ "%{_libdir}" != "/usr/lib" ]; then
-  mv %{buildroot}/usr/lib/lib* %{buildroot}%{_libdir}
+if [ "%{_lib}" != "lib" ]; then
+  mv %{buildroot}%{_prefix}/lib/lib* %{buildroot}%{_libdir}
 fi
+
+cp -af lib/libnetpbm.a %{buildroot}%{_libdir}/libnetpbm.a
 
 mkdir -p %{buildroot}%{_datadir}
 mv userguide/man %{buildroot}%{_mandir}
@@ -171,16 +176,16 @@ done
 rm -f %{buildroot}%{_mandir}/man5/extendedopacity.5
 
 mkdir -p %{buildroot}%{_datadir}/netpbm
-mv %{buildroot}/usr/misc/*.map %{buildroot}%{_datadir}/netpbm/
-mv %{buildroot}/usr/misc/rgb.txt %{buildroot}%{_datadir}/netpbm/
-rm -rf %{buildroot}/usr/README
-rm -rf %{buildroot}/usr/VERSION
-rm -rf %{buildroot}/usr/link
-rm -rf %{buildroot}/usr/misc
-rm -rf %{buildroot}/usr/man
-rm -rf %{buildroot}/usr/pkginfo
-rm -rf %{buildroot}/usr/config_template
-rm -rf %{buildroot}/usr/pkgconfig_template
+mv %{buildroot}%{_prefix}/misc/*.map %{buildroot}%{_datadir}/netpbm/
+mv %{buildroot}%{_prefix}/misc/rgb.txt %{buildroot}%{_datadir}/netpbm/
+rm -rf %{buildroot}%{_prefix}/README
+rm -rf %{buildroot}%{_prefix}/VERSION
+rm -rf %{buildroot}%{_prefix}/link
+rm -rf %{buildroot}%{_prefix}/misc
+rm -rf %{buildroot}%{_prefix}/man
+rm -rf %{buildroot}%{_prefix}/pkginfo
+rm -rf %{buildroot}%{_prefix}/config_template
+rm -rf %{buildroot}%{_prefix}/pkgconfig_template
 
 # Don't ship the static library
 rm -f %{buildroot}%{_libdir}/lib*.a
@@ -204,8 +209,8 @@ export PBM_BINPREFIX=%{buildroot}%{_bindir}
 popd
 
 %files
-%doc doc/HISTORY README
-%license doc/copyright_summary doc/COPYRIGHT.PATENT doc/GPL_LICENSE.txt
+%doc doc/copyright_summary doc/COPYRIGHT.PATENT doc/HISTORY README
+%license doc/GPL_LICENSE.txt
 %{_libdir}/lib*.so.*
 
 %files devel
@@ -224,23 +229,96 @@ popd
 %doc userguide/*
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-6
-- Updating naming for 3.0 version of Azure Linux.
+* Thu Feb 06 2025 Josef Ridky <jridky@redhat.com> - 11.09.00-2
+- add LDFLAGS patch (RHEL-70899)
 
-* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-5
-- Bumping release to re-build with newer 'libtiff' libraries.
+* Tue Jan 28 2025 Josef Ridky <jridky@redhat.com> - 11.09.00-1
+- New upstream release 11.09.00 (#2218312)
+- Review and update license field
 
-* Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-4
-- Updating source URL.
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 11.02.00-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-3
-- Removing dependency on 'ghostscript'.
-- License verified.
+* Fri Dec 13 2024 Lukáš Zaoral <lzaoral@redhat.com> - 11.02.00-9
+- build netpbm with correct LDFLAGS (RHEL-70899)
 
-* Wed Mar 31 2021 Henry Li <lihl@microsoft.com> - 10.90.00-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove libX11-devel from build requirement
-- Apply patch to disable building and installing pamx 
+* Mon Sep 02 2024 Miroslav Suchý <msuchy@redhat.com> - 11.02.00-8
+- convert license to SPDX
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.02.00-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.02.00-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Florian Weimer <fweimer@redhat.com> - 11.02.00-5
+- GCC 14 compatibility fixes:
+  Drop netpbm-cmuwtopbm.patch to fix an out-of-bounds stack write (#2259450)
+  Stub out unused converter/other/jpeg2000/libjasper_compat.c (#2259448)
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.02.00-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 28 2023 Orion Poplawski <orion@nwra.com> - 11.02.00-3
+- Rebuild for jasper 4.1
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11.02.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Mar 27 2023 Josef Ridky <jridky@redhat.com> - 11.02.00-1
+- New upstream release 11.02.00 (#2157125)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11.01.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 02 2023 Josef Ridky <jridky@redhat.com> - 11.01.00-1
+- New upstream release 11.01.00 (#2157125)
+
+* Fri Dec 02 2022 Florian Weimer <fweimer@redhat.com> - 11.00.00-2
+- Port downstream-specific patches to C99
+
+* Tue Oct 04 2022 Josef Ridky <jridky@redhat.com> - 11.00.00-1
+- New upstream release 11.00.00 (#2130384)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 10.99.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 28 2022 Josef Ridky <jridky@redhat.com> - 10.99.00-1
+- New upstream release 10.99.00 (#2068865)
+- Use %%set_build_flags to set environment variables
+
+* Sun Feb 13 2022 Josef Ridky <jridky@redhat.com> - 10.97.00-4
+- Bump spec for new jasper
+
+* Fri Feb 11 2022 Josef Ridky <jridky@redhat.com> - 10.97.00-3
+- Rebuild for new jasper
+ 
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 10.97.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 03 2022 Josef Ridky <jridky@redhat.com> - 10.97.00-1
+- New upstream release 10.97.00 (#2035806)
+
+* Mon Oct 04 2021 Josef Ridky <jridky@redhat.com> - 10.96.00-1
+- New upstream release 10.96.00 (#2007871)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10.95.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Josef Ridky <jridky@redhat.com> - 10.95.00-1
+- New upstream release 10.95.00 (#1977974)
+
+* Wed Mar 31 2021 Josef Ridky <jridky@redhat.com> - 10.94.05-1
+- New upstream release 10.94.05 (#1943837)
+
+* Mon Jan 25 2021 Josef Ridky <jridky@redhat.com> - 10.93.00-1
+- New upstream release 10.93.00 (#1911159)
+
+* Wed Oct 07 2020 Josef Ridky <jridky@redhat.com> - 10.92.00-1
+- New upstream release 10.92.00 (#1851753)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.90.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Mar 26 2020 Josef Ridky <jridky@redhat.com> - 10.90.00-1
 - New upstream release 10.90.00 (#1817279)
@@ -1323,3 +1401,4 @@ popd
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

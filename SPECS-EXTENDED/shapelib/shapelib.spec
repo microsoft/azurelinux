@@ -1,194 +1,440 @@
-%define so_ver 2
+#global pre RC1
 
-Summary:        Library for ESRI Shapefile Handling
-Name:           shapelib
-Version:        1.5.0
-Release:        3%{?dist}
-License:        GPL-2.0-or-later AND (LGPL-2.0-or-later OR MIT) AND SUSE-Public-Domain
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Group:          Productivity/Graphics/Other
-URL:            https://shapelib.maptools.org/
-Source0:        https://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz
-# PATCH-FIX-UPSTREAM rpmlint-errors.patch -- Fix some of the rpmlint errors
-# to get package acceptable to Factory
-Patch0:         rpmlint-errors.patch
-# PATCH-Fix-UPSTREAM double free, CVE-2022-0699, https://github.com/OSGeo/shapelib/issues/39
-Patch1:         CVE-2022-0699.patch
+%if %{defined rhel} || %{defined flatpak}
+%bcond_with mingw
+%else
+%bcond_without mingw
+%endif
 
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig
-# dbfdump is also in perl-DBD-XBase
-Conflicts:      perl-DBD-XBase
+Name:          shapelib
+Version:       1.6.1
+Release:       1%{?dist}
+Summary:       C library for handling ESRI Shapefiles
+# The core library is dual-licensed LGPLv2 or MIT.
+# Some contributed files have different licenses:
+# - contrib/csv2shp.c: GPLv2+
+# - contrib/dbfinfo.c: Public domain
+# - contrib/dbfcat.c:  Public domain
+License:       (LGPL-2.0-or-later OR MIT) AND GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
+URL:           http://shapelib.maptools.org/
+Source0:       http://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre}.tar.gz
+# Man pages from debian package
+# wget https://salsa.debian.org/debian-gis-team/shapelib/-/archive/master/shapelib-master.tar.gz
+# tar --strip-components=2 -xvf shapelib-master.tar.gz shapelib-master/debian/man
+# tar -czf shapelib-man.tar.gz man/
+# rm -r man
+Source1:       %{name}-man.tar.gz
+
+BuildRequires: automake autoconf libtool
+BuildRequires: gcc-c++
+BuildRequires: make
+BuildRequires: proj-devel >= 4.4.1
+# For man pages
+BuildRequires: rubygem-ronn
+
+%if %{with mingw}
+BuildRequires: mingw32-filesystem >= 95
+BuildRequires: mingw32-gcc-c++
+BuildRequires: mingw32-binutils
+BuildRequires: mingw32-proj
+
+BuildRequires: mingw64-filesystem >= 95
+BuildRequires: mingw64-gcc-c++
+BuildRequires: mingw64-binutils
+BuildRequires: mingw64-proj
+%endif
+
 
 %description
-The Shapefile C Library provides the ability to write simple C programs for
-reading, writing and updating (to a limited extent) ESRI Shapefiles, and the
-associated attribute file (.dbf).
+The Shapefile C Library provides the ability to write
+simple C programs for reading, writing and updating (to a
+limited extent) ESRI Shapefiles, and the associated
+attribute file (.dbf).
 
-This package contains the executable programs.
 
-%package -n libshp-devel
-Summary:        Development Environment for %{name}
-Group:          Development/Libraries/C and C++
-Requires:       libshp%{so_ver} = %{version}
-Provides:       shapelib-devel = %{version}
+%package devel
+Summary:       Development files for shapelib
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
-%description -n libshp-devel
-The Shapefile C Library provides the ability to write simple C programs for
-reading, writing and updating (to a limited extent) ESRI Shapefiles, and the
-associated attribute file (.dbf).
+%description devel
+This package contains libshp and the appropriate header files.
 
-This package contains the development environment for shapelib project.
 
-%package -n libshp%{so_ver}
-Summary:        Library for ESRI Shapefile Handling
-Group:          System/Libraries
+%package tools
+Summary:       shapelib utility programs
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
-%description -n libshp%{so_ver}
-The Shapefile C Library provides the ability to write simple C programs for
-reading, writing and updating (to a limited extent) ESRI Shapefiles, and the
-associated attribute file (.dbf).
+%description tools
+This package contains various utility programs distributed with shapelib.
 
-This package contains the dynamic link library for shapelib project.
+
+%if %{with mingw}
+%package -n mingw32-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+
+%description -n mingw32-%{name}
+%{summary}.
+
+
+%package -n mingw32-%{name}-static
+Summary:       Static version of the  MinGW Windows %{name} library
+Requires:      mingw32-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw32-%{name}-static
+%{summary}.
+
+
+%package -n mingw32-%{name}-tools
+Summary:       Tools for the  MinGW Windows %{name} library
+Requires:      mingw32-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw32-%{name}-tools
+%{summary}.
+
+
+%package -n mingw64-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+
+%description -n mingw64-%{name}
+%{summary}.
+
+
+%package -n mingw64-%{name}-static
+Summary:       Static version of the  MinGW Windows %{name} library
+Requires:      mingw64-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw64-%{name}-static
+%{summary}.
+
+
+%package -n mingw64-%{name}-tools
+Summary:       Tools for the  MinGW Windows %{name} library
+Requires:      mingw64-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw64-%{name}-tools
+%{summary}.
+%endif
+
+
+%{?mingw_debug_package}
+
 
 %prep
-%autosetup -p1
+%autosetup -p1 -a1
 
-# Fix rpmlint warning "wrong-file-end-of-line-encoding"
-sed -i 's/\r$//' contrib/doc/shpsort.txt
 
 %build
-%configure \
-  --disable-static \
-  --disable-silent-rules
+# Kill rpath
+autoreconf -ifv
+
+# Native build
+mkdir build_native
+pushd build_native
+%define _configure ../configure
+%configure --disable-static
 %make_build
+popd
+
+%if %{with mingw}
+# MinGW build
+%mingw_configure
+%mingw_make_build
+%endif
+
 
 %install
-%make_install
+%make_install -C build_native
+%if %{with mingw}
+%mingw_make_install
+%endif
 
-# Remove libtool config files
-find %{buildroot} -type f -name "*.la" -delete -print
+# Remove static libraries
+find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
-%check
-# Contrib tests fail
-%make_build check ||:
+# Build man pages
+ronn -r --date="$(LC_ALL=C date -u "+%Y-%m-%d")" --manual=%{name} man/*.md
+mkdir -p %{buildroot}%{_mandir}/man1/
+install -pm 0644 man/*.1 %{buildroot}%{_mandir}/man1/
 
-%post -n libshp%{so_ver} -p /sbin/ldconfig
-%postun -n libshp%{so_ver} -p /sbin/ldconfig
+
+%{?mingw_debug_install_post}
+
 
 %files
-%license COPYING
-%doc ChangeLog
-%doc contrib/doc/ web/
-%{_bindir}/Shape_PointInPoly
-%{_bindir}/dbfadd
-%{_bindir}/dbfcat
-%{_bindir}/dbfcreate
-%{_bindir}/dbfdump
-%{_bindir}/dbfinfo
-%{_bindir}/shpadd
-%{_bindir}/shpcat
-%{_bindir}/shpcentrd
-%{_bindir}/shpcreate
-%{_bindir}/shpdata
-%{_bindir}/shpdump
-%{_bindir}/shpdxf
-%{_bindir}/shpfix
-%{_bindir}/shpinfo
-%{_bindir}/shprewind
-%{_bindir}/shpsort
-%{_bindir}/shptreedump
-%{_bindir}/shputils
-%{_bindir}/shpwkb
+%doc README README.tree ChangeLog web/*.html
+%license LICENSE*
+%{_libdir}/libshp.so.4*
 
-%files -n libshp-devel
-%{_includedir}/*
-%{_libdir}/pkgconfig/shapelib.pc
+%files devel
+%{_includedir}/shapefil.h
 %{_libdir}/libshp.so
+%{_libdir}/pkgconfig/%{name}.pc
 
-%files -n libshp%{so_ver}
-%{_libdir}/libshp.so.%{so_ver}*
+%files tools
+%doc contrib/doc/
+%{_bindir}/*
+%{_mandir}/man1/*.1*
+
+%if %{with mingw}
+%files -n mingw32-%{name}
+%license LICENSE*
+%{mingw32_bindir}/libshp-4.dll
+%{mingw32_includedir}/shapefil.h
+%{mingw32_libdir}/libshp.dll.a
+%{mingw32_libdir}/pkgconfig/shapelib.pc
+
+%files -n mingw32-%{name}-static
+%{mingw32_libdir}/libshp.a
+
+%files -n mingw32-%{name}-tools
+%{mingw32_bindir}/*.exe
+
+%files -n mingw64-%{name}
+%license LICENSE*
+%{mingw64_bindir}/libshp-4.dll
+%{mingw64_includedir}/shapefil.h
+%{mingw64_libdir}/libshp.dll.a
+%{mingw64_libdir}/pkgconfig/shapelib.pc
+
+%files -n mingw64-%{name}-static
+%{mingw64_libdir}/libshp.a
+
+%files -n mingw64-%{name}-tools
+%{mingw64_bindir}/*.exe
+%endif
+
 
 %changelog
-* Sun Aug 20 2023 Archana Choudhary <archana1@microsoft.com> - 1.5.0-3
-- Update 'Release' tag format to '[number]%{?dist}'
+* Wed Aug 14 2024 Sandro Mani <manisandro@gmail.com> - 1.6.1-1
+- Update to 1.6.1
 
-* Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 1.5.0-2.7
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- License verified
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Feb 21 2022 Dirk Stoecker <opensuse@dstoecker.de>
-- fix CVE-2022-0699, patch c75b9281a5b9452d92e1682bdfe6019a13ed819f.diff
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Sat Mar 30 2019 Atri Bhattacharya <badshah400@gmail.com>
-- Update to version 1.5.0:
-  * shpopen.c: resync with GDAL internal shapelib to avoid being
-    dependent on correctness of file size field in .shp. Fixes
-    https://lists.osgeo.org/pipermail/gdal-dev/2018-October/049218.html
-  * contrib/shpgeo.h/.c: Remove PROJ.4 dependency and
-    functionality, causing removal of SHPProject(),
-    SHPSetProjection() and SHPFreeProjection()
-  * contrib/shpproj.c: removed
-    shpopen.c, dbfopen.c, shptree.c, sbnsearch.c: resyc with GDAL
-    internal shapelib. Mostly to allow building those files as C++
-    without warning. Also add FTDate entry in DBFFieldType (see
-    https://github.com/OSGeo/gdal/pull/308). And some other code
-    cleanups
-  * dbfopen.c: fix a bug where the end of file character was
-    written on top of the first character of the first field name
-    when deleting a field on a .dbf without records.  Fixes
-    https://github.com/OSGeo/gdal/issues/863
-  * safileio.c: remove duplicate test. Patch by Jaroslav Fojtik.
-    Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2744
-- Rebase rpmlint-errors.patch for current version.
-- Drop proj4 Requires and BuildRequires: functionality dropped by
-  upstream.
+* Fri Dec 22 2023 Sandro Mani <manisandro@gmail.com> - 1.6.0-1
+- Update to 1.6.0
 
-* Wed Jul 25 2018 mpluskal@suse.com
-- Update to version 1.4.1:
-  * See ChangeLog for details
-- Drop no longer needed patches:
-  * shapelib_autotools.patch
-  * shapelib_backports.patch
-- Refresh rpmlint-errors.patch
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
-* Fri May 29 2015 tchvatal@suse.com
-- Add patch to fix bunch of rpmlint errors:
-  * rpmlint-errors.patch
-- Refresh autotools patch to actually pass the testsuite:
-  * shapelib_autotools.patch
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
-* Thu May 28 2015 dgutu@suse.com
-- Re-enabled the post build check now everything fails because of
-  coding issues
-- This needs to be fixed not hidden
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
-* Wed May 27 2015 dgutu@suse.com
-- Called spec-cleaner against spec file
+* Fri Mar 25 2022 Sandro Mani <manisandro@gmail.com> - 1.5.0-13
+- Rebuild with mingw-gcc-12
 
-* Wed May 28 2014 asterios.dramis@gmail.com
-- Update to version 1.3.0:
-  * See ChangeLog for details.
-- Corrected the Name: entry in the spec file from libshp1 to shapelib (same as
-  spec file name and package name).
-- Changed License to "(LGPL-2.0+ or MIT) and GPL-2.0+ and SUSE-Public-Domain".
-- Removed shapelib-endian-destdir-combined.diff and shapelib-fix-contrib.diff
-  patches (not needed anymore).
-- Added two patches (taken from Fedora):
-  * shapelib_autotools.patch (Use autotools)
-  * shapelib_backports.patch (Backport some fixes from the gdal bundled
-    shapelib)
-- Removed gcc and make build requirements (not needed).
-- Added gcc-c++ and pkg-config build requirements.
+* Wed Mar 02 2022 Sandro Mani <manisandro@gmail.com> - 1.5.0-12
+- Backport fix for CVE-2022-0699
 
-* Tue Apr  2 2013 opensuse@dstoecker.de
-- fix license
+* Thu Feb 24 2022 Sandro Mani <manisandro@gmail.com> - 1.5.0-11
+- Make mingw subpackages noarch
 
-* Mon Jul 21 2008 Dirk Stöcker <opensuse@dstoecker.de>
-- some BuildService and rpmlint fixes
-  Wed Jan 11 00:00:00 UTC 2006 Pascal Bleser
-- added fixing of libshp.la file ("installed=no" -> "installed=yes")
-  Wed Jan 11 00:00:00 UTC 2006 Pascal Bleser
-- new package
+* Thu Feb 24 2022 Sandro Mani <manisandro@gmail.com> - 1.5.0-10
+- Make mingw subpackages noarch
+
+* Thu Feb 24 2022 Sandro Mani <manisandro@gmail.com> - 1.5.0-9
+- Add mingw subpackage
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Fri Mar 01 2019 Sandro Mani <manisandro@gmail.com> - 1.5.0-1
+- Update to 1.5.0
+
+* Thu Feb 14 2019 Björn Esser <besser82@fedoraproject.org> - 1.4.1-7
+- rebuilt (proj)
+
+* Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Mon Aug 20 2018 Sandro Mani <manisandro@gmail.com> - 1.4.1-5
+- Add man pages (#1619071)
+
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Wed Mar 07 2018 Sandro Mani <manisandro@gmail.com> - 1.4.1-3
+- BR: gcc-c++
+
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Thu Sep 14 2017 Sandro Mani <manisandro@gmail.com> - 1.4.1-1
+- Update to 1.4.1
+
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Wed Jan 25 2017 Sandro Mani <manisandro@gmail.com> - 1.4.0-2
+- Rebuild (proj)
+
+* Sun Dec 11 2016 Sandro Mani <manisandro@gmail.com> - 1.4.0-1
+- Update to 1.4.0
+
+* Wed Dec 07 2016 Sandro Mani <manisandro@gmail.com> - 1.4.0-0.1.RC1
+- Update to 1.4.0-RC1
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0f-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0f-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 1.3.0f-7
+- Rebuilt for GCC 5 C++11 ABI change
+
+* Thu Mar 12 2015 Sandro Mani <manisandro@gmail.com> - 1.3.0f-5
+- Rebuild (proj)
+
+* Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0f-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0f-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Sun Apr 06 2014 Sandro Mani <manisandro@gmail.com> - 1.3.0f-3
+- Backport some fixes from the gdal bundled shapelib
+
+* Thu Aug 08 2013 Sandro Mani <manisandro@gmail.com> - 1.3.0f-2
+- Add missing licenses
+
+* Mon Aug 05 2013 Sandro Mani <manisandro@gmail.com> - 1.3.0f-1
+- Update to 1.3.0 final
+
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0b2-10.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0b2-9.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0b2-8.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Thu Apr 21 2011 Karsten Hopp <karsten@redhat.com> 1.3.0b2-7.1
+- remove endian definition from Makefile, leave it to endian.h
+
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0b2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Wed May 19 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b2-6
+- update to latest upstream beta
+
+* Tue Mar 09 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b1-5
+- update to latest upstream version
+
+* Fri Feb 19 2010 Lucian Langa <cooly@gnome.eu.org> - 1.2.10-2.20100216cvs
+- update patch0-3 fix undefined symbols
+
+* Tue Feb 16 2010 Lucian Langa <cooly@gnome.eu.org> - 1.2.10-1.20100216cvs
+- revert to latest cvs snapshot
+
+* Thu Feb 04 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b1-4
+- misc cleanups
+
+* Thu Feb 04 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b1-3
+- do not package static libfiles (#556094)
+
+* Thu Jan 07 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b1-2
+- fix patch2 - no not depend on gdal
+
+* Thu Jan 07 2010 Lucian Langa <cooly@gnome.eu.org> - 1.3.0b1-1
+- misc cleanups
+- update BR
+- fix source0
+- update to latest upstream snapshot
+
+* Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.10-20.20060304cvs
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.10-19.20060304cvs
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Thu Sep  4 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.2.10-18.20060304cvs
+- fix patch application
+
+* Thu Sep  4 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.2.10-17.20060304cvs
+- fix license tag
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.2.10-16.20060304cvs
+- Autorebuild for GCC 4.3
+
+* Sun Oct  21 2007 Shawn McCann <mccann0011@hotmail.com> - 1.2.10-15.20060304cvs
+- Fix for bug 339931
+
+* Sat Sep  16 2006 Shawn McCann <mccann0011@hotmail.com> - 1.2.10-12.20060304cvs
+- Rebuild for FC6
+
+* Sun Mar  5 2006 Shawn McCann <mccann0011@hotmail.com> - 1.2.10-11.20060304cvs
+- Fixed a makefile bug that messed up parallel builds
+
+* Sat Mar  4 2006 Shawn McCann <mccann0011@hotmail.com> - 1.2.10-10.20060304cvs
+- Upgraded to cvs snapshot taken on March 4, 2006
+
+* Sat Mar  4 2006 Shawn McCann <mccann0011@hotmail.com> - 1.2.10-9
+- Rebuild for Fedora Extras 5
+
+* Mon Apr 11 2005 Michael Schwendt <mschwendt[AT]users.sf.net> - 1.2.10-8
+- Fix "invalid lvalue in assignment" for GCC4.
+
+* Fri Apr  8 2005 Michael Schwendt <mschwendt[AT]users.sf.net>
+- rebuilt
+
+* Sun Feb 13 2005 David Woodhouse <dwmw2@infradead.org> 0:1.2.10-6
+- Don't hard-code endianness; just use endian.h
+
+* Wed Dec 15 2004 David M. Kaplan <dmk@erizo.ucdavis.edu> 0:1.2.10-5
+- Patched patch and spec file according to suggestions of Michael Schwendt
+- In particular, this separates the building from the installing in the rpm.
+
+* Thu Aug 12 2004 David M. Kaplan <dmk@erizo.ucdavis.edu> 0:1.2.10-0.fdr.4
+- Moved RPM_OPT_FLAGS out of make files.
+- Removed backup files from patch.
+- Made sure that make was using the appropriate libdir.
+
+* Mon Dec 22 2003 David M. Kaplan <dmk@erizo.ucdavis.edu> 0:1.2.10-0.fdr.3
+- Added url tag, changed copyright to license and changed permissions on patch file.
+
+* Mon Dec 22 2003 David M. Kaplan <dmk@erizo.ucdavis.edu> 0:1.2.10-0.fdr.2
+- Add source URL
+- Removed proj requirement as it is automatically detected.
+- Added epoch to proj-devel requirement
+- Fixed post and postun
+- Changed group to Development/Libraries, although this appears to be only
+  somewhat satisfactory.
+- Removed "which make"
+
+* Wed Nov  5 2003 David M. Kaplan <dmk@erizo.ucdavis.edu> 0:1.2.10-0.fdr.1
+- Updated to 1.2.10 release
+- Major changes to spec for Fedora
+- Changes to Makefile patch for Fedora
+- Split off devel package

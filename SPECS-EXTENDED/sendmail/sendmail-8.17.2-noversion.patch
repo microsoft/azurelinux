@@ -1,0 +1,13 @@
+diff --git a/sendmail/helpfile b/sendmail/helpfile
+index 315cb0b..d47e4c5 100644
+--- a/sendmail/helpfile
++++ b/sendmail/helpfile
+@@ -11,7 +11,7 @@ cpyr	By using this file, you agree to the terms and conditions set
+ cpyr	forth in the LICENSE file which can be found at the top level of
+ cpyr	the sendmail distribution.
+ cpyr
+-smtp	This is sendmail version $v
++smtp	This is sendmail
+ smtp	Topics:
+ smtp		HELO	EHLO	MAIL	RCPT	DATA
+ smtp		RSET	NOOP	QUIT	HELP	VRFY

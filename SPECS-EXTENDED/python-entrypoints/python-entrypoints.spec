@@ -1,30 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname entrypoints
 %global sum Discover and load entry points from installed packages
-
-%global python3_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
 
 Name:		python-%{srcname}
 
 # WARNING: Check if an update does not break flake8!
-Version:	0.3
-
-Release:	6%{?dist}
+Version:	0.4
+Release:	5%{?dist}
 Summary:	%{sum}
-
-# license clarification issue opened upstream
-# https://github.com/takluyver/entrypoints/issues/10
-
+# SPDX
 License:	MIT
 
 URL:		https://entrypoints.readthedocs.io/
-Source0:	https://github.com/takluyver/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source0:	https://github.com/takluyver/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:	noarch
+BuildRequires: make
 BuildRequires:	python3-devel
-BuildRequires:	python3-pip
-BuildRequires:	python3-flit
 BuildRequires:	python3-sphinx
 
 %description
@@ -36,7 +27,6 @@ The entrypoints module contains functions to find and load entry points.
 
 %package -n python3-%{srcname}
 Summary:	%{sum}
-%{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
 Entry points are a way for Python packages to advertise objects with some
@@ -52,11 +42,15 @@ Summary:	Documentation for python-entrypoints
 Documentation files for python-entrypoints
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version} -p1
+
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 
 %build
-XDG_CACHE_HOME=$PWD/.cache FLIT_NO_NETWORK=1 flit build --format wheel
+%pyproject_wheel
 
 pushd doc
 make html PYTHON="%{__python3}" SPHINXBUILD=sphinx-build-%{python3_version}
@@ -65,22 +59,80 @@ popd
 
 
 %install
-%py3_install_wheel %python3_wheelname
+%pyproject_install
+%pyproject_save_files %{srcname}
 
-%files -n python3-%{srcname}
+
+%check
+%pyproject_check_import
+
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %doc doc/_build/html
 %license LICENSE
-%{python3_sitelib}/__pycache__/*
-%{python3_sitelib}/*.py
-%{python3_sitelib}/%{srcname}-%{version}.dist-info
 
 %files -n python-%{srcname}-doc
 %doc doc/_build/html
 %license LICENSE
 
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.4-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 16 2023 Lumír Balhar <lbalhar@redhat.com> - 0.4-1
+- Update to 0.4 (rhbz#2049921)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 0.3-17
+- Rebuilt for Python 3.12
+
+* Mon May 15 2023 Miro Hrončok <mhroncok@redhat.com> - 0.3-16
+- Use flit-core to build this package, instead of flit
+
+* Mon Feb 13 2023 Miro Hrončok <mhroncok@redhat.com>
+- Convert to pyproject-rpm-macros
+- The INSTALLER file now says "rpm" instead of "pip"
+- Run basic import check during the build
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.3-12
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-10
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.3-9
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 0.3-6
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

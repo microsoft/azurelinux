@@ -1,0 +1,13 @@
+diff --git v4l-utils-1.26.1/utils/v4l2-dbg/meson.build~ v4l-utils-1.26.1/utils/v4l2-dbg/meson.build
+index c23bf8f351..bfbc10c616 100644
+--- v4l-utils-1.26.1/utils/v4l2-dbg/meson.build~
++++ v4l-utils-1.26.1/utils/v4l2-dbg/meson.build
+@@ -13,7 +13,7 @@ v4l2_dbg_sources = files(
+ v4l2_dbg = executable('v4l2-dbg',
+                       v4l2_dbg_sources,
+                       install : true,
+-                      install_dir : 'sbin',
++                      install_dir : get_option('sbindir'),
+                       include_directories : [
+                           v4l2_utils_incdir,
+                           utils_common_incdir,

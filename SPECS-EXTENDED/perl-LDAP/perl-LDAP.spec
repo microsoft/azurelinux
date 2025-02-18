@@ -1,35 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Perform optional tests
-%bcond_with perl_LDAP_enables_optional_test
 # Support XML serialization of LDAP schemata (DSML languge)
 %if 0%{?rhel}
+%bcond_with perl_LDAP_enables_optional_test
 %bcond_with perl_LDAP_enables_xml
 %else
+%bcond_without perl_LDAP_enables_optional_test
 %bcond_without perl_LDAP_enables_xml
 %endif
 
 Name:           perl-LDAP
-Version:        0.66
-Release:        10%{?dist}
+Version:        0.68
+Release:        14%{?dist}
+Epoch:          1
 Summary:        LDAP Perl module
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/perl-ldap
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MARSCHAP/perl-ldap-%{version}.tar.gz
-Source1:        LICENSE.PTR
 # Optional tests need to know a location of an LDAP server executable
 Patch0:         perl-ldap-0.65-Configure-usr-sbin-slapd-for-tests.patch
 # Remove an unreliable cancelling test
 Patch1:         perl-ldap-0.66-test-Remove-a-test-for-cancelling-asynchronous-calls.patch
-# Fix a shell bang in a certificate generator script,
-# <https://github.com/perl-ldap/perl-ldap/pull/55>
-Patch2:         perl-ldap-0.66-Correct-a-shell-bang-in-data-regenerate_cert.sh.patch
+# Fix resolving localhost on loopback-only machines,
+# <https://github.com/perl-ldap/perl-ldap/pull/60>, CPAN RT#104793
+Patch2:         perl-ldap-0.68-Do-not-default-IO-Socket-IP-to-AI_ADDRCONFIG-flag.patch
 BuildArch:      noarch
-BuildRequires:  perl-interpreter
+BuildRequires:  coreutils
+BuildRequires:  make
 BuildRequires:  perl-generators
-BuildRequires:  perl(FindBin)
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Config)
 BuildRequires:  perl(inc::Module::Install)
-BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::AutoInstall)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
@@ -77,7 +77,6 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  openldap-servers
 BuildRequires:  perl(LWP::UserAgent)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Authen::SASL) >= 2.00
 Requires:       perl(Convert::ASN1) >= 0.2
 Requires:       perl(IO::Socket::SSL) >= 1.26
@@ -93,6 +92,7 @@ Requires:       perl(Time::Local)
 # Remove under-specified dependencies
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(Net::LDAP::Filter\\)$
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Convert::ASN1\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(t::common.pl\\)
 
 %description
 Net::LDAP is a collection of modules that implements an LDAP services API
@@ -102,8 +102,7 @@ maintenance functions such as adding, deleting or modifying entries.
 %if %{with perl_LDAP_enables_xml}
 %package -n perl-Net-LDAP-DSML
 Summary:        DSML Writer for Net::LDAP
-Requires:       perl-LDAP = %{version}-%{release}
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl-LDAP = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl(MIME::Base64)
 Requires:       perl(Net::LDAP::Schema)
 Requires:       perl(XML::SAX::Writer)
@@ -118,38 +117,15 @@ project.
 %package tests
 Summary:        Tests for %{name}
 Requires:       coreutils
-Requires:       perl-LDAP = %{version}-%{release}
+Requires:       perl-LDAP = %{?epoch:%{epoch}:}%{version}-%{release}
 # perl-Test-Harness for "prove" command
 Requires:       perl-Test-Harness
 Requires:       perl(Convert::ASN1) >= 0.2
-Requires:       perl(File::Basename)
-Requires:       perl(File::Compare)
-Requires:       perl(File::Path)
 Requires:       perl(File::Spec)
-Requires:       perl(IO::File)
-Requires:       perl(Net::LDAP)
-Requires:       perl(Net::LDAP::ASN)
-Requires:       perl(Net::LDAP::Constant)
-Requires:       perl(Net::LDAP::Control::Assertion)
-Requires:       perl(Net::LDAP::Control::ManageDsaIT)
-Requires:       perl(Net::LDAP::Control::MatchedValues)
-Requires:       perl(Net::LDAP::Control::PostRead)
-Requires:       perl(Net::LDAP::Control::PreRead)
-Requires:       perl(Net::LDAP::Control::ProxyAuth)
-Requires:       perl(Net::LDAP::Control::Sort)
-Requires:       perl(Net::LDAP::Entry)
-Requires:       perl(Net::LDAP::Extension::Cancel)
-Requires:       perl(Net::LDAP::Filter)
-Requires:       perl(Net::LDAP::FilterMatch)
-Requires:       perl(Net::LDAP::LDIF)
-Requires:       perl(Net::LDAP::Schema)
-Requires:       perl(Net::LDAP::Util)
 Requires:       perl(Net::LDAPI)
-Requires:       perl(Test::More)
 # Prefer core Text::Soundex
 Requires:       perl(Text::Soundex)
 %if %{with perl_LDAP_enables_xml}
-Requires:       perl(Net::LDAP::DSML)
 Requires:       perl(XML::SAX::Base)
 Requires:       perl(XML::SAX::Writer)
 %endif
@@ -167,28 +143,32 @@ Tests from %{name}-%{version}. Execute them with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n perl-ldap-%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 chmod -c 644 bin/* contrib/* lib/Net/LDAP/DSML.pm
 perl -pi -e 's|^#!/usr/local/bin/perl\b|#!%{__perl}|' contrib/*
 # Remove bundled libraries
 rm -rf inc
-sed -i -e '/^inc\// d' MANIFEST
+perl -i -ne 'print $_ unless m{^inc/}' MANIFEST
 # Remove tests specific for XML support if the support is disabled
 %if !%{with perl_LDAP_enables_xml}
 rm t/05dsml.t
-sed -i -e '/^t\/05dsml\.t/ d' MANIFEST
+perl -i -ne 'print $_ unless m{^t/05dsml\.t}' MANIFEST
 %endif
 find -type f \! -name 'regenerate_cert.sh' -exec chmod -x {} +
+# Help generators to recognize Perl scripts
+for F in t/*; do
+    perl -i -MConfig -pe 's/\A#!perl\b/$Config{startperl}/' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor < /dev/null
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 < /dev/null
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 mkdir -p %{buildroot}/%{_libexecdir}/%{name}
 # FIXME: Generators should scan these non-executable files
 cp -a data t test.cfg %{buildroot}/%{_libexecdir}/%{name}
@@ -207,13 +187,10 @@ EOF
 chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
 %{_fixperms} %{buildroot}/*
 
-cp %{SOURCE1} .
-
 %check
 make test
  
 %files
-%license LICENSE.PTR
 %doc Changes CREDITS
 %doc contrib/ bin/
 %{perl_vendorlib}/Bundle/
@@ -233,15 +210,54 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.66-10
-- License verified.
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.66-9
-- Remove epoch
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 1:0.66-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Disable optional tests
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jan 24 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.68-10
+- Filter run-require perl(t::common.pl) (BZ#2163998)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.68-7
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.68-4
+- Perl 5.34 rebuild
+
+* Tue Feb 16 2021 Petr Pisar <ppisar@redhat.com> - 1:0.68-3
+- Fix resolving localhost on loopback-only machines
+  (https://github.com/perl-ldap/perl-ldap/pull/60)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.68-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 05 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.68-1
+- 0.68 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.66-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.66-8
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.66-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

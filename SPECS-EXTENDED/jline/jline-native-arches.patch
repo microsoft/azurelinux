@@ -1,0 +1,24 @@
+--- jline3-jline-parent-3.23.0/native/src/main/java/org/jline/nativ/OSInfo.java.orig	2023-03-08 12:46:17.000000000 -0700
++++ jline3-jline-parent-3.23.0/native/src/main/java/org/jline/nativ/OSInfo.java	2023-03-15 13:52:46.880225775 -0600
+@@ -46,6 +46,8 @@ public class OSInfo {
+     public static final String IA64 = "ia64";
+     public static final String PPC = "ppc";
+     public static final String PPC64 = "ppc64";
++    public static final String PPC64LE = "ppc64le";
++    public static final String S390X = "s390x";
+     public static final String ARM64 = "arm64";
+ 
+     private static final HashMap<String, String> archMapping = new HashMap<String, String>();
+@@ -87,6 +89,12 @@ public class OSInfo {
+         archMapping.put("power_pc64", PPC64);
+         archMapping.put("power_rs64", PPC64);
+ 
++        // PowerPC 64bit little endian mappings
++        archMapping.put(PPC64LE, PPC64LE);
++
++        // S390x mappings
++        archMapping.put(S390X, S390X);
++
+         archMapping.put("aarch64", ARM64);
+     }
+ 

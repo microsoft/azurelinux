@@ -1,14 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           wsmancli
-Version:        2.6.0
-Release:        13%{?dist}
-License:        BSD
+Version:        2.6.2
+Release:        4%{?dist}
+License:        BSD-3-Clause
 Url:            http://www.openwsman.org/
-Source0:        https://github.com/Openwsman/wsmancli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# You can get this tarball here:
+# https://github.com/Openwsman/wsmancli/archive/v%%{version}.tar.gz
+Source:         wsmancli-%{version}.tar.gz
 Source1:        COPYING
 Source2:        README
 Source3:        AUTHORS
+BuildRequires: make
 BuildRequires:  openwsman-devel >= 2.1.0 pkgconfig curl-devel
 BuildRequires:  autoconf automake libtool
 Requires:       openwsman curl
@@ -16,40 +17,71 @@ Patch0:         missing-pthread-symbols.patch
 Summary:        WS-Management-Command line Interface
 
 %description
-Command line interface for managing
+Command line interface for managing 
 systems using Web Services Management protocol.
 
 %prep
-%setup -q
-%patch 0 -p1
+%setup -q 
+%autopatch -p1
 cp -fp %SOURCE1 %SOURCE2 %SOURCE3 .;
 
 %build
 ./bootstrap
-%configure --disable-more-warnings
+%configure --disable-more-warnings 
 make %{?_smp_flags}
 
 %install
 make DESTDIR=%{buildroot} install
 
 %files
-%license COPYING
-%doc README AUTHORS
 %{_bindir}/wsman
 %{_bindir}/wseventmgr
 %{_mandir}/man1/wsman*
 %{_mandir}/man1/wseventmgr*
-
+%doc COPYING README AUTHORS
 
 %changelog
-* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.6.0-13
-- Update Source0
-- Improve formatting
-- Added %%license
-- License verified.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-12
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri May 19 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.2-1
+- Update to wsmancli-2.6.2
+
+* Tue Apr 25 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.0-21
+- SPDX migration
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 10 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.0-19
+- Replace obsolete getpass function
+
+* Thu Sep 08 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.0-18
+- Improve handling of HTTP 401 Unauthorized
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 09 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.0-14
+- Rebuild because of soname change in openswman
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -146,3 +178,4 @@ make DESTDIR=%{buildroot} install
 
 * Tue Sep 30 2008  <srinivas_ramanatha@dell.com> - 2.1.0-1%{?dist}
 - Modified the spec file to adhere to fedora packaging guidelines.
+

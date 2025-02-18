@@ -1,0 +1,64 @@
+diff --git a/cf/cf/Build b/cf/cf/Build
+index 9fecb79..e9a5968 100755
+--- a/cf/cf/Build
++++ b/cf/cf/Build
+@@ -18,7 +18,7 @@
+ SMROOT=${SMROOT-../..}
+ BUILDTOOLS=${BUILDTOOLS-$SMROOT/devtools}
+ 
+-M4=`sh $BUILDTOOLS/bin/find_m4.sh`
++M4=/usr/bin/m4
+ ret=$?
+ if [ $ret -ne 0 ]
+ then
+diff --git a/devtools/OS/Linux b/devtools/OS/Linux
+index bc02f82..dec3ae6 100644
+--- a/devtools/OS/Linux
++++ b/devtools/OS/Linux
+@@ -6,7 +6,7 @@ dnl	Place personal settings in devtools/Site/site.config.m4
+ define(`confDEPEND_TYPE', `CC-M')
+ define(`confCCOPTS_SO', `-fPIC')
+ define(`confSM_OS_HEADER', `sm_os_linux')
+-define(`confMANROOT', `/usr/man/man')
++define(`confMANROOT', `/usr/share/man/man')
+ define(`confLIBS', `-ldl')
+ define(`confEBINDIR', `/usr/sbin')
+ APPENDDEF(`confLIBSEARCH', `crypt nsl')
+@@ -16,6 +16,8 @@ define(`confMTCCOPTS', `-D_REENTRANT')
+ define(`confMTLDOPTS', `-lpthread')
+ define(`confLDOPTS_SO', `-shared')
+ define(`confSONAME',`-soname')
++define('confSBINGRP', 'mail')
++define('confSBINMODE', '6755')
+ 
+ ifelse(confBLDVARIANT, `DEBUG',
+ dnl Debug build
+diff --git a/makemap/makemap.8 b/makemap/makemap.8
+index 16481ef..32cda2a 100644
+--- a/makemap/makemap.8
++++ b/makemap/makemap.8
+@@ -54,12 +54,6 @@ selected using the
+ parameter.  
+ They may be
+ .TP
+-dbm
+-DBM format maps.  
+-This requires the 
+-ndbm(3) 
+-library.
+-.TP
+ btree
+ B-Tree format maps.  
+ This requires the new Berkeley DB 
+diff --git a/rmail/rmail.c b/rmail/rmail.c
+index 154d772..d556df1 100644
+--- a/rmail/rmail.c
++++ b/rmail/rmail.c
+@@ -276,7 +276,6 @@ main(argc, argv)
+ 	args[i++] = _PATH_SENDMAIL;	/* Build sendmail's argument list. */
+ 	args[i++] = "-G";		/* relay submission */
+ 	args[i++] = "-oee";		/* No errors, just status. */
+-	args[i++] = "-odq";		/* Queue it, don't try to deliver. */
+ 	args[i++] = "-oi";		/* Ignore '.' on a line by itself. */
+ 
+ 	/* set from system and protocol used */

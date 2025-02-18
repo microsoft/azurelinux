@@ -1,19 +1,17 @@
 Summary:        Generic IMAP server compliancy tester
 Name:           imaptest
 # Upstream is not really planning on adding version numbers
-Version:        20210511
-Release:        1%{?dist}
+Version:        20210705
+Release:        8%{?dist}
 License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            https://www.imapwiki.org/ImapTest
 Source0:        https://dovecot.org/nightly/%{name}/%{name}-%{version}.tar.gz
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  dovecot-devel >= 2.3.15
-BuildRequires:  gcc
-BuildRequires:  libtool
-BuildRequires:  make
+BuildRequires:  gcc, make, dovecot-devel >= 2.3.15
+BuildRequires:  autoconf, automake, libtool
+# dovecot-devel.i686 was removed with dovecot-2.3.21-7.fc41
+%if 0%{?fedora} > 40 || 0%{?rhel} > 9
+ExcludeArch:    %{ix86}
+%endif
 
 %description
 ImapTest is a generic IMAP server compliancy tester that works with all IMAP
@@ -40,11 +38,11 @@ sed -e 's@\(^LIBDOVECOT .*\)@\1 -Wl,-rpath -Wl,%{_libdir}/dovecot@' -i src/Makef
 %make_install
 
 # Copy test files for later shipping
-mkdir -p %{buildroot}%{_datadir}/%{name}/
-cp -pr src/tests/ %{buildroot}%{_datadir}/%{name}/
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/
+cp -pr src/tests/ $RPM_BUILD_ROOT%{_datadir}/%{name}/
 
 %check
-%{buildroot}%{_bindir}/%{name} --help
+$RPM_BUILD_ROOT%{_bindir}/%{name} --help
 
 %files
 %license COPYING COPYING.MIT
@@ -53,12 +51,35 @@ cp -pr src/tests/ %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/
 
 %changelog
-* Thu Sep 14 2023 Archana Choudhary <archana1@microsoft.com> - 20210511-1
-- Upgrade to 20210511 to support dovecot>=2.3.15
-- License verified
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20210305-2
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210705-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 09 2021 Robert Scheck <robert@fedoraproject.org> 20210705-1
+- Upgrade to 20210705 (#1940745)
+
+* Fri Jul 23 2021 Robert Scheck <robert@fedoraproject.org> 20210319-1
+- Upgrade to 20210319 (#1940745)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210305-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
 * Sat Mar 06 2021 Robert Scheck <robert@fedoraproject.org> 20210305-1
 - Upgrade to 20210305 (#1935535)

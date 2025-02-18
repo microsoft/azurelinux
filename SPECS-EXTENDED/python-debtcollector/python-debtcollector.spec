@@ -1,14 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# Macros for py2/py3 compatibility
-%global pyver %{python3_pkgversion}
-%global pyver_bin python%{pyver}
-%global pyver_sitelib %{expand:%{python%{pyver}_sitelib}}
-%global pyver_install %{expand:%{py%{pyver}_install}}
-%global pyver_build %{expand:%{py%{pyver}_build}}
-# End of macros for py2/py3 compatibility
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 4;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+%{!?sources_gpg: %{!?dlrn:%global sources_gpg 1} }
+%global sources_gpg_sign 0x2ef3fe0ec2b075ab7458b5f8b702b20b13df2318
 
 %{!?upstream_version: %global upstream_version %{version}%{?milestone}}
+# we are excluding some BRs from automatic generator
+%global excluded_brs doc8 bandit pre-commit hacking flake8-import-order
 
 %global pypi_name debtcollector
 %global with_doc 1
@@ -21,35 +26,38 @@ It is a collection of functions/decorators which is used to signal a user when \
 * further customizing the emitted messages
 
 Name:        python-%{pypi_name}
-Version:     1.22.0
-Release:     4%{?dist}
+Version:     3.0.0
+Release:     %autorelease
 Summary:     A collection of Python deprecation patterns and strategies
 
-License:     ASL 2.0
+License:     Apache-2.0
 URL:         https://pypi.python.org/pypi/%{pypi_name}
-Source0:     https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz#/python-%{pypi_name}-%{upstream_version}.tar.gz
+Source0:     https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+Source101:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz.asc
+Source102:        https://releases.openstack.org/_static/%{sources_gpg_sign}.txt
+%endif
 
 BuildArch:   noarch
 
-BuildRequires: git
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+BuildRequires:  /usr/bin/gpgv2
+%endif
+
+BuildRequires: git-core
 
 %description
 %{common_desc}
 
-%package -n python%{pyver}-%{pypi_name}
+%package -n python3-%{pypi_name}
 Summary:     A collection of Python deprecation patterns and strategies
-%{?python_provide:%python_provide python%{pyver}-%{pypi_name}}
 
-BuildRequires: python%{pyver}-devel
-BuildRequires: python%{pyver}-setuptools
-BuildRequires: python%{pyver}-pbr
+BuildRequires: python3-devel
+BuildRequires: pyproject-rpm-macros
 
-Requires:    python%{pyver}-funcsigs
-Requires:    python%{pyver}-pbr
-Requires:    python%{pyver}-six
-Requires:    python%{pyver}-wrapt
-
-%description -n python%{pyver}-%{pypi_name}
+%description -n python3-%{pypi_name}
 %{common_desc}
 
 
@@ -57,42 +65,60 @@ Requires:    python%{pyver}-wrapt
 %package -n python-%{pypi_name}-doc
 Summary:        Documentation for the debtcollector module
 
-BuildRequires:  python%{pyver}-sphinx
-BuildRequires:  python%{pyver}-openstackdocstheme
-BuildRequires:  python%{pyver}-fixtures
-BuildRequires:  python%{pyver}-six
-BuildRequires:  python%{pyver}-wrapt
-
 %description -n python-%{pypi_name}-doc
 Documentation for the debtcollector module
 %endif
 
-
 %prep
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+%{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
+%endif
 %autosetup -n %{pypi_name}-%{upstream_version} -S git
 
-# let RPM handle deps
-rm -rf *requirements.txt
+
+sed -i /^[[:space:]]*-c{env:.*_CONSTRAINTS_FILE.*/d tox.ini
+sed -i "s/^deps = -c{env:.*_CONSTRAINTS_FILE.*/deps =/" tox.ini
+sed -i /^minversion.*/d tox.ini
+sed -i /^requires.*virtualenv.*/d tox.ini
+
+# Exclude some bad-known BRs
+for pkg in %{excluded_brs};do
+  for reqfile in doc/requirements.txt test-requirements.txt; do
+    if [ -f $reqfile ]; then
+      sed -i /^${pkg}.*/d $reqfile
+    fi
+  done
+done
+
+# Automatic BR generation
+%generate_buildrequires
+%if 0%{?with_doc}
+  %pyproject_buildrequires -t -e %{default_toxenv},docs
+%else
+  %pyproject_buildrequires -t -e %{default_toxenv}
+%endif
 
 %build
-%{pyver_build}
+%pyproject_wheel
+
+%install
+%pyproject_install
 
 %if 0%{?with_doc}
 # doc
-%{pyver_bin} setup.py build_sphinx -b html
+PYTHONPATH="%{buildroot}/%{python3_sitelib}"
+%tox -e docs
 # Fix hidden-file-or-dir warnings
-rm -fr doc/build/html/.buildinfo
+rm -fr doc/build/html/.{doctrees,buildinfo}
 %endif
 
-%install
-%{pyver_install}
-
-%files -n python%{pyver}-%{pypi_name}
+%files -n python3-%{pypi_name}
 %doc README.rst CONTRIBUTING.rst
 %license LICENSE
-%{pyver_sitelib}/%{pypi_name}
-%{pyver_sitelib}/%{pypi_name}*.egg-info
-%exclude %{pyver_sitelib}/%{pypi_name}/tests
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}*.dist-info
+%exclude %{python3_sitelib}/%{pypi_name}/tests
 
 %if 0%{?with_doc}
 %files -n python-%{pypi_name}-doc
@@ -101,8 +127,70 @@ rm -fr doc/build/html/.buildinfo
 %endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+## START: Generated by rpmautospec
+* Fri Nov 29 2024 Tim Semeijn <tim@semeijn.net> - 3.0.0-4
+- Use autorelease and autochangelog (current version fixes rhbz#1214707)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 3.0.0-2
+- Rebuilt for Python 3.13
+
+* Mon May 06 2024 Alfredo Moralejo <amoralej@redhat.com> 3.0.0-1
+- Update to upstream version 3.0.0
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 2.5.0-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jun 16 2022 Python Maint <python-maint@redhat.com> - 2.5.0-2
+- Rebuilt for Python 3.11
+
+* Thu May 19 2022 Joel Capitao <jcapitao@redhat.com> 2.5.0-1
+- Update to upstream version 2.5.0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.2.0-5
+- Rebuilt for Python 3.10
+
+* Wed Feb 10 2021 Charalampos Stratakis <cstratak@redhat.com> - 2.2.0-4
+- Remove redundant python-funcsigs dependency
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Oct 28 2020 Alfredo Moralejo <amoralej@redhat.com> 2.2.0-2
+- Update to upstream version 2.2.0
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jun 03 2020 Joel Capitao <jcapitao@redhat.com> 2.0.1-1
+- Update to upstream version 2.0.1
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.22.0-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -122,3 +210,53 @@ rm -fr doc/build/html/.buildinfo
 * Fri Mar 08 2019 RDO <dev@lists.rdoproject.org> 1.21.0-1
 - Update to 1.21.0
 
+* Tue Feb 07 2017 Alfredo Moralejo <amoralej@redhat.com> 1.11.0-1
+- Update to 1.11.0
+
+* Mon Dec 19 2016 Miro Hrončok <mhroncok@redhat.com> - 1.8.0-2
+- Rebuild for Python 3.6
+
+* Fri Sep 02 2016 Haikel Guemar <hguemar@fedoraproject.org> 1.8.0-1
+- Update to 1.8.0
+
+* Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0-2
+- https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
+
+* Fri Mar 18 2016 Haikel Guemar <hguemar@fedoraproject.org> 1.3.0-1
+- Update to 1.3.0
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Tue Nov 10 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Changes/python3.5
+
+* Fri Sep 18 2015 Alan Pevec <alan.pevec@redhat.com> 0.8.0-1
+- Update to upstream 0.8.0
+
+* Mon Sep 07 2015 Chandan Kumar <chkumar246@gmail.com> 0.7.0-3
+- Fixed obseletes
+- Fixed package namespaces
+
+* Wed Sep 02 2015 Chandan Kumar <chkumar246@gmail.com> 0.7.0-2
+- Added python 2 and python 3 subpackage
+
+* Wed Aug 05 2015 Alan Pevec <alan.pevec@redhat.com> 0.7.0-1
+- Update to upstream 0.7.0
+
+* Sun Jun 28 2015 Alan Pevec <alan.pevec@redhat.com> 0.5.0-1
+- Update to upstream 0.5.0
+
+* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Fri Mar 27 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-3
+- Fixed jquery doc issues
+
+* Wed Mar 25 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-2
+- Fixed doc and license macro in spec file
+
+* Tue Mar 10 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-1
+- Initial Package
+
+## END: Generated by rpmautospec

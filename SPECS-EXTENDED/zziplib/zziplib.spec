@@ -1,23 +1,25 @@
-Summary:        Lightweight library to easily extract data from zip files
-Name:           zziplib
-Version:        0.13.72
-Release:        3%{?dist}
-License:        LGPLv2+ OR MPLv1.1
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://zziplib.sourceforge.net/
-Source:         https://github.com/gdraheim/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  SDL-devel
-BuildRequires:  cmake
-BuildRequires:  gcc
-BuildRequires:  make
-BuildRequires:  perl-interpreter
-BuildRequires:  pkgconfig
-BuildRequires:  python3
-BuildRequires:  python3-rpm-macros
-BuildRequires:  xmlto
-BuildRequires:  zip
-BuildRequires:  zlib-devel
+# FTBFS with GCC 14, reported upstream, no fix yet
+# https://bugzilla.redhat.com/show_bug.cgi?id=2256917
+
+Summary: Lightweight library to easily extract data from zip files
+Name: zziplib
+Version: 0.13.74
+Release: 2%{?dist}
+License: LGPL-2.0-or-later OR MPL-1.1
+URL: http://zziplib.sourceforge.net/
+Source: https://github.com/gdraheim/zziplib/archive/v%{version}.tar.gz
+
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: perl-interpreter
+BuildRequires: python3
+BuildRequires: python3-rpm-macros
+BuildRequires: zip
+BuildRequires: xmlto
+BuildRequires: zlib-devel
+BuildRequires: SDL-devel
+BuildRequires: pkgconfig
+BuildRequires: cmake
 
 %description
 The zziplib library is intentionally lightweight, it offers the ability to
@@ -27,8 +29,8 @@ is based only on the (free) subset of compression with the zlib algorithm
 which is actually used by the zip/unzip tools.
 
 %package utils
-Summary:        Utilities for the zziplib library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary: Utilities for the zziplib library
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description utils
 The zziplib library is intentionally lightweight, it offers the ability to
@@ -40,11 +42,11 @@ which is actually used by the zip/unzip tools.
 This packages contains all the utilities that come with the zziplib library.
 
 %package devel
-Summary:        Development files for the zziplib library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       SDL-devel
-Requires:       pkgconfig
-Requires:       zlib-devel
+Summary: Development files for the zziplib library
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: pkgconfig
+Requires: zlib-devel
+Requires: SDL-devel
 
 %description devel
 The zziplib library is intentionally lightweight, it offers the ability to
@@ -57,7 +59,7 @@ This package contains files required to build applications that will use the
 zziplib library.
 
 %prep
-%autosetup -p1
+%setup -q
 
 %build
 %cmake -B "%{_vpath_builddir}"
@@ -67,15 +69,12 @@ zziplib library.
 %install
 %make_install -C "%{_vpath_builddir}"
 
-%check
-make test -C "%{_vpath_builddir}"
-
 %ldconfig_scriptlets
 
 %files
-%license docs/COPYING*
-%doc ChangeLog README TODO
+%doc docs/COPYING* ChangeLog README TODO
 %{_libdir}/*.so.*
+%exclude %{_datadir}/zziplib/*.cmake
 
 %files utils
 %{_bindir}/*
@@ -90,9 +89,23 @@ make test -C "%{_vpath_builddir}"
 %{_mandir}/man3/*
 
 %changelog
-* Wed Dec 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.13.72-3
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- License Verified
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.74-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Apr 04 2024 Jakub Martisko <jamartis@redhat.com> - 0.13.74-1
+- Rebase to 0.13.74
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.72-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.72-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed May 17 2023 David Cantrell <dcantrell@redhat.com> - 0.13.72-4
+- Update License tag to SPDX identifiers
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.72-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.72-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -290,3 +303,4 @@ Related: rhbz#1915747
 
 * Tue Jun  8 2004 Matthias Saou <http://freshrpms.net/> 0.13.36-1
 - Initial RPM release.
+

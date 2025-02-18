@@ -6,12 +6,10 @@
 %endif
 
 Name:		perl-Perl-Critic
-Version:	1.138
-Release:	3%{?dist}
+Version:	1.152
+Release:	5%{?dist}
 Summary:	Critique Perl source code for best-practices
-License:	GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Perl-Critic
 Source0:	https://cpan.metacpan.org/modules/by-module/Perl/Perl-Critic-%{version}.tar.gz
 Patch0:		0001-Change-default-spell-check-tool-from-aspell-to-hunsp.patch
@@ -23,15 +21,15 @@ BuildRequires:	coreutils
 BuildRequires:	findutils
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
+BuildRequires:	perl(Fatal)
 BuildRequires:	perl(lib)
 BuildRequires:	perl(Module::Build) >= 0.42
-BuildRequires:	perl(Task::Weaken)
 
 # Module requirements
 BuildRequires:	hunspell >= 1.2.12
 BuildRequires:	hunspell-en
-BuildRequires:	perl(B::Keywords) >= 1.05
-BuildRequires:	perl(base)
+BuildRequires:	perl(:VERSION) >= 5.10.1
+BuildRequires:	perl(B::Keywords) >= 1.23
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(Config::Tiny) >= 2
 BuildRequires:	perl(English)
@@ -44,22 +42,20 @@ BuildRequires:	perl(File::Spec::Unix)
 BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(File::Which)
 BuildRequires:	perl(Getopt::Long)
-BuildRequires:	perl(IO::String)
-BuildRequires:	perl(List::MoreUtils) >= 0.19
+BuildRequires:	perl(List::SomeUtils) >= 0.55
 BuildRequires:	perl(List::Util)
 BuildRequires:	perl(Module::Pluggable) >= 3.1
+BuildRequires:	perl(parent)
 BuildRequires:	perl(Perl::Tidy)
-BuildRequires:	perl(Pod::Parser)
 BuildRequires:	perl(Pod::PlainText)
 BuildRequires:	perl(Pod::Select)
 BuildRequires:	perl(Pod::Spell) >= 1
 BuildRequires:	perl(Pod::Usage)
-BuildRequires:	perl(PPI) >= 1.265
+BuildRequires:	perl(PPI) >= 1.277
 BuildRequires:	perl(PPIx::QuoteLike)
 BuildRequires:	perl(PPIx::Regexp) >= 0.010
 BuildRequires:	perl(PPIx::Regexp::Util) >= 0.068
-BuildRequires:	perl(PPIx::Utilities::Node)
-BuildRequires:	perl(PPIx::Utilities::Statement) >= 1.001
+BuildRequires:	perl(PPIx::Utils::Traversal) >= 0.003
 BuildRequires:	perl(Readonly) >= 2
 BuildRequires:	perl(Scalar::Util)
 BuildRequires:	perl(strict)
@@ -71,10 +67,10 @@ BuildRequires:	perl(version) >= 0.77
 BuildRequires:	perl(warnings)
 
 # Main test suite
-
-BuildRequires:	perl(Fatal)
+%if 0%{?fedora} > 23 || 0%{?rhel} > 7
+BuildRequires:	glibc-langpack-en
+%endif
 BuildRequires:	perl(File::Spec::Functions)
-BuildRequires:	perl(Test::Deep)
 BuildRequires:	perl(Test::Memory::Cycle)
 BuildRequires:	perl(Test::More)
 
@@ -93,12 +89,12 @@ BuildRequires:	perl(Test::Without::Module)
 %endif
 
 # Optional/not automatically detected runtime dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	hunspell >= 1.2.12
+Requires:	perl(B::Keywords) >= 1.23
+Requires:	perl(ExtUtils::Manifest)
 Requires:	perl(File::Which)
 Requires:	perl(Module::Pluggable) >= 3.1
-Requires:	perl(Pod::Parser)
-Requires:	perl(PPI) >= 1.265
+Requires:	perl(PPI) >= 1.277
 Requires:	perl(Term::ANSIColor) >= 2.02
 
 %description
@@ -114,7 +110,7 @@ also create new Policy modules that suit your own tastes.
 
 %package -n perl-Test-Perl-Critic-Policy
 Summary:	A framework for testing your custom Policies
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Requires:	perl(Test::Builder) >= 0.92
 
 %description -n perl-Test-Perl-Critic-Policy
@@ -127,10 +123,10 @@ of Perl code were mixed directly in the test script. That sucked.
 %setup -q -n Perl-Critic-%{version}
 
 # Switch spell checker tool from aspell to hunspell
-%patch 0 -p1
+%patch -P 0 -p1
 
 # Fix shellbang in ppidump tool
-%patch 3
+%patch -P 3
 
 # Drop exec bits from samples/docs to avoid dependency bloat
 find tools examples -type f -exec chmod -c -x {} ';'
@@ -151,11 +147,7 @@ LC_ALL=en_US ./Build test
 %endif
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes CONTRIBUTING.md README TODO.pod examples/ extras/ tools/
 %{_bindir}/perlcritic
 %{perl_vendorlib}/Perl/
@@ -167,9 +159,189 @@ LC_ALL=en_US ./Build test
 %{_mandir}/man3/Test::Perl::Critic::Policy.3*
 
 %changelog
-* Sun Jul 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.138-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Removed dependency on glibc-langpack-en.
+* Mon Oct 21 2024 Petr Pisar <ppisar@redhat.com> - 1.152-5
+- Require ExtUtils::Manifest for Perl::Critic::TestUtils::bundled_policy_names()
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.152-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.152-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.152-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Oct 17 2023 Paul Howarth <paul@city-fan.org> - 1.152-1
+- Update to 1.152 (rhbz#2244582)
+  - Fix a test failure for Subroutines::RequireArgUnpacking (GH#1048)
+  - Fix a test failure in t/06_violation.t on Perl 5.39.1 or above (GH#1037)
+
+* Mon Sep 25 2023 Paul Howarth <paul@city-fan.org> - 1.150-4
+- Fix for Perl::Critic::Policy::Subroutines::RequireArgUnpacking with PPI 1.277
+  (GH#1048)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.150-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 10 2023 Paul Howarth <paul@city-fan.org> - 1.150-2
+- Use SPDX-format license tag for perl-Test-Perl-Critic-Policy sub-package
+- Avoid use of deprecated patch syntax
+
+* Sun Mar  5 2023 Paul Howarth <paul@city-fan.org> - 1.150-1
+- Update to 1.150 (rhnz#2175475)
+  Enhancements
+  - Added Test::Builder and Text::Wrap to the list of default exceptions in
+    Variables::ProhibitPackageVars (GH#1025)
+  Internals
+  - We now use PPIx::Utils instead of PPIx::Utilities, which is more recently
+    maintained
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.148-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Jan  8 2023 Paul Howarth <paul@city-fan.org> - 1.148-1
+- Update to 1.148 (rhbz#2159041)
+  Possible breakage
+  - Removed Perl::Critic::Utils::DataConversion; any add-on policies that used
+    it will need to copy the functions from there into their own code
+  Documentation
+  - ProhibitCascadingIfElse no longer suggests using given/when
+  Internals
+  - We no longer require Test::Deep for testing
+  - Test::Kwalitee is now only recommended, not required
+  - Random micro-optimizations, like using hashes for array contents checking,
+    and using any() instead of calling grep as a boolean
+
+* Thu Dec 22 2022 Paul Howarth <paul@city-fan.org> - 1.146-1
+- Update to 1.146 (rhbz#2155727)
+  New features
+  - ProhibitBarewordDirHandles now checks for sysopen as well as open (GH#732)
+  - Added a Dockerfile in the extras/ directory for those who want to run P::C
+    in a container (GH#832)
+  - Subroutines::ProhibitBuiltinHomonyms now can take an "allows" parameter to
+    specify subroutines that won't violate the policy (GH#14, GH#932)
+  - ProhibitStringyEval now allows package declarations in evals when
+    allow_includes = true; this is a common way packages are declared (GH#908)
+  Bug Fixes
+  - Fixed some problems with how Perl::Critic determined scope (GH#793)
+  - Fixed improper violation for lexical subroutines in
+    Subroutines::ProhibitBuiltinHomonyms (GH#973, GH#955, GH#546)
+  - ValuesAndExpressions::RequireNumberSeparators no longer complains if your
+    version numbers do not have number separators in them (GH#856, GH#904)
+  - Fixed a false positive with split() in ProhibitUnusedCapture (GH#888)
+  Internals
+  - We no longer use or need IO::String (GH#997)
+  - Removed requirements and mentions of modules no longer used:
+    - Fatal
+    - IO::String
+    - IPC::Open2
+    - Pod::Parser
+    - Task::Weaken
+
+* Tue Dec  6 2022 Paul Howarth <paul@city-fan.org> - 1.144-1
+- Update to 1.144 (rhbz#2151095)
+  - Perl::Critic now requires Perl 5.10.1
+  New features
+  - The ProhibitAugmentedAssignmentInDeclaration policy now allows augmented
+    assignments to "our" variables, if the allow_our option is enabled (GH#993)
+  - ProhibitExplicitISA now recommends "use parent" instead of "use base"
+    (GH#987)
+  - RequireUseWarnings now recognizes that "use v5.36" implies warnings (GH#984)
+  - Subroutines::ProhibitNestedSubs now allows that lexical subroutines can be
+    inside other subroutines (GH#946, GH#971, GH#972)
+  - RequireUseStrict now knows that Test::Spec enables it (GH#906)
+  - ProhibitUnusedCapture now understands @{^CAPTURE} and %%{^CAPTURE_ALL} that
+    were added in Perl 5.26.0 (GH#778)
+  - Allow numeric operators on special number strings 'NaN' and 'inf' (GH#803)
+  Fixes
+  - Miscellanea::ProhibitUselessNoCritic no longer filters out errors about
+    itself, just as Miscellanea::ProhibitUnrestrictedNoCritic cannot (GH#939)
+  - Fixed GH#878: bareword filehandle dies on "open(CHECK, '/foo');"
+  Internals
+  - Updated to using Perl 5.10.1; starting migrating to Perl 5.10-isms like
+    defined-or
+  Documentation
+  - Updated some outdated docs in Perl::Critic::Utils (GH#951)
+
+* Tue Nov 29 2022 Paul Howarth <paul@city-fan.org> - 1.142-1
+- Update to 1.142 (rhbz#2149154)
+  - This is the last version of Perl::Critic that will run on Perl 5.6.1; the
+    next release will require Perl 5.10.1
+  New Features
+  - Add new policy InputOutput::ProhibitBarewordDirHandles, comparable to
+    ProhibitBarewordFilehandles (GH#912)
+  - References::ProhibitDoubleSigils policy now allows for Perl's postfix
+    dereference syntax and does not report a policy violation (GH#578)
+  - Added Test::Class::Moose and MooseX::MethodAttributes::Role to the list of
+    modules that are equivalent to "use strict" (GH#808, GH#886)
+  - Subroutines::RequireArgUnpacking now detects anonymous subroutines with
+    attributes, prototypes or signatures (GH#684)
+  - ProhibitVoidMap and ProhibitVoidGrep now detect void context inside subs
+    (GH#905), such as: sub { map { foo($_) } @list; return }
+  - RequireArgUnpacking now allows a closure to be recognized as a way that
+    subroutine arguments can be unpacked; this is specified with an optional
+    allow_closures configuration option (GH#737)
+  - ProhibitTwoArgOpen now disallows one-arg opens as well; also, it no longer
+    allows two-arg opening of STDIN/STDOUT/STDERR (GH#652, GH#653)
+  Fixes
+  - ProhibitLeadingZeros would not handle sysopen and lexical variables
+    correctly; this has been fixed (GH#789)
+  Documentation
+  - We note that the any() function is available in both List::MoreUtils and
+    List::SomeUtils
+  - Added instructions to perlcritic on how to integrate with Visual Studio
+    Code
+  Internals
+  - Switch to using List::SomeUtils instead of List::MoreUtils
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.140-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.140-7
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.140-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.140-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.140-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.140-3
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.140-2
+- Perl 5.34 rebuild
+
+* Wed Mar 24 2021 Paul Howarth <paul@city-fan.org> - 1.140-1
+- Update to 1.140
+  - Subroutines::RequireFinalReturn now lets you specify a terminal_methods
+    parameter to specify methods that should be seen as terminal; this is like
+    the terminal_funcs parameter, but for methods (GH#920)
+  - Removed an extra /x in RequireInterpolationOfMetachars.pm that caused
+    deprecation warnings in Perl 5.22 and higher  (GH#822)
+  - Documentation::RequirePackageMatchesPodName now recognizes the package
+    name if it's in 'I<>' or 'B<>' markup (GH#913)
+- Use %%license unconditionally
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.138-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.138-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat Jul 11 2020 Paul Howarth <paul@city-fan.org> - 1.138-5
+- Add workaround for 'Subroutine name is a homonym for builtin function isa'
+  (#1852437, GH#911)
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.138-4
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.138-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.138-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

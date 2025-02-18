@@ -1,63 +1,106 @@
+%undefine __cmake_in_source_build
 %global with_lua 1
-%global plugins_version 4.0
+%global with_maxminddb 1
+%global plugins_version 4.4
 
-Summary:        Network traffic analyzer
-Name:           wireshark
-Version:        4.0.8
-Release:        1%{?dist}
-License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.wireshark.org/
-Source0:        https://wireshark.org/download/src/%{name}-%{version}.tar.xz
-Source1:        90-wireshark-usbmon.rules
-Patch2:         wireshark-0002-Customize-permission-denied-error.patch
-Patch3:         wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
-Patch4:         wireshark-0004-Restore-Fedora-specific-groups.patch
-Patch5:         wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
-Patch6:         wireshark-0006-Move-tmp-to-var-tmp.patch
-Patch7:         wireshark-0007-cmakelists.patch
-Patch8:         wireshark-0008-glib2-g_strdup-build.patch
-Patch9:         wireshark-0009-fix-asn2wrs-cmake.patch
-Patch10:        wireshark-0010-ripemd-fips-core-dump.patch
-Patch11:        wireshark-0011-manage-interfaces-crash.patch
-BuildRequires:  bison
-BuildRequires:  bzip2-devel
-BuildRequires:  c-ares-devel
-BuildRequires:  cmake
-BuildRequires:  elfutils-devel
-BuildRequires:  flex
-BuildRequires:  gcc-c++
-BuildRequires:  git
-BuildRequires:  glib2-devel
-BuildRequires:  gnutls-devel
-BuildRequires:  krb5-devel
-BuildRequires:  libcap-devel
-BuildRequires:  libgcrypt-devel
-BuildRequires:  libnghttp2-devel
-BuildRequires:  libnl3-devel
-BuildRequires:  libpcap-devel >= 0.9
-BuildRequires:  libselinux-devel
-BuildRequires:  libsmi-devel
-BuildRequires:  libssh-devel
-BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
-BuildRequires:  pcre2-devel
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  systemd-devel
-BuildRequires:  xdg-utils
-BuildRequires:  zlib-devel
-BuildRequires:  perl(English)
-BuildRequires:  perl(Pod::Html)
-BuildRequires:  perl(Pod::Man)
-BuildRequires:  perl(open)
+Summary:	Network traffic analyzer
+Name:		wireshark
+Version:	4.4.3
+Release:	1%{?dist}
+Epoch:		1
+License:	BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
+Url:		http://www.wireshark.org/
+
+Source0:	https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+Source1:        https://www.wireshark.org/download/src/all-versions/SIGNATURES-%{version}.txt
+Source2:	90-wireshark-usbmon.rules
+Source3:	wireshark.sysusers
+
+# Fedora-specific
+Patch2:   wireshark-0002-Customize-permission-denied-error.patch
+# Will be proposed upstream
+Patch3:   wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
+# Fedora-specific
+Patch4:   wireshark-0004-Restore-Fedora-specific-groups.patch
+# Fedora-specific
+Patch5:   wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
+# Fedora-specific
+Patch6:   wireshark-0006-Move-tmp-to-var-tmp.patch
+Patch7:   wireshark-0007-cmakelists.patch
+Patch8:   wireshark-0008-pkgconfig.patch
+
 #install tshark together with wireshark GUI
-Requires:       %{name}-cli = %{version}-%{release}
-Requires:       c-ares
-Requires:       glib2
-Requires:       systemd-libs
-Requires:       zlib
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+
+Requires:	xdg-utils
+Requires:	hicolor-icon-theme
+
+%if %{with_maxminddb} && 0%{?fedora}
+Requires:	libmaxminddb
+%endif
+
+BuildRequires:	bzip2-devel
+BuildRequires:	c-ares-devel
+BuildRequires:	elfutils-devel
+BuildRequires:	gcc-c++
+BuildRequires:	glib2-devel
+BuildRequires:	gnutls-devel
+BuildRequires:	krb5-devel
+BuildRequires:	libcap-devel
+BuildRequires:	libgcrypt-devel
+BuildRequires:	libnl3-devel
+BuildRequires:	libpcap-devel >= 0.9
+BuildRequires:	libselinux-devel
+BuildRequires:	libsmi-devel
+BuildRequires:	openssl-devel
+BuildRequires:	desktop-file-utils
+BuildRequires:	xdg-utils
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	perl(Pod::Html)
+BuildRequires:	perl(Pod::Man)
+BuildRequires:	perl(open)
+BuildRequires:	pcre2-devel
+Buildrequires:	libssh-devel
+BuildRequires:	qt6-qttools-devel
+BuildRequires:	qt6-linguist
+BuildRequires:	qt6-qtbase-devel
+BuildRequires:	qt6-qt5compat-devel
+BuildRequires:	qt6-qtmultimedia-devel
+BuildRequires:	qt6-qtsvg-devel
+BuildRequires:  qt6-qtimageformats
+BuildRequires:	zlib-devel
+BuildRequires:	asciidoctor
+%if %{with_maxminddb} && 0%{?fedora}
+BuildRequires:	libmaxminddb-devel
+%endif
+%if %{with_lua} && 0%{?fedora}
+BuildRequires:	lua-devel
+%endif
+Buildrequires:	git-core
+Buildrequires:	python3-devel
+Buildrequires:	cmake
+Buildrequires:	speexdsp-devel
+#needed for sdjournal external capture interface
+BuildRequires:	systemd-devel
+BuildRequires:	libnghttp2-devel
+BuildRequires:	systemd-rpm-macros
+BuildRequires:	lz4-devel
+BuildRequires:	snappy-devel
+BuildRequires:	brotli-devel
+BuildRequires:	opus-devel
+BuildRequires:	sbc-devel
+%if 0%{?fedora}
+BuildRequires:	ilbc-devel
+BuildRequires:	opencore-amr-devel
+# bcg729 for G.729
+BuildRequires:	bcg729-devel
+# spandsp for G.722 and G.726
+BuildRequires:	spandsp-devel
+# wireshark needs the -compat package
+BuildRequires:	minizip-ng-compat-devel
+%endif
+
 
 %description
 Wireshark allows you to examine protocol data stored in files or as it is
@@ -70,103 +113,98 @@ and the ability to reassemble multiple protocol packets in order to, for
 example, view a complete TCP stream, save the contents of a file which was
 transferred over HTTP or CIFS, or play back an RTP audio stream.
 
-%package        cli
-Summary:        Network traffic analyzer
-Requires(post): systemd-udev
-Requires(pre):  shadow-utils
+%package	cli
+Summary:	Network traffic analyzer
+Requires(pre):	shadow-utils
 
-%description    cli
+%description cli
 This package contains command-line utilities, plugins, and documentation for
 Wireshark.
 
-%package        devel
-Summary:        Development headers and libraries for wireshark
-Requires:       %{name} = %{version}-%{release}
-Requires:       glib2-devel
-Requires:       glibc-devel
+%package devel
+Summary:	Development headers and libraries for wireshark
+Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires:	glibc-devel
+Requires:	glib2-devel
 
 %description devel
 The wireshark-devel package contains the header files, developer
 documentation, and libraries required for development of wireshark scripts
 and plugins.
 
+
 %prep
 %autosetup -S git
 
 %build
 %cmake -G "Unix Makefiles" \
-  -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
   -DDISABLE_WERROR=ON \
+  -DBUILD_wireshark=ON \
+%if %{with_lua} && 0%{?fedora}
   -DENABLE_LUA=ON \
-  -DENABLE_LIBXML2=ON \
-  -DENABLE_NETLINK=ON \
-  -DENABLE_NGHTTP2=ON \
-  -DENABLE_PLUGINS=ON \
-  -DENABLE_SMI=ON \
-  -DBUILD_androiddump=OFF \
-  -DBUILD_dcerpcidl2wrs=OFF \
+%else
+  -DENABLE_LUA=OFF \
+%endif
+%if %{with_maxminddb} && 0%{?fedora} 
+  -DBUILD_mmdbresolve=ON \
+%else
   -DBUILD_mmdbresolve=OFF \
+%endif
   -DBUILD_randpktdump=OFF \
-  -DBUILD_sdjournal=ON \
-  -DBUILD_wireshark=OFF \
-  .
+  -DBUILD_androiddump=ON \
+  -DENABLE_SMI=ON \
+  -DUSE_qt6=ON \
+  -DENABLE_PLUGINS=ON \
+  -DENABLE_NETLINK=ON \
+  -DBUILD_dcerpcidl2wrs=OFF \
+  -DBUILD_sdjournal=ON
 
 %cmake_build
 
 %install
 %cmake_install
+%cmake_install --component Development
 
+desktop-file-validate %{buildroot}%{_datadir}/applications/org.wireshark.Wireshark.desktop
 
 #install devel files (inspired by debian/wireshark-dev.header-files)
 install -d -m 0755  %{buildroot}%{_includedir}/wireshark
 IDIR="%{buildroot}%{_includedir}/wireshark"
-mkdir -p "${IDIR}/epan"
-mkdir -p "${IDIR}/epan/crypt"
-mkdir -p "${IDIR}/epan/ftypes"
-mkdir -p "${IDIR}/epan/dfilter"
-mkdir -p "${IDIR}/epan/dissectors"
-mkdir -p "${IDIR}/epan/wmem"
-mkdir -p "${IDIR}/wiretap"
-mkdir -p "${IDIR}/wsutil"
 mkdir -p %{buildroot}%{_udevrulesdir}
-install -m 644 config.h epan/register.h "${IDIR}/"
-install -m 644 cfile.h file.h "${IDIR}/"
-install -m 644 epan/*.h "${IDIR}/epan/"
-install -m 644 epan/crypt/*.h "${IDIR}/epan/crypt"
-install -m 644 epan/ftypes/*.h "${IDIR}/epan/ftypes"
-install -m 644 epan/dfilter/*.h "${IDIR}/epan/dfilter"
-install -m 644 epan/dissectors/*.h "${IDIR}/epan/dissectors"
-install -m 644 wiretap/*.h "${IDIR}/wiretap"
-install -m 644 wsutil/*.h "${IDIR}/wsutil"
-install -m 644 %{SOURCE1} %{buildroot}%{_udevrulesdir}
-
+install -m 644 %{SOURCE2}		%{buildroot}%{_udevrulesdir}
+install -Dpm 644 %{SOURCE3}		%{buildroot}%{_sysusersdir}/%{name}.conf
 
 touch %{buildroot}%{_bindir}/%{name}
 
 # Remove libtool archives and static libs
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.la" -delete
 
 %pre cli
-getent group wireshark >/dev/null || groupadd -r wireshark
-getent group usbmon >/dev/null || groupadd -r usbmon
+%sysusers_create_compat %{SOURCE3}
 
 %post cli
 %{?ldconfig}
 # skip triggering if udevd isn't even accessible, e.g. containers or
 # rpm-ostree-based systems
 if [ -S /run/udev/control ]; then
-  %{_bindir}/udevadm trigger --subsystem-match=usbmon
+    /usr/bin/udevadm trigger --subsystem-match=usbmon
 fi
 
 %ldconfig_postun cli
 
 %files
+%{_datadir}/applications/org.wireshark.Wireshark.desktop
+%{_datadir}/metainfo/*.xml
+%{_datadir}/mime/packages/*.xml
+%{_datadir}/icons/hicolor/*/apps/*
+%{_datadir}/icons/hicolor/*/mimetypes/*
 %{_bindir}/wireshark
-#%{_mandir}/man1/wireshark.*
+%{_mandir}/man1/wireshark.*
 
 %files cli
 %license COPYING
-%doc AUTHORS INSTALL NEWS README*
+%doc AUTHORS INSTALL README*
 %{_bindir}/capinfos
 %{_bindir}/captype
 %{_bindir}/editcap
@@ -176,6 +214,9 @@ fi
 %{_bindir}/sharkd
 %{_bindir}/text2pcap
 %{_bindir}/tshark
+%if %{with_maxminddb} && 0%{?fedora}
+%{_bindir}/mmdbresolve
+%endif
 %attr(0750, root, wireshark) %caps(cap_net_raw,cap_net_admin=ep) %{_bindir}/dumpcap
 %{_bindir}/rawshark
 %{_udevrulesdir}/90-wireshark-usbmon.rules
@@ -189,8 +230,7 @@ fi
 %{_libdir}/wireshark/extcap/sshdump
 %{_libdir}/wireshark/extcap/sdjournal
 %{_libdir}/wireshark/extcap/dpauxmon
-%dir %{_libdir}/wireshark/cmake
-%{_libdir}/wireshark/cmake/*.cmake
+%{_libdir}/wireshark/extcap/androiddump
 #the version wireshark uses to store plugins is only x.y, not .z
 %dir %{_libdir}/wireshark/plugins/%{plugins_version}
 %dir %{_libdir}/wireshark/plugins/%{plugins_version}/epan
@@ -199,74 +239,208 @@ fi
 %{_libdir}/wireshark/plugins/%{plugins_version}/epan/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/wiretap/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/codecs/*.so
-#%{_mandir}/man1/editcap.*
-#%{_mandir}/man1/tshark.*
-#%{_mandir}/man1/mergecap.*
-#%{_mandir}/man1/text2pcap.*
-#%{_mandir}/man1/capinfos.*
-#%{_mandir}/man1/dumpcap.*
-#%{_mandir}/man4/wireshark-filter.*
-#%{_mandir}/man1/rawshark.*
-#%{_mandir}/man1/dftest.*
-#%{_mandir}/man1/randpkt.*
-#%{_mandir}/man1/reordercap.*
-#%{_mandir}/man1/sshdump.*
-#%{_mandir}/man1/udpdump.*
-#%{_mandir}/man1/androiddump.*
-#%{_mandir}/man1/captype.*
-#%{_mandir}/man1/ciscodump.*
-#%{_mandir}/man1/randpktdump.*
-#%{_mandir}/man1/dpauxmon.*
-#%{_mandir}/man1/sdjournal.*
-#%{_mandir}/man4/extcap.*
+%{_mandir}/man1/editcap.*
+%{_mandir}/man1/tshark.*
+%{_mandir}/man1/mergecap.*
+%{_mandir}/man1/text2pcap.*
+%{_mandir}/man1/capinfos.*
+%{_mandir}/man1/dumpcap.*
+%{_mandir}/man4/wireshark-filter.*
+%{_mandir}/man1/rawshark.*
+%{_mandir}/man1/randpkt.*
+%{_mandir}/man1/reordercap.*
+%{_mandir}/man1/sshdump.*
+%{_mandir}/man1/udpdump.*
+%{_mandir}/man1/wifidump.*
+%{_mandir}/man1/androiddump.*
+%{_mandir}/man1/captype.*
+%{_mandir}/man1/ciscodump.*
+%{_mandir}/man1/randpktdump.*
+%{_mandir}/man1/dpauxmon.*
+%{_mandir}/man1/sdjournal.*
+%{_mandir}/man1/etwdump.*
+%{_mandir}/man1/falcodump.*
+%{_mandir}/man4/extcap.*
+%{_datadir}/doc/wireshark/*
+
+%if %{with_maxminddb} && 0%{?fedora}
+%{_mandir}/man1/mmdbresolve.*
+%endif
 %dir %{_datadir}/wireshark
 %{_datadir}/wireshark/*
-#%{_docdir}/wireshark/*.html
+%{_sysusersdir}/%{name}.conf
 
 %files devel
 %doc doc/README.* ChangeLog
-%{_includedir}/wireshark
+%dir %{_includedir}/wireshark
+%{_includedir}/wireshark/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/cmake/%{name}/*.cmake
 
 %changelog
-* Thu Sep 07 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.0.8-1
-- Upgrade version to address 27 CVEs
-- Address CVE-2021-22207, CVE-2021-22222, CVE-2021-22235, CVE-2021-39920, CVE-2021-39921,
-  CVE-2021-39922, CVE-2021-39923, CVE-2021-39924, CVE-2021-39925, CVE-2021-39926,
-  CVE-2021-39928, CVE-2021-39929, CVE-2021-4181, CVE-2021-4182, CVE-2021-4184,
-  CVE-2021-4185, CVE-2021-4186, CVE-2021-4190, CVE-2022-0581, CVE-2022-0582,
-  CVE-2022-0583, CVE-2022-0585, CVE-2022-0586, CVE-2022-3190, CVE-2022-4344,
-  CVE-2023-0667, CVE-2023-2906
-- Swith to SPDX identifiers
-- Fix source URL
-- Lint spec
+* Wed Jan 22 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.4.3-1
+- New version 4.4.3
 
-* Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.16-1
-- Upgrade to 3.4.16
+* Thu Nov 21 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.4.2-1
+- New version 4.4.2
 
-* Fri Jun 10 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.14-1
-- Update to resolves CVEs
-- Disabled Android Dump.
-- Removed unused/disabled features.
-- Fixed Formatting.
+* Thu Oct 10 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.4.1-1
+- New version 4.4.1
 
-* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
-- License verified.
+* Fri Sep 20 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.4.0-2
+- Using cmake install for development headers and .cmake files
 
-* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-4
-- Adding missing BRs on Perl modules.
+* Thu Aug 29 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.4.0-1
+- New version 4.4.0
 
-* Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 3.4.4-3
-- Remove epoch
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.2.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Aug 23 2021 Muhammad Falak <mwani@microsoft.com> - 1:3.4.4-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Introduce macro `with_gui` to toggle building with/without gui support.
+* Thu Jul 11 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.6-1
+- New version 4.2.6
+
+* Fri May 24 2024 Neal Gompa <ngompa@fedoraproject.org> - 1:4.2.5-2
+- Rebuild (Qt6)
+
+* Wed May 22 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.5-1
+- New version 4.2.5
+
+* Tue May 21 2024 Jan Grulich <jgrulich@redhat.com> - 1:4.2.4-3
+- Rebuild (qt6)
+
+* Sat May 04 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.4-2
+- Enabling additional features (rhbz#2278136)
+
+* Mon Apr 08 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.4-1
+- New version 4.2.4
+
+* Thu Apr 04 2024 Jan Grulich <jgrulich@redhat.com> - 1:4.2.3-2
+- Rebuild (qt6)
+
+* Tue Mar 12 2024 Marie Loise Nolden <loise@kde.org> - 1:4.2.3-1
+- New version 4.2.3-1
+
+* Sun Feb 18 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 1:4.2.2-3
+- Install more devel headers
+
+* Sun Feb 11 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.2-2
+- Making sure that wireshark.pc is created and installed
+
+* Thu Feb 01 2024 Michal Ruprich <mruprich@redhat.com> - 1:4.2.2-1
+- New version 4.2.2
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.0.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 31 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.8-2
+- Resolves: #2236246 - wireshark crash in managed interfaces
+
+* Tue Aug 29 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.8-1
+- New version 4.0.8
+- Resolves: #2235577 - possible Denial of Service via crafted package
+
+* Fri Jul 28 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.7-3
+- Resolves: #2227004 - capinfos aborts in FIPS
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.0.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 14 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.7-1
+- New version 4.0.7
+
+* Thu May 25 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.6-1
+- New version 4.0.6
+
+* Thu Apr 13 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.5-1
+- New version 4.0.5
+- Fix for bug #2159392
+
+* Wed Mar 22 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.4-2
+- SPDX migration
+
+* Tue Mar 07 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.4-1
+- New version 4.0.4
+
+* Thu Feb 02 2023 Michal Ruprich <mruprich@redhat.com> - 1:4.0.3-1
+- New version 4.0.3
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 08 2022 Michal Ruprich <mruprich@redhat.com> - 1:4.0.2-1
+- New version 4.0.2
+
+* Thu Oct 27 2022 Michal Ruprich <mruprich@redhat.com> - 1:4.0.1-1
+- New version 4.0.1
+- Only compat-lua is supported, on Fedora only
+
+* Fri Oct 14 2022 Michal Ruprich <mruprich@redhat.com> - 1:4.0.0-2
+- Adding a couple of tweaks for the latest rebased version
+
+* Thu Oct 06 2022 Kenneth Topp <toppk@bllue.org> - 1:4.0.0-1
+- New version 4.0.0
+
+* Thu Sep 29 2022 Michal Ruprich <mruprich@redhat.com> - 1:3.6.8-2
+- New version 3.6.8
+- Fix for CVE-2022-3190
+
+* Mon Aug 01 2022 Davide Cavalca <dcavalca@fedoraproject.org> - 1:3.6.7-2
+- Drop gating for python3-devel dependency
+
+* Thu Jul 28 2022 Michal Ruprich <mruprich@redhat.com> - 1:3.6.7-1
+- New version 3.6.7
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Feb 16 2022 Michal Ruprich <mruprich@redhat.com> - 1:3.6.2-1
+- New version 3.6.2
+- Fix for CVE-2022-0581, CVE-2022-0582, CVE-2022-0583, CVE-2022-0585, CVE-2022-0586
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jan 12 2022 Michal Ruprich <mruprich@redhat.com> - 1:3.6.1-1
+- New version 3.6.1
+- Fix for CVE-2021-4181, CVE-2021-4182, CVE-2021-4183, CVE-2021-4184, CVE-2021-4185, CVE-2021-4190
+
+* Thu Nov 25 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.6.0-1
+- New version 3.6.0
+- Fix for CVE-2021-39920, CVE-2021-39921, CVE-2021-39922, CVE-2021-39923, CVE-2021-39924, CVE-2021-39925, CVE-2021-39926, CVE-2021-39928, CVE-2021-39929
+
+* Wed Oct 13 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.9-2
+- New version 3.4.9
+
+* Mon Sep 06 2021 Timothée Ravier <tim@siosm.fr> - 1:3.4.8-2
+- Use system sysusers config to create groups
+
+* Tue Aug 31 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.8-1
+- New version 3.4.8
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.4.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.7-1
+- New version 3.4.7
+
+* Thu Jun 10 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.6-1
+- New version 3.4.6
+- Fix for CVE-2021-22207
+
+* Thu May 27 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.5-1
+- New version 3.4.5
+- Fix for CVE-2021-22207
 
 * Tue Mar 16 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.4-1
 - New version 3.4.4
 - Fix for CVE-2021-22191
+
+* Tue Feb 23 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.3-3
+- Adding more commits to make SMC complete
+
+* Mon Feb 22 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.3-2
+- Adding SMC-R, SMC-D and SMC-D v2
 
 * Tue Feb 16 2021 Michal Ruprich <mruprich@redhat.com> - 1:3.4.3-1
 - New version 3.4.3
@@ -276,7 +450,10 @@ fi
 - New version 3.4.2
 - Fix for CVE-2020-26418, CVE-2020-26419, CVE-2020-26420, CVE-2020-26421
 
-* Thu Dec 03 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.4.0-1
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec 02 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.4.0-1
 - New version 3.4.0
 - Fix for CVE-2020-26575, CVE-2020-28030
 
@@ -284,12 +461,18 @@ fi
 - New version 3.2.7
 - Fix for CVE-2020-25862, CVE-2020-25863, CVE-2020-25866
 
+* Thu Sep 10 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.2.6-2
+- Temprorarily disabling LTO build due to errors in libqt5core
+
 * Wed Aug 19 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.2.6-1
 - New version 3.2.6
 - Fix for CVE-2020-17498
 
-* Thu Jul 30 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.2.5-2
+* Thu Jul 30 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.2.5-3
 - Adding ownership for dirs created by wireshark (rhbz#1860650)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jul 02 2020 Michal Ruprich <mruprich@redhat.com> - 1:3.2.5-1
 - New version 3.2.5
@@ -869,6 +1052,7 @@ fi
 * Fri Sep  9 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.2-1
 - upgrade to 1.6.2
 - see https://www.wireshark.org/docs/relnotes/wireshark-1.6.2.html
+
 
 * Thu Jul 21 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.1-1
 - upgrade to 1.6.1

@@ -2,6 +2,10 @@
 # read the smb.conf manpage.
 # Run 'testparm' to verify the config is correct after
 # you modified it.
+#
+# Note:
+# SMB1 is disabled by default. This means clients without support for SMB2 or
+# SMB3 are no longer able to connect to smbd (by default).
 
 [global]
 	workgroup = SAMBA
@@ -13,6 +17,9 @@
 	printcap name = cups
 	load printers = yes
 	cups options = raw
+
+	# Install samba-usershares package for support
+	include = /etc/samba/usershares.conf
 
 [homes]
 	comment = Home Directories

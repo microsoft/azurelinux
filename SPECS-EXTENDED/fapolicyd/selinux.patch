@@ -1,0 +1,13 @@
+diff -up ./fapolicyd-selinux-0.6/fapolicyd.te.fix ./fapolicyd-selinux-0.6/fapolicyd.te
+--- ./fapolicyd-selinux-0.7/fapolicyd.te.fix	2023-06-15 17:11:47.964646794 +0200
++++ ./fapolicyd-selinux-0.7/fapolicyd.te	2023-06-15 17:13:10.426477653 +0200
+@@ -50,6 +50,9 @@ ifdef(`watch_mount_dirs_pattern',`
+ 
+ ifdef(`fs_watch_all_fs',`
+     fs_watch_all_fs(fapolicyd_t)
++')
++
++ifdef(`files_watch_sb_all_mountpoints',`
+     files_watch_sb_all_mountpoints(fapolicyd_t)
+ ')
+ 

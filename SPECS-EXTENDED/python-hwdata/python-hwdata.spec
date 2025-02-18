@@ -1,48 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
-# Enable python3 build by default
-%bcond_without python3
-
-# Disable python2 build by default
-%bcond_with python2
-
 Name:		python-hwdata
-Version:	2.3.7
-Release:	11%{?dist}
+Version:	2.4.1
+Release:	1%{?dist}
 Summary:	Python bindings to hwdata package
 BuildArch:  noarch
-License:	GPLv2
+License:	GPL-2.0-or-later
 URL:		https://github.com/xsuchy/python-hwdata
 # git clone https://github.com/xsuchy/python-hwdata.git
 # cd python-hwdata
 # tito build --tgz
-Source0:	%{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:	%{name}-%{version}.tar.gz
 
 %description
 Provide python interface to database stored in hwdata package.
 It allows you to get human readable description of USB and PCI devices.
 
-%if %{with python2}
-%package -n python2-hwdata
-Summary:	Python bindings to hwdata package
-
-BuildRequires: python2-devel
-
-Requires:	hwdata
-%{?python_provide:%python_provide python2-hwdata}
-%if 0%{?rhel} < 8
-Provides:	python-hwdata = %{version}-%{release}
-%endif
-
-%description -n python2-hwdata
-Provide python interface to database stored in hwdata package.
-It allows you to get human readable description of USB and PCI devices.
-
-This is the Python 2 build of the module.
-%endif # with python2
-
-%if %{with python3}
 %package -n python3-hwdata
 Summary:	Python bindings to hwdata package
 
@@ -57,70 +28,67 @@ Provide python interface to database stored in hwdata package.
 It allows you to get human readable description of USB and PCI devices.
 
 This is the Python 3 build of the module.
-%endif # with python3
 
 %prep
 %setup -q
 
-%if %{with python3}
 rm -rf %{py3dir}
 cp -a . %{py3dir}
-%endif # with python3
 
 %build
-%if %{with python2}
-%py2_build
-%endif # with python2
-
-%if %{with python3}
 pushd %{py3dir}
 %py3_build
 popd
-%endif # with python3
 
 %install
-%if %{with python2}
-%py2_install
-%endif # with python2
-
-%if %{with python3}
 pushd %{py3dir}
 %py3_install
 popd
-%endif # with python3
 
 %check
-%if %{with python3}
 pylint-3 hwdata.py example.py || :
-%endif # with python3
 
-%if %{with python2}
-%files -n python2-hwdata
-%license LICENSE
-%doc README.md example.py
-%doc html
-%{python2_sitelib}/*
-%endif # with python2
-
-%if %{with python3}
 %files -n python3-hwdata
 %license LICENSE
 %doc README.md example.py
 %doc html
 %{python3_sitelib}/*
-%endif # with python3
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.7-11
-- Updating naming for 3.0 version of Azure Linux.
+* Fri Nov 10 2023 Miroslav Suchý <msuchy@redhat.com> 2.4.1-1
+- remove python2 code
+- spec: generate only python3 package
+- use SPDX identifier for license
+- add PCI subsystem support (jussi.kuokkanen@protonmail.com)
 
-* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3.7-10
-- Updated source URL.
-- License verified.
+* Wed Nov 30 2022 Miroslav Suchý <msuchy@redhat.com> 2.3.8-1
+- use spdx license
+- update README
+- Add NotImplementedError (kaveshnikov.denis@hotmail.com)
 
-* Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 2.3.7-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix distro checking to enable python3 build and disable python2 build
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.3.7-15
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.3.7-12
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.3.7-9
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.7-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

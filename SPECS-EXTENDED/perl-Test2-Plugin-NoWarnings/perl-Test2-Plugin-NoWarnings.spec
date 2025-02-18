@@ -1,12 +1,10 @@
 Name:		perl-Test2-Plugin-NoWarnings
-Version:	0.08
-Release:	3%{?dist}
+Version:	0.10
+Release:	2%{?dist}
 Summary:	Fail if tests warn
-License:	Artistic 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	Artistic-2.0
 URL:		https://metacpan.org/release/Test2-Plugin-NoWarnings
-Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
@@ -18,7 +16,7 @@ BuildRequires:	perl(ExtUtils::MakeMaker) > 6.75
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(parent)
 BuildRequires:	perl(strict)
-BuildRequires:	perl(Test2) >= 1.302096
+BuildRequires:	perl(Test2) >= 1.302167
 BuildRequires:	perl(Test2::API)
 BuildRequires:	perl(Test2::Event)
 BuildRequires:	perl(Test2::Util::HashBase)
@@ -26,6 +24,7 @@ BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(IPC::Run3)
+BuildRequires:	perl(Module::Pluggable)
 BuildRequires:	perl(Test2::Require::Module)
 BuildRequires:	perl(Test2::V0)
 BuildRequires:	perl(Test::More) >= 0.96
@@ -33,7 +32,7 @@ BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 %description
 Loading this plugin causes your tests to fail if there are any warnings while
@@ -65,8 +64,56 @@ make test
 %{_mandir}/man3/Test2::Plugin::NoWarnings.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Apr  7 2024 Paul Howarth <paul@city-fan.org> - 0.10-1
+- Update to 0.10
+  - Previously, when tests were run via prove without the verbose flag and
+    there was a warning that caused a test failure, there was no output
+    indicating that a warning caused the failure; this has now been corrected
+    and you'll see output that includes "Unexpected warning"
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.09-7
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.09-4
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 30 2020 Paul Howarth <paul@city-fan.org> - 0.09-1
+- Update to 0.09
+  - Don't emit a failing test if there is a warning _after_ done_testing() is
+    called (based on GH#3)
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.08-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
