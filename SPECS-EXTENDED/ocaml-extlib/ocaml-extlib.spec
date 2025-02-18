@@ -4,7 +4,7 @@
 
 Name:           ocaml-extlib
 Version:        1.7.9
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        OCaml ExtLib additions to the standard library
 License:        LGPL-2.1-or-later with OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
@@ -85,7 +85,7 @@ make -C test all run
 
 
 %changelog
-* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.7.9-2
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.7.9-1
 - Update to 1.7.9
 - License verified
 
