@@ -6,8 +6,8 @@ Distribution:   Azure Linux
 %global pypi_name openstackdocstheme
 
 Name:           python-%{pypi_name}
-Version:        1.29.0
-Release:        8%{?dist}
+Version:        3.0.0
+Release:        1%{?dist}
 Summary:        OpenStack Docs Theme
 
 License:        ASL 2.0
@@ -135,6 +135,9 @@ rm -rf html/.{doctrees,buildinfo}
 %doc doc/build/html
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-1
+- Auto-upgrade to 3.0.0 - Extended package upgrade to IDC
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.29.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add missing dependency on python3-extras
