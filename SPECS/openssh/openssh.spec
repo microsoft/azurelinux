@@ -48,7 +48,6 @@ Patch319:       CVE-2023-48795-0009-upstream-implement-strict-key-exchange-in-ss
 Patch350:       CVE-2023-28531.patch
 # Patch for CVE-2024-6387 can be removed if openssh is upgraded to version 9.8p1 or greater
 Patch351:       CVE-2024-6387.patch
-# This patch also fixes CVE-2025-26466
 Patch352:       CVE-2025-26465.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
