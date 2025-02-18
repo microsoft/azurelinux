@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global srcname requests-file
 
 Name:           python-%{srcname}
-Version:        1.4.3
-Release:        15%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 Summary:        Transport adapter for using file:// URLs with python-requests
 
 License:        ASL 2.0
@@ -58,6 +58,9 @@ rm -rf requests_file.egg-info
 %{python3_sitelib}/requests_file*.egg-info*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

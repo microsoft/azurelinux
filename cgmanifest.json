@@ -24233,8 +24233,8 @@
         "type": "other",
         "other": {
           "name": "python-requests-file",
-          "version": "1.4.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/r/requests-file/requests-file-1.4.3.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2b/69/ba1b5f52f96cde4f2d8eca74a0aa2c11a66b2fe58d0fb63b2e46edce6ed3/requests-file-2.0.0.tar.gz"
         }
       }
     },
