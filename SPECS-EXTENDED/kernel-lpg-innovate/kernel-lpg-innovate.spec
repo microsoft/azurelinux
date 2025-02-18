@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
 Version:        6.6.82.1
-Release:        1%{?dist}
+Release:        1001%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -445,6 +445,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Mar 18 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.82.1-1001
+- adjust release to 1000 + release number to avoid conflicting with
+  real kernel package content
+
 * Tue Mar 18 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.82.1-1
 - Update to kernel-lpg-innovate source
 
