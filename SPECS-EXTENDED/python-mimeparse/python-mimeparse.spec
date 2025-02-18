@@ -18,8 +18,8 @@ and matching them against a list of media-ranges.}
 
 
 Name:           python-%{pkgname}
-Version:        1.6.0
-Release:        13%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 Summary:        Python module for parsing mime-type names
 License:        MIT
 URL:            https://github.com/dbtsai/python-mimeparse
@@ -96,6 +96,9 @@ rm -rf %{eggname}.egg-info
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.0-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
