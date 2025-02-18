@@ -23,7 +23,7 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-6-vendor.tar.gz
+Source1:        %{name}-%{version}-7-vendor.tar.gz
 Patch0:         KCCM-Changes.patch
 Patch1:         Golang-Version-Upgrade.patch
 %global debug_package %{nil}
