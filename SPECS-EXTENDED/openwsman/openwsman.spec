@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 Name:		openwsman
-Version:	2.6.8
-Release:	13%{?dist}
+Version:	2.7.2
+Release:	1%{?dist}
 Summary:	Open source Implementation of WS-Management
 
 License:	BSD
@@ -236,6 +236,9 @@ rm -f /var/log/wsmand.log
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.2-1
+- Auto-upgrade to 2.7.2 - Extended package upgrade to IDC
+
 * Thu Jun 10 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.8-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove support for building ruby-gem
