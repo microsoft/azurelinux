@@ -28,7 +28,7 @@
 
 %global last-known-kernel 6.6.64.2
 
-%if 0%{?azl}
+%if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
 %else
 %global target_kernel_version_full f.a.k.e
@@ -64,7 +64,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 7%{?dist}
+Release:	 6%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -253,9 +253,6 @@ fi
 %endif
 
 %changelog
-* Wed Feb 11 2025 Sam Meluch <sammeluch@microsoft.com> - 24.10-7
-- fix broken azl macro for fasttrack
-
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
 - Bump release to rebuild for new kernel release
 
