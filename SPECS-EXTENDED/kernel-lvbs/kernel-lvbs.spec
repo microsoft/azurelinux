@@ -35,11 +35,10 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        config
-Source2:        sha512hmac-openssl.sh
-Source3:        azurelinux-ca-20230216.pem
-Source4:        cpupower
-Source5:        cpupower.service
+Source1:        sha512hmac-openssl.sh
+Source2:        azurelinux-ca-20230216.pem
+Source3:        cpupower
+Source4:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
 BuildRequires:  audit-devel
@@ -174,10 +173,10 @@ manipulation of eBPF programs and maps.
 %autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 make mrproper
 
-cp %{SOURCE1} .config
+cp Microsoft/azl3_normal_config .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE3} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -237,9 +236,9 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -c -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
-install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
+install -c -m 644 %{SOURCE4} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
