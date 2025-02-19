@@ -35,6 +35,8 @@ Patch7:         CVE-2023-5156.patch
 Patch8:         CVE-2023-6246.patch
 Patch9:         CVE-2023-6779.patch
 Patch10:        CVE-2023-6780.patch
+# Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
+Patch11:		nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
 
