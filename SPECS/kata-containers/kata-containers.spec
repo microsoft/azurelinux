@@ -39,7 +39,7 @@ Summary:        Kata Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-src
+%autosetup -p1 -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
 popd
