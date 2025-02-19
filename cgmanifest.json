@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "jx",
-          "version": "3.10.116",
-          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.116.tar.gz"
+          "version": "3.10.182",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.182.tar.gz"
         }
       }
     },
