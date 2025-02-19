@@ -1,7 +1,7 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        29.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://www.gnu.org/software/emacs/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Source1:        site-start.el
 Source2:        default.el
+Patch0:         CVE-2025-1244.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -35,7 +36,7 @@ This package provides some directories which are required by other
 packages that add functionality to Emacs.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -128,6 +129,9 @@ rm -f *-filelist {common,el}-*-files
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 29.4-2
+- Apply upstream patch to fix CVE-2025-1244
+
 * Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 29.4-1
 - Auto-upgrade to 29.4 - CVE
 
