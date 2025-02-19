@@ -2868,8 +2868,8 @@
         "type": "other",
         "other": {
           "name": "docker-cli",
-          "version": "25.0.3",
-          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.3.tar.gz"
+          "version": "25.0.7",
+          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.7.tar.gz"
         }
       }
     },
@@ -3409,8 +3409,8 @@
         "other": {
           "name": "exempi",
           "version": "2.6.5",
-          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"        
-	}
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.5/exempi-2.6.5.tar.bz2"
+        }
       }
     },
     {
@@ -7251,8 +7251,8 @@
         "type": "other",
         "other": {
           "name": "influx-cli",
-          "version": "2.7.3",
-          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.7.3.tar.gz"
+          "version": "2.7.5",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.7.5.tar.gz"
         }
       }
     },
@@ -7261,8 +7261,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.7.3",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.3.tar.gz"
+          "version": "2.7.5",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.5.tar.gz"
         }
       }
     },
@@ -8071,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "jx",
-          "version": "3.10.116",
-          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.116.tar.gz"
+          "version": "3.10.182",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.182.tar.gz"
         }
       }
     },
@@ -21343,8 +21343,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.5",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.5/postgresql-16.5.tar.bz2"
+          "version": "16.7",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.7/postgresql-16.7.tar.bz2"
         }
       }
     },
