@@ -31,7 +31,7 @@ Source2:        config.toml
 #   cargo update -p openssl-src --precise 300.3.2+3.3.2
 #   diff -u ../cloud-hypervisor-msft-v38.0.72.2.backup/Cargo.lock Cargo.lock > ../upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
 Patch0:         upgrade-openssl-to-3.3.2-to-address-CVE-2024-6119.patch
-Patch1:			CVE-2024-12797.patch
+Patch1:         CVE-2024-12797.patch
 
 BuildRequires:  binutils
 BuildRequires:  gcc
