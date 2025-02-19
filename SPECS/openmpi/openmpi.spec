@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,7 @@ Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{
 Source1:        openmpi.module.in
 Source3:        openmpi.pth.py3
 Source4:        macros.openmpi
+Patch0:         CVE-2022-47022.patch
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  hwloc-devel
@@ -304,6 +305,9 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Wed Feb 12 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.1.7-2
+- Patch to fix CVE-2022-47022
+
 * Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.1.7-1
 - Upgrade to 4.1.7 - Azure Linux 3.0 - package upgrades
 
