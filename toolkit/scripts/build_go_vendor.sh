@@ -96,9 +96,9 @@ function clean-up {
 }
 trap clean-up EXIT
 
-tarball_name=$(basename "$SRC_TARBALL")
+TARBALL_NAME=$(basename "$SRC_TARBALL")
 
-cache_name=${tarball_name%.*}
+cache_name=${TARBALL_NAME%.*}
 if [[ "$cache_name" =~ \.tar$ ]]
 then
     cache_name=${cache_name%.*}
@@ -106,12 +106,12 @@ fi
 
 cache_tarball_name="$cache_name-$PKG_VERSION-govendor-v$VENDOR_VERSION.tar.gz"
 
-if [[ -f "$tarball_name" ]]
+if [[ -f "$TARBALL_NAME" ]]
 then
     cp "$SRC_TARBALL" "$temp_dir"
 else
-    echo "Tarball '$tarball_name' doesn't exist. Will attempt to download from blobstorage."
-    if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$temp_dir/$tarball_name"
+    echo "Tarball '$TARBALL_NAME' doesn't exist. Will attempt to download from blobstorage."
+    if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$TARBALL_NAME" -O "$temp_dir/$TARBALL_NAME"
     then
         echo "ERROR: failed to download the source tarball."
         exit 1
@@ -120,9 +120,9 @@ else
 fi
 
 pushd "$temp_dir" &> /dev/null
-    echo "Extracting $tarball_name."
+    echo "Extracting $TARBALL_NAME."
 
-    tar -xf "$tarball_name"
+    tar -xf "$TARBALL_NAME"
 
     directory_name=($(ls -d */))
 
