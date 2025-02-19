@@ -55,7 +55,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n Color-RGB-Util-%{version}
+%autosetup -n Color-RGB-Util-%{version}
 
 # Help file to recognise the Perl scripts
 for F in t/*.t; do
