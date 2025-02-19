@@ -138,7 +138,7 @@ pushd "$temp_dir" &> /dev/null
             --mtime="2021-04-26 00:00Z" \
             --owner=0 --group=0 --numeric-owner \
             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-            -czf "$cache_tarball_name" vendor
+            -I pigz -cf "$cache_tarball_name" vendor
     popd &> /dev/null
 popd &> /dev/null
 
