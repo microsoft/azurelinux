@@ -1,0 +1,70 @@
+From 8dea4055ab11c666635a0a03516767c1dcab9a50 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Tue, 31 Oct 2023 11:01:26 +0100
+Subject: [PATCH] Fix tests failures with Sphinx 7.2+
+
+Based on original patch fixing test failures with Sphinx 7.1+ by mitya57:
+https://github.com/sphinx-contrib/jquery/pull/26
+
+---
+ tests/test_jquery_installed.py | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/tests/test_jquery_installed.py b/tests/test_jquery_installed.py
+index a402bd4..f9fb85b 100644
+--- a/tests/test_jquery_installed.py
++++ b/tests/test_jquery_installed.py
+@@ -4,7 +4,6 @@ from pathlib import Path
+ 
+ import pytest
+ import sphinx
+-from sphinx.testing.path import path
+ from sphinx.testing.util import SphinxTestApp
+ 
+ from sphinxcontrib.jquery import _FILES, _ROOT_DIR  # NoQA
+@@ -26,9 +25,8 @@ def run_blank_app(srcdir, **kwargs):
+ @pytest.fixture(scope="function")
+ def blank_app(tmpdir, monkeypatch):
+     def inner(**kwargs):
+-        return run_blank_app(path(tmpdir), **kwargs)
++        return run_blank_app(Path(tmpdir), **kwargs)
+ 
+-    monkeypatch.setattr("sphinx.application.abspath", lambda x: x)
+     yield inner
+ 
+ 
+@@ -38,12 +36,14 @@ def test_jquery_installed_sphinx_ge_60_use_sri(blank_app):
+     out_dir = blank_app(confoverrides={"extensions": ["sphinxcontrib.jquery"], "jquery_use_sri": True})
+ 
+     text = out_dir.joinpath("index.html").read_text(encoding="utf-8")
++    checksum = '?v=5d32c60e' if sphinx.version_info[:2] >= (7, 1) else ''
+     assert ('<script '
+             'integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" '
+-            'src="_static/jquery.js"></script>') in text
++            f'src="_static/jquery.js{checksum}"></script>') in text
++    checksum = '?v=2cd50e6c' if sphinx.version_info[:2] >= (7, 1) else ''
+     assert ('<script '
+             'integrity="sha384-lSZeSIVKp9myfKbDQ3GkN/KHjUc+mzg17VKDN4Y2kUeBSJioB9QSM639vM9fuY//" '
+-            'src="_static/_sphinx_javascript_frameworks_compat.js"></script>') in text
++            f'src="_static/_sphinx_javascript_frameworks_compat.js{checksum}"></script>') in text
+ 
+     static_dir = out_dir / '_static'
+     assert static_dir.joinpath('jquery.js').is_file()
+@@ -56,10 +56,12 @@ def test_jquery_installed_sphinx_ge_60(blank_app):
+     out_dir = blank_app(confoverrides={"extensions": ["sphinxcontrib.jquery"]})
+ 
+     text = out_dir.joinpath("index.html").read_text(encoding="utf-8")
++    checksum = '?v=5d32c60e' if sphinx.version_info[:2] >= (7, 1) else ''
+     assert ('<script '
+-            'src="_static/jquery.js"></script>') in text
++            f'src="_static/jquery.js{checksum}"></script>') in text
++    checksum = '?v=2cd50e6c' if sphinx.version_info[:2] >= (7, 1) else ''
+     assert ('<script '
+-            'src="_static/_sphinx_javascript_frameworks_compat.js"></script>') in text
++            f'src="_static/_sphinx_javascript_frameworks_compat.js{checksum}"></script>') in text
+ 
+     static_dir = out_dir / '_static'
+     assert static_dir.joinpath('jquery.js').is_file()
+-- 
+2.41.0
+
