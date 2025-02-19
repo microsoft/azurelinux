@@ -16,7 +16,7 @@
 Summary:        Compiler assisted localization library (CAL10N)
 Name:           cal10n
 Version:        0.8.1.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,7 @@ BuildRequires:  junit
 BuildRequires:  xz
 Requires:       java
 BuildArch:      noarch
+Patch0:         CVE-2012-6708.patch
 
 %description
 Compiler Assisted Localization, abbreviated as CAL10N (pronounced as "calion")
@@ -56,6 +57,7 @@ API documentation for %{name}.
 %prep
 %setup -q -a1
 find . -name "*.jar" -exec rm -f {} \;
+%patch 0 -p1
 
 # We don't want to depend on ant, since it will be
 # present when we try to use the task
@@ -118,6 +120,9 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Feb 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.8.1.10-2
+- Fix CVE-2012-6708
+
 * Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1.10-1
 - Update to version 0.8.1.10
 - Import build, install section, and source file from openSUSE (license: MIT).
