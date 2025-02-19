@@ -9,7 +9,6 @@
         "dracut-hostonly",
         "dracut-vrf",
         "shadow-utils",
-        "initramfs",
-        "kernel-64k-drivers-gpu"
+        "initramfs"
     ]
 }
