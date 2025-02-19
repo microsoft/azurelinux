@@ -5,6 +5,6 @@
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
     "kernel-6.6.82.1.tar.gz": "66da12e2ca4d65d4a51e23423c60a03fb57910a91684e36643430c616e6d732a",
-    "kernel-lpg-innovate.normal.config": "8b8fc0f7923d046bc25c42c509a6012f9edfdf7a2985b0e7b5f21d3c626a3c7c"
+    "kernel-lpg-innovate.normal.config": "32f82d0caf657919cd3ff0e6145ff39e7c3b2eaaca79d05d768e341eb728ee59"
   }
 }
