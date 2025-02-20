@@ -235,6 +235,7 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 
 make O=build_secure VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} vmlinux
 objcopy -O binary -R .note -R .comment -S build_secure/vmlinux build_secure/vmlinux.bin
+build_normal/scripts/sign-file -dp sha512 build_normal/certs/signing_key.pem build_normal/certs/signing_key.x509 build_secure/vmlinux.bin
 
 %install
 export KBUILD_OUTPUT=build_normal
@@ -317,7 +318,7 @@ make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}
 rm -vf %{buildroot}%{_bindir}/trace
 
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
-install -vm 755 build_secure/vmlinux.bin %{buildroot}/lib/modules/%{uname_r}/secure
+install -vm 755 build_secure/vmlinux.bin build_secure/vmlinux.bin.p7s %{buildroot}/lib/modules/%{uname_r}/secure
 
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
