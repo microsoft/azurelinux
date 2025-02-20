@@ -40,6 +40,7 @@ Url:            http://www.nlnetlabs.nl/%{name}/
 Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
 
 Patch1:         ldns-swig-4.2.patch
+Patch2:         fix-intermittent-build-failure-with-milti-job-build.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
