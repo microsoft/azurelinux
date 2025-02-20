@@ -1,17 +1,18 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.19.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://c-ares.haxx.se/
-Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
+Source0:        https://github.com/c-ares/c-ares/releases/download/cares-1_19_1/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 
+Patch0:         CVE-2024-25629.patch
 %description
 c-ares is a C library that performs DNS requests and name resolves
 asynchronously. c-ares is a fork of the library named 'ares', written
@@ -28,7 +29,7 @@ This package contains the header files and libraries needed to
 compile applications or shared objects that use c-ares.
 
 %prep
-%autosetup
+%autosetup -p1
 f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 
 %build
@@ -113,6 +114,9 @@ fi
 %{_mandir}/man3/ares_*
 
 %changelog
+* Mon Feb 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.19.1-2
+- Patch to fix CVE-2024-25629.
+
 * Tue May 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.1-1
 - Auto-upgrade to 1.19.1 - CVE-2023-32067
 
