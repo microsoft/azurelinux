@@ -9,8 +9,8 @@
 %endif
 
 Name:		libpfm
-Version:	4.10.1
-Release:	11%{?dist}
+Version:	4.13.0
+Release:	1%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
@@ -115,6 +115,9 @@ make \
 %endif
 
 %changelog
+* Thu Feb 20 2025 Andy Zaugg <azaugg@linkedin.com> - 4.13.0-1
+* Bump version to 4.13.0 addressing use-after-free compile issues with gcc12
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.1-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

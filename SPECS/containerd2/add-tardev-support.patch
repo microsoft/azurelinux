@@ -1,6 +1,6 @@
-From 33ac7f6f513934a0ef59cc6739eee0efdac3631c Mon Sep 17 00:00:00 2001
+From b4c672fcfc8faad7d0534d887d72e2a68c112d20 Mon Sep 17 00:00:00 2001
 From: Mitch Zhu <mitchzhu@microsoft.com>
-Date: Fri, 22 Nov 2024 20:41:27 +0000
+Date: Mon, 3 Feb 2025 22:42:14 +0000
 Subject: [PATCH] Enhance snapshot handling and CRI runtime compatibility for
  tardev-snapshotter
 
@@ -8,11 +8,12 @@ Subject: [PATCH] Enhance snapshot handling and CRI runtime compatibility for
  client/image.go                               |  4 +-
  internal/cri/server/container_status_test.go  |  2 +-
  internal/cri/server/images/image_pull.go      | 37 +++++++++++--------
+ internal/cri/server/images/image_pull_test.go |  2 +-
  internal/cri/server/podsandbox/controller.go  |  2 +-
  internal/cri/server/podsandbox/sandbox_run.go | 30 ++++++++-------
  internal/cri/server/service.go                |  2 +-
  internal/cri/store/image/image.go             | 29 ++++++++++++---
- 7 files changed, 68 insertions(+), 38 deletions(-)
+ 8 files changed, 69 insertions(+), 39 deletions(-)
 
 diff --git a/client/image.go b/client/image.go
 index 355bcba..791db88 100644
@@ -126,6 +127,19 @@ index e59b88b..f9c90b7 100644
  	}
  
  	// TODO: Ensure error is returned if runtime not found?
+diff --git a/internal/cri/server/images/image_pull_test.go b/internal/cri/server/images/image_pull_test.go
+index bc79e35..af6a451 100644
+--- a/internal/cri/server/images/image_pull_test.go
++++ b/internal/cri/server/images/image_pull_test.go
+@@ -429,7 +429,7 @@ func TestSnapshotterFromPodSandboxConfig(t *testing.T) {
+ 				Platform:    platforms.DefaultSpec(),
+ 				Snapshotter: runtimeSnapshotter,
+ 			}
+-			snapshotter, err := cri.snapshotterFromPodSandboxConfig(context.Background(), "test-image", tt.podSandboxConfig)
++			snapshotter, err := cri.snapshotterFromPodSandboxConfig(context.Background(), "test-image", tt.podSandboxConfig, "")
+ 			assert.Equal(t, tt.expectedSnapshotter, snapshotter)
+ 			if tt.expectedErr {
+ 				assert.Error(t, err)
 diff --git a/internal/cri/server/podsandbox/controller.go b/internal/cri/server/podsandbox/controller.go
 index a185a4c..8fd032b 100644
 --- a/internal/cri/server/podsandbox/controller.go
