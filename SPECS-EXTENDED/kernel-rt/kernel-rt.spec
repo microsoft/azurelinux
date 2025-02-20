@@ -23,7 +23,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.55.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -389,6 +389,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-4
+- Append 20230216 key to CBL-Mariner key
+
 * Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-3
 - Disable rpm's debuginfo defaults which regenerate build-ids
 
