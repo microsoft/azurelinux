@@ -46,6 +46,7 @@ Patch10:        CVE-2024-45590.patch
 Patch11:        CVE-2024-21538.patch
 Patch12:        CVE-2020-28458.patch
 Patch13:        CVE-2024-52798.patch
+Patch14:        CVE-2020-24025.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -183,8 +184,8 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
-* Tue Feb 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.1.1-16
-- Patch to fix CVE-2024-52798 in node_modules
+* Mon Feb 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.1-16
+- Patch CVE-2020-24025 and CVE-2024-52798 
 
 * Sat Nov 16 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.1.1-15
 - Patch CVE-2024-21538 in node modules
