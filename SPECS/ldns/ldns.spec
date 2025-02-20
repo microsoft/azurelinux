@@ -170,7 +170,7 @@ export CFLAGS CXXFLAGS LDFLAGS
 pushd %{pkgname}_python3
 %else
 pushd %{pkgname}
-%endif # with python3
+%endif
 
 %configure \
   --disable-rpath \
