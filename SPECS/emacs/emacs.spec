@@ -1,13 +1,14 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        29.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.gnu.org/software/emacs/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2025-1244.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -84,6 +85,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 29.4-2
+- Apply upstream patch to fix CVE-2025-1244
+
 * Mon Jul 01 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 29.4-1
 - Upgrade to 29.4 to fix  CVE-2024-39331.
 
