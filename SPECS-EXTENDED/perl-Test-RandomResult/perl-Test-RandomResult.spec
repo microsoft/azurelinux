@@ -31,7 +31,7 @@ Requires:       perl(Exporter) >= 5.57
 Test that results of a running code look random
 
 %prep
-%setup -q -n Test-RandomResult-%{version}
+%autosetup -n Test-RandomResult-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -55,6 +55,7 @@ make test
 * Tue Dec 10 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.001-14
 - Add as a dependency of perl-Color-RGB-Util
 - License verified.
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.001-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
