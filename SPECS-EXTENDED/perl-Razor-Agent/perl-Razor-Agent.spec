@@ -11,7 +11,7 @@ Version:        2.86
 Release:        13%{?dist}
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/%{pkgname}
-Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/%{pkgname}-%{version}.tar.gz#/perl-%{pkgname}-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         https://github.com/toddr/Razor2-Client-Agent/commit/033b00e94741550ef3ef087d9903742ac881a7ba.patch#/perl-Razor-Agent-2.86-parallel-make.patch
 Patch1:         https://github.com/toddr/Razor2-Client-Agent/commit/1a8dc0ea64c6bbe187babdb1079bc0cf05926e59.patch#/perl-Razor-Agent-2.86-digest-sha.patch
 Requires:       perl(Digest::SHA)
