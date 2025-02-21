@@ -74,6 +74,7 @@ BuildRequires:  pciutils-devel
 %endif
 Requires:       filesystem
 Requires:       kmod
+Requires:       %{name}-grub
 Requires(post): coreutils
 Requires(postun): coreutils
 %{?grub2_configuration_requires}
@@ -157,6 +158,14 @@ Requires:       audit
 
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
+
+%package grub
+Summary:        Grub configuration for LVBS kernel
+Group:          System Environment/Kernel
+BuildArch:      noarch
+
+%description grub
+This package contains grub drop-in configuration file(s) to add required LVBS parameter(s) to the kernel cmdline.
 
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
@@ -328,6 +337,9 @@ install -vm 644 lvbs_secure/vmlinux.bin lvbs_secure/vmlinux.bin.p7s %{buildroot}
 install -vdm 755 %{buildroot}/etc/dracut.conf.d
 echo 'install_optional_items+=" /lib/modules/%{uname_r}/secure/vmlinux.bin /lib/modules/%{uname_r}/secure/vmlinux.bin.p7s "' > %{buildroot}/etc/dracut.conf.d/10-lvbs-%{uname_r}.conf
 
+install -vdm 755 %{buildroot}/etc/default/grub.d
+echo 'GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX securekernel=128M"' > %{buildroot}/etc/default/grub.d/10-lvbs.cfg
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -441,6 +453,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
+
+%files grub
+/etc/default/grub.d/10-lvbs.cfg
 
 %files -n python3-perf
 %{python3_sitearch}/*
