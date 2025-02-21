@@ -18433,8 +18433,8 @@
         "type": "other",
         "other": {
           "name": "perl-MIME-Charset",
-          "version": "1.012.2",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/MIME-Charset-1.012.2.tar.gz"
+          "version": "1.013.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/MIME-Charset-1.013.1.tar.gz"
         }
       }
     },
