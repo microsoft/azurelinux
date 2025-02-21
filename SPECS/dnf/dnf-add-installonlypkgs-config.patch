@@ -1,0 +1,11 @@
+diff -urpN dnf-4.19.0/etc/dnf/dnf.conf b/etc/dnf/dnf.conf
+--- dnf-4.19.0/etc/dnf/dnf.conf	2024-02-08 09:54:49.000000000 -0500
++++ b/etc/dnf/dnf.conf	2025-02-21 12:50:10.373026978 -0500
+@@ -2,6 +2,7 @@
+ 
+ [main]
+ gpgcheck=True
++installonlypkgs=kernel kernel-mshv kernel-uvm kernel-uki kernel-64k
+ installonly_limit=3
+ clean_requirements_on_remove=True
+ best=False
