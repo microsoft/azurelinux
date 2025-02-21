@@ -119,7 +119,7 @@ make DESTDIR=%{buildroot} install
 %{python3_sitelib}/*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.11.0-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.11.0-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
