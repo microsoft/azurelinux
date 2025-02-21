@@ -12,6 +12,8 @@ repo_urls_file = $(precache_state_dir)/repo_urls.txt
 precache_chroot_dir = $(precache_state_dir)/chroot
 precache_logs_path = $(LOGS_DIR)/precache/precache.log
 
+PRECACHE_CONCURRENCY_PROCS ?= 20
+
 $(call create_folder,$(precache_state_dir))
 $(call create_folder,$(remote_rpms_cache_dir))
 
@@ -46,6 +48,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(PRECACHER_
 		--cpu-prof-file=$(PROFILE_DIR)/precacher.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/precacher.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/precacher.trace \
+		--concurrent-net-ops=$(PRECACHE_CONCURRENCY_PROCS) \
 		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
