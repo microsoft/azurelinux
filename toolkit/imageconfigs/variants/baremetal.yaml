@@ -1,0 +1,15 @@
+os:
+  hostname: azure-linux
+  selinux:
+    mode: enforcing
+  kernelCommandLine:
+    extraCommandLine: "console=tty0 console=ttyS0 rd.info log_buf_len=1M"
+  packages:
+    installLists:
+    - packagelists/baremetal-packages.yaml
+    - packagelists/base-image-packages.yaml
+    - packagelists/cloud-init-packages.yaml
+    - packagelists/selinux.yaml
+scripts:
+  finalizeCustomization:
+  - path: ../scripts/cleanup.sh
