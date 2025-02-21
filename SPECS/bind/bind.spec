@@ -360,8 +360,7 @@ if [ $1 -gt 1 ]; then \
     fi \
   done \
 fi
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
 %ldconfig_scriptlets libs
 
 %post chroot
