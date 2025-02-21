@@ -25935,7 +25935,7 @@
         "other": {
           "name": "rhash",
           "version": "1.4.4",
-          "downloadUrl": "https://github.com/rhash/RHash/archive/refs/tags/v1.4.4.tar.gz"
+          "downloadUrl": "https://github.com/rhash/RHash/archive/v1.4.4/rhash-1.4.4.tar.gz"
         }
       }
     },
