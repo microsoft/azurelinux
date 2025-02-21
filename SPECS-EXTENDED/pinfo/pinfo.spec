@@ -57,7 +57,7 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %{_mandir}/man1/pinfo.1*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.6.13-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.6.13-8
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
