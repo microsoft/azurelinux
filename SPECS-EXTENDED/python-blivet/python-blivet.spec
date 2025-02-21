@@ -7,7 +7,7 @@ Version: 3.11.0
 
 #%%global prerelease .b2
 # prerelease, if defined, should be something like .a1, .b1, .b2.dev1, or .c2
-Release: 1%{?prerelease}%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: LGPL-2.1-or-later
 %global realname blivet
