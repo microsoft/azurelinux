@@ -104,7 +104,7 @@ then
     cache_name=${cache_name%.*}
 fi
 
-cache_tarball_name="$cache_name-$PKG_VERSION-govendor-v$VENDOR_VERSION.tar.gz"
+cache_tarball_name="$cache_name-govendor-v$VENDOR_VERSION.tar.gz"
 
 if [[ -f "$TARBALL_NAME" ]]
 then
