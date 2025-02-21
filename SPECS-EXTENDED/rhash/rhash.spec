@@ -3,7 +3,7 @@ Version:        1.4.4
 Release:        3%{?dist}
 Summary:        Great utility for computing hash sums
 
-License:        MIT
+License:        0BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/rhash/RHash
@@ -56,20 +56,16 @@ developing applications that use lib%{name}.
 %setup -q -n RHash-%{version}
 sed -i -e '/^INSTALL_SHARED/s/644/755/' librhash/Makefile
 
-
 %build
 INSTALL_INCDIR=%{_includedir} ./configure --sysconfdir=%{_sysconfdir} --exec-prefix=%{_prefix} --mandir=%{_mandir} --libdir=%{_libdir}
 %make_build OPTFLAGS="%{optflags}" OPTLDFLAGS="-g %{?__global_ldflags}" build
-
 
 %install
 %make_install
 make DESTDIR=%{buildroot} -C librhash install-so-link install-lib-headers
 
-
 %check
 make test-shared
-
 
 %files
 %license COPYING
@@ -82,7 +78,6 @@ make test-shared
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
-
 
 %changelog
 * Wed Dec 18 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1.4.4-3
