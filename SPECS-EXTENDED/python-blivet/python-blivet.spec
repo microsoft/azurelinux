@@ -120,7 +120,7 @@ make DESTDIR=%{buildroot} install
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.11.0-1
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Wed Oct 09 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.11.0-3
