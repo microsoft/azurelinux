@@ -12,7 +12,7 @@ Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}
 Patch0:         CVE-2024-52533.patch
 Patch1:         CVE-2023-29499.patch
 # This patch fixes 2 CVEs - CVE-2023-32643 and CVE-2023-32636 
-Patch2:         CVE-2023-32643.patch
+Patch2:         CVE-2023-32643-CVE-2023-32636.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
