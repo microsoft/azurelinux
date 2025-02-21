@@ -20262,6 +20262,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Test-RandomResult",
+          "version": "0.001",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Test-RandomResult-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Test-Requires",
           "version": "0.10",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Requires-0.10.tar.gz"
