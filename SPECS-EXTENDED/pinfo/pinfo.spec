@@ -1,6 +1,6 @@
 Name:    pinfo
 Version: 0.6.13
-Release: 1%{?dist}
+Release: 8%{?dist}
 Summary: An info file viewer
 License: GPL-2.0-only
 Vendor:         Microsoft Corporation
