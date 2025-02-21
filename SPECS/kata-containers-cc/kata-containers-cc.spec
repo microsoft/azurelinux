@@ -10,7 +10,7 @@ URL:          https://github.com/microsoft/kata-containers
 Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      %{sourceName}-%{version}.tar.gz
-Source1:      %{sourceName}-%{version}-cargo.tar.gz
+Source1:      %{sourceName}-3.2.0.azl4-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
