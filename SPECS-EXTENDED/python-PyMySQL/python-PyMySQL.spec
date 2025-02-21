@@ -1,15 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global pypi_name PyMySQL
-
-Name:           python-%{pypi_name}
-Version:        0.9.3
+Name:           python-PyMySQL
+Version:        1.1.1
 Release:        3%{?dist}
 Summary:        Pure-Python MySQL client library
 
 License:        MIT
-URL:            https://pypi.python.org/pypi/%{pypi_name}/
-Source0:        https://files.pythonhosted.org/packages/source/P/PyMySQL/PyMySQL-%{version}.tar.gz#/python-PyMySQL-%{version}.tar.gz
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://pypi.org/project/pymysql/
+Source0:        https://files.pythonhosted.org/packages/b3/8f/ce59b5e5ed4ce8512f879ff1fa5ab699d211ae2495f1adaa5fbba2a1eada/pymysql-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -18,49 +16,121 @@ This package contains a pure-Python MySQL client library. The goal of PyMySQL is
 to be a drop-in replacement for MySQLdb and work on CPython, PyPy, IronPython
 and Jython.
 
-
-%package -n     python%{python3_pkgversion}-%{pypi_name}
+%package -n     python3-PyMySQL
 Summary:        %{summary}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-cryptography
-Requires:       python%{python3_pkgversion}-cryptography
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+BuildRequires:  python3-devel
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
 
-%description -n python%{python3_pkgversion}-%{pypi_name}
+%description -n python3-PyMySQL
 This package contains a pure-Python MySQL client library. The goal of PyMySQL is
 to be a drop-in replacement for MySQLdb and work on CPython, PyPy, IronPython
 and Jython.
 
+%pyproject_extras_subpkg -n python3-PyMySQL rsa %{!?rhel:ed25519}
 
 %prep
-%setup -qn %{pypi_name}-%{version}
-rm -rf %{pypi_name}.egg-info
-# Remove tests files so they are not installed globally.
-rm -rf tests
+%autosetup -n pymysql-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires -x rsa %{!?rhel:-x ed25519}
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files pymysql
 
 %check
 # Tests cannot be launch on koji, they require a mysqldb running.
+%pyproject_check_import
 
-
-%files -n python%{python3_pkgversion}-%{pypi_name}
+%files -n python3-PyMySQL -f %{pyproject_files}
 %license LICENSE
-%doc README.rst
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
-%{python3_sitelib}/pymysql/
+%doc README.md
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.3-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Feb 11 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+- Added 'BuildRequires: python3-pip python3-wheel'
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 15 2024 Julien Enselme <jujens@jujens.eu> - 1.1.1-1
+- Update to 1.1.1
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 1.1.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 16 2024 Carl George <carlwgeorge@fedoraproject.org> - 1.1.0-4
+- Convert to pyproject macros
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 04 2023 Python Maint <python-maint@redhat.com> - 1.1.0-2
+- Rebuilt for Python 3.12
+
+* Tue Jul 04 2023 Julien Enselme <jujens@jujens.eu> - 1.1.0-1
+- Update to 1.1.0
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.0.3-3
+- Rebuilt for Python 3.12
+
+* Thu May 11 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.0.3-2
+- Disable ed25519 in RHEL builds
+
+* Tue Apr 25 2023 Julien Enselme <jujens@jujens.eu> - 1.0.3-1
+- Update to 1.0.3
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 11 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.0.2-3
+- Add metapackages for “rsa” and “ed25519” extras
+- Drop hard dependency on python3-cryptography
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 29 2022 Julien Enselme <jujens@jujens.eu> - 1.0.2-1
+- Update to 1.0.2
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 0.10.1-6
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.10.1-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Sep 10 2020 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 0.10.1-1
+- Update to 0.10.1 (#1877703)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat Jul 18 2020 Julien Enselme <jujens@jujens.eu> - 0.10.0-1
+- Update to 0.10.0
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.9.3-3
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

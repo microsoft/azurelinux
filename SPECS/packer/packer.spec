@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +17,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #   1. wget https://github.com/hashicorp/packer/archive/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2023-49569.patch.
+#   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2025-21613.patch.
 #   5. go mod vendor
 #   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
@@ -30,12 +30,12 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-45288.patch
-Patch1:         CVE-2022-3064.patch
-Patch2:         CVE-2023-49569.patch
-Patch3:         CVE-2024-6104.patch
-BuildRequires:  golang >= 1.17.1
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Patch0:         CVE-2022-3064.patch
+Patch1:         CVE-2024-6104.patch
+Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2025-21613.patch
+BuildRequires:  golang >= 1.21
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
 
@@ -68,6 +68,16 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Thu Jan 09 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.9.5-5
+- Add patch for CVE-2025-21613 and CVE-2025-21614
+- Remove patch for CVE-2023-45288, CVE-2023-49569, CVE-2024-45337
+
+* Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 1.9.5-4
+- Add patch for CVE-2024-45337
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.9.5-3
+- Patched CVE-2024-24786
+
 * Mon Aug 05 2024 Bala <balakumaran.kannan@microsoft.com> - 1.9.5-2
 - Patched CVE-2024-6104.
 

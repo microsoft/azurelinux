@@ -2,7 +2,7 @@
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.12
+Version:        3.5.18
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -60,7 +60,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%autosetup -p1
+%autosetup -N -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
@@ -145,10 +145,16 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Tue Feb 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.18-1
+- Auto-upgrade to 3.5.18 - Upgrade to fix CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
+
+* Tue Dec 03 2024 bhapathak <bhapathak@microsoft.com> - 3.5.12-2
+- Patch CVE-2024-24786
+
 * Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.12-1
 - Auto-upgrade to 3.5.12 - none
 
-* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
+* Wed Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
 - Upgrade to 3.5.9 to match version required by kubernetes
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-12

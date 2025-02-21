@@ -1,0 +1,88 @@
+From 82441ca6f9736bc542e699c8cbf46f80542ed618 Mon Sep 17 00:00:00 2001
+From: Vince Perri <5596945+vinceaperri@users.noreply.github.com>
+Date: Tue, 19 Nov 2024 23:29:08 +0000
+Subject: [PATCH] Fix false-negative in TestMigrationWriteErrors when root
+
+---
+ internal/config/migrate_test.go | 44 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/internal/config/migrate_test.go b/internal/config/migrate_test.go
+index 783f605..7557149 100644
+--- a/internal/config/migrate_test.go
++++ b/internal/config/migrate_test.go
+@@ -6,13 +6,20 @@ import (
+ 	"io"
+ 	"os"
+ 	"path/filepath"
++	"syscall"
+ 	"testing"
++	"unsafe"
+ 
+ 	ghmock "github.com/cli/cli/v2/internal/gh/mock"
+ 	ghConfig "github.com/cli/go-gh/v2/pkg/config"
+ 	"github.com/stretchr/testify/require"
+ )
+ 
++const (
++	FS_IOC_SETFLAGS = 0x40086602
++	FS_IMMUTABLE_FL = 0x00000010
++)
++
+ func TestMigrationAppliedSuccessfully(t *testing.T) {
+ 	readConfig := StubWriteConfig(t)
+ 
+@@ -215,6 +222,9 @@ func TestMigrationWriteErrors(t *testing.T) {
+ 
+ 			// Then the error is wrapped and bubbled
+ 			require.ErrorContains(t, err, tt.wantErrContains)
++
++			// Make the file writeable again so we can clean up
++			makeFileWriteable(t, filepath.Join(tempDir, tt.unwriteableFile))
+ 		})
+ 	}
+ }
+@@ -226,7 +236,39 @@ func makeFileUnwriteable(t *testing.T, file string) {
+ 	require.NoError(t, err)
+ 	f.Close()
+ 
+-	require.NoError(t, os.Chmod(file, 0000))
++	if os.Geteuid() == 0 {
++		fd, err := syscall.Open(file, syscall.O_RDONLY, 0)
++		require.NoError(t, err)
++		defer syscall.Close(fd)
++
++		var flags uint
++		_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(FS_IOC_SETFLAGS), uintptr(unsafe.Pointer(&flags)))
++		require.Zero(t, errno)
++
++		flags |= FS_IMMUTABLE_FL
++		_, _, errno = syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(FS_IOC_SETFLAGS), uintptr(unsafe.Pointer(&flags)))
++		require.Zero(t, errno)
++	} else {
++		require.NoError(t, os.Chmod(file, 0000))
++	}
++}
++
++func makeFileWriteable(t *testing.T, file string) {
++	t.Helper()
++
++	if os.Geteuid() == 0 {
++		fd, err := syscall.Open(file, syscall.O_RDONLY, 0)
++		require.NoError(t, err)
++		defer syscall.Close(fd)
++
++		var flags uint
++		_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(FS_IOC_SETFLAGS), uintptr(unsafe.Pointer(&flags)))
++		require.Zero(t, errno)
++
++		flags &^= FS_IMMUTABLE_FL
++		_, _, errno = syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(FS_IOC_SETFLAGS), uintptr(unsafe.Pointer(&flags)))
++		require.Zero(t, errno)
++	}
+ }
+ 
+ func mockMigration(doFunc func(config *ghConfig.Config) error) *ghmock.MigrationMock {
+-- 
+2.34.1
+

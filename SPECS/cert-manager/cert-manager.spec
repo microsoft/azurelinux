@@ -1,6 +1,6 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.12.13
+Version:        1.12.15
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -13,6 +13,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-45338.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -57,7 +58,7 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-%setup -q -a 1
+%autosetup -a 1 -p1
 
 %build
 
@@ -103,6 +104,16 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Mon Jan 27 2025 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.15-1
+- Upgrade to 1.12.15 - to fix CVE-2024-12401
+- Remove CVE-2024-45337.patch as it is fixed in 1.12.15
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.13-3
+- Add patch for CVE-2024-45338
+
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
+- Patch CVE-2024-45337
+
 * Mon Sep 16 2024 Jiri Appl <jiria@microsoft.com> - 1.12.13-1
 - Upgrade to 1.12.13 which carries helm 3.14.2 to fix CVE-2024-26147 and CVE-2024-25620
 

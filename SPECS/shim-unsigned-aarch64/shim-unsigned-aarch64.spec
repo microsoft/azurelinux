@@ -32,7 +32,7 @@ Name:		shim-unsigned-aarch64
 Provides:       shim-unsigned-%{efiarch}
 
 Version:	15.8
-Release:	3%{?dist}
+Release:	5%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	aarch64
 License:	BSD
@@ -160,6 +160,12 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
+- Bump to match shim release
+
+* Tue Nov 26 2024 Chris Co <chrco@microsoft.com> - 15.8-4
+- Bump to match shim release
+
 * Tue Mar 12 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-3
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - license verified

@@ -5,7 +5,7 @@ Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.3
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,9 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-39325.patch
+Patch1:         CVE-2024-24786.patch
+Patch2:         CVE-2024-45337.patch
+Patch3:         CVE-2024-45338.patch
 
 BuildRequires:  golang >= 1.18.3
 %global debug_package %{nil}
@@ -43,7 +46,7 @@ The official command line client for Cloud Foundry.
 %prep
 %setup -q -n cli-%{version}
 tar --no-same-owner -xf %{SOURCE1}
-%patch 0 -p1
+%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
@@ -65,6 +68,15 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 8.7.3-5
+- Add patch for CVE-2024-45338
+
+* Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 8.7.3-4
+- Add patch for CVE-2024-45337
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 8.7.3-3
+- Fix CVE-2024-24786
+
 * Mon Jul 29 2024 Muhammad Falak <mwani@microsoft.com> - 8.7.3-2
 - Fix CF_BUILD_SHA to have correct build sha in the binary
 - Move Source1 un-taring in prep section

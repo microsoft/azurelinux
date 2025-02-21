@@ -1,8 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.23.1-20240925.6.src.tar.gz
-%global ms_go_revision  3
-%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
+%global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
+%global ms_go_revision  2
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.23.1
-Release:        1%{?dist}
+Version:        1.23.3
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -134,17 +133,10 @@ EOF
 
 %post -p /sbin/ldconfig
 
-alternatives --install %{_bindir}/go go %{goroot}/bin/go %{go_priority}
-alternatives --install %{_bindir}/gofmt gofmt %{goroot}/bin/gofmt %{go_priority}
-
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ]; then
   # This is uninstall
-  alternatives --remove go %{goroot}/bin/go
-  alternatives --remove gofmt %{goroot}/bin/gofmt
-
-  rm %{_sysconfdir}/profile.d/go-exports.sh
   rm -rf /opt/go
   exit 0
 fi
@@ -162,6 +154,17 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.23.3-3
+- Fix post scriptlet
+- Remove calls to alternatives
+- Don't manually delete go-exports.sh
+
+* Tue Dec 03 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-2
+- Bump version to 1.23.3-2
+
+* Fri Nov 08 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-1
+- Bump version to 1.23.3-1
+
 * Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.1-1
 - Upgrade to 1.23.1
 
@@ -180,7 +183,7 @@ fi
 * Tue Jun 04 2024 Davis Goodin <dagood@microsoft.com> - 1.22.4-1
 - Bump version to 1.22.4-1
 
-* Tue May 07 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
+* Mon May 27 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
 - Bump version to 1.22.3-1
 
 * Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2

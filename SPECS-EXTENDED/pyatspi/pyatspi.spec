@@ -3,27 +3,27 @@ Distribution:   Azure Linux
 %global debug_package %{nil}
 
 Name:           pyatspi
-Version:        2.36.0
-Release:        2%{?dist}
+Version:        2.46.1
+Release:        1%{?dist}
 Summary:        Python bindings for at-spi
 
-License:        LGPLv2 and GPLv2
-URL:            https://wiki.linuxfoundation.org/accessibility/atk/at-spi/at-spi_on_d-bus
-Source0:        https://download.gnome.org/sources/pyatspi/2.36/%{name}-%{version}.tar.xz
+License:        LGPL-2.0-or-later AND GPL-2.0-or-later
+URL:            http://www.linuxfoundation.org/en/AT-SPI_on_D-Bus
+Source0:        https://download.gnome.org/sources/pyatspi/2.46/%{name}-%{version}.tar.xz
 
-# For tests
+BuildRequires:  make
+BuildRequires:  pkgconfig(atk) >= 2.11.2
+BuildRequires:  pkgconfig(atspi-2)
 BuildRequires:  pkgconfig(dbus-1) >= 1.0
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  dbus-glib-devel >= 0.7.0
-BuildRequires:  pkgconfig(gobject-2.0) >= 2.0.0
 BuildRequires:  pkgconfig(gmodule-2.0) >= 2.0.0
+BuildRequires:  pkgconfig(gobject-2.0) >= 2.0.0
+BuildRequires:  pkgconfig(gtk+-3.0)
 BuildRequires:  pkgconfig(libxml-2.0) >= 2.0.0
-BuildRequires:  pkgconfig(atk) >= 2.11.2
-BuildRequires:  pkgconfig(gtk+-2.0) >= 2.10.0
 BuildRequires:  pkgconfig(pygobject-3.0) >= 2.90.1
 
-BuildRequires:  python3-devel
 BuildRequires:  python3-dbus
+BuildRequires:  python3-devel
 
 BuildArch:      noarch
 
@@ -56,12 +56,10 @@ This package includes a python3 client library for at-spi.
 
 %build
 %configure --with-python=python3 --enable-tests
-make
-
+%make_build
 
 %install
 %make_install
-
 # Fix up the shebang for python3 example
 sed -i '1s|^#!/usr/bin/python|#!%{__python3}|' examples/magFocusTracker.py
 
@@ -72,12 +70,16 @@ sed -i '1s|^#!/usr/bin/python|#!%{__python3}|' examples/magFocusTracker.py
 
 %files -n python3-pyatspi
 %license COPYING COPYING.GPL
-%doc AUTHORS README
+%doc AUTHORS README.md
 %doc examples/magFocusTracker.py
 %{python3_sitelib}/pyatspi/
 
 
 %changelog
+* Fri Oct 25 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.46.1-1
+- Update to version 2.46.1
+- License verified
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly require dbus-glib-devel instead of pkgconfig(dbus-glib-1)

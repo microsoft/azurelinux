@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,10 @@ Patch2:         CVE-2023-49295.patch
 Patch3:         CVE-2024-22189.patch
 Patch4:         CVE-2023-45288.patch
 Patch5:         CVE-2024-0874.patch
+Patch6:         CVE-2024-24786.patch
+# Patch to fix the package test suite due to external akamai update
+# https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
+Patch7:         coredns-example-net-test.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -58,12 +62,28 @@ make
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
+%check
+# From go.test.yml
+go install github.com/fatih/faillint@latest && \
+(cd request && go test -v -race ./...) && \
+(cd core && go test -v -race ./...) && \
+(cd coremain && go test -v -race ./...) && \
+(cd plugin && go test -v -race ./...) && \
+(cd test && go test -v -race ./...) && \
+./coredns -version
+
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/%{name}
 
 %changelog
+* Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.1-4
+- readd check section from 2.0
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
+- Fix CVE-2024-24786
+
 * Mon Jun 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-2
 - Address CVE-2023-44487, CVE-2023-45288, CVE-2023-49295, CVE-2024-0874, CVE-2024-22189
 

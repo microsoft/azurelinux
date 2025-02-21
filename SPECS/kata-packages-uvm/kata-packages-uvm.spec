@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,8 +61,7 @@ Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
 Requires:       kernel-uvm-devel
-# Uncomment and remove duplicates once msigvm is available
-#Requires:       msigvm
+Requires:       make
 Requires:       parted
 # Python dependencies for non-packaged IGVM tool
 Requires:       python3
@@ -86,8 +85,6 @@ Requires:       veritysetup
 %package        coco-sign
 Summary:        Metapackage to install the set of packages for building the signing tool for Kata confidential containers UVM.
 Requires:       build-essential
-# Uncomment and remove duplicates once cosesign1go is available
-#Requires:       cosesign1go
 Requires:       golang
 
 %description    coco-sign
@@ -105,6 +102,10 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
+- Add explicit make dependency for UVM build
+- Remove commented package dependencies
+
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-6
 - Update for 3.2.0.azl3 kata-containers(-cc) packages
 

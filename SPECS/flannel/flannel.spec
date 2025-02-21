@@ -3,7 +3,7 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.24.2
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,8 @@ Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
 Source0:        https://github.com/flannel-io/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-24786.patch
+Patch1:         CVE-2023-44487.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-8%{?dist}
@@ -21,12 +23,9 @@ BuildRequires:  kernel-headers
 Flannel is a simple and easy way to configure a layer 3 network fabric designed for Kubernetes.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -a 1
 
 %build
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-
 export GOPATH=%{our_gopath}
 export TAG=v%{version}
 %ifarch x86_64
@@ -50,6 +49,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+* Wed Feb 05 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.24.2-9
+- Patch CVE-2023-44487
+
+* Fri Dec 06 2024 sthelkar <sthelkar@microsoft.com> - 0.24.2-8
+- Patch CVE-2024-24786
+
 * Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.24.2-7
 - Update to build dep latest glibc-static version
 
@@ -89,7 +94,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-16
 - Bump release to rebuild with go 1.19.12
 
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-15
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-15
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-14
