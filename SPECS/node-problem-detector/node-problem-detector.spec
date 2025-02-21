@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.15
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,8 @@ Source2:        %{name}-%{version}-test-vendor.tar.gz
 Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
 Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
 Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2024-45338.patch
+Patch4:         CVE-2023-45288.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
@@ -60,14 +62,21 @@ Requires:       node-problem-detector
 Default configuration files for node-problem-detector
 
 %prep
-%autosetup -p1
+%autosetup -p1 -N
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 4 -p1
 
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
 %patch 2 -p1
+%patch 4 -p1
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
 %patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
 popd
 
 %build
@@ -102,6 +111,12 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.15-4
+- Address CVE-2023-45288
+
+* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.8.15-3
+- Fix CVE-2024-45338 by patching
+
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 0.8.15-2
 - Fix CVE-2024-24786 by patching
 

@@ -2,7 +2,7 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.5
+Version:        16.7
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -15,6 +15,7 @@ Source1:	%{name}.service
 # Common libraries needed
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  lz4-devel
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  perl
@@ -33,6 +34,7 @@ BuildRequires:  sudo
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libxml2
+Requires:       lz4
 Requires:       openldap
 Requires:       openssl
 Requires:       readline
@@ -96,6 +98,7 @@ sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_man
     --with-openssl \
     --with-gssapi \
     --with-readline \
+    --with-lz4 \
     --with-system-tzdata=%{_datadir}/zoneinfo \
     --docdir=%{_docdir}/postgresql
 make -C ./src/backend generated-headers
@@ -240,6 +243,12 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.7-1
+- Auto-upgrade to 16.7 - to fix CVE-2025-1094
+
+* Mon Jan 15 2025 Uri Smiley <udsmicrosoft@microsoft.com> - 16.5-2
+- Add LZ4 option to enable TOAST compression
+
 * Mon Nov 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.5-1
 - Auto-upgrade to 16.5 - CVE-2024-10976, CVE-2024-10977, CVE-2024-10978, CVE-2024-10979
 

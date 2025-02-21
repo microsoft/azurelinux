@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        18%{?dist}
+Release:        20%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -142,6 +142,7 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
+Patch0902:      CVE-2023-7008.patch
 
 %ifarch %{ix86} x86_64
 %global want_bootloader 1
@@ -1216,6 +1217,13 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Jan 10 2025 Aditya Dubey <adityadubey@microsoft.com> - 255-20
+- adding patch for enhancing DNSSEC signature validation integrity
+- addresses CVE-2023-7008
+
+* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
+- Version bump to force signing with new Azure Linux secure boot key
+
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Install systemd-boot binary to ESP
 
@@ -1234,7 +1242,7 @@ rm -f %{name}.lang
 * Thu May 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 255-13
 - Supply 10-console-messages.conf sysctl to lower the default kernel messages to the console
 
-* Thu Apr 18 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
+* Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
 - move libidn2 recommends from core package to systemd-networkd
 
 * Wed Apr 24 2024 Dan Streetman <ddstreet@microsoft.com> - 255-11
@@ -1250,7 +1258,7 @@ rm -f %{name}.lang
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-8
 - Obsolete the new systemd-bootstrap-libs subpacakge.
 
-* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
+* Thu Feb 29 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
 - remove use of %%azure (or %%azl) macro
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6

@@ -114,6 +114,7 @@ func validatePackages(config configuration.Config) (err error) {
 
 	const (
 		validateError     = "failed to validate package lists in config"
+		kernelPkgName     = "kernel"
 		dracutFipsPkgName = "dracut-fips"
 		fipsKernelCmdLine = "fips=1"
 		userAddPkgName    = "shadow-utils"
@@ -133,20 +134,30 @@ func validatePackages(config configuration.Config) (err error) {
 			selinuxPkgName = configuration.SELinuxPolicyDefault
 		}
 
-		for _, pkg := range packageList {
-			if pkg == "kernel" {
-				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
-			}
-			if pkg == dracutFipsPkgName {
-				foundDracutFipsPackage = true
-			}
-			if pkg == selinuxPkgName {
-				foundSELinuxPackage = true
-			}
-			if pkg == userAddPkgName {
-				foundUserAddPackage = true
-			}
+		foundKernelPackage, err := installutils.PackagelistContainsPackage(packageList, kernelPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
 		}
+
+		foundDracutFipsPackage, err = installutils.PackagelistContainsPackage(packageList, dracutFipsPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		foundSELinuxPackage, err = installutils.PackagelistContainsPackage(packageList, selinuxPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		foundUserAddPackage, err = installutils.PackagelistContainsPackage(packageList, userAddPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		if foundKernelPackage {
+			return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
+		}
+
 		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) || systemConfig.KernelCommandLine.EnableFIPS {
 			if !foundDracutFipsPackage {
 				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)

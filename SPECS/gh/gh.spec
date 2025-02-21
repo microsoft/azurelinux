@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.62.0
-Release:        1%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,10 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
+Patch1:         CVE-2024-54132.patch
+Patch2:         CVE-2024-45337.patch
+Patch3:         CVE-2024-45338.patch
+Patch5:         CVE-2024-53859.patch
 
 BuildRequires:  golang < 1.23
 BuildRequires:  git
@@ -25,10 +29,9 @@ Requires:       git
 GitHub official command line tool.
 
 %prep
-%autosetup -p1 -n cli-%{version}
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No mod download use vednor cache locally
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor -modcacherw -ldflags=-linkmode=external"
@@ -57,6 +60,18 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-5
+- Patch CVE-2024-53859, CVE-2024-53858
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
+- Add patch for CVE-2024-45338
+
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.62.0-3
+- Patch CVE-2024-45337
+
+* Fri Dec 13 2024 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-2
+- Patch CVE-2024-54132
+
 * Mon Nov 18 2024 Vince Perri <viperri@microsoft.com> - 2.62.0-1
 - Update to v2.62.0
 
