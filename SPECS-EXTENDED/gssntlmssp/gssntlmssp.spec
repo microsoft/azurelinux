@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:		gssntlmssp
-Version:	1.3.1
-Release:	1%{?dist}
-Summary:	GSSAPI NTLMSSP Mechanism
+Name:           gssntlmssp
+Version:        1.3.1
+Release:        1%{?dist}
+Summary:        GSSAPI NTLMSSP Mechanism
 
-License:	LGPLv3+
-URL:		https://github.com/gssapi/gss-ntlmssp
-Source0:	https://github.com/gssapi/gss-ntlmssp/releases/download/v%{version}/%{name}-%{version}.tar.gz
+License:        LGPLv3+
+URL:            https://github.com/gssapi/gss-ntlmssp
+Source0:        https://github.com/gssapi/gss-ntlmssp/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 Requires: krb5-libs >= 1.12.1-9
 
