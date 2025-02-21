@@ -72,6 +72,7 @@ BuildRequires:  pciutils-devel
 %endif
 Requires:       filesystem
 Requires:       kmod
+Requires:       %{name}-grub
 Requires(post): coreutils
 Requires(postun): coreutils
 %{?grub2_configuration_requires}
@@ -155,6 +156,14 @@ Requires:       audit
 
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
+
+%package grub
+Summary:        Grub configuration for LPG-Innovate kernel
+Group:          System Environment/Kernel
+BuildArch:      noarch
+
+%description grub
+This package contains a grub config file to add required LPG-Innovate parameters to the kernel cmdline.
 
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
@@ -323,6 +332,9 @@ install -vm 755 build_secure/vmlinux.bin build_secure/vmlinux.bin.p7s %{buildroo
 install -vdm 755 %{buildroot}/etc/dracut.conf.d
 echo 'install_optional_items+=" /lib/modules/%{uname_r}/secure/vmlinux.bin /lib/modules/%{uname_r}/secure/vmlinux.bin.p7s "' > %{buildroot}/etc/dracut.conf.d/10-lpg-innovate-%{uname_r}.conf
 
+install -vdm 755 %{buildroot}/etc/default/grub.d
+echo 'GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX securekernel=128M"' > %{buildroot}/etc/default/grub.d/10-lpg-innovate.cfg
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -436,6 +448,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
+
+%files grub
+/etc/default/grub.d/10-lpg-innovate.cfg
 
 %files -n python3-perf
 %{python3_sitearch}/*
