@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        17.0.7
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -26,6 +26,8 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-45338.patch
+Patch1:		CVE-2024-45339.patch
 BuildRequires: golang
 
 %description
@@ -72,29 +74,24 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go check -t go/cmd \
-         -d go/mysql \
-         -d go/mysql/endtoend \
-         -d go/sqltypes \
-         -d go/vt/hook \
-         -d go/vt/mysqlctl \
-         -d go/vt/srvtopo \
-         -t go/vt/topo \
-         -d go/vt/vtctld \
-         -d go/vt/vtgate/evalengine \
-         -d go/vt/vtqueryserver \
-         -d go/vt/vttablet/endtoend \
-         -t go/vt/vttablet/tabletmanager \
-         -t go/vt/vttablet/tabletserver \
-         -t go/vt/vttablet/worker \
-         -d go/vt/withddl \
-         -t go/vt/worker \
-         -d go/vt/workflow/reshardingworkflowgen \
-         -d go/vt/wrangler \
-         -d go/vt/wrangler/testlib \
-         -d go/vt/zkctl \
-         -d go/json2 \
-         -t go/test/endtoend
+go test -v ./go/cmd/... \
+           ./go/mysql/... \
+           ./go/mysql/endtoend/... \
+           ./go/sqltypes/... \
+           ./go/vt/hook/... \
+           ./go/vt/mysqlctl/... \
+           ./go/vt/srvtopo/... \
+           ./go/vt/topo/... \
+           ./go/vt/vtctld/... \
+           ./go/vt/vtgate/evalengine/... \
+           ./go/vt/vttablet/endtoend/... \
+           ./go/vt/vttablet/tabletmanager/... \
+           ./go/vt/vttablet/tabletserver/... \
+           ./go/vt/wrangler/... \
+           ./go/vt/wrangler/testlib/... \
+           ./go/vt/zkctl/... \
+           ./go/json2/... \
+           ./go/test/endtoend/...
 
 %files
 %license LICENSE
@@ -103,6 +100,12 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Fri Jan 31 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 17.0.7-4
+- Add patch for CVE-2024-45339
+
+* Thu Jan 02 2025 Sumedh Sharma <sumsharma@microsoft.com> - 17.0.7-3
+- Add patch for CVE-2024-45338.
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 17.0.7-2
 - Bump release to rebuild with go 1.22.7
 

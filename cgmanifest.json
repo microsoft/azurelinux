@@ -1408,7 +1408,7 @@
         "other": {
           "name": "c-ares",
           "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/cares-1_19_1/c-ares-1.19.1.tar.gz"
         }
       }
     },
@@ -3507,16 +3507,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fdk-aac-free",
-          "version": "2.0.0",
-          "downloadUrl": "https://people.freedesktop.org/~wtay/fdk-aac-free-2.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fdupes",
           "version": "2.1.2",
           "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
@@ -3708,8 +3698,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.3.tar.gz"
+          "version": "3.0.6",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.0.6.tar.gz"
         }
       }
     },
@@ -4100,8 +4090,8 @@
         "type": "other",
         "other": {
           "name": "gcr",
-          "version": "3.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/gcr/3.36/gcr-3.36.0.tar.xz"
+          "version": "3.38.1",
+          "downloadUrl": "https://download.gnome.org/sources/gcr/3.38/gcr-3.38.1.tar.xz"
         }
       }
     },
@@ -4300,8 +4290,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.39.4",
-          "downloadUrl": "https://www.kernel.org/pub/software/scm/git/git-2.39.4.tar.xz"
+          "version": "2.40.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.40.4.tar.gz"
         }
       }
     },
@@ -7381,8 +7371,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.17",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.17.tar.gz"
+          "version": "3.18",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.18.tar.gz"
         }
       }
     },
@@ -7441,8 +7431,8 @@
         "type": "other",
         "other": {
           "name": "iptraf-ng",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.1.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/iptraf-ng/iptraf-ng/archive/v1.2.2.tar.gz"
         }
       }
     },
@@ -10351,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.1",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.1.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -13673,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.22.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.8-1/go1.22.8-20241001.6.src.tar.gz"
+          "version": "1.23.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.6-2/go1.23.6-20250211.6.src.tar.gz"
         }
       }
     },
@@ -14603,8 +14593,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.1",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.1.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -15596,26 +15586,6 @@
           "name": "optipng",
           "version": "0.7.7",
           "downloadUrl": "http://downloads.sourceforge.net/optipng/optipng-0.7.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "opus",
-          "version": "1.3.1",
-          "downloadUrl": "http://downloads.xiph.org/releases/opus/opus-1.3.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "opusfile",
-          "version": "0.12",
-          "downloadUrl": "https://downloads.xiph.org/releases/opus/opusfile-0.12.tar.gz"
         }
       }
     },
@@ -21474,8 +21444,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.14",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.14/postgresql-14.14.tar.bz2"
+          "version": "14.16",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.16/postgresql-14.16.tar.bz2"
         }
       }
     },
@@ -25604,8 +25574,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.16",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.16.tar.gz"
+          "version": "6.2.17",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.17.tar.gz"
         }
       }
     },
@@ -25845,8 +25815,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.2.5",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.5.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.4.1.tar.gz"
         }
       }
     },
@@ -29047,8 +29017,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2024a",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024a.tar.gz"
+          "version": "2024b",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024b.tar.gz"
         }
       }
     },
@@ -30093,7 +30063,7 @@
         "other": {
           "name": "xerces-c",
           "version": "3.2.4",
-          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
+          "downloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
         }
       }
     },

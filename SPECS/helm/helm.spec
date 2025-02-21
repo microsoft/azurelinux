@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.14.2
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -26,6 +26,7 @@ Source0:       %{name}-%{version}.tar.gz
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2023-45288.patch
+Patch1:        CVE-2024-45338.patch
 BuildRequires: golang
 
 %description
@@ -55,6 +56,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 3.14.2-5
+- Add patch for CVE-2024-45338
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.2-4
 - Bump release to rebuild with go 1.22.7
 

@@ -1,7 +1,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.10.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{n
 Patch0:         CVE-2023-45322.patch
 Patch1:         CVE-2024-34459.patch
 Patch2:         CVE-2024-25062.patch
+Patch3:         CVE-2022-49043.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -81,6 +82,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.10.4-5 
+- Fix CVE-2022-49043 with an upstream patch
+
 * Tue Sep 17 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.10.4-4
 - Add patch to resolve CVE-2024-25062
 

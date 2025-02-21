@@ -62,10 +62,10 @@ jobs:
           path: 'spec-cleaner'
 
       # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
-      - name: Setup Python 3.7
+      - name: Setup Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.9
 
       # We take our version of the linting tool from the master branch to ensure rules
       # are consistent across all branches
