@@ -51,6 +51,8 @@ popd
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
+echo "mitchzhu Running make_build as: %make_build"
+echo "Go Version Used for Build:" $(go version)
 %make_build package-confpods
 popd
 
