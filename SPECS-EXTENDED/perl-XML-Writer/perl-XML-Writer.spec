@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-XML-Writer
 Version:        0.900
-Release:        1%{?dist}
+Release:        14%{?dist}
 Summary:        A simple Perl module for writing XML documents
 License:        LicenseRef-Fedora-UltraPermissive
 URL:            https://metacpan.org/release/XML-Writer
@@ -90,7 +90,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.900-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.900-14
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
