@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libgxps
-Version:        0.3.1
-Release:        8%{?dist}
+Version:        0.3.2
+Release:        10%{?dist}
 Summary:        GObject based library for handling and rendering XPS documents
 
 License:        LGPLv2+
@@ -77,6 +77,10 @@ documents using the %{name} library.
 
 
 %changelog
+* Thu Nov 28 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.3.2-10
+- Update to 0.3.2
+- License verified.
+
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-8
 - Bumping release to re-build with newer 'libtiff' libraries.
 
