@@ -5,7 +5,7 @@ diff -urpN dnf-4.19.0/etc/dnf/dnf.conf b/etc/dnf/dnf.conf
  
  [main]
  gpgcheck=True
-+installonlypkgs=kernel kernel-mshv kernel-uvm kernel-uki kernel-64k
++installonlypkgs=kernel kernel-mshv kernel-uvm kernel-uki kernel-64k kernel-lpg-innovate
  installonly_limit=3
  clean_requirements_on_remove=True
  best=False

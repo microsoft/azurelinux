@@ -3,7 +3,7 @@
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
 Version:        4.19.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -152,6 +152,9 @@ popd
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Tue Apr 08 2025 Dan Streetman <ddstreet@ieee.org> - 4.19.0-3
+- Add kernel-lpg-innovate to dnf.conf installonlypkgs parameter
+
 * Tue Apr 08 2025 Dan Streetman <ddstreet@ieee.org> - 4.19.0-2
 - Add installonlypkgs parameter to dnf.conf
 
