@@ -1,26 +1,27 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+# Default to no static libraries
+%{!?with_static: %global with_static 1}
 %bcond_without python
 %if %{with python}
 %define python_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; print (get_python_lib(1))")
 %define python_prefix %(python3 -c "import sys; print (sys.prefix)")
-%{?filter_setup:
-%filter_provides_in %{python3_sitearch}/perfmon/.*\.so$
-%filter_setup
-}
+%global __provides_exclude_from ^%{python3_sitearch}/perfmon/.*\.so$
 %endif
 
 Name:		libpfm
-Version:	4.10.1
+Version:	4.13.0
 Release:	11%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
 License:	MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:		http://perfmon2.sourceforge.net/
 Source0:	http://sourceforge.net/projects/perfmon2/files/libpfm4/%{name}-%{version}.tar.gz
 Patch2:		libpfm-python3-setup.patch
+Patch3:		libpfm-gcc14.patch
 
+BuildRequires: make
 BuildRequires:	gcc
 %if %{with python}
 BuildRequires:	python3
@@ -36,6 +37,7 @@ kernels performance monitoring interfaces. The current version provides support
 for the perf_events interface available in upstream Linux kernels since v2.6.31.
 
 %package devel
+License:	MIT
 Summary:	Development library to encode performance events for perf_events based tools
 Requires:	%{name}%{?_isa} = %{version}-%{release}
 
@@ -43,16 +45,20 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 Development library and header files to create performance monitoring
 applications for the perf_events interface.
 
+%if %{with_static}
 %package static
+License:	MIT
 Summary:	Static library to encode performance events for perf_events based tools
 Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description static
 Static version of the libpfm library for performance monitoring
 applications for the perf_events interface.
+%endif
 
 %if %{with python}
 %package -n python3-libpfm
+License:	MIT AND LicenseRef-Fedora-UltraPermissive
 %{?python_provide:%python_provide python3-libpfm}
 # Remove before F30
 Provides: %{name}-python = %{version}-%{release}
@@ -67,7 +73,12 @@ Python bindings for libpfm4 and perf_event_open system call.
 
 %prep
 %setup -q
-%patch 2 -p1 -b .python3
+%patch -P2 -p1 -b .python3
+%patch -P3 -p1 -b .gcc14
+# to prevent setuptools from installing an .egg, we need to pass --root to setup.py install
+# see https://github.com/pypa/setuptools/issues/3143
+# and https://github.com/pypa/pip/issues/11501
+sed -i 's/--prefix=$(DESTDIR)$(PYTHON_PREFIX)/--root=$(DESTDIR) --prefix=$(PYTHON_PREFIX)/' python/Makefile
 
 %build
 %if %{with python}
@@ -75,7 +86,7 @@ Python bindings for libpfm4 and perf_event_open system call.
 %else
 %global python_config CONFIG_PFMLIB_NOPYTHON=y
 %endif
-make %{python_config} %{?_smp_mflags} \
+%make_build %{python_config} \
      OPTIM="%{optflags}" LDFLAGS="%{build_ldflags}"
 
 
@@ -83,17 +94,22 @@ make %{python_config} %{?_smp_mflags} \
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with python}
-%global python_config CONFIG_PFMLIB_NOPYTHON=n PYTHON_PREFIX=$RPM_BUILD_ROOT/%{python_prefix}
+%global python_config CONFIG_PFMLIB_NOPYTHON=n PYTHON_PREFIX=%{python_prefix}
 %else
 %global python_config CONFIG_PFMLIB_NOPYTHON=y
 %endif
 
 make \
-    PREFIX=$RPM_BUILD_ROOT%{_prefix} \
-    LIBDIR=$RPM_BUILD_ROOT%{_libdir} \
+    DESTDIR=$RPM_BUILD_ROOT \
+    PREFIX=%{_prefix} \
+    LIBDIR=%{_libdir} \
     %{python_config} \
     LDCONFIG=/bin/true \
     install
+
+%if !%{with_static}
+rm $RPM_BUILD_ROOT%{_libdir}/lib*.a
+%endif
 
 %ldconfig_scriptlets
 
@@ -106,17 +122,97 @@ make \
 %{_mandir}/man3/*
 %{_libdir}/lib*.so
 
+%if %{with_static}
 %files static
 %{_libdir}/lib*.a
+%endif
 
 %if %{with python}
 %files -n python3-libpfm
-%{python3_sitearch}/*
+%{python3_sitearch}/perfmon-*.egg-info/
+%{python3_sitearch}/perfmon/
 %endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.1-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.13.0-11
+- AzureLinux import from Fedora 41 .
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.13.0-9
+- Rebuilt for Python 3.13
+
+* Mon Jan 29 2024 William Cohen <wcohen@redhat.com> - 4.13.0-8
+- Fix gcc-14 -Werror=calloc-transposed-args compatibility
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug 1 2023 William Cohen <wcohen@redhat.com> - 4.13.0-5
+- migrated to SPDX license
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.13.0-3
+- Rebuilt for Python 3.12
+
+* Tue Apr 25 2023 Miro Hrončok <mhroncok@redhat.com> - 4.13.0-2
+- Don't install a Python .egg
+
+* Tue Mar 28 2023 William Cohen <wcohen@redhat.com> - 4.13.0-1
+- Rebase on libpfm-4.13.0.
+
+* Tue Mar 14 2023 William Cohen <wcohen@redhat.com> - 4.11.0-12
+- Add libpfm upstream patch to allow papi-7.0.1 to build.
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 21 2022 Python Maint <python-maint@redhat.com> - 4.11.0-9
+- Fix FTBFS due to gcc12. (rhbz2045823)
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.11.0-8
+- Rebuilt for Python 3.11
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 4.11.0-5
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 23 2021 William Cohen <wcohen@redhat.com> - 4.11.0-3
+- Reenable generation of static libraries for time being.
+
+* Fri Jan 22 2021 William Cohen <wcohen@redhat.com> - 4.11.0-2
+- By default disable generation of static libraries
+
+* Tue Sep 08 2020 William Cohen <wcohen@redhat.com> - 4.11.0-1
+- Rebase on libpfm-4.11.0.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.10.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 4.10.1-12
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 4.10.1-11
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.10.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
