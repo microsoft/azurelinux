@@ -129,8 +129,16 @@ DIRECTORY_NAME=${DIRECTORY_NAME[0]%//}
 pushd "$DIRECTORY_NAME" &> /dev/null
 echo "Fetching dependencies to a temporary cache in $DIRECTORY_NAME."
 
-#TODO: installing rust as auto-patcher does not have it installed by default. Possibly remove if auto-patcher will be changed to have rust included.
-sudo dnf install -y rust || sudo apt install -y rustc
+echo "Installing build prerequisites for AzureLinux..."
+CURRENT_OS=$(grep '^ID=' /etc/os-release | cut -d'=' -f2-)
+echo "Current OS: $CURRENT_OS" && \
+if [ "$CURRENT_OS" = "mariner" ] || [ "$CURRENT_OS" = "azurelinux" ]; then
+    sudo dnf install -y rust
+elif [ "$$CURRENT_OS" = "ubuntu" ]; then
+    sudo apt install -y rustc
+else
+    $(call print_error,"Unsupported OS: $$CURRENT_OS") ;
+fi
 
 # assume there is only one Cargo.toml
 TOML_LOCATION=$(find . -maxdepth 2 -name "Cargo.toml" -exec dirname {} \;)
