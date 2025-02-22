@@ -33,7 +33,7 @@
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 7%{?dist}
+Release:	 8%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -228,6 +228,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Sat Feb 22 2025 Chris Co <chrco@microsoft.com>
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-7
 - Bump release to rebuild for new kernel release
 
