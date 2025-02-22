@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           js-jquery
-Version:        3.5.0
-Release:        4%{?dist}
+Version:        3.7.1
+Release:        1%{?dist}
 Summary:        JavaScript DOM manipulation, event handling, and AJAX library
 BuildArch:      noarch
 
@@ -18,8 +18,7 @@ Source1:        jquery_%{version}_node_modules.tar.gz
 
 # disable gzip-js during build
 Patch1:         %{name}-disable-gzip-js.patch
-# Patch for CVE-2019-20149 in kind-of package https://github.com/jonschlinkert/kind-of/pull/31
-Patch2:         CVE-2019-20149.patch
+
 
 
 BuildRequires:  web-assets-devel
@@ -55,7 +54,7 @@ rm -rf dist/*
 
 # Install the cached node modules
 tar xf %{SOURCE1}
-%patch 2 -p1
+
 
 %build
 ./node_modules/grunt-cli/bin/grunt -v 'build:*:*' uglify
@@ -86,6 +85,9 @@ ln -s %{version} %{installdir}/%{ver_x}.%{ver_y}
 
 
 %changelog
+* wed Nov 11 2024 Akarsh Chaudhary <v-akarshc@microsoft.com>-3.7.1-1
+- Upgrade to version 3.7.1
+
 * Fri Aug 9 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.5.0-4
 - Patch CVE-2019-20149 in kind-of package.
 - License verified
