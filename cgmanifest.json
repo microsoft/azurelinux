@@ -15923,8 +15923,8 @@
         "type": "other",
         "other": {
           "name": "PEGTL",
-          "version": "2.8.3",
-          "downloadUrl": "https://github.com/taocpp/PEGTL/archive/2.8.3.tar.gz"
+          "version": "3.2.8",
+          "downloadUrl": "https://github.com/taocpp/PEGTL/archive/refs/tags/3.2.8.tar.gz"
         }
       }
     },
