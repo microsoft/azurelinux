@@ -23804,7 +23804,7 @@
         "other": {
           "name": "python-productmd",
           "version": "1.41",
-          "downloadUrl": "https://files.pythonhosted.org/packages/55/a9/30c7f22528ba386eebeaf4e6821d91ea402c27f8c851ec7e2c40e5f67762/productmd-1.41.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/productmd/productmd-1.41.tar.gz"
         }
       }
     },
