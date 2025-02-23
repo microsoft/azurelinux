@@ -16073,8 +16073,8 @@
         "type": "other",
         "other": {
           "name": "perl-Archive-Extract",
-          "version": "0.86",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Archive-Extract-0.86.tar.gz"
+          "version": "0.88",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Archive-Extract-0.88.tar.gz"
         }
       }
     },
