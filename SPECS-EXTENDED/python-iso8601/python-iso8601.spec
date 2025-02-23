@@ -68,6 +68,7 @@ BuildRequires:  python%{python3_other_pkgversion}-setuptools
 %changelog
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.0-1
 - Auto-upgrade to 1.1.0 - Extended package upgrade to IDC
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
