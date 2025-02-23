@@ -326,7 +326,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
-* Thu Feb 06 2025 Sudipta Pandit <sudpandit@microsoft.com> - 2.41-4
+* Sun Feb 23 2025 Sudipta Pandit <sudpandit@microsoft.com> - 2.41-4
 - Fix CVE-2025-0840 by backporting upstream patch
 
 * Mon Feb 17 2025 Sindhu Karri <lakarri@microsoft.com> - 2.41-3
