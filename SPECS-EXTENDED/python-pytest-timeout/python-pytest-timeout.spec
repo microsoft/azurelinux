@@ -10,6 +10,8 @@
 Summary:        py.test plugin to abort hanging tests
 Name:           python-%{pypi_name}
 Version:        2.3.1
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/pytest-dev/pytest-timeout
