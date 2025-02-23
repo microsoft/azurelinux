@@ -6,7 +6,7 @@ Release:        5%{?dist}
 Summary:        IMAP client interface with lots of features
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Mail-IMAPTalk
-Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROBM/Mail-IMAPTalk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
