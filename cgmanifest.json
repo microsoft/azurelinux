@@ -24263,8 +24263,8 @@
         "type": "other",
         "other": {
           "name": "python-qrcode",
-          "version": "6.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/q/qrcode/qrcode-6.1.tar.gz"
+          "version": "7.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/q/qrcode/qrcode-7.4.2.tar.gz"
         }
       }
     },
