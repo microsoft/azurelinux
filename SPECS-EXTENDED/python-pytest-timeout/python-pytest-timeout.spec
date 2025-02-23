@@ -58,6 +58,7 @@ pip3 install pytest==7.1.2 pytest-cov==3.0.0
 %changelog
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.1-1
 - Auto-upgrade to 2.3.1 - Extended package upgrade to IDC
+- License verified
 
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4.2-4
 - Drop BR on pytest and install latest deps to enable ptest
