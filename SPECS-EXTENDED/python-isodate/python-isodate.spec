@@ -73,6 +73,7 @@ mv %{SOURCE1} ./LICENSE.txt
 %changelog
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-1
 - Auto-upgrade to 0.6.1 - Extended package upgrade to IDC
+- License verified
 
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
 - License verified

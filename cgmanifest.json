@@ -22964,7 +22964,7 @@
         "other": {
           "name": "python-isodate",
           "version": "0.6.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/db/7a/c0a56c7d56c7fa723988f122fa1f1ccf8c5c4ccc48efad0d214b49e5b1af/isodate-0.6.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/isodate/isodate-0.6.1.tar.gz"
         }
       }
     },
