@@ -64,6 +64,7 @@ find %{buildroot}%{python3_sitearch}/gssapi -name '*.so' \
 %changelog
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-1
 - Auto-upgrade to 1.7.3 - Extended package upgrade to IDC
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
