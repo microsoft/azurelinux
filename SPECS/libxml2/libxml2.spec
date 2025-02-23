@@ -14,6 +14,7 @@ Patch2:         CVE-2024-25062.patch
 Patch3:         CVE-2022-49043.patch
 Patch4:         CVE-2024-56171.patch
 Patch5:         CVE-2025-24928.patch
+Patch6:         CVE-2025-27113.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -85,7 +86,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Sat Feb 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.10.4-6
-- Patch CVE-2025-24928 & CVE-2024-56171
+- Patch CVE-2025-24928, CVE-2025-27113 & CVE-2024-56171
 
 * Tue Jan 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.10.4-5 
 - Fix CVE-2022-49043 with an upstream patch
