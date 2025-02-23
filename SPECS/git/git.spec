@@ -7,13 +7,14 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.45.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-52005.patch
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
@@ -107,6 +108,7 @@ BuildArch:      noarch
 
 %prep
 %setup -q
+%autopatch -p1
 %{py3_shebang_fix} git-p4.py
 
 %build
@@ -173,6 +175,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 24 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.45.3-2
+- Patch CVE-2024-52005
+
 * Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.3-1
 - Auto-upgrade to 2.45.3 - CVE-2024-50349 and CVE-2024-52006
 
