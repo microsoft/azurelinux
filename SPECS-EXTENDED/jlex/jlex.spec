@@ -36,7 +36,7 @@ Release:        286%{?dist}
 Summary:        A Lexical Analyzer Generator for Java
 License:        BSD
 Group:          Development/Libraries
-URL:            http://www.cs.princeton.edu/~appel/modern/java/JLex/
+URL:            http://www.cs.princeton.edu/~appel/modern/java/JLex
 Source0:        %{url}/Archive/%{version}/Main.java
 Source1:        %{name}-%{version}.build.xml
 Source2:        %{url}/Archive/%{version}/manual.html
