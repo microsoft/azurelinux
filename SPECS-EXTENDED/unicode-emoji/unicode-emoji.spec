@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:           unicode-emoji
 Version:        16.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Unicode Emoji Data Files
 
 License:        Unicode-DFS-2016
@@ -22,7 +22,7 @@ BuildArch:      noarch
 %description
 Unicode Emoji Data Files are the machine-readable
 emoji data files associated with
-http://www.unicode.org/reports/tr51/index.html
+https://www.unicode.org/reports/tr51/index.html
 
 %prep
 %{nil}
@@ -49,7 +49,7 @@ cp -p %{SOURCE6} %{buildroot}%{emojidir}
 
 %changelog
 * Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 16.0-2
-- Update to 16.0
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - change the URL from http to https
 - License verified
 
