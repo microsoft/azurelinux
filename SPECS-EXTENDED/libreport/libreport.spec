@@ -673,6 +673,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %changelog
 * Thu Nov 28 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.17.15-1
 - Update to version 2.17.15
+-License verified.
 
 * Tue Dec 20 2022 Muhammad Falak <mwani@microsoft.com> - 2.13.1-9
 - License verified
