@@ -175,8 +175,8 @@ openssl-devel-3.3.2-2.azl3.aarch64.rpm
 openssl-libs-3.3.2-2.azl3.aarch64.rpm
 openssl-perl-3.3.2-2.azl3.aarch64.rpm
 openssl-static-3.3.2-2.azl3.aarch64.rpm
-libcap-2.69-1.azl3.aarch64.rpm
-libcap-devel-2.69-1.azl3.aarch64.rpm
+libcap-2.69-2.azl3.aarch64.rpm
+libcap-devel-2.69-2.azl3.aarch64.rpm
 debugedit-5.0-2.azl3.aarch64.rpm
 libarchive-3.7.7-1.azl3.aarch64.rpm
 libarchive-devel-3.7.7-1.azl3.aarch64.rpm
