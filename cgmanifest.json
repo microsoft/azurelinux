@@ -3805,7 +3805,7 @@
         }
       }
     },
-    y
+    {
       "component": {
         "type": "other",
         "other": {
@@ -27365,7 +27365,7 @@
         "other": {
           "name": "rubygem-sys-filesystem",
           "version": "1.4.3",
-          "downloadUrl": " https://rubygems.org/downloads/sys-filesystem-1.4.3.gem"
+          "downloadUrl": "https://github.com/djberg96/sys-filesystem/archive/refs/tags/sys-filesystem-1.4.3.tar.gz"
         }
       }
     },
