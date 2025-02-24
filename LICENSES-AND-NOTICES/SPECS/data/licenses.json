@@ -1840,6 +1840,7 @@
                 "python-sphinxcontrib-jsmath",
                 "python-sphinxcontrib-qthelp",
                 "python-sphinxcontrib-serializinghtml",
+                "python-sphinxygen",
                 "python-sqlalchemy",
                 "python-suds",
                 "python-systemd",
