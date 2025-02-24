@@ -107,6 +107,7 @@ chmod -R u+w $RPM_BUILD_ROOT%{perl_vendorarch}
 %changelog
 * Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.5-1
 - Update to version 1.4.5
+- License verified.
 
 * Thu Jul  8 2021 Muhammad Falak R Wani <mwani@microsoft.com> - 1.2.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
