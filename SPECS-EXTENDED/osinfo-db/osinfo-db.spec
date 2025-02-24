@@ -1,4 +1,3 @@
-
 Summary: 	osinfo database files
 Name: 		osinfo-db
 Version: 	20240701
