@@ -1,0 +1,11 @@
+diff -up dovecot-2.2.19/dovecot.service.in.privatetmp dovecot-2.2.19/dovecot.service.in
+--- dovecot-2.2.19/dovecot.service.in.privatetmp	2015-10-05 12:50:24.273780394 +0200
++++ dovecot-2.2.19/dovecot.service.in	2015-10-05 12:50:56.281621589 +0200
+@@ -26,6 +26,7 @@ After=local-fs.target network.target
+ Type=simple
+ ExecStart=@sbindir@/dovecot -F $OPTIONS
+ ExecReload=@sbindir@/dovecot reload
++PrivateTmp=true
+ NonBlocking=yes
+ 
+ [Install]
