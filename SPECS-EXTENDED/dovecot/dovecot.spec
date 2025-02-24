@@ -523,6 +523,7 @@ make check
 %changelog
 * Mon Oct 28 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.3.21.1-1
 - Upgrade to 2.3.21.1
+- License verified
 
 * Wed Aug 30 2023 Archana Choudhary <archana1@microsoft.com> - 2.3.20-1
 - Upgrade to 2.3.20
