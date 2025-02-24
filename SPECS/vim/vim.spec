@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.1.0791
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,8 @@ Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%
 Source1:        macros.vim
 Patch0:         CVE-2025-22134.patch
 Patch1:         CVE-2025-24014.patch
+Patch2:         CVE-2025-26603.patch
+Patch3:         CVE-2025-1215.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -220,6 +222,9 @@ fi
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
+- Patch CVE-2025-26603 & CVE-2025-1215
+
 * Thu Jan 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.0791-3
 - Patch to fix CVE-2025-24014.
 
