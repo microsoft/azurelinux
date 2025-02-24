@@ -10861,8 +10861,8 @@
         "type": "other",
         "other": {
           "name": "libreport",
-          "version": "2.13.1",
-          "downloadUrl": "https://github.com/abrt/libreport/archive/2.13.1/libreport-2.13.1.tar.gz"
+          "version": "2.17.15",
+          "downloadUrl": "https://github.com/abrt/libreport/archive/2.17.15/libreport-2.17.15.tar.gz"
         }
       }
     },
