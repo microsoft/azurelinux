@@ -6,7 +6,7 @@ Release: 10%{?dist}
 Summary: Library for controlling team network device
 License: LGPLv2+
 URL: http://www.libteam.org
-Source: http://www.libteam.org/files/libteam-%{version}.tar.gz
+Source0: https://www.libteam.org/files/libteam-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: jansson-devel
