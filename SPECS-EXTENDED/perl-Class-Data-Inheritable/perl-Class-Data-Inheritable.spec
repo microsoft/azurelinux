@@ -15,19 +15,21 @@ Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
-# Source0:      https://cpan.metacpan.org/modules/by-module/Class/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        %{_distro_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz#/perl-Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:       https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-%%{version}.tar.gz#/perl-Class-Data-Inheritable-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
+
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
+
 # Tests:
 BuildRequires:  perl(base)
 BuildRequires:  perl(Test::More)
@@ -64,7 +66,7 @@ make test
 %{_mandir}/man3/Class::Data::Inheritable.3*
 
 %changelog
-* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.09 - 10
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.09-10
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
