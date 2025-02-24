@@ -112,7 +112,7 @@ popd
 
 %changelog
 * Fri Dec 06 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.1-101
-- Initial CBL-Mariner import from Fedora 41.
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Wed Jul 31 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.8.1-100
