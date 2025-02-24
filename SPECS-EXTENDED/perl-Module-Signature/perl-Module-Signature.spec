@@ -99,7 +99,7 @@ rm -rf %{buildroot} %{gnupghome}
 
 %changelog
 * Wed Dec 11 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.89-1
-- Update to 0.89
+- Upgrade to 0.89
 - License verified
 
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.83-8
