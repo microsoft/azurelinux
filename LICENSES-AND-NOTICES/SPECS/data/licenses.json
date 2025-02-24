@@ -1945,6 +1945,7 @@
                 "rubygem-mustache",
                 "rubygem-mysql2",
                 "rubygem-pkg-config",
+                "rubygem-racc",
                 "rubygem-rake",
                 "rubygem-rake-compiler",
                 "rubygem-ronn",
