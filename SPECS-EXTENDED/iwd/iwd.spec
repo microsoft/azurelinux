@@ -1,7 +1,7 @@
 Summary:        Wireless daemon for Linux
 Name:           iwd
-Version:        1.22
-Release:        2%{?dist}
+Version:        3.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,6 +71,9 @@ mkdir -p %{buildroot}%{_sharedstatedir}/ead
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1-1
+- Auto-upgrade to 3.1 - Extended package upgrade to IDC
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22-2
 - Fix build issue for systemd/systemd-bootstrap confusion
 
