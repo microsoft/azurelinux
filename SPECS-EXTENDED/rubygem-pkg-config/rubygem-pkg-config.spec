@@ -41,8 +41,7 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
-%patch -P0 -p1
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
