@@ -2,7 +2,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.8.1
-Release:	1%{?dist}
+Release:	101%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:	LALR(1) parser generator
@@ -111,7 +111,7 @@ popd
 %doc	%{gem_instdir}/sample
 
 %changelog
-* Fri Dec 06 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.1-1
+* Fri Dec 06 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.1-101
 - Initial CBL-Mariner import from Fedora 41.
 - License verified
 
