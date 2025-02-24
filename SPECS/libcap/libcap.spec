@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.60
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Patch0:         CVE-2023-2602.patch
 Patch1:         CVE-2023-2603.patch
+Patch2:         CVE-2025-1390.patch
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
@@ -60,6 +61,9 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.60-3
+- Patch CVE-2025-1390
+
 * Thu Jun 15 2023 Henry Li <lihl@microsoft.com> - 2.60-2
 - Add patch to resolve CVE-2023-2602 and CVE-2023-2603
 - Use autosetup
