@@ -80,6 +80,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 %changelog
 * Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 4.1.1-11
 - Added Essential patches from Fedora 41.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
