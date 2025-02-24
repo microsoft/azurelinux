@@ -111,6 +111,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %changelog
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.9.92-1
 - Update to version 2.9.92
+- License verified
 
 * Mon Jun 28 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
