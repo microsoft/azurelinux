@@ -9742,7 +9742,7 @@
         "other": {
           "name": "libid3tag",
           "version": "0.16.3",
-          "downloadUrl":"https://codeberg.org/tenacityteam/libid3tag/archive/0.16.3.tar.gz"
+          "downloadUrl": "https://codeberg.org/tenacityteam/libid3tag/archive/0.16.3.tar.gz"
         }
       }
     },
