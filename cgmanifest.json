@@ -7642,7 +7642,7 @@
         "other": {
           "name": "iwd",
           "version": "3.3",
-          "downloadUrl": "https://www.kernel.org/pub/linux/network/wireless/iwd-3,3.tar.xz"
+          "downloadUrl": "https://www.kernel.org/pub/linux/network/wireless/iwd-3.3.tar.xz"
         }
       }
     },
