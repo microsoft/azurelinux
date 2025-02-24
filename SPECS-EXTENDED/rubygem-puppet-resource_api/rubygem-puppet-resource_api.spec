@@ -64,6 +64,7 @@ rm -rf %{buildroot}%{gem_instdir}/{.gitignore,.rubocop.yml,.travis.yml,appveyor.
 %changelog
 * Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.8.18-1
 - Update to version 1.8.18
+- License verified
 
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.14-2
 - Build from .tar.gz source.
