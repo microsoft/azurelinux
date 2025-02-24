@@ -68,7 +68,7 @@ Javadoc for %{name}.
 cp %{SOURCE0} .
 cp %{SOURCE2} .
 cp %{SOURCE3} .
-%patch0 -p0
+%patch 0
 cp %{SOURCE1} build.xml
  
 %build
