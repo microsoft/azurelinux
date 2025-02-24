@@ -9,7 +9,7 @@ License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://rubygems.org/gems/sys-filesystem
-Source:         https://rubygems.org/downloads/%{gem_name}-%{version}.gem#/%{name}-%{version}.gem
+Source:         https://github.com/djberg96/sys-filesystem/archive/refs/tags/sys-filesystem-1.4.3.tar.gz#/rubygem-sys-filesystem-1.4.3.tar.gz
 
 BuildRequires:  rubygems-devel
 
@@ -27,10 +27,10 @@ BuildArch:      noarch
 %{summary}.
 
 %prep
-%autosetup -n %{name}-%{version}
-
+%autosetup -n %{gem_name}-%{gem_name}-%{version}
+ 
 %build
-gem build ../%{name}-%{version}.gemspec
+gem build %{gem_name}.gemspec
 %gem_install
 
 %install
@@ -54,8 +54,8 @@ rm -v %{buildroot}%{gem_cache}
 
 %changelog
 * Wed Oct 30 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.4.3-6
-- Initial Azure Linux import from Fedora 41.
-- License verified
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
