@@ -43,7 +43,6 @@ make sudotest
 sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 ./quicktest.sh
-sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 
 %files
 %defattr(-,root,root)
