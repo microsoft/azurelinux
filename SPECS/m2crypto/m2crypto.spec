@@ -12,7 +12,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
-URL:            https://gitlab.com/m2crypto/m2crypto/
+URL:            https://gitlab.com/m2crypto/m2crypto
 Source:         %{url}/-/archive/%{commit}/%{name}-%{commit}.tar.gz
 Patch0:         0001-Don-t-expect-test_mkcert-to-fail-on-32-bit-Fedora-sp.patch
 
