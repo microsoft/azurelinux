@@ -12,6 +12,8 @@ Group:          Development/Tools
 URL:            https://sourceware.org/elfutils
 Source0:        https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
 Source1:        10-ptrace-yama.conf
+Patch0:         CVE-2025-1365.patch
+Patch1:         CVE-2025-1372.patch
 
 BuildRequires:  bison >= 1.875
 BuildRequires:  bzip2-devel
@@ -144,7 +146,7 @@ Requires:       %{name}-libelf = %{version}-%{release}
 These are the additional language files of elfutils.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -279,7 +281,8 @@ fi
 
 %changelog
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.192-1
-- Auto-upgrade to 0.192 - for CVE-2025-1372 & CVE-2025-1365
+- Auto-upgrade to 0.192 
+- Add patch for CVE-2025-1372 & CVE-2025-1365
 
 * Mon Jun 24 2024 Chris Co <chrco@microsoft.com> - 0.189-3
 - Use our own ptrace yama conf file to override default yama scope setting to be more secure
