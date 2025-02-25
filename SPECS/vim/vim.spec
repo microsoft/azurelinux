@@ -10,10 +10,6 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        macros.vim
-Patch0:         CVE-2025-22134.patch
-Patch1:         CVE-2025-24014.patch
-Patch2:         CVE-2025-26603.patch
-Patch3:         CVE-2025-1215.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -224,6 +220,7 @@ fi
 %changelog
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1146-1
 - Auto-upgrade to 9.1.1146 - for CVE-2025-26603 & CVE-2025-1215 [Medium]
+- Remove previously applied patches
 
 * Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
 - Patch CVE-2025-26603 & CVE-2025-1215
