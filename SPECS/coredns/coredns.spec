@@ -50,6 +50,13 @@ tar --no-same-owner -xf %{SOURCE1}
 %build
 export BUILDOPTS="-mod=vendor -v"
 export GITCOMMIT=%{coredns_gitcommit}
+
+# use go provided by host
+go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
+go_version_min=$(cat %{_builddir}/%{name}-%{version}/.go-version)
+echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
+export FORCE_HOST_GO=y
+
 make
 
 %install
