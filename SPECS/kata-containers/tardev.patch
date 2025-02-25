@@ -1,17 +1,44 @@
-From b3e71154d3cdc5a3e3033e1c3c504f26dc0d0523 Mon Sep 17 00:00:00 2001
+From c3251c07c519f6347b4a1492f8609d113da0d054 Mon Sep 17 00:00:00 2001
 From: Mitch Zhu <mitchzhu@microsoft.com>
-Date: Wed, 5 Feb 2025 01:08:34 +0000
-Subject: [PATCH] Build pod sandboxing with snapshotter and tarfs
+Date: Tue, 25 Feb 2025 01:46:38 +0000
+Subject: [PATCH] eliminate virtiofs
 
 ---
+ .../config/configuration-clh-snp.toml.in      |  2 +-
+ src/runtime/config/configuration-clh.toml.in  |  2 +-
  .../node-builder/azure-linux/package_build.sh | 27 ++++++++----------
  .../azure-linux/package_install.sh            | 28 +++++++++----------
  .../azure-linux/package_tools_install.sh      |  7 +++--
  .../node-builder/azure-linux/uvm_build.sh     | 12 ++++----
- .../rootfs-builder/cbl-mariner/config.sh      |  2 +-
- .../static-build/initramfs/Dockerfile         |  2 +-
- 6 files changed, 37 insertions(+), 41 deletions(-)
+ .../rootfs-builder/cbl-mariner/config.sh      |  1 -
+ 7 files changed, 37 insertions(+), 42 deletions(-)
 
+diff --git a/src/runtime/config/configuration-clh-snp.toml.in b/src/runtime/config/configuration-clh-snp.toml.in
+index 994605bb80..acc579d2ce 100644
+--- a/src/runtime/config/configuration-clh-snp.toml.in
++++ b/src/runtime/config/configuration-clh-snp.toml.in
+@@ -137,7 +137,7 @@ default_maxmemory = @DEFMAXMEMSZ@
+ #   - virtio-fs (default)
+ #   - virtio-fs-nydus
+ #   - none
+-shared_fs = "@DEFSHAREDFS_CLH_SNP_VIRTIOFS@"
++shared_fs = "none"
+ 
+ # Path to vhost-user-fs daemon.
+ virtio_fs_daemon = "@DEFVIRTIOFSDAEMON@"
+diff --git a/src/runtime/config/configuration-clh.toml.in b/src/runtime/config/configuration-clh.toml.in
+index 4e587d962d..e6fd828172 100644
+--- a/src/runtime/config/configuration-clh.toml.in
++++ b/src/runtime/config/configuration-clh.toml.in
+@@ -132,7 +132,7 @@ default_maxmemory = @DEFMAXMEMSZ@
+ #   - virtio-fs (default)
+ #   - virtio-fs-nydus
+ #   - none
+-shared_fs = "@DEFSHAREDFS_CLH_VIRTIOFS@"
++shared_fs = "none"
+ 
+ # Path to vhost-user-fs daemon.
+ virtio_fs_daemon = "@DEFVIRTIOFSDAEMON@"
 diff --git a/tools/osbuilder/node-builder/azure-linux/package_build.sh b/tools/osbuilder/node-builder/azure-linux/package_build.sh
 index 93cedb8554..d427946b43 100755
 --- a/tools/osbuilder/node-builder/azure-linux/package_build.sh
@@ -166,31 +193,16 @@ index 6734277650..75e268eeab 100755
  	pushd tools/osbuilder
  	sudo -E PATH=$PATH make DISTRO=cbl-mariner MEASURED_ROOTFS=yes DM_VERITY_FORMAT=kernelinit image
 diff --git a/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh b/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
-index 09f87cc91c..07ae735f1e 100644
+index 09f87cc91c..f032867d0c 100644
 --- a/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
 +++ b/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh
-@@ -5,7 +5,7 @@
- OS_NAME=cbl-mariner
+@@ -6,6 +6,5 @@ OS_NAME=cbl-mariner
  OS_VERSION=${OS_VERSION:-3.0}
  LIBC="gnu"
--PACKAGES="kata-packages-uvm"
-+PACKAGES="kata-packages-uvm systemd-udev"
- [ "$CONF_GUEST" = yes ] && PACKAGES+=" kata-packages-uvm-coco"
+ PACKAGES="kata-packages-uvm"
+-[ "$CONF_GUEST" = yes ] && PACKAGES+=" kata-packages-uvm-coco"
  [ "$AGENT_INIT" = no ] && PACKAGES+=" systemd"
  [ "$SECCOMP" = yes ] && PACKAGES+=" libseccomp"
-diff --git a/tools/packaging/static-build/initramfs/Dockerfile b/tools/packaging/static-build/initramfs/Dockerfile
-index 9ba6968c2c..b7970b9859 100644
---- a/tools/packaging/static-build/initramfs/Dockerfile
-+++ b/tools/packaging/static-build/initramfs/Dockerfile
-@@ -56,7 +56,7 @@ RUN apt-get update &&\
-     git clone --depth 1 --branch "${cryptsetup_version}" "${cryptsetup_repo}" cryptsetup && \
-     pushd cryptsetup && \
-     ./autogen.sh && \
--    ./configure  --enable-static --enable-static-cryptsetup --disable-udev --disable-external-tokens --disable-ssh-token && \
-+    ./configure  --enable-static --enable-static-cryptsetup --disable-external-tokens --disable-ssh-token && \
-     make && make install && \
-     strip /usr/sbin/veritysetup.static && \
-     popd && \
 -- 
 2.34.1
 
