@@ -1,5 +1,8 @@
 %global debug_package %{nil}
 
+# set commit number that corresponds to the github tag for the version
+%global coredns_gitcommit "6e11ebddfc13bfca683fcbcae72cc4af6de47dd2"
+
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
@@ -46,8 +49,7 @@ tar --no-same-owner -xf %{SOURCE1}
 
 %build
 export BUILDOPTS="-mod=vendor -v"
-# set commit number that correspond to the github tag for that version
-export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
+export GITCOMMIT=%{coredns_gitcommit}
 make
 
 %install
