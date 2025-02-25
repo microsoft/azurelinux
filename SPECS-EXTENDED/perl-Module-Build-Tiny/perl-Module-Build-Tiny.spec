@@ -1,7 +1,7 @@
 Summary:	A tiny replacement for Module::Build
 Name:		perl-Module-Build-Tiny
-Version:	0.039
-Release:	17%{?dist}
+Version:	0.051
+Release:	1%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,19 +36,18 @@ BuildRequires:	perl(File::ShareDir)
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(IO::File)
-BuildRequires:	perl(IO::Handle)
 BuildRequires:	perl(IPC::Open2)
 BuildRequires:	perl(IPC::Open3)
-BuildRequires:	perl(Test::More)
+BuildRequires:	perl(Test::More) >= 0.88
 BuildRequires:	perl(Test::Pod) >= 1.41
 BuildRequires:	perl(XSLoader)
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(DynaLoader)
 Requires:	perl(ExtUtils::CBuilder)
 Requires:	perl(ExtUtils::ParseXS)
 Requires:	perl(Pod::Man)
 Requires:	perl(TAP::Harness::Env)
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 # ExtUtils::CBuilder in EL-8 has no dependency on gcc or c++ (#1547165)
 # so pull them in ourselves
@@ -75,9 +74,10 @@ perl Build.PL --installdirs=vendor
 
 %install
 ./Build install --destdir=%{buildroot} --create_packlist=0
+%{_fixperms} -c %{buildroot}
 
 %check
-AUTHOR_TESTING=1 RELEASE_TESTING=1 ./Build test
+./Build test --verbose
 
 %files
 %license LICENSE
@@ -86,6 +86,10 @@ AUTHOR_TESTING=1 RELEASE_TESTING=1 ./Build test
 %{_mandir}/man3/Module::Build::Tiny.3*
 
 %changelog
+* Mon Dec 16 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.051-1
+- Update to 0.051 
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.039-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
