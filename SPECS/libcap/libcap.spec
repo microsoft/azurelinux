@@ -39,7 +39,7 @@ chmod -v 755 %{buildroot}%{_libdir}/libcap.so
 
 %check
 cd progs
-make tcapsh-static
+make sudotest
 sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 ./quicktest.sh
 
