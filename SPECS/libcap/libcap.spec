@@ -35,9 +35,7 @@ make prefix=%{_prefix}	SBINDIR=%{_sbindir} PAM_LIBDIR=%{_libdir} RAISE_SETFCAP=n
 chmod -v 755 %{buildroot}%{_libdir}/libcap.so
 
 %check
-cd progs
-sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
-./quicktest.sh
+make test
 
 %files
 %defattr(-,root,root)
