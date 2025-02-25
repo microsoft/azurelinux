@@ -1,13 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm16
 Version:        16.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+Patch0:         CVE-2023-29941.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -29,7 +30,7 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%setup -q -n llvm-project-llvmorg-%{version}
+%autosetup -n llvm-project-llvmorg-%{version}
 
 %build
 # Disable symbol generation
@@ -89,6 +90,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Mon Feb 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 16.0.0-4
+- Add patch for CVE-2023-29941
+
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-3
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 
