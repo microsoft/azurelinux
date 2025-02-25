@@ -1,0 +1,9 @@
+Error:
+<nil>
+
+Tokens:
+WORD[1:1-1:68][0-67]
+  KEYWORD_STRING[1:1-1:28][0-27]("GRUB_CMDLINE_LINUX_DEFAULT=")
+  STRING[1:28-1:56][27-55]("console=tty0 console=ttyS0 ")
+  QUOTED_VAR_EXPANSION[1:56-1:67][55-66]("kernelopts")
+  STRING[1:67-1:68][66-67]("")
