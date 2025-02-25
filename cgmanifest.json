@@ -12641,8 +12641,8 @@
         "type": "other",
         "other": {
           "name": "m2crypto",
-          "version": "0.38.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-0.38.0.tar.gz"
+          "version": "0.41.0^git20240613.3156614",
+          "downloadUrl": "https://gitlab.com/m2crypto/m2crypto/-/archive/3156614a94a4767ee563530983cba87cf2aad193/m2crypto-3156614a94a4767ee563530983cba87cf2aad193.tar.gz"
         }
       }
     },

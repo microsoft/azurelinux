@@ -1,16 +1,20 @@
+
+%global snapdate 20240613
+%global commit 3156614a94a4767ee563530983cba87cf2aad193
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
-Version:        0.38.0
-Release:        4%{?dist}
+Version:        0.41.0%{?snapdate:^git%{snapdate}.%{shortcommit}}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
-URL:            https://pypi.python.org/pypi/M2Crypto
-Source0:        https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-%{version}.tar.gz
-Patch0:         0001-skip-test_tls1_nok-which-cant-be-run-in-FIPS.patch
-Patch1:         CVE-2020-25657.patch
-Patch2:         CVE-2019-11358.patch
+URL:            https://gitlab.com/m2crypto/m2crypto/
+Source:         %{url}/-/archive/%{commit}/%{name}-%{commit}.tar.gz
+Patch0:         0001-Don-t-expect-test_mkcert-to-fail-on-32-bit-Fedora-sp.patch
 
 %description
 M2Crypto is a crypto and SSL toolkit for Python
@@ -22,6 +26,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  swig
+BuildRequires:  pkgconfig
 Requires:       openssl >= 1.1.1g-6
 Requires:       python3
 %if 0%{?with_check}
@@ -39,25 +44,44 @@ server. S/MIME. ZServerSSL: A HTTPS server for Zope. ZSmime: An S/MIME
 messenger for Zope.
 
 %prep
-%autosetup -n M2Crypto-%{version} -p1
+%autosetup -n %{?snapdate:%{name}-%{commit}}%{!?snapdate:M2Crypto-%{version}} -p1
+
+# remove outdated generated files
+rm -f src/M2Crypto/m2crypto.py src/SWIG/_m2crypto_wrap.c
 
 %build
+%set_build_flags
+if pkg-config openssl ; then
+	CFLAGS="$CFLAGS `pkg-config --cflags openssl`" ; export CFLAGS
+	LDFLAGS="$LDFLAGS`pkg-config --libs-only-L openssl`" ; export LDFLAGS
+fi
+
 %py3_build
 
 %install
+%set_build_flags
+if pkg-config openssl ; then
+	CFLAGS="$CFLAGS `pkg-config --cflags openssl`" ; export CFLAGS
+	LDFLAGS="$LDFLAGS`pkg-config --libs-only-L openssl`" ; export LDFLAGS
+fi
+
 %py3_install
 
 %check
-pip3 install parameterized
-#Testing: MiscSSLClientTestCase failing with SSLError not raised
-%python3 setup.py test
+# FIXME: Make the tests pass on RHEL 9 again...
+PYTHONPATH=%{buildroot}%{python3_sitearch} %{__python3} -munittest discover -v tests/ %{?rhel: || :}
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
+%doc CHANGES README.rst
 %license LICENCE
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 24 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.41.0^git20240613.3156614-1
+- Upgrade version to 0.41.0 post-release snapshot to support with Python 3.12
+- Updated Source URL path and removed patches which are not applicable with 0.41.0 version
+
 * Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.38.0-4
 - Fix CVE-2019-11358
 
