@@ -213,6 +213,8 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
