@@ -37,6 +37,7 @@ make prefix=%{_prefix}	SBINDIR=%{_sbindir} PAM_LIBDIR=%{_libdir} RAISE_SETFCAP=n
 chmod -v 755 %{buildroot}%{_libdir}/libcap.so
 
 %check
+cd progs
 make sudotest
 
 %files
