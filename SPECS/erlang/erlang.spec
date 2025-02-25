@@ -9,7 +9,6 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
-Patch0:         CVE-2023-48795.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -50,6 +49,7 @@ make
 %changelog
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.3.2.18-1
 - Auto-upgrade to 25.3.2.18 - for CVE-2025-26618
+- Remove previously applied patch for CVE-2023-48795
 
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 25.2-2
 - Include patch to fix CVE-2023-48795
