@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kronosnet",
-          "version": "1.20",
-          "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.20.tar.xz"
+          "version": "1.29",
+          "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.29.tar.xz"
         }
       }
     },
