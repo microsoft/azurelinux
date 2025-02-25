@@ -31,7 +31,7 @@
 Summary:        Low-level DNS(SEC) library with API
 Name:           ldns
 Version:        1.8.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -279,6 +279,10 @@ rm -rf doc/man
 %doc doc
 
 %changelog
+* Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.3-2
+- Patch to fix multi-job builds.
+- Also removed comment that caused rpmbuild warning.
+
 * Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.3-1
 - Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0
 - Removed unsupported multilib patch (azl only supports 64bit)
