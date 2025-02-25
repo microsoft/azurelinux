@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		pps-tools
 Version:	1.0.3
-Release:	1%{?dist}
+Release:	10%{?dist}
 Summary:	LinuxPPS user-space tools
 
 License:	GPL-2.0-or-later
@@ -43,7 +43,7 @@ install -p -m644 -t $RPM_BUILD_ROOT%{_includedir}/sys timepps.h
 %{_includedir}/sys/timepps.h
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-10
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
