@@ -97,7 +97,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 %changelog
 * Wed Feb 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.3.0-10
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified
+- License verified.
 - Added `BuildRequires: python3-sphinxcontrib-jquery` to fix build.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.3.0-9
@@ -220,3 +220,4 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 
 * Mon Apr  2 2018 Matthieu Saulnier <fantom@fedoraproject.org> - 2.3.0-1
 - Initial package
+
