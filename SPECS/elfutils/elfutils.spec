@@ -3,8 +3,8 @@
 
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
-Version:        0.189
-Release:        3%{?dist}
+Version:        0.192
+Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -278,6 +278,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.192-1
+- Auto-upgrade to 0.192 - for CVE-2025-1372 & CVE-2025-1365
+
 * Mon Jun 24 2024 Chris Co <chrco@microsoft.com> - 0.189-3
 - Use our own ptrace yama conf file to override default yama scope setting to be more secure
 
