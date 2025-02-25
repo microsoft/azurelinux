@@ -22,8 +22,16 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/kernel-mshv-signed/kernel-mshv-signed.spec",
+        "SPECS/kernel-mshv/kernel-mshv.spec",
+    ]),
+    frozenset([
         "SPECS-SIGNED/systemd-boot-signed/systemd-boot-signed.spec",
         "SPECS/systemd/systemd.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/edk2-hvloader-signed/edk2-hvloader-signed.spec",
+        "SPECS/edk2/edk2.spec"
     ]),
     frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
