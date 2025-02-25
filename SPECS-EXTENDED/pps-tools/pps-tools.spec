@@ -44,7 +44,7 @@ install -p -m644 -t $RPM_BUILD_ROOT%{_includedir}/sys timepps.h
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-10
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-9
