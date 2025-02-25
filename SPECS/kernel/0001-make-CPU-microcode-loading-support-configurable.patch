@@ -1,0 +1,32 @@
+From 8d50f733172324eaf3408806b4aaba3457fbb0ae Mon Sep 17 00:00:00 2001
+From: Allen Pais <apais@linux.microsoft.com>
+Date: Tue, 25 Feb 2025 17:18:27 +0000
+Subject: [PATCH] make CPU microcode loading support configurable
+
+Signed-off-by: Allen Pais <apais@linux.microsoft.com>
+---
+ arch/x86/Kconfig | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 05c82fd5d0f60..b62466920d857 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1311,8 +1311,12 @@ config X86_REBOOTFIXUPS
+ 	  Say N otherwise.
+ 
+ config MICROCODE
+-	def_bool y
+-	depends on CPU_SUP_AMD || CPU_SUP_INTEL
++	bool "CPU microcode loading support"
++	default y
++	help
++          Include support for loading CPU microcode updates.
++          Microcode updates can correct processor bugs or improve
++          stability and performance. You can safely say N if unsure.
+ 
+ config MICROCODE_LATE_LOADING
+ 	bool "Late microcode loading (DANGEROUS)"
+-- 
+2.48.1
+
