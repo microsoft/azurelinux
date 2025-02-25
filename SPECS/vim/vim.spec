@@ -197,6 +197,8 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %changelog
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1146-1
