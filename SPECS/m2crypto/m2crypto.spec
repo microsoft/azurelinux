@@ -125,7 +125,7 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} %{__python3} -munittest discover -v t
 * Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> - 0.35.2-1
 - Update to version 0.35.2. License verified.
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 0.30.1-4
+* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 0.30.1-4
 - Replaced incorrect URL link (removed mismatched version specifier). Fixed Source URL. Verified license.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 0.30.1-3
