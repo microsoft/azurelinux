@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "libnvidia-container-1.17.3.tar.gz": "9c28e729f1677b6ff9edb3f4dccff4f9827ffe13c04fbcffa41aabacbc0fdd54",
-  "nvidia-modprobe-550.54.14.tar.gz": "5687b0dfa6087dd480ae91e91ff1dca975794e35a2edcf9ec08d8f9cb98ef905"
- }
+  "Signatures": {
+    "nvidia-modprobe-550.54.14.tar.gz": "5687b0dfa6087dd480ae91e91ff1dca975794e35a2edcf9ec08d8f9cb98ef905",
+    "libnvidia-container-1.17.4.tar.gz": "dca982cb83a5937c4533e707dc8fb1070496dff989d71319b64e698519b3a0b9"
+  }
 }
