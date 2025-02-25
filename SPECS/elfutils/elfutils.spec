@@ -237,6 +237,9 @@ fi
 /etc/profile.d/debuginfod.sh
 %{_mandir}/man1/*
 %exclude %{_mandir}/man7/*
+%{_datadir}/fish/vendor_conf.d/debuginfod.fish
+%{_mandir}/man8/debuginfod.8.gz
+%{_mandir}/man8/debuginfod.service.8.gz
 
 %files default-yama-scope
 %{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
