@@ -1,7 +1,8 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.22.8-20241001.6.src.tar.gz
-%global ms_go_revision  1
+%global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
+%global ms_go_revision  2
+%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -14,8 +15,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.22.8
-Release:        1%{?dist}
+Version:        1.23.3
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +30,8 @@ Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.
 # bootstrap 02
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2024-45336.patch
+Patch2:         CVE-2024-45341.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -48,6 +51,8 @@ tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
 
 %setup -q -n go
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 # go 1.4 bootstraps with C.
@@ -153,6 +158,15 @@ fi
 %{_bindir}/*
 
 %changelog
+* Sat Feb 1 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.23.3-2
+- Address CVE-2024-45336, CVE-2024-45341 using an upstream patch.
+
+* Wed Jan 15 2025 Muhammad Falak <mwani@microsoft.com> - 1.23.3-1
+- Bump version to 1.23.3
+
+* Mon Jan 06 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.22.10-1
+- Bump version to 1.22.10-1
+
 * Thu Oct 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.8-1
 - Auto-upgrade to 1.22.8 - To fix CVE-2022-41717
 
