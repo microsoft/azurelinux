@@ -55,7 +55,7 @@ export GITCOMMIT=%{coredns_gitcommit}
 go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
 go_version_min=$(cat %{_builddir}/%{name}-%{version}/.go-version)
 echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
-export FORCE_HOST_GO=y
+echo "${go_version_host}" > %{_builddir}/%{name}-%{version}/.go-version
 
 make
 
