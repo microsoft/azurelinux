@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
-Version:        20.14.0
-Release:        6%{?dist}
+Version:        20.26.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.26.6-1
+- Auto-upgrade to 20.26.6 - for CVE-2024-53899 [High]
+
 * Wed Feb 07 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-6
 - Fix pytest version to <8 for compatibility
 
