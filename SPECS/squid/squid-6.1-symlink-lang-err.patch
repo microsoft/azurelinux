@@ -1,0 +1,26 @@
+diff --git a/errors/aliases b/errors/aliases
+index c256106..38c123a 100644
+--- a/errors/aliases
++++ b/errors/aliases
+@@ -14,8 +14,7 @@ da	da-dk
+ de	de-at de-ch de-de de-li de-lu
+ el	el-gr
+ en	en-au en-bz en-ca en-cn en-gb en-ie en-in en-jm en-nz en-ph en-sg en-tt en-uk en-us en-za en-zw
+-es	es-ar es-bo es-cl es-cu es-co es-do es-ec es-es es-pe es-pr es-py es-us es-uy es-ve es-xl spq
+-es-mx	es-bz es-cr es-gt es-hn es-ni es-pa es-sv
++es	es-ar es-bo es-cl es-co es-cr es-do es-ec es-es es-gt es-hn es-mx es-ni es-pa es-pe es-pr es-py es-sv es-us es-uy es-ve es-xl
+ et	et-ee
+ fa	fa-fa fa-ir
+ fi	fi-fi
+diff --git a/errors/language.am b/errors/language.am
+index a437d17..f2fe463 100644
+--- a/errors/language.am
++++ b/errors/language.am
+@@ -19,7 +19,6 @@ LANGUAGE_FILES = \
+ 	de.lang \
+ 	el.lang \
+ 	en.lang \
+-	es-mx.lang \
+ 	es.lang \
+ 	et.lang \
+ 	fa.lang \
