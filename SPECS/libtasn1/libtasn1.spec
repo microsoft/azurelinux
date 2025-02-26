@@ -25,7 +25,6 @@ developing applications that use libtasn1.
 
 %prep
 %autosetup -p1
-%setup -q
 
 %build
 ./configure \
