@@ -1,0 +1,47 @@
+From f27d65d3de42affe2aac14607066c293891cec4e Mon Sep 17 00:00:00 2001
+From: Ryan Delaney <ryan@reverecre.com>
+Date: Mon, 8 Jan 2024 17:04:16 -0800
+Subject: [PATCH] fix: serialize URL string contents to prevent XSS (#173)
+
+---
+ index.js               | 2 +-
+ test/unit/serialize.js | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/index.js b/index.js
+index ef54077..156f8f9 100644
+--- a/index.js
++++ b/index.js
+@@ -258,7 +258,7 @@ module.exports = function serialize(obj, options) {
+         }
+ 
+         if (type === 'L') {
+-            return "new URL(\"" + urls[valueIndex].toString() + "\")"; 
++            return "new URL(" + serialize(urls[valueIndex].toString(), options) + ")";
+         }
+ 
+         var fn = functions[valueIndex];
+diff --git a/test/unit/serialize.js b/test/unit/serialize.js
+index 6062910..54167d0 100644
+--- a/test/unit/serialize.js
++++ b/test/unit/serialize.js
+@@ -461,8 +461,8 @@ describe('serialize( obj )', function () {
+     describe('URL', function () {
+         it('should serialize URL', function () {
+             var u = new URL('https://x.com/')
+-            expect(serialize(u)).to.equal('new URL("https://x.com/")');
+-            expect(serialize({t: [u]})).to.be.a('string').equal('{"t":[new URL("https://x.com/")]}');
++            expect(serialize(u)).to.equal('new URL("https:\\u002F\\u002Fx.com\\u002F")');
++            expect(serialize({t: [u]})).to.be.a('string').equal('{"t":[new URL("https:\\u002F\\u002Fx.com\\u002F")]}');
+         });
+ 
+         it('should deserialize URL', function () {
+@@ -477,6 +477,8 @@ describe('serialize( obj )', function () {
+             expect(serialize('</script>')).to.equal('"\\u003C\\u002Fscript\\u003E"');
+             expect(JSON.parse(serialize('</script>'))).to.equal('</script>');
+             expect(eval(serialize('</script>'))).to.equal('</script>');
++            expect(serialize(new URL('x:</script>'))).to.equal('new URL("x:\\u003C\\u002Fscript\\u003E")');
++            expect(eval(serialize(new URL('x:</script>'))).href).to.equal('x:</script>');
+         });
+     });
+ 
