@@ -4,7 +4,6 @@ Name:           smc-tools
 Version:        1.8.4
 Release:        1%{?dist}
 Summary:        Shared Memory Communication Tools
-
 License:        EPL-1.0
 URL:            https://github.com/ibm-s390-linux/smc-tools
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
@@ -16,18 +15,17 @@ BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  libnl3-devel
 BuildRequires:  pkgconfig(bash-completion)
- 
+
 %ifarch s390 s390x
 # for smc_chk
 Requires:       python3
 Requires:       man
 %endif
- 
- 
+
 %description
 The Shared Memory Communication Tools (smc-tools) package enables usage of SMC
 sockets in Linux.
- 
+
 %prep
 %autosetup
  
@@ -41,7 +39,6 @@ sockets in Linux.
  
 %install
 %make_install V=1 LIBDIR=%{_libdir}
- 
  
 %files
 %license LICENSE
@@ -67,8 +64,6 @@ sockets in Linux.
 %endif
 %{_datadir}/bash-completion/
  
-
-
 %changelog
 * Mon Feb 17 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.8.4-1
 - Upgrade to version 1.8.4
