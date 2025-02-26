@@ -25213,8 +25213,8 @@
         "type": "other",
         "other": {
           "name": "python-waitress",
-          "version": "1.4.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/python-waitress-1.4.4-nodocs.tar.gz"
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/Pylons/waitress/archive/refs/tags/v3.0.1.tar.gz"
         }
       }
     },
