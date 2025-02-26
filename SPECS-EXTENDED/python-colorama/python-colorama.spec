@@ -72,6 +72,7 @@ Termcolor.
 * Wed Feb 26 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.4.6-10
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
+- Added `BuildRequires: python3-trove-classifiers python3-hatchling python3-pathspec` to fix build.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
