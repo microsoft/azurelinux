@@ -27754,8 +27754,8 @@
         "type": "other",
         "other": {
           "name": "serd",
-          "version": "0.30.2",
-          "downloadUrl": "https://download.drobilla.net/serd-0.30.2.tar.bz2"
+          "version": "0.32.4",
+          "downloadUrl": "https://download.drobilla.net/serd-0.32.4.tar.xz"
         }
       }
     },
