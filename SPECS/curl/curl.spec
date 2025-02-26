@@ -19,6 +19,13 @@ Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
 
+%if 0%{?with_check}
+BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(Digest::SHA)
+BuildRequires:  perl(Memoize)
+BuildRequires:  perl(Time::HiRes)
+%endif
+
 %description
 The cURL package contains an utility and a library used for
 transferring files with URL syntax to any of the following
@@ -60,6 +67,9 @@ This package contains minimal set of shared curl libraries.
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
 %make_build
+
+%check
+make test
 
 %install
 %make_install
