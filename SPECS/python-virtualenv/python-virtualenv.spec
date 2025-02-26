@@ -20,12 +20,12 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
-BuildRequires:  python3-flit
-BuildRequires:  python3-flit-core >= 3.8.0
 
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core >= 3.8.0
 
 Requires:       python3
 Requires:       python3-filelock
@@ -39,6 +39,8 @@ virtualenv is a tool to create isolated Python environment.
 
 %prep
 %autosetup -p1 -n virtualenv-%{version}
+
+%generate_buildrequires
 
 %build
 %pyproject_wheel
