@@ -19,6 +19,7 @@ Patch1: pcp-gcc15.patch
 %global __python2 python2
 
 %global _hostname_executable /bin/hostname
+%global _ps_executable /bin/ps
 
 # On 32-bit systems time64_t and perl modules do not play well together
 %ifarch ix86
