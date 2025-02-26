@@ -7,7 +7,7 @@ Name: 		memkind
 Summary: 	User Extensible Heap Manager
 Version: 	1.14.0
 Release: 	10%{?dist}
-License: 	BSD-2-Clause
+License: 	BSD-3-Clause
 URL: 		http://memkind.github.io/memkind
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ ExclusiveArch:	ppc64le
 ExclusiveArch:	s390x
 ExclusiveArch:	aarch64
 
-Source0: https://github.com/%{name}/%{name}/archive/%{gittag0}/%{name}-%{version}.tar.gz
+Source0: 	https://github.com/%{name}/%{name}/archive/%{gittag0}/%{name}-%{version}.tar.gz
 
 # unbreak the atrocious autotools Makefile.am construction for
 # libmemkind archive creation target
@@ -69,8 +69,7 @@ pre-alpha: bugs may exist and the interfaces may be subject to change prior to
 alpha release. Feedback on design or implementation is greatly appreciated.
 
 %prep
-%setup -q -a 0 -n %{name}-%{version}
-%patch -P0 -p1
+%autosetup -n %{name}-%{version}
 
 %build
 cd %{_builddir}/%{name}-%{version}
