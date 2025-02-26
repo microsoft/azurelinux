@@ -6,7 +6,7 @@ Release:        29%{?dist}
 Summary:        Compile .po files to .mo files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-Msgfmt
-Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
 # Update Makefile.PL to not use Module::Install::DSL CPAN RT#148295
 Patch0:         Locale-Msgfmt-0.15-Remove-using-of-MI-DSL.patch
 BuildArch:      noarch
