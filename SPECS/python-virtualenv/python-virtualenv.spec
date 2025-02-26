@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Derived from upstream patch https://github.com/pypa/virtualenv/commit/9f9dc6250fc88e92b1ca6206429966788846d696
 Patch0:         0001-replace-to-flit.patch
 BuildArch:      noarch
 
@@ -21,6 +20,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core >= 3.8.0
 
 %if 0%{?with_check}
 BuildRequires:  python3-pip
@@ -40,13 +41,15 @@ virtualenv is a tool to create isolated Python environment.
 %autosetup -p1 -n virtualenv-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 pip3 install 'tox>=3.27.1,<4.0.0'
+# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
+sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
 tox -e py
 
 %files -n python3-virtualenv
