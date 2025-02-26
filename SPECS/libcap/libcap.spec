@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.60
-Release:        4{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
