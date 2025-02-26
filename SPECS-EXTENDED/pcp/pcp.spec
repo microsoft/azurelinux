@@ -61,7 +61,6 @@ Patch1: pcp-gcc15.patch
 
 %bcond_without libvirt
 
-
 %global perl_interpreter perl-interpreter
 
 # support for pmdabcc, check bcc.spec for supported architectures of bcc
@@ -2564,7 +2563,9 @@ basic_manifest | keep '(etc/pcp|pmdas)/hacluster(/|$)' >pcp-pmda-hacluster-files
 basic_manifest | keep '(etc/pcp|pmdas)/haproxy(/|$)' >pcp-pmda-haproxy-files
 basic_manifest | keep '(etc/pcp|pmdas)/infiniband(/|$)' >pcp-pmda-infiniband-files
 basic_manifest | keep '(etc/pcp|pmdas)/json(/|$)' >pcp-pmda-json-files
+%if %{with libvirt}
 basic_manifest | keep '(etc/pcp|pmdas)/libvirt(/|$)' >pcp-pmda-libvirt-files
+%endif
 basic_manifest | keep '(etc/pcp|pmdas)/lio(/|$)' >pcp-pmda-lio-files
 basic_manifest | keep '(etc/pcp|pmdas)/lmsensors(/|$)' >pcp-pmda-lmsensors-files
 basic_manifest | keep '(etc/pcp|pmdas)/logger(/|$)' >pcp-pmda-logger-files
@@ -3387,7 +3388,10 @@ fi
 %endif
 
 %if !%{disable_python2} || !%{disable_python3}
+
+%if %{with libvirt}
 %files pmda-libvirt -f pcp-pmda-libvirt-files.rpm
+%endif
 
 %files pmda-lio -f pcp-pmda-lio-files.rpm
 
