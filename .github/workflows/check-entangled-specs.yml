@@ -31,5 +31,8 @@ jobs:
       - name: Get Python dependencies
         run: python3 -m pip install -r toolkit/scripts/requirements.txt
 
+      # We run unit test for check_entangled_specs.py before invoking it
       - name: Run entanglement checking script
-        run: python3 toolkit/scripts/check_entangled_specs.py .
+        run: |
+          PYTHONPATH=toolkit/scripts python3 toolkit/scripts/tests/test_check_entangled_specs.py
+          python3 toolkit/scripts/check_entangled_specs.py .
