@@ -22213,8 +22213,8 @@
         "type": "other",
         "other": {
           "name": "python-colorama",
-          "version": "0.4.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/colorama/colorama-0.4.1.tar.gz"
+          "version": "0.4.6",
+          "downloadUrl": "https://github.com/tartley/colorama/archive/0.4.6/colorama-0.4.6.tar.gz"
         }
       }
     },
