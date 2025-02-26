@@ -76,7 +76,7 @@ mkdir -p pyproject-wheeldir/ && cp tensorboard/data/server/pip_package/dist/*.wh
 bazel --batch --output_user_root=./tb_tmp build //tensorboard/pip_package:build_pip_package
 bazel-bin/tensorboard/pip_package/build_pip_package .
 mv %{pypi_name}-*.whl pyproject-wheeldir/
-rm -r tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm/_/node_modules
+rm -r tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
 
 %install
 %{pyproject_install}
