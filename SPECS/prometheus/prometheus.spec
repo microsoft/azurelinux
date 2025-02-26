@@ -1,9 +1,9 @@
 # When upgrading Prometheus, run `./generate_source_tarball.sh --pkgVersion <version>`
 # The script will spit out custom tarballs for `prometheus` and `promu` (More details in the script)
-%global promu_version 0.14.0
+%global promu_version 0.15.0
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
-Version:        2.45.4
+Version:        2.52.0
 Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -18,9 +18,9 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-Patch1:         CVE-2023-45288.patch
+#Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2024-6104.patch
-Patch3:         CVE-2024-24786.patch
+#Patch3:         CVE-2024-24786.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
