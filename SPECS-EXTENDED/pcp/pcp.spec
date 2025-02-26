@@ -127,7 +127,7 @@ Patch1: pcp-gcc15.patch
 # rpm producing "noarch" packages
 %global disable_noarch 0
 
-%global disable_arrow 0
+%global disable_arrow 1
 %global disable_xlsx 1
 
 %global disable_amdgpu 0
