@@ -61,7 +61,7 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n tensorboard-%{version}
-rm -r tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
+rm -r tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm/_/node_modules
 
 %build
 
