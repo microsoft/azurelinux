@@ -193,6 +193,8 @@ def check_matches(base_path: str):
     
     check_result = []
     for check_args in groups_to_check:
+        if verbose:
+            print(f'Calling check_spec_tags with "{check_args}"')
         check_result.append(check_spec_tags(base_path, *check_args))
     if any(check_result):
         print('The current repository state violates one or more spec entanglement rule!')

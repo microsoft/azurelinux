@@ -67,5 +67,30 @@ class TestCheckSpecTags(unittest.TestCase):
         result = check_entangled_specs.check_spec_tags(base_path, tags, groups, tag_expected_value)
         self.assertTrue(result)
 
+class TestCheckMatches(unittest.TestCase):
+    @patch('check_entangled_specs.Spec.from_file')
+    @patch('check_entangled_specs.get_tag_value')
+    @patch('check_entangled_specs.check_spec_tags')
+    @patch('sys.exit')
+    def test_check_matches_no_errors(self, mock_exit, mock_check_spec_tags, mock_get_tag_value, mock_from_file):
+        mock_get_tag_value.side_effect = ["1.0", "1"]
+        mock_from_file.return_value = MagicMock()
+        mock_check_spec_tags.side_effect = [ False, False, False, False, False ]
+        base_path = "/fake/path"
+        check_entangled_specs.check_matches(base_path)
+        mock_exit.assert_not_called()
+
+    @patch('check_entangled_specs.Spec.from_file')
+    @patch('check_entangled_specs.get_tag_value')
+    @patch('check_entangled_specs.check_spec_tags')
+    @patch('sys.exit')
+    def test_check_matches_with_errors(self, mock_exit, mock_check_spec_tags, mock_get_tag_value, mock_from_file):
+        mock_get_tag_value.side_effect = ["1.0", "1"]
+        mock_from_file.return_value = MagicMock()
+        mock_check_spec_tags.side_effect = [False, False, True, False, False]
+        base_path = "/fake/path"
+        check_entangled_specs.check_matches(base_path)
+        mock_exit.assert_called_once_with(1)
+
 if __name__ == '__main__':
     unittest.main()
