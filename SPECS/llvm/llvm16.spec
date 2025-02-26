@@ -9,6 +9,7 @@ Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 Patch0:         CVE-2023-29941.patch
+Patch1:         CVE-2023-29933.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -92,6 +93,7 @@ ninja check-all
 %changelog
 * Mon Feb 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 16.0.0-4
 - Add patch for CVE-2023-29941
+- Add patch for CVE-2023-29933
 
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-3
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
