@@ -1,6 +1,6 @@
 # When upgrading Prometheus, run `./generate_source_tarball.sh --pkgVersion <version>`
 # The script will spit out custom tarballs for `prometheus` and `promu` (More details in the script)
-%global promu_version 0.14.0
+%global promu_version 0.15.0
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.52.0
@@ -18,9 +18,7 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-Patch1:         CVE-2023-45288.patch
-Patch2:         CVE-2024-6104.patch
-Patch3:         CVE-2024-24786.patch
+Patch1:         CVE-2024-6104.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
@@ -139,6 +137,7 @@ fi
 %changelog
 * Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.52.0-1
 - Auto-upgrade to 2.52.0 - for CVE-2024-35255
+- Remove previously applied patch for CVE-2023-45288.patch and CVE-2024-24786.patch
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 2.45.4-6
 - Fix CVE-2024-24786 by patching
