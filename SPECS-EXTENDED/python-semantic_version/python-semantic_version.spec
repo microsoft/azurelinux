@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{pypi_name}
 Version:        2.10.0
-Release:        9%{?dist}   
+Release:        1%{?dist}   
 Summary:        Library implementing the 'SemVer' scheme
 
 License:        BSD
@@ -72,8 +72,8 @@ rm -rf docs/_build/html/.{doctrees,buildinfo}
 %doc docs/_build/html
 
 %changelog
-* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.10.0-9
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.10.0-1
+- Update to version 2.10.0
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.4-4
