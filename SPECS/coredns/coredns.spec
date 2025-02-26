@@ -66,7 +66,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
-* Fri Dec 13 2023 <ankitapareek@microsoft.com> - 1.11.1-4
+* Fri Dec 13 2024 <ankitapareek@microsoft.com> - 1.11.1-4
 - Address CVE-2024-53259 in the vendor package
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
