@@ -106,7 +106,7 @@ Patch1: pcp-gcc15.patch
 %global disable_nutcracker 0
 
 # support for pmdarpm
-%global disable_rpm 0
+%global disable_rpm 1
 
 
 # Qt development and runtime environment missing components before el6
