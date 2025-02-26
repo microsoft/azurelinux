@@ -28687,7 +28687,7 @@
         "other": {
           "name": "taglib",
           "version": "1.13.1",
-          "downloadUrl": "http://taglib.github.io/releases/taglib-1.13.1.tar.gz"
+          "downloadUrl": "https://taglib.github.io/releases/taglib-1.13.1.tar.gz"
         }
       }
     },
