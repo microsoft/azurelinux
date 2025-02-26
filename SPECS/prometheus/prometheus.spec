@@ -3,8 +3,8 @@
 %global promu_version 0.14.0
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
-Version:        2.45.4
-Release:        6%{?dist}
+Version:        2.52.0
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -137,6 +137,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.52.0-1
+- Auto-upgrade to 2.52.0 - for CVE-2024-35255
+
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 2.45.4-6
 - Fix CVE-2024-24786 by patching
 
