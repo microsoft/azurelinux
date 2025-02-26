@@ -7,7 +7,7 @@ TensorBoard is a suite of web applications for inspecting and understanding your
 Summary:        TensorBoard is a suite of web applications for inspecting and understanding your TensorFlow runs and graphs
 Name:           python-%{pypi_name}
 Version:        2.16.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,9 +15,6 @@ URL:            https://github.com/tensorflow/tensorboard
 # This source also contains the dependencies required for building tensorboard
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0000-Use-system-package.patch
-Patch1:         CVE-2024-43788.patch
-Patch2:         CVE-2024-43796.patch
-Patch3:         CVE-2024-45590.patch
 
 BuildRequires:  bazel
 BuildRequires:  build-essential
@@ -64,7 +61,7 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n tensorboard-%{version}
-rm -rf tensorboard-%{version}/tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
+rm -r tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
 
 %build
 
@@ -98,6 +95,10 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 %{python3_sitelib}/tensorboard_data_server*
 
 %changelog
+* Wed Feb 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.16.2-7
+- fix prep section
+- Remove previously applied patches.
+
 * Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 2.16.2-6
 - Remove npm directory before building to make sure as no nodejs vulnerability is getting through
 - It is done while fixing CVE-2024-21538
