@@ -68,7 +68,6 @@ fi
 %py3_install
 
 %check
-# FIXME: Make the tests pass on RHEL 9 again...
 PYTHONPATH=%{buildroot}%{python3_sitearch} %{__python3} -munittest discover -v tests/ %{?rhel: || :}
 
 %files -n python3-m2crypto
