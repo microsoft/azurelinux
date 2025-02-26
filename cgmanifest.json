@@ -1967,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "24.1.2",
-          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
+          "version": "24.3.0",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.3.0/conda-24.3.0.tar.gz"
         }
       }
     },
@@ -15817,7 +15817,7 @@
           "downloadUrl": "https://github.com/hughsie/passim/releases/download/0.1.8/passim-0.1.8.tar.xz"
         }
       }
-    },    
+    },
     {
       "component": {
         "type": "other",

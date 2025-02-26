@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
-Version:        24.1.2
-Release:        2%{?dist}
+Version:        24.3.0
+Release:        1%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -424,6 +424,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.3.0-1
+- Auto-upgrade to 24.3.0 - fixes subprocess_call when stdin is bytes
+
 * Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 24.1.2-2
 - Add pytest and pip install archspec to fix package tests
 
