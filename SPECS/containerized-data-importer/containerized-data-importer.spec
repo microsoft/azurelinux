@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        9%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,8 @@ Patch3:         CVE-2024-45338.patch
 Patch4:         CVE-2023-39325.patch
 Patch5:         CVE-2023-44487.patch
 Patch6:         CVE-2024-28180.patch
+Patch7:         CVE-2023-45288.patch
+Patch8:         CVE-2023-3978.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -149,20 +151,20 @@ CGO_ENABLED=0 ./hack/build/build-go.sh build \
 %install
 mkdir -p %{buildroot}%{_bindir}
 
-install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/virt-cdi-apiserver
+install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/cdi-apiserver
 
 install -p -m 0755 cmd/cdi-cloner/cloner_startup.sh %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/cdi-cloner/cdi-cloner %{buildroot}%{_bindir}/
 
-install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/virt-cdi-controller
+install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/cdi-controller
 
-install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/virt-cdi-importer
+install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/cdi-importer
 
-install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/virt-cdi-operator
+install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/cdi-operator
 
-install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
+install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/cdi-uploadproxy
 
-install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
+install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/cdi-uploadserver
 
 install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
 
@@ -180,7 +182,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %files api
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-apiserver
+%{_bindir}/cdi-apiserver
 
 %files cloner
 %license LICENSE
@@ -191,12 +193,12 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %files controller
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-controller
+%{_bindir}/cdi-controller
 
 %files importer
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-importer
+%{_bindir}/cdi-importer
 %{_bindir}/cdi-containerimage-server
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
@@ -204,18 +206,18 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %files operator
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-operator
+%{_bindir}/cdi-operator
 %{_bindir}/csv-generator
 
 %files uploadproxy
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-uploadproxy
+%{_bindir}/cdi-uploadproxy
 
 %files uploadserver
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-uploadserver
+%{_bindir}/cdi-uploadserver
 
 %files manifests
 %license LICENSE
@@ -226,6 +228,15 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Sun Feb 23 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.57.0-12
+- Fix CVE-2023-3978 with a backported patch
+
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-11
+- Address CVE-2023-45288
+
+* Mon Feb 03 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.57.0-10
+- Rename cdi binaries to be inline with upstream.
+
 * Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-9
 - Fix CVE-2024-28180 with an upstream patch
 

@@ -1,15 +1,18 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global apiversion 0.5
+%global apiversion 0.6
 
 Name: libcmis
-Version: 0.5.2
-Release: 5%{?dist}
+Version: 0.6.2
+Release: 1%{?dist}
 Summary: A C/C++ client library for CM interfaces
 
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 URL: https://github.com/tdf/libcmis
 Source: https://github.com/tdf/libcmis/releases/download/v%{version}/%{name}-%{version}.tar.xz
+
+# https://github.com/tdf/libcmis/issues/51
+Patch:  libxmis-0.6.2-libxml2-2.12.0-includes.patch
 
 BuildRequires: boost-devel
 BuildRequires: gcc-c++
@@ -17,6 +20,7 @@ BuildRequires: pkgconfig(cppunit)
 BuildRequires: pkgconfig(libcurl)
 BuildRequires: pkgconfig(libxml-2.0)
 BuildRequires: xmlto
+BuildRequires: make
 
 %description
 LibCMIS is a C/C++ client library for working with CM (content management)
@@ -51,17 +55,17 @@ sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     libtool
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 rm -f %{buildroot}/%{_libdir}/*.la
 
 %ldconfig_scriptlets
 
 %check
 export LD_LIBRARY_PATH=%{buildroot}/%{_libdir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-make %{?_smp_mflags} check
+%make_build} check
 
 %files
 %doc AUTHORS NEWS
@@ -83,6 +87,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/cmis-client.1*
 
 %changelog
+* Tue Nov 12 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.6.2-1
+- Update to 0.6.2
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

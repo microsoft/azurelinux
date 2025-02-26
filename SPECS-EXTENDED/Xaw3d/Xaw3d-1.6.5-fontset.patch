@@ -1,0 +1,44 @@
+--- libXaw3d-1.6.5/src/Command.c~	2023-05-12 19:08:46.000000000 -0500
++++ libXaw3d-1.6.5/src/Command.c	2024-02-01 15:39:48.779640222 -0600
+@@ -220,6 +220,8 @@
+   CommandWidget cbw = (CommandWidget) new;
+   int shape_event_base, shape_error_base;
+ 
++  if (!cbw->label.font) XtError("Aborting: no font found\n");
++
+   if (cbw->command.shape_style != XawShapeRectangle
+       && !XShapeQueryExtension(XtDisplay(new), &shape_event_base,
+ 			       &shape_error_base))
+--- libXaw3d-1.6.5/src/List.c~	2023-05-12 19:08:46.000000000 -0500
++++ libXaw3d-1.6.5/src/List.c	2024-02-01 15:40:50.716135054 -0600
+@@ -362,6 +362,8 @@
+ {
+     ListWidget lw = (ListWidget) new;
+ 
++    if (!lw->list.font) XtError("Aborting: no font found\n");
++
+ /*
+  * Initialize all private resources.
+  */
+--- libXaw3d-1.6.5/src/SmeBSB.c~	2023-05-12 19:08:46.000000000 -0500
++++ libXaw3d-1.6.5/src/SmeBSB.c	2024-02-01 15:41:39.772150867 -0600
+@@ -203,6 +203,8 @@
+     else
+ 	entry->sme_bsb.label = XtNewString( entry->sme_bsb.label );
+ 
++    if (!entry->sme_bsb.font) XtError("Aborting: no font found\n");
++
+     CreateGCs(new);
+ 
+     GetBitmapInfo(new, TRUE);	/* Left Bitmap Info */
+--- libXaw3d-1.6.5/src/Tip.c~	2023-05-12 19:08:46.000000000 -0500
++++ libXaw3d-1.6.5/src/Tip.c	2024-02-01 15:42:15.952687460 -0600
+@@ -248,6 +248,8 @@
+     TipWidget tip = (TipWidget)w;
+     XGCValues values;
+ 
++    if (!tip->tip.font) XtError("Aborting: no font found\n");
++
+     tip->tip.timer = 0;
+ 
+     values.foreground = tip->tip.foreground;
