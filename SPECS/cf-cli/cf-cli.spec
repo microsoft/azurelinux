@@ -4,8 +4,8 @@
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
-Version:        8.7.3
-Release:        6%{?dist}
+Version:        8.7.11
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,6 +69,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.7.11-1
+- Auto-upgrade to 8.7.11 - address CVE-2023-44487
+
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.7.3-6
 - Address CVE-2023-45288
 
