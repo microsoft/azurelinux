@@ -1,17 +1,17 @@
-From c3251c07c519f6347b4a1492f8609d113da0d054 Mon Sep 17 00:00:00 2001
+From 9b54eedf28753df1485d9a08c7572684c7cebf75 Mon Sep 17 00:00:00 2001
 From: Mitch Zhu <mitchzhu@microsoft.com>
 Date: Tue, 25 Feb 2025 01:46:38 +0000
-Subject: [PATCH] eliminate virtiofs
+Subject: [PATCH] eliminate virtiofs, with AGENT_POLICY=yes
 
 ---
  .../config/configuration-clh-snp.toml.in      |  2 +-
  src/runtime/config/configuration-clh.toml.in  |  2 +-
- .../node-builder/azure-linux/package_build.sh | 27 ++++++++----------
- .../azure-linux/package_install.sh            | 28 +++++++++----------
- .../azure-linux/package_tools_install.sh      |  7 +++--
- .../node-builder/azure-linux/uvm_build.sh     | 12 ++++----
+ .../node-builder/azure-linux/package_build.sh | 34 +++++++++----------
+ .../azure-linux/package_install.sh            | 28 +++++++--------
+ .../azure-linux/package_tools_install.sh      | 12 ++++---
+ .../node-builder/azure-linux/uvm_build.sh     | 17 +++++-----
  .../rootfs-builder/cbl-mariner/config.sh      |  1 -
- 7 files changed, 37 insertions(+), 42 deletions(-)
+ 7 files changed, 48 insertions(+), 48 deletions(-)
 
 diff --git a/src/runtime/config/configuration-clh-snp.toml.in b/src/runtime/config/configuration-clh-snp.toml.in
 index 994605bb80..acc579d2ce 100644
@@ -40,10 +40,20 @@ index 4e587d962d..e6fd828172 100644
  # Path to vhost-user-fs daemon.
  virtio_fs_daemon = "@DEFVIRTIOFSDAEMON@"
 diff --git a/tools/osbuilder/node-builder/azure-linux/package_build.sh b/tools/osbuilder/node-builder/azure-linux/package_build.sh
-index 93cedb8554..d427946b43 100755
+index 93cedb8554..b4e0101bb5 100755
 --- a/tools/osbuilder/node-builder/azure-linux/package_build.sh
 +++ b/tools/osbuilder/node-builder/azure-linux/package_build.sh
-@@ -47,23 +47,20 @@ fi
+@@ -41,29 +41,27 @@ fi
+ 
+ agent_make_flags="LIBC=gnu OPENSSL_NO_VENDOR=Y DESTDIR=${AGENT_INSTALL_DIR} BUILD_TYPE=${AGENT_BUILD_TYPE}"
+ 
+-if [ "${CONF_PODS}" == "yes" ]; then
+-	agent_make_flags+=" AGENT_POLICY=yes"
+-fi
++#if [ "${CONF_PODS}" == "yes" ]; then
++#	agent_make_flags+=" AGENT_POLICY=yes"
++#fi
++agent_make_flags+=" AGENT_POLICY=yes"
  
  pushd "${repo_dir}"
  
@@ -127,7 +137,7 @@ index ecc2b8bee0..15c542f3b1 100755
  
  echo "Installing diagnosability binaries (monitor, runtime, collect-data script)"
 diff --git a/tools/osbuilder/node-builder/azure-linux/package_tools_install.sh b/tools/osbuilder/node-builder/azure-linux/package_tools_install.sh
-index 8bf306bce1..6d6417a071 100755
+index 8bf306bce1..404cddede9 100755
 --- a/tools/osbuilder/node-builder/azure-linux/package_tools_install.sh
 +++ b/tools/osbuilder/node-builder/azure-linux/package_tools_install.sh
 @@ -27,10 +27,10 @@ mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_OSB}/rootfs-builder/cbl-mariner"
@@ -135,22 +145,25 @@ index 8bf306bce1..6d6417a071 100755
  mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_OSB}/node-builder/azure-linux/agent-install/usr/bin"
  mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_OSB}/node-builder/azure-linux/agent-install/usr/lib/systemd/system"
 +mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs"
++mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa"
  
  if [ "${CONF_PODS}" == "yes" ]; then
- 	mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa"
+-	mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa"
 -	mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs"
  	mkdir -p "${PREFIX}/${UVM_TOOLS_PATH_OSB}/igvm-builder/azure-linux"
  fi
  
-@@ -52,11 +52,12 @@ cp -a --backup=numbered tools/osbuilder/node-builder/azure-linux/agent-install/u
+@@ -52,11 +52,13 @@ cp -a --backup=numbered tools/osbuilder/node-builder/azure-linux/agent-install/u
  cp -a --backup=numbered tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-containers.target "${PREFIX}/${UVM_TOOLS_PATH_OSB}/node-builder/azure-linux/agent-install/usr/lib/systemd/system/"
  cp -a --backup=numbered tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service "${PREFIX}/${UVM_TOOLS_PATH_OSB}/node-builder/azure-linux/agent-install/usr/lib/systemd/system/"
  
 +cp -a --backup=numbered src/tarfs/Makefile "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs/"
 +cp -a --backup=numbered src/tarfs/tarfs.c "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs/"
 +
++cp -a --backup=numbered src/kata-opa/allow-all.rego "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa/"
++
  if [ "${CONF_PODS}" == "yes" ]; then
- 	cp -a --backup=numbered src/kata-opa/allow-all.rego "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa/"
+-	cp -a --backup=numbered src/kata-opa/allow-all.rego "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa/"
  	cp -a --backup=numbered src/kata-opa/allow-set-policy.rego "${PREFIX}/${UVM_TOOLS_PATH_SRC}/kata-opa/"
 -	cp -a --backup=numbered src/tarfs/Makefile "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs/"
 -	cp -a --backup=numbered src/tarfs/tarfs.c "${PREFIX}/${UVM_TOOLS_PATH_SRC}/tarfs/"
@@ -158,11 +171,18 @@ index 8bf306bce1..6d6417a071 100755
  	cp -a --backup=numbered tools/osbuilder/igvm-builder/azure-linux/config.sh "${PREFIX}/${UVM_TOOLS_PATH_OSB}/igvm-builder/azure-linux/"
  	cp -a --backup=numbered tools/osbuilder/igvm-builder/azure-linux/igvm_lib.sh "${PREFIX}/${UVM_TOOLS_PATH_OSB}/igvm-builder/azure-linux/"
 diff --git a/tools/osbuilder/node-builder/azure-linux/uvm_build.sh b/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
-index 6734277650..75e268eeab 100755
+index 6734277650..4b2e32abae 100755
 --- a/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
 +++ b/tools/osbuilder/node-builder/azure-linux/uvm_build.sh
-@@ -29,11 +29,9 @@ if [ "${CONF_PODS}" == "yes" ]; then
- 	rootfs_make_flags+=" AGENT_POLICY=yes CONF_GUEST=yes AGENT_POLICY_FILE=${agent_policy_file_abs}"
+@@ -26,14 +26,15 @@ source "${common_file}"
+ rootfs_make_flags="AGENT_SOURCE_BIN=${AGENT_INSTALL_DIR}/usr/bin/kata-agent OS_VERSION=${OS_VERSION}"
+ 
+ if [ "${CONF_PODS}" == "yes" ]; then
+-	rootfs_make_flags+=" AGENT_POLICY=yes CONF_GUEST=yes AGENT_POLICY_FILE=${agent_policy_file_abs}"
++	rootfs_make_flags+=" CONF_GUEST=yes AGENT_POLICY=yes AGENT_POLICY_FILE=${agent_policy_file_abs}"
++else
++	agent_policy_allow_all="${repo_dir}/src/kata-opa/allow-all.rego"
++	rootfs_make_flags+=" AGENT_POLICY=yes AGENT_POLICY_FILE=${agent_policy_file_allow_all}"
  fi
  
 -if [ "${CONF_PODS}" == "yes" ]; then
@@ -176,7 +196,7 @@ index 6734277650..75e268eeab 100755
  fi
  
  pushd "${repo_dir}"
-@@ -49,13 +47,13 @@ echo "Installing agent service files into rootfs"
+@@ -49,13 +50,13 @@ echo "Installing agent service files into rootfs"
  sudo cp ${AGENT_INSTALL_DIR}/usr/lib/systemd/system/kata-containers.target ${ROOTFS_PATH}/usr/lib/systemd/system/kata-containers.target
  sudo cp ${AGENT_INSTALL_DIR}/usr/lib/systemd/system/kata-agent.service ${ROOTFS_PATH}/usr/lib/systemd/system/kata-agent.service
  

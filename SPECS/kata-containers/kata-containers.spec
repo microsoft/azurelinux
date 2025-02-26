@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.2.0.azl4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -101,6 +101,9 @@ fi
 %dir %{tools_pkg}/tools/osbuilder
 %{tools_pkg}/tools/osbuilder/Makefile
 
+%dir %{tools_pkg}/src
+%dir %{tools_pkg}/src/kata-opa
+%{tools_pkg}/src/kata-opa/allow-all.rego
 %dir %{tools_pkg}/src/tarfs
 %{tools_pkg}/src/tarfs/Makefile
 %{tools_pkg}/src/tarfs/tarfs.c
@@ -136,6 +139,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Feb 25 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-5
+- Set AGENT_POLICY=yes
+
 * Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-4
 - Refactor patch
 
