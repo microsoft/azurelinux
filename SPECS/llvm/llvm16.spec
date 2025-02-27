@@ -15,6 +15,7 @@ BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
+BuildRequires:  python3-psutil
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
@@ -31,7 +32,10 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%autosetup -n llvm-project-llvmorg-%{version}
+%autosetup -p1 -n llvm-project-llvmorg-%{version}
+
+echo "errors: FINDME"
+find -name SparseBufferRewriting.cpp
 
 %build
 # Disable symbol generation
