@@ -357,8 +357,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.3-1
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-1
 - Auto-upgrade to 3.3.3 - none
+- Initially run through autoupgrader (CBL-Mariner Servicing Account <cblmargh@microsoft.com>)
 
 * Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-2
 - Move SymCrypt and SymCrypt-OpenSSL Recommends from main package to libs
