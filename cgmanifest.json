@@ -1967,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "24.1.2",
-          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
+          "version": "24.3.0",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.3.0/conda-24.3.0.tar.gz"
         }
       }
     },
@@ -15817,7 +15817,7 @@
           "downloadUrl": "https://github.com/hughsie/passim/releases/download/0.1.8/passim-0.1.8.tar.xz"
         }
       }
-    },    
+    },
     {
       "component": {
         "type": "other",
@@ -22055,6 +22055,16 @@
           "name": "python-blivet",
           "version": "3.2.2",
           "downloadUrl": "http://github.com/storaged-project/blivet/archive/blivet-3.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-boltons",
+          "version": "25.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/boltons/boltons-25.0.0.tar.gz"
         }
       }
     },
