@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.20.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -529,6 +529,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Thu Feb 27 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-3
+- Fix uninitialized memory warning.
+
 * Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-2
 - Fix warning during package uninstall.
 
