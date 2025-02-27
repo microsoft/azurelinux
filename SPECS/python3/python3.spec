@@ -342,7 +342,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Thu Feb 06 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.9.19-10
 - Patch CVE-2025-0938
 
-* Mon Feb 03 2024 Bala <balakumaran.kannan@microsoft.com> - 3.9.19-9
+* Mon Feb 03 2025 Balakumaran Kannan <balakumaran.kannan@microsoft.com> - 3.9.19-9
 - Address CVE-2023-27043 by patching
 
 * Thu Nov 28 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.9.19-8
