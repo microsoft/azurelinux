@@ -8,7 +8,7 @@ Summary:        OpenCL Library (Installable Client Library) Bindings
 
 License:        BSD-2-Clause
 URL:            https://github.com/OCL-dev/%{name}/
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/OCL-dev/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  automake
