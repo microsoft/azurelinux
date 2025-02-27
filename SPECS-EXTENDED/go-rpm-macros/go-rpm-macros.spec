@@ -7,7 +7,6 @@ Distribution:   Azure Linux
 Version:   3.6.0
 %forgemeta
 
-#https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/azl
 %global _docdir_fmt     %{name}
 
@@ -27,8 +26,8 @@ Summary:   Build-stage rpm automation for Go packages
 
 License:   GPLv3+
 URL:       %{forgeurl}
-#Source:    %{forgesource}
 Source0:  https://pagure.io/go-rpm-macros/archive/3.6.0/%{name}-%{version}.tar.gz
+Source1:    %{forgesource}
 
 Requires:  go-srpm-macros = %{version}-%{release}
 Requires:  go-filesystem  = %{version}-%{release}
@@ -81,8 +80,6 @@ Summary:   RPM spec templates for Go packages
 License:   MIT
 BuildArch: noarch
 Requires:  go-rpm-macros = %{version}-%{release}
-#https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
-#Requires:  redhat-rpm-templates
 
 %description -n go-rpm-templates
 This package contains documented rpm spec templates showcasing how to use the
@@ -98,10 +95,6 @@ for template in templates/rpm/*\.spec ; do
 done
 
 %install
-# Some of those probably do not work with gcc-go right now
-# This is not intentional, but mips is not a primary Fedora architecture
-# Patches and PRs are welcome
-
 install -m 0755 -vd   %{buildroot}%{gopath}/src
 
 install -m 0755 -vd   %{buildroot}%{_spectemplatedir}
@@ -161,7 +154,6 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %files -n go-rpm-templates
 %license LICENSE-templates.txt
 %doc README.md
-# https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %dir %{dirname:%{_spectemplatedir}}
 %dir %{_spectemplatedir}
 %{_spectemplatedir}/*.spec
