@@ -1,5 +1,5 @@
 # NOTE(mfrw): Modify the CF_BUILD_SHA by running: `git rev-parse --short HEAD` on the release
-%global cf_build_sha efd1d03e7
+%global cf_build_sha b1b4068ff
 
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
@@ -31,11 +31,9 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-39325.patch
-Patch1:         CVE-2024-24786.patch
-Patch2:         CVE-2024-45337.patch
-Patch3:         CVE-2024-45338.patch
-Patch4:         CVE-2023-45288.patch
+
+Patch0:         CVE-2024-45337.patch
+Patch1:         CVE-2024-45338.patch
 
 BuildRequires:  golang >= 1.18.3
 %global debug_package %{nil}
