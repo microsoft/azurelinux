@@ -3,22 +3,19 @@ Summary:        The Squid proxy caching server
 Name:           squid
 Version:        6.13
 Release:        1%{?dist}
-Epoch:          7
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:       GPL-2.0-or-later AND (LGPL-2.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND BSD-4-Clause-UC AND LicenseRef-Fedora-Public-Domain AND Beerware)  
 URL:            http://www.squid-cache.org
 
 Source0:        https://github.com/squid-cache/squid/releases/download/SQUID_6_13/squid-%{version}.tar.xz
-Source1: 	https://github.com/squid-cache/squid/releases/download/SQUID_6_13/squid-%{version}.tar.xz.asc
-Source2: 	https://www.squid-cache.org/pgp.asc
-Source3:        squid.logrotate
-Source4:        squid.sysconfig
-Source5:        squid.pam
-Source6:        squid.nm
-Source7:        squid.service
-Source8:        cache_swap.sh
-Source9:        squid.sysusers
+Source1:        squid.logrotate
+Source2:        squid.sysconfig
+Source3:        squid.pam
+Source4:        squid.nm
+Source5:        squid.service
+Source6:        cache_swap.sh
+Source7:        squid.sysusers
 
 Source98:       perl-requires-squid.sh
 
@@ -100,8 +97,6 @@ lookup program (dnsserver), a program for retrieving FTP data
 (ftpget), and some management and client tools.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'    
-
 %autosetup -p1
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
@@ -193,13 +188,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 mkdir -p %{buildroot}%{_libdir}/NetworkManager/dispatcher.d
 mkdir -p %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_libexecdir}/squid
-install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/squid
-install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/sysconfig/squid
-install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/squid
-install -m 644 %{SOURCE7} %{buildroot}%{_unitdir}
-install -m 755 %{SOURCE8} %{buildroot}%{_libexecdir}/squid
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/logrotate.d/squid
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/squid
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/squid
+install -m 644 %{SOURCE5} %{buildroot}%{_unitdir}
+install -m 755 %{SOURCE6} %{buildroot}%{_libexecdir}/squid
 install -m 644 %{buildroot}/squid.httpd.tmp %{buildroot}%{_sysconfdir}/httpd/conf.d/squid.conf
-install -m 755 %{SOURCE6} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d/20-squid
+install -m 755 %{SOURCE4} %{buildroot}%{_libdir}/NetworkManager/dispatcher.d/20-squid
 mkdir -p %{buildroot}%{_localstatedir}/log/squid
 mkdir -p %{buildroot}%{_localstatedir}/spool/squid
 mkdir -p %{buildroot}/run/squid
@@ -216,7 +211,7 @@ rm -f %{buildroot}%{_sysconfdir}/squid/squid.conf.documented
 rm -f %{buildroot}/squid.httpd.tmp
 
 # sysusers.d
-install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
+install -p -D -m 0644 %{SOURCE7} %{buildroot}%{_sysusersdir}/squid.conf
 
 %files
 %license COPYING
@@ -259,7 +254,7 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 %{_sysusersdir}/squid.conf
 
 %pre
-%{sysusers_create_compat} %{SOURCE9}
+%{sysusers_create_compat} %{SOURCE7}
 
 for i in %{_var}/log/squid %{_var}/spool/squid ; do
         if [ -d $i ] ; then
@@ -319,7 +314,7 @@ fi
     chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
 
 %changelog
-* Wed Feb 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 7:6.13-1
+* Wed Feb 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 6.13-1
 - Update to 6.13
 - Promote package to Azure Linux Base repo
 - License verified

@@ -28306,7 +28306,7 @@
         "type": "other",
         "other": {
           "name": "squid",
-          "version": "5.7",
+          "version": "6.13",
           "downloadUrl": "https://github.com/squid-cache/squid/releases/download/SQUID_6_13/squid-6.13.tar.xz"
         }
       }
