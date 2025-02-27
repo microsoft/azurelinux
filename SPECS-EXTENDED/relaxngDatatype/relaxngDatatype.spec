@@ -48,7 +48,7 @@ cp -p %{SOURCE1} .
 %build
 ant \
     -Dbuild.sysclasspath=only \
-    -Dant.build.javac.source=1.7 -Dant.build.javac.target=1.7
+    -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8
 
 %install
 install -Dpm 644 %{name}.jar \
