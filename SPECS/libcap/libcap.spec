@@ -11,7 +11,7 @@ Distribution:   Mariner
 Patch0:         CVE-2023-2602.patch
 Patch1:         CVE-2023-2603.patch
 Patch2:         CVE-2025-1390.patch
-BuildRequires:  glibc-static
+BuildRequires: glibc-static >= 2.35-7%{?dist}
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
