@@ -2,9 +2,7 @@
  "Signatures": {
   "cache_swap.sh": "c71ce77f33ac58f8a2e93a0e09f7324bb3d567cd7a6469aa783d6e8aa35b0e63",
   "perl-requires-squid.sh": "6d142ffcfb64d9dedbed785c85d96fe15293feb589e7d8170c4d825302021401",
-  "pgp.asc": "15e5f517cfd0b985def66f4cb1278e0c855abe2b426f259d14d13ad2f999660f",
   "squid-6.13.tar.xz": "232e0567946ccc0115653c3c18f01e83f2d9cc49c43d9dead8b319af0b35ad52",
-  "squid-6.13.tar.xz.asc": "e262fd0eb4e9521193f9c8fc650d55661d12b007f7e5c03f0a3f5745130b4b13",
   "squid.logrotate": "a6954fdc5cfaff414645b6c2d5f4d1ed952681fd47c75b0fdb7d5db8ebbf28d2",
   "squid.nm": "f7a1b043d4ad9bb1b14a11035594db65ae414012ee8b414e9b701338d5b2828d",
   "squid.pam": "7b2ccad84e5f2b337985c983b6085e17c47643abaa0b7033c36145864f123a62",
