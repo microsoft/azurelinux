@@ -74,7 +74,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %license %{python3_sitelib}/%{pkgname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* Mon Feb 24 2025 Andrew Phelps <anphel@microsoft.com>
+* Mon Feb 24 2025 Andrew Phelps <anphel@microsoft.com> - 2.1.1-2
 - Fix tomli/packaging conflict seen during package test setup
 
 * Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.1.1-1
