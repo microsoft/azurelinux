@@ -112,6 +112,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
+    --enable-profiler \
     --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
     --release-description="CBL-Mariner %{version}-%{release}"
