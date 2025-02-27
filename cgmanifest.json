@@ -22062,6 +22062,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-boltons",
+          "version": "25.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/boltons/boltons-25.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-boto3",
           "version": "1.10.21",
           "downloadUrl": "https://github.com/boto/boto3/archive/1.10.21.tar.gz"
