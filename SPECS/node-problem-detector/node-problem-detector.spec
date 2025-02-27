@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
-Version:        0.8.17
-Release:        5%{?dist}
+Version:        0.8.20
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Thu Feb 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.20-1
+- Auto-upgrade to 0.8.20 - fix CVE-2023-44487
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.17-5
 - Bump release to rebuild with go 1.22.7
 
