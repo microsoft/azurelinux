@@ -15,7 +15,7 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
-#   1. wget https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version}.tar.gz -O cli-%%{version}.tar.gz
+#   1. wget https://github.com/cloudfoundry/cli/archive/refs/tags/v%%{version}.tar.gz -O cli-%%{version}.tar.gz
 #   2. tar -xf cli-%%{version}.tar.gz
 #   3. cd cli-%%{version}
 #   4. go mod vendor
@@ -49,7 +49,7 @@ tar --no-same-owner -xf %{SOURCE1}
 
 %build
 export GOPATH=%{our_gopath}
-# No mod download use vednor cache locally
+# No mod download use vendor cache locally
 sed -i 's/GOFLAGS := -mod=mod/GOFLAGS := -mod=vendor/' ./Makefile
 make build CF_BUILD_SHA=%{cf_build_sha}
 
