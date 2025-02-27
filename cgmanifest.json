@@ -1408,7 +1408,7 @@
         "other": {
           "name": "c-ares",
           "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/cares-1_19_1/c-ares-1.19.1.tar.gz"
         }
       }
     },
@@ -10341,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -13663,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.23.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
+          "version": "1.23.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.6-2/go1.23.6-20250211.6.src.tar.gz"
         }
       }
     },
@@ -14593,8 +14593,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -21444,8 +21444,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.14",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.14/postgresql-14.14.tar.bz2"
+          "version": "14.16",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.16/postgresql-14.16.tar.bz2"
         }
       }
     },

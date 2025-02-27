@@ -45,7 +45,6 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:		Fix-21763-ui-test.patch
 Patch100:         CVE-2024-43806.patch
 
-
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -179,6 +178,7 @@ rm -f %{buildroot}%{_bindir}/*.old
 - Drop patches
 - Remove expand-yaml-anchors tool in %check
 - Add patch to fix ui-test-21763
+
 
 * Fri Nov 22 2024 Tobias Brick <tobiasb@microsoft.com> - 1.72.0-9
 - Patch CVE-2024-43806
