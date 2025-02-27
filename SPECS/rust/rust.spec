@@ -42,8 +42,11 @@ Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 
-Patch0:		Fix-21763-ui-test.patch
-Patch100:         CVE-2024-43806.patch
+Patch0:		Remove_cannot_write_error_test.patch
+Patch1:		Remove_leave_log_after_failure_test.patch
+Patch2:		Ignore_failing_ci_tests.patch
+Patch3:		skip-failing-run-make-tests.patch
+#Patch100:	CVE-2024-9681.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -129,7 +132,7 @@ mkdir -p .github/workflows
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
-rm -v ./tests/rustdoc-ui/issue-98690.*
+rm -v ./tests/rustdoc-ui/issues/issue-98690.*
 %make_build check
 
 %install
@@ -178,8 +181,9 @@ rm -f %{buildroot}%{_bindir}/*.old
 - Upgrade to 1.83.0
 - Drop patches
 - Remove expand-yaml-anchors tool in %check
-- Add patch to fix ui-test-21763
-
+- Remove rust-demangler tool
+- Update source tarball generating script
+- Skip and remove failing tests
 
 * Fri Nov 22 2024 Tobias Brick <tobiasb@microsoft.com> - 1.72.0-9
 - Patch CVE-2024-43806

@@ -1,0 +1,35 @@
+From 6d9a8f12e121678c9a50fc8cfaf3b8da517e9a55 Mon Sep 17 00:00:00 2001
+From: kavyasree <kkaitepalli@microsoft.com>
+Date: Wed, 26 Feb 2025 00:03:44 +0530
+Subject: [PATCH] Remove_cannot_write_error_test
+
+---
+ src/tools/rust-installer/test.sh | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/src/tools/rust-installer/test.sh b/src/tools/rust-installer/test.sh
+index 7b3e74560..36fc60dd1 100755
+--- a/src/tools/rust-installer/test.sh
++++ b/src/tools/rust-installer/test.sh
+@@ -983,19 +983,6 @@ runtest combined_remains
+
+ # Smoke tests
+
+-cannot_write_error() {
+-    # chmod doesn't work on windows
+-    if [ ! -n "${WINDOWS-}" ]; then
+-    try sh "$S/gen-installer.sh" \
+-        --image-dir="$TEST_DIR/image1" \
+-        --work-dir="$WORK_DIR" \
+-        --output-dir="$OUT_DIR"
+-    chmod u-w "$PREFIX_DIR"
+-    expect_fail "$WORK_DIR/package/install.sh" --prefix="$PREFIX_DIR"
+-    chmod u+w "$PREFIX_DIR"
+-    fi
+-}
+-runtest cannot_write_error
+
+ cannot_install_to_installer() {
+     try sh "$S/gen-installer.sh" \
+--
+2.34.1

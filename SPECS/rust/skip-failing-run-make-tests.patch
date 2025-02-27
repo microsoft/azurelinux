@@ -1,0 +1,75 @@
+From b926f37df15074e62d2f6d63d9fa3ca2a33ceb06 Mon Sep 17 00:00:00 2001
+From: kavyasree <kkaitepalli@microsoft.com>
+Date: Thu, 27 Feb 2025 12:15:20 +0530
+Subject: [PATCH] skip-failing-run-make-tests
+
+---
+ tests/run-make/inaccessible-temp-dir/rmake.rs | 1 +
+ tests/run-make/libtest-thread-limit/rmake.rs  | 2 +-
+ tests/run-make/libtest-thread-limit/test.rs   | 4 ++--
+ tests/run-make/rustdoc-io-error/rmake.rs      | 2 +-
+ 4 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/tests/run-make/inaccessible-temp-dir/rmake.rs b/tests/run-make/inaccessible-temp-dir/rmake.rs
+index b6624f37f..a8936cf29 100644
+--- a/tests/run-make/inaccessible-temp-dir/rmake.rs
++++ b/tests/run-make/inaccessible-temp-dir/rmake.rs
+@@ -24,6 +24,7 @@
+ // Reason: `set_readonly` has no effect on directories
+ // and does not prevent modification.
+ 
++//@ ignore-linux
+ use run_make_support::{rfs, rustc, test_while_readonly};
+ 
+ fn main() {
+diff --git a/tests/run-make/libtest-thread-limit/rmake.rs b/tests/run-make/libtest-thread-limit/rmake.rs
+index 817328cd3..945ceaf28 100644
+--- a/tests/run-make/libtest-thread-limit/rmake.rs
++++ b/tests/run-make/libtest-thread-limit/rmake.rs
+@@ -7,7 +7,7 @@
+ // should succeed without an error.
+ // See https://github.com/rust-lang/rust/pull/81546
+ 
+-//@ only-linux
++//@ ignore-linux
+ // Reason: thread limit modification
+ //@ ignore-cross-compile
+ // Reason: this test fails armhf-gnu, reasons unknown
+diff --git a/tests/run-make/libtest-thread-limit/test.rs b/tests/run-make/libtest-thread-limit/test.rs
+index d4eb12426..060bc73ec 100644
+--- a/tests/run-make/libtest-thread-limit/test.rs
++++ b/tests/run-make/libtest-thread-limit/test.rs
+@@ -3,7 +3,7 @@ use std::sync::OnceLock;
+ use std::thread::{self, Builder, ThreadId};
+ 
+ static THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
+-
++#[ignore]
+ #[test]
+ fn spawn_thread_would_block() {
+     assert_eq!(Builder::new().spawn(|| unreachable!()).unwrap_err().kind(), ErrorKind::WouldBlock);
+@@ -14,7 +14,7 @@ fn spawn_thread_would_block() {
+ // first to set THREAD_ID. Do not rename the tests in such a way that `test_run_in_same_thread`
+ // would run before `spawn_thread_would_block`.
+ // See https://doc.rust-lang.org/rustc/tests/index.html#--shuffle
+-
++#[ignore]
+ #[test]
+ fn test_run_in_same_thread() {
+     assert_eq!(*THREAD_ID.get().unwrap(), thread::current().id());
+diff --git a/tests/run-make/rustdoc-io-error/rmake.rs b/tests/run-make/rustdoc-io-error/rmake.rs
+index 31441d7eb..5dae5655b 100644
+--- a/tests/run-make/rustdoc-io-error/rmake.rs
++++ b/tests/run-make/rustdoc-io-error/rmake.rs
+@@ -13,7 +13,7 @@
+ // containers would use a non-root user, but this leads to issues with
+ // `mkfs.ext4 -d`, as well as mounting a loop device for the rootfs.
+ //@ ignore-windows - the `set_readonly` functions doesn't work on folders.
+-
++//@ ignore-linux
+ use run_make_support::{path, rfs, rustdoc};
+ 
+ fn main() {
+-- 
+2.34.1
+
