@@ -1,13 +1,14 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.7.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/%{name}-%{version}.tar.xz
+Patch0:         CVE-2024-12133.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  guile-devel
@@ -94,6 +95,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 26 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.7.11-2
+- Address CVE-2024-12133 with a patch
+
 * Mon Sep 30 2024 Muhammad Falak <mwani@microsoft.com> - 3.7.11-1
 - Upgrade to v3.7.11 to address CVE-2023-5981, CVE-2024-28835, CVE-2024-28834, CVE-2024-0553
 - Drop patches which are already included in the source.

@@ -13,7 +13,7 @@
 
 Name:           netplan
 Version:        0.95
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -23,6 +23,7 @@ URL:            https://netplan.io/
 # Source0:      https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch1:         force-bringup-interface-no-ipadd.patch
+Patch2:         CVE-2022-4968.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -105,6 +106,9 @@ make check
 
 
 %changelog
+* Thu Feb 13 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 0.95-3
+- Patch CVE-2022-4968
+
 * Wed Dec 13 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.95-2
 - Add patch for force bringing up devices with no IP addresses
 
