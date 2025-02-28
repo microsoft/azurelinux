@@ -1,14 +1,14 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2024-10-17
-%define stage0_version 1.82.0
+%define release_date 2025-01-09
+%define stage0_version 1.84.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.83.0
+Version:        1.85.0
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -46,7 +46,8 @@ Patch0:		Remove_cannot_write_error_test.patch
 Patch1:		Remove_leave_log_after_failure_test.patch
 Patch2:		Ignore_failing_ci_tests.patch
 Patch3:		skip-failing-run-make-tests.patch
-#Patch100:	CVE-2024-9681.patch
+Patch4:		Ignore-test-for-aarch64.patch
+Patch100:	CVE-2024-9681.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -177,8 +178,8 @@ rm -f %{buildroot}%{_bindir}/*.old
 
 %changelog
 
-* Thu Dec 19 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -1.83.0-1
-- Upgrade to 1.83.0
+* Thu Feb 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -1.85.0-1
+- Upgrade to 1.85.0
 - Drop patches
 - Remove expand-yaml-anchors tool in %check
 - Remove rust-demangler tool
