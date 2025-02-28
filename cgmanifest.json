@@ -10652,7 +10652,7 @@
         "other": {
           "name": "libpinyin",
           "version": "2.9.92",
-          "downloadUrl": "http://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.9.92.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.9.92.tar.gz"
         }
       }
     },
