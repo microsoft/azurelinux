@@ -36,6 +36,8 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 
+Source2:       coredns-example-net-test.patch
+
 BuildRequires:  golang >= 1.23
 
 %description
@@ -62,6 +64,16 @@ make
 %install
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
+
+%check
+# From go.test.yml
+go install github.com/fatih/faillint@latest && \
+(cd request && go test -v -race ./...) && \
+(cd core && go test -v -race ./...) && \
+(cd coremain && go test -v -race ./...) && \
+(cd plugin && go test -v -race ./...) && \
+(cd test && go test -v -race ./...) && \
+./coredns -version
 
 %files
 %defattr(-,root,root)
