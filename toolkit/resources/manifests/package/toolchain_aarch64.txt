@@ -232,9 +232,9 @@ libssh2-debuginfo-1.11.0-1.azl3.aarch64.rpm
 libssh2-devel-1.11.0-1.azl3.aarch64.rpm
 libstdc++-13.2.0-7.azl3.aarch64.rpm
 libstdc++-devel-13.2.0-7.azl3.aarch64.rpm
-libtasn1-4.19.0-1.azl3.aarch64.rpm
-libtasn1-debuginfo-4.19.0-1.azl3.aarch64.rpm
-libtasn1-devel-4.19.0-1.azl3.aarch64.rpm
+libtasn1-4.19.0-2.azl3.aarch64.rpm
+libtasn1-debuginfo-4.19.0-2.azl3.aarch64.rpm
+libtasn1-devel-4.19.0-2.azl3.aarch64.rpm
 libtool-2.4.7-1.azl3.aarch64.rpm
 libtool-debuginfo-2.4.7-1.azl3.aarch64.rpm
 libxcrypt-4.4.36-2.azl3.aarch64.rpm
