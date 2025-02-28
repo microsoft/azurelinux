@@ -1,0 +1,25 @@
+From 6f69a0f933bc79fcfc334cd49eb61cd20a0a7f52 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Fri, 28 Feb 2025 01:56:53 +0000
+Subject: [PATCH] Ignore test for aarch64
+
+---
+ tests/run-make/mte-ffi/rmake.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/run-make/mte-ffi/rmake.rs b/tests/run-make/mte-ffi/rmake.rs
+index 50f5f1419..0685e7df2 100644
+--- a/tests/run-make/mte-ffi/rmake.rs
++++ b/tests/run-make/mte-ffi/rmake.rs
+@@ -2,7 +2,7 @@
+ //! FFI boundaries (C <-> Rust). This test does not require MTE: whilst the test will use MTE if
+ //! available, if it is not, arbitrary tag bits are set using TBI.
+ 
+-//@ only-aarch64-unknown-linux-gnu
++//@ ignore-linux
+ // Reason: this test is only valid for AArch64 with `gcc`. The linker must be explicitly specified
+ // when cross-compiling, so it is limited to `aarch64-unknown-linux-gnu`.
+ 
+-- 
+2.45.3
+
