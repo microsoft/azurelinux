@@ -186,9 +186,11 @@ rm -f %{buildroot}%{_bindir}/*.old
 - Update source tarball generating script
 - Skip and remove failing tests
 
+* Fri Jan 31 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.72.0-10
+- Fix CVE-2024-9681
+
 * Fri Nov 22 2024 Tobias Brick <tobiasb@microsoft.com> - 1.72.0-9
 - Patch CVE-2024-43806
-
 
 * Thu Aug 08 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.72.0-8
 - Patch CVE-2024-32884 and CVE-2024-31852
