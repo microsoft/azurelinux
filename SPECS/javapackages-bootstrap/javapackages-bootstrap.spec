@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -140,6 +140,7 @@ Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
 Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
+Patch4:         CVE-2021-36373.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -300,6 +301,10 @@ pushd "downstream/plexus-archiver"
 %patch2 -p1 
 popd
 
+pushd "downstream/ant"
+%patch4 -p1
+popd
+
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
 # edit version from guava.properties
@@ -384,6 +389,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Wed Feb 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.5.0-6
+- Patch CVE-2021-36373 and CVE-2021-36374.
+
 * Fri Mar 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-5
 - Update Guava to fix CVE-2023-2976 using Fedora 40 (License: MIT).
 
