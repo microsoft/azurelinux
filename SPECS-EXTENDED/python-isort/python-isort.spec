@@ -9,7 +9,7 @@ Summary:            Python utility / library to sort Python imports
 
 License:            MIT
 URL:                https://github.com/timothycrosley/%{modname}
-Source0:            %pypi_source#/%{name}-%{version}.tar.gz
+Source0:            https://files.pythonhosted.org/packages/87/f9/c1eb8635a24e87ade2efce21e3ce8cd6b8630bb685ddc9cdaca1349b2eb5/%{modname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:          noarch
 
 %description
