@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
-Source0:        https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz
+Source0:        https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0001-replace-to-flit.patch
 BuildArch:      noarch
 
