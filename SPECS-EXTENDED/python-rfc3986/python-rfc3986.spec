@@ -5,8 +5,8 @@ Distribution:   Azure Linux
 %global pypi_name rfc3986
 
 Name:           python-%{pypi_name}
-Version:        1.2.0
-Release:        8%{?dist}
+Version:        1.5.0
+Release:        1%{?dist}
 Summary:        Validating URI References per RFC 3986
 
 License:        ASL 2.0
@@ -49,6 +49,9 @@ rm -rf %{pypi_name}.egg-info
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-1
+- Auto-upgrade to 1.5.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

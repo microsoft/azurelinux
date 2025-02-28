@@ -24423,8 +24423,8 @@
         "type": "other",
         "other": {
           "name": "python-rfc3986",
-          "version": "1.2.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/r/rfc3986/rfc3986-1.2.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/79/30/5b1b6c28c105629cc12b33bdcbb0b11b5bb1880c6cfbd955f9e792921aa8/rfc3986-1.5.0.tar.gz"
         }
       }
     },
