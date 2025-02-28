@@ -25,14 +25,6 @@ BuildRequires:	daxctl-devel
 # We are deprecating it now, to flag any potential user of its future removal.
 Provides: 	deprecated()
 
-# Upstream testing of memkind is done exclusively on x86_64; other archs
-# are unsupported but may work.
-ExclusiveArch: 	x86_64
-ExclusiveArch:	ppc64
-ExclusiveArch:	ppc64le
-ExclusiveArch:	s390x
-ExclusiveArch:	aarch64
-
 Source0: 	https://github.com/%{name}/%{name}/archive/%{gittag0}/%{name}-%{version}.tar.gz
 
 # unbreak the atrocious autotools Makefile.am construction for
