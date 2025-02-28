@@ -18,7 +18,7 @@ index b6624f37f..a8936cf29 100644
  // Reason: `set_readonly` has no effect on directories
  // and does not prevent modification.
  
-+//@ ignore-linux
++//@ ignore-test
  use run_make_support::{rfs, rustc, test_while_readonly};
  
  fn main() {
@@ -31,7 +31,7 @@ index 817328cd3..945ceaf28 100644
  // See https://github.com/rust-lang/rust/pull/81546
  
 -//@ only-linux
-+//@ ignore-linux
++//@ ignore-test
  // Reason: thread limit modification
  //@ ignore-cross-compile
  // Reason: this test fails armhf-gnu, reasons unknown
@@ -66,7 +66,7 @@ index 31441d7eb..5dae5655b 100644
  // `mkfs.ext4 -d`, as well as mounting a loop device for the rootfs.
  //@ ignore-windows - the `set_readonly` functions doesn't work on folders.
 -
-+//@ ignore-linux
++//@ ignore-test
  use run_make_support::{path, rfs, rustdoc};
  
  fn main() {

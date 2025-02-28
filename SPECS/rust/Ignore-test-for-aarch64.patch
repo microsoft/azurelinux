@@ -16,7 +16,7 @@ index 50f5f1419..0685e7df2 100644
  //! available, if it is not, arbitrary tag bits are set using TBI.
  
 -//@ only-aarch64-unknown-linux-gnu
-+//@ ignore-linux
++//@ ignore-test
  // Reason: this test is only valid for AArch64 with `gcc`. The linker must be explicitly specified
  // when cross-compiling, so it is limited to `aarch64-unknown-linux-gnu`.
  
