@@ -2404,21 +2404,11 @@ rm -fr $RPM_BUILD_ROOT/%{_selinuxdir}
 %endif
 
 %if !%{disable_qt}
-rm -rf $RPM_BUILD_ROOT/usr/share/doc/pcp-gui
 desktop-file-validate $RPM_BUILD_ROOT/%{_datadir}/applications/pmchart.desktop
-%else
-rm -fr $RPM_BUILD_ROOT/%{_pixmapdir}
-rm -fr $RPM_BUILD_ROOT/%{_hicolordir}
-rm -fr $RPM_BUILD_ROOT/%{_confdir}/pmsnap
-rm -fr $RPM_BUILD_ROOT/%{_localstatedir}/lib/pcp/config/pmsnap
-rm -fr $RPM_BUILD_ROOT/%{_localstatedir}/lib/pcp/config/pmchart
-rm -f $RPM_BUILD_ROOT/%{_localstatedir}/lib/pcp/config/pmafm/pcp-gui
-rm -f $RPM_BUILD_ROOT/%{_datadir}/applications/pmchart.desktop
-rm -f `find $RPM_BUILD_ROOT/%{_mandir}/man1 | grep -E "$PCP_GUI"`
 %endif
 
 %if %{disable_xlsx}
-rm -f $RPM_BUILD_ROOT/%{_bashcompdir}/pcp2xlsx
+rm -fr $RPM_BUILD_ROOT/%{_bashcompdir}/pcp2xlsx
 %endif
 
 # Fedora and RHEL default local only access for pmcd and pmlogger
