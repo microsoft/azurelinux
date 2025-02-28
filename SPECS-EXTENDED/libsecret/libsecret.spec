@@ -113,7 +113,6 @@ cp -a libsecret/mock-service*.py %{buildroot}%{_datadir}/libsecret/
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/libsecret-1.deps
 %{_datadir}/vala/vapi/libsecret-1.vapi
-#%doc %{_docdir}/libsecret-1/
 
 %files mock-service
 %license COPYING
