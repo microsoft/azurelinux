@@ -124,6 +124,7 @@ cp -a libsecret/mock-service*.py %{buildroot}%{_datadir}/libsecret/
 %changelog
 * Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.21.4-1
 - Update to version 0.21.4
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.4-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
