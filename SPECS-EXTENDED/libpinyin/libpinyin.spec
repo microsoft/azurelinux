@@ -9,7 +9,7 @@ Summary:        Library to deal with pinyin
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/libpinyin/libpinyin
-Source0:        http://downloads.sourceforge.net/libpinyin/libpinyin/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/libpinyin/libpinyin/%{name}-%{version}.tar.gz
 %if %snapshot
 Patch0:         libpinyin-2.8.x-head.patch
 %endif
