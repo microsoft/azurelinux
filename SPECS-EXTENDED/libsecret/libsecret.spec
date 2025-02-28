@@ -8,14 +8,15 @@ Distribution:   Azure Linux
 %endif
 
 Name:           libsecret
-Version:        0.20.4
-Release:        2%{?dist}
+Version:        0.21.4
+Release:        1%{?dist}
 Summary:        Library for storing and retrieving passwords and other secrets
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/Libsecret
 Source0:        https://download.gnome.org/sources/libsecret/%{release_version}/libsecret-%{version}.tar.xz
 
+BuildRequires:  meson
 BuildRequires:  gettext
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
@@ -27,6 +28,8 @@ BuildRequires:  docbook-style-xsl
 %if 0%{?has_valgrind}
 BuildRequires:  valgrind-devel
 %endif
+BuildRequires:  python3-devel
+BuildRequires:  /usr/bin/xsltproc
 
 Provides:       bundled(egglib)
 
@@ -45,8 +48,20 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 
+%package        mock-service
+Summary:        Python mock-service files from %{name}
+# This subpackage does not need libsecret installed,
+# but this ensure that if it is installed, the version matches (for good measure):
+Requires:       (%{name} = %{version}-%{release} if %{name})
+BuildArch:      noarch
+ 
+%description    mock-service
+The %{name}-mock-service package contains testing Python files from %{name},
+for testing of other similar tools, such as the Python SecretStorage package.
+
+
 %prep
-%setup -q
+%autosetup -p1
 
 # Use system valgrind headers instead
 %if 0%{?has_valgrind}
@@ -55,21 +70,31 @@ rm -rf build/valgrind/
 
 
 %build
-%configure --disable-static
-%make_build
+%meson \
+-Dgtk_doc=false \
+%if %{with gnutls}
+-Dcrypto=gnutls \
+%else
+-Dcrypto=libgcrypt \
+%endif
+%{nil}
 
+%meson_build
 
 %install
-%make_install
-
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-
+%meson_install
 %find_lang libsecret
+
+# For the mock-service subpackage
+mkdir -p %{buildroot}%{_datadir}/libsecret/mock
+cp -a libsecret/mock/*.py %{buildroot}%{_datadir}/libsecret/mock/
+cp -a libsecret/mock-service*.py %{buildroot}%{_datadir}/libsecret/
+%py_byte_compile %{python3} %{buildroot}%{_datadir}/libsecret/mock/
 
 
 %files -f libsecret.lang
 %license COPYING
-%doc AUTHORS NEWS README
+%doc NEWS README.md
 %{_bindir}/secret-tool
 %{_libdir}/libsecret-1.so.0*
 %dir %{_libdir}/girepository-1.0
@@ -77,6 +102,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man1/secret-tool.1*
 
 %files devel
+%license COPYING docs/reference/COPYING
 %{_includedir}/libsecret-1/
 %{_libdir}/libsecret-1.so
 %{_libdir}/pkgconfig/libsecret-1.pc
@@ -87,10 +113,19 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/libsecret-1.deps
 %{_datadir}/vala/vapi/libsecret-1.vapi
-%doc %{_datadir}/gtk-doc/
+
+%files mock-service
+%license COPYING
+%dir %{_datadir}/libsecret
+%{_datadir}/libsecret/mock/
+%{_datadir}/libsecret/mock-service*.py
 
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.21.4-1
+- Update to version 0.21.4
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.4-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
