@@ -7541,8 +7541,8 @@
         "type": "other",
         "other": {
           "name": "irssi",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/irssi/irssi/releases/download/1.2.2/irssi-1.2.2.tar.xz"
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/irssi/irssi/releases/download/1.4.5/irssi-1.4.5.tar.xz"
         }
       }
     },
