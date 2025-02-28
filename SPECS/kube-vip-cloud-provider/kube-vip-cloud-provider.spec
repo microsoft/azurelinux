@@ -71,7 +71,7 @@ go test -mod=vendor ./...
 * Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.0.2-15
 - Fix CVE-2021-44716
 
-* Tue Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.2-14
+* Wed Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.2-14
 - Fix CVE-2022-21698
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.2-13
