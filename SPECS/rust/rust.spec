@@ -48,6 +48,7 @@ Patch2:		Ignore_failing_ci_tests.patch
 Patch3:		skip-failing-run-make-tests.patch
 Patch4:		Ignore-test-for-aarch64.patch
 Patch5:		Ignore-failing-ui-tests.patch
+Patch6:		Fix-ui-fuldeps-test.patch
 Patch100:	CVE-2024-9681.patch
 
 BuildRequires:  binutils

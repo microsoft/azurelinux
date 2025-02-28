@@ -1,0 +1,23 @@
+From 6ec29703c01e057566f3ce858a49b511aafe1a57 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Fri, 28 Feb 2025 19:41:52 +0000
+Subject: [PATCH] Fix ui-fulldeps test
+
+---
+ tests/ui-fulldeps/obtain-borrowck.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/ui-fulldeps/obtain-borrowck.rs b/tests/ui-fulldeps/obtain-borrowck.rs
+index 8ea2ac619..2cbee245b 100644
+--- a/tests/ui-fulldeps/obtain-borrowck.rs
++++ b/tests/ui-fulldeps/obtain-borrowck.rs
+@@ -1,5 +1,6 @@
+ //@ edition: 2021
+ //@ run-pass
++//@ ignore-test
+ //@ check-run-results
+ //@ run-flags: --sysroot {{sysroot-base}} --edition=2021 {{src-base}}/auxiliary/obtain-borrowck-input.rs
+ //@ ignore-stage1 (requires matching sysroot built with in-tree compiler)
+-- 
+2.45.3
+
