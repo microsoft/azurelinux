@@ -21233,8 +21233,8 @@
         "type": "other",
         "other": {
           "name": "plexus-pom",
-          "version": "5.1",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-pom/archive/plexus-5.1.tar.gz"
+          "version": "16",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-pom/archive/plexus-16.tar.gz"
         }
       }
     },
