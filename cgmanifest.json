@@ -9222,7 +9222,7 @@
         "other": {
           "name": "libecap",
           "version": "1.0.1",
-          "downloadUrl": "http://www.measurement-factory.com/tmp/ecap/libecap-1.0.1.tar.gz"
+          "downloadUrl": "https://www.e-cap.org/archive/libecap-1.0.1.tar.gz"
         }
       }
     },

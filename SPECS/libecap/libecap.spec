@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:       libecap
 Version:    1.0.1
-Release:    7%{?dist}
+Release:    8%{?dist}
 Summary:    Squid interface for embedded adaptation modules
 License:    BSD
-URL:        http://www.e-cap.org/
-Source0:    http://www.measurement-factory.com/tmp/ecap/%{name}-%{version}.tar.gz
+URL:        https://www.e-cap.org/
+Source0:    https://www.e-cap.org/archive/%{name}-%{version}.tar.gz
 Source1:    autoconf.h
 
 BuildRequires:  gcc
@@ -66,6 +66,10 @@ install -pm644 %{SOURCE1} %{buildroot}%{_includedir}/%{name}/common/autoconf.h
 %{_includedir}/libecap
 
 %changelog
+* Wed Feb 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.0.1-8
+- Promote package to Azure Linux Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
