@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.20.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ Source14:       named-chroot.files
 Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
 
 Patch0:         nongit-fix.patch
+Patch1:         fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
 
 BuildRequires:  gcc
 BuildRequires:  git
@@ -190,7 +191,15 @@ Summary:        BIND utilities
 
 %prep
 %setup -q
-%patch 0 -p1
+
+# DLZ modules do not support oot builds. Copy files into build
+mkdir -p build/contrib/dlz
+pushd build/contrib/dlz
+tar --no-same-owner -xf %{SOURCE15}
+mv dlz-modules-main/modules ./
+popd
+
+%autopatch -p1
 
 # Copying auxiliary files with libtoolize. Some files will be replaced by libtoolize -c -f.
 # The files "compile", "depcomp", and "missing" will be deleted by this process, as some
@@ -203,13 +212,6 @@ mv backup/* .
 rmdir backup
 
 %build
-# DLZ modules do not support oot builds. Copy files into build
-mkdir -p build/contrib/dlz
-pushd build/contrib/dlz
-tar --no-same-owner -xf %{SOURCE15}
-mv dlz-modules-main/modules ./
-popd
-
 ./configure \
     --prefix=%{_prefix} \
     --localstatedir=%{_var} \
@@ -527,6 +529,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Thu Feb 27 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-3
+- Fix uninitialized memory warning.
+
 * Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-2
 - Fix warning during package uninstall.
 
