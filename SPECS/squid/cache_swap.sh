@@ -17,5 +17,8 @@ done
 
 if [ $init_cache_dirs -ne 0 ]; then
 	echo ""
-	squid --foreground -z -f "$SQUID_CONF" >> /var/log/squid/squid.out 2>&1
+	if ! squid --foreground -z -f "$SQUID_CONF" >> /var/log/squid/squid.out 2>&1; then
+		echo "init_cache_dir failed, see /var/log/squid/squid.out for more information"
+		exit 1
+	fi
 fi

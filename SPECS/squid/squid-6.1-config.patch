@@ -1,7 +1,8 @@
-diff -up squid-4.0.11/src/cf.data.pre.config squid-4.0.11/src/cf.data.pre
---- squid-4.0.11/src/cf.data.pre.config	2016-06-09 22:32:57.000000000 +0200
-+++ squid-4.0.11/src/cf.data.pre	2016-07-11 21:08:35.090976840 +0200
-@@ -4658,7 +4658,7 @@ DOC_END
+diff --git a/src/cf.data.pre b/src/cf.data.pre
+index 44aa34d..12225bc 100644
+--- a/src/cf.data.pre
++++ b/src/cf.data.pre
+@@ -5453,7 +5453,7 @@ DOC_END
  
  NAME: logfile_rotate
  TYPE: int
@@ -10,7 +11,7 @@ diff -up squid-4.0.11/src/cf.data.pre.config squid-4.0.11/src/cf.data.pre
  LOC: Config.Log.rotateNumber
  DOC_START
  	Specifies the default number of logfile rotations to make when you
-@@ -6444,11 +6444,11 @@ COMMENT_END
+@@ -7447,11 +7447,11 @@ COMMENT_END
  
  NAME: cache_mgr
  TYPE: string
