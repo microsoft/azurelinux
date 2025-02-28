@@ -3338,8 +3338,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.6",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.6/otp-OTP-26.2.5.6.tar.gz"
+          "version": "26.2.5.9",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.9/otp-OTP-26.2.5.9.tar.gz"
         }
       }
     },
@@ -8441,8 +8441,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.30.3",
-          "downloadUrl": "https://dl.k8s.io/v1.30.3/kubernetes-src.tar.gz"
+          "version": "1.30.10",
+          "downloadUrl": "https://dl.k8s.io/v1.30.10/kubernetes-src.tar.gz"
         }
       }
     },
@@ -10451,8 +10451,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -14492,8 +14492,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -15453,8 +15453,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.2",
-          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.2/openssl-3.3.2.tar.gz"
+          "version": "3.3.3",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.3/openssl-3.3.3.tar.gz"
         }
       }
     },
@@ -25423,8 +25423,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.12.3",
-          "downloadUrl": "https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tar.xz"
+          "version": "3.12.9",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.9/Python-3.12.9.tar.xz"
         }
       }
     },
