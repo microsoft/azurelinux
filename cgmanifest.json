@@ -25503,8 +25503,8 @@
         "type": "other",
         "other": {
           "name": "pyxattr",
-          "version": "0.7.1",
-          "downloadUrl": "https://pyxattr.k1024.org//downloads/pyxattr-0.7.1.tar.gz"
+          "version": "0.7.2",
+          "downloadUrl": "https://pyxattr.k1024.org//downloads/pyxattr-0.7.2.tar.gz"
         }
       }
     },
