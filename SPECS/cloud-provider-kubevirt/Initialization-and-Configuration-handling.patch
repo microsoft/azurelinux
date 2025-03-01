@@ -1,0 +1,209 @@
+From 18283b69ff8dc71390789ace99aad7dd2e5ce03b Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Fri, 28 Feb 2025 17:32:32 -0800
+Subject: [PATCH] Enhancements for Cloud Controller Manager Initialization and Configuration Handling
+
+These changes are put in place on the request for a specific customer and may not be upstream able. We will continue maintaining this patch mentioned here.
+
+### `main.go` Changes
+
+1. **New Import: `k8s.io/cloud-provider/names`**
+   - **Reason:** The added import is likely used for fetching `CCMControllerAliases`, which is a collection of controller aliases needed for initializing the cloud controller manager.
+   
+2. **Initialization of `controllerAliases` and Passing to `NewCloudControllerManagerCommand`:**
+   - **Reason:** 
+     - *Controller Aliases:* By using `names.CCMControllerAliases()`, the application can manage and initialize different cloud controller managers with more flexibility. This can facilitate the use of aliases for controllers and potentially allow for custom controllers or extended functionalities to be more easily integrated.
+     - *Function Parameter:* Updating `NewCloudControllerManagerCommand` to accept these aliases ensures that the cloud controller manager is initialized with all the necessary references to these controllers, thereby enabling or supporting additional or customized behaviors.
+
+### `cloud.go` Changes
+
+1. **New Import Statements:**
+   - **Reason:** The new imports (`io/ioutil`, `github.com/pkg/errors`, and `k8s.io/client-go/util/cert`) bring in functionality for:
+     - Reading files (`ioutil`)
+     - Enhanced error handling and wrapping errors with context (`errors`)
+     - Handling certificates (`certutil`)
+
+2. **`CloudConfig` Struct Addition (ControlEndpoint Field):**
+   - **Reason:** The addition of the `ControlEndpoint` field allows the cloud configuration to specify an endpoint for control operations, which may be crucial for communicating with the Kubernetes control plane or other essential services. This can help in scenarios where the control plane location is not the default or needs to be explicitly defined.
+
+3. **New Function: `serviceAccountClusterConfig`:**
+   - **Reason:** 
+     - *Enhanced Configuration:* This function abstracts the creation of a Kubernetes REST configuration using service account tokens and certificates. This is particularly useful in cluster environments where the application needs to authenticate using the service account mechanism.
+     - *Security and Flexibility:* By reading the token, namespace, and CA files from specific paths, the function ensures secure access while also providing flexibility to handle different setups or environments.
+
+4. **Changes to `kubevirtCloudProviderFactory`:**
+   - **Initialization of `restConfig` and `namespace` Variables:**
+     - This change is for better clarity and initialization handling.
+   - **Use of `serviceAccountClusterConfig`:**
+     - **Reason:** This allows the factory to handle in-cluster configurations intelligently, using the control endpoint and service account information, as opposed to relying solely on provided kubeconfigs.
+   - **Improved Error Handling with `errors.Wrap`:**
+     - **Reason:** Enhances debugging and error tracing by providing more context in error messages, which is useful for identifying the cause of failures.
+   - **Removal of Redundant Code:**
+     - **Reason:** Simplifies the configuration setup by removing unnecessary handling of `infraKubeConfig`.
+
+### Overall Justification
+These changes collectively aim to:
+- Increase the flexibility and configurability of the cloud provider manager.
+- Enhance security and context-aware configurations (particularly using service accounts and control endpoints).
+- Improve error handling and debugging capabilities.
+- Streamline and modernize the codebase, removing redundant steps and clarifying variable initializations.
+
+---
+ cmd/kubevirt-cloud-controller-manager/main.go |  4 +-
+ pkg/provider/cloud.go                         | 84 +++++++++++++------
+ 2 files changed, 60 insertions(+), 28 deletions(-)
+
+diff --git a/cmd/kubevirt-cloud-controller-manager/main.go b/cmd/kubevirt-cloud-controller-manager/main.go
+index 8e2c2467..ad59c16a 100644
+--- a/cmd/kubevirt-cloud-controller-manager/main.go
++++ b/cmd/kubevirt-cloud-controller-manager/main.go
+@@ -34,6 +34,7 @@ import (
+ 	_ "k8s.io/component-base/metrics/prometheus/version"  // for version metric registration
+ 	"k8s.io/klog/v2"
+ 
++	"k8s.io/cloud-provider/names"
+ 	_ "kubevirt.io/cloud-provider-kubevirt/pkg/provider"
+ )
+ 
+@@ -46,7 +47,8 @@ func main() {
+ 	fss := cliflag.NamedFlagSets{}
+ 	controllerInitializers := app.DefaultInitFuncConstructors
+ 
+-	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, controllerInitializers, fss, wait.NeverStop)
++	controllerAliases := names.CCMControllerAliases()
++	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, controllerInitializers, controllerAliases, fss, wait.NeverStop)
+ 	code := cli.Run(command)
+ 	os.Exit(code)
+ }
+diff --git a/pkg/provider/cloud.go b/pkg/provider/cloud.go
+index fab7da0b..aaf3a0b1 100644
+--- a/pkg/provider/cloud.go
++++ b/pkg/provider/cloud.go
+@@ -16,6 +16,9 @@ import (
+ 	"k8s.io/utils/pointer"
+ 	kubevirtv1 "kubevirt.io/api/core/v1"
+ 	"sigs.k8s.io/controller-runtime/pkg/client"
++
++	"github.com/pkg/errors"
++	certutil "k8s.io/client-go/util/cert"
+ )
+ 
+ const (
+@@ -42,11 +45,12 @@ type cloud struct {
+ }
+ 
+ type CloudConfig struct {
+-	Kubeconfig   string             `yaml:"kubeconfig"`
+-	LoadBalancer LoadBalancerConfig `yaml:"loadBalancer"`
+-	InstancesV2  InstancesV2Config  `yaml:"instancesV2"`
+-	Namespace    string             `yaml:"namespace"`
+-	InfraLabels  map[string]string  `yaml:"infraLabels"`
++	Kubeconfig      string             `yaml:"kubeconfig"` // The kubeconfig used to connect to the underkube
++	LoadBalancer    LoadBalancerConfig `yaml:"loadBalancer"`
++	InstancesV2     InstancesV2Config  `yaml:"instancesV2"`
++	ControlEndpoint string             `yaml:"controlEndpoint"`
++	Namespace       string             `yaml:"namespace"`
++	InfraLabels     map[string]string  `yaml:"infraLabels"`
+ }
+ 
+ type LoadBalancerConfig struct {
+@@ -92,6 +96,42 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
+ 	return config, nil
+ }
+ 
++// adopted from client-go InClusterConfig
++func serviceAccountClusterConfig(controlEndpoint string) (*rest.Config, string, error) {
++	const (
++		tokenFile     = "/var/run/secrets/ecf/clusterserviceaccount/token"
++		rootCAFile    = "/var/run/secrets/ecf/clusterserviceaccount/ca.crt"
++		namespaceFile = "/var/run/secrets/ecf/clusterserviceaccount/namespace"
++	)
++
++	token, err := os.ReadFile(tokenFile)
++	if err != nil {
++		return nil, "", errors.Wrapf(err, "Failed to read tokenFile %s", tokenFile)
++	}
++
++	namespace, err := os.ReadFile(namespaceFile)
++	if err != nil {
++		return nil, "", errors.Wrapf(err, "Failed to read namespaceFile %s", namespaceFile)
++	}
++
++	tlsClientConfig := rest.TLSClientConfig{}
++
++	if _, err := certutil.NewPool(rootCAFile); err != nil {
++		klog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
++		return nil, "", errors.Wrapf(err, "Failed to read and parse rootCAFile %s", rootCAFile)
++	} else {
++		tlsClientConfig.CAFile = rootCAFile
++	}
++
++	return &rest.Config{
++		// TODO: switch to using cluster DNS.
++		Host:            controlEndpoint,
++		TLSClientConfig: tlsClientConfig,
++		BearerToken:     string(token),
++		BearerTokenFile: tokenFile,
++	}, string(namespace), nil
++}
++
+ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, error) {
+ 	if config == nil {
+ 		return nil, fmt.Errorf("No %s cloud provider config file given", ProviderName)
+@@ -106,41 +146,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
+ 	if err != nil {
+ 		return nil, fmt.Errorf("Failed to unmarshal cloud provider config: %v", err)
+ 	}
+-	namespace := cloudConf.Namespace
+-	var restConfig *rest.Config
++	var restConfig *rest.Config = nil
++	var namespace string = ""
+ 	if cloudConf.Kubeconfig == "" {
+-		restConfig, err = rest.InClusterConfig()
++		restConfig, namespace, err = serviceAccountClusterConfig(cloudConf.ControlEndpoint)
+ 		if err != nil {
+ 			return nil, err
+ 		}
+ 	} else {
+-		var infraKubeConfig string
+-		infraKubeConfig, err = getInfraKubeConfig(cloudConf.Kubeconfig)
+-		if err != nil {
+-			return nil, err
+-		}
+-		var clientConfig clientcmd.ClientConfig
+-		clientConfig, err = clientcmd.NewClientConfigFromBytes([]byte(infraKubeConfig))
++		clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(cloudConf.Kubeconfig))
+ 		if err != nil {
+-			return nil, err
++			return nil, errors.Wrap(err, "Failed to create client config from kubeconfig")
+ 		}
+ 		restConfig, err = clientConfig.ClientConfig()
+ 		if err != nil {
+-			return nil, err
++			return nil, errors.Wrap(err, "Failed to create rest config")
+ 		}
+-		if namespace == "" {
+-			namespace, _, err = clientConfig.Namespace()
+-			if err != nil {
+-				klog.Errorf("Could not find namespace in client config: %v", err)
+-				return nil, err
+-			}
++		namespace, _, err = clientConfig.Namespace()
++		if err != nil {
++			klog.Errorf("Could not find namespace in client config: %v", err)
++			return nil, errors.Wrap(err, "Could not find namespace in client config")
+ 		}
+ 	}
+-	c, err := client.New(restConfig, client.Options{
+-		Scheme: scheme,
+-	})
++	c, err := client.New(restConfig, client.Options{Scheme: scheme})
+ 	if err != nil {
+-		return nil, err
++		return nil, errors.Wrap(err, "Failed to create kube client")
+ 	}
+ 	return &cloud{
+ 		namespace: namespace,
+-- 
+2.45.2
+
