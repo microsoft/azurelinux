@@ -1,6 +1,7 @@
 {
-  "Signatures": {
-    "coredns-1.11.4.tar.gz": "19c3b34f99921c129a19797710ddcc35f974655c99914cc319ccd0ba14f13e57",
-    "coredns-1.11.4-vendor.tar.gz": "7b84d85ea60f6ac0c881985b5a734c33388e19db6b42323435bb1911179efb3b"
-  }
+ "Signatures": {
+  "coredns-1.11.4-vendor.tar.gz": "7b84d85ea60f6ac0c881985b5a734c33388e19db6b42323435bb1911179efb3b",
+  "coredns-1.11.4.tar.gz": "19c3b34f99921c129a19797710ddcc35f974655c99914cc319ccd0ba14f13e57",
+  "coredns-example-net-test.patch": "389918780bff0c0b0ebd2f782c9b751d99e41e6611feecef87d471d195399cf4"
+ }
 }
