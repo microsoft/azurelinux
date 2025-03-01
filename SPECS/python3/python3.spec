@@ -181,6 +181,8 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_bindir}/python3
 %{_bindir}/python%{majmin}
 %{_mandir}/*/*
+%{_bindir}/myscript.py
+%{_mandir}/*/*
 
 %dir %{_libdir}/python%{majmin}
 %dir %{_libdir}/python%{majmin}/site-packages
