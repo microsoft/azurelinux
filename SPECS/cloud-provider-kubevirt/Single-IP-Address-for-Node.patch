@@ -1,174 +1,48 @@
-From da8eeb79972922becc18e90f90eee97c990bff40 Mon Sep 17 00:00:00 2001
+From 9a0935316fe1b6b3ade39bfd3c4875dbc558f038 Mon Sep 17 00:00:00 2001
 From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
-Date: Wed, 5 Feb 2025 15:00:04 -0800
-Subject: [PATCH] Integrating Nexus Specific changes into patch file
+Date: Fri, 28 Feb 2025 17:42:00 -0800
+Subject: [PATCH] Report single IP address for the node
+
+Upstream Issue: https://github.com/kubevirt/cloud-provider-kubevirt/issues/339
+
+The changes in the patch file `instances_v2.go` and its associated test file `instances_v2_test.go` introduce several enhancements and improvements, likely intended to achieve the following goals:
+
+### 1. Improved IPv4 and IPv6 Handling
+#### Why:
+- **Support for IPv6:** The changes include logic to handle both IPv4 and IPv6 addresses, with particular attention to differentiating between standard and EUI-64 IPv6 addresses.
+- **Node Internal IP Handling:** Ensuring that the configured IP addresses for nodes are correctly identified and handled, including avoiding link-local addresses which are typically not useful for node-to-node communications.
+
+### 2. Enhanced Network Interface Parsing and Prioritization
+#### Why:
+- **Default Network Identification:** The changes prioritize interfaces named `"defaultcni"` and `"default"`, ensuring the primary network interfaces are chosen first.
+- **One Interface per Address Type:** Ensures that only one address of each type (IPv4 and IPv6) is assigned per node, which can simplify and clarify the networking setup of the cloud provider.
+
+### 3. New Function `isEUI64IPv6`
+#### Why:
+- **EUI-64 Address Validation:** The introduction of `isEUI64IPv6` adds functionality to detect and handle EUI-64 IPv6 addresses. This is important for correctly interpreting addresses that are auto-generated based on MAC addresses.
+
+### 4. Changes in `getNodeAddresses` Function
+#### Why:
+- **Address Categorization:** The updated function logic categorizes and selects appropriate IPv4 and IPv6 addresses for the node, by filtering out unwanted link-local addresses and ensuring the selection of appropriate internal IP addresses.
+- **Candidate Address Logic:** This improves the robustness of IP address assignment by considering multiple network interfaces and making intelligent choices about which IP addresses to use.
+
+### 5. Test Enhancements in `instances_v2_test.go`
+#### Why:
+- **Comprehensive Testing:** The tests have been expanded to cover scenarios with different combinations of IPv4 and IPv6 addresses, ensuring that the new logic for address handling and prioritization is correctly implemented.
+- **Edge Cases:** New test cases, such as those without default interfaces or with only IPv6 addresses, ensure the system behaves correctly under various configurations.
+
+### Summary
+#### Overall Rationale:
+1. **IPv6 Support:** Enhances the cloud provider's compatibility with modern networking standards by correctly supporting IPv6, including EUI-64 addresses.
+2. **Improved Node Address Management:** Ensures the cloud provider correctly identifies and prioritizes network interfaces and addresses, leading to more accurate and reliable node configurations.
+3. **Robustness and Reliability:** The improved error handling and logical separation of concerns in address processing increase the reliability and maintainability of the code.
+4. **Comprehensive Testing:** The expanded and refined tests ensure that the new logic works correctly across a wide range of scenarios, reducing the likelihood of bugs and regressions.
 
 ---
- cmd/kubevirt-cloud-controller-manager/main.go |   4 +-
- pkg/provider/cloud.go                         |  85 +-
- pkg/provider/instances_v2.go                  | 115 ++-
- pkg/provider/instances_v2_test.go             | 772 +++++++++++++++++-
- 4 files changed, 927 insertions(+), 49 deletions(-)
+ pkg/provider/instances_v2.go      | 115 ++++-
+ pkg/provider/instances_v2_test.go | 772 +++++++++++++++++++++++++++++-
+ 2 files changed, 866 insertions(+), 21 deletions(-)
 
-diff --git a/cmd/kubevirt-cloud-controller-manager/main.go b/cmd/kubevirt-cloud-controller-manager/main.go
-index 8e2c2467..ad59c16a 100644
---- a/cmd/kubevirt-cloud-controller-manager/main.go
-+++ b/cmd/kubevirt-cloud-controller-manager/main.go
-@@ -34,6 +34,7 @@ import (
- 	_ "k8s.io/component-base/metrics/prometheus/version"  // for version metric registration
- 	"k8s.io/klog/v2"
- 
-+	"k8s.io/cloud-provider/names"
- 	_ "kubevirt.io/cloud-provider-kubevirt/pkg/provider"
- )
- 
-@@ -46,7 +47,8 @@ func main() {
- 	fss := cliflag.NamedFlagSets{}
- 	controllerInitializers := app.DefaultInitFuncConstructors
- 
--	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, controllerInitializers, fss, wait.NeverStop)
-+	controllerAliases := names.CCMControllerAliases()
-+	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, controllerInitializers, controllerAliases, fss, wait.NeverStop)
- 	code := cli.Run(command)
- 	os.Exit(code)
- }
-diff --git a/pkg/provider/cloud.go b/pkg/provider/cloud.go
-index fab7da0b..cd54f26a 100644
---- a/pkg/provider/cloud.go
-+++ b/pkg/provider/cloud.go
-@@ -4,6 +4,7 @@ import (
- 	"bytes"
- 	"fmt"
- 	"io"
-+	"io/ioutil"
- 	"os"
- 
- 	"gopkg.in/yaml.v2"
-@@ -16,6 +17,9 @@ import (
- 	"k8s.io/utils/pointer"
- 	kubevirtv1 "kubevirt.io/api/core/v1"
- 	"sigs.k8s.io/controller-runtime/pkg/client"
-+
-+	"github.com/pkg/errors"
-+	certutil "k8s.io/client-go/util/cert"
- )
- 
- const (
-@@ -42,11 +46,12 @@ type cloud struct {
- }
- 
- type CloudConfig struct {
--	Kubeconfig   string             `yaml:"kubeconfig"`
--	LoadBalancer LoadBalancerConfig `yaml:"loadBalancer"`
--	InstancesV2  InstancesV2Config  `yaml:"instancesV2"`
--	Namespace    string             `yaml:"namespace"`
--	InfraLabels  map[string]string  `yaml:"infraLabels"`
-+	Kubeconfig      string             `yaml:"kubeconfig"` // The kubeconfig used to connect to the underkube
-+	LoadBalancer    LoadBalancerConfig `yaml:"loadBalancer"`
-+	InstancesV2     InstancesV2Config  `yaml:"instancesV2"`
-+	ControlEndpoint string             `yaml:"controlEndpoint"`
-+	Namespace       string             `yaml:"namespace"`
-+	InfraLabels     map[string]string  `yaml:"infraLabels"`
- }
- 
- type LoadBalancerConfig struct {
-@@ -92,6 +97,42 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
- 	return config, nil
- }
- 
-+// adopted from client-go InClusterConfig
-+func serviceAccountClusterConfig(controlEndpoint string) (*rest.Config, string, error) {
-+	const (
-+		tokenFile     = "/var/run/secrets/ecf/clusterserviceaccount/token"
-+		rootCAFile    = "/var/run/secrets/ecf/clusterserviceaccount/ca.crt"
-+		namespaceFile = "/var/run/secrets/ecf/clusterserviceaccount/namespace"
-+	)
-+
-+	token, err := ioutil.ReadFile(tokenFile)
-+	if err != nil {
-+		return nil, "", errors.Wrapf(err, "Failed to read tokenFile %s", tokenFile)
-+	}
-+
-+	namespace, err := ioutil.ReadFile(namespaceFile)
-+	if err != nil {
-+		return nil, "", errors.Wrapf(err, "Failed to read namespaceFile %s", namespaceFile)
-+	}
-+
-+	tlsClientConfig := rest.TLSClientConfig{}
-+
-+	if _, err := certutil.NewPool(rootCAFile); err != nil {
-+		klog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
-+		return nil, "", errors.Wrapf(err, "Failed to read and parse rootCAFile %s", rootCAFile)
-+	} else {
-+		tlsClientConfig.CAFile = rootCAFile
-+	}
-+
-+	return &rest.Config{
-+		// TODO: switch to using cluster DNS.
-+		Host:            controlEndpoint,
-+		TLSClientConfig: tlsClientConfig,
-+		BearerToken:     string(token),
-+		BearerTokenFile: tokenFile,
-+	}, string(namespace), nil
-+}
-+
- func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, error) {
- 	if config == nil {
- 		return nil, fmt.Errorf("No %s cloud provider config file given", ProviderName)
-@@ -106,41 +147,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
- 	if err != nil {
- 		return nil, fmt.Errorf("Failed to unmarshal cloud provider config: %v", err)
- 	}
--	namespace := cloudConf.Namespace
--	var restConfig *rest.Config
-+	var restConfig *rest.Config = nil
-+	var namespace string = ""
- 	if cloudConf.Kubeconfig == "" {
--		restConfig, err = rest.InClusterConfig()
-+		restConfig, namespace, err = serviceAccountClusterConfig(cloudConf.ControlEndpoint)
- 		if err != nil {
- 			return nil, err
- 		}
- 	} else {
--		var infraKubeConfig string
--		infraKubeConfig, err = getInfraKubeConfig(cloudConf.Kubeconfig)
--		if err != nil {
--			return nil, err
--		}
--		var clientConfig clientcmd.ClientConfig
--		clientConfig, err = clientcmd.NewClientConfigFromBytes([]byte(infraKubeConfig))
-+		clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(cloudConf.Kubeconfig))
- 		if err != nil {
--			return nil, err
-+			return nil, errors.Wrap(err, "Failed to create client config from kubeconfig")
- 		}
- 		restConfig, err = clientConfig.ClientConfig()
- 		if err != nil {
--			return nil, err
-+			return nil, errors.Wrap(err, "Failed to create rest config")
- 		}
--		if namespace == "" {
--			namespace, _, err = clientConfig.Namespace()
--			if err != nil {
--				klog.Errorf("Could not find namespace in client config: %v", err)
--				return nil, err
--			}
-+		namespace, _, err = clientConfig.Namespace()
-+		if err != nil {
-+			klog.Errorf("Could not find namespace in client config: %v", err)
-+			return nil, errors.Wrap(err, "Could not find namespace in client config")
- 		}
- 	}
--	c, err := client.New(restConfig, client.Options{
--		Scheme: scheme,
--	})
-+	c, err := client.New(restConfig, client.Options{Scheme: scheme})
- 	if err != nil {
--		return nil, err
-+		return nil, errors.Wrap(err, "Failed to create kube client")
- 	}
- 	return &cloud{
- 		namespace: namespace,
 diff --git a/pkg/provider/instances_v2.go b/pkg/provider/instances_v2.go
 index 0e49a708..cde1a325 100644
 --- a/pkg/provider/instances_v2.go

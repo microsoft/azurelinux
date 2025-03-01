@@ -2,7 +2,7 @@ Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
 Release:        1%{?dist}
-License:        MIT
+License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
 # The Group has been set to System/Management to mimic SPEC file of Kubevirt
@@ -24,8 +24,9 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-7-vendor.tar.gz
-Patch0:         KCCM-Changes.patch
-Patch1:         Golang-Version-Upgrade.patch
+Patch0:         Initialization-and-Configuration-handling.patch
+Patch1:         Single-IP-Address-for-Node.patch
+Patch2:         Golang-Version-Upgrade.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22
 
