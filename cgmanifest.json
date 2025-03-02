@@ -8821,8 +8821,8 @@
         "type": "other",
         "other": {
           "name": "libbsd",
-          "version": "0.10.0",
-          "downloadUrl": "http://libbsd.freedesktop.org/releases/libbsd-0.10.0.tar.xz"
+          "version": "0.12.2",
+          "downloadUrl": "https://libbsd.freedesktop.org/releases/libbsd-0.12.2.tar.xz"
         }
       }
     },
