@@ -7341,8 +7341,8 @@
         "type": "other",
         "other": {
           "name": "intel-cmt-cat",
-          "version": "4.1.0",
-          "downloadUrl": "https://github.com/01org/intel-cmt-cat/archive/v4.1.0.tar.gz"
+          "version": "24.05",
+          "downloadUrl": "https://github.com/intel/intel-cmt-cat/archive/v24.05/intel-cmt-cat-24.05.tar.gz"
         }
       }
     },
