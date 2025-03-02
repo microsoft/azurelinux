@@ -19483,8 +19483,8 @@
         "type": "other",
         "other": {
           "name": "perl-Razor-Agent",
-          "version": "2.85",
-          "downloadUrl": "https://downloads.sourceforge.net/project/razor/razor-agents/2.85/razor-agents-2.85.tar.bz2"
+          "version": "2.86",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Razor2-Client-Agent-2.86.tar.gz"
         }
       }
     },
