@@ -11521,8 +11521,8 @@
         "type": "other",
         "other": {
           "name": "libvarlink",
-          "version": "18",
-          "downloadUrl": "https://github.com/varlink/libvarlink/archive/18/libvarlink-18.tar.gz"
+          "version": "23",
+          "downloadUrl": "https://github.com/varlink/libvarlink/archive/23/libvarlink-23.tar.gz"
         }
       }
     },
