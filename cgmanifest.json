@@ -29566,8 +29566,8 @@
         "type": "other",
         "other": {
           "name": "uthash",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/troydhanson/uthash/archive/v2.0.2.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/troydhanson/uthash/archive/v2.3.0/uthash-2.3.0.tar.gz"
         }
       }
     },
