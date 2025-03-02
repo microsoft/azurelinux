@@ -11041,8 +11041,8 @@
         "type": "other",
         "other": {
           "name": "libsigsegv",
-          "version": "2.11",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.11.tar.gz"
+          "version": "2.14",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.14.tar.gz"
         }
       }
     },
