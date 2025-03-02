@@ -28996,8 +28996,8 @@
         "type": "other",
         "other": {
           "name": "tn5250",
-          "version": "0.17.4",
-          "downloadUrl": "http://downloads.sourceforge.net/tn5250/tn5250-0.17.4.tar.gz"
+          "version": "0.17.6",
+          "downloadUrl": "https://github.com/tn5250/tn5250/archive/v0.17.6/tn5250-0.17.6.tar.gz"
         }
       }
     },
