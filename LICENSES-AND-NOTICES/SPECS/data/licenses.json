@@ -1694,6 +1694,7 @@
                 "python-filelock",
                 "python-fixtures",
                 "python-flake8",
+                "python-flaky",
                 "python-flask",
                 "python-flit",
                 "python-flit-core",
