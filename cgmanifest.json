@@ -24682,6 +24682,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sphinxygen",
+	  "version": "1.0.2",
+          "downloadUrl": "https://gitlab.com/drobilla/sphinxygen/-/archive/v1.0.2/sphinxygen-v1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinx-epytext",
           "version": "0.0.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinx-epytext/sphinx-epytext-0.0.4.tar.gz"
