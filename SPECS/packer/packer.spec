@@ -37,6 +37,7 @@ Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2025-21613.patch
 Patch4:         CVE-2024-28180.patch
 Patch5:         CVE-2025-27144.patch
+Patch6:         CVE-2025-22869.patch
 BuildRequires:  golang >= 1.21
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -72,7 +73,7 @@ go test -mod=vendor
 %changelog
 
 * Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.9.5-6
-- Fix CVE-2024-28180, CVE-2025-27144 with an upstream patch
+- Fix CVE-2024-28180, CVE-2025-27144, CVE-2025-22869 with an upstream patch
 
 * Thu Jan 09 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.9.5-5
 - Add patch for CVE-2025-21613 and CVE-2025-21614
