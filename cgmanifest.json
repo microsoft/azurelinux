@@ -20133,8 +20133,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Manifest",
-          "version": "2.021",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Manifest-2.021.tar.gz"
+          "version": "2.024",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-Manifest-2.024.tar.gz"
         }
       }
     },
