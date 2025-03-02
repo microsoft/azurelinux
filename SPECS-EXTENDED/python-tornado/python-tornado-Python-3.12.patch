@@ -1,0 +1,404 @@
+diff --git a/requirements.txt b/requirements.txt
+index 349db21..e96c870 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -12,7 +12,7 @@ black==22.12.0
+     # via -r requirements.in
+ build==0.10.0
+     # via pip-tools
+-cachetools==5.2.1
++cachetools==5.3.1
+     # via tox
+ certifi==2022.12.7
+     # via requests
+@@ -32,7 +32,7 @@ docutils==0.17.1
+     # via
+     #   sphinx
+     #   sphinx-rtd-theme
+-filelock==3.9.0
++filelock==3.12.0
+     # via
+     #   tox
+     #   virtualenv
+@@ -54,7 +54,7 @@ mypy-extensions==0.4.3
+     # via
+     #   black
+     #   mypy
+-packaging==23.0
++packaging==23.1
+     # via
+     #   build
+     #   pyproject-api
+@@ -64,7 +64,7 @@ pathspec==0.10.3
+     # via black
+ pip-tools==6.12.1
+     # via -r requirements.in
+-platformdirs==2.6.2
++platformdirs==3.5.1
+     # via
+     #   black
+     #   tox
+@@ -77,7 +77,7 @@ pyflakes==3.0.1
+     # via flake8
+ pygments==2.14.0
+     # via sphinx
+-pyproject-api==1.5.0
++pyproject-api==1.5.1
+     # via tox
+ pyproject-hooks==1.0.0
+     # via build
+@@ -115,7 +115,7 @@ tomli==2.0.1
+     #   mypy
+     #   pyproject-api
+     #   tox
+-tox==4.3.5
++tox==4.6.0
+     # via -r requirements.in
+ types-pycurl==7.45.2.0
+     # via -r requirements.in
+@@ -123,7 +123,7 @@ typing-extensions==4.4.0
+     # via mypy
+ urllib3==1.26.14
+     # via requests
+-virtualenv==20.17.1
++virtualenv==20.23.0
+     # via tox
+ wheel==0.38.4
+     # via pip-tools
+diff --git a/tornado/httputil.py b/tornado/httputil.py
+index 9c341d4..b21d804 100644
+--- a/tornado/httputil.py
++++ b/tornado/httputil.py
+@@ -856,7 +856,8 @@ def format_timestamp(
+ 
+     The argument may be a numeric timestamp as returned by `time.time`,
+     a time tuple as returned by `time.gmtime`, or a `datetime.datetime`
+-    object.
++    object. Naive `datetime.datetime` objects are assumed to represent
++    UTC; aware objects are converted to UTC before formatting.
+ 
+     >>> format_timestamp(1359312200)
+     'Sun, 27 Jan 2013 18:43:20 GMT'
+diff --git a/tornado/locale.py b/tornado/locale.py
+index 55072af..c552670 100644
+--- a/tornado/locale.py
++++ b/tornado/locale.py
+@@ -333,7 +333,7 @@ class Locale(object):
+         shorter: bool = False,
+         full_format: bool = False,
+     ) -> str:
+-        """Formats the given date (which should be GMT).
++        """Formats the given date.
+ 
+         By default, we return a relative time (e.g., "2 minutes ago"). You
+         can return an absolute date string with ``relative=False``.
+@@ -343,10 +343,16 @@ class Locale(object):
+ 
+         This method is primarily intended for dates in the past.
+         For dates in the future, we fall back to full format.
++
++        .. versionchanged:: 6.4
++           Aware `datetime.datetime` objects are now supported (naive
++           datetimes are still assumed to be UTC).
+         """
+         if isinstance(date, (int, float)):
+-            date = datetime.datetime.utcfromtimestamp(date)
+-        now = datetime.datetime.utcnow()
++            date = datetime.datetime.fromtimestamp(date, datetime.timezone.utc)
++        if date.tzinfo is None:
++            date = date.replace(tzinfo=datetime.timezone.utc)
++        now = datetime.datetime.now(datetime.timezone.utc)
+         if date > now:
+             if relative and (date - now).seconds < 60:
+                 # Due to click skew, things are some things slightly
+diff --git a/tornado/test/httpclient_test.py b/tornado/test/httpclient_test.py
+index a71ec0a..a41040e 100644
+--- a/tornado/test/httpclient_test.py
++++ b/tornado/test/httpclient_test.py
+@@ -28,7 +28,7 @@ from tornado.iostream import IOStream
+ from tornado.log import gen_log, app_log
+ from tornado import netutil
+ from tornado.testing import AsyncHTTPTestCase, bind_unused_port, gen_test, ExpectLog
+-from tornado.test.util import skipOnTravis
++from tornado.test.util import skipOnTravis, ignore_deprecation
+ from tornado.web import Application, RequestHandler, url
+ from tornado.httputil import format_timestamp, HTTPHeaders
+ 
+@@ -887,7 +887,15 @@ class HTTPRequestTestCase(unittest.TestCase):
+         self.assertEqual(request.body, utf8("foo"))
+ 
+     def test_if_modified_since(self):
+-        http_date = datetime.datetime.utcnow()
++        http_date = datetime.datetime.now(datetime.timezone.utc)
++        request = HTTPRequest("http://example.com", if_modified_since=http_date)
++        self.assertEqual(
++            request.headers, {"If-Modified-Since": format_timestamp(http_date)}
++        )
++
++    def test_if_modified_since_naive_deprecated(self):
++        with ignore_deprecation():
++            http_date = datetime.datetime.utcnow()
+         request = HTTPRequest("http://example.com", if_modified_since=http_date)
+         self.assertEqual(
+             request.headers, {"If-Modified-Since": format_timestamp(http_date)}
+diff --git a/tornado/test/httputil_test.py b/tornado/test/httputil_test.py
+index 8424491..aa9b6ee 100644
+--- a/tornado/test/httputil_test.py
++++ b/tornado/test/httputil_test.py
+@@ -13,6 +13,7 @@ from tornado.httputil import (
+ from tornado.escape import utf8, native_str
+ from tornado.log import gen_log
+ from tornado.testing import ExpectLog
++from tornado.test.util import ignore_deprecation
+ 
+ import copy
+ import datetime
+@@ -412,8 +413,29 @@ class FormatTimestampTest(unittest.TestCase):
+         self.assertEqual(9, len(tup))
+         self.check(tup)
+ 
+-    def test_datetime(self):
+-        self.check(datetime.datetime.utcfromtimestamp(self.TIMESTAMP))
++    def test_utc_naive_datetime(self):
++        self.check(
++            datetime.datetime.fromtimestamp(
++                self.TIMESTAMP, datetime.timezone.utc
++            ).replace(tzinfo=None)
++        )
++
++    def test_utc_naive_datetime_deprecated(self):
++        with ignore_deprecation():
++            self.check(datetime.datetime.utcfromtimestamp(self.TIMESTAMP))
++
++    def test_utc_aware_datetime(self):
++        self.check(
++            datetime.datetime.fromtimestamp(self.TIMESTAMP, datetime.timezone.utc)
++        )
++
++    def test_other_aware_datetime(self):
++        # Other timezones are ignored; the timezone is always printed as GMT
++        self.check(
++            datetime.datetime.fromtimestamp(
++                self.TIMESTAMP, datetime.timezone(datetime.timedelta(hours=-4))
++            )
++        )
+ 
+ 
+ # HTTPServerRequest is mainly tested incidentally to the server itself,
+diff --git a/tornado/test/locale_test.py b/tornado/test/locale_test.py
+index ee74cb0..a2e0872 100644
+--- a/tornado/test/locale_test.py
++++ b/tornado/test/locale_test.py
+@@ -91,45 +91,55 @@ class EnglishTest(unittest.TestCase):
+             locale.format_date(date, full_format=True), "April 28, 2013 at 6:35 pm"
+         )
+ 
+-        now = datetime.datetime.utcnow()
+-
+-        self.assertEqual(
+-            locale.format_date(now - datetime.timedelta(seconds=2), full_format=False),
+-            "2 seconds ago",
+-        )
+-        self.assertEqual(
+-            locale.format_date(now - datetime.timedelta(minutes=2), full_format=False),
+-            "2 minutes ago",
+-        )
+-        self.assertEqual(
+-            locale.format_date(now - datetime.timedelta(hours=2), full_format=False),
+-            "2 hours ago",
+-        )
+-
+-        self.assertEqual(
+-            locale.format_date(
+-                now - datetime.timedelta(days=1), full_format=False, shorter=True
+-            ),
+-            "yesterday",
+-        )
+-
+-        date = now - datetime.timedelta(days=2)
+-        self.assertEqual(
+-            locale.format_date(date, full_format=False, shorter=True),
+-            locale._weekdays[date.weekday()],
+-        )
+-
+-        date = now - datetime.timedelta(days=300)
+-        self.assertEqual(
+-            locale.format_date(date, full_format=False, shorter=True),
+-            "%s %d" % (locale._months[date.month - 1], date.day),
+-        )
+-
+-        date = now - datetime.timedelta(days=500)
+-        self.assertEqual(
+-            locale.format_date(date, full_format=False, shorter=True),
+-            "%s %d, %d" % (locale._months[date.month - 1], date.day, date.year),
+-        )
++        aware_dt = datetime.datetime.now(datetime.timezone.utc)
++        naive_dt = aware_dt.replace(tzinfo=None)
++        for name, now in {"aware": aware_dt, "naive": naive_dt}.items():
++            with self.subTest(dt=name):
++                self.assertEqual(
++                    locale.format_date(
++                        now - datetime.timedelta(seconds=2), full_format=False
++                    ),
++                    "2 seconds ago",
++                )
++                self.assertEqual(
++                    locale.format_date(
++                        now - datetime.timedelta(minutes=2), full_format=False
++                    ),
++                    "2 minutes ago",
++                )
++                self.assertEqual(
++                    locale.format_date(
++                        now - datetime.timedelta(hours=2), full_format=False
++                    ),
++                    "2 hours ago",
++                )
++
++                self.assertEqual(
++                    locale.format_date(
++                        now - datetime.timedelta(days=1),
++                        full_format=False,
++                        shorter=True,
++                    ),
++                    "yesterday",
++                )
++
++                date = now - datetime.timedelta(days=2)
++                self.assertEqual(
++                    locale.format_date(date, full_format=False, shorter=True),
++                    locale._weekdays[date.weekday()],
++                )
++
++                date = now - datetime.timedelta(days=300)
++                self.assertEqual(
++                    locale.format_date(date, full_format=False, shorter=True),
++                    "%s %d" % (locale._months[date.month - 1], date.day),
++                )
++
++                date = now - datetime.timedelta(days=500)
++                self.assertEqual(
++                    locale.format_date(date, full_format=False, shorter=True),
++                    "%s %d, %d" % (locale._months[date.month - 1], date.day, date.year),
++                )
+ 
+     def test_friendly_number(self):
+         locale = tornado.locale.get("en_US")
+diff --git a/tornado/test/web_test.py b/tornado/test/web_test.py
+index c2d057c..a9bce04 100644
+--- a/tornado/test/web_test.py
++++ b/tornado/test/web_test.py
+@@ -404,10 +404,10 @@ class CookieTest(WebTestCase):
+         match = re.match("foo=bar; expires=(?P<expires>.+); Path=/", header)
+         assert match is not None
+ 
+-        expires = datetime.datetime.utcnow() + datetime.timedelta(days=10)
+-        parsed = email.utils.parsedate(match.groupdict()["expires"])
+-        assert parsed is not None
+-        header_expires = datetime.datetime(*parsed[:6])
++        expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
++            days=10
++        )
++        header_expires = email.utils.parsedate_to_datetime(match.groupdict()["expires"])
+         self.assertTrue(abs((expires - header_expires).total_seconds()) < 10)
+ 
+     def test_set_cookie_false_flags(self):
+@@ -1697,11 +1697,10 @@ class DateHeaderTest(SimpleHandlerTestCase):
+ 
+     def test_date_header(self):
+         response = self.fetch("/")
+-        parsed = email.utils.parsedate(response.headers["Date"])
+-        assert parsed is not None
+-        header_date = datetime.datetime(*parsed[:6])
++        header_date = email.utils.parsedate_to_datetime(response.headers["Date"])
+         self.assertTrue(
+-            header_date - datetime.datetime.utcnow() < datetime.timedelta(seconds=2)
++            header_date - datetime.datetime.now(datetime.timezone.utc)
++            < datetime.timedelta(seconds=2)
+         )
+ 
+ 
+@@ -3010,10 +3009,12 @@ class XSRFCookieKwargsTest(SimpleHandlerTestCase):
+         match = re.match(".*; expires=(?P<expires>.+);.*", header)
+         assert match is not None
+ 
+-        expires = datetime.datetime.utcnow() + datetime.timedelta(days=2)
+-        parsed = email.utils.parsedate(match.groupdict()["expires"])
+-        assert parsed is not None
+-        header_expires = datetime.datetime(*parsed[:6])
++        expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
++            days=2
++        )
++        header_expires = email.utils.parsedate_to_datetime(match.groupdict()["expires"])
++        if header_expires.tzinfo is None:
++            header_expires = header_expires.replace(tzinfo=datetime.timezone.utc)
+         self.assertTrue(abs((expires - header_expires).total_seconds()) < 10)
+ 
+ 
+diff --git a/tornado/web.py b/tornado/web.py
+index 5651404..439e02c 100644
+--- a/tornado/web.py
++++ b/tornado/web.py
+@@ -647,7 +647,9 @@ class RequestHandler(object):
+         if domain:
+             morsel["domain"] = domain
+         if expires_days is not None and not expires:
+-            expires = datetime.datetime.utcnow() + datetime.timedelta(days=expires_days)
++            expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
++                days=expires_days
++            )
+         if expires:
+             morsel["expires"] = httputil.format_timestamp(expires)
+         if path:
+@@ -698,7 +700,9 @@ class RequestHandler(object):
+                 raise TypeError(
+                     f"clear_cookie() got an unexpected keyword argument '{excluded_arg}'"
+                 )
+-        expires = datetime.datetime.utcnow() - datetime.timedelta(days=365)
++        expires = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
++            days=365
++        )
+         self.set_cookie(name, value="", expires=expires, **kwargs)
+ 
+     def clear_all_cookies(self, **kwargs: Any) -> None:
+@@ -2812,12 +2816,12 @@ class StaticFileHandler(RequestHandler):
+         # content has not been modified
+         ims_value = self.request.headers.get("If-Modified-Since")
+         if ims_value is not None:
+-            date_tuple = email.utils.parsedate(ims_value)
+-            if date_tuple is not None:
+-                if_since = datetime.datetime(*date_tuple[:6])
+-                assert self.modified is not None
+-                if if_since >= self.modified:
+-                    return True
++            if_since = email.utils.parsedate_to_datetime(ims_value)
++            if if_since.tzinfo is None:
++                if_since = if_since.replace(tzinfo=datetime.timezone.utc)
++            assert self.modified is not None
++            if if_since >= self.modified:
++                return True
+ 
+         return False
+ 
+@@ -2981,6 +2985,10 @@ class StaticFileHandler(RequestHandler):
+         object or None.
+ 
+         .. versionadded:: 3.1
++
++        .. versionchanged:: 6.4
++           Now returns an aware datetime object instead of a naive one.
++           Subclasses that override this method may return either kind.
+         """
+         stat_result = self._stat()
+         # NOTE: Historically, this used stat_result[stat.ST_MTIME],
+@@ -2991,7 +2999,9 @@ class StaticFileHandler(RequestHandler):
+         # consistency with the past (and because we have a unit test
+         # that relies on this), we truncate the float here, although
+         # I'm not sure that's the right thing to do.
+-        modified = datetime.datetime.utcfromtimestamp(int(stat_result.st_mtime))
++        modified = datetime.datetime.fromtimestamp(
++            int(stat_result.st_mtime), datetime.timezone.utc
++        )
+         return modified
+ 
+     def get_content_type(self) -> str:
