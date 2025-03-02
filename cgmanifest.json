@@ -19123,8 +19123,8 @@
         "type": "other",
         "other": {
           "name": "perl-PAR-Dist",
-          "version": "0.51",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/PAR-Dist-0.51.tar.gz"
+          "version": "0.53",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/PAR-Dist-0.53.tar.gz"
         }
       }
     },
