@@ -13001,8 +13001,8 @@
         "type": "other",
         "other": {
           "name": "mcelog",
-          "version": "168",
-          "downloadUrl": "https://github.com/andikleen/mcelog/archive/v168/mcelog-168.tar.gz"
+          "version": "175",
+          "downloadUrl": "https://github.com/andikleen/mcelog/archive/v175/mcelog-175.tar.gz"
         }
       }
     },
