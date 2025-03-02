@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "README-skkdic.rh.ja": "6a8cfc3249680034b9b549042bed348e6d460783c4f66290e1cb02b3a45226dc",
-  "license-investigation.txt": "775a789e6981329816b279ecc855a01fd7f09273c4813e41b57d3495d643dd58",
-  "skkdic-20210217.git1ca80982c5a32c82bfc5e98e1fe9d8751ab44946.tar.gz": "6cceb1a9f4a7c20f83bbd2d85d9bdeef3381dc629f5fe1d2d2e6a378cf7eff1d",
+  "license-investigation.txt": "aff9d1ec3614d82b72341c2e4eafda998bd9a0a3d23b53cbe0e9d664f1a4ba39", 
+  "skkdic-20240131.gitb798a46b886f71c0c25ad2a9e78b1c3e8933970c.tar.gz": "59b32e1a664ac8ed90f2ef8558f3d26eabeaa4e9de930b5b0ce9d3b85ed928cf", 
   "skkdic-LICENSE.txt": "dff86e06f127415191d952ded875e01f0d52ab1e52e21b81c4da4121dc12f686",
   "unannotation.awk": "34bc5b7c1edb5296b0e1951f0340b68f5b7cf9a4a5ca54c71f45eb8700a293e9"
  }
