@@ -18383,8 +18383,8 @@
         "type": "other",
         "other": {
           "name": "perl-Mail-IMAPTalk",
-          "version": "4.04",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBN/Mail-IMAPTalk-4.04.tar.gz"
+          "version": "4.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RO/ROBM/Mail-IMAPTalk-4.06.tar.gz"
         }
       }
     },
