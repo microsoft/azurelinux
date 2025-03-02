@@ -14,6 +14,7 @@ Source0: https://github.com/performancecopilot/pcp/archive/refs/tags/%{version}.
 Patch0: pcp-xsos-fixes.patch
 Patch1: pcp-gcc15.patch
 
+ExcludeArch: %{ix86}
 # The additional linker flags break out-of-tree PMDAs.
 %undefine _package_note_flags
 %global __python2 python2
@@ -144,7 +145,7 @@ Obsoletes: pcp-pmda-rpm-debuginfo < 5.3.2
 # PCP REST APIs are now provided by pmproxy
 Obsoletes: pcp-webapi-debuginfo < 5.0.0
 Obsoletes: pcp-webapi < 5.0.0
-Provides: pcp-webapi
+Provides: pcp-webapi = %{version}-%{release}
 
 # PCP discovery service now provided by pmfind
 Obsoletes: pcp-manager-debuginfo < 5.2.0
@@ -2658,6 +2659,7 @@ do \
     echo $subpackage >> packages.list; \
 done
 
+ls -l *-files.rpm
 rm -f *-files.rpm *-tmpfiles.rpm
 sort -u $DIST_MANIFEST | awk '
 function loadfiles(files) {
@@ -2718,6 +2720,7 @@ $1 == "l" {
 %endif
             print $3 >> f;
           }'
+ls -l *-files.rpm
 
 %if !%{disable_systemd}
 mkdir -p $DIST_ROOT/$PCP_SYSTEMDTMPFILES_DIR
@@ -3174,6 +3177,7 @@ if [ $1 -eq 0 ]; then
     %selinux_relabel_post -s targeted
 fi
 %endif
+ls -l *-files.rpm
 
 %files -f pcp-files.rpm
 %doc CHANGELOG COPYING INSTALL.md README.md VERSION.pcp pcp.lsm
