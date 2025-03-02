@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        Test case module for Perl
 Name:           perl-Test-Manifest
-Version:        2.021
-Release:        8%{?dist}
-License:        Artistic 2.0
+Version:        2.024
+Release:        5%{?dist}
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-Manifest
-Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Manifest-%{version}.tar.gz#/perl-Test-Manifest-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-Manifest-%{version}.tar.gz#/perl-Test-Manifest-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -27,7 +27,9 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 # Test Suite
 BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(Test::More) >= 0.94
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::More) >= 1
 # Optional Tests
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
@@ -65,18 +67,68 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README.pod
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Manifest.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.021-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.024-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.024-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.024-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.024-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan  9 2024 Paul Howarth <paul@city-fan.org> - 2.024-1
+- Update to 2.024
+  - Refresh distro
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.023-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.023-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.023-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.023-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.023-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Jan  9 2022 Paul Howarth <paul@city-fan.org> - 2.023-1
+- Update to 2.023
+  - Fix a link in the README.pod
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.022-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.022-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.022-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 18 2021 Paul Howarth <paul@city-fan.org> - 2.022-1
+- Update to 2.022
+  - Freshen distro, remove Travis CI, add GitHub Actions
+  - Fix parallel testing (CPAN RT#92604, GH#4)
+- Use %%license unconditionally
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.021-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.021-8
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.021-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
