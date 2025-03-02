@@ -9751,8 +9751,8 @@
         "type": "other",
         "other": {
           "name": "libid3tag",
-          "version": "0.15.1b",
-          "downloadUrl": "http://downloads.sourceforge.net/mad/libid3tag-0.15.1b.tar.gz"
+          "version": "0.16.3",
+          "downloadUrl": "https://codeberg.org/tenacityteam/libid3tag/archive/0.16.3.tar.gz"
         }
       }
     },
