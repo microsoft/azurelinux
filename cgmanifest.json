@@ -11261,8 +11261,8 @@
         "type": "other",
         "other": {
           "name": "libthai",
-          "version": "0.1.28",
-          "downloadUrl": "ftp://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.28.tar.xz"
+          "version": "0.1.29",
+	  "downloadUrl": "https://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz"
         }
       }
     },
