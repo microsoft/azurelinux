@@ -1,6 +1,6 @@
 .\" Simple man page to ps_mem script
 .\" Contact fholec@redhat.com
-.TH ps_mem 1 "04 October 2014" "" ""
+.TH ps_mem 1 "25 May 2018" "" ""
 .SH NAME
 ps_mem \- Memory profiling tool
 .SH SYNOPSIS
@@ -25,8 +25,19 @@ The shared RAM is problematic to calculate, and the tool automatically selects t
 \-h \-\-help
 Show help message
 .TP
+\-\-version
+Show version info
+.TP
 \-p PID[,PID2,...PIDN]
 Show memory consumption for the specified processes
+.TP
+\-S \-\-swap
+Show swap information of each item
+(and Shared swap if the kernel supports SwapPss).
+.TP
+\-d \-\-discriminate-by-pid
+Show and separate memory usage entries by process
+rather than by program.
 .TP
 \-s \-\-split\-args
 Show and separate memory usage entries by command line arguments
