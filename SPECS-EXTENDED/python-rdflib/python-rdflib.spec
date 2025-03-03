@@ -1,8 +1,8 @@
 %global srcname rdflib
 Summary:        Python library for working with RDF
 Name:           python-%{srcname}
-Version:        6.2.0
-Release:        2%{?dist}
+Version:        7.0.0
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -100,6 +100,9 @@ sed -i '1s=^#!/usr/bin/\(python\|env python\).*=#!%{__python3}='  \
 %{_bindir}/rdfs2dot
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.0.0-1
+- Auto-upgrade to 7.0.0 - Extended package upgrade to IDC
+
 * Wed Nov 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 6.2.0-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
