@@ -1125,6 +1125,7 @@
                 "perl-B-Keywords",
                 "perl-B-Lint",
                 "perl-bareword-filehandles",
+                "perl-BDB",
                 "perl-Bit-Vector",
                 "perl-boolean",
                 "perl-Browser-Open",
