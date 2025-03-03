@@ -1,9 +1,9 @@
 Name:             powertop
-Version:          2.13
-Release:          3%{?dist}
+Version:          2.15
+Release:          10%{?dist}
 Summary:          Power consumption monitor
 
-License:          GPLv2
+License:          gpl-2.0-only AND lgpl-2.1-only AND isc
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:              http://01.org/powertop/
@@ -12,13 +12,23 @@ Source1:          powertop.service
 
 # Sent upstream
 Patch0:           powertop-2.7-always-create-params.patch
-Patch1:           0001-ncurses.patch
-BuildRequires:    gettext-devel, ncurses-devel, pciutils-devel, zlib-devel, libnl3-devel
-BuildRequires:    automake, libtool, systemd, autoconf-archive
-BuildRequires:    gcc, gcc-c++
+BuildRequires:    make
+BuildRequires:    gettext-devel
+BuildRequires:    ncurses-devel
+BuildRequires:    pciutils-devel
+BuildRequires:    zlib-devel
+BuildRequires:    libnl3-devel
+BuildRequires:    automake
+BuildRequires:    libtool
+BuildRequires:    systemd
+BuildRequires:    autoconf-archive
+BuildRequires:    gcc
+BuildRequires:    gcc-c++
 Requires(post):   systemd, coreutils
 Requires(preun):  systemd
 Requires(postun): systemd
+# For "xset dpms force off" during calibration
+Recommends:       xset
 Provides:         bundled(kernel-event-lib)
 
 %description
@@ -26,9 +36,7 @@ PowerTOP is a tool that finds the software component(s) that make your
 computer use more power than necessary while it is idle.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .always-create-params
-%patch 1 -p1
+%autosetup -p1
 
 echo "v%{version}" > version-long
 echo '"v%{version}"' > version-short
@@ -37,7 +45,7 @@ echo '"v%{version}"' > version-short
 # workaround for rhbz#1826935
 autoreconf -fi || autoreconf -fi
 %configure
-make %{?_smp_mflags} CFLAGS="%{optflags}"
+make %{?_smp_mflags} CFLAGS="%{optflags}" V=1
 
 %install
 rm -rf %{buildroot}
@@ -71,12 +79,66 @@ touch %{_localstatedir}/cache/powertop/{saved_parameters.powertop,saved_results.
 %{_datadir}/bash-completion/completions/powertop
 
 %changelog
-* Thu Jun 23 2022 Ahmed Badawi <ahmedbadawi@microsoft.com> - 2.13-3
-- Added patch to fix compilation with ncurses 6.3
-- License verified
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.15-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 06 2024 Dominik Mierzejewski <dominik@greysector.net> 2.15-8
+- Made xset requirement weak
+  Resolves: rhbz#2290742
+
+* Thu May  2 2024 Jaroslav Škarvada <jskarvad@redhat.com> - 2.15-7
+- Added xset requirement
+  Resolves: rhbz#2278086
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Dec 12 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 2.15-4
+- Converted license to SPDX
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Oct  4 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 2.15-1
+- New version
+  Resolves: rhbz#2131251
+
+* Thu Aug  4 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 2.14-5
+- Fixed FTBFS
+  Resolves: rhbz#2113602
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue May 11 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.14-1
+- New version
+  Resolves: rhbz#1950154
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.13-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Jun 15 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.13-1
 - New version
