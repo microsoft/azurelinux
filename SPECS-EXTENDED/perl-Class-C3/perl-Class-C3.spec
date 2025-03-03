@@ -1,12 +1,12 @@
 Name:		perl-Class-C3
-Version:	0.34
-Release:	10%{?dist}
+Version:	0.35
+Release:	1%{?dist}
 Summary:	Pragma to use the C3 method resolution order algorithm
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Class-C3
-Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/Class-C3-%{version}.tar.gz#/perl-Class-C3-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Class/Class-C3-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
@@ -14,13 +14,14 @@ BuildRequires:	findutils
 BuildRequires:	make
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
+BuildRequires:	perl(ExtUtils::MakeMaker)
+BuildRequires:	perl(Text::ParseWords)
 # Build (dependencies of bundled ExtUtils::HasCompiler)
 BuildRequires:	perl(base)
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(Config)
 BuildRequires:	perl(DynaLoader)
 BuildRequires:	perl(Exporter)
-BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:	perl(File::Basename)
 BuildRequires:	perl(File::Spec::Functions)
 BuildRequires:	perl(File::Temp)
@@ -30,6 +31,7 @@ BuildRequires:	perl(warnings)
 BuildRequires:	perl(Algorithm::C3) >= 0.07
 BuildRequires:	perl(Scalar::Util) >= 1.10
 # Test Suite
+BuildRequires:	perl(Cwd)
 BuildRequires:	perl(File::Glob)
 BuildRequires:	perl(lib)
 BuildRequires:	perl(NEXT)
@@ -41,7 +43,6 @@ BuildRequires:	perl(Test::More) >= 0.88
 BuildRequires:	perl(MRO::Compat)
 %endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Algorithm::C3) >= 0.07
 Requires:	perl(Scalar::Util) >= 1.10
 
@@ -77,6 +78,10 @@ make test
 %{_mandir}/man3/Class::C3::next.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.35-1
+- Update to version 0.35
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.34-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
