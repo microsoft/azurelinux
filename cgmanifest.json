@@ -12941,8 +12941,8 @@
         "type": "other",
         "other": {
           "name": "maven-parent",
-          "version": "27",
-          "downloadUrl": "http://repo1.maven.org/maven2/org/apache/maven/maven-parent/27/maven-parent-27-source-release.zip"
+          "version": "41",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/maven-parent/41/maven-parent-41-source-release.zip"
         }
       }
     },
