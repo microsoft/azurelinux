@@ -30946,8 +30946,8 @@
         "type": "other",
         "other": {
           "name": "xterm",
-          "version": "380",
-          "downloadUrl": "https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/xterm-380.tar.gz"
+          "version": "395",
+          "downloadUrl": "https://invisible-island.net/archives/xterm/xterm-395.tgz"
         }
       }
     },
