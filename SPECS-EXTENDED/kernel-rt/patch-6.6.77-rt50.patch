@@ -1,4 +1,4 @@
-From 730ee65616a54b5c924a7a0c2991a33819915b00 Mon Sep 17 00:00:00 2001
+From c522ccff41c07e47d532b6080865fedb03e61477 Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:48 +0200
 Subject: [PATCH 001/211] sched: Constrain locks in sched_submit_work()
@@ -52,7 +52,7 @@ index 86606fb9e6bc..91152906bc1e 100644
 -- 
 2.48.1
 
-From 1b6b3eeda7fc6576bb1d1c0fd6e16089480eb31a Mon Sep 17 00:00:00 2001
+From b6ef19a26401492eaa4aa28c12803cf1cd813b4f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:49 +0200
 Subject: [PATCH 002/211] locking/rtmutex: Avoid unconditional slowpath for
@@ -138,7 +138,7 @@ index d1473c624105..c7196de838ed 100644
 -- 
 2.48.1
 
-From ed27c1d6b6ee311c55e8563c6d625767b173f246 Mon Sep 17 00:00:00 2001
+From 4500b676cf41f94e129ec151e424ffd894feeb86 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:50 +0200
 Subject: [PATCH 003/211] sched: Extract __schedule_loop()
@@ -201,7 +201,7 @@ index 91152906bc1e..7b0ed9994478 100644
 -- 
 2.48.1
 
-From 83de0d781c963fd0dcad00d11cc61b0eb0c14a0f Mon Sep 17 00:00:00 2001
+From a98c0d063c0021b157599fe61012e8e0ef31246a Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:51 +0200
 Subject: [PATCH 004/211] sched: Provide rt_mutex specific scheduler helpers
@@ -338,7 +338,7 @@ index 7b0ed9994478..032e5b2ea7ef 100644
 -- 
 2.48.1
 
-From f1b1e74d129a7f2989a621217f854ac8b335446f Mon Sep 17 00:00:00 2001
+From 6edf380ef806fd7add31540bc302d4a68b4bde2b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:52 +0200
 Subject: [PATCH 005/211] locking/rtmutex: Use rt_mutex specific scheduler
@@ -529,7 +529,7 @@ index 48a19ed8486d..842037b2ba54 100644
 -- 
 2.48.1
 
-From 574e56099fb17f2d8ef6dd76bfd6898709597bae Mon Sep 17 00:00:00 2001
+From ff50bf2f7008dc908bed6f299f0c112341d994cf Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:53 +0200
 Subject: [PATCH 006/211] locking/rtmutex: Add a lockdep assert to catch
@@ -595,7 +595,7 @@ index 842037b2ba54..38e292454fcc 100644
 -- 
 2.48.1
 
-From 9c1bff9f033cad76608bad87e2565bef57d371e3 Mon Sep 17 00:00:00 2001
+From dbfa3c28dc4d880fb91908e617e215bc0ae2a88f Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 15 Sep 2023 17:19:44 +0200
 Subject: [PATCH 007/211] futex/pi: Fix recursive rt_mutex waiter state
@@ -799,7 +799,7 @@ index cba8b1a6a4cc..4c73e0b81acc 100644
 -- 
 2.48.1
 
-From 58fa6fa6ab64cc352324f3e59b5a56aa658cee3a Mon Sep 17 00:00:00 2001
+From 07f092c672377b63bab16fdfe23878c232618e1b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:31 +0200
 Subject: [PATCH 008/211] signal: Add proper comment about the preempt-disable
@@ -851,7 +851,7 @@ index 49c8c24b444d..f14b6be19e79 100644
 -- 
 2.48.1
 
-From ca30a97f895665bead329263f9955734a3b3fc29 Mon Sep 17 00:00:00 2001
+From fb78b99f1802ab5f0c764ae2e9ebae670eba26e4 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:32 +0200
 Subject: [PATCH 009/211] signal: Don't disable preemption in ptrace_stop() on
@@ -904,7 +904,7 @@ index f14b6be19e79..107953e8a90c 100644
 -- 
 2.48.1
 
-From 756d562f7bfe984ac54452887c6dd31cfcb42b9e Mon Sep 17 00:00:00 2001
+From 653a79e080262efd7f6a34bdc447ec8a5c2529a3 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:12 +0200
 Subject: [PATCH 010/211] drm/amd/display: Remove migrate_en/dis from
@@ -995,7 +995,7 @@ index 172aa10a8800..86f4c0e04654 100644
 -- 
 2.48.1
 
-From efd6cdd846e0f058d15867fd45122a054d029897 Mon Sep 17 00:00:00 2001
+From 28dfe2fe716d37f3dd66209747c345f9012be55e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:13 +0200
 Subject: [PATCH 011/211] drm/amd/display: Simplify the per-CPU usage.
@@ -1127,7 +1127,7 @@ index 86f4c0e04654..8bd5926b47e0 100644
 -- 
 2.48.1
 
-From cdaa247eeeb4b9996a7d380b51643b0e6176a05e Mon Sep 17 00:00:00 2001
+From a783648a4ba0eaf248987539d46f417225e74d98 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:14 +0200
 Subject: [PATCH 012/211] drm/amd/display: Add a warning if the FPU is used
@@ -1158,7 +1158,7 @@ index 8bd5926b47e0..4ae4720535a5 100644
 -- 
 2.48.1
 
-From 6e7cbb7ae7487a762750b014b6f829cfeacaed6f Mon Sep 17 00:00:00 2001
+From 018fbbb4c161d90e9ea477febf92d1e96de9fbe7 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:15 +0200
 Subject: [PATCH 013/211] drm/amd/display: Move the memory allocation out of
@@ -1254,7 +1254,7 @@ index c51badf7b68a..a81a0b9e6884 100644
 -- 
 2.48.1
 
-From 2dd6fe8711d86da5c9ff136ac53e8e28276d69c2 Mon Sep 17 00:00:00 2001
+From 6180e47e7bea399e9272f47f42cf333758b2da61 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:16 +0200
 Subject: [PATCH 014/211] drm/amd/display: Move the memory allocation out of
@@ -1384,7 +1384,7 @@ index a81a0b9e6884..b6c34198ddc8 100644
 -- 
 2.48.1
 
-From 66c0cdee7efc1883f9273aa37da7e8316b281206 Mon Sep 17 00:00:00 2001
+From fe5520ba5fe1cac640052b72a9c6aa7cbd9e9efb Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 15 Aug 2022 17:29:50 +0200
 Subject: [PATCH 015/211] net: Avoid the IPI to free the
@@ -1512,7 +1512,7 @@ index f0a9ef1aeaa2..682175af439d 100644
 -- 
 2.48.1
 
-From a4fc6c5d526b12afafdc6167ea9bb5383d9370e9 Mon Sep 17 00:00:00 2001
+From c89a0f05cb4cbba68d5880aa3c9acaa74039c8c2 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 7 Aug 2019 18:15:38 +0200
 Subject: [PATCH 016/211] x86: Allow to enable RT
@@ -1540,7 +1540,7 @@ index 05c82fd5d0f6..4e12735e4a5d 100644
 -- 
 2.48.1
 
-From bb1d39b62c194611ae1bfe968104d7ba2ddcbf6e Mon Sep 17 00:00:00 2001
+From 5630581488599ca4f4f6903de11337a87100153d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Nov 2019 17:49:20 +0100
 Subject: [PATCH 017/211] x86: Enable RT also on 32bit
@@ -1574,7 +1574,7 @@ index 4e12735e4a5d..261188e66e78 100644
 -- 
 2.48.1
 
-From 698a0a3cd2bcbb1d61c6ea5e5685b85f25dfd741 Mon Sep 17 00:00:00 2001
+From b2881b3e4f5084ac10565a412a6490ffe2a898a4 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 1 Aug 2023 17:26:48 +0200
 Subject: [PATCH 018/211] sched/rt: Don't try push tasks if there are none.
@@ -1637,7 +1637,7 @@ index b89223a97316..ad523419cb90 100644
 -- 
 2.48.1
 
-From ba1c9de0dfefd2a40c3a62bc420df792223197a8 Mon Sep 17 00:00:00 2001
+From c14a78f2e36c9f702acd6e6c3e378ffab513a944 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 1 Dec 2021 17:41:09 +0100
 Subject: [PATCH 019/211] softirq: Use a dedicated thread for timer wakeups.
@@ -1870,7 +1870,7 @@ index 63a8ce7177dd..7cad6fe3c035 100644
 -- 
 2.48.1
 
-From 4508a965becc8c54d6c79a99844e2d60e6bb7be6 Mon Sep 17 00:00:00 2001
+From e4aebb751e1228556a9c3ba52450dda68dd3895b Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:51 +0200
 Subject: [PATCH 020/211] rcutorture: Also force sched priority to timersd on
@@ -1950,7 +1950,7 @@ index 307858228485..a9b6f8a65d27 100644
 -- 
 2.48.1
 
-From 0513c4e9cb5823cf5092a91131b5592e8155dccc Mon Sep 17 00:00:00 2001
+From e60d520f5191a4f1ff00e648a6ae70964560b15d Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:52 +0200
 Subject: [PATCH 021/211] tick: Fix timer storm since introduction of timersd
@@ -2065,7 +2065,7 @@ index 55cbc49f70d1..1a0ed106b192 100644
 -- 
 2.48.1
 
-From 8ed5013875bf298d378a1e031b0382b1e8ee95ff Mon Sep 17 00:00:00 2001
+From f7239a7adc3c8ecbdd850bf3d8c3eb289a966f29 Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Mon, 20 Feb 2023 09:12:20 +0100
 Subject: [PATCH 022/211] softirq: Wake ktimers thread also in softirq.
@@ -2114,7 +2114,7 @@ index bc5b81b009cd..d1375a07cbc9 100644
 -- 
 2.48.1
 
-From 7769e7ffcbc614bdbd2652f75c478f04765e0277 Mon Sep 17 00:00:00 2001
+From 75bae71347fcf9567e7c9a73aedc3795389a2345 Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Thu, 31 Mar 2016 04:08:28 +0200
 Subject: [PATCH 023/211] zram: Replace bit spinlocks with spinlock_t for
@@ -2216,7 +2216,7 @@ index 35e322144629..4e0c7c6d4813 100644
 -- 
 2.48.1
 
-From 561801783360a5444f4a682405cca276078652c9 Mon Sep 17 00:00:00 2001
+From 26eeb051faa4d3e5633559b252124a582515f92e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Mar 2023 16:29:38 +0100
 Subject: [PATCH 024/211] preempt: Put preempt_enable() within an
@@ -2268,7 +2268,7 @@ index 9aa6358a1a16..cd16f0330fba 100644
 -- 
 2.48.1
 
-From 57d3ed0a0f52779c7f90afe619129725157ee880 Mon Sep 17 00:00:00 2001
+From 315764f12a172da080df2dd315f77b8e09b58154 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:37 +0200
 Subject: [PATCH 025/211] sched/core: Provide a method to check if a task is
@@ -2329,7 +2329,7 @@ index 032e5b2ea7ef..79379e386666 100644
 -- 
 2.48.1
 
-From e1ca1c7b55b1999965a0e59f71d77082df6e811f Mon Sep 17 00:00:00 2001
+From 81b3cc1309bff7c4bc9404c3bbaf1c98f2ba9a5d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:38 +0200
 Subject: [PATCH 026/211] softirq: Add function to preempt serving softirqs.
@@ -2396,7 +2396,7 @@ index d1375a07cbc9..e3b9ffd7f3ed 100644
 -- 
 2.48.1
 
-From f3d56e55ba7ad8808d95b8ac1bf9162aec983fe3 Mon Sep 17 00:00:00 2001
+From 121c33b47e466cabf5c3717233fdc9214025acf3 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:39 +0200
 Subject: [PATCH 027/211] time: Allow to preempt after a callback.
@@ -2448,7 +2448,7 @@ index 7cad6fe3c035..b3fbe97d1e34 100644
 -- 
 2.48.1
 
-From 68eaccf61232b790627cb8c0671ef1197faa3f90 Mon Sep 17 00:00:00 2001
+From a26533aad2ceda8d9a02e53d7ea4a4b1dcb1c3f0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:19 +0206
 Subject: [PATCH 028/211] serial: core: Use lock wrappers
@@ -2546,7 +2546,7 @@ index 052df85dfd59..71d925e8a79b 100644
 -- 
 2.48.1
 
-From 3834fd392cac18bc2f45dc7cfe463b35b8fd9ae4 Mon Sep 17 00:00:00 2001
+From 82b747afe6c934cfaaa5a924e730ebb0669d1318 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:20 +0206
 Subject: [PATCH 029/211] serial: 21285: Use port lock wrappers
@@ -2626,7 +2626,7 @@ index d756fcc884cb..4de0c975ebdc 100644
 -- 
 2.48.1
 
-From 16181d18dafeb9d95f5a5db8bdecd2e663489bff Mon Sep 17 00:00:00 2001
+From fe421e3dc5e9bbf890eb42c4db1bd827e68e8d2a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:21 +0206
 Subject: [PATCH 030/211] serial: 8250_aspeed_vuart: Use port lock wrappers
@@ -2692,7 +2692,7 @@ index 4a9e71b2dbbc..021949f252f8 100644
 -- 
 2.48.1
 
-From 6e43f8581ca09dae94f1a459ea16cf89231c3158 Mon Sep 17 00:00:00 2001
+From 1ccc75d0b9793b6cb31e73ecf06191c2f8a4b6cd Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:22 +0206
 Subject: [PATCH 031/211] serial: 8250_bcm7271: Use port lock wrappers
@@ -2848,7 +2848,7 @@ index 9afd5979c9e0..db23b3a02aef 100644
 -- 
 2.48.1
 
-From a15a40b50d7f2a97b1bc368e1270e2c93a7c242d Mon Sep 17 00:00:00 2001
+From abe3994f7aab1969ca375fd06817d1a45741f1ff Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:23 +0206
 Subject: [PATCH 032/211] serial: 8250: Use port lock wrappers
@@ -3320,7 +3320,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
 -- 
 2.48.1
 
-From 4397b4385d7467fea098abb1e24a497e3641f2e5 Mon Sep 17 00:00:00 2001
+From 8fdc09411e5db2c5c3cef6e3a23e4f8a96a687f9 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:24 +0206
 Subject: [PATCH 033/211] serial: 8250_dma: Use port lock wrappers
@@ -3405,7 +3405,7 @@ index 7fa66501792d..8b30ca8fdd3f 100644
 -- 
 2.48.1
 
-From 26b7f522336bbc6fbc564fa70c3964548786653b Mon Sep 17 00:00:00 2001
+From c71482df500a18f14e5bd349a833120c15b1a3b0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:25 +0206
 Subject: [PATCH 034/211] serial: 8250_dw: Use port lock wrappers
@@ -3479,7 +3479,7 @@ index eaf4a907380a..d12f230f1605 100644
 -- 
 2.48.1
 
-From a884443b6b19c7f6838738048dc7dfecd6fd660e Mon Sep 17 00:00:00 2001
+From 1681985d3c092574837e54caa801316de9267b10 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:26 +0206
 Subject: [PATCH 035/211] serial: 8250_exar: Use port lock wrappers
@@ -3536,7 +3536,7 @@ index 27430fdd9e76..17be6ad24a0f 100644
 -- 
 2.48.1
 
-From 05a5cd4fb4ea90b866fcc4b5f30d78444c6bb36e Mon Sep 17 00:00:00 2001
+From 3b36e3f8067824950ef3fb527176759f37e84e7a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:27 +0206
 Subject: [PATCH 036/211] serial: 8250_fsl: Use port lock wrappers
@@ -3604,7 +3604,7 @@ index 6af4e1c1210a..f522eb5026c9 100644
 -- 
 2.48.1
 
-From 9caad2899b8e9d788341e9883f9095b4acfe2f32 Mon Sep 17 00:00:00 2001
+From a9d1add6530f5f2e4364b9ce832a855b33e4af4d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:28 +0206
 Subject: [PATCH 037/211] serial: 8250_mtk: Use port lock wrappers
@@ -3686,7 +3686,7 @@ index 28f9a2679a20..33699e86eb52 100644
 -- 
 2.48.1
 
-From 854af4f55288b35f260ef3b6e9956e24801d5b3e Mon Sep 17 00:00:00 2001
+From 892d6a093b64eab2967ed556acbb4c78f10a6226 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:29 +0206
 Subject: [PATCH 038/211] serial: 8250_omap: Use port lock wrappers
@@ -3927,7 +3927,7 @@ index 9ed62bc7cdd8..e687cd0daa76 100644
 -- 
 2.48.1
 
-From cd71bee7a6b9d8ce5501655d2afd4ab5da545fb4 Mon Sep 17 00:00:00 2001
+From b37200adb77e4aef5c4d6741eb90be77057410da Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:30 +0206
 Subject: [PATCH 039/211] serial: 8250_pci1xxxx: Use port lock wrappers
@@ -3998,7 +3998,7 @@ index a3b25779d921..53e238c8cc89 100644
 -- 
 2.48.1
 
-From 12bdf1660c576dc572e29c92c0a7beb0435c2fca Mon Sep 17 00:00:00 2001
+From ace92f877e9846d53c2ede946d1271665f1bb6f4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:31 +0206
 Subject: [PATCH 040/211] serial: altera_jtaguart: Use port lock wrappers
@@ -4136,7 +4136,7 @@ index 5fab4c978891..7090b251dd4d 100644
 -- 
 2.48.1
 
-From 3eeac7fc2f5ac5c4d97d365546573b9cfd4462f4 Mon Sep 17 00:00:00 2001
+From 5a7477ba848974610ac97d51cf5c9bb0b4d388ee Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:32 +0206
 Subject: [PATCH 041/211] serial: altera_uart: Use port lock wrappers
@@ -4257,7 +4257,7 @@ index a9c41942190c..77835ac68df2 100644
 -- 
 2.48.1
 
-From c896950096ae7d720025f553876bdaa5bb25abdb Mon Sep 17 00:00:00 2001
+From a99d7453948a555f70146a27fe518b666db60301 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:33 +0206
 Subject: [PATCH 042/211] serial: amba-pl010: Use port lock wrappers
@@ -4374,7 +4374,7 @@ index b5a7404cbacb..eabbf8afc9b5 100644
 -- 
 2.48.1
 
-From bdee0a1f1a3ea4d78ab35f768bcaa399b08f53bb Mon Sep 17 00:00:00 2001
+From 97fbab99203c543f201692f4b4561c62c9df6388 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:35 +0206
 Subject: [PATCH 043/211] serial: apb: Use port lock wrappers
@@ -4455,7 +4455,7 @@ index d3cb341f2c55..364599f256db 100644
 -- 
 2.48.1
 
-From 4b24daad3149cacdbcb20da1a49028f960ad27a1 Mon Sep 17 00:00:00 2001
+From f6abf89cfa548b29dad3a6978aec967ca4472c61 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:36 +0206
 Subject: [PATCH 044/211] serial: ar933x: Use port lock wrappers
@@ -4604,7 +4604,7 @@ index 924c1a89347c..ffd234673177 100644
 -- 
 2.48.1
 
-From ae1a654e98c12cebd8b24296f3c56a6cc52ac420 Mon Sep 17 00:00:00 2001
+From e0934d2361216412246e7ecbebd27a6853a68bdf Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:37 +0206
 Subject: [PATCH 045/211] serial: arc_uart: Use port lock wrappers
@@ -4706,7 +4706,7 @@ index ad4ae19b6ce3..1aa5b2b49c26 100644
 -- 
 2.48.1
 
-From 7d12c595c9f32d9123c58f7074ade0b2454cb591 Mon Sep 17 00:00:00 2001
+From 870b2a2990a2aa718f2e307800787800b06829c1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:38 +0206
 Subject: [PATCH 046/211] serial: atmel: Use port lock wrappers
@@ -4830,7 +4830,7 @@ index bcca5627afac..5a3f2fc476f9 100644
 -- 
 2.48.1
 
-From 37ab3ab57928aee647710bd38249339b2900c59c Mon Sep 17 00:00:00 2001
+From a946be68f7d48f7ca488fb7dbe630f8a1d7bb384 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:39 +0206
 Subject: [PATCH 047/211] serial: bcm63xx-uart: Use port lock wrappers
@@ -4963,7 +4963,7 @@ index 44c27e5cefbc..b104c36ce5c0 100644
 -- 
 2.48.1
 
-From 7838d1b1deec3ee810a5de82c9f0e63ea6e68558 Mon Sep 17 00:00:00 2001
+From 8fd3f58a3d96261e75f6c51c7d44934bdf87d9ce Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:40 +0206
 Subject: [PATCH 048/211] serial: cpm_uart: Use port lock wrappers
@@ -5038,7 +5038,7 @@ index 626423022d62..be4af6eda4c2 100644
 -- 
 2.48.1
 
-From 4ad9a83121f1a7c37bf4752788a960a98950291c Mon Sep 17 00:00:00 2001
+From d29f837acd66ca064e7339117a62d1fb4748637d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:41 +0206
 Subject: [PATCH 049/211] serial: digicolor: Use port lock wrappers
@@ -5156,7 +5156,7 @@ index 128b5479e813..5004125f3045 100644
 -- 
 2.48.1
 
-From 6f3b3558526d45ce5c51d9ba16635d0b2d013dfd Mon Sep 17 00:00:00 2001
+From 55866184853d471304a10abc900b523ad4090711 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:42 +0206
 Subject: [PATCH 050/211] serial: dz: Use port lock wrappers
@@ -5322,7 +5322,7 @@ index 667f52e83277..6df7af9edc1c 100644
 -- 
 2.48.1
 
-From bccdef689e44ed14d52db845361a3d5013671139 Mon Sep 17 00:00:00 2001
+From eae083a423949e8d9e0c060feb9019bf33efb73c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:43 +0206
 Subject: [PATCH 051/211] serial: linflexuart: Use port lock wrappers
@@ -5470,7 +5470,7 @@ index 249cb380c3c6..7fa809a405e8 100644
 -- 
 2.48.1
 
-From 6825cf0c04cec078b66d73f526df1cdea0cec879 Mon Sep 17 00:00:00 2001
+From a967a69990d5ea69e87d1a54589431cad28ab508 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:44 +0206
 Subject: [PATCH 052/211] serial: fsl_lpuart: Use port lock wrappers
@@ -5864,7 +5864,7 @@ index 8bd0f8e45b14..58c2c460ccd8 100644
 -- 
 2.48.1
 
-From de90e02a78f99c70e7ed51fd2f19ecc92801a240 Mon Sep 17 00:00:00 2001
+From 50619611c189bbfc315ab313530fe9f59559752d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:45 +0206
 Subject: [PATCH 053/211] serial: icom: Use port lock wrappers
@@ -6020,7 +6020,7 @@ index 819f957b6b84..a75eafbcbea3 100644
 -- 
 2.48.1
 
-From 1bac0cf195f1a6c920240fd987b27728899ac20d Mon Sep 17 00:00:00 2001
+From ab85b85faba2259386dffe139930f59cfb06c206 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:46 +0206
 Subject: [PATCH 054/211] serial: imx: Use port lock wrappers
@@ -6379,7 +6379,7 @@ index 349d4849ba5e..3934ab8fef14 100644
 -- 
 2.48.1
 
-From 5b00de64d5f997f208084102227cc4d64da02d9c Mon Sep 17 00:00:00 2001
+From eeb246f1512d762ee42060f5901e743576b70c29 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:47 +0206
 Subject: [PATCH 055/211] serial: ip22zilog: Use port lock wrappers
@@ -6569,7 +6569,7 @@ index 845ff706bc59..320b29cd4683 100644
 -- 
 2.48.1
 
-From ab03152cbadad29b336325816cc3400525968bfc Mon Sep 17 00:00:00 2001
+From 1baad4c3a648b565ab922ad45f44db994e922fa8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:48 +0206
 Subject: [PATCH 056/211] serial: jsm: Use port lock wrappers
@@ -6700,7 +6700,7 @@ index 222afc270c88..ce0fef7e2c66 100644
 -- 
 2.48.1
 
-From d51b5581521cd58d5fdc5ad065d47426e7b3e386 Mon Sep 17 00:00:00 2001
+From e0d8f34471d47d2cfc84391e0abec5ef76fb5e79 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:49 +0206
 Subject: [PATCH 057/211] serial: liteuart: Use port lock wrappers
@@ -6815,7 +6815,7 @@ index d881cdd2a58f..a25ab1efe38f 100644
 -- 
 2.48.1
 
-From a803c2385ef881a883bb607ae7a87b42b5fe47e3 Mon Sep 17 00:00:00 2001
+From fea3360eda273b53f336c1f6fab390ef7289f885 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:50 +0206
 Subject: [PATCH 058/211] serial: lpc32xx_hs: Use port lock wrappers
@@ -6968,7 +6968,7 @@ index b38fe4728c26..5149a947b7fe 100644
 -- 
 2.48.1
 
-From 8ae9a202a0cbb03b3b11ca3a3b0a39a7b1aaa8df Mon Sep 17 00:00:00 2001
+From 6446e14d58e737c2d96b1dcbcb7bd13db7422d89 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:51 +0206
 Subject: [PATCH 059/211] serial: ma35d1: Use port lock wrappers
@@ -7090,7 +7090,7 @@ index 99225f1e02ac..faccd772c68c 100644
 -- 
 2.48.1
 
-From f0cfc8adf6ae500aac2e8ccfed0d6b2779ae23e5 Mon Sep 17 00:00:00 2001
+From e23436c8e19de999b2087c36299964b6f5394321 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:52 +0206
 Subject: [PATCH 060/211] serial: mcf: Use port lock wrappers
@@ -7222,7 +7222,7 @@ index aea29b4e6567..ee40af20a08f 100644
 -- 
 2.48.1
 
-From 158dea84ea0f296abc1985656026663f45f0ad05 Mon Sep 17 00:00:00 2001
+From 7062a25c1efd98cc77bf6b7b86c3c0f7f0ef19cf Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:53 +0206
 Subject: [PATCH 061/211] serial: men_z135_uart: Use port lock wrappers
@@ -7303,7 +7303,7 @@ index d2502aaa3e8c..8048fa542fc4 100644
 -- 
 2.48.1
 
-From b5f5b7f9ee681cb42f6ab06e3f1738d2c712d0fe Mon Sep 17 00:00:00 2001
+From 4fa90b74a0da9a8b510f19bab36e146109f518ed Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:54 +0206
 Subject: [PATCH 062/211] serial: meson: Use port lock wrappers
@@ -7476,7 +7476,7 @@ index 9388b9ddea3b..4c1d2089a0bb 100644
 -- 
 2.48.1
 
-From 662e67a60a5d17038001fb1a5dc96f79aecb4778 Mon Sep 17 00:00:00 2001
+From cfd13bd2f7af0582a9280ba0fcfa2377e6fa6302 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:55 +0206
 Subject: [PATCH 063/211] serial: milbeaut_usio: Use port lock wrappers
@@ -7582,7 +7582,7 @@ index 70a910085e93..db3b81f2aa57 100644
 -- 
 2.48.1
 
-From 4fe2604ad757abb930110ccc3b6f850f74efcc4e Mon Sep 17 00:00:00 2001
+From d45ab89cae1b0bbb0c69268ec09e421661107750 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:56 +0206
 Subject: [PATCH 064/211] serial: mpc52xx: Use port lock wrappers
@@ -7676,7 +7676,7 @@ index 916507b8f31d..a252465e745f 100644
 -- 
 2.48.1
 
-From 27ebdc5b83ed2869cef6ff2fc0472e46e168c9a9 Mon Sep 17 00:00:00 2001
+From 71ea82a6dd981af183dbef4c6a447c320fea6482 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:57 +0206
 Subject: [PATCH 065/211] serial: mps2-uart: Use port lock wrappers
@@ -7784,7 +7784,7 @@ index ea5a7911cb15..2a4c09f3a834 100644
 -- 
 2.48.1
 
-From d6ba96d355ece68282fad53f891d79be1f4bc58d Mon Sep 17 00:00:00 2001
+From bc0e349083cd57cfbd9da418772ce1da30f031db Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:58 +0206
 Subject: [PATCH 066/211] serial: msm: Use port lock wrappers
@@ -7974,7 +7974,7 @@ index 90953e679e38..597264b546fd 100644
 -- 
 2.48.1
 
-From 3d4e68e201cd31b67c801845f13e1a44da31611e Mon Sep 17 00:00:00 2001
+From 4d93a74d33aef29585a2380de21346c1e0f966fe Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:59 +0206
 Subject: [PATCH 067/211] serial: mvebu-uart: Use port lock wrappers
@@ -8087,7 +8087,7 @@ index ea924e9b913b..0255646bc175 100644
 -- 
 2.48.1
 
-From 3f63e19f8857b59f46863ed7b49dc9d9ec2b4470 Mon Sep 17 00:00:00 2001
+From 13fc24293834385a035602143159a304f2edfd58 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:00 +0206
 Subject: [PATCH 068/211] serial: omap: Use port lock wrappers
@@ -8272,7 +8272,7 @@ index 135a838f517a..f4c6ff806465 100644
 -- 
 2.48.1
 
-From 6112aae3f91b0de241dc61395abbdc1bb8baa416 Mon Sep 17 00:00:00 2001
+From 570c0a40adfa87d8aba2d6b5e9748d48fbf0b6e3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:01 +0206
 Subject: [PATCH 069/211] serial: owl: Use port lock wrappers
@@ -8424,7 +8424,7 @@ index e99970a9437f..919f5e5aa0f1 100644
 -- 
 2.48.1
 
-From 9f655a4c57c3ddd900044fad7ad75c90d8db6d28 Mon Sep 17 00:00:00 2001
+From 49d2a1e56d7db3e6b9586aa5d08e14b9758bf225 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:02 +0206
 Subject: [PATCH 070/211] serial: pch: Use port lock wrappers
@@ -8509,7 +8509,7 @@ index cc83b772b7ca..436cc6d52a11 100644
 -- 
 2.48.1
 
-From 606cba5d2c988bbe2e187a014b0117112fbf08c2 Mon Sep 17 00:00:00 2001
+From 4318282e42dbd272d9c8342f14d0c308c712516a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:03 +0206
 Subject: [PATCH 071/211] serial: pic32: Use port lock wrappers
@@ -8632,7 +8632,7 @@ index e308d5022b3f..3a95bf5d55d3 100644
 -- 
 2.48.1
 
-From 1c32798f6dee2fd6d4660c88fc4d8c9cfb0b6d54 Mon Sep 17 00:00:00 2001
+From 4b4dbc47e5f0cb08846d2b0711ad68b3328bf4d5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:04 +0206
 Subject: [PATCH 072/211] serial: pmac_zilog: Use port lock wrappers
@@ -8869,7 +8869,7 @@ index 29bc80d39e8b..77691fbbf779 100644
 -- 
 2.48.1
 
-From 282cf3fabad44beca1dcc46b609ce15e724c79df Mon Sep 17 00:00:00 2001
+From 1ad8d595a43792a48a4e2af0304535c34dee918b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:05 +0206
 Subject: [PATCH 073/211] serial: pxa: Use port lock wrappers
@@ -9024,7 +9024,7 @@ index 73c60f5ea027..46e70e155aab 100644
 -- 
 2.48.1
 
-From 397df61e9442a8c0c97ee183c8cc5421c7ed1295 Mon Sep 17 00:00:00 2001
+From c28063f74017f3f8dc355db3666436f7a54a93eb Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:06 +0206
 Subject: [PATCH 074/211] serial: qcom-geni: Use port lock wrappers
@@ -9100,7 +9100,7 @@ index f820a09cb5c3..a7db08431ef3 100644
 -- 
 2.48.1
 
-From 92c38a024512bdc0320dff5c2639d96916b9ea15 Mon Sep 17 00:00:00 2001
+From 21c17bdccffda69991e43b844a9c23064b1b7425 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:07 +0206
 Subject: [PATCH 075/211] serial: rda: Use port lock wrappers
@@ -9282,7 +9282,7 @@ index be5c842b5ba9..d824c8318f33 100644
 -- 
 2.48.1
 
-From 2a17ae419aa999e72e032dd01e836dbeee814dac Mon Sep 17 00:00:00 2001
+From 6d0c06fded4496c7b47ed4b952a95fde30d68c1a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:08 +0206
 Subject: [PATCH 076/211] serial: rp2: Use port lock wrappers
@@ -9401,7 +9401,7 @@ index 5a1de6044b38..45be2b88168e 100644
 -- 
 2.48.1
 
-From e84c56f1a3183d76b888c03f5b0e0434a7c62033 Mon Sep 17 00:00:00 2001
+From 1a3add19bdcde10b250d6d3742437c4e72a12d1c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:09 +0206
 Subject: [PATCH 077/211] serial: sa1100: Use port lock wrappers
@@ -9523,7 +9523,7 @@ index ad011f1e2f4d..be7bcd75d9f4 100644
 -- 
 2.48.1
 
-From 933c39c364ef9069f46d7ce6cc1adcc1abc95fb6 Mon Sep 17 00:00:00 2001
+From ba60411d132154af1271958954bd0084ab6e4c66 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:10 +0206
 Subject: [PATCH 078/211] serial: samsung_tty: Use port lock wrappers
@@ -9773,7 +9773,7 @@ index 5a4d88e13471..a82b65155f6e 100644
 -- 
 2.48.1
 
-From 5a0abf52eeae7140b1dcf8b85e822705bd82bad3 Mon Sep 17 00:00:00 2001
+From c1968d62e93bda5f9c1331d6622d975caa3e578a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:11 +0206
 Subject: [PATCH 079/211] serial: sb1250-duart: Use port lock wrappers
@@ -9863,7 +9863,7 @@ index f3cd69346482..dbec29d9a6c3 100644
 -- 
 2.48.1
 
-From 0918a69f8c883dabb2fd97733614c6dcbe0c72d9 Mon Sep 17 00:00:00 2001
+From 0fb9cb9219154023310a47d64ac0bbcc3530c4c8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:12 +0206
 Subject: [PATCH 080/211] serial: sc16is7xx: Use port lock wrappers
@@ -9927,7 +9927,7 @@ index 8a2ce2ca6b39..fd0f03965c11 100644
 -- 
 2.48.1
 
-From f0841cffa3a6e50352631d05ba94effe120bc312 Mon Sep 17 00:00:00 2001
+From d8fd19f684b8a0abaf65179d86370bf4f068bff5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:13 +0206
 Subject: [PATCH 081/211] serial: tegra: Use port lock wrappers
@@ -10108,7 +10108,7 @@ index d4ec943cb8e9..6d4006b41975 100644
 -- 
 2.48.1
 
-From f0cb0fa5e19ace75fdb939ddb9ab93e277c9e912 Mon Sep 17 00:00:00 2001
+From 8ed1d96f9763add75cf1c34a9a47f18c6876a7ca Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:14 +0206
 Subject: [PATCH 082/211] serial: core: Use port lock wrappers
@@ -10485,7 +10485,7 @@ index 469ad26cde48..66fd117d8aea 100644
 -- 
 2.48.1
 
-From aac72d6c0cf5f7868c33941be521895dff0aa9ed Mon Sep 17 00:00:00 2001
+From 0006bcfe062e429ca11e2e238a7b0f22927d316a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:15 +0206
 Subject: [PATCH 083/211] serial: mctrl_gpio: Use port lock wrappers
@@ -10548,7 +10548,7 @@ index 7d5aaa8d422b..e51ca593ab86 100644
 -- 
 2.48.1
 
-From 3d71e190867baccfc16b61076eabf7daa6423cc2 Mon Sep 17 00:00:00 2001
+From cc35569a0f99c848046c8b47343de74700c161f8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:16 +0206
 Subject: [PATCH 084/211] serial: txx9: Use port lock wrappers
@@ -10687,7 +10687,7 @@ index be08fb6f749c..eaa980722455 100644
 -- 
 2.48.1
 
-From 1e5a0bca29b5a3cce172415b47555296594e47fc Mon Sep 17 00:00:00 2001
+From e59499a5c15c632651142f1750144bea9f820e49 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:17 +0206
 Subject: [PATCH 085/211] serial: sh-sci: Use port lock wrappers
@@ -10994,7 +10994,7 @@ index f793624fd501..2559c97812fa 100644
 -- 
 2.48.1
 
-From 25f01affd94465d8abac6f432099664fe95d66b6 Mon Sep 17 00:00:00 2001
+From 0473b9c3af080575b69dd34d9d2d83cef62aa8b8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:18 +0206
 Subject: [PATCH 086/211] serial: sifive: Use port lock wrappers
@@ -11101,7 +11101,7 @@ index d195c5de52e7..b296e57a9dee 100644
 -- 
 2.48.1
 
-From a32b2d2b09b03d72fa06bfbf0fe373ed73dc6d3e Mon Sep 17 00:00:00 2001
+From bededd4c3ae8dcbfb16c5a769019bc539bb639ce Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:19 +0206
 Subject: [PATCH 087/211] serial: sprd: Use port lock wrappers
@@ -11268,7 +11268,7 @@ index f328fa57231f..f257525f9299 100644
 -- 
 2.48.1
 
-From 5bc01e3bdcc1767dde692cd893c80ff704ebe057 Mon Sep 17 00:00:00 2001
+From 7a3537766aadedbf7a093a4ded321472c0a4ca25 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:20 +0206
 Subject: [PATCH 088/211] serial: st-asc: Use port lock wrappers
@@ -11383,7 +11383,7 @@ index 92b9f6894006..a821f5d76a26 100644
 -- 
 2.48.1
 
-From f48ae804dce543ed7ce8cdd3bac83662f25986f4 Mon Sep 17 00:00:00 2001
+From f1c80f92188b7d7e6f1814e3bf3298b8748bf0e2 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:21 +0206
 Subject: [PATCH 089/211] serial: stm32: Use port lock wrappers
@@ -11573,7 +11573,7 @@ index 9ef90bb30a47..b963f9ccb070 100644
 -- 
 2.48.1
 
-From fd24b2719d2dde561ca286d7bab0bb92753bd897 Mon Sep 17 00:00:00 2001
+From ec2d703b787940af7a72f40c93b0b703b2f27fa8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:22 +0206
 Subject: [PATCH 090/211] serial: sunhv: Use port lock wrappers
@@ -11727,7 +11727,7 @@ index c671d674bce4..5bfc0040f17b 100644
 -- 
 2.48.1
 
-From a9df7ab6b72e3ec29dbb493c426cff4a6affd530 Mon Sep 17 00:00:00 2001
+From ca486c39b09f1261595498c8e7bd3c9a364e2488 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:23 +0206
 Subject: [PATCH 091/211] serial: sunplus-uart: Use port lock wrappers
@@ -11878,7 +11878,7 @@ index 3aacd5eb414c..4251f4e1ba99 100644
 -- 
 2.48.1
 
-From 19d6458a157f7213fb2e7a413630965551649d00 Mon Sep 17 00:00:00 2001
+From abffac48287eff42be1d763977e06efec429c6af Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:24 +0206
 Subject: [PATCH 092/211] serial: sunsab: Use port lock wrappers
@@ -12059,7 +12059,7 @@ index 40eeaf835bba..6aa51a6f8063 100644
 -- 
 2.48.1
 
-From 5a73888c7e2970070bd91c3c1d85d68317b06d3a Mon Sep 17 00:00:00 2001
+From 27f7ef2ee373978a725cfeb5f2bb03c21be2dfa6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:25 +0206
 Subject: [PATCH 093/211] serial: sunsu: Use port lock wrappers
@@ -12283,7 +12283,7 @@ index 58a4342ad0f9..1e051cc2591c 100644
 -- 
 2.48.1
 
-From 65dedad389503d1a46386082dc72ed04c744afc1 Mon Sep 17 00:00:00 2001
+From 7da9284fba623583f804673d87ecaff8c6c4fd7d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:26 +0206
 Subject: [PATCH 094/211] serial: sunzilog: Use port lock wrappers
@@ -12499,7 +12499,7 @@ index c8c71c56264c..d3b5e864b727 100644
 -- 
 2.48.1
 
-From a320ac0000dfc011c45db845e5673aa456edf05c Mon Sep 17 00:00:00 2001
+From 65d52ce120bd4184e8a993263ad2ae359ed5037b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:27 +0206
 Subject: [PATCH 095/211] serial: timbuart: Use port lock wrappers
@@ -12575,7 +12575,7 @@ index 0859394a78cd..0cc6524f5e8b 100644
 -- 
 2.48.1
 
-From 8cb5f8586701e0a3dd08f816a2f16be105bb2ff7 Mon Sep 17 00:00:00 2001
+From 7c4516a30691a02473ff49eb0c20614572c2521b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:28 +0206
 Subject: [PATCH 096/211] serial: uartlite: Use port lock wrappers
@@ -12685,7 +12685,7 @@ index b225a78f6175..404c14acafa5 100644
 -- 
 2.48.1
 
-From feadd25e7dea4aaba3d30a120ff603016f7f3fab Mon Sep 17 00:00:00 2001
+From 15b626289472c5302b6fe5e9e3026877d4da3bca Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:29 +0206
 Subject: [PATCH 097/211] serial: ucc_uart: Use port lock wrappers
@@ -12749,7 +12749,7 @@ index b06661b80f41..ed7a6bb5596a 100644
 -- 
 2.48.1
 
-From 329a2c8b6cd82bb4f6f096a28fbdf486295652d4 Mon Sep 17 00:00:00 2001
+From 57838fc95fc95ca0d7438b444b17b7cea2b6888b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:30 +0206
 Subject: [PATCH 098/211] serial: vt8500: Use port lock wrappers
@@ -12830,7 +12830,7 @@ index c5d5c2765119..78a1c1eea11b 100644
 -- 
 2.48.1
 
-From 95541ffbb60f720c7fd425b131c3c4a682ff26b3 Mon Sep 17 00:00:00 2001
+From 092709e62155164ccaac9f41475f84c1cc842f64 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:31 +0206
 Subject: [PATCH 099/211] serial: xilinx_uartps: Use port lock wrappers
@@ -13111,7 +13111,7 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
 -- 
 2.48.1
 
-From 958842a8f779f0fef55d1bc2e7988e2fe5948800 Mon Sep 17 00:00:00 2001
+From 0661c70feab5e268132d67d4cc1ef41271aae6ed Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:00 +0206
 Subject: [PATCH 100/211] printk: Add non-BKL (nbcon) console basic
@@ -13385,7 +13385,7 @@ index 0fca282c0a25..b2c65b991e1e 100644
 -- 
 2.48.1
 
-From d2ad7de7994577eb13e91bea82062ba872e95ac1 Mon Sep 17 00:00:00 2001
+From 0f6b4adad7903f8a60c7f1faf42b562f1dbb521e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:01 +0206
 Subject: [PATCH 101/211] printk: nbcon: Add acquire/release logic
@@ -14097,7 +14097,7 @@ index 63d24ca62ac5..a2a354f859f9 100644
 -- 
 2.48.1
 
-From 71b7ed2138f1ce3abbb4208d296dd4906cf1732e Mon Sep 17 00:00:00 2001
+From f8e3a3817c604e91c9f6eb9e82928ed670125aa4 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:02 +0206
 Subject: [PATCH 102/211] printk: Make static printk buffers available to nbcon
@@ -14169,7 +14169,7 @@ index b2c65b991e1e..dd68135cb371 100644
 -- 
 2.48.1
 
-From 1280f31b30ae676cd23a104b1b195b6905550077 Mon Sep 17 00:00:00 2001
+From 7610c70a9f7049b7b7ebd265de577eff6e887a73 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:03 +0206
 Subject: [PATCH 103/211] printk: nbcon: Add buffer management
@@ -14491,7 +14491,7 @@ index dd68135cb371..58b57deb0cbe 100644
 -- 
 2.48.1
 
-From aedc796761614e91be4b18d72a485d566b1dbea3 Mon Sep 17 00:00:00 2001
+From 4dd07c88610b0bdb52083d137acabde253993e54 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:04 +0206
 Subject: [PATCH 104/211] printk: nbcon: Add ownership state functions
@@ -14675,7 +14675,7 @@ index ba1febf15db6..98e4be5429f0 100644
 -- 
 2.48.1
 
-From afb818625956b7b09e339289bc8b1237dbb6a136 Mon Sep 17 00:00:00 2001
+From 6a2e2b2bf4fe6ed93ef61c0100cc63b6e48c4f8a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:05 +0206
 Subject: [PATCH 105/211] printk: nbcon: Add sequence handling
@@ -14997,7 +14997,7 @@ index 58b57deb0cbe..a1ab4760f807 100644
 -- 
 2.48.1
 
-From 1c6bc14ef2b1b97518d7f291df0e39680a43ee2d Mon Sep 17 00:00:00 2001
+From b16a74d358ea2e52d20864d59e4c186689520dbe Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:06 +0206
 Subject: [PATCH 106/211] printk: nbcon: Add emit function and callback
@@ -15269,7 +15269,7 @@ index a1ab4760f807..70f793b392e5 100644
 -- 
 2.48.1
 
-From 3bc42463b1a63916370e062144b2c29bfaffeecc Mon Sep 17 00:00:00 2001
+From 33cb5eacca500a19fa28819570a9b2defd42c583 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:07 +0206
 Subject: [PATCH 107/211] printk: nbcon: Allow drivers to mark unsafe regions
@@ -15412,7 +15412,7 @@ index 6e05d263fd22..b96077152f49 100644
 -- 
 2.48.1
 
-From 9417408551b8746c81f6f31bff7ab901715902f6 Mon Sep 17 00:00:00 2001
+From ac278191ddde565d333bd960f5d7f20c72039d34 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 20 Sep 2023 17:58:38 +0206
 Subject: [PATCH 108/211] printk: fix illegal pbufs access for !CONFIG_PRINTK
@@ -15551,7 +15551,7 @@ index 70f793b392e5..3bf517ae8262 100644
 -- 
 2.48.1
 
-From ea6fd5d8c771340c9326e99de62530730b3f6d31 Mon Sep 17 00:00:00 2001
+From b4f28ffeb4edbe0711ae204b33ed39fc8492687d Mon Sep 17 00:00:00 2001
 From: Petr Mladek <pmladek@suse.com>
 Date: Fri, 6 Oct 2023 10:21:51 +0200
 Subject: [PATCH 109/211] printk: Reduce pr_flush() pooling time
@@ -15658,7 +15658,7 @@ index 3bf517ae8262..a30338aca084 100644
 -- 
 2.48.1
 
-From 166a9ea55b5ba1c1468c443b96659498d0d7d8b1 Mon Sep 17 00:00:00 2001
+From 46d798935cbad378db8fcabe034fc5eef55421d0 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 6 Dec 2023 12:01:56 +0000
 Subject: [PATCH 110/211] printk: nbcon: Relocate 32bit seq macros
@@ -15806,7 +15806,7 @@ index 18cd25e489b8..b82a96dc2ea2 100644
 -- 
 2.48.1
 
-From c465a120048b9d4268e92a7b18222df60a6784b1 Mon Sep 17 00:00:00 2001
+From 7a835cda91a3ae4dcca8c89f52b21114538d50f0 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Dec 2023 14:15:15 +0000
 Subject: [PATCH 111/211] printk: Adjust mapping for 32bit seq macros
@@ -15882,7 +15882,7 @@ index b82a96dc2ea2..12f60c782e46 100644
 -- 
 2.48.1
 
-From 8cbf5cc7184f2807f8ebf3579318af8af64e0455 Mon Sep 17 00:00:00 2001
+From b5930124ba7d6d7673127603e50d13fc9e15d712 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 16:13:37 +0000
 Subject: [PATCH 112/211] printk: Use prb_first_seq() as base for 32bit seq
@@ -15960,7 +15960,7 @@ index 12f60c782e46..ee294aaf4aeb 100644
 -- 
 2.48.1
 
-From 4d49ef761dfa5d3c8f2229d46b9da65f6e6beccb Mon Sep 17 00:00:00 2001
+From 8d8c86c11c2fabee160b1a6ccc6c53a7723c1003 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 19 Oct 2023 10:32:05 +0000
 Subject: [PATCH 113/211] printk: ringbuffer: Do not skip non-finalized records
@@ -16272,7 +16272,7 @@ index ee294aaf4aeb..2d948cc82b5b 100644
 -- 
 2.48.1
 
-From 9b01aa879f2d0d80cbfdd0ca2ed4a591e916019c Mon Sep 17 00:00:00 2001
+From 322e27ac78b0ebe7096a3c98778ec0895204677e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 11:11:05 +0000
 Subject: [PATCH 114/211] printk: ringbuffer: Clarify special lpos values
@@ -16371,7 +16371,7 @@ index 2d948cc82b5b..d49460f7578e 100644
 -- 
 2.48.1
 
-From c8d32a961ffd7dc45df185c01c0ef961d406171b Mon Sep 17 00:00:00 2001
+From f8d8a93568dd467e54c5fbe6ad85b81034d982bf Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 14:30:49 +0000
 Subject: [PATCH 115/211] printk: Add this_cpu_in_panic()
@@ -16466,7 +16466,7 @@ index a30338aca084..2bb393009d4e 100644
 -- 
 2.48.1
 
-From 6cb888fa959a97a3b72f8cc5bd602f598f153946 Mon Sep 17 00:00:00 2001
+From 3f2735a711f3eba54f6328ea634b661ecd323e19 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 15:01:58 +0000
 Subject: [PATCH 116/211] printk: ringbuffer: Cleanup reader terminology
@@ -16538,7 +16538,7 @@ index 244d991ffd73..67ee1c62fcd6 100644
 -- 
 2.48.1
 
-From bb87ae2ccc894bda9b1631a36b85529d57d55d4b Mon Sep 17 00:00:00 2001
+From 774c6f6654cbdd1e84dfd7ad8d92829f70bfa39c Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 14:59:55 +0000
 Subject: [PATCH 117/211] printk: Wait for all reserved records with pr_flush()
@@ -16717,7 +16717,7 @@ index d49460f7578e..52626d0f1fa3 100644
 -- 
 2.48.1
 
-From 4e62fab5d312f3918077111eaec508a9705006f5 Mon Sep 17 00:00:00 2001
+From eebf874db37c8d5682a6636f257cfd719958561a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 10:23:11 +0000
 Subject: [PATCH 118/211] printk: ringbuffer: Skip non-finalized records in
@@ -16790,7 +16790,7 @@ index b7748d7c44c1..d6ed33683b8b 100644
 -- 
 2.48.1
 
-From 80de4524b64056026c8597d02bac41d555a00a74 Mon Sep 17 00:00:00 2001
+From adf10af6794b9e43ee591cdde50bb39f8c537df2 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 20 Nov 2023 12:46:35 +0100
 Subject: [PATCH 119/211] printk: ringbuffer: Consider committed as finalized
@@ -16856,7 +16856,7 @@ index d6ed33683b8b..e7b808b829a0 100644
 -- 
 2.48.1
 
-From 19122c2a014c2e2c346580a8e280ebab8069ef53 Mon Sep 17 00:00:00 2001
+From 93e7c42965e60b675d2b92105149561212eb79f2 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:37:05 +0000
 Subject: [PATCH 120/211] printk: Avoid non-panic CPUs writing to ringbuffer
@@ -16939,7 +16939,7 @@ index 807692fd386a..7c5ab5c01abb 100644
 -- 
 2.48.1
 
-From 1f8e59cc60edbeb9ddecf49e6352f8361e2370cc Mon Sep 17 00:00:00 2001
+From 92d4099a0a552455014c9cb5d73eae66cf812fe7 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:23:43 +0000
 Subject: [PATCH 121/211] printk: Consider nbcon boot consoles on seq init
@@ -16995,7 +16995,7 @@ index 7c5ab5c01abb..ae3bf0cf215a 100644
 -- 
 2.48.1
 
-From d9f5d43d7ad68f598972f2d2666821f509a83536 Mon Sep 17 00:00:00 2001
+From 949a03c62edbc5da085acc47e567980da053404e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 9 Oct 2023 13:55:19 +0000
 Subject: [PATCH 122/211] printk: Add sparse notation to console_srcu locking
@@ -17036,7 +17036,7 @@ index ae3bf0cf215a..ea13c808c282 100644
 -- 
 2.48.1
 
-From a2396f6ad251a5e13819fe9054a6b6f8afedf12f Mon Sep 17 00:00:00 2001
+From 5a53dec0021c7ae013f0dafb2a51b96267eaa608 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:52:59 +0000
 Subject: [PATCH 123/211] printk: nbcon: Ensure ownership release on failed
@@ -17099,7 +17099,7 @@ index c8093bcc01fe..8ecd76aa22e6 100644
 -- 
 2.48.1
 
-From 6dcac0d95d75249de5f2428c62968b00524dc48a Mon Sep 17 00:00:00 2001
+From dda47caad4c9de6a474c18c13b7801f9cee6e315 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 22 Sep 2023 14:58:18 +0000
 Subject: [PATCH 124/211] printk: Check printk_deferred_enter()/_exit() usage
@@ -17164,7 +17164,7 @@ index 6d10927a07d8..8d9408d653de 100644
 -- 
 2.48.1
 
-From 704043041f6d20b09f7ff0c12c50e1a4d6cb2489 Mon Sep 17 00:00:00 2001
+From 6d2371f4ae31e5c6fc466264035bd0d35dff23ef Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 08:35:23 +0000
 Subject: [PATCH 125/211] printk: nbcon: Implement processing in port->lock
@@ -17419,7 +17419,7 @@ index 8ecd76aa22e6..a5707fe1e95e 100644
 -- 
 2.48.1
 
-From 511ae8ca59d9599ed2268efdb2b110c204d6ad39 Mon Sep 17 00:00:00 2001
+From e504fda757e0f4d994342be0ac1998f0c3c7a17d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 8 Dec 2023 15:54:27 +0000
 Subject: [PATCH 126/211] printk: nbcon: Add driver_enter/driver_exit console
@@ -17466,7 +17466,7 @@ index c27bd5189660..73515c324347 100644
 -- 
 2.48.1
 
-From 485c7a30ef2035d56031ff59bb6703a71faa7d6c Mon Sep 17 00:00:00 2001
+From 8f0622568b14e0570b6dd6411b972afc5051a0b9 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:25:41 +0000
 Subject: [PATCH 127/211] printk: Make console_is_usable() available to nbcon
@@ -17576,7 +17576,7 @@ index ea13c808c282..d959be5c4102 100644
 -- 
 2.48.1
 
-From 8bcb664cf2d53f76859af8e7faa8677fa1ee7bac Mon Sep 17 00:00:00 2001
+From 2fc275285de075a400db861ed6de70e80d8c6767 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:53:21 +0000
 Subject: [PATCH 128/211] printk: Let console_is_usable() handle nbcon
@@ -17624,7 +17624,7 @@ index 378ccca007ca..d741d19bb9db 100644
 -- 
 2.48.1
 
-From 40ee3960ac13de0b205216197519d1d964aea3cc Mon Sep 17 00:00:00 2001
+From c974c9e5db960e600f14b82287adcb07ea05256a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:45:33 +0000
 Subject: [PATCH 129/211] printk: Add @flags argument for console_is_usable()
@@ -17698,7 +17698,7 @@ index d959be5c4102..bdd3d7e40e63 100644
 -- 
 2.48.1
 
-From 0a8126c194f56c6f1cecb746fcb5fd5dd49fcdef Mon Sep 17 00:00:00 2001
+From bbd477321e6154512e6d4d159cacf6d6d3d90b26 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 12 Sep 2023 12:00:08 +0000
 Subject: [PATCH 130/211] printk: nbcon: Provide function to flush using
@@ -17893,7 +17893,7 @@ index bdd3d7e40e63..271865952a4d 100644
 -- 
 2.48.1
 
-From 35f727aea56d20881b6cd6bc44cf408bbcfa2d7d Mon Sep 17 00:00:00 2001
+From fbc8044b3315405f6700b46d916f3e534ce626c8 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 24 Oct 2023 14:13:14 +0000
 Subject: [PATCH 131/211] printk: Track registered boot consoles
@@ -17976,7 +17976,7 @@ index 271865952a4d..4185c58f7915 100644
 -- 
 2.48.1
 
-From 04b93c7345244bd7868806c7dfe0b3f29e947b07 Mon Sep 17 00:00:00 2001
+From 09960aec62e48d95ef27bda1203a6b903c275f4d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 14:33:27 +0000
 Subject: [PATCH 132/211] printk: nbcon: Use nbcon consoles in
@@ -18158,7 +18158,7 @@ index 4185c58f7915..d6173575ea03 100644
 -- 
 2.48.1
 
-From dd7a2b1eb0dc2c195ca95bd6e43f9f6e02a7bc4c Mon Sep 17 00:00:00 2001
+From 147e5359462936bff5af046b4ece9023e103f51f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 14 Dec 2023 14:38:42 +0000
 Subject: [PATCH 133/211] printk: nbcon: Assign priority based on CPU state
@@ -18278,7 +18278,7 @@ index c17cf3ea6153..3e999784ba5c 100644
 -- 
 2.48.1
 
-From d22d70a7c32525535944242092f1c4e56599042f Mon Sep 17 00:00:00 2001
+From 8aa58ad1a017aff0c98b841883727d4884827f2d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:03:42 +0000
 Subject: [PATCH 134/211] printk: nbcon: Add unsafe flushing on panic
@@ -18383,7 +18383,7 @@ index 3e999784ba5c..1c01f88d596d 100644
 -- 
 2.48.1
 
-From 6e34c4559e7c87e08a0420b7db2e1021b68c79da Mon Sep 17 00:00:00 2001
+From 1d1fe787769f4e8df747650875ea7eb9a8ef0371 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 12:44:07 +0000
 Subject: [PATCH 135/211] printk: Avoid console_lock dance if no legacy or boot
@@ -18601,7 +18601,7 @@ index d6173575ea03..e92da55b8e9f 100644
 -- 
 2.48.1
 
-From d5ae87bc1de1cb02ec1699443bd3ed3f965782a0 Mon Sep 17 00:00:00 2001
+From 8b4dc045dbccd7305580e65a5dd3ffb382843676 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:36:52 +0000
 Subject: [PATCH 136/211] printk: Track nbcon consoles
@@ -18673,7 +18673,7 @@ index e92da55b8e9f..977a97f0396b 100644
 -- 
 2.48.1
 
-From a1a01ebf475a4e7bd58c06521c755d68070c5a2b Mon Sep 17 00:00:00 2001
+From 85c2e69bea32255e09722b24e45e719bafdd01f3 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:56:58 +0000
 Subject: [PATCH 137/211] printk: Coordinate direct printing in panic
@@ -18816,7 +18816,7 @@ index 977a97f0396b..e8d60e29c17f 100644
 -- 
 2.48.1
 
-From 3ce1eaad7183def8476011cde43b9c897eccdf7c Mon Sep 17 00:00:00 2001
+From 7de2a532640eb169a18e0110143daae8ff562bb2 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:21:57 +0000
 Subject: [PATCH 138/211] printk: nbcon: Implement emergency sections
@@ -19059,7 +19059,7 @@ index e8d60e29c17f..4a0df41d32b8 100644
 -- 
 2.48.1
 
-From 83c9c2d0eddb6558f405060b23003c5df34405fd Mon Sep 17 00:00:00 2001
+From acebdb18fcece93b5f3cffc1d5dd10c2ff92a2d9 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:04 +0000
 Subject: [PATCH 139/211] panic: Mark emergency section in warn
@@ -19102,7 +19102,7 @@ index f0e91a0c4001..147803c3a402 100644
 -- 
 2.48.1
 
-From 09f2b271d000e6cc00053ad0a97f18731da59f42 Mon Sep 17 00:00:00 2001
+From 42df8eb76def3fdfb9c7fd3c0a07f392a803a698 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 17:07:34 +0000
 Subject: [PATCH 140/211] panic: Mark emergency section in oops
@@ -19146,7 +19146,7 @@ index 147803c3a402..9215df21d8c2 100644
 -- 
 2.48.1
 
-From 16785e6f5b1f24041eaad580118698dceddab002 Mon Sep 17 00:00:00 2001
+From efaff66bf7fd06348348a2c0713e3fc17d527c96 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:39 +0000
 Subject: [PATCH 141/211] rcu: Mark emergency section in rcu stalls
@@ -19196,7 +19196,7 @@ index 11a1fac3a589..6f085a159fca 100644
 -- 
 2.48.1
 
-From 16d711e9cc1c9fda188b162afb9c9114e88aaf1a Mon Sep 17 00:00:00 2001
+From 59d1c1b90c4e77c2cb51a8900035097989b81e87 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 18 Sep 2023 20:27:41 +0000
 Subject: [PATCH 142/211] lockdep: Mark emergency section in lockdep splats
@@ -19246,7 +19246,7 @@ index 3468d8230e5f..6eef8527e654 100644
 -- 
 2.48.1
 
-From ebed2aec2c638d7f1530f41dc563d6bfcb6ba9bd Mon Sep 17 00:00:00 2001
+From d9b021ef82d208258fa80d59389003b1feb59a1f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 22 Sep 2023 14:12:21 +0000
 Subject: [PATCH 143/211] printk: nbcon: Introduce printing kthreads
@@ -19698,7 +19698,7 @@ index 4a0df41d32b8..3e307d475d23 100644
 -- 
 2.48.1
 
-From 9b8eebd262c31269abcf1d9beec86f6603f1202d Mon Sep 17 00:00:00 2001
+From bcc758fe7fe2401cf3853dabb32efcd8b2ddbc2b Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 17:43:48 +0000
 Subject: [PATCH 144/211] printk: Atomic print in printk context on shutdown
@@ -19744,7 +19744,7 @@ index 3e307d475d23..2a77a4ad5619 100644
 -- 
 2.48.1
 
-From 592f305a09125e14cb8ea985fe70a6f3477b5d2e Mon Sep 17 00:00:00 2001
+From c21caaf8c770ac430393f9c80b68c17d7c249adc Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 14:43:30 +0000
 Subject: [PATCH 145/211] printk: nbcon: Add context to console_is_usable()
@@ -19864,7 +19864,7 @@ index 2a77a4ad5619..3863e3dc3816 100644
 -- 
 2.48.1
 
-From 1ecafd811f163e41a88b22623d89ff4cbc159160 Mon Sep 17 00:00:00 2001
+From 124d2b1af9a06ccd09cc9456f5dc6b110f6f68b4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 26 Sep 2023 13:03:52 +0000
 Subject: [PATCH 146/211] printk: nbcon: Add printer thread wakeups
@@ -20039,7 +20039,7 @@ index 3863e3dc3816..3cdda6dd8941 100644
 -- 
 2.48.1
 
-From de6067315b115f10dc5eee64fcab839450580387 Mon Sep 17 00:00:00 2001
+From fc147f880603c27e3a41a0309c525ef6a27ad0fe Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:04:15 +0000
 Subject: [PATCH 147/211] printk: nbcon: Stop threads on shutdown/reboot
@@ -20104,7 +20104,7 @@ index 337ec7a10095..57ed4968a653 100644
 -- 
 2.48.1
 
-From 1a192806bd30fa64caf59a5f33fd5799a534340f Mon Sep 17 00:00:00 2001
+From b704cb65c6caca0a65aaf1c220a254adb761b6a0 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 5 Dec 2023 14:09:31 +0000
 Subject: [PATCH 148/211] printk: nbcon: Start printing threads
@@ -20248,7 +20248,7 @@ index 3cdda6dd8941..3722f1a66357 100644
 -- 
 2.48.1
 
-From 9057cc183e9ab856d75f49f22960622f3d81d84e Mon Sep 17 00:00:00 2001
+From e1b849d38932ac82750aaff5a63edf9e5468ed3d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:31:00 +0000
 Subject: [PATCH 149/211] proc: Add nbcon support for /proc/consoles
@@ -20306,7 +20306,7 @@ index e0758fe7936d..2703676549f5 100644
 -- 
 2.48.1
 
-From a102858c0a6db2430d7adfa43d6ee79821b83fea Mon Sep 17 00:00:00 2001
+From 131242f794e99a5f131bba50f941f99cab93539f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 14:31:09 +0000
 Subject: [PATCH 150/211] tty: sysfs: Add nbcon support for 'active'
@@ -20344,7 +20344,7 @@ index 117abcf366d9..03e2eaf24fa5 100644
 -- 
 2.48.1
 
-From e1b42f7da0a8c97dfb208a383ab0a21ecb87eb7e Mon Sep 17 00:00:00 2001
+From 662ff82660d00ccaf578a7c934ba5aa0c3661cb4 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:01:58 +0000
 Subject: [PATCH 151/211] printk: nbcon: Provide function to reacquire
@@ -20443,7 +20443,7 @@ index b866d0138fe0..f843df54ee82 100644
 -- 
 2.48.1
 
-From 2f64eefc444bea61ab0c35bc452118f8c4d88de6 Mon Sep 17 00:00:00 2001
+From d8ec1f048be2f367e46e85571f2eefff9595df04 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:19:18 +0000
 Subject: [PATCH 152/211] serial: core: Provide low-level functions to port
@@ -20491,7 +20491,7 @@ index 6fc2003767a9..7c861b4606aa 100644
 -- 
 2.48.1
 
-From 06290abbec94e88d156b245cb3daa6f39d945650 Mon Sep 17 00:00:00 2001
+From 56561fe2f038b2375914b4e26163c2b7b7f122d5 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 15:30:36 +0000
 Subject: [PATCH 153/211] serial: 8250: Switch to nbcon console
@@ -20838,7 +20838,7 @@ index be65de65fe61..ec46e3b49ee9 100644
 -- 
 2.48.1
 
-From 70b5a0b4893e766f5076bdf411d5a411d2098ce0 Mon Sep 17 00:00:00 2001
+From f3644d3198ed3f97c6cb2c7533f88ad478cab11f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 17:35:04 +0000
 Subject: [PATCH 154/211] printk: Add kthread for all legacy consoles
@@ -21269,7 +21269,7 @@ index 3722f1a66357..4f1ca9931ddb 100644
 -- 
 2.48.1
 
-From bbf006b9290fab2de6b2e1de55eb12a0903cd2fc Mon Sep 17 00:00:00 2001
+From b519de907b24bf41e13b791bd8f221c030368059 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:34:16 +0000
 Subject: [PATCH 155/211] printk: Avoid false positive lockdep report for
@@ -21338,7 +21338,7 @@ index 4f1ca9931ddb..249576a8c351 100644
 -- 
 2.48.1
 
-From 1221e10242216e56eae1334c1ded3047d97486e5 Mon Sep 17 00:00:00 2001
+From 4851da120bc8d9f9b9c13e2c45d87112297bbd5e Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 08:09:11 +0100
 Subject: [PATCH 156/211] drm/i915: Use preempt_disable/enable_rt() where
@@ -21399,7 +21399,7 @@ index f5659ebd08eb..5b6d2f55528d 100644
 -- 
 2.48.1
 
-From 8885b172997bccfbcb6f9cbc675561fb7a1be131 Mon Sep 17 00:00:00 2001
+From 888807643dec3a2829901b4fdd5ca7bb93ef96df Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 09:01:42 +0100
 Subject: [PATCH 157/211] drm/i915: Don't disable interrupts on PREEMPT_RT
@@ -21489,7 +21489,7 @@ index cfbfbfed3f5e..da2becfbc86c 100644
 -- 
 2.48.1
 
-From 3331e30228d9ceccc15cde32f51e369ee3b28807 Mon Sep 17 00:00:00 2001
+From e3e5ed61e35a55ca4e8395a0ced3ffc1cde5bdfc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 25 Oct 2021 15:05:18 +0200
 Subject: [PATCH 158/211] drm/i915: Don't check for atomic context on
@@ -21525,7 +21525,7 @@ index c61066498bf2..48e19e55d6b0 100644
 -- 
 2.48.1
 
-From 26a4578ea5a9b4eb3c8b62aaeac9a1a94bacd45c Mon Sep 17 00:00:00 2001
+From 1ae0b0dd0cc857f7da9feb16593036cbe3fbcc67 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 6 Dec 2018 09:52:20 +0100
 Subject: [PATCH 159/211] drm/i915: Disable tracing points on PREEMPT_RT
@@ -21575,7 +21575,7 @@ index ce1cbee1b39d..c54653cf72c9 100644
 -- 
 2.48.1
 
-From a275daeed8447a14b0d32d61e4d735b29569eea9 Mon Sep 17 00:00:00 2001
+From 5987eabec915b8d34413a7e08ca0cda91c18fefb Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 19 Dec 2018 10:47:02 +0100
 Subject: [PATCH 160/211] drm/i915: skip DRM_I915_LOW_LEVEL_TRACEPOINTS with
@@ -21609,7 +21609,7 @@ index c54653cf72c9..3c51620d011b 100644
 -- 
 2.48.1
 
-From 07c3a56f86599bf08dc002f959eca33e97f30dea Mon Sep 17 00:00:00 2001
+From fa2eccf22a0a11dc5e4de88b977c867c0326d2dc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 17:18:00 +0200
 Subject: [PATCH 161/211] drm/i915/gt: Queue and wait for the irq_work item.
@@ -21657,7 +21657,7 @@ index f2973cd1a8aa..aa77f8601b8a 100644
 -- 
 2.48.1
 
-From 2f773f8200d2c5cc79ad6a14022fa9f3074335ce Mon Sep 17 00:00:00 2001
+From d50027cd5bbc8a1ac185821dca6d56602c647755 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 19:03:41 +0200
 Subject: [PATCH 162/211] drm/i915/gt: Use spin_lock_irq() instead of
@@ -21751,7 +21751,7 @@ index 2065be5a196b..73d815fc514b 100644
 -- 
 2.48.1
 
-From d23eb64acf63348a23795eaf17eae17a79c40d7a Mon Sep 17 00:00:00 2001
+From c328507a2c1371f91e985f9fd2a481be8d217c38 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 1 Oct 2021 20:01:03 +0200
 Subject: [PATCH 163/211] drm/i915: Drop the irqs_disabled() check
@@ -21795,7 +21795,7 @@ index f59081066a19..014d02029a41 100644
 -- 
 2.48.1
 
-From ed2d2d16cc5a27b40b4057fa26577c27e5038e4b Mon Sep 17 00:00:00 2001
+From 5a3ba5b6048f2dd6c24a46de939500974ef5257b Mon Sep 17 00:00:00 2001
 From: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
 Date: Wed, 5 Jul 2023 10:30:25 +0100
 Subject: [PATCH 164/211] drm/i915: Do not disable preemption for resets
@@ -21899,7 +21899,7 @@ index 13fb8e5042c5..b51fb0c97772 100644
 -- 
 2.48.1
 
-From 8481b622009ad69e64c1734963617caca62d3825 Mon Sep 17 00:00:00 2001
+From 8cd5d1f035c1002396ce59075a355a19d2af907c Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 3 Oct 2023 21:37:21 +0200
 Subject: [PATCH 165/211] drm/i915/guc: Consider also RCU depth in busy loop.
@@ -21933,7 +21933,7 @@ index 8dc291ff0093..5b8d084c9c58 100644
 -- 
 2.48.1
 
-From a1bbf76778a873e80e35426e90b4f6a2c24b0751 Mon Sep 17 00:00:00 2001
+From 76f7b6a95d5c0864f5030add4ce4891a74c624d6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 21 Feb 2022 17:59:14 +0100
 Subject: [PATCH 166/211] Revert "drm/i915: Depend on !PREEMPT_RT."
@@ -21961,7 +21961,7 @@ index ce397a8797f7..98c3f532822d 100644
 -- 
 2.48.1
 
-From 4e2a8a429f1383e325f42af171df816cd01e3763 Mon Sep 17 00:00:00 2001
+From 7ce283b404d9a748b008cb72ac0cc3deee5b3811 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 23 Sep 2023 03:11:05 +0200
 Subject: [PATCH 167/211] sched: define TIF_ALLOW_RESCHED
@@ -22783,7 +22783,7 @@ index 2b948d35fb59..959f09ab83ab 100644
 -- 
 2.48.1
 
-From 534313c0f984779dcc347e2bb7c17cea87780d6f Mon Sep 17 00:00:00 2001
+From 5faa01f312efd66fd185905c8d92e8d45fb0dc6e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Wed, 8 Jul 2015 17:14:48 +0200
 Subject: [PATCH 168/211] arm: Disable jump-label on PREEMPT_RT.
@@ -22824,7 +22824,7 @@ index 57c0448d017a..dea47ba6576b 100644
 -- 
 2.48.1
 
-From dc105f01345bab4580317874940ba67b01cd4fa1 Mon Sep 17 00:00:00 2001
+From c6c755b32c39044a03a77232862944d69b2a3127 Mon Sep 17 00:00:00 2001
 From: "Yadi.hu" <yadi.hu@windriver.com>
 Date: Wed, 10 Dec 2014 10:32:09 +0800
 Subject: [PATCH 169/211] ARM: enable irq in translation/section permission
@@ -22920,7 +22920,7 @@ index fef62e4a9edd..622a30243f4a 100644
 -- 
 2.48.1
 
-From 5f930e9c1bed08f729623e6db7e112b6d9d19072 Mon Sep 17 00:00:00 2001
+From 250e84e63af26c6688aa3bfa601e52a8980134ae Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 28 Jul 2011 13:32:57 +0200
 Subject: [PATCH 170/211] tty/serial/omap: Make the locking RT aware
@@ -22968,7 +22968,7 @@ index f4c6ff806465..1097fca22307 100644
 -- 
 2.48.1
 
-From 3814382c36984a50d738b2a169a56848b7b3c0ea Mon Sep 17 00:00:00 2001
+From 5e7ca9b6e1ab99409b44a5d675aba03c499a730d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 8 Jan 2013 21:36:51 +0100
 Subject: [PATCH 171/211] tty/serial/pl011: Make the locking work on RT
@@ -23015,7 +23015,7 @@ index bb31ac9cae8c..8b7cf07e4491 100644
 -- 
 2.48.1
 
-From 2cae0ff970645c9cb4c5cfcef837e75ca8029c7f Mon Sep 17 00:00:00 2001
+From 9ba057e58ca0d898c3d69b0c44697f77f1d8da7d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:29 +0200
 Subject: [PATCH 172/211] ARM: vfp: Provide vfp_lock() for VFP locking.
@@ -23095,7 +23095,7 @@ index 7e8773a2d99d..8d321cdb7ac5 100644
 -- 
 2.48.1
 
-From 34458a4fc39c26e42aa7953ad83997d88a0e6c81 Mon Sep 17 00:00:00 2001
+From 162022d0c99d42fb22f3f5e223d72d7afc0f8b57 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:30 +0200
 Subject: [PATCH 173/211] ARM: vfp: Use vfp_lock() in vfp_sync_hwstate().
@@ -23144,7 +23144,7 @@ index 8d321cdb7ac5..3b9360bfc508 100644
 -- 
 2.48.1
 
-From a866ec6561c3df091eb72445eb61eaefb3e3c90b Mon Sep 17 00:00:00 2001
+From 4dc914a8697fa42f375b2e47c1dbe6c86b18e44d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:36:10 +0200
 Subject: [PATCH 174/211] ARM: vfp: Use vfp_lock() in vfp_support_entry().
@@ -23197,7 +23197,7 @@ index 3b9360bfc508..9543f011d0ed 100644
 -- 
 2.48.1
 
-From 71b8eb553cbe25f7cbfdb14523cf00dc4909057a Mon Sep 17 00:00:00 2001
+From 99a0d403decbf7d32eb26b747c095263c21a3e15 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:39:33 +0200
 Subject: [PATCH 175/211] ARM: vfp: Move sending signals outside of
@@ -23323,7 +23323,7 @@ index 9543f011d0ed..9fde36fcb80c 100644
 -- 
 2.48.1
 
-From 9b1aa5dad2976c7cbae48642c5d8810d1f2e58a4 Mon Sep 17 00:00:00 2001
+From 2f95df7f0db2779a68e5164ff65fc99a5ddfe6d3 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:29 +0200
 Subject: [PATCH 176/211] ARM: Allow to enable RT
@@ -23359,7 +23359,7 @@ index dea47ba6576b..a154ecd2d3c3 100644
 -- 
 2.48.1
 
-From 130ceb112a80decdc9d0c8d5b972da68da2331a4 Mon Sep 17 00:00:00 2001
+From bcce8342e1cef31a6cf1cdacfc468e86c602e957 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:35 +0200
 Subject: [PATCH 177/211] ARM64: Allow to enable RT
@@ -23387,7 +23387,7 @@ index 658c6a61ab6f..f5d5c265f438 100644
 -- 
 2.48.1
 
-From 8b4c87d03a38315dc2319cab52ee52c9fde52862 Mon Sep 17 00:00:00 2001
+From e4110cf0785b7c5a3721e2e71d2d63e72b2b044f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 26 Jul 2019 11:30:49 +0200
 Subject: [PATCH 178/211] powerpc: traps: Use PREEMPT_RT
@@ -23426,7 +23426,7 @@ index 2de7f6dcd32b..739f5b179a7f 100644
 -- 
 2.48.1
 
-From 972f14e1c02e3682bd98073d7e253ac96ffb3351 Mon Sep 17 00:00:00 2001
+From 0a771e7f14a5f28e5057c9bcee185db604e480e9 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:54 +0100
 Subject: [PATCH 179/211] powerpc/pseries/iommu: Use a locallock instead
@@ -23543,7 +23543,7 @@ index b1e6d275cda9..9a8d3970da3c 100644
 -- 
 2.48.1
 
-From 2dec66a546d4238cfb553caec0973fa03f4f25b0 Mon Sep 17 00:00:00 2001
+From 747b1c6d19e582b8aa462f9b03a35cc0708c0a5d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 9 Mar 2023 09:13:52 +0100
 Subject: [PATCH 180/211] powerpc/pseries: Select the generic memory allocator.
@@ -23575,7 +23575,7 @@ index 4ebf2ef2845d..381c3be3bec1 100644
 -- 
 2.48.1
 
-From 3641a6f786dee72e89ff92cf639aca5eaa60e083 Mon Sep 17 00:00:00 2001
+From d7aa932b0fa9ee63b9b994d5b1ab356d071a9659 Mon Sep 17 00:00:00 2001
 From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
 Date: Fri, 24 Apr 2015 15:53:13 +0000
 Subject: [PATCH 181/211] powerpc/kvm: Disable in-kernel MPIC emulation for
@@ -23620,7 +23620,7 @@ index 902611954200..2f188137f830 100644
 -- 
 2.48.1
 
-From 691bd1dc3c93adac02eed89313754224451bb26c Mon Sep 17 00:00:00 2001
+From 06c18506c91385babec4ed354dfbac644d8f5c88 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:29 +0100
 Subject: [PATCH 182/211] powerpc/stackprotector: work around stack-guard init
@@ -23659,7 +23659,7 @@ index 283c34647856..4727f40052dd 100644
 -- 
 2.48.1
 
-From 5c17aeae3de31498b82e18e57105658678950bbf Mon Sep 17 00:00:00 2001
+From f95db62c95189063171f7843a55011c5c990225b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:41 +0200
 Subject: [PATCH 183/211] POWERPC: Allow to enable RT
@@ -23695,7 +23695,7 @@ index 6baa8b85601a..cca3f7ca6f10 100644
 -- 
 2.48.1
 
-From 250d58d4e2e1a9bc0ad197aee18781f9b016467b Mon Sep 17 00:00:00 2001
+From bed7c69631f910fb936a520c7c949c5c8b3c1c01 Mon Sep 17 00:00:00 2001
 From: Evan Green <evan@rivosinc.com>
 Date: Mon, 6 Nov 2023 14:58:55 -0800
 Subject: [PATCH 184/211] RISC-V: Probe misaligned access speed in parallel
@@ -23891,7 +23891,7 @@ index 1b8da4e40a4d..2cb5e651412c 100644
 -- 
 2.48.1
 
-From 05913870982775c2c565f005b81b2feb7d7cf420 Mon Sep 17 00:00:00 2001
+From d1d80d2d45640141b3329539c1c7d0d1a4f7286c Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:20 +0800
 Subject: [PATCH 185/211] riscv: add PREEMPT_AUTO support
@@ -23942,7 +23942,7 @@ index 8c72d1bcdf14..c59ad9b7af11 100644
 -- 
 2.48.1
 
-From 2549ed4435c66aebf040121c2732b48e7756a491 Mon Sep 17 00:00:00 2001
+From bec888391a1b14d6b6a0f4c0093e7adbb9a98e9f Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:21 +0800
 Subject: [PATCH 186/211] riscv: allow to enable RT
@@ -23970,7 +23970,7 @@ index f05883adb5f7..391adf8ffc8d 100644
 -- 
 2.48.1
 
-From cccdaa41adb8dad1cf3ec0ca1e47daddd7903566 Mon Sep 17 00:00:00 2001
+From efc9521ab46d0a1570fb9fb1653007c4640a9b93 Mon Sep 17 00:00:00 2001
 From: Clark Williams <williams@redhat.com>
 Date: Sat, 30 Jul 2011 21:55:53 -0500
 Subject: [PATCH 187/211] sysfs: Add /sys/kernel/realtime entry
@@ -24024,7 +24024,7 @@ index 1d4bc493b2f4..486c68c11bbe 100644
 -- 
 2.48.1
 
-From 9a618731a5a83a898a20096f3af4349e72201892 Mon Sep 17 00:00:00 2001
+From c6567f2db40719d14d8b333f5c0ba1fa25ab6224 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 5 Feb 2024 14:04:38 -0600
 Subject: [PATCH 188/211] arch/riscv: check_unaligned_acces(): don't alloc page
@@ -24059,7 +24059,7 @@ index 01dc099bfcdf..25b6819b66a3 100644
 -- 
 2.48.1
 
-From de83feae4434605025972aef6f88e0f5929d8c8a Mon Sep 17 00:00:00 2001
+From df10477cf4264e0cb0f3c3228c7e6301cfbcf486 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 6 Feb 2024 12:17:19 -0600
 Subject: [PATCH 189/211] Revert "preempt: Put preempt_enable() within an
@@ -24106,7 +24106,7 @@ index cd16f0330fba..9aa6358a1a16 100644
 -- 
 2.48.1
 
-From c47abfd2fa61eb7528856f97b7490cd3466ffb86 Mon Sep 17 00:00:00 2001
+From 42950500c85ee24df9eb8591082510c738158fe6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Jul 2011 20:25:16 +0200
 Subject: [PATCH 190/211] Add localversion for -RT release
@@ -24127,7 +24127,7 @@ index 000000000000..483ad771f201
 -- 
 2.48.1
 
-From 76f43121a2c6d3226f69cc90d681407187dbf588 Mon Sep 17 00:00:00 2001
+From 2aa97a9466fed2907f99abcd282be7f522e058bd Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 27 Feb 2024 17:13:28 -0600
 Subject: [PATCH 191/211] Linux 6.6.18-rt23 REBASE
@@ -24147,7 +24147,7 @@ index 483ad771f201..9a218ca23053 100644
 -- 
 2.48.1
 
-From ffd6e868374e7418cbc4ab3eaf6b7e263ff547b9 Mon Sep 17 00:00:00 2001
+From 00cd0e217c59c7eb473df32ac2ee726b98d2a75c Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 23 Jan 2024 12:56:21 +0100
 Subject: [PATCH 192/211] arm: Disable FAST_GUP on PREEMPT_RT if HIGHPTE is
@@ -24189,7 +24189,7 @@ index a154ecd2d3c3..e5a283851c02 100644
 -- 
 2.48.1
 
-From f0b2319b224fc2175053324d0ff0196c972c1fed Mon Sep 17 00:00:00 2001
+From 5d2092b043098c20a032dd2e86065e1ee0037d6f Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Tue, 23 Jan 2024 13:40:32 +0800
 Subject: [PATCH 193/211] printk: nbcon: move locked_port flag to struct
@@ -24285,7 +24285,7 @@ index 1b1b585b1675..b53d93585ee7 100644
 -- 
 2.48.1
 
-From eb5fefe9ff14deef2c4af457a299988f2c3e181b Mon Sep 17 00:00:00 2001
+From 6bc331a9dd031d8901dab55ee5b93cbf7acf2db1 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 25 Jun 2024 17:08:39 -0500
 Subject: [PATCH 194/211] Linux 6.6.35-rt34 REBASE
@@ -24305,7 +24305,7 @@ index 9a218ca23053..21988f9ad53f 100644
 -- 
 2.48.1
 
-From 412726c7e1c9780d6d3d01005b50d6655992af87 Mon Sep 17 00:00:00 2001
+From 4ea2cbab068c257390685905dea1c072368964a9 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 20 Jun 2024 11:21:13 +0200
 Subject: [PATCH 195/211] prinkt/nbcon: Add a scheduling point to
@@ -24346,7 +24346,7 @@ index b53d93585ee7..b941039ee7d2 100644
 -- 
 2.48.1
 
-From 6727fca4edcb697a8076a460cc5d7b1464dc7df2 Mon Sep 17 00:00:00 2001
+From 10be961cd4ee4fe27c1bc11f1cfefe72efae94b5 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Sun, 28 Jul 2024 15:53:21 -0500
 Subject: [PATCH 196/211] Linux 6.6.43-rt38 REBASE
@@ -24366,7 +24366,7 @@ index 21988f9ad53f..49bae8d6aa67 100644
 -- 
 2.48.1
 
-From 2bc36b28229b35aaa6ae108e3fbe9444cc0d4c57 Mon Sep 17 00:00:00 2001
+From 4a5bcd79a1348677a5252252047ed51dcc77f661 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 5 Aug 2024 09:48:12 -0500
 Subject: [PATCH 197/211] riscv: Add return value to check_unaligned_access().
@@ -24402,7 +24402,7 @@ index 25b6819b66a3..3f2767c9b01f 100644
 -- 
 2.48.1
 
-From 6164c0c760ce7eb163d0aae86869d0753d5dd2f8 Mon Sep 17 00:00:00 2001
+From be28f929723aadb962644679c578763a8a3e9364 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Thu, 24 Oct 2024 13:54:42 -0500
 Subject: [PATCH 198/211] Linux 6.6.58-rt45 REBASE
@@ -24422,7 +24422,7 @@ index 49bae8d6aa67..38c40b21a885 100644
 -- 
 2.48.1
 
-From d7c6288bb24b256ef63222541eadef3d7538741f Mon Sep 17 00:00:00 2001
+From 84dd411fc49b72e9add19259ccea3bdbaa22b2e7 Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 12 Jul 2024 09:11:14 +0200
 Subject: [PATCH 199/211] sign-file,extract-cert: move common SSL helper
@@ -24627,7 +24627,7 @@ index 000000000000..e6711c75ed91
 -- 
 2.48.1
 
-From 0ed840da6780ad1d10953fab4db10e1fe58471b2 Mon Sep 17 00:00:00 2001
+From 15736a0d12c6521bde04cf162912056bf89bf920 Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 12 Jul 2024 09:11:15 +0200
 Subject: [PATCH 200/211] sign-file,extract-cert: avoid using deprecated
@@ -24748,7 +24748,7 @@ index e6711c75ed91..2db0e181143c 100644
 -- 
 2.48.1
 
-From 058c49857d739ea681e7aeb7f98ad8037584393c Mon Sep 17 00:00:00 2001
+From 2d8416e30658739211f5af6f760bf36f9b3e0e1d Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 20 Sep 2024 19:52:48 +0300
 Subject: [PATCH 201/211] sign-file,extract-cert: use pkcs11 provider for
@@ -25036,7 +25036,7 @@ index bb3fdf1a617c..7070245edfc1 100644
 -- 
 2.48.1
 
-From 008a53941964e837e2975ddab3d993359615fe0d Mon Sep 17 00:00:00 2001
+From 0fcd3d31212fc449a5d3ff80c5953149c53b657a Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
 Date: Tue, 26 Nov 2024 08:37:58 -0600
 Subject: [PATCH 202/211] Linux 6.6.63-rt46 REBASE
@@ -25056,7 +25056,7 @@ index 38c40b21a885..272158183778 100644
 -- 
 2.48.1
 
-From 51c76043c5e104b45b32b87a5c27249fa445abbe Mon Sep 17 00:00:00 2001
+From a0f42d547c4d0f4be4fd38f7ec662a804b723fa6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 28 Oct 2024 01:07:26 +0000
 Subject: [PATCH 203/211] Fwd: [PATCH v6.6-RT] kvm: Use the proper mask to
@@ -25094,7 +25094,7 @@ index d952fa5ee880..5253d3d2d013 100644
 -- 
 2.48.1
 
-From 3b7719df1d5c0d63f2c9e4310dc1344610382dd6 Mon Sep 17 00:00:00 2001
+From eeacb9a74e54a3fbd2f57e98334b7016d8d78396 Mon Sep 17 00:00:00 2001
 From: Derek Barbosa <debarbos@redhat.com>
 Date: Mon, 4 Nov 2024 09:29:34 -0500
 Subject: [PATCH 204/211] printk: nbcon: Fix illegal RCU usage on thread wakeup
@@ -25149,7 +25149,7 @@ index b941039ee7d2..b4278854eeb9 100644
 -- 
 2.48.1
 
-From 460154b448289b560b5f1bcd69e8294b7c47f24a Mon Sep 17 00:00:00 2001
+From 8e2384250a21c79798e60989077b94ecad7a5b59 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 1 Mar 2024 22:45:25 +0100
 Subject: [PATCH 205/211] serial: sifive: Use uart_prepare_sysrq_char() to
@@ -25228,7 +25228,7 @@ index b296e57a9dee..d420bed4a3a7 100644
 -- 
 2.48.1
 
-From 46e04d146e43d8377a5fed242f176ed6c9010d29 Mon Sep 17 00:00:00 2001
+From 2ff6668ac4e9747666bd4226266af33d21d16f43 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
 Date: Tue, 17 Dec 2024 08:04:45 -0600
 Subject: [PATCH 206/211] Linux 6.6.65-rt47 REBASE
@@ -25248,7 +25248,7 @@ index 272158183778..8a777ac42aab 100644
 -- 
 2.48.1
 
-From 61a03ce56b62acb202029fe922317d1b8628c9ec Mon Sep 17 00:00:00 2001
+From d163e1e4694ee2a2307d214f893282d204234acf Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:21 -0600
 Subject: [PATCH 207/211] Revert "sign-file,extract-cert: use pkcs11 provider
@@ -25520,7 +25520,7 @@ index 7070245edfc1..bb3fdf1a617c 100644
 -- 
 2.48.1
 
-From c9830692fe8f503428279acae5caf1004861c33f Mon Sep 17 00:00:00 2001
+From 7b71af6372d4bdfb61d26fa4d279acb18f163d06 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:32 -0600
 Subject: [PATCH 208/211] Revert "sign-file,extract-cert: avoid using
@@ -25630,7 +25630,7 @@ index 2db0e181143c..e6711c75ed91 100644
 -- 
 2.48.1
 
-From b01b6c9f9fbaf1f1f5ad7237d68886b8a7eb7f1f Mon Sep 17 00:00:00 2001
+From f000310d77d0e5fe017c6569f45297f213f1d747 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:42 -0600
 Subject: [PATCH 209/211] Revert "sign-file,extract-cert: move common SSL
@@ -25827,7 +25827,7 @@ index e6711c75ed91..000000000000
 -- 
 2.48.1
 
-From 10849b532168235456124e169392b638625f0c44 Mon Sep 17 00:00:00 2001
+From 3824c3c597f2070e8f0d53fc7e319caf267b6651 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:07:03 -0600
 Subject: [PATCH 210/211] misc:  fix missing hunks from previous mis-merge
@@ -25890,10 +25890,10 @@ index fd0f03965c11..8a2ce2ca6b39 100644
 -- 
 2.48.1
 
-From b3212052ab5f72c886895ee4ddd88ad783e19211 Mon Sep 17 00:00:00 2001
+From 74f4025bfb44c659a7aec21b7955697201ec01e8 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
-Date: Tue, 11 Feb 2025 13:19:46 -0600
-Subject: [PATCH 211/211] Linux 6.6.76-rt49 REBASE
+Date: Sun, 16 Feb 2025 00:52:02 -0600
+Subject: [PATCH 211/211] Linux 6.6.77-rt50 REBASE
 
 Signed-off-by: Clark Williams <clrkwllms@kernel.org>
 ---
@@ -25901,12 +25901,12 @@ Signed-off-by: Clark Williams <clrkwllms@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/localversion-rt b/localversion-rt
-index 8a777ac42aab..4b7dca68a5b4 100644
+index 8a777ac42aab..42c384668389 100644
 --- a/localversion-rt
 +++ b/localversion-rt
 @@ -1 +1 @@
 --rt47
-+-rt49
++-rt50
 -- 
 2.48.1
 
