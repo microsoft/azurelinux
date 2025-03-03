@@ -35,6 +35,7 @@ Patch6:         CVE-2024-28180.patch
 Patch7:         CVE-2023-45288.patch
 Patch8:         CVE-2023-3978.patch
 Patch9:         CVE-2025-27144.patch
+Patch10:        CVE-2025-22868.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -229,8 +230,8 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
-* Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-13
-- Fix CVE-2025-27144
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-13
+- Fix CVE-2025-27144, CVE-2025-22868
 
 * Sun Feb 23 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.57.0-12
 - Fix CVE-2023-3978 with a backported patch
