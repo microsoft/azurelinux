@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.20
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,8 @@ Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45338.patch
 Patch4:         CVE-2023-45288.patch
+Patch5:         CVE-2025-22868.patch
+Patch6:         CVE-2025-22869.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
@@ -67,16 +69,20 @@ Default configuration files for node-problem-detector
 %patch 1 -p1
 %patch 2 -p1
 %patch 4 -p1
+%patch 5 -p1
 
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
 %patch 2 -p1
 %patch 4 -p1
+%patch 5 -p1
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
 %patch 2 -p1
 %patch 3 -p1
 %patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
 popd
 
 %build
@@ -111,6 +117,10 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.20-2
+- Fix CVE-2025-22868 & CVE-2025-22869 with an upstream patch
+- Fix name, sha256sum of vendor tar balls
+
 * Thu Feb 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.20-1
 - Auto-upgrade to 0.8.20 - fix CVE-2023-44487
 
