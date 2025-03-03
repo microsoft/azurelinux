@@ -13230,9 +13230,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "minizip",
-          "version": "2.10.1",
-          "downloadUrl": "https://github.com/nmoinvaz/minizip/archive/2.10.1/minizip-2.10.1.tar.gz"
+          "name": "minizip-ng",
+          "version": "4.0.7",
+          "downloadUrl": "https://github.com/nmoinvaz/minizip-ng/archive/4.0.7/minizip-ng-4.0.7.tar.gz"
         }
       }
     },
