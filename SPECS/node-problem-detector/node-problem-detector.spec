@@ -38,7 +38,6 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #
 Source2:        %{name}-%{version}-test-vendor.tar.gz
 Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
-Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
 Patch3:         CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -62,7 +61,6 @@ Default configuration files for node-problem-detector
 %prep
 %autosetup -p1 -N
 %patch 0 -p1
-%patch 1 -p1
 
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
