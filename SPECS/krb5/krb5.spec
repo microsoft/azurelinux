@@ -4,7 +4,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.21.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Source1:        krb5.conf
 Patch0:         CVE-2024-26461.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
+BuildRequires:  openldap
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{version}-%{release}
@@ -56,6 +57,7 @@ autoconf &&
     --with-system-et         \
     --with-system-ss         \
     --with-system-verto=no   \
+    --with-ldap              \
     --enable-dns-for-realm   \
     --enable-pkinit          \
     --enable-shared          \
@@ -126,6 +128,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Mar 3 2025 Andy Zaugg <azaugg@linkedin.com> - 1.21.3-3
+- Compile with ldap backend
+
 * Mon Sep 2 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.21.3-2
 - Add patch for CVE-2024-26458 and CVE-2024-26461
 
