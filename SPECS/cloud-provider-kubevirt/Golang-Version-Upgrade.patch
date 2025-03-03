@@ -17,7 +17,6 @@ These changes will potentially be removed as the upstream carries out a new rele
 
 3. **Newly Added Dependencies:**
    - `github.com/pkg/errors v0.9.1`, `github.com/fxamacker/cbor/v2 v2.7.0`, etc.
-   - **Reason:** New dependencies might be required for new functionalities or to replace older, less efficient libraries.
 
 4. **Changes in `go.sum`:**
    - The `go.sum` file has been updated to reflect the new checksums of the updated dependencies.
@@ -25,7 +24,6 @@ These changes will potentially be removed as the upstream carries out a new rele
 
 5. **Replacements and Removals:**
    - Some `replace` directives have been changed or removed.
-   - **Reason:** Dependencies that required specific versions or patches may no longer need replacements due to updates in the dependencies themselves.
 
 ---
  go.mod | 163 +++++++-------
