@@ -3,50 +3,44 @@ From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
 Date: Fri, 28 Feb 2025 17:32:32 -0800
 Subject: [PATCH] Enhancements for Cloud Controller Manager Initialization and Configuration Handling
 
-These changes are put in place on the request for a specific customer and may not be upstream able. We will continue maintaining this patch mentioned here.
+Upstream issue: https://github.com/kubevirt/cloud-provider-kubevirt/issues/340
+
+The patches achieve the following:
+1. Locks down the Service Account used to access the fabric cluster
+2. Uses a non-expiring secret for the Service Account (since kubeconfig can expire and original flow uses admin kubeconfig)
+
+We will not be able to upstream the changes to the hardcoded tokenFile, rootCAFile, and namespaceFile paths as they are specific to the ECF environment.
+However we will be able to upstream changes to lockdown the service account.
+
+The locking down of the service account and using a non-expiring secret go hand in hand and cannot be split up into 2 patches.
 
 ### `main.go` Changes
 
-1. **New Import: `k8s.io/cloud-provider/names`**
-   - **Reason:** The added import is likely used for fetching `CCMControllerAliases`, which is a collection of controller aliases needed for initializing the cloud controller manager.
-   
-2. **Initialization of `controllerAliases` and Passing to `NewCloudControllerManagerCommand`:**
+1. **Initialization of `controllerAliases` and Passing to `NewCloudControllerManagerCommand`:**
    - **Reason:** 
-     - *Controller Aliases:* By using `names.CCMControllerAliases()`, the application can manage and initialize different cloud controller managers with more flexibility. This can facilitate the use of aliases for controllers and potentially allow for custom controllers or extended functionalities to be more easily integrated.
-     - *Function Parameter:* Updating `NewCloudControllerManagerCommand` to accept these aliases ensures that the cloud controller manager is initialized with all the necessary references to these controllers, thereby enabling or supporting additional or customized behaviors.
+     - *Controller Aliases:* We are using the k8s.io/cloud-provider version 0.31.0 (from v0.28.3), which makes it a requirement to provide controllerAliases by default.
+	 	This is a change in parameters defined from an older version that is being used upstream
 
 ### `cloud.go` Changes
 
-1. **New Import Statements:**
-   - **Reason:** The new imports (`io/ioutil`, `github.com/pkg/errors`, and `k8s.io/client-go/util/cert`) bring in functionality for:
-     - Reading files (`ioutil`)
-     - Enhanced error handling and wrapping errors with context (`errors`)
-     - Handling certificates (`certutil`)
+**Notice the hardcoded tokenFile, rootCAFile, and namespaceFile paths.
+These are specific to the ECF environment and cannot be upstreamed.**
 
-2. **`CloudConfig` Struct Addition (ControlEndpoint Field):**
-   - **Reason:** The addition of the `ControlEndpoint` field allows the cloud configuration to specify an endpoint for control operations, which may be crucial for communicating with the Kubernetes control plane or other essential services. This can help in scenarios where the control plane location is not the default or needs to be explicitly defined.
+1. **`CloudConfig` Struct Addition (ControlEndpoint Field):**
+   - **Reason:** The addition of the `ControlEndpoint` field allows the cloud configuration to specify an endpoint for control operations.
+	 This parameter is used in `serviceAccountClusterConfig` function.
 
-3. **New Function: `serviceAccountClusterConfig`:**
+2. **New Function: `serviceAccountClusterConfig`:**
    - **Reason:** 
-     - *Enhanced Configuration:* This function abstracts the creation of a Kubernetes REST configuration using service account tokens and certificates. This is particularly useful in cluster environments where the application needs to authenticate using the service account mechanism.
-     - *Security and Flexibility:* By reading the token, namespace, and CA files from specific paths, the function ensures secure access while also providing flexibility to handle different setups or environments.
+     - Initial PR: https://dev.azure.com/mariner-org/ECF/_git/cloud-provider-kubevirt/commit/7180c9b9a426eae884fa9a42f0ef2bc9c195d457?path=/pkg/cloudprovider/kubevirt/cloud.go&_a=contents&tab=details
+     - This has been done to use a non-expiring secret and also to lock down access from tenant cluster to the fabric cluster.
+     - This function abstracts the creation of a Kubernetes REST configuration using service account tokens and certificates.
 
-4. **Changes to `kubevirtCloudProviderFactory`:**
-   - **Initialization of `restConfig` and `namespace` Variables:**
-     - This change is for better clarity and initialization handling.
+3. **Changes to `kubevirtCloudProviderFactory`:**
    - **Use of `serviceAccountClusterConfig`:**
-     - **Reason:** This allows the factory to handle in-cluster configurations intelligently, using the control endpoint and service account information, as opposed to relying solely on provided kubeconfigs.
+     - **Reason:** This allows the factory to handle in-cluster configurations using the control endpoint and service account information, as opposed to relying solely on provided kubeconfigs.
    - **Improved Error Handling with `errors.Wrap`:**
      - **Reason:** Enhances debugging and error tracing by providing more context in error messages, which is useful for identifying the cause of failures.
-   - **Removal of Redundant Code:**
-     - **Reason:** Simplifies the configuration setup by removing unnecessary handling of `infraKubeConfig`.
-
-### Overall Justification
-These changes collectively aim to:
-- Increase the flexibility and configurability of the cloud provider manager.
-- Enhance security and context-aware configurations (particularly using service accounts and control endpoints).
-- Improve error handling and debugging capabilities.
-- Streamline and modernize the codebase, removing redundant steps and clarifying variable initializations.
 
 ---
  cmd/kubevirt-cloud-controller-manager/main.go |  4 +-
