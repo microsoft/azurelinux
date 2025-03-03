@@ -163,3 +163,4 @@ Summary:        %{summary}
 
 * Wed Apr  4 2018 Matthieu Saulnier <fantom@fedoraproject.org> - 1.1.1-1
 - Initial package
+
