@@ -5,38 +5,30 @@ Subject: [PATCH] Report single IP address for the node
 
 Upstream Issue: https://github.com/kubevirt/cloud-provider-kubevirt/issues/339
 
-The changes in the patch file `instances_v2.go` and its associated test file `instances_v2_test.go` introduce several enhancements and improvements, likely intended to achieve the following goals:
+The changes in the patch file `instances_v2.go` and its associated test file `instances_v2_test.go` do the following:
 
 ### 1. Improved IPv4 and IPv6 Handling
 #### Why:
-- **Support for IPv6:** The changes include logic to handle both IPv4 and IPv6 addresses, with particular attention to differentiating between standard and EUI-64 IPv6 addresses.
-- **Node Internal IP Handling:** Ensuring that the configured IP addresses for nodes are correctly identified and handled, including avoiding link-local addresses which are typically not useful for node-to-node communications.
+- **Support for IPv6:** The changes include logic to handle both IPv4 and IPv6 addresses, differentiating between standard and EUI-64 IPv6 addresses.
+- **Node Internal IP Handling:** Ensuring that the configured IP addresses for nodes are correctly identified and handled, including avoiding link-local addresses.
 
 ### 2. Enhanced Network Interface Parsing and Prioritization
 #### Why:
-- **Default Network Identification:** The changes prioritize interfaces named `"defaultcni"` and `"default"`, ensuring the primary network interfaces are chosen first.
-- **One Interface per Address Type:** Ensures that only one address of each type (IPv4 and IPv6) is assigned per node, which can simplify and clarify the networking setup of the cloud provider.
+- **Default Network Identification:** The changes prioritize interfaces named `"defaultcni"` and `"default"`t.
+- **One Interface per Address Type:** Ensures that only one address of each type (IPv4 and IPv6) is assigned per node.
 
 ### 3. New Function `isEUI64IPv6`
 #### Why:
-- **EUI-64 Address Validation:** The introduction of `isEUI64IPv6` adds functionality to detect and handle EUI-64 IPv6 addresses. This is important for correctly interpreting addresses that are auto-generated based on MAC addresses.
+- **EUI-64 Address Validation:** The introduction of `isEUI64IPv6` adds functionality to detect and handle EUI-64 IPv6 addresses.
 
 ### 4. Changes in `getNodeAddresses` Function
 #### Why:
-- **Address Categorization:** The updated function logic categorizes and selects appropriate IPv4 and IPv6 addresses for the node, by filtering out unwanted link-local addresses and ensuring the selection of appropriate internal IP addresses.
-- **Candidate Address Logic:** This improves the robustness of IP address assignment by considering multiple network interfaces and making intelligent choices about which IP addresses to use.
+- **Address Categorization:** The updated function logic selects IPv4 and IPv6 addresses for the node, by filtering out unwanted link-local addresses and chooses appropriate internal IP addresses.
+- **Candidate Address Logic:** Chooses which IP addresses to use amongst a list of IPs for that node.
 
 ### 5. Test Enhancements in `instances_v2_test.go`
 #### Why:
 - **Comprehensive Testing:** The tests have been expanded to cover scenarios with different combinations of IPv4 and IPv6 addresses, ensuring that the new logic for address handling and prioritization is correctly implemented.
-- **Edge Cases:** New test cases, such as those without default interfaces or with only IPv6 addresses, ensure the system behaves correctly under various configurations.
-
-### Summary
-#### Overall Rationale:
-1. **IPv6 Support:** Enhances the cloud provider's compatibility with modern networking standards by correctly supporting IPv6, including EUI-64 addresses.
-2. **Improved Node Address Management:** Ensures the cloud provider correctly identifies and prioritizes network interfaces and addresses, leading to more accurate and reliable node configurations.
-3. **Robustness and Reliability:** The improved error handling and logical separation of concerns in address processing increase the reliability and maintainability of the code.
-4. **Comprehensive Testing:** The expanded and refined tests ensure that the new logic works correctly across a wide range of scenarios, reducing the likelihood of bugs and regressions.
 
 ---
  pkg/provider/instances_v2.go      | 115 ++++-
