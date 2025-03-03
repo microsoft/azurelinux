@@ -27,6 +27,8 @@ Patch5:         CVE-2024-24786.patch
 Patch6:         CVE-2024-45338.patch
 Patch7:         CVE-2024-10220.patch
 Patch8:         CVE-2025-27144.patch
+Patch9:         CVE-2025-22868.patch
+Patch10:        CVE-2025-22869.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -273,8 +275,8 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.28.4-15
-- Fix CVE-2025-27144 with an upstream patch
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.28.4-15
+- Fix CVE-2025-27144, CVE-2025-22868, CVE-2025-22869 with an upstream patch
 
 * Tue Jan 07 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.28.4-14
 - Add patch for CVE-2024-10220
