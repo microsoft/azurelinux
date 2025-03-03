@@ -1,0 +1,46 @@
+commit 5594d377ac73d37c06bbad1798e87a65f9a12e07
+Author: Chrissie Caulfield <ccaulfie@redhat.com>
+Date:   Fri Nov 25 07:38:20 2022 +0000
+
+    ipc: Retry receiving credentials if the the message is short (#476)
+    
+    ipc: Retry receiving credentials if the the message is short
+    
+    rhbz#2111711 refers
+
+diff --git a/lib/ipc_setup.c b/lib/ipc_setup.c
+index 0ef9bb6..0de7115 100644
+--- a/lib/ipc_setup.c
++++ b/lib/ipc_setup.c
+@@ -473,11 +473,15 @@ qb_ipcc_us_setup_connect(struct qb_ipcc_connection *c,
+ 	return 0;
+ }
+ 
++#define AUTH_RECV_MAX_RETRIES 10
++#define AUTH_RECV_SLEEP_TIME_US 100
++
+ /* Called from ipcc_connect_continue() when async connect socket is active */
+ int qb_ipcc_setup_connect_continue(struct qb_ipcc_connection *c, struct qb_ipc_connection_response *r)
+ {
+ 	struct ipc_auth_data *data;
+ 	int32_t res;
++	int retry_count = 0;
+ #ifdef QB_LINUX
+ 	int off = 0;
+ #endif
+@@ -486,8 +490,14 @@ int qb_ipcc_setup_connect_continue(struct qb_ipcc_connection *c, struct qb_ipc_c
+ 		qb_ipcc_us_sock_close(c->setup.u.us.sock);
+ 		return -ENOMEM;
+ 	}
+-
++retry:
+ 	res = qb_ipc_us_recv_msghdr(data);
++	if (res == -EAGAIN && ++retry_count < AUTH_RECV_MAX_RETRIES) {
++		struct timespec ts = {0,  AUTH_RECV_SLEEP_TIME_US*QB_TIME_NS_IN_USEC};
++		struct timespec ts_left = {0, 0};
++		nanosleep(&ts, &ts_left);
++		goto retry;
++	}
+ 
+ #ifdef QB_LINUX
+ 	setsockopt(c->setup.u.us.sock, SOL_SOCKET, SO_PASSCRED, &off,

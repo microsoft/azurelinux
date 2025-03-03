@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        8%{?dist}
+Release:        10%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -55,6 +55,7 @@ Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
 Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
 Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
 Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
+Patch:          avoid-mktemp-collisions-with-find-not-path.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -314,6 +315,12 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Feb 25 2025 Cameron Baird <cameronbaird@microsoft.com> - 102-10
+- Fix 0006-dracut.sh-validate-instmods patch to not break crypto module blacklisting
+
+* Tue Feb 04 2025 Brian Fjeldstad <bfjelds@microsoft.com> - 102-9
+- Avoid mktemp folder name colliding with find filter.
+
 * Mon Dec 09 2024 George Mileka <gmileka@microsoft.com> - 102-8
 - Augment overlayfs with selinux handling.
 

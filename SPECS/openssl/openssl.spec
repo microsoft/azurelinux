@@ -8,7 +8,7 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.2
+Version: 3.3.3
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,9 +90,6 @@ BuildRequires: perl(Test::More)
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
-Recommends: SymCrypt
-Recommends: SymCrypt-OpenSSL
-
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
@@ -101,6 +98,8 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
+Recommends: SymCrypt
+Recommends: SymCrypt-OpenSSL
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -358,6 +357,13 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-1
+- Auto-upgrade to 3.3.3 - none
+- Initially run through autoupgrader (CBL-Mariner Servicing Account <cblmargh@microsoft.com>)
+
+* Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-2
+- Move SymCrypt and SymCrypt-OpenSSL Recommends from main package to libs
+
 * Thu Sep 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-1
 - Upgrade to 3.3.2
 

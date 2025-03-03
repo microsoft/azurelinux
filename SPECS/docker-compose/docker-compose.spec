@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,8 @@ Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
 # After fixing any possible CVE for the vendored source, we must bump v1 -> v2
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         CVE-2024-45337.patch
+Patch1:         CVE-2024-45338.patch
 BuildRequires:  golang
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
@@ -44,6 +46,12 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
+- Add patch for CVE-2024-45338
+
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.27.0-2
+- Patch CVE-2024-45337
+
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.27.0-1
 - Auto-upgrade to 2.27.0 - address CVE-2024-23653
 

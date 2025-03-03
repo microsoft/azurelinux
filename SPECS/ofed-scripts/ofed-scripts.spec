@@ -28,104 +28,128 @@
 #  $Id: ofed-scripts.spec 8402 2006-07-06 06:35:57Z vlad $
 #
 
+%global         MLNX_OFED_VERSION 24.10-0.7.0.0
+
 Summary:        OFED scripts
 Name:           ofed-scripts
-# Update long_release with the OFED version along with version updates
-Version:        5.6
+Version:        24.10
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}.tar.gz
 
+BuildRoot:      %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}-%{version}-root}
+
+%global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
+%global RHEL8 0%{?rhel} >= 8
+%global FEDORA3X 0%{?fedora} >= 30
+%global SLES15 0%{?suse_version} >= 1500
+%global PYTHON3 %{RHEL8} || %{FEDORA3X} || %{SLES15}
 %global debug_package %{nil}
-%global long_release OFED.5.6.1.0.3
+
+# Packages that are no longer in MLNX_OFED and break package manager
+# upgrade:
+Obsoletes: ar_mgr
 
 %description
-OpenFabrics scripts from NVIDA %long_release
+OpenFabrics scripts
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+[ "${RPM_BUILD_ROOT}" != "/" -a -d ${RPM_BUILD_ROOT} ] && rm -rf $RPM_BUILD_ROOT
+%setup -q -n %{name}-%{version}
 
 %build
 
 %install
+%if "%{CUSTOM_PREFIX}" == "1"
+touch ofed-files
+%endif
 
-install -d %{buildroot}%{_bindir}
-install -d %{buildroot}%{_sbindir}
-install -m 0755 uninstall.sh %{buildroot}%{_sbindir}/ofed_uninstall.sh
-install -m 0755 sysinfo-snapshot.py %{buildroot}%{_sbindir}
-install -m 0755 vendor_pre_uninstall.sh %{buildroot}%{_sbindir}
-install -m 0755 vendor_post_uninstall.sh %{buildroot}%{_sbindir}
-install -m 0755 ofed_info %{buildroot}%{_bindir}
-install -m 0755 ofed_rpm_info %{buildroot}%{_bindir}
-# Mariner not yet supported upstream
-# install -m 0755 hca_self_test.ofed %{buildroot}%{_bindir}
+install -d $RPM_BUILD_ROOT%{_prefix}/bin
+install -d $RPM_BUILD_ROOT%{_prefix}/sbin
+install -m 0755 uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin/ofed_uninstall.sh
+install -m 0755 sysinfo-snapshot.py $RPM_BUILD_ROOT%{_prefix}/sbin
+install -m 0755 vendor_pre_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
+install -m 0755 vendor_post_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
+install -m 0755 ofed_info $RPM_BUILD_ROOT%{_prefix}/bin
+install -m 0755 ofed_rpm_info $RPM_BUILD_ROOT%{_prefix}/bin
+install -m 0755 hca_self_test.ofed $RPM_BUILD_ROOT%{_prefix}/bin
+
+%if ! (%{PYTHON3})
+sed -s -i -e '1s|python3\>|python|' $RPM_BUILD_ROOT%{_prefix}/sbin/sysinfo-snapshot.py
+%endif
+
+%if "%{CUSTOM_PREFIX}" == "1"
+install -d $RPM_BUILD_ROOT/etc/profile.d
+cat > $RPM_BUILD_ROOT/etc/profile.d/ofed.sh << EOF
+if ! echo \${PATH} | grep -q %{_prefix}/bin ; then
+        PATH=\${PATH}:%{_prefix}/bin
+fi
+if ! echo \${PATH} | grep -q %{_prefix}/sbin ; then
+        PATH=\${PATH}:%{_prefix}/sbin
+fi
+if ! echo \${MANPATH} | grep -q %{_mandir} ; then
+        MANPATH=\${MANPATH}:%{_mandir}
+fi
+EOF
+cat > $RPM_BUILD_ROOT/etc/profile.d/ofed.csh << EOF
+if (\$?path) then
+if ( "\${path}" !~ *%{_prefix}/bin* ) then
+        set path = ( \$path %{_prefix}/bin )
+endif
+if ( "\${path}" !~ *%{_prefix}/sbin* ) then
+        set path = ( \$path %{_prefix}/sbin )
+endif
+else
+        set path = ( %{_prefix}/bin %{_prefix}/sbin )
+endif
+if (\$?MANPATH) then
+if ( "\${MANPATH}" !~ *%{_mandir}* ) then
+        setenv MANPATH \${MANPATH}:%{_mandir}
+endif
+else
+        setenv MANPATH %{_mandir}:
+endif
+EOF
+
+install -d $RPM_BUILD_ROOT/etc/ld.so.conf.d
+echo %{_libdir} > $RPM_BUILD_ROOT/etc/ld.so.conf.d/ofed.conf
+%ifarch x86_64 ppc64
+echo "%{_prefix}/lib" >> $RPM_BUILD_ROOT/etc/ld.so.conf.d/ofed.conf
+%endif
+echo "/etc/profile.d/ofed.sh" >> ofed-files
+echo "/etc/profile.d/ofed.csh" >> ofed-files
+echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
+
+%endif
+# End of CUSTOM_PREFIX
 
 %post
-if [ $1 -ge 1 ]; then #This package is being installed or reinstalled
-	if [ -e /etc/yum.conf ]; then
-		list="ibutils-libs"
-		lista=`echo ${list} | sed -e "s/ /* /g" -e "s/$/*/"`
-
-		if [ -n "$list" ]; then
-			if ( grep -q "^exclude=" /etc/yum.conf ); then
-				new_list=
-				for pkg in $list
-				do
-					if (grep "^exclude=" /etc/yum.conf | grep -wq "$pkg"); then
-						continue
-					else
-						new_list="$new_list ${pkg}*"
-					fi
-				done
-				perl -ni -e "s@^(exclude=.*)@\$1 $new_list@;print" /etc/yum.conf
-			else
-				perl -i -ne "if (m@^\[main\]@) {
-					print q@[main]
-exclude=$lista
-@;
-				} else {
-					print;
-				}" /etc/yum.conf
-			fi
-		fi
-	fi
-fi
-
 /sbin/ldconfig
 
 %postun
-if [ $1 = 0 ]; then  #Erase, not upgrade
-	if [ -e /etc/yum.conf ]; then
-		list="ibutils-libs"
-
-		if [ -n "$list" ]; then
-			if ( grep -q "^exclude=" /etc/yum.conf ); then
-				for pkg in $list
-				do
-					if (grep "^exclude=" /etc/yum.conf | grep -wq "$pkg"); then
-						sed -i -e "s/\<$pkg\>\*//" /etc/yum.conf
-						sed -i -e "s/\<$pkg\>//" /etc/yum.conf
-					fi
-				done
-			fi
-		fi
-		perl -ni -e "print unless /^exclude=\s+$/" /etc/yum.conf
-		sed -i -e "s/^exclude= \{1,\}/exclude=/" -e "s/ \{1,\}$//" /etc/yum.conf
-	fi
-fi
 /sbin/ldconfig
 
+%clean
+[ "${RPM_BUILD_ROOT}" != "/" -a -d ${RPM_BUILD_ROOT} ] && rm -rf $RPM_BUILD_ROOT
+
+%if "%{CUSTOM_PREFIX}" == "1"
+%files -f ofed-files
+%else
 %files
+%endif
 %defattr(-,root,root)
 %license debian/copyright
-%{_bindir}/*
-%{_sbindir}/*
+%{_prefix}/bin/*
+%{_prefix}/sbin/*
 
 %changelog
+* Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
+- Upgrade version to 24.10.0
+
 * Fri Jul 22 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.6-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2)
 - License verified

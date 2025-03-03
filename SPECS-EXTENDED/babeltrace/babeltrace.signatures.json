@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "babeltrace-1.5.7.tar.bz2": "215331e025ffd39c665a34231b9429180e48aca78f79fb972d0bf1322d2b807b",
-  "babeltrace-1.5.7.tar.bz2.asc": "3a512544053776f21120b85e38795b17ea6b94307ebafd77e138b9e19e27714d",
+  "babeltrace-1.5.11.tar.bz2": "67b43aaaef5c951fa7af1a557cf7201a11fe89876b7c22ba0a03cbc316db5a9c",
+  "babeltrace-1.5.11.tar.bz2.asc": "b11744dbee03728bdedd619b442138afb29d25cfebbd2849e9876f4a10530480",
   "gpgkey-7F49314A26E0DE78427680E05F1B2A0789F12B11.gpg": "c2aa75d53157edfe561f56721d92376dc948e191792fd8cb35fe5757aa522127"
  }
 }

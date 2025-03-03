@@ -1,16 +1,16 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        8.8.0
-Release:        3%{?dist}
+Version:        8.11.1
+Release:        2%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-6197.patch
-Patch1:         CVE-2024-8096.patch
+BuildRequires:  cmake
 BuildRequires:  krb5-devel
+BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
 BuildRequires:  openssl-devel
@@ -18,6 +18,13 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
+
+%if 0%{?with_check}
+BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(Digest::SHA)
+BuildRequires:  perl(Memoize)
+BuildRequires:  perl(Time::HiRes)
+%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -56,9 +63,13 @@ This package contains minimal set of shared curl libraries.
     --with-gssapi \
     --with-libssh2 \
     --with-nghttp2 \
+    --without-libpsl \
     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.trust.crt \
     --with-ca-path=%{_sysconfdir}/ssl/certs
 %make_build
+
+%check
+make test
 
 %install
 %make_install
@@ -87,6 +98,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 8.11.1-2
+- Add check section.
+
+* Fri Feb 07 2025 Himaja Kesari <himajakesari@microsoft.com> - 8.11.1-1
+- Bump version to 8.11.1 to address CVE-2024-11053
+- Remove older applied patches for CVE-2024-6197 and CVE-2024-8096, CVE-2024-9681 as version 8.11.1 is unaffected.
+
+* Fri Jan 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 8.8.0-4
+- Fix for CVE-2024-9681
+
 * Tue Oct 15 2024 Muhammad Falak <mwani@microsoft.com> - 8.8.0-3
 - Address CVE-2024-8096
 
