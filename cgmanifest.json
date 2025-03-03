@@ -28756,8 +28756,8 @@
         "type": "other",
         "other": {
           "name": "targetcli",
-          "version": "2.1.53",
-          "downloadUrl": "https://github.com/open-iscsi/targetcli-fb/archive/v2.1.53/targetcli-fb-2.1.53.tar.gz"
+          "version": "2.1.58",
+          "downloadUrl": "https://github.com/open-iscsi/targetcli-fb/archive/v2.1.58/targetcli-fb-2.1.58.tar.gz"
         }
       }
     },
