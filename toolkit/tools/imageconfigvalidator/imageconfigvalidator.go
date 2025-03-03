@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
@@ -135,28 +134,30 @@ func validatePackages(config configuration.Config) (err error) {
 			selinuxPkgName = configuration.SELinuxPolicyDefault
 		}
 
-		for _, pkg := range packageList {
-			// The installer tools have an undocumented feature which can support both "pkg-name" and "pkg-name=version" formats.
-			// This is in use, so we need to handle pinned versions in this check. Technically, 'tdnf' also supports "pkg-name-version" format,
-			// but it is not easily distinguishable from "long-package-name" format so it will not be supported here.
-			pkgVer, err := pkgjson.PackageStringToPackageVer(pkg)
-			if err != nil {
-				return fmt.Errorf("%s: %w", validateError, err)
-			}
-
-			if pkgVer.Name == kernelPkgName {
-				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
-			}
-			if pkgVer.Name == dracutFipsPkgName {
-				foundDracutFipsPackage = true
-			}
-			if pkgVer.Name == selinuxPkgName {
-				foundSELinuxPackage = true
-			}
-			if pkgVer.Name == userAddPkgName {
-				foundUserAddPackage = true
-			}
+		foundKernelPackage, err := installutils.PackagelistContainsPackage(packageList, kernelPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
 		}
+
+		foundDracutFipsPackage, err = installutils.PackagelistContainsPackage(packageList, dracutFipsPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		foundSELinuxPackage, err = installutils.PackagelistContainsPackage(packageList, selinuxPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		foundUserAddPackage, err = installutils.PackagelistContainsPackage(packageList, userAddPkgName)
+		if err != nil {
+			return fmt.Errorf("%s: %w", validateError, err)
+		}
+
+		if foundKernelPackage {
+			return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
+		}
+
 		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) || systemConfig.KernelCommandLine.EnableFIPS {
 			if !foundDracutFipsPackage {
 				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)

@@ -1,0 +1,28 @@
+#! /bin/bash -efu
+
+## A counterpart of brp-kmod-set-exec-bits that restores original kmod
+## file permissions
+
+# If using normal root, avoid changing anything.
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != "/" ] || exit 0
+
+# Checking for required programs
+which chmod >/dev/null || exit 0
+
+[ -r "$RPM_BUILD_ROOT/kmod-permissions.list" ] || exit 0
+
+while read perm path; do
+	[ -n "$perm" ] || continue
+
+	# Account for possible kernel module compression
+	[ -e "$RPM_BUILD_ROOT/$path" ] || {
+		[ \! -e "$RPM_BUILD_ROOT/$path.gz"  ] || path="$path.gz"
+		[ \! -e "$RPM_BUILD_ROOT/$path.bz2" ] || path="$path.bz2"
+		[ \! -e "$RPM_BUILD_ROOT/$path.xz"  ] || path="$path.xz"
+		[ \! -e "$RPM_BUILD_ROOT/$path.zst" ] || path="$path.zst"
+	}
+
+	chmod "$perm" "$RPM_BUILD_ROOT/$path"
+done < "$RPM_BUILD_ROOT/kmod-permissions.list"
+
+rm -f "$RPM_BUILD_ROOT/kmod-permissions.list"

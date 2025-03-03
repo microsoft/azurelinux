@@ -3,7 +3,7 @@
 Summary:        GStreamer streaming media framework base plugins
 Name:           gstreamer1-plugins-base
 Version:        1.20.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,7 +26,6 @@ BuildRequires:  libXv-devel
 BuildRequires:  orc-devel >= 0.4.18
 BuildRequires:  pango-devel
 BuildRequires:  pkgconfig
-BuildRequires:  opus-devel
 BuildRequires:  gdk-pixbuf2-devel
 BuildRequires:  gtk3-devel
 BuildRequires:  libjpeg-turbo-devel
@@ -93,7 +92,8 @@ for developing applications that use %{name}.
   -D orc=enabled \
   -D tremor=disabled \
   -D tests=disabled \
-  -D examples=disabled
+  -D examples=disabled \
+  -D opus=disabled
 %meson_build
 
 %install
@@ -222,7 +222,6 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/gstreamer-%{majorminor}/libgstopengl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
-%{_libdir}/gstreamer-%{majorminor}/libgstopus.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttheora.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvorbis.so
@@ -416,6 +415,9 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Jan 22 2025 Andrew Phelps <anphel@microsoft.com> - 1.20.4-3
+- Remove dependency on opus
+
 * Wed Nov 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.20.4-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified

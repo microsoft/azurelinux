@@ -1,7 +1,7 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.9.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE2=1 USE_OPENSSL=1 \
-        USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1
+        USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1 USE_PROMEX=1
 make %{?_smp_mflags} -C admin/systemd
 sed -i s/"local\/"/""/g admin/systemd/haproxy.service
 sed -i "s/\/run/\/var\/run/g" admin/systemd/haproxy.service
@@ -59,6 +59,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Thu Jan 23 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.9.11-2
+- Support for Prometheus exporter in HAProxy
+
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.9.11-1
 - Upgrade to 2.9.11
 - Fix CVE-2024-45506

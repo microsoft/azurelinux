@@ -1,0 +1,94 @@
+# Use these macros to differentiate between RH and other KMP implementation(s).
+redhat_kernel_module_package	1
+kernel_module_package_release	1
+
+redhat_kmp_has_post_hooks	1
+
+%__brp_kmod_set_exec_bit  /usr/lib/rpm/redhat/brp-kmod-set-exec-bit
+%__brp_kmod_restore_perms /usr/lib/rpm/redhat/brp-kmod-restore-perms
+
+%__kmod_brps_added 0
+
+#kernel_module_package [ -n name ] [ -v version ] [ -r release ] [ -s script ]
+#                      [ -f filelist] [ -x ] [ -p preamble ] flavor flavor ...
+
+%kernel_module_package_buildreqs	%global kmodtool_generate_buildreqs 1 \
+					kernel-devel redhat-rpm-config kernel-rpm-macros elfutils-libelf-devel kmod
+
+%kernel_module_package(n:v:r:s:f:xp:) %{expand:%( \
+	## An ugly hack: we want kmods to be processed by find-debuginfo,
+	## but it processes only files with executable permission set.
+	## It is important now since, as of now, if debuginfo package
+	## is enabled (and it is enabled), there's an RPM build error
+	## as a result of lack of ether absence or emptiness of
+	## debugsourcefiles.list (which is likely a bug in RPM, but it looks
+	## like that there's no obvious fix and apparently no one have
+	## any issues with this).
+	## In order to minimise intrusiveness, usually (in Red Hat-built kmod
+	## RPMs) *.ko files just have executable permission being set as a part
+	## of %build section. There are two caveats with kmp, however:
+	##  * We have no control over %build section itself (and it wasn't
+	##    required previously)
+	##  * Changing the criteria used in find-debuginfo.sh/brp-strip
+	##    for selecting files that have to undergo debug section separation
+	##    may introduce regression.
+	## As a result, we insert additional hooks in __spec_install_post
+	## (__brp_kmod_set_exec_bit in the beginning and
+	## __brp_kmod_restore_perms in the end) that (temporarily) set
+	## executable permission for *.ko files so find-debuginfo.sh will pick
+	## them up.
+	## Unfortunately, __spec_install_post's body is copied here since
+	## we want that __debug_package macro expansion has been performed
+	## lazily and  it looks like RPM has no ability to provide a body
+	## of a macro verbatim.
+	if [ 0 = "%{__kmod_brps_added}" ]; then \
+		echo "%%global __spec_install_post \\\\" \
+		echo "	%%{?__brp_kmod_set_exec_bit} \\\\" \
+		echo "	%%%%{?__debug_package:%%%%{__debug_install_post}} \\\\" \
+		echo "	%%{__arch_install_post} \\\\" \
+		echo "	%%{__os_install_post} \\\\" \
+		echo "	%%{?__brp_kmod_pre_sign_process} \\\\" \
+		echo "	%%{?__brp_kmod_sign} \\\\" \
+		echo "	%%{?__brp_kmod_post_sign_process} \\\\" \
+		echo "	%%{?__brp_kmod_compress} \\\\" \
+		echo "	%%{?__brp_kmod_post_compress_process} \\\\" \
+		echo "	%%{?__brp_kmod_restore_perms} \\\\" \
+		echo "%%{nil}" \
+	fi \
+	%global __kmod_brps_added 1 \
+	%global kmodtool %{-s*}%{!-s:/usr/lib/rpm/redhat/kmodtool} \
+	%global kmod_version %{-v*}%{!-v:%{version}} \
+	%global kmod_release %{-r*}%{!-r:%{release}} \
+	%global latest_kernel %({ rpm -q --qf '%%{VERSION}-%%{RELEASE}.%%{ARCH}\\\\n' `rpm -qa | egrep "^kernel(-rt|-aarch64)?-devel" | /usr/lib/rpm/redhat/rpmsort -r | head -n 1`; echo '%%%%{nil}'; } | head -n 1) \
+	%{!?kernel_version:%{expand:%%global kernel_version %{latest_kernel}}} \
+	%global kverrel %(%{kmodtool} verrel %{?kernel_version} 2>/dev/null) \
+	flavors="default" \
+	if [ -z "%*" ]; then \
+		flavors_to_build=$flavors \
+	elif [ -z "%{-x}" ]; then \
+		flavors_to_build="%*" \
+	else \
+		flavors_to_build=" $flavors "\
+		for i in %* \
+		do \
+			flavors_to_build=${flavors_to_build//$i /}
+		done \
+	fi \
+	echo "%%global flavors_to_build ${flavors_to_build:-%%nil}" \
+	echo "%%global kernel_source() \\\$([ default = \"%%%%{1}\" ] && echo \"/usr/src/kernels//%%%%kverrel\" || %{kmodtool} kernel_source \"%%%%{kverrel}\" \"%%%%{1}\" 2>/dev/null || { ls -Ud \"/usr/src/kernels///%%%%{kverrel}\"[.+]\"%%%%{1}\" | sort -V | tail -n 1; } || echo \"/usr/src/kernels////%%%%kverrel.%%%%1\")" \
+	echo "%%global kernel_module_package_moddir() extra" \
+	if [ ! -z "%{-f*}" ] \
+	then \
+		filelist="%{-f*}" \
+	fi \
+	if [ ! -z "%{-p*}" ] \
+	then \
+		preamble="%{-p*}" \
+	fi \
+	nobuildreqs="yes" \
+	if [ "x%{kmodtool_generate_buildreqs}" != "x1" ] \
+	then \
+		nobuildreqs="no" \
+	fi \
+	override_filelist="$filelist" override_preamble="$preamble" nobuildreqs="$nobuildreqs" kmod_version=%kmod_version kmod_release=%kmod_release %{kmodtool} rpmtemplate %{-n*}%{!-n:%name} %{kverrel} $flavors_to_build 2>/dev/null \
+)}

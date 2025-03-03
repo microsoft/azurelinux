@@ -8,12 +8,12 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2024.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
-URL:            https://ostree.readthedocs.io/en/latest
+URL:            https://ostreedev.github.io/ostree/
 Source0:        https://github.com/ostreedev/ostree/releases/download/v%{version}/lib%{name}-%{version}.tar.xz
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
@@ -162,6 +162,9 @@ find %{buildroot} -name '*.la' -delete
 %{_libexecdir}/lib%{name}/grub2*
 
 %changelog
+* Thu Jan 23 2025 Mandeep Plaha <mandeepplaha@microsoft.com> - 2024.5-2
+- Update URL as https://ostree.readthedocs.io is now permanently removed.
+
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.5-1
 - Upgrade to 2024.4
 

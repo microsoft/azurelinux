@@ -47,7 +47,7 @@ set -e
 #    -r "" \
 #    -q "false"
 
-while getopts ":a:c:k:l:o:p:r:q:" OPTIONS; do
+while getopts ":a:c:k:l:o:p:r:q:s:t:u:v:" OPTIONS; do
     case ${OPTIONS} in
     a ) ACR=$OPTARG;;
     c ) CONTAINER_TARBALLS_DIR=$OPTARG;;
@@ -57,6 +57,10 @@ while getopts ":a:c:k:l:o:p:r:q:" OPTIONS; do
     p ) PUBLISHING_LEVEL=$OPTARG;;
     r ) REPO_PREFIX=$OPTARG;;
     q ) PUBLISH_TO_ACR=$OPTARG;;
+    s ) DISTROLESS_BASE_BUILD=$OPTARG;;
+    t ) DISTROLESS_DEBUG_BUILD=$OPTARG;; 
+    u ) DISTROLESS_MINIMAL_BUILD=$OPTARG;;
+    v ) BASE_BUILD=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -86,6 +90,10 @@ function print_inputs {
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
     echo "OUTPUT_DIR                    -> $OUTPUT_DIR"
+    echo "DISTROLESS_BASE_BUILD         -> $DISTROLESS_BASE_BUILD"
+    echo "DISTROLESS_DEBUG_BUILD        -> $DISTROLESS_DEBUG_BUILD"
+    echo "DISTROLESS_MINIMAL_BUILD      -> $DISTROLESS_MINIMAL_BUILD"
+    echo "BASE_BUILD                    -> $BASE_BUILD"
 }
 
 function validate_inputs {
@@ -104,10 +112,17 @@ function validate_inputs {
     DISTROLESS_BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-base-[0-9.]*.tar.gz")
     DISTROLESS_DEBUG_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-debug-[0-9.]*.tar.gz")
     DISTROLESS_MINIMAL_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-minimal-[0-9.]*.tar.gz")
-    if [[ (! -f $BASE_TARBALL)  || \
-        (! -f $DISTROLESS_BASE_TARBALL) || \
-        (! -f $DISTROLESS_DEBUG_TARBALL) || \
-        (! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
+    
+    # Give default values for when the variables are not set (non fasttrack builds).
+    BASE_BUILD=${BASE_BUILD:-true}
+    DISTROLESS_BASE_BUILD=${DISTROLESS_BASE_BUILD:-true}
+    DISTROLESS_DEBUG_BUILD=${DISTROLESS_DEBUG_BUILD:-true}
+    DISTROLESS_MINIMAL_BUILD=${DISTROLESS_MINIMAL_BUILD:-true}
+
+    if [[ ($BASE_BUILD =~ [Tt]rue && ! -f $BASE_TARBALL) || \
+      ($DISTROLESS_BASE_BUILD =~ [Tt]rue  && ! -f $DISTROLESS_BASE_TARBALL) || \
+      ($DISTROLESS_DEBUG_BUILD =~ [Tt]rue && ! -f $DISTROLESS_DEBUG_TARBALL) || \
+      ($DISTROLESS_MINIMAL_BUILD =~ [Tt]rue && ! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
         echo "Error - Missing some tarball(s) in $CONTAINER_TARBALLS_DIR"
         exit 1
     fi
@@ -191,6 +206,10 @@ function initialization {
     echo "DISTROLESS_MINIMAL_IMAGE_NAME         -> $DISTROLESS_MINIMAL_IMAGE_NAME"
     echo "DISTROLESS_DEBUG_IMAGE_NAME           -> $DISTROLESS_DEBUG_IMAGE_NAME"
     echo "MARINARA_IMAGE_NAME                   -> $MARINARA_IMAGE_NAME"
+    echo "DISTROLESS_BASE_BUILD                 -> $DISTROLESS_BASE_BUILD"
+    echo "DISTROLESS_DEBUG_BUILD                -> $DISTROLESS_DEBUG_BUILD"
+    echo "DISTROLESS_MINIMAL_BUILD              -> $DISTROLESS_MINIMAL_BUILD"
+    echo "BASE_BUILD                            -> $BASE_BUILD"
 
     ROOT_FOLDER="$(git rev-parse --show-toplevel)"
     EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
@@ -208,6 +227,12 @@ function docker_build {
     local image_full_name=$2
     local image_tarball=$3
     local dockerfile=$4
+    local should_build=$5
+
+    if [[ $should_build =~ [Ff]alse ]]; then
+        echo "+++ Skip building image- Fasttrack: $image_full_name"
+        return
+    fi
 
     echo "+++ Importing container image: $image_full_name"
     local temp_image=${image_full_name}_temp
@@ -308,10 +333,10 @@ function save_container_image {
 
 function build_images {
     echo "+++ Build images"
-    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template"
-    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template"
+    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template" "$BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_MINIMAL_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_DEBUG_BUILD"
     docker_build_marinara
 }
 

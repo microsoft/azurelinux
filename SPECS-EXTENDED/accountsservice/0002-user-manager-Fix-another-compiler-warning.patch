@@ -1,0 +1,145 @@
+From 99aa57bfa59e2578c4ef47e84338f7de85c6f61b Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 11 Apr 2023 10:11:05 -0400
+Subject: [PATCH 2/2] user-manager: Fix another compiler warning
+
+-Wswitch-enum apparently complains about missing entries even if there
+is a default:.
+
+This commit ensures ACT_USER_MANAGER_SEAT_STATE_UNLOADED is added to the
+default case to fix that warning.
+---
+ src/libaccountsservice/act-user-manager.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/libaccountsservice/act-user-manager.c b/src/libaccountsservice/act-user-manager.c
+index 61b4da5..3bbd480 100644
+--- a/src/libaccountsservice/act-user-manager.c
++++ b/src/libaccountsservice/act-user-manager.c
+@@ -1727,60 +1727,61 @@ unload_seat (ActUserManager *manager)
+ {
+         ActUserManagerPrivate *priv = act_user_manager_get_instance_private (manager);
+ 
+         priv->seat.state = ACT_USER_MANAGER_SEAT_STATE_UNLOADED;
+ 
+         g_free (priv->seat.id);
+         priv->seat.id = NULL;
+ 
+         g_free (priv->seat.session_id);
+         priv->seat.session_id = NULL;
+ 
+         g_debug ("ActUserManager: seat unloaded, so trying to set loaded property");
+         maybe_set_is_loaded (manager);
+ }
+ 
+ static void
+ load_new_session_incrementally (ActUserManagerNewSession *new_session)
+ {
+         switch (new_session->state) {
+         case ACT_USER_MANAGER_NEW_SESSION_STATE_GET_UID:
+                 get_uid_for_new_session (new_session);
+                 break;
+         case ACT_USER_MANAGER_NEW_SESSION_STATE_GET_X11_DISPLAY:
+                 get_x11_display_for_new_session (new_session);
+                 break;
+         case ACT_USER_MANAGER_NEW_SESSION_STATE_MAYBE_ADD:
+                 maybe_add_new_session (new_session);
+                 break;
+         case ACT_USER_MANAGER_NEW_SESSION_STATE_LOADED:
+                 break;
++        case ACT_USER_MANAGER_NEW_SESSION_STATE_UNLOADED:
+         default:
+                 g_assert_not_reached ();
+         }
+ }
+ 
+ static void
+ free_fetch_user_request (ActUserManagerFetchUserRequest *request)
+ {
+         ActUserManager *manager = request->manager;
+         ActUserManagerPrivate *priv = act_user_manager_get_instance_private (manager);
+ 
+         if (request->user != NULL) {
+                 g_object_set_data (G_OBJECT (request->user), "fetch-user-request", NULL);
+                 g_object_weak_unref (G_OBJECT (request->user), (GWeakNotify) on_user_destroyed, manager);
+         }
+ 
+         priv->fetch_user_requests = g_slist_remove (priv->fetch_user_requests, request);
+         if (request->type == ACT_USER_MANAGER_FETCH_USER_FROM_USERNAME_REQUEST) {
+                 g_free (request->username);
+         }
+ 
+         g_free (request->object_path);
+         g_free (request->description);
+ 
+         g_cancellable_cancel (request->cancellable);
+         g_object_unref (request->cancellable);
+ 
+ 
+         g_debug ("ActUserManager: unrefing manager owned by fetch user request");
+         g_object_unref (manager);
+@@ -2243,60 +2244,61 @@ load_users (ActUserManager *manager)
+                 return;
+         }
+ 
+         load_user_paths (manager, (const char * const *) user_paths);
+ 
+         load_included_usernames (manager);
+ 
+         priv->list_cached_users_done = TRUE;
+ }
+ 
+ static gboolean
+ load_seat_incrementally (ActUserManager *manager)
+ {
+         ActUserManagerPrivate *priv = act_user_manager_get_instance_private (manager);
+ 
+         priv->seat.load_idle_id = 0;
+ 
+         switch (priv->seat.state) {
+         case ACT_USER_MANAGER_SEAT_STATE_GET_SESSION_ID:
+                 get_current_session_id (manager);
+                 break;
+         case ACT_USER_MANAGER_SEAT_STATE_GET_ID:
+                 get_seat_id_for_current_session (manager);
+                 break;
+         case ACT_USER_MANAGER_SEAT_STATE_GET_SEAT_PROXY:
+                 get_seat_proxy (manager);
+                 break;
+         case ACT_USER_MANAGER_SEAT_STATE_LOADED:
+                 g_debug ("ActUserManager: Seat loading sequence complete");
+                 break;
++        case ACT_USER_MANAGER_NEW_SESSION_STATE_UNLOADED:
+         default:
+                 g_assert_not_reached ();
+         }
+ 
+         if (priv->seat.state == ACT_USER_MANAGER_SEAT_STATE_LOADED) {
+                 load_sessions (manager);
+         }
+ 
+         maybe_set_is_loaded (manager);
+ 
+         return FALSE;
+ }
+ 
+ static gboolean
+ load_idle (ActUserManager *manager)
+ {
+         ActUserManagerPrivate *priv = act_user_manager_get_instance_private (manager);
+ 
+         priv->seat.state = ACT_USER_MANAGER_SEAT_STATE_UNLOADED + 1;
+         load_seat_incrementally (manager);
+         priv->load_id = 0;
+ 
+         return FALSE;
+ }
+ 
+ static void
+ queue_load_seat (ActUserManager *manager)
+ {
+         ActUserManagerPrivate *priv = act_user_manager_get_instance_private (manager);
+ 
+-- 
+2.39.2
+
