@@ -3,33 +3,35 @@
 %bcond_with docs
 Summary:        An LV2 Resource Description Framework Library
 Name:           lilv
-Version:        0.24.14
-Release:        4%{?dist}
-License:        MIT
+Version:        0.24.26
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://drobilla.net/software/lilv
-Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
+
+License:    MIT
+URL:        https://drobilla.net/software/lilv
+Source0:    https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:    https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:    https://drobilla.net/drobilla.gpg
+
+BuildRequires:  gnupg2
+BuildRequires:  meson
 BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  sord-devel >= 0.14.0
-BuildRequires:  sratom-devel >= 0.4.4
-BuildRequires:  lv2-devel >= 1.18.0
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  swig
-BuildRequires:  serd-devel >= 0.30.0
+BuildRequires:  pkgconfig(sord-0) >= 0.16.16
+BuildRequires:  pkgconfig(sratom-0) >= 0.6.10
+BuildRequires:  pkgconfig(lv2) >= 1.18.2
+BuildRequires:  pkgconfig(python3)
+BuildRequires:  pkgconfig(serd-0) >= 0.30.10
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  libsndfile-devel >= 1.0.0
+BuildRequires:  pkgconfig(sndfile) >= 1.0.0
+BuildRequires:  pkgconfig(zix-0) >= 0.6.0
 %if %{with docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
 %endif
 Requires:       lv2 >= 1.18.0
-%if 0%{?with_check}
-BuildRequires:  lcov
-%endif
 
 # To try and deal with multilib issues from the -libs split:
 # https://bugzilla.redhat.com/show_bug.cgi?id=2052588
@@ -42,6 +44,7 @@ faster and have minimal dependencies.
 
 %package        libs
 Summary:        Libraries for %{name}
+Obsoletes:      lilv < 0.24.12-2
 
 %description libs
 %{name} is a lightweight C library for Resource Description Syntax which
@@ -70,39 +73,33 @@ supports reading and writing Turtle and NTriples.
 
 This package contains the python libraries for %{name}.
 
+
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
-# Do not run ld config
-sed -i -e 's|bld.add_post_fun(autowaf.run_ldconfig)||' wscript
-# for packagers sake, build the tests with debug symbols
-sed -i -e "s|'-ftest-coverage'\]|\
- '-ftest-coverage' \] + '%{optflags}'.split(' ')|" wscript
 
 %build
-%{set_build_flags}
-export LINKFLAGS="%{__global_ldflags}"
-%{python3} waf configure -v --prefix=%{_prefix} \
- --libdir=%{_libdir} --configdir=%{_sysconfdir} --mandir=%{_mandir} \
- --docdir=%{_pkgdocdir} \
 %if %{with docs}
- --docs \
+%meson
+%meson_build
 %endif
- --test --dyn-manifest
 
-%{python3} waf -v build %{?_smp_mflags}
-
+%meson -Ddocs=disabled
+%meson_build
 %install
-%{python3} waf -v install --destdir=%{buildroot}
-chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
+%meson_install
+
+%if %{with docs}
+mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
+%endif
 
 %check
-%{python3} waf test
+%meson_test
 
 %files
 %if %{with docs}
 %exclude %{_pkgdocdir}/%{name}-%{maj}/
 %endif
-%{_bindir}/lilv-bench
 %{_bindir}/lv2info
 %{_bindir}/lv2ls
 %{_bindir}/lv2bench
@@ -114,20 +111,25 @@ chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
 %doc AUTHORS NEWS README.md
 %license COPYING
 %{_libdir}/lib%{name}-%{maj}.so.*
+%if %{with docs}
+%{_pkgdocdir}/%{name}-%{maj}/
+%endif
+
 
 %files devel
 %{_libdir}/lib%{name}-%{maj}.so
 %{_libdir}/pkgconfig/%{name}-%{maj}.pc
 %{_includedir}/%{name}-%{maj}/
-%if %{with docs}
-%{_pkgdocdir}/%{name}-%{maj}/
-%endif
-
+                              
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}.*
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.24.26-1
+- Upgrade to 0.24.26
+- License verified.
+
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.24.14-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Disable subpackage doc
