@@ -42,7 +42,7 @@ Patch7:         CVE-2025-22868.patch
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 Patch8:         coredns-example-net-test.patch
 
-BuildRequires:  golang
+BuildRequires:  msft-golang
 
 %description
 CoreDNS is a fast and flexible DNS server.
