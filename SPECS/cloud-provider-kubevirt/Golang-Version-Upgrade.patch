@@ -3,6 +3,30 @@ From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
 Date: Fri, 14 Feb 2025 15:21:17 -0800
 Subject: [PATCH] Modifying Golang version
 
+The provided patch updates the dependencies and the Go version in the `go.mod` and `go.sum` files for the project `kubevirt.io/cloud-provider-kubevirt`.
+
+These changes will potentially be removed as the upstream carries out a new release.
+
+1. **Go Version Update:**
+   - Updated from `go 1.20` to `go 1.22.12`.
+   - **Reason:** To take advantage of new features, bug fixes, and performance improvements in the newer Go version.
+
+2. **Dependencies Updates in `go.mod`:**
+   - Several dependencies have been updated to newer versions.
+   - **Reason:** To incorporate the latest features, improvements, and security fixes provided by these libraries.
+
+3. **Newly Added Dependencies:**
+   - `github.com/pkg/errors v0.9.1`, `github.com/fxamacker/cbor/v2 v2.7.0`, etc.
+   - **Reason:** New dependencies might be required for new functionalities or to replace older, less efficient libraries.
+
+4. **Changes in `go.sum`:**
+   - The `go.sum` file has been updated to reflect the new checksums of the updated dependencies.
+   - **Reason:** Ensures the integrity and authenticity of the downloaded dependencies corresponding to the updates in `go.mod`.
+
+5. **Replacements and Removals:**
+   - Some `replace` directives have been changed or removed.
+   - **Reason:** Dependencies that required specific versions or patches may no longer need replacements due to updates in the dependencies themselves.
+
 ---
  go.mod | 163 +++++++-------
  go.sum | 696 ++++++++++++++++++---------------------------------------
