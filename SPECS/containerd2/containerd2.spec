@@ -31,6 +31,10 @@ Requires: runc >= 1.2.2
 Provides: containerd = %{version}-%{release}
 Obsoletes: containerd < %{version}-%{release}
 
+# This package replaces the old name of moby-containerd
+Provides: moby-containerd = %{version}-%{release}
+Obsoletes: moby-containerd < %{version}-%{release}
+
 %description
 containerd is an industry-standard container runtime with an emphasis on
 simplicity, robustness and portability. It is available as a daemon for Linux
@@ -85,8 +89,8 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Wed Feb 12 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-5
-- Add "Provides/Obsoletes: containerd" to shift all installs of containerd to containerd2
+* Mon Mar 03 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-5
+- Add "Provides/Obsoletes:" to shift all installs of containerd and moby-containerd to containerd2
 
 * Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-4
 - Fix ptest in tardev-snapshotter support patch
