@@ -15794,7 +15794,7 @@
         "other": {
           "name": "paps",
           "version": "0.8.0",
-          "downloadUrl": "https://github.com/dov/paps/archive/refs/tags/v0.8.0.tar.gz"
+          "downloadUrl": "https://github.com/dov/paps/releases/download/v0.8.0/paps-0.8.0.tar.gz"
         }
       }
     },
