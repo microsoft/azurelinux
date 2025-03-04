@@ -279,14 +279,10 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-<<<<<<< HEAD
-* Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-15
-=======
 * Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
 - Address CVE-2023-44487
 
 * Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
->>>>>>> b56d873c9 (Patch kubevirt for CVE-2023-44487 (#12742))
 - Address CVE-2025-22869
 
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14
