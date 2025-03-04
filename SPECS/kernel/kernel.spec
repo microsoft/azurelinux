@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.176.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Feb 22 2025 Chris Co <chrco@microsoft.com> - 5.15.176.3-3
+- Disable AX25 Amateur Radio protocol support
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 5.15.176.3-2
 - Append 20230216 key to CBL-Mariner key
 
