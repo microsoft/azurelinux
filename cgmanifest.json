@@ -3238,8 +3238,8 @@
         "type": "other",
         "other": {
           "name": "elfutils",
-          "version": "0.189",
-          "downloadUrl": "https://sourceware.org/elfutils/ftp/0.189/elfutils-0.189.tar.bz2"
+          "version": "0.192",
+          "downloadUrl": "https://sourceware.org/elfutils/ftp/0.192/elfutils-0.192.tar.bz2"
         }
       }
     },
