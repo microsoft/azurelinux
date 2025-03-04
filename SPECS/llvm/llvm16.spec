@@ -34,9 +34,6 @@ for developing applications that use llvm.
 %prep
 %autosetup -p1 -n llvm-project-llvmorg-%{version}
 
-echo "errors: FINDME"
-find -name SparseBufferRewriting.cpp
-
 %build
 # Disable symbol generation
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
