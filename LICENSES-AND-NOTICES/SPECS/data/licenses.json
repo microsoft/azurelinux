@@ -2240,6 +2240,7 @@
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor-cvm",
+                "cloud-provider-kubevirt",
                 "cmake-fedora",
                 "containerd",
                 "containerd2",
@@ -3145,7 +3146,6 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "cloud-provider-kubevirt",
                 "python-nocaselist"
             ]
         },
