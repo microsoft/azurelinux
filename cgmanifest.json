@@ -20453,8 +20453,8 @@
         "type": "other",
         "other": {
           "name": "perl-Text-CSV_XS",
-          "version": "1.41",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Text/Text-CSV_XS-1.41.tgz"
+          "version": "1.60",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Text/Text-CSV_XS-1.60.tgz"
         }
       }
     },
