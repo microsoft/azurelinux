@@ -1,0 +1,340 @@
+From 7dffc6dfc2eb181c6d1f3feb5b649df64ffd4e89 Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Wed, 16 Oct 2024 11:08:10 -0700
+Subject: [PATCH 091/124] kunit: Use string_stream for test log
+
+Replace the fixed-size log buffer with a string_stream so that the
+log can grow as lines are added.
+
+The existing kunit log tests have been updated for using a
+string_stream as the log. No new test have been added because there
+are already tests for the underlying string_stream.
+
+As the log tests now depend on string_stream functions they cannot
+build when kunit-test is a module. They have been surrounded by
+a #if to replace them with skipping version when the test is
+build as a module. Though this isn't pretty, it avoids moving
+code to another file while that code is also being changed.
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ include/kunit/test.h   | 14 +++++------
+ lib/kunit/debugfs.c    | 36 +++++++++++++++++----------
+ lib/kunit/kunit-test.c | 56 +++++++++++++++++++++++++++++++++++-------
+ lib/kunit/test.c       | 44 ++++-----------------------------
+ 4 files changed, 81 insertions(+), 69 deletions(-)
+
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 7ef770f966ad..38078c91c9e2 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -33,9 +33,7 @@
+ DECLARE_STATIC_KEY_FALSE(kunit_running);
+ 
+ struct kunit;
+-
+-/* Size of log associated with test. */
+-#define KUNIT_LOG_SIZE 2048
++struct string_stream;
+ 
+ /* Maximum size of parameter description string. */
+ #define KUNIT_PARAM_DESC_SIZE 128
+@@ -133,7 +131,7 @@ struct kunit_case {
+ 	/* private: internal use only. */
+ 	enum kunit_status status;
+ 	char *module_name;
+-	char *log;
++	struct string_stream *log;
+ };
+ 
+ static inline char *kunit_status_to_ok_not_ok(enum kunit_status status)
+@@ -253,7 +251,7 @@ struct kunit_suite {
+ 	/* private: internal use only */
+ 	char status_comment[KUNIT_STATUS_COMMENT_SIZE];
+ 	struct dentry *debugfs;
+-	char *log;
++	struct string_stream *log;
+ 	int suite_init_err;
+ };
+ 
+@@ -279,7 +277,7 @@ struct kunit {
+ 
+ 	/* private: internal use only. */
+ 	const char *name; /* Read only after initialization! */
+-	char *log; /* Points at case log after initialization */
++	struct string_stream *log; /* Points at case log after initialization */
+ 	struct kunit_try_catch try_catch;
+ 	/* param_value is the current parameter value for a test case. */
+ 	const void *param_value;
+@@ -317,7 +315,7 @@ const char *kunit_filter_glob(void);
+ char *kunit_filter(void);
+ char *kunit_filter_action(void);
+ 
+-void kunit_init_test(struct kunit *test, const char *name, char *log);
++void kunit_init_test(struct kunit *test, const char *name, struct string_stream *log);
+ 
+ int kunit_run_tests(struct kunit_suite *suite);
+ 
+@@ -475,7 +473,7 @@ static inline void *kunit_kcalloc(struct kunit *test, size_t n, size_t size, gfp
+ 
+ void kunit_cleanup(struct kunit *test);
+ 
+-void __printf(2, 3) kunit_log_append(char *log, const char *fmt, ...);
++void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt, ...);
+ 
+ /**
+  * kunit_mark_skipped() - Marks @test_or_suite as skipped
+diff --git a/lib/kunit/debugfs.c b/lib/kunit/debugfs.c
+index 35ddb329dad6..5bfc18ad5fff 100644
+--- a/lib/kunit/debugfs.c
++++ b/lib/kunit/debugfs.c
+@@ -37,14 +37,21 @@ void kunit_debugfs_init(void)
+ 		debugfs_rootdir = debugfs_create_dir(KUNIT_DEBUGFS_ROOT, NULL);
+ }
+ 
+-static void debugfs_print_result(struct seq_file *seq,
+-				 struct kunit_suite *suite,
+-				 struct kunit_case *test_case)
++static void debugfs_print_result(struct seq_file *seq, struct string_stream *log)
+ {
+-	if (!test_case || !test_case->log)
++	struct string_stream_fragment *frag_container;
++
++	if (!log)
+ 		return;
+ 
+-	seq_printf(seq, "%s", test_case->log);
++	/*
++	 * Walk the fragments so we don't need to allocate a temporary
++	 * buffer to hold the entire string.
++	 */
++	spin_lock(&log->lock);
++	list_for_each_entry(frag_container, &log->fragments, node)
++		seq_printf(seq, "%s", frag_container->fragment);
++	spin_unlock(&log->lock);
+ }
+ 
+ /*
+@@ -71,10 +78,9 @@ static int debugfs_print_results(struct seq_file *seq, void *v)
+ 	seq_printf(seq, KUNIT_SUBTEST_INDENT "1..%zd\n", kunit_suite_num_test_cases(suite));
+ 
+ 	kunit_suite_for_each_test_case(suite, test_case)
+-		debugfs_print_result(seq, suite, test_case);
++		debugfs_print_result(seq, test_case->log);
+ 
+-	if (suite->log)
+-		seq_printf(seq, "%s", suite->log);
++	debugfs_print_result(seq, suite->log);
+ 
+ 	seq_printf(seq, "%s %d %s\n",
+ 		   kunit_status_to_ok_not_ok(success), 1, suite->name);
+@@ -107,9 +113,13 @@ void kunit_debugfs_create_suite(struct kunit_suite *suite)
+ 	struct kunit_case *test_case;
+ 
+ 	/* Allocate logs before creating debugfs representation. */
+-	suite->log = kzalloc(KUNIT_LOG_SIZE, GFP_KERNEL);
+-	kunit_suite_for_each_test_case(suite, test_case)
+-		test_case->log = kzalloc(KUNIT_LOG_SIZE, GFP_KERNEL);
++	suite->log = alloc_string_stream(GFP_KERNEL);
++	string_stream_set_append_newlines(suite->log, true);
++
++	kunit_suite_for_each_test_case(suite, test_case) {
++		test_case->log = alloc_string_stream(GFP_KERNEL);
++		string_stream_set_append_newlines(test_case->log, true);
++	}
+ 
+ 	suite->debugfs = debugfs_create_dir(suite->name, debugfs_rootdir);
+ 
+@@ -123,7 +133,7 @@ void kunit_debugfs_destroy_suite(struct kunit_suite *suite)
+ 	struct kunit_case *test_case;
+ 
+ 	debugfs_remove_recursive(suite->debugfs);
+-	kfree(suite->log);
++	string_stream_destroy(suite->log);
+ 	kunit_suite_for_each_test_case(suite, test_case)
+-		kfree(test_case->log);
++		string_stream_destroy(test_case->log);
+ }
+diff --git a/lib/kunit/kunit-test.c b/lib/kunit/kunit-test.c
+index dd87ef8a5bc0..34b195e4b491 100644
+--- a/lib/kunit/kunit-test.c
++++ b/lib/kunit/kunit-test.c
+@@ -8,6 +8,7 @@
+ #include <kunit/test.h>
+ #include <kunit/test-bug.h>
+ 
++#include "string-stream.h"
+ #include "try-catch-impl.h"
+ 
+ struct kunit_try_catch_test_context {
+@@ -572,12 +573,27 @@ static struct kunit_suite kunit_resource_test_suite = {
+ 	.test_cases = kunit_resource_test_cases,
+ };
+ 
++/*
++ * Log tests call string_stream functions, which aren't exported. So only
++ * build this code if this test is built-in.
++ */
++#if IS_BUILTIN(CONFIG_KUNIT_TEST)
++
++/* This avoids a cast warning if kfree() is passed direct to kunit_add_action(). */
++static void kfree_wrapper(void *p)
++{
++	kfree(p);
++}
++
+ static void kunit_log_test(struct kunit *test)
+ {
+ 	struct kunit_suite suite;
+-
+-	suite.log = kunit_kzalloc(test, KUNIT_LOG_SIZE, GFP_KERNEL);
++#ifdef CONFIG_KUNIT_DEBUGFS
++	char *full_log;
++#endif
++	suite.log = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, suite.log);
++	string_stream_set_append_newlines(suite.log, true);
+ 
+ 	kunit_log(KERN_INFO, test, "put this in log.");
+ 	kunit_log(KERN_INFO, test, "this too.");
+@@ -585,14 +601,21 @@ static void kunit_log_test(struct kunit *test)
+ 	kunit_log(KERN_INFO, &suite, "along with this.");
+ 
+ #ifdef CONFIG_KUNIT_DEBUGFS
++	KUNIT_EXPECT_TRUE(test, test->log->append_newlines);
++
++	full_log = string_stream_get_string(test->log);
++	kunit_add_action(test, (kunit_action_t *)kfree, full_log);
+ 	KUNIT_EXPECT_NOT_ERR_OR_NULL(test,
+-				     strstr(test->log, "put this in log."));
++				     strstr(full_log, "put this in log."));
+ 	KUNIT_EXPECT_NOT_ERR_OR_NULL(test,
+-				     strstr(test->log, "this too."));
++				     strstr(full_log, "this too."));
++
++	full_log = string_stream_get_string(suite.log);
++	kunit_add_action(test, kfree_wrapper, full_log);
+ 	KUNIT_EXPECT_NOT_ERR_OR_NULL(test,
+-				     strstr(suite.log, "add to suite log."));
++				     strstr(full_log, "add to suite log."));
+ 	KUNIT_EXPECT_NOT_ERR_OR_NULL(test,
+-				     strstr(suite.log, "along with this."));
++				     strstr(full_log, "along with this."));
+ #else
+ 	KUNIT_EXPECT_NULL(test, test->log);
+ #endif
+@@ -600,15 +623,30 @@ static void kunit_log_test(struct kunit *test)
+ 
+ static void kunit_log_newline_test(struct kunit *test)
+ {
++	char *full_log;
++
+ 	kunit_info(test, "Add newline\n");
+ 	if (test->log) {
+-		KUNIT_ASSERT_NOT_NULL_MSG(test, strstr(test->log, "Add newline\n"),
+-			"Missing log line, full log:\n%s", test->log);
+-		KUNIT_EXPECT_NULL(test, strstr(test->log, "Add newline\n\n"));
++		full_log = string_stream_get_string(test->log);
++		kunit_add_action(test, kfree_wrapper, full_log);
++		KUNIT_ASSERT_NOT_NULL_MSG(test, strstr(full_log, "Add newline\n"),
++			"Missing log line, full log:\n%s", full_log);
++		KUNIT_EXPECT_NULL(test, strstr(full_log, "Add newline\n\n"));
+ 	} else {
+ 		kunit_skip(test, "only useful when debugfs is enabled");
+ 	}
+ }
++#else
++static void kunit_log_test(struct kunit *test)
++{
++	kunit_skip(test, "Log tests only run when built-in");
++}
++
++static void kunit_log_newline_test(struct kunit *test)
++{
++	kunit_skip(test, "Log tests only run when built-in");
++}
++#endif /* IS_BUILTIN(CONFIG_KUNIT_TEST) */
+ 
+ static struct kunit_case kunit_log_test_cases[] = {
+ 	KUNIT_CASE(kunit_log_test),
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index 1ac34a3c814d..87abd7afa108 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -110,51 +110,17 @@ static void kunit_print_test_stats(struct kunit *test,
+ 		  stats.total);
+ }
+ 
+-/**
+- * kunit_log_newline() - Add newline to the end of log if one is not
+- * already present.
+- * @log: The log to add the newline to.
+- */
+-static void kunit_log_newline(char *log)
+-{
+-	int log_len, len_left;
+-
+-	log_len = strlen(log);
+-	len_left = KUNIT_LOG_SIZE - log_len - 1;
+-
+-	if (log_len > 0 && log[log_len - 1] != '\n')
+-		strncat(log, "\n", len_left);
+-}
+-
+-/*
+- * Append formatted message to log, size of which is limited to
+- * KUNIT_LOG_SIZE bytes (including null terminating byte).
+- */
+-void kunit_log_append(char *log, const char *fmt, ...)
++/* Append formatted message to log. */
++void kunit_log_append(struct string_stream *log, const char *fmt, ...)
+ {
+ 	va_list args;
+-	int len, log_len, len_left;
+ 
+ 	if (!log)
+ 		return;
+ 
+-	log_len = strlen(log);
+-	len_left = KUNIT_LOG_SIZE - log_len - 1;
+-	if (len_left <= 0)
+-		return;
+-
+-	/* Evaluate length of line to add to log */
+ 	va_start(args, fmt);
+-	len = vsnprintf(NULL, 0, fmt, args) + 1;
++	string_stream_vadd(log, fmt, args);
+ 	va_end(args);
+-
+-	/* Print formatted line to the log */
+-	va_start(args, fmt);
+-	vsnprintf(log + log_len, min(len, len_left), fmt, args);
+-	va_end(args);
+-
+-	/* Add newline to end of log if not already present. */
+-	kunit_log_newline(log);
+ }
+ EXPORT_SYMBOL_GPL(kunit_log_append);
+ 
+@@ -360,14 +326,14 @@ void __kunit_do_failed_assertion(struct kunit *test,
+ }
+ EXPORT_SYMBOL_GPL(__kunit_do_failed_assertion);
+ 
+-void kunit_init_test(struct kunit *test, const char *name, char *log)
++void kunit_init_test(struct kunit *test, const char *name, struct string_stream *log)
+ {
+ 	spin_lock_init(&test->lock);
+ 	INIT_LIST_HEAD(&test->resources);
+ 	test->name = name;
+ 	test->log = log;
+ 	if (test->log)
+-		test->log[0] = '\0';
++		string_stream_clear(log);
+ 	test->status = KUNIT_SUCCESS;
+ 	test->status_comment[0] = '\0';
+ }
+-- 
+2.43.0
+

@@ -1,0 +1,62 @@
+From 4c04004d5e06eb2b0bc14bf3e4032996572e4c07 Mon Sep 17 00:00:00 2001
+From: Angelina Vu <angelinavu@microsoft.com>
+Date: Thu, 12 Dec 2024 19:04:11 +0000
+Subject: [PATCH 069/124] Merged PR 198: Config changes to fix struct size
+ mismatches
+
+Config changes to fix module and heki_arch_kinfo struct size mismatches
+
+Signed-off-by: Angelina Vu <angelinavu@microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+Bug fix to address struct size mismatches.
+
+#### PR Summary
+This pull request includes configuration changes to fix struct size mismatches in the project.
+- `/Microsoft/mshv_sk_config`: Enabled `CONFIG_XEN` and `CONFIG_X86_IOPL_IOPERM`, disabled `CONFIG_HAVE_STATIC_CALL_INLINE`.
+- `/arch/x86/Kconfig`: Modified `HAVE_STATIC_CALL_INLINE` selection condition to exclude `HV_SECURE_VTL`.
+---
+ Microsoft/mshv_sk_config | 4 ++--
+ arch/x86/Kconfig         | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Microsoft/mshv_sk_config b/Microsoft/mshv_sk_config
+index c16c1c59ff24..348e2057d02f 100644
+--- a/Microsoft/mshv_sk_config
++++ b/Microsoft/mshv_sk_config
+@@ -287,7 +287,7 @@ CONFIG_PARAVIRT=y
+ # CONFIG_PARAVIRT_DEBUG is not set
+ CONFIG_PARAVIRT_SPINLOCKS=y
+ CONFIG_X86_HV_CALLBACK_VECTOR=y
+-# CONFIG_XEN is not set
++CONFIG_XEN=y
+ # CONFIG_KVM_GUEST is not set
+ CONFIG_ARCH_CPUIDLE_HALTPOLL=y
+ # CONFIG_PVH is not set
+@@ -342,7 +342,7 @@ CONFIG_X86_IO_APIC=y
+ # end of Performance monitoring
+ 
+ # CONFIG_X86_VSYSCALL_EMULATION is not set
+-# CONFIG_X86_IOPL_IOPERM is not set
++CONFIG_X86_IOPL_IOPERM=y
+ CONFIG_MICROCODE=y
+ # CONFIG_MICROCODE_LATE_LOADING is not set
+ # CONFIG_X86_MSR is not set
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index ff6bbbcd4234..dc2dd92cc8ed 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -270,7 +270,7 @@ config X86
+ 	select HAVE_STACKPROTECTOR		if CC_HAS_SANE_STACKPROTECTOR
+ 	select HAVE_STACK_VALIDATION		if HAVE_OBJTOOL
+ 	select HAVE_STATIC_CALL			if !HEKI
+-	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL && !HEKI
++	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL && !HEKI && !HV_SECURE_VTL
+ 	select HAVE_PREEMPT_DYNAMIC_CALL	if !HEKI
+ 	select HAVE_RSEQ
+ 	select HAVE_RUST			if X86_64
+-- 
+2.43.0
+

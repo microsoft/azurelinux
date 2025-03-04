@@ -1,0 +1,44 @@
+From 7afff9ed5ffa7dd3f562e7e95d3471648e313461 Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Wed, 16 Oct 2024 11:34:40 -0700
+Subject: [PATCH 083/124] kunit: string-stream: Don't create a fragment for
+ empty strings
+
+If the result of the formatted string is an empty string just return
+instead of creating an empty fragment.
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reviewed-by: Rae Moar <rmoar@google.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/string-stream.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/lib/kunit/string-stream.c b/lib/kunit/string-stream.c
+index cc32743c1171..ed24d86af9f5 100644
+--- a/lib/kunit/string-stream.c
++++ b/lib/kunit/string-stream.c
+@@ -50,11 +50,17 @@ int string_stream_vadd(struct string_stream *stream,
+ 	/* Make a copy because `vsnprintf` could change it */
+ 	va_copy(args_for_counting, args);
+ 
+-	/* Need space for null byte. */
+-	len = vsnprintf(NULL, 0, fmt, args_for_counting) + 1;
++	/* Evaluate length of formatted string */
++	len = vsnprintf(NULL, 0, fmt, args_for_counting);
+ 
+ 	va_end(args_for_counting);
+ 
++	if (len == 0)
++		return 0;
++
++	/* Need space for null byte. */
++	len++;
++
+ 	frag_container = alloc_string_stream_fragment(stream->test,
+ 						      len,
+ 						      stream->gfp);
+-- 
+2.43.0
+

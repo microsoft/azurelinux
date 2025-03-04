@@ -1,0 +1,59 @@
+From a503f0bbedc10065e918aba28109bf8da0da9510 Mon Sep 17 00:00:00 2001
+From: Madhavan Venkataraman <Madhavan.Venkataraman@microsoft.com>
+Date: Fri, 7 Feb 2025 16:39:09 +0000
+Subject: [PATCH 114/124] Merged PR 11704481: Resolve a build error
+
+VTL0: Minor fix
+
+heki_store_blacklist_raw_hashes() is defined as an init.text
+function. But it is called by a non init.text function. This causes
+a build warning. This is wrong also because the memory for init
+functions and data are freed at the end of kernel boot. For now,
+remove the __init attribute for the function.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+Bug fix
+
+#### PR Summary
+This pull request resolves a build error by removing the `__init` attribute from a function declaration.
+- `include/linux/heki.h`: Removed `__init` attribute from `heki_store_blacklist_raw_hashes` function declaration.
+- `virt/heki/module.c`: Removed `__init` attribute from `heki_store_blacklist_raw_hashes` function definition.
+<!-- GitOpsUserAgent=GitOps.Apps.Server.pullrequestcopilot -->
+---
+ include/linux/heki.h | 2 +-
+ virt/heki/module.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index e62b1995322f..4cdd4ae1a7a3 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -213,7 +213,7 @@ long heki_validate_module(struct module *mod, struct load_info *info, int flags)
+ void heki_free_module_init(struct module *mod);
+ void heki_unload_module(struct module *mod);
+ void heki_copy_secondary_key(const void *data, size_t size);
+-void __init heki_store_blacklist_raw_hashes(const char *hash);
++void heki_store_blacklist_raw_hashes(const char *hash);
+ 
+ /* Arch-specific functions. */
+ void heki_arch_init(void);
+diff --git a/virt/heki/module.c b/virt/heki/module.c
+index 584441d699dc..fbbbe0ad176a 100644
+--- a/virt/heki/module.c
++++ b/virt/heki/module.c
+@@ -267,7 +267,7 @@ void heki_copy_secondary_key(const void *data, size_t size)
+ 	heki_cleanup_args(&args);
+ }
+ 
+-void __init heki_store_blacklist_raw_hashes(const char *hash)
++void heki_store_blacklist_raw_hashes(const char *hash)
+ {
+ 	/* Initialize the blacklist hashes array if it does not already exist */
+ 	if (!heki_blacklist_hashes) {
+-- 
+2.43.0
+

@@ -1,0 +1,63 @@
+From 91cbeb151fdf9d01cd8fe4472b7c19be18dcf421 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Thu, 19 Dec 2024 13:11:29 +0000
+Subject: [PATCH 072/124] drivers: hv: mshv_vsm_vtl1: Fix rcu stalls during
+ secondary cpu boot
+
+vtl1 per cpu task does not suppress tick before returning to vtl0 if there
+is any rcu pending. Further this task will also bring in all other cpus to
+vtl1 if there is an rcu activity pending there by ensuring that all cpus
+are synced.  During cpu bring ups though if ticks are suppressed on a cpu
+that is onlined and has already returned back to vtl0, subsequent rcu
+threads spwaned may not bring these cpus back to vtl1.  This is because
+during cpu onlining the per cpu thread is not functional for the cpu being
+onlined Introduce a boot_in_progress flag which if set indicates that cpu
+onlining is in progress and so no cpu should suppress ticks till all the
+cpus are onlined.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index f3b89e984e49..e92a4eaaae70 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -56,6 +56,7 @@
+ #define SYNIC_INTERCEPTION_SINT		0
+ 
+ bool vtl0_end_of_boot;
++static bool boot_in_progress;
+ 
+ struct hv_intercept_message_header {
+ 	u32 vp_index;
+@@ -1705,6 +1706,7 @@ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ 		return -EINVAL;
+ 	}
+ 
++	boot_in_progress = true;
+ 	per_cpu = this_cpu_ptr(&vsm_per_cpu);
+ 	per_cpu->stay_in_vtl1 = true;
+ 	/* Validate boot_signal_pfn parameter */
+@@ -1788,6 +1790,7 @@ static int mshv_vsm_boot_aps(unsigned int cpu_online_mask_pfn,
+ out:
+ 	per_cpu = this_cpu_ptr(&vsm_per_cpu);
+ 	per_cpu->stay_in_vtl1 = false;
++	boot_in_progress = false;
+ 	return status;
+ }
+ 
+@@ -2061,7 +2064,8 @@ static int mshv_vsm_vtl_task(void *unused)
+ 								 NULL, 0);
+ 			}
+ 		} else {
+-			per_cpu->suppress_tick = true;
++			if (!boot_in_progress)
++				per_cpu->suppress_tick = true;
+ 		}
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 		schedule();
+-- 
+2.43.0
+

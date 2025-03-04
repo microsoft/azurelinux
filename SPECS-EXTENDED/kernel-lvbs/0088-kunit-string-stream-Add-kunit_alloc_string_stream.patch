@@ -1,0 +1,210 @@
+From 548be8d5dac33f596b1c07c8d5290344e954927a Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Wed, 16 Oct 2024 11:07:54 -0700
+Subject: [PATCH 088/124] kunit: string-stream: Add kunit_alloc_string_stream()
+
+Add function kunit_alloc_string_stream() to do a resource-managed
+allocation of a string stream, and corresponding
+kunit_free_string_stream() to free the resource-managed stream.
+
+This is preparing for decoupling the string_stream
+implementation from struct kunit, to reduce the amount of code
+churn when that happens. Currently:
+ - kunit_alloc_string_stream() only calls alloc_string_stream().
+ - kunit_free_string_stream() takes a struct kunit* which
+   isn't used yet.
+
+Callers of the old alloc_string_stream() and
+string_stream_destroy() are all requesting a managed allocation
+so have been changed to use the new functions.
+
+alloc_string_stream() has been temporarily made static because
+its current behavior has been replaced with
+kunit_alloc_string_stream().
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/string-stream-test.c | 28 ++++++++++++++--------------
+ lib/kunit/string-stream.c      | 12 +++++++++++-
+ lib/kunit/string-stream.h      |  3 ++-
+ lib/kunit/test.c               |  4 ++--
+ 4 files changed, 29 insertions(+), 18 deletions(-)
+
+diff --git a/lib/kunit/string-stream-test.c b/lib/kunit/string-stream-test.c
+index f117c4b7389b..46b18e940b73 100644
+--- a/lib/kunit/string-stream-test.c
++++ b/lib/kunit/string-stream-test.c
+@@ -25,7 +25,7 @@ static void string_stream_init_test(struct kunit *test)
+ {
+ 	struct string_stream *stream;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	KUNIT_EXPECT_EQ(test, stream->length, 0);
+@@ -48,7 +48,7 @@ static void string_stream_line_add_test(struct kunit *test)
+ 	size_t len, total_len;
+ 	int num_lines, i;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	/* Add series of sequence numbered lines */
+@@ -104,7 +104,7 @@ static void string_stream_variable_length_line_test(struct kunit *test)
+ 	size_t offset, total_len;
+ 	int num_lines, i;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	/*
+@@ -164,10 +164,10 @@ static void string_stream_append_test(struct kunit *test)
+ 	size_t combined_length;
+ 	int i;
+ 
+-	stream_1 = alloc_string_stream(test, GFP_KERNEL);
++	stream_1 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_1);
+ 
+-	stream_2 = alloc_string_stream(test, GFP_KERNEL);
++	stream_2 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_2);
+ 
+ 	/* Append content of empty stream to empty stream */
+@@ -207,9 +207,9 @@ static void string_stream_append_test(struct kunit *test)
+ 	KUNIT_EXPECT_STREQ(test, get_concatenated_string(test, stream_1), combined_content);
+ 
+ 	/* Append content of non-empty stream to empty stream */
+-	string_stream_destroy(stream_1);
++	kunit_free_string_stream(test, stream_1);
+ 
+-	stream_1 = alloc_string_stream(test, GFP_KERNEL);
++	stream_1 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_1);
+ 
+ 	string_stream_append(stream_1, stream_2);
+@@ -222,13 +222,13 @@ static void string_stream_append_auto_newline_test(struct kunit *test)
+ 	struct string_stream *stream_1, *stream_2;
+ 
+ 	/* Stream 1 has newline appending enabled */
+-	stream_1 = alloc_string_stream(test, GFP_KERNEL);
++	stream_1 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_1);
+ 	string_stream_set_append_newlines(stream_1, true);
+ 	KUNIT_EXPECT_TRUE(test, stream_1->append_newlines);
+ 
+ 	/* Stream 2 does not append newlines */
+-	stream_2 = alloc_string_stream(test, GFP_KERNEL);
++	stream_2 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_2);
+ 
+ 	/* Appending a stream with a newline should not add another newline */
+@@ -239,8 +239,8 @@ static void string_stream_append_auto_newline_test(struct kunit *test)
+ 	KUNIT_EXPECT_STREQ(test, get_concatenated_string(test, stream_1),
+ 			   "Original string\nAppended content\nMore stuff\n");
+ 
+-	string_stream_destroy(stream_2);
+-	stream_2 = alloc_string_stream(test, GFP_KERNEL);
++	kunit_free_string_stream(test, stream_2);
++	stream_2 = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream_2);
+ 
+ 	/*
+@@ -261,7 +261,7 @@ static void string_stream_append_empty_string_test(struct kunit *test)
+ 	struct string_stream *stream;
+ 	int original_frag_count;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	/* Formatted empty string */
+@@ -283,7 +283,7 @@ static void string_stream_no_auto_newline_test(struct kunit *test)
+ {
+ 	struct string_stream *stream;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	/*
+@@ -306,7 +306,7 @@ static void string_stream_auto_newline_test(struct kunit *test)
+ {
+ 	struct string_stream *stream;
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
+ 
+ 	string_stream_set_append_newlines(stream, true);
+diff --git a/lib/kunit/string-stream.c b/lib/kunit/string-stream.c
+index 1dcf6513b692..12ecf15e1f6b 100644
+--- a/lib/kunit/string-stream.c
++++ b/lib/kunit/string-stream.c
+@@ -153,7 +153,7 @@ bool string_stream_is_empty(struct string_stream *stream)
+ 	return list_empty(&stream->fragments);
+ }
+ 
+-struct string_stream *alloc_string_stream(struct kunit *test, gfp_t gfp)
++static struct string_stream *alloc_string_stream(struct kunit *test, gfp_t gfp)
+ {
+ 	struct string_stream *stream;
+ 
+@@ -173,3 +173,13 @@ void string_stream_destroy(struct string_stream *stream)
+ {
+ 	string_stream_clear(stream);
+ }
++
++struct string_stream *kunit_alloc_string_stream(struct kunit *test, gfp_t gfp)
++{
++	return alloc_string_stream(test, gfp);
++}
++
++void kunit_free_string_stream(struct kunit *test, struct string_stream *stream)
++{
++	string_stream_destroy(stream);
++}
+diff --git a/lib/kunit/string-stream.h b/lib/kunit/string-stream.h
+index 048930bf97f0..3e70ee9d66e9 100644
+--- a/lib/kunit/string-stream.h
++++ b/lib/kunit/string-stream.h
+@@ -30,7 +30,8 @@ struct string_stream {
+ 
+ struct kunit;
+ 
+-struct string_stream *alloc_string_stream(struct kunit *test, gfp_t gfp);
++struct string_stream *kunit_alloc_string_stream(struct kunit *test, gfp_t gfp);
++void kunit_free_string_stream(struct kunit *test, struct string_stream *stream);
+ 
+ int __printf(2, 3) string_stream_add(struct string_stream *stream,
+ 				     const char *fmt, ...);
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index 1d151f6dc1cd..9cab9f2b4d78 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -309,7 +309,7 @@ static void kunit_fail(struct kunit *test, const struct kunit_loc *loc,
+ 
+ 	kunit_set_failure(test);
+ 
+-	stream = alloc_string_stream(test, GFP_KERNEL);
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
+ 	if (IS_ERR(stream)) {
+ 		WARN(true,
+ 		     "Could not allocate stream to print failed assertion in %s:%d\n",
+@@ -323,7 +323,7 @@ static void kunit_fail(struct kunit *test, const struct kunit_loc *loc,
+ 
+ 	kunit_print_string_stream(test, stream);
+ 
+-	string_stream_destroy(stream);
++	kunit_free_string_stream(test, stream);
+ }
+ 
+ void __noreturn __kunit_abort(struct kunit *test)
+-- 
+2.43.0
+

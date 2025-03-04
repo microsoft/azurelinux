@@ -1,0 +1,29 @@
+From 5fdb95397c7e015162066c47f0cc0cc7c7a191d8 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Thu, 13 Feb 2025 23:29:56 +0000
+Subject: [PATCH 118/124] fixup! Receive a VTL0 module and validate its
+ contents
+
+Fix relative path to kernel internals.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ drivers/hv/mshv_vsm_vtl1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/hv/mshv_vsm_vtl1.c b/drivers/hv/mshv_vsm_vtl1.c
+index 4df9f0c8cf06..8f4f4ca4c0ae 100644
+--- a/drivers/hv/mshv_vsm_vtl1.c
++++ b/drivers/hv/mshv_vsm_vtl1.c
+@@ -21,7 +21,7 @@
+ #include <linux/sort.h>
+ #include <linux/bsearch.h>
+ #include <linux/mem_attr.h>
+-#include "../../../kernel/module/internal.h"
++#include "../../kernel/module/internal.h"
+ #include <asm/mshyperv.h>
+ #include <asm/fpu/api.h>
+ #include <asm/cpu.h>
+-- 
+2.43.0
+

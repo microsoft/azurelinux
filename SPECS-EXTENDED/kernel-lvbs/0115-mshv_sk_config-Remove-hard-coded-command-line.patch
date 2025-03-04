@@ -1,0 +1,30 @@
+From d45b2e4903c4f4e40a696e0d9b0bbbc2b6264421 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Tue, 4 Feb 2025 19:33:50 +0000
+Subject: [PATCH 115/124] mshv_sk_config: Remove hard-coded command line
+
+The command line is now expected to be provided by the loader of the secure
+kernel.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ Microsoft/mshv_sk_config | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Microsoft/mshv_sk_config b/Microsoft/mshv_sk_config
+index a4b5ab3bc33b..0f6a93897c4f 100644
+--- a/Microsoft/mshv_sk_config
++++ b/Microsoft/mshv_sk_config
+@@ -393,8 +393,7 @@ CONFIG_PHYSICAL_ALIGN=0x200000
+ CONFIG_HOTPLUG_CPU=y
+ # CONFIG_LEGACY_VSYSCALL_XONLY is not set
+ CONFIG_LEGACY_VSYSCALL_NONE=y
+-CONFIG_CMDLINE_BOOL=y
+-CONFIG_CMDLINE="debug rootwait console=ttyS1,115200 earlyprintk=ttyS1,115200 cpuidle.off=1 cpufreq.off=1 idle=halt initcall_blacklist=do_init_real_mode,sbf_init"
++# CONFIG_CMDLINE_BOOL is not set
+ # CONFIG_CMDLINE_OVERRIDE is not set
+ # CONFIG_MODIFY_LDT_SYSCALL is not set
+ # CONFIG_STRICT_SIGALTSTACK_SIZE is not set
+-- 
+2.43.0
+

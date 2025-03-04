@@ -1,0 +1,43 @@
+From 1a80dd5e2cc77bab1d127c5d832b06f7ead4c8c9 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Mon, 16 Dec 2024 18:02:53 +0000
+Subject: [PATCH 071/124] include: linux: heki: Quick fix for all blacklist
+ hashes not being passed to...
+
+VTL0 passes all the blacklissted hashes to VTL1 so that VTL1 is aware of
+these hashes and rejects any authentication requests involving these
+hashes. The number of hashes that can be passed are hardcoded. Increase
+this count so that all the hashes get added for Azure Linux 3.0.  The
+proper fix for this is to convert the gathering of blacklist hashes from
+array to a linked list
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+Bug fix
+
+#### PR Summary
+This pull request addresses an issue where not all blacklist hashes were being passed correctly.
+- `include/linux/heki.h`: Increased `HEKI_MAX_TOTAL_HASHES` from 100 to 400 to ensure all blacklist hashes are included.
+---
+ include/linux/heki.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 8c8adbb703dd..0f2562c7c83b 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -158,7 +158,7 @@ struct heki_mod {
+ #ifdef CONFIG_HEKI
+ 
+ /* Currently 83 hashes get added to the blacklist keyring */
+-#define HEKI_MAX_TOTAL_HASHES 100
++#define HEKI_MAX_TOTAL_HASHES 400
+ 
+ /*
+  * If the active hypervisor supports Heki, it will plug its heki_hypervisor
+-- 
+2.43.0
+

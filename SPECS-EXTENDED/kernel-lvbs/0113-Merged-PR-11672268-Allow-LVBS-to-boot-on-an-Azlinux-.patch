@@ -1,0 +1,70 @@
+From 9e7f3021a8bcc63b35f2cb129ebf0e88a01bc445 Mon Sep 17 00:00:00 2001
+From: Karissa Sanchez <karsanchez@microsoft.com>
+Date: Thu, 6 Feb 2025 19:18:20 +0000
+Subject: [PATCH 113/124] Merged PR 11672268: Allow LVBS to boot on an Azlinux
+ VM in Azure
+
+- Include Anna's commit which checks if vsm is supported before enabling it
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+New feature to enable LVBS to boot on an Azlinux VM in Azure.
+
+#### PR Summary
+This pull request introduces changes to support LVBS booting on an Azlinux VM in Azure by checking and setting Hyper-V OS loader indications.
+- `drivers/firmware/efi/libstub/x86-stub.c`: Added checks for Hyper-V OS loader indications and support for VSM.
+---
+ drivers/firmware/efi/libstub/x86-stub.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmware/efi/libstub/x86-stub.c
+index 49622fbe4d42..a16c6a653739 100644
+--- a/drivers/firmware/efi/libstub/x86-stub.c
++++ b/drivers/firmware/efi/libstub/x86-stub.c
+@@ -26,6 +26,8 @@
+        EFI_GUID(0x610b9e98, 0xc6f6, 0x47f8, 0x8b, 0x47, 0x2d, 0x2d, 0xa0, 0xd5, 0x2a, 0x91)
+ 
+ static const efi_char16_t efi_HvPrivOsloaderIndications_name[] = L"OsLoaderIndications";
++static const efi_char16_t efi_HvPrivOsloaderIndicationsSupported_name[] =
++	L"OsLoaderIndicationsSupported";
+ #endif
+ 
+ extern char _bss[], _ebss[];
+@@ -740,13 +742,33 @@ static void efi_set_hv_os_indications(void)
+ 	unsigned long size;
+ 	u32 attr, val;
+ 
++	size = sizeof(val);
++	status = get_efi_var(efi_HvPrivOsloaderIndicationsSupported_name,
++			     &guid, &attr, &size, &val);
++	if (status != EFI_SUCCESS) {
++		efi_err("Could not read Hyper-V OsloaderIndicationsSupported\n");
++		return;
++	}
++
++	if (!(val & 1)) {
++		efi_info("Hyper-V does not support VSM in OsloaderIndicationsSupported\n");
++		return;
++	}
++
+ 	size = sizeof(val);
+ 	status = get_efi_var(efi_HvPrivOsloaderIndications_name, &guid, &attr, &size, &val);
+         if (status != EFI_SUCCESS) {
+ 		efi_err("Could not read Hyper-V OsLoaderIndications\n");
+ 		return;
+ 	}
++
++	if (val & 1) {
++		efi_info("VSM is already supported in OsLoaderIndications.");
++		return;
++	}
++
+ 	val |= 1;
++	size = sizeof(val);
+ 	set_efi_var(efi_HvPrivOsloaderIndications_name, &guid, attr, size, &val);
+         if (status != EFI_SUCCESS) {
+ 		efi_err("Could not set Hyper-V OsLoaderIndications to indicate VSM support \n");
+-- 
+2.43.0
+
