@@ -68,4 +68,5 @@ make test
 
 %changelog
 * Tue Feb 04 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 0.5.1-1
-- Initial Versioning of cloud-provider-kubevirt package.
+- Initial Azure Linux import from the source project (license: same as "License" tag).
+- License verified.
