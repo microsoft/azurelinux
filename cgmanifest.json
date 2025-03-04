@@ -19373,8 +19373,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Markdown",
-          "version": "3.200",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RW/RWSTAUNER/Pod-Markdown-3.200.tar.gz"
+          "version": "3.400",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RW/RWSTAUNER/Pod-Markdown-3.400.tar.gz"
         }
       }
     },
