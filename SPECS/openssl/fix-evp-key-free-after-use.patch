@@ -1,0 +1,41 @@
+From fbf164e960082f906a418a50e65cae004558b031 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Tue, 4 Mar 2025 20:36:03 +0000
+Subject: [PATCH] other-fix
+
+---
+ crypto/evp/exchange.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/evp/exchange.c b/crypto/evp/exchange.c
+index d9eed1c..b6af96b 100644
+--- a/crypto/evp/exchange.c
++++ b/crypto/evp/exchange.c
+@@ -431,7 +431,10 @@ int EVP_PKEY_derive_set_peer_ex(EVP_PKEY_CTX *ctx, EVP_PKEY *peer,
+      */
+     if (provkey == NULL)
+         goto legacy;
+-    return ctx->op.kex.exchange->set_peer(ctx->op.kex.algctx, provkey);
++    ret = ctx->op.kex.exchange->set_peer(ctx->op.kex.algctx, provkey);
++    if (ret <= 0)
++        return ret;
++    goto common;
+ 
+  legacy:
+ #ifdef FIPS_MODULE
+@@ -492,10 +495,11 @@ int EVP_PKEY_derive_set_peer_ex(EVP_PKEY_CTX *ctx, EVP_PKEY *peer,
+         ctx->peerkey = NULL;
+         return ret;
+     }
++#endif
+ 
++common:
+     EVP_PKEY_up_ref(peer);
+     return 1;
+-#endif
+ }
+ 
+ int EVP_PKEY_derive_set_peer(EVP_PKEY_CTX *ctx, EVP_PKEY *peer)
+-- 
+2.45.3
+

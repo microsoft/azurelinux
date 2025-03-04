@@ -62,6 +62,9 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+# Upstream: https://github.com/openssl/openssl/pull/26976
+Patch82:  fix-evp-key-free-after-use.patch
+Patch83:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
