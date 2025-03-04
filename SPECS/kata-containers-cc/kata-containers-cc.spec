@@ -89,7 +89,6 @@ fi
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
 
-%{defaults_kata}/configuration.toml
 %{defaults_kata}/configuration-clh-snp.toml
 %{defaults_kata}/configuration-clh-snp-debug.toml
 
