@@ -24893,8 +24893,8 @@
         "type": "other",
         "other": {
           "name": "python-suds",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/suds-community/suds/archive/v1.0.0.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/suds-community/suds/archive/v1.1.2.tar.gz"
         }
       }
     },
