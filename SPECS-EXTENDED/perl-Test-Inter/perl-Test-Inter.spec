@@ -88,7 +88,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 11-3
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.11-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
