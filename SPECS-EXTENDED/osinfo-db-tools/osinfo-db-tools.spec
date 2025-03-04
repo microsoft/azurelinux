@@ -28,7 +28,7 @@ BuildRequires: python3-requests
 
 %description
 This package provides tools for managing the osinfo database of
-information about operating systems for use with virtualization
+information about operating systems for use with virtualization.
 
 
 %prep
