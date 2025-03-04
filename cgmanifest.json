@@ -19913,8 +19913,8 @@
         "type": "other",
         "other": {
           "name": "perl-Term-UI",
-          "version": "0.46",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-0.46.tar.gz"
+          "version": "0.50",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-0.50.tar.gz"
         }
       }
     },
@@ -19983,8 +19983,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Differences",
-          "version": "0.6700",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-0.67.tar.gz"
+          "version": "0.7100",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-0.71.tar.gz"
         }
       }
     },
