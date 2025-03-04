@@ -5,13 +5,8 @@
 
 Summary:        Fast and flexible DNS server
 Name:           coredns
-<<<<<<< HEAD
-Version:        1.11.1
-Release:        4%{?dist}
-=======
 Version:        1.11.4
-Release:        1%{?dist}
->>>>>>> 4203fbd24 ([AUTOPATCHER-CORE] Upgrade coredns to 1.11.4 fix CVE-2023-44487 (#12417))
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,21 +33,9 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-<<<<<<< HEAD
-Patch0:         makefile-buildoption-commitnb.patch
-Patch1:         CVE-2023-44487.patch
-Patch2:         CVE-2023-49295.patch
-Patch3:         CVE-2024-22189.patch
-Patch4:         CVE-2023-45288.patch
-Patch5:         CVE-2024-0874.patch
-Patch6:         CVE-2024-24786.patch
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
-Patch7:         coredns-example-net-test.patch
-=======
-# Patch to fix the package test suite due to external akamai update
-# https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
->>>>>>> 4203fbd24 ([AUTOPATCHER-CORE] Upgrade coredns to 1.11.4 fix CVE-2023-44487 (#12417))
+Patch1:         coredns-example-net-test.patch
 
 BuildRequires:  golang >= 1.23
 
@@ -97,13 +80,11 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
-<<<<<<< HEAD
-* Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.1-4
+* Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.4-2
 - readd check section from 2.0
-=======
+
 * Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.4-1
 - Auto-upgrade to 1.11.4 to fix CVE-2023-44487
->>>>>>> 4203fbd24 ([AUTOPATCHER-CORE] Upgrade coredns to 1.11.4 fix CVE-2023-44487 (#12417))
 
 * Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
 - Fix CVE-2024-24786
