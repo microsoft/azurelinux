@@ -15383,8 +15383,8 @@
         "type": "other",
         "other": {
           "name": "openoffice-lv",
-          "version": "1.0.0",
-          "downloadUrl": "http://dict.dv.lv/download/lv_LV-1.0.0.oxt"
+          "version": "1.4.0",
+          "downloadUrl": "https://dict.dv.lv/download/lv_LV-1.4.0.oxt"
         }
       }
     },
