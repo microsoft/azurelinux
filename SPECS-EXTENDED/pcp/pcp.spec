@@ -3472,6 +3472,7 @@ ls -l *-files.rpm
 * Wed Mar 05 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 6.3.2-1
 - Import from fedora
 - Fix the build issues for azurelinux
+- License verified
 
 * Wed Jan 29 2025 William Cohen <wcohen@redhat.com> - 6.3.2-5
 - Backport GCC15 fixes (BZ #2341011)
