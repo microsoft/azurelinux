@@ -1,15 +1,15 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.2.0.azl4
+Version:        3.2.0.azl5
 Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+Source1:        %{name}-3.2.0.azl4-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
@@ -67,6 +67,7 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 
@@ -112,6 +113,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Feb 22 2025 Cameron Baird <cameronbaird@microsoft.com> - 3.2.0.azl5-1
+- TEMP: package branch sources of tools.
+
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 

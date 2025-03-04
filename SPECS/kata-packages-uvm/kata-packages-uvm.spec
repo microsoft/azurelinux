@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,13 @@ Requires:       zlib
 %description
 Metapackage to install the set of packages inside a Kata containers UVM
 
+%package        debug
+Summary:        Metapackage to install the set of packages inside a Kata confidential containers debug UVM.
+Requires:       %{name} = %{version}-%{release}
+
+%description    debug
+Metapackage to install the set of packages inside a Kata containers UVM, includes extra debug utilities.
+
 %package        coco
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
 Requires:       %{name} = %{version}-%{release}
@@ -51,6 +58,7 @@ Requires:       device-mapper
 Requires:       systemd-udev
 
 %description    coco
+Metapackage to install the set of packages inside a Kata containers coco UVM
 
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
@@ -95,6 +103,8 @@ Requires:       golang
 
 %files
 
+%files debug
+
 %files coco
 
 %files build
@@ -102,6 +112,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
+- Introduce debug metapackage
+
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
 - Add explicit make dependency for UVM build
 - Remove commented package dependencies
