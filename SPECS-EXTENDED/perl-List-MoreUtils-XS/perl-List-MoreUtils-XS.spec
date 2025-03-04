@@ -1,17 +1,24 @@
+# Run extra tests
+%if ! (0%{?rhel})
+%bcond_without perl_List_MoreUtils_XS_enables_extra_test
+%else
+%bcond_with perl_List_MoreUtils_XS_enables_extra_test
+%endif
+
 Name:		perl-List-MoreUtils-XS
-Version:	0.428
-Release:	9%{?dist}
+Version:	0.430
+Release:	1%{?dist}
 Summary:	Provide compiled List::MoreUtils functions
-# Code from List-MoreUtils < 0.417 is GPL+ or Artistic
-# Anything after that is ASL 2.0
+# Code from List-MoreUtils < 0.417 is GPL-1.0-or-later OR Artistic-1.0-Perl
+# Anything after that is Apache-2.0
 # "git blame" on the upstream repo will probably be needed to
 # determine the license of any particular chunk of code
-License:	(GPL+ or Artistic) and ASL 2.0
+License:	(GPL-1.0-or-later OR Artistic-1.0-Perl) AND Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/List-MoreUtils-XS
-Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-XS-%{version}.tar.gz#/perl-List-MoreUtils-XS-%{version}.tar.gz
-Patch0:		List-MoreUtils-XS-0.428-unbundle.patch
+Source0:	https://cpan.metacpan.org/modules/by-module/List/List-MoreUtils-XS-%{version}.tar.gz
+Patch0:		List-MoreUtils-XS-0.430-unbundle.patch
 # Module Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -35,13 +42,16 @@ BuildRequires:	perl(JSON::PP)
 BuildRequires:	perl(List::Util)
 BuildRequires:	perl(Math::Trig)
 BuildRequires:	perl(overload)
+BuildRequires:	perl(POSIX)
 BuildRequires:	perl(Storable)
 BuildRequires:	perl(Test::Builder::Module)
+%if %{with perl_List_MoreUtils_XS_enables_extra_test}
 BuildRequires:	perl(Test::LeakTrace)
+%endif
 BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(Tie::Array)
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
+# (none)
 
 # Don't "provide" private Perl libs
 %{?perl_default_filter}
@@ -53,8 +63,9 @@ This module provides accelerated versions of functions in List::MoreUtils.
 %setup -q -n List-MoreUtils-XS-%{version}
 
 # Unbundle bundled modules except private inc::Config::AutoConf::LMU
-%patch 0
+%patch -P 0
 find inc/ -type f ! -name LMU.pm -print -delete
+perl -i -ne 'print $_ unless m{^inc/} and not m{LMU\.pm}' MANIFEST
 
 %build
 perl Makefile.PL \
@@ -80,6 +91,10 @@ make test
 %{_mandir}/man3/List::MoreUtils::XS.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.430-1
+- Update to version 0.430
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.428-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
