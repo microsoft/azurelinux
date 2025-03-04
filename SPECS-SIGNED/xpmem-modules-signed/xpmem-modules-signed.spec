@@ -100,7 +100,7 @@ popd
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-2
 - Bump release to match kernel
 
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

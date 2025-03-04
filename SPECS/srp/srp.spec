@@ -277,8 +277,9 @@ fi
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Thu Jan 9 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
+
 * Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging

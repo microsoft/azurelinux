@@ -126,7 +126,7 @@ fi # 1 : closed
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - License verified
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
