@@ -36,6 +36,7 @@ Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45337.patch
 Patch4:         CVE-2024-45338.patch
 Patch5:         CVE-2023-45288.patch
+Patch6:         CVE-2025-22869.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
@@ -276,8 +277,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14
 - Bump to rebuild with updated glibc
+=======
+* Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
+- Address CVE-2025-22869
+>>>>>>> 1d5f5e5f2 (Patch `kubevirt` for CVE-2025-22869 [High] (#12716))
 
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-13
 - Address CVE-2023-45288
