@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
-Version:        0.8.15
-Release:        4%{?dist}
+Version:        0.8.20
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -111,6 +111,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Thu Feb 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.20-1
+- Auto-upgrade to 0.8.20 - fix CVE-2023-44487
+
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.15-4
 - Address CVE-2023-45288
 
