@@ -1,28 +1,34 @@
+Name:    libcdio
+Version: 2.1.0
+Release: 14%{?dist}
+Summary: CD-ROM input and control library
+
+# include/cdio/ecma_167.h and lib/driver/netbsd.c and lib/udf/udf_fs.c are BSD-2-Clause
+# src/getopt* are LGPL-2.1-or-later
+License:        GPL-3.0-or-later AND BSD-2-Clause AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name: libcdio
-Version: 2.0.0
-Release: 8%{?dist}
-Summary: CD-ROM input and control library
-License: GPLv3+
+
 URL: http://www.gnu.org/software/libcdio/
-Source0: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz
-Source1: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz.sig
+Source0: https://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.bz2
+Source1: https://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.bz2.sig
 Source2: libcdio-no_date_footer.hml
 Source3: cdio_config.h
-BuildRequires: gcc gcc-c++
-BuildRequires: pkgconfig doxygen
+# Fixed upstream but not in a stable release yet.
+# http://git.savannah.gnu.org/cgit/libcdio.git/commit/?id=2adb43c60afc6e98e94d86dad9f93d3df52862b1
+Patch0: format-security.patch
+# http://git.savannah.gnu.org/cgit/libcdio.git/commit/?id=56335fff0f21d294cd0e478d49542a43e9495ed0
+Patch1: realpath-test-fix.patch
+ 
+BuildRequires: gcc 
+BuildRequires: gcc-c++
+BuildRequires: pkgconfig
+BuildRequires: doxygen
 BuildRequires: ncurses-devel
 BuildRequires: help2man
 BuildRequires: gettext-devel
 BuildRequires: chrpath
-Patch0: fix_format_security.patch
-
-
-# ABI compatibility package dropped in F23
-Obsoletes: compat-libcdio15 < 0.93
-
-
+BuildRequires: make
 
 %description
 This library provides an interface for CD-ROM access. It can be used
@@ -31,6 +37,8 @@ devices.
 
 %package devel
 Summary: Header files and libraries for %{name}
+# doc/* is GFDL-1.2-or-later
+License: GPL-3.0-or-later AND BSD-2-Clause AND LGPL-2.1-or-later AND GFDL-1.2-or-later
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -38,19 +46,22 @@ This package contains header files and libraries for %{name}.
 
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 iconv -f ISO88591 -t utf-8 -o THANKS.utf8 THANKS && mv THANKS.utf8 THANKS
 
 %build
+%ifarch %{ix86}
+# avoid implicit declaration of fseeko64, lseek64
+export CPPFLAGS="$CPPFLAGS -D_LARGEFILE64_SOURCE"
+%endif
 %configure \
 	--disable-vcd-info \
 	--disable-dependency-tracking \
 	--disable-cddb \
 	--disable-static \
 	--disable-rpath
-make %{?_smp_mflags}
+%make_build
 
 # another multilib fix; remove the architecture information from version.h
 sed -i -e "s,%{version} .*$,%{version}\\\",g" include/cdio/version.h
@@ -62,7 +73,7 @@ cp %{SOURCE2} .
 ./run_doxygen
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # multilib header hack; taken from postgresql.spec
 case `uname -i` in
@@ -107,7 +118,7 @@ make check
 
 %files
 %license COPYING
-%doc AUTHORS NEWS README README.libcdio THANKS TODO
+%doc AUTHORS NEWS.md README README.libcdio THANKS TODO
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_infodir}/*
@@ -123,12 +134,49 @@ make check
 
 
 %changelog
-* Tue Jun 21 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.0-8
-- Add patch to fix build error with ncurses 6.3
+* Tue Mar 04 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.0-14
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Aug 30 2022 Parag Nemade <pnemade AT redhat DOT com> - 2.1.0-8
+- Fix the realpath test failure (upstream patch)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 2.1.0-2
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Mon Mar 30 2020 Adrian Reber <adrian@lisas.de> - 2.1.0-1
+- updated to 2.1.0
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
