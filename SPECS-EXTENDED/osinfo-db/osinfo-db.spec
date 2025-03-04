@@ -37,7 +37,7 @@ find %{buildroot}/%{_datadir}/osinfo/os/microsoft.com/ -name "win-*.d" -type d -
 %{_datadir}/osinfo/schema
 
 %changelog
-* Tue Dec 17 2024 Jyoti kanase <v-jykanase@microsoft.com> -  20240701-3
+* Tue Dec 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 20240701-3
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
