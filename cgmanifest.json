@@ -6560,8 +6560,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.76.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.76.1.tar.gz"
+          "version": "6.6.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.78.1.tar.gz"
         }
       }
     },
@@ -8201,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.76.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.76.1.tar.gz"
+          "version": "6.6.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.78.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.76.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.76.1.tar.gz"
+          "version": "6.6.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.78.1.tar.gz"
         }
       }
     },
@@ -8221,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.76.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.76.1.tar.gz"
+          "version": "6.6.78.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.78.1.tar.gz"
         }
       }
     },
@@ -11262,7 +11262,7 @@
         "other": {
           "name": "libthai",
           "version": "0.1.29",
-	  "downloadUrl": "https://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz"
+          "downloadUrl": "https://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz"
         }
       }
     },
@@ -22698,12 +22698,12 @@
         }
       }
     },
-     {
+    {
       "component": {
         "type": "other",
         "other": {
-          "name": "python-flaky",              
-	  "version": "3.8.1",
+          "name": "python-flaky",
+          "version": "3.8.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/5b/c5/ef69119a01427204ff2db5fc8f98001087bcce719bbb94749dcd7b191365/flaky-3.8.1.tar.gz"
         }
       }
@@ -24713,7 +24713,7 @@
         "type": "other",
         "other": {
           "name": "python-sphinxygen",
-	  "version": "1.0.2",
+          "version": "1.0.2",
           "downloadUrl": "https://gitlab.com/drobilla/sphinxygen/-/archive/v1.0.2/sphinxygen-v1.0.2.tar.gz"
         }
       }
