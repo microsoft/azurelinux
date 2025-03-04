@@ -3145,6 +3145,7 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
+                "cloud-provider-kubevirt",
                 "python-nocaselist"
             ]
         },
