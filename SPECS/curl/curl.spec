@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.11.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,13 @@ Requires:       curl-libs = %{version}-%{release}
 Requires:       krb5
 Requires:       libssh2
 Requires:       openssl
+
+%if 0%{?with_check}
+BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(Digest::SHA)
+BuildRequires:  perl(Memoize)
+BuildRequires:  perl(Time::HiRes)
+%endif
 
 %description
 The cURL package contains an utility and a library used for
@@ -64,6 +71,9 @@ This package contains minimal set of shared curl libraries.
     --with-ca-path=%{_sysconfdir}/ssl/certs
 %make_build
 
+%check
+make test
+
 %install
 %make_install
 install -v -d -m755 %{buildroot}/%{_docdir}/%{name}-%{version}
@@ -91,8 +101,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Thu Feb 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.11.1-2
+* Thu Feb 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.11.1-3
 - Fix CVE-2025-0665, CVE-2025-0167, CVE-2025-0725
+
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 8.11.1-2
+- Add check section.
 
 * Fri Feb 07 2025 Himaja Kesari <himajakesari@microsoft.com> - 8.11.1-1
 - Bump version to 8.11.1 to address CVE-2024-11053

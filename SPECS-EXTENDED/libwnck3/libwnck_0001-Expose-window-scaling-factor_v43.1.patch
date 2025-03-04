@@ -1,0 +1,58 @@
+From 18398f3a78b3fe71e99b2da9258cb793b0809bad Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Tue, 6 Aug 2019 09:59:59 -0400
+Subject: [PATCH 1/5] Expose window scaling factor
+
+---
+ libwnck/private.h |  2 ++
+ libwnck/util.c    | 21 +++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/libwnck/private.h b/libwnck/private.h
+index bf87619..0d88ddd 100644
+--- a/libwnck/private.h
++++ b/libwnck/private.h
+@@ -37,6 +37,8 @@ G_BEGIN_DECLS
+ 
+ WnckHandle *_wnck_get_handle (void);
+ 
++int _wnck_get_window_scaling_factor (void);
++
+ void _wnck_application_process_property_notify (WnckApplication *app,
+                                                 XEvent          *xevent);
+ void _wnck_window_process_property_notify (WnckWindow *window,
+diff --git a/libwnck/util.c b/libwnck/util.c
+index 83659dc..a58a99e 100644
+--- a/libwnck/util.c
++++ b/libwnck/util.c
+@@ -164,6 +164,27 @@ _wnck_get_handle (void)
+   return wnck_handle;
+ }
+ 
++/**
++ * _wnck_get_window_scaling_factor:
++ *
++ * Retrieves the internal scale factor that maps from window coordinates to the
++ * actual device pixels. On traditional systems this is 1, on high density
++ * outputs, it can be a higher value (typically 2).
++ */
++int
++_wnck_get_window_scaling_factor (void)
++{
++  GdkScreen *screen;
++  GValue value = G_VALUE_INIT;
++
++  g_value_init (&value, G_TYPE_INT);
++
++  screen = gdk_screen_get_default ();
++  if (gdk_screen_get_setting (screen, "gdk-window-scaling-factor", &value))
++    return g_value_get_int (&value);
++  return 1;
++}
++
+ /**
+  * wnck_set_default_icon_size:
+  * @size: the default size for windows and application standard icons.
+-- 
+2.46.1
+
