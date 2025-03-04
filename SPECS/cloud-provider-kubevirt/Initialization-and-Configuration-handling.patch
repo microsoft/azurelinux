@@ -32,7 +32,6 @@ These are specific to the ECF environment and cannot be upstreamed.**
 
 2. **New Function: `serviceAccountClusterConfig`:**
    - **Reason:** 
-     - Initial PR: https://dev.azure.com/mariner-org/ECF/_git/cloud-provider-kubevirt/commit/7180c9b9a426eae884fa9a42f0ef2bc9c195d457?path=/pkg/cloudprovider/kubevirt/cloud.go&_a=contents&tab=details
      - This has been done to use a non-expiring secret and also to lock down access from tenant cluster to the fabric cluster.
      - This function abstracts the creation of a Kubernetes REST configuration using service account tokens and certificates.
 
