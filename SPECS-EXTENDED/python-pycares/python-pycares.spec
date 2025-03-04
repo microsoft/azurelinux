@@ -23,7 +23,7 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 BuildRequires:  python3-sphinxcontrib-jquery
 # for tests
-#BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest
 
 %description
 pycares is a Python module which provides an interface to
@@ -82,6 +82,8 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 
 %check
 # no tests to run with pytest: Disabling.
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
+  %{python3} -m unittest -v
 
 %files -n python3-%{srcname}
 %license LICENSE
