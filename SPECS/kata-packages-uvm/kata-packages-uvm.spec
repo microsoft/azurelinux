@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,10 @@ Requires:       tar
 Requires:       tzdata
 Requires:       util-linux
 Requires:       zlib
+Requires:       cifs-utils
+Requires:       device-mapper
+# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
+Requires:       systemd-udev
 
 %description
 Metapackage to install the set of packages inside a Kata containers UVM
@@ -45,10 +49,6 @@ Metapackage to install the set of packages inside a Kata containers UVM
 %package        coco
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
 Requires:       %{name} = %{version}-%{release}
-Requires:       cifs-utils
-Requires:       device-mapper
-# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
-Requires:       systemd-udev
 
 %description    coco
 
@@ -102,6 +102,12 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-9
+- Remove coco subpackage
+
+* Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-8
+- Add cifs-utils to vanilla kata
+
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
 - Add explicit make dependency for UVM build
 - Remove commented package dependencies
