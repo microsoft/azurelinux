@@ -1,43 +1,39 @@
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
-# Filter modules bundled for tests
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
-
-Summary:        Some utility routines related to module loading
 Name:           perl-Module-Load-Util
-Version:        0.006
-Release:        2%{?dist}
-License:        GPL+ OR Artistic
+Version:        0.012
+Release:        1%{?dist}
+Summary:        Some utility routines related to module loading
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Load-Util/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-%{version}.tar.gz
-
 BuildArch:      noarch
-
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-# Run-time
-BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(Regexp::Pattern::Perl::Module)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
+# Run-time
+BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(Regexp::Pattern::Perl::Module)
+# Tests
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
+BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
-BuildRequires:  perl(blib)
-BuildRequires:  perl(lib)
-%endif
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Exporter) >= 5.57
+
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
+
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
 
 %description
 This module contains some utility routines related to module loading.
@@ -62,10 +58,10 @@ done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
 # Install tests
@@ -86,13 +82,17 @@ make test
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/Module*
+%{_mandir}/man3/Module::Load::Util*
 
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.012-1
+- Update to version 0.012
+- License verified
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.006-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
