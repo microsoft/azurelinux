@@ -5,8 +5,8 @@ Release: 	3%{?dist}
 License: 	GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0: 	https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz
-Source1: 	https://fedorahosted.org/releases/l/i/libosinfo/%{name}-%{version}.tar.xz.asc
+Source0: 	https://releases.pagure.org/libosinfo/%{name}-%{version}.tar.xz
+Source1: 	https://releases.pagure.org/libosinfo/%{name}-%{version}.tar.xz.asc
 URL: 		https://libosinfo.org/
 BuildRequires: 	intltool
 BuildRequires: 	osinfo-db-tools
