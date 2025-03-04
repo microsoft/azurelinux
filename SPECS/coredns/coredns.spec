@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2025-22868.patch
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 Patch1:         coredns-example-net-test.patch
@@ -80,6 +81,9 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.4-3
+- Fix CVE-2025-22868 with an upstream patch
+
 * Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.4-2
 - readd check section from 2.0
 
