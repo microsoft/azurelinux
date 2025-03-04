@@ -68,5 +68,5 @@ make test
 
 %changelog
 * Tue Feb 04 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 0.5.1-1
-- Initial Azure Linux import from the source project (license: same as "License" tag).
+- Original version for Azure Linux.
 - License verified.
