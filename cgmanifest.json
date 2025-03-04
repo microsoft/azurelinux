@@ -16413,8 +16413,8 @@
         "type": "other",
         "other": {
           "name": "perl-Class-Tiny",
-          "version": "1.006",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Class-Tiny-1.006.tar.gz"
+          "version": "1.008",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Class-Tiny-1.008.tar.gz"
         }
       }
     },
