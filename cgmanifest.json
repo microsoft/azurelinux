@@ -20083,8 +20083,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Harness",
-          "version": "3.42",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.42.tar.gz"
+          "version": "3.50",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.50.tar.gz"
         }
       }
     },
