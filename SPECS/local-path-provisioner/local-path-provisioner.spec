@@ -33,6 +33,7 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 
 %changelog
 * Tue Mar 04 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.0.24-4
+* Address CVE-2023-44487
 
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.0.24-3
 - Address CVE-2023-45288, CVE-2023-39325
