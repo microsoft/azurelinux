@@ -31239,8 +31239,8 @@
         "type": "other",
         "other": {
           "name": "zziplib",
-          "version": "0.13.72",
-          "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
+          "version": "0.13.74",
+          "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.74.tar.gz"
         }
       }
     }
