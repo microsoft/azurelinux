@@ -17573,8 +17573,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Find-Rule-Perl",
-          "version": "1.15",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/File-Find-Rule-Perl-1.15.tar.gz"
+          "version": "1.16",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/File-Find-Rule-Perl-1.16.tar.gz"
         }
       }
     },
