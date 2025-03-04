@@ -65,7 +65,7 @@
 Summary:	 %{_name} Driver
 Name:		 mlnx-nfsrdma
 Version:	 24.10
-Release:	 8%{?dist}
+Release:	 9%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -248,6 +248,9 @@ fi
 %endif
 
 %changelog
+* Mon Mar 03 2025 Andy Zaugg <azaugg@linkedin.com> - 24.10-9
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
 - Bump release to rebuild for new kernel release
 
