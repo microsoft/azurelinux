@@ -1,0 +1,56 @@
+--- a/lib/pfmlib_perf_event_pmu.c
++++ b/lib/pfmlib_perf_event_pmu.c
+@@ -23,6 +23,7 @@
+  */
+ #include <sys/types.h>
+ #include <string.h>
++#include <stddef.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <unistd.h>
+@@ -254,18 +255,21 @@
+ perf_table_alloc_event(void)
+ {
+ 	perf_event_t *new_pe;
++	ptrdiff_t perf_pe_diff;
+ 
+ retry:
+ 	if (perf_pe_free < perf_pe_end)
+ 		return perf_pe_free++;
+ 
+ 	perf_pe_count += PERF_ALLOC_EVENT_COUNT;
++	perf_pe_diff = perf_pe_free - perf_pe;
+ 	
+ 	new_pe = realloc(perf_pe, perf_pe_count * sizeof(perf_event_t));
+ 	if (!new_pe) 
+ 		return NULL;
+ 	
+-	perf_pe_free = new_pe + (perf_pe_free - perf_pe);
++	// perf_pe_free = new_pe + (perf_pe_free - perf_pe);
++	perf_pe_free = new_pe + perf_pe_diff;
+ 	perf_pe_end = perf_pe_free + PERF_ALLOC_EVENT_COUNT;
+ 	perf_pe = new_pe;
+ 
+@@ -290,18 +294,21 @@
+ perf_table_alloc_umask(void)
+ {
+ 	perf_umask_t *new_um;
++	ptrdiff_t perf_um_diff;
+ 
+ retry:
+ 	if (perf_um_free < perf_um_end)
+ 		return perf_um_free++;
+ 
+ 	perf_um_count += PERF_ALLOC_UMASK_COUNT;
++	perf_um_diff = perf_um_free - perf_um;
+ 	
+ 	new_um = realloc(perf_um, perf_um_count * sizeof(*new_um));
+ 	if (!new_um) 
+ 		return NULL;
+ 	
+-	perf_um_free = new_um + (perf_um_free - perf_um);
++	// perf_um_free = new_um + (perf_um_free - perf_um);
++	perf_um_free = new_um + perf_um_diff;
+ 	perf_um_end = perf_um_free + PERF_ALLOC_UMASK_COUNT;
+ 	perf_um = new_um;
+ 

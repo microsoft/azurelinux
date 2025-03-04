@@ -10,7 +10,7 @@
 
 Name:		libpfm
 Version:	4.10.1
-Release:	11%{?dist}
+Release:	12%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
@@ -20,6 +20,7 @@ Distribution:   Azure Linux
 URL:		http://perfmon2.sourceforge.net/
 Source0:	http://sourceforge.net/projects/perfmon2/files/libpfm4/%{name}-%{version}.tar.gz
 Patch2:		libpfm-python3-setup.patch
+Patch3:         gcc-pointer-use-agter-free.patch
 
 BuildRequires:	gcc
 %if %{with python}
@@ -68,6 +69,7 @@ Python bindings for libpfm4 and perf_event_open system call.
 %prep
 %setup -q
 %patch 2 -p1 -b .python3
+%patch3 -p1
 
 %build
 %if %{with python}
@@ -115,6 +117,9 @@ make \
 %endif
 
 %changelog
+* Thu Feb 20 2025 Andy Zaugg <azaugg@linkedin.com> - 4.10.1-12
+- Allow gcc12 to build library
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.1-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
