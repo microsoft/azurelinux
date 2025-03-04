@@ -19303,8 +19303,8 @@
         "type": "other",
         "other": {
           "name": "perl-PerlIO-utf8_strict",
-          "version": "0.007",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/PerlIO-utf8_strict-0.007.tar.gz"
+          "version": "0.010",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/PerlIO/PerlIO-utf8_strict-0.010.tar.gz"
         }
       }
     },
