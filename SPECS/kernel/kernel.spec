@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.76.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,6 +69,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
@@ -428,6 +429,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 03 2025 Andy Zaugg <azaugg@linkedin.com> - 6.6.76.1-3
+- Add slang as BuildRequires, enabling tui on perf
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
 - Bump release to match kernel-64k
 
