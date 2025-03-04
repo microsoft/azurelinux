@@ -20553,8 +20553,8 @@
         "type": "other",
         "other": {
           "name": "perl-Tree-DAG_Node",
-          "version": "1.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSAVAGE/Tree-DAG_Node-1.31.tgz"
+          "version": "1.32",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Tree/Tree-DAG_Node-1.32.tgz"
         }
       }
     },
