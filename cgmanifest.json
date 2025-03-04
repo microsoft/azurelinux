@@ -24102,7 +24102,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pyproject_api",
+          "name": "python-pyproject-api",
           "version": "1.6.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyproject-api/pyproject_api-1.6.1.tar.gz"
         }            
