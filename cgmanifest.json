@@ -16593,8 +16593,8 @@
         "type": "other",
         "other": {
           "name": "perl-Config-Tiny",
-          "version": "2.24",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Config/Config-Tiny-2.24.tgz"
+          "version": "2.30",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Config/Config-Tiny-2.30.tgz"
         }
       }
     },
