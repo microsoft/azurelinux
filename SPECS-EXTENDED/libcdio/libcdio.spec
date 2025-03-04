@@ -135,7 +135,7 @@ make check
 
 %changelog
 * Tue Mar 04 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.0-14
-- Upgrade to 2.1.0
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-13
