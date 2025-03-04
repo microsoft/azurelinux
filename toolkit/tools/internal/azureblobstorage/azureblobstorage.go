@@ -56,6 +56,9 @@ func (abs *AzureBlobStorage) Download(
 	containerName string,
 	blobName string,
 	localFileName string) (err error) {
+	if ctx == nil {
+		return fmt.Errorf("context is nil")
+	}
 
 	downloadStartTime := time.Now()
 
