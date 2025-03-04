@@ -92,16 +92,7 @@ ExcludeArch: %{ix86}
 %global disable_mongodb 1
 %endif
  
-# No mssql ODBC driver on non-x86 platforms
-%ifarch x86_64
-%if !%{disable_python2} || !%{disable_python3}
-%global disable_mssql 0
-%else
 %global disable_mssql 1
-%endif
-%else
-%global disable_mssql 1
-%endif
 
 # support for pmdanutcracker (perl deps missing on rhel)
 %global disable_nutcracker 0
@@ -2450,19 +2441,6 @@ sed -i '/.a$/d' pcp-devel-files
 sed -i '/\/man\//d' pcp-devel-files
 sed -i '/\/include\//d' pcp-devel-files
 
-%ifarch x86_64 ppc64 ppc64le aarch64 s390x riscv64
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-libs-files
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-devel-files
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-libs-devel-files
-%endif
-%ifarch ia64
-%if "%{_vendor}" != "suse"
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-libs-files
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-devel-files
-sed -i -e 's/usr\/lib\//usr\/lib64\//' pcp-libs-devel-files
-%endif
-%endif
-
 # some special cases for devel
 awk '{print $NF}' $DIST_MANIFEST |\
 grep -E 'pcp/(examples|demos)|(etc/pcp|pcp/pmdas)/(sample|simple|trivial|txmon)|bin/(pmdbg|pmclient|pmerr|genpmda)' | grep -E -v tutorials >>pcp-devel-files
@@ -2502,7 +2480,9 @@ total_manifest | keep 'tutorials|/html/|pcp-doc|man.*\.[1-9].*' | cull 'out' >pc
 total_manifest | keep 'testsuite|pcpqa|etc/systemd/system|libpcp_fault|pcp/fault.h|pmcheck/pmda-sample' >pcp-testsuite-files
 
 basic_manifest | keep "$PCP_GUI|pcp-gui|applications|pixmaps|hicolor" | cull 'pmtime.h' >pcp-gui-files
+%if !%{disable_selinux}
 basic_manifest | keep 'selinux' | cull 'tmp|testsuite' >pcp-selinux-files
+%endif
 basic_manifest | keep 'zeroconf|daily[-_]report|/sa$' | cull 'pmcheck' >pcp-zeroconf-files
 basic_manifest | grep -E -e 'pmiostat|pmrep|dstat|htop|pcp2csv' \
    -e 'pcp-atop|pcp-dmcache|pcp-dstat|pcp-free' \
@@ -2517,7 +2497,9 @@ basic_manifest | keep 'sheet2pcp' >pcp-import-sheet2pcp-files
 basic_manifest | keep 'mrtg2pcp' >pcp-import-mrtg2pcp-files
 basic_manifest | keep 'ganglia2pcp' >pcp-import-ganglia2pcp-files
 basic_manifest | keep 'collectl2pcp' >pcp-import-collectl2pcp-files
+%if !%{disable_arrow}
 basic_manifest | keep 'pcp2arrow' >pcp-export-pcp2arrow-files
+%endif
 basic_manifest | keep 'pcp2elasticsearch' >pcp-export-pcp2elasticsearch-files
 basic_manifest | keep 'pcp2influxdb' >pcp-export-pcp2influxdb-files
 basic_manifest | keep 'pcp2xlsx' >pcp-export-pcp2xlsx-files
@@ -2568,7 +2550,9 @@ basic_manifest | keep '(etc/pcp|pmdas)/mailq(/|$)' >pcp-pmda-mailq-files
 basic_manifest | keep '(etc/pcp|pmdas)/mic(/|$)' >pcp-pmda-mic-files
 basic_manifest | keep '(etc/pcp|pmdas)/mounts(/|$)' >pcp-pmda-mounts-files
 basic_manifest | keep '(etc/pcp|pmdas)/mongodb(/|$)' >pcp-pmda-mongodb-files
+%if !%{disable_mssql}
 basic_manifest | keep '(etc/pcp|pmdas|pmieconf)/mssql(/|$)' >pcp-pmda-mssql-files
+%endif
 basic_manifest | keep '(etc/pcp|pmdas)/mysql(/|$)' >pcp-pmda-mysql-files
 basic_manifest | keep '(etc/pcp|pmdas)/named(/|$)' >pcp-pmda-named-files
 basic_manifest | keep '(etc/pcp|pmdas)/netfilter(/|$)' >pcp-pmda-netfilter-files
@@ -2590,7 +2574,6 @@ basic_manifest | keep '(etc/pcp|pmdas)/rabbitmq(/|$)' >pcp-pmda-rabbitmq-files
 basic_manifest | keep '(etc/pcp|pmdas)/redis(/|$)' >pcp-pmda-redis-files
 basic_manifest | keep '(etc/pcp|pmdas)/resctrl(/|$)|sys-fs-resctrl' >pcp-pmda-resctrl-files
 basic_manifest | keep '(etc/pcp|pmdas)/roomtemp(/|$)' >pcp-pmda-roomtemp-files
-basic_manifest | keep '(etc/pcp|pmdas)/rpm(/|$)' >pcp-pmda-rpm-files
 basic_manifest | keep '(etc/pcp|pmdas)/rsyslog(/|$)' >pcp-pmda-rsyslog-files
 basic_manifest | keep '(etc/pcp|pmdas)/samba(/|$)' >pcp-pmda-samba-files
 basic_manifest | keep '(etc/pcp|pmdas)/sendmail(/|$)' >pcp-pmda-sendmail-files
@@ -2599,7 +2582,9 @@ basic_manifest | keep '(etc/pcp|pmdas)/slurm(/|$)' >pcp-pmda-slurm-files
 basic_manifest | keep '(etc/pcp|pmdas)/smart(/|$)' >pcp-pmda-smart-files
 basic_manifest | keep '(etc/pcp|pmdas)/snmp(/|$)' >pcp-pmda-snmp-files
 basic_manifest | keep '(etc/pcp|pmdas)/sockets(/|$)' >pcp-pmda-sockets-files
+%if !%{disable_statsd}
 basic_manifest | keep '(etc/pcp|pmdas)/statsd(/|$)' >pcp-pmda-statsd-files
+%endif
 basic_manifest | keep '(etc/pcp|pmdas)/summary(/|$)' >pcp-pmda-summary-files
 basic_manifest | keep '(etc/pcp|pmdas)/systemd(/|$)' >pcp-pmda-systemd-files
 basic_manifest | keep '(etc/pcp|pmdas)/trace(/|$)' >pcp-pmda-trace-files
@@ -2661,6 +2646,7 @@ done
 
 ls -l *-files.rpm
 rm -f *-files.rpm *-tmpfiles.rpm
+echo $DIST_MANIFEST
 sort -u $DIST_MANIFEST | awk '
 function loadfiles(files) {
     system ("touch " files"-files");
@@ -3483,6 +3469,10 @@ ls -l *-files.rpm
 %files zeroconf -f pcp-zeroconf-files.rpm
 
 %changelog
+* Wed Mar 05 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 6.3.2-1
+- Import from fedora
+- Fix the build issues for azurelinux
+
 * Wed Jan 29 2025 William Cohen <wcohen@redhat.com> - 6.3.2-5
 - Backport GCC15 fixes (BZ #2341011)
 
@@ -3590,18 +3580,6 @@ ls -l *-files.rpm
 
 * Mon Dec 12 2022 Florian Weimer <fweimer@redhat.com> - 6.0.1-4
 - Port configure script to C99
-
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1.1-3
-- Making binaries paths compatible with CBL-Mariner's paths.
-
-* Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 5.1.1-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Provide unversioned pcp-pmda-prometheus.
-- Disable qt support.
-- Disable xlsx support.
-- Disable bpftrace support.
-- Allow unpackaged files since features are disabled.
-- Add unstated which build dependency.
 
 * Thu Nov 03 2022 Jiri Olsa <jolsa@kernel.org> - 6.0.1-3
 - rebuilt for libbpf 1.0
