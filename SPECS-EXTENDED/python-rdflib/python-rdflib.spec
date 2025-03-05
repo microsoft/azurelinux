@@ -3,6 +3,10 @@
 
 %bcond docs 0
 %bcond tests 0
+%if 0%{?fedora}
+%bcond docs 1
+%bcond tests 1
+%endif
 
 Name:           python-%{srcname}
 Version:        7.0.0
@@ -23,9 +27,11 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires: 	python3-pip
 BuildRequires: 	python3-wheel
 BuildRequires: 	python3-poetry
+
 %if %{with tests}
 BuildRequires:  python3dist(pytest)
 %endif
+
 %if %{with docs}
 BuildRequires:  python3dist(myst-parser)
 BuildRequires:  python3dist(sphinx)
