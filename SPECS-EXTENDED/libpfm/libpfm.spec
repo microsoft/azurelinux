@@ -116,7 +116,7 @@ make \
 
 %changelog
 * Mon Feb 24 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.13.0-1
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Upgrade to 4.13.0 to fix build issue and support pcp upgrade
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.1-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
