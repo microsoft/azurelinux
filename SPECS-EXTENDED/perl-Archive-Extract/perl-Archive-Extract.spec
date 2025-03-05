@@ -7,7 +7,6 @@
 
 Name:           perl-Archive-Extract
 # Epoch to compete with core module from perl.spec
-Epoch:          1
 Version:        0.88
 Release:        13%{?dist}
 Summary:        Generic archive extracting mechanism
@@ -79,16 +78,16 @@ command-line tools on your system.
 # bz2:  bunzip2 || IO::Uncompress::Bunzip2
 %package bz2-bunzip2
 Summary:    Bzip2 decompressor for %{name} via bunzip2
-Provides:   %{name}-bz2 = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-bz2 = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   bzip2
 %description bz2-bunzip2
 %{summary}.
 
 %package bz2-IO-Uncompress-Bunzip2
 Summary:    Bzip2 decompressor for %{name} via IO::Uncompress::Bunzip2
-Provides:   %{name}-bz2 = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-bz2 = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(IO::Uncompress::Bunzip2)
 %description bz2-IO-Uncompress-Bunzip2
 %{summary}.
@@ -96,16 +95,16 @@ Requires:   perl(IO::Uncompress::Bunzip2)
 # gz:   gzip || Compress::Zlib
 %package gz-gzip
 Summary:    Gzip decompressor for %{name} via gzip
-Provides:   %{name}-gz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-gz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   gzip
 %description gz-gzip
 %{summary}.
 
 %package gz-Compress-Zlib
 Summary:    Gzip decompressor for %{name} via Compress::Zlib
-Provides:   %{name}-gz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-gz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Compress::Zlib)
 %description gz-Compress-Zlib
 %{summary}.
@@ -113,8 +112,8 @@ Requires:   perl(Compress::Zlib)
 # lzma: unlzma || IO::Uncompress::UnLzma || Compress::unLZMA
 %package lzma-unlzma
 Summary:    Lzma decompressor for %{name} via unlzma
-Provides:   %{name}-lzma = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-lzma = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   xz-lzma-compat
 %description lzma-unlzma
 %{summary}.
@@ -122,8 +121,8 @@ Requires:   xz-lzma-compat
 %if %{with perl_Archive_Extract_enables_perl_xz}
 %package lzma-IO-Uncompress-UnLzma
 Summary:    Lzma decompressor for %{name} via IO::Uncompress::UnLzma
-Provides:   %{name}-lzma = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-lzma = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(IO::Uncompress::UnLzma)
 # perl-Extract-Archive-lzma-Compress-unLZMA removed because Compress::unLZMA
 # is not yet packaged
@@ -136,8 +135,8 @@ Obsoletes:  perl-Archive-Extract-lzma-Compress-unLZMA < 1:0.80-8
 # Compress::unLZMA not yet packaged
 #%%package lzma-Compress-unLZMA
 #Summary:    Lzma decompressor for %%{name} via Compress::unLZMA
-#Provides:   %%{name}-lzma = %%{epoch}:%%{version}-%%{release}
-#Requires:   %%{name} = %%{epoch}:%%{version}-%%{release}
+#Provides:   %%{name}-lzma = %%{version}-%%{release}
+#Requires:   %%{name} = %%{version}-%%{release}
 #Requires:   perl(Compress::unLZMA)
 #%%description lzma-Compress-unLZMA
 #%%{summary}.
@@ -146,16 +145,16 @@ Obsoletes:  perl-Archive-Extract-lzma-Compress-unLZMA < 1:0.80-8
 # tar:  tar || Archive::Tar
 %package tar-tar
 Summary:    Tar decompressor for %{name} via tar
-Provides:   %{name}-tar = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tar = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   tar
 %description tar-tar
 %{summary}.
 
 %package tar-Archive-Tar
 Summary:    Tar decompressor for %{name} via Archive::Tar
-Provides:   %{name}-tar = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tar = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Tar)
 %description tar-Archive-Tar
 %{summary}.
@@ -163,8 +162,8 @@ Requires:   perl(Archive::Tar)
 # tbz:  (tar && bunzip2) || (Archive::Tar && IO::Uncompress::Bunzip2)
 %package tbz-tar-bunzip2
 Summary:    Bzipped-tar decompressor for %{name} via tar an bunzip2
-Provides:   %{name}-tbz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tbz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   tar
 Requires:   bzip2
 %description tbz-tar-bunzip2
@@ -172,8 +171,8 @@ Requires:   bzip2
 
 %package tbz-Archive-Tar-IO-Uncompress-Bunzip2
 Summary:    Bzipped-tar decompressor for %{name} via Archive::Tar and IO::Uncompress::Bunzip2
-Provides:   %{name}-tbz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tbz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Tar)
 Requires:   perl(IO::Uncompress::Bunzip2)
 %description tbz-Archive-Tar-IO-Uncompress-Bunzip2
@@ -183,8 +182,8 @@ IO::Uncompress::Bunzip2.
 # tgz:  (tar && gzip) || (Archive::Tar && (Compress::Zlib || IO::Zlib))
 %package tgz-tar-gzip
 Summary:    Gzipped-tar decompressor for %{name} via tar and gzip
-Provides:   %{name}-tgz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tgz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   tar
 Requires:   gzip
 %description tgz-tar-gzip
@@ -192,8 +191,8 @@ Requires:   gzip
 
 %package tgz-Archive-Tar-Compress-Zlib
 Summary:    Gzipped-tar decompressor for %{name} via Archive::Tar and Compress::Zlib
-Provides:   %{name}-tgz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tgz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Tar)
 Requires:   perl(Compress::Zlib)
 %description tgz-Archive-Tar-Compress-Zlib
@@ -202,8 +201,8 @@ Compress::Zlib.
 
 %package tgz-Archive-Tar-IO-Zlib
 Summary:    Gzipped-tar decompressor for %{name} via Archive::Tar and IO::Zlib
-Provides:   %{name}-tgz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-tgz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Tar)
 Requires:   perl(IO::Zlib)
 %description tgz-Archive-Tar-IO-Zlib
@@ -212,8 +211,8 @@ Requires:   perl(IO::Zlib)
 # txz:  (tar && unxz) || (Archive::Tar && IO::Uncompress::UnXz)
 %package txz-tar-unxz
 Summary:    Xzed-tar decompressor for %{name} via tar and unxz
-Provides:   %{name}-txz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-txz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   tar
 Requires:   xz
 %description txz-tar-unxz
@@ -222,8 +221,8 @@ Requires:   xz
 %if %{with perl_Archive_Extract_enables_perl_xz}
 %package txz-Archive-Tar-IO-Uncompress-UnXz
 Summary:    Xzed-tar decompressor for %{name} via Archive::Tar and IO::Uncompress::UnXz
-Provides:   %{name}-txz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-txz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Tar)
 Requires:   perl(IO::Uncompress::UnXz)
 %description txz-Archive-Tar-IO-Uncompress-UnXz
@@ -234,16 +233,16 @@ IO::Uncompress::UnXz.
 # Z:    uncompress || Compress::Zlib
 %package Z-uncompress
 Summary:    Z decompressor for %{name} via uncompress
-Provides:   %{name}-Z = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-Z = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   ncompress
 %description Z-uncompress
 %{summary}.
 
 %package Z-Compress-Zlib
 Summary:    Z decompressor for %{name} via Compress::Zlib
-Provides:   %{name}-Z = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-Z = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Compress::Zlib)
 %description Z-Compress-Zlib
 %{summary}.
@@ -251,16 +250,16 @@ Requires:   perl(Compress::Zlib)
 # zip:  unzip || Archive::Zip
 %package zip-unzip
 Summary:    ZIP decompressor for %{name} via unzip
-Provides:   %{name}-zip = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-zip = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   unzip
 %description zip-unzip
 %{summary}.
 
 %package zip-Archive-Zip
 Summary:    ZIP decompressor for %{name} via Archive::Zip
-Provides:   %{name}-zip = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-zip = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(Archive::Zip)
 %description zip-Archive-Zip
 %{summary}.
@@ -268,8 +267,8 @@ Requires:   perl(Archive::Zip)
 # xz:   unxz || IO::Uncompress::UnXz
 %package xz-unxz
 Summary:    Xz decompressor for %{name} via unxz
-Provides:   %{name}-xz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-xz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   xz
 %description xz-unxz
 %{summary}.
@@ -277,8 +276,8 @@ Requires:   xz
 %if %{with perl_Archive_Extract_enables_perl_xz}
 %package xz-IO-Uncompress-UnXz
 Summary:    Xz decompressor for %{name} via IO::Uncompress::UnXz
-Provides:   %{name}-xz = %{epoch}:%{version}-%{release}
-Requires:   %{name} = %{epoch}:%{version}-%{release}
+Provides:   %{name}-xz = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 Requires:   perl(IO::Uncompress::UnXz)
 %description xz-IO-Uncompress-UnXz
 %{summary}.
@@ -335,7 +334,7 @@ make test
 %endif
 
 %changelog
-* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1:0.88 - 13
+* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.88 - 13
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
