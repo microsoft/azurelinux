@@ -2,7 +2,7 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        2.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -19,6 +19,8 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 BuildRequires:  python%{python3_pkgversion}-wheel
 %if %{with check}
+# The azurelinux-release package is required to use tdnf to uninstall packages for the tests
+BuildRequires:  azurelinux-release
 BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
@@ -38,7 +40,7 @@ a minimal and fast API targetting the following uses:
 
 -distribute tasks to local or remote processes
 -write and deploy hybrid multi-process applications
--write scripts to administer multiple hosts}
+-write scripts to administer multiple hosts
 
 %prep
 %autosetup -n %{pkgname}-%{version}
@@ -60,6 +62,8 @@ rm doc/_build/html/.buildinfo
 %pyproject_save_files %{pkgname}
 
 %check
+# Need to remove tomli and packaging to allow tox installation via pip
+tdnf erase -y python3-tomli python3-packaging
 pip3 install tox iniconfig
 # sed -i "s/pytest$/pytest==7.1.3/" tox.ini
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
@@ -70,6 +74,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %license %{python3_sitelib}/%{pkgname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Mon Feb 24 2025 Andrew Phelps <anphel@microsoft.com> - 2.1.1-2
+- Fix tomli/packaging conflict seen during package test setup
+
 * Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.1.1-1
 - Auto-upgrade to 2.1.1
 - Replacing most of the %%py3... with %%pyproject...
