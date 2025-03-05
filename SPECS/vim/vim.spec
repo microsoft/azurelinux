@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.0791
-Release:        4%{?dist}
+Version:        9.1.1164
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -203,6 +203,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1164-1
+- Auto-upgrade to 9.1.1164 - for CVE-2025-27423
+
 * Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
 - Patch CVE-2025-26603 & CVE-2025-1215
 
