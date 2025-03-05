@@ -1,0 +1,22 @@
+From 128b2b40ec4e53986dd351dd49b89535da86e7e0 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 15 Sep 2024 12:50:07 -0400
+Subject: [PATCH] In libclamav_rust, use the current version of the image crate
+
+---
+ libclamav_rust/Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libclamav_rust/Cargo.toml b/libclamav_rust/Cargo.toml
+index 526951c519..eb95ca8011 100644
+--- a/libclamav_rust/Cargo.toml
++++ b/libclamav_rust/Cargo.toml
+@@ -12,7 +12,7 @@ log = { version = "0.4", features = ["std"] }
+ sha2 = "0.10"
+ tempfile = "3"
+ thiserror = "1"
+-image = "0.24"
++image = "0.25"
+ rustdct = "0.7"
+ transpose = "0.2"
+ num-traits = "0.2"
