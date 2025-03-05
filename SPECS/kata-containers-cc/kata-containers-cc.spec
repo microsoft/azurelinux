@@ -13,8 +13,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl2
-Release:      5%{?dist}
+Version:      3.2.0.azl8.abombo
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -293,6 +293,9 @@ fi
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl8.abombo-1
+- Auto-upgrade to 3.2.0.azl8.abombo
+
 * Mon Jul 15 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-5
 - Call make clean with OS distro variable
 
