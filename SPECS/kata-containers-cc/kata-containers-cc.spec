@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl4
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -43,6 +43,12 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 %description tools
 This package contains the scripts and files required to build the UVM
 
+%package tardev
+Summary:        tardev-snapshotter for Kata Containers
+
+%description tardev
+This package contains the tardev-snapshotter service for Kata Containers.
+
 %prep
 %autosetup -p1 -n %{sourceName}-%{version}
 pushd %{_builddir}/%{sourceName}-%{version}
@@ -52,6 +58,7 @@ popd
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package-confpods
+%make_build tardev
 popd
 
 %define kata_path     /opt/confidential-containers
@@ -64,15 +71,16 @@ popd
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-confpods-package
 PREFIX=%{buildroot} %make_build deploy-confpods-package-tools
+PREFIX=%{buildroot} %make_build deploy-tardev
 popd
 
-%preun
+%preun tardev
 %systemd_preun tardev-snapshotter.service
 
-%postun
+%postun tardev
 %systemd_postun tardev-snapshotter.service
 
-%post
+%post tardev
 %systemd_post tardev-snapshotter.service
 if [ $1 -eq 1 ]; then # Package install
 	systemctl enable tardev-snapshotter.service > /dev/null 2>&1 || :
@@ -82,9 +90,6 @@ fi
 %files
 %{_sbindir}/mount.tar
 %{_bindir}/kata-overlay
-%{_bindir}/tardev-snapshotter
-%{_unitdir}/tardev-snapshotter.service
-
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
@@ -97,6 +102,10 @@ fi
 %license LICENSE
 %doc CONTRIBUTING.md
 %doc README.md
+
+%files tardev
+%{_bindir}/tardev-snapshotter
+%{_unitdir}/tardev-snapshotter.service
 
 %files tools
 %dir %{kata_path}
@@ -150,6 +159,10 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Mar 03 2025 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl4-2
+- Add tardev subpackage
+
+
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 
