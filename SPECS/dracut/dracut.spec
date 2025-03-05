@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        11%{?dist}
+Release:        12%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -56,6 +56,18 @@ Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include
 Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
 Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
 Patch:          avoid-mktemp-collisions-with-find-not-path.patch
+# fix-dracut-systemd-include-systemd-cryptsetup.patch has been introduced  
+# by the Azure Linux team to ensure that the systemd-cryptsetup module is included  
+# in the initramfs when needed.  
+# In dracut version 102, the systemd-cryptsetup module was split from the crypt module  
+# and is no longer included by default in initramfs. This causes encrypted volumes  
+# defined in crypttab to not be processed during the initrd phase.  
+# This patch modifies the dracut-systemd module to explicitly include systemd-cryptsetup  
+# when required, restoring expected cryptsetup functionality.  
+# This is a temporary fix until Dracut is upgraded to 104+.  
+# - For reference, see https://github.com/dracut-ng/dracut-ng/pull/262 and
+# https://github.com/dracut-ng/dracut-ng/commit/e0e5424a7b5e387ccb70e47ffea5a59716bf7b76  
+Patch:          fix-dracut-systemd-include-systemd-cryptsetup.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -315,6 +327,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Mar 11 2025 Archana Choudhary <archana1@microsoft.com> - 102-12
+- Add fix for systemd-cryptsetup module to be included in initramfs when needed
+
 * Mon Mar 05 2025 George Mileka <gmileka@microsoft.com> - 102-11
 - Update overlayfs selinux handling with the full path of chcon
 
