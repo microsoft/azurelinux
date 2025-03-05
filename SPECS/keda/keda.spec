@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,8 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2024-6104.patch
 Patch1:         CVE-2024-45338.patch
+Patch2:         CVE-2025-27144.patch
+Patch3:         CVE-2025-22868.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -61,6 +63,9 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.14.1-3
+- Fix CVE-2025-27144, CVE-2025-22868 with an upstream patch
+
 * Wed Jan 08 2025 <rohitrawat@microsoft.com> - 2.14.1-2
 - Add patch for CVE-2024-45338
 
