@@ -1,6 +1,6 @@
 Name:           perl-MIME-Charset
-Version:        1.012.2
-Release:        12%{?dist}
+Version:        1.013.1
+Release:        1%{?dist}
 Summary:        Charset Informations for MIME
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -75,8 +75,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.012.2-12
-- License verified.
+* Wed Feb 19 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.013.1-1
+- Update to 1.013.1
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.012.2-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

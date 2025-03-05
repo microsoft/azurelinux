@@ -1,12 +1,12 @@
-Name: libteam
-Version: 1.30
-Release: 3%{?dist}
-Summary: Library for controlling team network device
-License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name: libteam
+Version: 1.32
+Release: 10%{?dist}
+Summary: Library for controlling team network device
+License: LGPLv2+
 URL: http://www.libteam.org
-Source: http://www.libteam.org/files/libteam-%{version}.tar.gz
+Source0: https://www.libteam.org/files/libteam-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: jansson-devel
@@ -16,6 +16,10 @@ BuildRequires: dbus-devel
 BuildRequires: systemd
 BuildRequires: swig
 BuildRequires: doxygen
+BuildRequires: make
+
+# subpackage removed in this version-release
+Obsoletes: network-scripts-teamd < 1.32-8
 
 %description
 This package contains a library which is a user-space
@@ -41,11 +45,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary: Libraries and header files for teamd development
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%package -n network-scripts-teamd
-Summary: teamd legacy network service support
-Requires: network-scripts
-Supplements: (%{name} and network-scripts)
-
 %description devel
 The libteam-devel package contains the header files and libraries
 necessary for developing programs using libteam.
@@ -56,11 +55,6 @@ The teamd package contains team network device control daemon.
 %description -n teamd-devel
 The teamd-devel package contains the header files and libraries
 necessary for developing programs using libteamdctl.
-
-%description -n network-scripts-teamd
-This provides the ifup and ifdown scripts for use with the legacy network
-service.
-service.
 
 %prep
 %setup -q
@@ -83,11 +77,6 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dbus-1/system.d
 install -p teamd/dbus/teamd.conf $RPM_BUILD_ROOT%{_sysconfdir}/dbus-1/system.d/
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 install -p teamd/redhat/systemd/teamd@.service $RPM_BUILD_ROOT%{_unitdir}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifup-Team $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifdown-Team $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifup-TeamPort $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
-install -p -m 755 teamd/redhat/initscripts_systemd/network-scripts/ifdown-TeamPort $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/network-scripts
 install -p -m 755 utils/bond2team $RPM_BUILD_ROOT%{_bindir}/bond2team
 
 %ldconfig_scriptlets
@@ -125,19 +114,90 @@ install -p -m 755 utils/bond2team $RPM_BUILD_ROOT%{_bindir}/bond2team
 %{_libdir}/libteamdctl.so
 %{_libdir}/pkgconfig/libteamdctl.pc
 
-%files -n network-scripts-teamd
-%{_sysconfdir}/sysconfig/network-scripts/ifup-Team
-%{_sysconfdir}/sysconfig/network-scripts/ifdown-Team
-%{_sysconfdir}/sysconfig/network-scripts/ifup-TeamPort
-%{_sysconfdir}/sysconfig/network-scripts/ifdown-TeamPort
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.30-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Nov 12 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.32-10
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.32-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 25 2024 Michel Lind <salimma@fedoraproject.org> - 1.32-8
+- Remove network-scripts-teamd again (rhbz#2294342)
+
+* Tue Apr 16 2024 Michel Lind <salimma@fedoraproject.org> - 1.32-7
+- Restore network-scripts-teamd, now that network-scripts is back
+
+* Mon Apr 15 2024 Michel Lind <salimma@fedoraproject.org> - 1.32-6
+- Properly obsolete network-scripts-teamd
+
+* Fri Apr 12 2024 Michel Lind <salimma@fedoraproject.org> - 1.32-5
+- Remove network-scripts-teamd subpackage (rhbz#2262986)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.32-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.32-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 03 2024 Xin Long <lxin@redhat.com> - 1.32-2
+Use SDPX license IDs
+
+* Wed Sep 06 2023 Jiri Pirko <jiri@resnulli.us> - 1.32-1
+teamd: Add option to change evaluation logic of multiple link-watchers
+Revert: teamd: lacp: make sure that lacp_port_agg_update() works with correct unselectable state
+teamd: lacp: don't move the port state from disabled when admin state is down
+teamd: lacp: set port to disabled state during removal
+teamd: lacp: make sure that lacp_port_agg_update() works with correct unselectable state
+libteam: clear changed bits in case of TEAM_IFINFO_CHANGE
+misc: fix possible strncpy truncation bug
+teamd: stop iterating callbacks when a loop restart is requested
+teamd: do no remove the ports on shutdown with -N
+binding/python: ifindex 0 is invalid so do not process it
+teamd: Include missing headers for strrchr and memcmp
+libteamdctl: validate the bus name before using it
+options: move option temporary check after the err check
+teamd: lacp: increase "min_ports" upper limit to 1024
+fix build on OpenWRT/musl-libc
+teamd: increase the waitting time for daemon killing
+Revert "teamd: Disregard current state when considering port enablement"
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun Jul 26 2020 Jiri Pirko <jiri@resnulli.us> - 1.31-1
+1.31 release
+utils/bond2team: remove TYPE in ifcfg file
+utils/bond2team: keep delivering config to file if stdout not supplied
+teamd/lacp: silence ignore none LACP frames
+teamd: fix ctx->hwaddr value assignment
+Send LACP PDU right after the Actor state has been changed
+Skip setting the same hwaddr to a lag port if not needed
+Make all netlink socket RCVBUF sizes configurable
+Don't return an error when timerfd socket return 0
+Fix ifinfo_link_with_port race condition with newlink
+teamd: fix possible race in master ifname callback
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
-
 
 * Thu Jan 09 2020 Jiri Pirko <jiri@resnulli.us> - 1.30-1
 - 1.30 release
