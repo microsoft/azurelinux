@@ -428,6 +428,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 05 2025 Hardik Garg <hargar@microsoft.com> - 6.6.78.1-2
+- enable CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS
+
 * Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
 - Auto-upgrade to 6.6.78.1
 
