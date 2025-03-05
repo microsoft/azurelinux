@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "coredns-1.11.1.tar.gz": "4e1cde1759d1705baa9375127eb405cd2f5031f9152947bb958a51fee5898d8c",
-    "coredns-1.11.1-vendor.tar.gz": "f6713fb6bdb6da88bab4c93a53317907991fa2e304cc2f224bfee88df6c26846"
+    "coredns-1.11.4.tar.gz": "19c3b34f99921c129a19797710ddcc35f974655c99914cc319ccd0ba14f13e57",
+    "coredns-1.11.4-vendor.tar.gz": "7b84d85ea60f6ac0c881985b5a734c33388e19db6b42323435bb1911179efb3b"
   }
 }

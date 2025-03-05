@@ -2077,8 +2077,8 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.11.1.tar.gz"
+          "version": "1.11.4",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.11.4.tar.gz"
         }
       }
     },
