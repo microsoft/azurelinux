@@ -41,6 +41,7 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
 Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+Patch3:		0001-flux-enable-build-with-rust-1.85.0.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -72,6 +73,7 @@ programs using Influx data language.
 %prep
 %setup -q
 %patch 2 -p1
+%patch 3 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
