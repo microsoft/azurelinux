@@ -15,7 +15,6 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
 # specific event. Revert back to the original filename when a new cache is created for a different version.
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:		libclamav_rust_image_version.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -60,7 +59,7 @@ popd
 %autosetup -p1 -n clamav-clamav-%{version}
 
 %build
-export CARGO_NET_OFFLINE=true
+export CARGO_NET_OFFLINE=false
 # Notes:
 # - milter must be disable because CBL-Mariner does not provide 'sendmail' packages
 #   which provides the necessary pieces to build 'clamav-milter'
