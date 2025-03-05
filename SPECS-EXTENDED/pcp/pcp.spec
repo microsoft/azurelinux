@@ -2644,7 +2644,6 @@ do \
     echo $subpackage >> packages.list; \
 done
 
-ls -l *-files.rpm
 rm -f *-files.rpm *-tmpfiles.rpm
 echo $DIST_MANIFEST
 sort -u $DIST_MANIFEST | awk '
@@ -2706,7 +2705,6 @@ $1 == "l" {
 %endif
             print $3 >> f;
           }'
-ls -l *-files.rpm
 
 %if !%{disable_systemd}
 mkdir -p $DIST_ROOT/$PCP_SYSTEMDTMPFILES_DIR
@@ -3163,7 +3161,6 @@ if [ $1 -eq 0 ]; then
     %selinux_relabel_post -s targeted
 fi
 %endif
-ls -l *-files.rpm
 
 %files -f pcp-files.rpm
 %doc CHANGELOG COPYING INSTALL.md README.md VERSION.pcp pcp.lsm
