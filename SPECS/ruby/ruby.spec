@@ -87,7 +87,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,6 +106,7 @@ Patch0:         CVE-2024-49761.patch
 # to remove the lock file for binstubs and avoid race condition
 Patch1:         Avoid-another-race-condition-of-open-mode.patch
 Patch2:         Remove-the-lock-file-for-binstubs.patch
+Patch3:         CVE-2025-25186.patch
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
 BuildRequires:  pkgconfig(yaml-0.1)
@@ -410,6 +411,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Feb 17 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.3.5-2
+- Patch to fix CVE-2025-25186
+
 * Fri Nov 08 2024 Saul Paredes <saulparedes@microsoft.com> - 3.3.5-1
 - Upgrade ruby to 3.3.5 to resolve CVE-2024-39908
 - Remove CVE-2024-41946.patch as it no longer applies as ruby 3.3.5 containers rubygem-rexml 3.3.6, where CVE-2024-41946 is already fixed
