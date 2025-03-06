@@ -24303,8 +24303,8 @@
         "type": "other",
         "other": {
           "name": "python-rdflib",
-          "version": "6.2.0",
-          "downloadUrl": "https://github.com/RDFLib/rdflib/releases/download/6.2.0/rdflib-6.2.0.tar.gz"
+          "version": "7.0.0",
+          "downloadUrl": "https://github.com/RDFLib/rdflib/releases/download/7.0.0/rdflib-7.0.0.tar.gz"
         }
       }
     },
