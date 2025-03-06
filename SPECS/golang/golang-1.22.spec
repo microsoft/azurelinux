@@ -1,7 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
-%global ms_go_revision  2
+%global ms_go_filename  go1.22.10-20241203.4.src.tar.gz
+%global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.23.3
-Release:        3%{?dist}
+Version:        1.22.10
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -154,19 +154,19 @@ fi
 %{_bindir}/*
 
 %changelog
-* Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.23.3-3
+* Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.22.10-2
 - Fix post scriptlet
 - Remove calls to alternatives
 - Don't manually delete go-exports.sh
 
-* Tue Dec 03 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-2
-- Bump version to 1.23.3-2
+* Wed Dec 04 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.10-1
+- Bump version to 1.22.10-1
 
-* Fri Nov 08 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-1
-- Bump version to 1.23.3-1
+* Tue Dec 03 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.9-1
+- Bump version to 1.22.9-2
 
-* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.23.1-1
-- Upgrade to 1.23.1
+* Tue Oct 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.7-3
+- Fork out 1.22 as supported version
 
 * Thu Sep 26 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.22.7-2
 - Bump version to 1.22.7-3
