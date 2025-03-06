@@ -15,6 +15,7 @@ BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  pkgconfig
 BuildRequires:  python3
+BuildRequires:  SDL-devel
 BuildRequires:  python3-rpm-macros
 BuildRequires:  xmlto
 BuildRequires:  zip
