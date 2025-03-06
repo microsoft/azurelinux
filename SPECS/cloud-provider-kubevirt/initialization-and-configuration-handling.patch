@@ -43,8 +43,8 @@ These are specific to the ECF environment and cannot be upstreamed.**
 
 ---
  cmd/kubevirt-cloud-controller-manager/main.go |  4 +-
- pkg/provider/cloud.go                         | 84 +++++++++++++------
- 2 files changed, 60 insertions(+), 28 deletions(-)
+ pkg/provider/cloud.go                         | 83 +++++++++++++------
+ 2 files changed, 59 insertions(+), 28 deletions(-)
 
 diff --git a/cmd/kubevirt-cloud-controller-manager/main.go b/cmd/kubevirt-cloud-controller-manager/main.go
 index 8e2c2467..ad59c16a 100644
@@ -69,7 +69,7 @@ index 8e2c2467..ad59c16a 100644
  	os.Exit(code)
  }
 diff --git a/pkg/provider/cloud.go b/pkg/provider/cloud.go
-index fab7da0b..aaf3a0b1 100644
+index fab7da0b..7f68de34 100644
 --- a/pkg/provider/cloud.go
 +++ b/pkg/provider/cloud.go
 @@ -16,6 +16,9 @@ import (
@@ -100,7 +100,7 @@ index fab7da0b..aaf3a0b1 100644
  }
  
  type LoadBalancerConfig struct {
-@@ -92,6 +96,42 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
+@@ -92,6 +96,41 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
  	return config, nil
  }
  
@@ -132,7 +132,6 @@ index fab7da0b..aaf3a0b1 100644
 +	}
 +
 +	return &rest.Config{
-+		// TODO: switch to using cluster DNS.
 +		Host:            controlEndpoint,
 +		TLSClientConfig: tlsClientConfig,
 +		BearerToken:     string(token),
@@ -143,7 +142,7 @@ index fab7da0b..aaf3a0b1 100644
  func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, error) {
  	if config == nil {
  		return nil, fmt.Errorf("No %s cloud provider config file given", ProviderName)
-@@ -106,41 +146,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
+@@ -106,41 +145,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
  	if err != nil {
  		return nil, fmt.Errorf("Failed to unmarshal cloud provider config: %v", err)
  	}
@@ -199,4 +198,3 @@ index fab7da0b..aaf3a0b1 100644
  		namespace: namespace,
 -- 
 2.45.2
-
