@@ -10,10 +10,10 @@ import (
 
 // PartitionSetting holds the mounting information for each partition.
 type PartitionSetting struct {
-	ID              string              `yaml:"ID"`
-	MountIdentifier MountIdentifierType `yaml:"MountIdentifier"`
-	MountOptions    string              `yaml:"MountOptions"`
-	MountPoint      string              `yaml:"MountPoint"`
+	ID              string              `yaml:"id"`
+	MountIdentifier MountIdentifierType `yaml:"mountIdentifier"`
+	MountOptions    string              `yaml:"mountOptions"`
+	MountPoint      string              `yaml:"mountPoint"`
 }
 
 // IsValid returns an error if the PartitionSetting is not valid
