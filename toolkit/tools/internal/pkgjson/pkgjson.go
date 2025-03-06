@@ -153,7 +153,7 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 		}
 	case pkgVer.Version != "" && pkgVer.SVersion != "":
 		// Explicit version information for both (duplicate version data is handled above)
-		if v1.Compare(v2) == versioncompare.LessThan {
+		if v1.LT(v2) {
 			lowerBound, lowerCond = v1, c1
 			upperBound, upperCond = v2, c2
 		} else {
@@ -236,10 +236,9 @@ func (pkgVer *PackageVer) validatedIntervals() error {
 	v1 := versioncompare.New(pkgVer.Version)
 	v2 := versioncompare.New(pkgVer.SVersion)
 
-	comparisonResult := v1.Compare(v2)
-	if (comparisonResult == versioncompare.LessThan && (conditionUpperBound(c1) || (conditionEquals(c1) && !conditionUpperBound(c2)))) ||
-		(comparisonResult == versioncompare.EqualTo && (!conditionCanEqual(c1) || !conditionCanEqual(c2))) ||
-		(comparisonResult == versioncompare.GreatherThan && (conditionUpperBound(c2) || (conditionEquals(c2) && !conditionUpperBound(c1)))) {
+	if (v1.LT(v2) && (conditionUpperBound(c1) || (conditionEquals(c1) && !conditionUpperBound(c2)))) ||
+		(v1.EQ(v2) && (!conditionCanEqual(c1) || !conditionCanEqual(c2))) ||
+		(v1.GT(v2) && (conditionUpperBound(c2) || (conditionEquals(c2) && !conditionUpperBound(c1)))) {
 		return fmt.Errorf("version bounds (%s) don't overlap", pkgVer)
 	}
 
@@ -307,13 +306,13 @@ func (interval *PackageVerInterval) Compare(other *PackageVerInterval) (result i
 		greatherThan = 1
 	)
 
-	if interval.LowerBound.Compare(other.LowerBound) < 0 {
+	if interval.LowerBound.LT(other.LowerBound) {
 		return lessThan
 	}
-	if interval.LowerBound.Compare(other.LowerBound) > 0 {
+	if interval.LowerBound.GT(other.LowerBound) {
 		return greatherThan
 	}
-	if interval.LowerBound.Compare(other.LowerBound) == 0 {
+	if interval.LowerBound.EQ(other.LowerBound) {
 		if interval.LowerInclusive && !other.LowerInclusive {
 			return lessThan
 		}
@@ -322,13 +321,13 @@ func (interval *PackageVerInterval) Compare(other *PackageVerInterval) (result i
 		}
 	}
 
-	if interval.UpperBound.Compare(other.UpperBound) < 0 {
+	if interval.UpperBound.LT(other.UpperBound) {
 		return lessThan
 	}
-	if interval.UpperBound.Compare(other.UpperBound) > 0 {
+	if interval.UpperBound.GT(other.UpperBound) {
 		return greatherThan
 	}
-	if interval.UpperBound.Compare(other.UpperBound) == 0 {
+	if interval.UpperBound.EQ(other.UpperBound) {
 		if interval.UpperInclusive && !other.UpperInclusive {
 			return greatherThan
 		}
@@ -339,78 +338,56 @@ func (interval *PackageVerInterval) Compare(other *PackageVerInterval) (result i
 	return equalTo
 }
 
-// versionInInterval returns true if ver is a version in the set of versions represented in interval
-func (interval *PackageVerInterval) versionInInterval(ver *versioncompare.TolerantVersion) (valid bool) {
-	if ver.Compare(interval.LowerBound) == 0 && interval.LowerInclusive {
-		return true
-	}
-	if ver.Compare(interval.UpperBound) == 0 && interval.UpperInclusive {
-		return true
-	}
-	if ver.Compare(interval.UpperBound) < 0 && ver.Compare(interval.LowerBound) > 0 {
-		return true
-	}
-	return false
-}
-
 // Contains checks if the interval fully contains the query range
-func (interval *PackageVerInterval) Contains(queryInterval *PackageVerInterval) (contains bool) {
-	// Check the lower bound
-	lowerBoundValid := interval.versionInInterval(queryInterval.LowerBound)
-	upperBoundValid := interval.versionInInterval(queryInterval.UpperBound)
+func (interval *PackageVerInterval) contains(queryInterval *PackageVerInterval) (contains bool) {
+	lowerBoundValid := false
+	upperBoundValid := false
+
+	// Check if the each bound of the query is within the interval, or if it is the same as the bound of the interval
+	// and the bound is inclusive.
+	if interval.LowerBound.LT(queryInterval.LowerBound) ||
+		(interval.LowerBound.EQ(queryInterval.LowerBound) && interval.LowerInclusive) ||
+		(interval.LowerBound.EQ(queryInterval.LowerBound) && (interval.LowerInclusive == queryInterval.LowerInclusive)) {
+		lowerBoundValid = true
+	}
+
+	if interval.UpperBound.GT(queryInterval.UpperBound) ||
+		(interval.UpperBound.EQ(queryInterval.UpperBound) && interval.UpperInclusive) ||
+		(interval.UpperBound.EQ(queryInterval.UpperBound) && (interval.UpperInclusive == queryInterval.UpperInclusive)) {
+		upperBoundValid = true
+	}
 
 	return lowerBoundValid && upperBoundValid
 }
 
-// Satisfies returns true the query interval overlaps the current interval at any point (ie it provides a version of a package
-// which satisfied the query)
-func (interval *PackageVerInterval) Satisfies(queryInterval *PackageVerInterval) (valid bool) {
-	var (
-		queryUpperValid, queryLowerValid, superset bool
-	)
-	if interval.LowerBound.Compare(queryInterval.UpperBound) > 0 || interval.UpperBound.Compare(queryInterval.LowerBound) < 0 {
+func (interval *PackageVerInterval) intersects(queryInterval *PackageVerInterval) (intersects bool) {
+	if interval.LowerBound.GT(queryInterval.UpperBound) || interval.UpperBound.LT(queryInterval.LowerBound) {
 		// No overlap at all
 		return false
 	}
 
-	// Check lower bound of the query
-	switch {
-	case queryInterval.LowerBound.Compare(interval.UpperBound) == 0:
-		// Check if the query lower bound touches the interval upper bound exactly
-		if interval.UpperInclusive && queryInterval.LowerInclusive {
-			queryLowerValid = true
-		}
-	case queryInterval.LowerBound.Compare(interval.LowerBound) == 0:
-		// Check if both lower bounds are the same
-		if interval.LowerInclusive || !queryInterval.LowerInclusive {
-			queryLowerValid = true
-		}
-	default:
-		// Otherwise simple check
-		queryLowerValid = interval.versionInInterval(queryInterval.LowerBound)
+	// Handle equal versions but open intervals
+	if interval.LowerBound.EQ(queryInterval.UpperBound) && (!interval.LowerInclusive || !queryInterval.UpperInclusive) {
+		return false
 	}
 
-	// Check the upper bound of the query
-	switch {
-	case queryInterval.UpperBound.Compare(interval.LowerBound) == 0:
-		// Check if the query upper bound touches the interval lower bound exactly
-		if interval.LowerInclusive && queryInterval.UpperInclusive {
-			queryUpperValid = true
-		}
-	case queryInterval.UpperBound.Compare(interval.UpperBound) == 0:
-		// Check if both upper bounds are the same
-		if interval.UpperInclusive || !queryInterval.UpperInclusive {
-			queryLowerValid = true
-		}
-	default:
-		// Otherwise simple check
-		queryUpperValid = interval.versionInInterval(queryInterval.UpperBound)
+	if interval.UpperBound.EQ(queryInterval.LowerBound) && (!interval.UpperInclusive || !queryInterval.LowerInclusive) {
+		return false
 	}
 
-	// Check if the query interval is a superset of the provided interval
-	superset = queryInterval.LowerBound.Compare(interval.LowerBound) < 0 && queryInterval.UpperBound.Compare(interval.UpperBound) > 0
+	return true
+}
 
-	return queryUpperValid || queryLowerValid || superset
+// GuaranteedSatisfies returns true if every version in the interval is guaranteed to satisfy the query. A pair of
+// intervals may overlap, but not guarantee that the query interval is satisfied.
+// i.e., interval: [1, 3], query: [2, 4] will overlap, but the valid version '1' does not satisfy the query.
+func (interval *PackageVerInterval) GuaranteedSatisfies(queryInterval *PackageVerInterval) (valid bool) {
+	return queryInterval.contains(interval)
+}
+
+// Satisfies returns true if there exists some version in the interval that satisfies the query interval.
+func (interval *PackageVerInterval) Satisfies(queryInterval *PackageVerInterval) (valid bool) {
+	return interval.intersects(queryInterval)
 }
 
 // conditionCanEqual checks if the input condition allows "equal to" versions.

@@ -223,8 +223,10 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 			err = fmt.Errorf("failed to add a package (%s):\n%w", dependency.Name, err)
 			return err
 		}
+		logger.Log.Debugf("Added new node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 	} else {
 		// All dependencies are assumed to be "Run" dependencies
+		logger.Log.Debugf("Found existing node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 		dependentNode = nodes.RunNode
 	}
 
