@@ -143,6 +143,7 @@ fi
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/bin/kata-agent
+%{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install-debug/usr/bin/kata-agent
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system
