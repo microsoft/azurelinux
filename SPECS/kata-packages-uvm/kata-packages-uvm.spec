@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        8%{?dist}
+Release:        800%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,25 +10,18 @@ URL:            https://aka.ms/mariner
 
 ExclusiveArch:  x86_64
 
-Requires:       bash
 Requires:       ca-certificates
 Requires:       chrony
-Requires:       cpio
 Requires:       cryptsetup
-Requires:       curl
 Requires:       dbus
 Requires:       elfutils-libelf
 Requires:       filesystem
-Requires:       grep
-Requires:       gzip
 Requires:       iptables
 Requires:       iproute
 Requires:       iputils
 Requires:       irqbalance
 Requires:       lvm2
 Requires:       lz4
-Requires:       procps-ng
-Requires:       readline
 Requires:       sed
 # Note: We currently only support using systemd for our init process, not the kata-agent.
 # When we go to add support for AGENT_INIT=yes, can drop this.
@@ -45,6 +38,13 @@ Metapackage to install the set of packages inside a Kata containers UVM
 %package        debug
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers debug UVM.
 Requires:       %{name} = %{version}-%{release}
+Requires:       bash
+Requires:       curl
+Requires:       cpio
+Requires:       grep
+Requires:       readline
+Requires:       gzip
+Requires:       procps-ng
 
 %description    debug
 Metapackage to install the set of packages inside a Kata containers UVM, includes extra debug utilities.
@@ -112,7 +112,7 @@ Requires:       golang
 %files coco-sign
 
 %changelog
-* Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
+* Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-800
 - Introduce debug metapackage
 
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
