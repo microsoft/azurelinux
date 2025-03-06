@@ -15,7 +15,6 @@ BuildRequires: git
 BuildRequires: glib2-devel
 BuildRequires: libxml2-devel >= 2.6.0
 BuildRequires: libxslt-devel >= 1.0.0
-BuildRequires: libsoup3-devel
 BuildRequires: libsoup-devel
 BuildRequires: libarchive-devel
 BuildRequires: json-glib-devel
