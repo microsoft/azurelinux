@@ -2763,7 +2763,7 @@
                 "gnutls",
                 "gobject-introspection",
                 "golang",
-                "golang-1.23",
+                "golang-1.22",
                 "gperf",
                 "gperftools",
                 "gpgme",
