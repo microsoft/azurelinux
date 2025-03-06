@@ -15623,8 +15623,8 @@
         "type": "other",
         "other": {
           "name": "osinfo-db",
-          "version": "20221130",
-          "downloadUrl": "https://releases.pagure.org/libosinfo/osinfo-db-20221130.tar.xz"
+          "version": "20240701",
+          "downloadUrl": "https://releases.pagure.org/libosinfo/osinfo-db-20240701.tar.xz"
         }
       }
     },
