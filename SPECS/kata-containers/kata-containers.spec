@@ -124,23 +124,9 @@ popd
 
 %changelog
 * Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4mz-1
-- Auto-upgrade to 3.2.0.azl4mz
-
-* Mon Mar 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-6
-- Move tardev-snapshotter into kata-containers-cc-tardev
-
-* Tue Feb 25 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-5
-- Set AGENT_POLICY=yes
-
-* Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-4
-- Refactor patch
-
-* Wed Feb 12 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-3
-- shared_fs=none
-
-* Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4-2
 - Add systemd-udev and tarfs to enable virtio-blk with pod sandboxing
-- Add tardev-snapshotter
+- Set AGENT_POLICY=yes
+- Move tardev-snapshotter into kata-containers-cc-tardev
 
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release

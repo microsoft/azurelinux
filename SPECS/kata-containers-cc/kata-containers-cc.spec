@@ -160,11 +160,7 @@ fi
 
 %changelog
 * Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4mz-1
-- Auto-upgrade to 3.2.0.azl4mz
-
-* Mon Mar 03 2025 Mitch Zhu <mitchzhu@microsoft.com> 3.2.0.azl4-2
 - Add tardev subpackage
-
 
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
