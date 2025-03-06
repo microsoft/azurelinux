@@ -24,7 +24,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.78.1
+Version:        6.6.79.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -371,6 +371,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Mar 06 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
+- Auto-upgrade to 6.6.79.1
+
 * Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
 - Auto-upgrade to 6.6.78.1
 
