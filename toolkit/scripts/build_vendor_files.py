@@ -91,6 +91,7 @@ class VendorProcessor:
         except Exception as e:
             PipelineLogging.output_log_error_and_exit(
                 f"Failed to read {toml_file_path} file: {e}")
+            return None
 
         return toml_data
 
@@ -106,6 +107,14 @@ class VendorProcessor:
         toml_file_path = f"{self.pkg_path}/{toml_name}"
 
         toml_data = self.read_toml_file(toml_file_path)
+
+        # We might not have TOML file just yet, attempt to run custom
+        if toml_data is None:
+            PipelineLogging.output_debug(
+                f"Failed to read {toml_file_path} file. Attempting to run custom vendor script.")
+            self.process_vendor_type(VendorType.CUSTOM)
+            return
+
         package_data: dict = toml_data['components'][self.pkg_name]
         vendor_types: list = package_data['vendors']['vendor_types']
 
@@ -171,8 +180,6 @@ parser.add_argument('--pkgVersion',
                     help='package version', required=True)
 parser.add_argument('--vendorVersion',
                     help='vendor version', required=True)
-parser.add_argument('--pipelineEnviroment', required=False,
-                    type=lambda x: (str(x).lower() == 'true'), default=False, help='True if running in pipeline environment')
 args = parser.parse_args()
 
 
@@ -182,7 +189,6 @@ def main():
     out_folder = args.outFolder
     pkg_version = args.pkgVersion
     vendor_version = args.vendorVersion
-    pipeline_env = args.pipelineEnviroment
     pkg_name = args.pkgName
     pkg_path = args.pkgPath
 
@@ -194,8 +200,6 @@ def main():
         f"Package version: {pkg_version}")
     PipelineLogging.output_debug(
         f"Vendor version: {vendor_version}")
-    PipelineLogging.output_debug(
-        f"Pipeline environment: {pipeline_env}")
     PipelineLogging.output_debug(
         f"Package name: {pkg_name}")
     PipelineLogging.output_debug(
