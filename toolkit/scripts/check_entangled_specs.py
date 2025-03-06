@@ -151,23 +151,25 @@ oot_kmodule_matching_groups = [
     ])
 ]
 
+def print_verbose(message: str):
+    "Print 'message' to stdout if global variable 'verbose' is true."
+    if verbose:
+        print(message)
+
 def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet], tag_expected={}) -> bool:
     """Check if spec set violates matching rules for any of given tags. Return True/False accordingly."""
     has_error = False
     for group in groups:
-        if verbose: 
-            print(f"Processing group: {group}")
+        print_verbose(f"Processing group: {group}")
         spec_tag_map = {tag: {} for tag in tags}
         for spec_filename in group:
             parsed_spec = Spec.from_file(path.join(base_path, spec_filename))
-            if verbose:
-                print(f"\t{spec_filename}")
+            print_verbose(f"\t{spec_filename}")
             for tag in tags:
                 tag_value = get_tag_value(parsed_spec, tag)
                 spec_tag_map[tag][spec_filename] = tag_value
-                if verbose:
-                    tag_want = "" if not tag_expected else f" (want: {tag_expected.get(tag)})"
-                    print(f"\t\ttag({tag}) value: {tag_value}{tag_want}")
+                tag_want = "" if not tag_expected else f" (want: {tag_expected.get(tag)})"
+                print_verbose(f"\t\ttag({tag}) value: {tag_value}{tag_want}")
         
         for tag, specs_values in spec_tag_map.items():
             # Skip to next tag if tag value is unique and it matches "tag_expected_value" if set
@@ -195,8 +197,7 @@ def check_matches(base_path: str):
     
     check_result = []
     for check_args in groups_to_check:
-        if verbose:
-            print(f'Calling check_spec_tags with "{check_args}"')
+        print_verbose(f'Calling check_spec_tags with "{check_args}"')
         check_result.append(check_spec_tags(base_path, *check_args))
     if any(check_result):
         print('The current repository state violates one or more spec entanglement rule!')
