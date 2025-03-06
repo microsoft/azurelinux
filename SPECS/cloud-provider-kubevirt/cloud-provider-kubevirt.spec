@@ -25,9 +25,9 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-7-vendor.tar.gz
-Patch0:         Initialization-and-Configuration-handling.patch
-Patch1:         Single-IP-Address-for-Node.patch
-Patch2:         Golang-Version-Upgrade.patch
+Patch0:         initialization-and-configuration-handling.patch
+Patch1:         single-ip-address-for-node.patch
+Patch2:         golang-version-upgrade.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22
 
