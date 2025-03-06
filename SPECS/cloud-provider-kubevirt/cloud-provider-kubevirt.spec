@@ -11,11 +11,12 @@ Distribution:   Azure Linux
 Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
+# We can use the generate-source-tarball.sh script in the given folder along with the package version to build the tarball automatically.
+# In case we need to re-build this file manually:
 #   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. Apply Golang-Version-Upgrade.patch
+#   4. Apply golang-version-upgrade.patch
 #   5. go mod vendor
 #   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
