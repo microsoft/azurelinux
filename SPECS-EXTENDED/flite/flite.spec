@@ -1,33 +1,30 @@
 %bcond_with docs
 
 Name:           flite
-Version:        1.3
-Release:        36%{?dist}
+Version:        2.2
+Release:        1%{?dist}
 Summary:        Small, fast speech synthesis engine (text-to-speech)
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.speech.cs.cmu.edu/flite/
 
-Source0:        http://www.speech.cs.cmu.edu/flite/packed/%{name}-%{version}/%{name}-%{version}-release.tar.gz
-Source1:        README-ALSA.txt
-Patch0:         flite-1.3-sharedlibs.patch
-Patch1:         flite-1.3-doc_texinfo.patch
-Patch2:         flite-1.3-alsa_support.patch
-Patch3:         flite-1.3-implicit_dso_linking.patch
-Patch4:         0001-auserver.c-Only-write-audio-data-to-a-file-in-debug-.patch
-Patch5:         flite-0001-Fixed-texi2html-ambiguity.patch
+Source0:        https://github.com/festvox/flite/archive/refs/tags/v2.2.tar.gz#/%{name}-%{version}.tar.gz
 
-%if %{with docs}
-BuildRequires:  texi2html
+Patch0:         flite-2.2-lto.patch
+# fixes build with texinfo-7.0+, see https://lists.gnu.org/archive/html/bug-texinfo/2022-11/msg00036.html
+Patch1:         flite-2.2-texinfo-7.0.patch
 # texi2pdf
+
 # WARNING see explanation about PDF doc below.
 #BuildRequires:  texinfo-tex
-%endif
 
 BuildRequires:  gcc
 BuildRequires:  autoconf automake libtool
 BuildRequires:  ed alsa-lib-devel
+BuildRequires: make
+BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  texinfo
 
 
 %description
@@ -46,42 +43,36 @@ Development files for Flite, a small, fast speech synthesis engine.
 
 
 %prep
-%setup -q -n %{name}-%{version}-release
-%patch 0 -p1 -b .flite-1.3-sharedlibs
-%patch 1 -p1 -b .flite-1.3-doc_texinfo
-%patch 2 -p1 -b .flite-1.3-alsa_support
-%patch 3 -p1 -b .flite-1.3-implicit_dso_linking
-%patch 4 -p1
-%patch 5 -p1
-cp -p %{SOURCE1} .
-
+%setup -q
+%patch -P0 -p1 -b .lto
+%patch -P1 -p1 -b .ti7
 
 %build
 autoreconf -vif
 %configure --enable-shared --with-audio=alsa
-# This package fails parallel make (thus cannot be built using "_smp_flags")
 make
-%if %{with docs}
+
 # Build documentation
 cd doc
 # WARNING "make doc" provides a huge PDF file. It was decided not to produce/package it.
 #make doc
 make flite.html
-%endif
+
 
 %install
-make install INSTALLBINDIR=%{buildroot}%{_bindir} INSTALLLIBDIR=%{buildroot}%{_libdir}  INSTALLINCDIR=%{buildroot}%{_includedir}/flite
+%make_install
+rm %{buildroot}%{_libdir}/libflite*.a
 
-
-%ldconfig_scriptlets
-
+%if %{with check}
+%check
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} make -C testsuite do_thread_test
+%endif
 
 %files
 %license COPYING
-%doc ACKNOWLEDGEMENTS README README-ALSA.txt
-%if %{with docs}
+%doc ACKNOWLEDGEMENTS
 %doc doc/html
-%endif
+%doc README.md
 %{_libdir}/*.so.*
 %{_bindir}/*
 
@@ -92,6 +83,10 @@ make install INSTALLBINDIR=%{buildroot}%{_bindir} INSTALLLIBDIR=%{buildroot}%{_l
 
 
 %changelog
+* Fri Nov 29 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.2-1
+- Update to 2.2
+- License verified
+
 * Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.3-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build documentation, and turn off documentation building by default
