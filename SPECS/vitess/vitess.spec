@@ -30,6 +30,7 @@ Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2024-45339.patch
 Patch2:         CVE-2025-22868.patch
 BuildRequires: golang
+BuildRequires: etcd
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -66,7 +67,7 @@ for cmd in $(find go/cmd/* -maxdepth 0 -type d); do
     continue
   fi
   go build -buildmode pie -compiler gc '-tags=rpm_crashtraceback ' \
-           -ldflags "-X vitess.io/vitess/version=$VERSION -extldflags -Wl,-z,relro" \
+           -ldflags "-X vitess.io/vitess/version=$VERSION -linkmode=external -extldflags -Wl,-z,relro" \
            -mod=vendor -v -a -x -o ./bin/$(basename $cmd) ./$cmd
 done
 
@@ -75,6 +76,7 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
+export PATH=%{buildroot}%{_bindir}:$PATH
 go test -v ./go/cmd/... \
            ./go/mysql/... \
            ./go/mysql/endtoend/... \
