@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -17,7 +17,9 @@ Source1: containerd.service
 Source2: containerd.toml
 # Added patch to support tardev-snapshotter for Kata CC
 Patch0:	CVE-2024-45338.patch
-Patch1:  add-tardev-support.patch
+Patch1: add-tardev-support.patch
+Patch2: 0001-Add-manifest-digest-label-into-unpack.patch
+
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -81,6 +83,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon Mar 03 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-5
+- Add patch for manifest-digest-label support
+
 * Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-4
 - Fix ptest in tardev-snapshotter support patch
 
