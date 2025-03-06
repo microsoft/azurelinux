@@ -29736,8 +29736,8 @@
         "type": "other",
         "other": {
           "name": "virt-p2v",
-          "version": "1.42.0",
-          "downloadUrl": "http://download.libguestfs.org/virt-p2v/virt-p2v-1.42.0.tar.gz"
+          "version": "1.42.4",
+          "downloadUrl": "https://download.libguestfs.org/virt-p2v/virt-p2v-1.42.4.tar.gz"
         }
       }
     },
