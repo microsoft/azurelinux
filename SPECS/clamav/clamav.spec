@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        1.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 
 # Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
 # specific event. Revert back to the original filename when a new cache is created for a different version.
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-1-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
