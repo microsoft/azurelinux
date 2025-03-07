@@ -45,7 +45,7 @@ This Perl extension allows you to extract meta information from
 various types of image files.
 
 %prep
-%setup -q -n Image-Info-%{version}
+%autosetup -n Image-Info-%{version}
 chmod -c 644 exifdump imgdump
 
 %build
