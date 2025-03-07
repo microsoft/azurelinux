@@ -25493,8 +25493,8 @@
         "type": "other",
         "other": {
           "name": "python3-typed_ast",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/python/typed_ast/archive/1.4.2/typed_ast-1.4.2.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://github.com/python/typed_ast/archive/1.5.4/typed_ast-1.5.4.tar.gz"
         }
       }
     },

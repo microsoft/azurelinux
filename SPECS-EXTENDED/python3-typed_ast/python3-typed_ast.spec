@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global modname typed_ast
 
 Name:               python3-%{modname}
-Version:            1.4.2
-Release:            2%{?dist}
+Version:            1.5.4
+Release:            1%{?dist}
 Summary:            A fork of the ast module with type annotations
 
 License:            ASL 2.0
@@ -16,6 +16,7 @@ Source0:            %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 BuildRequires:      gcc
 BuildRequires:      python3-devel
 BuildRequires:      python3-setuptools
+BuildRequires:      python3-pytest
 
 %description
 %summary. This package is based on the ast modules from Python 2 and 3,
@@ -32,6 +33,7 @@ as supported in Python 3.6.
 %py3_install
 
 %check
+%py3_check_import typed_ast.ast3 typed_ast.ast27 typed_ast.conversions
 %{__python3} setup.py test
 
 %files
@@ -41,6 +43,10 @@ as supported in Python 3.6.
 %{python3_sitearch}/%{modname}-*.egg-info
 
 %changelog
+* Fri Mar 07 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.4-1 
+- Upgrade to 1.5.4
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
