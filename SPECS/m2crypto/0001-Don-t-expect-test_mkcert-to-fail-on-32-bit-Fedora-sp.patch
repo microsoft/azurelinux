@@ -1,0 +1,28 @@
+From f8e27f3c8a983dd6ddc57833b4b56914d7bb2f59 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 21 Jun 2024 14:43:26 -0700
+Subject: [PATCH] Don't expect test_mkcert to fail on 32-bit (Fedora-specific?)
+
+This test passes just fine on Fedora i686 builds, so don't expect
+it to fail.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ tests/test_x509.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/test_x509.py b/tests/test_x509.py
+index 882958e..7ab9333 100644
+--- a/tests/test_x509.py
++++ b/tests/test_x509.py
+@@ -246,7 +246,6 @@ class X509TestCase(unittest.TestCase):
+         self.assertEqual(req.get_version(), 0)
+ 
+     @unittest.skipIf(platform.system() == 'Windows', 'Skip on Windows. TODO')
+-    @expectedFailureIf(is_32bit())
+     def test_mkcert(self):
+         for utc in (True, False):
+             req, pk = self.mkreq(1024)
+-- 
+2.45.2
+
