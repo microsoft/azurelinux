@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gonum.org/v1/gonum/graph"
 )
 
@@ -321,6 +322,25 @@ func getRealNodeFromGraphHelper(t *testing.T, g *PkgGraph, n *PkgNode) (realN *P
 	return
 }
 
+// Ensure that if we have a 'Requires: pkg < 5', we don't pick a node that has 'pkg > 1', even
+// though they *might* be compatible. We can't predict, so we have to be conservative.
+func TestDoNotPickGTNodeForLTDep(t *testing.T) {
+	pkgGT := pkgjson.PackageVer{Name: "pkg", Version: "1", Condition: ">"}
+	pkgGTUnresolved := buildUnresolvedNodeHelper(&pkgGT)
+
+	g := NewPkgGraph()
+	err := addNodesHelper(g, []*PkgNode{pkgGTUnresolved})
+	assert.NoError(t, err)
+
+	// When we look to search for a node that satisfies the requirement, we should not find the GT node
+	pkgLT := pkgjson.PackageVer{Name: "pkg", Version: "5", Condition: "<"}
+	ltNode, err := g.FindBestPkgNode(&pkgLT)
+	assert.NoError(t, err)
+	assert.Nil(t, ltNode)
+
+	return
+}
+
 // Validate the test graph is well formed
 func TestCreateTestGraph(t *testing.T) {
 	g, err := buildTestGraphHelper()
@@ -600,11 +620,20 @@ func TestConditionalLookupBasic(t *testing.T) {
 	assert.NotNil(t, lu)
 	assert.True(t, lu.RunNode.Equal(pkgCRun))
 
-	// Best is D2, which is ver: <=2
+	// Best is D2, which is ver: <=2, BUT since we can't predict the future its not safe to use it
+	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{Name: "D", Version: "1"})
+	assert.NoError(t, err)
+	assert.Nil(t, lu)
+
+	// If we add a new special exact version of D, we should get that one
+	pkgDExactly1 := pkgjson.PackageVer{Name: "D", Version: "1", Condition: "="}
+	pkgpkgDExactly1Unresolved := buildUnresolvedNodeHelper(&pkgDExactly1)
+	require.NoError(t, addNodesHelper(g, []*PkgNode{pkgpkgDExactly1Unresolved}))
+
 	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{Name: "D", Version: "1"})
 	assert.NoError(t, err)
 	assert.NotNil(t, lu)
-	assert.True(t, lu.RunNode.Equal(pkgD2Unresolved))
+	assert.True(t, lu.RunNode.Equal(pkgpkgDExactly1Unresolved))
 
 	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{Name: "D", Version: "2.1"})
 	assert.NoError(t, err)
@@ -615,27 +644,28 @@ func TestConditionalLookupBasic(t *testing.T) {
 func TestConditionalLookupMulti(t *testing.T) {
 	g := NewPkgGraph()
 	err := addNodesHelper(g, unresolvedNodes)
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
+	require.NoError(t, err)
+	require.NotNil(t, g)
 
-	// Should get D2 (<= 2)
+	// Should get nothing, closest is D2 (<= 2), but we have no garantuee that it will be >=1 when resolved
 	lu, err := g.FindBestPkgNode(&pkgjson.PackageVer{
 		Name:       "D",
 		Condition:  ">=",
 		Version:    "1",
 		SCondition: "<",
-		SVersion:   "3"})
+		SVersion:   "2"})
 	assert.NoError(t, err)
-	assert.True(t, lu.RunNode.Equal(pkgD2Unresolved))
+	assert.Nil(t, lu)
 
 	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{
 		Name:       "D",
 		Condition:  ">=",
 		Version:    "2",
 		SCondition: "<",
-		SVersion:   "3"})
-	assert.NoError(t, err)
-	assert.True(t, lu.RunNode.Equal(pkgD2Unresolved))
+		SVersion:   "4"})
+	require.NoError(t, err)
+	require.NotNil(t, lu)
+	assert.True(t, lu.RunNode.Equal(pkgD3Unresolved))
 
 	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{
 		Name:       "D",
@@ -643,7 +673,8 @@ func TestConditionalLookupMulti(t *testing.T) {
 		Version:    "2",
 		SCondition: "<=",
 		SVersion:   "3"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
+	require.NotNil(t, lu)
 	assert.True(t, lu.RunNode.Equal(pkgD3Unresolved))
 
 	lu, err = g.FindBestPkgNode(&pkgjson.PackageVer{
