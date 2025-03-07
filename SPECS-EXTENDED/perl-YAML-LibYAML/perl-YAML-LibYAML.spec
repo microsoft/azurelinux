@@ -8,7 +8,7 @@
 Name:           perl-YAML-LibYAML
 Epoch:          1
 Version:        0.902.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Perl YAML Serialization using XS and libyaml
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
@@ -161,7 +161,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.902.0-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.902.0-2
 - Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
