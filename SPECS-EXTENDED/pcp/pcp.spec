@@ -169,7 +169,6 @@ BuildRequires: %{_ps_executable}
 %if !%{disable_systemd}
 BuildRequires: systemd-devel
 %endif
- 
 # Utilities used indirectly e.g. by scripts we install
 Requires: bash
 Requires: xz
@@ -2953,7 +2952,7 @@ fi
 
 %changelog
 * Wed Mar 05 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 6.3.2-1
-- Initial Azurelinux import from Fedora 42 (license: MIT).
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - Fix the build issues for azurelinux
 - License verified
 
