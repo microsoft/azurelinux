@@ -1,7 +1,7 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.0.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         CVE-2024-22195.patch
 Patch1:         CVE-2024-34064.patch
 Patch2:         CVE-2024-56201.patch
 Patch3:         CVE-2024-56326.patch
+Patch4:         CVE-2025-27516.patch
 BuildArch:      noarch
 
 %description
@@ -57,6 +58,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Fri Mar 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.0.3-6
+- Address CVE-2025-27516 with an upstream patch
+
 * Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.0.3-5
 - Address CVE-2024-56201, CVE-2024-56326.patch with an upstream patch.
 
