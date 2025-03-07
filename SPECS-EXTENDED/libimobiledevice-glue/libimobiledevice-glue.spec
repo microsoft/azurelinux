@@ -57,5 +57,5 @@ make check
 
 %changelog
 * Wed Oct 30 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.3.1-1
-- Initial package
+- Original version for Azure Linux
 - License verified
