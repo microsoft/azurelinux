@@ -1,5 +1,5 @@
 filesystem-1.1-20.cm2.aarch64.rpm
-kernel-headers-5.15.173.1-2.cm2.noarch.rpm
+kernel-headers-5.15.176.3-3.cm2.noarch.rpm
 glibc-2.35-7.cm2.aarch64.rpm
 glibc-devel-2.35-7.cm2.aarch64.rpm
 glibc-i18n-2.35-7.cm2.aarch64.rpm
@@ -170,8 +170,8 @@ openssl-devel-1.1.1k-35.cm2.aarch64.rpm
 openssl-libs-1.1.1k-35.cm2.aarch64.rpm
 openssl-perl-1.1.1k-35.cm2.aarch64.rpm
 openssl-static-1.1.1k-35.cm2.aarch64.rpm
-libcap-2.60-3.cm2.aarch64.rpm
-libcap-devel-2.60-3.cm2.aarch64.rpm
+libcap-2.60-4.cm2.aarch64.rpm
+libcap-devel-2.60-4.cm2.aarch64.rpm
 debugedit-5.0-2.cm2.aarch64.rpm
 libarchive-3.6.1-4.cm2.aarch64.rpm
 libarchive-devel-3.6.1-4.cm2.aarch64.rpm
