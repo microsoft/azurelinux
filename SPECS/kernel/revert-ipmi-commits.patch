@@ -1,0 +1,68 @@
+From 05f26eabb5f97d1df08cc22fca7a703099c3dbd2 Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 7 Mar 2025 17:11:03 +0000
+Subject: [PATCH 1/2] Revert "ipmi: ssif_bmc: Fix new request loss when bmc
+ ready for a response"
+
+This reverts commit 2851acb600d66ba3ebba209864367c8025a5326c.
+---
+ drivers/char/ipmi/ssif_bmc.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/ipmi/ssif_bmc.c b/drivers/char/ipmi/ssif_bmc.c
+index e8460e966b83..ab4e87a99f08 100644
+--- a/drivers/char/ipmi/ssif_bmc.c
++++ b/drivers/char/ipmi/ssif_bmc.c
+@@ -292,6 +292,7 @@ static void complete_response(struct ssif_bmc_ctx *ssif_bmc)
+ 	ssif_bmc->nbytes_processed = 0;
+ 	ssif_bmc->remain_len = 0;
+ 	ssif_bmc->busy = false;
++	memset(&ssif_bmc->part_buf, 0, sizeof(struct ssif_part_buffer));
+ 	wake_up_all(&ssif_bmc->wait_queue);
+ }
+ 
+@@ -743,11 +744,9 @@ static void on_stop_event(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
+ 			ssif_bmc->aborting = true;
+ 		}
+ 	} else if (ssif_bmc->state == SSIF_RES_SENDING) {
+-		if (ssif_bmc->is_singlepart_read || ssif_bmc->block_num == 0xFF) {
+-			memset(&ssif_bmc->part_buf, 0, sizeof(struct ssif_part_buffer));
++		if (ssif_bmc->is_singlepart_read || ssif_bmc->block_num == 0xFF)
+ 			/* Invalidate response buffer to denote it is sent */
+ 			complete_response(ssif_bmc);
+-		}
+ 		ssif_bmc->state = SSIF_READY;
+ 	}
+ 
+-- 
+2.45.3
+
+
+From d83f52163193cd443784ad838ed179d4c00004a6 Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 7 Mar 2025 17:11:26 +0000
+Subject: [PATCH 2/2] Revert "ipmi: ipmb: Add check devm_kasprintf() returned
+ value"
+
+This reverts commit 4c9caf86d04dcb10e9fd8cd9db8eb79b5bfcc4d8.
+---
+ drivers/char/ipmi/ipmb_dev_int.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/char/ipmi/ipmb_dev_int.c b/drivers/char/ipmi/ipmb_dev_int.c
+index 937189191512..49100845fcb7 100644
+--- a/drivers/char/ipmi/ipmb_dev_int.c
++++ b/drivers/char/ipmi/ipmb_dev_int.c
+@@ -321,9 +321,6 @@ static int ipmb_probe(struct i2c_client *client)
+ 	ipmb_dev->miscdev.name = devm_kasprintf(&client->dev, GFP_KERNEL,
+ 						"%s%d", "ipmb-",
+ 						client->adapter->nr);
+-	if (!ipmb_dev->miscdev.name)
+-		return -ENOMEM;
+-
+ 	ipmb_dev->miscdev.fops = &ipmb_fops;
+ 	ipmb_dev->miscdev.parent = &client->dev;
+ 	ret = misc_register(&ipmb_dev->miscdev);
+-- 
+2.45.3
+

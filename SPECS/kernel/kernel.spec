@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.78.1
-Release:        1%{?dist}
+Release:        1000%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
+Patch2:         revert-ipmi-commits.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
