@@ -39,7 +39,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 9%{?dist}
+Release:	 10%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -125,7 +125,7 @@ EOF)
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
 %description modules
@@ -247,6 +247,9 @@ fi
 %endif
 
 %changelog
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-10
+- Bump release to rebuild for new kernel release
+
 * Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-9
 - Bump release to rebuild for new kernel release
 
