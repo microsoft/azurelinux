@@ -1005,3 +1005,80 @@ func TestShouldFailToConvertPackageListEntryWithWhitespacesInVersion(t *testing.
 
 	assert.Error(t, err)
 }
+
+func TestSimpleSort(t *testing.T) {
+	pkgRepo := &PackageRepo{
+		Repo: []*Package{
+			{
+				Provides: &PackageVer{Name: "pkgB", Version: "1.0.0"},
+			},
+			{
+				Provides: &PackageVer{Name: "pkgA", Version: "1.0.0"},
+			},
+		},
+	}
+
+	SortPackageList(pkgRepo.Repo)
+	assert.Equal(t, "pkgA", pkgRepo.Repo[0].Provides.Name)
+	assert.Equal(t, "pkgB", pkgRepo.Repo[1].Provides.Name)
+
+}
+
+func TestSortRepo(t *testing.T) {
+	pkgRepo := &PackageRepo{
+		Repo: []*Package{
+			{
+				Provides: &PackageVer{Name: "pkgB", Version: "1.0.0"},
+				Requires: []*PackageVer{
+					{Name: "pkgC", Version: "1.0.0"},
+					{Name: "pkgA", Version: "1.0.0"},
+				},
+				BuildRequires: []*PackageVer{
+					{Name: "pkgD", Version: "1.0.0"},
+					{Name: "pkgB", Version: "1.0.0"},
+				},
+				TestRequires: []*PackageVer{
+					{Name: "pkgF", Version: "1.0.0"},
+					{Name: "pkgE", Version: "1.0.0"},
+				},
+			},
+			{
+				Provides: &PackageVer{Name: "pkgA", Version: "1.0.0"},
+				Requires: []*PackageVer{
+					{Name: "pkgB", Version: "1.0.0"},
+					{Name: "pkgC", Version: "1.0.0"},
+				},
+				BuildRequires: []*PackageVer{
+					{Name: "pkgA", Version: "1.0.0"},
+					{Name: "pkgC", Version: "1.0.0"},
+				},
+				TestRequires: []*PackageVer{
+					{Name: "pkgD", Version: "1.0.0"},
+					{Name: "pkgB", Version: "1.0.0"},
+				},
+			},
+		},
+	}
+
+	SortPackageList(pkgRepo.Repo)
+
+	// Check the order of the main repo
+	assert.Equal(t, "pkgA", pkgRepo.Repo[0].Provides.Name)
+	assert.Equal(t, "pkgB", pkgRepo.Repo[1].Provides.Name)
+
+	// Check the order of the Requires list
+	assert.Equal(t, "pkgB", pkgRepo.Repo[0].Requires[0].Name)
+	assert.Equal(t, "pkgC", pkgRepo.Repo[0].Requires[1].Name)
+
+	// Check the order of the BuildRequires list
+	assert.Equal(t, "pkgA", pkgRepo.Repo[0].BuildRequires[0].Name)
+	assert.Equal(t, "pkgC", pkgRepo.Repo[0].BuildRequires[1].Name)
+
+	// Check the order of the TestRequires list
+	assert.Equal(t, "pkgB", pkgRepo.Repo[0].TestRequires[0].Name)
+	assert.Equal(t, "pkgD", pkgRepo.Repo[0].TestRequires[1].Name)
+
+	// Spot check 2nd package
+	assert.Equal(t, "pkgA", pkgRepo.Repo[1].Requires[0].Name)
+	assert.Equal(t, "pkgC", pkgRepo.Repo[1].Requires[1].Name)
+}
