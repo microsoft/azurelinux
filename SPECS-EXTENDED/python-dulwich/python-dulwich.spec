@@ -1,16 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
 %global srcname dulwich
 %global __provides_exclude_from ^(%{python3_sitearch}/.*\\.so)$
 
 Name:           python-%{srcname}
-Version:        0.19.16
-Release:        2%{?dist}
+Version:        0.21.7
+Release:        6%{?dist}
 Summary:        Python implementation of the Git file formats and protocols
 
-License:        GPLv2+ or ASL 2.0
+License:        GPL-2.0-or-later OR Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://www.dulwich.io/
-Source0:        %pypi_source dulwich
+Source0:        %{pypi_source}#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 
@@ -23,7 +24,7 @@ Mrs. Git live in the Monty Python sketch.
 Summary:        %{summary}
 
 BuildRequires:  python3-devel
-
+BuildRequires:  python3-setuptools
 %{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
@@ -72,235 +73,165 @@ rm -rf %{buildroot}%{python3_sitearch}/docs/tutorial/
 %doc html
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.19.16-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 17 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.21.7-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.21.7-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 06 2023 Joel Capitao <jcapitao@redhat.com> - 0.21.7-1
+- Update to latest upstream release 0.21.7 (closes rhbz#2236973)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 0.21.5-2
+- Rebuilt for Python 3.12
+
+* Mon May 22 2023 Fabian Affolter <mail@fabian-affolter.ch> - 0.21.5-1
+- Upgrade to latest upstream release 0.21.5 (closes rhbz#2193005)
+
+* Sun Feb 19 2023 Fabian Affolter <mail@fabian-affolter.ch> - 0.21.3-1
+- Upgrade to latest upstream release 0.21.3 (closes rhbz#2170942)
+
+* Wed Jan 25 2023 Fabian Affolter <mail@fabian-affolter.ch> - 0.21.2-1
+- Upgrade to latest upstream release 0.21.2 (closes rhbz#2138585)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.46-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 13 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.46-1
+- Update to latest upstream release 0.20.46 (closes rhbz#2124623)
+
+* Fri Aug 19 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.45-1
+- Update to latest upstream release 0.20.45 (closes rhbz#2107737)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.44-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 08 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.44-1
+- Update to latest upstream release 0.20.44 (closes rhbz#2102830)
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.20.43-2
+- Rebuilt for Python 3.11
+
+* Tue Jun 07 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.43-1
+- Update to latest upstream release 0.20.43 (closes rhbz#2089721)
+
+* Thu May 19 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.40-1
+- Update to latest upstream release 0.20.40 (closes rhbz#2086840)
+
+* Sun May 15 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.36-1
+- Update to latest upstream release 0.20.36 (closes rhbz#2086300)
+
+* Sun Mar 20 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.35-1
+- Update to latest upstream release 0.20.35 (closes rhbz#2066021)
+
+* Thu Mar 17 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.34-1
+- Update to latest upstream release 0.20.34 (closes rhbz#2064048)
+
+* Sun Mar 06 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.33-1
+- Update to latest upstream release 0.20.33 (closes rhbz#2061090)
+
+* Mon Jan 24 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.32-1
+- Update to latest upstream release 0.20.31 (closes rhbz#2044558)
+
+* Fri Jan 21 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.31-1
+- * Fri Jan 21 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.31-1 -
+  Update to latest upstream release 0.20.31 (closes rhbz#2037101)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.25-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Aug 27 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.25-2
+- Update bug id
+
+* Fri Aug 27 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.25-1
+- * Fri Aug 27 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.25-1 -
+  Update to latest upstream release 0.20.25 (closes rhbz#1923878)
+
+* Wed Aug 25 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.24-1
+- * Wed Aug 25 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.24-1 -
+  Update to latest upstream release 0.20.24 (rhbz#1925135)
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.23-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 0.20.23-2
+- Rebuilt for Python 3.10
+
+* Tue May 25 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.23-1
+- * Tue May 25 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.23-1 -
+  Update to latest upstream version 0.20.23 (#1925135)
+
+* Sat Feb 06 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.18-1
+- * Sat Feb 06 2021 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.18-1 -
+  Update to latest upstream release 0.20.18 (#1925135)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.15-1
+- * Wed Dec 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.15-1 -
+  Update to latest upstream release 0.20.15 (#1910183)
+
+* Fri Nov 27 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.14-1
+- * Mon Nov 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.14-1 -
+  Update to latest upstream release 0.20.14 (#1902106)
+
+* Mon Nov 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.13-2
+- Fix name
+
+* Mon Nov 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.13-1
+- * Mon Nov 23 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.13-1 -
+  CLI part was fixed by upstream (#1866463) - Update to latest upstream
+  release 0.20.13 (#1900385)
+
+* Fri Oct 30 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.11-1
+- * Fri Oct 30 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.11-1 -
+  Update to latest upstream release 0.20.11 (#1893055)
+
+* Mon Aug 31 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.6-1
+- * Mon Aug 31 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.6-1 -
+  Update to latest upstream release 0.20.6 (rhbz#1873748)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.5-2
+- * Fri Jun 26 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.5-2 -
+  Add python3-setuptools as BR
+
+* Mon Jun 22 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.5-1
+- * Mon Jun 22 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.5-1 -
+  Update to latest upstream release 0.20.5 (rhbz#1846933)
+
+* Mon Jun 15 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.3-1
+- * Mon Jun 15 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.3-1 -
+  Update to latest upstream release 0.20.3 (rhbz#1846933)
+
+* Mon Jun 01 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.2-1
+- * Mon Jun 01 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.20.2-1 -
+  Update to latest upstream release 0.20.2 (rhbz#1842651)
+
+* Sat May 23 2020 Miro Hrončok <miro@hroncok.cz> - 0.19.16-2
+- Rebuilt for Python 3.9
 
 * Sat Apr 18 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.16-1
-- Update to latest upstream release 0.19.16 (rhbz#1825352)
+- * Sat Apr 18 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.16-1 -
+  Update to latest upstream release 0.19.16 (rhbz#1825352)
 
 * Fri Feb 28 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.15-3
-- Move docs to subpackage
+- RPMAUTOSPEC: unresolvable merge
 
-* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.15-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
-
-* Mon Jan 27 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.15-1
-- Update to new upstream version 0.19.15
-
-* Wed Dec 25 2019 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.14-1
-- Update to new upstream version 0.19.14
-
-* Mon Nov 11 2019 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.13-1
-- Remove Python 2 (rhbz#1761783)
-- Update to new upstream version 0.19.13
-
-* Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.19.12-3
-- Rebuilt for Python 3.8.0rc1 (#1748018)
-
-* Wed Aug 21 2019 Miro Hrončok <mhroncok@redhat.com> - 0.19.12-2
-- Rebuilt for Python 3.8
-
-* Mon Aug 19 2019 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.12-1
-- Update to new upstream version 0.19.12
-
-* Sat Aug 17 2019 Miro Hrončok <mhroncok@redhat.com> - 0.19.11-4
-- Rebuilt for Python 3.8
-
-* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.11-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
-
-* Mon Jun 24 2019 Yatin Karel <ykarel@redhat.com> - 0.19.11-2
-- Rebuild after removing python2-sphinx
-
-* Fri Mar 1 2019 Yatin Karel <ykarel@redhat.com> - 0.19.11-1
-- Update to new upstream version 0.19.11
-
-* Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.9-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
-
-* Sun Nov 18 2018 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.9-1
-- Update to new upstream version 0.19.9
-
-* Mon Aug 27 2018 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.6-1
-- Update to new upstream version 0.19.6
-
-* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.2-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
-
-* Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 0.19.2-2
-- Rebuilt for Python 3.7
-
-* Sat May 05 2018 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.2-1
-- Update to new upstream version 0.19.2
-
-* Fri Mar 23 2018 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.0-1
-- Update to new upstream version 0.19.0
-
-* Tue Mar 13 2018 Iryna Shcherbina <ishcherb@redhat.com> - 0.18.6-3
-- Update Python 2 dependency declarations to new packaging standards
-  (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
-
-* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.6-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
-
-* Mon Nov 27 2017 Alan Pevec <alan.pevec@redhat.com> 0.18.6-1
-- Update to 0.18.6
-- Fixes CVE-2017-16228
-
-* Fri Oct 13 2017 Fabian Affolter <mail@fabian-affolter.ch> - 0.18.4-1
-- Update to new upstream version 0.16.0 (rhbz#*1405983)
-
-* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.0-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
-
-* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
-
-* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
-
-* Mon Jan 23 2017 Fabian Affolter <mail@fabian-affolter.ch> - 0.16.0-1
-- Update to new upstream version 0.16.0
-
-* Sat Jan 21 2017 Fabian Affolter <mail@fabian-affolter.ch> - 0.15.0-1
-- Update to new upstream version 0.15.0
-
-* Mon Dec 19 2016 Miro Hrončok <mhroncok@redhat.com> - 0.12.0-4
-- Rebuild for Python 3.6
-
-* Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.12.0-3
-- https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
-
-* Tue Feb 02 2016 Raphael Groner <projects.rg@smart.ms> - 0.12.0-2
-- Generate documentation for python3
-- Split binaries in subpackage to avoid duplication
-- Execute tests
-- Fix rhbz#1304050
-
-* Tue Feb 02 2016 Fabian Affolter <mail@fabian-affolter.ch> - 0.12.0-1
-- Update to new upstream version 0.12.0
-
-* Sat Nov 14 2015 Fabian Affolter <mail@fabian-affolter.ch> - 0.11.2-3
-- Cleanup and py3
-
-* Tue Oct 06 2015 Fabian Affolter <mail@fabian-affolter.ch> - 0.11.2-2
-- Update docs
-- Update to new upstream version 0.11.2
-
-* Tue Oct 06 2015 Fabian Affolter <mail@fabian-affolter.ch> - 0.11.1-1
-- Update to new upstream version 0.11.1
-
-* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.10.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
-
-* Mon Mar 23 2015 Fabian Affolter <mail@fabian-affolter.ch> - 0.10.0-1
-- Fix for CVE-2014-9706 (rhbz#1204889, rhbz#1204890, and rhbz#1204891)
-- Update to new upstream version 0.10.0
-
-* Mon Mar 23 2015 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.9-1
-- Update to new upstream version 0.9.9
-
-* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.7-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
-
-* Fri Jun 27 2014 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.7-1
-- Update to new upstream version 0.9.7
-
-* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.6-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
-
-* Sat May 24 2014 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.6-1
-- Update to new upstream version 0.9.6
-
-* Wed Feb 26 2014 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.5-1
-- Tests are currently not working
-- Update to new upstream version 0.9.5
-
-* Mon Oct 28 2013 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.1-1
-- Update to new upstream version 0.9.1
-
-* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
-
-* Sat Jun 15 2013 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.0-1
-- Update to new upstream version 0.9.0
-- Now dual-licensed GPLv2+ or ASL 2.0
-
-* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.7-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
-
-* Tue Jan 15 2013 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.7-1
-- Update to new upstream version 0.8.7
-
-* Sat Nov 10 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.6-1
-- Update to new upstream version 0.8.6
-
-* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.5-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
-* Sat Jun 23 2012 Matěj Cepl <mcepl@redhat.com> - 0.8.5-2
-- We don’t need python-unittest2 anymore.
-
-* Fri Apr 13 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.5-1
-- Update to new upstream version 0.8.5
-
-* Fri Apr 06 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.4-1
-- Update to new upstream version 0.8.4
-
-* Fri Feb 24 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.3-1
-- Update to new upstream version 0.8.3
-
-* Sat Jan 28 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.2-2
-- Add missing BR
-
-* Fri Jan 27 2012 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.2-1
-- Update to new upstream version 0.8.2
-
-* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
-
-* Thu Oct 13 2011 Fabian Affolter <mail@fabian-affolter.ch> - 0.8.0-1
-- Update to new upstream version 0.8.0
-
-* Sun Apr 17 2011 Fabian Affolter <mail@fabian-affolter.ch> - 0.7.1-1
-- Update to new upstream version 0.7.1
-
-* Fri Mar 11 2011 Fabian Affolter <mail@fabian-affolter.ch> - 0.7.0-3
-- Test section reworked
-
-* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-
-* Thu Jan 27 2011 Fabian Affolter <mail@fabian-affolter.ch> - 0.7.0-1
-- Update to new upstream version 0.7.0
-
-* Mon Nov 08 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.6.2-1
-- Filtering added
-- Update to new upstream version 0.6.2
-
-* Wed Sep 01 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.6.1-1
-- Fix grep parameter
-- Run all test now
-- Update to new upstream version 0.6.1
-
-* Sat Jul 03 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.6.0-3
-- Remove exec permission from test.py
-- Add python-nose
-
-* Fri Jun 25 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.6.0-2
-- Change summary
-- Change to srcname
-- Fix rpmlint issue
-- Add check section and exclude the tests directory
-
-* Thu Jun 17 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.6.0-1
-- Fix some rpmlint issues
-- Add docs directory
-- Update to new upstream version 0.6.0
-
-* Wed Apr 28 2010 Fabian Affolter <mail@fabian-affolter.ch> - 0.5.0-2
-- Add Doc
-- Add BR setuptools
-
-* Fri Apr 16 2010 Steve 'Ashcrow' Milner <me@stevemilner.org> 0.5.0-1
-- Initial package
