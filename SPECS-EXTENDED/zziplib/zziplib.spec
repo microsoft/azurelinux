@@ -75,7 +75,8 @@ make test -C "%{_vpath_builddir}"
 %ldconfig_scriptlets
 
 %files
-%doc  docs/COPYING* ChangeLog README TODO
+%license docs/COPYING*
+%doc ChangeLog README TODO
 %{_libdir}/*.so.*
 %exclude %{_datadir}/zziplib/*.cmake
 
