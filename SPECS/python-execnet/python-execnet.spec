@@ -2,7 +2,7 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        1.9.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -13,6 +13,8 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 %if %{with check}
+# The mariner-release package is required to use tdnf to uninstall a package for the tests
+BuildRequires:  mariner-release
 BuildRequires:  python3-pip
 %endif
 BuildArch:      noarch
@@ -31,7 +33,7 @@ a minimal and fast API targetting the following uses:
 
 -distribute tasks to local or remote processes
 -write and deploy hybrid multi-process applications
--write scripts to administer multiple hosts}
+-write scripts to administer multiple hosts
 
 %prep
 %autosetup -n %{pkgname}-%{version}
@@ -43,6 +45,8 @@ a minimal and fast API targetting the following uses:
 %py3_install
 
 %check
+# Need to remove tomli to allow tox installation via pip
+tdnf erase -y python3-tomli
 pip3 install tox
 sed -i "s/pytest$/pytest==7.1.3/" tox.ini
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
@@ -53,6 +57,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 19 2025 Andrew Phelps <anphel@microsoft.com> - 1.9.0-3
+- Fix tomli conflict seen during package test setup
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
 - Freezing 'pytest' test dependency to version 7.1.3.
 
