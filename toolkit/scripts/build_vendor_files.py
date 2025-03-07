@@ -94,6 +94,13 @@ class VendorProcessor:
             return None
 
         return toml_data
+    
+    @staticmethod
+    def vendor_script_exists(script_directory: str, vendor_script_name: str) -> bool:
+        for root, _, files in os.walk(script_directory):
+            if vendor_script_name in files:
+                return True
+        return False
 
     def __raiseException(self, message):
         '''Raise an exception and log it as an error in the pipeline'''
@@ -136,6 +143,11 @@ class VendorProcessor:
         # custom vendors store the script in the package folder
         if vendor_type == vendor_type.CUSTOM:
             script_directory = self.pkg_path
+
+        if VendorProcessor.vendor_script_exists(script_directory, vendor_script_name) is False:
+            PipelineLogging.output_log_error(
+                f"Vendor script '{vendor_script_name}' not found in {script_directory} folder")
+            return
 
         vendor_script_path = os.path.join(
             script_directory, vendor_script_name)
