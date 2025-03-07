@@ -2,16 +2,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %bcond_without tests
 
+%global debug_package %{nil}
 %global srcname urwid
 
 Name:          python-%{srcname}
-Version:       2.1.2
-Release:       2%{?dist}
+Version:       2.6.14
+Release:       1%{?dist}
 Summary:       Console user interface library
 
-License:       LGPLv2+
-URL:           http://excess.org/urwid/
-Source0:       %{pypi_source urwid}
+License:       LGPL-2.1-or-later AND MIT
+URL:           https://excess.org/urwid/
+Source0:       https://pypi.org/packages/source/u/urwid/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wcwidth
+BuildRequires:  python3-typing-extensions
+BuildRequires:  python3-curses
 
 %global _description\
 Urwid is a Python library for making text console applications.  It has\
@@ -26,40 +34,43 @@ control.
 %package -n python3-%{srcname}
 Summary: %summary
 %{?python_provide:%python_provide python3-urwid}
-BuildRequires: gcc
 BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-# needed by selftest suite for test.support
-BuildRequires: python3-test
+BuildRequires: python3-pytest
 
 %description -n python3-%{srcname} %_description
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version}
+sed -i -e 's/--cov=urwid//' pyproject.toml
 find urwid -type f -name "*.py" -exec sed -i -e '/^#!\//, 1d' {} \;
 find urwid -type f -name "*.py" -exec chmod 644 {} \;
 
 %build
-%py3_build
-
+%pyproject_wheel
 find examples -type f -exec chmod 0644 \{\} \;
+
 
 %check
 %if %{with tests}
-# tests are failing: https://github.com/urwid/urwid/issues/344
 PYTHON=%{__python3} %{__python3} setup.py test || :
 %endif
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
-%files -n python3-%{srcname}
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license COPYING
 %doc README.rst examples docs
-%{python3_sitearch}/urwid/
-%{python3_sitearch}/urwid-%{version}*.egg-info/
 
 %changelog
+* Fri Mar 07 2024 Jyoti kanase <v-jykanase@microsoft.com> - 2.6.14-1
+- Upgrade to 2.6.14
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
