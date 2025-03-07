@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.173.1
-Release:        1%{?dist}
+Version:        5.15.176.3
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source4:        cbl-mariner-ca-20211013-20230216.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -420,6 +420,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Feb 22 2025 Chris Co <chrco@microsoft.com> - 5.15.176.3-3
+- Disable AX25 Amateur Radio protocol support
+
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 5.15.176.3-2
+- Append 20230216 key to CBL-Mariner key
+
+* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.176.3-1
+- Auto-upgrade to 5.15.176.3
+
 * Fri Dec 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.173.1-1
 - Auto-upgrade to 5.15.173.1
 
