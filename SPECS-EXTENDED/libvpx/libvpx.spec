@@ -184,6 +184,11 @@ rm -rf %{buildroot}%{_prefix}/src
 
 %ldconfig_scriptlets
 
+%check
+# This symbolic linking is needed for the tests to execute successfully.
+ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
+make test
+
 %files
 %license LICENSE
 %doc AUTHORS CHANGELOG README
