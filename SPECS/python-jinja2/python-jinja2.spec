@@ -33,8 +33,8 @@ inspired non-XML syntax but supports inline expressions and an optional
 sandboxed environment.
 
 %prep
-%autosetup -p1 -n Jinja2-%{version}
-sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
+%autosetup -p1 -n jinja2-%{version}
+sed -i 's/\r$//' LICENSE.txt # Fix wrong EOL encoding
 
 %build
 %py3_build
