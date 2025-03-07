@@ -5,11 +5,17 @@ import argparse
 import os
 import subprocess
 import sys
-import tomllib
 from enum import Enum
 
 from colorama import Fore, Style
 
+# this is to support python below 3.11 where tomblib was introduced
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
+tomllib.loads("['This parses fine with Python 3.6+']")
 
 class VendorType(Enum):
     '''VendorType enum contains vendor types'''
