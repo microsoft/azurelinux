@@ -1,7 +1,6 @@
 # TODO: BR: optional test dependency Unknown::Values if it becomes available
-
-Name:           perl-Test-Differences
 %global cpan_version 0.71
+Name:           perl-Test-Differences
 Version:        %(LANG=C printf "%.4f" %{cpan_version})
 Release:        1%{?dist}
 Summary:        Test strings and data structures and show differences if not OK

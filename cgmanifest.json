@@ -19913,8 +19913,8 @@
         "type": "other",
         "other": {
           "name": "perl-Term-UI",
-          "version": "0.50",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-0.50.tar.gz"
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-0.46.tar.gz"
         }
       }
     },
