@@ -19,7 +19,7 @@
 Summary:        Linux Kernel for MOS
 Name:           kernel-mos
 Version:        5.15.164.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/%{mariner_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
+Source2:        cbl-mariner-ca-20211013-20230216.pem
 Source3:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -377,6 +377,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 5.15.164.1-2
+- Append 20230216 key to CBL-Mariner key
+
 * Mon Aug 12 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.164.1-1
 - Update to 5.15.164.1
 
