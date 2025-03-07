@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.2.0.azl4
+Version:        3.2.0.azl4mz
 Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -22,8 +22,10 @@ BuildRequires:  openssl-devel
 BuildRequires:  clang
 BuildRequires:  device-mapper-devel
 BuildRequires:  cmake
+BuildRequires:  fuse-devel
 
 Requires:       kernel-uvm
+Requires:       kata-containers-cc-tardev
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:       virtiofsd = 1.8.0
 
@@ -62,6 +64,8 @@ PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
 
 %files
+%{_sbindir}/mount.tar
+%{_bindir}/kata-overlay
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
@@ -80,6 +84,13 @@ popd
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
 %{tools_pkg}/tools/osbuilder/Makefile
+
+%dir %{tools_pkg}/src
+%dir %{tools_pkg}/src/kata-opa
+%{tools_pkg}/src/kata-opa/allow-all.rego
+%dir %{tools_pkg}/src/tarfs
+%{tools_pkg}/src/tarfs/Makefile
+%{tools_pkg}/src/tarfs/tarfs.c
 
 %dir %{tools_pkg}/tools/osbuilder/scripts
 %{tools_pkg}/tools/osbuilder/scripts/lib.sh
@@ -112,6 +123,11 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4mz-1
+- Add systemd-udev and tarfs to enable virtio-blk with pod sandboxing
+- Set AGENT_POLICY=yes
+- Move tardev-snapshotter into kata-containers-cc-tardev
+
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 
