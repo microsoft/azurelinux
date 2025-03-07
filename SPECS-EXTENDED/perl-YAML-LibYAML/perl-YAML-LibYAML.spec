@@ -162,7 +162,7 @@ make test
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.902.0-2
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Mon Sep 23 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.902.0-1
