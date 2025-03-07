@@ -163,7 +163,7 @@ class VendorProcessor:
 
         # run the script
         proc = subprocess.Popen([
-            vendor_script_path,
+            "bash", vendor_script_path,
             "--srcTarball", self.src_tarball,
             "--outFolder", self.out_folder,
             "--pkgVersion", self.pkg_version,
