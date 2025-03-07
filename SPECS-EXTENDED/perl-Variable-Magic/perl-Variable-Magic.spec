@@ -1,6 +1,6 @@
 Name:           perl-Variable-Magic
 Version:        0.64
-Release:        1%{?dist}
+Release:        4%{?dist}
 Summary:        Associate user-defined magic to variables from Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
@@ -79,7 +79,7 @@ make test
 %{_mandir}/man3/Variable::Magic.3*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.64-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.64-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
