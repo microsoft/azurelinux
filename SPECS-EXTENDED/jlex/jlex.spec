@@ -42,27 +42,27 @@ Source1:        %{name}-%{version}.build.xml
 Source2:        %{url}/Archive/%{version}/manual.html
 Source3:        %{url}/Archive/%{version}/sample.lex
 Patch0:         %{name}-%{version}.static.patch
- 
+
 BuildRequires: ant
 BuildRequires: java-devel
 BuildRequires: jpackage-utils
- 
+
 Requires:      java
 Requires:      jpackage-utils
- 
+
 BuildArch:     noarch
- 
+
 %description
 JLex is a Lexical Analyzer Generator for Java.
- 
+
 %package javadoc
 Group:          Documentation
 Summary:        Javadoc for %{name}
 Requires:       jpackage-utils
- 
+
 %description javadoc
 Javadoc for %{name}.
- 
+
 %prep
 %setup -c -T
 cp %{SOURCE0} .
@@ -70,29 +70,29 @@ cp %{SOURCE2} .
 cp %{SOURCE3} .
 %patch 0
 cp %{SOURCE1} build.xml
- 
+
 %build
 ant
- 
+
 %install
 # jar
 install -pD -T dist/lib/%{name}.jar \
   %{buildroot}%{_javadir}/%{name}.jar
- 
+
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
- 
+
 %pre javadoc
 # workaround for rpm bug, can be removed in F-17
 [ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
 rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
- 
+
 %files
 %defattr(-,root,root,-)
 %{_javadir}/%{name}.jar
 %doc manual.html sample.lex
- 
+
 %files javadoc
 %defattr(-,root,root,-)
 %{_javadocdir}/%{name}
