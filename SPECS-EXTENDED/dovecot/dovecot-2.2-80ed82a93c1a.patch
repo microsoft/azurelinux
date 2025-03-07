@@ -1,0 +1,450 @@
+
+# HG changeset patch
+# User Timo Sirainen <tss@iki.fi>
+# Date 1416386277 -32400
+# Node ID 80ed82a93c1af5f6885e75a34007eb52d0692a8d
+# Parent  31262a892ba7302bfea6e70e17d3acd468736d70
+mbox: Added more (and earlier) detection for errors in mbox istreams.
+
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/istream-raw-mbox.c
+--- a/src/lib-storage/index/mbox/istream-raw-mbox.c	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/istream-raw-mbox.c	Wed Nov 19 17:37:57 2014 +0900
+@@ -506,7 +506,8 @@
+ 	return rstream->from_offset;
+ }
+ 
+-uoff_t istream_raw_mbox_get_header_offset(struct istream *stream)
++int istream_raw_mbox_get_header_offset(struct istream *stream,
++				       uoff_t *hdr_offset_r)
+ {
+ 	struct raw_mbox_istream *rstream =
+ 		(struct raw_mbox_istream *)stream->real_stream;
+@@ -520,13 +521,17 @@
+ 		i_error("Unexpectedly lost From-line from mbox file %s at "
+ 			"%"PRIuUOFF_T, i_stream_get_name(stream),
+ 			rstream->from_offset);
+-		return (uoff_t)-1;
++		return -1;
+ 	}
++	if (stream->stream_errno != 0)
++		return -1;
+ 
+-	return rstream->hdr_offset;
++	*hdr_offset_r = rstream->hdr_offset;
++	return 0;
+ }
+ 
+-uoff_t istream_raw_mbox_get_body_offset(struct istream *stream)
++int istream_raw_mbox_get_body_offset(struct istream *stream,
++				     uoff_t *body_offset_r)
+ {
+ 	struct raw_mbox_istream *rstream =
+ 		(struct raw_mbox_istream *)stream->real_stream;
+@@ -534,8 +539,10 @@
+ 
+ 	i_assert(rstream->seeked);
+ 
+-	if (rstream->body_offset != (uoff_t)-1)
+-		return rstream->body_offset;
++	if (rstream->body_offset != (uoff_t)-1) {
++		*body_offset_r = rstream->body_offset;
++		return 0;
++	}
+ 
+ 	offset = stream->v_offset;
+ 	i_stream_seek(stream, rstream->hdr_offset);
+@@ -551,27 +558,30 @@
+ 			} else {
+ 				i_assert(rstream->body_offset != (uoff_t)-1);
+ 			}
+-			break;
++			return -1;
+ 		}
+ 	}
+ 
+ 	i_stream_seek(stream, offset);
+-	return rstream->body_offset;
++	*body_offset_r = rstream->body_offset;
++	return 0;
+ }
+ 
+-uoff_t istream_raw_mbox_get_body_size(struct istream *stream,
+-				      uoff_t expected_body_size)
++int istream_raw_mbox_get_body_size(struct istream *stream,
++				   uoff_t expected_body_size,
++				   uoff_t *body_size_r)
+ {
+ 	struct raw_mbox_istream *rstream =
+ 		(struct raw_mbox_istream *)stream->real_stream;
+ 	const unsigned char *data;
+ 	size_t size;
+-	uoff_t old_offset, body_size, next_body_offset;
++	uoff_t old_offset, body_offset, body_size, next_body_offset;
+ 
+ 	i_assert(rstream->seeked);
+ 	i_assert(rstream->hdr_offset != (uoff_t)-1);
+ 
+-	(void)istream_raw_mbox_get_body_offset(stream);
++	if (istream_raw_mbox_get_body_offset(stream, &body_offset) < 0)
++		return -1;
+ 	body_size = rstream->mail_size == (uoff_t)-1 ? (uoff_t)-1 :
+ 		rstream->mail_size - (rstream->body_offset -
+ 				      rstream->hdr_offset);
+@@ -580,8 +590,10 @@
+ 		/* if we already have the existing body size, use it as long as
+ 		   it's >= expected body_size. otherwise the previous parsing
+ 		   may have stopped at a From_-line that belongs to the body. */
+-		if (body_size != (uoff_t)-1 && body_size >= expected_body_size)
+-			return body_size;
++		if (body_size != (uoff_t)-1 && body_size >= expected_body_size) {
++			*body_size_r = body_size;
++			return 0;
++		}
+ 
+ 		next_body_offset = rstream->body_offset + expected_body_size;
+ 		/* If header_missing_eoh is set, the message body begins with
+@@ -600,21 +612,27 @@
+ 			rstream->mail_size =
+ 				next_body_offset - rstream->hdr_offset;
+ 			i_stream_seek(stream, old_offset);
+-			return expected_body_size;
++			*body_size_r = expected_body_size;
++			return 0;
+ 		}
+ 		/* invalid expected_body_size */
+ 	}
+-	if (body_size != (uoff_t)-1)
+-		return body_size;
++	if (body_size != (uoff_t)-1) {
++		*body_size_r = body_size;
++		return 0;
++	}
+ 
+ 	/* have to read through the message body */
+ 	while (i_stream_read_data(stream, &data, &size, 0) > 0)
+ 		i_stream_skip(stream, size);
+ 	i_stream_seek(stream, old_offset);
++	if (stream->stream_errno != 0)
++		return -1;
+ 
+ 	i_assert(rstream->mail_size != (uoff_t)-1);
+-	return rstream->mail_size -
++	*body_size_r = rstream->mail_size -
+ 		(rstream->body_offset - rstream->hdr_offset);
++	return 0;
+ }
+ 
+ time_t istream_raw_mbox_get_received_time(struct istream *stream)
+@@ -651,13 +669,15 @@
+ 	return rstream->crlf_ending;
+ }
+ 
+-void istream_raw_mbox_next(struct istream *stream, uoff_t expected_body_size)
++int istream_raw_mbox_next(struct istream *stream, uoff_t expected_body_size)
+ {
+ 	struct raw_mbox_istream *rstream =
+ 		(struct raw_mbox_istream *)stream->real_stream;
+ 	uoff_t body_size;
+ 
+-	body_size = istream_raw_mbox_get_body_size(stream, expected_body_size);
++	if (istream_raw_mbox_get_body_size(stream, expected_body_size,
++					   &body_size) < 0)
++		return -1;
+ 	rstream->mail_size = (uoff_t)-1;
+ 
+ 	rstream->received_time = rstream->next_received_time;
+@@ -678,6 +698,7 @@
+ 
+ 	rstream->eof = FALSE;
+ 	rstream->istream.istream.eof = FALSE;
++	return 0;
+ }
+ 
+ int istream_raw_mbox_seek(struct istream *stream, uoff_t offset)
+@@ -698,10 +719,8 @@
+ 	/* if seeked is FALSE, we unlocked in the middle. don't try to use
+ 	   any cached state then. */
+ 	if (rstream->mail_size != (uoff_t)-1 && rstream->seeked &&
+-	    rstream->hdr_offset + rstream->mail_size == offset) {
+-		istream_raw_mbox_next(stream, (uoff_t)-1);
+-		return 0;
+-	}
++	    rstream->hdr_offset + rstream->mail_size == offset)
++		return istream_raw_mbox_next(stream, (uoff_t)-1);
+ 
+ 	if (offset == rstream->from_offset && rstream->seeked) {
+ 		/* back to beginning of current message */
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/istream-raw-mbox.h
+--- a/src/lib-storage/index/mbox/istream-raw-mbox.h	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/istream-raw-mbox.h	Wed Nov 19 17:37:57 2014 +0900
+@@ -9,15 +9,18 @@
+ /* Return offset to beginning of the "\nFrom"-line. */
+ uoff_t istream_raw_mbox_get_start_offset(struct istream *stream);
+ /* Return offset to beginning of the headers. */
+-uoff_t istream_raw_mbox_get_header_offset(struct istream *stream);
++int istream_raw_mbox_get_header_offset(struct istream *stream,
++				       uoff_t *hdr_offset_r);
+ /* Return offset to beginning of the body. */
+-uoff_t istream_raw_mbox_get_body_offset(struct istream *stream);
++int istream_raw_mbox_get_body_offset(struct istream *stream,
++				     uoff_t *body_offset_r);
+ 
+ /* Return the number of bytes in the body of this message. If
+    expected_body_size isn't (uoff_t)-1, we'll use it as potentially valid body
+    size to avoid actually reading through the whole message. */
+-uoff_t istream_raw_mbox_get_body_size(struct istream *stream,
+-				      uoff_t expected_body_size);
++int istream_raw_mbox_get_body_size(struct istream *stream,
++				   uoff_t expected_body_size,
++				   uoff_t *body_size_r);
+ 
+ /* Return received time of current message, or (time_t)-1 if the timestamp is
+    broken. */
+@@ -30,7 +33,7 @@
+ 
+ /* Jump to next message. If expected_body_size isn't (uoff_t)-1, we'll use it
+    as potentially valid body size. */
+-void istream_raw_mbox_next(struct istream *stream, uoff_t expected_body_size);
++int istream_raw_mbox_next(struct istream *stream, uoff_t expected_body_size);
+ 
+ /* Seek to message at given offset. offset must point to beginning of
+    "\nFrom ", or 0 for beginning of file. Returns -1 if it offset doesn't
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/mbox-mail.c
+--- a/src/lib-storage/index/mbox/mbox-mail.c	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/mbox-mail.c	Wed Nov 19 17:37:57 2014 +0900
+@@ -304,10 +304,10 @@
+ 		return -1;
+ 
+ 	/* our header size varies, so don't do any caching */
+-	body_offset = istream_raw_mbox_get_body_offset(mbox->mbox_stream);
+-	if (body_offset == (uoff_t)-1) {
++	if (istream_raw_mbox_get_body_offset(mbox->mbox_stream, &body_offset) < 0) {
+ 		mail_storage_set_critical(_mail->box->storage,
+-					  "Couldn't get mbox size");
++			"mbox %s: Couldn't get body offset for uid=%u",
++			mailbox_get_path(&mbox->box), mail->mail.mail.uid);
+ 		return -1;
+ 	}
+ 
+@@ -319,8 +319,13 @@
+ 		body_size = (uoff_t)-1;
+ 
+ 	/* verify that the calculated body size is correct */
+-	body_size = istream_raw_mbox_get_body_size(mbox->mbox_stream,
+-						   body_size);
++	if (istream_raw_mbox_get_body_size(mbox->mbox_stream,
++					   body_size, &body_size) < 0) {
++		mail_storage_set_critical(_mail->box->storage,
++			"mbox %s: Couldn't get body size for uid=%u",
++			mailbox_get_path(&mbox->box), mail->mail.mail.uid);
++		return -1;
++	}
+ 
+ 	data->physical_size = hdr_size.physical_size + body_size;
+ 	*size_r = data->physical_size;
+@@ -352,7 +357,12 @@
+ 	}
+ 
+ 	raw_stream = mbox->mbox_stream;
+-	hdr_offset = istream_raw_mbox_get_header_offset(raw_stream);
++	if (istream_raw_mbox_get_header_offset(raw_stream, &hdr_offset) < 0) {
++		mail_storage_set_critical(mbox->box.storage,
++			"mbox %s: Couldn't get header offset for uid=%u",
++			mailbox_get_path(&mbox->box), mail->mail.mail.uid);
++		return -1;
++	}
+ 	i_stream_seek(raw_stream, hdr_offset);
+ 
+ 	if (next_offset != (uoff_t)-1)
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/mbox-sync-parse.c
+--- a/src/lib-storage/index/mbox/mbox-sync-parse.c	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/mbox-sync-parse.c	Wed Nov 19 17:37:57 2014 +0900
+@@ -453,8 +453,8 @@
+ 	return strcasecmp(key, func->header);
+ }
+ 
+-void mbox_sync_parse_next_mail(struct istream *input,
+-			       struct mbox_sync_mail_context *ctx)
++int mbox_sync_parse_next_mail(struct istream *input,
++			      struct mbox_sync_mail_context *ctx)
+ {
+ 	struct mbox_sync_context *sync_ctx = ctx->sync_ctx;
+ 	struct message_header_parser_ctx *hdr_ctx;
+@@ -545,6 +545,12 @@
+ 	}
+ 
+ 	ctx->body_offset = input->v_offset;
++	if (input->stream_errno != 0) {
++		mbox_sync_set_critical(ctx->sync_ctx, "read(%s) failed: %s",
++			i_stream_get_name(input), i_stream_get_error(input));
++		return -1;
++	}
++	return 0;
+ }
+ 
+ bool mbox_sync_parse_match_mail(struct mbox_mailbox *mbox,
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/mbox-sync-private.h
+--- a/src/lib-storage/index/mbox/mbox-sync-private.h	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/mbox-sync-private.h	Wed Nov 19 17:37:57 2014 +0900
+@@ -158,8 +158,8 @@
+ void mbox_sync_set_critical(struct mbox_sync_context *sync_ctx,
+ 			    const char *fmt, ...) ATTR_FORMAT(2, 3);
+ 
+-void mbox_sync_parse_next_mail(struct istream *input,
+-			       struct mbox_sync_mail_context *ctx);
++int mbox_sync_parse_next_mail(struct istream *input,
++			      struct mbox_sync_mail_context *ctx);
+ bool mbox_sync_parse_match_mail(struct mbox_mailbox *mbox,
+ 				struct mail_index_view *view, uint32_t seq);
+ 
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/mbox-sync-rewrite.c
+--- a/src/lib-storage/index/mbox/mbox-sync-rewrite.c	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/mbox-sync-rewrite.c	Wed Nov 19 17:37:57 2014 +0900
+@@ -318,11 +318,11 @@
+ 	return 1;
+ }
+ 
+-static void mbox_sync_read_next(struct mbox_sync_context *sync_ctx,
+-				struct mbox_sync_mail_context *mail_ctx,
+-				struct mbox_sync_mail *mails,
+-				uint32_t seq, uint32_t idx,
+-				uoff_t expunged_space)
++static int mbox_sync_read_next(struct mbox_sync_context *sync_ctx,
++			       struct mbox_sync_mail_context *mail_ctx,
++			       struct mbox_sync_mail *mails,
++			       uint32_t seq, uint32_t idx,
++			       uoff_t expunged_space)
+ {
+ 	unsigned int first_mail_expunge_extra;
+ 	uint32_t orig_next_uid;
+@@ -332,8 +332,12 @@
+ 	mail_ctx->seq = seq;
+ 	mail_ctx->header = sync_ctx->header;
+ 
+-	mail_ctx->mail.offset =
+-		istream_raw_mbox_get_header_offset(sync_ctx->input);
++	if (istream_raw_mbox_get_header_offset(sync_ctx->input,
++					       &mail_ctx->mail.offset) < 0) {
++		mbox_sync_set_critical(sync_ctx,
++			"Couldn't get header offset for seq=%u", seq);
++		return -1;
++	}
+ 	mail_ctx->mail.body_size = mails[idx].body_size;
+ 
+ 	orig_next_uid = sync_ctx->next_uid;
+@@ -361,7 +365,8 @@
+ 		mails[idx].from_offset += first_mail_expunge_extra;
+ 	}
+ 
+-	mbox_sync_parse_next_mail(sync_ctx->input, mail_ctx);
++	if (mbox_sync_parse_next_mail(sync_ctx->input, mail_ctx) < 0)
++		return -1;
+ 	i_assert(mail_ctx->mail.pseudo == mails[idx].pseudo);
+ 
+ 	/* set next_uid back before updating the headers. this is important
+@@ -381,6 +386,7 @@
+ 		if (mail_ctx->have_eoh)
+ 			str_append_c(mail_ctx->header, '\n');
+ 	}
++	return 0;
+ }
+ 
+ static int mbox_sync_read_and_move(struct mbox_sync_context *sync_ctx,
+@@ -398,8 +404,9 @@
+ 		if (mbox_sync_seek(sync_ctx, mails[idx].from_offset) < 0)
+ 			return -1;
+ 
+-		mbox_sync_read_next(sync_ctx, &new_mail_ctx, mails, seq, idx,
+-				    expunged_space);
++		if (mbox_sync_read_next(sync_ctx, &new_mail_ctx, mails, seq, idx,
++					expunged_space) < 0)
++			return -1;
+ 		mail_ctx = &new_mail_ctx;
+ 	} else {
+ 		i_assert(seq == mail_ctx->seq);
+diff -r 31262a892ba7 -r 80ed82a93c1a src/lib-storage/index/mbox/mbox-sync.c
+--- a/src/lib-storage/index/mbox/mbox-sync.c	Wed Nov 19 17:37:18 2014 +0900
++++ b/src/lib-storage/index/mbox/mbox-sync.c	Wed Nov 19 17:37:57 2014 +0900
+@@ -131,8 +131,10 @@
+ mbox_sync_read_next_mail(struct mbox_sync_context *sync_ctx,
+ 			 struct mbox_sync_mail_context *mail_ctx)
+ {
++	uoff_t offset;
++
+ 	/* get EOF */
+-	(void)istream_raw_mbox_get_header_offset(sync_ctx->input);
++	(void)istream_raw_mbox_get_header_offset(sync_ctx->input, &offset);
+ 	if (istream_raw_mbox_is_eof(sync_ctx->input))
+ 		return 0;
+ 
+@@ -144,19 +146,27 @@
+ 
+ 	mail_ctx->mail.from_offset =
+ 		istream_raw_mbox_get_start_offset(sync_ctx->input);
+-	mail_ctx->mail.offset =
+-		istream_raw_mbox_get_header_offset(sync_ctx->input);
++	if (istream_raw_mbox_get_header_offset(sync_ctx->input, &mail_ctx->mail.offset) < 0) {
++		mbox_sync_set_critical(sync_ctx,
++			"Couldn't get header offset for seq=%u", mail_ctx->seq);
++		return -1;
++	}
+ 
+-	mbox_sync_parse_next_mail(sync_ctx->input, mail_ctx);
++	if (mbox_sync_parse_next_mail(sync_ctx->input, mail_ctx) < 0)
++		return -1;
++	if (istream_raw_mbox_is_corrupted(sync_ctx->input))
++		return -1;
++
+ 	i_assert(sync_ctx->input->v_offset != mail_ctx->mail.from_offset ||
+ 		 sync_ctx->input->eof);
+ 
+-	if (istream_raw_mbox_is_corrupted(sync_ctx->input))
++	if (istream_raw_mbox_get_body_size(sync_ctx->input,
++					   mail_ctx->content_length,
++					   &mail_ctx->mail.body_size) < 0) {
++		mbox_sync_set_critical(sync_ctx,
++			"Couldn't get body size for seq=%u", mail_ctx->seq);
+ 		return -1;
+-
+-	mail_ctx->mail.body_size =
+-		istream_raw_mbox_get_body_size(sync_ctx->input,
+-					       mail_ctx->content_length);
++	}
+ 	i_assert(mail_ctx->mail.body_size < OFF_T_MAX);
+ 
+ 	if ((mail_ctx->mail.flags & MAIL_RECENT) != 0 &&
+@@ -810,7 +820,7 @@
+ mbox_sync_seek_to_seq(struct mbox_sync_context *sync_ctx, uint32_t seq)
+ {
+ 	struct mbox_mailbox *mbox = sync_ctx->mbox;
+-	uoff_t old_offset;
++	uoff_t old_offset, offset;
+ 	uint32_t uid;
+ 	int ret;
+         bool deleted;
+@@ -864,7 +874,11 @@
+ 
+         sync_ctx->idx_seq = seq;
+ 	sync_ctx->dest_first_mail = sync_ctx->seq == 0;
+-        (void)istream_raw_mbox_get_body_offset(sync_ctx->input);
++	if (istream_raw_mbox_get_body_offset(sync_ctx->input, &offset) < 0) {
++		mbox_sync_set_critical(sync_ctx,
++			"Message body offset lookup failed");
++		return -1;
++	}
+ 	return 1;
+ }
+ 
+@@ -1149,8 +1163,9 @@
+ 			sync_ctx->idx_seq++;
+ 		}
+ 
+-		istream_raw_mbox_next(sync_ctx->input,
+-				      mail_ctx->mail.body_size);
++		if (istream_raw_mbox_next(sync_ctx->input,
++					  mail_ctx->mail.body_size) < 0)
++			return -1;
+ 		offset = istream_raw_mbox_get_start_offset(sync_ctx->input);
+ 
+ 		if (sync_ctx->need_space_seq != 0) {
+
