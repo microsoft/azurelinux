@@ -1,15 +1,6 @@
 # Run extra tests
-%if 0%{?fedora} || 0%{?rhel} > 6
-%bcond_without perl_Software_License_enables_extra_test
-%else
 %bcond_with perl_Software_License_enables_extra_test
-%endif
-# Run optional tests
-%if 0%{!?perl_bootstrap:1} && 0%{?fedora}
-%bcond_without perl_Software_License_enables_optional_test
-%else
 %bcond_with perl_Software_License_enables_optional_test
-%endif
 
 Name:           perl-Software-License
 Version:        0.104006
