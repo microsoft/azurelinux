@@ -226,8 +226,8 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		logger.Log.Debugf("Added new node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 	} else {
 		// All dependencies are assumed to be "Run" dependencies
-		logger.Log.Debugf("Found existing node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 		dependentNode = nodes.RunNode
+		logger.Log.Debugf("Found existing node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 	}
 
 	if packageNode == dependentNode {
