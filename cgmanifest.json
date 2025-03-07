@@ -24373,8 +24373,8 @@
         "type": "other",
         "other": {
           "name": "python-requests-kerberos",
-          "version": "0.12.0",
-          "downloadUrl": "https://github.com/requests/requests-kerberos/archive/393e49c698904c76ad9f56c6e4dbd2dbc55a7c42.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/requests/requests-kerberos/archive/v0.14.0/requests-kerberos-0.14.0.tar.gz"
         }
       }
     },
