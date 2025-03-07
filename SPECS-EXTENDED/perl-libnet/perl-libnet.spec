@@ -13,7 +13,7 @@
 
 Name:           perl-libnet
 Version:        3.15
-Release:        1%{?dist}
+Release:        513%{?dist}
 Summary:        Perl clients for various network protocols
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
@@ -124,7 +124,7 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.15-1
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.15-513
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
