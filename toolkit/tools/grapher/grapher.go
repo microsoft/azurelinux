@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
@@ -122,7 +123,8 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	nodes, err := g.FindBestPkgNode(pkgVer)
+	// Unresolved packages must match exactly to a package in the graph.
+	nodes, err := g.FindExactPkgNodeFromPkg(pkgVer)
 	if err != nil {
 		return
 	}
@@ -217,13 +219,28 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		return err
 	}
 
-	if nodes == nil {
-		dependentNode, err = addUnresolvedPackage(g, dependency)
+	// Either the dependency is not in the graph, or it is a remote dependency and we need to be more careful about the
+	// version constraints since we can't assume that we will end up picking the exact version needed to meet all constraints.
+	if nodes == nil || nodes.RunNode.Type != pkggraph.TypeLocalRun {
+		existingRemoteNodes, err := g.FindExactPkgNodeFromPkg(dependency)
 		if err != nil {
-			err = fmt.Errorf("failed to add a package (%s):\n%w", dependency.Name, err)
+			err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
 			return err
 		}
-		logger.Log.Debugf("Added new node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
+
+		if existingRemoteNodes == nil {
+			// No local, and no exact remote, so create a new node.
+			dependentNode, err = addUnresolvedPackage(g, dependency)
+			if err != nil {
+				err = fmt.Errorf("failed to add a package (%s):\n%w", dependency.Name, err)
+				return err
+			}
+			logger.Log.Debugf("Added new node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
+		} else {
+			// This exact dependency is already in the graph, so reuse it.
+			dependentNode = existingRemoteNodes.RunNode
+			logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
+		}
 	} else {
 		// All dependencies are assumed to be "Run" dependencies
 		dependentNode = nodes.RunNode
@@ -337,10 +354,14 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	timestamp.StopEvent(nil) // add package nodes
 	timestamp.StartEvent("add dependencies", nil)
 
+	// Sort the map to ensure the order is deterministic
+	packageList := sliceutils.MapToSlice(uniquePackages)
+	pkgjson.SortPackageList(packageList)
+
 	// Rescan and add all the dependencies
 	logger.Log.Infof("Adding all dependencies from (%s)", *input)
 	dependenciesAdded := 0
-	for uniquePkg := range uniquePackages {
+	for _, uniquePkg := range packageList {
 		num, err := addPkgDependencies(graph, uniquePkg)
 		if err != nil {
 			err = fmt.Errorf("failed to add dependency %+v:\n%w", uniquePkg, err)
