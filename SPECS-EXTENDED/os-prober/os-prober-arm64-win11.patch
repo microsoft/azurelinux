@@ -1,0 +1,15 @@
+diff --git a/os-probes/mounted/arm64/20microsoft b/os-probes/mounted/arm64/20microsoft
+index 066918a..b69c2ba 100755
+--- a/os-probes/mounted/arm64/20microsoft
++++ b/os-probes/mounted/arm64/20microsoft
+@@ -31,7 +31,9 @@ if item_in_dir -q bootmgr "$2"; then
+ 	for boot in $(item_in_dir boot "$2"); do
+ 		bcd=$(item_in_dir bcd "$2/$boot")
+ 		if [ -n "$bcd" ]; then
+-			if   grep -aqs "W.i.n.d.o.w.s. .1.0" "$2/$boot/$bcd"; then
++			if   grep -aqs "W.i.n.d.o.w.s. .1.1" "$2/$boot/$bcd"; then
++				long="Windows 11"
++			elif grep -aqs "W.i.n.d.o.w.s. .1.0" "$2/$boot/$bcd"; then
+ 				long="Windows 10"
+ 			elif grep -aqs "W.i.n.d.o.w.s. .8" "$2/$boot/$bcd"; then
+ 				long="Windows 8"
