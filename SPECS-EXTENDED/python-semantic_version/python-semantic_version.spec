@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{pypi_name}
 Version:        2.10.0
-Release:        1%{?dist}   
+Release:        1%{?dist}
 Summary:        Library implementing the 'SemVer' scheme
 
 License:        BSD
