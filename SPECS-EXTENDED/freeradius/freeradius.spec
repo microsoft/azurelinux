@@ -3,52 +3,62 @@
 %global HAVE_EC_CRYPTO 1
 %global debug_package %{nil}
 
-Summary:        High-performance and highly configurable free RADIUS server
-Name:           freeradius
-Version:        3.2.3
-Release:        2%{?dist}
-License:        GPLv2+ AND LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://freeradius.org/
+Summary:       High-performance and highly configurable free RADIUS server
+Name:          freeradius
+Version:       3.2.5
+Release:       3%{?dist}
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+License: GPL-2.0-or-later AND LGPL-2.0-or-later
+URL: http://www.freeradius.org/
 
 %global dist_base freeradius-server-%{version}
+
+Source0:  https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_5/%{dist_base}.tar.bz2
+Source100: radiusd.service
+Source102: freeradius-logrotate
+Source103: freeradius-pam-conf
+Source104: freeradius-tmpfiles.conf
+Source105: freeradius.sysusers
+
+Patch1: freeradius-Adjust-configuration-to-fit-Red-Hat-specifics.patch
+Patch2: freeradius-Use-system-crypto-policy-by-default.patch
+Patch3: freeradius-bootstrap-create-only.patch
+Patch4: freeradius-no-buildtime-cert-gen.patch
+Patch5: freeradius-bootstrap-make-permissions.patch
+Patch6: freeradius-ldap-infinite-timeout-on-starttls.patch
+Patch7: freeradius-ease-openssl-version-check.patch
+Patch8: freeradius-configure-c99.patch
+
 %global docdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
-Source0:        ftp://ftp.freeradius.org/pub/radius/%{dist_base}.tar.bz2
-Source100:      radiusd.service
-Source102:      freeradius-logrotate
-Source103:      freeradius-pam-conf
-Source104:      freeradius-tmpfiles.conf
-Source105:      freeradius.sysusers
-Patch1:         freeradius-Adjust-configuration-to-fit-Red-Hat-specifics.patch
-Patch2:         freeradius-Use-system-crypto-policy-by-default.patch
-Patch3:         freeradius-bootstrap-create-only.patch
-Patch4:         freeradius-no-buildtime-cert-gen.patch
-Patch5:         freeradius-bootstrap-make-permissions.patch
-Patch6:         fix-error-for-expansion-of-macro-in-thread.h.patch
-BuildRequires:  autoconf
-BuildRequires:  gcc
-BuildRequires:  gdbm-devel
-BuildRequires:  libpcap-devel
-BuildRequires:  libtalloc-devel
-BuildRequires:  make
-BuildRequires:  net-snmp-devel
-BuildRequires:  net-snmp-utils
-BuildRequires:  openssl
-BuildRequires:  openssl-devel
-BuildRequires:  pam-devel
-BuildRequires:  pcre-devel
-BuildRequires:  readline-devel
-BuildRequires:  systemd-units
-BuildRequires:  zlib-devel
+
+BuildRequires: autoconf
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: gdbm-devel
+BuildRequires: openssl
+BuildRequires: openssl-devel
+# https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
+BuildRequires: pam-devel
+BuildRequires: zlib-devel
+BuildRequires: net-snmp-devel
+BuildRequires: net-snmp-utils
+BuildRequires: readline-devel
+BuildRequires: libpcap-devel
+BuildRequires: systemd-units
+BuildRequires: libtalloc-devel
+BuildRequires: chrpath
+BuildRequires: systemd-rpm-macros
+
 # Require OpenSSL version we built with, or newer, to avoid startup failures
 # due to runtime OpenSSL version checks.
 Requires: openssl >= %(rpm -q --queryformat '%%{VERSION}' openssl)
 Requires(pre): shadow-utils glibc-common
 Requires(post): systemd-sysv
 Requires(post): systemd-units
-# Needed for certificate generation
-Requires(post): make
+# Needed for certificate generation as upstream bootstrap script isn't
+# compatible with Makefile equivalent.
+Requires: make
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 
@@ -68,17 +78,16 @@ be centralized, and minimizes the amount of re-configuration which has to be
 done when adding or deleting new users.
 
 %package doc
-Summary:        FreeRADIUS documentation
+Summary: FreeRADIUS documentation
 
 %description doc
 All documentation supplied by the FreeRADIUS project is included
 in this package.
 
 %package utils
-Summary:        FreeRADIUS utilities
-Requires:       %{name} = %{version}-%{release}
-Requires:       libpcap >= 0.9.4
-Requires:       perl-Net-IP
+Summary: FreeRADIUS utilities
+Requires: %{name} = %{version}-%{release}
+Requires: libpcap >= 0.9.4
 
 %description utils
 The FreeRADIUS server has a number of features found in other servers,
@@ -90,86 +99,85 @@ Support for RFC and VSA Attributes Additional server configuration
 attributes Selecting a particular configuration Authentication methods
 
 %package devel
-Summary:        FreeRADIUS development files
-Requires:       %{name} = %{version}-%{release}
+Summary: FreeRADIUS development files
+Requires: %{name} = %{version}-%{release}
 
 %description devel
 Development headers and libraries for FreeRADIUS.
 
 %package ldap
-Summary:        LDAP support for freeradius
-BuildRequires:  openldap-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: LDAP support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: openldap-devel
 
 %description ldap
 This plugin provides the LDAP support for the FreeRADIUS server project.
 
 %package krb5
-Summary:        Kerberos 5 support for freeradius
-BuildRequires:  krb5-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: Kerberos 5 support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: krb5-devel
 
 %description krb5
 This plugin provides the Kerberos 5 support for the FreeRADIUS server project.
 
 %package perl
-Summary:        Perl support for freeradius
+Summary: Perl support for freeradius
+Requires: %{name} = %{version}-%{release}
 %{?fedora:BuildRequires: perl-devel}
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::Embed)
-Requires:       %{name} = %{version}-%{release}
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires: perl-devel
+BuildRequires: perl-generators
+BuildRequires: perl(ExtUtils::Embed)
 
 %description perl
 This plugin provides the Perl support for the FreeRADIUS server project.
 
 %package -n python3-freeradius
-Summary:        Python 3 support for freeradius
+Summary: Python 3 support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: python3-devel
 %{?python_provide:%python_provide python3-freeradius}
-BuildRequires:  python3-devel
-Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-freeradius
 This plugin provides the Python 3 support for the FreeRADIUS server project.
 
 %package mysql
-Summary:        MySQL support for freeradius
-BuildRequires:  mariadb-connector-c-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: MySQL support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: mariadb-connector-c-devel
 
 %description mysql
 This plugin provides the MySQL support for the FreeRADIUS server project.
 
 %package postgresql
-Summary:        Postgresql support for freeradius
-BuildRequires:  postgresql-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: Postgresql support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: libpq-devel
 
 %description postgresql
 This plugin provides the postgresql support for the FreeRADIUS server project.
 
 %package sqlite
-Summary:        SQLite support for freeradius
-BuildRequires:  sqlite-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: SQLite support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: sqlite-devel
 
 %description sqlite
 This plugin provides the SQLite support for the FreeRADIUS server project.
 
 %package unixODBC
-Summary:        Unix ODBC support for freeradius
-BuildRequires:  unixODBC-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: Unix ODBC support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: unixODBC-devel
 
 %description unixODBC
 This plugin provides the unixODBC support for the FreeRADIUS server project.
 
 %package rest
-Summary:        REST support for freeradius
-BuildRequires:  json-c-devel
-BuildRequires:  libcurl-devel
-Requires:       %{name} = %{version}-%{release}
+Summary: REST support for freeradius
+Requires: %{name} = %{version}-%{release}
+BuildRequires: libcurl-devel
+BuildRequires: json-c-devel
 
 %description rest
 This plugin provides the REST support for the FreeRADIUS server project.
@@ -181,18 +189,9 @@ This plugin provides the REST support for the FreeRADIUS server project.
 # Force compile/link options, extra security for network facing daemon
 %global _hardened_build 1
 
-# Hack: rlm_python3 as stable; prevents building other unstable modules.
-sed 's/rlm_python/rlm_python3/g' src/modules/stable -i
-
-# python3-config is broken:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1772988
-export PY3_LIB_DIR=%{_libdir}/"$(python3-config --configdir | sed 's#/usr/lib/##g')"
+%global build_ldflags %{build_ldflags} $(python3-config --embed --libs)
+export PY3_LIB_DIR="$(python3-config --configdir)"
 export PY3_INC_DIR="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("INCLUDEPY"))')"
-
-# In order for the above hack to stick, do a fake configure so
-# we can run reconfig before cleaning up after ourselves and running
-# configure for real.
-./configure && make reconfig && (make clean distclean || true)
 
 %configure \
         --libdir=%{_libdir}/freeradius \
@@ -212,6 +211,7 @@ export PY3_INC_DIR="$(python3 -c 'import sysconfig; print(sysconfig.get_config_v
         --with-rlm_python3 \
         --with-rlm-python3-lib-dir=$PY3_LIB_DIR \
         --with-rlm-python3-include-dir=$PY3_INC_DIR \
+        --without-rlm_python \
         --without-rlm_eap_ikev2 \
         --without-rlm_eap_tnc \
         --without-rlm_sql_iodbc \
@@ -223,7 +223,8 @@ export PY3_INC_DIR="$(python3 -c 'import sysconfig; print(sysconfig.get_config_v
         --without-rlm_rediswho \
         --without-rlm_cache_memcached
 
-make
+# Build fast, but get better errors if we fail
+make %{?_smp_mflags} || make -j1
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/radiusd
@@ -247,6 +248,15 @@ install -p -D -m 0644 %{SOURCE105} %{buildroot}%{_sysusersdir}/freeradius.conf
 # install SNMP MIB files
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/snmp/mibs/
 install -m 644 mibs/*RADIUS*.mib $RPM_BUILD_ROOT%{_datadir}/snmp/mibs/
+
+# remove rpath where needed
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/freeradius/*.so
+for f in $RPM_BUILD_ROOT/usr/sbin/*; do chrpath --delete $f || true; done
+for f in $RPM_BUILD_ROOT/usr/bin/*; do chrpath --delete $f || true; done
+
+# update ld with freeradius libs
+mkdir -p %{buildroot}/%{_sysconfdir}/ld.so.conf.d
+echo "%{_libdir}/freeradius" > %{buildroot}/%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
 
 # remove unneeded stuff
 rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/raddb/certs/*.crt
@@ -317,7 +327,7 @@ EOF
 
 # Make sure our user/group is present prior to any package or subpackage installation
 %pre
-%sysusers_create_package %{name} %{SOURCE105}
+%sysusers_create_compat %{SOURCE105}
 
 %preun
 %systemd_preun radiusd.service
@@ -326,6 +336,7 @@ EOF
 %systemd_postun_with_restart radiusd.service
 
 /bin/systemctl try-restart radiusd.service >/dev/null 2>&1 || :
+
 
 %files
 
@@ -338,6 +349,7 @@ EOF
 # system
 %config(noreplace) %{_sysconfdir}/pam.d/radiusd
 %config(noreplace) %{_sysconfdir}/logrotate.d/radiusd
+%config(noreplace) %{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
 %{_unitdir}/radiusd.service
 %{_tmpfilesdir}/radiusd.conf
 %{_sysusersdir}/freeradius.conf
@@ -374,6 +386,7 @@ EOF
 %config(noreplace) /etc/raddb/certs/Makefile
 %config(noreplace) /etc/raddb/certs/passwords.mk
 /etc/raddb/certs/README.md
+/etc/raddb/certs/realms/README.md
 %config(noreplace) /etc/raddb/certs/xpextensions
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/certs/*.cnf
 %attr(750,root,radiusd) /etc/raddb/certs/bootstrap
@@ -500,6 +513,7 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/utf8
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/wimax
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/yubikey
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dpsk
 
 # mods-enabled
 # symlink: /etc/raddb/mods-enabled/xxx -> ../mods-available/xxx
@@ -625,35 +639,37 @@ EOF
 %{_libdir}/freeradius/rlm_utf8.so
 %{_libdir}/freeradius/rlm_wimax.so
 %{_libdir}/freeradius/rlm_yubikey.so
+%{_libdir}/freeradius/rlm_dpsk.so
+%{_libdir}/freeradius/rlm_eap_teap.so
 
 # main man pages
-%{_mandir}/man5/clients.conf.5.gz
-%{_mandir}/man5/dictionary.5.gz
-%{_mandir}/man5/radiusd.conf.5.gz
-%{_mandir}/man5/radrelay.conf.5.gz
-%{_mandir}/man5/rlm_always.5.gz
-%{_mandir}/man5/rlm_attr_filter.5.gz
-%{_mandir}/man5/rlm_chap.5.gz
-%{_mandir}/man5/rlm_counter.5.gz
-%{_mandir}/man5/rlm_detail.5.gz
-%{_mandir}/man5/rlm_digest.5.gz
-%{_mandir}/man5/rlm_expr.5.gz
-%{_mandir}/man5/rlm_files.5.gz
-%{_mandir}/man5/rlm_idn.5.gz
-%{_mandir}/man5/rlm_mschap.5.gz
-%{_mandir}/man5/rlm_pap.5.gz
-%{_mandir}/man5/rlm_passwd.5.gz
-%{_mandir}/man5/rlm_realm.5.gz
-%{_mandir}/man5/rlm_sql.5.gz
-%{_mandir}/man5/rlm_unbound.5.gz
-%{_mandir}/man5/rlm_unix.5.gz
-%{_mandir}/man5/unlang.5.gz
-%{_mandir}/man5/users.5.gz
-%{_mandir}/man8/raddebug.8.gz
-%{_mandir}/man8/radiusd.8.gz
-%{_mandir}/man8/radmin.8.gz
-%{_mandir}/man8/radrelay.8.gz
-%{_mandir}/man8/rlm_sqlippool_tool.8.gz
+%doc %{_mandir}/man5/clients.conf.5.gz
+%doc %{_mandir}/man5/dictionary.5.gz
+%doc %{_mandir}/man5/radiusd.conf.5.gz
+%doc %{_mandir}/man5/radrelay.conf.5.gz
+%doc %{_mandir}/man5/rlm_always.5.gz
+%doc %{_mandir}/man5/rlm_attr_filter.5.gz
+%doc %{_mandir}/man5/rlm_chap.5.gz
+%doc %{_mandir}/man5/rlm_counter.5.gz
+%doc %{_mandir}/man5/rlm_detail.5.gz
+%doc %{_mandir}/man5/rlm_digest.5.gz
+%doc %{_mandir}/man5/rlm_expr.5.gz
+%doc %{_mandir}/man5/rlm_files.5.gz
+%doc %{_mandir}/man5/rlm_idn.5.gz
+%doc %{_mandir}/man5/rlm_mschap.5.gz
+%doc %{_mandir}/man5/rlm_pap.5.gz
+%doc %{_mandir}/man5/rlm_passwd.5.gz
+%doc %{_mandir}/man5/rlm_realm.5.gz
+%doc %{_mandir}/man5/rlm_sql.5.gz
+%doc %{_mandir}/man5/rlm_unbound.5.gz
+%doc %{_mandir}/man5/rlm_unix.5.gz
+%doc %{_mandir}/man5/unlang.5.gz
+%doc %{_mandir}/man5/users.5.gz
+%doc %{_mandir}/man8/raddebug.8.gz
+%doc %{_mandir}/man8/radiusd.8.gz
+%doc %{_mandir}/man8/radmin.8.gz
+%doc %{_mandir}/man8/radrelay.8.gz
+%doc %{_mandir}/man8/rlm_sqlippool_tool.8.gz
 
 # MIB files
 %{_datadir}/snmp/mibs/*RADIUS*.mib
@@ -661,6 +677,7 @@ EOF
 %files doc
 
 %doc %{docdir}/
+
 
 %files utils
 /usr/bin/*
@@ -846,35 +863,185 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
-* Wed Oct 18 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-2
-- Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
-- Add runtime requirement for utils subpackage
-- Update build requirement for postgresql subpackage
-- Disable generation of debuginfo package as its files conflict with filsystem package
+* Fri Jan 31 2025 Jyoti kanase <v-jykanase@microsoft.com> -  3.2.5-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
-- Upgrade to 3.2.3
-- Address CVE-2022-41860, CVE-2022-41861
-- Update Patch2 & Patch4
-- Add Patch6 to address build error
-- Add Source105 for user management during installation
-- License verified
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.21-9
-- Making binaries paths compatible with CBL-Mariner's paths.
+* Tue Jul 09 2024 Antonio Torres <antorres@redhat.com> - 3.2.5-1
+- Update to upstream release 3.2.5
 
-* Fri Feb 05 2021 Henry Li <lihl@microsoft.com> - 3.0.21-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove %%{EPOCH}
-- Remove python2-freeradius
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.2.4-3
+- Perl 5.40 rebuild
 
-* Wed May 13 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-7
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.2.4-2
+- Rebuilt for Python 3.13
+
+* Fri May 31 2024 Antonio Torres <antorres@redhat.com> - 3.2.4-1
+- Update to upstream release 3.2.4
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Dec 19 2023 Florian Weimer <fweimer@redhat.com> - 3.2.3-2
+- Fix C compatibility issue in configure script
+
+* Tue Oct 24 2023 Antonio Torres <antorres@redhat.com> - 3.2.3-1
+- Update to upstream release 3.2.3
+
+* Tue Sep 12 2023 Antonio Torres <antorres@redhat.com> - 3.2.2-5
+- Ease OpenSSL version check requirement
+  Resolves #2238511
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 3.2.2-3
+- Perl 5.38 rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.2.2-2
+- Rebuilt for Python 3.12
+
+* Tue Mar 21 2023 Antonio Torres <antorres@redhat.com> - 3.2.2-1
+- Update to upstream release 3.2.2
+
+* Wed Mar 15 2023 Antonio Torres <antorres@redhat.com> - 3.2.1-4
+- Migrate to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 17 2022 Antonio Torres <antorres@redhat.com> - 3.2.1-2
+- Remove hack for Python3 support from specfile
+
+* Mon Oct 17 2022 Antonio Torres <antorres@redhat.com> - 3.2.1-1
+- Update to 3.2.1 upstream release
+  Resolves #2131850
+
+* Tue Sep 20 2022 Antonio Torres <antorres@redhat.com> - 3.2.0-4
+- Remove deprecated pcre-devel dependency
+  Resolves #2128292
+
+* Mon Sep 5 2022 Antonio Torres <antorres@redhat.com> - 3.2.0-3
+- configure: allow building with runstatedir option
+  Resolves: #2123374
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 19 2022 Antonio Torres <antorres@redhat.com> - 3.2.0-1
+- Rebase to 3.2.0 upstream release
+  Related: #2077687
+
+* Wed Jun 29 2022 Antonio Torres <antorres@redhat.com> - 3.0.25-8
+- Use GID / UID 95 as it's reserved for FreeRADIUS (https://pagure.io/setup/blob/07f8debf03dfb0e5ed36051c13c86c8cd00cd241/f/uidgid#_107)
+  Related: #2095741
+
+* Fri Jun 24 2022 Antonio Torres <antorres@redhat.com> - 3.0.25-7
+- Dynamically allocate users using sysusers.d format
+  Related: #2095741
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.0.25-6
+- Rebuilt for Python 3.11
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.0.25-5
+- Perl 5.36 rebuild
+
+* Fri Apr 22 2022 Antonio Torres <antorres@redhat.com> - 3.0.25-4
+- Use infinite timeout when using LDAP+start-TLS
+  Related: #1983063
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.25-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Oct 14 2021 Antonio Torres <antorres@redhat.com> - 3.0.25-2
+- Fix file conflict in SQL files
+  Resolves: bz#2014014 
+
+* Fri Oct 08 2021 Antonio Torres <antorres@redhat.com> - 3.0.25-1
+- Update to 3.0.25.
+  Resolves: bz#2011984
+
+* Thu Sep 30 2021 Antonio Torres <antorres@redhat.com> - 3.0.24-1
+- Update to 3.0.24.
+  Resolves: bz#2009036
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 3.0.23-7
+- Rebuilt with OpenSSL 3.0.0
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.23-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Antonio Torres <antorres@redhat.com> - 3.0.23-5
+- Fix coredump not being able to be enabled
+
+* Sat Jul 10 2021 Björn Esser <besser82@fedoraproject.org> - 3.0.23-4
+- Rebuild for versioned symbols in json-c
+
+* Tue Jun 29 2021 Antonio Torres <antorres@redhat.com> - 3.0.23-2
+- Fix rpath not being removed correctly
+
+* Tue Jun 29 2021 Antonio Torres <antorres@redhat.com> - 3.0.23-2
+- Remove RPATH usage from additional binaries
+
+* Tue Jun 29 2021 Antonio Torres <antorres@redhat.com> - 3.0.23-1
+- Rebase to 3.0.23
+  Fixes: bz#1970528
+
+* Tue Jun 29 2021 Antonio Torres <antorres@redhat.com> - 3.0.22-5
+- Fix binaries not being correctly linked after RPATH removal
+
+* Fri Jun 25 2021 Antonio Torres <antorres@redhat.com> - 3.0.22-4
+- Fix python3 not being correctly linked
+
+* Mon Jun 07 2021 Python Maint <python-maint@redhat.com> - 3.0.22-2
+- Rebuilt for Python 3.10
+
+* Fri Jun 4 2021 Antonio Torres <antorres@redhat.com> - 3.0.22-1
+- Rebased to 3.0.22
+  Resolves: bz#1961190
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.0.21-12
+- Perl 5.34 rebuild
+
+* Wed Mar 10 2021 Robbie Harwood <rharwood@redhat.com> - 3.0.21-11
+- Disable automatic bootstrap
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.0.21-10
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Mon Feb 08 2021 Pavel Raiskup <praiskup@redhat.com> - 3.0.21-9
+- rebuild for libpq ABI fix rhbz#1908268
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.21-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Aug 04 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-7
 - Fix certificate permissions after make-based generation
   Resolves: bz#1835249
 
-* Wed May 13 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-2
+* Tue Aug 04 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-6
+- Fix certificate permissions after make-based generation
+  Resolves: bz#1835249
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.21-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 3.0.21-4
+- Perl 5.32 rebuild
+
+* Wed May 13 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-3
 - Fix certificate generation
   Resolves: bz#1835249
+
+* Tue Apr 21 2020 Björn Esser <besser82@fedoraproject.org> - 3.0.21-2
+- Rebuild (json-c)
 
 * Wed Apr 01 2020 Alexander Scheel <ascheel@redhat.com> - 3.0.21-1
 - Rebased to 3.0.21
@@ -1339,6 +1506,7 @@ EOF
     config test on restart.
   * Added cache config item to rlm_krb5. When set to "no" ticket
     caching is disabled which may increase performance.
+
   Bug fixes
   * Fix CVE-2012-3547.  All users of 2.1.10, 2.1.11, 2.1.12,
     and 802.1X should upgrade immediately.
@@ -1458,6 +1626,7 @@ EOF
     radclient continues to be more flexible.
   * Updated Oracle schema and queries
   * Added SecurID module.  See src/modules/rlm_securid/README
+
   Bug fixes
   * Fix memory leak in rlm_detail
   * Fix "failed to insert event"
@@ -1531,6 +1700,7 @@ EOF
     "foo", "authorize" method.
   * Produce errors in more situations when the configuration files
     have invalid syntax.
+
   Bug fixes
   * Ignore pre/post-proxy sections if proxying is disabled
   * Add configure checks for pcap_fopen*.
@@ -1676,6 +1846,7 @@ EOF
     in sql{} section.
   * Added %%{tolower: ...string ... }, which returns the lowercase
     version of the string.  Also added %%{toupper: ... } for uppercase.
+
   Bug fixes
   * Fix endless loop when there are multiple sub-options for
     DHCP option 82.
@@ -1792,6 +1963,7 @@ EOF
   * Added documentation for CoA.  See raddb/sites-available/coa
   * Add sub-option support for Option 82.  See dictionary.dhcp
   * Add "server" field to default SQL NAS table, and documented it.
+
   Bug fixes
   * Reset "received ping" counter for Status-Server checks.  In some
     corner cases it was not getting reset.
@@ -1877,6 +2049,7 @@ EOF
   * Allow accounting packets to be written to a detail file, even
     if they were read from a different detail file.
   * Added OpenSSL license exception (src/LICENSE.openssl)
+
   Bug fixes
   * DHCP sockets can now set the broadcast flag before binding to a
     socket.  You need to set "broadcast = yes" in the DHCP listener.
@@ -2128,6 +2301,7 @@ EOF
     * Remove macro that was causing build issues on some platforms.
     * Fixed issues with dead home servers.  Bug noted by Chris Moules.
     * Fixed "access after free" with some dynamic clients.
+
 - fix packaging bug, some directories missing execute permission
   /etc/raddb/dictionary now readable by all.
 
