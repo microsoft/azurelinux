@@ -6,7 +6,7 @@
   "00-vrf.conf": "e2885a4b090d8ca3771e60ce6dcd8b849e28ce5002a5c7b71ff796a92deb2810",
   "00-xen.conf": "8b7a89b7716cb40a9c0d681caed6994d81ff4dfad4fe50cea15cd47b885dc5a6",
   "50-noxattr.conf": "61d95f05890ac6ee3355d0a386dd5645d82b7a4202d90305d997fd18c6d139dd",
-  "azl-configure-selinux.sh": "5f526509910fccdc2dffad4ef5070740847195510e3faefff39b831c9d28a439",
+  "azl-configure-selinux.sh": "a32da2e920348a5f991d6c418873a0a761f6e4bd926bb17a43cdb2c28b4f21d6",
   "azl-liveos-artifacts-download.service": "888be8c82297cccd510d7f963611c2360ae67559826b2b474da6d9935237de64",
   "azl-liveos-artifacts-download.sh": "f21dc68de8c81d8a8128e7a9d7be45d25978f0b5e47a4cf1a2d97b1e171ec045",
   "dracut-102.tar.gz": "601b175cbf4d2ee902bb7bda3af8826ae2ca060c1af880f6da5a833413f4ec70",
