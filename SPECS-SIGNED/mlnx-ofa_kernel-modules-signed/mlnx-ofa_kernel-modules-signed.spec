@@ -44,7 +44,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-modules
 Version:	 24.10
-Release:	 9%{?dist}
+Release:	 8%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -185,9 +185,6 @@ fi
 %license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
-- Bump release to rebuild for new kernel release
-
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
 - Bump release to rebuild for new kernel release
 
