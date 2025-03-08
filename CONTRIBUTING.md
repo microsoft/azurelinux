@@ -95,7 +95,7 @@ We welcome documentation improvements. See [toolkit/docs](toolkit/docs) for the 
 
 ## Pull Request Guidelines
 
-Please direct pull requests to the desired development branch. Development changes to `2.0` should target `main`. Development changes to `1.0` should target `1.0-dev`.
+Please direct pull requests to the desired development branch. Development changes to `3.0` should target `3.0-dev`. Development changes to `2.0` should target `main`. `1.0` is deprecated and should not be used.
 
 ### Branch structure
 
@@ -103,17 +103,17 @@ An overview of how the branches are structured can be seen below
 
 | Branch / Tag | For PRs | Published | Notes
 |:-------------|:--------|:----------|:------------
-|main          |Yes       |No         | **Primary development branch**
-|2.0           |No       |Yes - eventually   | Staging branch for publishing
-|2.0-stable    |No       |  Yes      | Last published release
-|2.0-preview   |No       |No         | Publishing in progress
+|3.0-dev       |Yes      |No         | **Primary development branch**
+|3.0           |No       |Yes - eventually | Staging branch for publishing
+|3.0-preview   |No       |No         | Publishing in progress
+|3.0-stable    |No       |Yes        | Last published release
 
 | Branch / Tag | For PRs | Published | Notes
 |:-------------|:--------|:----------|:------------
-|1.0-dev       |Yes      |No         | Development branch for 1.0
-|1.0           |No       |Yes - eventually    | Staging branch for publishing
-|1.0-stable    |No       |Yes        | Last published release
-|1.0-preview   |No       |No         | Publishing in progress
+|main          |Yes      |No         | **Primary development branch**
+|2.0           |No       |Yes - eventually | Staging branch for publishing
+|2.0-preview   |No       |No         | Publishing in progress
+|2.0-stable    |No       |Yes        | Last published release
 
 ### PR Titles
 
@@ -134,7 +134,7 @@ Please avoid titles such as
 ```bash
 - package: <whatever you did to the package>
 - CVE-XXXX-YYYY (leaving off what package was patched or upgraded)
-- [1.0] (prefixing with branch or other information)
+- [2.0] (prefixing with branch or other information)
 ```
 
 ### PR Checklist
