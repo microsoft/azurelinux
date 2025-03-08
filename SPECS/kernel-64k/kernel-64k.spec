@@ -25,7 +25,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.64.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -371,6 +371,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Mar 08 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-10
+- Enable Tegra IVC protocol
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
 - Apply upstream patches to fix kernel panic in jitterentropy initialization on
   ARM64 FIPS boot
