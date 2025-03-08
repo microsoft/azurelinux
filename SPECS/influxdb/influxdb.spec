@@ -17,7 +17,7 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.7.5
+Version:        2.7.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -127,6 +127,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Sat Mar 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.6-1
+- Auto-upgrade to 2.7.6 - test new vendor generation script
+
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.5-1
 - Auto-upgrade to 2.7.5 - Upgrade influxdb to fix CVE-2023-44487
 

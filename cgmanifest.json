@@ -7281,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.7.5",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.5.tar.gz"
+          "version": "2.7.6",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.6.tar.gz"
         }
       }
     },
@@ -15817,7 +15817,7 @@
           "downloadUrl": "https://github.com/hughsie/passim/releases/download/0.1.8/passim-0.1.8.tar.xz"
         }
       }
-    },    
+    },
     {
       "component": {
         "type": "other",
