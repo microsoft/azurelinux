@@ -1,0 +1,3734 @@
+From 4ca60562c0d2f39c9ea802f375ac736d0c1ea229 Mon Sep 17 00:00:00 2001
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Date: Fri, 6 Dec 2024 22:38:09 +0900
+Subject: [PATCH 01/49] mtd: hyperbus: hbmc-am654: fix an OF node reference
+ leak
+
+[ Upstream commit bf5821909eb9c7f5d07d5c6e852ead2c373c94a0 ]
+
+In am654_hbmc_platform_driver, .remove() and the error path of .probe()
+do not decrement the refcount of an OF node obtained by
+  of_get_next_child(). Fix this by adding of_node_put() calls.
+
+Fixes: aca31ce96814 ("mtd: hyperbus: hbmc-am654: Fix direct mapping setup flash access")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/mtd/hyperbus/hbmc-am654.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/mtd/hyperbus/hbmc-am654.c b/drivers/mtd/hyperbus/hbmc-am654.c
+index dbe3eb361cca..4b6cbee23fe8 100644
+--- a/drivers/mtd/hyperbus/hbmc-am654.c
++++ b/drivers/mtd/hyperbus/hbmc-am654.c
+@@ -174,26 +174,30 @@ static int am654_hbmc_probe(struct platform_device *pdev)
+ 	priv->hbdev.np = of_get_next_child(np, NULL);
+ 	ret = of_address_to_resource(priv->hbdev.np, 0, &res);
+ 	if (ret)
+-		return ret;
++		goto put_node;
+ 
+ 	if (of_property_read_bool(dev->of_node, "mux-controls")) {
+ 		struct mux_control *control = devm_mux_control_get(dev, NULL);
+ 
+-		if (IS_ERR(control))
+-			return PTR_ERR(control);
++		if (IS_ERR(control)) {
++			ret = PTR_ERR(control);
++			goto put_node;
++		}
+ 
+ 		ret = mux_control_select(control, 1);
+ 		if (ret) {
+ 			dev_err(dev, "Failed to select HBMC mux\n");
+-			return ret;
++			goto put_node;
+ 		}
+ 		priv->mux_ctrl = control;
+ 	}
+ 
+ 	priv->hbdev.map.size = resource_size(&res);
+ 	priv->hbdev.map.virt = devm_ioremap_resource(dev, &res);
+-	if (IS_ERR(priv->hbdev.map.virt))
+-		return PTR_ERR(priv->hbdev.map.virt);
++	if (IS_ERR(priv->hbdev.map.virt)) {
++		ret = PTR_ERR(priv->hbdev.map.virt);
++		goto disable_mux;
++	}
+ 
+ 	priv->ctlr.dev = dev;
+ 	priv->ctlr.ops = &am654_hbmc_ops;
+@@ -226,6 +230,8 @@ static int am654_hbmc_probe(struct platform_device *pdev)
+ disable_mux:
+ 	if (priv->mux_ctrl)
+ 		mux_control_deselect(priv->mux_ctrl);
++put_node:
++	of_node_put(priv->hbdev.np);
+ 	return ret;
+ }
+ 
+@@ -241,6 +247,7 @@ static void am654_hbmc_remove(struct platform_device *pdev)
+ 
+ 	if (dev_priv->rx_chan)
+ 		dma_release_channel(dev_priv->rx_chan);
++	of_node_put(priv->hbdev.np);
+ }
+ 
+ static const struct of_device_id am654_hbmc_dt_ids[] = {
+-- 
+2.45.2
+
+
+From 7f6802ca6d1349928e916cb95386b6a1321e86e6 Mon Sep 17 00:00:00 2001
+From: Laurentiu Palcu <laurentiu.palcu@oss.nxp.com>
+Date: Tue, 24 Sep 2024 13:33:04 +0300
+Subject: [PATCH 02/49] media: nxp: imx8-isi: fix v4l2-compliance test errors
+
+[ Upstream commit 7b12ab055edef2f51733d155617a401a05237bcc ]
+
+Running the v4l2-compliance (1.27.0-5208, SHA: af114250d48d) on the m2m
+device fails on the MMAP streaming tests, with the following messages:
+
+fail: v4l2-test-buffers.cpp(240): g_field() == V4L2_FIELD_ANY
+fail: v4l2-test-buffers.cpp(1508): buf.qbuf(node)
+
+Apparently, the driver does not properly set the field member of
+vb2_v4l2_buffer struct, returning the default V4L2_FIELD_ANY value which
+is against the guidelines.
+
+Fixes: cf21f328fcaf ("media: nxp: Add i.MX8 ISI driver")
+Signed-off-by: Laurentiu Palcu <laurentiu.palcu@oss.nxp.com>
+Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Link: https://lore.kernel.org/r/20240924103304.124085-1-laurentiu.palcu@oss.nxp.com
+Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Signed-off-by: Hans Verkuil <hverkuil@xs4all.nl>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/media/platform/nxp/imx8-isi/imx8-isi-video.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/media/platform/nxp/imx8-isi/imx8-isi-video.c b/drivers/media/platform/nxp/imx8-isi/imx8-isi-video.c
+index 10840c9a0912..111be77eca1c 100644
+--- a/drivers/media/platform/nxp/imx8-isi/imx8-isi-video.c
++++ b/drivers/media/platform/nxp/imx8-isi/imx8-isi-video.c
+@@ -861,6 +861,7 @@ int mxc_isi_video_buffer_prepare(struct mxc_isi_dev *isi, struct vb2_buffer *vb2
+ 				 const struct mxc_isi_format_info *info,
+ 				 const struct v4l2_pix_format_mplane *pix)
+ {
++	struct vb2_v4l2_buffer *v4l2_buf = to_vb2_v4l2_buffer(vb2);
+ 	unsigned int i;
+ 
+ 	for (i = 0; i < info->mem_planes; i++) {
+@@ -875,6 +876,8 @@ int mxc_isi_video_buffer_prepare(struct mxc_isi_dev *isi, struct vb2_buffer *vb2
+ 		vb2_set_plane_payload(vb2, i, size);
+ 	}
+ 
++	v4l2_buf->field = pix->field;
++
+ 	return 0;
+ }
+ 
+-- 
+2.45.2
+
+
+From 09ab93b4b6b2faecf0ed1a0999f92228e19df2a9 Mon Sep 17 00:00:00 2001
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Date: Sun, 5 Jan 2025 20:17:18 +0900
+Subject: [PATCH 03/49] watchdog: rti_wdt: Fix an OF node leak in
+ rti_wdt_probe()
+
+[ Upstream commit 143981aa63f33d469a55a55fd9fb81cd90109672 ]
+
+rti_wdt_probe() does not release the OF node reference obtained by
+of_parse_phandle(). Add a of_node_put() call.
+
+This was found by an experimental verification tool that I am
+developing. Due to the lack of the actual device, no runtime test was
+able to be performed.
+
+Fixes: f20ca595ae23 ("watchdog:rit_wdt: Add support for WDIOF_CARDRESET")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Reviewed-by: Guenter Roeck <linux@roeck-us.net>
+Link: https://lore.kernel.org/r/20250105111718.4184192-1-joe@pf.is.s.u-tokyo.ac.jp
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Wim Van Sebroeck <wim@linux-watchdog.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/watchdog/rti_wdt.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/watchdog/rti_wdt.c b/drivers/watchdog/rti_wdt.c
+index 563d842014df..cc239251e193 100644
+--- a/drivers/watchdog/rti_wdt.c
++++ b/drivers/watchdog/rti_wdt.c
+@@ -301,6 +301,7 @@ static int rti_wdt_probe(struct platform_device *pdev)
+ 	node = of_parse_phandle(pdev->dev.of_node, "memory-region", 0);
+ 	if (node) {
+ 		ret = of_address_to_resource(node, 0, &res);
++		of_node_put(node);
+ 		if (ret) {
+ 			dev_err(dev, "No memory address assigned to the region.\n");
+ 			goto err_iomap;
+-- 
+2.45.2
+
+
+From aba54e4583f662c6dc2a0ab263cfd7f192d66300 Mon Sep 17 00:00:00 2001
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Date: Tue, 24 Dec 2024 12:54:11 +0900
+Subject: [PATCH 04/49] staging: media: imx: fix OF node leak in
+ imx_media_add_of_subdevs()
+
+[ Upstream commit 094f5c315f756b19198e6c401aa821ac0e868750 ]
+
+imx_media_add_of_subdevs() calls of_parse_phandle() and passes the
+obtained node to imx_media_of_add_csi(). The passed node is used in
+v4l2_async_nf_add_fwnode(), which increments the refcount of the node.
+Therefore, while the current implementation only releases the node when
+imx_media_of_add_csi() fails, but should always release it. Call
+of_node_put() right after imx_media_of_add_csi().
+
+Fixes: dee747f88167 ("media: imx: Don't register IPU subdevs/links if CSI port missing")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Reviewed-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+Reviewed-by: Philipp Zabel <p.zabel@pengutronix.de>
+Signed-off-by: Hans Verkuil <hverkuil@xs4all.nl>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/staging/media/imx/imx-media-of.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx-media-of.c b/drivers/staging/media/imx/imx-media-of.c
+index 118bff988bc7..bb28daa4d713 100644
+--- a/drivers/staging/media/imx/imx-media-of.c
++++ b/drivers/staging/media/imx/imx-media-of.c
+@@ -54,22 +54,18 @@ int imx_media_add_of_subdevs(struct imx_media_dev *imxmd,
+ 			break;
+ 
+ 		ret = imx_media_of_add_csi(imxmd, csi_np);
++		of_node_put(csi_np);
+ 		if (ret) {
+ 			/* unavailable or already added is not an error */
+ 			if (ret == -ENODEV || ret == -EEXIST) {
+-				of_node_put(csi_np);
+ 				continue;
+ 			}
+ 
+ 			/* other error, can't continue */
+-			goto err_out;
++			return ret;
+ 		}
+ 	}
+ 
+ 	return 0;
+-
+-err_out:
+-	of_node_put(csi_np);
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(imx_media_add_of_subdevs);
+-- 
+2.45.2
+
+
+From 0d3f69add24e651664b1949ec5482e1fe3f80468 Mon Sep 17 00:00:00 2001
+From: Desnes Nunes <desnesn@redhat.com>
+Date: Thu, 19 Sep 2024 14:27:55 -0300
+Subject: [PATCH 05/49] media: dvb-usb-v2: af9035: fix ISO C90 compilation
+ error on af9035_i2c_master_xfer
+
+[ Upstream commit c36b9ad1a8add3c114e25fe167efa217a813b0c7 ]
+
+This fixes a 'ISO C90 forbids mixed declarations and code' compilation
+error on af9035_i2c_master_xfer, which is caused by the sanity check added
+on user controlled msg[i], before declaring the demodulator register.
+
+Fixes: 7bf744f2de0a ("media: dvb-usb-v2: af9035: Fix null-ptr-deref in af9035_i2c_master_xfer")
+Signed-off-by: Desnes Nunes <desnesn@redhat.com>
+Link: https://lore.kernel.org/r/20240919172755.196907-1-desnesn@redhat.com
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/media/usb/dvb-usb-v2/af9035.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/media/usb/dvb-usb-v2/af9035.c b/drivers/media/usb/dvb-usb-v2/af9035.c
+index 4eb7dd4599b7..7caf5e90721a 100644
+--- a/drivers/media/usb/dvb-usb-v2/af9035.c
++++ b/drivers/media/usb/dvb-usb-v2/af9035.c
+@@ -322,13 +322,16 @@ static int af9035_i2c_master_xfer(struct i2c_adapter *adap,
+ 			ret = -EOPNOTSUPP;
+ 		} else if ((msg[0].addr == state->af9033_i2c_addr[0]) ||
+ 			   (msg[0].addr == state->af9033_i2c_addr[1])) {
++			/* demod access via firmware interface */
++			u32 reg;
++
+ 			if (msg[0].len < 3 || msg[1].len < 1) {
+ 				ret = -EOPNOTSUPP;
+ 				goto unlock;
+ 			}
+-			/* demod access via firmware interface */
+-			u32 reg = msg[0].buf[0] << 16 | msg[0].buf[1] << 8 |
+-					msg[0].buf[2];
++
++			reg = msg[0].buf[0] << 16 | msg[0].buf[1] << 8 |
++				msg[0].buf[2];
+ 
+ 			if (msg[0].addr == state->af9033_i2c_addr[1])
+ 				reg |= 0x100000;
+@@ -385,13 +388,16 @@ static int af9035_i2c_master_xfer(struct i2c_adapter *adap,
+ 			ret = -EOPNOTSUPP;
+ 		} else if ((msg[0].addr == state->af9033_i2c_addr[0]) ||
+ 			   (msg[0].addr == state->af9033_i2c_addr[1])) {
++			/* demod access via firmware interface */
++			u32 reg;
++
+ 			if (msg[0].len < 3) {
+ 				ret = -EOPNOTSUPP;
+ 				goto unlock;
+ 			}
+-			/* demod access via firmware interface */
+-			u32 reg = msg[0].buf[0] << 16 | msg[0].buf[1] << 8 |
+-					msg[0].buf[2];
++
++			reg = msg[0].buf[0] << 16 | msg[0].buf[1] << 8 |
++				msg[0].buf[2];
+ 
+ 			if (msg[0].addr == state->af9033_i2c_addr[1])
+ 				reg |= 0x100000;
+-- 
+2.45.2
+
+
+From 2c54b9fca1755e80a343ccfde0652dc5ea4744b2 Mon Sep 17 00:00:00 2001
+From: King Dix <kingdix10@qq.com>
+Date: Thu, 9 Jan 2025 08:50:18 +0800
+Subject: [PATCH 06/49] PCI: rcar-ep: Fix incorrect variable used when calling
+ devm_request_mem_region()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 2d2da5a4c1b4509f6f7e5a8db015cd420144beb4 ]
+
+The rcar_pcie_parse_outbound_ranges() uses the devm_request_mem_region()
+macro to request a needed resource. A string variable that lives on the
+stack is then used to store a dynamically computed resource name, which
+is then passed on as one of the macro arguments. This can lead to
+undefined behavior.
+
+Depending on the current contents of the memory, the manifestations of
+errors may vary. One possible output may be as follows:
+
+  $ cat /proc/iomem
+  30000000-37ffffff :
+  38000000-3fffffff :
+
+Sometimes, garbage may appear after the colon.
+
+In very rare cases, if no NULL-terminator is found in memory, the system
+might crash because the string iterator will overrun which can lead to
+access of unmapped memory above the stack.
+
+Thus, fix this by replacing outbound_name with the name of the previously
+requested resource. With the changes applied, the output will be as
+follows:
+
+  $ cat /proc/iomem
+  30000000-37ffffff : memory2
+  38000000-3fffffff : memory3
+
+Fixes: 2a6d0d63d999 ("PCI: rcar: Add endpoint mode support")
+Link: https://lore.kernel.org/r/tencent_DBDCC19D60F361119E76919ADAB25EC13C06@qq.com
+Tested-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Signed-off-by: King Dix <kingdix10@qq.com>
+[kwilczynski: commit log]
+Signed-off-by: Krzysztof Wilczyński <kwilczynski@kernel.org>
+Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/pci/controller/pcie-rcar-ep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/pci/controller/pcie-rcar-ep.c b/drivers/pci/controller/pcie-rcar-ep.c
+index f9682df1da61..209719fb6ddc 100644
+--- a/drivers/pci/controller/pcie-rcar-ep.c
++++ b/drivers/pci/controller/pcie-rcar-ep.c
+@@ -107,7 +107,7 @@ static int rcar_pcie_parse_outbound_ranges(struct rcar_pcie_endpoint *ep,
+ 		}
+ 		if (!devm_request_mem_region(&pdev->dev, res->start,
+ 					     resource_size(res),
+-					     outbound_name)) {
++					     res->name)) {
+ 			dev_err(pcie->dev, "Cannot request memory region %s.\n",
+ 				outbound_name);
+ 			return -EIO;
+-- 
+2.45.2
+
+
+From c64da8e0ad764e08c724e43a5517df0a1be2d114 Mon Sep 17 00:00:00 2001
+From: Frank Li <Frank.Li@nxp.com>
+Date: Tue, 20 Feb 2024 11:19:11 -0500
+Subject: [PATCH 07/49] PCI: imx6: Simplify clock handling by using clk_bulk*()
+ function
+
+[ Upstream commit 6a40185838759cdae728ed79738680d798863ce7 ]
+
+Refactor the clock handling logic. Add 'clk_names' define in drvdata.
+Use clk_bulk*() API to simplify the code.
+
+Link: https://lore.kernel.org/r/20240220161924.3871774-2-Frank.Li@nxp.com
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Signed-off-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Stable-dep-of: f068ffdd034c ("PCI: imx6: Skip controller_id generation logic for i.MX7D")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/pci/controller/dwc/pci-imx6.c | 138 ++++++++++----------------
+ 1 file changed, 50 insertions(+), 88 deletions(-)
+
+diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
+index 86b09b5d7f24..20c8f2cba453 100644
+--- a/drivers/pci/controller/dwc/pci-imx6.c
++++ b/drivers/pci/controller/dwc/pci-imx6.c
+@@ -61,12 +61,16 @@ enum imx6_pcie_variants {
+ #define IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE	BIT(1)
+ #define IMX6_PCIE_FLAG_SUPPORTS_SUSPEND		BIT(2)
+ 
++#define IMX6_PCIE_MAX_CLKS       6
++
+ struct imx6_pcie_drvdata {
+ 	enum imx6_pcie_variants variant;
+ 	enum dw_pcie_device_mode mode;
+ 	u32 flags;
+ 	int dbi_length;
+ 	const char *gpr;
++	const char * const *clk_names;
++	const u32 clks_cnt;
+ };
+ 
+ struct imx6_pcie {
+@@ -74,11 +78,7 @@ struct imx6_pcie {
+ 	int			reset_gpio;
+ 	bool			gpio_active_high;
+ 	bool			link_is_up;
+-	struct clk		*pcie_bus;
+-	struct clk		*pcie_phy;
+-	struct clk		*pcie_inbound_axi;
+-	struct clk		*pcie;
+-	struct clk		*pcie_aux;
++	struct clk_bulk_data	clks[IMX6_PCIE_MAX_CLKS];
+ 	struct regmap		*iomuxc_gpr;
+ 	u16			msi_ctrl;
+ 	u32			controller_id;
+@@ -407,13 +407,18 @@ static void imx7d_pcie_wait_for_phy_pll_lock(struct imx6_pcie *imx6_pcie)
+ 
+ static int imx6_setup_phy_mpll(struct imx6_pcie *imx6_pcie)
+ {
+-	unsigned long phy_rate = clk_get_rate(imx6_pcie->pcie_phy);
++	unsigned long phy_rate = 0;
+ 	int mult, div;
+ 	u16 val;
++	int i;
+ 
+ 	if (!(imx6_pcie->drvdata->flags & IMX6_PCIE_FLAG_IMX6_PHY))
+ 		return 0;
+ 
++	for (i = 0; i < imx6_pcie->drvdata->clks_cnt; i++)
++		if (strncmp(imx6_pcie->clks[i].id, "pcie_phy", 8) == 0)
++			phy_rate = clk_get_rate(imx6_pcie->clks[i].clk);
++
+ 	switch (phy_rate) {
+ 	case 125000000:
+ 		/*
+@@ -550,19 +555,11 @@ static int imx6_pcie_attach_pd(struct device *dev)
+ 
+ static int imx6_pcie_enable_ref_clk(struct imx6_pcie *imx6_pcie)
+ {
+-	struct dw_pcie *pci = imx6_pcie->pci;
+-	struct device *dev = pci->dev;
+ 	unsigned int offset;
+ 	int ret = 0;
+ 
+ 	switch (imx6_pcie->drvdata->variant) {
+ 	case IMX6SX:
+-		ret = clk_prepare_enable(imx6_pcie->pcie_inbound_axi);
+-		if (ret) {
+-			dev_err(dev, "unable to enable pcie_axi clock\n");
+-			break;
+-		}
+-
+ 		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR12,
+ 				   IMX6SX_GPR12_PCIE_TEST_POWERDOWN, 0);
+ 		break;
+@@ -589,12 +586,6 @@ static int imx6_pcie_enable_ref_clk(struct imx6_pcie *imx6_pcie)
+ 	case IMX8MQ_EP:
+ 	case IMX8MP:
+ 	case IMX8MP_EP:
+-		ret = clk_prepare_enable(imx6_pcie->pcie_aux);
+-		if (ret) {
+-			dev_err(dev, "unable to enable pcie_aux clock\n");
+-			break;
+-		}
+-
+ 		offset = imx6_pcie_grp_offset(imx6_pcie);
+ 		/*
+ 		 * Set the over ride low and enabled
+@@ -615,9 +606,6 @@ static int imx6_pcie_enable_ref_clk(struct imx6_pcie *imx6_pcie)
+ static void imx6_pcie_disable_ref_clk(struct imx6_pcie *imx6_pcie)
+ {
+ 	switch (imx6_pcie->drvdata->variant) {
+-	case IMX6SX:
+-		clk_disable_unprepare(imx6_pcie->pcie_inbound_axi);
+-		break;
+ 	case IMX6QP:
+ 	case IMX6Q:
+ 		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
+@@ -631,14 +619,6 @@ static void imx6_pcie_disable_ref_clk(struct imx6_pcie *imx6_pcie)
+ 				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL,
+ 				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL);
+ 		break;
+-	case IMX8MM:
+-	case IMX8MM_EP:
+-	case IMX8MQ:
+-	case IMX8MQ_EP:
+-	case IMX8MP:
+-	case IMX8MP_EP:
+-		clk_disable_unprepare(imx6_pcie->pcie_aux);
+-		break;
+ 	default:
+ 		break;
+ 	}
+@@ -650,23 +630,9 @@ static int imx6_pcie_clk_enable(struct imx6_pcie *imx6_pcie)
+ 	struct device *dev = pci->dev;
+ 	int ret;
+ 
+-	ret = clk_prepare_enable(imx6_pcie->pcie_phy);
+-	if (ret) {
+-		dev_err(dev, "unable to enable pcie_phy clock\n");
++	ret = clk_bulk_prepare_enable(imx6_pcie->drvdata->clks_cnt, imx6_pcie->clks);
++	if (ret)
+ 		return ret;
+-	}
+-
+-	ret = clk_prepare_enable(imx6_pcie->pcie_bus);
+-	if (ret) {
+-		dev_err(dev, "unable to enable pcie_bus clock\n");
+-		goto err_pcie_bus;
+-	}
+-
+-	ret = clk_prepare_enable(imx6_pcie->pcie);
+-	if (ret) {
+-		dev_err(dev, "unable to enable pcie clock\n");
+-		goto err_pcie;
+-	}
+ 
+ 	ret = imx6_pcie_enable_ref_clk(imx6_pcie);
+ 	if (ret) {
+@@ -679,11 +645,7 @@ static int imx6_pcie_clk_enable(struct imx6_pcie *imx6_pcie)
+ 	return 0;
+ 
+ err_ref_clk:
+-	clk_disable_unprepare(imx6_pcie->pcie);
+-err_pcie:
+-	clk_disable_unprepare(imx6_pcie->pcie_bus);
+-err_pcie_bus:
+-	clk_disable_unprepare(imx6_pcie->pcie_phy);
++	clk_bulk_disable_unprepare(imx6_pcie->drvdata->clks_cnt, imx6_pcie->clks);
+ 
+ 	return ret;
+ }
+@@ -691,9 +653,7 @@ static int imx6_pcie_clk_enable(struct imx6_pcie *imx6_pcie)
+ static void imx6_pcie_clk_disable(struct imx6_pcie *imx6_pcie)
+ {
+ 	imx6_pcie_disable_ref_clk(imx6_pcie);
+-	clk_disable_unprepare(imx6_pcie->pcie);
+-	clk_disable_unprepare(imx6_pcie->pcie_bus);
+-	clk_disable_unprepare(imx6_pcie->pcie_phy);
++	clk_bulk_disable_unprepare(imx6_pcie->drvdata->clks_cnt, imx6_pcie->clks);
+ }
+ 
+ static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
+@@ -1253,6 +1213,7 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	struct device_node *node = dev->of_node;
+ 	int ret;
+ 	u16 val;
++	int i;
+ 
+ 	imx6_pcie = devm_kzalloc(dev, sizeof(*imx6_pcie), GFP_KERNEL);
+ 	if (!imx6_pcie)
+@@ -1306,32 +1267,20 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 		return imx6_pcie->reset_gpio;
+ 	}
+ 
+-	/* Fetch clocks */
+-	imx6_pcie->pcie_bus = devm_clk_get(dev, "pcie_bus");
+-	if (IS_ERR(imx6_pcie->pcie_bus))
+-		return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_bus),
+-				     "pcie_bus clock source missing or invalid\n");
++	if (imx6_pcie->drvdata->clks_cnt >= IMX6_PCIE_MAX_CLKS)
++		return dev_err_probe(dev, -ENOMEM, "clks_cnt is too big\n");
+ 
+-	imx6_pcie->pcie = devm_clk_get(dev, "pcie");
+-	if (IS_ERR(imx6_pcie->pcie))
+-		return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie),
+-				     "pcie clock source missing or invalid\n");
++	for (i = 0; i < imx6_pcie->drvdata->clks_cnt; i++)
++		imx6_pcie->clks[i].id = imx6_pcie->drvdata->clk_names[i];
++
++	/* Fetch clocks */
++	ret = devm_clk_bulk_get(dev, imx6_pcie->drvdata->clks_cnt, imx6_pcie->clks);
++	if (ret)
++		return ret;
+ 
+ 	switch (imx6_pcie->drvdata->variant) {
+-	case IMX6SX:
+-		imx6_pcie->pcie_inbound_axi = devm_clk_get(dev,
+-							   "pcie_inbound_axi");
+-		if (IS_ERR(imx6_pcie->pcie_inbound_axi))
+-			return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_inbound_axi),
+-					     "pcie_inbound_axi clock missing or invalid\n");
+-		break;
+ 	case IMX8MQ:
+ 	case IMX8MQ_EP:
+-		imx6_pcie->pcie_aux = devm_clk_get(dev, "pcie_aux");
+-		if (IS_ERR(imx6_pcie->pcie_aux))
+-			return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_aux),
+-					     "pcie_aux clock source missing or invalid\n");
+-		fallthrough;
+ 	case IMX7D:
+ 		if (dbi_base->start == IMX8MQ_PCIE2_BASE_ADDR)
+ 			imx6_pcie->controller_id = 1;
+@@ -1354,10 +1303,6 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	case IMX8MM_EP:
+ 	case IMX8MP:
+ 	case IMX8MP_EP:
+-		imx6_pcie->pcie_aux = devm_clk_get(dev, "pcie_aux");
+-		if (IS_ERR(imx6_pcie->pcie_aux))
+-			return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_aux),
+-					     "pcie_aux clock source missing or invalid\n");
+ 		imx6_pcie->apps_reset = devm_reset_control_get_exclusive(dev,
+ 									 "apps");
+ 		if (IS_ERR(imx6_pcie->apps_reset))
+@@ -1373,14 +1318,6 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	default:
+ 		break;
+ 	}
+-	/* Don't fetch the pcie_phy clock, if it has abstract PHY driver */
+-	if (imx6_pcie->phy == NULL) {
+-		imx6_pcie->pcie_phy = devm_clk_get(dev, "pcie_phy");
+-		if (IS_ERR(imx6_pcie->pcie_phy))
+-			return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_phy),
+-					     "pcie_phy clock source missing or invalid\n");
+-	}
+-
+ 
+ 	/* Grab turnoff reset */
+ 	imx6_pcie->turnoff_reset = devm_reset_control_get_optional_exclusive(dev, "turnoff");
+@@ -1471,6 +1408,11 @@ static void imx6_pcie_shutdown(struct platform_device *pdev)
+ 	imx6_pcie_assert_core_reset(imx6_pcie);
+ }
+ 
++static const char * const imx6q_clks[] = {"pcie_bus", "pcie", "pcie_phy"};
++static const char * const imx8mm_clks[] = {"pcie_bus", "pcie", "pcie_aux"};
++static const char * const imx8mq_clks[] = {"pcie_bus", "pcie", "pcie_phy", "pcie_aux"};
++static const char * const imx6sx_clks[] = {"pcie_bus", "pcie", "pcie_phy", "pcie_inbound_axi"};
++
+ static const struct imx6_pcie_drvdata drvdata[] = {
+ 	[IMX6Q] = {
+ 		.variant = IMX6Q,
+@@ -1478,6 +1420,8 @@ static const struct imx6_pcie_drvdata drvdata[] = {
+ 			 IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE,
+ 		.dbi_length = 0x200,
+ 		.gpr = "fsl,imx6q-iomuxc-gpr",
++		.clk_names = imx6q_clks,
++		.clks_cnt = ARRAY_SIZE(imx6q_clks),
+ 	},
+ 	[IMX6SX] = {
+ 		.variant = IMX6SX,
+@@ -1485,6 +1429,8 @@ static const struct imx6_pcie_drvdata drvdata[] = {
+ 			 IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE |
+ 			 IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+ 		.gpr = "fsl,imx6q-iomuxc-gpr",
++		.clk_names = imx6sx_clks,
++		.clks_cnt = ARRAY_SIZE(imx6sx_clks),
+ 	},
+ 	[IMX6QP] = {
+ 		.variant = IMX6QP,
+@@ -1493,40 +1439,56 @@ static const struct imx6_pcie_drvdata drvdata[] = {
+ 			 IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+ 		.dbi_length = 0x200,
+ 		.gpr = "fsl,imx6q-iomuxc-gpr",
++		.clk_names = imx6q_clks,
++		.clks_cnt = ARRAY_SIZE(imx6q_clks),
+ 	},
+ 	[IMX7D] = {
+ 		.variant = IMX7D,
+ 		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+ 		.gpr = "fsl,imx7d-iomuxc-gpr",
++		.clk_names = imx6q_clks,
++		.clks_cnt = ARRAY_SIZE(imx6q_clks),
+ 	},
+ 	[IMX8MQ] = {
+ 		.variant = IMX8MQ,
+ 		.gpr = "fsl,imx8mq-iomuxc-gpr",
++		.clk_names = imx8mq_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mq_clks),
+ 	},
+ 	[IMX8MM] = {
+ 		.variant = IMX8MM,
+ 		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+ 		.gpr = "fsl,imx8mm-iomuxc-gpr",
++		.clk_names = imx8mm_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mm_clks),
+ 	},
+ 	[IMX8MP] = {
+ 		.variant = IMX8MP,
+ 		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+ 		.gpr = "fsl,imx8mp-iomuxc-gpr",
++		.clk_names = imx8mm_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mm_clks),
+ 	},
+ 	[IMX8MQ_EP] = {
+ 		.variant = IMX8MQ_EP,
+ 		.mode = DW_PCIE_EP_TYPE,
+ 		.gpr = "fsl,imx8mq-iomuxc-gpr",
++		.clk_names = imx8mq_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mq_clks),
+ 	},
+ 	[IMX8MM_EP] = {
+ 		.variant = IMX8MM_EP,
+ 		.mode = DW_PCIE_EP_TYPE,
+ 		.gpr = "fsl,imx8mm-iomuxc-gpr",
++		.clk_names = imx8mm_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mm_clks),
+ 	},
+ 	[IMX8MP_EP] = {
+ 		.variant = IMX8MP_EP,
+ 		.mode = DW_PCIE_EP_TYPE,
+ 		.gpr = "fsl,imx8mp-iomuxc-gpr",
++		.clk_names = imx8mm_clks,
++		.clks_cnt = ARRAY_SIZE(imx8mm_clks),
+ 	},
+ };
+ 
+-- 
+2.45.2
+
+
+From 2a12efc567a270a155e3b886258297abd79cdea0 Mon Sep 17 00:00:00 2001
+From: Richard Zhu <hongxing.zhu@nxp.com>
+Date: Tue, 26 Nov 2024 15:56:56 +0800
+Subject: [PATCH 08/49] PCI: imx6: Skip controller_id generation logic for
+ i.MX7D
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit f068ffdd034c93f0c768acdc87d4d2d7023c1379 ]
+
+The i.MX7D only has one PCIe controller, so controller_id should always be
+0. The previous code is incorrect although yielding the correct result.
+
+Fix by removing "IMX7D" from the switch case branch.
+
+Fixes: 2d8ed461dbc9 ("PCI: imx6: Add support for i.MX8MQ")
+Link: https://lore.kernel.org/r/20241126075702.4099164-5-hongxing.zhu@nxp.com
+Signed-off-by: Richard Zhu <hongxing.zhu@nxp.com>
+Signed-off-by: Krzysztof Wilczyński <kwilczynski@kernel.org>
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/pci/controller/dwc/pci-imx6.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
+index 20c8f2cba453..822a750b064b 100644
+--- a/drivers/pci/controller/dwc/pci-imx6.c
++++ b/drivers/pci/controller/dwc/pci-imx6.c
+@@ -1281,7 +1281,6 @@ static int imx6_pcie_probe(struct platform_device *pdev)
+ 	switch (imx6_pcie->drvdata->variant) {
+ 	case IMX8MQ:
+ 	case IMX8MQ_EP:
+-	case IMX7D:
+ 		if (dbi_base->start == IMX8MQ_PCIE2_BASE_ADDR)
+ 			imx6_pcie->controller_id = 1;
+ 
+-- 
+2.45.2
+
+
+From 48349476ae1372e4b389e848de0f4ae5033ae709 Mon Sep 17 00:00:00 2001
+From: Mohamed Khalfella <khalfella@gmail.com>
+Date: Fri, 27 Dec 2024 08:08:41 -0800
+Subject: [PATCH 09/49] PCI: endpoint: pci-epf-test: Set dma_chan_rx pointer to
+ NULL on error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit b1b1f4b12969130c0a6ec0cf0299460cb01e799c ]
+
+If dma_chan_tx allocation fails, set dma_chan_rx to NULL after it is
+freed.
+
+Link: https://lore.kernel.org/r/20241227160841.92382-1-khalfella@gmail.com
+Fixes: 8353813c88ef ("PCI: endpoint: Enable DMA tests for endpoints with DMA capabilities")
+Signed-off-by: Mohamed Khalfella <khalfella@gmail.com>
+[kwilczynski: commit log]
+Signed-off-by: Krzysztof Wilczyński <kwilczynski@kernel.org>
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Reviewed-by: Niklas Cassel <cassel@kernel.org>
+Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/pci/endpoint/functions/pci-epf-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/pci/endpoint/functions/pci-epf-test.c b/drivers/pci/endpoint/functions/pci-epf-test.c
+index 1f0d2b84296a..fa7ae8cedb67 100644
+--- a/drivers/pci/endpoint/functions/pci-epf-test.c
++++ b/drivers/pci/endpoint/functions/pci-epf-test.c
+@@ -251,7 +251,7 @@ static int pci_epf_test_init_dma_chan(struct pci_epf_test *epf_test)
+ 
+ fail_back_rx:
+ 	dma_release_channel(epf_test->dma_chan_rx);
+-	epf_test->dma_chan_tx = NULL;
++	epf_test->dma_chan_rx = NULL;
+ 
+ fail_back_tx:
+ 	dma_cap_zero(mask);
+-- 
+2.45.2
+
+
+From c994716d33911cf287cb98d15973cdcdf2cfe8ef Mon Sep 17 00:00:00 2001
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Date: Thu, 16 Jan 2025 22:46:47 +0530
+Subject: [PATCH 10/49] PCI: endpoint: pci-epf-test: Fix check for DMA MEMCPY
+ test
+
+[ Upstream commit 235c2b197a8de2887f13990094a3343d2392155b ]
+
+Currently, if DMA MEMCPY test is requested by the host, and if the endpoint
+DMA controller supports DMA_PRIVATE, the test will fail. This is not
+correct since there is no check for DMA_MEMCPY capability and the DMA
+controller can support both DMA_PRIVATE and DMA_MEMCPY.
+
+Fix the check and also reword the error message.
+
+Link: https://lore.kernel.org/r/20250116171650.33585-2-manivannan.sadhasivam@linaro.org
+Fixes: 8353813c88ef ("PCI: endpoint: Enable DMA tests for endpoints with DMA capabilities")
+Reported-by: Niklas Cassel <cassel@kernel.org>
+Closes: https://lore.kernel.org/linux-pci/Z3QtEihbiKIGogWA@ryzen
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Tested-by: Niklas Cassel <cassel@kernel.org>
+Reviewed-by: Niklas Cassel <cassel@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/pci/endpoint/functions/pci-epf-test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pci/endpoint/functions/pci-epf-test.c b/drivers/pci/endpoint/functions/pci-epf-test.c
+index fa7ae8cedb67..ac1dae113f2d 100644
+--- a/drivers/pci/endpoint/functions/pci-epf-test.c
++++ b/drivers/pci/endpoint/functions/pci-epf-test.c
+@@ -361,8 +361,8 @@ static void pci_epf_test_copy(struct pci_epf_test *epf_test,
+ 
+ 	ktime_get_ts64(&start);
+ 	if (reg->flags & FLAG_USE_DMA) {
+-		if (epf_test->dma_private) {
+-			dev_err(dev, "Cannot transfer data using DMA\n");
++		if (!dma_has_cap(DMA_MEMCPY, epf_test->dma_chan_tx->device->cap_mask)) {
++			dev_err(dev, "DMA controller doesn't support MEMCPY\n");
+ 			ret = -EINVAL;
+ 			goto err_map_addr;
+ 		}
+-- 
+2.45.2
+
+
+From 495dcb00d4fec18b6d8873380003c4a94e2e028a Mon Sep 17 00:00:00 2001
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Date: Thu, 12 Dec 2024 23:18:12 +0100
+Subject: [PATCH 11/49] scsi: mpt3sas: Set ioc->manu_pg11.EEDPTagMode directly
+ to 1
+
+[ Upstream commit ad7c3c0cb8f61d6d5a48b83e62ca4a9fd2f26153 ]
+
+Currently, the code does:
+
+    if (x == 0) {
+    	x &= ~0x3;
+	x |= 0x1;
+    }
+
+Zeroing bits 0 and 1 of a variable that is 0 is not necessary. So directly
+set the variable to 1.
+
+Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Fixes: f92363d12359 ("[SCSI] mpt3sas: add new driver supporting 12GB SAS")
+Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Link: https://lore.kernel.org/r/20241212221817.78940-2-pmenzel@molgen.mpg.de
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/scsi/mpt3sas/mpt3sas_base.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
+index a5d12b95fbd0..cd00f1967035 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_base.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
+@@ -5638,8 +5638,7 @@ _base_static_config_pages(struct MPT3SAS_ADAPTER *ioc)
+ 	if (!ioc->is_gen35_ioc && ioc->manu_pg11.EEDPTagMode == 0) {
+ 		pr_err("%s: overriding NVDATA EEDPTagMode setting\n",
+ 		    ioc->name);
+-		ioc->manu_pg11.EEDPTagMode &= ~0x3;
+-		ioc->manu_pg11.EEDPTagMode |= 0x1;
++		ioc->manu_pg11.EEDPTagMode = 0x1;
+ 		mpt3sas_config_set_manufacturing_pg11(ioc, &mpi_reply,
+ 		    &ioc->manu_pg11);
+ 	}
+-- 
+2.45.2
+
+
+From e5565240c648d28398b4ff952d7ac712074d339d Mon Sep 17 00:00:00 2001
+From: Guixin Liu <kanie@linux.alibaba.com>
+Date: Wed, 18 Dec 2024 09:42:13 +0800
+Subject: [PATCH 12/49] scsi: ufs: bsg: Delete bsg_dev when setting up bsg
+ fails
+
+[ Upstream commit fcf247deb3c3e1c6be5774e3fa03bbd018eff1a9 ]
+
+We should remove the bsg device when bsg_setup_queue() fails to release the
+resources.
+
+Fixes: df032bf27a41 ("scsi: ufs: Add a bsg endpoint that supports UPIUs")
+Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+Link: https://lore.kernel.org/r/20241218014214.64533-2-kanie@linux.alibaba.com
+Reviewed-by: Avri Altman <avri.altman@wdc.com>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/ufs/core/ufs_bsg.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/ufs/core/ufs_bsg.c b/drivers/ufs/core/ufs_bsg.c
+index fec5993c66c3..f21423a7a6d7 100644
+--- a/drivers/ufs/core/ufs_bsg.c
++++ b/drivers/ufs/core/ufs_bsg.c
+@@ -256,6 +256,7 @@ int ufs_bsg_probe(struct ufs_hba *hba)
+ 	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), ufs_bsg_request, NULL, 0);
+ 	if (IS_ERR(q)) {
+ 		ret = PTR_ERR(q);
++		device_del(bsg_dev);
+ 		goto out;
+ 	}
+ 
+-- 
+2.45.2
+
+
+From 3e6e5acf4c7dead000aea3492b01fc7f008c6a04 Mon Sep 17 00:00:00 2001
+From: Su Yue <glass.su@suse.com>
+Date: Mon, 6 Jan 2025 22:06:53 +0800
+Subject: [PATCH 13/49] ocfs2: mark dquot as inactive if failed to start trans
+ while releasing dquot
+
+[ Upstream commit 276c61385f6bc3223a5ecd307cf4aba2dfbb9a31 ]
+
+While running fstests generic/329, the kernel workqueue
+quota_release_workfn is dead looping in calling ocfs2_release_dquot().
+The ocfs2 state is already readonly but ocfs2_release_dquot wants to
+start a transaction but fails and returns.
+
+=====================================================================
+[ 2918.123602 ][  T275 ] On-disk corruption discovered. Please run
+fsck.ocfs2 once the filesystem is unmounted.
+[ 2918.124034 ][  T275 ] (kworker/u135:1,275,11):ocfs2_release_dquot:765
+ERROR: status = -30
+[ 2918.124452 ][  T275 ] (kworker/u135:1,275,11):ocfs2_release_dquot:795
+ERROR: status = -30
+[ 2918.124883 ][  T275 ] (kworker/u135:1,275,11):ocfs2_start_trans:357
+ERROR: status = -30
+[ 2918.125276 ][  T275 ] OCFS2: abort (device dm-0): ocfs2_start_trans:
+Detected aborted journal
+[ 2918.125710 ][  T275 ] On-disk corruption discovered. Please run
+fsck.ocfs2 once the filesystem is unmounted.
+=====================================================================
+
+ocfs2_release_dquot() is much like dquot_release(), which is called by
+ext4 to handle similar situation.  So here fix it by marking the dquot as
+inactive like what dquot_release() does.
+
+Link: https://lkml.kernel.org/r/20250106140653.92292-1-glass.su@suse.com
+Fixes: 9e33d69f553a ("ocfs2: Implementation of local and global quota file handling")
+Signed-off-by: Su Yue <glass.su@suse.com>
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Mark Fasheh <mark@fasheh.com>
+Cc: Joel Becker <jlbec@evilplan.org>
+Cc: Junxiao Bi <junxiao.bi@oracle.com>
+Cc: Changwei Ge <gechangwei@live.cn>
+Cc: Jun Piao <piaojun@huawei.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ocfs2/quota_global.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/ocfs2/quota_global.c b/fs/ocfs2/quota_global.c
+index 0dffd6a44d39..24b031dc44ee 100644
+--- a/fs/ocfs2/quota_global.c
++++ b/fs/ocfs2/quota_global.c
+@@ -749,6 +749,11 @@ static int ocfs2_release_dquot(struct dquot *dquot)
+ 	handle = ocfs2_start_trans(osb,
+ 		ocfs2_calc_qdel_credits(dquot->dq_sb, dquot->dq_id.type));
+ 	if (IS_ERR(handle)) {
++		/*
++		 * Mark dquot as inactive to avoid endless cycle in
++		 * quota_release_workfn().
++		 */
++		clear_bit(DQ_ACTIVE_B, &dquot->dq_flags);
+ 		status = PTR_ERR(handle);
+ 		mlog_errno(status);
+ 		goto out_ilock;
+-- 
+2.45.2
+
+
+From 724dc6daebb103ed13c9a7d39026d3524030a1dc Mon Sep 17 00:00:00 2001
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Date: Mon, 16 Oct 2023 21:10:49 +0100
+Subject: [PATCH 14/49] buffer: make folio_create_empty_buffers() return a
+ buffer_head
+
+[ Upstream commit 3decb8564eff88a2533f83b01cec2cf9259c3eaf ]
+
+Patch series "Finish the create_empty_buffers() transition", v2.
+
+Pankaj recently added folio_create_empty_buffers() as the folio equivalent
+to create_empty_buffers().  This patch set finishes the conversion by
+first converting all remaining filesystems to call
+folio_create_empty_buffers(), then renaming it back to
+create_empty_buffers().  I took the opportunity to make a few
+simplifications like making folio_create_empty_buffers() return the head
+buffer and extracting get_nth_bh() from nilfs2.
+
+A few of the patches in this series aren't directly related to
+create_empty_buffers(), but I saw them while I was working on this and
+thought they'd be easy enough to add to this series.  Compile-tested only,
+other than ext4.
+
+This patch (of 26):
+
+Almost all callers want to know the first BH that was allocated for this
+folio.  We already have that handy, so return it.
+
+Link: https://lkml.kernel.org/r/20231016201114.1928083-1-willy@infradead.org
+Link: https://lkml.kernel.org/r/20231016201114.1928083-3-willy@infradead.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Stable-dep-of: 367a9bffabe0 ("nilfs2: protect access to buffers with no active references")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/buffer.c                 | 24 +++++++++++++-----------
+ include/linux/buffer_head.h |  4 ++--
+ 2 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index ecd8b47507ff..4b86e971efd8 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1640,8 +1640,8 @@ EXPORT_SYMBOL(block_invalidate_folio);
+  * block_dirty_folio() via private_lock.  try_to_free_buffers
+  * is already excluded via the folio lock.
+  */
+-void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+-				unsigned long b_state)
++struct buffer_head *folio_create_empty_buffers(struct folio *folio,
++		unsigned long blocksize, unsigned long b_state)
+ {
+ 	struct buffer_head *bh, *head, *tail;
+ 
+@@ -1667,6 +1667,8 @@ void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+ 	}
+ 	folio_attach_private(folio, head);
+ 	spin_unlock(&folio->mapping->private_lock);
++
++	return head;
+ }
+ EXPORT_SYMBOL(folio_create_empty_buffers);
+ 
+@@ -1768,13 +1770,15 @@ static struct buffer_head *folio_create_buffers(struct folio *folio,
+ 						struct inode *inode,
+ 						unsigned int b_state)
+ {
++	struct buffer_head *bh;
++
+ 	BUG_ON(!folio_test_locked(folio));
+ 
+-	if (!folio_buffers(folio))
+-		folio_create_empty_buffers(folio,
+-					   1 << READ_ONCE(inode->i_blkbits),
+-					   b_state);
+-	return folio_buffers(folio);
++	bh = folio_buffers(folio);
++	if (!bh)
++		bh = folio_create_empty_buffers(folio,
++				1 << READ_ONCE(inode->i_blkbits), b_state);
++	return bh;
+ }
+ 
+ /*
+@@ -2678,10 +2682,8 @@ int block_truncate_page(struct address_space *mapping,
+ 		return PTR_ERR(folio);
+ 
+ 	bh = folio_buffers(folio);
+-	if (!bh) {
+-		folio_create_empty_buffers(folio, blocksize, 0);
+-		bh = folio_buffers(folio);
+-	}
++	if (!bh)
++		bh = folio_create_empty_buffers(folio, blocksize, 0);
+ 
+ 	/* Find the buffer that contains "offset" */
+ 	offset = offset_in_folio(folio, from);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 44e9de51eedf..572030db2f06 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -203,8 +203,8 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
+ 		bool retry);
+ void create_empty_buffers(struct page *, unsigned long,
+ 			unsigned long b_state);
+-void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+-				unsigned long b_state);
++struct buffer_head *folio_create_empty_buffers(struct folio *folio,
++		unsigned long blocksize, unsigned long b_state);
+ void end_buffer_read_sync(struct buffer_head *bh, int uptodate);
+ void end_buffer_write_sync(struct buffer_head *bh, int uptodate);
+ void end_buffer_async_write(struct buffer_head *bh, int uptodate);
+-- 
+2.45.2
+
+
+From 61a8a1917a4b2ca56bb21f78377a4d7c3c6244ca Mon Sep 17 00:00:00 2001
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Date: Mon, 16 Oct 2023 21:11:03 +0100
+Subject: [PATCH 15/49] nilfs2: convert nilfs_lookup_dirty_data_buffers to use
+ folio_create_empty_buffers
+
+[ Upstream commit 922b12eff0b293fc13ae4045c7d7264e18938878 ]
+
+This function was already using a folio, so this update to the new API
+removes a single folio->page->folio conversion.
+
+Link: https://lkml.kernel.org/r/20231016201114.1928083-17-willy@infradead.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Pankaj Raghav <p.raghav@samsung.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Stable-dep-of: 367a9bffabe0 ("nilfs2: protect access to buffers with no active references")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/nilfs2/segment.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index 0610cb12c11c..57b535921a73 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -731,10 +731,9 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 			continue;
+ 		}
+ 		head = folio_buffers(folio);
+-		if (!head) {
+-			create_empty_buffers(&folio->page, i_blocksize(inode), 0);
+-			head = folio_buffers(folio);
+-		}
++		if (!head)
++			head = folio_create_empty_buffers(folio,
++					i_blocksize(inode), 0);
+ 		folio_unlock(folio);
+ 
+ 		bh = head;
+-- 
+2.45.2
+
+
+From 8e1b9201c9a24638cf09c6e1c9f224157328010b Mon Sep 17 00:00:00 2001
+From: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date: Wed, 8 Jan 2025 05:00:47 +0900
+Subject: [PATCH 16/49] nilfs2: protect access to buffers with no active
+ references
+
+[ Upstream commit 367a9bffabe08c04f6d725032cce3d891b2b9e1a ]
+
+nilfs_lookup_dirty_data_buffers(), which iterates through the buffers
+attached to dirty data folios/pages, accesses the attached buffers without
+locking the folios/pages.
+
+For data cache, nilfs_clear_folio_dirty() may be called asynchronously
+when the file system degenerates to read only, so
+nilfs_lookup_dirty_data_buffers() still has the potential to cause use
+after free issues when buffers lose the protection of their dirty state
+midway due to this asynchronous clearing and are unintentionally freed by
+try_to_free_buffers().
+
+Eliminate this race issue by adjusting the lock section in this function.
+
+Link: https://lkml.kernel.org/r/20250107200202.6432-3-konishi.ryusuke@gmail.com
+Signed-off-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Fixes: 8c26c4e2694a ("nilfs2: fix issue with flush kernel thread after remount in RO mode because of driver's internal error or metadata corruption")
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/nilfs2/segment.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index 57b535921a73..d4a98ac72b8e 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -734,7 +734,6 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 		if (!head)
+ 			head = folio_create_empty_buffers(folio,
+ 					i_blocksize(inode), 0);
+-		folio_unlock(folio);
+ 
+ 		bh = head;
+ 		do {
+@@ -744,11 +743,14 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 			list_add_tail(&bh->b_assoc_buffers, listp);
+ 			ndirties++;
+ 			if (unlikely(ndirties >= nlimit)) {
++				folio_unlock(folio);
+ 				folio_batch_release(&fbatch);
+ 				cond_resched();
+ 				return ndirties;
+ 			}
+ 		} while (bh = bh->b_this_page, bh != head);
++
++		folio_unlock(folio);
+ 	}
+ 	folio_batch_release(&fbatch);
+ 	cond_resched();
+-- 
+2.45.2
+
+
+From 91c9ec5a208d2760a57a5895edd04ede70f94ade Mon Sep 17 00:00:00 2001
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Wed, 8 Jan 2025 10:04:30 +0100
+Subject: [PATCH 17/49] module: Extend the preempt disabled section in
+ dereference_symbol_descriptor().
+
+[ Upstream commit a145c848d69f9c6f32008d8319edaa133360dd74 ]
+
+dereference_symbol_descriptor() needs to obtain the module pointer
+belonging to pointer in order to resolve that pointer.
+The returned mod pointer is obtained under RCU-sched/ preempt_disable()
+guarantees and needs to be used within this section to ensure that the
+module is not removed in the meantime.
+
+Extend the preempt_disable() section to also cover
+dereference_module_function_descriptor().
+
+Fixes: 04b8eb7a4ccd9 ("symbol lookup: introduce dereference_symbol_descriptor()")
+Cc: James E.J. Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Helge Deller <deller@gmx.de>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Naveen N Rao <naveen@kernel.org>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Cc: linux-parisc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://lore.kernel.org/r/20250108090457.512198-2-bigeasy@linutronix.de
+Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/kallsyms.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/kallsyms.h b/include/linux/kallsyms.h
+index c3f075e8f60c..1c6a6c1704d8 100644
+--- a/include/linux/kallsyms.h
++++ b/include/linux/kallsyms.h
+@@ -57,10 +57,10 @@ static inline void *dereference_symbol_descriptor(void *ptr)
+ 
+ 	preempt_disable();
+ 	mod = __module_address((unsigned long)ptr);
+-	preempt_enable();
+ 
+ 	if (mod)
+ 		ptr = dereference_module_function_descriptor(mod, ptr);
++	preempt_enable();
+ #endif
+ 	return ptr;
+ }
+-- 
+2.45.2
+
+
+From f4b9bc823b0cfdebfed479c0e87d6939c7562e87 Mon Sep 17 00:00:00 2001
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+Date: Sun, 5 Jan 2025 16:34:02 +0800
+Subject: [PATCH 18/49] driver core: class: Fix wild pointer dereferences in
+ API class_dev_iter_next()
+
+[ Upstream commit e128f82f7006991c99a58114f70ef61e937b1ac1 ]
+
+There are a potential wild pointer dereferences issue regarding APIs
+class_dev_iter_(init|next|exit)(), as explained by below typical usage:
+
+// All members of @iter are wild pointers.
+struct class_dev_iter iter;
+
+// class_dev_iter_init(@iter, @class, ...) checks parameter @class for
+// potential class_to_subsys() error, and it returns void type and does
+// not initialize its output parameter @iter, so caller can not detect
+// the error and continues to invoke class_dev_iter_next(@iter) even if
+// @iter still contains wild pointers.
+class_dev_iter_init(&iter, ...);
+
+// Dereference these wild pointers in @iter here once suffer the error.
+while (dev = class_dev_iter_next(&iter)) { ... };
+
+// Also dereference these wild pointers here.
+class_dev_iter_exit(&iter);
+
+Actually, all callers of these APIs have such usage pattern in kernel tree.
+Fix by:
+- Initialize output parameter @iter by memset() in class_dev_iter_init()
+  and give callers prompt by pr_crit() for the error.
+- Check if @iter is valid in class_dev_iter_next().
+
+Fixes: 7b884b7f24b4 ("driver core: class.c: convert to only use class_to_subsys")
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Link: https://lore.kernel.org/r/20250105-class_fix-v6-1-3a2f1768d4d4@quicinc.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/base/class.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/base/class.c b/drivers/base/class.c
+index 9cd489a57708..695e7fba580b 100644
+--- a/drivers/base/class.c
++++ b/drivers/base/class.c
+@@ -314,8 +314,12 @@ void class_dev_iter_init(struct class_dev_iter *iter, const struct class *class,
+ 	struct subsys_private *sp = class_to_subsys(class);
+ 	struct klist_node *start_knode = NULL;
+ 
+-	if (!sp)
++	memset(iter, 0, sizeof(*iter));
++	if (!sp) {
++		pr_crit("%s: class %p was not registered yet\n",
++			__func__, class);
+ 		return;
++	}
+ 
+ 	if (start)
+ 		start_knode = &start->p->knode_class;
+@@ -342,6 +346,9 @@ struct device *class_dev_iter_next(struct class_dev_iter *iter)
+ 	struct klist_node *knode;
+ 	struct device *dev;
+ 
++	if (!iter->sp)
++		return NULL;
++
+ 	while (1) {
+ 		knode = klist_next(&iter->ki);
+ 		if (!knode)
+-- 
+2.45.2
+
+
+From fe616b82bc46982f60c2f95fe0f3023d7de6598b Mon Sep 17 00:00:00 2001
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 7 Jan 2025 22:32:57 +0106
+Subject: [PATCH 19/49] serial: 8250: Adjust the timeout for FIFO mode
+
+[ Upstream commit d91f98be26510f5f81ec66425bb0306d1ccd571a ]
+
+After a console has written a record into UART_TX, it uses
+wait_for_xmitr() to wait until the data has been sent out before
+returning. However, wait_for_xmitr() will timeout after 10ms,
+regardless if the data has been transmitted or not.
+
+For single bytes, this timeout is sufficient even at very slow
+baud rates, such as 1200bps. However, when FIFO mode is used,
+there may be 64 bytes pushed into the FIFO at once. At a baud
+rate of 115200bps, the 10ms timeout is still sufficient. But
+when using lower baud rates (such as 57600bps), the timeout
+is _not_ sufficient. This causes longer lines to be cut off,
+resulting in lost and horribly misformatted output on the
+console.
+
+When using FIFO mode, take the number of bytes into account to
+determine an appropriate maximum timeout. Increasing the timeout
+does not affect performance since ideally the timeout never
+occurs.
+
+Fixes: 8f3631f0f6eb ("serial/8250: Use fifo in 8250 console driver")
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Wander Lairson Costa <wander@redhat.com>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20250107212702.169493-2-john.ogness@linutronix.de
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/tty/serial/8250/8250_port.c | 32 +++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
+index a17803da83f8..2b1b2928ef7b 100644
+--- a/drivers/tty/serial/8250/8250_port.c
++++ b/drivers/tty/serial/8250/8250_port.c
+@@ -2074,7 +2074,8 @@ static void serial8250_break_ctl(struct uart_port *port, int break_state)
+ 	serial8250_rpm_put(up);
+ }
+ 
+-static void wait_for_lsr(struct uart_8250_port *up, int bits)
++/* Returns true if @bits were set, false on timeout */
++static bool wait_for_lsr(struct uart_8250_port *up, int bits)
+ {
+ 	unsigned int status, tmout = 10000;
+ 
+@@ -2089,11 +2090,11 @@ static void wait_for_lsr(struct uart_8250_port *up, int bits)
+ 		udelay(1);
+ 		touch_nmi_watchdog();
+ 	}
++
++	return (tmout != 0);
+ }
+ 
+-/*
+- *	Wait for transmitter & holding register to empty
+- */
++/* Wait for transmitter and holding register to empty with timeout */
+ static void wait_for_xmitr(struct uart_8250_port *up, int bits)
+ {
+ 	unsigned int tmout;
+@@ -3350,6 +3351,16 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+ 	serial8250_out_MCR(up, up->mcr | UART_MCR_DTR | UART_MCR_RTS);
+ }
+ 
++static void fifo_wait_for_lsr(struct uart_8250_port *up, unsigned int count)
++{
++	unsigned int i;
++
++	for (i = 0; i < count; i++) {
++		if (wait_for_lsr(up, UART_LSR_THRE))
++			return;
++	}
++}
++
+ /*
+  * Print a string to the serial port using the device FIFO
+  *
+@@ -3359,13 +3370,15 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+ static void serial8250_console_fifo_write(struct uart_8250_port *up,
+ 					  const char *s, unsigned int count)
+ {
+-	int i;
+ 	const char *end = s + count;
+ 	unsigned int fifosize = up->tx_loadsz;
++	unsigned int tx_count = 0;
+ 	bool cr_sent = false;
++	unsigned int i;
+ 
+ 	while (s != end) {
+-		wait_for_lsr(up, UART_LSR_THRE);
++		/* Allow timeout for each byte of a possibly full FIFO */
++		fifo_wait_for_lsr(up, fifosize);
+ 
+ 		for (i = 0; i < fifosize && s != end; ++i) {
+ 			if (*s == '\n' && !cr_sent) {
+@@ -3376,7 +3389,14 @@ static void serial8250_console_fifo_write(struct uart_8250_port *up,
+ 				cr_sent = false;
+ 			}
+ 		}
++		tx_count = i;
+ 	}
++
++	/*
++	 * Allow timeout for each byte written since the caller will only wait
++	 * for UART_LSR_BOTH_EMPTY using the timeout of a single character
++	 */
++	fifo_wait_for_lsr(up, tx_count);
+ }
+ 
+ /*
+-- 
+2.45.2
+
+
+From cedab40478283219b01247c1543deb72e3556de6 Mon Sep 17 00:00:00 2001
+From: Olga Kornievskaia <okorniev@redhat.com>
+Date: Fri, 13 Dec 2024 11:52:00 -0500
+Subject: [PATCH 20/49] NFSv4.2: fix COPY_NOTIFY xdr buf size calculation
+
+[ Upstream commit e8380c2d06055665b3df6c03964911375d7f9290 ]
+
+We need to include sequence size in the compound.
+
+Fixes: 0491567b51ef ("NFS: add COPY_NOTIFY operation")
+Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
+Signed-off-by: Anna Schumaker <anna.schumaker@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/nfs/nfs42xdr.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/fs/nfs/nfs42xdr.c b/fs/nfs/nfs42xdr.c
+index 9e3ae53e2205..becc3149aa9e 100644
+--- a/fs/nfs/nfs42xdr.c
++++ b/fs/nfs/nfs42xdr.c
+@@ -144,9 +144,11 @@
+ 					 decode_putfh_maxsz + \
+ 					 decode_offload_cancel_maxsz)
+ #define NFS4_enc_copy_notify_sz		(compound_encode_hdr_maxsz + \
++					 encode_sequence_maxsz + \
+ 					 encode_putfh_maxsz + \
+ 					 encode_copy_notify_maxsz)
+ #define NFS4_dec_copy_notify_sz		(compound_decode_hdr_maxsz + \
++					 decode_sequence_maxsz + \
+ 					 decode_putfh_maxsz + \
+ 					 decode_copy_notify_maxsz)
+ #define NFS4_enc_deallocate_sz		(compound_encode_hdr_maxsz + \
+-- 
+2.45.2
+
+
+From 34c3ea55d1a7588781776d6e4b7f41d524f75c8d Mon Sep 17 00:00:00 2001
+From: Olga Kornievskaia <okorniev@redhat.com>
+Date: Fri, 13 Dec 2024 11:52:01 -0500
+Subject: [PATCH 21/49] NFSv4.2: mark OFFLOAD_CANCEL MOVEABLE
+
+[ Upstream commit 668135b9348c53fd205f5e07d11e82b10f31b55b ]
+
+OFFLOAD_CANCEL should be marked MOVEABLE for when we need to move
+tasks off a non-functional transport.
+
+Fixes: c975c2092657 ("NFS send OFFLOAD_CANCEL when COPY killed")
+Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
+Signed-off-by: Anna Schumaker <anna.schumaker@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/nfs/nfs42proc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/nfs/nfs42proc.c b/fs/nfs/nfs42proc.c
+index 531c9c20ef1d..9f0d69e65264 100644
+--- a/fs/nfs/nfs42proc.c
++++ b/fs/nfs/nfs42proc.c
+@@ -552,7 +552,7 @@ static int nfs42_do_offload_cancel_async(struct file *dst,
+ 		.rpc_message = &msg,
+ 		.callback_ops = &nfs42_offload_cancel_ops,
+ 		.workqueue = nfsiod_workqueue,
+-		.flags = RPC_TASK_ASYNC,
++		.flags = RPC_TASK_ASYNC | RPC_TASK_MOVEABLE,
+ 	};
+ 	int status;
+ 
+-- 
+2.45.2
+
+
+From d49ab6857d98266010f3446c9c2063014db5b654 Mon Sep 17 00:00:00 2001
+From: Huacai Chen <chenhuacai@loongson.cn>
+Date: Sun, 26 Jan 2025 21:49:59 +0800
+Subject: [PATCH 22/49] LoongArch: Fix warnings during S3 suspend
+
+[ Upstream commit 26c0a2d93af55d30a46d5f45d3e9c42cde730168 ]
+
+The enable_gpe_wakeup() function calls acpi_enable_all_wakeup_gpes(),
+and the later one may call the preempt_schedule_common() function,
+resulting in a thread switch and causing the CPU to be in an interrupt
+enabled state after the enable_gpe_wakeup() function returns, leading
+to the warnings as follow.
+
+[ C0] WARNING: ... at kernel/time/timekeeping.c:845 ktime_get+0xbc/0xc8
+[ C0]          ...
+[ C0] Call Trace:
+[ C0] [<90000000002243b4>] show_stack+0x64/0x188
+[ C0] [<900000000164673c>] dump_stack_lvl+0x60/0x88
+[ C0] [<90000000002687e4>] __warn+0x8c/0x148
+[ C0] [<90000000015e9978>] report_bug+0x1c0/0x2b0
+[ C0] [<90000000016478e4>] do_bp+0x204/0x3b8
+[ C0] [<90000000025b1924>] exception_handlers+0x1924/0x10000
+[ C0] [<9000000000343bbc>] ktime_get+0xbc/0xc8
+[ C0] [<9000000000354c08>] tick_sched_timer+0x30/0xb0
+[ C0] [<90000000003408e0>] __hrtimer_run_queues+0x160/0x378
+[ C0] [<9000000000341f14>] hrtimer_interrupt+0x144/0x388
+[ C0] [<9000000000228348>] constant_timer_interrupt+0x38/0x48
+[ C0] [<90000000002feba4>] __handle_irq_event_percpu+0x64/0x1e8
+[ C0] [<90000000002fed48>] handle_irq_event_percpu+0x20/0x80
+[ C0] [<9000000000306b9c>] handle_percpu_irq+0x5c/0x98
+[ C0] [<90000000002fd4a0>] generic_handle_domain_irq+0x30/0x48
+[ C0] [<9000000000d0c7b0>] handle_cpu_irq+0x70/0xa8
+[ C0] [<9000000001646b30>] handle_loongarch_irq+0x30/0x48
+[ C0] [<9000000001646bc8>] do_vint+0x80/0xe0
+[ C0] [<90000000002aea1c>] finish_task_switch.isra.0+0x8c/0x2a8
+[ C0] [<900000000164e34c>] __schedule+0x314/0xa48
+[ C0] [<900000000164ead8>] schedule+0x58/0xf0
+[ C0] [<9000000000294a2c>] worker_thread+0x224/0x498
+[ C0] [<900000000029d2f0>] kthread+0xf8/0x108
+[ C0] [<9000000000221f28>] ret_from_kernel_thread+0xc/0xa4
+[ C0]
+[ C0] ---[ end trace 0000000000000000 ]---
+
+The root cause is acpi_enable_all_wakeup_gpes() uses a mutex to protect
+acpi_hw_enable_all_wakeup_gpes(), and acpi_ut_acquire_mutex() may cause
+a thread switch. Since there is no longer concurrent execution during
+loongarch_acpi_suspend(), we can call acpi_hw_enable_all_wakeup_gpes()
+directly in enable_gpe_wakeup().
+
+The solution is similar to commit 22db06337f590d01 ("ACPI: sleep: Avoid
+breaking S3 wakeup due to might_sleep()").
+
+Fixes: 366bb35a8e48 ("LoongArch: Add suspend (ACPI S3) support")
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/loongarch/power/platform.c | 2 +-
+ drivers/acpi/acpica/achware.h   | 2 --
+ include/acpi/acpixf.h           | 1 +
+ 3 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/arch/loongarch/power/platform.c b/arch/loongarch/power/platform.c
+index 3ea8e07aa225..6c7735cda4d8 100644
+--- a/arch/loongarch/power/platform.c
++++ b/arch/loongarch/power/platform.c
+@@ -17,7 +17,7 @@ void enable_gpe_wakeup(void)
+ 	if (acpi_gbl_reduced_hardware)
+ 	       return;
+ 
+-	acpi_enable_all_wakeup_gpes();
++	acpi_hw_enable_all_wakeup_gpes();
+ }
+ 
+ void enable_pci_wakeup(void)
+diff --git a/drivers/acpi/acpica/achware.h b/drivers/acpi/acpica/achware.h
+index 79bbfe00d241..b8543a34caea 100644
+--- a/drivers/acpi/acpica/achware.h
++++ b/drivers/acpi/acpica/achware.h
+@@ -103,8 +103,6 @@ acpi_hw_get_gpe_status(struct acpi_gpe_event_info *gpe_event_info,
+ 
+ acpi_status acpi_hw_enable_all_runtime_gpes(void);
+ 
+-acpi_status acpi_hw_enable_all_wakeup_gpes(void);
+-
+ u8 acpi_hw_check_all_gpes(acpi_handle gpe_skip_device, u32 gpe_skip_number);
+ 
+ acpi_status
+diff --git a/include/acpi/acpixf.h b/include/acpi/acpixf.h
+index a3c9dd4a1ac3..7e9e7e769043 100644
+--- a/include/acpi/acpixf.h
++++ b/include/acpi/acpixf.h
+@@ -763,6 +763,7 @@ ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status
+ 						     *event_status))
+ ACPI_HW_DEPENDENT_RETURN_UINT32(u32 acpi_dispatch_gpe(acpi_handle gpe_device, u32 gpe_number))
+ ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status acpi_hw_disable_all_gpes(void))
++ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status acpi_hw_enable_all_wakeup_gpes(void))
+ ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status acpi_disable_all_gpes(void))
+ ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status acpi_enable_all_runtime_gpes(void))
+ ACPI_HW_DEPENDENT_RETURN_STATUS(acpi_status acpi_enable_all_wakeup_gpes(void))
+-- 
+2.45.2
+
+
+From 9e0f793ee9616db8f66985fdb98f65f2821d0f85 Mon Sep 17 00:00:00 2001
+From: Luo Yifan <luoyifan@cmss.chinamobile.com>
+Date: Tue, 28 Jan 2025 23:27:01 +0900
+Subject: [PATCH 23/49] tools/bootconfig: Fix the wrong format specifier
+
+[ Upstream commit f6ab7384d554ba80ff4793259d75535874b366f5 ]
+
+Use '%u' instead of '%d' for unsigned int.
+
+Link: https://lore.kernel.org/all/20241105011048.201629-1-luoyifan@cmss.chinamobile.com/
+
+Fixes: 973780011106 ("tools/bootconfig: Suppress non-error messages")
+Signed-off-by: Luo Yifan <luoyifan@cmss.chinamobile.com>
+Signed-off-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ tools/bootconfig/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/bootconfig/main.c b/tools/bootconfig/main.c
+index 156b62a163c5..8a48cc2536f5 100644
+--- a/tools/bootconfig/main.c
++++ b/tools/bootconfig/main.c
+@@ -226,7 +226,7 @@ static int load_xbc_from_initrd(int fd, char **buf)
+ 	/* Wrong Checksum */
+ 	rcsum = xbc_calc_checksum(*buf, size);
+ 	if (csum != rcsum) {
+-		pr_err("checksum error: %d != %d\n", csum, rcsum);
++		pr_err("checksum error: %u != %u\n", csum, rcsum);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -395,7 +395,7 @@ static int apply_xbc(const char *path, const char *xbc_path)
+ 	xbc_get_info(&ret, NULL);
+ 	printf("\tNumber of nodes: %d\n", ret);
+ 	printf("\tSize: %u bytes\n", (unsigned int)size);
+-	printf("\tChecksum: %d\n", (unsigned int)csum);
++	printf("\tChecksum: %u\n", (unsigned int)csum);
+ 
+ 	/* TODO: Check the options by schema */
+ 	xbc_exit();
+-- 
+2.45.2
+
+
+From 68a5e8b9125b672b08b79e15d1089b819c0a9e33 Mon Sep 17 00:00:00 2001
+From: Jianbo Liu <jianbol@nvidia.com>
+Date: Tue, 12 Nov 2024 14:10:31 +0200
+Subject: [PATCH 24/49] xfrm: replay: Fix the update of replay_esn->oseq_hi for
+ GSO
+
+[ Upstream commit c05c5e5aa163f4682ca97a2f0536575fc7dbdecb ]
+
+When skb needs GSO and wrap around happens, if xo->seq.low (seqno of
+the first skb segment) is before the last seq number but oseq (seqno
+of the last segment) is after it, xo->seq.low is still bigger than
+replay_esn->oseq while oseq is smaller than it, so the update of
+replay_esn->oseq_hi is missed for this case wrap around because of
+the change in the cited commit.
+
+For example, if sending a packet with gso_segs=3 while old
+replay_esn->oseq=0xfffffffe, we calculate:
+    xo->seq.low = 0xfffffffe + 1 = 0x0xffffffff
+    oseq = 0xfffffffe + 3 = 0x1
+(oseq < replay_esn->oseq) is true, but (xo->seq.low <
+replay_esn->oseq) is false, so replay_esn->oseq_hi is not incremented.
+
+To fix this issue, change the outer checking back for the update of
+replay_esn->oseq_hi. And add new checking inside for the update of
+packet's oseq_hi.
+
+Fixes: 4b549ccce941 ("xfrm: replay: Fix ESN wrap around for GSO")
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/xfrm/xfrm_replay.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
+index ce56d659c55a..7f52bb2e14c1 100644
+--- a/net/xfrm/xfrm_replay.c
++++ b/net/xfrm/xfrm_replay.c
+@@ -714,10 +714,12 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
+ 			oseq += skb_shinfo(skb)->gso_segs;
+ 		}
+ 
+-		if (unlikely(xo->seq.low < replay_esn->oseq)) {
+-			XFRM_SKB_CB(skb)->seq.output.hi = ++oseq_hi;
+-			xo->seq.hi = oseq_hi;
+-			replay_esn->oseq_hi = oseq_hi;
++		if (unlikely(oseq < replay_esn->oseq)) {
++			replay_esn->oseq_hi = ++oseq_hi;
++			if (xo->seq.low < replay_esn->oseq) {
++				XFRM_SKB_CB(skb)->seq.output.hi = oseq_hi;
++				xo->seq.hi = oseq_hi;
++			}
+ 			if (replay_esn->oseq_hi == 0) {
+ 				replay_esn->oseq--;
+ 				replay_esn->oseq_hi--;
+-- 
+2.45.2
+
+
+From b0f47b08786de5b02cedcadc88dad77ed4b1e671 Mon Sep 17 00:00:00 2001
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Date: Thu, 19 Dec 2024 11:05:07 +0900
+Subject: [PATCH 25/49] dmaengine: ti: edma: fix OF node reference leaks in
+ edma_driver
+
+[ Upstream commit e883c64778e5a9905fce955681f8ee38c7197e0f ]
+
+The .probe() of edma_driver calls of_parse_phandle_with_fixed_args() but
+does not release the obtained OF nodes. Thus add a of_node_put() call.
+
+This bug was found by an experimental verification tool that I am
+developing.
+
+Fixes: 1be5336bc7ba ("dmaengine: edma: New device tree binding")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+Link: https://lore.kernel.org/r/20241219020507.1983124-3-joe@pf.is.s.u-tokyo.ac.jp
+Signed-off-by: Vinod Koul <vkoul@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/dma/ti/edma.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/dma/ti/edma.c b/drivers/dma/ti/edma.c
+index 155c409d2b43..c0fa54132467 100644
+--- a/drivers/dma/ti/edma.c
++++ b/drivers/dma/ti/edma.c
+@@ -208,7 +208,6 @@ struct edma_desc {
+ struct edma_cc;
+ 
+ struct edma_tc {
+-	struct device_node		*node;
+ 	u16				id;
+ };
+ 
+@@ -2466,13 +2465,13 @@ static int edma_probe(struct platform_device *pdev)
+ 			if (ret || i == ecc->num_tc)
+ 				break;
+ 
+-			ecc->tc_list[i].node = tc_args.np;
+ 			ecc->tc_list[i].id = i;
+ 			queue_priority_mapping[i][1] = tc_args.args[0];
+ 			if (queue_priority_mapping[i][1] > lowest_priority) {
+ 				lowest_priority = queue_priority_mapping[i][1];
+ 				info->default_queue = i;
+ 			}
++			of_node_put(tc_args.np);
+ 		}
+ 
+ 		/* See if we have optional dma-channel-mask array */
+-- 
+2.45.2
+
+
+From c6e1b2cac24b2a4d1dd472071021bf00c26450eb Mon Sep 17 00:00:00 2001
+From: Alexandre Cassen <acassen@corp.free.fr>
+Date: Thu, 2 Jan 2025 12:11:11 +0200
+Subject: [PATCH 26/49] xfrm: delete intermediate secpath entry in packet
+ offload mode
+
+[ Upstream commit 600258d555f0710b9c47fb78d2d80a4aecd608cc ]
+
+Packets handled by hardware have added secpath as a way to inform XFRM
+core code that this path was already handled. That secpath is not needed
+at all after policy is checked and it is removed later in the stack.
+
+However, in the case of IP forwarding is enabled (/proc/sys/net/ipv4/ip_forward),
+that secpath is not removed and packets which already were handled are reentered
+to the driver TX path with xfrm_offload set.
+
+The following kernel panic is observed in mlx5 in such case:
+
+ mlx5_core 0000:04:00.0 enp4s0f0np0: Link up
+ mlx5_core 0000:04:00.1 enp4s0f1np1: Link up
+ Initializing XFRM netlink socket
+ IPsec XFRM device driver
+ BUG: kernel NULL pointer dereference, address: 0000000000000000
+ #PF: supervisor instruction fetch in kernel mode
+ #PF: error_code(0x0010) - not-present page
+ PGD 0 P4D 0
+ Oops: Oops: 0010 [#1] PREEMPT SMP
+ CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc1-alex #3
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+ RIP: 0010:0x0
+ Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+ RSP: 0018:ffffb87380003800 EFLAGS: 00010206
+ RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
+ RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
+ RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
+ R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
+ R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
+ FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
+ Call Trace:
+  <IRQ>
+  ? show_regs+0x63/0x70
+  ? __die_body+0x20/0x60
+  ? __die+0x2b/0x40
+  ? page_fault_oops+0x15c/0x550
+  ? do_user_addr_fault+0x3ed/0x870
+  ? exc_page_fault+0x7f/0x190
+  ? asm_exc_page_fault+0x27/0x30
+  mlx5e_ipsec_handle_tx_skb+0xe7/0x2f0 [mlx5_core]
+  mlx5e_xmit+0x58e/0x1980 [mlx5_core]
+  ? __fib_lookup+0x6a/0xb0
+  dev_hard_start_xmit+0x82/0x1d0
+  sch_direct_xmit+0xfe/0x390
+  __dev_queue_xmit+0x6d8/0xee0
+  ? __fib_lookup+0x6a/0xb0
+  ? internal_add_timer+0x48/0x70
+  ? mod_timer+0xe2/0x2b0
+  neigh_resolve_output+0x115/0x1b0
+  __neigh_update+0x26a/0xc50
+  neigh_update+0x14/0x20
+  arp_process+0x2cb/0x8e0
+  ? __napi_build_skb+0x5e/0x70
+  arp_rcv+0x11e/0x1c0
+  ? dev_gro_receive+0x574/0x820
+  __netif_receive_skb_list_core+0x1cf/0x1f0
+  netif_receive_skb_list_internal+0x183/0x2a0
+  napi_complete_done+0x76/0x1c0
+  mlx5e_napi_poll+0x234/0x7a0 [mlx5_core]
+  __napi_poll+0x2d/0x1f0
+  net_rx_action+0x1a6/0x370
+  ? atomic_notifier_call_chain+0x3b/0x50
+  ? irq_int_handler+0x15/0x20 [mlx5_core]
+  handle_softirqs+0xb9/0x2f0
+  ? handle_irq_event+0x44/0x60
+  irq_exit_rcu+0xdb/0x100
+  common_interrupt+0x98/0xc0
+  </IRQ>
+  <TASK>
+  asm_common_interrupt+0x27/0x40
+ RIP: 0010:pv_native_safe_halt+0xb/0x10
+ Code: 09 c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 0f 22
+ 0f 1f 84 00 00 00 00 00 90 eb 07 0f 00 2d 7f e9 36 00 fb
+40 00 83 ff 07 77 21 89 ff ff 24 fd 88 3d a1 bd 0f 21 f8
+ RSP: 0018:ffffffffbe603de8 EFLAGS: 00000202
+ RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000f92f46680
+ RDX: 0000000000000037 RSI: 00000000ffffffff RDI: 00000000000518d4
+ RBP: ffffffffbe603df0 R08: 000000cd42e4dffb R09: ffffffffbe603d70
+ R10: 0000004d80d62680 R11: 0000000000000001 R12: ffffffffbe60bf40
+ R13: 0000000000000000 R14: 0000000000000000 R15: ffffffffbe60aff8
+  ? default_idle+0x9/0x20
+  arch_cpu_idle+0x9/0x10
+  default_idle_call+0x29/0xf0
+  do_idle+0x1f2/0x240
+  cpu_startup_entry+0x2c/0x30
+  rest_init+0xe7/0x100
+  start_kernel+0x76b/0xb90
+  x86_64_start_reservations+0x18/0x30
+  x86_64_start_kernel+0xc0/0x110
+  ? setup_ghcb+0xe/0x130
+  common_startup_64+0x13e/0x141
+  </TASK>
+ Modules linked in: esp4_offload esp4 xfrm_interface
+xfrm6_tunnel tunnel4 tunnel6 xfrm_user xfrm_algo binfmt_misc
+intel_rapl_msr intel_rapl_common kvm_amd ccp kvm input_leds serio_raw
+qemu_fw_cfg sch_fq_codel dm_multipath scsi_dh_rdac scsi_dh_emc
+scsi_dh_alua efi_pstore ip_tables x_tables autofs4 raid10 raid456
+async_raid6_recov async_memcpy async_pq raid6_pq async_xor xor async_tx
+libcrc32c raid1 raid0 mlx5_core crct10dif_pclmul crc32_pclmul
+polyval_clmulni polyval_generic ghash_clmulni_intel sha256_ssse3
+sha1_ssse3 ahci mlxfw i2c_i801 libahci i2c_mux i2c_smbus psample
+virtio_rng pci_hyperv_intf aesni_intel crypto_simd cryptd
+ CR2: 0000000000000000
+ ---[ end trace 0000000000000000 ]---
+ RIP: 0010:0x0
+ Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+ RSP: 0018:ffffb87380003800 EFLAGS: 00010206
+ RAX: ffff8df004e02600 RBX: ffffb873800038d8 RCX: 00000000ffff98cf
+ RDX: ffff8df00733e108 RSI: ffff8df00521fb80 RDI: ffff8df001661f00
+ RBP: ffffb87380003850 R08: ffff8df013980000 R09: 0000000000000010
+ R10: 0000000000000002 R11: 0000000000000002 R12: ffff8df001661f00
+ R13: ffff8df00521fb80 R14: ffff8df00733e108 R15: ffff8df011faf04e
+ FS:  0000000000000000(0000) GS:ffff8df46b800000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: ffffffffffffffd6 CR3: 0000000106384000 CR4: 0000000000350ef0
+ Kernel panic - not syncing: Fatal exception in interrupt
+ Kernel Offset: 0x3b800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+ ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+
+Fixes: 5958372ddf62 ("xfrm: add RX datapath protection for IPsec packet offload mode")
+Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/net/xfrm.h | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 93a9866ee481..b33d27e42cff 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1181,9 +1181,19 @@ static inline int __xfrm_policy_check2(struct sock *sk, int dir,
+ 
+ 	if (xo) {
+ 		x = xfrm_input_state(skb);
+-		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
+-			return (xo->flags & CRYPTO_DONE) &&
+-			       (xo->status & CRYPTO_SUCCESS);
++		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
++			bool check = (xo->flags & CRYPTO_DONE) &&
++				     (xo->status & CRYPTO_SUCCESS);
++
++			/* The packets here are plain ones and secpath was
++			 * needed to indicate that hardware already handled
++			 * them and there is no need to do nothing in addition.
++			 *
++			 * Consume secpath which was set by drivers.
++			 */
++			secpath_reset(skb);
++			return check;
++		}
+ 	}
+ 
+ 	return __xfrm_check_nopolicy(net, skb, dir) ||
+-- 
+2.45.2
+
+
+From 9adefa7b9559d0f21034a5d5ec1b55840c9348b9 Mon Sep 17 00:00:00 2001
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+Date: Wed, 18 Dec 2024 20:34:58 +0100
+Subject: [PATCH 27/49] rtc: pcf85063: fix potential OOB write in PCF85063
+ NVMEM read
+
+[ Upstream commit 3ab8c5ed4f84fa20cd16794fe8dc31f633fbc70c ]
+
+The nvmem interface supports variable buffer sizes, while the regmap
+interface operates with fixed-size storage. If an nvmem client uses a
+buffer size less than 4 bytes, regmap_read will write out of bounds
+as it expects the buffer to point at an unsigned int.
+
+Fix this by using an intermediary unsigned int to hold the value.
+
+Fixes: fadfd092ee91 ("rtc: pcf85063: add nvram support")
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Link: https://lore.kernel.org/r/20241218-rtc-pcf85063-stack-corruption-v1-1-12fd0ee0f046@pengutronix.de
+Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/rtc/rtc-pcf85063.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/rtc/rtc-pcf85063.c b/drivers/rtc/rtc-pcf85063.c
+index fdbc07f14036..905986c61655 100644
+--- a/drivers/rtc/rtc-pcf85063.c
++++ b/drivers/rtc/rtc-pcf85063.c
+@@ -322,7 +322,16 @@ static const struct rtc_class_ops pcf85063_rtc_ops = {
+ static int pcf85063_nvmem_read(void *priv, unsigned int offset,
+ 			       void *val, size_t bytes)
+ {
+-	return regmap_read(priv, PCF85063_REG_RAM, val);
++	unsigned int tmp;
++	int ret;
++
++	ret = regmap_read(priv, PCF85063_REG_RAM, &tmp);
++	if (ret < 0)
++		return ret;
++
++	*(u8 *)val = tmp;
++
++	return 0;
+ }
+ 
+ static int pcf85063_nvmem_write(void *priv, unsigned int offset,
+-- 
+2.45.2
+
+
+From 20f0f55e6d686eae7934e28358ea446e36cff77f Mon Sep 17 00:00:00 2001
+From: Ming Wang <wangming01@loongson.cn>
+Date: Thu, 5 Dec 2024 19:43:07 +0800
+Subject: [PATCH 28/49] rtc: loongson: clear TOY_MATCH0_REG in
+ loongson_rtc_isr()
+
+[ Upstream commit 09471d8f5b390883eaf21b917c4bf3ced1b8a1df ]
+
+The TOY_MATCH0_REG should be cleared to 0 in the RTC interrupt handler,
+otherwise the interrupt cannot be cleared, which will cause the
+loongson_rtc_isr() to be triggered multiple times.
+
+The previous code cleared TOY_MATCH0_REG in the loongson_rtc_handler(),
+which is an ACPI interrupt. This did not prevent loongson_rtc_isr()
+from being triggered multiple times.
+
+This commit moves the clearing of TOY_MATCH0_REG to the
+loongson_rtc_isr() to ensure that the interrupt is properly cleared.
+
+Fixes: 1b733a9ebc3d ("rtc: Add rtc driver for the Loongson family chips")
+Signed-off-by: Ming Wang <wangming01@loongson.cn>
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+Reviewed-by: Keguang Zhang <keguang.zhang@gmail.com> # on LS1B
+Tested-by: Keguang Zhang <keguang.zhang@gmail.com>
+Link: https://lore.kernel.org/r/20241205114307.1891418-1-wangming01@loongson.cn
+Signed-off-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/rtc/rtc-loongson.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/rtc/rtc-loongson.c b/drivers/rtc/rtc-loongson.c
+index e8ffc1ab90b0..90e9d97a86b4 100644
+--- a/drivers/rtc/rtc-loongson.c
++++ b/drivers/rtc/rtc-loongson.c
+@@ -114,6 +114,13 @@ static irqreturn_t loongson_rtc_isr(int irq, void *id)
+ 	struct loongson_rtc_priv *priv = (struct loongson_rtc_priv *)id;
+ 
+ 	rtc_update_irq(priv->rtcdev, 1, RTC_AF | RTC_IRQF);
++
++	/*
++	 * The TOY_MATCH0_REG should be cleared 0 here,
++	 * otherwise the interrupt cannot be cleared.
++	 */
++	regmap_write(priv->regmap, TOY_MATCH0_REG, 0);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -131,11 +138,7 @@ static u32 loongson_rtc_handler(void *id)
+ 	writel(RTC_STS, priv->pm_base + PM1_STS_REG);
+ 	spin_unlock(&priv->lock);
+ 
+-	/*
+-	 * The TOY_MATCH0_REG should be cleared 0 here,
+-	 * otherwise the interrupt cannot be cleared.
+-	 */
+-	return regmap_write(priv->regmap, TOY_MATCH0_REG, 0);
++	return ACPI_INTERRUPT_HANDLED;
+ }
+ 
+ static int loongson_rtc_set_enabled(struct device *dev)
+-- 
+2.45.2
+
+
+From 40e25a3c0063935763717877bb2a814c081509ff Mon Sep 17 00:00:00 2001
+From: pangliyuan <pangliyuan1@huawei.com>
+Date: Tue, 24 Dec 2024 16:18:23 +0800
+Subject: [PATCH 29/49] ubifs: skip dumping tnc tree when zroot is null
+
+[ Upstream commit bdb0ca39e0acccf6771db49c3f94ed787d05f2d7 ]
+
+Clearing slab cache will free all znode in memory and make
+c->zroot.znode = NULL, then dumping tnc tree will access
+c->zroot.znode which cause null pointer dereference.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=219624#c0
+Fixes: 1e51764a3c2a ("UBIFS: add new flash file system")
+Signed-off-by: pangliyuan <pangliyuan1@huawei.com>
+Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
+Signed-off-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ubifs/debug.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/fs/ubifs/debug.c b/fs/ubifs/debug.c
+index eef9e527d9ff..ff9e574c07a8 100644
+--- a/fs/ubifs/debug.c
++++ b/fs/ubifs/debug.c
+@@ -946,16 +946,20 @@ void ubifs_dump_tnc(struct ubifs_info *c)
+ 
+ 	pr_err("\n");
+ 	pr_err("(pid %d) start dumping TNC tree\n", current->pid);
+-	znode = ubifs_tnc_levelorder_next(c, c->zroot.znode, NULL);
+-	level = znode->level;
+-	pr_err("== Level %d ==\n", level);
+-	while (znode) {
+-		if (level != znode->level) {
+-			level = znode->level;
+-			pr_err("== Level %d ==\n", level);
++	if (c->zroot.znode) {
++		znode = ubifs_tnc_levelorder_next(c, c->zroot.znode, NULL);
++		level = znode->level;
++		pr_err("== Level %d ==\n", level);
++		while (znode) {
++			if (level != znode->level) {
++				level = znode->level;
++				pr_err("== Level %d ==\n", level);
++			}
++			ubifs_dump_znode(c, znode);
++			znode = ubifs_tnc_levelorder_next(c, c->zroot.znode, znode);
+ 		}
+-		ubifs_dump_znode(c, znode);
+-		znode = ubifs_tnc_levelorder_next(c, c->zroot.znode, znode);
++	} else {
++		pr_err("empty TNC tree in memory\n");
+ 	}
+ 	pr_err("(pid %d) finish dumping TNC tree\n", current->pid);
+ }
+-- 
+2.45.2
+
+
+From c0f6111bb525d86f3a6befb1f29771684b372cad Mon Sep 17 00:00:00 2001
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+Date: Wed, 22 Jan 2025 08:20:19 +0100
+Subject: [PATCH 30/49] regulator: core: Add missing newline character
+
+[ Upstream commit 155c569fa4c3b340fbf8571a0e42dd415c025377 ]
+
+dev_err_probe() error messages need newline character.
+
+Fixes: 6eabfc018e8d ("regulator: core: Allow specifying an initial load w/ the bulk API")
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+Link: https://patch.msgid.link/20250122072019.1926093-1-alexander.stein@ew.tq-group.com
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/regulator/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+index c96bf095695f..352131d2df4c 100644
+--- a/drivers/regulator/core.c
++++ b/drivers/regulator/core.c
+@@ -4876,7 +4876,7 @@ int _regulator_bulk_get(struct device *dev, int num_consumers,
+ 						       consumers[i].supply, get_type);
+ 		if (IS_ERR(consumers[i].consumer)) {
+ 			ret = dev_err_probe(dev, PTR_ERR(consumers[i].consumer),
+-					    "Failed to get supply '%s'",
++					    "Failed to get supply '%s'\n",
+ 					    consumers[i].supply);
+ 			consumers[i].consumer = NULL;
+ 			goto err;
+-- 
+2.45.2
+
+
+From b5a8bc47aa0a4aa8bca5466dfa2d12dbb5b3cd0c Mon Sep 17 00:00:00 2001
+From: Jian Shen <shenjian15@huawei.com>
+Date: Sat, 18 Jan 2025 17:47:41 +0800
+Subject: [PATCH 31/49] net: hns3: fix oops when unload drivers paralleling
+
+[ Upstream commit 92e5995773774a3e70257e9c95ea03518268bea5 ]
+
+When unload hclge driver, it tries to disable sriov first for each
+ae_dev node from hnae3_ae_dev_list. If user unloads hns3 driver at
+the time, because it removes all the ae_dev nodes, and it may cause
+oops.
+
+But we can't simply use hnae3_common_lock for this. Because in the
+process flow of pci_disable_sriov(), it will trigger the remove flow
+of VF, which will also take hnae3_common_lock.
+
+To fixes it, introduce a new mutex to protect the unload process.
+
+Fixes: 0dd8a25f355b ("net: hns3: disable sriov before unload hclge layer")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Link: https://patch.msgid.link/20250118094741.3046663-1-shaojijie@huawei.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/hisilicon/hns3/hnae3.c       | 15 +++++++++++++++
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h       |  2 ++
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 ++
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c   |  2 ++
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c |  2 ++
+ 5 files changed, 23 insertions(+)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.c b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
+index 9a63fbc69408..b25fb400f476 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
+@@ -40,6 +40,21 @@ EXPORT_SYMBOL(hnae3_unregister_ae_algo_prepare);
+  */
+ static DEFINE_MUTEX(hnae3_common_lock);
+ 
++/* ensure the drivers being unloaded one by one */
++static DEFINE_MUTEX(hnae3_unload_lock);
++
++void hnae3_acquire_unload_lock(void)
++{
++	mutex_lock(&hnae3_unload_lock);
++}
++EXPORT_SYMBOL(hnae3_acquire_unload_lock);
++
++void hnae3_release_unload_lock(void)
++{
++	mutex_unlock(&hnae3_unload_lock);
++}
++EXPORT_SYMBOL(hnae3_release_unload_lock);
++
+ static bool hnae3_client_match(enum hnae3_client_type client_type)
+ {
+ 	if (client_type == HNAE3_CLIENT_KNIC ||
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 57787c380fa0..7eb22b8ea3e7 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -946,4 +946,6 @@ int hnae3_register_client(struct hnae3_client *client);
+ void hnae3_set_client_init_flag(struct hnae3_client *client,
+ 				struct hnae3_ae_dev *ae_dev,
+ 				unsigned int inited);
++void hnae3_acquire_unload_lock(void);
++void hnae3_release_unload_lock(void);
+ #endif
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index 14d086b535a2..801801e8803e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -6008,9 +6008,11 @@ module_init(hns3_init_module);
+  */
+ static void __exit hns3_exit_module(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	pci_unregister_driver(&hns3_driver);
+ 	hnae3_unregister_client(&client);
+ 	hns3_dbg_unregister_debugfs();
++	hnae3_release_unload_lock();
+ }
+ module_exit(hns3_exit_module);
+ 
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index 9650ce594e2f..4d318af748a0 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -12814,9 +12814,11 @@ static int __init hclge_init(void)
+ 
+ static void __exit hclge_exit(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	hnae3_unregister_ae_algo_prepare(&ae_algo);
+ 	hnae3_unregister_ae_algo(&ae_algo);
+ 	destroy_workqueue(hclge_wq);
++	hnae3_release_unload_lock();
+ }
+ module_init(hclge_init);
+ module_exit(hclge_exit);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+index affdd9d70549..69bfcfb148de 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+@@ -3345,8 +3345,10 @@ static int __init hclgevf_init(void)
+ 
+ static void __exit hclgevf_exit(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	hnae3_unregister_ae_algo(&ae_algovf);
+ 	destroy_workqueue(hclgevf_wq);
++	hnae3_release_unload_lock();
+ }
+ module_init(hclgevf_init);
+ module_exit(hclgevf_exit);
+-- 
+2.45.2
+
+
+From d5a17441bb38ca558fae0a80664cb7b1222787bf Mon Sep 17 00:00:00 2001
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Date: Mon, 13 Jan 2025 23:19:11 +0100
+Subject: [PATCH 32/49] gpio: mxc: remove dead code after switch to DT-only
+
+[ Upstream commit b049e7abe9001a780d58e78e3833dcceee22f396 ]
+
+struct platform_device::id was only set by board code, but since i.MX
+became a devicetree-only platform, this will always be -1
+(PLATFORM_DEVID_NONE).
+
+Note: of_alias_get_id() returns a negative number on error and base
+treats all negative errors the same, so we need not add any additional
+error handling.
+
+Fixes: 0f2c7af45d7e ("gpio: mxc: Convert the driver to DT-only")
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Reviewed-by: Andy Shevchenko <andy@kernel.org>
+Link: https://lore.kernel.org/r/20250113-b4-imx-gpio-base-warning-v1-3-0a28731a5cf6@pengutronix.de
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/gpio/gpio-mxc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/gpio/gpio-mxc.c b/drivers/gpio/gpio-mxc.c
+index 4cb455b2bdee..619b6fb9d833 100644
+--- a/drivers/gpio/gpio-mxc.c
++++ b/drivers/gpio/gpio-mxc.c
+@@ -490,8 +490,7 @@ static int mxc_gpio_probe(struct platform_device *pdev)
+ 	port->gc.request = mxc_gpio_request;
+ 	port->gc.free = mxc_gpio_free;
+ 	port->gc.to_irq = mxc_gpio_to_irq;
+-	port->gc.base = (pdev->id < 0) ? of_alias_get_id(np, "gpio") * 32 :
+-					     pdev->id * 32;
++	port->gc.base = of_alias_get_id(np, "gpio") * 32;
+ 
+ 	err = devm_gpiochip_add_data(&pdev->dev, &port->gc, port);
+ 	if (err)
+-- 
+2.45.2
+
+
+From d063bec046a04c26bcabf90f36289c77ae51413f Mon Sep 17 00:00:00 2001
+From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+Date: Mon, 20 Jan 2025 14:24:30 +0530
+Subject: [PATCH 33/49] net: fec: implement TSO descriptor cleanup
+
+[ Upstream commit 61dc1fd9205bc9d9918aa933a847b08e80b4dc20 ]
+
+Implement cleanup of descriptors in the TSO error path of
+fec_enet_txq_submit_tso(). The cleanup
+
+- Unmaps DMA buffers for data descriptors skipping TSO header
+- Clears all buffer descriptors
+- Handles extended descriptors by clearing cbd_esc when enabled
+
+Fixes: 79f339125ea3 ("net: fec: Add software TSO support")
+Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+Reviewed-by: Wei Fang <wei.fang@nxp.com>
+Link: https://patch.msgid.link/20250120085430.99318-1-dheeraj.linuxdev@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/freescale/fec_main.c | 31 ++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 8f5cc1f23318..2d6b50903c92 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -821,6 +821,8 @@ static int fec_enet_txq_submit_tso(struct fec_enet_priv_tx_q *txq,
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+ 	int hdr_len, total_len, data_left;
+ 	struct bufdesc *bdp = txq->bd.cur;
++	struct bufdesc *tmp_bdp;
++	struct bufdesc_ex *ebdp;
+ 	struct tso_t tso;
+ 	unsigned int index = 0;
+ 	int ret;
+@@ -894,7 +896,34 @@ static int fec_enet_txq_submit_tso(struct fec_enet_priv_tx_q *txq,
+ 	return 0;
+ 
+ err_release:
+-	/* TODO: Release all used data descriptors for TSO */
++	/* Release all used data descriptors for TSO */
++	tmp_bdp = txq->bd.cur;
++
++	while (tmp_bdp != bdp) {
++		/* Unmap data buffers */
++		if (tmp_bdp->cbd_bufaddr &&
++		    !IS_TSO_HEADER(txq, fec32_to_cpu(tmp_bdp->cbd_bufaddr)))
++			dma_unmap_single(&fep->pdev->dev,
++					 fec32_to_cpu(tmp_bdp->cbd_bufaddr),
++					 fec16_to_cpu(tmp_bdp->cbd_datlen),
++					 DMA_TO_DEVICE);
++
++		/* Clear standard buffer descriptor fields */
++		tmp_bdp->cbd_sc = 0;
++		tmp_bdp->cbd_datlen = 0;
++		tmp_bdp->cbd_bufaddr = 0;
++
++		/* Handle extended descriptor if enabled */
++		if (fep->bufdesc_ex) {
++			ebdp = (struct bufdesc_ex *)tmp_bdp;
++			ebdp->cbd_esc = 0;
++		}
++
++		tmp_bdp = fec_enet_get_nextdesc(tmp_bdp, &txq->bd);
++	}
++
++	dev_kfree_skb_any(skb);
++
+ 	return ret;
+ }
+ 
+-- 
+2.45.2
+
+
+From b379b3162ff55a70464c6a934ae9bf0497478a62 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 21 Jan 2025 18:12:41 +0000
+Subject: [PATCH 34/49] ipmr: do not call mr_mfc_uses_dev() for unres entries
+
+[ Upstream commit 15a901361ec3fb1c393f91880e1cbf24ec0a88bd ]
+
+syzbot found that calling mr_mfc_uses_dev() for unres entries
+would crash [1], because c->mfc_un.res.minvif / c->mfc_un.res.maxvif
+alias to "struct sk_buff_head unresolved", which contain two pointers.
+
+This code never worked, lets remove it.
+
+[1]
+Unable to handle kernel paging request at virtual address ffff5fff2d536613
+KASAN: maybe wild-memory-access in range [0xfffefff96a9b3098-0xfffefff96a9b309f]
+Modules linked in:
+CPU: 1 UID: 0 PID: 7321 Comm: syz.0.16 Not tainted 6.13.0-rc7-syzkaller-g1950a0af2d55 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : mr_mfc_uses_dev net/ipv4/ipmr_base.c:290 [inline]
+ pc : mr_table_dump+0x5a4/0x8b0 net/ipv4/ipmr_base.c:334
+ lr : mr_mfc_uses_dev net/ipv4/ipmr_base.c:289 [inline]
+ lr : mr_table_dump+0x694/0x8b0 net/ipv4/ipmr_base.c:334
+Call trace:
+  mr_mfc_uses_dev net/ipv4/ipmr_base.c:290 [inline] (P)
+  mr_table_dump+0x5a4/0x8b0 net/ipv4/ipmr_base.c:334 (P)
+  mr_rtm_dumproute+0x254/0x454 net/ipv4/ipmr_base.c:382
+  ipmr_rtm_dumproute+0x248/0x4b4 net/ipv4/ipmr.c:2648
+  rtnl_dump_all+0x2e4/0x4e8 net/core/rtnetlink.c:4327
+  rtnl_dumpit+0x98/0x1d0 net/core/rtnetlink.c:6791
+  netlink_dump+0x4f0/0xbc0 net/netlink/af_netlink.c:2317
+  netlink_recvmsg+0x56c/0xe64 net/netlink/af_netlink.c:1973
+  sock_recvmsg_nosec net/socket.c:1033 [inline]
+  sock_recvmsg net/socket.c:1055 [inline]
+  sock_read_iter+0x2d8/0x40c net/socket.c:1125
+  new_sync_read fs/read_write.c:484 [inline]
+  vfs_read+0x740/0x970 fs/read_write.c:565
+  ksys_read+0x15c/0x26c fs/read_write.c:708
+
+Fixes: cb167893f41e ("net: Plumb support for filtering ipv4 and ipv6 multicast route dumps")
+Reported-by: syzbot+5cfae50c0e5f2c500013@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/678fe2d1.050a0220.15cac.00b3.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Link: https://patch.msgid.link/20250121181241.841212-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv4/ipmr_base.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
+index 03b6eee407a2..28d77d454d44 100644
+--- a/net/ipv4/ipmr_base.c
++++ b/net/ipv4/ipmr_base.c
+@@ -330,9 +330,6 @@ int mr_table_dump(struct mr_table *mrt, struct sk_buff *skb,
+ 	list_for_each_entry(mfc, &mrt->mfc_unres_queue, list) {
+ 		if (e < s_e)
+ 			goto next_entry2;
+-		if (filter->dev &&
+-		    !mr_mfc_uses_dev(mrt, mfc, filter->dev))
+-			goto next_entry2;
+ 
+ 		err = fill(mrt, skb, NETLINK_CB(cb->skb).portid,
+ 			   cb->nlh->nlmsg_seq, mfc, RTM_NEWROUTE, flags);
+-- 
+2.45.2
+
+
+From 02794e35ab0db32ad72d46afb5f02133b46d977b Mon Sep 17 00:00:00 2001
+From: Wentao Liang <vulab@iscas.ac.cn>
+Date: Sun, 19 Jan 2025 22:32:05 +0800
+Subject: [PATCH 35/49] PM: hibernate: Add error handling for syscore_suspend()
+
+[ Upstream commit e20a70c572539a486dbd91b225fa6a194a5e2122 ]
+
+In hibernation_platform_enter(), the code did not check the
+return value of syscore_suspend(), potentially leading to a
+situation where syscore_resume() would be called even if
+syscore_suspend() failed. This could cause unpredictable
+behavior or system instability.
+
+Modify the code sequence in question to properly handle errors returned
+by syscore_suspend(). If an error occurs in the suspend path, the code
+now jumps to label 'Enable_irqs' skipping the syscore_resume() call and
+only enabling interrupts after setting the system state to SYSTEM_RUNNING.
+
+Fixes: 40dc166cb5dd ("PM / Core: Introduce struct syscore_ops for core subsystems PM")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+Link: https://patch.msgid.link/20250119143205.2103-1-vulab@iscas.ac.cn
+[ rjw: Changelog edits ]
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ kernel/power/hibernate.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index 8d35b9f9aaa3..c2fc58938dee 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -599,7 +599,11 @@ int hibernation_platform_enter(void)
+ 
+ 	local_irq_disable();
+ 	system_state = SYSTEM_SUSPEND;
+-	syscore_suspend();
++
++	error = syscore_suspend();
++	if (error)
++		goto Enable_irqs;
++
+ 	if (pm_wakeup_pending()) {
+ 		error = -EAGAIN;
+ 		goto Power_up;
+@@ -611,6 +615,7 @@ int hibernation_platform_enter(void)
+ 
+  Power_up:
+ 	syscore_resume();
++ Enable_irqs:
+ 	system_state = SYSTEM_RUNNING;
+ 	local_irq_enable();
+ 
+-- 
+2.45.2
+
+
+From 5385c1d1c08fd79064b613a0658c4235299ddb50 Mon Sep 17 00:00:00 2001
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Date: Thu, 5 Sep 2024 11:14:10 +0200
+Subject: [PATCH 36/49] iavf: allow changing VLAN state without calling PF
+
+[ Upstream commit ee7d79433d783346430ee32f28c9df44a88b3bb6 ]
+
+First case:
+> ip l a l $VF name vlanx type vlan id 100
+> ip l d vlanx
+> ip l a l $VF name vlanx type vlan id 100
+
+As workqueue can be execute after sometime, there is a window to have
+call trace like that:
+- iavf_del_vlan
+- iavf_add_vlan
+- iavf_del_vlans (wq)
+
+It means that our VLAN 100 will change the state from IAVF_VLAN_ACTIVE
+to IAVF_VLAN_REMOVE (iavf_del_vlan). After that in iavf_add_vlan state
+won't be changed because VLAN 100 is on the filter list. The final
+result is that the VLAN 100 filter isn't added in hardware (no
+iavf_add_vlans call).
+
+To fix that change the state if the filter wasn't removed yet directly
+to active. It is save as IAVF_VLAN_REMOVE means that virtchnl message
+wasn't sent yet.
+
+Second case:
+> ip l a l $VF name vlanx type vlan id 100
+Any type of VF reset ex. change trust
+> ip l s $PF vf $VF_NUM trust on
+> ip l d vlanx
+> ip l a l $VF name vlanx type vlan id 100
+
+In case of reset iavf driver is responsible for readding all filters
+that are being used. To do that all VLAN filters state are changed to
+IAVF_VLAN_ADD. Here is even longer window for changing VLAN state from
+kernel side, as workqueue isn't called immediately. We can have call
+trace like that:
+
+- changing to IAVF_VLAN_ADD (after reset)
+- iavf_del_vlan (called from kernel ops)
+- iavf_del_vlans (wq)
+
+Not exsisitng VLAN filters will be removed from hardware. It isn't a
+bug, ice driver will handle it fine. However, we can have call trace
+like that:
+
+- changing to IAVF_VLAN_ADD (after reset)
+- iavf_del_vlan (called from kernel ops)
+- iavf_add_vlan (called from kernel ops)
+- iavf_del_vlans (wq)
+
+With fix for previous case we end up with no VLAN filters in hardware.
+We have to remove VLAN filters if the state is IAVF_VLAN_ADD and delete
+VLAN was called. It is save as IAVF_VLAN_ADD means that virtchnl message
+wasn't sent yet.
+
+Fixes: 0c0da0e95105 ("iavf: refactor VLAN filter states")
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index ce0b91999526..fde8d7b80ca6 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -801,6 +801,11 @@ iavf_vlan_filter *iavf_add_vlan(struct iavf_adapter *adapter,
+ 		f->state = IAVF_VLAN_ADD;
+ 		adapter->num_vlan_filters++;
+ 		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_VLAN_FILTER);
++	} else if (f->state == IAVF_VLAN_REMOVE) {
++		/* IAVF_VLAN_REMOVE means that VLAN wasn't yet removed.
++		 * We can safely only change the state here.
++		 */
++		f->state = IAVF_VLAN_ACTIVE;
+ 	}
+ 
+ clearout:
+@@ -821,8 +826,18 @@ static void iavf_del_vlan(struct iavf_adapter *adapter, struct iavf_vlan vlan)
+ 
+ 	f = iavf_find_vlan(adapter, vlan);
+ 	if (f) {
+-		f->state = IAVF_VLAN_REMOVE;
+-		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_VLAN_FILTER);
++		/* IAVF_ADD_VLAN means that VLAN wasn't even added yet.
++		 * Remove it from the list.
++		 */
++		if (f->state == IAVF_VLAN_ADD) {
++			list_del(&f->list);
++			kfree(f);
++			adapter->num_vlan_filters--;
++		} else {
++			f->state = IAVF_VLAN_REMOVE;
++			iavf_schedule_aq_request(adapter,
++						 IAVF_FLAG_AQ_DEL_VLAN_FILTER);
++		}
+ 	}
+ 
+ 	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+-- 
+2.45.2
+
+
+From 51c128ba038cf1b79d605cbee325919b45ab95a5 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 Jan 2025 18:02:44 +0000
+Subject: [PATCH 37/49] net: rose: fix timer races against user threads
+
+[ Upstream commit 5de7665e0a0746b5ad7943554b34db8f8614a196 ]
+
+Rose timers only acquire the socket spinlock, without
+checking if the socket is owned by one user thread.
+
+Add a check and rearm the timers if needed.
+
+BUG: KASAN: slab-use-after-free in rose_timer_expiry+0x31d/0x360 net/rose/rose_timer.c:174
+Read of size 2 at addr ffff88802f09b82a by task swapper/0/0
+
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc5-syzkaller-00172-gd1bf27c4e176 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <IRQ>
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:378 [inline]
+  print_report+0x169/0x550 mm/kasan/report.c:489
+  kasan_report+0x143/0x180 mm/kasan/report.c:602
+  rose_timer_expiry+0x31d/0x360 net/rose/rose_timer.c:174
+  call_timer_fn+0x187/0x650 kernel/time/timer.c:1793
+  expire_timers kernel/time/timer.c:1844 [inline]
+  __run_timers kernel/time/timer.c:2418 [inline]
+  __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2430
+  run_timer_base kernel/time/timer.c:2439 [inline]
+  run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2449
+  handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
+  __do_softirq kernel/softirq.c:595 [inline]
+  invoke_softirq kernel/softirq.c:435 [inline]
+  __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
+  irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
+  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20250122180244.1861468-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/rose/rose_timer.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/net/rose/rose_timer.c b/net/rose/rose_timer.c
+index f06ddbed3fed..1525773e94aa 100644
+--- a/net/rose/rose_timer.c
++++ b/net/rose/rose_timer.c
+@@ -122,6 +122,10 @@ static void rose_heartbeat_expiry(struct timer_list *t)
+ 	struct rose_sock *rose = rose_sk(sk);
+ 
+ 	bh_lock_sock(sk);
++	if (sock_owned_by_user(sk)) {
++		sk_reset_timer(sk, &sk->sk_timer, jiffies + HZ/20);
++		goto out;
++	}
+ 	switch (rose->state) {
+ 	case ROSE_STATE_0:
+ 		/* Magic here: If we listen() and a new link dies before it
+@@ -152,6 +156,7 @@ static void rose_heartbeat_expiry(struct timer_list *t)
+ 	}
+ 
+ 	rose_start_heartbeat(sk);
++out:
+ 	bh_unlock_sock(sk);
+ 	sock_put(sk);
+ }
+@@ -162,6 +167,10 @@ static void rose_timer_expiry(struct timer_list *t)
+ 	struct sock *sk = &rose->sock;
+ 
+ 	bh_lock_sock(sk);
++	if (sock_owned_by_user(sk)) {
++		sk_reset_timer(sk, &rose->timer, jiffies + HZ/20);
++		goto out;
++	}
+ 	switch (rose->state) {
+ 	case ROSE_STATE_1:	/* T1 */
+ 	case ROSE_STATE_4:	/* T2 */
+@@ -182,6 +191,7 @@ static void rose_timer_expiry(struct timer_list *t)
+ 		}
+ 		break;
+ 	}
++out:
+ 	bh_unlock_sock(sk);
+ 	sock_put(sk);
+ }
+@@ -192,6 +202,10 @@ static void rose_idletimer_expiry(struct timer_list *t)
+ 	struct sock *sk = &rose->sock;
+ 
+ 	bh_lock_sock(sk);
++	if (sock_owned_by_user(sk)) {
++		sk_reset_timer(sk, &rose->idletimer, jiffies + HZ/20);
++		goto out;
++	}
+ 	rose_clear_queues(sk);
+ 
+ 	rose_write_internal(sk, ROSE_CLEAR_REQUEST);
+@@ -207,6 +221,7 @@ static void rose_idletimer_expiry(struct timer_list *t)
+ 		sk->sk_state_change(sk);
+ 		sock_set_flag(sk, SOCK_DEAD);
+ 	}
++out:
+ 	bh_unlock_sock(sk);
+ 	sock_put(sk);
+ }
+-- 
+2.45.2
+
+
+From b91034314ad24a5dcdd4739035e9f787a9030a9e Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 22 Jan 2025 14:45:03 -0800
+Subject: [PATCH 38/49] net: netdevsim: try to close UDP port harness races
+
+[ Upstream commit 50bf398e1ceacb9a7f85bd3bdca065ebe5cb6159 ]
+
+syzbot discovered that we remove the debugfs files after we free
+the netdev. Try to clean up the relevant dir while the device
+is still around.
+
+Reported-by: syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com
+Fixes: 424be63ad831 ("netdevsim: add UDP tunnel port offload support")
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Link: https://patch.msgid.link/20250122224503.762705-1-kuba@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/netdevsim/netdevsim.h             |  1 +
+ drivers/net/netdevsim/udp_tunnels.c           | 23 +++++++++++--------
+ .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 16 ++++++-------
+ 3 files changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 028c825b86db..dfc6e00b718e 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -121,6 +121,7 @@ struct netdevsim {
+ 		u32 sleep;
+ 		u32 __ports[2][NSIM_UDP_TUNNEL_N_PORTS];
+ 		u32 (*ports)[NSIM_UDP_TUNNEL_N_PORTS];
++		struct dentry *ddir;
+ 		struct debugfs_u32_array dfs_ports[2];
+ 	} udp_ports;
+ 
+diff --git a/drivers/net/netdevsim/udp_tunnels.c b/drivers/net/netdevsim/udp_tunnels.c
+index 02dc3123eb6c..640b4983a9a0 100644
+--- a/drivers/net/netdevsim/udp_tunnels.c
++++ b/drivers/net/netdevsim/udp_tunnels.c
+@@ -112,9 +112,11 @@ nsim_udp_tunnels_info_reset_write(struct file *file, const char __user *data,
+ 	struct net_device *dev = file->private_data;
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 
+-	memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
+ 	rtnl_lock();
+-	udp_tunnel_nic_reset_ntf(dev);
++	if (dev->reg_state == NETREG_REGISTERED) {
++		memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
++		udp_tunnel_nic_reset_ntf(dev);
++	}
+ 	rtnl_unlock();
+ 
+ 	return count;
+@@ -144,23 +146,23 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
+ 	else
+ 		ns->udp_ports.ports = nsim_dev->udp_ports.__ports;
+ 
+-	debugfs_create_u32("udp_ports_inject_error", 0600,
+-			   ns->nsim_dev_port->ddir,
++	ns->udp_ports.ddir = debugfs_create_dir("udp_ports",
++						ns->nsim_dev_port->ddir);
++
++	debugfs_create_u32("inject_error", 0600, ns->udp_ports.ddir,
+ 			   &ns->udp_ports.inject_error);
+ 
+ 	ns->udp_ports.dfs_ports[0].array = ns->udp_ports.ports[0];
+ 	ns->udp_ports.dfs_ports[0].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
+-	debugfs_create_u32_array("udp_ports_table0", 0400,
+-				 ns->nsim_dev_port->ddir,
++	debugfs_create_u32_array("table0", 0400, ns->udp_ports.ddir,
+ 				 &ns->udp_ports.dfs_ports[0]);
+ 
+ 	ns->udp_ports.dfs_ports[1].array = ns->udp_ports.ports[1];
+ 	ns->udp_ports.dfs_ports[1].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
+-	debugfs_create_u32_array("udp_ports_table1", 0400,
+-				 ns->nsim_dev_port->ddir,
++	debugfs_create_u32_array("table1", 0400, ns->udp_ports.ddir,
+ 				 &ns->udp_ports.dfs_ports[1]);
+ 
+-	debugfs_create_file("udp_ports_reset", 0200, ns->nsim_dev_port->ddir,
++	debugfs_create_file("reset", 0200, ns->udp_ports.ddir,
+ 			    dev, &nsim_udp_tunnels_info_reset_fops);
+ 
+ 	/* Note: it's not normal to allocate the info struct like this!
+@@ -196,6 +198,9 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
+ 
+ void nsim_udp_tunnels_info_destroy(struct net_device *dev)
+ {
++	struct netdevsim *ns = netdev_priv(dev);
++
++	debugfs_remove_recursive(ns->udp_ports.ddir);
+ 	kfree(dev->udp_tunnel_nic_info);
+ 	dev->udp_tunnel_nic_info = NULL;
+ }
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+index 185b02d2d4cd..7af78990b5bb 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+@@ -142,7 +142,7 @@ function pre_ethtool {
+ }
+ 
+ function check_table {
+-    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
++    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
+     local -n expected=$2
+     local last=$3
+ 
+@@ -212,7 +212,7 @@ function check_tables {
+ }
+ 
+ function print_table {
+-    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
++    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
+     read -a have < $path
+ 
+     tree $NSIM_DEV_DFS/
+@@ -640,7 +640,7 @@ for port in 0 1; do
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+-    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
++    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
+ 
+     msg="1 - create VxLANs v6"
+     exp0=( 0 0 0 0 )
+@@ -662,7 +662,7 @@ for port in 0 1; do
+     new_geneve gnv0 20000
+ 
+     msg="2 - destroy GENEVE"
+-    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
++    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
+     exp1=( `mke 20000 2` 0 0 0 )
+     del_dev gnv0
+ 
+@@ -763,7 +763,7 @@ for port in 0 1; do
+     msg="create VxLANs v4"
+     new_vxlan vxlan0 10000 $NSIM_NETDEV
+ 
+-    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
++    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+     check_tables
+ 
+     msg="NIC device goes down"
+@@ -774,7 +774,7 @@ for port in 0 1; do
+     fi
+     check_tables
+ 
+-    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
++    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+     check_tables
+ 
+     msg="NIC device goes up again"
+@@ -788,7 +788,7 @@ for port in 0 1; do
+     del_dev vxlan0
+     check_tables
+ 
+-    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
++    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+     check_tables
+ 
+     msg="destroy NIC"
+@@ -895,7 +895,7 @@ msg="vacate VxLAN in overflow table"
+ exp0=( `mke 10000 1` `mke 10004 1` 0 `mke 10003 1` )
+ del_dev vxlan2
+ 
+-echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
++echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+ check_tables
+ 
+ msg="tunnels destroyed 2"
+-- 
+2.45.2
+
+
+From a84d511165d6ba7f331b90ae6b6ce180ec534daa Mon Sep 17 00:00:00 2001
+From: Shigeru Yoshida <syoshida@redhat.com>
+Date: Thu, 23 Jan 2025 23:57:46 +0900
+Subject: [PATCH 39/49] vxlan: Fix uninit-value in vxlan_vnifilter_dump()
+
+[ Upstream commit 5066293b9b7046a906eff60e3949a887ae185a43 ]
+
+KMSAN reported an uninit-value access in vxlan_vnifilter_dump() [1].
+
+If the length of the netlink message payload is less than
+sizeof(struct tunnel_msg), vxlan_vnifilter_dump() accesses bytes
+beyond the message. This can lead to uninit-value access. Fix this by
+returning an error in such situations.
+
+[1]
+BUG: KMSAN: uninit-value in vxlan_vnifilter_dump+0x328/0x920 drivers/net/vxlan/vxlan_vnifilter.c:422
+ vxlan_vnifilter_dump+0x328/0x920 drivers/net/vxlan/vxlan_vnifilter.c:422
+ rtnl_dumpit+0xd5/0x2f0 net/core/rtnetlink.c:6786
+ netlink_dump+0x93e/0x15f0 net/netlink/af_netlink.c:2317
+ __netlink_dump_start+0x716/0xd60 net/netlink/af_netlink.c:2432
+ netlink_dump_start include/linux/netlink.h:340 [inline]
+ rtnetlink_dump_start net/core/rtnetlink.c:6815 [inline]
+ rtnetlink_rcv_msg+0x1256/0x14a0 net/core/rtnetlink.c:6882
+ netlink_rcv_skb+0x467/0x660 net/netlink/af_netlink.c:2542
+ rtnetlink_rcv+0x35/0x40 net/core/rtnetlink.c:6944
+ netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+ netlink_unicast+0xed6/0x1290 net/netlink/af_netlink.c:1347
+ netlink_sendmsg+0x1092/0x1230 net/netlink/af_netlink.c:1891
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:726
+ ____sys_sendmsg+0x7f4/0xb50 net/socket.c:2583
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2637
+ __sys_sendmsg net/socket.c:2669 [inline]
+ __do_sys_sendmsg net/socket.c:2674 [inline]
+ __se_sys_sendmsg net/socket.c:2672 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2672
+ x64_sys_call+0x3878/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4110 [inline]
+ slab_alloc_node mm/slub.c:4153 [inline]
+ kmem_cache_alloc_node_noprof+0x800/0xe80 mm/slub.c:4205
+ kmalloc_reserve+0x13b/0x4b0 net/core/skbuff.c:587
+ __alloc_skb+0x347/0x7d0 net/core/skbuff.c:678
+ alloc_skb include/linux/skbuff.h:1323 [inline]
+ netlink_alloc_large_skb+0xa5/0x280 net/netlink/af_netlink.c:1196
+ netlink_sendmsg+0xac9/0x1230 net/netlink/af_netlink.c:1866
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:726
+ ____sys_sendmsg+0x7f4/0xb50 net/socket.c:2583
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2637
+ __sys_sendmsg net/socket.c:2669 [inline]
+ __do_sys_sendmsg net/socket.c:2674 [inline]
+ __se_sys_sendmsg net/socket.c:2672 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2672
+ x64_sys_call+0x3878/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 30991 Comm: syz.4.10630 Not tainted 6.12.0-10694-gc44daa7e3c73 #29
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20250123145746.785768-1-syoshida@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/vxlan/vxlan_vnifilter.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+index d2023e7131bd..6e6e9f05509a 100644
+--- a/drivers/net/vxlan/vxlan_vnifilter.c
++++ b/drivers/net/vxlan/vxlan_vnifilter.c
+@@ -411,6 +411,11 @@ static int vxlan_vnifilter_dump(struct sk_buff *skb, struct netlink_callback *cb
+ 	struct tunnel_msg *tmsg;
+ 	struct net_device *dev;
+ 
++	if (cb->nlh->nlmsg_len < nlmsg_msg_size(sizeof(struct tunnel_msg))) {
++		NL_SET_ERR_MSG(cb->extack, "Invalid msg length");
++		return -EINVAL;
++	}
++
+ 	tmsg = nlmsg_data(cb->nlh);
+ 
+ 	if (tmsg->flags & ~TUNNEL_MSG_VALID_USER_FLAGS) {
+-- 
+2.45.2
+
+
+From c411f9a5fdc9158e8f7c57eac961d3df3eb4d8ca Mon Sep 17 00:00:00 2001
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+Date: Thu, 23 Jan 2025 15:42:13 -0600
+Subject: [PATCH 40/49] net: davicom: fix UAF in dm9000_drv_remove
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 19e65c45a1507a1a2926649d2db3583ed9d55fd9 ]
+
+dm is netdev private data and it cannot be
+used after free_netdev() call. Using dm after free_netdev()
+can cause UAF bug. Fix it by moving free_netdev() at the end of the
+function.
+
+This is similar to the issue fixed in commit
+ad297cd2db89 ("net: qcom/emac: fix UAF in emac_remove").
+
+This bug is detected by our static analysis tool.
+
+Fixes: cf9e60aa69ae ("net: davicom: Fix regulator not turned off on driver removal")
+Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+CC: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Link: https://patch.msgid.link/20250123214213.623518-1-chenyuan0y@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/davicom/dm9000.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/davicom/dm9000.c b/drivers/net/ethernet/davicom/dm9000.c
+index 05a89ab6766c..bd38f2f57c8a 100644
+--- a/drivers/net/ethernet/davicom/dm9000.c
++++ b/drivers/net/ethernet/davicom/dm9000.c
+@@ -1778,10 +1778,11 @@ dm9000_drv_remove(struct platform_device *pdev)
+ 
+ 	unregister_netdev(ndev);
+ 	dm9000_release_board(pdev, dm);
+-	free_netdev(ndev);		/* free device structure */
+ 	if (dm->power_supply)
+ 		regulator_disable(dm->power_supply);
+ 
++	free_netdev(ndev);		/* free device structure */
++
+ 	dev_dbg(&pdev->dev, "released and freed device\n");
+ 	return 0;
+ }
+-- 
+2.45.2
+
+
+From 2a6d1e1d022bf1b3dce34b7d25d3783f59006561 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Sat, 25 Jan 2025 10:28:38 +0100
+Subject: [PATCH 41/49] ptp: Properly handle compat ioctls
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 19ae40f572a9ce1ade9954990af709a03fd37010 ]
+
+Pointer arguments passed to ioctls need to pass through compat_ptr() to
+work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
+Detect compat mode at runtime and call compat_ptr() for those commands
+which do take pointer arguments.
+
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Link: https://lore.kernel.org/lkml/1ba5d3a4-7931-455b-a3ce-85a968a7cb10@app.fastmail.com/
+Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Reviewed-by: Cyrill Gorcunov <gorcunov@gmail.com>
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Richard Cochran <richardcochran@gmail.com>
+Link: https://patch.msgid.link/20250125-posix-clock-compat_ioctl-v2-1-11c865c500eb@weissschuh.net
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/ptp/ptp_chardev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 91cc6ffa0095..6f6019fb41c0 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -4,6 +4,7 @@
+  *
+  * Copyright (C) 2010 OMICRON electronics GmbH
+  */
++#include <linux/compat.h>
+ #include <linux/module.h>
+ #include <linux/posix-clock.h>
+ #include <linux/poll.h>
+@@ -124,6 +125,9 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
+ 	struct timespec64 ts;
+ 	int enable, err = 0;
+ 
++	if (in_compat_syscall() && cmd != PTP_ENABLE_PPS && cmd != PTP_ENABLE_PPS2)
++		arg = (unsigned long)compat_ptr(arg);
++
+ 	switch (cmd) {
+ 
+ 	case PTP_CLOCK_GETCAPS:
+-- 
+2.45.2
+
+
+From 80083bd4c214ae15a5a906330ace6266548610de Mon Sep 17 00:00:00 2001
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Date: Mon, 27 Jan 2025 10:38:18 +0900
+Subject: [PATCH 42/49] net: stmmac: Limit the number of MTL queues to hardware
+ capability
+
+[ Upstream commit f5fb35a3d6b36d378b2e2ecbfb9caa337d5428e6 ]
+
+The number of MTL queues to use is specified by the parameter
+"snps,{tx,rx}-queues-to-use" from stmmac_platform layer.
+
+However, the maximum numbers of queues are constrained by upper limits
+determined by the capability of each hardware feature. It's appropriate
+to limit the values not to exceed the upper limit values and display
+a warning message.
+
+This only works if the hardware capability has the upper limit values.
+
+Fixes: d976a525c371 ("net: stmmac: multiple queues dt configuration")
+Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Reviewed-by: Yanteng Si <si.yanteng@linux.dev>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index d6ee90fef2ec..48ad12bca956 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7103,6 +7103,21 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+ 	if (priv->dma_cap.tsoen)
+ 		dev_info(priv->device, "TSO supported\n");
+ 
++	if (priv->dma_cap.number_rx_queues &&
++	    priv->plat->rx_queues_to_use > priv->dma_cap.number_rx_queues) {
++		dev_warn(priv->device,
++			 "Number of Rx queues (%u) exceeds dma capability\n",
++			 priv->plat->rx_queues_to_use);
++		priv->plat->rx_queues_to_use = priv->dma_cap.number_rx_queues;
++	}
++	if (priv->dma_cap.number_tx_queues &&
++	    priv->plat->tx_queues_to_use > priv->dma_cap.number_tx_queues) {
++		dev_warn(priv->device,
++			 "Number of Tx queues (%u) exceeds dma capability\n",
++			 priv->plat->tx_queues_to_use);
++		priv->plat->tx_queues_to_use = priv->dma_cap.number_tx_queues;
++	}
++
+ 	priv->hw->vlan_fail_q_en =
+ 		(priv->plat->flags & STMMAC_FLAG_VLAN_FAIL_Q_EN);
+ 	priv->hw->vlan_fail_q = priv->plat->vlan_fail_q;
+-- 
+2.45.2
+
+
+From 6d3693d402a81043d6231fcb31e2bf6acb4cb4ef Mon Sep 17 00:00:00 2001
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Date: Mon, 27 Jan 2025 10:38:19 +0900
+Subject: [PATCH 43/49] net: stmmac: Limit FIFO size by hardware capability
+
+[ Upstream commit 044f2fbaa2725696ecbf1f02ba7ab0a8ccb7e1ae ]
+
+Tx/Rx FIFO size is specified by the parameter "{tx,rx}-fifo-depth" from
+stmmac_platform layer.
+
+However, these values are constrained by upper limits determined by the
+capabilities of each hardware feature. There is a risk that the upper
+bits will be truncated due to the calculation, so it's appropriate to
+limit them to the upper limit values and display a warning message.
+
+This only works if the hardware capability has the upper limit values.
+
+Fixes: e7877f52fd4a ("stmmac: Read tx-fifo-depth and rx-fifo-depth from the devicetree")
+Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Reviewed-by: Yanteng Si <si.yanteng@linux.dev>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 48ad12bca956..d3d5c01f6dcb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7118,6 +7118,21 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+ 		priv->plat->tx_queues_to_use = priv->dma_cap.number_tx_queues;
+ 	}
+ 
++	if (priv->dma_cap.rx_fifo_size &&
++	    priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
++		dev_warn(priv->device,
++			 "Rx FIFO size (%u) exceeds dma capability\n",
++			 priv->plat->rx_fifo_size);
++		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
++	}
++	if (priv->dma_cap.tx_fifo_size &&
++	    priv->plat->tx_fifo_size > priv->dma_cap.tx_fifo_size) {
++		dev_warn(priv->device,
++			 "Tx FIFO size (%u) exceeds dma capability\n",
++			 priv->plat->tx_fifo_size);
++		priv->plat->tx_fifo_size = priv->dma_cap.tx_fifo_size;
++	}
++
+ 	priv->hw->vlan_fail_q_en =
+ 		(priv->plat->flags & STMMAC_FLAG_VLAN_FAIL_Q_EN);
+ 	priv->hw->vlan_fail_q = priv->plat->vlan_fail_q;
+-- 
+2.45.2
+
+
+From d2cd915aea83c6e8993ee239492076c36ffba6e1 Mon Sep 17 00:00:00 2001
+From: Howard Chu <howardchu95@gmail.com>
+Date: Tue, 21 Jan 2025 18:55:19 -0800
+Subject: [PATCH 44/49] perf trace: Fix runtime error of index out of bounds
+
+[ Upstream commit c7b87ce0dd10b64b68a0b22cb83bbd556e28fe81 ]
+
+libtraceevent parses and returns an array of argument fields, sometimes
+larger than RAW_SYSCALL_ARGS_NUM (6) because it includes "__syscall_nr",
+idx will traverse to index 6 (7th element) whereas sc->fmt->arg holds 6
+elements max, creating an out-of-bounds access. This runtime error is
+found by UBsan. The error message:
+
+  $ sudo UBSAN_OPTIONS=print_stacktrace=1 ./perf trace -a --max-events=1
+  builtin-trace.c:1966:35: runtime error: index 6 out of bounds for type 'syscall_arg_fmt [6]'
+    #0 0x5c04956be5fe in syscall__alloc_arg_fmts /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:1966
+    #1 0x5c04956c0510 in trace__read_syscall_info /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:2110
+    #2 0x5c04956c372b in trace__syscall_info /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:2436
+    #3 0x5c04956d2f39 in trace__init_syscalls_bpf_prog_array_maps /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:3897
+    #4 0x5c04956d6d25 in trace__run /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:4335
+    #5 0x5c04956e112e in cmd_trace /home/howard/hw/linux-perf/tools/perf/builtin-trace.c:5502
+    #6 0x5c04956eda7d in run_builtin /home/howard/hw/linux-perf/tools/perf/perf.c:351
+    #7 0x5c04956ee0a8 in handle_internal_command /home/howard/hw/linux-perf/tools/perf/perf.c:404
+    #8 0x5c04956ee37f in run_argv /home/howard/hw/linux-perf/tools/perf/perf.c:448
+    #9 0x5c04956ee8e9 in main /home/howard/hw/linux-perf/tools/perf/perf.c:556
+    #10 0x79eb3622a3b7 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #11 0x79eb3622a47a in __libc_start_main_impl ../csu/libc-start.c:360
+    #12 0x5c04955422d4 in _start (/home/howard/hw/linux-perf/tools/perf/perf+0x4e02d4) (BuildId: 5b6cab2d59e96a4341741765ad6914a4d784dbc6)
+
+     0.000 ( 0.014 ms): Chrome_ChildIO/117244 write(fd: 238, buf: !, count: 1)                                      = 1
+
+Fixes: 5e58fcfaf4c6 ("perf trace: Allow allocating sc->arg_fmt even without the syscall tracepoint")
+Signed-off-by: Howard Chu <howardchu95@gmail.com>
+Link: https://lore.kernel.org/r/20250122025519.361873-1-howardchu95@gmail.com
+Signed-off-by: Namhyung Kim <namhyung@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ tools/perf/builtin-trace.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tools/perf/builtin-trace.c b/tools/perf/builtin-trace.c
+index 3ecd6868be2d..12bdbf3ecc6a 100644
+--- a/tools/perf/builtin-trace.c
++++ b/tools/perf/builtin-trace.c
+@@ -1850,8 +1850,12 @@ static int trace__read_syscall_info(struct trace *trace, int id)
+ 		return PTR_ERR(sc->tp_format);
+ 	}
+ 
++	/*
++	 * The tracepoint format contains __syscall_nr field, so it's one more
++	 * than the actual number of syscall arguments.
++	 */
+ 	if (syscall__alloc_arg_fmts(sc, IS_ERR(sc->tp_format) ?
+-					RAW_SYSCALL_ARGS_NUM : sc->tp_format->format.nr_fields))
++					RAW_SYSCALL_ARGS_NUM : sc->tp_format->format.nr_fields - 1))
+ 		return -ENOMEM;
+ 
+ 	sc->args = sc->tp_format->format.fields;
+-- 
+2.45.2
+
+
+From 3924c153761c4dd44f1ef1b5c94a7313f90f8336 Mon Sep 17 00:00:00 2001
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Date: Mon, 20 Jan 2025 19:49:46 +0530
+Subject: [PATCH 45/49] Bluetooth: btnxpuart: Fix glitches seen in dual A2DP
+ streaming
+
+[ Upstream commit 7de119bb79a63f6a1959b83117a98734914fb0b0 ]
+
+This fixes a regression caused by previous commit for fixing truncated
+ACL data, which is causing some intermittent glitches when running two
+A2DP streams.
+
+serdev_device_write_buf() is the root cause of the glitch, which is
+reverted, and the TX work will continue to write until the queue is empty.
+
+This change fixes both issues. No A2DP streaming glitches or truncated
+ACL data issue observed.
+
+Fixes: 8023dd220425 ("Bluetooth: btnxpuart: Fix driver sending truncated data")
+Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/btnxpuart.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index e809bb2dbe5e..a4274d8c7faa 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1280,13 +1280,12 @@ static void btnxpuart_tx_work(struct work_struct *work)
+ 
+ 	while ((skb = nxp_dequeue(nxpdev))) {
+ 		len = serdev_device_write_buf(serdev, skb->data, skb->len);
+-		serdev_device_wait_until_sent(serdev, 0);
+ 		hdev->stat.byte_tx += len;
+ 
+ 		skb_pull(skb, len);
+ 		if (skb->len > 0) {
+ 			skb_queue_head(&nxpdev->txq, skb);
+-			break;
++			continue;
+ 		}
+ 
+ 		switch (hci_skb_pkt_type(skb)) {
+-- 
+2.45.2
+
+
+From 77ad90dd18aec27700a69239938eda597ef7d8e7 Mon Sep 17 00:00:00 2001
+From: Michal Luczaj <mhal@rbox.co>
+Date: Tue, 28 Jan 2025 14:15:28 +0100
+Subject: [PATCH 46/49] vsock: Allow retrying on connect() failure
+
+[ Upstream commit aa388c72113b7458127b709bdd7d3628af26e9b4 ]
+
+sk_err is set when a (connectible) connect() fails. Effectively, this makes
+an otherwise still healthy SS_UNCONNECTED socket impossible to use for any
+subsequent connection attempts.
+
+Clear sk_err upon trying to establish a connection.
+
+Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Link: https://patch.msgid.link/20250128-vsock-transport-vs-autobind-v3-2-1cf57065b770@rbox.co
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/vmw_vsock/af_vsock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 2050d888df2a..f4dbf5f87962 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -1453,6 +1453,11 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+ 		if (err < 0)
+ 			goto out;
+ 
++		/* sk_err might have been set as a result of an earlier
++		 * (failed) connect attempt.
++		 */
++		sk->sk_err = 0;
++
+ 		/* Mark sock as connecting and set the error code to in
+ 		 * progress in case this is a non-blocking connect.
+ 		 */
+-- 
+2.45.2
+
+
+From 5e6e723675e54ced5200bcc367e2526badc4070c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
+Date: Mon, 27 Jan 2025 09:51:59 -0800
+Subject: [PATCH 47/49] bgmac: reduce max frame size to support just MTU 1500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 752e5fcc2e77358936d36ef8e522d6439372e201 ]
+
+bgmac allocates new replacement buffer before handling each received
+frame. Allocating & DMA-preparing 9724 B each time consumes a lot of CPU
+time. Ideally bgmac should just respect currently set MTU but it isn't
+the case right now. For now just revert back to the old limited frame
+size.
+
+This change bumps NAT masquerade speed by ~95%.
+
+Since commit 8218f62c9c9b ("mm: page_frag: use initial zero offset for
+page_frag_alloc_align()"), the bgmac driver fails to open its network
+interface successfully and runs out of memory in the following call
+stack:
+
+bgmac_open
+  -> bgmac_dma_init
+    -> bgmac_dma_rx_skb_for_slot
+      -> netdev_alloc_frag
+
+BGMAC_RX_ALLOC_SIZE = 10048 and PAGE_FRAG_CACHE_MAX_SIZE = 32768.
+
+Eventually we land into __page_frag_alloc_align() with the following
+parameters across multiple successive calls:
+
+__page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=0
+__page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=10048
+__page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=20096
+__page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=30144
+
+So in that case we do indeed have offset + fragsz (40192) > size (32768)
+and so we would eventually return NULL. Reverting to the older 1500
+bytes MTU allows the network driver to be usable again.
+
+Fixes: 8c7da63978f1 ("bgmac: configure MTU and add support for frames beyond 8192 byte size")
+Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+[florian: expand commit message about recent commits]
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Link: https://patch.msgid.link/20250127175159.1788246-1-florian.fainelli@broadcom.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/bgmac.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bgmac.h b/drivers/net/ethernet/broadcom/bgmac.h
+index d73ef262991d..6fee9a41839c 100644
+--- a/drivers/net/ethernet/broadcom/bgmac.h
++++ b/drivers/net/ethernet/broadcom/bgmac.h
+@@ -328,8 +328,7 @@
+ #define BGMAC_RX_FRAME_OFFSET			30		/* There are 2 unused bytes between header and real data */
+ #define BGMAC_RX_BUF_OFFSET			(NET_SKB_PAD + NET_IP_ALIGN - \
+ 						 BGMAC_RX_FRAME_OFFSET)
+-/* Jumbo frame size with FCS */
+-#define BGMAC_RX_MAX_FRAME_SIZE			9724
++#define BGMAC_RX_MAX_FRAME_SIZE			1536
+ #define BGMAC_RX_BUF_SIZE			(BGMAC_RX_FRAME_OFFSET + BGMAC_RX_MAX_FRAME_SIZE)
+ #define BGMAC_RX_ALLOC_SIZE			(SKB_DATA_ALIGN(BGMAC_RX_BUF_SIZE + BGMAC_RX_BUF_OFFSET) + \
+ 						 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
+-- 
+2.45.2
+
+
+From b01e7ceb35dcb7ffad413da657b78c3340a09039 Mon Sep 17 00:00:00 2001
+From: Jon Maloy <jmaloy@redhat.com>
+Date: Mon, 27 Jan 2025 18:13:04 -0500
+Subject: [PATCH 48/49] tcp: correct handling of extreme memory squeeze
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 8c670bdfa58e48abad1d5b6ca1ee843ca91f7303 ]
+
+Testing with iperf3 using the "pasta" protocol splicer has revealed
+a problem in the way tcp handles window advertising in extreme memory
+squeeze situations.
+
+Under memory pressure, a socket endpoint may temporarily advertise
+a zero-sized window, but this is not stored as part of the socket data.
+The reasoning behind this is that it is considered a temporary setting
+which shouldn't influence any further calculations.
+
+However, if we happen to stall at an unfortunate value of the current
+window size, the algorithm selecting a new value will consistently fail
+to advertise a non-zero window once we have freed up enough memory.
+This means that this side's notion of the current window size is
+different from the one last advertised to the peer, causing the latter
+to not send any data to resolve the sitution.
+
+The problem occurs on the iperf3 server side, and the socket in question
+is a completely regular socket with the default settings for the
+fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
+
+The following excerpt of a logging session, with own comments added,
+shows more in detail what is happening:
+
+//              tcp_v4_rcv(->)
+//                tcp_rcv_established(->)
+[5201<->39222]:     ==== Activating log @ net/ipv4/tcp_input.c/tcp_data_queue()/5257 ====
+[5201<->39222]:     tcp_data_queue(->)
+[5201<->39222]:        DROPPING skb [265600160..265665640], reason: SKB_DROP_REASON_PROTO_MEM
+                       [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+                       [copied_seq 259909392->260034360 (124968), unread 5565800, qlen 85, ofoq 0]
+                       [OFO queue: gap: 65480, len: 0]
+[5201<->39222]:     tcp_data_queue(<-)
+[5201<->39222]:     __tcp_transmit_skb(->)
+                        [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+[5201<->39222]:       tcp_select_window(->)
+[5201<->39222]:         (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM) ? --> TRUE
+                        [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+                        returning 0
+[5201<->39222]:       tcp_select_window(<-)
+[5201<->39222]:       ADVERTISING WIN 0, ACK_SEQ: 265600160
+[5201<->39222]:     [__tcp_transmit_skb(<-)
+[5201<->39222]:   tcp_rcv_established(<-)
+[5201<->39222]: tcp_v4_rcv(<-)
+
+// Receive queue is at 85 buffers and we are out of memory.
+// We drop the incoming buffer, although it is in sequence, and decide
+// to send an advertisement with a window of zero.
+// We don't update tp->rcv_wnd and tp->rcv_wup accordingly, which means
+// we unconditionally shrink the window.
+
+[5201<->39222]: tcp_recvmsg_locked(->)
+[5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+[5201<->39222]:     [new_win = 0, win_now = 131184, 2 * win_now = 262368]
+[5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+[5201<->39222]:     NOT calling tcp_send_ack()
+                    [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+[5201<->39222]:   __tcp_cleanup_rbuf(<-)
+                  [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+                  [copied_seq 260040464->260040464 (0), unread 5559696, qlen 85, ofoq 0]
+                  returning 6104 bytes
+[5201<->39222]: tcp_recvmsg_locked(<-)
+
+// After each read, the algorithm for calculating the new receive
+// window in __tcp_cleanup_rbuf() finds it is too small to advertise
+// or to update tp->rcv_wnd.
+// Meanwhile, the peer thinks the window is zero, and will not send
+// any more data to trigger an update from the interrupt mode side.
+
+[5201<->39222]: tcp_recvmsg_locked(->)
+[5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+[5201<->39222]:     [new_win = 262144, win_now = 131184, 2 * win_now = 262368]
+[5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+[5201<->39222]:     NOT calling tcp_send_ack()
+                    [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+[5201<->39222]:   __tcp_cleanup_rbuf(<-)
+                  [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+                  [copied_seq 260099840->260171536 (71696), unread 5428624, qlen 83, ofoq 0]
+                  returning 131072 bytes
+[5201<->39222]: tcp_recvmsg_locked(<-)
+
+// The above pattern repeats again and again, since nothing changes
+// between the reads.
+
+[...]
+
+[5201<->39222]: tcp_recvmsg_locked(->)
+[5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+[5201<->39222]:     [new_win = 262144, win_now = 131184, 2 * win_now = 262368]
+[5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+[5201<->39222]:     NOT calling tcp_send_ack()
+                    [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+[5201<->39222]:   __tcp_cleanup_rbuf(<-)
+                  [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+                  [copied_seq 265600160->265600160 (0), unread 0, qlen 0, ofoq 0]
+                  returning 54672 bytes
+[5201<->39222]: tcp_recvmsg_locked(<-)
+
+// The receive queue is empty, but no new advertisement has been sent.
+// The peer still thinks the receive window is zero, and sends nothing.
+// We have ended up in a deadlock situation.
+
+Note that well behaved endpoints will send win0 probes, so the problem
+will not occur.
+
+Furthermore, we have observed that in these situations this side may
+send out an updated 'th->ack_seq´ which is not stored in tp->rcv_wup
+as it should be. Backing ack_seq seems to be harmless, but is of
+course still wrong from a protocol viewpoint.
+
+We fix this by updating the socket state correctly when a packet has
+been dropped because of memory exhaustion and we have to advertize
+a zero window.
+
+Further testing shows that the connection recovers neatly from the
+squeeze situation, and traffic can continue indefinitely.
+
+Fixes: e2142825c120 ("net: tcp: send zero-window ACK when no memory")
+Cc: Menglong Dong <menglong8.dong@gmail.com>
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Link: https://patch.msgid.link/20250127231304.1465565-1-jmaloy@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv4/tcp_output.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index cfddc94508f0..3771ed22c2f5 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -263,11 +263,14 @@ static u16 tcp_select_window(struct sock *sk)
+ 	u32 cur_win, new_win;
+ 
+ 	/* Make the window 0 if we failed to queue the data because we
+-	 * are out of memory. The window is temporary, so we don't store
+-	 * it on the socket.
++	 * are out of memory.
+ 	 */
+-	if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM))
++	if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)) {
++		tp->pred_flags = 0;
++		tp->rcv_wnd = 0;
++		tp->rcv_wup = tp->rcv_nxt;
+ 		return 0;
++	}
+ 
+ 	cur_win = tcp_receive_window(tp);
+ 	new_win = __tcp_select_window(sk);
+-- 
+2.45.2
+
+
+From b1bc4a35a04cbeb85b6ef5911ec015baa424989f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Date: Mon, 27 Jan 2025 14:13:42 +0100
+Subject: [PATCH 49/49] net: xdp: Disallow attaching device-bound programs in
+ generic mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 3595599fa8360bb3c7afa7ee50c810b4a64106ea ]
+
+Device-bound programs are used to support RX metadata kfuncs. These
+kfuncs are driver-specific and rely on the driver context to read the
+metadata. This means they can't work in generic XDP mode. However, there
+is no check to disallow such programs from being attached in generic
+mode, in which case the metadata kfuncs will be called in an invalid
+context, leading to crashes.
+
+Fix this by adding a check to disallow attaching device-bound programs
+in generic mode.
+
+Fixes: 2b3486bc2d23 ("bpf: Introduce device-bound XDP programs")
+Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Closes: https://lore.kernel.org/r/dae862ec-43b5-41a0-8edf-46c59071cdda@hetzner-cloud.de
+Tested-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+Link: https://patch.msgid.link/20250127131344.238147-1-toke@redhat.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/dev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 69da7b009f8b..479a3892f98c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9346,6 +9346,10 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
+ 			NL_SET_ERR_MSG(extack, "Program bound to different device");
+ 			return -EINVAL;
+ 		}
++		if (bpf_prog_is_dev_bound(new_prog->aux) && mode == XDP_MODE_SKB) {
++			NL_SET_ERR_MSG(extack, "Can't attach device-bound programs in generic mode");
++			return -EINVAL;
++		}
+ 		if (new_prog->expected_attach_type == BPF_XDP_DEVMAP) {
+ 			NL_SET_ERR_MSG(extack, "BPF_XDP_DEVMAP programs can not be attached to a device");
+ 			return -EINVAL;
+-- 
+2.45.2
+
