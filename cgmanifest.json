@@ -24573,8 +24573,8 @@
         "type": "other",
         "other": {
           "name": "python-semantic_version",
-          "version": "2.8.4",
-          "downloadUrl": "https://github.com/rbarrois/python-semanticversion/archive/v2.8.4/semantic_version-2.8.4.tar.gz"
+          "version": "2.10.0",
+          "downloadUrl": "https://github.com/rbarrois/python-semanticversion/archive/2.10.0/python-semanticversion-2.10.0.tar.gz"
         }
       }
     },
