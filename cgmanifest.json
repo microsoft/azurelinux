@@ -20373,8 +20373,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Warn",
-          "version": "0.36",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BI/BIGJ/Test-Warn-0.36.tar.gz"
+          "version": "0.37",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Warn-0.37.tar.gz"
         }
       }
     },
