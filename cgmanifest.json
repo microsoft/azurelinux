@@ -13221,8 +13221,8 @@
         "type": "other",
         "other": {
           "name": "minicom",
-          "version": "2.7.1",
-          "downloadUrl": "https://alioth.debian.org/frs/download.php/file/4215/minicom-2.7.1.tar.gz"
+          "version": "2.9",
+          "downloadUrl": "https://salsa.debian.org/minicom-team/minicom/-/archive/2.9/minicom-2.9.tar.gz"
         }
       }
     },
