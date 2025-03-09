@@ -28246,8 +28246,8 @@
         "type": "other",
         "other": {
           "name": "spausedd",
-          "version": "20201112",
-          "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20201112/spausedd-20201112.tar.gz"
+          "version": "20210719",
+          "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20210719/spausedd-20210719.tar.gz"
         }
       }
     },
