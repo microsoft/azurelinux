@@ -1,0 +1,12 @@
+diff -up suds-1.1.1/setup.py.pkg_name suds-1.1.1/setup.py
+--- suds-1.1.1/setup.py.pkg_name	2022-05-02 15:35:35.000000000 -0400
++++ suds-1.1.1/setup.py	2022-05-28 17:08:08.819608025 -0400
+@@ -645,7 +645,7 @@ licensed under LGPL (see the LICENSE.txt
+ distribution).
+ """
+ 
+-package_name = os.environ.get('SUDS_PACKAGE', 'suds-community')
++package_name = os.environ.get('SUDS_PACKAGE', 'suds')
+ version_tag = safe_version(__version__)
+ project_url = "https://github.com/suds-community/suds"
+ base_download_url = project_url + "/archive"
