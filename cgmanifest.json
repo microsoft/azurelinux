@@ -20983,8 +20983,8 @@
         "type": "other",
         "other": {
           "name": "perl-YAML-Syck",
-          "version": "1.32",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-Syck-1.32.tar.gz"
+          "version": "1.34",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-Syck-1.34.tar.gz"
         }
       }
     },
