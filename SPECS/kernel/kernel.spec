@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.64.2
-Release:        1000%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -428,9 +428,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.64.2-1000
-- Test build
-
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
 - Apply upstream patches to fix kernel panic in jitterentropy initialization on
   ARM64 FIPS boot
