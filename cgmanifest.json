@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "bats",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/bats-core/bats-core/archive/v1.2.1.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/bats-core/bats-core/archive/v1.11.0.tar.gz"
         }
       }
     },
