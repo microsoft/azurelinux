@@ -15102,8 +15102,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-tyxml",
-          "version": "4.5.0",
-          "downloadUrl": "https://github.com/ocsigen/tyxml/releases/download/4.5.0/tyxml-4.5.0.tbz"
+          "version": "4.6.0",
+          "downloadUrl": "https://github.com/ocsigen/tyxml/releases/download/4.6.0/tyxml-4.6.0.tbz"
         }
       }
     },
