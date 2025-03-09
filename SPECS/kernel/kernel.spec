@@ -46,7 +46,8 @@ Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
 Patch2:         1-194.patch
-Patch3:         195-291.patch
+Patch3:         195-255.patch
+Patch4:         256-291.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
