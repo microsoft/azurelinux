@@ -21003,8 +21003,8 @@
         "type": "other",
         "other": {
           "name": "perltidy",
-          "version": "20200110",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Perl/Perl-Tidy-20200110.tar.gz"
+          "version": "20240903",
+          "downloadUrl": "https://www.cpan.org/authors/id/S/SH/SHANCOCK/Perl-Tidy-20240903.tar.gz"
         }
       }
     },
