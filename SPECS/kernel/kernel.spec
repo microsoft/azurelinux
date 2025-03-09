@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.76.1
-Release:        2000%{?dist}
+Release:        2001%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,8 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
+Patch2:         0001-Revert-ipmi-ssif_bmc-Fix-new-request-loss-when-bmc-r.patch
+Patch3:         0002-Revert-ipmi-ipmb-Add-check-devm_kasprintf-returned-v.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -428,6 +430,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Mar 09 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2001
+- Revert ipmi changes
+
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-2000
 - Auto-upgrade to 6.6.76.1
 

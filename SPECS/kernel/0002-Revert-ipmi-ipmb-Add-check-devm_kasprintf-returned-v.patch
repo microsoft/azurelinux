@@ -1,0 +1,28 @@
+From dce60d1ba28fedec5fd17b5260f0a88fa9a50526 Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Sat, 8 Mar 2025 21:52:51 -0800
+Subject: [PATCH 2/2] Revert "ipmi: ipmb: Add check devm_kasprintf() returned
+ value"
+
+This reverts commit 4c9caf86d04dcb10e9fd8cd9db8eb79b5bfcc4d8.
+---
+ drivers/char/ipmi/ipmb_dev_int.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/char/ipmi/ipmb_dev_int.c b/drivers/char/ipmi/ipmb_dev_int.c
+index 937189191512..49100845fcb7 100644
+--- a/drivers/char/ipmi/ipmb_dev_int.c
++++ b/drivers/char/ipmi/ipmb_dev_int.c
+@@ -321,9 +321,6 @@ static int ipmb_probe(struct i2c_client *client)
+ 	ipmb_dev->miscdev.name = devm_kasprintf(&client->dev, GFP_KERNEL,
+ 						"%s%d", "ipmb-",
+ 						client->adapter->nr);
+-	if (!ipmb_dev->miscdev.name)
+-		return -ENOMEM;
+-
+ 	ipmb_dev->miscdev.fops = &ipmb_fops;
+ 	ipmb_dev->miscdev.parent = &client->dev;
+ 	ret = misc_register(&ipmb_dev->miscdev);
+-- 
+2.45.2
+

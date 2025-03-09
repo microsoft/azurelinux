@@ -1,0 +1,39 @@
+From 26dd83b26595599f870fbaaea2b85d1b66ef9cf6 Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Sat, 8 Mar 2025 21:52:36 -0800
+Subject: [PATCH 1/2] Revert "ipmi: ssif_bmc: Fix new request loss when bmc
+ ready for a response"
+
+This reverts commit 2851acb600d66ba3ebba209864367c8025a5326c.
+---
+ drivers/char/ipmi/ssif_bmc.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/ipmi/ssif_bmc.c b/drivers/char/ipmi/ssif_bmc.c
+index e8460e966b83..ab4e87a99f08 100644
+--- a/drivers/char/ipmi/ssif_bmc.c
++++ b/drivers/char/ipmi/ssif_bmc.c
+@@ -292,6 +292,7 @@ static void complete_response(struct ssif_bmc_ctx *ssif_bmc)
+ 	ssif_bmc->nbytes_processed = 0;
+ 	ssif_bmc->remain_len = 0;
+ 	ssif_bmc->busy = false;
++	memset(&ssif_bmc->part_buf, 0, sizeof(struct ssif_part_buffer));
+ 	wake_up_all(&ssif_bmc->wait_queue);
+ }
+ 
+@@ -743,11 +744,9 @@ static void on_stop_event(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
+ 			ssif_bmc->aborting = true;
+ 		}
+ 	} else if (ssif_bmc->state == SSIF_RES_SENDING) {
+-		if (ssif_bmc->is_singlepart_read || ssif_bmc->block_num == 0xFF) {
+-			memset(&ssif_bmc->part_buf, 0, sizeof(struct ssif_part_buffer));
++		if (ssif_bmc->is_singlepart_read || ssif_bmc->block_num == 0xFF)
+ 			/* Invalidate response buffer to denote it is sent */
+ 			complete_response(ssif_bmc);
+-		}
+ 		ssif_bmc->state = SSIF_READY;
+ 	}
+ 
+-- 
+2.45.2
+
