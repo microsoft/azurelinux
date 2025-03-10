@@ -16543,8 +16543,8 @@
         "type": "other",
         "other": {
           "name": "perl-Config-AutoConf",
-          "version": "0.318",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/Config-AutoConf-0.318.tar.gz"
+          "version": "0.320",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AM/AMBS/Config-AutoConf-0.320.tar.gz"
         }
       }
     },
