@@ -1,0 +1,120 @@
+From fe616b82bc46982f60c2f95fe0f3023d7de6598b Mon Sep 17 00:00:00 2001
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 7 Jan 2025 22:32:57 +0106
+Subject: [PATCH] serial: 8250: Adjust the timeout for FIFO mode
+
+[ Upstream commit d91f98be26510f5f81ec66425bb0306d1ccd571a ]
+
+After a console has written a record into UART_TX, it uses
+wait_for_xmitr() to wait until the data has been sent out before
+returning. However, wait_for_xmitr() will timeout after 10ms,
+regardless if the data has been transmitted or not.
+
+For single bytes, this timeout is sufficient even at very slow
+baud rates, such as 1200bps. However, when FIFO mode is used,
+there may be 64 bytes pushed into the FIFO at once. At a baud
+rate of 115200bps, the 10ms timeout is still sufficient. But
+when using lower baud rates (such as 57600bps), the timeout
+is _not_ sufficient. This causes longer lines to be cut off,
+resulting in lost and horribly misformatted output on the
+console.
+
+When using FIFO mode, take the number of bytes into account to
+determine an appropriate maximum timeout. Increasing the timeout
+does not affect performance since ideally the timeout never
+occurs.
+
+Fixes: 8f3631f0f6eb ("serial/8250: Use fifo in 8250 console driver")
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Wander Lairson Costa <wander@redhat.com>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20250107212702.169493-2-john.ogness@linutronix.de
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/tty/serial/8250/8250_port.c | 32 +++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
+index a17803da83f8..2b1b2928ef7b 100644
+--- a/drivers/tty/serial/8250/8250_port.c
++++ b/drivers/tty/serial/8250/8250_port.c
+@@ -2074,7 +2074,8 @@ static void serial8250_break_ctl(struct uart_port *port, int break_state)
+ 	serial8250_rpm_put(up);
+ }
+ 
+-static void wait_for_lsr(struct uart_8250_port *up, int bits)
++/* Returns true if @bits were set, false on timeout */
++static bool wait_for_lsr(struct uart_8250_port *up, int bits)
+ {
+ 	unsigned int status, tmout = 10000;
+ 
+@@ -2089,11 +2090,11 @@ static void wait_for_lsr(struct uart_8250_port *up, int bits)
+ 		udelay(1);
+ 		touch_nmi_watchdog();
+ 	}
++
++	return (tmout != 0);
+ }
+ 
+-/*
+- *	Wait for transmitter & holding register to empty
+- */
++/* Wait for transmitter and holding register to empty with timeout */
+ static void wait_for_xmitr(struct uart_8250_port *up, int bits)
+ {
+ 	unsigned int tmout;
+@@ -3350,6 +3351,16 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+ 	serial8250_out_MCR(up, up->mcr | UART_MCR_DTR | UART_MCR_RTS);
+ }
+ 
++static void fifo_wait_for_lsr(struct uart_8250_port *up, unsigned int count)
++{
++	unsigned int i;
++
++	for (i = 0; i < count; i++) {
++		if (wait_for_lsr(up, UART_LSR_THRE))
++			return;
++	}
++}
++
+ /*
+  * Print a string to the serial port using the device FIFO
+  *
+@@ -3359,13 +3370,15 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+ static void serial8250_console_fifo_write(struct uart_8250_port *up,
+ 					  const char *s, unsigned int count)
+ {
+-	int i;
+ 	const char *end = s + count;
+ 	unsigned int fifosize = up->tx_loadsz;
++	unsigned int tx_count = 0;
+ 	bool cr_sent = false;
++	unsigned int i;
+ 
+ 	while (s != end) {
+-		wait_for_lsr(up, UART_LSR_THRE);
++		/* Allow timeout for each byte of a possibly full FIFO */
++		fifo_wait_for_lsr(up, fifosize);
+ 
+ 		for (i = 0; i < fifosize && s != end; ++i) {
+ 			if (*s == '\n' && !cr_sent) {
+@@ -3376,7 +3389,14 @@ static void serial8250_console_fifo_write(struct uart_8250_port *up,
+ 				cr_sent = false;
+ 			}
+ 		}
++		tx_count = i;
+ 	}
++
++	/*
++	 * Allow timeout for each byte written since the caller will only wait
++	 * for UART_LSR_BOTH_EMPTY using the timeout of a single character
++	 */
++	fifo_wait_for_lsr(up, tx_count);
+ }
+ 
+ /*
+-- 
+2.45.2
+
