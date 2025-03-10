@@ -443,7 +443,7 @@ Requires: libnozzle1%{_isa} = %{version}-%{release}
 %endif
 
 %changelog
-* Tue Feb 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.29-2
+* Wed Feb 26 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.29-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
