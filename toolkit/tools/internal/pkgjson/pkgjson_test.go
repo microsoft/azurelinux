@@ -888,7 +888,7 @@ func TestShouldFailToConvertPackageListEntryWithWhitespacesInVersion(t *testing.
 	assert.Error(t, err)
 }
 
-func TestSimpleSort(t *testing.T) {
+func TestSortRepoByName(t *testing.T) {
 	pkgRepo := &PackageRepo{
 		Repo: []*Package{
 			{
@@ -903,10 +903,26 @@ func TestSimpleSort(t *testing.T) {
 	SortPackageList(pkgRepo.Repo)
 	assert.Equal(t, "pkgA", pkgRepo.Repo[0].Provides.Name)
 	assert.Equal(t, "pkgB", pkgRepo.Repo[1].Provides.Name)
-
 }
 
-func TestSortRepo(t *testing.T) {
+func TestSortRepoByVersion(t *testing.T) {
+	pkgRepo := &PackageRepo{
+		Repo: []*Package{
+			{
+				Provides: &PackageVer{Name: "pkgA", Version: "2.0.0"},
+			},
+			{
+				Provides: &PackageVer{Name: "pkgA", Version: "1.0.0"},
+			},
+		},
+	}
+
+	SortPackageList(pkgRepo.Repo)
+	assert.Equal(t, "pkgA", pkgRepo.Repo[0].Provides.Name)
+	assert.Equal(t, "pkgB", pkgRepo.Repo[1].Provides.Name)
+}
+
+func TestRecursiveSortRepo(t *testing.T) {
 	pkgRepo := &PackageRepo{
 		Repo: []*Package{
 			{
