@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -17,11 +17,12 @@ Source0:  https://github.com/microsoft/confidential-containers-containerd/archiv
 Source1: containerd.service
 Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
-Patch1: CVE-2023-44487.patch
+Patch1: CVE-2023-39325.patch
 Patch2: fix_cc_tests_for_golang1.21.patch
 Patch3: CVE-2024-24786.patch
 Patch4: CVE-2024-28180.patch
 Patch5: CVE-2023-45288.patch
+Patch7: CVE-2023-44487.patch
 
 %{?systemd_requires}
 
@@ -79,6 +80,11 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Mar 05 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com - 1.7.7-7
+- Rename patch file that addresses CVE-2023-39325
+- Address CVE-2023-44487
+- Fix rpmbuild warnings for changelog dates
+
 * Fri Jan 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.7-6
 - Address CVE-2024-28180, CVE-2023-45288
 
@@ -109,10 +115,10 @@ fi
 * Wed Dec 20 2023 Manuel Huber <mahuber@microsoft.com> - 1.7.2-3
 - Set oom_score_adj of containerd to -999
 
-* Wed Nov 23 2023 Bala <balakumaran.kannan@gmail.com> - 1.7.2-2
+* Wed Nov 22 2023 Bala <balakumaran.kannan@gmail.com> - 1.7.2-2
 - Fix CVE-2023-47108 by backporting the fix made for otel-grpc-0.40.0
 
-* Fri Nov 08 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
+* Fri Nov 10 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
 - Always add TargetLayerDigestLabel label to snapshots
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-6
