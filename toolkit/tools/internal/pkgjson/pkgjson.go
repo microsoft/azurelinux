@@ -90,7 +90,7 @@ func packageLess(a, b PackageVer) bool {
 	return false
 }
 
-func sortPackageList(packages []*Package) {
+func SortPackageList(packages []*Package) {
 
 	sort.Slice(packages, func(i, j int) bool {
 		return packageLess(*packages[i].Provides, *packages[j].Provides)
@@ -119,7 +119,7 @@ func (pkg *PackageRepo) ParsePackageJSON(path string) (err error) {
 	}
 
 	// Ensure deterministic ordering of the package list
-	sortPackageList(pkg.Repo)
+	SortPackageList(pkg.Repo)
 
 	return nil
 }
