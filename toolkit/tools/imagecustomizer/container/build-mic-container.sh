@@ -14,18 +14,30 @@ function showUsage() {
     echo "usage:"
     echo
     echo "build-mic-container.sh \\"
-    echo "    -t <container-tag>"
+    echo "    -t <container-tag> \\"
+    echo "    [-a <architecture>]"
+    echo
+    echo "    Architecture can be 'amd64' or 'arm64'. Default is 'amd64'."
     echo
 }
 
-while getopts ":r:n:t:" OPTIONS; do
+while getopts ":a:t:" OPTIONS; do
   case "${OPTIONS}" in
     t ) containerTag=$OPTARG ;;
+    a ) ARCH=$OPTARG ;;
+    \? ) echo "Invalid option: -$OPTARG" >&2; showUsage; exit 1 ;;
+    : ) echo "Option -$OPTARG requires an argument." >&2; showUsage; exit 1 ;;
   esac
 done
 
 if [[ -z $containerTag ]]; then
-    echo "missing required argument '-t containerTag'"
+    echo "missing required argument '-t <container-tag>'"
+    showUsage
+    exit 1
+fi
+
+if [[ "$ARCH" != "amd64" && "$ARCH" != "arm64" ]]; then
+    echo "Invalid architecture: $ARCH"
     showUsage
     exit 1
 fi
