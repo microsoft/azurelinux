@@ -27,9 +27,7 @@ Requires:       sed
 # When we go to add support for AGENT_INIT=yes, can drop this.
 # https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10
 Requires:       systemd
-Requires:       tar
 Requires:       tzdata
-Requires:       util-linux
 Requires:       zlib
 
 %description
@@ -44,7 +42,9 @@ Requires:       cpio
 Requires:       grep
 Requires:       readline
 Requires:       gzip
+Requires:       tar
 Requires:       procps-ng
+Requires:       util-linux
 
 %description    debug
 Metapackage to install the set of packages inside a Kata containers UVM, includes extra debug utilities.
