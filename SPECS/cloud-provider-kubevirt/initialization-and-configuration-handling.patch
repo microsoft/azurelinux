@@ -9,9 +9,6 @@ The patches achieve the following:
 1. Locks down the Service Account used to access the fabric cluster
 2. Uses a non-expiring secret for the Service Account (since kubeconfig can expire and original flow uses admin kubeconfig)
 
-We will not be able to upstream the changes to the hardcoded tokenFile, rootCAFile, and namespaceFile paths as they are specific to the ECF environment.
-However we will be able to upstream changes to lockdown the service account.
-
 The locking down of the service account and using a non-expiring secret go hand in hand and cannot be split up into 2 patches.
 
 ### `main.go` Changes
@@ -22,9 +19,6 @@ The locking down of the service account and using a non-expiring secret go hand 
 	 	This is a change in parameters defined from an older version that is being used upstream
 
 ### `cloud.go` Changes
-
-**Notice the hardcoded tokenFile, rootCAFile, and namespaceFile paths.
-These are specific to the ECF environment and cannot be upstreamed.**
 
 1. **`CloudConfig` Struct Addition (ControlEndpoint Field):**
    - **Reason:** The addition of the `ControlEndpoint` field allows the cloud configuration to specify an endpoint for control operations.
@@ -43,8 +37,8 @@ These are specific to the ECF environment and cannot be upstreamed.**
 
 ---
  cmd/kubevirt-cloud-controller-manager/main.go |  4 +-
- pkg/provider/cloud.go                         | 83 +++++++++++++------
- 2 files changed, 59 insertions(+), 28 deletions(-)
+ pkg/provider/cloud.go                         | 82 +++++++++++++------
+ 2 files changed, 58 insertions(+), 28 deletions(-)
 
 diff --git a/cmd/kubevirt-cloud-controller-manager/main.go b/cmd/kubevirt-cloud-controller-manager/main.go
 index 8e2c2467..ad59c16a 100644
@@ -69,7 +63,7 @@ index 8e2c2467..ad59c16a 100644
  	os.Exit(code)
  }
 diff --git a/pkg/provider/cloud.go b/pkg/provider/cloud.go
-index fab7da0b..7f68de34 100644
+index fab7da0b..b4f90ea3 100644
 --- a/pkg/provider/cloud.go
 +++ b/pkg/provider/cloud.go
 @@ -16,6 +16,9 @@ import (
@@ -100,17 +94,16 @@ index fab7da0b..7f68de34 100644
  }
  
  type LoadBalancerConfig struct {
-@@ -92,6 +96,41 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
+@@ -92,6 +96,40 @@ func NewCloudConfigFromBytes(configBytes []byte) (CloudConfig, error) {
  	return config, nil
  }
  
 +// adopted from client-go InClusterConfig
 +func serviceAccountClusterConfig(controlEndpoint string) (*rest.Config, string, error) {
-+	const (
-+		tokenFile     = "/var/run/secrets/ecf/clusterserviceaccount/token"
-+		rootCAFile    = "/var/run/secrets/ecf/clusterserviceaccount/ca.crt"
-+		namespaceFile = "/var/run/secrets/ecf/clusterserviceaccount/namespace"
-+	)
++	var serviceAccountMountPath = os.Getenv("CLUSTER_SERVICE_ACCOUNT_PATH")
++	var tokenFile = serviceAccountMountPath + "/token"
++	var rootCAFile = serviceAccountMountPath + "/ca.crt"
++	var namespaceFile = serviceAccountMountPath + "/namespace"
 +
 +	token, err := os.ReadFile(tokenFile)
 +	if err != nil {
@@ -142,7 +135,7 @@ index fab7da0b..7f68de34 100644
  func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, error) {
  	if config == nil {
  		return nil, fmt.Errorf("No %s cloud provider config file given", ProviderName)
-@@ -106,41 +145,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
+@@ -106,41 +144,31 @@ func kubevirtCloudProviderFactory(config io.Reader) (cloudprovider.Interface, er
  	if err != nil {
  		return nil, fmt.Errorf("Failed to unmarshal cloud provider config: %v", err)
  	}
