@@ -214,7 +214,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 // It is important that we only match on the exact dependency name and version. If we don't, we may end up with
 // unpredictable behavior in the scheduler. If two different remote dependencies are added to two different build
 // nodes of a single SRPM, then the scheduler may queue that node twice.
-func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (reslovedNode *pkggraph.PkgNode, err error) {
+func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (resolvedNode *pkggraph.PkgNode, err error) {
 	existingRemoteNode, err := g.FindExactPkgNodeFromPkg(dependency)
 	if err != nil {
 		err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
