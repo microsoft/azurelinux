@@ -208,7 +208,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	return
 }
 
-// handleRemoteDependency ensures that a remote dependency is available in the graph for a given dependency.
+// handleRemoteDependency ensures that a remote node is available in the graph for every unresolved dependency.
 // 1. Check if the exact dependency is already in the graph. If it is, reuse it.
 // 2. If it is not, create a new unresolved node for the dependency.
 // It is important that we only match on the exact dependency name and version. If we don't, we may end up with
