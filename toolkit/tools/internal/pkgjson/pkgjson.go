@@ -74,8 +74,6 @@ type Package struct {
 	RunTests      bool          `json:"RunTests"`      // Should we run tests for this package.
 }
 
-//cmp func(a, b E) int
-
 func packageLess(a, b PackageVer) bool {
 	if a.Name < b.Name {
 		return true
