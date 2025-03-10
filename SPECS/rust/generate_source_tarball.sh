@@ -101,9 +101,10 @@ popd > /dev/null
 
 pushd $OUT_FOLDER > /dev/null
 echo "get additional src tarballs"
-CONFIG_FILE="$src_root/src/stage0.json"
-RUST_RELEASE_DATE=$(cat $CONFIG_FILE | jq -r '.compiler.date')
-RUST_STAGE0_VERSION=$(cat $CONFIG_FILE | jq -r '.compiler.version')
+CONFIG_FILE="$src_root/src/stage0"
+RUST_RELEASE_DATE=$(grep "^compiler_date=" $CONFIG_FILE | cut -d '=' -f 2)
+RUST_STAGE0_VERSION=$(grep "^compiler_version=" $CONFIG_FILE | cut -d '=' -f 2)
+
 wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/cargo-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
 wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rustc-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
 wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rust-std-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
