@@ -29306,8 +29306,8 @@
         "type": "other",
         "other": {
           "name": "udica",
-          "version": "0.2.1",
-          "downloadUrl": "https://github.com/containers/udica/archive/v0.2.1.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://github.com/containers/udica/archive/v0.2.8.tar.gz"
         }
       }
     },
