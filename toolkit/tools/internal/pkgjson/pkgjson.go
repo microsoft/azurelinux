@@ -76,7 +76,7 @@ type Package struct {
 
 //cmp func(a, b E) int
 
-func PackageLess(a, b PackageVer) bool {
+func packageLess(a, b PackageVer) bool {
 	if a.Name < b.Name {
 		return true
 	} else if a.Name == b.Name {
@@ -90,22 +90,22 @@ func PackageLess(a, b PackageVer) bool {
 	return false
 }
 
-func SortPackageList(packages []*Package) {
+func sortPackageList(packages []*Package) {
 
 	sort.Slice(packages, func(i, j int) bool {
-		return PackageLess(*packages[i].Provides, *packages[j].Provides)
+		return packageLess(*packages[i].Provides, *packages[j].Provides)
 	})
 
 	// For each package, also sort the package lists
 	for _, pkg := range packages {
 		sort.Slice(pkg.Requires, func(i, j int) bool {
-			return PackageLess(*pkg.Requires[i], *pkg.Requires[j])
+			return packageLess(*pkg.Requires[i], *pkg.Requires[j])
 		})
 		sort.Slice(pkg.BuildRequires, func(i, j int) bool {
-			return PackageLess(*pkg.BuildRequires[i], *pkg.BuildRequires[j])
+			return packageLess(*pkg.BuildRequires[i], *pkg.BuildRequires[j])
 		})
 		sort.Slice(pkg.TestRequires, func(i, j int) bool {
-			return PackageLess(*pkg.TestRequires[i], *pkg.TestRequires[j])
+			return packageLess(*pkg.TestRequires[i], *pkg.TestRequires[j])
 		})
 	}
 }
@@ -119,7 +119,7 @@ func (pkg *PackageRepo) ParsePackageJSON(path string) (err error) {
 	}
 
 	// Ensure deterministic ordering of the package list
-	SortPackageList(pkg.Repo)
+	sortPackageList(pkg.Repo)
 
 	return nil
 }
