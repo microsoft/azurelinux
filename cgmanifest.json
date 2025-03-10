@@ -16533,8 +16533,8 @@
         "type": "other",
         "other": {
           "name": "perl-Compress-Raw-Lzma",
-          "version": "2.101",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-2.101.tar.gz"
+          "version": "2.213",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-2.213.tar.gz"
         }
       }
     },
