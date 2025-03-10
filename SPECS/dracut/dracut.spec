@@ -59,14 +59,12 @@ Patch:          avoid-mktemp-collisions-with-find-not-path.patch
 # fix-dracut-systemd-include-systemd-cryptsetup.patch has been introduced  
 # by the Azure Linux team to ensure that the systemd-cryptsetup module is included  
 # in the initramfs when needed.  
-# In dracut version 102, the systemd-cryptsetup module was split from the crypt module  
-# and is no longer included by default in initramfs. This causes encrypted volumes  
-# defined in crypttab to not be processed during the initrd phase.  
-# This patch modifies the dracut-systemd module to explicitly include systemd-cryptsetup  
-# when required, restoring expected cryptsetup functionality.  
-# This is a temporary fix until Dracut is upgraded to 104+.  
-# - For reference, see https://github.com/dracut-ng/dracut-ng/pull/262 and
-# https://github.com/dracut-ng/dracut-ng/commit/e0e5424a7b5e387ccb70e47ffea5a59716bf7b76  
+# In dracut 102, systemd-cryptsetup was split from the crypt module and is no longer  
+# included by default, causing encrypted volumes in crypttab to be skipped in initrd.  
+# This patch modifies dracut-systemd to explicitly include systemd-cryptsetup.  
+# The patch can be removed if Dracut is upgraded to 104+.
+# - References: https://github.com/dracut-ng/dracut-ng/pull/262  
+#               https://github.com/dracut-ng/dracut-ng/commit/e0e5424a7b5e387ccb70e47ffea5a59716bf7b76  
 Patch:          fix-dracut-systemd-include-systemd-cryptsetup.patch
 
 BuildRequires:  bash
