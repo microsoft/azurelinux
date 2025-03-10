@@ -231,7 +231,7 @@ func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer
 		logger.Log.Debugf("Added new node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
 	} else {
 		// This exact dependency is already in the graph, so reuse it.
-		resolvedNode= existingRemoteNode.RunNode
+		resolvedNode = existingRemoteNode.RunNode
 		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
 	}
 
