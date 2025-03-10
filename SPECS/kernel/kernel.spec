@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.75.1
-Release:        3310%{?dist}
+Release:        4310%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,6 +51,7 @@ Patch4:         256-291.patch
 Patch5:         292-303.patch
 Patch6:         304-309.patch
 Patch7:         310.patch
+Patch8:         0001-serial-8250-Fix-fifo-underflow-on-flush.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -434,7 +435,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.75.1-3310
+* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.75.1-4310
 - new version
 
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
