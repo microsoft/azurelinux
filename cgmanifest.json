@@ -16133,8 +16133,8 @@
         "type": "other",
         "other": {
           "name": "perl-B-Hooks-EndOfScope",
-          "version": "0.24",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-0.24.tar.gz"
+          "version": "0.28",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/B/B-Hooks-EndOfScope-0.28.tar.gz"
         }
       }
     },
