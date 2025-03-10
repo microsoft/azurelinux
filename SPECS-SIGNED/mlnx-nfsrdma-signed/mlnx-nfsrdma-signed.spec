@@ -43,7 +43,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 10%{?dist}
+Release:	 7%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -111,16 +111,7 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 
 %changelog
-* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-10
-- Bump release to rebuild for new kernel release
-
-* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
-- Bump release to rebuild for new kernel release
-
-* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
-- Bump release to rebuild for new kernel release
-
-* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-7
+* Sat Mar 08 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-7
 - Bump release to rebuild for new kernel release
 
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 24.10-6
@@ -138,7 +129,7 @@ fi
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
