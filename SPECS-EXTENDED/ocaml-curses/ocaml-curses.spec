@@ -150,6 +150,9 @@ developing applications that use %{name}.
 * Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-13
 - Update all OCaml dependencies for RPM 4.16.
 
+* Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-12.1
+- OCaml 4.10.0 final (Fedora 32).
+
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-12
 - OCaml 4.10.0 final.
 
