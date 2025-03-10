@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.75.1
-Release:        3316%{?dist}
+Release:        3328%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,7 @@ Patch2:         1-194.patch
 Patch3:         195-255.patch
 Patch4:         256-291.patch
 Patch5:         292-316.patch
+Patch6:         317-328.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -432,7 +433,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.75.1-3316
+* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.75.1-3328
 - new version
 
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
