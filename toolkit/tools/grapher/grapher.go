@@ -208,6 +208,12 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	return
 }
 
+// handleRemoteDependency ensures that a remote dependency is available in the graph for a given dependency.
+// 1. Check if the exact dependency is already in the graph. If it is, reuse it.
+// 2. If it is not, create a new unresolved node for the dependency.
+// It is important that we only match on the exact dependency name and version. If we don't, we may end up with
+// unpredictable behavior in the scheduler. If two different remote dependencies are added to two different build
+// nodes of a single SRPM, then the scheduler may queue that node twice.
 func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (reslovedNode *pkggraph.PkgNode, err error) {
 	existingRemoteNode, err := g.FindExactPkgNodeFromPkg(dependency)
 	if err != nil {
@@ -216,7 +222,7 @@ func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer
 	}
 
 	if existingRemoteNode == nil {
-		// No local, and no exact remote, so create a new node.
+		// No exact match, add a new one.
 		reslovedNode, err = addUnresolvedPackage(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to add a remote node (%s):\n%w", dependency.Name, err)
