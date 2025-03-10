@@ -595,9 +595,9 @@ popd
 rm -rf openssl-3.3.2
 touch /logs/status_openssl_complete
 
-echo Elfutils-0.189
-tar xjf elfutils-0.189.tar.bz2
-pushd elfutils-0.189
+echo Elfutils-0.192
+tar xjf elfutils-0.192.tar.bz2
+pushd elfutils-0.192
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -611,7 +611,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.189
+rm -rf elfutils-0.192
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.4
