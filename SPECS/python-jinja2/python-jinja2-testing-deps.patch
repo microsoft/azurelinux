@@ -5,7 +5,8 @@ Subject: [PATCH] fix mariner test deps
 
 ---
  requirements/tests.txt | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ tests/test_loader.py   |  6 ++++--
+ 2 files changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/requirements/tests.txt b/requirements/tests.txt
 index 4cd3fe99..31c9bb06 100644
@@ -34,6 +35,36 @@ index 4cd3fe99..31c9bb06 100644
      # via -r requirements/tests.in
  tomli==2.0.1
      # via pytest
+
+diff --git a/tests/test_loader.py b/tests/test_loader.py
+index 04c921d24..77d686ef5 100644
+--- a/tests/test_loader.py
++++ b/tests/test_loader.py
+@@ -183,6 +183,7 @@ def test_filename_normpath(self):
+
+ class TestModuleLoader:
+     archive = None
++    mod_env = None
+
+     def compile_down(self, prefix_loader, zip="deflated"):
+         log = []
+@@ -196,13 +197,14 @@ def compile_down(self, prefix_loader, zip="deflated"):
+         self.mod_env = Environment(loader=loaders.ModuleLoader(self.archive))
+         return "".join(log)
+
+-    def teardown(self):
+-        if hasattr(self, "mod_env"):
++    def teardown_method(self):
++        if self.archive is not None:
+             if os.path.isfile(self.archive):
+                 os.remove(self.archive)
+             else:
+                 shutil.rmtree(self.archive)
+             self.archive = None
++            self.mod_env = None
+
+     def test_log(self, prefix_loader):
+         log = self.compile_down(prefix_loader)
 -- 
 2.34.1
 

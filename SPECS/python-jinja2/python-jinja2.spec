@@ -50,7 +50,7 @@ sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 
 %check
 pip3 install tox packaging==23.2
-tox -v -e py%{python3_version_nodots} -- -k 'not test_loader'
+tox -v -e py%{python3_version_nodots} --
 
 %files -n python3-jinja2
 %defattr(-,root,root)
