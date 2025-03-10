@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           relaxngDatatype
 Version:        2011.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        RELAX NG Datatype API
 License:        BSD-3-Clause
 Group:          Development/Languages/Java
