@@ -1,0 +1,39 @@
+From 26b3a167236e300f05780c4b675ec6e2dba04e24 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 10 Mar 2025 15:28:30 -0700
+Subject: [PATCH] fix mariner test deps
+
+---
+ requirements/tests.txt | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/requirements/tests.txt b/requirements/tests.txt
+index 4cd3fe99..31c9bb06 100644
+--- a/requirements/tests.txt
++++ b/requirements/tests.txt
+@@ -7,17 +7,15 @@
+ #
+ attrs==21.4.0
+     # via pytest
+-iniconfig==1.1.1
++exceptiongroup==1.1.1
+     # via pytest
+-packaging==21.3
++iniconfig==1.1.1
+     # via pytest
+-pluggy==1.0.0
++packaging==23.2
+     # via pytest
+-py==1.11.0
++pluggy==1.5.0
+     # via pytest
+-pyparsing==3.0.8
+-    # via packaging
+-pytest==7.1.2
++pytest==7.4.0
+     # via -r requirements/tests.in
+ tomli==2.0.1
+     # via pytest
+-- 
+2.34.1
+
