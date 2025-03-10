@@ -223,19 +223,19 @@ func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer
 
 	if existingRemoteNode == nil {
 		// No exact match, add a new one.
-		reslovedNode, err = addUnresolvedPackage(g, dependency)
+		resolvedNode, err = addUnresolvedPackage(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to add a remote node (%s):\n%w", dependency.Name, err)
 			return nil, err
 		}
-		logger.Log.Debugf("Added new node: '%s' for dependency %+v", reslovedNode.FriendlyName(), dependency)
+		logger.Log.Debugf("Added new node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
 	} else {
 		// This exact dependency is already in the graph, so reuse it.
-		reslovedNode = existingRemoteNode.RunNode
-		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", reslovedNode.FriendlyName(), dependency)
+		resolvedNode= existingRemoteNode.RunNode
+		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
 	}
 
-	return reslovedNode, nil
+	return resolvedNode, nil
 }
 
 // addSingleDependency will add an edge between packageNode and the "Run" node for the
