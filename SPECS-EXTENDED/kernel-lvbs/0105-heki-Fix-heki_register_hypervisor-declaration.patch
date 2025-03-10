@@ -1,0 +1,29 @@
+From 52ba5cba1c15aa5ae7aa1ce5acf8fcc76462040f Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Mon, 27 Jan 2025 11:25:26 -0800
+Subject: [PATCH 105/124] heki: Fix heki_register_hypervisor declaration
+
+Make it inline, as otherwise compiler produce a build warning because of
+the unused function if CONFIG_HEKI is unset.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ include/linux/heki.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/heki.h b/include/linux/heki.h
+index 0f2562c7c83b..e62b1995322f 100644
+--- a/include/linux/heki.h
++++ b/include/linux/heki.h
+@@ -236,7 +236,7 @@ static inline void heki_free_module_init(struct module *mod) { }
+ static inline void heki_unload_module(struct module *mod) { }
+ static inline void heki_copy_secondary_key(const void *data, size_t size) { }
+ 
+-static void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
++static inline void heki_register_hypervisor(struct heki_hypervisor *hypervisor) { }
+ 
+ static inline void heki_store_blacklist_raw_hashes(const char *hash)
+ {
+-- 
+2.43.0
+

@@ -1,0 +1,26 @@
+From 30a34ceec50b7bbcf5ee466d13608ed36c597ca6 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Mon, 27 Jan 2025 11:25:27 -0800
+Subject: [PATCH 109/124] lvbs.config: Add CONFIG_MODULE_SIG dependency
+
+LVBS boot doesn't make much sense without modules signature verification as
+VTL1 kernel won't be able to sign any modules, which will likely lead to
+missing network, ob lock device, etc.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ Microsoft/lvbs.config | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Microsoft/lvbs.config b/Microsoft/lvbs.config
+index ba178b8cf172..981dcb321f9e 100644
+--- a/Microsoft/lvbs.config
++++ b/Microsoft/lvbs.config
+@@ -6,3 +6,4 @@ CONFIG_DYNAMIC_DEBUG_CORE=n
+ CONFIG_HEKI=y
+ CONFIG_HYPERV=y
+ CONFIG_HYPERV_VSM=y
++CONFIG_MODULE_SIG=y
+-- 
+2.43.0
+

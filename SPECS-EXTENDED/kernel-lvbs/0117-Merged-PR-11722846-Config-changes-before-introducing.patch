@@ -1,0 +1,113 @@
+From b992e77e365ca294ebb5182999e9f8fda0f9569e Mon Sep 17 00:00:00 2001
+From: Madhavan Venkataraman <Madhavan.Venkataraman@microsoft.com>
+Date: Mon, 10 Feb 2025 23:27:21 +0000
+Subject: [PATCH 117/124] Merged PR 11722846: Config changes before introducing
+ kexec
+
+Config changes before introducing kexec
+
+For module validation in VTL1, the module structure must match exactly
+between VTL0 and VTL1. In other words, the configs around the different
+fields in the module structure must match. Introduce the following
+config changes in lvbs.config to match with mshv_sk_config:
+
+	CONFIG_MODULE_SIG_FORCE=y
+	CONFIG_IMA=n
+
+Introduce the following config changes for VTL1 kexec support in
+mshv_sk_config.
+
+	CONFIG_KEXEC_FILE=y
+	CONFIG_KEXEC_SIG=y
+	CONFIG_KEXEC_BZIMAGE_VERIFY_SIG=y
+	CONFIG_KEXEC_CORE=y
+
+CONFIG_KEXEC_JUMP is enabled for hibernation. In this, the kernel jumps
+back to the original kernel from the new kernel. This is something we
+cannot support in LVBS in principle. So, disable CONFIG_KEXEC_JUMP, if
+CONFIG_HEKI is enabled.
+
+CONFIG_KEXEC is a feature that directly loads the segments from user
+space instead of loading a file that contains the segments. Since we
+need a signed kexec file to be loaded for LVBS, we will not support
+CONFIG_KEXEC.
+
+Signed-off-by: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+
+----
+#### AI description  (iteration 1)
+#### PR Classification
+Configuration changes in preparation for introducing kexec.
+
+#### PR Summary
+This pull request updates configuration settings to enable kexec-related features.
+- `Microsoft/mshv_sk_config`: Enabled `CONFIG_KEXEC_FILE`, `CONFIG_KEXEC_SIG`, `CONFIG_KEXEC_BZIMAGE_VERIFY_SIG`, and `CONFIG_KEXEC_CORE`.
+- `kernel/Kconfig.kexec`: Modified dependencies for `KEXEC` and `KEXEC_JUMP` to exclude `HEKI`.
+- `Microsoft/lvbs.config`: Enabled `CONFIG_MODULE_SIG_FORCE` and disabled `CONFIG_IMA`.
+<!-- GitOpsUserAgent=GitOps.Apps.Server.pullrequestcopilot -->
+---
+ Microsoft/lvbs.config    | 2 ++
+ Microsoft/mshv_sk_config | 6 +++++-
+ kernel/Kconfig.kexec     | 4 ++--
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/Microsoft/lvbs.config b/Microsoft/lvbs.config
+index 492bb4a1fd0c..4536f2a653f8 100644
+--- a/Microsoft/lvbs.config
++++ b/Microsoft/lvbs.config
+@@ -9,3 +9,5 @@ CONFIG_HYPERV=y
+ CONFIG_HYPERV_VSM=y
+ CONFIG_MODULE_SIG=y
+ CONFIG_KUNIT_AUTORUN_ENABLED=n
++CONFIG_MODULE_SIG_FORCE=y
++CONFIG_IMA=n
+diff --git a/Microsoft/mshv_sk_config b/Microsoft/mshv_sk_config
+index 0f6a93897c4f..68bc56faede0 100644
+--- a/Microsoft/mshv_sk_config
++++ b/Microsoft/mshv_sk_config
+@@ -241,8 +241,11 @@ CONFIG_SYSTEM_DATA_VERIFICATION=y
+ # Kexec and crash features
+ #
+ # CONFIG_KEXEC is not set
+-# CONFIG_KEXEC_FILE is not set
+ # CONFIG_CRASH_DUMP is not set
++CONFIG_KEXEC_FILE=y
++CONFIG_KEXEC_SIG=y
++# CONFIG_KEXEC_SIG_FORCE is not set
++CONFIG_KEXEC_BZIMAGE_VERIFY_SIG=y
+ # end of Kexec and crash features
+ # end of General setup
+ 
+@@ -472,6 +475,7 @@ CONFIG_ARCH_CONFIGURES_CPU_MITIGATIONS=y
+ #
+ # General architecture-dependent options
+ #
++CONFIG_KEXEC_CORE=y
+ CONFIG_HOTPLUG_SMT=y
+ CONFIG_HOTPLUG_CORE_SYNC=y
+ CONFIG_HOTPLUG_CORE_SYNC_DEAD=y
+diff --git a/kernel/Kconfig.kexec b/kernel/Kconfig.kexec
+index 37e488d5b4fc..9e11dc942dbd 100644
+--- a/kernel/Kconfig.kexec
++++ b/kernel/Kconfig.kexec
+@@ -17,7 +17,7 @@ config HAVE_IMA_KEXEC
+ 
+ config KEXEC
+ 	bool "Enable kexec system call"
+-	depends on ARCH_SUPPORTS_KEXEC
++	depends on ARCH_SUPPORTS_KEXEC && !HEKI
+ 	select KEXEC_CORE
+ 	help
+ 	  kexec is a system call that implements the ability to shutdown your
+@@ -88,7 +88,7 @@ config KEXEC_BZIMAGE_VERIFY_SIG
+ config KEXEC_JUMP
+ 	bool "kexec jump"
+ 	depends on ARCH_SUPPORTS_KEXEC_JUMP
+-	depends on KEXEC && HIBERNATION
++	depends on KEXEC && HIBERNATION && !HEKI
+ 	help
+ 	  Jump between original kernel and kexeced kernel and invoke
+ 	  code in physical address mode via KEXEC
+-- 
+2.43.0
+
