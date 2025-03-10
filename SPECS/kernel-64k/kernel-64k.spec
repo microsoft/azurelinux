@@ -40,6 +40,7 @@ Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
 Patch2:         jent-init-fix.patch
+Patch3:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
