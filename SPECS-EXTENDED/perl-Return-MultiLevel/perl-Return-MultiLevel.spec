@@ -1,12 +1,12 @@
-Name:           perl-Return-MultiLevel
-Version:        0.05
-Release:        10%{?dist}
-Summary:        Return across multiple call levels
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Return-MultiLevel
+Version:        0.08
+Release:        10%{?dist}
+Summary:        Return across multiple call levels
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Return-MultiLevel
-Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-%{version}.tar.gz#/perl-Return-MultiLevel-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Return-MultiLevel-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -14,27 +14,22 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Find)
-BuildRequires:  perl(File::Spec)
 # Module
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(Data::Munge) >= 0.07
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Test Suite
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Data::Munge) >= 0.07
+# (none)
 # Optional Functionality
 BuildRequires:  perl(Scope::Upper) >= 0.29
 Requires:       perl(Scope::Upper) >= 0.29
-
-# Filter under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Data::Munge\\)$
 
 %description
 This module provides a way to return immediately from a deeply nested call
@@ -57,13 +52,71 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/Return/
 %{_mandir}/man3/Return::MultiLevel.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.05-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.08-10
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.08-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Dec 20 2021 Paul Howarth <paul@city-fan.org> - 0.08-1
+- Update to 0.08
+  - Remove most uses of stringy eval (GH#6); one still remains
+  - Remove dependency on Data::Munge (GH#6)
+- Package new LICENSE file
+
+* Tue Oct 12 2021 Paul Howarth <paul@city-fan.org> - 0.06-1
+- Update to 0.06
+  - Fixed test bug (CPAN RT#133221)
+  - New caretaker maintainer, new repository:
+    https://github.com/uperl/Return-MultiLevel
+- This release by PLICEASE → update source URL
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.05-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.05-14
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.05-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 17 2020 Paul Howarth <paul@city-fan.org> - 0.05-12
+- Fix compatibility with Test::Fatal ≥ 0.016
+  https://github.com/mauke/Return-MultiLevel/pull/1
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.05-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.05-10
+- Perl 5.32 rebuild
 
 * Mon Feb 17 2020 Paul Howarth <paul@city-fan.org> - 0.05-9
 - Spec tidy-up
