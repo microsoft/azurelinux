@@ -918,8 +918,9 @@ func TestSortRepoByVersion(t *testing.T) {
 	}
 
 	SortPackageList(pkgRepo.Repo)
-	assert.Equal(t, "pkgA", pkgRepo.Repo[0].Provides.Name)
-	assert.Equal(t, "pkgB", pkgRepo.Repo[1].Provides.Name)
+	// Compare versions since name is same
+	assert.Equal(t, "1.0.0", pkgRepo.Repo[0].Provides.Version)
+	assert.Equal(t, "2.0.0", pkgRepo.Repo[1].Provides.Version)
 }
 
 func TestRecursiveSortRepo(t *testing.T) {
