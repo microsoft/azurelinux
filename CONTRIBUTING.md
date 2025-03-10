@@ -101,19 +101,19 @@ Please direct pull requests to the desired development branch. Development chang
 
 An overview of how the branches are structured can be seen below
 
-| Branch / Tag | For PRs | Published | Notes
-|:-------------|:--------|:----------|:------------
-|3.0-dev       |Yes      |No         | **Primary development branch**
-|3.0           |No       |Yes - eventually | Staging branch for publishing
-|3.0-preview   |No       |No         | Publishing in progress
-|3.0-stable    |No       |Yes        | Last published release
+| Git Ref      | Branch / Tag | For PRs | Published | Notes
+|:-------------|:-------------|:--------|:----------|:------------
+|3.0-dev       |Branch        |Yes      |No         | **Primary development branch**
+|3.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
+|3.0-preview   |Tag           |No       |No         | Publishing in progress
+|3.0-stable    |Tag           |No       |Yes        | Last published release
 
-| Branch / Tag | For PRs | Published | Notes
-|:-------------|:--------|:----------|:------------
-|main          |Yes      |No         | **Primary development branch**
-|2.0           |No       |Yes - eventually | Staging branch for publishing
-|2.0-preview   |No       |No         | Publishing in progress
-|2.0-stable    |No       |Yes        | Last published release
+| Git Ref      | Branch / Tag | For PRs | Published | Notes
+|:-------------|:-------------|:--------|:----------|:------------
+|main          |Branch        |Yes      |No         | **Primary development branch**
+|2.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
+|2.0-preview   |Tag           |No       |No         | Publishing in progress
+|2.0-stable    |Tag           |No       |Yes        | Last published release
 
 ### PR Titles
 
