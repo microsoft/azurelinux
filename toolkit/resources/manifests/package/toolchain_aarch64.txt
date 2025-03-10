@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
 kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
-kernel-headers-5.15.173.1-2.cm2.noarch.rpm
+kernel-headers-5.15.176.3-3.cm2.noarch.rpm
 kmod-29-2.cm2.aarch64.rpm
 kmod-debuginfo-29-2.cm2.aarch64.rpm
 kmod-devel-29-2.cm2.aarch64.rpm
@@ -151,9 +151,9 @@ libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
 libbacktrace-static-11.2.0-8.cm2.aarch64.rpm
-libcap-2.60-3.cm2.aarch64.rpm
-libcap-debuginfo-2.60-3.cm2.aarch64.rpm
-libcap-devel-2.60-3.cm2.aarch64.rpm
+libcap-2.60-4.cm2.aarch64.rpm
+libcap-debuginfo-2.60-4.cm2.aarch64.rpm
+libcap-devel-2.60-4.cm2.aarch64.rpm
 libcap-ng-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-debuginfo-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-devel-0.8.2-2.cm2.aarch64.rpm
@@ -518,7 +518,7 @@ python3-Cython-0.29.33-2.cm2.aarch64.rpm
 python3-debuginfo-3.9.19-11.cm2.aarch64.rpm
 python3-devel-3.9.19-11.cm2.aarch64.rpm
 python3-gpg-1.16.0-2.cm2.aarch64.rpm
-python3-jinja2-3.0.3-5.cm2.noarch.rpm
+python3-jinja2-3.0.3-6.cm2.noarch.rpm
 python3-libcap-ng-0.8.2-2.cm2.aarch64.rpm
 python3-libs-3.9.19-11.cm2.aarch64.rpm
 python3-libxml2-2.10.4-6.cm2.aarch64.rpm
