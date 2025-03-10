@@ -14792,8 +14792,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-extlib",
-          "version": "1.7.8",
-          "downloadUrl": "https://github.com/ygrek/ocaml-extlib/releases/download/1.7.8/extlib-1.7.8.tar.gz"
+          "version": "1.7.9",
+          "downloadUrl": "https://github.com/ygrek/ocaml-extlib/releases/download/1.7.9/extlib-1.7.9.tar.gz"
         }
       }
     },
