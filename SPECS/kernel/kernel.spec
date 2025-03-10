@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.78.1
-Release:        2000%{?dist}
+Release:        2002%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
+Patch2:         0001-Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -428,7 +429,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-2000
+* Sat Mar 08 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-2002
 - rebuilt
 
 * Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
