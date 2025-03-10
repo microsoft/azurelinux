@@ -123,7 +123,8 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	// Unresolved packages must match exactly to a package in the graph.
+	// Double check that the package is not already in the graph. The graph should have already used that node before
+	// this point.
 	nodes, err := g.FindExactPkgNodeFromPkg(pkgVer)
 	if err != nil {
 		return
@@ -207,6 +208,30 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	return
 }
 
+func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (reslovedNode *pkggraph.PkgNode, err error) {
+	existingRemoteNode, err := g.FindExactPkgNodeFromPkg(dependency)
+	if err != nil {
+		err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
+		return nil, err
+	}
+
+	if existingRemoteNode == nil {
+		// No local, and no exact remote, so create a new node.
+		reslovedNode, err = addUnresolvedPackage(g, dependency)
+		if err != nil {
+			err = fmt.Errorf("failed to add a remote node (%s):\n%w", dependency.Name, err)
+			return nil, err
+		}
+		logger.Log.Debugf("Added new node: '%s' for dependency %+v", reslovedNode.FriendlyName(), dependency)
+	} else {
+		// This exact dependency is already in the graph, so reuse it.
+		reslovedNode = existingRemoteNode.RunNode
+		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", reslovedNode.FriendlyName(), dependency)
+	}
+
+	return reslovedNode, nil
+}
+
 // addSingleDependency will add an edge between packageNode and the "Run" node for the
 // dependency described in the PackageVer structure. Returns an error if the
 // addition failed.
@@ -219,31 +244,16 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		return err
 	}
 
-	// Either the dependency is not in the graph, or it is a remote dependency and we need to be more careful about the
-	// version constraints since we can't assume that we will end up picking the exact version needed to meet all constraints.
+	// If we can't find the dependency in the graph, or it is a remote dependency, we need to do a bit of extra validation.
 	if nodes == nil || nodes.RunNode.Type != pkggraph.TypeLocalRun {
-		existingRemoteNodes, err := g.FindExactPkgNodeFromPkg(dependency)
+		dependentNode, err = handleRemoteDependency(g, dependency)
 		if err != nil {
-			err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
-			return err
-		}
-
-		if existingRemoteNodes == nil {
-			// No local, and no exact remote, so create a new node.
-			dependentNode, err = addUnresolvedPackage(g, dependency)
-			if err != nil {
-				err = fmt.Errorf("failed to add a package (%s):\n%w", dependency.Name, err)
-				return err
-			}
-			logger.Log.Debugf("Added new node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
-		} else {
-			// This exact dependency is already in the graph, so reuse it.
-			dependentNode = existingRemoteNodes.RunNode
-			logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
+			err = fmt.Errorf("failed to handle remote dependency from %+v to %+v:\n%w", packageNode.VersionedPkg, dependency, err)
 		}
 	} else {
 		// All dependencies are assumed to be "Run" dependencies
 		dependentNode = nodes.RunNode
+		logger.Log.Debugf("Found existing node: '%s' for dependency %+v", dependentNode.FriendlyName(), dependency)
 	}
 
 	if packageNode == dependentNode {
