@@ -41,7 +41,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 9%{?dist}
+Release:	 10%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -103,6 +103,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 
 %changelog
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 24.10-10
+- Bump release to rebuild for new kernel release
+
 * Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
 - Bump release to rebuild for new kernel release
 
