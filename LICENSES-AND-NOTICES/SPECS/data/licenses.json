@@ -2237,6 +2237,7 @@
                 "check-restart",
                 "clamav",
                 "cloud-hypervisor-cvm",
+                "cloud-provider-kubevirt",
                 "cmake-fedora",
                 "containerd",
                 "containerd2",
