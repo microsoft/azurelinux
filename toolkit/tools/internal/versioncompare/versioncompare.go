@@ -4,15 +4,16 @@
 package versioncompare
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 const (
-	lessThan    = -1
-	equalTo     = 0
-	greaterThan = 1
+	LessThan     = -1
+	EqualTo      = 0
+	GreatherThan = 1
 )
 
 var (
@@ -46,78 +47,73 @@ func NewMin() *TolerantVersion {
 	return &TolerantVersion{original: "MIN_VER", isMinVer: true}
 }
 
-func (v *TolerantVersion) GT(other *TolerantVersion) bool {
-	return v.compare(other) > 0
-}
-
-func (v *TolerantVersion) GTE(other *TolerantVersion) bool {
-	return v.compare(other) >= 0
-}
-
-func (v *TolerantVersion) LT(other *TolerantVersion) bool {
-	return v.compare(other) < 0
-}
-
-func (v *TolerantVersion) LTE(other *TolerantVersion) bool {
-	return v.compare(other) <= 0
-}
-
-func (v *TolerantVersion) EQ(other *TolerantVersion) bool {
-	return v.compare(other) == 0
-}
-
-func (v *TolerantVersion) NEQ(other *TolerantVersion) bool {
-	return v.compare(other) != 0
+// CompareWithConditional evaluates a conditional statement
+func (v *TolerantVersion) CompareWithConditional(condition string, b *TolerantVersion) (valid bool, err error) {
+	// Validate the operator
+	switch condition {
+	case "<":
+		return v.Compare(b) < 0, nil
+	case "<=":
+		return v.Compare(b) <= 0, nil
+	case ">":
+		return v.Compare(b) > 0, nil
+	case ">=":
+		return v.Compare(b) >= 0, nil
+	case "=":
+		return v.Compare(b) == 0, nil
+	default:
+		return false, fmt.Errorf("unknown conditional operator %s", condition)
+	}
 }
 
 // Compare compares this version and the argument version and returns 1 if the argument's version is higher,
 // -1 if argument's version is lower and 0 if they are equal (three-way comparison)
-func (v *TolerantVersion) compare(other *TolerantVersion) int {
+func (v *TolerantVersion) Compare(other *TolerantVersion) int {
 	switch {
 	case v.isMaxVer && other.isMaxVer:
 		fallthrough
 	case v.isMinVer && other.isMinVer:
-		return equalTo
+		return EqualTo
 	case v.isMaxVer || other.isMinVer:
-		return greaterThan
+		return GreatherThan
 	case v.isMinVer || other.isMaxVer:
-		return lessThan
+		return LessThan
 	}
 
 	for i := range v.versionComponents {
 		if i == len(other.versionComponents) {
-			return greaterThan
+			return GreatherThan
 		}
 		if v.versionComponents[i] < other.versionComponents[i] {
-			return lessThan
+			return LessThan
 		}
 		if v.versionComponents[i] > other.versionComponents[i] {
-			return greaterThan
+			return GreatherThan
 		}
 	}
 	if len(v.versionComponents) < len(other.versionComponents) {
-		return lessThan
+		return LessThan
 	}
 
 	// Only check the release components if both versions request it.
 	if len(v.releaseComponents) > 0 && len(other.releaseComponents) > 0 {
 		for i := range v.releaseComponents {
 			if i == len(other.releaseComponents) {
-				return greaterThan
+				return GreatherThan
 			}
 			if v.releaseComponents[i] < other.releaseComponents[i] {
-				return lessThan
+				return LessThan
 			}
 			if v.releaseComponents[i] > other.releaseComponents[i] {
-				return greaterThan
+				return GreatherThan
 			}
 		}
 		if len(v.releaseComponents) < len(other.releaseComponents) {
-			return lessThan
+			return LessThan
 		}
 	}
 
-	return equalTo
+	return EqualTo
 }
 
 // String returns the original string representation of the version

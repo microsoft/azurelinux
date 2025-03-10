@@ -6,27 +6,24 @@ package pkgjson
 import (
 	"testing"
 
-	"fmt"
-
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/versioncompare"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestBasicInterval(t *testing.T) {
 	p1 := &PackageVer{Version: "1"}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 
 	p1 = &PackageVer{Version: "1", Condition: "="}
 	interval, err = p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 }
@@ -50,16 +47,16 @@ func TestBasicIntervalSVersion(t *testing.T) {
 	p1 := &PackageVer{SVersion: "1"}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 
 	p1 = &PackageVer{SVersion: "1", SCondition: "="}
 	interval, err = p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 }
@@ -68,8 +65,8 @@ func TestNoDataInterval(t *testing.T) {
 	p1 := &PackageVer{}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.UpperBound.EQ(versioncompare.NewMax()))
-	assert.True(t, interval.LowerBound.EQ(versioncompare.NewMin()))
+	assert.True(t, interval.UpperBound.Compare(versioncompare.NewMax()) == 0)
+	assert.True(t, interval.LowerBound.Compare(versioncompare.NewMin()) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 }
@@ -78,8 +75,8 @@ func TestSingleConditionalIntervalGreater(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">"}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.NewMax()))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.NewMax()) == 0)
 	assert.False(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 }
@@ -88,8 +85,8 @@ func TestSingleConditionalIntervalGreaterOrEqual(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">="}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.NewMax()))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.NewMax()) == 0)
 	assert.True(t, interval.LowerInclusive)
 	assert.True(t, interval.UpperInclusive)
 }
@@ -98,8 +95,8 @@ func TestSingleConditionalIntervalLess(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: "<"}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.LowerBound.EQ(versioncompare.NewMin()))
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.LowerBound.Compare(versioncompare.NewMin()) == 0)
 	assert.False(t, interval.UpperInclusive)
 	assert.True(t, interval.LowerInclusive)
 }
@@ -108,8 +105,8 @@ func TestSingleConditionalIntervalLessOrEqual(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: "<="}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.LowerBound.EQ(versioncompare.NewMin()))
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.LowerBound.Compare(versioncompare.NewMin()) == 0)
 	assert.True(t, interval.UpperInclusive)
 	assert.True(t, interval.LowerInclusive)
 }
@@ -118,8 +115,8 @@ func TestCreateRangeBothInclusive(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: "<="}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("2")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("2")) == 0)
 	assert.True(t, interval.UpperInclusive)
 	assert.True(t, interval.LowerInclusive)
 }
@@ -128,8 +125,8 @@ func TestCreateRangeInverted(t *testing.T) {
 	p1 := &PackageVer{Version: "2", Condition: "<=", SVersion: "1", SCondition: ">="}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("2")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("2")) == 0)
 	assert.True(t, interval.UpperInclusive)
 	assert.True(t, interval.LowerInclusive)
 }
@@ -138,16 +135,16 @@ func TestCreateRangeOneInclusive(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">", SVersion: "2", SCondition: "<="}
 	interval, err := p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("2")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("2")) == 0)
 	assert.True(t, interval.UpperInclusive)
 	assert.False(t, interval.LowerInclusive)
 
 	p1 = &PackageVer{Version: "1", Condition: ">=", SVersion: "2", SCondition: "<"}
 	interval, err = p1.Interval()
 	assert.NoError(t, err)
-	assert.True(t, interval.LowerBound.EQ(versioncompare.New("1")))
-	assert.True(t, interval.UpperBound.EQ(versioncompare.New("2")))
+	assert.True(t, interval.LowerBound.Compare(versioncompare.New("1")) == 0)
+	assert.True(t, interval.UpperBound.Compare(versioncompare.New("2")) == 0)
 	assert.False(t, interval.UpperInclusive)
 	assert.True(t, interval.LowerInclusive)
 }
@@ -197,60 +194,36 @@ func TestMembershipOutsideInterval(t *testing.T) {
 func TestMembershipEdgeInvalidInterval(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">", SVersion: "3", SCondition: "<"}
 	tests := []*PackageVer{
-		{Version: "1", Condition: "="},
-		{Version: "1", Condition: "<"},
-		{Version: "1", Condition: "<="},
-		{Version: "3", Condition: "="},
-		{Version: "3", Condition: ">"},
-		{Version: "3", Condition: ">="},
+		&PackageVer{Version: "1", Condition: "="},
+		&PackageVer{Version: "1", Condition: "<"},
+		&PackageVer{Version: "1", Condition: "<="},
+		&PackageVer{Version: "3", Condition: "="},
+		&PackageVer{Version: "3", Condition: ">"},
+		&PackageVer{Version: "3", Condition: ">="},
 	}
 	interval1, err := p1.Interval()
 	assert.NoError(t, err)
-	for i, pkg := range tests {
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			interval2, err := pkg.Interval()
-			assert.NoError(t, err)
-			assert.False(t, interval1.Satisfies(&interval2))
-		})
+	for _, pkg := range tests {
+		interval2, err := pkg.Interval()
+		assert.NoError(t, err)
+		assert.False(t, interval1.Satisfies(&interval2))
 	}
 }
 
 func TestMembershipEdgeValidInterval(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">=", SVersion: "3", SCondition: "<="}
 	tests := []*PackageVer{
-		{Version: "1", Condition: "="},
-		{Version: "1", Condition: "<="},
-		{Version: "3", Condition: "="},
-		{Version: "3", Condition: ">="},
-		{Version: "1", Condition: ">"},
-		{Version: "3", Condition: "<"},
-		{Version: "1", Condition: ">", SVersion: "3", SCondition: "<"},
+		&PackageVer{Version: "1", Condition: "="},
+		&PackageVer{Version: "1", Condition: "<="},
+		&PackageVer{Version: "3", Condition: "="},
+		&PackageVer{Version: "3", Condition: ">="},
 	}
 	interval1, err := p1.Interval()
 	assert.NoError(t, err)
-	for i, pkg := range tests {
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			interval2, err := pkg.Interval()
-			assert.NoError(t, err)
-			assert.True(t, interval1.Satisfies(&interval2))
-		})
-	}
-}
-
-func TestMembershipEdgeExclusiveValidInterval(t *testing.T) {
-	p1 := &PackageVer{Version: "1", Condition: ">", SVersion: "3", SCondition: "<"}
-	tests := []*PackageVer{
-		{Version: "1", Condition: ">"},
-		{Version: "1", Condition: ">="},
-	}
-	interval1, err := p1.Interval()
-	assert.NoError(t, err)
-	for i, pkg := range tests {
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			interval2, err := pkg.Interval()
-			assert.NoError(t, err)
-			assert.True(t, interval1.Satisfies(&interval2))
-		})
+	for _, pkg := range tests {
+		interval2, err := pkg.Interval()
+		assert.NoError(t, err)
+		assert.True(t, interval1.Satisfies(&interval2))
 	}
 }
 
@@ -267,8 +240,8 @@ func TestSubsetValidInside(t *testing.T) {
 
 	assert.True(t, interval1.Satisfies(&interval2))
 	assert.True(t, interval1.Satisfies(&interval3))
-	assert.False(t, interval1.GuaranteedSatisfies(&interval2))
-	assert.False(t, interval1.GuaranteedSatisfies(&interval3))
+	assert.False(t, interval1.Contains(&interval2))
+	assert.False(t, interval1.Contains(&interval3))
 }
 
 func TestSubsetValidOutside(t *testing.T) {
@@ -284,116 +257,25 @@ func TestSubsetValidOutside(t *testing.T) {
 
 	assert.True(t, interval1.Satisfies(&interval2))
 	assert.True(t, interval1.Satisfies(&interval3))
-	assert.True(t, interval1.GuaranteedSatisfies(&interval2))
-	assert.True(t, interval1.GuaranteedSatisfies(&interval3))
+	assert.False(t, interval1.Contains(&interval2))
+	assert.False(t, interval1.Contains(&interval3))
 }
 
 func TestSubsetInvalid(t *testing.T) {
 	p1 := &PackageVer{Version: "1", Condition: ">=", SVersion: "3", SCondition: "<="}
 	p2 := &PackageVer{Version: "1", Condition: ">"}
+	p3 := &PackageVer{Version: "1", Condition: ">"}
 	interval1, err := p1.Interval()
 	assert.NoError(t, err)
 	interval2, err := p2.Interval()
 	assert.NoError(t, err)
+	interval3, err := p3.Interval()
+	assert.NoError(t, err)
 
 	assert.True(t, interval1.Satisfies(&interval2))
-	assert.False(t, interval1.GuaranteedSatisfies(&interval2))
-}
-
-// Ensure we don't allow 'pkg > 1' and 'pkg < 3' to match. While they have overlapping versions, in practice we have no
-// guarantee that we will actually be able to provide a version that satisfies both conditions.
-func TestSubsetNonDeterministicInterval(t *testing.T) {
-	testInputs := []struct {
-		name                                                                 string
-		existingPkgVer1, existingPkgCond1, existingPkgVer2, existingPkgCond2 string
-		queryPkgVer1, queryPkgCond1, queryPkgVer2, queryPkgCond2             string
-		expected                                                             bool
-	}{
-		{
-			name:            "p < q, unbounded",
-			existingPkgVer1: "1", existingPkgCond1: ">",
-			queryPkgVer1: "3", queryPkgCond1: ">",
-			expected: false,
-		},
-		{
-			name:            "p < q, bounded",
-			existingPkgVer1: "1", existingPkgCond1: ">", existingPkgVer2: "5", existingPkgCond2: "<",
-			queryPkgVer1: "3", queryPkgCond1: ">",
-			expected: false,
-		},
-		{
-			name:            "p <= q, unbounded",
-			existingPkgVer1: "1", existingPkgCond1: ">",
-			queryPkgVer1: "1", queryPkgCond1: ">",
-			expected: true,
-		},
-		{
-			name:            "p <= q, bounded",
-			existingPkgVer1: "1", existingPkgCond1: ">", existingPkgVer2: "5", existingPkgCond2: "<",
-			queryPkgVer1: "1", queryPkgCond1: ">",
-			expected: true,
-		},
-		{
-			name:            "p > q, unbounded",
-			existingPkgVer1: "5", existingPkgCond1: "<",
-			queryPkgVer1: "1", queryPkgCond1: "<",
-			expected: false,
-		},
-		{
-			name:            "p > q, bounded",
-			existingPkgVer1: "5", existingPkgCond1: "<", existingPkgVer2: "1", existingPkgCond2: ">",
-			queryPkgVer1: "1", queryPkgCond1: "<",
-			expected: false,
-		},
-		{
-			name:            "p >= q, unbounded",
-			existingPkgVer1: "5", existingPkgCond1: "<",
-			queryPkgVer1: "5", queryPkgCond1: "<",
-			expected: true,
-		},
-		{
-			name:            "p >= q, bounded",
-			existingPkgVer1: "5", existingPkgCond1: "<", existingPkgVer2: "1", existingPkgCond2: ">",
-			queryPkgVer1: "5", queryPkgCond1: "<",
-			expected: true,
-		},
-		{
-			name:            "p = q, unbounded",
-			existingPkgVer1: "1", existingPkgCond1: ">",
-			queryPkgVer1: "1", queryPkgCond1: ">",
-			expected: true,
-		},
-		{
-			name:            "p = q, one bounded",
-			existingPkgVer1: "1", existingPkgCond1: ">", existingPkgVer2: "5", existingPkgCond2: "<",
-			queryPkgVer1: "1", queryPkgCond1: ">",
-			expected: true,
-		},
-		{
-			name:            "p = q, both bounded",
-			existingPkgVer1: "1", existingPkgCond1: ">", existingPkgVer2: "5", existingPkgCond2: "<",
-			queryPkgVer1: "1", queryPkgCond1: ">", queryPkgVer2: "5", queryPkgCond2: "<",
-			expected: true,
-		},
-		{
-			name:            "subset",
-			existingPkgVer1: "1", existingPkgCond1: ">", existingPkgVer2: "3", existingPkgCond2: "<",
-			queryPkgVer1: "1", queryPkgCond1: ">=", queryPkgVer2: "5", queryPkgCond2: "<=",
-			expected: true,
-		},
-	}
-	for _, test := range testInputs {
-		t.Run(test.name, func(t *testing.T) {
-			p1 := &PackageVer{Version: test.existingPkgVer1, Condition: test.existingPkgCond1, SVersion: test.existingPkgVer2, SCondition: test.existingPkgCond2}
-			p2 := &PackageVer{Version: test.queryPkgVer1, Condition: test.queryPkgCond1, SVersion: test.queryPkgVer2, SCondition: test.queryPkgCond2}
-			interval1, err := p1.Interval()
-			require.NoError(t, err)
-			interval2, err := p2.Interval()
-			require.NoError(t, err)
-
-			assert.Equal(t, test.expected, interval1.GuaranteedSatisfies(&interval2))
-		})
-	}
+	assert.True(t, interval1.Satisfies(&interval3))
+	assert.False(t, interval1.Contains(&interval2))
+	assert.False(t, interval1.Contains(&interval3))
 }
 
 func TestIntervalEquality(t *testing.T) {

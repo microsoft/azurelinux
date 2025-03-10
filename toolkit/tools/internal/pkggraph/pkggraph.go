@@ -325,7 +325,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	// Basic run nodes can only provide basic conditional versions
 	if pkgNode.Type != TypeRemoteRun {
 		// We only support a single conditional (ie ver >= 1), or (ver = 1)
-		if versionInterval.UpperBound.NEQ(versioncompare.NewMax()) && versionInterval.UpperBound.NEQ(versionInterval.LowerBound) {
+		if versionInterval.UpperBound.Compare(versioncompare.NewMax()) != 0 && versionInterval.UpperBound.Compare(versionInterval.LowerBound) != 0 {
 			err = fmt.Errorf("%s is a run node and can't have double conditionals", pkgNode)
 			return
 		}
@@ -552,7 +552,7 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 			return
 		}
 
-		if nodeInterval.GuaranteedSatisfies(&requestInterval) {
+		if nodeInterval.Satisfies(&requestInterval) {
 			// Only local packages will have a build node
 			if node.BuildNode != nil {
 				bestLocalNode = node
