@@ -16093,8 +16093,8 @@
         "type": "other",
         "other": {
           "name": "perl-Authen-SASL",
-          "version": "2.16",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GB/GBARR/Authen-SASL-2.16.tar.gz"
+          "version": "2.1700",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EH/EHUELS/Authen-SASL-2.1700.tar.gz"
         }
       }
     },
