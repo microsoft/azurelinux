@@ -25243,8 +25243,8 @@
         "type": "other",
         "other": {
           "name": "python-voluptuous",
-          "version": "0.11.7",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/v/voluptuous/voluptuous-0.11.7.tar.gz"
+          "version": "0.15.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/v/voluptuous/voluptuous-0.15.2.tar.gz"
         }
       }
     },
