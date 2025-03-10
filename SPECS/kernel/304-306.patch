@@ -1,0 +1,230 @@
+From 3e6e5acf4c7dead000aea3492b01fc7f008c6a04 Mon Sep 17 00:00:00 2001
+From: Su Yue <glass.su@suse.com>
+Date: Mon, 6 Jan 2025 22:06:53 +0800
+Subject: [PATCH 1/3] ocfs2: mark dquot as inactive if failed to start trans
+ while releasing dquot
+
+[ Upstream commit 276c61385f6bc3223a5ecd307cf4aba2dfbb9a31 ]
+
+While running fstests generic/329, the kernel workqueue
+quota_release_workfn is dead looping in calling ocfs2_release_dquot().
+The ocfs2 state is already readonly but ocfs2_release_dquot wants to
+start a transaction but fails and returns.
+
+=====================================================================
+[ 2918.123602 ][  T275 ] On-disk corruption discovered. Please run
+fsck.ocfs2 once the filesystem is unmounted.
+[ 2918.124034 ][  T275 ] (kworker/u135:1,275,11):ocfs2_release_dquot:765
+ERROR: status = -30
+[ 2918.124452 ][  T275 ] (kworker/u135:1,275,11):ocfs2_release_dquot:795
+ERROR: status = -30
+[ 2918.124883 ][  T275 ] (kworker/u135:1,275,11):ocfs2_start_trans:357
+ERROR: status = -30
+[ 2918.125276 ][  T275 ] OCFS2: abort (device dm-0): ocfs2_start_trans:
+Detected aborted journal
+[ 2918.125710 ][  T275 ] On-disk corruption discovered. Please run
+fsck.ocfs2 once the filesystem is unmounted.
+=====================================================================
+
+ocfs2_release_dquot() is much like dquot_release(), which is called by
+ext4 to handle similar situation.  So here fix it by marking the dquot as
+inactive like what dquot_release() does.
+
+Link: https://lkml.kernel.org/r/20250106140653.92292-1-glass.su@suse.com
+Fixes: 9e33d69f553a ("ocfs2: Implementation of local and global quota file handling")
+Signed-off-by: Su Yue <glass.su@suse.com>
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Mark Fasheh <mark@fasheh.com>
+Cc: Joel Becker <jlbec@evilplan.org>
+Cc: Junxiao Bi <junxiao.bi@oracle.com>
+Cc: Changwei Ge <gechangwei@live.cn>
+Cc: Jun Piao <piaojun@huawei.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ocfs2/quota_global.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/ocfs2/quota_global.c b/fs/ocfs2/quota_global.c
+index 0dffd6a44d39..24b031dc44ee 100644
+--- a/fs/ocfs2/quota_global.c
++++ b/fs/ocfs2/quota_global.c
+@@ -749,6 +749,11 @@ static int ocfs2_release_dquot(struct dquot *dquot)
+ 	handle = ocfs2_start_trans(osb,
+ 		ocfs2_calc_qdel_credits(dquot->dq_sb, dquot->dq_id.type));
+ 	if (IS_ERR(handle)) {
++		/*
++		 * Mark dquot as inactive to avoid endless cycle in
++		 * quota_release_workfn().
++		 */
++		clear_bit(DQ_ACTIVE_B, &dquot->dq_flags);
+ 		status = PTR_ERR(handle);
+ 		mlog_errno(status);
+ 		goto out_ilock;
+-- 
+2.45.2
+
+
+From 724dc6daebb103ed13c9a7d39026d3524030a1dc Mon Sep 17 00:00:00 2001
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Date: Mon, 16 Oct 2023 21:10:49 +0100
+Subject: [PATCH 2/3] buffer: make folio_create_empty_buffers() return a
+ buffer_head
+
+[ Upstream commit 3decb8564eff88a2533f83b01cec2cf9259c3eaf ]
+
+Patch series "Finish the create_empty_buffers() transition", v2.
+
+Pankaj recently added folio_create_empty_buffers() as the folio equivalent
+to create_empty_buffers().  This patch set finishes the conversion by
+first converting all remaining filesystems to call
+folio_create_empty_buffers(), then renaming it back to
+create_empty_buffers().  I took the opportunity to make a few
+simplifications like making folio_create_empty_buffers() return the head
+buffer and extracting get_nth_bh() from nilfs2.
+
+A few of the patches in this series aren't directly related to
+create_empty_buffers(), but I saw them while I was working on this and
+thought they'd be easy enough to add to this series.  Compile-tested only,
+other than ext4.
+
+This patch (of 26):
+
+Almost all callers want to know the first BH that was allocated for this
+folio.  We already have that handy, so return it.
+
+Link: https://lkml.kernel.org/r/20231016201114.1928083-1-willy@infradead.org
+Link: https://lkml.kernel.org/r/20231016201114.1928083-3-willy@infradead.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Stable-dep-of: 367a9bffabe0 ("nilfs2: protect access to buffers with no active references")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/buffer.c                 | 24 +++++++++++++-----------
+ include/linux/buffer_head.h |  4 ++--
+ 2 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index ecd8b47507ff..4b86e971efd8 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1640,8 +1640,8 @@ EXPORT_SYMBOL(block_invalidate_folio);
+  * block_dirty_folio() via private_lock.  try_to_free_buffers
+  * is already excluded via the folio lock.
+  */
+-void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+-				unsigned long b_state)
++struct buffer_head *folio_create_empty_buffers(struct folio *folio,
++		unsigned long blocksize, unsigned long b_state)
+ {
+ 	struct buffer_head *bh, *head, *tail;
+ 
+@@ -1667,6 +1667,8 @@ void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+ 	}
+ 	folio_attach_private(folio, head);
+ 	spin_unlock(&folio->mapping->private_lock);
++
++	return head;
+ }
+ EXPORT_SYMBOL(folio_create_empty_buffers);
+ 
+@@ -1768,13 +1770,15 @@ static struct buffer_head *folio_create_buffers(struct folio *folio,
+ 						struct inode *inode,
+ 						unsigned int b_state)
+ {
++	struct buffer_head *bh;
++
+ 	BUG_ON(!folio_test_locked(folio));
+ 
+-	if (!folio_buffers(folio))
+-		folio_create_empty_buffers(folio,
+-					   1 << READ_ONCE(inode->i_blkbits),
+-					   b_state);
+-	return folio_buffers(folio);
++	bh = folio_buffers(folio);
++	if (!bh)
++		bh = folio_create_empty_buffers(folio,
++				1 << READ_ONCE(inode->i_blkbits), b_state);
++	return bh;
+ }
+ 
+ /*
+@@ -2678,10 +2682,8 @@ int block_truncate_page(struct address_space *mapping,
+ 		return PTR_ERR(folio);
+ 
+ 	bh = folio_buffers(folio);
+-	if (!bh) {
+-		folio_create_empty_buffers(folio, blocksize, 0);
+-		bh = folio_buffers(folio);
+-	}
++	if (!bh)
++		bh = folio_create_empty_buffers(folio, blocksize, 0);
+ 
+ 	/* Find the buffer that contains "offset" */
+ 	offset = offset_in_folio(folio, from);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 44e9de51eedf..572030db2f06 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -203,8 +203,8 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
+ 		bool retry);
+ void create_empty_buffers(struct page *, unsigned long,
+ 			unsigned long b_state);
+-void folio_create_empty_buffers(struct folio *folio, unsigned long blocksize,
+-				unsigned long b_state);
++struct buffer_head *folio_create_empty_buffers(struct folio *folio,
++		unsigned long blocksize, unsigned long b_state);
+ void end_buffer_read_sync(struct buffer_head *bh, int uptodate);
+ void end_buffer_write_sync(struct buffer_head *bh, int uptodate);
+ void end_buffer_async_write(struct buffer_head *bh, int uptodate);
+-- 
+2.45.2
+
+
+From 61a8a1917a4b2ca56bb21f78377a4d7c3c6244ca Mon Sep 17 00:00:00 2001
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Date: Mon, 16 Oct 2023 21:11:03 +0100
+Subject: [PATCH 3/3] nilfs2: convert nilfs_lookup_dirty_data_buffers to use
+ folio_create_empty_buffers
+
+[ Upstream commit 922b12eff0b293fc13ae4045c7d7264e18938878 ]
+
+This function was already using a folio, so this update to the new API
+removes a single folio->page->folio conversion.
+
+Link: https://lkml.kernel.org/r/20231016201114.1928083-17-willy@infradead.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Pankaj Raghav <p.raghav@samsung.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Stable-dep-of: 367a9bffabe0 ("nilfs2: protect access to buffers with no active references")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/nilfs2/segment.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index 0610cb12c11c..57b535921a73 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -731,10 +731,9 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 			continue;
+ 		}
+ 		head = folio_buffers(folio);
+-		if (!head) {
+-			create_empty_buffers(&folio->page, i_blocksize(inode), 0);
+-			head = folio_buffers(folio);
+-		}
++		if (!head)
++			head = folio_create_empty_buffers(folio,
++					i_blocksize(inode), 0);
+ 		folio_unlock(folio);
+ 
+ 		bh = head;
+-- 
+2.45.2
+
