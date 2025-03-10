@@ -1,0 +1,49 @@
+From 7f89208b860ea0c41636410bfdb6a609b2772f47 Mon Sep 17 00:00:00 2001
+From: Eivind Naess <eivnaes@yahoo.com>
+Date: Sun, 23 Apr 2023 11:37:01 -0700
+Subject: [PATCH] Closes #411, Fixing up parsing in radiusclient.conf
+
+Adding curly braces to fix the code.
+
+Signed-off-by: Eivind Naess <eivnaes@yahoo.com>
+---
+ pppd/plugins/radius/config.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/pppd/plugins/radius/config.c b/pppd/plugins/radius/config.c
+index 39744fca1..e1a481487 100644
+--- a/pppd/plugins/radius/config.c
++++ b/pppd/plugins/radius/config.c
+@@ -235,24 +235,28 @@ int rc_read_config(char *filename)
+ 
+ 		switch (option->type) {
+ 			case OT_STR:
+-				 if (set_option_str(filename, line, option, p) < 0)
++				if (set_option_str(filename, line, option, p) < 0) {
+ 					fclose(configfd);
+ 					return (-1);
++				}
+ 				break;
+ 			case OT_INT:
+-				 if (set_option_int(filename, line, option, p) < 0)
++				if (set_option_int(filename, line, option, p) < 0) {
+ 					fclose(configfd);
+ 					return (-1);
++				}
+ 				break;
+ 			case OT_SRV:
+-				 if (set_option_srv(filename, line, option, p) < 0)
++				if (set_option_srv(filename, line, option, p) < 0) {
+ 					fclose(configfd);
+ 					return (-1);
++				}
+ 				break;
+ 			case OT_AUO:
+-				 if (set_option_auo(filename, line, option, p) < 0)
++				if (set_option_auo(filename, line, option, p) < 0) {
+ 					fclose(configfd);
+ 					return (-1);
++				}
+ 				break;
+ 			default:
+ 				fatal("rc_read_config: impossible case branch!");
