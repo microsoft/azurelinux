@@ -82,7 +82,7 @@ func PackageLess(a, b PackageVer) bool {
 	} else if a.Name == b.Name {
 		v1 := versioncompare.New(a.Version)
 		v2 := versioncompare.New(b.Version)
-		if v1.LT(v2) {
+		if v1.Compare(v2) < 0 {
 			return true
 		}
 	}
