@@ -131,6 +131,9 @@ install -p -m0644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/cups/mime/
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/fonts/conf.d
 install -p -m0644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/fonts/conf.d/
 
+install -d $RPM_BUILD_ROOT%{_licensedir}
+install COPYING.LIB $RPM_BUILD_ROOT%{_licensedir}/COPYING_1.LIB
+
 rm -rf $RPM_BUILD_ROOT%{_includedir}
 rm $RPM_BUILD_ROOT%{_libdir}/libpaps.so
 popd
@@ -140,7 +143,8 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 %ldconfig_scriptlets libs
 
 %files
-%doc AUTHORS COPYING.LIB README
+%license COPYING.LIB
+%doc AUTHORS README
 %dir %{_datadir}/paps
 %{_bindir}/paps
 %{_bindir}/src-to-paps
@@ -148,7 +152,8 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 %{_mandir}/man1/paps.1*
 
 %files -n texttopaps
-%doc %{name}-0.6.8/COPYING.LIB %{name}-0.6.8/AUTHORS %{name}-0.6.8/README
+%license %{_licensedir}/COPYING_1.LIB
+%doc %{name}-0.6.8/AUTHORS %{name}-0.6.8/README
 %{_mandir}/man1/texttopaps.1*
 %{_libdir}/libpaps.so.*
 %{_cups_serverbin}/filter/texttopaps
@@ -157,7 +162,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 
 
 %changelog
-* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> -    0.8.0 -12
+* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> - 0.8.0-12
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
