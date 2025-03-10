@@ -22543,8 +22543,8 @@
         "type": "other",
         "other": {
           "name": "python-dulwich",
-          "version": "0.19.16",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/dulwich/dulwich-0.19.16.tar.gz"
+          "version": "0.21.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/dulwich/dulwich-0.21.7.tar.gz"
         }
       }
     },
