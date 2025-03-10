@@ -75,17 +75,13 @@ type Package struct {
 }
 
 func packageLess(a, b PackageVer) bool {
-	if a.Name < b.Name {
-		return true
-	} else if a.Name == b.Name {
+	if a.Name == b.Name {
 		v1 := versioncompare.New(a.Version)
 		v2 := versioncompare.New(b.Version)
-		if v1.Compare(v2) < 0 {
-			return true
-		}
+		return v1.Compare(v2) < 0
 	}
 
-	return false
+	return a.Name < b.Name
 }
 
 func SortPackageList(packages []*Package) {
