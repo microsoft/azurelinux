@@ -25173,8 +25173,8 @@
         "type": "other",
         "other": {
           "name": "python-urwid",
-          "version": "2.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/u/urwid/urwid-2.1.2.tar.gz"
+          "version": "2.6.14",
+          "downloadUrl": "https://pypi.org/packages/source/u/urwid/urwid-2.6.14.tar.gz"
         }
       }
     },
