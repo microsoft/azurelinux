@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Business-ISBN-Data
 Version:        20240930.001
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The data pack for Business::ISBN
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Business-ISBN-Data
@@ -59,8 +59,8 @@ make test
 %{_mandir}/man3/Business::ISBN::Data.3*
 
 %changelog
-* Thu Dec 12 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 20240930.001-1
-- Update to 20240930.001
+* Thu Dec 12 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 20240930.001-2
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
 - License verified
 
 * Mon Sep 30 2024 Jitka Plesnikova <jplesnik@redhat.com> - 20240930.001-1
