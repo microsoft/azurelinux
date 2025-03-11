@@ -320,15 +320,7 @@ fi
 %{_libdir}/opencryptoki/stdll/PKCS11_ICSF.so
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/icsf/
 
-%ifarch s390 s390x
-%files icatok
-%{_libdir}/opencryptoki/stdll/libpkcs11_ica.*
-%{_libdir}/opencryptoki/stdll/PKCS11_ICA.so
-%dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/lite/
-%dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/lite/TOK_OBJ/
-%endif
-
-%ifarch s390 s390x x86_64 ppc64le
+%ifarch x86_64
 %files ccatok
 %doc doc/README.cca_stdll
 %config(noreplace) %{_sysconfdir}/%{name}/ccatok.conf
@@ -338,21 +330,6 @@ fi
 %{_libdir}/opencryptoki/stdll/PKCS11_CCA.so
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/ccatok/
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/ccatok/TOK_OBJ/
-%endif
-
-%ifarch s390 s390x
-%files ep11tok
-%doc doc/README.ep11_stdll
-%config(noreplace) %{_sysconfdir}/%{name}/ep11tok.conf
-%config(noreplace) %{_sysconfdir}/%{name}/ep11cpfilter.conf
-%{_sbindir}/pkcsep11_migrate
-%{_sbindir}/pkcsep11_session
-%{_mandir}/man1/pkcsep11_migrate.1*
-%{_mandir}/man1/pkcsep11_session.1*
-%{_libdir}/opencryptoki/stdll/libpkcs11_ep11.*
-%{_libdir}/opencryptoki/stdll/PKCS11_EP11.so
-%dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/ep11tok/
-%dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/ep11tok/TOK_OBJ/
 %endif
 
 %changelog
