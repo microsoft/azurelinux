@@ -77,7 +77,7 @@ mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
 %doc %{_docdir}/%{name}/%{name}-%{maj}
 
 %changelog
-* Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.6.2-2
+* Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.6.2-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
