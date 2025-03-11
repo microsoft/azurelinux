@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.17
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         001-remove_arch_specific_makefile_logic.patch
 Patch1:         002-add_mariner_OSVersion.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2023-45288.patch
+Patch4:         CVE-2025-22868.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       mariner-release
@@ -66,6 +67,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.17-6
+- Fix CVE-2025-22868 with an upstream patch
+
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.17-5
 - Bump release to rebuild with go 1.22.7
 
