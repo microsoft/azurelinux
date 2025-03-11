@@ -4,7 +4,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
-Version:        1.1.9
+Version:        1.1.15
 Release:        7%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
