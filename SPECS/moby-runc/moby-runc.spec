@@ -13,7 +13,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-21626.patch
 
 BuildRequires:  git
 BuildRequires:  golang => 1.16
