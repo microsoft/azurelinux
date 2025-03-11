@@ -1,7 +1,7 @@
 Summary:        Command-line editing and history capabilities
 Name:           readline
 Version:        8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,8 @@ URL:            https://tiswww.case.edu/php/chet/readline/rltop.html
 Source0:        https://ftp.gnu.org/gnu/readline/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 Requires:       ncurses-libs
+
+Patch:          readline-8.2-patch-1.patch
 
 %description
 The Readline package is a set of libraries that offers command-line
@@ -23,7 +25,7 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 
@@ -109,6 +111,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/history.pc
 
 %changelog
+* Tue Mar 11 2025 Thien Trung Vuong <tvuong@microsoft.com> - 8.2-2
+- Add patch to fix readline crash when initialized with an invalid locale specification
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2-1
 - Auto-upgrade to 8.2 - Azure Linux 3.0 - package upgrades
 
