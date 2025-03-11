@@ -1,20 +1,20 @@
 %bcond_with jack
-Summary:        Cross-platform multimedia library
 Name:           SDL2
-Version:        2.24.0
-Release:        2%{?dist}
-License:        zlib AND MIT
+Version:        2.30.9
+Release:        1%{?dist}
+Summary:        Cross-platform multimedia library
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+License:        Zlib AND MIT AND Apache-2.0 AND (Apache-2.0 OR MIT)
 URL:            https://www.libsdl.org/
 Source0:        https://www.libsdl.org/release/%{name}-%{version}.tar.gz
 Source1:        SDL_config.h
 Source2:        SDL_revision.h
+
 Patch0:         multilib.patch
-# ptrdiff_t is not the same as khronos defines on 32bit arches
-Patch1:         SDL2-2.0.9-khrplatform.patch
 # Prefer Wayland by default
-Patch2:         SDL2-2.0.22-prefer-wayland.patch
+Patch1:         SDL2-2.30.1-prefer-wayland.patch
+
 BuildRequires:  git-core
 BuildRequires:  cmake
 BuildRequires:  make
@@ -30,7 +30,8 @@ BuildRequires:  libX11-devel
 BuildRequires:  libXi-devel
 BuildRequires:  libXrandr-devel
 BuildRequires:  libXrender-devel
-BuildRequires:  libXScrnSaver-devel
+# While SDL2 supports this, Xwayland does not expose XScrnSaver.
+# BuildRequires:  libXScrnSaver-devel
 BuildRequires:  libXinerama-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  systemd-devel
@@ -67,9 +68,9 @@ to provide fast access to the graphics frame buffer and audio device.
 %package devel
 Summary:        Files needed to develop Simple DirectMedia Layer applications
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libX11-devel%{?_isa}
 Requires:       mesa-libEGL-devel%{?_isa}
 Requires:       mesa-libGLES-devel%{?_isa}
+Requires:       libX11-devel%{?_isa}
 # Conflict with versions before libSDLmain moved here
 Conflicts:      %{name}-static < 2.0.18-4
 
@@ -90,14 +91,16 @@ Conflicts:      %{name}-devel < 2.0.18-4
 Static libraries for SDL2.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -S git
+#autopatch 0
 sed -i -e 's/\r//g' TODO.txt README.md WhatsNew.txt BUGS.txt LICENSE.txt CREDITS.txt README-SDL.txt
 
 %build
 # Deal with new CMake policy around whitespace in LDFLAGS...
 export LDFLAGS="%{shrink:%{build_ldflags}}"
 
-mkdir -p buildDir
+mkdir -p build
+cd build
 
 %cmake \
     -DSDL_DLOPEN=ON \
@@ -109,7 +112,7 @@ mkdir -p buildDir
 %if %{with jack}
     -DSDL_JACK_SHARED=ON \
 %else
-    -DSDL_JACK=OFF \
+    -DSDL_JACK_SHARED=ON  \
 %endif
     -DSDL_PIPEWIRE_SHARED=ON \
     -DSDL_ALSA=ON \
@@ -118,12 +121,15 @@ mkdir -p buildDir
     -DSDL_SSE3=OFF \
     -DSDL_RPATH=OFF \
     -DSDL_STATIC=ON \
-    -DSDL_STATIC_PIC=ON -B ./buildDir
+    -DSDL_STATIC_PIC=ON \
+     ..
 
-cmake --build buildDir %{?_smp_mflags} --verbose
+%cmake_build
 
 %install
-DESTDIR=%{buildroot} cmake --install buildDir
+cd build
+%cmake_install
+cd ..
 
 # Rename SDL_config.h to SDL_config-<arch>.h to avoid file conflicts on
 # multilib systems and install SDL_config.h wrapper
@@ -151,6 +157,7 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 %{_libdir}/cmake/SDL2/SDL2Config*.cmake
 %{_libdir}/cmake/SDL2/SDL2Targets*.cmake
 %{_libdir}/cmake/SDL2/SDL2mainTargets*.cmake
+%{_libdir}/cmake/SDL2/sdlfind.cmake
 %{_includedir}/SDL2
 %{_datadir}/aclocal/*
 %{_libdir}/libSDL2_test.a
@@ -162,7 +169,11 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 %{_libdir}/cmake/SDL2/SDL2staticTargets*.cmake
 
 %changelog
-* Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2
+* Tue Mar 11 2025 Jyoti kanase <v-jykanase@microsoft.com> - 2.30.9-1
+- Upgrade to 2.30.9
+- License verified.
+
+* Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2                           
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with feature disabled: jack
 - License verified
