@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -130,6 +130,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
+- Enable webdav module
+
 * Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
 - Fix CVE-2025-234419
 
