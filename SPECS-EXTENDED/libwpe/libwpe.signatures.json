@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "libwpe-1.12.0.tar.xz": "e8eeca228a6b4c36294cfb63f7d3ba9ada47a430904a5a973b3c99c96a44c18c"
+  "libwpe-1.15.2.tar.xz": "6d769f64cee0fb1b5069c3b250b0f91e5cd90564cd2efdf633442bab96e5dbe8",
+  "libwpe-1.15.2.tar.xz.asc": "17577d9bf2603c0caba8cda5dfa8a69cb11114c57282071f8dce1b96385e6ab4",
+  "gpgkey-5AA3BC334FD7E3369E7C77B291C559DBE4C9123B.gpg": "acfa112e3719b1f5aee1a658affe36a9ab4f0b068a139fbcf8ac2ccd3c1f3959"
  }
 }

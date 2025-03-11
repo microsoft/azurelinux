@@ -1,12 +1,12 @@
 Name:		perltidy
-Version:	20200110
-Release:	3%{?dist}
+Version:	20240903
+Release:	2%{?dist}
 Summary:	Tool for indenting and re-formatting Perl scripts
-License:	GPLv2+
+License:	GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		http://perltidy.sourceforge.net/
-Source0:	https://cpan.metacpan.org/modules/by-module/Perl/Perl-Tidy-%{version}.tar.gz
+Source0:	https://www.cpan.org/authors/id/S/SH/SHANCOCK/Perl-Tidy-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -23,6 +23,7 @@ BuildRequires:	perl(Cwd)
 BuildRequires:	perl(Data::Dumper)
 BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(Encode)
+BuildRequires:	perl(English)
 BuildRequires:	perl(Exporter)
 BuildRequires:	perl(File::Basename)
 BuildRequires:	perl(File::Copy)
@@ -31,17 +32,20 @@ BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(Getopt::Long)
 BuildRequires:	perl(HTML::Entities)
 BuildRequires:	perl(IO::File)
+BuildRequires:	perl(List::Util)
 BuildRequires:	perl(Pod::Html)
+BuildRequires:	perl(Scalar::Util)
 BuildRequires:	perl(strict)
 BuildRequires:	perl(vars)
 BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(FindBin)
 BuildRequires:	perl(Test)
+BuildRequires:	perl(Test::More)
 BuildRequires:	perl(utf8)
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
 Requires:	perl(File::Spec)
+Requires:	perl(File::Temp)
 Requires:	perl(HTML::Entities)
 Requires:	perl(Pod::Html)
 Provides:	perl-Perl-Tidy = %{version}-%{release}
@@ -82,11 +86,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license COPYING
-%else
-%doc COPYING
-%endif
 %doc BUGS.md CHANGES.md README.md docs/ examples/
 %{_bindir}/perltidy
 %{perl_vendorlib}/Perl/
@@ -94,8 +94,123 @@ make test
 %{_mandir}/man3/Perl::Tidy.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200110-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Tue Sep  3 2024 Paul Howarth <paul@city-fan.org> - 20240903-1
+- Update to 20240903 (see CHANGES.md for details) (rhbz#2309446)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240511-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun May 12 2024 Paul Howarth <paul@city-fan.org> - 20240511-1
+- Update to 20240511 (see CHANGES.md for details)
+
+* Thu Feb  1 2024 Paul Howarth <paul@city-fan.org> - 20240202-1
+- Update to 20240202 (see CHANGES.md for details) (rhbz#2262294)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230912-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230912-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Sep 13 2023 Paul Howarth <paul@city-fan.org> - 20230912-1
+- Update to 20230912 (rhbz#2238633)
+  - Remove a syntax error check that could cause an incorrect error message
+    when List::Gather::gather was used (GH#124)
+
+* Sat Sep  9 2023 Paul Howarth <paul@city-fan.org> - 20230909-1
+- Update to 20230909 (see CHANGES.md for details) (rhbz#2238025)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20230701-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jul  1 2023 Paul Howarth <paul@city-fan.org> - 20230701-1
+- Update to 20230701 (see CHANGES.md for details) (rhbz#2219054)
+
+* Thu Mar  9 2023 Paul Howarth <paul@city-fan.org> - 20230309-1
+- Update to 20230309 (see CHANGES.md for details) (rhbz#2176557)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221112-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 11 2022 Paul Howarth <paul@city-fan.org> - 20221112-1
+- Update to 20221112 (rhbz#2142076)
+  - Fix undef warning in Perl before 5.12 (CPAN RT#145095)
+
+* Thu Nov 10 2022 Paul Howarth <paul@city-fan.org> - 20221111-1
+- Update to 20221111 (see CHANGES.md for details) (rhbz#2141765)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220613-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Paul Howarth <paul@city-fan.org> - 20220613-1
+- Update to 20220613 (see CHANGES.md for details)
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 20220217-2
+- Perl 5.36 rebuild
+
+* Tue Feb 15 2022 Paul Howarth <paul@city-fan.org> - 20220217-1
+- Update to 20220217 (see CHANGES.md for details)
+
+* Tue Feb 15 2022 Paul Howarth <paul@city-fan.org> - 20220215-1
+- Update to 20220215 (see CHANGES.md for details)
+- Add workaround for bogus dependencies generated on EL-7
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211029-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Oct 29 2021 Paul Howarth <paul@city-fan.org> - 20211029-1
+- Update to 20211029 (see CHANGES.md for details)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210717-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jul 17 2021 Paul Howarth <paul@city-fan.org> - 20210717-1
+- Update to 20210717 (see CHANGES.md for details)
+
+* Thu Jun 24 2021 Paul Howarth <paul@city-fan.org> - 20210625-1
+- Update to 20210625 (see CHANGES.md for details)
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20210402-2
+- Perl 5.34 rebuild
+
+* Thu Apr  1 2021 Paul Howarth <paul@city-fan.org> - 20210402-1
+- Update to 20210402 (see CHANGES.md for details)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210111-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 11 2021 Paul Howarth <paul@city-fan.org> - 20210111-1
+- Update to 20210111 (see CHANGES.md for details)
+- Use %%license unconditionally
+
+* Mon Dec  7 2020 Paul Howarth <paul@city-fan.org> - 20201207-1
+- Update to 20201207 (see CHANGES.md for details)
+
+* Thu Dec  3 2020 Paul Howarth <paul@city-fan.org> - 20201202-1
+- Update to 20201202 (see CHANGES.md for details)
+
+* Tue Sep 29 2020 Paul Howarth <paul@city-fan.org> - 20201001-1
+- Update to 20201001 (see CHANGES.md for details)
+
+* Mon Sep  7 2020 Paul Howarth <paul@city-fan.org> - 20200907-1
+- Update to 20200907 (see CHANGES.md for details)
+
+* Sat Aug 22 2020 Paul Howarth <paul@city-fan.org> - 20200822-1
+- Update to 20200822 (see CHANGES.md for details)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200619-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 20200619-2
+- Perl 5.32 rebuild
+
+* Sat Jun 20 2020 Paul Howarth <paul@city-fan.org> - 20200619-1
+- Update to 20200619 (see CHANGES.md for details)
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200110-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

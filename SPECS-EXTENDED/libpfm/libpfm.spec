@@ -9,8 +9,8 @@
 %endif
 
 Name:		libpfm
-Version:	4.10.1
-Release:	11%{?dist}
+Version:	4.13.0
+Release:	1%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
@@ -115,6 +115,10 @@ make \
 %endif
 
 %changelog
+* Mon Feb 24 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.13.0-1
+- Upgrade to 4.13.0 to fix build issue and support pcp upgrade
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.1-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
