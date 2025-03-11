@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://github.com/dcos/dcos-cli
 Source0:        https://github.com/dcos/dcos-cli/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-28180.patch
 Patch1:         CVE-2025-27144.patch
+Patch2:         CVE-2024-51744.patch
 BuildRequires:  golang
 BuildRequires:  git
 %global debug_package %{nil}
@@ -19,7 +20,10 @@ BuildRequires:  git
 The command line for DC/OS.
 
 %prep
-%autosetup -p1
+%autosetup -N
+%autopatch -p1 0 1
+cd vendor/github.com/dgrijalva/jwt-go
+%autopatch 2
 
 %build
 export GOPATH=%{our_gopath}
@@ -46,10 +50,13 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Tue Mar 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.2.0-21
+- Add patch for CVE-2024-51744
+
 * Sat Mar 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-20
 - Fix CVE-2025-27144 with an upstream patch
 
-* Mon Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.2.0-19
+* Tue Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.2.0-19
 - Add patch to resolve CVE-2024-28180
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-18
