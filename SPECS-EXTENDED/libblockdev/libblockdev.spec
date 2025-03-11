@@ -86,7 +86,7 @@ License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/storaged-project/libblockdev
-Source0:     https://github.com/storaged-project/libblockdev/releases/download/%{version}-%{release}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  glib2-devel
