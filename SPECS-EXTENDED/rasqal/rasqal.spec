@@ -34,7 +34,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 Libraries, includes etc to develop with the Rasqal RDF query language library.
 
-
 %prep
 %setup -q
 %patch -P1 -p1 -b .printf
@@ -45,7 +44,6 @@ Libraries, includes etc to develop with the Rasqal RDF query language library.
 sed -i -e 's|"/lib /usr/lib|"/%{_lib} %{_libdir}|' configure
 %endif
 
-
 %build
 %configure \
   --with-digest-library=gcrypt\
@@ -54,7 +52,6 @@ sed -i -e 's|"/lib /usr/lib|"/%{_lib} %{_libdir}|' configure
   --enable-release
 
 %make_build
-
 
 %install
 %make_install
@@ -102,7 +99,7 @@ fi
 %changelog
 * Fri Mar 07 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.9.33-14
 - fix build for 0.9.33
-- License Verified
+- License Verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.33-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
