@@ -8,8 +8,8 @@ Name: opendnssec
 Version: 2.1.14
 Release: 1%{?dist}
 License: BSD
-Url: http://www.opendnssec.org/
-Source0: http://www.opendnssec.org/files/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz
+Url: https://www.opendnssec.org/
+Source0: https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
 Source1: ods-enforcerd.service
 Source2: ods-signerd.service
 Source3: ods.sysconfig

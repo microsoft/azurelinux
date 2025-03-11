@@ -15304,7 +15304,7 @@
         "other": {
           "name": "opendnssec",
           "version": "2.1.14",
-          "downloadUrl": "http://www.opendnssec.org/files/source/opendnssec-2.1.14.tar.gz"
+          "downloadUrl": "https://dist.opendnssec.org/source/opendnssec-2.1.14.tar.gz"
         }
       }
     },
