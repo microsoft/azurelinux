@@ -9,7 +9,7 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
 Patch1:         rpm-ostree-libdnf-build.patch
-Patch2:		0001-build-with-latest-rust-1.85.patch
+Patch2:		0001-build-with-rust-1.85.patch
 
 BuildRequires:  attr-devel
 BuildRequires:  autoconf

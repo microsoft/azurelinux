@@ -1,12 +1,12 @@
-From 38761d29b00203dc5c13d134dce9ce8596572d82 Mon Sep 17 00:00:00 2001
-From: Kavya Sree <kkaitepalli@microsoft.com>
-Date: Tue, 11 Mar 2025 14:34:45 +0000
-Subject: [PATCH] build with latest rust 1.85
+From 9f5a7165bb1e4f4f0e30e7f35f29ffcc4e97c200 Mon Sep 17 00:00:00 2001
+From: kavyasree <kkaitepalli@microsoft.com>
+Date: Tue, 11 Mar 2025 23:16:44 +0530
+Subject: [PATCH] build with rust 1.85
 
 ---
  rust/src/cxxrsutil.rs | 4 ++--
- rust/src/tokio_ffi.rs | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ rust/src/tokio_ffi.rs | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/rust/src/cxxrsutil.rs b/rust/src/cxxrsutil.rs
 index b985185..9d231f3 100644
@@ -31,19 +31,17 @@ index b985185..9d231f3 100644
                  let p = p as *const Self::ReWrapped;
                  unsafe { &*p }
 diff --git a/rust/src/tokio_ffi.rs b/rust/src/tokio_ffi.rs
-index 62d9600..8745ee0 100644
+index 62d9600..ba3505b 100644
 --- a/rust/src/tokio_ffi.rs
 +++ b/rust/src/tokio_ffi.rs
-@@ -2,7 +2,8 @@
- 
+@@ -3,6 +3,7 @@
  // SPDX-License-Identifier: Apache-2.0 OR MIT
  
--pub(crate) struct TokioHandle(tokio::runtime::Handle);
-+pub(crate) struct TokioHandle(tokio::runtime::Handle);i
+ pub(crate) struct TokioHandle(tokio::runtime::Handle);
 +#[allow(dead_code)]
  pub(crate) struct TokioEnterGuard<'a>(tokio::runtime::EnterGuard<'a>);
  
  pub(crate) fn tokio_handle_get() -> Box<TokioHandle> {
 -- 
-2.45.3
+2.34.1
 
