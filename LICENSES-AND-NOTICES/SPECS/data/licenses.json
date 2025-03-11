@@ -1986,6 +1986,7 @@
                 "screen",
                 "scrub",
                 "SDL",
+                "SDL2",
                 "SDL_sound",
                 "sdparm",
                 "seabios",

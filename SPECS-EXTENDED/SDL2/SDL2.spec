@@ -3,6 +3,8 @@ Name:           SDL2
 Version:        2.30.9
 Release:        1%{?dist}
 Summary:        Cross-platform multimedia library
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 License:        Zlib AND MIT AND Apache-2.0 AND (Apache-2.0 OR MIT)
 URL:            https://www.libsdl.org/
 Source0:        https://www.libsdl.org/release/%{name}-%{version}.tar.gz
@@ -171,7 +173,8 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 - Upgrade to 2.30.9
 - License verified.
 
-* Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2                                - Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2                           
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with feature disabled: jack
 - License verified
 
