@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        10%{?dist}
+Release:        11%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -315,6 +315,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Mon Mar 05 2025 George Mileka <gmileka@microsoft.com> - 102-11
+- Update overlayfs selinux handling with the full path of chcon
+
 * Tue Feb 25 2025 Cameron Baird <cameronbaird@microsoft.com> - 102-10
 - Fix 0006-dracut.sh-validate-instmods patch to not break crypto module blacklisting
 
