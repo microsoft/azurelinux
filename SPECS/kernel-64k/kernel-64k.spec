@@ -25,7 +25,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.78.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,7 @@ Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
 Patch2:         jent-init-fix.patch
+Patch3:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -372,6 +373,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
+- Add patch to revert UART change that breaks IPMI SEL panic message
+
 * Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.78.1-2
 - Add slang as BuildRequires, enabling tui on perf
 
