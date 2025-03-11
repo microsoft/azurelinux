@@ -1,6 +1,6 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
-Version:        2.5.3
+Version:        2.5.5
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
