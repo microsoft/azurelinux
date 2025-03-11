@@ -57,7 +57,7 @@ sed -i "/covdefaults/d;/pytest-cov/d" pyproject.toml
 %license %{python3_sitelib}/pyproject_api-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* 21 Fri Feb 2025 Jyoti kanase <v-jykanase@microsoft.com> -  1.6.1-6
+* Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  1.6.1-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
