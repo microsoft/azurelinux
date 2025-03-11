@@ -39,8 +39,8 @@ ncurses-compat-6.4-2.azl3.x86_64.rpm
 ncurses-devel-6.4-2.azl3.x86_64.rpm
 ncurses-libs-6.4-2.azl3.x86_64.rpm
 ncurses-term-6.4-2.azl3.x86_64.rpm
-readline-8.2-1.azl3.x86_64.rpm
-readline-devel-8.2-1.azl3.x86_64.rpm
+readline-8.2-2.azl3.x86_64.rpm
+readline-devel-8.2-2.azl3.x86_64.rpm
 libattr-2.5.2-1.azl3.x86_64.rpm
 attr-2.5.2-1.azl3.x86_64.rpm
 libacl-2.3.1-2.azl3.x86_64.rpm
