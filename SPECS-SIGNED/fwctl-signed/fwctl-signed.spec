@@ -45,7 +45,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 10%{?dist}
+Release:	 11%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -112,6 +112,9 @@ fi # 1 : closed
 
 
 %changelog
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 24.10-11
+- Bump release to rebuild for new kernel release
+
 * Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-10
 - Bump release to rebuild for new kernel release
 
