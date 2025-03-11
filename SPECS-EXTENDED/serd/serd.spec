@@ -6,7 +6,6 @@ Name:           serd
 Version:        0.32.4
 Release:        1%{?dist}
 Summary:        A lightweight C library for RDF syntax
-
 License:        ISC
 URL:            https://drobilla.net/software/%{name}.html
 Source0:        https://download.drobilla.net/%{name}-%{version}.tar.xz
@@ -74,7 +73,7 @@ mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
 %{_includedir}/%{name}-%{maj}/
 
 %changelog
-* Mon Feb 24 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.32.4-1
+* Mon Feb 24 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.32.4-1
 - Upgrade to 0.32.4
 - License verified.
 
