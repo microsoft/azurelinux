@@ -4600,8 +4600,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.10-1/go1.22.10-20241203.4.src.tar.gz"
+          "version": "1.23.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.7-1/go1.23.7-20250304.2.src.tar.gz"
         }
       }
     },
@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
+          "version": "1.24.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.1-1/go1.24.1-20250304.4.src.tar.gz"
         }
       }
     },
@@ -29536,8 +29536,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.0791",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.0791.tar.gz"
+          "version": "9.1.1164",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1164.tar.gz"
         }
       }
     },
@@ -30558,8 +30558,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.1.tar.xz"
+          "version": "24.1.6",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.6.tar.xz"
         }
       }
     },
