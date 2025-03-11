@@ -1,6 +1,6 @@
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.78.1
+%global last-known-kernel 6.6.79.1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -39,7 +39,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 11%{?dist}
+Release:	 12%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -125,7 +125,7 @@ EOF)
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
 %description modules
@@ -247,6 +247,9 @@ fi
 %endif
 
 %changelog
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-12
+- Bump release to rebuild for new kernel release
+
 * Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 2.7.4-11
 - Bump release to rebuild for new kernel release
 
