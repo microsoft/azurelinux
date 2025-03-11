@@ -24102,6 +24102,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyproject-api",
+          "version": "1.6.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyproject-api/pyproject_api-1.6.1.tar.gz"
+        }            
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyproject-metadata",
           "version": "0.8.0",
           "downloadUrl": "https://github.com/pypa/python-pyproject-metadata/archive/0.8.0/python-pyproject-metadata-0.8.0.tar.gz"

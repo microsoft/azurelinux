@@ -1782,6 +1782,7 @@
                 "python-pymongo",
                 "python-PyMySQL",
                 "python-pyperclip",
+                "python-pyproject-api",
                 "python-pyproject-metadata",
                 "python-pyroute2",
                 "python-pyrsistent",
