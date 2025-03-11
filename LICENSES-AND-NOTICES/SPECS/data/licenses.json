@@ -2191,6 +2191,7 @@
                 "zerofree",
                 "zfs-fuse",
                 "zipper",
+                "zix",
                 "zopfli",
                 "zziplib"
             ]
