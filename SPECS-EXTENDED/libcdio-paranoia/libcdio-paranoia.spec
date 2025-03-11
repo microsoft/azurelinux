@@ -8,7 +8,7 @@ License: GPLv3+
 URL: https://www.gnu.org/software/libcdio/
 Source0: https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-%{version}.tar.bz2
 Patch0: libcdio-paranoia-manpage.patch
-Patch1: https://github.com/rocky/libcdio-paranoia/pull/38.patch
+Patch1: 38.patch
 
 BuildRequires: gcc
 BuildRequires: pkgconfig
