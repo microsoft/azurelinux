@@ -1,6 +1,6 @@
 Name:          bash-completion
 Version:       2.11
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
@@ -51,6 +51,9 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/nmcli
 rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 {cal,chsh,dmesg,eject,hexdump,ionice,hwclock,ionice,look,mount,renice,rtcwake,su,umount}
 
+# does not work anymore with new versions of influx and provided by influx-cli-bash-completion
+rm -f %{buildroot}%{_datadir}/bash-completion/completions/influx
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -69,13 +72,16 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Wed Mar 12 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.11-2
+- Remove influx bash completion file as it no longer works and is provided by influx-cli-bash-completion package.
+
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.11-1
 - Upgrade to 2.11.
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-5
 - Removing the explicit %%clean stage.
 
-* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 2.7-4
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsoft.com> - 2.7-4
 - Remove epoch
 
 * Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-3
