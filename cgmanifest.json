@@ -13111,8 +13111,8 @@
         "type": "other",
         "other": {
           "name": "memkind",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/memkind/memkind/archive/v1.10.0/memkind-1.10.0.tar.gz"
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/memkind/memkind/archive/v1.14.0/memkind-1.14.0.tar.gz"
         }
       }
     },
