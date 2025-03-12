@@ -205,13 +205,13 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	return
 }
 
-// addExactRemoteDependency ensures that a remote node is available in the graph for every unresolved dependency.
+// findOrAddExactRemoteDependency ensures that a remote node is available in the graph for every unresolved dependency.
 // 1. Check if the exact dependency is already in the graph. If it is, reuse it.
 // 2. If it is not, create a new unresolved node for the dependency.
 // It is important that we only match on the exact dependency name and version. If we don't, we may end up with
 // unpredictable behavior in the scheduler. If two different remote dependencies are added to two different build
 // nodes of a single SRPM, then the scheduler may queue that node twice.
-func addExactRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (selectedRemoteNode *pkggraph.PkgNode, err error) {
+func findOrAddExactRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (selectedRemoteNode *pkggraph.PkgNode, err error) {
 	existingRemoteNode, err := g.FindExactPkgNodeFromPkg(dependency)
 	if err != nil {
 		err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
@@ -249,7 +249,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 
 	// If we can't find the dependency in the graph, or it is a remote dependency, we need to do a bit of extra validation.
 	if nodes == nil || nodes.RunNode.Type != pkggraph.TypeLocalRun {
-		dependentNode, err = addExactRemoteDependency(g, dependency)
+		dependentNode, err = findOrAddExactRemoteDependency(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to handle remote dependency from %+v to %+v:\n%w", packageNode.VersionedPkg, dependency, err)
 			return err
