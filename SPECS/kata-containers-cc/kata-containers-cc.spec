@@ -2,7 +2,7 @@
 %define sourceName kata-containers
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl4
+Version:      3.2.0.azl5
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
@@ -10,7 +10,7 @@ URL:          https://github.com/microsoft/kata-containers
 Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
-Source1:      %{sourceName}-%{version}-cargo.tar.gz
+Source1:      %{sourceName}-3.2.0.azl4-cargo.tar.gz
 
 ExclusiveArch: x86_64
 
