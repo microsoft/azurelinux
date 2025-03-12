@@ -15,7 +15,7 @@ Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
-Source0:       https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-%{version}.tar.gz#/perl-Class-Data-Inheritable-%{version}.tar.gz
+Source0:       https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  coreutils
