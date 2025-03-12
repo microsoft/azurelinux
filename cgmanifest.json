@@ -1577,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "cf-cli",
-          "version": "8.7.3",
-          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.7.3.tar.gz"
+          "version": "8.7.11",
+          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.7.11.tar.gz"
         }
       }
     },
@@ -2077,8 +2077,8 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.11.1.tar.gz"
+          "version": "1.11.4",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.11.4.tar.gz"
         }
       }
     },
@@ -2868,8 +2868,8 @@
         "type": "other",
         "other": {
           "name": "docker-cli",
-          "version": "25.0.3",
-          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.3.tar.gz"
+          "version": "25.0.7",
+          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.7.tar.gz"
         }
       }
     },
@@ -3338,8 +3338,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.6",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.6/otp-OTP-26.2.5.6.tar.gz"
+          "version": "26.2.5.9",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.9/otp-OTP-26.2.5.9.tar.gz"
         }
       }
     },
@@ -4600,8 +4600,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.22.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.10-1/go1.22.10-20241203.4.src.tar.gz"
+          "version": "1.23.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.7-1/go1.23.7-20250304.2.src.tar.gz"
         }
       }
     },
@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.3-2/go1.23.3-20241202.3.src.tar.gz"
+          "version": "1.24.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.1-1/go1.24.1-20250304.4.src.tar.gz"
         }
       }
     },
@@ -8071,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "jx",
-          "version": "3.10.116",
-          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.116.tar.gz"
+          "version": "3.10.182",
+          "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.10.182.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.30.3",
-          "downloadUrl": "https://dl.k8s.io/v1.30.3/kubernetes-src.tar.gz"
+          "version": "1.30.10",
+          "downloadUrl": "https://dl.k8s.io/v1.30.10/kubernetes-src.tar.gz"
         }
       }
     },
@@ -10411,8 +10411,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -14242,8 +14242,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.15",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.15.tar.gz"
+          "version": "0.8.20",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.20.tar.gz"
         }
       }
     },
@@ -14442,8 +14442,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.3",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.3.tar.gz"
+          "version": "1.17.4",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
         }
       }
     },
@@ -21343,8 +21343,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.5",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.5/postgresql-16.5.tar.bz2"
+          "version": "16.7",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.7/postgresql-16.7.tar.bz2"
         }
       }
     },
@@ -29536,8 +29536,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.0791",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.0791.tar.gz"
+          "version": "9.1.1164",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1164.tar.gz"
         }
       }
     },
@@ -30558,8 +30558,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.1.tar.xz"
+          "version": "24.1.6",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.6.tar.xz"
         }
       }
     },

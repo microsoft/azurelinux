@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.0791
-Release:        3%{?dist}
+Version:        9.1.1164
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,8 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        macros.vim
-Patch0:         CVE-2025-22134.patch
-Patch1:         CVE-2025-24014.patch
+
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -215,11 +214,20 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1164-1
+- Auto-upgrade to 9.1.1164 - for CVE-2025-27423
+- Remove previously applied patches
+
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
+- Patch CVE-2025-26603 & CVE-2025-1215
+
 * Thu Jan 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.0791-3
 - Patch to fix CVE-2025-24014.
 
