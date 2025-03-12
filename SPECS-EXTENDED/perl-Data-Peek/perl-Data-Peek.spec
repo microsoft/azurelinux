@@ -1,15 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Run optional test
 %{bcond_without perl_Data_Peek_enables_option_test}
 
 Name:           perl-Data-Peek
-Version:        0.49
-Release:        2%{?dist}
+Version:        0.52
+Release:        9%{?dist}
 Summary:        Collection of low-level debug facilities
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Peek
-Source0:        https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/Data-Peek-%{version}.tgz
+Source0:        https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/Data-Peek-%{version}.tgz#/%{name}-%{version}.tgz
+BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
@@ -23,19 +24,20 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(bytes)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(DynaLoader)
+BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 # Tests:
-BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::More) >= 0.90
 BuildRequires:  perl(Test::Warnings)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 %if %{with perl_Data_Peek_enables_option_test}
 # Optional tests:
 BuildRequires:  perl(Perl::Tidy) >= 20120714
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %{?perl_default_filter}
 
@@ -45,8 +47,22 @@ but grew out to be a set of low-level data introspection utilities that no
 other module provided yet, using the lowest level of the perl internals API
 as possible.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Data-Peek-%{version}
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS"
@@ -54,10 +70,20 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_
 
 %install
 %{make_install}
-find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+find %{buildroot} -type f -name '*.bs' -size 0 -delete
+%{_fixperms} %{buildroot}/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/*pod.t
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -r -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
@@ -67,9 +93,68 @@ make test
 %{perl_vendorarch}/DP.pm
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.49-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.52-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.52-7
+- Perl 5.40 rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.52-3
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 04 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.52-1
+- 0.52 bump
+- Package tests
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.51-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jan 05 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.51-1
+- 0.51 bump
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.50-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.50-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.50-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 21 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.50-1
+- 0.50 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-2
+- Perl 5.32 rebuild
 
 * Fri Jan 31 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-1
 - 0.49 bump

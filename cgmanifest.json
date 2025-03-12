@@ -16833,8 +16833,8 @@
         "type": "other",
         "other": {
           "name": "perl-Data-Peek",
-          "version": "0.49",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/Data-Peek-0.49.tgz"
+          "version": "0.52",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/Data-Peek-0.52.tgz"
         }
       }
     },
