@@ -16233,8 +16233,8 @@
         "type": "other",
         "other": {
           "name": "perl-Business-ISBN-Data",
-          "version": "20191107",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Business-ISBN-Data-20191107.tar.gz"
+          "version": "20240930.001",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Business/Business-ISBN-Data-20240930.001.tar.gz"
         }
       }
     },
