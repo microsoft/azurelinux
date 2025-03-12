@@ -255,6 +255,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		dependentNode, err = handleRemoteDependency(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to handle remote dependency from %+v to %+v:\n%w", packageNode.VersionedPkg, dependency, err)
+			return err
 		}
 	} else {
 		// All dependencies are assumed to be "Run" dependencies
