@@ -22,6 +22,7 @@ class VendorType(Enum):
     GO = "go"
     CARGO = "cargo"
     CUSTOM = "custom"
+    LEGACY = "legacy" #TODO: remove this once all scripts have been converted
 
 
 class PipelineLogging:
@@ -62,11 +63,11 @@ class PipelineLogging:
         '''Prints a debug with magenta color message to the console'''
         print(f"##[debug]{Fore.MAGENTA}{message}{Style.RESET_ALL}")
 
-
 vendor_script_mapping = {
     VendorType.GO: "build_go_vendor.sh",
     VendorType.CARGO: "build_cargo_vendor.sh",
-    VendorType.CUSTOM: "generate_source_tarball.sh"
+    VendorType.CUSTOM: "generate_source_tarball.sh",
+    VendorType.LEGACY: "generate_source_tarball.sh" #TODO: remove this once all scripts have been converted
 }
 
 
@@ -95,7 +96,7 @@ class VendorProcessor:
             with open(toml_file_path, "rb") as f:
                 toml_data = tomllib.load(f)
         except Exception as e:
-            PipelineLogging.output_log_error_and_exit(
+            PipelineLogging.output_log_error(
                 f"Failed to read {toml_file_path} file: {e}")
             return None
 
@@ -121,11 +122,11 @@ class VendorProcessor:
 
         toml_data = self.read_toml_file(toml_file_path)
 
-        # We might not have TOML file just yet, attempt to run custom
+        # We might not have TOML file just yet then we probably are dealing with legacy
         if toml_data is None:
             PipelineLogging.output_debug(
                 f"Failed to read {toml_file_path} file. Attempting to run custom vendor script.")
-            self.process_vendor_type(VendorType.CUSTOM)
+            self.process_vendor_type(VendorType.LEGACY)
             return
 
         package_data: dict = toml_data['components'][self.pkg_name]
@@ -146,8 +147,8 @@ class VendorProcessor:
         working_directory = os.path.dirname(os.path.realpath(__file__))
         script_directory = working_directory
 
-        # custom vendors store the script in the package folder
-        if vendor_type == vendor_type.CUSTOM:
+        # custom and legacy vendors store the script in the package folder
+        if vendor_type == vendor_type.CUSTOM or vendor_type == vendor_type.LEGACY:
             script_directory = self.pkg_path
 
         if VendorProcessor.vendor_script_exists(script_directory, vendor_script_name) is False:
@@ -161,13 +162,18 @@ class VendorProcessor:
         PipelineLogging.output_debug(
             f"Vendor script path: {vendor_script_path}")
 
-        # run the script
-        proc = subprocess.Popen([
+        script_args: list = [
             "bash", vendor_script_path,
             "--srcTarball", self.src_tarball,
             "--outFolder", self.out_folder,
-            "--pkgVersion", self.pkg_version,
-            "--vendorVersion", self.vendor_version],
+            "--pkgVersion", self.pkg_version
+            ]
+
+        if vendor_type != VendorType.LEGACY:
+            script_args.extend(["--vendorVersion", self.vendor_version])
+
+        # run the script
+        proc = subprocess.Popen(script_args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True)
