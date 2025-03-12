@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "index.txt": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
-  "public_suffix_list.dat": "64d487bce3f6e71ef4ffb00d64ca418f9e53b29b5ff2d29656c09d627e44c416",
+  "index.txt": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+  "public_suffix_list.dat": "2c975de8ece4767c377c2a6369b4b4ccd10f9a4e0b422e93283dc6c2cfa6a17d",
   "test_psl.txt": "8f50ad958916d6a8f79fba2363501475571acce752757f9126fe9d2f17dd920d"
  }
 }

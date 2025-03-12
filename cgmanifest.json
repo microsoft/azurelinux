@@ -21813,8 +21813,8 @@
         "type": "other",
         "other": {
           "name": "publicsuffix-list",
-          "version": "20190417",
-          "downloadUrl": "https://publicsuffix.org/list/public_suffix_list.dat"
+          "version": "20250116",
+          "downloadUrl": " https://publicsuffix.org/list/public_suffix_list.dat"
         }
       }
     },
