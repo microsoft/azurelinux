@@ -34,7 +34,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
 cp -p hyph_tk_TM.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 %files
-%doc README
+%license README
 %{_datadir}/hyphen/hyph_tk_TM.dic
 
 %changelog
