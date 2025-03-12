@@ -12,6 +12,7 @@ ExclusiveArch:  x86_64
 
 Requires:       ca-certificates
 Requires:       chrony
+Requires:       cryptsetup
 Requires:       dbus
 Requires:       elfutils-libelf
 Requires:       filesystem
@@ -33,7 +34,6 @@ Metapackage to install the set of packages inside a Kata containers UVM
 %package        debug
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers debug UVM.
 Requires:       %{name} = %{version}-%{release}
-Requires:       cryptsetup
 Requires:       curl
 Requires:       cpio
 Requires:       findutils
@@ -110,7 +110,7 @@ Requires:       golang
 %changelog
 * Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
 - Introduce debug metapackage
-- Move cryptsetup, curl, cpio, gzip, iputils, lvm2, tar, procps-ng to debug metapackage
+- Move curl, cpio, gzip, iputils, lvm2, tar, procps-ng to debug metapackage
 - Remove bash, grep, readline, util-linux from all metapackages (implicit deps of existing requirements)
 - Add findutils to debug metapackage
 
