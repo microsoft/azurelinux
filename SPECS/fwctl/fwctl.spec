@@ -30,7 +30,7 @@
 # SOFTWARE.
 #
 
-%global last-known-kernel 6.6.78.1
+%global last-known-kernel 6.6.78.1-3
 
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
