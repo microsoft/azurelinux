@@ -31,23 +31,21 @@ func makePackage(pkgName, subPkgName string, buildRequires []*pkgjson.PackageVer
 			Name:    subPkgName,
 			Version: "1.0",
 		},
-		SrpmPath:     pkgName + ".src.rpm",
-		RpmPath:      pkgName + ".rpm",
-		SourceDir:    pkgName + "-src",
-		SpecPath:     pkgName + ".spec",
-		Architecture: "x86_64",
-		IsToolchain:  false,
-		RunTests:     true,
+		SrpmPath:      pkgName + ".src.rpm",
+		RpmPath:       pkgName + ".rpm",
+		SourceDir:     pkgName + "-src",
+		SpecPath:      pkgName + ".spec",
+		Architecture:  "x86_64",
+		IsToolchain:   false,
+		RunTests:      true,
+		BuildRequires: buildRequires,
 	}
-
-	pkg.BuildRequires = buildRequires
 
 	return pkg
 }
 
-// A very simiple test case to validate that the test framework is working
-func TestValidate(t *testing.T) {
-
+// A very simple test case to validate that the test framework is working
+func TestValidateFramework(t *testing.T) {
 	testRepo := &pkgjson.PackageRepo{
 		Repo: []*pkgjson.Package{
 			makePackage("pkg1", "pkg1-a", nil),
@@ -67,29 +65,29 @@ func TestValidate(t *testing.T) {
 // packages that try to pollute the available remote dependencies. The test will check if the various build
 // nodes of the sub-package SRPM are all using the same set of dependencies. The other packages will add
 // new remote nodes to the graph since they may not be satisfied by the already existing nodes. Once
-// this happens, the sub-package build nodes may start using the "better" dependencys, which is not what we want.
+// this happens, the sub-package build nodes may start using the "better" dependencies, which is not what we want.
 func TestScenarioMultiRemoteProvides(t *testing.T) {
-	anyVer := []*pkgjson.PackageVer{
+	anyVerBr := []*pkgjson.PackageVer{
 		{
-			Name:       "dep1",
+			Name:       "build-req",
 			Version:    "",
 			Condition:  "",
 			SVersion:   "",
 			SCondition: "",
 		},
 	}
-	lowVer := []*pkgjson.PackageVer{
+	lowVerBr := []*pkgjson.PackageVer{
 		{
-			Name:       "dep1",
+			Name:       "build-req",
 			Version:    "1.0",
 			Condition:  "<",
 			SVersion:   "",
 			SCondition: "",
 		},
 	}
-	highVer := []*pkgjson.PackageVer{
+	highVerBr := []*pkgjson.PackageVer{
 		{
-			Name:       "dep1",
+			Name:       "build-req",
 			Version:    "2.0",
 			Condition:  ">",
 			SVersion:   "",
@@ -100,11 +98,11 @@ func TestScenarioMultiRemoteProvides(t *testing.T) {
 	// Define the test repo
 	testRepo := pkgjson.PackageRepo{
 		Repo: []*pkgjson.Package{
-			makePackage("pkg1", "pkg1-a", anyVer),
-			makePackage("other-pkg-1", "other-pkg-1", lowVer),
-			makePackage("pkg1", "pkg1-b", anyVer),
-			makePackage("other-pkg-2", "other-pkg-2", highVer),
-			makePackage("pkg1", "pkg1-c", anyVer),
+			makePackage("pkg1", "pkg1-a", anyVerBr),
+			makePackage("other-pkg-1", "other-pkg-1", lowVerBr),
+			makePackage("pkg1", "pkg1-b", anyVerBr),
+			makePackage("other-pkg-2", "other-pkg-2", highVerBr),
+			makePackage("pkg1", "pkg1-c", anyVerBr),
 		},
 	}
 
@@ -129,10 +127,10 @@ func TestScenarioMultiRemoteProvides(t *testing.T) {
 				continue
 			}
 
-			dependnecies := depGraph.From(buildNode.ID())
+			dependencies := depGraph.From(buildNode.ID())
 
-			for dependnecies.Next() {
-				dep := dependnecies.Node().(*pkggraph.PkgNode)
+			for dependencies.Next() {
+				dep := dependencies.Node().(*pkggraph.PkgNode)
 				// Add to the set
 				actualDepsUsed[*dep.VersionedPkg] = true
 			}
