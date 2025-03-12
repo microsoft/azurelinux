@@ -63,7 +63,7 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/influx
 %dir %{_datadir}/bash-completion/helpers
 %{_datadir}/bash-completion/helpers/perl
 %{_datadir}/bash-completion/helpers/python
-%doc AUTHORS COPYING
+%doc AUTHORS
 
 %files devel
 %defattr(-,root,root)
