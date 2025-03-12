@@ -15,6 +15,7 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Spec::Functions)
@@ -70,7 +71,7 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} -c $RPM_BUILD_ROOT/*
+%{_fixperms} -c %{buildroot}/*
 
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
