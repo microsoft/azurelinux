@@ -219,6 +219,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Wed Mar 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.176.3-1
+- Auto-upgrade to 5.15.176.3
+
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.176.3-1
 - Auto-upgrade to 5.15.176.3
 
