@@ -1,0 +1,26 @@
+From f18e95585de3d6f94c3b64af7bcc8793063223d3 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 8 Aug 2018 18:08:34 +0200
+Subject: [PATCH] Makefile.in: do not update currency.units from network
+
+Builds of packages are supposed to be reproducible.
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 79baf1d..2b71aeb 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -266,7 +266,7 @@ units.txt: units.1
+ 
+ doc: units.dvi units.info units.txt units.pdf UnitsMKS.pdf UnitsWin.pdf
+ 
+-check: all currency-update-check
++check: all
+ 	@echo Checking units
+ 	@./units -f $(srcdir)/definitions.units \
+ 	      '(((square(kiloinch)+2.84m2) /0.5) meters^2)^(1|4)' m \
+-- 
+2.37.2
+

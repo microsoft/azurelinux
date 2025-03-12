@@ -2,20 +2,26 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: A utility for converting amounts from one unit to another
 Name: units
-Version: 2.19
+Version: 2.23
 Release: 4%{?dist}
 Source: https://ftp.gnu.org/gnu/units/%{name}-%{version}.tar.gz
 URL: https://www.gnu.org/software/units/units.html
-License: GPLv3+
-BuildRequires: automake
+License: GPL-3.0-or-later
+
+Requires: less
+
 BuildRequires: bison
 BuildRequires: gcc
+BuildRequires: make
 BuildRequires: ncurses-devel
 BuildRequires: python3-devel
 BuildRequires: readline-devel
 
 # do not update currency.units from network during build
-Patch2: 0002-units-2.17-no-network.patch
+Patch100: 0100-units-2.22-no-network.patch
+
+# make less a default pager to avoid error about missing /usr/bin/pager
+Patch101: 0101-fix-make-less-default-pager.patch
 
 %description
 Units converts an amount from one unit to another, or tells you what
@@ -26,19 +32,17 @@ well as conversions such as Fahrenheit to Celsius.
 %prep
 %autosetup -p1
 
-# make units_cur use Python 3
-sed -e 's|^AC_PATH_PROG(PYTHON, .*$|PYTHON=%{__python3}\nAC_SUBST(PYTHON)|' \
-    -i configure.ac
-autoreconf -fiv
-
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT 
+%make_install
 
-gzip $RPM_BUILD_ROOT%{_infodir}/units.info
+# replace an absolute symlink by a relative symlink
+ln -fsv ../../..%{_sharedstatedir}/units/currency.units %{buildroot}%{_datadir}/units
+
+gzip %{buildroot}%{_infodir}/units.info
 
 # provide a man page for units_cur as a symlink to units.1
 ln -s units.1 %{buildroot}%{_mandir}/man1/units_cur.1
@@ -47,7 +51,7 @@ ln -s units.1 %{buildroot}%{_mandir}/man1/units_cur.1
 make check
 
 %files
-%doc ChangeLog COPYING NEWS README
+%doc COPYING NEWS README
 %{_bindir}/units
 %{_bindir}/units_cur
 %{_datadir}/units
@@ -56,8 +60,68 @@ make check
 %{_mandir}/man1/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.19-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 16 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.23-4
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.23-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Apr 11 2024 Jan Macku <jamacku@redhat.com> - 2.23-2
+- fix make less the default pager (#2268395)
+
+* Mon Feb 19 2024 Jan Macku <jamacku@redhat.com> - 2.23-1
+- new upstream release
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.22-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov 30 2023 Florian Weimer <fweimer@redhat.com> - 2.22-7
+- C compatibility fix for the configure script (#2252276)
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.22-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 13 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.22-5
+- migrate to SPDX license format
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.22-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 06 2022 Kamil Dudka <kdudka@redhat.com> - 2.22-3
+- remove a build system tweak related to Python 3 no longer needed
+
+* Tue Sep 06 2022 Kamil Dudka <kdudka@redhat.com> - 2.22-2
+- replace an absolute symlink by a relative symlink
+- use %%make_build and %%make_install RPM macros
+
+* Tue Sep 06 2022 Kamil Dudka <kdudka@redhat.com> - 2.22-1
+- new upstream release
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 16 2020 Kamil Dudka <kdudka@redhat.com> - 2.21-1
+- new upstream release
+
+* Thu Oct 01 2020 Kamil Dudka <kdudka@redhat.com> - 2.20-1
+- new upstream release
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.19-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.19-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
