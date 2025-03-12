@@ -27683,9 +27683,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SDL",
-          "version": "1.2.15",
-          "downloadUrl": "https://github.com/libsdl-org/SDL-1.2/archive/refs/tags/release-1.2.15.tar.gz"
+          "name": "sdl12-compat",
+          "version": "1.2.68",
+          "downloadUrl": "https://github.com/libsdl-org/sdl12-compat/archive/release-1.2.68/sdl12-compat-1.2.68.tar.gz"
         }
       }
     },
