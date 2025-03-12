@@ -14772,8 +14772,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-curses",
-          "version": "1.0.4",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/ocaml-tmk/ocaml-curses-1.0.4.tar.gz"
+          "version": "1.0.11",
+          "downloadUrl": "https://github.com/mbacarella/curses/archive/1.0.11/curses-1.0.11.tar.gz"
         }
       }
     },
