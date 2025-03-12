@@ -39,7 +39,6 @@ Requires(post): systemd diffutils
 Requires(preun): systemd
 Requires(postun): systemd
 
-
 %description
 Opencryptoki implements the PKCS#11 specification v2.20 for a set of
 cryptographic hardware, such as IBM 4764 and 4765 crypto cards, and the
