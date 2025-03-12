@@ -1,74 +1,64 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global upstream_name requests-kerberos
-%global module_name requests_kerberos
-%global commit0 393e49c698904c76ad9f56c6e4dbd2dbc55a7c42
-%global gittag0 v0.12.0
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-
-Name:           python-%{upstream_name}
-Version:        0.12.0
-Release:        11%{?dist}
+Name:           python-requests-kerberos
+Version:        0.14.0
+Release:        6%{?dist}
 Summary:        A Kerberos authentication handler for python-requests
-License:        MIT
+License:        ISC
 URL:            https://github.com/requests/requests-kerberos
 # Upstream considers Github not PyPI to be the authoritative source tarballs:
 # https://github.com/requests/requests-kerberos/pull/78
-Source0:        https://github.com/requests/requests-kerberos/archive/%{commit0}.tar.gz#/%{upstream_name}-%{shortcommit0}.tar.gz
-# Upstream has switched their requirement to the "pykerberos" fork, but for now 
-# we still have the original "kerberos" module in Fedora.
-Patch1:         0001-switch-requirement-from-pykerberos-back-to-kerberos.patch
+Source:         %{url}/archive/v%{version}/requests-kerberos-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-mock
-%if 0%{?with_check}
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3dist(wheel)
+BuildRequires:  python3dist(pytest)   
+BuildRequires:  python3dist(pytest-mock)
+BuildRequires:  python3-requests
 
+%global _description %{expand:
+Requests is an HTTP library, written in Python, for human beings. This library
+adds optional Kerberos/GSSAPI authentication support and supports mutual
+authentication.}
 
-%description
-Requests is an HTTP library, written in Python, for human beings. This library 
-adds optional Kerberos/GSSAPI authentication support and supports mutual 
-authentication.
+%description %_description
 
-%package -n python3-%{upstream_name}
+%package -n python3-requests-kerberos
 Summary:        %{summary}
-Requires:       python3-requests >= 1.1
-Requires:       python3-kerberos
-Requires:       python3-cryptography
-# runtime requirements are needed for tests also
-BuildRequires:  python3-requests >= 1.1
-BuildRequires:  python3-kerberos
-BuildRequires:  python3-cryptography
-%{?python_provide:%python_provide python3-%{upstream_name}}
 
-%description -n python3-%{upstream_name}
-Requests is an HTTP library, written in Python, for human beings. This library 
-adds optional Kerberos/GSSAPI authentication support and supports mutual 
-authentication.
+
+%description -n python3-requests-kerberos %_description
 
 %prep
-%setup -q -n %{upstream_name}-%{commit0}
-%patch 1 -p1
+%autosetup -n requests-kerberos-%{version}
+# avoid unnecessary coverage dependency
+sed -i '/pytest-cov/d' requirements-test.txt
+
+%generate_buildrequires
+%pyproject_buildrequires requirements-test.txt
 
 %build
-%py3_build
-
-%check
-pip3 install pytest
-py.test tests/
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files requests_kerberos
 
-%files -n python3-%{upstream_name}
-%license LICENSE
+
+%check
+pip install pyspnego
+%pytest -v tests
+
+
+%files -n python3-requests-kerberos -f %{pyproject_files}
 %doc README.rst AUTHORS HISTORY.rst
-%{python3_sitelib}/%{module_name}
-%{python3_sitelib}/%{module_name}*.egg-info
 
 %changelog
+* Thu Feb 12 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.14.0-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.12.0-11
 - Use `py.test` instead of `py.test-3` to enable ptest
 - License verified
