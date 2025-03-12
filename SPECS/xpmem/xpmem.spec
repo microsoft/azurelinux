@@ -1,6 +1,6 @@
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.78.1-1
+%global last-known-kernel 6.6.78.1-3
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
