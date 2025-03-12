@@ -74,6 +74,7 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/influx
 %changelog
 * Wed Mar 12 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.11-2
 - Remove influx bash completion file as it no longer works and is provided by influx-cli-bash-completion package.
+- Removed duplicated license file
 
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.11-1
 - Upgrade to 2.11.
