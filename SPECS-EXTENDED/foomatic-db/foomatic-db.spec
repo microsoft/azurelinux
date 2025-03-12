@@ -1,15 +1,15 @@
 %global dbver_rel 4.0
-%global dbver_snap 20241027
+%global dbver_snap 20250311
 
 Summary:        Database of printers and printer drivers
 Name:           foomatic-db
-Version:        %{dbver_rel}
+Version:        %{dbver_rel}.%{dbver_snap}
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.openprinting.org
-Source0: http://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+Source0:        https://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
 
 Patch1:         foomatic-db-device-ids.patch
 Patch2:         foomatic-db-invalid.patch
@@ -48,7 +48,7 @@ Requires:       sed
 PPDs from printer manufacturers.
 
 %prep
-%autosetup -n foomatic-db-%{dbver_snap}
+%setup -q -n foomatic-db-%{dbver_snap}
 
 find -type d | xargs -d '\n' chmod g-s
 
@@ -112,10 +112,10 @@ popd
 # HP DeskJet 720C (bug #797099)
 # Kyocera FS-1118MFP (bug #782377)
 # Brother HL-2040 (bug #999040)
-%patch 1 -p1
+%patch -P 1 -p1
 
 # These can't be generated at all (bug #866476)
-%patch 2 -p1
+%patch -P 2 -p1
 
 # Use sed instead of perl in the PPDs (bug #512739).
 find db/source/PPD -type f -name '*.ppd' -exec sed -i 's,perl -p,sed,g' {} +
