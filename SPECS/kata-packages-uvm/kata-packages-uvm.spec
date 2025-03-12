@@ -55,7 +55,6 @@ Requires:       device-mapper
 Requires:       systemd-udev
 
 %description    coco
-Metapackage to install the set of packages inside a Kata containers coco UVM
 
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
