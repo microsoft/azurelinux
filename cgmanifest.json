@@ -16334,7 +16334,7 @@
         "other": {
           "name": "perl-Class-Data-Inheritable",
           "version": "0.09",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.09-clean.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-0.09.tar.gz"
         }
       }
     },
