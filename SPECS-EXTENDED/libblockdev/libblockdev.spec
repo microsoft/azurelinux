@@ -93,9 +93,7 @@ BuildRequires:  glib2-devel
 %if %{with_gi}
 BuildRequires:  gobject-introspection-devel
 %endif
-%if %{with_python3}
 BuildRequires:  python3-devel
-%endif
 %if %{with_gtk_doc}
 BuildRequires:  gtk-doc
 %endif
@@ -135,7 +133,6 @@ Obsoletes: libblockdev-vdo-devel < %{version}-%{release}
 This package contains header files and pkg-config files needed for development
 with the libblockdev library.
 
-%if %{with_python3}
 %package -n python3-blockdev
 Summary:        Python3 gobject-introspection bindings for libblockdev
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -146,7 +143,6 @@ Requires:       python3-bytesize
 %description -n python3-blockdev
 This package contains enhancements to the gobject-introspection bindings for
 libblockdev in Python3.
-%endif
 
 %package utils
 Summary:        A library with utility functions for the libblockdev library
