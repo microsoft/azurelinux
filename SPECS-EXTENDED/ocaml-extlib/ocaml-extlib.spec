@@ -1,20 +1,26 @@
-# The debuginfo package is empty, so don't generate it.
-# Could possibly be fixed by passing -g option correctly to the compiler.
+%ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
-Summary:        OCaml ExtLib additions to the standard library
+%endif
+
 Name:           ocaml-extlib
-Version:        1.7.8
+Version:        1.7.9
 Release:        1%{?dist}
-License:        LGPLv2 with exceptions
+Summary:        OCaml ExtLib additions to the standard library
+License:        LGPL-2.1-or-later with OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ygrek/ocaml-extlib
 Source0:        https://github.com/ygrek/ocaml-extlib/releases/download/%{version}/extlib-%{version}.tar.gz
-BuildRequires:  gawk
-BuildRequires:  ocaml
-BuildRequires:  ocaml-cppo
-BuildRequires:  ocaml-findlib-devel >= 1.5.1
+
+BuildRequires:  make
+BuildRequires:  ocaml >= 4.02
+BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
 BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-cppo
+BuildRequires:  ocaml-rpm-macros
+# In order to apply patches:
+BuildRequires:  git-core
+
 
 %description
 ExtLib is a project aiming at providing a complete - yet small -
@@ -24,48 +30,65 @@ modules, to modify some functions in order to get better performances
 or more safety (tail-recursive) but also to provide new modules which
 should be useful for the average OCaml programmer.
 
+
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %prep
-%autosetup -n extlib-%{version}
+%autosetup -S git -n extlib-%{version}
+
+# Remove references to the bytes library for OCaml 5.0
+sed -i '/bytes/d' src/META
+
 
 %build
-# Parallel builds do not work.
-unset MAKEFLAGS
-make build -j1
+# https://bugzilla.redhat.com/show_bug.cgi?id=1837823
+export minimal=1
+%ifarch %{ocaml_native_compiler}
+%make_build
+%else
+%make_build -C src all
+%endif
+
 
 %install
-export DESTDIR=%{buildroot}
-export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
+export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
 mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-make install -j1
 
-%files
+export minimal=1
+%make_install
+%ocaml_files
+
+
+%check
+export minimal=1
+%ifarch %{ocaml_native_compiler}
+make test
+%else
+make -C test all run
+%endif
+
+
+%files -f .ofiles
 %doc README.md
 %license LICENSE
-%{_libdir}/ocaml/extlib
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/extlib/*.a
-%exclude %{_libdir}/ocaml/extlib/*.cmxa
-%exclude %{_libdir}/ocaml/extlib/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/extlib/*.mli
 
-%files devel
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/extlib/*.a
-%{_libdir}/ocaml/extlib/*.cmxa
-%{_libdir}/ocaml/extlib/*.cmx
-%endif
-%{_libdir}/ocaml/extlib/*.mli
+
+%files devel -f .ofiles-devel
+
 
 %changelog
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.7.9-1
+- Update to 1.7.9
+- License verified
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.7.8-1
 - Upgrade to latest upstream version
 - Lint spec
@@ -307,3 +330,4 @@ make install -j1
 
 * Fri May 18 2007 Richard W.M. Jones <rjones@redhat.com> - 1.5-1
 - Initial RPM release.
+
