@@ -15193,8 +15193,8 @@
         "type": "other",
         "other": {
           "name": "ogdi",
-          "version": "4.1.0",
-          "downloadUrl": "https://github.com/libogdi/ogdi/archive/ogdi_4_1_0.tar.gz"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/libogdi/ogdi/archive/ogdi_4_1_1.tar.gz"
         }
       }
     },
