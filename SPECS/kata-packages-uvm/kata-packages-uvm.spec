@@ -12,15 +12,15 @@ ExclusiveArch:  x86_64
 
 Requires:       ca-certificates
 Requires:       chrony
+# Required for confidential storage functionality
 Requires:       cryptsetup
 Requires:       dbus
+# Required for confidential storage functionality
+Requires:       e2fsprogs
 Requires:       elfutils-libelf
 Requires:       filesystem
 Requires:       iptables
-Requires:       iproute
 Requires:       irqbalance
-Requires:       lz4
-Requires:       sed
 # Note: We currently only support using systemd for our init process, not the kata-agent.
 # When we go to add support for AGENT_INIT=yes, can drop this.
 # https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10
@@ -36,11 +36,16 @@ Summary:        Metapackage to install the set of packages inside a Kata confide
 Requires:       %{name} = %{version}-%{release}
 Requires:       curl
 Requires:       cpio
+# Provides find
 Requires:       findutils
 Requires:       gzip
+Requires:       iproute
+# Provides ping, tracepath, etc for debugging net
 Requires:       iputils
-Requires:       lvm2
+Requires:       lz4
+Requires:       sed
 Requires:       tar
+# Provides free, kill, pgrep, ps, etc
 Requires:       procps-ng
 
 %description    debug
