@@ -84,13 +84,14 @@ func packageLess(a, b PackageVer) bool {
 	return a.Name < b.Name
 }
 
+// SortPackageList ensures the package list is sorted in a deterministic way. It will primarily sort by name, then
+// version. It will also recursively sort the package lists (requires, buildRequires, testRequires) of each package.
 func SortPackageList(packages []*Package) {
-
 	sort.Slice(packages, func(i, j int) bool {
 		return packageLess(*packages[i].Provides, *packages[j].Provides)
 	})
 
-	// For each package, also sort the package lists
+	// For each package, also sort the lists of its dependencies
 	for _, pkg := range packages {
 		sort.Slice(pkg.Requires, func(i, j int) bool {
 			return packageLess(*pkg.Requires[i], *pkg.Requires[j])

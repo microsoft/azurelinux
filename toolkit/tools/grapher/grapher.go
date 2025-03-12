@@ -24,14 +24,13 @@ var (
 	input  = exe.InputFlag(app, "Input json listing all local SRPMs")
 	output = exe.OutputFlag(app, "Output file to export the graph to")
 
-	logFlags              = exe.SetupLogFlags(app)
-	profFlags             = exe.SetupProfileFlags(app)
-	strictGoals           = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
-	strictUnresolved      = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
-	timestampFile         = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	usePMCtoResolveCycles = app.Flag("usePMCtoresolvecycles", "Cycles will be resolved by downloading rpm packages from PMC if locally unavailable").Bool()
-	tlsClientCert         = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
-	tlsClientKey          = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
+	logFlags         = exe.SetupLogFlags(app)
+	profFlags        = exe.SetupProfileFlags(app)
+	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
+	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
+	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	tlsClientCert    = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
+	tlsClientKey     = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 
 	resolveCyclesFromUpstream     = app.Flag("resolve-cycles-from-upstream", "Let grapher resolve cycles by marking rpms available in repo as remote").Bool()
 	outDir                        = exe.OutputDirFlag(app, "Directory to download packages into.")
@@ -44,8 +43,6 @@ var (
 	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
 	repoSnapshotTime              = app.Flag("repo-snapshot-time", "Optional: Repo time limit for tdnf virtual snapshot").String()
-
-	depGraph = pkggraph.NewPkgGraph()
 )
 
 func main() {
@@ -114,7 +111,7 @@ func main() {
 }
 
 // addUnresolvedPackage adds an unresolved node to the graph representing the
-// packged described in the PackgetVer structure. Returns an error if the node
+// package described in the PackageVer structure. Returns an error if the node
 // could not be created.
 func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (newRunNode *pkggraph.PkgNode, err error) {
 	logger.Log.Debugf("Adding unresolved %s", pkgVer)
@@ -123,8 +120,8 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	// Double check that the package is not already in the graph. The graph should have already used that node before
-	// this point.
+	// Double check that the package is not already in the graph. A previous check should have already found the node
+	// and no call to addUnresolvedPackage() should have been made.
 	nodes, err := g.FindExactPkgNodeFromPkg(pkgVer)
 	if err != nil {
 		return
@@ -208,13 +205,13 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	return
 }
 
-// handleRemoteDependency ensures that a remote node is available in the graph for every unresolved dependency.
+// addExactRemoteDependency ensures that a remote node is available in the graph for every unresolved dependency.
 // 1. Check if the exact dependency is already in the graph. If it is, reuse it.
 // 2. If it is not, create a new unresolved node for the dependency.
 // It is important that we only match on the exact dependency name and version. If we don't, we may end up with
 // unpredictable behavior in the scheduler. If two different remote dependencies are added to two different build
 // nodes of a single SRPM, then the scheduler may queue that node twice.
-func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (resolvedNode *pkggraph.PkgNode, err error) {
+func addExactRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer) (selectedRemoteNode *pkggraph.PkgNode, err error) {
 	existingRemoteNode, err := g.FindExactPkgNodeFromPkg(dependency)
 	if err != nil {
 		err = fmt.Errorf("failed to check lookup list for exact remote %+v:\n%w", dependency, err)
@@ -223,19 +220,19 @@ func handleRemoteDependency(g *pkggraph.PkgGraph, dependency *pkgjson.PackageVer
 
 	if existingRemoteNode == nil {
 		// No exact match, add a new one.
-		resolvedNode, err = addUnresolvedPackage(g, dependency)
+		selectedRemoteNode, err = addUnresolvedPackage(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to add a remote node (%s):\n%w", dependency.Name, err)
 			return nil, err
 		}
-		logger.Log.Debugf("Added new node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
+		logger.Log.Debugf("Added new node: '%s' for dependency %+v", selectedRemoteNode.FriendlyName(), dependency)
 	} else {
 		// This exact dependency is already in the graph, so reuse it.
-		resolvedNode = existingRemoteNode.RunNode
-		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", resolvedNode.FriendlyName(), dependency)
+		selectedRemoteNode = existingRemoteNode.RunNode
+		logger.Log.Debugf("Found existing exact remote node: '%s' for dependency %+v", selectedRemoteNode.FriendlyName(), dependency)
 	}
 
-	return resolvedNode, nil
+	return selectedRemoteNode, nil
 }
 
 // addSingleDependency will add an edge between packageNode and the "Run" node for the
@@ -252,7 +249,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 
 	// If we can't find the dependency in the graph, or it is a remote dependency, we need to do a bit of extra validation.
 	if nodes == nil || nodes.RunNode.Type != pkggraph.TypeLocalRun {
-		dependentNode, err = handleRemoteDependency(g, dependency)
+		dependentNode, err = addExactRemoteDependency(g, dependency)
 		if err != nil {
 			err = fmt.Errorf("failed to handle remote dependency from %+v to %+v:\n%w", packageNode.VersionedPkg, dependency, err)
 			return err
