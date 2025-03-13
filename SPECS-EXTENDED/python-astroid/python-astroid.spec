@@ -1,33 +1,23 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# Remove when globs in setup.py work.
-%{?python_disable_dependency_generator}
 
-%global github_owner    PyCQA
-%global github_name     astroid
-%global commit ace7b2967ea762ec43fc7be8ab9c8007564d9be2
-%{?commit:%global shortcommit %(c=%{commit}; echo ${c:0:7})}
+%global srcname     astroid
 
 Name:           python-astroid
-Version:        2.3.3
-Release:        8%{?dist}
+# Note: please check that this doesn't break pylint before committing and building! -GC
+Version:        3.3.8
+Release:        2%{?dist}
 Summary:        Common base representation of python source code for pylint and other projects
-License:        GPLv2+
-URL:            https://github.com/%{github_owner}/%{github_name}
-Source0:        https://github.com/PyCQA/astroid/archive/%{commit}/astroid-%{shortcommit}.tar.gz#/python-astroid-%{shortcommit}.tar.gz
-Patch0:         noglobs.patch
-
+License:        LGPL-2.1-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://pypi.org/project/astroid/
+Source0:        https://github.com/pylint-dev/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-lazy-object-proxy
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-runner
-BuildRequires:  python3-six
-BuildRequires:  python3-typed_ast >= 1.3.0
-BuildRequires:  python3-wrapt
-BuildRequires:  git-core
+BuildRequires:  python3-setuptools
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
 
 %global _description %{expand:
 The aim of this module is to provide a common base representation of python
@@ -41,44 +31,199 @@ trees by inspecting living objects.}
 
 %description %_description
 
-%package -n python3-%{github_name}
+%package -n python3-%{srcname}
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{github_name}}
-Requires:  python3-lazy-object-proxy
-Requires:  python3-wrapt
-Requires:  python3-typed_ast
-Requires:  python3-six
+%{?python_provide:%python_provide python3-%{srcname}}
 
-%description -n python3-%{github_name} %_description
+%description -n python3-%{srcname} %_description
 
 %prep
-%autosetup -n astroid-%{commit} -p0
-sed -i /six/d tox.ini
-sed -i /six/d astroid/__pkginfo__.py
+%autosetup -n %{srcname}-%{version} -p1
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-rm -rf %{buildroot}%{python3_sitelib}/astroid/tests
+%pyproject_install
+# https://github.com/pylint-dev/astroid/pull/2156#issuecomment-1612640531
+rm -rf %{buildroot}%{python3_sitelib}/tests
 
+%check
+%{pytest} -v
 
-#%check
-#%{__python3} -m pytest -v
-
-
-%files -n python3-%{github_name}
-%doc README.rst
-%license COPYING
+%files -n python3-%{srcname}
+%license LICENSE
 %{python3_sitelib}/astroid
-%{python3_sitelib}/astroid*.egg-info
+%{python3_sitelib}/astroid*.dist-info/
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Tue Feb 11 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.3.8-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+- Added 'BuildRequires: python3-pip python3-wheel'
+
+* Mon Dec 30 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.8-1
+- 3.3.8
+
+* Sun Dec 22 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.7-1
+- 3.3.7
+
+* Tue Dec 10 2024 Karolina Surma <ksurma@redhat.com> - 3.3.6-3
+- Use the %%pytest macro - it's the recommended way
+
+* Tue Dec 10 2024 Karolina Surma <ksurma@redhat.com> - 3.3.6-2
+- All tests pass with Python 3.13 now
+
+* Mon Dec 09 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.6-1
+- 3.3.6
+
+* Mon Oct 07 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.5-1
+- 3.3.5
+
+* Tue Sep 24 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.4-1
+- 3.3.4
+
+* Fri Sep 20 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.3-1
+- 3.3.3
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 16 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.3-1
+- 3.2.3
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.2.2-3
+- Rebuilt for Python 3.13
+
+* Sun Jun 02 2024 Miro Hrončok <miro@hroncok.cz> - 3.2.2-2
+- Deselect tests failing with Python 3.13
+
+* Mon May 20 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.2-1
+- 3.2.2
+
+* Fri May 17 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.1-2
+- 3.2.1
+
+* Fri May 17 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.1-1
+- 3.2.1
+
+* Mon Feb 26 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.1.0-1
+- 3.1.0
+
+* Mon Feb 05 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.0.3-1
+- 3.0.3
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 13 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.2-1
+- 3.0.2
+
+* Mon Oct 16 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.1-1
+- 3.0.1
+
+* Tue Oct 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.0-1
+- 3.0.0
+
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 10 2022 Gwyn Ciesla <gwync@protonmail.com> - 2.9.3-1
+- 2.9.3
+
+* Thu Jan 06 2022 Gwyn Ciesla <gwync@protonmail.com> - 2.9.2-2
+- Bump EVR
+
+* Tue Jan 04 2022 Gwyn Ciesla <gwync@protonmail.com> - 2.9.2-1
+- 2.9.2
+
+* Mon Nov 22 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.9.0-1
+- 2.9.0
+
+* Fri Nov 12 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.8.5-1
+- 2.8.5
+
+* Tue Oct 26 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.8.4-1
+- 2.8.4
+
+* Mon Oct 18 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.8.3-1
+- 2.8.3
+
+* Fri Oct 08 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.8.2-1
+- 2.8.2
+
+* Wed Sep 15 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.7.2-1
+- 2.7.2
+
+* Wed Aug 04 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.6-1
+- 2.6.6
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.5-1
+- 2.6.5
+
+* Tue Jul 20 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.4-1
+- 2.6.4
+
+* Wed Jun 30 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.2-1
+- 2.6.2
+
+* Tue Jun 29 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.1-1
+- 2.6.1
+
+* Tue Jun 08 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.8-1
+- 2.5.8
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.5.7-2
+- Rebuilt for Python 3.10
+
+* Tue Jun 01 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.7-1
+- 2.5.7
+
+* Mon Apr 26 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.6-1.git36dda3f
+- 2.5.6
+
+* Mon Apr 12 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.3-1.git55953b3
+- 2.5.3
+
+* Mon Mar 29 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.2-1.gitc3b58a3
+- 2.5.2
+
+* Mon Mar 01 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5.1-1.git79d7237
+- 2.5.1
+
+* Wed Feb 24 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5-2.git0f97f79
+- Bump EVR
+
+* Tue Feb 16 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.5-1.git0f97f79
+- 2.5
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-3.git2d25e84
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-2.git2d25e84
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 19 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.4.2-1
+- 2.4.2
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 2.4.1-2.gita672051
+- Rebuilt for Python 3.9
+
+* Tue May 05 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.4.1-1
+- 2.4.1
+
+* Tue Apr 28 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.4.0-1
+- 2.4.0
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-7.gitace7b29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -445,3 +590,4 @@ rm -rf %{buildroot}%{python3_sitelib}/astroid/tests
 
 * Sun Nov 06 2005 Konstantin Ryabitsev <icon@fedoraproject.org> - 0.13.0-0.1
 - Initial packaging.
+

@@ -6,14 +6,17 @@
 %endif
 
 Name:           perl-YAML-Syck
-Version:        1.32
-Release:        2%{?dist}
+Version:        1.34
+Release:        1%{?dist}
 Summary:        Fast, lightweight YAML loader and dumper
-License:        BSD and MIT
+# gram.*: GPL-2.0-or-later
+# *:      MIT
+# Note that libsyck COPYING file describes itself as BSD but it's actually MIT
+License:        GPL-2.0-or-later AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-Syck
-Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-Syck-%{version}.tar.gz#/perl-YAML-Syck-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-Syck-%{version}.tar.gz
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -55,7 +58,7 @@ BuildRequires:  perl(JSON)
 BuildRequires:  perl(Symbol)
 %endif
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 # Avoid provides for private perl objects
 %{?perl_default_filter}
@@ -68,11 +71,8 @@ structures to YAML strings, and the other way around.
 %prep
 %setup -q -n YAML-Syck-%{version}
 
-# Unbundle core and unused modules
-rm -rvf inc/{Module,Scalar,Test}
-
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags} -DI_STDLIB=1 -DI_STRING=1"
+perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags} -DI_STDLIB=1 -DI_STRING=1 -std=gnu17"
 make %{?_smp_mflags}
 
 %install
@@ -94,6 +94,10 @@ make test
 %{_mandir}/man3/YAML::Syck.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.34-1
+- Update to version 1.34
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.32-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
