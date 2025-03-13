@@ -1,24 +1,24 @@
-Name:           perl-Scope-Upper
-Summary:        Act on upper scopes
-Version:        0.32
-Release:        4%{?dist}
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-%{version}.tar.gz 
+Name:           perl-Scope-Upper
+Summary:        Act on upper scopes
+Version:        0.34
+Release:        8%{?dist}
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-%{version}.tar.gz#/perl-Scope-Upper-%{version}.tar.gz
 URL:            https://metacpan.org/release/Scope-Upper
 # Build
+BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-BuildRequires:  sed
 # Runtime
 BuildRequires:  perl(base)
 BuildRequires:  perl(Exporter)
@@ -36,10 +36,16 @@ BuildRequires:  perl(threads::shared)
 # Optional tests only
 BuildRequires:  perl(Time::HiRes)
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
-Requires:       perl(Exporter)
 Requires:       perl(XSLoader)
 
 %{?perl_default_filter}
+
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Scope::Upper::TestGenerator\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(Test::Leaner\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(VPIT::TestHelpers\\)
+
 
 %description
 This module lets you defer actions that will take place when the control
@@ -48,32 +54,113 @@ end, or localize variables, array/hash values or deletions of elements
 in higher contexts. You can also return to an upper level and know which
 context was in use then.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Requires:       perl(Time::HiRes)
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Scope-Upper-%{version}
-sed -i -e '1s,^#!.*perl,%(perl -MConfig -e 'print $Config{startperl}'),' \
-    samples/*
+perl -MConfig -pi -e 's|^#!.*perl|$Config{startperl}|' samples/*
+
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
-%doc README Changes samples
+%doc README Changes CONTRIBUTING samples
 %{perl_vendorarch}/*
 %exclude %dir %{perl_vendorarch}/auto
 %{_mandir}/man3/*.3*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.34-8
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.34-6
+- Perl 5.40 rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.34-2
+- Perl 5.38 rebuild
+
+* Mon Mar 27 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.34-1
+- 0.34 bump
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.33-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Dec 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.33-1
+- 0.33 bump
+- Package tests
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.32-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.32-7
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.32-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.32-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.32-4
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.32-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

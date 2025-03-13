@@ -1,14 +1,15 @@
-Summary:        A portable number theoretic multiple-precision integer library
-Name:           libtommath
-Version:        1.1.0
-Release:        5%{?dist}
-License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.libtom.net/
-Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-36328.patch
+Name:           libtommath
+Version:        1.3.1~rc1
+Release:        3%{?dist}
+Summary:        A portable number theoretic multiple-precision integer library
+License:        Public Domain
+URL:            http://www.libtom.net/
 
+Source0:        https://github.com/libtom/%{name}/archive/v%{version_no_tilde}.tar.gz#/%{name}-%{version_no_tilde}.tar.gz
+
+BuildRequires:  make
 BuildRequires:  libtool
 
 %description
@@ -26,7 +27,7 @@ The %{name}-devel package contains libraries and header files for developing
 applications that use %{name}.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version_no_tilde}
 # Fix permissions on installed library
 sed -i -e 's/644 $(LIBNAME)/755 $(LIBNAME)/g' makefile.shared
 # Fix pkgconfig path
@@ -39,10 +40,14 @@ sed -i \
 %set_build_flags
 %make_build V=1 CFLAGS="$CFLAGS -I./" -f makefile.shared
 
+%check
+make test
+./test
+
 %install
 %make_install V=1 CFLAGS="$CFLAGS -I./" PREFIX=%{_prefix} LIBPATH=%{_libdir} -f makefile.shared
 
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -name '*.la' -delete
 find %{buildroot} -name '*.a' -delete
 
 %ldconfig_scriptlets
@@ -57,16 +62,69 @@ find %{buildroot} -name '*.a' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.1.0-5
-- Fix CVE-2023-36328
+* Thu Nov 14 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.3.1~rc1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-4
-- Removing docs to drop dependency on 'ghostscript'.
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1~rc1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Conditionally build documentation, and turn off documentation building by default
+* Tue Apr 30 2024 Frantisek Sumsal <frantisek@sumsal.cz> - 1.3.1~rc1-1
+- Bump to v1.3.1-rc1 (rhbz#2275490)
+
+* Wed Mar 27 2024 Frantisek Sumsal <frantisek@sumsal.cz> - 1.3.0-1
+- Bump to v1.3.0
+
+* Wed Mar 20 2024 Frantisek Sumsal <frantisek@sumsal.cz> - 1.3.0~rc1-1
+- Bump to v1.3.0-rc1
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Sep 08 2023 Frantisek Sumsal <frantisek@sumsal.cz> - 1.2.1-1
+- Bump to 1.2.1
+
+* Fri Sep 08 2023 Frantisek Sumsal <frantisek@sumsal.cz> - 1.2.0-14
+- Run unit tests
+
+* Sat Sep 02 2023 Frantisek Sumsal <frantisek@sumsal.cz> - 1.2.0-13
+- Fix CVE-2023-36328 (#2236877,#2236878)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Dec 13 2021 Frantisek Sumsal <frantisek@sumsal.cz> - 1.2.0-6
+- Add a couple of missing BRs (texlive-kpathsea and texlive-metafont)
+
+* Wed Nov 03 2021 Frantisek Sumsal <frantisek@sumsal.cz> - 1.2.0-5
+- Drop an obsoleted texlive-updmap-map build dependency (#1999507, #1987664)
+- (see: #1965446)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jan 25 2021 Than Ngo <than@redhat.com> - 1.2.0-3
+- Add missing BRs
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Apr 09 2020 Gerd Pokorra <gp@zimt.uni-siegen.de> - 1.2.0-1
+- Update to 1.2.0.
+- Remove poster make tag
+- Add BuildRequires texlive-appendix
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

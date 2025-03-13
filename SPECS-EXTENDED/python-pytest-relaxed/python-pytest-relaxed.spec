@@ -1,20 +1,20 @@
+Name:           python-pytest-relaxed
+Version:        2.0.2
+Release:        4%{?dist}
+Summary:        Relaxed test discovery/organization for pytest
+
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:           python-pytest-relaxed
-Version:        2.0.0
-Release:        1%{?dist}
-Summary:        Relaxed test discovery/organization for pytest
-License:        BSD-2-Clause
 URL:            https://github.com/bitprophet/pytest-relaxed
-Source:         %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         %{url}/archive/%{version}/pytest-relaxed-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python3-packaging
-BuildRequires:  python3-requests
-BuildRequires:  python3-wheel
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-decorator
 
 %global _description %{expand:
 This package provides relaxed test discovery for pytest.
@@ -25,44 +25,66 @@ ability to opt-in to various behaviors).}
 
 %description %_description
 
-
-%package -n     python3-pytest-relaxed
+%package -n python3-pytest-relaxed
 Summary:        %{summary}
 
 %description -n python3-pytest-relaxed %_description
 
-
 %prep
 %autosetup -p1 -n pytest-relaxed-%{version}
-sed -i 's/decorator>=4,<5/decorator>=4,<6/' setup.py
-
 
 %generate_buildrequires
 %pyproject_buildrequires
 
-
 %build
 %pyproject_wheel
-
 
 %install
 %pyproject_install
 %pyproject_save_files pytest_relaxed
 
-
 %check
 %pyproject_check_import
 %pytest
 
-
 %files -n python3-pytest-relaxed -f %{pyproject_files}
-
+%license LICENSE
+%doc README.rst
 
 %changelog
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.0.0-1
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- Bump version to 2.0.0
+* Wed Feb 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.0.2-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
+- Added `BuildRequires: python3-pytest python3-decorator` to fix build.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.0.2-2
+- Rebuilt for Python 3.13
+
+* Tue Apr 16 2024 Tomáš Hrnčiar <thrnciar@redhat.com> - 2.0.2-1
+- Update to 2.0.2
+- Fixes: rhbz#2209340
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.0.0-2
+- Rebuilt for Python 3.12
+
+* Sat Mar 04 2023 Jiří Kučera <jkucera@redhat.com> - 2.0.0-1
+- Update to 2.0.0
+  Resolves: #2157782
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.5^20220502git000bba0e-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Mon May 02 2022 Miro Hrončok <mhroncok@redhat.com> - 1.1.5^20220502git000bba0e-1
 - Initial package from upstream pull request #22
