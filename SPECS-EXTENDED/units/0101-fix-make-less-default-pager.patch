@@ -1,0 +1,26 @@
+From 413f9f5563ec85756ff1a35276e1c4833d15713e Mon Sep 17 00:00:00 2001
+From: Jan Macku <jamacku@redhat.com>
+Date: Thu, 11 Apr 2024 16:10:28 +0200
+Subject: [PATCH] fix: make less default pager
+
+Resolves: #2268395
+---
+ units.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/units.c b/units.c
+index 469a82b..8b7dd78 100644
+--- a/units.c
++++ b/units.c
+@@ -130,7 +130,7 @@ under the terms of the GNU General Public License."
+ #ifdef _WIN32
+ #  define DEFAULTPAGER "more"             /* Default pager for Windows */
+ #else
+-#  define DEFAULTPAGER "/usr/bin/pager"   /* Default pager for Unix */
++#  define DEFAULTPAGER "/usr/bin/less"   /* Default pager for Unix */
+ #endif
+ #define DEFAULTLOCALE "en_US"   /* Default locale */
+ #define MAXINCLUDE 5            /* Max depth of include files */
+-- 
+2.44.0
+

@@ -4,15 +4,14 @@ Distribution:   Azure Linux
 %global gtk3_version 3.24.0
 
 Name:           libdazzle
-Version:        3.36.0
-Release:        3%{?dist}
+Version:        3.44.0
+Release:        1%{?dist}
 Summary:        Experimental new features for GTK+ and GLib
 
 License:        GPLv3+
 URL:            https://git.gnome.org/browse/libdazzle/
-Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/3.44/%{name}-%{version}.tar.xz
 
-BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  meson
 BuildRequires:  vala
 
@@ -23,8 +22,8 @@ BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(gtk+-3.0) >= %{gtk3_version}
 
 # for tests
-BuildRequires:  xorg-x11-server-Xvfb
 BuildRequires:  words
+BuildRequires:  xorg-x11-server-Xvfb
 
 Requires:       glib2%{?_isa} >= %{glib2_version}
 Requires:       gtk3%{?_isa} >= %{gtk3_version}
@@ -57,12 +56,14 @@ developing applications that use %{name}.
 %install
 %meson_install
 
+%find_lang libdazzle-1.0
 
 %check
 xvfb-run -w 10 ninja test %{__ninja_common_opts} -C %{_vpath_builddir}
 
 
-%files
+
+%files -f libdazzle-1.0.lang
 %license COPYING
 %doc AUTHORS NEWS README.md
 %{_bindir}/dazzle-list-counters
@@ -83,6 +84,10 @@ xvfb-run -w 10 ninja test %{__ninja_common_opts} -C %{_vpath_builddir}
 
 
 %changelog
+* Wed Nov 13 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.44.0-1
+- Update to 3.44.0
+- License verified
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           relaxngDatatype
 Version:        2011.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        RELAX NG Datatype API
 License:        BSD-3-Clause
 Group:          Development/Languages/Java
@@ -48,7 +48,7 @@ cp -p %{SOURCE1} .
 %build
 ant \
     -Dbuild.sysclasspath=only \
-    -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6
+    -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8
 
 %install
 install -Dpm 644 %{name}.jar \
@@ -64,6 +64,10 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %{_javadir}/*.jar
 
 %changelog
+* Thu Feb 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2011.1-6
+- Error fix
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2011.1-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

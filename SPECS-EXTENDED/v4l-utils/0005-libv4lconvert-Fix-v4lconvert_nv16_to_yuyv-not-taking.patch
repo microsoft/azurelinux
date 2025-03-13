@@ -1,0 +1,97 @@
+From 2cfd6dc33d7f7743843e9ad65d31baef5508f636 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Sun, 16 Oct 2022 16:15:53 +0200
+Subject: [PATCH v4l-utils 5/5] libv4lconvert: Fix v4lconvert_nv16_to_yuyv()
+ not taking stride into account
+
+The atomisp driver can generate V4L2_PIX_FMT_NV16 buffers where
+stride != width. Where as v4lconvert_nv16_to_yuyv() assumed that
+stride == width is always true.
+
+Add a stride argument to v4lconvert_nv16_to_yuyv() to fix this.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ lib/libv4lconvert/libv4lconvert-priv.h |  2 +-
+ lib/libv4lconvert/libv4lconvert.c      |  8 ++++----
+ lib/libv4lconvert/rgbyuv.c             | 16 ++++++++++------
+ 3 files changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/lib/libv4lconvert/libv4lconvert-priv.h b/lib/libv4lconvert/libv4lconvert-priv.h
+index f361f2a0..00a03f9e 100644
+--- a/lib/libv4lconvert/libv4lconvert-priv.h
++++ b/lib/libv4lconvert/libv4lconvert-priv.h
+@@ -133,7 +133,7 @@ void v4lconvert_yuyv_to_yuv420(const unsigned char *src, unsigned char *dst,
+ 		int width, int height, int stride, int yvu);
+ 
+ void v4lconvert_nv16_to_yuyv(const unsigned char *src, unsigned char *dest,
+-		int width, int height);
++		int width, int height, int stride);
+ 
+ void v4lconvert_yvyu_to_rgb24(const unsigned char *src, unsigned char *dst,
+ 		int width, int height, int stride);
+diff --git a/lib/libv4lconvert/libv4lconvert.c b/lib/libv4lconvert/libv4lconvert.c
+index d0d38286..b07bf3ba 100644
+--- a/lib/libv4lconvert/libv4lconvert.c
++++ b/lib/libv4lconvert/libv4lconvert.c
+@@ -1445,10 +1445,10 @@ static int v4lconvert_convert_pixfmt(struct v4lconvert_data *data,
+ 		if (!tmpbuf)
+ 			return v4lconvert_oom_error(data);
+ 
+-		v4lconvert_nv16_to_yuyv(src, tmpbuf, width, height);
++		v4lconvert_nv16_to_yuyv(src, tmpbuf, width, height, bytesperline);
+ 		src_pix_fmt = V4L2_PIX_FMT_YUYV;
+ 		src = tmpbuf;
+-		bytesperline = bytesperline * 2;
++		bytesperline = width * 2;
+ 		/* fall through */
+ 	}
+ 	case V4L2_PIX_FMT_YUYV:
+@@ -1482,10 +1482,10 @@ static int v4lconvert_convert_pixfmt(struct v4lconvert_data *data,
+ 			return v4lconvert_oom_error(data);
+ 
+ 		/* Note NV61 is NV16 with U and V swapped so this becomes yvyu. */
+-		v4lconvert_nv16_to_yuyv(src, tmpbuf, width, height);
++		v4lconvert_nv16_to_yuyv(src, tmpbuf, width, height, bytesperline);
+ 		src_pix_fmt = V4L2_PIX_FMT_YVYU;
+ 		src = tmpbuf;
+-		bytesperline = bytesperline * 2;
++		bytesperline = width * 2;
+ 		/* fall through */
+ 	}
+ 	case V4L2_PIX_FMT_YVYU:
+diff --git a/lib/libv4lconvert/rgbyuv.c b/lib/libv4lconvert/rgbyuv.c
+index e9fe6df9..ce31a1ba 100644
+--- a/lib/libv4lconvert/rgbyuv.c
++++ b/lib/libv4lconvert/rgbyuv.c
+@@ -304,17 +304,21 @@ void v4lconvert_yuyv_to_yuv420(const unsigned char *src, unsigned char *dest,
+ }
+ 
+ void v4lconvert_nv16_to_yuyv(const unsigned char *src, unsigned char *dest,
+-		int width, int height)
++		int width, int height, int stride)
+ {
+ 	const unsigned char *y, *cbcr;
+-	int count = 0;
++	int i, j;
+ 
+ 	y = src;
+-	cbcr = src + width*height;
++	cbcr = src + stride * height;
+ 
+-	while (count++ < width*height) {
+-		*dest++ = *y++;
+-		*dest++ = *cbcr++;
++	for (i = 0; i < height; i++) {
++		for (j = 0; j < width; j++) {
++			*dest++ = *y++;
++			*dest++ = *cbcr++;
++		}
++		y += stride - width;
++		cbcr += stride - width;
+ 	}
+ }
+ 
+-- 
+2.37.3
+

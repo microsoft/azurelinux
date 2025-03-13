@@ -1,52 +1,62 @@
-# Filter example dependencies
-%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_docdir}
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
-
-# Run optional tests
-%bcond_without perl_Test_Harness_enables_optional_test
-Summary:        Run Perl standard test scripts with statistics
-Name:           perl-Test-Harness
-Version:        3.42
-Release:        444%{?dist}
-License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# Run optional tests
+%if ! (0%{?rhel})
+%bcond_without perl_Test_Harness_enables_optional_test
+%else
+%bcond_with perl_Test_Harness_enables_optional_test
+%endif
+
+Name:           perl-Test-Harness
+Version:        3.50
+Release:        2%{?dist}
+Summary:        Run Perl standard test scripts with statistics
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Harness
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove hard-coded shell bangs
 Patch0:         Test-Harness-3.38-Remove-shell-bangs.patch
+BuildArch:      noarch
+BuildRequires:  coreutils
+BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+# Run-time:
+BuildRequires:  perl(base)
 BuildRequires:  perl(Benchmark)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Encode)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(Errno)
 BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(POSIX)
-BuildRequires:  perl(Symbol)
-BuildRequires:  perl(Term::ANSIColor)
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Text::ParseWords)
-BuildRequires:  perl(Time::HiRes)
-BuildRequires:  perl(base)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-BuildArch:      noarch
+# Optional run-time:
+BuildRequires:  perl(Encode)
+# Keep Pod::Usage 1.12 really optional
+BuildRequires:  perl(Term::ANSIColor)
+BuildRequires:  perl(Time::HiRes)
+# Tests:
+BuildRequires:  perl(Data::Dumper)
+# Dev::Null bundled for bootstrap
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Symbol)
+BuildRequires:  perl(Test::More)
+# Optional tests:
 %if %{with perl_Test_Harness_enables_optional_test}
 BuildRequires:  perl(CPAN::Meta::YAML)
 BuildRequires:  perl(File::Temp)
@@ -56,6 +66,20 @@ BuildRequires:  perl(TAP::Harness::Archive)
 BuildRequires:  perl(YAML)
 %endif
 %endif
+Suggests:       perl(Term::ANSIColor)
+Suggests:       perl(Time::HiRes)
+
+# Filter example dependencies
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_datadir}/doc
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_datadir}/doc
+
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(My.*\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(Dev::Null\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(EmptyParser\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(IO::c55Capture\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(NoFork\\)
 
 %description
 This package allows tests to be run and results automatically aggregated and
@@ -66,37 +90,158 @@ from this module it now exists only to provide TAP::Harness with an interface
 that is somewhat backwards compatible with Test::Harness 2.xx. If you're
 writing new code consider using TAP::Harness directly instead.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
-%autosetup -p1 -n Test-Harness-%{version}
+%setup -q -n Test-Harness-%{version}
+%patch -P0 -p1
+
+# Help generators to recognize Perl scripts
+for F in `find t -name *.t -o -name *.pl`; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-%make_build
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/000-load.t
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The easiest solution
+# is to copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
-%license README
-%doc Changes Changes-2.64 examples
-%{perl_vendorlib}/*
-%{_bindir}/*
-%{_mandir}/man1/*
-%{_mandir}/man3/*
+%doc Changes Changes-2.64 examples README
+%{perl_vendorlib}/App*
+%{perl_vendorlib}/TAP*
+%{perl_vendorlib}/Test*
+%{_bindir}/prove
+%{_mandir}/man1/prove*
+%{_mandir}/man3/App::Prove*
+%{_mandir}/man3/TAP::Base*
+%{_mandir}/man3/TAP::Formatter*
+%{_mandir}/man3/TAP::Harness*
+%{_mandir}/man3/TAP::Object*
+%{_mandir}/man3/TAP::Parser*
+%{_mandir}/man3/Test::*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 3.42-444
+
+%changelog
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.50-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.42-443
-- Remove epoch
+* Thu Aug 15 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.50-1
+- 3.50 bump (rhbz#2304673)
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.42-442
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.48-512
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.48-511
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.48-510
+- Increase release to favour standalone package
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.48-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.48-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Oct 03 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.48-1
+- 3.48 bump (rhbz#2241802)
+
+* Wed Aug 23 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.47-1
+- 3.47 bump (rhbz#2231692)
+
+* Wed Aug 09 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.46-1
+- 3.46 bump (rhbz#2229823)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.44-501
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.44-500
+- Perl 5.38 re-rebuild of bootstrapped packages
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.44-499
+- Increase release to favour standalone package
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.44-491
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.44-490
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.44-489
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.44-488
+- Increase release to favour standalone package
+
+* Tue Apr 19 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.44-1
+- 3.44 bump
+- Package tests
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.43-480
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.43-479
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.43-478
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.43-477
+- Increase release to favour standalone package
+
+* Thu May 06 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.43-1
+- Upgrade to 3.43 as provided in perl-5.34.0
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.42-459
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.42-458
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.42-457
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.42-456
+- Increase release to favour standalone package
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.42-441
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
