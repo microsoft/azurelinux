@@ -7040,8 +7040,8 @@
         "type": "other",
         "other": {
           "name": "ibus",
-          "version": "1.5.22",
-          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.22/ibus-1.5.22.tar.gz"
+          "version": "1.5.31",
+          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.31/ibus-1.5.31s.tar.gz"
         }
       }
     },
