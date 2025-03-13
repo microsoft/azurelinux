@@ -1,0 +1,13 @@
+diff --git a/Makefile.in b/Makefile.in
+index 750d9b7..d41b22c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -139,7 +139,7 @@ test:	$(PGMS) $(TESTFRAMEWORK) verify
+ 
+ pandoc_headers.o: tools/pandoc_headers.c config.h
+ 	$(BUILD) -c -o pandoc_headers.o tools/pandoc_headers.c
+-pandoc_headers: pandoc_headers.o
++pandoc_headers: pandoc_headers.o $(MKDLIB)
+ 	$(LINK) -o pandoc_headers pandoc_headers.o $(COMMON) -lmarkdown 
+ 
+ branch.o: tools/branch.c config.h

@@ -9,26 +9,25 @@ Distribution:   Azure Linux
 
 Summary: Mail processing program
 Name: procmail
-Version: 3.22
-Release: 53%{?dist}
-License: GPLv2+ or Artistic
-# Source: ftp://ftp.procmail.org/pub/procmail/procmail-%{version}.tar.gz
-# The original source doesn't seem to be available anymore, using mirror
-Source: ftp://ftp.ucsb.edu/pub/mirrors/procmail/procmail-%{version}.tar.gz
+Version: 3.24
+Release: 8%{?dist}
+# Dual licensed "gpl-2.0-or-later OR artistic-perl-1.0", but
+# artistic-perl-1.0 is not allowed, thus dropped from the license
+# tag as per: https://gitlab.com/fedora/legal/fedora-license-data/-/issues/423
+License: gpl-2.0-or-later
+URL: https://github.com/BuGlessRB/%{name}
+Source0: %{URL}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Source2: http://www.linux.org.uk/~telsa/BitsAndPieces/procmailrc
 # The Telsa config file doesn't seem to be available anymore, using local copy
 Source2: procmailrc
-URL: http://www.procmail.org
-Patch0: procmail-3.22-rhconfig.patch
+Patch0: procmail-3.24-rhconfig.patch
 Patch1: procmail-3.15.1-man.patch
-Patch2: procmail_3.22-8.debian.patch
-Patch4: procmail-3.22-truncate.patch
-Patch5: procmail-3.22-ipv6.patch
-Patch6: procmail-3.22-getline.patch
-Patch7: procmail-3.22-CVE-2014-3618.patch
-Patch8: procmail-3.22-crash-fix.patch
-Patch9: procmail-3.22-CVE-2017-16844.patch
-Patch10: procmail-3.22-coverity-scan-fixes.patch
+Patch2: procmail-3.22-truncate.patch
+Patch3: procmail-3.24-ipv6.patch
+Patch4: procmail-3.24-coverity-scan-fixes.patch
+# https://github.com/BuGlessRB/procmail/pull/7
+Patch5: procmail-3.24-gcc-14-fix.patch
+BuildRequires: make
 BuildRequires: gcc
 
 %description
@@ -40,17 +39,7 @@ chimes on your workstation for different types of mail) or selectively
 forward certain incoming mail automatically to someone.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .rhconfig
-%patch 1 -p1
-%patch 2 -p1
-%patch 4 -p1 -b .truncate
-%patch 5 -p1 -b .ipv6
-%patch 6 -p1 -b .getline
-%patch 7 -p1 -b .CVE-2014-3618
-%patch 8 -p1 -b .crash-fix
-%patch 9 -p1 -b .CVE-2017-16844
-%patch 10 -p1 -b .coverity-scan-fixes
+%autosetup -p1
 
 find examples -type f | xargs chmod 644
 
@@ -67,12 +56,11 @@ make \
     BASENAME=${RPM_BUILD_ROOT}%{_prefix} MANDIR=${RPM_BUILD_ROOT}%{_mandir} \
     install
 
-cp debian/mailstat.1 ${RPM_BUILD_ROOT}%{_mandir}/man1
 cp -p %{SOURCE2} telsas_procmailrc
 
 
 %files
-%doc Artistic COPYING FAQ FEATURES HISTORY README KNOWN_BUGS examples telsas_procmailrc debian/QuickStart debian/README.Maildir
+%doc Artistic COPYING FAQ FEATURES HISTORY README KNOWN_BUGS examples telsas_procmailrc
 
 %{_bindir}/formail
 %attr(2755,root,mail) %{_bindir}/lockfile
@@ -82,8 +70,48 @@ cp -p %{SOURCE2} telsas_procmailrc
 %{_mandir}/man[15]/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22-53
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.24-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.24-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 31 2024 Jaroslav Škarvada <jskarvad@redhat.com> - 3.24-6
+- Fixed FTBFS with gcc-14
+  Resolves: rhbz#2261530
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.24-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.24-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Dec 12 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 3.24-3
+- Converted license tag to SPDX
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 12 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 3.24-1
+- Switched to the github fork
+- New version
+  Resolves: rhbz#2143702
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-57
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-56
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-55
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-54
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-53
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.22-52
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -1,143 +1,162 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%bcond_with    python2
-%bcond_without python3
 
 %global pypi_name openstackdocstheme
 
 Name:           python-%{pypi_name}
-Version:        1.29.0
-Release:        8%{?dist}
+Version:        3.0.0
+Release:        9%{?dist}
 Summary:        OpenStack Docs Theme
 
-License:        ASL 2.0
-URL:            http://docs.openstack.org/
-Source0:        https://pypi.io/packages/source/o/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
+License:        Apache-2.0
+URL:            https://docs.openstack.org/
+Source0:        %{pypi_source}#/%{name}-%{version}.tar.gz
 Patch0001:      0001-Remove-all-Google-Analytics-tracking.patch
 BuildArch:      noarch
 
-%if %{with python2}
-%package -n     python2-%{pypi_name}
-Summary:        OpenStack Docs Theme
-%{?python_provide:%python_provide python2-%{pypi_name}}
-Provides:       bundled(js-jquery)
+BuildRequires:  python3-devel
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-sphinx
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-pbr
+BuildRequires:  python3-dulwich
+BuildRequires:  python3-pip
+BuildRequires:  python3-extras
+BuildRequires:  git-core
+BuildRequires:  python3dist(wheel)
 
-BuildRequires:  python2-devel
-BuildRequires:  python2-dulwich
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-pbr >= 1.8
-BuildRequires:  python2-sphinx
-BuildRequires:  git
-
-Requires: python2-dulwich
-Requires: python2-pbr
-Requires: python2-sphinx >= 1.6.2
-
-%description -n python2-%{pypi_name}
-OpenStack docs.openstack.org Sphinx Theme
-
-Theme and extension support for Sphinx documentation that is published to
+%global common_desc \
+OpenStack docs.openstack.org Sphinx Theme\
+\
+Theme and extension support for Sphinx documentation that is published to\
 docs.openstack.org. Intended for use by OpenStack projects.
-%endif
 
-%if %{with python3}
+%description
+%{common_desc}
+
+
 %package -n     python3-%{pypi_name}
 Summary:        OpenStack Docs Theme
 %{?python_provide:%python_provide python3-%{pypi_name}}
 Provides:       bundled(js-jquery)
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-dulwich
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-pbr >= 1.8
-BuildRequires:  python3-sphinx
-BuildRequires:  git
-
-Requires: python3-babel
-Requires: python3-dulwich
-Requires: python3-pbr
 Requires: python3-sphinx >= 1.6.2
-Requires: python3-extras
+Requires: python3-babel
 
 %description -n python3-%{pypi_name}
-OpenStack docs.openstack.org Sphinx Theme
+%{common_desc}
 
-Theme and extension support for Sphinx documentation that is published to
-docs.openstack.org. Intended for use by OpenStack projects.
-%endif
-
-%package -n python-%{pypi_name}-doc
+%package -n     python-%{pypi_name}-doc
 Summary:        openstackdocstheme documentation
 %description -n python-%{pypi_name}-doc
 Documentation for openstackdocstheme
 
-%description
-OpenStack docs.openstack.org Sphinx Theme
 
-Theme and extension support for Sphinx documentation that is published to
-docs.openstack.org. Intended for use by OpenStack projects.
+%generate_buildrequires
+%pyproject_buildrequires
+
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1 -S git
-
-%build
 # Make sure there is no Google Analytics
 sed -i 's/analytics_tracking_code.*/analytics_tracking_code\ =/' openstackdocstheme/theme/openstackdocs/theme.conf
 # Prevent doc build warnings from causing a build failure
 sed -i '/warning-is-error/d' setup.cfg
 
-%if %{with python2}
-%py2_build
-%endif
-%if %{with python3}
-%py3_build
-%endif
+%build
+%pyproject_wheel
 
-%if %{with python2}
-# generate html docs
-%{__python2} setup.py build_sphinx
-%endif
-%if %{with python3}
-%{__python3} setup.py build_sphinx
-%endif
+export PYTHONPATH=.
+sphinx-build -b html doc/source doc/build/html
 # remove the sphinx-build leftovers
 rm -rf html/.{doctrees,buildinfo}
 
 %install
-%if %{with python2}
-%py2_install
-%endif
-%if %{with python3}
-%py3_install
-%endif
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
-%if %{with python2}
-%files -n python2-%{pypi_name}
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %doc README.rst
 %license LICENSE
-%{python2_sitelib}/%{pypi_name}
-%{python2_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%{_bindir}/docstheme-build-pdf
 %{_bindir}/docstheme-build-translated.sh
 %{_bindir}/docstheme-lang-display-name.py
-%endif
-
-%if %{with python3}
-%files -n python3-%{pypi_name}
-%doc README.rst
-%license LICENSE
-%{_bindir}/docstheme-build-translated.sh
-%{_bindir}/docstheme-lang-display-name.py
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
-%endif
 
 %files -n python-%{pypi_name}-doc
 %doc doc/build/html
 
 %changelog
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.29.0-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add missing dependency on python3-extras
+* Wed Feb 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.0.0-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.0.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 3.0.0-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 04 2022 Joel Capitao <jcapitao@redhat.com> - 3.0.0-1
+- Update to latest release (rhbz#1672986)
+- Take advantage of DynamicBuildRequires
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.3.0-5
+- Rebuilt for Python 3.11
+
+* Thu Jan 27 2022 Joel Capitao <jcapitao@redhat.com> - 2.3.0-4
+- Requires autopage to fix F36/FTBFS
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 23 2021 Joel Capitao <jcapitao@redhat.com> - 2.3.0-1
+- Update to latest release
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.2.6-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 12 2020 Joel Capitao <jcapitao@redhat.com> - 2.2.6-2
+- Use git-core as BR instead of git
+
+* Thu Oct 29 2020 Joel Capitao <jcapitao@redhat.com> - 2.2.6-1
+- Update to 2.2.6
+
+* Mon Sep 14 2020 Joel Capitao <jcapitao@redhat.com> - 2.2.5-1
+- Update to 2.2.5
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 01 2020 Alfredo Moralejo <amoralej@redhat.com> - 2.2.1-1
+- Update to 2.2.1
+- Remove python2 subpackage
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 1.29.0-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.29.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -1,6 +1,6 @@
 Summary:        Recompression utilities for .png, .mng, .zip and .gz files
 Name:           advancecomp
-Version:        2.5
+Version:        2.6
 Release:        1%{?dist}
 # Source file headers all specify GPL-2.0-or-later (see source file headers),
 # except:
@@ -23,7 +23,7 @@ License:        GPL-3.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.advancemame.it/
-Source0:        https://github.com/amadvance/advancecomp/archive/v%{version}/advancecomp-%{version}.tar.gz
+Source0:        https://github.com/amadvance/advancecomp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  dos2unix
@@ -132,6 +132,10 @@ export LDFLAGS="-lzopfli ${LDFLAGS-}"
 %{_mandir}/man1/adv{def,mng,png,zip}.1*
 
 %changelog
+* Fri Oct 11 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.6-1
+- Upgrade to 2.6
+
+
 * Tue Sep 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5-1
 - Auto-upgrade to 2.5 - CVE-2023-2961
 

@@ -6,30 +6,11 @@
 This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
 
 ```bash
-sudo apt-get update
-
 # Install required dependencies.
-# Recommended but not required: `pigz` for faster compression operations.
-sudo apt -y install \
-    acl \
-    curl \
-    diffutils \
-    gawk \
-    genisoimage \
-    git \
-    golang-1.21-go \
-    jq \
-    make \
-    parted \
-    pigz \
-    openssl \
-    systemd \
-    qemu-utils \
-    rpm \
-    tar \
-    wget \
-    xfsprogs \
-    zstd
+sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
+
+# Also supported is:
+#    make -C toolkit install-prereqs
 
 # Fix go 1.21 link
 sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go

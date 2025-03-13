@@ -54,7 +54,6 @@
            deprecation="${compile.deprecation}" 
            optimize="${compile.optimize}" />
   
-
     </target>
 
   <!-- ======================== Build JavaDoc =========================== -->
@@ -69,7 +68,7 @@
 
 
   <!-- ===================== Distribution Files ========================= -->
-  <target name="dist" depends="package">
+  <target name="dist" depends="package,javadoc">
     <copy todir="${dist.dir}/docs/api">
             <fileset dir="${build.dir}/docs/api"/>
         </copy>

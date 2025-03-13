@@ -4,10 +4,9 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global forgeurl  https://pagure.io/go-rpm-macros
-Version:   3.0.9
+Version:   3.6.0
 %forgemeta
 
-#https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %global _spectemplatedir %{_datadir}/rpmdevtools/azl
 %global _docdir_fmt     %{name}
 
@@ -22,14 +21,13 @@ Version:   3.0.9
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
 Name:      go-rpm-macros
-Release:   3%{?dist}
+Release:   1%{?dist}
 Summary:   Build-stage rpm automation for Go packages
 
 License:   GPLv3+
 URL:       %{forgeurl}
-# Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
-Source:    %{forgesource}
-Patch0:    fixing_ldflags_for_azl.patch
+Source0:  https://pagure.io/go-rpm-macros/archive/3.6.0/%{name}-%{version}.tar.gz
+Source1:    %{forgesource}
 
 Requires:  go-srpm-macros = %{version}-%{release}
 Requires:  go-filesystem  = %{version}-%{release}
@@ -82,17 +80,13 @@ Summary:   RPM spec templates for Go packages
 License:   MIT
 BuildArch: noarch
 Requires:  go-rpm-macros = %{version}-%{release}
-#https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
-#Requires:  redhat-rpm-templates
 
 %description -n go-rpm-templates
 This package contains documented rpm spec templates showcasing how to use the
 macros provided by go-rpm-macros to create Go packages.
 
 %prep
-%forgesetup
-%patch 0 -p1
-
+%forgeautosetup -p1
 %writevars -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
 for template in templates/rpm/*\.spec ; do
   target=$(echo "${template}" | sed "s|^\(.*\)\.spec$|\1-bare.spec|g")
@@ -101,10 +95,6 @@ for template in templates/rpm/*\.spec ; do
 done
 
 %install
-# Some of those probably do not work with gcc-go right now
-# This is not intentional, but mips is not a primary Fedora architecture
-# Patches and PRs are welcome
-
 install -m 0755 -vd   %{buildroot}%{gopath}/src
 
 install -m 0755 -vd   %{buildroot}%{_spectemplatedir}
@@ -164,12 +154,15 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %files -n go-rpm-templates
 %license LICENSE-templates.txt
 %doc README.md
-# https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
 %dir %{dirname:%{_spectemplatedir}}
 %dir %{_spectemplatedir}
 %{_spectemplatedir}/*.spec
 
 %changelog
+* Wed Nov 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.6.0-1
+- Update to 3.6.0.
+- License verified
+
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-3
 - Fixing Go's linker flags.
 - License verified.

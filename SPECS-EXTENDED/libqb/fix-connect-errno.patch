@@ -1,0 +1,22 @@
+commit f5106342d023e7cc238899ec7a567ad1eeb9b404
+Author: Christine Caulfield <ccaulfie@redhat.com>
+Date:   Wed Mar 2 15:23:39 2022 +0000
+
+    ipcc: Fix errno returned from qb_ipcc_connect
+    
+    The errno value from qb_ipcc_connect was incorrectly negated
+    when I introduced qb_ipcc_async_connect()
+
+diff --git a/lib/ipcc.c b/lib/ipcc.c
+index c744ea1..4f35ea2 100644
+--- a/lib/ipcc.c
++++ b/lib/ipcc.c
+@@ -152,7 +152,7 @@ disconnect_and_cleanup:
+ 	free(c->receive_buf);
+ 	free(c);
+ 	errno = -res;
+-	return -res;
++	return res;
+ 
+ }
+ 

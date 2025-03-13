@@ -6,17 +6,17 @@ Distribution:   Azure Linux
 
 Summary: X.Org X11 DMX runtime library
 Name: libdmx
-Version: 1.1.4
-Release: 8%{?dist}
+Version: 1.1.5
+Release: 1%{?dist}
 License: MIT
-URL: http://www.x.org
+URL: https://www.x.org
 
 %if 0%{?gitdate}
-Source0:    %{tarball}-%{gitdate}.tar.bz2
+Source0:    %{tarball}-%{gitdate}.tar.xz
 Source1:    make-git-snapshot.sh
 Source2:    commitid
 %else
-Source0: https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Source0: https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 %endif
 
 Requires: libX11 >= 1.6.0
@@ -37,7 +37,7 @@ Requires: %{name} = %{version}-%{release}
 The X.Org X11 DMX (Distributed Multihead X) development files.
 
 %prep
-%setup -q -n %{tarball}-%{?gitdate:%{gitdate}}%{!?gitdate:%{version}}
+%autosetup -n %{tarball}-%{?gitdate:%{gitdate}}%{!?gitdate:%{version}}
 
 %build
 autoreconf -v --install --force
@@ -67,6 +67,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/X11/extensions/dmxext.h
 
 %changelog
+* Tue Nov 19 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.1.5-1
+- Update to 1.1.5
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

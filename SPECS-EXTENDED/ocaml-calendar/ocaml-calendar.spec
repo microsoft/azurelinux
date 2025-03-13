@@ -1,29 +1,31 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
+# ocaml-alcotest requires ocaml-astring, ocaml-cmdliner, ocaml-fmt, and ocaml-uutf,
+# none of which are otherwise needed for building the OCaml-dependent packages
+
+%global giturl  https://github.com/ocaml-community/calendar
+
 Name:           ocaml-calendar
-Version:        2.04
-Release:        29%{?dist}
+Version:        3.0.0
+Release:        14%{?dist}
 Summary:        Objective Caml library for managing dates and times
-License:        LGPLv2
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
-URL:            https://github.com/ocaml-community/calendar
-Source0:        https://download.ocamlcore.org/calendar/calendar/%{version}/calendar-%{version}.tar.gz
+URL:            https://ocaml-community.github.io/calendar/
+Source0:        https://github.com/ocaml-community/calendar/archive/refs/tags/v3.0.0.tar.gz#/%{name}-%{version}.tar.gz
 
-Patch1:         calendar-2.03.2-enable-debug.patch
+BuildRequires:  ocaml >= 4.03
+BuildRequires:  ocaml-dune >= 1.0
+BuildRequires:  ocaml-re-devel >= 1.7.2
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  gawk
-
-# Ignore all generated modules *except* CalendarLib, since everything
-# now appears in that namespace.
-%global __ocaml_requires_opts -i Calendar_builder -i Calendar_sig -i Date -i Date_sig -i Fcalendar -i Ftime -i Period -i Printer -i Time -i Time_sig -i Time_Zone -i Utils -i Version
-%global __ocaml_provides_opts -i Calendar_builder -i Calendar_sig -i Date -i Date_sig -i Fcalendar -i Ftime -i Period -i Printer -i Time -i Time_sig -i Time_Zone -i Utils -i Version
+%if %{with tests}
+BuildRequires:  ocaml-alcotest-devel
+%endif
 
 
 %description
@@ -41,47 +43,131 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n calendar-%{version}
-%patch 1 -p1
+%autosetup -n calendar-%{version} -p1
 
 
 %build
-./configure --libdir=%{_libdir}
-make
-make doc
-
-mv TODO TODO.old
-iconv -f iso-8859-1 -t utf-8 < TODO.old > TODO
+%dune_build
 
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-make install
+%dune_install
 
 
-%files
-%doc CHANGES README TODO LGPL COPYING
-%{_libdir}/ocaml/calendar
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/calendar/*.cmx
+%if %{with tests}
+%check
+%dune_check
 %endif
-%exclude %{_libdir}/ocaml/calendar/*.mli
 
 
-%files devel
-%doc CHANGES README TODO LGPL COPYING calendarFAQ-2.6.txt doc/*
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/calendar/*.cmx
-%endif
-%{_libdir}/ocaml/calendar/*.mli
+%files -f .ofiles
+%doc CHANGES README.md TODO
+%license LGPL COPYING
+
+%files devel -f .ofiles-devel
+%doc CHANGES README.md TODO calendarFAQ-2.6.txt
+%license LGPL COPYING
 
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.04-29
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-14
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 1:3.0.0-12
+- OCaml 5.2.0 ppc64le fix
+
+* Thu May 30 2024 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-11
+- OCaml 5.2.0 for Fedora 41
+
+* Thu May 23 2024 Jerry James <loganjerry@gmail.com> - 3.0.0-8
+- Simplify with %%bcond
+- Add VCS field
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-6
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-5
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-4
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 3.0.0-2
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 3.0.0-1
+- Version 3.0.0
+- New project URLs
+- Convert License tag to SPDX
+- Drop obsolete debuginfo patch
+- Build with dune
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 2.04-46
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-45
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-44
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 2.04-43
+- OCaml 4.14.0 rebuild
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.04-42
+- Bump release and rebuild.
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.04-41
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-40
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 2.04-39
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-38
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 14:31:55 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 2.04-37
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-35
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-34
+- OCaml 4.11.0 rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.04-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-32
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-31
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 17 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-30
+- OCaml 4.11.0 pre-release
+
+* Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-29
+- Update all OCaml dependencies for RPM 4.16
 
 * Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 2.04-28.1
 - OCaml 4.10.0 final (Fedora 32).

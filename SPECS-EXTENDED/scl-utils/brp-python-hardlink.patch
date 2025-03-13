@@ -1,0 +1,29 @@
+From e75f3f522f34e1cdd19852763363dd8b503e305e Mon Sep 17 00:00:00 2001
+From: Michal Nowak <mnowak@isc.org>
+Date: Tue, 7 Dec 2021 17:35:01 +0100
+Subject: [PATCH] Update brp-python-hardlink path
+
+Since Fedora 35 "brp-python-hardlink" script is in /usr/lib/rpm/redhat/.
+Otherwise RPM build fails with:
+
+    + /usr/lib/rpm/brp-python-hardlink
+    /var/tmp/rpm-tmp.VsVGRP: line 312: /usr/lib/rpm/brp-python-hardlink: No such file or directory
+
+Fixes #42
+---
+ rpm/macros.scl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rpm/macros.scl b/rpm/macros.scl
+index f1ee5f2..0d27a6b 100644
+--- a/rpm/macros.scl
++++ b/rpm/macros.scl
+@@ -91,7 +91,7 @@ package or when debugging this package.
+     }
+     /usr/lib/rpm/brp-strip-static-archive %{__strip}
+     /usr/lib/rpm/brp-scl-python-bytecompile %{__python3} %{?_python_bytecompile_errors_terminate_build} %{_scl_root}
+-    /usr/lib/rpm/brp-python-hardlink
++    [ -f /usr/lib/rpm/redhat/brp-python-hardlink ] && /usr/lib/rpm/redhat/brp-python-hardlink || /usr/lib/rpm/brp-python-hardlink
+ %{nil}}
+ BuildRequires: scl-utils-build
+ %if "%{?scl}%{!?scl:0}" == "%{pkg_name}"

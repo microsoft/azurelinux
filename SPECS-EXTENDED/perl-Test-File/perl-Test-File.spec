@@ -1,42 +1,44 @@
-# This module usually ships with version numbers having two digits after the decimal point
-%global cpanversion 1.443
-
-Summary:        Test file attributes through Test::Builder
-Name:           perl-Test-File
-Version:        1.44.3
-Release:        12%{?dist}
-License:        Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://metacpan.org/release/Test-File
-Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpanversion}.tar.gz#/perl-Test-File-%{cpanversion}.tar.gz
-BuildArch:      noarch
+# This module usually ships with version numbers having two digits after the decimal point
+%global cpan_version 1.993
+%global rpm_version 1.99.3
+
+Summary:	Test file attributes through Test::Builder
+Name:		perl-Test-File
+Version:	%{rpm_version}
+Release:	8%{?dist}
+License:	Artistic-2.0
+URL:		https://metacpan.org/release/Test-File
+Source0:	https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpan_version}.tar.gz#/perl-Test-File-%{cpan_version}.tar.gz
+BuildArch:	noarch
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  make
-BuildRequires:  perl-interpreter
-BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(ExtUtils::Manifest) >= 1.21
+BuildRequires:	coreutils
+BuildRequires:	make
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:	perl(ExtUtils::Manifest) >= 1.21
 # Module Runtime
-BuildRequires:  perl(base)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(Test::Builder)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(warnings)
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(File::Spec)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(Test::Builder)
+BuildRequires:	perl(vars)
+BuildRequires:	perl(warnings)
+BuildRequires:	perl(XSLoader)
 # Test Suite
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(Test::Builder) >= 1.001006
-BuildRequires:  perl(Test::Builder::Tester)
-BuildRequires:  perl(Test::More) >= 0.95
-BuildRequires:  perl(Test::utf8)
-BuildRequires:  perl(utf8)
+BuildRequires:	perl(Config)
+BuildRequires:	perl(Cwd)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(Test::Builder) >= 1.001006
+BuildRequires:	perl(Test::Builder::Tester)
+BuildRequires:	perl(Test::More) >= 1
+BuildRequires:	perl(utf8)
 # Optional Tests
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage)
+BuildRequires:	perl(Test::Pod) >= 1.00
+BuildRequires:	perl(Test::Pod::Coverage) >= 1.00
 # Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -47,14 +49,14 @@ Some file attributes depend on the owner of the process testing the file
 in the same way the file test operators do.
 
 %prep
-%setup -q -n Test-File-%{cpanversion}
+%setup -q -n Test-File-%{cpan_version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-make %{?_smp_mflags}
+%{make_build}
 
 %install
-make install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -67,13 +69,102 @@ make test
 %{_mandir}/man3/Test::File.3*
 
 %changelog
-* Thu Mar 28 2024 Andrew Phelps <anphel@microsoft.com> - 1.44.3-12
-- Remove `rpmversion` global definition due to macro conflict with rpm-4.18.2
-- Update license to Artistic-2.0
-- License verified.
+* Wed Dec 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.99.3-8
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44.3-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Aug  8 2023 Paul Howarth <paul@city-fan.org> - 1.99.3-4
+- Fix FTBFS in Rawhide due to %%rpmversion macro becoming an rpm built-in
+  (rhbz#2229872)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan  2 2023 Paul Howarth <paul@city-fan.org> - 1.99.3-1
+- Update to 1.993
+  - Try harder to check for symlinks on Windows by stealing some code from
+    Win32:: (GH#36)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.99.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.99.2-2
+- Perl 5.36 rebuild
+
+* Wed Feb 16 2022 Paul Howarth <paul@city-fan.org> - 1.99.2-1
+- Update to 1.992
+  - Fix race condition in tests for mtime (GH#29)
+
+* Fri Jan 21 2022 Paul Howarth <paul@city-fan.org> - 1.99.1-1
+- Update to 1.991
+  - Enforce text files in some functions, as warned in GH#18
+  - Change up some diag messages:
+    - Lowercase first letter
+    - Not ! at end
+    - Use "file" instead of "filename"
+    If you were matching on those, you may need to update your patterns
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.44.8-2
+- Perl 5.34 rebuild
+
+* Fri Mar  5 2021 Paul Howarth <paul@city-fan.org> - 1.44.8-1
+- Update to 1.448
+  - Try handling all-numeric user and group names (GH#26)
+
+* Thu Feb 25 2021 Paul Howarth <paul@city-fan.org> - 1.44.7-1
+- Update to 1.447
+  - Trying harder to get the tests to pass on Cygwin
+
+* Sun Feb 21 2021 Paul Howarth <paul@city-fan.org> - 1.44.6-1
+- Update to 1.446
+  - Better Cygwin detection
+
+* Tue Feb 16 2021 Paul Howarth <paul@city-fan.org> - 1.44.5-1
+- Update to 1.445
+  - Get the tests to pass under Cygwin (GH#17)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan  6 2021 Paul Howarth <paul@city-fan.org> - 1.44.4-1
+- Update to 1.444
+  - Change the file_writeable_ok tests to file_writable_ok, which is the
+    correct spelling; the old names work but now warn to use the new name
+  - Some updates to refresh the tests
+  - Start mirroring Test2::Tools::File so we support the same names
+  - Deprecated directories in tests appropriate for only plain files; it's a
+    diag() message now but will be a test failure later
+  - Merge some test additions from Desmond Daignault (GH#20)
+  - Remove Travis, add GitHub actions
+  - Add file_is_symlink_not_ok
+- License changed to Artistic 2.0
+- Use author-independent source URL
+- Use %%{make_build} and %%{make_install}
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.44.3-11
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.3-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

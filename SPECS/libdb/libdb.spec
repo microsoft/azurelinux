@@ -1,7 +1,7 @@
 Summary:        The Berkley DB database library for C
 Name:           libdb
 Version:        5.3.28
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          System/Libraries
 URL:            https://oss.oracle.com/berkeley-db.html
 Source0:        http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
 Patch0:         CVE-2019-2708.patch
+Patch1:         CVE-2020-13435.patch
 Obsoletes:      db
 
 %description
@@ -92,6 +93,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/db*_tuner
 
 %changelog
+* Fri Feb 21 2025 Rohit Rawat <rohitrawat@microsoft.com> - 5.3.28-9
+- Patch CVE-2020-13435
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 5.3.28-8
 - Sanitize license files
 

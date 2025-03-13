@@ -1,28 +1,24 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 %global homepage https://github.com/latchset/libverto
 
 Name:           libverto
-Version:        0.3.0
+Version:        0.3.2
 Release:        10%{?dist}
 Summary:        Main loop abstraction library
 
 License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            %{homepage}
 Source0:        %{homepage}/releases/download/%{version}/%{name}-%{version}.tar.gz
-
-Patch0: Work-around-libev-not-being-c89-compliant.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  make
 
 BuildRequires:  glib2-devel
 BuildRequires:  libevent-devel
-# BuildRequires:  libtevent-devel
-%if !0%{?rhel}
 BuildRequires:  libev-devel
-%endif
 
 BuildRequires:  git
 
@@ -86,27 +82,6 @@ Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 The %{name}-libevent-devel package contains libraries and header files for
 developing applications that use %{name}-libevent.
 
-# %package        tevent
-# Summary:        tevent module for %{name}
-# Requires:       %{name}%{?_isa} = %{version}-%{release}
-# Provides:       %{name}-module-base = %{version}-%{release}
-
-# %description    tevent
-# Module for %{name} which provides integration with tevent.
-
-# This package provides %{name}-module-base since it supports io, timeout
-# and signal.
-
-# %package        tevent-devel
-# Summary:        Development files for %{name}-tevent
-# Requires:       %{name}-tevent%{?_isa} = %{version}-%{release}
-# Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-
-# %description    tevent-devel
-# The %{name}-tevent-devel package contains libraries and header files for
-# developing applications that use %{name}-tevent.
-
-%if !0%{?rhel}
 %package        libev
 Summary:        libev module for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -129,7 +104,6 @@ developing applications that use %{name}-libev.
 
 This package provides %{name}-module-base since it supports io, timeout
 and signal.
-%endif
 
 %prep
 %autosetup -S git
@@ -147,10 +121,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %ldconfig_scriptlets
 %ldconfig_scriptlets glib
 %ldconfig_scriptlets libevent
-#ldconfig_scriptlets tevent
-%if !0%{?rhel}
 %ldconfig_scriptlets libev
-%endif
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -180,15 +151,6 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/%{name}-libevent.so
 %{_libdir}/pkgconfig/%{name}-libevent.pc
 
-# %files tevent
-# %{_libdir}/%{name}-tevent.so.*
-
-# %files tevent-devel
-# %{_includedir}/verto-tevent.h
-# %{_libdir}/%{name}-tevent.so
-# %{_libdir}/pkgconfig/%{name}-tevent.pc
-
-%if !0%{?rhel}
 %files libev
 %{_libdir}/%{name}-libev.so.*
 
@@ -196,11 +158,51 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_includedir}/verto-libev.h
 %{_libdir}/%{name}-libev.so
 %{_libdir}/pkgconfig/%{name}-libev.pc
-%endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.0-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Nov 14 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.3.2-10
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar 15 2021 Robbie Harwood <rharwood@redhat.com> - 0.3.2-1
+- New upstream version (0.3.2)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 22 2021 Robbie Harwood <rharwood@redhat.com> - 0.3.1-2
+- New upstream version (0.3.1)
+- Drop tevent goo and RHEL conditionals
+
+* Tue Sep 15 2020 Robbie Harwood <rharwood@redhat.com> - 0.3.0-11
+- Rebuild for libevent soname bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
