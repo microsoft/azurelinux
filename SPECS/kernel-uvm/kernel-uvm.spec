@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.1.58.mshv4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -154,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Mar 12 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-2
+- Enable EROFS
+
 * Tue May 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv4-1
 - Auto-upgrade to 6.1.58.mshv4
 
