@@ -8,8 +8,8 @@ Distribution:   Azure Linux
 %endif
 
 Name:           perl-Devel-Size
-Version:        0.83
-Release:        6%{?dist}
+Version:        0.84
+Release:        1%{?dist}
 Summary:        Perl extension for finding the memory usage of Perl variables
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Devel-Size
@@ -75,6 +75,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 17 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.84-1
+- Version bump to 0.84
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.83-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
