@@ -1,0 +1,134 @@
+From b14fa83ef1a23f4df5f11a05ef547fe507701edf Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Thu, 3 Jun 2021 14:04:06 -0400
+Subject: [PATCH 5/5] tasklist: Add surface loader function
+
+Since the tasklist now supports cairo_surface_t icons, we provide
+a similar icon loader function that takes surface icons.
+---
+ libwnck/tasklist.c | 50 +++++++++++++++++++++++++++++++++++++++++++++-
+ libwnck/tasklist.h | 26 ++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+), 1 deletion(-)
+
+diff --git a/libwnck/tasklist.c b/libwnck/tasklist.c
+index 70bbff3..676f2cb 100644
+--- a/libwnck/tasklist.c
++++ b/libwnck/tasklist.c
+@@ -235,6 +235,10 @@ struct _WnckTasklistPrivate
+   void *icon_loader_data;
+   GDestroyNotify free_icon_loader_data;
+ 
++  WnckLoadSurfaceFunction surface_loader;
++  void *surface_loader_data;
++  GDestroyNotify free_surface_loader_data;
++
+ #ifdef HAVE_STARTUP_NOTIFICATION
+   SnDisplay *sn_display;
+   SnMonitorContext *sn_context;
+@@ -1281,6 +1285,11 @@ wnck_tasklist_finalize (GObject *object)
+   tasklist->priv->free_icon_loader_data = NULL;
+   tasklist->priv->icon_loader_data = NULL;
+ 
++  if (tasklist->priv->free_surface_loader_data != NULL)
++    (* tasklist->priv->free_surface_loader_data) (tasklist->priv->surface_loader_data);
++  tasklist->priv->free_surface_loader_data = NULL;
++  tasklist->priv->surface_loader_data = NULL;
++
+   g_clear_object (&tasklist->priv->handle);
+ 
+   G_OBJECT_CLASS (wnck_tasklist_parent_class)->finalize (object);
+@@ -1521,6 +1530,31 @@ wnck_tasklist_set_icon_loader (WnckTasklist         *tasklist,
+   tasklist->priv->free_icon_loader_data = free_data_func;
+ }
+ 
++/**
++ * wnck_tasklist_set_surface_loader:
++ * @tasklist: a #WnckTasklist
++ * @load_surface_func: icon loader function
++ * @data: data for icon loader function
++ * @free_data_func: function to free the data
++ *
++ * Sets a function to be used for loading cairo surface icons.
++ **/
++void
++wnck_tasklist_set_surface_loader (WnckTasklist           *tasklist,
++                                  WnckLoadSurfaceFunction load_surface_func,
++                                  void                   *data,
++                                  GDestroyNotify          free_data_func)
++{
++  g_return_if_fail (WNCK_IS_TASKLIST (tasklist));
++
++  if (tasklist->priv->free_surface_loader_data != NULL)
++    (* tasklist->priv->free_surface_loader_data) (tasklist->priv->surface_loader_data);
++
++  tasklist->priv->surface_loader = load_surface_func;
++  tasklist->priv->surface_loader_data = data;
++  tasklist->priv->free_surface_loader_data = free_data_func;
++}
++
+ static void
+ get_layout (GtkOrientation  orientation,
+             int             for_size,
+@@ -3933,7 +3967,21 @@ wnck_task_get_icon (WnckTask *task)
+ 
+     case WNCK_TASK_STARTUP_SEQUENCE:
+ #ifdef HAVE_STARTUP_NOTIFICATION
+-      if (task->tasklist->priv->icon_loader != NULL)
++      if (task->tasklist->priv->surface_loader != NULL)
++        {
++          const char *icon;
++
++          icon = sn_startup_sequence_get_icon_name (task->startup_sequence);
++          if (icon != NULL)
++            {
++              surface =  (* task->tasklist->priv->surface_loader) (icon,
++                                                                  mini_icon_size,
++                                                                  0,
++                                                                  task->tasklist->priv->surface_loader_data);
++
++            }
++        }
++      else if (task->tasklist->priv->icon_loader != NULL)
+         {
+           const char *icon;
+ 
+diff --git a/libwnck/tasklist.h b/libwnck/tasklist.h
+index 82f2d3e..60b90dd 100644
+--- a/libwnck/tasklist.h
++++ b/libwnck/tasklist.h
+@@ -146,6 +146,32 @@ void wnck_tasklist_set_icon_loader (WnckTasklist         *tasklist,
+                                     void                 *data,
+                                     GDestroyNotify        free_data_func);
+ 
++/**
++ * WnckLoadSurfaceFunction:
++ * @icon_name: an icon name as in the Icon field in a .desktop file for the
++ * icon to load.
++ * @size: the desired icon size.
++ * @flags: not defined to do anything yet.
++ * @data: data passed to the function, set when the #WnckLoadSurfaceFunction has
++ * been set for the #WnckTasklist.
++ *
++ * Specifies the type of function passed to wnck_tasklist_set_icon_loader().
++ *
++ * Returns: it should return a <classname>cairo_surface_t</classname> of @icon_name
++ * at size @size, or %NULL if no icon for @icon_name at size @size could be
++ * loaded.
++ *
++ */
++typedef cairo_surface_t* (*WnckLoadSurfaceFunction) (const char   *icon_name,
++                                                     int           size,
++                                                     unsigned int  flags,
++                                                     void         *data);
++
++void wnck_tasklist_set_surface_loader (WnckTasklist           *tasklist,
++                                       WnckLoadSurfaceFunction load_surface_func,
++                                       void                   *data,
++                                       GDestroyNotify          free_data_func);
++
+ G_END_DECLS
+ 
+ #endif /* WNCK_TASKLIST_H */
+-- 
+2.46.1
+
