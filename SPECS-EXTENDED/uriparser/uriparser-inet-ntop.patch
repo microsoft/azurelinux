@@ -1,0 +1,14 @@
+diff -rupN --no-dereference uriparser-0.9.6/tool/uriparse.c uriparser-0.9.6-new/tool/uriparse.c
+--- uriparser-0.9.6/tool/uriparse.c	2022-01-06 19:01:11.000000000 +0100
++++ uriparser-0.9.6-new/tool/uriparse.c	2022-01-07 10:22:25.506474914 +0100
+@@ -43,10 +43,6 @@
+ #ifdef _WIN32
+ # include <winsock2.h>
+ # include <ws2tcpip.h>
+-# ifdef __MINGW32__
+-WINSOCK_API_LINKAGE const char * WSAAPI inet_ntop(
+-		int af, const void *src, char *dst, socklen_t size);
+-# endif
+ #else
+ # include <sys/socket.h>
+ # include <arpa/inet.h>
