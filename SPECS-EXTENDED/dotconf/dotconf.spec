@@ -1,18 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		dotconf
-Version:	1.3
-Release:	26%{?dist}
+Version:	1.4.1
+Release:	1%{?dist}
 Summary:	Libraries to parse configuration files
-License:	LGPLv2.1
+License:	LGPLv2.1-only AND Apache-1.1
 URL:		https://github.com/williamh/dotconf/
-# Upstream source's hash different from the Mariner one.
-# Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source:		%{_distro_sources_url}/%{name}-%{version}.tar.gz
- 
+Source: 	https://github.com/williamh/dotconf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	findutils
 BuildRequires:	gcc
 BuildRequires:	glibc-common
+BuildRequires:	libtool
 BuildRequires:	make
 
 %description
@@ -30,14 +31,15 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
+autoreconf -fiv
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%make_install
 
 iconv -f iso-8859-2 -t utf-8 -o iconv.tmp AUTHORS
 mv iconv.tmp AUTHORS
@@ -64,6 +66,10 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 %{_libdir}/pkgconfig/dotconf.pc
 
 %changelog
+* Wed Oct 16 2014 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.1-1
+- Update to version 1.4.1
+- License verified
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-26
 - Updating naming for 3.0 version of Azure Linux.
 
