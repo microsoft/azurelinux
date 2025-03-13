@@ -26,7 +26,7 @@
 #
 #
 
-%global last-known-kernel 6.6.79.1
+%global last-known-kernel 6.6.82.1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -64,7 +64,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 12%{?dist}
+Release:	 13%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -253,6 +253,9 @@ fi
 %endif
 
 %changelog
+* Thu Mar 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
+- Bump release to rebuild for new kernel release
+
 * Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-12
 - Bump release to rebuild for new kernel release
 
