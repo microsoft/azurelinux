@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
-Summary:        Prism
-Name:           image-customizer
+Summary:        Azure Linux image customization tool
+Name:           prism
 Version:        0.12.0
 Release:        1%{?dist}
 License:        MIT
@@ -10,8 +10,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/microsoft/azure-linux-image-tools
 Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v%{version}.tar.gz#/azure-linux-image-tools-%{version}.tar.gz
-BuildArch: noarch
-BuildRequires: golang >= 1.20
+BuildArch: x86_64
+#BuildRequires: golang >= 1.21
 Requires: qemu-img
 Requires: rpm
 Requires: coreutils
@@ -47,16 +47,16 @@ which customize the image by booting it inside a VM.
 %build
 export GOPATH=%{our_gopath}
 cd toolkit/tools/imagecustomizer
-go mod tidy
-go build -o %{_builddir}/image-customizer .
+go build -o %{_builddir}/imagecustomizer .
 
 %install
-mkdir -p %{buildroot}/usr/local/bin/
-install -m 755 %{_builddir}/image-customizer %{buildroot}/usr/local/bin/image-customizer
+mkdir -p %{buildroot}%{_bindir}
+install -m 0755 %{_builddir}/imagecustomizer %{buildroot}%{_bindir}/imagecustomizer
 
 %files
-/usr/local/bin/image-customizer
+%{_bindir}/imagecustomizer
+%license LICENSE
 
 %changelog
-* Wed Mar 12 2025 Elaine Zhao <elainezhao@microsoft.com> - 0.12.0-1
+* Thu Mar 13 2025 Elaine Zhao <elainezhao@microsoft.com> - 0.12.0-1
 - Original version for Azure Linux.
