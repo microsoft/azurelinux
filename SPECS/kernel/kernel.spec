@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.64.2
-Release:        9%{?dist}
+Version:        6.6.78.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         jent-init-fix.patch
+Patch2:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -69,6 +70,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
@@ -428,6 +430,21 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
+- Add patch to revert UART change that breaks IPMI SEL panic message
+
+* Mon Mar 03 2025 Andy Zaugg <azaugg@linkedin.com> - 6.6.78.1-2
+- Add slang as BuildRequires, enabling tui on perf
+
+* Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
+- Auto-upgrade to 6.6.78.1
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
+- Bump release to match kernel-64k
+
+* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-1
+- Auto-upgrade to 6.6.76.1
+
 * Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
 - Apply upstream patches to fix kernel panic in jitterentropy initialization on
   ARM64 FIPS boot
