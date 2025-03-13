@@ -1,7 +1,7 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,8 +43,11 @@ Provides header files needed for Cifs-Utils development.
 
 %build
 autoreconf -fiv
-%configure
-%configure --prefix=%{_prefix} ROOTSBINDIR=%{_sbindir}
+# Disabling 'cifsupcall' to not introduce a dependency on 'krb5'.
+%configure \
+    --prefix=%{_prefix} \
+    ROOTSBINDIR=%{_sbindir} \
+    --disable-cifsupcall
 %make_build
 
 %install
@@ -70,6 +73,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Fri Feb 07 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0-2
+- Explicitly disable 'cifs-upcall'.
+
 * Wed Feb 07 2024 Suresh Thelkar <sthelkar@microsoft.com> - 7.0-1
 - Upgrade to 7.0
 
