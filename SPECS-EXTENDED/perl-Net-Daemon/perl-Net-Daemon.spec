@@ -1,28 +1,53 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Net-Daemon
-Version:        0.48
-Release:        25%{?dist}
+Version:        0.49
+Release:        14%{?dist}
 Summary:        Perl extension for portable daemons
 
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Net-Daemon
-Source0:        https://cpan.metacpan.org/authors/id/M/MN/MNOONING/Net-Daemon-%{version}.tar.gz#/perl-Net-Daemon-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/Net-Daemon-%{version}.tar.gz#/perl-Net-Daemon-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl-doc
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl-Pod-Perldoc
+BuildRequires:  sed
 # Run-time:
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires:  perl(Config)
+BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(Getopt::Long)
-# Tests:
 BuildRequires:  perl(IO::Socket)
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(Symbol)
+%{?_with_network_tests:
+BuildRequires:  perl(Sys::Syslog)
+}
+# Thread not used at tests
+# threads not used at tests
+BuildRequires:  perl(threads::shared)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+# Tests:
 BuildRequires:  perl(Test::More)
 # Network tests:
 %{?_with_network_tests:
+BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(Socket)
 }
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Suggests:       perl(Sys::Syslog)
+# threads is prefered over Threads
+Suggests:       perl(threads)
+Requires:       perl(threads::shared)
 
 %{?perl_default_filter}
 
@@ -41,23 +66,21 @@ inheriting will safe you a lot of work anyways.
 %prep
 %setup -q -n Net-Daemon-%{version}
 # Convert EOL
-sed -i 's/\r//' README
+/usr/bin/sed -i 's/\r//' README
 
 # generate our other two licenses...
-perldoc perlgpl > LICENSE.GPL
-perldoc perlartistic > LICENSE.Artistic
+/usr/bin/perldoc perlgpl > LICENSE.GPL
+/usr/bin/perldoc perlartistic > LICENSE.Artistic
 
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS"
-make %{?_smp_mflags}
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS" NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} $RPM_BUILD_ROOT/*
 
 
 %check
@@ -71,7 +94,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
   rm t/unix.t
 }
 
-make test
+%{make_build} test
 
 
 %files
@@ -82,8 +105,62 @@ make test
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-25
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.49-14
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-7
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-4
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Oct 22 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 0.49-2
+- Specify fill path to programs used in spec file
+- Use the %%{_fixperms} macro
+
+* Sun Sep 27 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 0.49-1
+- Update to 0.49
+- Pass NO_PACKLIST=1 NO_PERLLOCAL=1 to Makefile.PL
+- Use %%{make_install} instead of "make pure_install"
+- Use %%{make_build} instead of make
+- Replace %%{__perl} with /usr/bin/perl
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.48-26
+- Perl 5.32 rebuild
+
+* Tue Mar 10 2020 Petr Pisar <ppisar@redhat.com> - 0.48-25
+- Specify all dependencies
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

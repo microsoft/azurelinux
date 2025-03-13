@@ -127,3 +127,18 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-level=$(LOG_LEVEL) \
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
+
+##help:target:install-prereqs=Install build prerequisites automatically.
+install-prereqs:
+	echo "Installing build prerequisites for AzureLinux..." && \
+	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
+	echo "Current OS: $$current_os" && \
+	if [ "$$current_os" = "mariner" ] || [ "$$current_os" = "azurelinux" ]; then \
+		scriptfile="$(toolkit_root)/docs/building/prerequisites-mariner.sh" ; \
+	elif [ "$$current_os" = "ubuntu" ]; then \
+		scriptfile="$(toolkit_root)/docs/building/prerequisites-ubuntu.sh" ; \
+	else \
+		$(call print_error,"Unsupported OS: $$current_os") ; \
+	fi && \
+	"$$scriptfile" || \
+	$(call print_error,Install failed)
