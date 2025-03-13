@@ -1,26 +1,23 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
 %global pypi_name testscenarios
 
 Name:           python-%{pypi_name}
 Version:        0.5.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Testscenarios, a pyunit extension for dependency injection
 License:        ASL 2.0 and BSD
 URL:            https://launchpad.net/testscenarios
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://pypi.python.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/f0/de/b0b5b98c0f38fd7086d082c47fcb455eedd39a044abe7c595f5f40cd6eed/testscenarios-0.5.0.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-pbr
 BuildRequires:  python3-testtools
 BuildRequires:  python3-xml
-%if 0%{?with_check}
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3dist(wheel)
 
 %global _description\
 testscenarios provides clean dependency injection for python unittest style\
@@ -45,32 +42,33 @@ different situations).
 
 %prep
 %setup -q -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
 # Remove unknown test options from setup.py
 sed -i '/^buffer = 1$/d' setup.cfg
 sed -i '/^catch = 1$/d' setup.cfg
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-CFLAGS="%{optflags}" %{__python3} setup.py build
+%pyproject_wheel
+
 
 %install
-%{__python3} setup.py install --skip-build --root %{buildroot}
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
 %check
-%{__python3} setup.py test
+%{python3} setup.py test
 
-%files -n python3-%{pypi_name}
-%license Apache-2.0
-%license BSD
-%doc GOALS
-%doc HACKING
-%doc NEWS
-%doc README
-%doc doc/
-%{python3_sitelib}/*
+%files -n python3-%{pypi_name} -f %{pyproject_files}
+%license Apache-2.0 BSD
+%doc GOALS HACKING NEWS README doc/
 
 %changelog
+* Fri Dec 21 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.5.0-24
+- Updated source0 and build dependency
+- License verified.
+
 * Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-23
 - Release bump to fix package information.
 
