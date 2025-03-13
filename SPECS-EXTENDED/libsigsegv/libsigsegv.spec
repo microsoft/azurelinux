@@ -3,15 +3,16 @@ Distribution:   Azure Linux
 
 Summary: Library for handling page faults in user mode
 Name:    libsigsegv
-Version: 2.11
-Release: 11%{?dist}
-
-License: GPLv2+
+Version: 2.14
+Release: 1%{?dist}
+License: GPL-2.0-or-later
 URL:     https://www.gnu.org/software/libsigsegv/
-Source0: http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
-Patch0: configure.patch
+Source0: https://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
+Patch0:  configure.patch
 
 BuildRequires: automake libtool
+BuildRequires: gcc
+BuildRequires: make
 
 %description
 This is a library for handling page faults in user mode. A page fault
@@ -38,35 +39,24 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 
 %build
+# for patch1, rpaths
 autoreconf -ivf
+ 
 %configure \
   --enable-shared \
   --disable-silent-rules \
   --enable-static
 
-make %{?_smp_mflags}
-
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
-
-## FIXME/TODO: review if this is needed anymore, particularly after usrmove
-
-# move shlib to %{_lib}
-pushd %{buildroot}%{_libdir}
-mkdir ../../%{_lib}
-mv libsigsegv.so.2* ../../%{_lib}/
-ln -sf ../../%{_lib}/libsigsegv.so.2 %{buildroot}%{_libdir}/libsigsegv.so
-popd
-
-
-## unpackaged files
-rm -fv %{buildroot}%{_libdir}/lib*.la
+%make_install
+# remove libtool archives
+find %{buildroot} -type f -name "*.la" -delete
 
 
 %check
@@ -76,13 +66,9 @@ make check
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS NEWS README
 %license COPYING
-
-/%{_lib}/libsigsegv.so.2*
-
-
-
+%doc AUTHORS NEWS README
+%{_libdir}/libsigsegv.so.2*
 
 %files devel
 %{_libdir}/libsigsegv.so
@@ -93,6 +79,10 @@ make check
 
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.14-1
+- Update to version 2.14
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
