@@ -1,0 +1,797 @@
+From c3c3a3a95ba079fbc7f4bd43cbe6836b9b53a818 Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Mon, 20 Jan 2020 13:38:59 -0500
+Subject: [PATCH 3/5] xutils: Change icons to being cairo surfaces
+
+Since all icons are stored internally as cairo surfaces, we should be
+returning icons as cairo surfaces from the private functions in xutils.
+This simplifies the drawing codepath and makes us able to delete a bunch
+of GdkPixbuf manipulation.
+
+adapted from https://gitlab.gnome.org/GNOME/mutter/commit/af7f51b9
+---
+ libwnck/application.c             |  22 +--
+ libwnck/class-group.c             |  16 +-
+ libwnck/tasklist.c                |   9 +-
+ libwnck/util.c                    |   4 +-
+ libwnck/window.c                  |  22 +--
+ libwnck/wnck-icon-cache-private.h |  15 +-
+ libwnck/wnck-icon-cache.c         | 299 +++++++++++++-----------------
+ libwnck/xutils.c                  |  42 ++---
+ libwnck/xutils.h                  |  11 +-
+ 9 files changed, 181 insertions(+), 259 deletions(-)
+
+diff --git a/libwnck/application.c b/libwnck/application.c
+index 77958c4..be1107d 100644
+--- a/libwnck/application.c
++++ b/libwnck/application.c
+@@ -309,10 +309,11 @@ static void
+ get_icons (WnckApplication *app)
+ {
+   WnckHandle *handle;
+-  GdkPixbuf *icon;
+-  GdkPixbuf *mini_icon;
++  cairo_surface_t *icon;
++  cairo_surface_t *mini_icon;
+   gsize normal_size;
+   gsize mini_size;
++  int scaling_factor;
+ 
+   handle = wnck_screen_get_handle (app->priv->screen);
+ 
+@@ -320,6 +321,7 @@ get_icons (WnckApplication *app)
+   mini_icon = NULL;
+   normal_size = _wnck_handle_get_default_icon_size (handle);
+   mini_size = _wnck_handle_get_default_mini_icon_size (handle);
++  scaling_factor = _wnck_get_window_scaling_factor ();
+ 
+   if (_wnck_read_icons (app->priv->screen,
+                         app->priv->xwindow,
+@@ -327,24 +329,16 @@ get_icons (WnckApplication *app)
+                         &icon,
+                         normal_size,
+                         &mini_icon,
+-                        mini_size))
++                        mini_size,
++                        scaling_factor))
+     {
+       app->priv->need_emit_icon_changed = TRUE;
+ 
+       g_clear_pointer (&app->priv->icon, cairo_surface_destroy);
+       g_clear_pointer (&app->priv->mini_icon, cairo_surface_destroy);
+ 
+-      if (icon)
+-        {
+-          app->priv->icon = gdk_cairo_surface_create_from_pixbuf (icon, 0, NULL);
+-          g_clear_object (&icon);
+-        }
+-
+-      if (mini_icon)
+-        {
+-          app->priv->mini_icon = gdk_cairo_surface_create_from_pixbuf (mini_icon, 0, NULL);
+-          g_clear_object (&mini_icon);
+-        }
++      app->priv->icon = icon;
++      app->priv->mini_icon = mini_icon;
+     }
+ 
+   /* FIXME we should really fall back to using the icon
+diff --git a/libwnck/class-group.c b/libwnck/class-group.c
+index acdb062..7899497 100644
+--- a/libwnck/class-group.c
++++ b/libwnck/class-group.c
+@@ -438,25 +438,13 @@ set_icon (WnckClassGroup *class_group)
+   if (!icon || !mini_icon)
+     {
+       WnckHandle *handle;
+-      GdkPixbuf *icon_pixbuf, *mini_icon_pixbuf;
+ 
+       handle = wnck_screen_get_handle (class_group->priv->screen);
+ 
+-      _wnck_get_fallback_icons (&icon_pixbuf,
++      _wnck_get_fallback_icons (&icon,
+                                 _wnck_handle_get_default_icon_size (handle),
+-                                &mini_icon_pixbuf,
++                                &mini_icon,
+                                 _wnck_handle_get_default_mini_icon_size (handle));
+-      if (icon_pixbuf)
+-        {
+-          icon = gdk_cairo_surface_create_from_pixbuf (icon_pixbuf, 0, NULL);
+-          g_clear_object (&icon_pixbuf);
+-        }
+-
+-      if (mini_icon_pixbuf)
+-        {
+-          mini_icon = gdk_cairo_surface_create_from_pixbuf (mini_icon_pixbuf, 0, NULL);
+-          g_clear_object (&mini_icon_pixbuf);
+-        }
+ 
+       icons_reffed = TRUE;
+     }
+diff --git a/libwnck/tasklist.c b/libwnck/tasklist.c
+index b7e783b..70bbff3 100644
+--- a/libwnck/tasklist.c
++++ b/libwnck/tasklist.c
+@@ -3962,15 +3962,8 @@ wnck_task_get_icon (WnckTask *task)
+ 
+       if (surface == NULL)
+         {
+-          GdkPixbuf *pixbuf;
+           _wnck_get_fallback_icons (NULL, 0,
+-                                    &pixbuf, mini_icon_size);
+-
+-          if (pixbuf != NULL)
+-            {
+-              surface = gdk_cairo_surface_create_from_pixbuf (pixbuf, 0, NULL);
+-              g_object_unref (pixbuf);
+-            }
++                                    &surface, mini_icon_size);
+         }
+ #endif
+       break;
+diff --git a/libwnck/util.c b/libwnck/util.c
+index d8942b4..5a214e0 100644
+--- a/libwnck/util.c
++++ b/libwnck/util.c
+@@ -203,7 +203,7 @@ wnck_set_default_icon_size (gsize size)
+ gsize
+ _wnck_get_default_icon_size (void)
+ {
+-  return _wnck_handle_get_default_icon_size (_wnck_get_handle ()) * _wnck_get_window_scaling_factor ();
++  return _wnck_handle_get_default_icon_size (_wnck_get_handle ());
+ }
+ 
+ /**
+@@ -224,7 +224,7 @@ wnck_set_default_mini_icon_size (gsize size)
+ gsize
+ _wnck_get_default_mini_icon_size (void)
+ {
+-  return _wnck_handle_get_default_mini_icon_size (_wnck_get_handle ()) * _wnck_get_window_scaling_factor ();
++  return _wnck_handle_get_default_mini_icon_size (_wnck_get_handle ());
+ }
+ 
+ /**
+diff --git a/libwnck/window.c b/libwnck/window.c
+index 52504f6..094dc5a 100644
+--- a/libwnck/window.c
++++ b/libwnck/window.c
+@@ -2113,10 +2113,11 @@ static void
+ get_icons (WnckWindow *window)
+ {
+   WnckHandle *handle;
+-  GdkPixbuf *icon;
+-  GdkPixbuf *mini_icon;
++  cairo_surface_t *icon;
++  cairo_surface_t *mini_icon;
+   gsize normal_size;
+   gsize mini_size;
++  int scaling_factor;
+ 
+   handle = wnck_screen_get_handle (window->priv->screen);
+ 
+@@ -2124,6 +2125,7 @@ get_icons (WnckWindow *window)
+   mini_icon = NULL;
+   normal_size = _wnck_handle_get_default_icon_size (handle);
+   mini_size = _wnck_handle_get_default_mini_icon_size (handle);
++  scaling_factor = _wnck_get_window_scaling_factor ();
+ 
+   if (_wnck_read_icons (window->priv->screen,
+                         window->priv->xwindow,
+@@ -2131,24 +2133,16 @@ get_icons (WnckWindow *window)
+                         &icon,
+                         normal_size,
+                         &mini_icon,
+-                        mini_size))
++                        mini_size,
++                        scaling_factor))
+     {
+       window->priv->need_emit_icon_changed = TRUE;
+ 
+       g_clear_pointer (&window->priv->icon, cairo_surface_destroy);
+       g_clear_pointer (&window->priv->mini_icon, cairo_surface_destroy);
+ 
+-      if (icon)
+-        {
+-          window->priv->icon = gdk_cairo_surface_create_from_pixbuf (icon, 0, NULL);
+-          g_clear_object (&icon);
+-        }
+-
+-      if (mini_icon)
+-        {
+-          window->priv->mini_icon = gdk_cairo_surface_create_from_pixbuf (mini_icon, 0, NULL);
+-          g_clear_object (&mini_icon);
+-        }
++      window->priv->icon = icon;
++      window->priv->mini_icon = mini_icon;
+     }
+ 
+   g_assert ((window->priv->icon && window->priv->mini_icon) ||
+diff --git a/libwnck/wnck-icon-cache-private.h b/libwnck/wnck-icon-cache-private.h
+index 6a3d5ec..d3c39e2 100644
+--- a/libwnck/wnck-icon-cache-private.h
++++ b/libwnck/wnck-icon-cache-private.h
+@@ -38,13 +38,14 @@ void           _wnck_icon_cache_set_want_fallback    (WnckIconCache  *icon_cache
+                                                       gboolean        setting);
+ gboolean       _wnck_icon_cache_get_is_fallback      (WnckIconCache  *icon_cache);
+ 
+-gboolean       _wnck_read_icons                      (WnckScreen     *screen,
+-                                                      Window          xwindow,
+-                                                      WnckIconCache  *icon_cache,
+-                                                      GdkPixbuf     **iconp,
+-                                                      int             ideal_size,
+-                                                      GdkPixbuf     **mini_iconp,
+-                                                      int             ideal_mini_size);
++gboolean       _wnck_read_icons                      (WnckScreen       *screen,
++                                                      Window            xwindow,
++                                                      WnckIconCache    *icon_cache,
++                                                      cairo_surface_t **iconp,
++                                                      int               ideal_size,
++                                                      cairo_surface_t **mini_iconp,
++                                                      int               ideal_mini_size,
++                                                      int               scaling_factor);
+ 
+ G_END_DECLS
+ 
+diff --git a/libwnck/wnck-icon-cache.c b/libwnck/wnck-icon-cache.c
+index 9ff8d15..d9e67e8 100644
+--- a/libwnck/wnck-icon-cache.c
++++ b/libwnck/wnck-icon-cache.c
+@@ -44,8 +44,8 @@ struct _WnckIconCache
+   IconOrigin origin;
+   Pixmap prev_pixmap;
+   Pixmap prev_mask;
+-  GdkPixbuf *icon;
+-  GdkPixbuf *mini_icon;
++  cairo_surface_t *icon;
++  cairo_surface_t *mini_icon;
+   int ideal_size;
+   int ideal_mini_size;
+   guint want_fallback : 1;
+@@ -139,49 +139,65 @@ find_best_size (gulong  *data,
+     return FALSE;
+ }
+ 
+-static void
+-argbdata_to_pixdata (gulong *argb_data, int len, guchar **pixdata)
++static cairo_surface_t *
++argbdata_to_surface (gulong *argb_data,
++                     int     w,
++                     int     h,
++                     int     ideal_w,
++                     int     ideal_h,
++                     int     scaling_factor)
+ {
+-  guchar *p;
+-  int i;
++  cairo_surface_t *surface, *icon;
++  cairo_t *cr;
++  int y, x, stride;
++  uint32_t *data;
+ 
+-  *pixdata = g_new (guchar, len * 4);
+-  p = *pixdata;
++  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, w, h);
++  cairo_surface_set_device_scale (surface, (double)scaling_factor, (double)scaling_factor);
++  stride = cairo_image_surface_get_stride (surface) / sizeof (uint32_t);
++  data = (uint32_t *) cairo_image_surface_get_data (surface);
+ 
+   /* One could speed this up a lot. */
+-  i = 0;
+-  while (i < len)
++  for (y = 0; y < h; y++)
+     {
+-      guint argb;
+-      guint rgba;
+-
+-      argb = argb_data[i];
+-      rgba = (argb << 8) | (argb >> 24);
+-
+-      *p = rgba >> 24;
+-      ++p;
+-      *p = (rgba >> 16) & 0xff;
+-      ++p;
+-      *p = (rgba >> 8) & 0xff;
+-      ++p;
+-      *p = rgba & 0xff;
+-      ++p;
+-
+-      ++i;
++      for (x = 0; x < w; x++)
++        {
++          uint32_t *p = &data[y * stride + x];
++          gulong *d = &argb_data[y * w + x];
++          *p = *d;
++        }
+     }
++
++  cairo_surface_mark_dirty (surface);
++
++  icon = cairo_surface_create_similar_image (surface,
++                                             cairo_image_surface_get_format (surface),
++                                             ideal_w, ideal_h);
++
++  cairo_surface_set_device_scale (icon, (double)scaling_factor, (double)scaling_factor);
++
++  cr = cairo_create (icon);
++  cairo_scale (cr, ideal_w / (double)w, ideal_h / (double)h);
++  cairo_set_source_surface (cr, surface, 0, 0);
++  cairo_paint (cr);
++
++  cairo_set_operator (cr, CAIRO_OPERATOR_IN);
++  cairo_paint (cr);
++
++  cairo_destroy (cr);
++  cairo_surface_destroy (surface);
++
++  return icon;
+ }
+ 
+ static gboolean
+-read_rgb_icon (Screen  *screen,
+-               Window   xwindow,
+-               int      ideal_size,
+-               int      ideal_mini_size,
+-               int     *width,
+-               int     *height,
+-               guchar **pixdata,
+-               int     *mini_width,
+-               int     *mini_height,
+-               guchar **mini_pixdata)
++read_rgb_icon (Screen           *screen,
++               Window            xwindow,
++               int               ideal_size,
++               int               ideal_mini_size,
++               cairo_surface_t **iconp,
++               cairo_surface_t **mini_iconp,
++               int               scaling_factor)
+ {
+   Display *display;
+   Atom type;
+@@ -219,7 +235,9 @@ read_rgb_icon (Screen  *screen,
+       return FALSE;
+     }
+ 
+-  if (!find_best_size (data, nitems, ideal_size, &w, &h, &best))
++  if (!find_best_size (data, nitems,
++                       ideal_size,
++                       &w, &h, &best))
+     {
+       XFree (data);
+       return FALSE;
+@@ -233,14 +251,8 @@ read_rgb_icon (Screen  *screen,
+       return FALSE;
+     }
+ 
+-  *width = w;
+-  *height = h;
+-
+-  *mini_width = mini_w;
+-  *mini_height = mini_h;
+-
+-  argbdata_to_pixdata (best, w * h, pixdata);
+-  argbdata_to_pixdata (best_mini, mini_w * mini_h, mini_pixdata);
++  *iconp = argbdata_to_surface (best, w, h, ideal_size, ideal_size, scaling_factor);
++  *mini_iconp = argbdata_to_surface (best_mini, mini_w, mini_h, ideal_mini_size, ideal_mini_size, scaling_factor);
+ 
+   XFree (data);
+ 
+@@ -248,27 +260,27 @@ read_rgb_icon (Screen  *screen,
+ }
+ 
+ static gboolean
+-try_pixmap_and_mask (Screen     *screen,
+-                     Pixmap      src_pixmap,
+-                     Pixmap      src_mask,
+-                     GdkPixbuf **iconp,
+-                     int         ideal_size,
+-                     GdkPixbuf **mini_iconp,
+-                     int         ideal_mini_size)
++try_pixmap_and_mask (Screen           *screen,
++                     Pixmap            src_pixmap,
++                     Pixmap            src_mask,
++                     cairo_surface_t **iconp,
++                     int               ideal_size,
++                     cairo_surface_t **mini_iconp,
++                     int               ideal_mini_size,
++                     int               scaling_factor)
+ {
+   cairo_surface_t *surface, *mask_surface, *image;
+   GdkDisplay *gdk_display;
+-  GdkPixbuf *unscaled;
+   int width, height;
+   cairo_t *cr;
+ 
+   if (src_pixmap == None)
+     return FALSE;
+ 
+-  surface = _wnck_cairo_surface_get_from_pixmap (screen, src_pixmap);
++  surface = _wnck_cairo_surface_get_from_pixmap (screen, src_pixmap, scaling_factor);
+ 
+   if (surface && src_mask != None)
+-    mask_surface = _wnck_cairo_surface_get_from_pixmap (screen, src_mask);
++    mask_surface = _wnck_cairo_surface_get_from_pixmap (screen, src_mask, scaling_factor);
+   else
+     mask_surface = NULL;
+ 
+@@ -324,26 +336,41 @@ try_pixmap_and_mask (Screen     *screen,
+       return FALSE;
+     }
+ 
+-  unscaled = gdk_pixbuf_get_from_surface (image,
+-                                          0, 0,
+-                                          width, height);
++  if (image)
++    {
++      int image_w, image_h;
+ 
+-  cairo_surface_destroy (image);
++      image_w = cairo_image_surface_get_width (image);
++      image_h = cairo_image_surface_get_height (image);
++
++      *iconp = cairo_surface_create_similar (image,
++                                             cairo_surface_get_content (image),
++                                             ideal_size,
++                                             ideal_size);
++
++      cairo_surface_set_device_scale (*iconp, (double)scaling_factor, (double)scaling_factor);
++
++      cr = cairo_create (*iconp);
++      cairo_scale (cr, ideal_size / (double)image_w, ideal_size / (double)image_h);
++      cairo_set_source_surface (cr, image, 0, 0);
++      cairo_paint (cr);
++      cairo_destroy (cr);
++
++      *mini_iconp = cairo_surface_create_similar (image,
++                                                  cairo_surface_get_content (image),
++                                                  ideal_mini_size,
++                                                  ideal_mini_size);
++
++      cairo_surface_set_device_scale (*mini_iconp, (double)scaling_factor, (double)scaling_factor);
++
++      cr = cairo_create (*mini_iconp);
++      cairo_scale (cr, ideal_mini_size / (double)image_w, ideal_mini_size / (double)image_h);
++      cairo_set_source_surface (cr, image, 0, 0);
++      cairo_paint (cr);
++      cairo_destroy (cr);
++
++      cairo_surface_destroy (image);
+ 
+-  if (unscaled)
+-    {
+-      *iconp =
+-        gdk_pixbuf_scale_simple (unscaled,
+-                                 ideal_size,
+-                                 ideal_size,
+-                                 GDK_INTERP_BILINEAR);
+-      *mini_iconp =
+-        gdk_pixbuf_scale_simple (unscaled,
+-                                 ideal_mini_size,
+-                                 ideal_mini_size,
+-                                 GDK_INTERP_BILINEAR);
+-
+-      g_object_unref (G_OBJECT (unscaled));
+       return TRUE;
+     }
+   else
+@@ -354,13 +381,8 @@ static void
+ clear_icon_cache (WnckIconCache *icon_cache,
+                   gboolean       dirty_all)
+ {
+-  if (icon_cache->icon)
+-    g_object_unref (G_OBJECT (icon_cache->icon));
+-  icon_cache->icon = NULL;
+-
+-  if (icon_cache->mini_icon)
+-    g_object_unref (G_OBJECT (icon_cache->mini_icon));
+-  icon_cache->mini_icon = NULL;
++  g_clear_pointer (&icon_cache->icon, cairo_surface_destroy);
++  g_clear_pointer (&icon_cache->mini_icon, cairo_surface_destroy);
+ 
+   icon_cache->origin = USING_NO_ICON;
+ 
+@@ -372,89 +394,26 @@ clear_icon_cache (WnckIconCache *icon_cache,
+ }
+ 
+ static void
+-replace_cache (WnckIconCache *icon_cache,
+-               IconOrigin     origin,
+-               GdkPixbuf     *new_icon,
+-               GdkPixbuf     *new_mini_icon)
++replace_cache (WnckIconCache   *icon_cache,
++               IconOrigin       origin,
++               cairo_surface_t *new_icon,
++               cairo_surface_t *new_mini_icon)
+ {
+   clear_icon_cache (icon_cache, FALSE);
+ 
+   icon_cache->origin = origin;
+ 
+   if (new_icon)
+-    g_object_ref (G_OBJECT (new_icon));
++    cairo_surface_reference (new_icon);
+ 
+   icon_cache->icon = new_icon;
+ 
+   if (new_mini_icon)
+-    g_object_ref (G_OBJECT (new_mini_icon));
++    cairo_surface_reference (new_mini_icon);
+ 
+   icon_cache->mini_icon = new_mini_icon;
+ }
+ 
+-static void
+-free_pixels (guchar   *pixels,
+-             gpointer  data)
+-{
+-  g_free (pixels);
+-}
+-
+-static GdkPixbuf*
+-scaled_from_pixdata (guchar *pixdata,
+-                     int     w,
+-                     int     h,
+-                     int     new_w,
+-                     int     new_h)
+-{
+-  GdkPixbuf *src;
+-  GdkPixbuf *dest;
+-
+-  src = gdk_pixbuf_new_from_data (pixdata,
+-                                  GDK_COLORSPACE_RGB,
+-                                  TRUE,
+-                                  8,
+-                                  w, h, w * 4,
+-                                  free_pixels,
+-                                  NULL);
+-
+-  if (src == NULL)
+-    return NULL;
+-
+-  if (w != h)
+-    {
+-      GdkPixbuf *tmp;
+-      int size;
+-
+-      size = MAX (w, h);
+-
+-      tmp = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, size, size);
+-
+-      if (tmp != NULL)
+-        {
+-          gdk_pixbuf_fill (tmp, 0);
+-          gdk_pixbuf_copy_area (src, 0, 0, w, h,
+-                                tmp,
+-                                (size - w) / 2, (size - h) / 2);
+-
+-          g_object_unref (src);
+-          src = tmp;
+-        }
+-    }
+-
+-  if (w != new_w || h != new_h)
+-    {
+-      dest = gdk_pixbuf_scale_simple (src, new_w, new_h, GDK_INTERP_BILINEAR);
+-
+-      g_object_unref (G_OBJECT (src));
+-    }
+-  else
+-    {
+-      dest = src;
+-    }
+-
+-  return dest;
+-}
+-
+ WnckIconCache*
+ _wnck_icon_cache_new (void)
+ {
+@@ -528,22 +487,17 @@ _wnck_icon_cache_get_is_fallback (WnckIconCache *icon_cache)
+ }
+ 
+ gboolean
+-_wnck_read_icons (WnckScreen     *screen,
+-                  Window          xwindow,
+-                  WnckIconCache  *icon_cache,
+-                  GdkPixbuf     **iconp,
+-                  int             ideal_size,
+-                  GdkPixbuf     **mini_iconp,
+-                  int             ideal_mini_size)
++_wnck_read_icons (WnckScreen       *screen,
++                  Window            xwindow,
++                  WnckIconCache    *icon_cache,
++                  cairo_surface_t **iconp,
++                  int               ideal_size,
++                  cairo_surface_t **mini_iconp,
++                  int               ideal_mini_size,
++                  int               scaling_factor)
+ {
+   Screen *xscreen;
+   Display *display;
+-  guchar *pixdata;
+-  int w, h;
+-  guchar *mini_pixdata;
+-  int mini_w, mini_h;
+-  Pixmap pixmap;
+-  Pixmap mask;
+   XWMHints *hints;
+ 
+   /* Return value is whether the icon changed */
+@@ -556,6 +510,9 @@ _wnck_read_icons (WnckScreen     *screen,
+   *iconp = NULL;
+   *mini_iconp = NULL;
+ 
++  ideal_size *= scaling_factor;
++  ideal_mini_size *= scaling_factor;
++
+   if (ideal_size != icon_cache->ideal_size ||
+       ideal_mini_size != icon_cache->ideal_mini_size)
+     clear_icon_cache (icon_cache, TRUE);
+@@ -566,8 +523,6 @@ _wnck_read_icons (WnckScreen     *screen,
+   if (!_wnck_icon_cache_get_icon_invalidated (icon_cache))
+     return FALSE; /* we have no new info to use */
+ 
+-  pixdata = NULL;
+-
+   /* Our algorithm here assumes that we can't have for example origin
+    * < USING_NET_WM_ICON and icon_cache->net_wm_icon_dirty == FALSE
+    * unless we have tried to read NET_WM_ICON.
+@@ -579,21 +534,15 @@ _wnck_read_icons (WnckScreen     *screen,
+ 
+   if (icon_cache->origin <= USING_NET_WM_ICON &&
+       icon_cache->net_wm_icon_dirty)
+-
+     {
+       icon_cache->net_wm_icon_dirty = FALSE;
+ 
+       if (read_rgb_icon (xscreen, xwindow,
+                          ideal_size,
+                          ideal_mini_size,
+-                         &w, &h, &pixdata,
+-                         &mini_w, &mini_h, &mini_pixdata))
++                         iconp, mini_iconp,
++                         scaling_factor))
+         {
+-          *iconp = scaled_from_pixdata (pixdata, w, h, ideal_size, ideal_size);
+-
+-          *mini_iconp = scaled_from_pixdata (mini_pixdata, mini_w, mini_h,
+-                                             ideal_mini_size, ideal_mini_size);
+-
+           replace_cache (icon_cache, USING_NET_WM_ICON,
+                          *iconp, *mini_iconp);
+ 
+@@ -604,6 +553,9 @@ _wnck_read_icons (WnckScreen     *screen,
+   if (icon_cache->origin <= USING_WM_HINTS &&
+       icon_cache->wm_hints_dirty)
+     {
++      Pixmap pixmap;
++      Pixmap mask;
++
+       icon_cache->wm_hints_dirty = FALSE;
+ 
+       _wnck_error_trap_push (display);
+@@ -632,7 +584,8 @@ _wnck_read_icons (WnckScreen     *screen,
+         {
+           if (try_pixmap_and_mask (xscreen, pixmap, mask,
+                                    iconp, ideal_size,
+-                                   mini_iconp, ideal_mini_size))
++                                   mini_iconp, ideal_mini_size,
++                                   scaling_factor))
+             {
+               icon_cache->prev_pixmap = pixmap;
+               icon_cache->prev_mask = mask;
+diff --git a/libwnck/xutils.c b/libwnck/xutils.c
+index 91c2d50..6ce6a1e 100644
+--- a/libwnck/xutils.c
++++ b/libwnck/xutils.c
+@@ -1408,7 +1408,8 @@ _wnck_select_input (Screen *screen,
+ 
+ cairo_surface_t *
+ _wnck_cairo_surface_get_from_pixmap (Screen *screen,
+-                                     Pixmap  xpixmap)
++                                     Pixmap  xpixmap,
++                                     int     scaling_factor)
+ {
+   cairo_surface_t *surface;
+   Display *display;
+@@ -1426,6 +1427,9 @@ _wnck_cairo_surface_get_from_pixmap (Screen *screen,
+                      &x_ret, &y_ret, &w_ret, &h_ret, &bw_ret, &depth_ret))
+     goto TRAP_POP;
+ 
++  w_ret *= scaling_factor;
++  h_ret *= scaling_factor;
++
+   if (depth_ret == 1)
+     {
+       surface = cairo_xlib_surface_create_for_bitmap (display,
+@@ -1482,7 +1486,7 @@ _wnck_gdk_pixbuf_get_from_pixmap (Screen *screen,
+   cairo_surface_t *surface;
+   GdkPixbuf *retval;
+ 
+-  surface = _wnck_cairo_surface_get_from_pixmap (screen, xpixmap);
++  surface = _wnck_cairo_surface_get_from_pixmap (screen, xpixmap, 1);
+ 
+   if (surface == NULL)
+     return NULL;
+@@ -1497,36 +1501,30 @@ _wnck_gdk_pixbuf_get_from_pixmap (Screen *screen,
+   return retval;
+ }
+ 
+-static GdkPixbuf*
++static cairo_surface_t*
+ default_icon_at_size (int size)
+ {
+-  GdkPixbuf *base;
++  GdkPixbuf *pixbuf;
++  cairo_surface_t *surface;
+ 
+-  base = gdk_pixbuf_new_from_resource ("/org/gnome/libwnck/default_icon.png", NULL);
++  pixbuf = gdk_pixbuf_new_from_resource_at_scale ("/org/gnome/libwnck/default_icon.png",
++                                                  size, size,
++                                                  TRUE, NULL);
+ 
+-  g_assert (base);
++  g_assert (pixbuf);
+ 
+-  if (gdk_pixbuf_get_width (base) == size &&
+-      gdk_pixbuf_get_height (base) == size)
+-    {
+-      return base;
+-    }
+-  else
+-    {
+-      GdkPixbuf *scaled;
++  surface = gdk_cairo_surface_create_from_pixbuf (pixbuf, 0, NULL);
+ 
+-      scaled = gdk_pixbuf_scale_simple (base, size, size, GDK_INTERP_BILINEAR);
+-      g_object_unref (G_OBJECT (base));
++  g_clear_object (&pixbuf);
+ 
+-      return scaled;
+-    }
++  return surface;
+ }
+ 
+ void
+-_wnck_get_fallback_icons (GdkPixbuf **iconp,
+-                          int         ideal_size,
+-                          GdkPixbuf **mini_iconp,
+-                          int         ideal_mini_size)
++_wnck_get_fallback_icons (cairo_surface_t **iconp,
++                          int               ideal_size,
++                          cairo_surface_t **mini_iconp,
++                          int               ideal_mini_size)
+ {
+   if (iconp)
+     *iconp = default_icon_at_size (ideal_size);
+diff --git a/libwnck/xutils.h b/libwnck/xutils.h
+index 700832a..18cb8bf 100644
+--- a/libwnck/xutils.h
++++ b/libwnck/xutils.h
+@@ -156,10 +156,10 @@ void _wnck_keyboard_size (WnckScreen *screen,
+ void _wnck_toggle_showing_desktop (Screen  *screen,
+                                    gboolean show);
+ 
+-void _wnck_get_fallback_icons (GdkPixbuf **iconp,
+-                               int         ideal_size,
+-                               GdkPixbuf **mini_iconp,
+-                               int         ideal_mini_size);
++void _wnck_get_fallback_icons (cairo_surface_t **iconp,
++                               int               ideal_size,
++                               cairo_surface_t **mini_iconp,
++                               int               ideal_mini_size);
+ 
+ void _wnck_get_window_geometry (Screen *screen,
+ 				Window  xwindow,
+@@ -192,7 +192,8 @@ void _wnck_set_desktop_layout (Screen *xscreen,
+                                int     columns);
+ 
+ cairo_surface_t *_wnck_cairo_surface_get_from_pixmap (Screen *screen,
+-                                                      Pixmap  xpixmap);
++                                                      Pixmap  xpixmap,
++                                                      int     scaling_factor);
+ 
+ GdkPixbuf* _wnck_gdk_pixbuf_get_from_pixmap (Screen *screen,
+                                              Pixmap  xpixmap);
+-- 
+2.46.1
+

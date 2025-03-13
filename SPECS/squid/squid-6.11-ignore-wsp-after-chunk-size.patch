@@ -1,0 +1,367 @@
+From 8d0ee420a4d91ac7fd97316338f1e28b4b060cbf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Thu, 10 Oct 2024 19:26:27 +0200
+Subject: [PATCH 1/6] Ignore whitespace chars after chunk-size
+
+Previously (before #1498 change), squid was accepting TE-chunked replies
+with whitespaces after chunk-size and missing chunk-ext data. After
+
+It turned out that replies with such whitespace chars are pretty
+common and other webservers which can act as forward proxies (e.g.
+nginx, httpd...) are accepting them.
+
+This change will allow to proxy chunked responses from origin server,
+which had whitespaces inbetween chunk-size and CRLF.
+---
+ src/http/one/TeChunkedParser.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/http/one/TeChunkedParser.cc b/src/http/one/TeChunkedParser.cc
+index 9cce10fdc91..04753395e16 100644
+--- a/src/http/one/TeChunkedParser.cc
++++ b/src/http/one/TeChunkedParser.cc
+@@ -125,6 +125,7 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+     // Code becomes much simpler when incremental parsing functions throw on
+     // bad or insufficient input, like in the code below. TODO: Expand up.
+     try {
++        tok.skipAll(CharacterSet::WSP); // Some servers send SP/TAB after chunk-size
+         parseChunkExtensions(tok); // a possibly empty chunk-ext list
+         tok.skipRequired("CRLF after [chunk-ext]", Http1::CrLf());
+         buf_ = tok.remaining();
+
+From 9c8d35f899035fa06021ab3fe6919f892c2f0c6b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Fri, 11 Oct 2024 02:06:31 +0200
+Subject: [PATCH 2/6] Added new argument to Http::One::ParseBws()
+
+Depending on new wsp_only argument in ParseBws() it will be decided
+which set of whitespaces characters will be parsed. If wsp_only is set
+to true, only SP and HTAB chars will be parsed.
+
+Also optimized number of ParseBws calls.
+---
+ src/http/one/Parser.cc          |  4 ++--
+ src/http/one/Parser.h           |  3 ++-
+ src/http/one/TeChunkedParser.cc | 13 +++++++++----
+ src/http/one/TeChunkedParser.h  |  2 +-
+ 4 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/src/http/one/Parser.cc b/src/http/one/Parser.cc
+index b1908316a0b..01d7e3bc0e8 100644
+--- a/src/http/one/Parser.cc
++++ b/src/http/one/Parser.cc
+@@ -273,9 +273,9 @@ Http::One::ErrorLevel()
+ 
+ // BWS = *( SP / HTAB ) ; WhitespaceCharacters() may relax this RFC 7230 rule
+ void
+-Http::One::ParseBws(Parser::Tokenizer &tok)
++Http::One::ParseBws(Parser::Tokenizer &tok, const bool wsp_only)
+ {
+-    const auto count = tok.skipAll(Parser::WhitespaceCharacters());
++    const auto count = tok.skipAll(wsp_only ? CharacterSet::WSP : Parser::WhitespaceCharacters());
+ 
+     if (tok.atEnd())
+         throw InsufficientInput(); // even if count is positive
+diff --git a/src/http/one/Parser.h b/src/http/one/Parser.h
+index d9a0ac8c273..08200371cd6 100644
+--- a/src/http/one/Parser.h
++++ b/src/http/one/Parser.h
+@@ -163,8 +163,9 @@ class Parser : public RefCountable
+ };
+ 
+ /// skips and, if needed, warns about RFC 7230 BWS ("bad" whitespace)
++/// \param wsp_only force skipping of whitespaces only, don't consider skipping relaxed delimeter chars
+ /// \throws InsufficientInput when the end of BWS cannot be confirmed
+-void ParseBws(Parser::Tokenizer &);
++void ParseBws(Parser::Tokenizer &, const bool wsp_only = false);
+ 
+ /// the right debugs() level for logging HTTP violation messages
+ int ErrorLevel();
+diff --git a/src/http/one/TeChunkedParser.cc b/src/http/one/TeChunkedParser.cc
+index 04753395e16..41e1e5ddaea 100644
+--- a/src/http/one/TeChunkedParser.cc
++++ b/src/http/one/TeChunkedParser.cc
+@@ -125,8 +125,11 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+     // Code becomes much simpler when incremental parsing functions throw on
+     // bad or insufficient input, like in the code below. TODO: Expand up.
+     try {
+-        tok.skipAll(CharacterSet::WSP); // Some servers send SP/TAB after chunk-size
+-        parseChunkExtensions(tok); // a possibly empty chunk-ext list
++        // A possibly empty chunk-ext list. If no chunk-ext has been found,
++        // try to skip trailing BWS, because some servers send "chunk-size BWS CRLF".
++        if (!parseChunkExtensions(tok))
++            ParseBws(tok, true);
++
+         tok.skipRequired("CRLF after [chunk-ext]", Http1::CrLf());
+         buf_ = tok.remaining();
+         parsingStage_ = theChunkSize ? Http1::HTTP_PARSE_CHUNK : Http1::HTTP_PARSE_MIME;
+@@ -140,20 +143,22 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+ 
+ /// Parses the chunk-ext list (RFC 9112 section 7.1.1:
+ /// chunk-ext = *( BWS ";" BWS chunk-ext-name [ BWS "=" BWS chunk-ext-val ] )
+-void
++bool
+ Http::One::TeChunkedParser::parseChunkExtensions(Tokenizer &callerTok)
+ {
++    bool foundChunkExt = false;
+     do {
+         auto tok = callerTok;
+ 
+         ParseBws(tok); // Bug 4492: IBM_HTTP_Server sends SP after chunk-size
+ 
+         if (!tok.skip(';'))
+-            return; // reached the end of extensions (if any)
++            return foundChunkExt; // reached the end of extensions (if any)
+ 
+         parseOneChunkExtension(tok);
+         buf_ = tok.remaining(); // got one extension
+         callerTok = tok;
++        foundChunkExt = true;
+     } while (true);
+ }
+ 
+diff --git a/src/http/one/TeChunkedParser.h b/src/http/one/TeChunkedParser.h
+index 02eacd1bb89..8c5d4bb4cba 100644
+--- a/src/http/one/TeChunkedParser.h
++++ b/src/http/one/TeChunkedParser.h
+@@ -71,7 +71,7 @@ class TeChunkedParser : public Http1::Parser
+ private:
+     bool parseChunkSize(Tokenizer &tok);
+     bool parseChunkMetadataSuffix(Tokenizer &);
+-    void parseChunkExtensions(Tokenizer &);
++    bool parseChunkExtensions(Tokenizer &);
+     void parseOneChunkExtension(Tokenizer &);
+     bool parseChunkBody(Tokenizer &tok);
+     bool parseChunkEnd(Tokenizer &tok);
+
+From 81e67f97f9c386bdd0bb4a5e182395c46adb70ad Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Fri, 11 Oct 2024 02:44:33 +0200
+Subject: [PATCH 3/6] Fix typo in Parser.h
+
+---
+ src/http/one/Parser.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/http/one/Parser.h b/src/http/one/Parser.h
+index 08200371cd6..3ef4c5f7752 100644
+--- a/src/http/one/Parser.h
++++ b/src/http/one/Parser.h
+@@ -163,7 +163,7 @@ class Parser : public RefCountable
+ };
+ 
+ /// skips and, if needed, warns about RFC 7230 BWS ("bad" whitespace)
+-/// \param wsp_only force skipping of whitespaces only, don't consider skipping relaxed delimeter chars
++/// \param wsp_only force skipping of whitespaces only, don't consider skipping relaxed delimiter chars
+ /// \throws InsufficientInput when the end of BWS cannot be confirmed
+ void ParseBws(Parser::Tokenizer &, const bool wsp_only = false);
+ 
+
+From a0d4fe1794e605f8299a5c118c758a807453f016 Mon Sep 17 00:00:00 2001
+From: Alex Rousskov <rousskov@measurement-factory.com>
+Date: Thu, 10 Oct 2024 22:39:42 -0400
+Subject: [PATCH 4/6] Bug 5449 is a regression of Bug 4492!
+
+Both bugs deal with "chunk-size SP+ CRLF" use cases. Bug 4492 had _two_
+spaces after chunk-size, which answers one of the PR review questions:
+Should we skip just one space? No, we should not.
+
+The lines moved around in many commits, but I believe this regression
+was introduced in commit 951013d0 because that commit stopped consuming
+partially parsed chunk-ext sequences. That consumption was wrong, but it
+had a positive side effect -- fixing Bug 4492...
+---
+ src/http/one/TeChunkedParser.cc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/http/one/TeChunkedParser.cc b/src/http/one/TeChunkedParser.cc
+index 41e1e5ddaea..aa4a840fdcf 100644
+--- a/src/http/one/TeChunkedParser.cc
++++ b/src/http/one/TeChunkedParser.cc
+@@ -125,10 +125,10 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+     // Code becomes much simpler when incremental parsing functions throw on
+     // bad or insufficient input, like in the code below. TODO: Expand up.
+     try {
+-        // A possibly empty chunk-ext list. If no chunk-ext has been found,
+-        // try to skip trailing BWS, because some servers send "chunk-size BWS CRLF".
+-        if (!parseChunkExtensions(tok))
+-            ParseBws(tok, true);
++        // Bug 4492: IBM_HTTP_Server sends SP after chunk-size
++        ParseBws(tok, true);
++
++        parseChunkExtensions(tok);
+ 
+         tok.skipRequired("CRLF after [chunk-ext]", Http1::CrLf());
+         buf_ = tok.remaining();
+@@ -150,7 +150,7 @@ Http::One::TeChunkedParser::parseChunkExtensions(Tokenizer &callerTok)
+     do {
+         auto tok = callerTok;
+ 
+-        ParseBws(tok); // Bug 4492: IBM_HTTP_Server sends SP after chunk-size
++        ParseBws(tok);
+ 
+         if (!tok.skip(';'))
+             return foundChunkExt; // reached the end of extensions (if any)
+
+From f837f5ff61301a17008f16ce1fb793c2abf19786 Mon Sep 17 00:00:00 2001
+From: Alex Rousskov <rousskov@measurement-factory.com>
+Date: Thu, 10 Oct 2024 23:06:42 -0400
+Subject: [PATCH 5/6] fixup: Fewer conditionals/ifs and more explicit spelling
+
+... to draw code reader attention when something unusual is going on.
+---
+ src/http/one/Parser.cc          | 22 ++++++++++++++++++----
+ src/http/one/Parser.h           | 10 ++++++++--
+ src/http/one/TeChunkedParser.cc | 14 ++++++--------
+ src/http/one/TeChunkedParser.h  |  2 +-
+ 4 files changed, 33 insertions(+), 15 deletions(-)
+
+diff --git a/src/http/one/Parser.cc b/src/http/one/Parser.cc
+index 01d7e3bc0e8..d3937e5e96b 100644
+--- a/src/http/one/Parser.cc
++++ b/src/http/one/Parser.cc
+@@ -271,11 +271,12 @@ Http::One::ErrorLevel()
+     return Config.onoff.relaxed_header_parser < 0 ? DBG_IMPORTANT : 5;
+ }
+ 
+-// BWS = *( SP / HTAB ) ; WhitespaceCharacters() may relax this RFC 7230 rule
+-void
+-Http::One::ParseBws(Parser::Tokenizer &tok, const bool wsp_only)
++/// common part of ParseBws() and ParseStrctBws()
++namespace Http::One {
++static void
++ParseBws_(Parser::Tokenizer &tok, const CharacterSet &bwsChars)
+ {
+-    const auto count = tok.skipAll(wsp_only ? CharacterSet::WSP : Parser::WhitespaceCharacters());
++    const auto count = tok.skipAll(bwsChars);
+ 
+     if (tok.atEnd())
+         throw InsufficientInput(); // even if count is positive
+@@ -290,4 +291,17 @@ Http::One::ParseBws(Parser::Tokenizer &tok, const bool wsp_only)
+ 
+     // success: no more BWS characters expected
+ }
++} // namespace Http::One
++
++void
++Http::One::ParseBws(Parser::Tokenizer &tok)
++{
++    ParseBws_(tok, CharacterSet::WSP);
++}
++
++void
++Http::One::ParseStrictBws(Parser::Tokenizer &tok)
++{
++    ParseBws_(tok, Parser::WhitespaceCharacters());
++}
+ 
+diff --git a/src/http/one/Parser.h b/src/http/one/Parser.h
+index 3ef4c5f7752..49e399de546 100644
+--- a/src/http/one/Parser.h
++++ b/src/http/one/Parser.h
+@@ -163,9 +163,15 @@ class Parser : public RefCountable
+ };
+ 
+ /// skips and, if needed, warns about RFC 7230 BWS ("bad" whitespace)
+-/// \param wsp_only force skipping of whitespaces only, don't consider skipping relaxed delimiter chars
+ /// \throws InsufficientInput when the end of BWS cannot be confirmed
+-void ParseBws(Parser::Tokenizer &, const bool wsp_only = false);
++/// \sa WhitespaceCharacters() for the definition of BWS characters
++/// \sa ParseStrictBws() that avoids WhitespaceCharacters() uncertainties
++void ParseBws(Parser::Tokenizer &);
++
++/// Like ParseBws() but only skips CharacterSet::WSP characters. This variation
++/// must be used if the next element may start with CR or any other character
++/// from RelaxedDelimiterCharacters().
++void ParseStrictBws(Parser::Tokenizer &);
+ 
+ /// the right debugs() level for logging HTTP violation messages
+ int ErrorLevel();
+diff --git a/src/http/one/TeChunkedParser.cc b/src/http/one/TeChunkedParser.cc
+index aa4a840fdcf..859471b8c77 100644
+--- a/src/http/one/TeChunkedParser.cc
++++ b/src/http/one/TeChunkedParser.cc
+@@ -125,11 +125,11 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+     // Code becomes much simpler when incremental parsing functions throw on
+     // bad or insufficient input, like in the code below. TODO: Expand up.
+     try {
+-        // Bug 4492: IBM_HTTP_Server sends SP after chunk-size
+-        ParseBws(tok, true);
+-
+-        parseChunkExtensions(tok);
++        // Bug 4492: IBM_HTTP_Server sends SP after chunk-size.
++        // No ParseBws() here because it may consume CR required further below.
++        ParseStrictBws(tok);
+ 
++        parseChunkExtensions(tok); // a possibly empty chunk-ext list
+         tok.skipRequired("CRLF after [chunk-ext]", Http1::CrLf());
+         buf_ = tok.remaining();
+         parsingStage_ = theChunkSize ? Http1::HTTP_PARSE_CHUNK : Http1::HTTP_PARSE_MIME;
+@@ -143,22 +143,20 @@ Http::One::TeChunkedParser::parseChunkMetadataSuffix(Tokenizer &tok)
+ 
+ /// Parses the chunk-ext list (RFC 9112 section 7.1.1:
+ /// chunk-ext = *( BWS ";" BWS chunk-ext-name [ BWS "=" BWS chunk-ext-val ] )
+-bool
++void
+ Http::One::TeChunkedParser::parseChunkExtensions(Tokenizer &callerTok)
+ {
+-    bool foundChunkExt = false;
+     do {
+         auto tok = callerTok;
+ 
+         ParseBws(tok);
+ 
+         if (!tok.skip(';'))
+-            return foundChunkExt; // reached the end of extensions (if any)
++            return; // reached the end of extensions (if any)
+ 
+         parseOneChunkExtension(tok);
+         buf_ = tok.remaining(); // got one extension
+         callerTok = tok;
+-        foundChunkExt = true;
+     } while (true);
+ }
+ 
+diff --git a/src/http/one/TeChunkedParser.h b/src/http/one/TeChunkedParser.h
+index 8c5d4bb4cba..02eacd1bb89 100644
+--- a/src/http/one/TeChunkedParser.h
++++ b/src/http/one/TeChunkedParser.h
+@@ -71,7 +71,7 @@ class TeChunkedParser : public Http1::Parser
+ private:
+     bool parseChunkSize(Tokenizer &tok);
+     bool parseChunkMetadataSuffix(Tokenizer &);
+-    bool parseChunkExtensions(Tokenizer &);
++    void parseChunkExtensions(Tokenizer &);
+     void parseOneChunkExtension(Tokenizer &);
+     bool parseChunkBody(Tokenizer &tok);
+     bool parseChunkEnd(Tokenizer &tok);
+
+From f79936a234e722adb2dd08f31cf6019d81ee712c Mon Sep 17 00:00:00 2001
+From: Alex Rousskov <rousskov@measurement-factory.com>
+Date: Thu, 10 Oct 2024 23:31:08 -0400
+Subject: [PATCH 6/6] fixup: Deadly typo
+
+---
+ src/http/one/Parser.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/http/one/Parser.cc b/src/http/one/Parser.cc
+index d3937e5e96b..7403a9163a2 100644
+--- a/src/http/one/Parser.cc
++++ b/src/http/one/Parser.cc
+@@ -296,12 +296,12 @@ ParseBws_(Parser::Tokenizer &tok, const CharacterSet &bwsChars)
+ void
+ Http::One::ParseBws(Parser::Tokenizer &tok)
+ {
+-    ParseBws_(tok, CharacterSet::WSP);
++    ParseBws_(tok, Parser::WhitespaceCharacters());
+ }
+ 
+ void
+ Http::One::ParseStrictBws(Parser::Tokenizer &tok)
+ {
+-    ParseBws_(tok, Parser::WhitespaceCharacters());
++    ParseBws_(tok, CharacterSet::WSP);
+ }
+ 
+
