@@ -1,5 +1,8 @@
 {
  "Signatures": {
-  "nilfs-utils-2.2.8.tar.bz2": "5a29f8f59db03edf8dd1e68dfd80ff4713e0aa184cfa83a6326ac8af93d9bda6"
+  "8B055AE86DEFF458.asc": "07b979c2a541e4874e868de257097766f1a32685da38ee18bc59deddb485cca2",
+  "nilfs-utils-2.2.11.tar.bz2": "8602897ff0d2c49be9bc76311f0b102088e58b6de4f749009403de06ff2c34cd",
+  "nilfs-utils-2.2.11.tar.bz2.asc": "232e08e95ca20a8169f4b941a31a98ea2c076429b406f8146bad60b00c828006"
  }
 }
+
