@@ -1,0 +1,23 @@
+From 72618e63433c7243e4d9e79a638f19a09402eecc Mon Sep 17 00:00:00 2001
+From: Andreas Sturmlechner <asturm@gentoo.org>
+Date: Tue, 21 Nov 2023 23:10:07 +0100
+Subject: [PATCH] Fix build with libxml2-2.12 (missing include)
+
+See also: https://github.com/tdf/libcmis/issues/51
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+---
+ inc/libcmis/xml-utils.hxx | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/inc/libcmis/xml-utils.hxx b/inc/libcmis/xml-utils.hxx
+index 929385e1..9bd99aed 100644
+--- a/inc/libcmis/xml-utils.hxx
++++ b/inc/libcmis/xml-utils.hxx
+@@ -34,6 +34,7 @@
+ #include <string>
+ 
+ #include <boost/date_time.hpp>
++#include <libxml/parser.h>
+ #include <libxml/tree.h>
+ #include <libxml/xpathInternals.h>
+ #include <libxml/xmlwriter.h>

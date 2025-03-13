@@ -1,29 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		libmad
-Version:	0.15.1b
-Release:	30%{?dist}
+Version:	0.16.4
+Release:	1%{?dist}
 Summary:	MPEG audio decoder library
 
 License:	GPLv2+
-URL:		http://www.underbit.com/products/mad/
-Source0:	http://download.sourceforge.net/mad/%{name}-%{version}.tar.gz
-#Create the same header on multilibs arches
-Patch0:		libmad-0.15.1b-multiarch.patch
-Patch1:		libmad-0.15.1b-ppc.patch
-#https://bugs.launchpad.net/ubuntu/+source/libmad/+bug/534287
-Patch2:		Provide-Thumb-2-alternative-code-for-MAD_F_MLN.diff
-#https://bugs.launchpad.net/ubuntu/+source/libmad/+bug/513734
-Patch3:		libmad.thumb.diff
-Patch4:		https://gitweb.gentoo.org/repo/gentoo.git/plain/media-libs/libmad/files/libmad-0.15.1b-cflags.patch
-Patch5:		https://gitweb.gentoo.org/repo/gentoo.git/plain/media-libs/libmad/files/libmad-0.15.1b-cflags-O2.patch
-#Patches taken from debian - Kurt Roeckx <kurt@roeckx.be>
-Patch6:         length-check.patch
-Patch7:         md_size.diff
+URL:		https://codeberg.org/tenacityteam/libmad
+Source0:	https://codeberg.org/tenacityteam/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:	automake
-BuildRequires:	autoconf
 BuildRequires:	libtool
+BuildRequires:	cmake
 
 
 %description
@@ -35,84 +22,40 @@ and Layer III a.k.a. MP3) are fully implemented.
 %package        devel
 Summary:	MPEG audio decoder library development files
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-%if 0%{?el5}
-Requires:	pkgconfig
-%endif
 
 %description	devel
 %{summary}.
 
-
 %prep
-%setup -q
-#Only relevant on multilibs arches
-%ifarch %{ix86} x86_64 ppc ppc64
-%patch 0 -p1 -b .multiarch
-%endif
-%patch 1 -p1 -b .ppc
-%patch 2 -p1 -b .alt_t2
-%patch 3 -p1 -b .thumb
-%patch 4 -p1 -b .cflags
-%patch 5 -p1 -b .02
-%patch 6 -p1 -b .lc
-%patch 7 -p1 -b .md_size
-
-touch -r aclocal.m4 configure.ac NEWS AUTHORS ChangeLog
-
-# Create an additional pkgconfig file
-%{__cat} << EOF > mad.pc
-prefix=%{_prefix}
-exec_prefix=%{_prefix}
-libdir=%{_libdir}
-includedir=%{_includedir}
-
-Name: mad
-Description: MPEG Audio Decoder
-Requires:
-Version: %{version}
-Libs: -L%{_libdir} -lmad -lm
-Cflags: -I%{_includedir}
-EOF
-
-
+%autosetup -n %{name} -p1
 
 %build
-autoreconf -sfiv
-%configure \
-%if 0%{?__isa_bits} == 64
-	--enable-fpm=64bit \
-%endif
-%ifarch %{arm}
-	--enable-fpm=arm \
-%endif
-	--disable-dependency-tracking \
-	--enable-accuracy \
-	--disable-static    
-
-%make_build
+%cmake
+%cmake_build
 
 %install
-%make_install
-rm -f %{buildroot}%{_libdir}/*.la
-install -D -p -m 0644 mad.pc %{buildroot}%{_libdir}/pkgconfig/mad.pc
-touch -r mad.h.sed %{buildroot}/%{_includedir}/mad.h
-
+%cmake_install
 
 %ldconfig_scriptlets
 
-
 %files
-%doc CHANGES CREDITS README TODO
+%doc CHANGES CREDITS README.md TODO
 %license COPYING COPYRIGHT
 %{_libdir}/libmad.so.*
 
 %files devel
 %{_libdir}/libmad.so
+%{_libdir}/cmake/mad/
 %{_libdir}/pkgconfig/mad.pc
 %{_includedir}/mad.h
 
 
 %changelog
+* Mon Nov 11 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.16.4-1
+- Update to 0.16.4
+- Switch to Tenacity fork
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1b-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,30 +4,30 @@ Name:           perl-Mozilla-CA
 # You do not need to back-port a new version for updating a list of the
 # certificates. They are taken from ca-certificates package instead
 # per bug #738383.
-Version:        20200520
+Version:        20240730
 Release:        2%{?dist}
 Summary:        Mozilla's CA certificate bundle in PEM format
-# README:                       MPLv2.0
+# README:                       MPL-2.0
 ## Unbundled
 # mk-ca-bundle.pl:              MIT
-# lib/Mozilla/CA/cacert.pem:    MPLv2.0
-License:        MPLv2.0
+# lib/Mozilla/CA/cacert.pem:    MPL-2.0
+License:        MPL-2.0
 URL:            https://metacpan.org/release/Mozilla-CA
-Source0:        https://cpan.metacpan.org/authors/id/A/AB/ABH/Mozilla-CA-%{version}.tar.gz#/perl-Mozilla-CA-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LW/LWP/Mozilla-CA-%{version}.tar.gz#/perl-Mozilla-CA-%{version}.tar.gz
 # Use a CA bundle from ca-certificates package, bug #738383
-Patch0:         Mozilla-CA-20200520-Redirect-to-ca-certificates-bundle.patch
+Patch0:         Mozilla-CA-20240730-Redirect-to-ca-certificates-bundle.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  ca-certificates
 BuildRequires:  perl(strict)
 BuildRequires:  perl(File::Spec)
 # Tests:
-BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       ca-certificates
 
@@ -36,15 +36,25 @@ Mozilla::CA provides a path to ca-certificates copy of Mozilla's bundle of
 certificate authority certificates in a form that can be consumed by modules
 and libraries based on OpenSSL.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Mozilla-CA-%{version}
-%patch 0 -p1
+%patch -P0 -p1
 # Remove a bundled CA bundle for sure
 rm lib/Mozilla/CA/cacert.pem
-# Do not distribute Mozilla downloader, we take certificates from
-# ca-certificates package
-rm mk-ca-bundle.pl
-perl -i -ne 'print $_ unless m{^mk-ca-bundle\.pl$}' MANIFEST
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -52,7 +62,15 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
@@ -62,9 +80,82 @@ make test
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200520-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 20240730-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Aug 01 2024 Michal Josef Špaček <mspacek@redhat.com> - 20240730-1
+- 20240730 bump
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240313-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Mar 15 2024 Michal Josef Špaček <mspacek@redhat.com> - 20240313-1
+- 20240313 bump
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20231213-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20231213-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 14 2023 Michal Josef Špaček <mspacek@redhat.com> - 20231213-1
+- 20231213 bump
+
+* Fri Aug 25 2023 Michal Josef Špaček <mspacek@redhat.com> - 20230821-1
+- 20230821 bump
+
+* Tue Aug 15 2023 Michal Josef Špaček <mspacek@redhat.com> - 20230807-1
+- 20230807 bump
+
+* Thu Aug 03 2023 Michal Josef Špaček <mspacek@redhat.com> - 20230801-1
+- 20230801 bump
+- Fix %patch macro usage
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221114-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221114-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 15 2022 Michal Josef Špaček <mspacek@redhat.com> - 20221114-1
+- 20221114 bump
+
+* Mon Nov 07 2022 Michal Josef Špaček <mspacek@redhat.com> - 20211001-5
+- Package tests
+- Unify variable to macro
+- Update license to SPDX format
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211001-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 20211001-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211001-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Dec 02 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20211001-1
+- 20211001 bump
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200520-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20200520-5
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200520-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200520-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 20200520-2
+- Perl 5.32 rebuild
 
 * Wed May 20 2020 Petr Pisar <ppisar@redhat.com> - 20200520-1
 - 20200520 bump
