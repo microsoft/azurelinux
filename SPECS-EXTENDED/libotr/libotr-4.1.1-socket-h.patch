@@ -1,0 +1,11 @@
+diff --color -ruN libotr-4.1.1.orig/tests/regression/client/client.c libotr-4.1.1/tests/regression/client/client.c
+--- libotr-4.1.1.orig/tests/regression/client/client.c	2015-12-25 12:39:45.000000000 -0500
++++ libotr-4.1.1/tests/regression/client/client.c	2022-11-15 14:33:22.838537166 -0500
+@@ -27,6 +27,7 @@
+ #include <syscall.h>
+ #include <sys/epoll.h>
+ #include <sys/types.h>
++#include <sys/socket.h>
+ #include <sys/un.h>
+ #include <unistd.h>
+ 

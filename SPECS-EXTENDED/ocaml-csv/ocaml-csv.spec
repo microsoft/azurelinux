@@ -1,20 +1,21 @@
+%global srcname csv
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:           ocaml-csv
-Version:        1.7
-Release:        17%{?dist}
+Name:           ocaml-%{srcname}
+Version:        2.4
+Release:        23%{?dist}
 Summary:        OCaml library for reading and writing CSV files
-License:        LGPLv2+
+License:        LGPL-2.1-only WITH OCaml-LGPL-linking-exception
 
 URL:            https://github.com/Chris00/ocaml-csv/
-Source0:        https://github.com/Chris00/ocaml-csv/files/1394287/csv-1.7.tar.gz
+Source0:        https://github.com/Chris00/ocaml-csv/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         %{name}-bytes.patch
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-extlib-devel >= 1.5.3-2
-BuildRequires:  gawk
+BuildRequires:  ocaml >= 4.03.0
+BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-uutf-devel
+BuildRequires:  ocaml-lwt-devel
 
 
 %description
@@ -28,7 +29,7 @@ handling CSV files from shell scripts.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
 %description    devel
@@ -36,57 +37,171 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 
+%package        lwt
+Summary:        LWT bindings for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+
+%description    lwt
+The %{name}-lwt package contains LWT bindings for %{name}.
+
+
+%package        lwt-devel
+Summary:        LWT development files for %{name}
+Requires:       %{name}-lwt%{?_isa} = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       ocaml-lwt-devel%{?_isa}
+
+
+%description    lwt-devel
+The %{name}-devel package contains libraries and signature files for
+developing applications that use LWT with %{name}.
+
+
 %prep
-%setup -q -n csv-%{version}
+%autosetup -p1
 
 
 %build
-ocaml setup.ml -configure --prefix %{_prefix} --destdir $RPM_BUILD_ROOT --disable-tests
-ocaml setup.ml -build
+# _smp_mflags breaks the build for some reason.
+# https://github.com/Chris00/ocaml-csv/issues/34
+%dune_build -j1
 
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR
+%dune_install -s
 
-ocaml setup.ml -install
-
-%ifarch %{ocaml_native_compiler}
-mkdir -p $DESTDIR%{_bindir}
-install -m 0755 csvtool.native $DESTDIR%{_bindir}/csvtool
-%endif
+# Remove the csvtool META file and opam project
+rm -r %{buildroot}%{ocamldir}/csvtool
 
 
-%files
-%doc LICENSE.txt
-%{_libdir}/ocaml/csv
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/csv/*.a
-%exclude %{_libdir}/ocaml/csv/*.cmxa
-%exclude %{_libdir}/ocaml/csv/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/csv/*.mli
+%files -f .ofiles-csv
+%license LICENSE.md
 %{_bindir}/csvtool
 
 
-%files devel
-%doc AUTHORS.txt LICENSE.txt README.txt
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/csv/*.a
-%{_libdir}/ocaml/csv/*.cmxa
-%{_libdir}/ocaml/csv/*.cmx
-%endif
-%{_libdir}/ocaml/csv/*.mli
+%files devel -f .ofiles-csv-devel
+%doc CHANGES.md README.md
+
+
+%files lwt -f .ofiles-csv-lwt
+
+
+%files lwt-devel -f .ofiles-csv-lwt-devel
 
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-17
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4-23
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Feb 28 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-16.1
-- OCaml 4.10.0 final (Fedora 32).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 2.4-21
+- OCaml 5.2.0 ppc64le fix
+
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 2.4-20
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-17
+- Bump release and rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-16
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-15
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-14
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-12
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 2.4-11
+- OCaml 5.0.0 rebuild
+- Patch out references to the bytes library
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-10
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 18 2022 Jerry James <loganjerry@gmail.com> - 2.4-8
+- Bump and rebuild
+
+* Mon Aug  8 2022 Jerry James <loganjerry@gmail.com> - 2.4-7
+- Rebuild for ocaml-lwt 5.6.1
+- Change license from LGPLv2+ to LGPL-2.1-only WITH OCaml-LGPL-linking-exception
+- Trim BuildRequires
+- Use new OCaml macros
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 2.4-5
+- OCaml 4.14.0 rebuild
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.4-4
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.4-2
+- Build and rebuild for new ocaml-lwt (RHBZ#2036637)
+
+* Thu Oct 07 2021 Richard W.M. Jones <rjones@redhat.com> - 2.4-1
+- New upstream version 2.4
+- Add LWT bindings in new lwt/lwt-devel subpackages
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 1.7-28
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 15:56:23 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 1.7-26
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-24
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-23
+- OCaml 4.11.0 rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-22
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 30 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-20
+- Rebuild for updated ocaml-extlib (RHBZ#1837823).
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-19
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-18
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 03 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-17
+- Update all OCaml dependencies for RPM 4.16.
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 1.7-16
 - OCaml 4.10.0 final.

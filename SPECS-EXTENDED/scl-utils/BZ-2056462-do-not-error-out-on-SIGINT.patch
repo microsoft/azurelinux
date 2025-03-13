@@ -1,0 +1,61 @@
+From 9147d3b66e0a263c2eb427b7892b34c925363854 Mon Sep 17 00:00:00 2001
+From: Michal Domonkos <mdomonko@redhat.com>
+Date: Thu, 17 Feb 2022 17:36:00 +0100
+Subject: [PATCH] Don't error out when command receives SIGINT
+
+Interrupting a running command isn't really an execution problem so
+don't print an error or return a non-zero exit status.
+
+This is also how it worked in versions older than 2.0.
+
+Resolves: rhbz#1967686
+---
+ src/fallback.c | 3 +++
+ src/scllib.c   | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/fallback.c b/src/fallback.c
+index 4b9c8fd..c907a34 100644
+--- a/src/fallback.c
++++ b/src/fallback.c
+@@ -6,6 +6,7 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <dirent.h>
++#include <signal.h>
+ 
+ #include "scllib.h"
+ #include "sclmalloc.h"
+@@ -229,6 +230,8 @@ scl_rc fallback_run_command(char * const colnames[], const char *cmd, bool exec)
+         xasprintf(&bash_cmd, "/bin/bash %s", tmp);
+         status = system(bash_cmd);
+         if (status == -1 || !WIFEXITED(status)) {
++            if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
++                goto exit;
+             debug("Problem with executing command \"%s\"\n", bash_cmd);
+             ret = ERUN;
+             goto exit;
+diff --git a/src/scllib.c b/src/scllib.c
+index a182194..2ba8df8 100644
+--- a/src/scllib.c
++++ b/src/scllib.c
+@@ -11,6 +11,7 @@
+ #include <rpm/rpmcli.h>
+ #include <errno.h>
+ #include <wordexp.h>
++#include <signal.h>
+ 
+ #include "config.h"
+ #include "errors.h"
+@@ -341,6 +342,8 @@ scl_rc run_command(char * const colnames[], const char *cmd, bool exec)
+ 
+         status = system(cmd);
+         if (status == -1 || !WIFEXITED(status)) {
++            if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
++                goto exit;
+             debug("Problem with executing program \"%s\"\n", cmd);
+             ret = ERUN;
+             goto exit;
+-- 
+2.35.1
+
