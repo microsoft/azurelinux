@@ -3,16 +3,17 @@ Distribution:   Azure Linux
 %{!?python3_sitearch: %global python_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
 Name:     libplist
-Version:  2.1.0
-Release:  4%{?dist}
+Version:  2.6.0
+Release:  1%{?dist}
 Summary:  Library for manipulating Apple Binary and XML Property Lists
 
-License:  LGPLv2+
+License:  LGPLv2.1+ AND GPLv2.1
 URL:      http://www.libimobiledevice.org/
-Source0:  https://github.com/libimobiledevice/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:  https://github.com/libimobiledevice/libplist/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires: chrpath
 BuildRequires: gcc gcc-c++
+BuildRequires: python3
 BuildRequires: python3-Cython
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
@@ -49,14 +50,12 @@ Requires: python3
 %prep
 %autosetup -p1
 
-NOCONFIGURE=1 ./autogen.sh
-
 %build
 export CC=%{__cc}
 export CXX=%{__cxx}
 export CFLAGS='%optflags -fno-strict-aliasing'
 export CXXFLAGS='%optflags -fno-strict-aliasing'
-export PYTHON='python3'
+export PYTHON='%{_bindir}/python3'
 %configure --disable-static
 
 %make_build V=1
@@ -67,7 +66,7 @@ export PYTHON='python3'
 find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 
 chrpath --delete $RPM_BUILD_ROOT%{_bindir}/plistutil
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libplist++.so.3*
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libplist++-2.0.so.4*
 chrpath --delete $RPM_BUILD_ROOT%{python3_sitearch}/plist*
 
 %check
@@ -78,21 +77,26 @@ make check
 %files
 %license COPYING.LESSER
 %doc AUTHORS README.md
+%doc %{_mandir}/man1/plistutil.1.gz
 %{_bindir}/plistutil
-%{_libdir}/libplist.so.3*
-%{_libdir}/libplist++.so.3*
+%{_libdir}/libplist-2.0.so.4*
+%{_libdir}/libplist++-2.0.so.4*
 
 %files devel
-%{_libdir}/pkgconfig/libplist.pc
-%{_libdir}/pkgconfig/libplist++.pc
-%{_libdir}/libplist.so
-%{_libdir}/libplist++.so
+%{_libdir}/pkgconfig/libplist-2.0.pc
+%{_libdir}/pkgconfig/libplist++-2.0.pc
+%{_libdir}/libplist-2.0.so
+%{_libdir}/libplist++-2.0.so
 %{_includedir}/plist
 
 %files -n python3-libplist
 %{python3_sitearch}/plist*
 
 %changelog
+* Tue Oct 29 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.6.0-1
+- Update to 2.6.0
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
