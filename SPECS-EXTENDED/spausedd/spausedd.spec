@@ -4,20 +4,16 @@ Distribution:   Azure Linux
 
 Name: spausedd
 Summary: Utility to detect and log scheduler pause
-Version: 20201112
-Release: 3%{?dist}
+Version: 20210719
+Release: 10%{?dist}
 License: ISC
 URL: https://github.com/jfriesse/spausedd
 Source0: https://github.com/jfriesse/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 
-# VMGuestLib exists only for x86 architectures
-%if %{with vmguestlib}
-%ifarch %{ix86} x86_64
-%global use_vmguestlib 1
-%endif
-%endif
+%global use_vmguestlib 0
 
 BuildRequires: gcc
+BuildRequires: make
 %{?systemd_requires}
 BuildRequires: systemd
 
@@ -33,16 +29,15 @@ Utility to detect and log scheduler pause
 
 %build
 %set_build_flags
-make \
+%make_build \
 %if %{defined use_vmguestlib}
     WITH_VMGUESTLIB=1 \
 %else
     WITH_VMGUESTLIB=0 \
 %endif
-    %{?_smp_mflags}
 
 %install
-make DESTDIR="%{buildroot}" PREFIX="%{_prefix}" install
+%make_install PREFIX="%{_prefix}"
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
@@ -64,12 +59,50 @@ install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 %systemd_postun spausedd.service
 
 %changelog
-* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-3
+* Fri Jan 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 20210719-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - Removing the explicit %%clean stage.
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 06 2023 Jan Friesse <jfriesse@redhat.com> - 20210719-6
+- migrated to SPDX license
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210719-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 19 2021 Jan Friesse <jfriesse@redhat.com> - 20210719-1
+- Add mode option for moving to root cgroup functionality
+
+* Thu May 20 2021 Jan Friesse <jfriesse@redhat.com> - 20210520-1
+- Document cgroup v2 problems
+
+* Tue May 11 2021 Jan Friesse <jfriesse@redhat.com> - 20210511-1
+- Support for cgroup v2
+
+* Fri Mar 26 2021 Jan Friesse <jfriesse@redhat.com> - 20210326-1
+- Fix possible memory leak
+- Check memlock rlimit
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20201112-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Thu Nov 12 2020 Jan Friesse <jfriesse@redhat.com> - 20201112-1
 - Add ability to move process into root cgroup
@@ -77,7 +110,22 @@ install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 
 * Tue Nov 10 2020 Jan Friesse <jfriesse@redhat.com> - 20201110-1
 - Fix log_perror
+- Rebase to new version
+
+* Tue Sep 22 2020 Jan Friesse <jfriesse@redhat.com> - 20200323-4
+- Fix build for ELN
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200323-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 22 2020 Jan Friesse <jfriesse@redhat.com> - 20200323-2
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Mon Mar 23 2020 Jan Friesse <jfriesse@redhat.com> - 20200323-1
 - Enhance man page
+- Add CI tests
+- Enable gating
 - Rebase to new version
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20190807-2

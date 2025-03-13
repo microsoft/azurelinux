@@ -1,0 +1,11 @@
+diff -ru glm-1.0.1/CMakeLists.txt glm-1.0.1-noarch/CMakeLists.txt
+--- glm-1.0.1/CMakeLists.txt	2024-02-27 18:19:47.000000000 +0100
++++ glm-1.0.1-noarch/CMakeLists.txt	2024-03-02 11:25:31.703221759 +0100
+@@ -270,6 +270,7 @@
+ 	write_basic_package_version_file(
+ 		"${CMAKE_CURRENT_BINARY_DIR}/glmConfigVersion.cmake"
+ 		COMPATIBILITY AnyNewerVersion
++                ARCH_INDEPENDENT
+ 	)
+ 	install(
+ 		FILES "${CMAKE_CURRENT_BINARY_DIR}/glmConfigVersion.cmake"
