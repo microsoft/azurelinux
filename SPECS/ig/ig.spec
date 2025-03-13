@@ -1,7 +1,7 @@
 Summary:        The eBPF tool and systems inspection framework for Kubernetes, containers and Linux hosts.
 Name:           ig
-Version:        0.32.0
-Release:        3%{?dist}
+Version:        0.37.0
+Release:        1%{?dist}
 License:        Apache 2.0 and GPL 2.0 for eBPF code
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,8 +9,7 @@ Group:          Tools/Container
 URL:            https://github.com/inspektor-gadget/inspektor-gadget
 Source0:        https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-Patch0:         CVE-2024-45338.patch
-BuildRequires:  golang < 1.23
+BuildRequires:  golang >= 1.23
 
 
 %description
@@ -66,6 +65,10 @@ fi
 %{_bindir}/ig
 
 %changelog
+* Mon Feb 03 2025 Francis Laniel <flaniel@linux.microsoft.com> - 0.37.0-1
+- Bump to version 0.37.0
+- Drop patch for CVE-2024-45338 as it was fixed in golang.org/x/net 0.33.0 and ig uses 0.34.0.
+
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.32.0-3
 - Add patch for CVE-2024-45338
 

@@ -1,10 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Text-CSV_XS
-Version:        1.41
-Release:        2%{?dist}
+Version:        1.60
+Release:        1%{?dist}
 Summary:        Comma-separated values manipulation routines
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Text-CSV_XS
 Source0:        https://cpan.metacpan.org/modules/by-module/Text/Text-CSV_XS-%{version}.tgz
 # Build:
@@ -15,11 +15,12 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(charnames)
 BuildRequires:  perl(Config::Tiny)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(Carp)
-# Specific version ≥ 2.92 for Encode is recommended but not required
+# Specific version ≥ 3.20 for Encode is recommended but not required
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(IO::Handle)
@@ -30,13 +31,11 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(XSLoader)
 # Tests:
 BuildRequires:  perl(base)
-BuildRequires:  perl(charnames)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Scalar)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
-# Specific version ≥ 2.92 for Encode is recommended but not required
+# Specific version ≥ 3.20 for Encode is recommended but not required
 Requires:       perl(Encode)
 # IO::Handle is loaded by XS code
 Requires:       perl(IO::Handle)
@@ -77,12 +76,16 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{make_build} test
 
 %files
-%doc ChangeLog CONTRIBUTING.md README examples/
+%doc ChangeLog CONTRIBUTING.md examples/ README SECURITY.md
 %{perl_vendorarch}/Text/
 %{perl_vendorarch}/auto/Text/
 %{_mandir}/man3/Text::CSV_XS.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.60-1
+- Update to version 1.60
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

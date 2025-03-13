@@ -42,7 +42,7 @@ Patch7:         CVE-2025-22869.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-8%{?dist}
+BuildRequires:  glibc-static >= 2.38-9%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -284,6 +284,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 * Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
 - Address CVE-2025-22869
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14
+- Bump to rebuild with updated glibc
 
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-13
 - Address CVE-2023-45288

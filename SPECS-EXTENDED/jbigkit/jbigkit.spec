@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           jbigkit
 Version:        2.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        JBIG1 lossless image compression tools
 
 License:        GPLv2+
@@ -17,6 +17,8 @@ Patch3:         jbigkit-covscan.patch
 # gcc is no longer in buildroot by default
 # gcc needed for libjbig library and several filters - jbigtopbm, pbmtojbig e.g.
 BuildRequires: gcc
+BuildRequires: make
+BuildRequires: git-core
 
 Requires:       jbigkit-libs%{?_isa} = %{version}-%{release}
 
@@ -51,13 +53,7 @@ formats.
 
 
 %prep
-%setup -q -n jbigkit-2.1
-%patch 0 -p1 -b .shlib
-%patch 1 -p1 -b .warnings
-# jbigkit: Partial Fedora build flags injection (bug #1548546)
-%patch 2 -p1 -b .ldflags
-# covscan issues - backported from upstream
-%patch 3 -p1 -b .covscan
+%autosetup -n jbigkit-2.1 -S git
 
 %build
 # get the correct redhat build flags
@@ -89,8 +85,12 @@ make test
 %ldconfig_scriptlets libs
 
 %files
-%{_bindir}/???to*
-%{_mandir}/man1/*
+%{_bindir}/jbgtopbm
+%{_bindir}/jbgtopbm85
+%{_bindir}/pbmtojbg
+%{_bindir}/pbmtojbg85
+%{_mandir}/man1/jbgtopbm.1.gz
+%{_mandir}/man1/pbmtojbg.1.gz
 %license COPYING
 
 %files libs
@@ -103,6 +103,10 @@ make test
 %{_includedir}/jbig*.h
 
 %changelog
+* Tue Mar 04 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1-20
+- Updated patch to fix build
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

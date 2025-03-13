@@ -1,14 +1,10 @@
-# MRO is part of the Perl core since 5.9.5
-
-%global mro_in_core 1
-
-Name:		perl-MRO-Compat
-Version:	0.13
-Release:	11%{?dist}
-Summary:	Mro::* interface compatibility for Perls < 5.9.5
-License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:		perl-MRO-Compat
+Version:	0.15
+Release:	11%{?dist}
+Summary:	Mro::* interface compatibility for Perls < 5.9.5
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MRO-Compat
 Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz#/perl-MRO-Compat-%{version}.tar.gz
 BuildArch:	noarch
@@ -16,24 +12,16 @@ BuildArch:	noarch
 BuildRequires:	coreutils
 BuildRequires:	findutils
 BuildRequires:	make
-BuildRequires:	perl-interpreter
 BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
 BuildRequires:	perl(ExtUtils::MakeMaker)
 # Module
-%if ! %{mro_in_core}
-BuildRequires:	perl(Class::C3) >= 0.24
-BuildRequires:	perl(Class::C3::XS) >= 0.08
-%endif
 BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 # Test
 BuildRequires:	perl(Test::More) >= 0.47
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-%if ! %{mro_in_core}
-Requires:	perl(Class::C3) >= 0.24
-Requires:	perl(Class::C3::XS) >= 0.08
-%endif
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 The "mro" namespace provides several utilities for dealing with method
@@ -60,7 +48,6 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
@@ -69,13 +56,66 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes README t/
 %{perl_vendorlib}/MRO/
 %{_mandir}/man3/MRO::Compat.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.15-11
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 21 2023 Michal Josef Špaček <mspacek@redhat.com> - 0.15-6
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.15-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Jan  8 2022 Paul Howarth <paul@city-fan.org> - 0.15-1
+- Update to 0.15
+  - Optimize pure perl DFS inheritance calculation on perl 5.8
+  - Fix function prototypes to match core functions
+  - Pod formatting fix
+- Package new LICENSE file
+- Drop redundant buildroot cleaning in %%install section
+- Drop support for old perls without mro support in core
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.13-14
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.13-11
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

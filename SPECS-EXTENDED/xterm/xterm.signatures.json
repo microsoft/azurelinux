@@ -1,6 +1,8 @@
 {
  "Signatures": {
   "16colors.txt": "a2342029672532256110ef28a0ea1addb7f6fd1f08aacc382d0fbe2308f178c2",
-  "xterm-380.tar.gz": "a46c2799ee2897006f3a01cd80416cca7a3942503a8975f51a281a9f5627da21"
+  "dickey@invisible-island.net-rsa3072.asc": "59ac84797cd902c55f22d550155fa9e02f7e0c923ad64d6d81b2c88668e265bb",
+  "xterm-395.tgz": "286e3caa5938eae38e202827621567629dfeaae689e8070b413ca11398093dc8",
+  "xterm-395.tgz.asc": "021949ae527c2a4286dcd5021017caf39cfe049242f08287fa4d6b885db6f1be"
  }
 }

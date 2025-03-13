@@ -1,54 +1,56 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           teckit
-Version:        2.5.9
+Version:        2.5.12
 Release:        4%{?dist}
-Summary:        Conversion library and mapping compiler
+Summary:        Encoding conversion library and mapping compiler
 # COPYING:                      links to license/LICENSING.txt
-# license/License_CPLv05.txt:   CPLv0.5 text
-# license/License_LGPLv21.txt:  LGPLv2 text
+# license/License_CPLv05.txt:   CPL-1.0 text, "0.5" version in the license
+#                               title is irrelevant
+#                               <https://gitlab.com/fedora/legal/fedora-license-data/-/issues/160>
+# license/License_LGPLv21.txt:  LGPL-2.1 text
 # license/LICENSING.txt:        license declarations
-# SFconv/UtfCodec.cpp:      LGPLv2+ or GPLv2+ or MPL(?version) (bundled Graphite2)
-# SFconv/UtfCodec.h:        LGPLv2+ or GPLv2+ or MPL(?version) (bundled Graphite2)
-#                           <https://github.com/silnrsi/graphite/issues/58>,
-#                           graphite2 package uses "MPL"
-# source/Engine.cpp:        LGPLv2+ or CPL
-# source/TECkit_Format.h:   LGPLv2+ or CPL
+# SFconv/UtfCodec.cpp:      LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-2.0 (bundled Graphite2)
+# SFconv/UtfCodec.h:        LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-2.0 (bundled Graphite2)
+#                           MPL version clarified at <https://github.com/silnrsi/graphite/issues/58>,
+# source/Engine.cpp:        LGPL-2.1-or-later OR CPL-1.0, CPL-1.0 identifier already
+#                           encompases "or later" choice
+#                           <https://gitlab.com/fedora/legal/fedora-license-data/-/issues/160>
+# source/TECkit_Format.h:   LGPL-2.1-or-later OR CPL-0.5-or-later
 ## Not in any binary package
 # aclocal.m4:           FSFULLR
-# compile:              GPLv2+ with exceptions
-# config.guess:         GPLv3+ with exceptions
-# config.sub:           GPLv3+ with exceptions
-# configure:            FSFUL and GPLv2+ with exceptions
-# depcomp:              GPLv2+ with exceptions
-# install-sh:           MIT
-# lib/Makefile.in:      FSFULLR
-# ltmain.sh:            GPLv2+ with exceptions and GPLv3+ with exceptions and GPLv3+
-# m4/libtool.m4:        FSFULL and FSFULLR and GPLv2+ with exceptions
+# compile:              GPL-2.0-or-later WITH Autoconf-exception-generic
+#                       <https://gitlab.com/fedora/legal/fedora-license-data/-/issues/68>
+# config.guess:         GPL-3.0-or-later WITH Autoconf-exception-generic
+# config.sub:           GPL-3.0-or-later WITH Autoconf-exception-generic
+# configure:            FSFUL AND GPL-2.0-or-later WITH Libtool-exception
+# depcomp:              GPL-2.0-or-later WITH Autoconf-exception-generic
+# install-sh:           X11
+# lib/Makefile.in:      FSFULLRWD
+# ltmain.sh:            GPL-2.0-or-later WITH Libtool-exception AND
+#                       GPL-3.0-or-later WITH Libtool-exception AND GPL-3.0-or-later
+# m4/libtool.m4:        FSFULL AND FSFULLR AND GPL-2.0-or-later WITH Libtool-exception
 # m4/ltoptions.m4:      FSFULLR
 # m4/ltsugar.m4:        FSFULLR
 # m4/ltversion.m4:      FSFULLR
 # m4/lt~obsolete.m4:    FSFULLR
-# Makefile.in:          FSFULLR
-# missing:              GPLv2+ with exceptions
-# test-driver:          GPLv2+ with exceptions
-# test/Makefile.in:     FSFULLR
+# Makefile.in:          FSFULLRWD
+# missing:              GPL-2.0-or-later WITH Autoconf-exception-generic
+# test-driver:          GPL-2.0-or-later WITH Autoconf-exception-generic
+# test/Makefile.in:     FSFULLRWD
 ## Unbundled
-# SFconv/expat/xmlparse/hashtable.c:    MPLv1.1 of GPL+ (bundled expat)
-# SFconv/expat/xmlparse/xmlparse.c:     MPLv1.1 of GPL+ (bundled expat)
-# zlib-1.2.3:           zlib (see nonexistent zlib.h, reported to
-#                       <https://github.com/silnrsi/teckit/issues/22>)
-License:        (LGPLv2+ or CPL) and (LGPLv2+ or GPLv2+ or MPLv2.0 or MPLv1.1)
-URL:            https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=teckit
+# SFconv/expat/xmlparse/hashtable.c:    MPL-1.1 OR GPL-1.0-or-later (bundled expat)
+# SFconv/expat/xmlparse/xmlparse.c:     MPL-1.1 OR GPL-1.0-or-later (bundled expat)
+# zlib-1.2.3:           "sse copyright notice in zlib.h"
+# zlib-1.2.3/zlib.h:    zlib-acknowledgement
+License:        (LGPL-2.1-or-later OR CPL-1.0) AND (LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-2.0)
+URL:            https://software.sil.org/teckit/
 Source0:        https://github.com/silnrsi/teckit/releases/download/v%{version}/teckit-%{version}.tar.gz
 Source1:        https://github.com/silnrsi/teckit/releases/download/v%{version}/teckit-%{version}.tar.gz.asc
 # Exported from ppisar's keyring
 Source2:        gpgkey-15D41BC02EB807D405EFFAF6C9183BEA0288CDEE.gpg
-# Fix a compiler warning about a misindentation,
-# <https://github.com/silnrsi/teckit/pull/23>
-Patch0:         teckit-2.5.9-Correct-indentation.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
+BuildRequires:  autoconf >= 2.54
+BuildRequires:  automake >= 1.11
 BuildRequires:  coreutils
 BuildRequires:  expat-devel
 # gcc is not needed, the only source/NormalizationData.c is included into
@@ -75,7 +77,7 @@ a human-readable mapping description (a simple text file).
 
 %package devel
 Summary:        Developmental files for TECkit library
-License:        LGPLv2+ or CPL
+License:        LGPL-2.1-or-later OR CPL-1.0
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
@@ -84,14 +86,13 @@ that use TECkit, a character encoding and mapping, library.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 # Remove bundled libraries
-rm -r zlib-*/*.c SFconv/expat
-# Regenerate build script
-autoreconf -fi
+rm -r zlib-*/*.{c,h} SFconv/expat
 
 %build
+# Regenerate a build script
+autoreconf -fi
 %configure \
     --disable-debug \
     --disable-final \
@@ -123,18 +124,67 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_libdir}/libTECkit.so.0.*
 %{_libdir}/libTECkit_Compiler.so.0
 %{_libdir}/libTECkit_Compiler.so.0.*
-%{_mandir}/man1/*
+%{_mandir}/man1/sfconv.*
+%{_mandir}/man1/teckit_compile.*
+%{_mandir}/man1/txtconv.*
 
 %files devel
 %doc docs/*.pdf
-%{_includedir}/teckit/
+%{_includedir}/teckit
 %{_libdir}/libTECkit.so
 %{_libdir}/libTECkit_Compiler.so
 %{_libdir}/pkgconfig/teckit.pc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.9-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.5.12-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Aug 28 2023 Petr Pisar <ppisar@redhat.com> - 2.5.12-1
+- 2.5.12 bump
+- Correct a license tag to "(LGPL-2.1-or-later OR CPL-1.0) AND
+  (LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-2.0)"
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Feb 20 2023 Petr Pisar <ppisar@redhat.com> - 2.5.11-1
+- 2.5.11 bump
+
+* Mon Feb 20 2023 Petr Pisar <ppisar@redhat.com> - 2.5.9-12
+- Correct a license tag to "(LGPL-2.1-or-later OR CPL-1.0) AND
+  (LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-2.0 OR MPL-1.1)"
+
+* Sat Feb 18 2023 Than Ngo <than@redhat.com> - 2.5.9-11
+- migrated to SPDX license
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.9-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

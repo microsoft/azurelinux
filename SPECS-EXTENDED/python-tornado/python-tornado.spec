@@ -1,84 +1,89 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global srcname tornado
+%global common_description %{expand:
+Tornado is an open source version of the scalable, non-blocking web
+server and tools.
+
+The framework is distinct from most mainstream web server frameworks
+(and certainly most Python frameworks) because it is non-blocking and
+reasonably fast. Because it is non-blocking and uses epoll, it can
+handle thousands of simultaneous standing connections, which means it is
+ideal for real-time web services.}
 
 Name:           python-%{srcname}
-Version:        6.2.0
-Release:        1%{?dist}
+Version:        6.3.3
+Release:        11%{?dist}
 Summary:        Scalable, non-blocking web server and tools
 
-License:        ASL 2.0
-URL:            http://www.tornadoweb.org
-Source0:        https://github.com/tornadoweb/%{srcname}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+License:        Apache-2.0 
+URL:            https://www.tornadoweb.org
+Source0:        https://github.com/tornadoweb/tornado/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 # Do not turn DeprecationWarning in tornado module into Exception
 # fixes FTBFS with Python 3.8
 Patch1:         Do-not-turn-DeprecationWarning-into-Exception.patch
+# Fixes for Python 3.12 - rebased
+# https://github.com/tornadoweb/tornado/pull/3288
+Patch2:         python-tornado-Python-3.12.patch
+
+# Compatibility with pytest 8
+Patch3:         https://github.com/tornadoweb/tornado/pull/3374.patch
 
 BuildRequires:  gcc
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3dist(wheel)   
 
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-devel
+%description %{common_description}
+ 
+%package -n python3-%{srcname}
+Summary:        %{summary}
 
-%description
-Tornado is an open source version of the scalable, non-blocking web
-server and tools.
-
-The framework is distinct from most mainstream web server frameworks
-(and certainly most Python frameworks) because it is non-blocking and
-reasonably fast. Because it is non-blocking and uses epoll, it can
-handle thousands of simultaneous standing connections, which means it is
-ideal for real-time web services.
-
-%package -n python%{python3_pkgversion}-%{srcname}
-Summary:        Scalable, non-blocking web server and tools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-Requires:       python%{python3_pkgversion}-pycurl
-
-%description -n python%{python3_pkgversion}-%{srcname}
-Tornado is an open source version of the scalable, non-blocking web
-server and tools.
-
-The framework is distinct from most mainstream web server frameworks
-(and certainly most Python frameworks) because it is non-blocking and
-reasonably fast. Because it is non-blocking and uses epoll, it can
-handle thousands of simultaneous standing connections, which means it is
-ideal for real-time web services.
+%description -n python3-%{srcname} %{common_description}
 
 %package doc
-Summary:        Examples for python-tornado
-Obsoletes:      python%{python3_pkgversion}-%{srcname}-doc < 4.2.1-3
-Provides:       python%{python3_pkgversion}-%{srcname}-doc = %{version}-%{release}
+Summary:        Examples for %{name}
 
-%description doc
-Tornado is an open source version of the scalable, non-blocking web
-server and and tools. This package contains some example applications.
+%description doc %{common_description}
 
-%prep 
+This package contains some example applications.
+
+%prep
 %autosetup -p1 -n %{srcname}-%{version}
-# remove shebang from files
-%{__sed} -i.orig -e '/^#!\//, 1d' *py tornado/*.py tornado/*/*.py
 
+%generate_buildrequires
+%pyproject_buildrequires
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 %check
-export ASYNC_TEST_TIMEOUT=10
-%{__python3} -m tornado.test.runtests --verbose
+# Skip the same timing-related tests that upstream skips when run in Travis CI.
+# https://github.com/tornadoweb/tornado/commit/abc5780a06a1edd0177a399a4dd4f39497cb0c57
+export TRAVIS=true
 
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE
+# Increase timeout for tests on riscv64
+%ifarch riscv64
+export ASYNC_TEST_TIMEOUT=80
+%endif
+
+%{py3_test_envvars} %{python3} -m tornado.test
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.rst
-%{python3_sitearch}/%{srcname}/
-%{python3_sitearch}/%{srcname}-*.egg-info
 
 %files doc
+%license LICENSE
 %doc demos
 
 %changelog
+* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 6.3.3-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
 * Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-1
 - Bump version
 - License verified

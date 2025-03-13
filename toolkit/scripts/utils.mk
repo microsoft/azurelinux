@@ -20,9 +20,14 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
 # created.
 #
+# To allow output to be printed, we use the $(eval) function to create a new
+# variable _out which will contain the output of the shell command. If the output
+# is not empty, we print it to the console.
+#
 # $1 - Folder path
 define create_folder
-$(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
+$(eval _out := $(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 2>&1 && touch -d @0 $1 ; fi ))
+$(if $(strip $(_out)),$(warning $(_out)))
 endef
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc

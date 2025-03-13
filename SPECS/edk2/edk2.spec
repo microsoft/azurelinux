@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -782,9 +782,13 @@ done
 %{_datadir}/%{name}/Python
 
 %files hvloader
+%license MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/LICENSE
 /boot/efi/HvLoader.efi
 
 %changelog
+* Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
+- Package license for edk2-hvloader
+
 * Thu Sep 19 2024 Minghe Ren <mingheren@microsoft.com> - 20240524git3e722403cd16-3
 - Add patch for CVE-2024-6119
 

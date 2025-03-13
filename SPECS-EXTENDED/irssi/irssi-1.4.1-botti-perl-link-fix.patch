@@ -1,0 +1,43 @@
+diff --git a/configure.ac b/configure.ac
+index f03569e..53a9de6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -650,6 +650,7 @@ for c in $CHAT_MODULES; do
+ done
+ 
+ FE_COMMON_LIBS="$FE_COMMON_LIBS../fe-common/core/libfe_common_core.a"
++AC_SUBST(FE_COMMON_LIBS)
+ 
+ dnl ** common libraries needed by frontends
+ COMMON_NOUI_LIBS="$CHAT_LIBS $CORE_LIBS"
+diff --git a/src/fe-none/Makefile.am b/src/fe-none/Makefile.am
+index bbcd63f..e8ce8d6 100644
+--- a/src/fe-none/Makefile.am
++++ b/src/fe-none/Makefile.am
+@@ -4,12 +4,13 @@ AM_CPPFLAGS = \
+ 	-I$(top_builddir) \
+ 	$(GLIB_CFLAGS)
+ 
+-botti_DEPENDENCIES = @COMMON_NOUI_LIBS@
++botti_DEPENDENCIES = @COMMON_NOUI_LIBS@ @FE_COMMON_LIBS@
+ 
+ botti_LDADD = \
+ 	@COMMON_NOUI_LIBS@ \
+ 	@PERL_LINK_LIBS@ \
+ 	@PERL_LINK_FLAGS@ \
++	@FE_COMMON_LIBS@ \
+ 	@PROG_LIBS@
+ 
+ botti_SOURCES = \
+diff --git a/src/fe-none/meson.build b/src/fe-none/meson.build
+index 58df15f..8e32b94 100644
+--- a/src/fe-none/meson.build
++++ b/src/fe-none/meson.build
+@@ -11,6 +11,7 @@ executable('botti',
+     libconfig_a,
+     libcore_a,
+     libirc_a,
++    libfe_common_core_a,
+   ],
+   install : true,
+   dependencies : dep
