@@ -52,7 +52,7 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %{python3_sitelib}/*
 
 %changelog
-* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 31.0.0-12
+* Tue Dec 24 2024 Akhila Guruju <v-guakhila@microsoft.com> - 31.0.0-12
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
