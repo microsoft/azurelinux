@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,8 +39,8 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
-Patch1:         disable-static-library.patch
-Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+Patch0:		0001-flux-enable-build-with-rust-1.85.0.patch
+Patch1:		test-with-rust.1.85.0.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -71,23 +71,11 @@ programs using Influx data language.
 
 %prep
 %setup -q
-%patch 2 -p1
+%patch 0 -p1
+%patch 1 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
-
-patch -p2 < %{PATCH1}
-patch -p2 <<EOF
---- a/libflux/flux/build.rs
-+++ b/libflux/flux/build.rs
-@@ -82,5 +82,7 @@ fn main() -> Result<()> {
-     let path = dir.join("stdlib.data");
-     serialize(Environment::from(imports), fb::build_env, &path)?;
-
-+    println!("cargo:rustc-cdylib-link-arg=-Wl,-soname,libflux.so.%{version}");
-+
-     Ok(())
- }
 popd
 
 %build
@@ -139,6 +127,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Wed Mar 05 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.194.5-2
+- Build with rust 1.85
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
 
