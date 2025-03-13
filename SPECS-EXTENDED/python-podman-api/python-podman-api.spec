@@ -7,6 +7,7 @@ Distribution:   Azure Linux
 %global git https://github.com/containers/python-%{srcname}
 %global commit d4b8263bf08b72082cfb45e7367ebf4309facc54
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
+%define _python_dist_allow_version_zero 1
 
 # Several tests require internet conection or journald to be running
 # Let's disable checking for now
@@ -18,7 +19,7 @@ Distribution:   Azure Linux
 Name: python-%{pkgsuf}
 # See https://github.com/containers/python-podman/issues/27
 Version: 0.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Python bindings for using Varlink access to Podman Service
 
 License: ASL 2.0
@@ -80,6 +81,9 @@ export PBR_VERSION="0.0.0"
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
+* Thu Feb 20 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.0.0-3
+- Added a macro to fix build
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.0-2
 - Removing epoch.
 - License verified.

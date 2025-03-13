@@ -3,12 +3,12 @@ Distribution:   Azure Linux
 # asio only ships headers, so no debuginfo package is needed
 %global debug_package %{nil}
 
-%global commit 28d9b8d6df708024af5227c551673fdb2519f5bf
+%global commit 1f534288b4be0be2dd664aab43882a0aa3106a1d
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           asio
-Version:        1.10.8
-Release:        12%{?dist}
+Version:        1.31.0
+Release:        1%{?dist}
 Summary:        A cross-platform C++ library for network programming
 
 License:        Boost
@@ -56,8 +56,13 @@ modern C++ approach.
 %license LICENSE_1_0.txt
 %{_includedir}/asio/
 %{_includedir}/asio.hpp
+%{_libdir}/pkgconfig/asio.pc
 
 %changelog
+* Tue Oct 08 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.31.0-1
+- Upgrade to current upstream
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.8-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

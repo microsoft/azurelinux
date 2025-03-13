@@ -1,6 +1,6 @@
-From 454bc007e96a4a85d1210ab44863cf53615e0b6f Mon Sep 17 00:00:00 2001
-From: Javier Pena <jpena@redhat.com>
-Date: Thu, 3 Mar 2016 14:13:21 +0100
+From 21b6f4101a5c04cd8e2e959f4bfb8932af6267b6 Mon Sep 17 00:00:00 2001
+From: Alfredo Moralejo <amoralej@redhat.com>
+Date: Mon, 1 Jun 2020 15:13:26 +0200
 Subject: [PATCH] Remove all Google Analytics tracking
 
 Even if https://github.com/openstack/openstackdocstheme/commit/89b0475539ac6763baa27f5fc334639ee3853ebf
@@ -12,11 +12,11 @@ script_search.html
  2 files changed, 1 insertion(+), 27 deletions(-)
 
 diff --git a/openstackdocstheme/theme/openstackdocs/script_search.html b/openstackdocstheme/theme/openstackdocs/script_search.html
-index 98c9e9e..1141d82 100644
+index 8a62dc6..1141d82 100644
 --- a/openstackdocstheme/theme/openstackdocs/script_search.html
 +++ b/openstackdocstheme/theme/openstackdocs/script_search.html
 @@ -1,28 +1,2 @@
--<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+-<script src="https://www.google.com/jsapi" type="text/javascript"></script>
  <script type="text/javascript">
 - //<![CDATA[
 -google.load('search', '1', {
@@ -45,7 +45,7 @@ index 98c9e9e..1141d82 100644
 -true);//]]>
  </script>
 diff --git a/openstackdocstheme/theme/openstackdocs/theme.conf b/openstackdocstheme/theme/openstackdocs/theme.conf
-index ee5d0b4..cd43847 100644
+index 8d0ef5b..1f7d26e 100644
 --- a/openstackdocstheme/theme/openstackdocs/theme.conf
 +++ b/openstackdocstheme/theme/openstackdocs/theme.conf
 @@ -4,7 +4,7 @@ stylesheet = css/basic.css
@@ -58,5 +58,5 @@ index ee5d0b4..cd43847 100644
  display_badge = True
  display_toc = True
 -- 
-2.17.1
+2.20.1
 

@@ -1,17 +1,17 @@
 Name:           perl-Pod-Markdown
-Version:        3.200
-Release:        4%{?dist}
+Version:        3.400
+Release:        1%{?dist}
 Summary:        Convert POD to Markdown
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Markdown
-Source0:        https://cpan.metacpan.org/authors/id/R/RW/RWSTAUNER/Pod-Markdown-%{version}.tar.gz#/perl-Pod-Markdown-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RW/RWSTAUNER/Pod-Markdown-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  findutils
+BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
@@ -22,6 +22,7 @@ BuildRequires:  perl(Pod::Simple) >= 3.27
 BuildRequires:  perl(Pod::Simple::Methody)
 BuildRequires:  perl(URI::Escape)
 # Tests:
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Spec::Functions)
@@ -29,13 +30,11 @@ BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(blib)
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test::Differences)
 BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(version)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This module subclasses Pod::Parser and converts POD to Markdown.
@@ -49,7 +48,7 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{_fixperms} -c $RPM_BUILD_ROOT
 
 %check
 make test
@@ -57,11 +56,17 @@ make test
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man[13]/*
-%{_bindir}/*
+%{_bindir}/pod2markdown
+%{perl_vendorlib}/Pod/
+%{_mandir}/man1/pod2markdown.1*
+%{_mandir}/man3/Pod::Markdown.3*
+%{_mandir}/man3/Pod::Perldoc::ToMarkdown.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.400-1
+- Update to version 3.400
+- License verified
+
 * Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 3.200-4
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified

@@ -56,8 +56,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/createrepo_c-devel/d' $TmpPkgGen
     sed -i '/docbook-xml/d' $TmpPkgGen
     sed -i '/docbook-xsl/d' $TmpPkgGen
-    sed -i '/e2fsprogs-[0-9]/d' $TmpPkgGen
-    sed -i '/e2fsprogs-devel/d' $TmpPkgGen
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
@@ -68,7 +66,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/kbd/d' $TmpPkgGen
     sed -i '/kmod/d' $TmpPkgGen
-    sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
+    sed -i '/krb5-lang/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
     sed -i '/libbacktrace-static/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
@@ -82,7 +80,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/lua-rpm/d' $TmpPkgGen
     sed -i '/lua-srpm/d' $TmpPkgGen
     sed -ri '/azurelinux-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
-    sed -i '/nghttp2-devel/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
     sed -i '/perl-A/d' $TmpPkgGen
