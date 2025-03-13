@@ -12,11 +12,7 @@ ExclusiveArch:  x86_64
 
 Requires:       ca-certificates
 Requires:       chrony
-# Required for confidential storage functionality
-Requires:       cryptsetup
 Requires:       dbus
-# Required for confidential storage functionality
-Requires:       e2fsprogs
 Requires:       elfutils-libelf
 Requires:       filesystem
 Requires:       iptables
@@ -55,7 +51,11 @@ Metapackage to install the set of packages inside a Kata containers UVM, include
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
+# Required for confidential storage functionality
+Requires:       cryptsetup
 Requires:       device-mapper
+# Required for confidential storage functionality
+Requires:       e2fsprogs
 # Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
 Requires:       systemd-udev
 
