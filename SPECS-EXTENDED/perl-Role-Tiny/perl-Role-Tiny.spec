@@ -1,10 +1,10 @@
-Name:           perl-Role-Tiny
-Version:        2.001004
-Release:        3%{?dist}
-Summary:        A nouvelle cuisine portion size slice of Moose
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Role-Tiny
+Version:        2.002004
+Release:        13%{?dist}
+Summary:        A nouvelle cuisine portion size slice of Moose
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Role-Tiny
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-%{version}.tar.gz#/perl-Role-Tiny-%{version}.tar.gz
 BuildArch:      noarch
@@ -28,13 +28,9 @@ BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Test::More) >= 0.88
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(Class::Method::Modifiers) >= 1.05
 Requires:       perl(mro)
-
-# perl-Role-Tiny was split from perl-Moo
-Conflicts:      perl-Moo < 0.009014
 
 %description
 Role::Tiny is a minimalist role composition tool.
@@ -48,22 +44,67 @@ Role::Tiny is a minimalist role composition tool.
 
 %install
 %{make_install}
-
 %{_fixperms} -c %{buildroot}
 
 %check
 %{make_build} test
 
 %files
-%doc Changes README
 %license LICENSE
+%doc Changes README
 %{perl_vendorlib}/Role/
 %{_mandir}/man3/Role::Tiny.3*
 %{_mandir}/man3/Role::Tiny::With.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.001004-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.002004-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.002004-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.002004-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.002004-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 24 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 2.002004-1
+- Update to 2.002004
+
+* Tue Jan 12 2021 Paul Howarth <paul@city-fan.org> - 2.002003-1
+- Update to 2.002003
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.001004-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.001004-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.001004-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

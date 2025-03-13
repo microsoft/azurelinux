@@ -9,8 +9,8 @@ diff -up jbigkit-2.1/libjbig/Makefile.ldflags jbigkit-2.1/libjbig/Makefile
 +	$(CC) $(CFLAGS) -o tstcodec $< -L. -ljbig $(LDFLAGS)
  
  tstcodec85: tstcodec85.o libjbig85.so
--	$(CC) $(CFLAGS) -o tstcodec85 $^ -L. -ljbig
-+	$(CC) $(CFLAGS) -o tstcodec85 $^ -L. -ljbig $(LDFLAGS)
+-	$(CC) $(CFLAGS) -o tstcodec85 $< -L. -ljbig85
++	$(CC) $(CFLAGS) -o tstcodec85 $< -L. -ljbig85 $(LDFLAGS)
  
  %.so: %.so.$(VERSION)
  	ln -sf $< $@

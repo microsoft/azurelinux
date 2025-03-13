@@ -2,18 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Linux UDF Filesystem userspace utilities
 Name: udftools
-Version: 2.1
-Release: 6%{?dist}
-License: GPLv2+
-URL: http://sourceforge.net/projects/linux-udf/
-#Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-Source: https://github.com/pali/udftools/releases/tag/%{version}/udftools-%{version}.tar.gz
-#old versions at Source: https://sourceforge.net/projects/linux-udf/files/%{name}/%{version}/%{name}-%{version}.tar.gz
-Source2: wrudf.1
+Version: 2.3
+Release: 10%{?dist}
+License: GPL-2.0-or-later
+URL: https://sourceforge.net/projects/linux-udf/
+Source: https://github.com/pali/udftools/releases/download/%{version}/udftools-%{version}.tar.gz
+Patch1: udftools-2.3-backported_fixes.patch
+BuildRequires: make
 BuildRequires: readline-devel, ncurses-devel
 BuildRequires: autoconf, automake, libtool, perl-Carp
 BuildRequires: udev
-BuildRequires: systemd-devel
 Requires: udev
 
 %description
@@ -21,24 +19,23 @@ Linux UDF Filesystem userspace utilities.
 
 
 %prep
-%setup
+%autosetup -p1
 
 %build
 #./bootstrap #not in the tarball anymore, lets use pregenerated autotools
 ##export CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing --std=gnu99"
 %configure
 %make_build
-##%{__make} %{?_smp_mflags}
+##%%{__make} %%{?_smp_mflags}
 
 %install
 %make_install
-#./libtool --finish %{buildroot}%{_libdir} #causes failure and is probably unneeded, we dont ship a library
-install -m 644 %{SOURCE2} %buildroot%{_mandir}/man1/
+#./libtool --finish %%{buildroot}%%{_libdir} #causes failure and is probably unneeded, we dont ship a library
 rm -rf %{buildroot}%{_bindir}/udffsck
 
 
 %files
-%doc AUTHORS ChangeLog
+%doc AUTHORS NEWS
 %license COPYING
 %{_bindir}/*
 %{_sbindir}/*
@@ -48,9 +45,47 @@ rm -rf %{buildroot}%{_bindir}/udffsck
 
 
 %changelog
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add dependency on systemd-devel for udev pkgconfig files
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.3-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 15 2021 Jiri Kucera <jkucera@redhat.com> - 2.3-2
+- wrudf: Fix parsing Volume Descriptor Sequence
+- wrudf: Exit on allocation failure
+
+* Wed Jun 09 2021 Jiri Kucera <jkucera@redhat.com> - 2.3-1
+- Update to 2.3
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Apr 20 2020 Filipe Rosset <rosset.filipe@gmail.com> - 2.2-1
+- Update to 2.2
+
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

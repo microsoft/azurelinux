@@ -61,7 +61,7 @@ index 83fcd564..3e3a7c88 100755
 +            return 1
          fi
 +        echo "$_mod" >> "${initdir}/etc/fipsmodules"
-+        echo "blacklist $_mod" >> "${initdir}/etc/modprobe.d/fips.conf"
++        echo "blacklist $_mod" >> "${initdir}/etc/fips.conf"
      done
  
      # with hostonly_default_device fs module for /boot is not installed by default

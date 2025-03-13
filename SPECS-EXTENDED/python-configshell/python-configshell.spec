@@ -4,10 +4,11 @@ Distribution:   Azure Linux
 %global oname configshell-fb
 
 Name:           python-configshell
-License:        ASL 2.0
+License:        Apache-2.0
 Summary:        A framework to implement simple but nice CLIs
-Version:        1.1.28
-Release:        3%{?dist}
+Epoch:          1
+Version:        1.1.30
+Release:        9%{?dist}
 URL:            https://github.com/open-iscsi/configshell-fb
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 BuildArch:      noarch
@@ -30,6 +31,8 @@ Requires:       python3-pyparsing python3-urwid
 %prep
 %setup -q -n %{oname}-%{version}
 
+sed -r -i "s/'pyparsing.*'/'pyparsing'/" setup.py
+
 %build
 %py3_build
 
@@ -41,13 +44,68 @@ Requires:       python3-pyparsing python3-urwid
 %doc COPYING README.md
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.1.28-3
-- Remove epoch
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.1.30-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.1.28-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.30-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Jul 10 2020 Maurizio Lombardi <mlombard@redhat.com> - 1:1.1.28-1
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1:1.1.30-7
+- Rebuilt for Python 3.13
+
+* Mon Feb 12 2024 Maurizio Lombardi <mlombard@redhat.com> - 1:1.1.30-6
+- Migrated to SPDX License
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.30-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.30-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.30-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1:1.1.30-2
+- Rebuilt for Python 3.12
+
+* Tue Jun 06 2023 Maurizio Lombardi <mlombard@redhat.com> - 1:1.1.30-1
+- Rebase to version v1.1.30
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.29-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Aug 03 2022 Vojtech Trefny <vtrefny@redhat.com> - 1:1.1.29-9
+- Python 3.11: replace getargspec() with getfullargspec()
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.29-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 19 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1:1.1.29-7
+- Rebuilt for pyparsing-3.0.9
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1:1.1.29-5
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.29-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.29-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1:1.1.29-2
+- Rebuilt for Python 3.10
+
+* Mon May 17 2021 Maurizio Lombardi <mlombard@redhat.com> - 1:1.1.29-1
+- Update to version 1.1.29
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.28-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.28-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jun 18 2020 Matt Coleman <matt@datto.com> - 1:1.1.28-1
 - New upstream version
 
 * Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1:1.1.fb25-9

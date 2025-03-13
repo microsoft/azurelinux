@@ -1,15 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           speexdsp
-Version:        1.2.0
-Release:        2%{?dist}
+Version:        1.2.1
+Release:        8%{?dist}
 Summary:        A voice compression format (DSP)
 
-License:        BSD
-URL:            http://www.speex.org/
-Source0:        http://downloads.xiph.org/releases/speex/%{name}-%{version}.tar.gz
+License:        BSD-3-Clause
+URL:            https://www.speex.org/
+Source0:        https://downloads.xiph.org/releases/speex/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  make
 # speexdsp was split from speex in 1.2rc2. As speexdsp does not depend on
 # speex, a versioned conflict is required.
 Conflicts: speex <= 1.2-0.21.rc1
@@ -59,18 +60,53 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %files
-%doc AUTHORS COPYING TODO ChangeLog README NEWS doc/manual.pdf
+%license COPYING
+%doc AUTHORS TODO ChangeLog README NEWS doc/manual.pdf
 %doc %{_docdir}/speexdsp/manual.pdf
-%{_libdir}/libspeexdsp.so.*
+%{_libdir}/libspeexdsp.so.1*
 
 %files devel
-%{_includedir}/speex
+%{_includedir}/speex/
 %{_libdir}/pkgconfig/speexdsp.pc
 %{_libdir}/libspeexdsp.so
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jan 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.2.1-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun  6 2023 Jaroslav Kysela <perex@perex.cz> - 1.2.1-4
+- SPDX license
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 07 2022 David King <amigadave@amigadave.com> - 1.2.1-1
+- Update to 1.2.1 (#2098129)
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jun 11 2020 David King <amigadave@amigadave.com> - 1.2.0-1
 - Update to 1.2.0

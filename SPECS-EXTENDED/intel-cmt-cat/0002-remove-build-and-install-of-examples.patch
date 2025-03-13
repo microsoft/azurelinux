@@ -1,0 +1,20 @@
+Description: Remove examples
+ No need to install these, developers are encouraged to look
+ at the code in the repository
+Forwarded: not-needed
+Author: Colin Ian King <colin.i.king@gmail.com>
+
+Index: intel-cmt-cat-24.05/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/Makefile
++++ intel-cmt-cat-24.05/Makefile
+@@ -55,9 +55,6 @@ all:
+ 	$(MAKE) -C pqos
+ 	$(MAKE) -C rdtset
+ 	$(MAKE) -C tools/membw
+-	$(MAKE) -C examples/c/CAT_MBA
+-	$(MAKE) -C examples/c/CMT_MBM
+-	$(MAKE) -C examples/c/PSEUDO_LOCK
+ 
+ setup-dev:
+ 	$(MAKE) -C appqos setup-dev
