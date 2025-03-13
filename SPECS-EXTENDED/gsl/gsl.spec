@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: The GNU Scientific Library for numerical analysis
 Name: gsl
-Version: 2.6
-Release: 3%{?dist}
-URL: http://www.gnu.org/software/gsl/
+Version: 2.8
+Release: 1%{?dist}
+URL: https://www.gnu.org/software/gsl/
 License: GPLv3+
-Source: http://ftp.gnu.org/gnu/gsl/%{name}-%{version}.tar.gz
+Source: https://ftp.gnu.org/gnu/gsl/%{name}-%{version}.tar.gz
 Patch0: gsl-1.10-lib64.patch
 # http://lists.gnu.org/archive/html/bug-gsl/2015-12/msg00012.html
 Patch1: gsl-tol.patch
@@ -65,7 +65,7 @@ rm -r %{buildroot}%{_libdir}/*.a
 %doc AUTHORS ChangeLog NEWS README THANKS TODO
 %{_bindir}/gsl-histogram
 %{_bindir}/gsl-randist
-%{_libdir}/libgsl.so.25*
+%{_libdir}/libgsl.so.28*
 %{_libdir}/libgslcblas.so.0*
 %{_mandir}/man1/gsl-histogram.1*
 %{_mandir}/man1/gsl-randist.1*
@@ -82,6 +82,10 @@ rm -r %{buildroot}%{_libdir}/*.a
 %{_includedir}/gsl/
 
 %changelog
+* Tue Oct 15 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.8-1
+- Upgrade for azurelinux 3.0
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

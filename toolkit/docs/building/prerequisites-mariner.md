@@ -7,36 +7,10 @@ This page lists host machine requirements for building with the Azure Linux tool
 
 ```bash
 # Install required dependencies.
-# Recommended but not required: `pigz` for faster compression operations.
-sudo tdnf -y install \
-    acl \
-    binutils \
-    cdrkit \
-    curl \
-    diffutils \
-    dosfstools \
-    gawk \
-    glibc-devel \
-    genisoimage \
-    git \
-    golang \
-    jq \
-    kernel-headers \
-    make \
-    moby-cli \
-    moby-engine \
-    openssl \
-    parted \
-    pigz \
-    qemu-img \
-    rpm \
-    rpm-build \
-    sudo \
-    systemd \
-    tar \
-    wget \
-    xfsprogs \
-    zstd
+sudo ./toolkit/docs/building/prerequisites-mariner.sh
+
+# Also supported is:
+#    make -C toolkit install-prereqs
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service

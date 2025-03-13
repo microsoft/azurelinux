@@ -6,29 +6,17 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf
-Version:        4.2.15
-Release:        13%{?dist}
+Version:        4.3.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/
-Source0:        https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/HDFGroup/%{name}4/archive/refs/tags/%{name}%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        h4comp
-Patch1:         hdf-ppc.patch
-Patch2:         hdf-4.2.4-sparc.patch
-Patch3:         hdf-s390.patch
-Patch4:         hdf-arm.patch
-# Support DESTDIR in install-examples
-Patch5:         hdf-destdir.patch
-# Install examples into the right location
-Patch6:         hdf-examplesdir.patch
-# Add AArch64 definitions
-Patch8:         hdf-aarch64.patch
-# ppc64le support
-# https://bugzilla.redhat.com/show_bug.cgi?id=1134385
-Patch9:         hdf-ppc64le.patch
 # Fix java build
-Patch11:        hdf-build.patch
+Patch1:         hdf-build.patch
+
 BuildRequires:  %{!?el6:libaec-devel}
 # For destdir/examplesdir patches
 BuildRequires:  automake
@@ -46,13 +34,13 @@ BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  slf4j
 BuildRequires:  zlib-devel
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %if %{with java}
 BuildRequires:  java-devel
 BuildRequires:  javapackages-tools
 %else
 Obsoletes:      java-hdf < %{version}-%{release}
 %endif
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 HDF4 is a general purpose library and file format for storing scientific data.
@@ -99,7 +87,7 @@ HDF4 java library
 
 
 %prep
-%autosetup -p1 -S gendiff
+%autosetup -p1 -S gendiff -n %{name}4-%{name}%{version}
 
 %if %{with java}
 # Replace jars with system versions
@@ -118,10 +106,6 @@ ln -s %{_javadir}/slf4j/simple.jar java/lib/ext/slf4j-simple-1.7.25.jar
 
 find . -type f -name "*.h" -exec chmod 0644 '{}' \;
 find . -type f -name "*.c" -exec chmod 0644 '{}' \;
-
-# restore include file timestamps modified by patching
-touch -c -r ./hdf/src/hdfi.h.1 ./hdf/src/hdfi.h
-
 
 %build
 
@@ -170,8 +154,6 @@ touch -c -r mfhdf/fortran/mffunc.inc mfhdf/fortran/mffunc.f90
 %make_install -C build-shared
 chrpath --delete --keepgoing %{buildroot}%{_bindir}/* %{buildroot}%{_libdir}/%{name}/*.so.* %{buildroot}%{_libdir}/*.so.* || :
 
-install -pm 644 MANIFEST README.txt release_notes/*.txt %{buildroot}%{_pkgdocdir}/
-
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -183,7 +165,7 @@ for file in ncdump ncgen; do
 done
 
 # this is done to have the same timestamp on multiarch setups
-touch -c -r README.txt %{buildroot}%{_includedir}/hdf/h4config.h
+touch -c -r README.md %{buildroot}%{_includedir}/hdf/h4config.h
 
 # Remove an autoconf conditional from the API that is unused and cause
 # the API to be different on x86 and x86_64
@@ -224,19 +206,17 @@ make -j1 -C build-static check
 
 %files
 %license COPYING
-%{_pkgdocdir}/
-%exclude %{_pkgdocdir}/examples
+%doc README.md release_notes/*.txt
 %{_bindir}/*
 %exclude %{_bindir}/h4?c*
 %{_libdir}/*.so.0*
-%{_mandir}/man1/*.gz
 
 %files devel
 %{_bindir}/h4?c*
 %{_includedir}/%{name}/
 %{_libdir}/*.so
 %{_libdir}/*.settings
-%{_pkgdocdir}/examples/
+%doc HDF4Examples
 
 %files libs
 %{_libdir}/*.so.0*
@@ -252,6 +232,10 @@ make -j1 -C build-static check
 
 
 %changelog
+* Mon Oct 28 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 4.3.0-1
+- Upgrade to 4.3.0
+- License verified.
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 4.2.15-13
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

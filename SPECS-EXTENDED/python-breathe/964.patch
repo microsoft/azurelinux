@@ -1,0 +1,25 @@
+From e487d63ca45304fc9e4c0b27de163302aa91ed35 Mon Sep 17 00:00:00 2001
+From: Scott Main <scottamain@gmail.com>
+Date: Fri, 8 Dec 2023 10:41:12 -0800
+Subject: [PATCH] Fix PosixPath issue with Sphinx 7.2
+
+Just need to cast the path to a string.
+
+Fixes https://github.com/breathe-doc/breathe/issues/944
+---
+ breathe/project.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/breathe/project.py b/breathe/project.py
+index 865236e8..f5b780a4 100644
+--- a/breathe/project.py
++++ b/breathe/project.py
+@@ -113,7 +113,7 @@ def __init__(self, app: Sphinx):
+         # Assume general build directory is the doctree directory without the last component.
+         # We strip off any trailing slashes so that dirname correctly drops the last part.
+         # This can be overridden with the breathe_build_directory config variable
+-        self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
++        self._default_build_dir = os.path.dirname(str(app.doctreedir).rstrip(os.sep))
+         self.project_count = 0
+         self.project_info_store: Dict[str, ProjectInfo] = {}
+         self.project_info_for_auto_store: Dict[str, AutoProjectInfo] = {}
