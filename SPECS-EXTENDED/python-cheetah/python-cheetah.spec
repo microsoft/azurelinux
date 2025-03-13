@@ -1,109 +1,144 @@
-%bcond_with python2
-
 Name:           python-cheetah
-Version:        3.2.4
-Release:        4%{?dist}
+Version:        3.2.6.post1
+Release:        12%{?dist}
 Summary:        Template engine and code generator
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://cheetahtemplate.org/
-Source:         https://github.com/CheetahTemplate3/cheetah3/archive/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  gcc
+Source:         https://github.com/CheetahTemplate3/cheetah3/archive/%{version}/Cheetah3-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-%global _description\
-Cheetah is an open source template engine and code generation tool,\
-written in Python. It can be used standalone or combined with other\
-tools and frameworks. Web development is its principal use, but\
-Cheetah is very flexible and is also being used to generate C++ code,\
-Java, SQL, form emails and even Python code.
+# Instead of playing Whac-A-Mole and adding more and more basepythons,
+# e.g. in https://github.com/CheetahTemplate3/cheetah3/commit/6be6bc10a4,
+# we let tox do the right thing by not setting any:
+Patch:          tox-no-basepython.patch
+Patch1:         cheetah3-3.2.6.post1-protect-cgi.patch
+Patch2:         cheetah3-3.2.6.post1-loadTestsFromModule.patch
+Patch3:         cheetah3-3.2.6.post1-typeerror.patch
+Patch4:         cheetah3-3.2.6.post1-framelocalsproxy.patch
+Patch5:         cheetah3-3.2.6.post1-parse_qs.patch
+
+BuildRequires:  gcc
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+
+# for tests
+%if 0%{?with_check}
+BuildRequires:  python3-tox
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-py
+BuildRequires:  python3-filelock
+BuildRequires:  python3-toml
+BuildRequires:  python3-six
+BuildRequires:  python3-tox-current-env
+%endif
+
+%global _description %{expand:
+Cheetah3 is a free and open source template engine and code generation tool.
+It can be used standalone or combined with other tools and frameworks.  Web
+development is its principle use, but Cheetah is very flexible and is also
+being used to generate C++ game code, Java, SQL, form emails and even Python
+code.}
 
 %description %{_description}
 
-%if %{with python2}
-%package -n python2-cheetah
-Summary: %summary
-%{?python_provide:%python_provide python2-cheetah}
-
-BuildRequires: python2-devel
-BuildRequires: python2-setuptools
-
-
-BuildRequires: python2-pygments
-
-%description -n python2-cheetah %_description
-
-%endif
-
 %package -n python3-cheetah
-Summary: %summary
-%{?python_provide:%python_provide python3-cheetah}
+Summary:        %{summary}
 
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-BuildRequires: python3-markdown
-BuildRequires: python3-pygments
-
-%description -n python3-cheetah %_description
-
+%description -n python3-cheetah %{_description}
 
 %prep
 %autosetup -p1 -n cheetah3-%{version}
 
+# remove upper bound on markdown test dependency
+sed -e 's|, < 3.2||' -i tox.ini
+
 # remove unnecessary shebang lines to silence rpmlint
-%{__sed} -i -e '/^#!/,1d' Cheetah/Tests/*.py \
-    Cheetah/CheetahWrapper.py Cheetah/DirectiveAnalyzer.py \
-    Cheetah/Filters.py Cheetah/NameMapper.py Cheetah/Servlet.py \
-    Cheetah/Templates/SkeletonPage.py Cheetah/Tools/SiteHierarchy.py \
-    Cheetah/Version.py
+find Cheetah -type f -name '*.py' -print0 | xargs -0 sed -i -e '1 {/^#!/d}'
+
+%generate_buildrequires
+%pyproject_buildrequires -t
 
 %build
-%if %{with python2}
-%py2_build
-%endif
-
-%py3_build
+%pyproject_wheel
 
 %install
-%if %{with python2}
-%py2_install
-
-EGG_INFO=(%{buildroot}/%{python2_sitearch}/Cheetah*.egg-info)
-cp -r $EGG_INFO ${EGG_INFO//Cheetah3/Cheetah}
-sed -i "s/Name: Cheetah3/Name: Cheetah/" ${EGG_INFO//Cheetah3/Cheetah}/PKG-INFO
-rm %{buildroot}%{_bindir}/*
-%endif
-
-%py3_install
-
+%pyproject_install
+%pyproject_save_files Cheetah
 
 %check
-export PATH="%{buildroot}/%{_bindir}:$PATH"
-export PYTHONPATH="%{buildroot}/%{python3_sitearch}"
-%{buildroot}/%{_bindir}/cheetah test
+# changing this in %%prep would cause an rpmlint error (rpm-buildroot-usage),
+# so do it here instead
+sed -e 's|{envsitepackagesdir}|%{buildroot}%{python3_sitearch}|' -i tox.ini
+%tox
 
-%if %{with python2}
-%files -n python2-cheetah
-%license LICENSE
+%files -n python3-cheetah -f %{pyproject_files}
 %doc ANNOUNCE.rst README.rst TODO BUGS
-
-%{python2_sitearch}/Cheetah
-%{python2_sitearch}/Cheetah*.egg-info
-%endif
-
-%files -n python3-cheetah
-%license LICENSE
-%doc ANNOUNCE.rst README.rst TODO BUGS
-
 %{_bindir}/cheetah*
 
-%{python3_sitearch}/Cheetah
-%{python3_sitearch}/Cheetah*.egg-info
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.4-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Feb 13 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.2.6.post1-12
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+- Added additional dependencies for successful build and test
+
+* Wed Oct 30 2024 Mike Bonnet <mikeb@redhat.com> - 3.2.6.post1-11
+- Backport fix from upstream to support Python 3.13+ (protect import of cgi module)
+- Backport fix for running tests under Python 3.13+ (use unittest.defaultTestLoader.loadTestsFromModule)
+- Backport fix that silences a TypeError
+- Backport fix for a mapping test
+- Backport fix to remove use of dropped cgi module
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.2.6.post1-9
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 3.2.6.post1-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.6.post1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.2.6.post1-2
+- Rebuilt for Python 3.11
+
+* Thu Apr 07 2022 Carl George <carl@george.computer> - 3.2.6.post1-1
+- Update to 3.2.6.post1
+- Convert to pyproject macros
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.4-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.2.4-7
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 3.2.4-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

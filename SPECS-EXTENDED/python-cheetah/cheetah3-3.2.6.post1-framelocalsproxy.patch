@@ -1,0 +1,43 @@
+diff -ur cheetah3-3.2.6.post1.orig/Cheetah/NameMapper.py cheetah3-3.2.6.post1/Cheetah/NameMapper.py
+--- cheetah3-3.2.6.post1.orig/Cheetah/NameMapper.py	2024-10-30 14:53:31.879049340 -0700
++++ cheetah3-3.2.6.post1/Cheetah/NameMapper.py	2024-10-30 14:54:48.896711953 -0700
+@@ -140,6 +140,7 @@
+ """
+ 
+ import inspect
++import sys
+ from pprint import pformat
+ 
+ from Cheetah.compat import PY2
+@@ -147,6 +148,8 @@
+     from collections import Mapping
+ else:
+     from collections.abc import Mapping
++    if sys.version_info[:2] >= (3, 13):
++        from collections.abc import MutableMapping
+ 
+ _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
+ _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True
+@@ -315,6 +318,10 @@
+         try:
+             if not frame:
+                 frame = inspect.stack()[1][0]
++            if sys.version_info[:2] >= (3, 13):
++                FrameLocalsProxy = frame.f_locals
++                if not isinstance(FrameLocalsProxy, Mapping):
++                    MutableMapping.register(type(FrameLocalsProxy))
+             key = name.split('.')[0]
+             for namespace in _namespaces(frame, searchList):
+                 if hasKey(namespace, key):
+diff -ur cheetah3-3.2.6.post1.orig/docs/news.rst cheetah3-3.2.6.post1/docs/news.rst
+--- cheetah3-3.2.6.post1.orig/docs/news.rst	2024-10-30 14:53:31.872049370 -0700
++++ cheetah3-3.2.6.post1/docs/news.rst	2024-10-30 14:54:36.807764910 -0700
+@@ -11,6 +11,8 @@
+    - Fixed ``_namemapper.c``: Silent an inadvertent ``TypeError`` exception
+      in ``PyMapping_HasKeyString`` under Python 3.13+
+      caused by ``_namemapper`` looking up a key in a non-dictionary.
++   - Fixed mapping test in ``NameMapper.py``:
++     Python 3.13 brough a new mapping type ``FrameLocalsProxy``.
+ 
+ 3.2.6.post1 (2021-02-22)
+ ------------------------
