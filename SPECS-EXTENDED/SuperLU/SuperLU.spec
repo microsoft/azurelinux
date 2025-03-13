@@ -1,7 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global genname superlu
-%global libver 5
 
 ## The RPM macro for the linker flags does not exist on EPEL
 %if 0%{?rhel} && 0%{?rhel} < 7
@@ -9,26 +8,31 @@ Distribution:   Azure Linux
 %endif
 
 Name:			SuperLU
-Version:		5.2.1
-Release:		10%{?dist}
+Version:		7.0.0
+Release:		1%{?dist}
 Summary:		Subroutines to solve sparse linear systems
-License:		BSD and GPLv2+
+License:		BSD-2-Clause AND GPL-2.0-or-later
 URL:			http://crd-legacy.lbl.gov/~xiaoye/SuperLU/
-Source0:		http://crd-legacy.lbl.gov/~xiaoye/SuperLU/%{genname}_%{version}.tar.gz#/%{genname}-%{version}.tar.gz
-Patch0:			%{genname}-cmake-includedir.patch
-Patch1:			%{genname}-removemc64.patch
 
-# Patch soname (5 -> 5.2) of shared library
-Patch2:                 %{name}-%{version}-set_soname.patch
+Source0:		https://github.com/xiaoyeli/%{genname}/archive/refs/tags/v%{version}.tar.gz#/%{genname}-%{version}.tar.gz
 
-BuildRequires:    openblas-devel, openblas-srpm-macros
-BuildRequires:		gcc
+# Use a pre-made configuration file for Make
+Source1:      %{name}-fedora-make.inc.in
+Patch0:	      %{genname}-removemc64.patch
+
+# Fix ldflags of example files
+Patch1:       %{name}-fix_example_builds.patch
+
+BuildRequires:  openblas-devel, openblas-srpm-macros
+BuildRequires:  metis-devel
+BuildRequires:	gcc
 %if 0%{?rhel}
-BuildRequires:          epel-rpm-macros
+BuildRequires:  epel-rpm-macros
 %endif
-BuildRequires:          cmake3
-BuildRequires:		gcc-gfortran
-BuildRequires:		csh
+BuildRequires:  make
+BuildRequires:  cmake
+BuildRequires:	gcc-gfortran
+BuildRequires:	csh
 
 %description
 SuperLU contains a set of subroutines to solve a sparse linear system 
@@ -53,10 +57,17 @@ The %{name}-doc package contains all the help documentation along with C
 and FORTRAN examples.
 
 %prep
-%autosetup -n %{name}_%{version} -p1
+%autosetup -n %{genname}-%{version} -p1
+
+rm -f make.inc
+cp -pf %{SOURCE1} make.inc.in
+
+# Remove bundled BLAS
+rm -rf CBLAS
 
 rm -fr SRC/mc64ad.f.bak
 find . -type f | sed -e "/TESTING/d" | xargs chmod a-x
+
 # Remove the shippped executables from EXAMPLE
 find EXAMPLE -type f | while read file
 do
@@ -64,38 +75,50 @@ do
 done
 
 # Change optimization level
-sed -i.bak '/NOOPTS/d' make.inc.in
 sed -e 's|-O0|-O2|g' -i SRC/CMakeLists.txt
 
 %build
-mkdir -p build; cd build
-
-# Do not use bundled CBLAS code
-%cmake3 -Denable_blaslib:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING=Release ..
-%make_build
+%cmake \
+   -Denable_internal_blaslib:BOOL=NO \
+   -DXSDK_ENABLE_Fortran:BOOL=OFF \
+   -DCMAKE_Fortran_FLAGS_RELEASE:STRING="%{__global_fflags}" \
+   -DTPL_BLAS_LIBRARIES="`pkg-config --libs flexiblas`" \
+   -DTPL_ENABLE_METISLIB:BOOL=ON \
+   -DTPL_METIS_INCLUDE_DIRS:PATH=%{_includedir} \
+   -DTPL_METIS_LIBRARIES:FILEPATH=%{_libdir}/libmetis.so \
+   -DCMAKE_BUILD_TYPE:STRING=Release \
+   -DCMAKE_INSTALL_INCLUDEDIR:PATH=include/%{name} \
+   -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
+   -DCMAKE_SKIP_RPATH:BOOL=YES -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES
+%cmake_build
 
 %install
-%make_install -C build
+%cmake_install
 
 %check
-pushd build
-ctest3 -V %{?_smp_mflags}
-popd
-
-%ldconfig_scriptlets
+export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:MATGEN
+%ctest
 
 %files
 %license License.txt
-%{_libdir}/libsuperlu.so.%{libver}*
+%{_libdir}/libsuperlu.so.7
+%{_libdir}/libsuperlu.so.%{version}
 
 %files devel
-%{_includedir}/%{name}/
+%{_includedir}/
 %{_libdir}/libsuperlu.so
+%{_libdir}/cmake/%{genname}/
+%{_libdir}/pkgconfig/%{genname}.pc
 
 %files doc
+%license License.txt
 %doc DOC EXAMPLE FORTRAN
 
 %changelog
+* Tue Oct 15 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 7.0.0-1
+- Update to 7.0.0
+-License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-10
 - Removing unused BR on "atlas".
 

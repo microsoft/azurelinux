@@ -1,0 +1,31 @@
+From 033b00e94741550ef3ef087d9903742ac881a7ba Mon Sep 17 00:00:00 2001
+From: Robert Scheck <robert@fedoraproject.org>
+Date: Thu, 9 Dec 2021 03:10:51 +0100
+Subject: [PATCH] Unbreak builds with parallel make at manifypods-razor
+
+The 'manifypods-razor' target depends on INST_MAN5DIR which gets
+created by the 'config' target. Without this, there may problems
+building with parallel make. See also:
+
+ - https://sourceforge.net/p/razor/bugs/67/
+ - https://bugzilla.redhat.com/show_bug.cgi?id=1379566
+
+Original author: Klaus Heinz <https://sourceforge.net/u/kheinz/>
+---
+ Makefile.PL | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 833d1dc..bcfbee3 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -131,7 +131,8 @@ MAKE_FRAG
+ # begin razor-agents
+ %s
+ 
+-manifypods-razor : docs/razor-agent.conf.pod \
++manifypods-razor : config \
++	docs/razor-agent.conf.pod \
+ 	docs/razor-agents.pod                \
+ 	docs/razor-whitelist.pod
+ 	$(POD2MAN) \
