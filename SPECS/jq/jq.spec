@@ -1,12 +1,13 @@
 Summary:        jq is a lightweight and flexible command-line JSON processor.
 Name:           jq
 Version:        1.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 License:        MIT
 URL:            https://jqlang.github.io/jq/
 Source0:        https://github.com/jqlang/jq/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-53427.patch
 Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -29,7 +30,7 @@ Requires:   %{name} = %{version}-%{release}
 Development files for jq
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -59,6 +60,9 @@ make check
 %{_includedir}/*
 
 %changelog
+* Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.1-2
+- Patch CVE-2024-53427
+
 * Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.7.1-1
 - Upgrade to version 1.7.1
 
