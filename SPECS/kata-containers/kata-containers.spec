@@ -67,6 +67,7 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 
