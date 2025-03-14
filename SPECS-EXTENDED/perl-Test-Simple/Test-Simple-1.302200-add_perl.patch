@@ -1,0 +1,629 @@
+--- Test-Simple-1.302200/t/acceptance/Workflow-Acceptance.t
++++ Test-Simple-1.302200/t/acceptance/Workflow-Acceptance.t
+@@ -172,7 +172,7 @@ is(
+             call effective_pass => 1;
+ 
+             prop file => match qr{\QAcceptance.t\E$};
+-            prop line => 77;
++            prop line => 78;
+ 
+             call subevents => array {
+                 event Ok => sub {
+@@ -181,7 +181,7 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 12;
++                    prop line => 13;
+                 };
+ 
+                 event Ok => sub {
+@@ -190,7 +190,7 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 16;
++                    prop line => 17;
+                 };
+ 
+                 event Subtest => sub {
+@@ -199,7 +199,7 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 34;
++                    prop line => 35;
+ 
+                     call subevents => array {
+                         event Ok => sub {
+@@ -208,7 +208,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 37;
++                            prop line => 38;
+                         };
+ 
+                         event Ok => sub {
+@@ -217,7 +217,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 40;
++                            prop line => 41;
+                         };
+ 
+                         event Ok => sub {
+@@ -226,7 +226,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 34;
++                            prop line => 35;
+                         };
+ 
+                         event Skip => sub {
+@@ -236,7 +236,7 @@ is(
+                             call reason         => 'No isolation method available';
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 48;
++                            prop line => 49;
+                         };
+ 
+                         event Subtest => sub {
+@@ -245,7 +245,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 52;
++                            prop line => 53;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -254,7 +254,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -263,7 +263,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -272,7 +272,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 51;
++                                    prop line => 52;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -281,7 +281,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -290,14 +290,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 52;
++                                    prop line => 53;
+                                 };
+                                 end();
+                             };
+@@ -309,7 +309,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 57;
++                            prop line => 58;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -318,7 +318,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -327,7 +327,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -337,14 +337,14 @@ is(
+                                     call todo           => 'foo todo';
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 56;
++                                    prop line => 57;
+                                 };
+ 
+                                 event Note => sub {
+                                     call message => match qr{^\n?Failed test};
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 56;
++                                    prop line => 57;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -353,7 +353,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -362,14 +362,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 57;
++                                    prop line => 58;
+                                 };
+                                 end();
+                             };
+@@ -381,7 +381,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 61;
++                            prop line => 62;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -390,7 +390,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -399,7 +399,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -408,14 +408,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 60;
++                                    prop line => 61;
+                                 };
+ 
+                                 event Note => sub {
+                                     call message => match qr{^\n?Failed test};
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 60;
++                                    prop line => 61;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -424,7 +424,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -433,14 +433,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 61;
++                                    prop line => 62;
+                                 };
+                                 end();
+                             };
+@@ -462,7 +462,7 @@ is(
+                             call reason         => 'No isolation method available';
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 76;
++                            prop line => 77;
+                         };
+ 
+                         event Ok => sub {
+@@ -471,7 +471,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 42;
++                            prop line => 43;
+                         };
+ 
+                         event Ok => sub {
+@@ -480,14 +480,14 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 44;
++                            prop line => 45;
+                         };
+ 
+                         event Plan => sub {
+                             call max => 11;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 34;
++                            prop line => 35;
+                         };
+                         end();
+                     };
+@@ -499,7 +499,7 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 35;
++                    prop line => 36;
+ 
+                     call subevents => array {
+                         event Ok => sub {
+@@ -508,7 +508,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 37;
++                            prop line => 38;
+                         };
+ 
+                         event Ok => sub {
+@@ -517,7 +517,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 40;
++                            prop line => 41;
+                         };
+ 
+                         event Ok => sub {
+@@ -526,7 +526,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 35;
++                            prop line => 36;
+                         };
+ 
+                         event Skip => sub {
+@@ -536,7 +536,7 @@ is(
+                             call reason         => 'No isolation method available';
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 48;
++                            prop line => 49;
+                         };
+ 
+                         event Subtest => sub {
+@@ -545,7 +545,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 52;
++                            prop line => 53;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -554,7 +554,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -563,7 +563,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -572,7 +572,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 51;
++                                    prop line => 52;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -581,7 +581,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -590,14 +590,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 52;
++                                    prop line => 53;
+                                 };
+                                 end();
+                             };
+@@ -609,7 +609,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 57;
++                            prop line => 58;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -618,7 +618,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -627,7 +627,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -637,14 +637,14 @@ is(
+                                     call todo           => 'foo todo';
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 56;
++                                    prop line => 57;
+                                 };
+ 
+                                 event Note => sub {
+                                     call message => match qr{^\n?Failed test};
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 56;
++                                    prop line => 57;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -653,7 +653,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -662,14 +662,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 57;
++                                    prop line => 58;
+                                 };
+                                 end();
+                             };
+@@ -681,7 +681,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 61;
++                            prop line => 62;
+ 
+                             call subevents => array {
+                                 event Ok => sub {
+@@ -690,7 +690,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 23;
++                                    prop line => 24;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -699,7 +699,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 27;
++                                    prop line => 28;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -708,14 +708,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 60;
++                                    prop line => 61;
+                                 };
+ 
+                                 event Note => sub {
+                                     call message => match qr{^\n?Failed test};
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 60;
++                                    prop line => 61;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -724,7 +724,7 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 29;
++                                    prop line => 30;
+                                 };
+ 
+                                 event Ok => sub {
+@@ -733,14 +733,14 @@ is(
+                                     call effective_pass => 1;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 32;
++                                    prop line => 33;
+                                 };
+ 
+                                 event Plan => sub {
+                                     call max => 5;
+ 
+                                     prop file => match qr{\QAcceptance.t\E$};
+-                                    prop line => 61;
++                                    prop line => 62;
+                                 };
+                                 end();
+                             };
+@@ -762,7 +762,7 @@ is(
+                             call reason         => 'No isolation method available';
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 76;
++                            prop line => 77;
+                         };
+ 
+                         event Ok => sub {
+@@ -771,7 +771,7 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 42;
++                            prop line => 43;
+                         };
+ 
+                         event Ok => sub {
+@@ -780,14 +780,14 @@ is(
+                             call effective_pass => 1;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 44;
++                            prop line => 45;
+                         };
+ 
+                         event Plan => sub {
+                             call max => 11;
+ 
+                             prop file => match qr{\QAcceptance.t\E$};
+-                            prop line => 35;
++                            prop line => 36;
+                         };
+                         end();
+                     };
+@@ -799,7 +799,7 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 18;
++                    prop line => 19;
+                 };
+ 
+                 event Ok => sub {
+@@ -808,14 +808,14 @@ is(
+                     call effective_pass => 1;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 21;
++                    prop line => 22;
+                 };
+ 
+                 event Plan => sub {
+                     call max => 6;
+ 
+                     prop file => match qr{\QAcceptance.t\E$};
+-                    prop line => 77;
++                    prop line => 78;
+                 };
+                 end();
+             };
+--- Test-Simple-1.302200/t/Legacy_And_Test2/diag_event_on_ok.t
++++ Test-Simple-1.302200/t/Legacy_And_Test2/diag_event_on_ok.t
+@@ -17,6 +17,6 @@ is($ok->pass, 0, "'ok' test failed");
+ is($ok->name, 'name', "got 'ok' name");
+ 
+ ok($diag->isa('Test2::Event::Diag'), "got 'ok' result");
+-is($diag->message, "  Failed test 'name'\n  at $0 line 9.\n", "got all diag message in one diag event");
++is($diag->message, "  Failed test 'name'\n  at $0 line 10.\n", "got all diag message in one diag event");
+ 
+ done_testing;
