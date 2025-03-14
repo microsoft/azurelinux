@@ -11,7 +11,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/microsoft/azure-linux-image-tools
 Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v%{version}.tar.gz#/azure-linux-image-tools-%{version}.tar.gz
 BuildArch: x86_64
-#BuildRequires: golang >= 1.21
+BuildRequires: golang >= 1.21
 Requires: qemu-img
 Requires: rpm
 Requires: coreutils
