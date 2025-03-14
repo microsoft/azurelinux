@@ -1,0 +1,42 @@
+From 55f272ee9373f6effd49a87a2a329ab758b67896 Mon Sep 17 00:00:00 2001
+From: Scott Mayhew <smayhew@redhat.com>
+Date: Wed, 16 Oct 2024 10:29:27 -0700
+Subject: [PATCH 099/124] kunit: bail out early in __kunit_test_suites_init()
+ if there are no suites to test
+
+Commit c72a870926c2 added a mutex to prevent kunit tests from running
+concurrently.  Unfortunately that mutex gets locked during module load
+regardless of whether the module actually has any kunit tests.  This
+causes a problem for kunit tests that might need to load other kernel
+modules (e.g. gss_krb5_test loading the camellia module).
+
+So check to see if there are actually any tests to run before locking
+the kunit_run_lock mutex.
+
+Fixes: c72a870926c2 ("kunit: add ability to run tests after boot using debugfs")
+Reported-by: Nico Pache <npache@redhat.com>
+Signed-off-by: Scott Mayhew <smayhew@redhat.com>
+Reviewed-by: Rae Moar <rmoar@google.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/test.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index 3239d2aefa39..229a599409f7 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -706,6 +706,9 @@ int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_
+ {
+ 	unsigned int i;
+ 
++	if (num_suites == 0)
++		return 0;
++
+ 	if (!kunit_enabled() && num_suites > 0) {
+ 		pr_info("kunit: disabled\n");
+ 		return 0;
+-- 
+2.43.0
+

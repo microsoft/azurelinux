@@ -1,0 +1,29 @@
+From 5b425e1795b210a401d8d72efc8e8fe9317b4252 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Wed, 20 Nov 2024 13:50:43 +0000
+Subject: [PATCH 066/124] arch: x86: xen: enlighten_pv: Fix compile error
+
+Since lvbs disables static calls, code that does boot time text patching
+fails to compile. Fix this error. This can be reverted once static calls
+are supported with LVBS.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/xen/enlighten_pv.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
+index 3df7c96e7388..31c4e2e4691d 100644
+--- a/arch/x86/xen/enlighten_pv.c
++++ b/arch/x86/xen/enlighten_pv.c
+@@ -72,6 +72,7 @@
+ #include <asm/mwait.h>
+ #include <asm/pci_x86.h>
+ #include <asm/cpu.h>
++#include <asm/text-patching.h>
+ #ifdef CONFIG_X86_IOPL_IOPERM
+ #include <asm/io_bitmap.h>
+ #endif
+-- 
+2.43.0
+

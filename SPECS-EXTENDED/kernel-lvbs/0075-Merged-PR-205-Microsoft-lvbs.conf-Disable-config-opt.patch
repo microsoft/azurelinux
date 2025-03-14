@@ -1,0 +1,34 @@
+From d0bbe74bad8d294240e5c5898d0f625f6d131976 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 20 Dec 2024 21:23:33 +0000
+Subject: [PATCH 075/124] Merged PR 205: Microsoft:lvbs.conf: Disable config
+ options to ensure struct module has same...
+
+Disable CONFIG_DEBUG_INFO_BTF_MODULES and  CONFIG_DYNAMIC_DEBUG_CORE in
+vtl0 config so that struct module size is the same between vtl0 and vtl1
+kernels. Without this module authentication fails. Another way to fix this
+issue is to enable these config options in VTL1. That leads to an increase
+in VTL1 size.  For the experimental image it is okay to have these options
+disabled. If absolutely needed, after discussion with AzLinux team, we can
+reenable these options in both vtl0 and vtl1 config files.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ Microsoft/lvbs.config | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Microsoft/lvbs.config b/Microsoft/lvbs.config
+index b17c7e539b2b..9e606306c0e2 100644
+--- a/Microsoft/lvbs.config
++++ b/Microsoft/lvbs.config
+@@ -1,4 +1,7 @@
+ CONFIG_LOCALVERSION="-lvbs"
+ CONFIG_LOCALVERSION_AUTO=n
++CONFIG_DEBUG_INFO_BTF_MODULES=n
++CONFIG_DYNAMIC_DEBUG=n
++CONFIG_DYNAMIC_DEBUG_CORE=n
+ CONFIG_HEKI=y
+ CONFIG_HYPERV_VSM=y
+-- 
+2.43.0
+

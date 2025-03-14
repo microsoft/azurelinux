@@ -1,0 +1,83 @@
+From 879f09fa873c3eaeeb9abe1df786b7ef41cc71ab Mon Sep 17 00:00:00 2001
+From: Rae Moar <rmoar@google.com>
+Date: Wed, 16 Oct 2024 10:33:26 -0700
+Subject: [PATCH 100/124] Documentation: Add debugfs docs with run after boot
+
+Expand the documentation on the KUnit debugfs filesystem on the
+run_manual.rst page.
+
+Add section describing how to access results using debugfs.
+
+Add section describing how to run tests after boot using debugfs.
+
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Rae Moar <rmoar@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ Documentation/dev-tools/kunit/run_manual.rst | 51 ++++++++++++++++++--
+ 1 file changed, 47 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/dev-tools/kunit/run_manual.rst b/Documentation/dev-tools/kunit/run_manual.rst
+index e7b46421f247..699d92885075 100644
+--- a/Documentation/dev-tools/kunit/run_manual.rst
++++ b/Documentation/dev-tools/kunit/run_manual.rst
+@@ -49,9 +49,52 @@ loaded.
+ 
+ The results will appear in TAP format in ``dmesg``.
+ 
++debugfs
++=======
++
++KUnit can be accessed from userspace via the debugfs filesystem (See more
++information about debugfs at Documentation/filesystems/debugfs.rst).
++
++If ``CONFIG_KUNIT_DEBUGFS`` is enabled, the KUnit debugfs filesystem is
++mounted at /sys/kernel/debug/kunit. You can use this filesystem to perform
++the following actions.
++
++Retrieve Test Results
++=====================
++
++You can use debugfs to retrieve KUnit test results. The test results are
++accessible from the debugfs filesystem in the following read-only file:
++
++.. code-block :: bash
++
++	/sys/kernel/debug/kunit/<test_suite>/results
++
++The test results are printed in a KTAP document. Note this document is separate
++to the kernel log and thus, may have different test suite numbering.
++
++Run Tests After Kernel Has Booted
++=================================
++
++You can use the debugfs filesystem to trigger built-in tests to run after
++boot. To run the test suite, you can use the following command to write to
++the ``/sys/kernel/debug/kunit/<test_suite>/run`` file:
++
++.. code-block :: bash
++
++	echo "any string" > /sys/kernel/debugfs/kunit/<test_suite>/run
++
++As a result, the test suite runs and the results are printed to the kernel
++log.
++
++However, this feature is not available with KUnit suites that use init data,
++because init data may have been discarded after the kernel boots. KUnit
++suites that use init data should be defined using the
++kunit_test_init_section_suites() macro.
++
++Also, you cannot use this feature to run tests concurrently. Instead a test
++will wait to run until other tests have completed or failed.
++
+ .. note ::
+ 
+-	If ``CONFIG_KUNIT_DEBUGFS`` is enabled, KUnit test results will
+-	be accessible from the ``debugfs`` filesystem (if mounted).
+-	They will be in ``/sys/kernel/debug/kunit/<test_suite>/results``, in
+-	TAP format.
++	For test authors, to use this feature, tests will need to correctly initialise
++	and/or clean up any data, so the test runs correctly a second time.
+-- 
+2.43.0
+

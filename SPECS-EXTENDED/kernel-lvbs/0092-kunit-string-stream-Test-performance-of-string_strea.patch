@@ -1,0 +1,105 @@
+From 8a9bc7837b3ba07b46b46ba8f441283a4d602b1a Mon Sep 17 00:00:00 2001
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Date: Wed, 16 Oct 2024 11:08:16 -0700
+Subject: [PATCH 092/124] kunit: string-stream: Test performance of
+ string_stream
+
+Add a test of the speed and memory use of string_stream.
+
+string_stream_performance_test() doesn't actually "test" anything (it
+cannot fail unless the system has run out of allocatable memory) but it
+measures the speed and memory consumption of the string_stream and reports
+the result.
+
+This allows changes in the string_stream implementation to be compared.
+
+Signed-off-by: Richard Fitzgerald <rf@opensource.cirrus.com>
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/string-stream-test.c | 54 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/lib/kunit/string-stream-test.c b/lib/kunit/string-stream-test.c
+index b759974d9cec..06822766f29a 100644
+--- a/lib/kunit/string-stream-test.c
++++ b/lib/kunit/string-stream-test.c
+@@ -8,7 +8,9 @@
+ 
+ #include <kunit/static_stub.h>
+ #include <kunit/test.h>
++#include <linux/ktime.h>
+ #include <linux/slab.h>
++#include <linux/timekeeping.h>
+ 
+ #include "string-stream.h"
+ 
+@@ -454,6 +456,57 @@ static void string_stream_auto_newline_test(struct kunit *test)
+ 			   "One\nTwo\nThree\nFour\nFive\nSix\nSeven\n\nEight\n");
+ }
+ 
++/*
++ * This doesn't actually "test" anything. It reports time taken
++ * and memory used for logging a large number of lines.
++ */
++static void string_stream_performance_test(struct kunit *test)
++{
++	struct string_stream_fragment *frag_container;
++	struct string_stream *stream;
++	char test_line[101];
++	ktime_t start_time, end_time;
++	size_t len, bytes_requested, actual_bytes_used, total_string_length;
++	int offset, i;
++
++	stream = kunit_alloc_string_stream(test, GFP_KERNEL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, stream);
++
++	memset(test_line, 'x', sizeof(test_line) - 1);
++	test_line[sizeof(test_line) - 1] = '\0';
++
++	start_time = ktime_get();
++	for (i = 0; i < 10000; i++) {
++		offset = i % (sizeof(test_line) - 1);
++		string_stream_add(stream, "%s: %d\n", &test_line[offset], i);
++	}
++	end_time = ktime_get();
++
++	/*
++	 * Calculate memory used. This doesn't include invisible
++	 * overhead due to kernel allocator fragment size rounding.
++	 */
++	bytes_requested = sizeof(*stream);
++	actual_bytes_used = ksize(stream);
++	total_string_length = 0;
++
++	list_for_each_entry(frag_container, &stream->fragments, node) {
++		bytes_requested += sizeof(*frag_container);
++		actual_bytes_used += ksize(frag_container);
++
++		len = strlen(frag_container->fragment);
++		total_string_length += len;
++		bytes_requested += len + 1; /* +1 for '\0' */
++		actual_bytes_used += ksize(frag_container->fragment);
++	}
++
++	kunit_info(test, "Time elapsed:           %lld us\n",
++		   ktime_us_delta(end_time, start_time));
++	kunit_info(test, "Total string length:    %zu\n", total_string_length);
++	kunit_info(test, "Bytes requested:        %zu\n", bytes_requested);
++	kunit_info(test, "Actual bytes allocated: %zu\n", actual_bytes_used);
++}
++
+ static int string_stream_test_init(struct kunit *test)
+ {
+ 	struct string_stream_test_priv *priv;
+@@ -479,6 +532,7 @@ static struct kunit_case string_stream_test_cases[] = {
+ 	KUNIT_CASE(string_stream_append_empty_string_test),
+ 	KUNIT_CASE(string_stream_no_auto_newline_test),
+ 	KUNIT_CASE(string_stream_auto_newline_test),
++	KUNIT_CASE(string_stream_performance_test),
+ 	{}
+ };
+ 
+-- 
+2.43.0
+

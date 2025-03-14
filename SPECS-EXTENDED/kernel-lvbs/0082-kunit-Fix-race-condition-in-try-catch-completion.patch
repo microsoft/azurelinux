@@ -1,0 +1,64 @@
+From f40b641f6fab897e36502524bbd8fe7bb70aab63 Mon Sep 17 00:00:00 2001
+From: David Gow <davidgow@google.com>
+Date: Wed, 16 Oct 2024 11:34:40 -0700
+Subject: [PATCH 082/124] kunit: Fix race condition in try-catch completion
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+KUnit's try-catch infrastructure now uses vfork_done, which is always
+set to a valid completion when a kthread is created, but which is set to
+NULL once the thread terminates. This creates a race condition, where
+the kthread exits before we can wait on it.
+
+Keep a copy of vfork_done, which is taken before we wake_up_process()
+and so valid, and wait on that instead.
+
+Fixes: 93533996100c ("kunit: Handle test faults")
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Closes: https://lore.kernel.org/lkml/20240410102710.35911-1-naresh.kamboju@linaro.org/
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Acked-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: David Gow <davidgow@google.com>
+Reviewed-by: Rae Moar <rmoar@google.com>
+Tested-by: Miguel Ojeda <ojeda@kernel.org>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/try-catch.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/lib/kunit/try-catch.c b/lib/kunit/try-catch.c
+index fa687278ccc9..6bbe0025b079 100644
+--- a/lib/kunit/try-catch.c
++++ b/lib/kunit/try-catch.c
+@@ -63,6 +63,7 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ {
+ 	struct kunit *test = try_catch->test;
+ 	struct task_struct *task_struct;
++	struct completion *task_done;
+ 	int exit_code, time_remaining;
+ 
+ 	try_catch->context = context;
+@@ -75,13 +76,16 @@ void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
+ 		return;
+ 	}
+ 	get_task_struct(task_struct);
+-	wake_up_process(task_struct);
+ 	/*
+ 	 * As for a vfork(2), task_struct->vfork_done (pointing to the
+ 	 * underlying kthread->exited) can be used to wait for the end of a
+-	 * kernel thread.
++	 * kernel thread. It is set to NULL when the thread exits, so we
++	 * keep a copy here.
+ 	 */
+-	time_remaining = wait_for_completion_timeout(task_struct->vfork_done,
++	task_done = task_struct->vfork_done;
++	wake_up_process(task_struct);
++
++	time_remaining = wait_for_completion_timeout(task_done,
+ 						     kunit_test_timeout());
+ 	if (time_remaining == 0) {
+ 		try_catch->try_result = -ETIMEDOUT;
+-- 
+2.43.0
+

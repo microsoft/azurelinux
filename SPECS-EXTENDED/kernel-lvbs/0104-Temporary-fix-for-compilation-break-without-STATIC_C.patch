@@ -1,0 +1,62 @@
+From 5ef9c50321deee0bbc757fba8b3a7fe74a3e4490 Mon Sep 17 00:00:00 2001
+From: Thara Gopinath <tgopinath@microsoft.com>
+Date: Fri, 24 Jan 2025 14:45:22 +0000
+Subject: [PATCH 104/124] Temporary fix for compilation break without
+ STATIC_CALL
+
+Heki disables STATIC_CALL and STATIC_CALL_INLINE because these involve
+patching of code after W^X memory permsssions have been applied. With the
+latest kernel upgrade XEN drivers have introduced static call apis and
+trampolines that breaks during compilation without STATIC_CALL. Introduce
+temporary fixes to fix the compilation break. These can be reverted once we
+support STATIC_CALL with lvbs.
+
+Signed-off-by: Thara Gopinath <tgopinath@microsoft.com>
+---
+ arch/x86/include/asm/xen/hypercall.h | 5 +++++
+ include/linux/static_call.h          | 8 ++++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/arch/x86/include/asm/xen/hypercall.h b/arch/x86/include/asm/xen/hypercall.h
+index 97771b9d33af..c74e090cf7ee 100644
+--- a/arch/x86/include/asm/xen/hypercall.h
++++ b/arch/x86/include/asm/xen/hypercall.h
+@@ -97,9 +97,14 @@ DECLARE_STATIC_CALL(xen_hypercall, xen_hypercall_func);
+ #define __ADDRESSABLE_xen_hypercall __ADDRESSABLE_ASM_STR(__SCK__xen_hypercall)
+ #endif
+ 
++#ifdef CONFIG_HAVE_STATIC_CALL
+ #define __HYPERCALL					\
+ 	__ADDRESSABLE_xen_hypercall			\
+ 	"call __SCT__xen_hypercall"
++#else
++#define __HYPERCALL					\
++	"call __SCK__xen_hypercall"
++#endif
+ 
+ #define __HYPERCALL_ENTRY(x)	"a" (x)
+ 
+diff --git a/include/linux/static_call.h b/include/linux/static_call.h
+index f78ae0224964..5c08f079bb47 100644
+--- a/include/linux/static_call.h
++++ b/include/linux/static_call.h
+@@ -344,8 +344,16 @@ static inline int static_call_text_reserved(void *start, void *end)
+ 	return 0;
+ }
+ 
++#define static_call_update_early(name, func)				\
++({									\
++	typeof(&STATIC_CALL_TRAMP(name)) __F = (func);			\
++	__static_call_update(&STATIC_CALL_KEY(name),			\
++			     STATIC_CALL_TRAMP_ADDR(name), __F);	\
++})
++
+ #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
+ #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
++#define EXPORT_STATIC_CALL_TRAMP(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
+ #define EXPORT_STATIC_CALL_TRAMP_GPL(name)				\
+ 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
+ 
+-- 
+2.43.0
+

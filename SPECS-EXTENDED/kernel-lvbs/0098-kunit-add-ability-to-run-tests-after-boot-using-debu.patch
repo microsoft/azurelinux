@@ -1,0 +1,207 @@
+From 7c0fa79d22d68532420a2ca2c3db4de1bbb69387 Mon Sep 17 00:00:00 2001
+From: Rae Moar <rmoar@google.com>
+Date: Wed, 13 Dec 2023 19:44:20 +0000
+Subject: [PATCH 098/124] kunit: add ability to run tests after boot using
+ debugfs
+
+Add functionality to run built-in tests after boot by writing to a
+debugfs file.
+
+Add a new debugfs file labeled "run" for each test suite to use for
+this purpose.
+
+As an example, write to the file using the following:
+
+echo "any string" > /sys/kernel/debugfs/kunit/<testsuite>/run
+
+This will trigger the test suite to run and will print results to the
+kernel log.
+
+To guard against running tests concurrently with this feature, add a
+mutex lock around running kunit. This supports the current practice of
+not allowing tests to be run concurrently on the same kernel.
+
+This new functionality could be used to design a parameter
+injection feature in the future.
+
+Fixed up merge conflict duing rebase to Linux 6.7-rc6
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Rae Moar <rmoar@google.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ lib/kunit/debugfs.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
+ lib/kunit/test.c    | 10 +++++++
+ 2 files changed, 78 insertions(+)
+
+diff --git a/lib/kunit/debugfs.c b/lib/kunit/debugfs.c
+index 382706dfb47d..d548750a325a 100644
+--- a/lib/kunit/debugfs.c
++++ b/lib/kunit/debugfs.c
+@@ -8,12 +8,14 @@
+ #include <linux/module.h>
+ 
+ #include <kunit/test.h>
++#include <kunit/test-bug.h>
+ 
+ #include "string-stream.h"
+ #include "debugfs.h"
+ 
+ #define KUNIT_DEBUGFS_ROOT             "kunit"
+ #define KUNIT_DEBUGFS_RESULTS          "results"
++#define KUNIT_DEBUGFS_RUN              "run"
+ 
+ /*
+  * Create a debugfs representation of test suites:
+@@ -21,6 +23,8 @@
+  * Path						Semantics
+  * /sys/kernel/debug/kunit/<testsuite>/results	Show results of last run for
+  *						testsuite
++ * /sys/kernel/debug/kunit/<testsuite>/run	Write to this file to trigger
++ *						testsuite to run
+  *
+  */
+ 
+@@ -101,6 +105,51 @@ static int debugfs_results_open(struct inode *inode, struct file *file)
+ 	return single_open(file, debugfs_print_results, suite);
+ }
+ 
++/*
++ * Print a usage message to the debugfs "run" file
++ * (/sys/kernel/debug/kunit/<testsuite>/run) if opened.
++ */
++static int debugfs_print_run(struct seq_file *seq, void *v)
++{
++	struct kunit_suite *suite = (struct kunit_suite *)seq->private;
++
++	seq_puts(seq, "Write to this file to trigger the test suite to run.\n");
++	seq_printf(seq, "usage: echo \"any string\" > /sys/kernel/debugfs/kunit/%s/run\n",
++			suite->name);
++	return 0;
++}
++
++/*
++ * The debugfs "run" file (/sys/kernel/debug/kunit/<testsuite>/run)
++ * contains no information. Write to the file to trigger the test suite
++ * to run.
++ */
++static int debugfs_run_open(struct inode *inode, struct file *file)
++{
++	struct kunit_suite *suite;
++
++	suite = (struct kunit_suite *)inode->i_private;
++
++	return single_open(file, debugfs_print_run, suite);
++}
++
++/*
++ * Trigger a test suite to run by writing to the suite's "run" debugfs
++ * file found at: /sys/kernel/debug/kunit/<testsuite>/run
++ *
++ * Note: what is written to this file will not be saved.
++ */
++static ssize_t debugfs_run(struct file *file,
++		const char __user *buf, size_t count, loff_t *ppos)
++{
++	struct inode *f_inode = file->f_inode;
++	struct kunit_suite *suite = (struct kunit_suite *) f_inode->i_private;
++
++	__kunit_test_suites_init(&suite, 1);
++
++	return count;
++}
++
+ static const struct file_operations debugfs_results_fops = {
+ 	.open = debugfs_results_open,
+ 	.read = seq_read,
+@@ -108,11 +157,23 @@ static const struct file_operations debugfs_results_fops = {
+ 	.release = debugfs_release,
+ };
+ 
++static const struct file_operations debugfs_run_fops = {
++	.open = debugfs_run_open,
++	.read = seq_read,
++	.write = debugfs_run,
++	.llseek = seq_lseek,
++	.release = debugfs_release,
++};
++
+ void kunit_debugfs_create_suite(struct kunit_suite *suite)
+ {
+ 	struct kunit_case *test_case;
+ 	struct string_stream *stream;
+ 
++	/* If suite log already allocated, do not create new debugfs files. */
++	if (suite->log)
++		return;
++
+ 	/*
+ 	 * Allocate logs before creating debugfs representation.
+ 	 * The suite->log and test_case->log pointer are expected to be NULL
+@@ -140,6 +201,13 @@ void kunit_debugfs_create_suite(struct kunit_suite *suite)
+ 	debugfs_create_file(KUNIT_DEBUGFS_RESULTS, S_IFREG | 0444,
+ 			    suite->debugfs,
+ 			    suite, &debugfs_results_fops);
++
++	/* Do not create file to re-run test if test runs on init */
++	if (!suite->is_init) {
++		debugfs_create_file(KUNIT_DEBUGFS_RUN, S_IFREG | 0644,
++				    suite->debugfs,
++				    suite, &debugfs_run_fops);
++	}
+ 	return;
+ 
+ err:
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index 5b69d6f25966..3239d2aefa39 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -13,6 +13,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
++#include <linux/mutex.h>
+ #include <linux/panic.h>
+ #include <linux/sched/debug.h>
+ #include <linux/sched.h>
+@@ -23,6 +24,8 @@
+ #include "string-stream.h"
+ #include "try-catch-impl.h"
+ 
++static DEFINE_MUTEX(kunit_run_lock);
++
+ /*
+  * Hook to fail the current test and print an error message to the log.
+  */
+@@ -691,6 +694,7 @@ static void kunit_init_suite(struct kunit_suite *suite)
+ 	kunit_debugfs_create_suite(suite);
+ 	suite->status_comment[0] = '\0';
+ 	suite->suite_init_err = 0;
++	string_stream_clear(suite->log);
+ }
+ 
+ bool kunit_enabled(void)
+@@ -709,6 +713,11 @@ int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_
+ 
+ 	kunit_suite_counter = 1;
+ 
++	/* Use mutex lock to guard against running tests concurrently. */
++	if (mutex_lock_interruptible(&kunit_run_lock)) {
++		pr_err("kunit: test interrupted\n");
++		return -EINTR;
++	}
+ 	static_branch_inc(&kunit_running);
+ 
+ 	for (i = 0; i < num_suites; i++) {
+@@ -717,6 +726,7 @@ int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_
+ 	}
+ 
+ 	static_branch_dec(&kunit_running);
++	mutex_unlock(&kunit_run_lock);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(__kunit_test_suites_init);
+-- 
+2.43.0
+

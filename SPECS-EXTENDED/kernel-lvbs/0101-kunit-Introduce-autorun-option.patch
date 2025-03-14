@@ -1,0 +1,141 @@
+From a02cb8aa7f48cd655061d72791ee3c71574a1f60 Mon Sep 17 00:00:00 2001
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Date: Wed, 16 Oct 2024 16:59:23 -0700
+Subject: [PATCH 101/124] kunit: Introduce autorun option
+
+The new option controls tests run on boot or module load. With the new
+debugfs "run" dentry allowing to run tests on demand, an ability to disable
+automatic tests run becomes a useful option in case of intrusive tests.
+
+The option is set to true by default to preserve the existent behavior. It
+can be overridden by either the corresponding module option or by the
+corresponding config build option.
+
+Signed-off-by: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+---
+ include/kunit/test.h |  4 +++-
+ lib/kunit/Kconfig    | 12 ++++++++++++
+ lib/kunit/debugfs.c  |  2 +-
+ lib/kunit/executor.c | 18 +++++++++++++++++-
+ lib/kunit/test.c     |  6 ++++--
+ 5 files changed, 37 insertions(+), 5 deletions(-)
+
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 0302f11109a7..8a172dab9bfb 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -311,6 +311,7 @@ static inline void kunit_set_failure(struct kunit *test)
+ }
+ 
+ bool kunit_enabled(void);
++bool kunit_autorun(void);
+ const char *kunit_action(void);
+ const char *kunit_filter_glob(void);
+ char *kunit_filter(void);
+@@ -333,7 +334,8 @@ kunit_filter_suites(const struct kunit_suite_set *suite_set,
+ 		    int *err);
+ void kunit_free_suite_set(struct kunit_suite_set suite_set);
+ 
+-int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_suites);
++int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_suites,
++			     bool run_tests);
+ 
+ void __kunit_test_suites_exit(struct kunit_suite **suites, int num_suites);
+ 
+diff --git a/lib/kunit/Kconfig b/lib/kunit/Kconfig
+index 68a6daec0aef..9816d8e454ef 100644
+--- a/lib/kunit/Kconfig
++++ b/lib/kunit/Kconfig
+@@ -70,4 +70,16 @@ config KUNIT_DEFAULT_ENABLED
+ 	  In most cases this should be left as Y. Only if additional opt-in
+ 	  behavior is needed should this be set to N.
+ 
++config KUNIT_AUTORUN_ENABLED
++	bool "Default value of kunit.autorun"
++	default y
++	help
++	  Sets the default value of kunit.autorun. If set to N then KUnit
++	  tests will not run after initialization unless kunit.autorun=1 is
++	  passed to the kernel command line. The test can still be run manually
++	  via debugfs interface.
++
++	  In most cases this should be left as Y. Only if additional opt-in
++	  behavior is needed should this be set to N.
++
+ endif # KUNIT
+diff --git a/lib/kunit/debugfs.c b/lib/kunit/debugfs.c
+index d548750a325a..9df064f40d98 100644
+--- a/lib/kunit/debugfs.c
++++ b/lib/kunit/debugfs.c
+@@ -145,7 +145,7 @@ static ssize_t debugfs_run(struct file *file,
+ 	struct inode *f_inode = file->f_inode;
+ 	struct kunit_suite *suite = (struct kunit_suite *) f_inode->i_private;
+ 
+-	__kunit_test_suites_init(&suite, 1);
++	__kunit_test_suites_init(&suite, 1, true);
+ 
+ 	return count;
+ }
+diff --git a/lib/kunit/executor.c b/lib/kunit/executor.c
+index 689fff2b2b10..4a7f34f32f74 100644
+--- a/lib/kunit/executor.c
++++ b/lib/kunit/executor.c
+@@ -29,6 +29,22 @@ const char *kunit_action(void)
+ 	return action_param;
+ }
+ 
++/*
++ * Run KUnit tests after initialization
++ */
++#ifdef CONFIG_KUNIT_AUTORUN_ENABLED
++static bool autorun_param = true;
++#else
++static bool autorun_param;
++#endif
++module_param_named(autorun, autorun_param, bool, 0);
++MODULE_PARM_DESC(autorun, "Run KUnit tests after initialization");
++
++bool kunit_autorun(void)
++{
++	return autorun_param;
++}
++
+ static char *filter_glob_param;
+ static char *filter_param;
+ static char *filter_action_param;
+@@ -272,7 +288,7 @@ void kunit_exec_run_tests(struct kunit_suite_set *suite_set, bool builtin)
+ 		pr_info("1..%zu\n", num_suites);
+ 	}
+ 
+-	__kunit_test_suites_init(suite_set->start, num_suites);
++	__kunit_test_suites_init(suite_set->start, num_suites, kunit_autorun());
+ }
+ 
+ void kunit_exec_list_tests(struct kunit_suite_set *suite_set, bool include_attr)
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index 229a599409f7..a74c62d3b049 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -702,7 +702,8 @@ bool kunit_enabled(void)
+ 	return enable_param;
+ }
+ 
+-int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_suites)
++int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_suites,
++			     bool run_tests)
+ {
+ 	unsigned int i;
+ 
+@@ -725,7 +726,8 @@ int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_
+ 
+ 	for (i = 0; i < num_suites; i++) {
+ 		kunit_init_suite(suites[i]);
+-		kunit_run_tests(suites[i]);
++		if (run_tests)
++			kunit_run_tests(suites[i]);
+ 	}
+ 
+ 	static_branch_dec(&kunit_running);
+-- 
+2.43.0
+
