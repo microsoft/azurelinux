@@ -3347,6 +3347,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "erofs-utils",
+          "version": "1.8.5",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/snapshot/erofs-utils-1.8.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "espeak-ng",
           "version": "1.51.1",
           "downloadUrl": "https://github.com/espeak-ng/espeak-ng/archive/1.51.1/espeak-ng-1.51.1.tar.gz"
