@@ -11,7 +11,7 @@
 Name: 		corosync-qdevice
 Summary: 	The Corosync Cluster Engine Qdevice
 Version: 	3.0.3
-Release: 	6%{?gitver}%{?dist}
+Release: 	7%{?gitver}%{?dist}
 License: 	BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
