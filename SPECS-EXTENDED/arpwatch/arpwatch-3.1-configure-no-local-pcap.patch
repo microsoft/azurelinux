@@ -1,0 +1,15 @@
+Do not attempt to search for local libpcap libraries lying around in the parent
+of the build directory, or anywhere else random. This is not expected to
+succeed anyway, but it is better to be sure.
+
+diff -Naur arpwatch-3.1-original/configure arpwatch-3.1/configure
+--- arpwatch-3.1-original/configure	2020-04-05 20:22:04.000000000 -0400
++++ arpwatch-3.1/configure	2020-11-07 11:59:40.114550004 -0500
+@@ -5437,6 +5437,7 @@
+     places=`ls .. | sed -e 's,/$,,' -e 's,^,../,' | \
+ 	egrep '/libpcap-[0-9]*\.[0-9]*(\.[0-9]*)?([ab][0-9]*)?$'`
+     for dir in $places ../libpcap libpcap ; do
++	    break
+ 	    basedir=`echo $dir | sed -e 's/[ab][0-9]*$//'`
+ 	    if test $lastdir = $basedir ; then
+ 		    		    continue;

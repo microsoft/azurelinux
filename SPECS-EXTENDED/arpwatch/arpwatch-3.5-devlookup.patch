@@ -1,0 +1,138 @@
+diff -Naur arpwatch-3.5-original/arpwatch.c arpwatch-3.5/arpwatch.c
+--- arpwatch-3.5-original/arpwatch.c	2023-12-03 13:10:05.000000000 -0500
++++ arpwatch-3.5/arpwatch.c	2023-12-03 20:06:32.694857659 -0500
+@@ -163,6 +163,8 @@
+ void	hup(int);
+ int	isbogon(u_int32_t);
+ int	main(int, char **);
++int     try_open_live(pcap_t ** pd_ptr, char const * interface_name,
++	       int promiscuous_enable);
+ void	process_ether(u_char *, const struct pcap_pkthdr *, const u_char *);
+ void	process_fddi(u_char *, const struct pcap_pkthdr *, const u_char *);
+ int	readsnmp(char *);
+@@ -179,7 +181,7 @@
+ 	int op, snaplen, timeout, linktype, status;
+ 	pcap_t *pd;
+ 	FILE *fp;
+-	pcap_if_t *alldevs;
++	pcap_if_t *alldevs, *dev;
+ 	char *interface, *rfilename;
+ 	struct bpf_program code;
+ 	char errbuf[PCAP_ERRBUF_SIZE];
+@@ -311,13 +313,18 @@
+ 				    "%s: pcap_findalldevs: %s\n", prog, errbuf);
+ 				exit(1);
+ 			}
+-			if (alldevs == NULL) {
++			for (dev = alldevs; dev; dev = dev->next) {
++				if (try_open_live(&pd, dev->name, promisc)) {
++					interface = savestr(alldevs->name);
++					break;
++				}
++			}
++			pcap_freealldevs(alldevs);
++			if (interface == NULL) {
+ 				(void)fprintf(stderr, "%s: pcap_findalldevs:"
+ 				    " no suitable devices found\n", prog);
+ 				exit(1);
+ 			}
+-			interface = savestr(alldevs->name);
+-			pcap_freealldevs(alldevs);
+ #else
+ 			if (interface = pcap_lookupdev(errbuf)) == NULL) {
+ 				(void)fprintf(stderr,
+@@ -356,15 +363,12 @@
+ 		}
+ 		swapped = pcap_is_swapped(pd);
+ 	} else {
+-		snaplen = max(sizeof(struct ether_header),
+-		    sizeof(struct fddi_header)) + sizeof(struct ether_arp);
+-		timeout = 1000;
+-		pd = pcap_open_live(interface, snaplen, promisc, timeout,
+-		    errbuf);
+ 		if (pd == NULL) {
+-			lg(LOG_ERR, "pcap open %s: %s", interface, errbuf);
+-			exit(1);
++			if (!try_open_live(&pd, interface, promisc)) {
++				exit(1);
++			}
+ 		}
++		/* else pd was already opened based on pcap_findalldevs */
+ #ifdef WORDS_BIGENDIAN
+ 		swapped = 1;
+ #endif
+@@ -454,6 +458,74 @@
+ 	exit(0);
+ }
+ 
++int
++try_open_live(pcap_t ** pd_ptr, char const * interface_name, int promiscuous_enable) {
++	/* Attempt to open an interface and set up a supported datalink type;
++	 * return nonzero on success and zero on failure (and log a message).
++	 */
++	int snaplen, timeout, n_datalinks, datalink_i;
++	int * datalinks, datalink;
++	char errbuf[PCAP_ERRBUF_SIZE];
++
++	snaplen = max(sizeof(struct ether_header),
++	    sizeof(struct fddi_header)) + sizeof(struct ether_arp);
++	timeout = 1000;
++	datalinks = NULL;
++
++	/* Just in case... */
++	if (*pd_ptr != NULL) {
++		pcap_close(*pd_ptr);
++		*pd_ptr = NULL;
++	}
++
++	*pd_ptr = pcap_open_live(interface_name, snaplen, promiscuous_enable,
++	    timeout, errbuf);
++	if (*pd_ptr == NULL) {
++		lg(LOG_ERR, "pcap open %s: %s", interface_name, errbuf);
++		goto fail;
++	}
++
++	/* Must be able to select an ethernet or fddi datalink */
++	n_datalinks = pcap_list_datalinks(*pd_ptr, &datalinks);
++	if (n_datalinks < 0) {
++		lg(LOG_ERR, "pcap_list_datalinks %s: %s", interface_name,
++		    pcap_geterr(*pd_ptr));
++		goto fail;
++	}
++	for (datalink_i = 0; datalink_i < n_datalinks; ++datalink_i) {
++		switch (datalinks[datalink_i]) {
++		case DLT_EN10MB:
++		case DLT_FDDI:
++			break;
++		default:
++			continue; /* unsupported; try the next datalink */
++		}
++		if (pcap_set_datalink(*pd_ptr, datalinks[datalink_i]) != 0) {
++			lg(LOG_ERR, "pcap_set_datalink %s %d: %s",
++			    interface_name, datalinks[datalink_i],
++			    pcap_geterr(*pd_ptr));
++			continue;
++		}
++		break; /* success */
++	}
++	if (datalink_i >= n_datalinks) {
++		lg(LOG_ERR, "no ethernet or fddi datalink for %s",
++		    interface_name);
++		goto fail;
++	}
++
++	free(datalinks);
++	return 1; /* success */
++
++fail:
++	if (*pd_ptr != NULL) {
++		pcap_close(*pd_ptr);
++		*pd_ptr = NULL;
++	}
++	free(datalinks);
++	return 0; /* failure */
++}
++
+ /* Process an ethernet arp/rarp packet */
+ void
+ process_ether(u_char *u, const struct pcap_pkthdr *h, const u_char *p)

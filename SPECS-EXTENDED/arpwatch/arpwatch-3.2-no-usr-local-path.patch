@@ -1,0 +1,40 @@
+Do not add /usr/local/bin or /usr/local/sbin to the PATH in any scripts.
+
+diff -Naur arpwatch-3.2-original/arpfetch arpwatch-3.2/arpfetch
+--- arpwatch-3.2-original/arpfetch	2013-02-16 03:10:28.000000000 -0500
++++ arpwatch-3.2/arpfetch	2021-12-16 08:26:26.931846139 -0500
+@@ -4,8 +4,6 @@
+ # arpfetch - collect arp data from a cisco using net-snmp
+ #
+ 
+-export PATH="/usr/local/bin:${PATH}"
+-
+ prog=`basename $0`
+ 
+ if [ $# -ne 2 ]; then
+diff -Naur arpwatch-3.2-original/bihourly.sh arpwatch-3.2/bihourly.sh
+--- arpwatch-3.2-original/bihourly.sh	2016-09-16 22:40:54.000000000 -0400
++++ arpwatch-3.2/bihourly.sh	2021-12-16 08:26:35.671910709 -0500
+@@ -3,9 +3,6 @@
+ #
+ #  bihourly arpwatch job
+ #
+-PATH=${PATH}:/usr/local/sbin
+-export PATH
+-#
+ cd /usr/local/arpwatch
+ #
+ list="`cat list`"
+diff -Naur arpwatch-3.2-original/update-ethercodes.sh.in arpwatch-3.2/update-ethercodes.sh.in
+--- arpwatch-3.2-original/update-ethercodes.sh.in	2021-12-14 19:47:54.000000000 -0500
++++ arpwatch-3.2/update-ethercodes.sh.in	2021-12-16 08:26:16.309767665 -0500
+@@ -6,9 +6,6 @@
+ 
+ prog="`basename $0`"
+ 
+-PATH=/usr/local/bin:${PATH}
+-export PATH
+-
+ t1=/tmp/${prog}.1.$$
+ 
+ trap 'rm -f ${t1}; exit 1' 1 2 3 15 EXIT
