@@ -1,0 +1,131 @@
+From 5115db2f754563674a8f5baf4107beccbd0baed9 Mon Sep 17 00:00:00 2001
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+Date: Sat, 15 Feb 2025 00:36:20 +0800
+Subject: [PATCH 5/7] erofs-utils: mkfs: add per-segment reaper for
+ multi-threaded compression
+
+Replace the old per-inode reaper to avoid unnecessary memory overhead.
+It also speeds up the multithreaded compression a bit.
+
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+Link: https://lore.kernel.org/r/20250214163621.4109215-1-hsiangkao@linux.alibaba.com
+---
+ lib/compress.c | 31 ++++++++++++++-----------------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
+
+diff --git a/lib/compress.c b/lib/compress.c
+index 1f2807b..a4fe5dc 100644
+--- a/lib/compress.c
++++ b/lib/compress.c
+@@ -52,23 +52,21 @@ struct z_erofs_compress_ictx {		/* inode context */
+ 	u8 *metacur;
+ 	struct list_head extents;
+ 	u16 clusterofs;
+-
+ 	int seg_num;
+ 
+ #if EROFS_MT_ENABLED
+ 	pthread_mutex_t mutex;
+ 	pthread_cond_t cond;
+-	int nfini;
+ 
+ 	struct erofs_compress_work *mtworks;
+ #endif
+ };
+ 
+ struct z_erofs_compress_sctx {		/* segment context */
++	struct list_head extents;
+ 	struct z_erofs_compress_ictx *ictx;
+ 
+ 	u8 *queue;
+-	struct list_head extents;
+ 	struct z_erofs_extent_item *pivot;
+ 
+ 	struct erofs_compress *chandle;
+@@ -98,6 +96,7 @@ struct erofs_compress_work {
+ 	/* Note: struct erofs_work must be the first member */
+ 	struct erofs_work work;
+ 	struct z_erofs_compress_sctx ctx;
++	pthread_cond_t cond;
+ 	struct erofs_compress_work *next;
+ 
+ 	unsigned int alg_id;
+@@ -1307,12 +1306,10 @@ void z_erofs_mt_workfn(struct erofs_work *work, void *tlsp)
+ 				       EROFS_NULL_ADDR);
+ 
+ out:
+-	cwork->errcode = ret;
++	DBG_BUGON(ret > 0);
+ 	pthread_mutex_lock(&ictx->mutex);
+-	if (++ictx->nfini >= ictx->seg_num) {
+-		DBG_BUGON(ictx->nfini > ictx->seg_num);
+-		pthread_cond_signal(&ictx->cond);
+-	}
++	cwork->errcode = ret;
++	pthread_cond_signal(&cwork->cond);
+ 	pthread_mutex_unlock(&ictx->mutex);
+ }
+ 
+@@ -1346,6 +1343,7 @@ int z_erofs_merge_segment(struct z_erofs_compress_ictx *ictx,
+ 		}
+ 	}
+ 	free(sctx->membuf);
++	sctx->membuf = NULL;
+ 	return ret;
+ }
+ 
+@@ -1358,7 +1356,6 @@ int z_erofs_mt_compress(struct z_erofs_compress_ictx *ictx)
+ 	int i;
+ 
+ 	ictx->seg_num = nsegs;
+-	ictx->nfini = 0;
+ 	pthread_mutex_init(&ictx->mutex, NULL);
+ 	pthread_cond_init(&ictx->cond, NULL);
+ 
+@@ -1374,6 +1371,7 @@ int z_erofs_mt_compress(struct z_erofs_compress_ictx *ictx)
+ 			cur = calloc(1, sizeof(*cur));
+ 			if (!cur)
+ 				return -ENOMEM;
++			pthread_cond_init(&cur->cond, NULL);
+ 		}
+ 		*last = cur;
+ 		last = &cur->next;
+@@ -1396,6 +1394,7 @@ int z_erofs_mt_compress(struct z_erofs_compress_ictx *ictx)
+ 		cur->alg_name = ccfg->handle.alg->name;
+ 		cur->comp_level = ccfg->handle.compression_level;
+ 		cur->dict_size = ccfg->handle.dict_size;
++		cur->errcode = 1;	/* mark as "in progress" */
+ 
+ 		cur->work.fn = z_erofs_mt_workfn;
+ 		erofs_queue_work(&z_erofs_mt_ctrl.wq, &cur->work);
+@@ -1412,11 +1411,6 @@ int erofs_mt_write_compressed_file(struct z_erofs_compress_ictx *ictx)
+ 	erofs_blk_t blkaddr, compressed_blocks = 0;
+ 	int ret;
+ 
+-	pthread_mutex_lock(&ictx->mutex);
+-	while (ictx->nfini < ictx->seg_num)
+-		pthread_cond_wait(&ictx->cond, &ictx->mutex);
+-	pthread_mutex_unlock(&ictx->mutex);
+-
+ 	bh = erofs_balloc(sbi->bmgr, DATA, 0, 0, 0);
+ 	if (IS_ERR(bh)) {
+ 		ret = PTR_ERR(bh);
+@@ -1431,9 +1425,12 @@ int erofs_mt_write_compressed_file(struct z_erofs_compress_ictx *ictx)
+ 		cur = head;
+ 		head = cur->next;
+ 
+-		if (cur->errcode) {
+-			ret = cur->errcode;
+-		} else {
++		pthread_mutex_lock(&ictx->mutex);
++		while ((ret = cur->errcode) > 0)
++			pthread_cond_wait(&cur->cond, &ictx->mutex);
++		pthread_mutex_unlock(&ictx->mutex);
++
++		if (!ret) {
+ 			int ret2;
+ 
+ 			cur->ctx.blkaddr = blkaddr;
+-- 
+2.48.1
+

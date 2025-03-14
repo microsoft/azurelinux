@@ -212,6 +212,7 @@
                 "enchant2",
                 "enscript",
                 "environment-modules",
+                "erofs-utils",
                 "evemu",
                 "execstack",
                 "exempi",
