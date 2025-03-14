@@ -24423,8 +24423,8 @@
         "type": "other",
         "other": {
           "name": "python-requests-toolbelt",
-          "version": "0.9.1",
-          "downloadUrl": "https://github.com/sigmavirus24/requests-toolbelt/archive/0.9.1/python-requests-toolbelt-0.9.1.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/sigmavirus24/requests-toolbelt/archive/1.0.0/requests-toolbelt-1.0.0.tar.gz"
         }
       }
     },
