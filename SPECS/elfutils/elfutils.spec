@@ -3,8 +3,8 @@
 
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
-Version:        0.189
-Release:        3%{?dist}
+Version:        0.192
+Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,10 @@ Group:          Development/Tools
 URL:            https://sourceware.org/elfutils
 Source0:        https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
 Source1:        10-ptrace-yama.conf
+Patch0:         CVE-2025-1365.patch
+Patch1:         CVE-2025-1372.patch
+Patch2:         CVE-2025-1376.patch
+Patch3:         CVE-2025-1377.patch
 
 BuildRequires:  bison >= 1.875
 BuildRequires:  bzip2-devel
@@ -144,7 +148,7 @@ Requires:       %{name}-libelf = %{version}-%{release}
 These are the additional language files of elfutils.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -235,6 +239,9 @@ fi
 /etc/profile.d/debuginfod.sh
 %{_mandir}/man1/*
 %exclude %{_mandir}/man7/*
+%{_datadir}/fish/vendor_conf.d/debuginfod.fish
+%{_mandir}/man8/debuginfod.8.gz
+%{_mandir}/man8/debuginfod.service.8.gz
 
 %files default-yama-scope
 %{_sysconfdir}/sysctl.d/10-default-yama-scope.conf
@@ -278,6 +285,10 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.192-1
+- Auto-upgrade to 0.192 
+- Add patch for CVE-2025-1372, CVE-2025-1365, CVE-2025-1376 & CVE-2025-1377
+
 * Mon Jun 24 2024 Chris Co <chrco@microsoft.com> - 0.189-3
 - Use our own ptrace yama conf file to override default yama scope setting to be more secure
 
