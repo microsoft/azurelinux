@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source1:        %{name}-%{version}-submodules.tar.gz
 
 Patch0:         CVE-2023-32067.patch
 Patch1:         CVE-2024-25629.patch
+Patch2:         CVE-2023-31147.patch
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -152,6 +153,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Wed Mar 05 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.42.0-10
+- Patch to fix CVE-2023-31147
+
 * Wed Feb 12 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.42.0-9
 - Patch to fix CVE-2024-25629.patch in the grpc submodules package
 
