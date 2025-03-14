@@ -34,9 +34,10 @@ var (
 	tlsClientCert = app.Flag("certificate", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("private-key", "TLS client key to use when downloading files.").String()
 
-	dstFile   = app.Flag("output-file", "Destination file to download to").Short('O').String()
-	prefixDir = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
-	srcUrl    = app.Arg("url", "URL to download").Required().String()
+	dstFile     = app.Flag("output-file", "Destination file to download to").Short('O').String()
+	prefixDir   = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
+	rpmFilename = app.Arg("rpm-filename", "RPM to download").Required().String()
+	srcUrls     = app.Arg("url-list", "URLs to download").Required().Strings()
 )
 
 func main() {
@@ -75,17 +76,6 @@ func main() {
 	if *dstFile != "" && *prefixDir != "" {
 		logger.Log.Fatalf("Cannot specify both --output-file and --directory-prefix")
 	}
-	if *dstFile == "" {
-		// strip query strings from url
-		u, err := url.Parse(*srcUrl)
-		if err != nil {
-			logger.Log.Fatalf("Invalid URL (%s), Error:\n%s", *srcUrl, err)
-		}
-		*dstFile = filepath.Base(u.Path)
-		if *prefixDir != "" {
-			*dstFile = filepath.Join(*prefixDir, *dstFile)
-		}
-	}
 
 	if *noClobber {
 		exists, err := file.PathExists(*dstFile)
@@ -98,9 +88,38 @@ func main() {
 		}
 	}
 
-	err = downloadFile(*srcUrl, *dstFile, caCerts, tlsCerts)
-	if err != nil {
-		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
+	for idx, srcUrl := range *srcUrls {
+		localDstFile := *dstFile
+		srcUrl = srcUrl + "/" + *rpmFilename
+		if localDstFile == "" {
+			// strip query strings from url
+			_, err := url.Parse(srcUrl)
+			if err != nil {
+				// if the url is invalid, we need to log the error and continue to the next url
+				// if the url is the last in the slice, which means we are unable to download the package
+				// from all the previous urls, we should return an error
+				if idx == len(*srcUrls)-1 {
+					logger.Log.Fatalf("Invalid URL (%s), Error:\n%s", srcUrl, err)
+				} else {
+					logger.Log.Errorf("Invalid URL (%s), Error:\n%s", srcUrl, err)
+					continue
+				}
+			}
+			localDstFile = *rpmFilename
+			if *prefixDir != "" {
+				localDstFile = filepath.Join(*prefixDir, localDstFile)
+			}
+		}
+		err = downloadFile(srcUrl, localDstFile, caCerts, tlsCerts)
+		if err != nil {
+			if idx == len(*srcUrls)-1 {
+				logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, localDstFile, err)
+			} else {
+				logger.Log.Errorf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, localDstFile, err)
+			}
+		} else {
+			break
+		}
 	}
 }
 
