@@ -21482,6 +21482,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "prism",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "priv_wrapper",
           "version": "1.0.1",
           "downloadUrl": "https://ftp.samba.org/pub/cwrap/priv_wrapper-1.0.1.tar.gz"
