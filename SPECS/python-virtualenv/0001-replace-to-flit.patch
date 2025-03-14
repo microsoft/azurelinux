@@ -1,0 +1,65 @@
+From efa2c18a0c114f2d32e2c101401b716e4ac9e6f4 Mon Sep 17 00:00:00 2001
+From: Kanishk-Bansal <kbkanishk975@gmail.com>
+Date: Wed, 26 Feb 2025 06:31:14 +0000
+Subject: [PATCH] replace-to-flit
+
+---
+ pyproject.toml | 23 ++++-------------------
+ 1 file changed, 4 insertions(+), 19 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index fabf434..179525d 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,9 +1,6 @@
+ [build-system]
+-build-backend = "hatchling.build"
+-requires = [
+-  "hatch-vcs>=0.3",
+-  "hatchling>=1.17.1",
+-]
++build-backend = "flit_core.buildapi"
++requires = ["flit_core >=3.8.0,<4"]
+ 
+ [project]
+ name = "virtualenv"
+@@ -14,7 +11,7 @@ keywords = [
+   "isolated",
+   "virtual",
+ ]
+-license = "MIT"
++license = {text = "MIT"}
+ maintainers = [
+   { name = "Bernat Gabor", email = "gaborjbernat@gmail.com" },
+ ]
+@@ -40,9 +37,7 @@ classifiers = [
+   "Topic :: Software Development :: Testing",
+   "Topic :: Utilities",
+ ]
+-dynamic = [
+-  "version",
+-]
++version = "3.10.0"
+ dependencies = [
+   "distlib<1,>=0.3.7",
+   "filelock<4,>=3.12.2",
+@@ -95,16 +90,6 @@ entry-points."virtualenv.discovery".builtin = "virtualenv.discovery.builtin:Buil
+ entry-points."virtualenv.seed".app-data = "virtualenv.seed.embed.via_app_data.via_app_data:FromAppData"
+ entry-points."virtualenv.seed".pip = "virtualenv.seed.embed.pip_invoke:PipInvoke"
+ 
+-[tool.hatch]
+-build.hooks.vcs.version-file = "src/virtualenv/version.py"
+-build.targets.sdist.include = [
+-  "/src",
+-  "/tests",
+-  "/tasks",
+-  "/tox.ini",
+-]
+-version.source = "vcs"
+-
+ [tool.ruff]
+ target-version = "py37"
+ line-length = 120
+-- 
+2.45.2
+
