@@ -1,8 +1,8 @@
 Name:           perl-Alien-pkgconf
-Version:        0.17
-Release:        2%{?dist}
+Version:        0.20
+Release:        1%{?dist}
 Summary:        Discover pkgconf and libpkgconf
-# Other files:              GPL+ or Artistic
+# Other files:  GPL+ or Artistic
 ## Not used
 # pkgconf-1.3.9/aclocal.m4: GPLv3+ with exceptions
 License:        GPL+ or Artistic
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Alien-pkgconf
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-pkgconf-%{version}.tar.gz#/perl-Alien-pkgconf-%{version}.tar.gz
+Patch0:         Alien-pkgconf-0.19-Accept-pkgconf-1.9.patch
 # This is a full-arch package because it stores data about arch-specific
 # libpkgconf.so library and it stores them into arch-specific directory.
 # But it does not install any ELF, therefore disable debuginfo generation.
@@ -76,6 +77,10 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{_mandir}/man3/*
 
 %changelog
+* Fri Mar 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.20-1
+- Upgrade to 0.20
+- License verified
+
 * Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 0.17-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable tests to avoid Alien circular dependency.
