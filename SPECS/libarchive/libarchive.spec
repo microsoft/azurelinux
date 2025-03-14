@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.6.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -14,6 +14,7 @@ Patch1:         CVE-2024-26256.patch
 Patch2:         CVE-2024-20696.patch
 Patch3:         CVE-2024-48958.patch
 Patch4:         CVE-2024-48957.patch
+Patch5:         CVE-2025-25724.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -66,6 +67,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Mar 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.6.1-5
+- Patch CVE-2025-25724
+
 * Tue Oct 15 2024 Nan Liu <liunan@microsoft.com> - 3.6.1-4
 - Patch CVE-2024-48957, CVE-2024-48958, CVE-2024-20696
 
