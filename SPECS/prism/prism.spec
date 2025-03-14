@@ -60,3 +60,4 @@ install -m 0755 %{_builddir}/imagecustomizer %{buildroot}%{_bindir}/imagecustomi
 %changelog
 * Thu Mar 13 2025 Elaine Zhao <elainezhao@microsoft.com> - 0.12.0-1
 - Original version for Azure Linux.
+- License verified.
