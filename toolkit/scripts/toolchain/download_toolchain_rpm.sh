@@ -28,6 +28,7 @@ function usage() {
     echo "-k|--private-key: Optional path to a private key file to use for the download"
     echo "-e|--enforce-signatures: Optional flag to enforce RPM signatures"
     echo "-g|--allowable-gpg-keys: Optional space separated list of GPG keys to allow for signature validation"
+    echo "--skip-hash-check: Optional flag to skip RPM hash validation"
 }
 
 # Default values
@@ -41,6 +42,7 @@ cert=""
 key=""
 enforce_signatures=false
 allowable_gpg_keys=""
+skip_hash_check=false
 
 while (( "$#")); do
     case "$1" in
@@ -83,6 +85,10 @@ while (( "$#")); do
         -g|--allowable-gpg-keys)
             allowable_gpg_keys=$2
             shift 2
+            ;;
+        --skip-hash-check)
+            skip_hash_check=true
+            shift
             ;;
         -h|--help)
             usage
@@ -178,13 +184,9 @@ function download() {
     return 1
 }
 
+# Validate the signatures of the downloaded RPM against the provided GPG keys
 function validate_signatures() {
     echo "Validating toolchain RPM: $rpm_name" | tee -a "$log_file"
-
-    for key in $allowable_gpg_keys; do
-        echo "Adding key ($key) to empty workdir at ($work_dir)" >> "$log_file"
-        rpmkeys --root "$work_dir" --import "$key" >> "$log_file"
-    done
 
     if ! rpmkeys --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level signature" >> "$log_file"; then
         echo "Failed to validate toolchain package $rpm_name signature, aborting." | tee -a "$log_file"
@@ -193,10 +195,34 @@ function validate_signatures() {
     return 0
 }
 
-mkdir -p "$(dirname "$log_file")"
+# Validate the integrity of the downloaded RPM using its digests
+function validate_hash() {
+    echo "Checking hash of toolchain RPM: $rpm_name" | tee -a "$log_file"
+
+    if ! rpm --root "$work_dir" --checksig --verbose "$dst_file" -D "%_pkgverify_level digest" >> "$log_file"; then
+        echo "Failed to validate toolchain package $rpm_name hashes, aborting." | tee -a "$log_file"
+        return 1
+    fi
+    return 0
+}
+
+function import_rpm_keys() {
+    echo "Allowing GPG keys" >> "$log_file"
+    for key in $allowable_gpg_keys; do
+        echo "Adding key ($key) to empty workdir at ($work_dir)" >> "$log_file"
+        rpmkeys --root "$work_dir" --import "$key" >> "$log_file"
+    done
+}
+
+mkdir -pv "$(dirname "$log_file")"
 
 download
 
+import_rpm_keys
+
 if $enforce_signatures; then
     validate_signatures
+elif ! $skip_hash_check; then
+    # validate_hash is a subset of validate_signatures, no need to run both
+    validate_hash
 fi

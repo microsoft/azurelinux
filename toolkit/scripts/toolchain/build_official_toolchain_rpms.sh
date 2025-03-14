@@ -353,7 +353,7 @@ case $(uname -m) in
     x86_64)  MSOPENJDK_EXPECTED_HASH="08d46b64dc0202ad54be937bb5eab7d4c6a6f7f355a40afbeb295cb591dba126" ;;
     aarch64) MSOPENJDK_EXPECTED_HASH="0532d42d5c010152c09e88971f9aecd84af54f935973bbf0f1eba2c1c6839726" ;;
 esac
-wget -nv --server-response --no-clobber --timeout=30 $MSOPENJDK_URL --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+wget -nv --server-response --no-clobber --timeout=30 --tries=3 --waitretry=10 --retry-connrefused $MSOPENJDK_URL --directory-prefix=$CHROOT_RPMS_DIR_ARCH
 MSOPENJDK_ACTUAL_HASH=$(sha256sum "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME" | awk '{print $1}')
 if [[ "$MSOPENJDK_EXPECTED_HASH" != "$MSOPENJDK_ACTUAL_HASH" ]]; then
     echo "Error, incorrect msopenjdk hash: '$MSOPENJDK_ACTUAL_HASH'. Expected hash: '$MSOPENJDK_EXPECTED_HASH'"
