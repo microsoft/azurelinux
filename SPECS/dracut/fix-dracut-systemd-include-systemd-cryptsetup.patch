@@ -1,0 +1,33 @@
+From e0e5424a7b5e387ccb70e47ffea5a59716bf7b76 Mon Sep 17 00:00:00 2001
+From: Jo Zzsi <jozzsicsataban@gmail.com>
+Date: Wed, 28 Aug 2024 23:06:08 -0400
+Subject: [PATCH] fix(dracut-systemd): include systemd-cryptsetup module when
+ needed
+
+---
+ modules.d/98dracut-systemd/module-setup.sh | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/modules.d/98dracut-systemd/module-setup.sh b/modules.d/98dracut-systemd/module-setup.sh
+index 0ea26d425..6b8f42ae3 100755
+--- a/modules.d/98dracut-systemd/module-setup.sh
++++ b/modules.d/98dracut-systemd/module-setup.sh
+@@ -12,7 +12,17 @@ check() {
+ 
+ # called by dracut
+ depends() {
+-    echo "systemd-initrd systemd-ask-password"
++    local deps
++    deps="systemd-initrd systemd-ask-password"
++
++    # when systemd and crypt are both included
++    # systemd-cryptsetup is mandatory dependency
++    # see https://github.com/dracut-ng/dracut-ng/issues/563
++    if dracut_module_included "crypt"; then
++        deps+=" systemd-cryptsetup"
++    fi
++
++    echo "$deps"
+     return 0
+ }
+ 
