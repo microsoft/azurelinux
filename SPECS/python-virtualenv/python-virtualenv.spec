@@ -1,16 +1,14 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
-Version:        20.14.0
-Release:        6%{?dist}
+Version:        20.26.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
-Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Derived from upstream patch https://github.com/pypa/virtualenv/commit/9f9dc6250fc88e92b1ca6206429966788846d696
-Patch0:         fix-plugin-attribute-name.patch
-Patch1:         pin-pytest-version.patch
+Source0:        https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-replace-to-flit.patch
 BuildArch:      noarch
 
 %description
@@ -26,6 +24,8 @@ BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core >= 3.8.0
 
 Requires:       python3
 Requires:       python3-filelock
@@ -40,14 +40,18 @@ virtualenv is a tool to create isolated Python environment.
 %prep
 %autosetup -p1 -n virtualenv-%{version}
 
+%generate_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 pip3 install 'tox>=3.27.1,<4.0.0'
+# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
+sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
 tox -e py
 
 %files -n python3-virtualenv
@@ -57,6 +61,11 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Feb 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.26.6-1
+- Auto-upgrade to 20.26.6 - for CVE-2024-53899 [High]
+- Remove previously applied patches
+- Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Azure Linux) 
+
 * Wed Feb 07 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-6
 - Fix pytest version to <8 for compatibility
 
