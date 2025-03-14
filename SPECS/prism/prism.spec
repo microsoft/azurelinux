@@ -16,7 +16,7 @@ Requires: qemu-img
 Requires: rpm
 Requires: coreutils
 Requires: util-linux
-Requires: systemd
+Requires: /usr/bin/udevadm
 Requires: openssl
 Requires: sed
 Requires: createrepo_c
