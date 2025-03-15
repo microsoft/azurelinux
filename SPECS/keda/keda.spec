@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.4.0
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,7 @@ Patch4:         CVE-2024-6104.patch
 Patch5:         CVE-2024-45338.patch
 Patch6:         CVE-2024-28180.patch
 Patch7:         CVE-2025-27144.patch
+Patch8:         CVE-2022-3162.patch
 
 BuildRequires:  golang
 
@@ -71,6 +72,9 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Thu Mar 06 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.4.0-28
+- Fix CVE-2022-3162 with upstream patch
+
 * Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.4.0-27
 - Fix CVE-2025-27144 with an upstream patch
 
