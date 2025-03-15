@@ -30892,8 +30892,8 @@
         "type": "other",
         "other": {
           "name": "xrestop",
-          "version": "0.4",
-          "downloadUrl": "http://downloads.yoctoproject.org/releases/xrestop/xrestop-0.4.tar.gz"
+          "version": "0.6",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xrestop-0.6.tar.gz"
         }
       }
     },
