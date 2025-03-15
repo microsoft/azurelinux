@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -17,7 +17,7 @@ Patch2:         CVE-2022-3650.patch
 Patch3:         CVE-2022-3854.patch
 Patch4:         CVE-2023-43040.patch
 Patch5:         CVE-2024-38517.patch
-
+Patch6:		CVE-2025-1744.patch
 # 
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -1813,6 +1813,8 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Tue Mar 11 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 16.2.10-7
+- Patch CVE-2025-1744
 * Sat Aug 24 2024 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-6
 - Add missing Requires for shadow-utils
 
