@@ -19,6 +19,13 @@ BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 BuildRequires:  python%{python3_pkgversion}-tox-current-env
 BuildRequires:  python%{python3_pkgversion}-wheel
 BuildRequires:  python%{python3_pkgversion}-pip
+#for tests
+BuildRequires: 	python3-tox
+BuildRequires:  python3-pluggy
+BuildRequires: 	python3-py
+BuildRequires: 	python-filelock
+BuildRequires: 	python3-toml
+BuildRequires: 	python3-six
 
 %description
 A fast and thorough lazy object proxy.
