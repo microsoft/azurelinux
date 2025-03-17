@@ -23203,8 +23203,8 @@
         "type": "other",
         "other": {
           "name": "python-kdcproxy",
-          "version": "0.4.2",
-          "downloadUrl": "https://github.com/latchset/kdcproxy/releases/download/v0.4.2/kdcproxy-0.4.2.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/latchset/kdcproxy/releases/download/v1.0.0/kdcproxy-1.0.0.tar.gz"
         }
       }
     },
