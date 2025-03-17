@@ -4360,6 +4360,7 @@
         "type": "other",
         "other": {
 <<<<<<< HEAD
+<<<<<<< HEAD
           "name": "gi-docgen",
           "version": "2024.1",
           "downloadUrl": "https://gitlab.gnome.org/GNOME/gi-docgen/-/archive/2024.1/gi-docgen-2024.1.tar.bz2"
@@ -4375,6 +4376,8 @@
       "component": {
         "type": "other",
         "other": {
+=======
+>>>>>>> e9932cb8e (ghc-srpm-macros: Removing the package after the approval of the reviewer)
           "name": "giflib",
           "version": "5.2.1",
           "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.1.tar.gz"
