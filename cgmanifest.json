@@ -7041,7 +7041,7 @@
         "other": {
           "name": "ibus",
           "version": "1.5.31",
-          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.31/ibus-1.5.31s.tar.gz"
+          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.31/ibus-1.5.31.tar.gz"
         }
       }
     },
