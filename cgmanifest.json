@@ -15584,7 +15584,7 @@
         "other": {
           "name": "os-prober",
           "version": "1.81",
-          "downloadUrl": "https://deb.debian.org/debian/pool/main/o/os-prober/os-prober_1.81.tar.xz  "
+          "downloadUrl": "https://deb.debian.org/debian/pool/main/o/os-prober/os-prober_1.81.tar.xz"
         }
       }
     },
