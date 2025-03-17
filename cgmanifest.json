@@ -20303,8 +20303,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Simple",
-          "version": "1.302174",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-1.302174.tar.gz"
+          "version": "1.302204",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-1.302204.tar.gz"
         }
       }
     },
