@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,8 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        azure-storage-%{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2025-22868.patch
+Patch1:         CVE-2025-22870.patch
+Patch2:         CVE-2024-51744.patch
 
 BuildRequires:  golang
 BuildRequires:  git
@@ -64,6 +66,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Mon Mar 17 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 10.25.1-4
+- Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
+
 * Tue Mar 04 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-3
 - Fix CVE-2025-22868 with an upstream patch
 
