@@ -8,7 +8,8 @@ License:        GPL-2.0-or-later AND GPL-1.0-or-later
 Vendor:         Microsoft Corporation                                    
 Distribution:   Azure Linux
 URL:            https://kitenet.net/~joey/code/os-prober/
-Source0:        https://ftp.us.debian.org/debian/pool/main/o/os-prober/%{name}_%{version}.tar.xz
+Source0:        https://deb.debian.org/debian/pool/main/o/os-prober/%{name}_%{version}.tar.xz
+
 Patch0:         os-prober-no-dummy-mach-kernel.patch
 # Sent upstream
 Patch1:         os-prober-mdraidfix.patch
