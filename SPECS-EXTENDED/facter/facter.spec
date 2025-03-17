@@ -1,5 +1,4 @@
 %global gem_name facter
-%global debug_package %{nil}
 
 Name:           facter
 Version:        4.8.0
