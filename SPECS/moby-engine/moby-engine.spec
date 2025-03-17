@@ -131,7 +131,7 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Mon Mar 17 2025 Dallas Delaney <dadelan@microsoft.com> 24.0.9-15
+* Mon Mar 17 2025 Dallas Delaney <dadelan@microsoft.com> - 24.0.9-15
 - Patch CVE-2025-22868 & CVE-2025-22869
 
 * Tue Feb 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.0.9-14
