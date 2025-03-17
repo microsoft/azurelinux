@@ -1,127 +1,179 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-%global debug_package %{nil}
 
-%global svnrev 234
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
+%endif
+
+%global forgeurl https://github.com/ncannasse/xml-light
+Version: 2.5
+%forgemeta
 
 Name:           ocaml-xml-light
-Version:        2.3
-Release:        3%{?dist}
+Release:        13%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
-License:        LGPLv2.1
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            http://tech.motion-twin.com/xmllight.html
+Source0:        https://github.com/ncannasse/xml-light/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-# Upstream does not have releases (or rather, it did up to version 2.2
-# and then they stopped).  Use the SVN repository here:
-# https://code.google.com/p/ocamllibs/source/checkout
-#
-# To prepare a source release:
-# (1) Adjust 'svnrev' above to the latest release.
-# (2) Check out the sources:
-#       svn checkout http://ocamllibs.googlecode.com/svn/trunk/ ocamllibs
-# (3) Create a tarball:
-#       cd ocamllibs/xml-light/
-#       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
-#         (where NNN is the svnrev above)
-Source0:        %{_distro_sources_url}/xml-light-%{svnrev}.tar.gz
-Source1:        LICENSE.PTR
+BuildRequires:  ocaml >= 4.03
+BuildRequires:  ocaml-dune >= 2.7
 
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  gawk
 
 %description
 Xml-Light is a minimal XML parser & printer for OCaml. It provides
 functions to parse an XML document into an OCaml data structure, work
-with it, and print it back to an XML document. It support also DTD
-parsing and checking, and is entirely written in OCaml, hence it does
-not require additional C library.
+with it, and print it back to an XML document. It also supports DTD
+parsing and checking, and is entirely written in OCaml; hence it does
+not require a C library.
+
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %prep
-%setup -n xml-light-%{svnrev}
-cp %{SOURCE1} .
+%forgesetup
+
 
 %build
-# Build breaks if parallelized.
-unset MAKEFLAGS
-make all
-make doc
-%if %opt
-make opt
-%endif
-sed -e 's/@VERSION@/%{VERSION}/' < META.in > META
+%dune_build
+
 
 %check
-./test.exe <<EOF
-<abc><123/></abc>
+%dune_check
 
-EOF
-
-%if %opt
-./test_opt.exe <<EOF
-<abc><123/></abc>
-
-EOF
-%endif
 
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-rm -f test.cmi
-ocamlfind install xml-light META *.mli *.cmi *.cma \
-%if %{opt}
-*.a *.cmxa *.cmx
-%endif
+%dune_install -s
 
-%files
-%doc README
-%{_libdir}/ocaml/xml-light
-%license LICENSE.PTR README
-%if %opt
-%exclude %{_libdir}/ocaml/xml-light/*.a
-%exclude %{_libdir}/ocaml/xml-light/*.cmxa
-%exclude %{_libdir}/ocaml/xml-light/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/xml-light/*.mli
 
-%files devel
-%doc README doc/*
-%license LICENSE.PTR README
-%if %opt
-%{_libdir}/ocaml/xml-light/*.a
-%{_libdir}/ocaml/xml-light/*.cmxa
-%{_libdir}/ocaml/xml-light/*.cmx
-%endif
-%{_libdir}/ocaml/xml-light/*.mli
+%files -f .ofiles-xml-light
+%license LICENSE
+
+
+%files devel -f .ofiles-xml-light-devel
+%doc README.md
+%license LICENSE
+
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-3
-- Updating naming for 3.0 version of Azure Linux.
+* Mon Mar 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.5-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3-2
-- Updated source URL.
-- Improved formatting.
-- Added LICENSE.PTR to clarify the package's license.
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-1
-- Switching to using full number for the 'Release' tag.
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 2.5-11
+- OCaml 5.2.0 ppc64le fix
 
-* Thu Feb 27 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.43.svn234.1
-- OCaml 4.10.0 final (Fedora 32).
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 2.5-10
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 2.5-7
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 2.5-6
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 2.5-5
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 2.5-3
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 2.5-2
+- OCaml 5.0.0 rebuild
+- Convert License tag to SPDX
+- Trim BuildRequires
+
+* Wed Feb 22 2023 Richard W.M. Jones <rjones@redhat.com> - 2.5-1
+- New upstream version 2.5
+- Use forge macros.
+- Use dune for building.
+- Rename README.
+- Include LICENSE file.
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-8
+- Bump release and rebuild.
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 2.4-7
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 2.4-4
+- OCaml 4.14.0 rebuild
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.4-3
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Dec 27 2021 Jerry James <loganjerry@gmail.com> - 2.4-1
+- Version 2.4
+- New upstream URL
+- Clarify that license includes the OCaml exception
+- Add patch to fix parsing of hex entities
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.56.svn234
+- Bump release and rebuild.
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.55.svn234
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-0.54.svn234
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 13:12:07 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.53.svn234
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-0.52.svn234
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.51.svn234
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.50.svn234
+- Bump release and rebuild.
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.49.svn234
+- OCaml 4.11.0 rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-0.48.svn234
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.47.svn234
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.46.svn234
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 17 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.45.svn234
+- OCaml 4.11.0 pre-release
+
+* Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.44.svn234
+- Update all OCaml dependencies for RPM 4.16.
 
 * Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 2.3-0.43.svn234
 - OCaml 4.10.0 final.
