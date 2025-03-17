@@ -565,8 +565,8 @@
         "type": "other",
         "other": {
           "name": "arpwatch",
-          "version": "2.1a15",
-          "downloadUrl": "ftp://ftp.ee.lbl.gov/arpwatch-2.1a15.tar.gz"
+          "version": "3.7",
+          "downloadUrl": "https://ee.lbl.gov/downloads/arpwatch/arpwatch-3.7.tar.gz"
         }
       }
     },
