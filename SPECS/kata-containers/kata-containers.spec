@@ -71,6 +71,7 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-blk.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 
@@ -123,10 +124,10 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4mz-1
-- Add systemd-udev and tarfs to enable virtio-blk with pod sandboxing
-- Set AGENT_POLICY=yes
-- Move tardev-snapshotter into kata-containers-cc-tardev
+* Tue Mar 18 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4mz-1
+- Add systemd-udev, tarfs, and tardev-snapshotter to enable virtio-blk with pod sandboxing
+- Add new config for virtio-blk based pod sandboxing
+- Set AGENT_POLICY=yes for UVM and kata-agent
 
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
