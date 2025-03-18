@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/mikefarah/yq
-Source:         https://github.com/mikefarah/yq/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://github.com/mikefarah/yq/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang
 BuildRequires:  git
@@ -42,5 +42,5 @@ bash ./scripts/acceptance.sh
 
 %changelog
 * Mon Mar 17 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.45.1-1
-- Build yq rpm for Azure Linux
+- Initial Azure Linux import from Fedora license: MIT
 - License verified
