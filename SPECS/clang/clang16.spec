@@ -45,6 +45,7 @@ Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%
 Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_tools_srcdir}.tar.xz
 Patch0:         CVE-2023-29933.patch
 Patch1:         CVE-2023-29935.patch
+Patch2:         CVE-2023-29942.patch
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm16-devel = %{version}
@@ -231,6 +232,7 @@ make clang-check
 * Tue Mar 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 16.0.0-2
 - Add patch for CVE-2023-29933
 - Add patch for CVE-2023-29935
+- Add patch for CVE-2023-29942
 
 * Wed Apr 05 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-1
 - Add spec for clang16
