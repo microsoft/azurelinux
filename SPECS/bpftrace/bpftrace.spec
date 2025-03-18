@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/iovisor/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-2313.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
@@ -78,6 +79,9 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Tue Mar 18 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.16.0-3
+- Fix CVE-2024-2313
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.16.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
