@@ -1,7 +1,9 @@
 {
  "Signatures": {
+  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
   "processcsv.py": "2176eb136d0c9fa60369a563767d69c1de5e4e22f72465fb42f8279d375dd34e",
   "processcsv.py.pod": "d8c6be480cfb20cab5f0c4e8390b0093cc8e08aec5a8328260aa7728a5914dd0",
-  "virt-top-1.0.9.tar.gz": "d615e63821cbf0bd5e4cdc1c315450dcd32cf188ee36a30fd52e85df3b7cb491"
+  "virt-top-1.1.1.tar.gz": "6cdd98d2334f4061f8dac5d157178102f9dd8a929fadf87e85d773235044042a",
+  "virt-top-1.1.1.tar.gz.sig": "f68bb678fbdca59f2fca6299c1eae6ab8f2abc285237ef55003c48d8d46f4522"
  }
 }
