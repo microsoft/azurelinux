@@ -113,12 +113,12 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 
 %changelog
 * Tue Mar 18 2025 Andy Zaugg <azaugg@linkedin.com> - 3.0-6
-- Stop initrd creation on systemd system unit files
+- Stop initrd creation on systemd system unit files and /sbin additions
 
 * Tue Jul 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-5
 - Remove old dm-verity boot support
 
-* Thu Mar 23 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-4
+* Fri Jun 07 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-4
 - Flag all dracut driver list configs as watched pkgs for initramfs regen
 
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-3
