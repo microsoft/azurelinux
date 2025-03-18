@@ -1,13 +1,14 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Utilities/System
 URL:            https://subversion.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2024-46901-advisory.patch
 BuildRequires:  apr-devel
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
@@ -48,7 +49,7 @@ Requires:       %{name} = %{version}
 Provides Perl (SWIG) support for Subversion version control system.
 
 %prep
-%autosetup -p1
+%autosetup -p0
 
 %build
 export CFLAGS="%{build_cflags} -Wformat"
@@ -103,6 +104,9 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Fri Mar 06 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.14.2-2
+- Add patch for CVE-2024-46901
+
 * Mon Jun 06 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.2-1
 - Updating to 1.14.2 to fix CVE-2021-28544.
 
