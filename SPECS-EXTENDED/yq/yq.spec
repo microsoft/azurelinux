@@ -42,5 +42,5 @@ bash ./scripts/acceptance.sh
 
 %changelog
 * Mon Mar 17 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.45.1-1
-- Initial Azure Linux import from Fedora license
+- Initial Azure Linux import from Fedora 41
 - License verified
