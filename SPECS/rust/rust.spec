@@ -138,10 +138,10 @@ rm -v ./tests/rustdoc-ui/issues/issue-98690.*
 %install
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
-rm -f %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
-rm -f %{buildroot}%{_docdir}/docs/html/.lock
-rm -f %{buildroot}%{_docdir}/rustc/*.old
-rm -f %{buildroot}%{_bindir}/*.old
+rm  %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
+rm  %{buildroot}%{_docdir}/docs/html/.lock
+rm  %{buildroot}%{_docdir}/rustc/*.old
+rm  %{buildroot}%{_bindir}/*.old
 
 %ldconfig_scriptlets
 
