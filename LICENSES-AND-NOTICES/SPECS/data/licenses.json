@@ -2187,6 +2187,7 @@
                 "yp-tools",
                 "ypbind",
                 "ypserv",
+                "yq",
                 "z3",
                 "zenity",
                 "zerofree",
