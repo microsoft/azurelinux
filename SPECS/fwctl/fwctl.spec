@@ -67,7 +67,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 13%{?dist}
+Release:	 14%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -250,6 +250,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Tue Mar 18 2025 Chris Co <chrco@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
 - Bump release to rebuild for new kernel release
 

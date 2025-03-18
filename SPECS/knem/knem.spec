@@ -53,7 +53,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 13%{?dist}
+Release:	 14%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -116,7 +116,7 @@ EOF)
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -282,6 +282,9 @@ fi
 %endif
 
 %changelog
+* Tue Mar 18 2025 Chris Co <chrco@microsoft.com> - 1.1.4.90mlnx3-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-13
 - Bump release to rebuild for new kernel release
 
