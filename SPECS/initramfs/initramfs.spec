@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        3.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,7 @@ This package provides the configuration files for initrd generation.
 mkdir -p %{buildroot}%{_sysconfdir}/dracut.conf.d
 install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 
-%define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
+%define watched_path %{_libdir}/udev/rules.d /lib/modules %{_sysconfdir}/dracut.conf.d
 %define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, dracut-fips, dracut-megaraid, dracut-hostonly, dracut-hyperv, dracut-overlayfs, dracut-virtio, dracut-vrf, dracut-xen
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
@@ -112,6 +112,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %{_sysconfdir}/dracut.conf.d/fscks.conf
 
 %changelog
+* Tue Mar 18 2025 Andy Zaugg <azaugg@linkedin.com> - 3.0-6
+- Stop initrd creation on systemd system unit files
+
 * Tue Jul 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-5
 - Remove old dm-verity boot support
 
