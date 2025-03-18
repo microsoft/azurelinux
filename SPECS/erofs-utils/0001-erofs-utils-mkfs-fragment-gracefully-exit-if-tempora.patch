@@ -1,0 +1,84 @@
+From bc8ec19a4ed741c9b457387dcba2b647e819b16d Mon Sep 17 00:00:00 2001
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+Date: Wed, 12 Feb 2025 20:36:33 +0800
+Subject: [PATCH 1/7] erofs-utils: mkfs: fragment: gracefully exit if temporary
+ storage is low
+
+Currently, EROFS keeps all fragments into a temporary file for later
+packed inode compression.  However, this could trigger an unexpected
+segfault if temporary storage runs low.
+
+Print a proper error message and gracefully exit.
+
+Closes: https://github.com/erofs/erofs-utils/issues/13
+Link: https://lore.kernel.org/r/20250212123633.40004-1-hsiangkao@linux.alibaba.com
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+---
+ include/erofs/internal.h | 3 ++-
+ lib/fragments.c          | 4 ++++
+ lib/inode.c              | 8 +++-----
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/include/erofs/internal.h b/include/erofs/internal.h
+index 5f5bc10..2f71557 100644
+--- a/include/erofs/internal.h
++++ b/include/erofs/internal.h
+@@ -256,7 +256,6 @@ struct erofs_inode {
+ 	unsigned int eof_tailrawsize;
+ 
+ 	union {
+-		void *compressmeta;
+ 		void *chunkindexes;
+ 		struct {
+ 			uint16_t z_advise;
+@@ -274,6 +273,8 @@ struct erofs_inode {
+ #define z_idata_size	idata_size
+ 		};
+ 	};
++	void *compressmeta;
++
+ #ifdef WITH_ANDROID
+ 	uint64_t capabilities;
+ #endif
+diff --git a/lib/fragments.c b/lib/fragments.c
+index 32ac6f5..9633a2b 100644
+--- a/lib/fragments.c
++++ b/lib/fragments.c
+@@ -266,6 +266,10 @@ int z_erofs_pack_file_from_fd(struct erofs_inode *inode, int fd, u32 tofcrc)
+ 	else
+ 		rc = 0;
+ out:
++	if (rc)
++		erofs_err("Failed to record %llu-byte fragment data @ %llu for nid %llu: %d",
++			  inode->fragment_size | 0ULL,
++			  inode->fragmentoff | 0ULL, inode->nid | 0ULL, rc);
+ 	if (memblock)
+ 		munmap(memblock, inode->i_size);
+ 	return rc;
+diff --git a/lib/inode.c b/lib/inode.c
+index 7f97030..743e915 100644
+--- a/lib/inode.c
++++ b/lib/inode.c
+@@ -141,16 +141,14 @@ unsigned int erofs_iput(struct erofs_inode *inode)
+ 		free(d);
+ 
+ 	free(inode->compressmeta);
+-	if (inode->eof_tailraw)
+-		free(inode->eof_tailraw);
++	free(inode->eof_tailraw);
+ 	list_del(&inode->i_hash);
+-	if (inode->i_srcpath)
+-		free(inode->i_srcpath);
++	free(inode->i_srcpath);
+ 
+ 	if (inode->datasource == EROFS_INODE_DATA_SOURCE_DISKBUF) {
+ 		erofs_diskbuf_close(inode->i_diskbuf);
+ 		free(inode->i_diskbuf);
+-	} else if (inode->i_link) {
++	} else {
+ 		free(inode->i_link);
+ 	}
+ 	free(inode);
+-- 
+2.48.1
+
