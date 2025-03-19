@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,33 +14,49 @@ Requires:       bash
 Requires:       ca-certificates
 Requires:       chrony
 Requires:       cpio
+# Required for confidential storage functionality
 Requires:       cryptsetup
 Requires:       curl
 Requires:       dbus
+# Required for confidential storage functionality
+Requires:       e2fsprogs
 Requires:       elfutils-libelf
 Requires:       filesystem
-Requires:       grep
-Requires:       gzip
 Requires:       iptables
-Requires:       iproute
-Requires:       iputils
 Requires:       irqbalance
-Requires:       lvm2
-Requires:       lz4
-Requires:       procps-ng
-Requires:       readline
-Requires:       sed
 # Note: We currently only support using systemd for our init process, not the kata-agent.
 # When we go to add support for AGENT_INIT=yes, can drop this.
 # https://github.com/microsoft/kata-containers/blob/msft-main/tools/osbuilder/rootfs-builder/cbl-mariner/config.sh#L10
 Requires:       systemd
-Requires:       tar
 Requires:       tzdata
-Requires:       util-linux
 Requires:       zlib
+Requires:       cifs-utils
+Requires:       device-mapper
+# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
+Requires:       systemd-udev
 
 %description
 Metapackage to install the set of packages inside a Kata containers UVM
+
+%package        debug
+Summary:        Metapackage to install the set of packages inside a Kata confidential containers debug UVM.
+Requires:       %{name} = %{version}-%{release}
+Requires:       curl
+Requires:       cpio
+# Provides find
+Requires:       findutils
+Requires:       gzip
+Requires:       iproute
+# Provides ping, tracepath, etc for debugging net
+Requires:       iputils
+Requires:       lz4
+Requires:       sed
+Requires:       tar
+# Provides free, kill, pgrep, ps, etc
+Requires:       procps-ng
+
+%description    debug
+Metapackage to install the set of packages inside a Kata containers UVM, includes extra debug utilities.
 
 %package        coco
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
@@ -95,6 +111,8 @@ Requires:       golang
 
 %files
 
+%files debug
+
 %files coco
 
 %files build
@@ -102,6 +120,15 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-9
+- Add cifs-utils, device-mapper, and systemd-udev to kata pod sandboxing.
+
+* Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
+- Introduce debug metapackage
+- Move curl, cpio, gzip, iputils, lvm2, tar, procps-ng to debug metapackage
+- Remove bash, grep, readline, util-linux from all metapackages (implicit deps of existing requirements)
+- Add findutils to debug metapackage
+
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
 - Add explicit make dependency for UVM build
 - Remove commented package dependencies
