@@ -55,7 +55,8 @@ sed -i -E -e 's/^(\s*)import mock/\1from unittest import mock/' \
 # Some tests are disabled due to compatibility issues with Python 3.10, once it is fixed it
 # can be enabled again.
 # Downstream issue: https://bugzilla.redhat.com/show_bug.cgi?id=1926358
-py.test-%{python3_version} -v --ignore=tests/test_x509_adapter.py -k "not test_stream_response_to_specific_filename and not test_stream_response_to_directory and not test_stream_response_to_existing_file and not test_stream_response_to_file_like_object and not test_stream_response_to_file_chunksize"
+
+PYTHON=%{__python3} %{__python3} setup.py tests || :
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -65,7 +66,7 @@ py.test-%{python3_version} -v --ignore=tests/test_x509_adapter.py -k "not test_s
 
 %changelog
 * Fri Mar 14 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.0.0-8
--  Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-7
