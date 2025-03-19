@@ -1,27 +1,22 @@
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((Term::ANSIColor)\\)\s*$
-
-Summary:        Encode to colored JSON
 Name:           perl-JSON-Color
-Version:        0.133
-Release:        3%{?dist}
-License:        GPL+ OR Artistic
+Version:        0.134
+Release:        6%{?dist}
+Summary:        Encode to colored JSON
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 URL:            https://metacpan.org/release/JSON-Color/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-%{version}.tar.gz
 BuildArch:      noarch
-
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.10.1
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
 # Run-time
 BuildRequires:  perl(Color::ANSI::Util)
 BuildRequires:  perl(ColorTheme::NoColor)
@@ -29,25 +24,24 @@ BuildRequires:  perl(ColorThemeBase::Static::FromStructColors)
 BuildRequires:  perl(ColorThemeRole::ANSI)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Graphics::ColorNamesLite::WWW)
-BuildRequires:  perl(Module::Load::Util) >= 0.004
-BuildRequires:  perl(Role::Tiny)
-BuildRequires:  perl(Term::ANSIColor) >= 3.00
+BuildRequires:  perl(Module::Load::Util) >= 0.009
 BuildRequires:  perl(parent)
-
-%if 0%{?with_check}
+BuildRequires:  perl(Role::Tiny)
+# Not used for tests - Scalar::Util::LooksLikeNumber
+BuildRequires:  perl(Term::ANSIColor) >= 3.00
+# Tests
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
-BuildRequires:  perl(blib)
-%endif
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(ColorTheme::NoColor)
-Requires:       perl(Module::Load::Util) >= 0.004
+Requires:       perl(Module::Load::Util) >= 0.009
 Requires:       perl(Role::Tiny)
 Requires:       perl(Term::ANSIColor) >= 3.00
 Recommends:     perl(Scalar::Util::LooksLikeNumber)
+
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((Term::ANSIColor)\\)\s*$
 
 %description
 This module generates JSON, colorized with ANSI escape sequences.
@@ -66,7 +60,7 @@ with "%{_libexecdir}/%{name}/test".
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 # Help file to recognise the Perl scripts
 for F in t/*.t; do
@@ -75,7 +69,7 @@ for F in t/*.t; do
 done
 
 %install
-%make_install
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
 # Install tests
@@ -91,21 +85,50 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 %check
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 unset AUTHOR_TESTING
-%make_build test
+make test
 
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/ColorTheme*
+%{perl_vendorlib}/JSON*
+%{_mandir}/man3/ColorTheme::JSON::Color::*
+%{_mandir}/man3/JSON::Color*
 
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
-* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.133-3
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+* Wed Mar 19 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.134.6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.134-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.134-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.134-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.134-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 14 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.134-1
+- 0.134 bump (BZ#2219181)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.133-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.133-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.133-4
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.133-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Thu Jan 06 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.133-2
 - Added missing requires perl(ColorTheme::NoColor)
