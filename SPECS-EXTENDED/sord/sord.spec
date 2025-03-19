@@ -1,25 +1,26 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global maj 0
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
 Name:       sord
-Version:    0.16.4
-Release:    5%{?dist}
+Version:    0.16.18
+Release:    1%{?dist}
 Summary:    A lightweight Resource Description Framework (RDF) C library
 
 License:    ISC
 URL:        https://drobilla.net/software/sord
-Source0:    https://download.drobilla.net/%{name}-%{version}.tar.bz2
+Source0:    https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:    https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:    https://drobilla.net/drobilla.gpg
 
-BuildRequires: boost-devel
 BuildRequires: doxygen
-BuildRequires: graphviz
-BuildRequires: glib2-devel
-BuildRequires: python3
-BuildRequires: serd-devel >= 0.30.0
 BuildRequires: gcc
-BuildRequires: gcc-c++
+BuildRequires: meson
+BuildRequires: gnupg
+BuildRequires: pkgconfig(serd-0) >= 0.30.10
+BuildRequires: pkgconfig(libpcre2-8)
+BuildRequires: cmake
+BuildRequires: pkgconfig(zix-0) >= 0.4.0
 
 %description
 %{name} is a lightweight C library for storing Resource Description
@@ -38,42 +39,28 @@ Framework (RDF) data in memory.
 This package contains the headers and development libraries for %{name}.
 
 %prep
-%setup -q
-# we'll run ldconfig, and add our optflags 
-sed -i -e "s|bld.add_post_fun(autowaf.run_ldconfig)||" \
-       -e "s|cflags          = [ '-DSORD_INTERNAL' ]\
-|cflags          = [ '-DSORD_INTERNAL' ] + '%optflags'.split(' ') |" wscript
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%autosetup -p1
 
 %build
-%set_build_flags
-# Work around a possible GCC 10 bug
-# GCC 10 crashes on these arches in for loop with ZixBTreeIter
-%ifarch %{power64} %{arm} aarch64 s390 s390x
-CFLAGS+=" -O1"
-CXXFLAGS+=" -O1"
-%endif
-export LINKFLAGS="%{__global_ldflags}"
-python3 waf configure \
-    --prefix=%{_prefix} \
-    --libdir=%{_libdir} \
-    --mandir=%{_mandir} \
-    --datadir=%{_datadir} \
-    --docdir=%{_pkgdocdir} \
-    --test \
-    --docs 
-python3 waf build -v %{?_smp_mflags}
+%meson
+%meson_build
 
 %install
-DESTDIR=%{buildroot} python3 waf install
-chmod +x %{buildroot}%{_libdir}/lib%{name}-%{maj}.so.*
-install -pm 644 AUTHORS NEWS README.md COPYING %{buildroot}%{_pkgdocdir}
+%meson_install
+
+# Move devel docs to the right directory
+install -d %{buildroot}%{_docdir}/%{name}
+mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
+
+%check
+%meson_test
 
 %files
 %{_pkgdocdir}
 %exclude %{_pkgdocdir}/%{name}-%{maj}/
-%exclude %{_pkgdocdir}/COPYING
 %license COPYING
-%{_libdir}/lib%{name}-%{maj}.so.*
+%{_libdir}/lib%{name}-%{maj}.so.%{maj}*
 %{_bindir}/sordi
 %{_bindir}/sord_validate
 %{_mandir}/man1/%{name}*.1*
@@ -83,9 +70,12 @@ install -pm 644 AUTHORS NEWS README.md COPYING %{buildroot}%{_pkgdocdir}
 %{_libdir}/lib%{name}-%{maj}.so
 %{_libdir}/pkgconfig/%{name}-%{maj}.pc
 %{_includedir}/%{name}-%{maj}/
-%{_mandir}/man3/%{name}*.3*
 
 %changelog
+* Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.16.18-1
+- Upgrade to 0.16.18
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
