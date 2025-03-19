@@ -123,6 +123,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Mar 19 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl4mz-1
+- Auto-upgrade to 3.2.0.azl4mz
+
 * Tue Mar 18 2025 Mitch Zhu <mitchzhu@microsoft.com> - 3.2.0.azl4mz-1
 - Add systemd-udev, tarfs, and tardev-snapshotter to enable virtio-blk with pod sandboxing
 - Add new config for virtio-blk based pod sandboxing
