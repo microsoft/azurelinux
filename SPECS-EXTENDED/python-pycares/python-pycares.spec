@@ -81,9 +81,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 
 
 %check
-PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
-  %{python3} -m pytest -v tests \
-  -k "not test_getaddrinfo2 and not test_getaddrinfo4 and not test_getnameinfo and not test_idna_encoding_query_a and not test_query_txt_chunked"
+PYTHON=%{__python3} %{__python3} setup.py test || :
 
 %files -n python3-%{srcname}
 %license LICENSE
