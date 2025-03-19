@@ -17,12 +17,11 @@ Source2:        target-x86.txt
 Patch0:         CVE-2024-1298.patch
 Patch1:         CVE-2023-0464.patch
 Patch2:         CVE-2024-5535.patch
-Patch3:         CVE-2023-45230.patch
-Patch4:         CVE-2023-45229.patch
-Patch5:         CVE-2023-45231.patch
-Patch6:         CVE-2023-45232_CVE-2023-45233.patch
-Patch7:         CVE-2023-45234.patch
-Patch8:         CVE-2023-45235.patch
+Patch3:         CVE-2023-2650.patch
+Patch4:         CVE-2023-0465.patch
+Patch5:         CVE-2024-0727.patch
+Patch6:         CVE-2023-3817.patch
+Patch7:         CVE-2023-5678.patch
 BuildRequires:  bc
 BuildRequires:  gcc
 BuildRequires:  build-essential
@@ -67,13 +66,12 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
-* Fri Feb 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.0.1-7
-- Add patch to resolve CVE-2023-45230
-- Add patch to resolve CVE-2023-45229
-- Add patch to resolve CVE-2023-45231
-- Add patch to resolve CVE-2023-45232 and CVE-2023-45233
-- Add patch to resolve CVE-2023-45234
-- Add patch to resolve CVE-2023-45235
+* Mon Mar 03 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.0.1-7
+- Add patch for CVE-2023-2650.patch
+- Add patch for CVE-2023-0465.patch
+- Add patch for CVE-2024-0727.patch
+- Add patch for CVE-2023-3817.patch
+- Add patch for CVE-2023-5678.patch
 
 * Mon Nov 25 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.0.1-6
 - Add patch to resolve CVE-2024-5535

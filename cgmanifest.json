@@ -3880,8 +3880,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.13.0",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.gz"
+          "version": "2.13.1",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.1.tar.gz"
         }
       }
     },
@@ -24924,8 +24924,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+          "version": "20.26.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz"
         }
       }
     },
@@ -29467,8 +29467,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1164",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1164.tar.gz"
+          "version": "9.1.1198",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1198.tar.gz"
         }
       }
     },
