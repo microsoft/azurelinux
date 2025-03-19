@@ -55,10 +55,10 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license Copyright
+%doc AUTHORS NEWS README.md FEATURES
 %{_libdir}/*.so.*
 %{_libdir}/*.sh
-%{_libdir}/libxslt-plugins
 %{_bindir}/*
 %{_mandir}/man1/*
 
@@ -71,7 +71,6 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 %{_docdir}/*
 %{_datadir}/gtk-doc/*
-%{_datadir}/aclocal/*
 %{_mandir}/man3/*
 
 
