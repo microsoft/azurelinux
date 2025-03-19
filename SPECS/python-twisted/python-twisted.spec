@@ -2,7 +2,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        22.10.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ Patch0:         disable_multicast_test.patch
 Patch1:         CVE-2024-41671.patch
 # Patch2 is required for both CVE-2024-41671 and CVE-2024-41810
 Patch2:         CVE-2024-41810.patch
-
+Patch3:         CVE-2023-46137.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-incremental
 BuildRequires:  python3-pyOpenSSL
@@ -101,6 +101,9 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/cftp3
 
 %changelog
+* Mon Feb 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 22.10.0-4
+- Fix CVE-2023-46137
+
 * Thu Aug 01 2024 Sindhu Karri <lakarri@microsoft.com> - 22.10.0-3
 - Fix CVE-2024-41671 and CVE-2024-41810 with patches
 
