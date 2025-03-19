@@ -1,50 +1,45 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %{?nodejs_find_provides_and_requires}
 %global npm_name nodemon
 
-# Disable until dependencies are met
+# Disable until dependencies are bundled
 %global enable_tests 0
 
 Name:          nodejs-%{npm_name}
-Version:       2.0.3
-Release:       5%{?dist}
+Version:       3.1.4
+Release:       3%{?dist}
 Summary:       Simple monitor script for use during development of a node.js app
-License:       MIT
+License:       ISC AND MIT
 URL:           https://github.com/remy/nodemon
-Source0:       %{_distro_sources_url}/%{npm_name}-v%{version}-bundled.tar.gz
-
+#Source0:       %{npm_name}-v%{version}-bundled.tar.gz
+Source0:       https://github.com/remy/nodemon/archive/refs/tags/v3.1.4.tar.gz#/nodemon-v3.1.4-bundled.tar.gz
 BuildRequires: nodejs-devel
 BuildRequires: nodejs-packaging
+BuildRequires: npm
+
+# Let the nodemon work with any nodejs version available
+%global __requires_exclude ^\/usr\/bin\/node
+Requires:      nodejs(engine)
+Suggests:      nodejs
 
 ExclusiveArch: %{nodejs_arches} noarch
 BuildArch:     noarch
-
-%if 0%{?enable_tests}
-BuildRequires:  npm(async)
-BuildRequires:  npm(coffee-script)
-BuildRequires:  npm(husky)
-BuildRequires:  npm(istanbul)
-BuildRequires:  npm(jscs)
-BuildRequires:  npm(mocha)
-BuildRequires:  npm(proxyquire)
-BuildRequires:  npm(semantic-release)
-BuildRequires:  npm(should)
-%endif
 
 %description
 Simple monitor script for use during development of a node.js app.
 
 For use during development of a node.js based application.
 
-nodemon will watch the files in the directory in which nodemon 
-was started, and if any files change, nodemon will automatically 
+nodemon will watch the files in the directory in which nodemon
+was started, and if any files change, nodemon will automatically
 restart your node application.
 
-nodemon does not require any changes to your code or method of 
-development. nodemon simply wraps your node application and keeps 
-an eye on any files that have changed. Remember that nodemon is a 
-replacement wrapper for node, think of it as replacing the word "node" 
+nodemon does not require any changes to your code or method of
+development. nodemon simply wraps your node application and keeps
+an eye on any files that have changed. Remember that nodemon is a
+replacement wrapper for node, think of it as replacing the word "node"
 on the command line when you run your script.
 
 %prep
@@ -72,24 +67,69 @@ npm run test
 %endif
 
 %files
-%license LICENSE
 %doc CODE_OF_CONDUCT.md doc faq.md README.md
 %{nodejs_sitelib}/%{npm_name}
 %{_bindir}/nodemon
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-5
-- Updating naming for 3.0 version of Azure Linux.
-
-* Mon May 15 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.3-4
-- Remove explicit build-time dependency on npm (provided by nodejs-devel)
-
-* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.3-3
-- Updated source URL.
+* Fri Mar 19 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.1.4-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-2
-- Initial CBL-Mariner import from CentOS 8 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 24 2024 Jan Staněk <jstanek@redhat.com> - 3.1.4-1
+- Update to version 3.1.4 (rhbz#2290334)
+
+* Fri May 31 2024 Jan Staněk <jstanek@redhat.com> - 3.1.2-1
+- Update to version 3.1.2 (rhbz#2284031)
+
+* Tue May 28 2024 Jan Staněk <jstanek@redhat.com> - 3.1.1-1
+- Update to 3.1.1 (rhbz#2283282)
+
+* Mon Mar 18 2024 Honza Horak <hhorak@redhat.com> - 3.1.0-1
+- update to 3.1.0
+
+* Fri Feb 09 2024 Honza Horak <hhorak@redhat.com> - 3.0.3-2
+- SPDX conversion
+
+* Fri Feb 09 2024 Honza Horak <hhorak@redhat.com> - 3.0.3-1
+- update to version 3.0.3
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Oct 11 2023 Jan Staněk <jstanek@redhat.com> - 3.0.1-1
+- update to version 3.0.1
+
+* Wed Aug 09 2023 Honza Horak <hhorak@redhat.com> - 2.0.3-9
+- Let nodemon work with any Node.js version
+  Resolves: #2230317
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri May 01 2020 Honza Horak <hhorak@redhat.com> - 2.0.3-1
 - Update to 2.0.3
