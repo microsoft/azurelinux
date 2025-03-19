@@ -18533,8 +18533,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-Build-Tiny",
-          "version": "0.039",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Module/Module-Build-Tiny-0.039.tar.gz"
+          "version": "0.051",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Module/Module-Build-Tiny-0.051.tar.gz"
         }
       }
     },
