@@ -5,8 +5,8 @@ Distribution:   Azure Linux
 %global _docdir_fmt %{name}
 
 Name:           python-%{modname}
-Version:        1.43.0
-Release:        4%{?dist}
+Version:        1.47.0
+Release:        1%{?dist}
 Summary:        Mutagen is a Python module to handle audio meta-data
 
 License:        GPLv2+
@@ -86,6 +86,9 @@ pip3 install pytest==7.1.2 hypothesis==6.45.1
 %doc docs/_build/*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.47.0-1
+- Auto-upgrade to 1.47.0 - Extended package upgrade to IDC
+
 * Wed May 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.43.0-4
 - Drop BR on pytest & pip install latests deps to enable ptest
 - License verified
