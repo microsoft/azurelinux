@@ -3890,8 +3890,8 @@
         "type": "other",
         "other": {
           "name": "freexl",
-          "version": "1.0.6",
-          "downloadUrl": "https://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-1.0.6.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-2.0.0.tar.gz"
         }
       }
     },
