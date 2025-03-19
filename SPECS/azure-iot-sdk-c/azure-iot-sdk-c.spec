@@ -7,7 +7,7 @@ Name:           azure-iot-sdk-c
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
 Version:        2022.01.21
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
@@ -23,6 +23,7 @@ Source0:        %{name}-%{version}.tar.bz2
 Patch0:         CVE-2024-21646.patch
 Patch1:         CVE-2024-25110.patch
 Patch2:         CVE-2024-27099.patch
+Patch3:         CVE-2024-29195.patch
 BuildRequires:  cmake
 BuildRequires:  build-essential
 BuildRequires:  curl-devel
@@ -88,6 +89,9 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 /usr/cmake/*
 
 %changelog
+*   Fri Feb 28 2025 Mayank Singh <mayansingh@microsoft.com> - 2022.01.21-4
+-   Fix CVE-2024-29195 with an upstream patch
+
 *   Tue Mar 12 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 2022.01.21-3
 -   Add patch for CVE-2024-25110
 -   Add patch for CVE-2024-27099
