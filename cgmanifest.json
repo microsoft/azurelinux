@@ -29486,8 +29486,8 @@
         "type": "other",
         "other": {
           "name": "udisks2",
-          "version": "2.9.4",
-          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.9.4/udisks-2.9.4.tar.bz2"
+          "version": "2.10.1",
+          "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.10.1/udisks-2.10.1.tar.bz2"
         }
       }
     },
