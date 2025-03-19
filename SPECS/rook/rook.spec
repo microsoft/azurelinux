@@ -265,9 +265,6 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 * Fri Feb 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.2-24
 - Add patch for CVE-2022-3162
 
-* Fri Feb 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.2-24
-- Add patch for CVE-2022-3162
-
 * Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.2-23
 - Fix CVE-2024-28180 with an upstream patch
 
