@@ -19903,8 +19903,8 @@
         "type": "other",
         "other": {
           "name": "perl-Term-Table",
-          "version": "0.015",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Term-Table-0.015.tar.gz"
+          "version": "0.024",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Term-Table-0.024.tar.gz"
         }
       }
     },
