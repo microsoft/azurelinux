@@ -106,6 +106,8 @@ fi
 %files tardev
 %{_bindir}/tardev-snapshotter
 %{_unitdir}/tardev-snapshotter.service
+%{_sbindir}/mount.tar
+%{_bindir}/kata-overlay
 
 %files tools
 %dir %{kata_path}

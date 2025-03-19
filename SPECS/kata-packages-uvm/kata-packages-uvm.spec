@@ -46,6 +46,16 @@ Requires:       systemd-udev
 %description
 Metapackage to install the set of packages inside a Kata containers UVM
 
+%package        coco
+Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
+Requires:       %{name} = %{version}-%{release}
+Requires:       cifs-utils
+Requires:       device-mapper
+# Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
+Requires:       systemd-udev
+
+%description    coco
+
 %package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
@@ -89,13 +99,15 @@ Requires:       golang
 
 %files
 
+%files coco
+
 %files build
 
 %files coco-sign
 
 %changelog
 * Mon Feb 24 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-8
-- Add cifs-utils to vanilla kata. Remove coco subpackage.
+- Add cifs-utils, device-mapper, and systemd-udev to kata pod sandboxing.
 
 * Mon Nov 25 2024 Manuel Huber <mahuber@microsoft.com> - 1.0.0-7
 - Add explicit make dependency for UVM build

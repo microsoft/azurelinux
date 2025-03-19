@@ -64,8 +64,6 @@ PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
 
 %files
-%{_sbindir}/mount.tar
-%{_bindir}/kata-overlay
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
