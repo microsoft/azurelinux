@@ -11,20 +11,16 @@ Distribution:   Azure Linux
 
 Summary:        SAX XML parser based on the Expat library
 Name:           lua-expat
-Version:        1.3.0
-Release:        19%{?dist}
+Version:        1.5.2
+Release:        1%{?dist}
 License:        MIT
-URL:            https://matthewwild.co.uk/projects/luaexpat/
-Source0:        https://matthewwild.co.uk/projects/luaexpat/luaexpat-%{version}.tar.gz
-Source1:        https://matthewwild.co.uk/projects/luaexpat/luaexpat-%{version}.tar.gz.asc
-Source2:        gpgkey-32A9EDDE3609931EB98CEAC315907E8E7BDD6BFE.gpg
-
+URL:            https://lunarmodules.github.io/luaexpat/
+Source0:        https://github.com/lunarmodules/luaexpat/archive/%{version}/luaexpat-%{version}.tar.gz
 Requires:       lua(abi) = %{lua_version}
-
-
-
-BuildRequires:  gcc, lua-devel >= %{lua_version}, expat-devel
-BuildRequires:  gnupg2
+BuildRequires:  gcc
+BuildRequires:  lua >= %{lua_version}
+BuildRequires:  lua-devel >= %{lua_version}
+BuildRequires:  expat-devel >= 2.4.0
 
 %description
 LuaExpat is a SAX XML parser based on the Expat library.
@@ -36,6 +32,7 @@ Obsoletes:      lua-expat-compat < 1.3.0-16
 Provides:       lua-expat-compat = %{version}-%{release}
 Provides:       lua-expat-compat%{?_isa} = %{version}-%{release}
 Requires:       lua(abi) = %{lua_compat_version}
+BuildRequires:  compat-lua >= %{lua_compat_version}
 BuildRequires:  compat-lua-devel >= %{lua_compat_version}
 
 %description -n lua%{lua_compat_version}-expat
@@ -43,7 +40,6 @@ LuaExpat is a SAX XML parser based on the Expat library for Lua %{lua_compat_ver
 
 
 %prep
-gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %setup -q -n luaexpat-%{version}
 
 
@@ -53,16 +49,18 @@ cp -a . %{lua_compat_builddir}
 
 %build
 %make_build \
-  CFLAGS="%{optflags} -fPIC -std=c99" LDFLAGS="%{?__global_ldflags}" \
-  LUA_V=%{lua_version} LUA_CDIR=%{lua_libdir} LUA_LDIR=%{lua_pkgdir} LUA_INC=-I%{_includedir} \
-  EXPAT_INC=-I%{_includedir}
+  CFLAGS="$RPM_OPT_FLAGS -fPIC -std=c99" LDFLAGS="$RPM_LD_FLAGS" \
+  LUA_V=%{lua_version} \
+  LUA_CDIR=%{lua_libdir} LUA_LDIR=%{lua_pkgdir} \
+  LUA_INC=-I%{_includedir}
 
 
 pushd %{lua_compat_builddir}
 %make_build \
-  CFLAGS="%{optflags} -fPIC -std=c99" LDFLAGS="%{?__global_ldflags}" \
-  LUA_V=%{lua_compat_version} LUA_CDIR=%{lua_compat_libdir} LUA_LDIR=%{lua_compat_pkgdir} LUA_INC=-I%{_includedir}/lua-%{lua_compat_version} \
-  EXPAT_INC=-I%{_includedir}
+  CFLAGS="$RPM_OPT_FLAGS -fPIC -std=c99" LDFLAGS="$RPM_LD_FLAGS" \
+  LUA_V=%{lua_compat_version} \
+  LUA_CDIR=%{lua_compat_libdir} LUA_LDIR=%{lua_compat_pkgdir} \
+  LUA_INC=-I%{_includedir}/lua-%{lua_compat_version}
 popd
 
 
@@ -76,22 +74,33 @@ popd
 
 
 %check
-lua -e 'package.cpath="./src/?.so;"..package.cpath; dofile("tests/test.lua");'
-lua -e 'package.cpath="./src/?.so;" .. package.cpath; package.path="./src/?.lua;" .. package.path; dofile("tests/test-lom.lua");'
+lua -e \
+  'package.cpath="%{buildroot}%{lua_libdir}/?.so;"..package.cpath;
+   package.path="%{buildroot}%{lua_pkgdir}/?.lua;"..package.path;
+   local lxp = require("lxp"); print("Hello from "..lxp._VERSION.."!");'
+lua-%{lua_compat_version} -e \
+  'package.cpath="%{buildroot}%{lua_compat_libdir}/?.so;"..package.cpath;
+   package.path="%{buildroot}%{lua_compat_pkgdir}/?.lua;"..package.path;
+   local lxp = require("lxp"); print("Hello from "..lxp._VERSION.."!");'
 
 %files
-%doc README doc/us/*
-%{lua_libdir}/*
-%{lua_pkgdir}/*
+%license LICENSE
+%doc README.md docs/*
+%{lua_libdir}/lxp.so
+%{lua_pkgdir}/lxp/
 
 
 %files -n lua%{lua_compat_version}-expat
-%doc README doc/us/*
-%{lua_compat_libdir}/*
-%{lua_compat_pkgdir}/*
+%doc README.md docs/*
+%{lua_compat_libdir}/lxp.so
+%{lua_compat_pkgdir}/lxp/
 
 
 %changelog
+* Tue Nov 26 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.5.2-1
+- Updated to version 1.5.2
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
