@@ -8,7 +8,7 @@ import (
 )
 
 type Module struct {
-	Name string `yaml:"Name"`
+	Name string `yaml:"name"`
 }
 
 func (m *Module) IsValid() error {
@@ -20,8 +20,8 @@ func (m *Module) IsValid() error {
 }
 
 type Modules struct {
-	Load    []Module `yaml:"Load"`
-	Disable []Module `yaml:"Disable"`
+	Load    []Module `yaml:"load"`
+	Disable []Module `yaml:"disable"`
 }
 
 func (m *Modules) IsValid() error {
