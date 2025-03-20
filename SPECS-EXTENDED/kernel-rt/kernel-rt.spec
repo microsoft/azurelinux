@@ -4,6 +4,7 @@
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
+%define short_name rt
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -24,7 +25,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.77.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,17 +145,19 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
-%description -n python3-perf
+%description -n python3-perf-%{short_name}
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     bpftool
+%package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Requires:       %{name} = %{version}-%{release}
 
-%description -n bpftool
+%description -n bpftool-%{short_name}
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -406,14 +409,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
-%files -n python3-perf
+%files -n python3-perf-%{short_name}
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-%{short_name}
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Mar 20 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.77.1-2
+- Rename bpftool and python3-perf to be kernel specific
+
 * Mon Feb 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.77.1-1
 - Auto-upgrade to 6.6.77.1
 
