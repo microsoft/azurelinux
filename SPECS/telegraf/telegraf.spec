@@ -86,7 +86,7 @@ fi
 
 %changelog
 * Thu Mar 20 2025 Mayank Singh <mayansingh@microsoft.com> - 1.31.0-6
-- Fix CVE-2024-35255 and CVE-2025-27144.patch with an upstream patch
+- Fix CVE-2024-35255 and CVE-2025-27144 with an upstream patch
 
 * Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-5
 - Patch CVE-2025-22868, CVE-2025-22869
