@@ -1,13 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-XML-Writer
-Version:        0.625
-Release:        17%{?dist}
+Version:        0.900
+Release:        14%{?dist}
 Summary:        A simple Perl module for writing XML documents
-License:        CC0
+License:        LicenseRef-Fedora-UltraPermissive
 URL:            https://metacpan.org/release/XML-Writer
-Source0:        https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-%{version}.tar.gz#/perl-XML-Writer-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
@@ -28,7 +29,6 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(IO::Scalar)
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
-Requires:  perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 XML::Writer is a simple Perl module for writing XML documents: it
@@ -38,31 +38,115 @@ checking on the output, to make certain (for example) that start and
 end tags match, that there is exactly one document element, and that
 there are not duplicate attribute names.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Recommends:     perl(IO::Scalar)
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n XML-Writer-%{version}
 find examples -type f -exec chmod -x {} +
+# Remove executable flag from library
+chmod -x Writer.pm
+# Help generators to recognize Perl scripts
+perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "t/selfcontained_output.t"
+chmod +x "t/selfcontained_output.t"
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags} 
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -a \( -name .packlist \
-  -o \( -name '*.bs' -a -empty \) \) -exec rm -f {} ';'
+%{make_install}
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+# Remove release tests
+rm %{buildroot}/%{_libexecdir}/%{name}/t/pod-coverage.t
+rm %{buildroot}/%{_libexecdir}/%{name}/t/pod.t
+# Test script
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
 
 %files
-%doc Changes examples LICENSE README TODO
+%doc Changes examples README TODO
+%license LICENSE
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.625-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.900-14
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Mar 15 2023 Michal Josef Špaček <mspacek@redhat.com> - 0.900-11
+- Fix SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Oct 27 2022 Michal Josef Špaček <mspacek@redhat.com> - 0.900-9
+- Package tests
+- Update license to SPDX format and change from CC0, it's not CC0, but public domain
+- Remove bad executable flag from library file
+- Simplify build and install process
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.900-7
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.900-4
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.900-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 12 2020 Xavier Bachelot <xavier@bachelot.org> - 0.900-2
+- Use %%license
+
+* Mon Oct 12 2020 Xavier Bachelot <xavier@bachelot.org> - 0.900-1
+- Update to 0.900
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.625-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.625-17
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.625-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
