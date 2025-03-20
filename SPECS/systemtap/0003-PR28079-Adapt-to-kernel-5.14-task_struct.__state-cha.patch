@@ -1,0 +1,81 @@
+From fface03033853a265d8282d6846d0ee8df0fdce8 Mon Sep 17 00:00:00 2001
+From: Stan Cox <scox@redhat.com>
+Date: Sun, 18 Jul 2021 21:32:51 -0400
+Subject: [PATCH 3/4] PR28079: Adapt to kernel 5.14 task_struct.__state change
+
+Use signal_wake_up_state for the 5.14 kernel which changed volatile long state to unsigned int __state.
+---
+ buildrun.cxx                        |  3 +++
+ runtime/linux/autoconf-task-state.c | 18 ++++++++++++++++++
+ runtime/stp_utrace.c                |  7 +++++--
+ 3 files changed, 26 insertions(+), 2 deletions(-)
+ create mode 100644 runtime/linux/autoconf-task-state.c
+
+diff --git a/buildrun.cxx b/buildrun.cxx
+index b050e35b1..ae27ddea4 100644
+--- a/buildrun.cxx
++++ b/buildrun.cxx
+@@ -521,6 +521,9 @@ compile_pass (systemtap_session& s)
+ 		  "STAPCONF_ATOMIC_FETCH_ADD_UNLESS", NULL);
+   output_autoconf(s, o, cs, "autoconf-lockdown-debugfs.c", "STAPCONF_LOCKDOWN_DEBUGFS", NULL);
+   output_autoconf(s, o, cs, "autoconf-lockdown-kernel.c", "STAPCONF_LOCKDOWN_KERNEL", NULL);
++  output_autoconf(s, o, cs, "autoconf-hlist_add_tail_rcu.c",
++		  "STAPCONF_HLIST_ADD_TAIL_RCU", NULL);
++  output_autoconf(s, o, cs, "autoconf-task-state.c", "STAPCONF_TASK_STATE", NULL);
+   
+   // used by runtime/linux/netfilter.c
+   output_exportconf(s, o2, "nf_register_hook", "STAPCONF_NF_REGISTER_HOOK");
+diff --git a/runtime/linux/autoconf-task-state.c b/runtime/linux/autoconf-task-state.c
+new file mode 100644
+index 000000000..27a1d7c13
+--- /dev/null
++++ b/runtime/linux/autoconf-task-state.c
+@@ -0,0 +1,18 @@
++/*
++ * Is this a kernel prior to the following kernel commit:
++ *
++ * commit	2f064a59a11ff9bc22e52e9678bc601404c7cb34
++ * Author:	Peter Zijlstra <peterz@infradead.org>
++ * Date:	2021-06-11 10:28:17 +0200
++ *
++ * sched: Change task_struct::state
++ * Change the type and name of task_struct::state. Drop the volatile and
++ * shrink it to an 'unsigned int'. Rename it in order to find all uses
++ * such that we can use READ_ONCE/WRITE_ONCE as appropriate.
++ */
++
++#include <linux/sched.h>
++
++unsigned int bar (struct task_struct *foo) { 
++  return (foo->state = 0); 
++}
+diff --git a/runtime/stp_utrace.c b/runtime/stp_utrace.c
+index ff8c5549d..d63e6366c 100644
+--- a/runtime/stp_utrace.c
++++ b/runtime/stp_utrace.c
+@@ -33,9 +33,12 @@
+ #if defined(__set_task_state)
+ #define __stp_set_task_state(tsk, state_value)		\
+ 	__set_task_state((tsk), (state_value))
+-#else
++#elif defined(STAPCONF_TASK_STATE)
+ #define __stp_set_task_state(tsk, state_value)		\
+ 	do { (tsk)->state = (state_value); } while (0)
++#else
++#define __stp_set_task_state(tsk, state_value)		\
++	signal_wake_up_state((tsk), (state_value))
+ #endif
+ 
+ // For now, disable the task_work_queue on non-RT kernels.
+@@ -1263,7 +1266,7 @@ static void utrace_wakeup(struct task_struct *target, struct utrace *utrace)
+ 	spin_lock_irq(&target->sighand->siglock);
+ 	if (target->signal->flags & SIGNAL_STOP_STOPPED ||
+ 	    target->signal->group_stop_count)
+-		target->state = TASK_STOPPED;
++	        __stp_set_task_state(target, TASK_STOPPED);
+ 	else
+ 		stp_wake_up_state(target, __TASK_TRACED);
+ 	spin_unlock_irq(&target->sighand->siglock);
+-- 
+2.34.1
+
