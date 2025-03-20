@@ -4,6 +4,8 @@
 %global commit      148454621f9bd8dd843f591e87715415431f6979
 %global shortcommit %{lua:print(macros.commit:sub(1,7))}
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           python-curio
 Version:        1.6^1.%{shortcommit}
 Release:        1%{?dist}
