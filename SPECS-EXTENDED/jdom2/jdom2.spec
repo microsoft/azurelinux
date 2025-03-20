@@ -1,7 +1,7 @@
 Summary:        Java manipulation of XML made easy
 Name:           jdom2
-Version:        2.0.6
-Release:        29%{?dist}
+Version:        2.0.6.1
+Release:        1%{?dist}
 # Sam as the "Saxpath" license but restricts the use of the name "JDOM" instead of "SAXPath".
 License:        JDOM
 Vendor:         Microsoft Corporation
@@ -9,27 +9,24 @@ Distribution:   Azure Linux
 URL:            http://www.jdom.org/
 # ./generate-tarball.sh
 Source0:        https://github.com/hunterhacker/jdom/archive/JDOM-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Bnd tool configuration
+Source3:       bnd.properties
 # Remove bundled jars that might not have clear licensing
 Source4:        generate-tarball.sh
 # Use system libraries
 # Disable gpg signatures
 # Process contrib and junit pom files
 Patch0:         0001-Adapt-build.patch
-#
-# Security patches
-# P100 -> ...
-#
-# CVE-2021-33813
-Patch100:       bd3ab78370098491911d7fe9d7a43b97144a234e.patch
-Patch101:       dd4f3c2fc7893edd914954c73eb577f925a7d361.patch
-Patch102:       07f316957b59d305f04c7bdb26292852bcbc2eb5.patch
+
 
 BuildArch:      noarch
+
 
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
+
 
 %description
 JDOM is a Java-oriented object model which models XML documents.
@@ -51,7 +48,7 @@ This package contains javadoc for %{name}.
 %prep
 %autosetup -p1 -n jdom-JDOM-%{version}
 
-sed -i 's/\r//' LICENSE.txt README.txt
+sed -i 's/\r//' LICENSE.txt 
 
 # Unable to run coverage: use log4j12 but switch to log4j 2.x
 sed -i.coverage "s|coverage, jars|jars|" build.xml
@@ -61,8 +58,8 @@ rm -rf core/src/java/org/jdom2/xpath/
 sed -i '/import org.jdom2.xpath.XPathFactory/d' core/src/java/org/jdom2/JDOMConstants.java
 
 %build
-mkdir lib
-%ant -Dversion=%{version} -Dcompile.source=1.7 -Dcompile.target=1.7 -Dj2se.apidoc=%{_javadocdir}/java maven
+[ -d lib ] || mkdir lib
+%ant -Dversion=%{version} -Dcompile.source=1.8 -Dcompile.target=1.8 -Dj2se.apidoc=%{_javadocdir}/java maven
 
 %install
 # jar
@@ -78,13 +75,16 @@ cp -pr build/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %fdupes %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
+%doc CHANGES.txt COMMITTERS.txt README.md TODO.txt
 %license LICENSE.txt
-%doc CHANGES.txt COMMITTERS.txt README.txt TODO.txt
 
 %files javadoc
 %{_javadocdir}/%{name}
 
 %changelog
+* wed nov 13 20204 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.0.6.1-1
+- upgrade to version 2.0.6.1
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.6-29
 - Fixing source URL.
 
