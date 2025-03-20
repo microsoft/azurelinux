@@ -14,15 +14,10 @@ Summary:       Simple monitor script for use during development of a node.js app
 License:       ISC AND MIT
 URL:           https://github.com/remy/nodemon
 #Source0:       %{npm_name}-v%{version}-bundled.tar.gz
-Source0:       https://github.com/remy/nodemon/archive/refs/tags/v3.1.4.tar.gz#/nodemon-v3.1.4-bundled.tar.gz
+Source0:       https://github.com/remy/nodemon/archive/refs/tags/v3.1.4.tar.gz#/%{npm_name}-v%{version}-bundled.tar.gz
 BuildRequires: nodejs-devel
 BuildRequires: nodejs-packaging
 BuildRequires: npm
-
-# Let the nodemon work with any nodejs version available
-%global __requires_exclude ^\/usr\/bin\/node
-Requires:      nodejs(engine)
-Suggests:      nodejs
 
 ExclusiveArch: %{nodejs_arches} noarch
 BuildArch:     noarch
@@ -52,7 +47,7 @@ on the command line when you run your script.
 
 %install
 mkdir -p %{buildroot}%{nodejs_sitelib}/%{npm_name}
-cp -pr doc bin lib package.json website node_modules %{buildroot}%{nodejs_sitelib}/%{npm_name}
+cp -pr doc bin lib package.json website %{buildroot}%{nodejs_sitelib}/%{npm_name}
 
 mkdir -p %{buildroot}%{_bindir}
 ln -sf %{nodejs_sitelib}/%{npm_name}/bin/nodemon.js %{buildroot}%{_bindir}/nodemon
