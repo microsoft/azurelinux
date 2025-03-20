@@ -1,20 +1,26 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global _unitdir /usr/lib/systemd/system
-Summary: A log file analysis program
+Summary: Analyzes and Reports on system logs
 Name: logwatch
-Version: 7.5.3
-Release: 5%{?dist}
+Version: 7.11
+Release: 1%{?dist}
 License: MIT
-URL: http://www.logwatch.org/
-Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Temporary fix for update to DNF 4.4
-Source1: dnf-rpm.conf
+URL: https://sourceforge.net/projects/logwatch/
+Source0: https://sourceforge.net/projects/logwatch/files/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildRequires: perl-generators
-Requires: grep mailx
-Requires: perl(Date::Manip)
-Requires: perl(Sys::CPU)
-Requires: perl(Sys::MemInfo)
+Requires: grep
+Requires: perl(diagnostics)
+Requires: perl(Errno)
+Requires: perl(File::Basename)
+Requires: perl(lib)
+Requires: perl(re)
+Requires: perl(Socket)
+Requires: perl(subs)
+Requires: perl(Time::Local)
+Requires: perl(URI::URL)
+Requires: perl(vars)
+Requires: perl(warnings)
 Requires: cronie
 BuildArchitectures: noarch
 
@@ -25,8 +31,7 @@ that you wish with the detail that you wish.  Easy to use - works right out
 of the package on many systems.
 
 %prep
-%setup -q
-cp -p %{SOURCE1} .
+%autosetup -p1
 
 %build
 
@@ -47,37 +52,41 @@ install -m 0755 -d %{buildroot}%{_datadir}/logwatch/scripts/services
 install -m 0755 -d %{buildroot}%{_datadir}/logwatch/scripts/shared
 install -m 0755 -d %{buildroot}%{_datadir}/logwatch/lib
 install -m 0755 -d %{buildroot}%{_sbindir}
+install -m 0755 -d %{buildroot}%{_mandir}/man1
 install -m 0755 -d %{buildroot}%{_mandir}/man5
 install -m 0755 -d %{buildroot}%{_mandir}/man8
 
-for i in scripts/logfiles/*; do
-    if [ $(ls $i | wc -l) -ne 0 ]; then
-        install -m 0755 -d %{buildroot}%{_datadir}/logwatch/$i
-        install -m 0644 $i/* %{buildroot}%{_datadir}/logwatch/$i
-    fi
+for i in scripts/logfiles/* ; do
+   if [ $(ls $i | wc -l) -ne 0 ] ; then
+      install -m 0755 -d %{buildroot}%{_datadir}/logwatch/$i
+      install -m 0644 $i/* %{buildroot}%{_datadir}/logwatch/$i
+   fi
 done
 
 install -m 0755 scripts/logwatch.pl %{buildroot}%{_datadir}/logwatch/scripts/logwatch.pl
 install -m 0644 scripts/services/* %{buildroot}%{_datadir}/logwatch/scripts/services
 install -m 0644 scripts/shared/* %{buildroot}%{_datadir}/logwatch/scripts/shared
 
-install -m 0644 conf/logwatch.conf %{buildroot}%{_datadir}/logwatch/default.conf/logwatch.conf
+install -m 0644 conf/*.conf %{buildroot}%{_datadir}/logwatch/default.conf
 
 install -m 0644 conf/logfiles/* %{buildroot}%{_datadir}/logwatch/default.conf/logfiles
 install -m 0644 conf/services/* %{buildroot}%{_datadir}/logwatch/default.conf/services
 install -m 0644 conf/html/* %{buildroot}%{_datadir}/logwatch/default.conf/html
 
-install -m 0644 lib/Logwatch.pm %{buildroot}%{_datadir}/logwatch/lib/Logwatch.pm
+install -m 0644 lib/* %{buildroot}%{_datadir}/logwatch/lib
 
-install -m 0644 ignore.conf.5 %{buildroot}%{_mandir}/man5
-install -m 0644 override.conf.5 %{buildroot}%{_mandir}/man5
+install -m 0644 amavis-logwatch.1 %{buildroot}%{_mandir}/man1
+install -m 0644 postfix-logwatch.1 %{buildroot}%{_mandir}/man1
 install -m 0644 logwatch.conf.5 %{buildroot}%{_mandir}/man5
+ln -s logwatch.conf.5 %{buildroot}%{_mandir}/man5/ignore.conf.5
+ln -s logwatch.conf.5 %{buildroot}%{_mandir}/man5/override.conf.5
 install -m 0644 logwatch.8 %{buildroot}%{_mandir}/man8
 
 install -m 0755 scheduler/logwatch.cron %{buildroot}%{_sysconfdir}/cron.daily/0logwatch
 mkdir -p %{buildroot}%{_unitdir}
-install -m 0755 scheduler/logwatch.timer %{buildroot}%{_unitdir}/logwatch.timer
-install -m 0755 scheduler/logwatch.service %{buildroot}%{_unitdir}/logwatch.service
+install -m 0644 scheduler/logwatch.timer %{buildroot}%{_unitdir}/logwatch.timer
+install -m 0644 scheduler/logwatch.service %{buildroot}%{_unitdir}/logwatch.service
+install -m 0644 scheduler/systemd.conf %{buildroot}%{_datadir}/logwatch/default.conf/systemd.conf
 
 ln -s ../../%{_datadir}/logwatch/scripts/logwatch.pl %{buildroot}/%{_sbindir}/logwatch
 
@@ -85,12 +94,8 @@ echo "###### REGULAR EXPRESSIONS IN THIS FILE WILL BE TRIMMED FROM REPORT OUTPUT
 echo "# Local configuration options go here (defaults are in %{_datadir}/logwatch/default.conf/logwatch.conf)" > %{buildroot}%{_sysconfdir}/logwatch/conf/logwatch.conf
 echo "# Configuration overrides for specific logfiles/services may be placed here." > %{buildroot}%{_sysconfdir}/logwatch/conf/override.conf
 
-# Fix for DNF 4.4
-install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
-
 %files
-%license LICENSE
-%doc README HOWTO-Customize-LogWatch
+%doc README HOWTO-Customize-LogWatch LICENSE
 %dir %{_var}/cache/logwatch
 %dir %{_sysconfdir}/logwatch
 %dir %{_sysconfdir}/logwatch/scripts
@@ -104,8 +109,6 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %dir %{_datadir}/logwatch/dist.conf
 %dir %{_datadir}/logwatch/dist.conf/services
 %dir %{_datadir}/logwatch/dist.conf/logfiles
-# Fix for DNF 4.4
-%{_datadir}/logwatch/dist.conf/logfiles/*.conf
 %{_datadir}/logwatch/scripts/logwatch.pl
 %config(noreplace) %{_datadir}/logwatch/default.conf/*.conf
 %{_sbindir}/logwatch
@@ -114,7 +117,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_datadir}/logwatch/scripts/services
 %{_datadir}/logwatch/scripts/logfiles
 %dir %{_datadir}/logwatch/lib
-%{_datadir}/logwatch/lib/Logwatch.pm
+%{_datadir}/logwatch/lib/*
 %dir %{_datadir}/logwatch/default.conf
 %dir %{_datadir}/logwatch/default.conf/services
 %{_datadir}/logwatch/default.conf/services/*.conf
@@ -127,6 +130,10 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_unitdir}/logwatch.timer
 
 %changelog
+* Mon Nov 18 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.11-1
+- Update to version 7.11
+- License verified.
+
 * Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 7.5.3-5
 - Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
 
