@@ -1,7 +1,7 @@
 Summary:        An Enchanting Spell Checking Library
 Name:           enchant2
-Version:        2.2.14
-Release:        4%{?dist}
+Version:        2.7.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ URL:            https://github.com/AbiWord/enchant
 Source0:        https://github.com/AbiWord/enchant/releases/download/v%{version}/enchant-%{version}.tar.gz
 # Look for aspell using pkg-config, instead of AC_CHECK_LIB which adds -laspell
 # to the global LIBS and over-links libenchant (#1574893)
-Patch0:         enchant_aspell.patch
+#Patch0:         enchant_aspell.patch
 BuildRequires:  aspell-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -19,6 +19,9 @@ BuildRequires:  hunspell-devel
 BuildRequires:  libtool
 BuildRequires:  libvoikko-devel
 BuildRequires:  make
+BuildRequires:  pkg-config
+BuildRequires:  git
+BuildRequires:  groff
 Provides:       bundled(gnulib)
 
 %description
@@ -52,7 +55,7 @@ developing applications that use %{name}.
 %autosetup -p1 -n enchant-%{version}
 
 # Needed for Patch0
-autoreconf -ifv
+#autoreconf -ifv
 
 %build
 %configure \
@@ -79,7 +82,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %dir %{_libdir}/enchant-2
 %{_libdir}/enchant-2/enchant_hunspell.so
 %{_mandir}/man1/*
-%{_datadir}/enchant-2
+%{_datadir}/enchant-2-2
 
 %files aspell
 %{_libdir}/enchant-2/enchant_aspell.so*
@@ -88,11 +91,18 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/enchant-2/enchant_voikko.so*
 
 %files devel
+%doc %{_defaultdocdir}/%{name}/enchant.html
+%doc %{_defaultdocdir}/%{name}/enchant-2.html
+%doc %{_defaultdocdir}/%{name}/enchant-lsmod-2.html
 %{_libdir}/libenchant-2.so
 %{_libdir}/pkgconfig/enchant-2.pc
 %{_includedir}/enchant-2
+%{_mandir}/man5/enchant.5*
 
 %changelog
+* Thu Apr 25 2024 Andrew Phelps <anphel@microsoft.com> - 2.7.1-1
+- Upgrade to version 2.7.1
+
 * Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 2.2.14-4
 - Moved from SPECS-EXTENDED to SPECS
 
