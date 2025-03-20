@@ -278,6 +278,7 @@ Patch1016:      CVE-2023-3354.patch
 Patch1017:      CVE-2024-24474.patch
 Patch1018:      CVE-2023-6683.patch
 Patch1019:      CVE-2023-6693.patch
+Patch1020:      CVE-2023-5088.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2315,6 +2316,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 * Wed Mar 19 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-21
 - Add patch for CVE-2023-6683
 - Add patch for CVE-2023-6693
+- Add patch for CVE-2023-5088
 
 * Mon Aug 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 6.2.0-20
 - Address CVE-2024-24474
