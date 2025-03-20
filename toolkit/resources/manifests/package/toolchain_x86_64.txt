@@ -150,9 +150,9 @@ krb5-1.19.4-3.cm2.x86_64.rpm
 krb5-debuginfo-1.19.4-3.cm2.x86_64.rpm
 krb5-devel-1.19.4-3.cm2.x86_64.rpm
 krb5-lang-1.19.4-3.cm2.x86_64.rpm
-libarchive-3.6.1-4.cm2.x86_64.rpm
-libarchive-debuginfo-3.6.1-4.cm2.x86_64.rpm
-libarchive-devel-3.6.1-4.cm2.x86_64.rpm
+libarchive-3.6.1-5.cm2.x86_64.rpm
+libarchive-debuginfo-3.6.1-5.cm2.x86_64.rpm
+libarchive-devel-3.6.1-5.cm2.x86_64.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
@@ -218,9 +218,9 @@ libtool-debuginfo-2.4.6-8.cm2.x86_64.rpm
 libxml2-2.10.4-6.cm2.x86_64.rpm
 libxml2-debuginfo-2.10.4-6.cm2.x86_64.rpm
 libxml2-devel-2.10.4-6.cm2.x86_64.rpm
-libxslt-1.1.34-7.cm2.x86_64.rpm
-libxslt-debuginfo-1.1.34-7.cm2.x86_64.rpm
-libxslt-devel-1.1.34-7.cm2.x86_64.rpm
+libxslt-1.1.34-8.cm2.x86_64.rpm
+libxslt-debuginfo-1.1.34-8.cm2.x86_64.rpm
+libxslt-devel-1.1.34-8.cm2.x86_64.rpm
 lua-5.4.4-1.cm2.x86_64.rpm
 lua-debuginfo-5.4.4-1.cm2.x86_64.rpm
 lua-devel-5.4.4-1.cm2.x86_64.rpm
