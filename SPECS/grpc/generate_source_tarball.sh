@@ -6,13 +6,12 @@ SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PKG_VERSION=""
 
-# parameters:
-#
-# --srcTarball  : src tarball file
-#                 this file contains the 'initial' source code of the component
-#                 and should be replaced with the new/modified src code
-# --outFolder   : folder where to copy the new tarball(s)
-# --pkgVersion  : package version
+# --srcTarball    : src tarball file
+#                   this file contains the 'initial' source code of the component
+#                   and should be replaced with the new/modified src code
+# --outFolder     : folder where to copy the new tarball(s)
+# --pkgVersion    : package version
+# --vendorVersion : vendor version
 #
 PARAMS=""
 while (( "$#" )); do
@@ -44,6 +43,15 @@ while (( "$#" )); do
             exit 1
         fi
         ;;
+        --vendorVersion)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            VENDOR_VERSION=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
         -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $1" >&2
         exit 1
@@ -55,9 +63,10 @@ while (( "$#" )); do
   esac
 done
 
-echo "--srcTarball   -> $SRC_TARBALL"
-echo "--outFolder    -> $OUT_FOLDER"
-echo "--pkgVersion   -> $PKG_VERSION"
+echo "--srcTarball      -> $SRC_TARBALL"
+echo "--outFolder       -> $OUT_FOLDER"
+echo "--pkgVersion      -> $PKG_VERSION"
+echo "--vendorVersion   -> $VENDOR_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
@@ -82,7 +91,7 @@ git submodule update --init
 popd
 mv grpc/third_party third_party
 
-TARBALL_NAME="grpc-$PKG_VERSION-submodules.tar.gz"
+TARBALL_NAME="grpc-$PKG_VERSION-submodules-v$VENDOR_VERSION.tar.gz"
 
 NEW_TARBALL="$OUT_FOLDER/$TARBALL_NAME"
 
