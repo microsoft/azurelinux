@@ -1,0 +1,36 @@
+From 625bf7d9c11ec366c45514d5ec12ab1cdd8ce094 Mon Sep 17 00:00:00 2001
+From: Benjamin Dauvergne <bdauvergne@entrouvert.com>
+Date: Tue, 13 Feb 2024 16:01:14 +0100
+Subject: [PATCH] misc: move declaration of lasso_get_default_signature_method
+ in xml.h (#86867)
+
+---
+ lasso/id-ff/server.h | 2 --
+ lasso/xml/xml.h      | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lasso/id-ff/server.h b/lasso/id-ff/server.h
+index 5f9022e9..4eb7e361 100644
+--- a/lasso/id-ff/server.h
++++ b/lasso/id-ff/server.h
+@@ -134,8 +134,6 @@ LASSO_EXPORT GList *lasso_server_get_filtered_provider_list(const LassoServer *s
+ 	LassoProviderRole role, LassoMdProtocolType protocol_type, LassoHttpMethod http_method);
+ 
+ LASSO_EXPORT LassoSignatureMethod lasso_get_default_signature_method();
+-void lasso_set_default_signature_method(LassoSignatureMethod meth);
+-
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
+diff --git a/lasso/xml/xml.h b/lasso/xml/xml.h
+index 9fb4668a..ddc96d9a 100644
+--- a/lasso/xml/xml.h
++++ b/lasso/xml/xml.h
+@@ -214,6 +214,7 @@ LASSO_EXPORT LassoKeyEncryptionMethod lasso_get_default_key_encryption_method();
+ LASSO_EXPORT void lasso_set_default_key_encryption_method(LassoKeyEncryptionMethod method);
+ 
+ /* signature method and hash strength */
++LASSO_EXPORT LassoSignatureMethod lasso_get_default_signature_method();
+ LASSO_EXPORT LassoSignatureMethod lasso_get_min_signature_method();
+ 
+ void lasso_set_min_signature_method(LassoSignatureMethod meth);
