@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
 Version:        0.16.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
