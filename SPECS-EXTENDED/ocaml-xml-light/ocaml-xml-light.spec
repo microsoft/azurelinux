@@ -3,17 +3,18 @@
 %global debug_package %{nil}
 %endif
 
+%global srcname xml-light
 %global forgeurl https://github.com/ncannasse/xml-light
 Version: 2.5
 %forgemeta
 
-Name:           ocaml-xml-light
+Name:           ocaml-%{srcname}
 Release:        13%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            http://tech.motion-twin.com/xmllight.html
-Source0:        https://github.com/ncannasse/xml-light/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/ncannasse/xml-light/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.03
 BuildRequires:  ocaml-dune >= 2.7
