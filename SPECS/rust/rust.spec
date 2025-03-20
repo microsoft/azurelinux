@@ -42,8 +42,8 @@ Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 
-Patch0:		Remove_cannot_write_error_test.patch
-Patch1:		Remove_leave_log_after_failure_test.patch
+#Patch0:		Remove_cannot_write_error_test.patch
+#Patch1:		Remove_leave_log_after_failure_test.patch
 Patch2:		Ignore_failing_ci_tests.patch
 Patch3:		skip-failing-run-make-tests.patch
 Patch4:		Ignore-test-for-aarch64.patch
@@ -138,10 +138,10 @@ rm -v ./tests/rustdoc-ui/issues/issue-98690.*
 %install
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
-rm  %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
-rm  %{buildroot}%{_docdir}/docs/html/.lock
-rm  %{buildroot}%{_docdir}/rustc/*.old
-rm  %{buildroot}%{_bindir}/*.old
+rm -rf %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
+rm -rf %{buildroot}%{_docdir}/docs/html/.lock
+rm -rf %{buildroot}%{_docdir}/rustc/*.old
+rm -rf %{buildroot}%{_bindir}/*.old
 
 %ldconfig_scriptlets
 
