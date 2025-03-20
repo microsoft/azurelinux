@@ -1,25 +1,26 @@
 {
- "Signatures": {
-  "es_AR.oxt": "8d0952c6eb3bf40bcbc60cd8ea8f876f8e0c4ff714b65e06556ee06bfeaa0a7e",
-  "es_BO.oxt": "97e3b37efb3bb0149405bee38666b75a44d4c683a3f0b3b77ff442299a5987a2",
-  "es_CL.oxt": "15c99c78cbeae09a02a74a8eff0beda219ae639e2673100fad9cec9ad93aca99",
-  "es_CO.oxt": "bc876b22df92211791655fee3eb2f74a9c52e10cc1f2143239fd5326c0a1fefa",
-  "es_CR.oxt": "5f834d9a6570b351702adeaa0d160c0514b4510147623d8c70cc1d3e5c49dcfe",
-  "es_CU.oxt": "2051ce3aea6b8e50b3ec305b6915320ced630b2f6e89c27126b33bd5d58f8476",
-  "es_DO.oxt": "a63fd1ad3db6dc1bfd1585320c18775fd58df4f7e7fc3dce9903284053536412",
-  "es_EC.oxt": "7c48d2845312bcd83c5f85cf20672fcdbeb632ab7fde5403bd393c61fafc3b55",
-  "es_ES.oxt": "837fe70fe5dade69a5991f5088e68368a139ec76655bb551ebfc1c2ae1c4a71a",
-  "es_GT.oxt": "1fdf774bff8e923e03177beb5a8b2d8c47760274617adf59a78904bdc22356f5",
-  "es_HN.oxt": "b7710785e7079b62609ab800fa1fe9f4de337454fbac15bc5d10955a2af298ab",
-  "es_MX.oxt": "ec4fb742a1bce1cb7de92ca544bb9583c7956dcf562465ca9d41fd6eff44c492",
-  "es_NI.oxt": "9d3990fb1f3686fa2a0880ba42bc6e3a9ca9702500cb5d9a2a16e226a8859514",
-  "es_PA.oxt": "b631d583bf153d02d117724cfeace26269eb2c24f390bc3d989ae32bc7b59e5f",
-  "es_PE.oxt": "8960855f46f0a5febcc433882f5fc29a7d85a7861e0f1005b8d97c51434aa59b",
-  "es_PR.oxt": "46652a01289460926fabf01ee89cdd162bd22499e3dd48cc2e9b31cee8b3a232",
-  "es_PY.oxt": "fbc2dc7ac633cc81592d4ac5f3170415dbb786669e3a93f8b72b9a2b7fec9f78",
-  "es_SV.oxt": "ea3ccd70b22f57d31ecfd6c4cf5e8545c59f8b0bff558619f824a0116bfdeaa4",
-  "es_US.oxt": "7c73c634f0a0a59bb83448863bf545ae58f8f4ff179afe23074bb345d832bfbd",
-  "es_UY.oxt": "c516f12a801161497c765d58021a04f7596e9957c22d915527596c76b5bd7ec3",
-  "es_VE.oxt": "b53bffc7b041831df47babefc667a5a00f01ba5bad77f264219b05eaf8670bc8"
- }
-}
+    "Signatures": {
+     "es_AR.oxt": "8d0952c6eb3bf40bcbc60cd8ea8f876f8e0c4ff714b65e06556ee06bfeaa0a7e",
+     "es_BO.oxt": "97e3b37efb3bb0149405bee38666b75a44d4c683a3f0b3b77ff442299a5987a2",
+     "es_CL.oxt": "15c99c78cbeae09a02a74a8eff0beda219ae639e2673100fad9cec9ad93aca99",
+     "es_CO.oxt": "bc876b22df92211791655fee3eb2f74a9c52e10cc1f2143239fd5326c0a1fefa",
+     "es_CR.oxt": "5f834d9a6570b351702adeaa0d160c0514b4510147623d8c70cc1d3e5c49dcfe",
+     "es_CU.oxt": "2051ce3aea6b8e50b3ec305b6915320ced630b2f6e89c27126b33bd5d58f8476",
+     "es_DO.oxt": "a63fd1ad3db6dc1bfd1585320c18775fd58df4f7e7fc3dce9903284053536412",
+     "es_EC.oxt": "7c48d2845312bcd83c5f85cf20672fcdbeb632ab7fde5403bd393c61fafc3b55",
+     "es_ES.oxt": "837fe70fe5dade69a5991f5088e68368a139ec76655bb551ebfc1c2ae1c4a71a",
+     "es_GQ.oxt": "2103d3c9c62602577c048421113c262d625a98995aacf6a881e3dcb10c44ef2a",
+     "es_GT.oxt": "1fdf774bff8e923e03177beb5a8b2d8c47760274617adf59a78904bdc22356f5",
+     "es_HN.oxt": "b7710785e7079b62609ab800fa1fe9f4de337454fbac15bc5d10955a2af298ab",
+     "es_MX.oxt": "ec4fb742a1bce1cb7de92ca544bb9583c7956dcf562465ca9d41fd6eff44c492",
+     "es_NI.oxt": "9d3990fb1f3686fa2a0880ba42bc6e3a9ca9702500cb5d9a2a16e226a8859514",
+     "es_PA.oxt": "b631d583bf153d02d117724cfeace26269eb2c24f390bc3d989ae32bc7b59e5f",
+     "es_PE.oxt": "8960855f46f0a5febcc433882f5fc29a7d85a7861e0f1005b8d97c51434aa59b",
+     "es_PR.oxt": "46652a01289460926fabf01ee89cdd162bd22499e3dd48cc2e9b31cee8b3a232",
+     "es_PY.oxt": "fbc2dc7ac633cc81592d4ac5f3170415dbb786669e3a93f8b72b9a2b7fec9f78",
+     "es_SV.oxt": "ea3ccd70b22f57d31ecfd6c4cf5e8545c59f8b0bff558619f824a0116bfdeaa4",
+     "es_US.oxt": "7c73c634f0a0a59bb83448863bf545ae58f8f4ff179afe23074bb345d832bfbd",
+     "es_UY.oxt": "c516f12a801161497c765d58021a04f7596e9957c22d915527596c76b5bd7ec3",
+     "es_VE.oxt": "b53bffc7b041831df47babefc667a5a00f01ba5bad77f264219b05eaf8670bc8"
+    }
+   }
