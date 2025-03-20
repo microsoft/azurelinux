@@ -6,13 +6,14 @@ Distribution:   Azure Linux
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           lua-json
-Version:        1.3.2
-Release:        16%{?dist}
+Version:        1.3.4
+Release:        1%{?dist}
 Summary:        JSON Parser/Constructor for Lua
 License:        MIT
 URL:            https://github.com/harningt/luajson
-Source0:        https://github.com/harningt/luajson/archive/%{commit}/luajson-%{version}-%{shortcommit}.tar.gz
-Patch0:		luajson-lua-5.2.patch
+Source0:        https://github.com/harningt/luajson/archive/%{version}/luajson-%{version}.tar.gz
+# Support for lpeg 1.1.0
+Patch0:         https://github.com/harningt/luajson/pull/48.patch
 BuildRequires:  lua >= %{luaver}, lua-lpeg >= 0.8.1
 # for checks
 BuildRequires:  lua-filesystem >= 1.4.1, lua-lunit >= 0.4
@@ -23,8 +24,7 @@ BuildArch:      noarch
 LuaJSON is a customizable JSON decoder/encoder, using LPEG for parsing.
 
 %prep
-%setup -q -n luajson-%{commit}
-%patch 0 -p1 -b .lua-52
+%autosetup -p1 -n luajson-%{version}
 
 %build
 
@@ -39,11 +39,14 @@ make check-regression
 # grep -q "0 failed, 0 errors" testlog.txt
 
 %files
-%license LICENSE
-%doc docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
+%doc LICENSE docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
 %{luapkgdir}/*
 
 %changelog
+* Thu Nov 21 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.3.4-1
+- Updated to version 1.3.4.
+- License verified.
+
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-16
 - Fixing run-time dependencies.
 - License verified.
