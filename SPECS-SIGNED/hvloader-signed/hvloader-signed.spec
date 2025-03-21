@@ -6,7 +6,7 @@
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           hvloader-signed-%{buildarch}
 Version:        1.0.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,8 +38,8 @@ Group:          Applications/System
 %description -n hvloader
 HvLoader.efi is an EFI application for loading an external hypervisor loader.
 
-HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and 
-calls it's entry point passing HvLoader.efi ImageHandle. This way the 
+HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and
+calls it's entry point passing HvLoader.efi ImageHandle. This way the
 hypervisor loader binary has access to HvLoader.efi's command line options,
 and use those as configuration parameters. The first HvLoader.efi command line
 option is the path to hypervisor loader binary.
@@ -69,7 +69,13 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Tue Mar 04 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.0.1-7
+* Fri Mar 21 2025 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.1-9
+- Update version for consistency with hvloader spec
+
+* Tue Mar 04 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.0.1-8
+- Update version for consistency with hvloader spec
+
+* Mon Feb 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.0.1-7
 - Update version for consistency with hvloader spec
 
 * Mon Nov 25 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.0.1-6

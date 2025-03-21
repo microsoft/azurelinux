@@ -4,7 +4,7 @@
 Summary:        HvLoader.efi is an EFI application for loading an external hypervisor loader.
 Name:           hvloader
 Version:        1.0.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,11 +17,18 @@ Source2:        target-x86.txt
 Patch0:         CVE-2024-1298.patch
 Patch1:         CVE-2023-0464.patch
 Patch2:         CVE-2024-5535.patch
-Patch3:         CVE-2023-2650.patch
-Patch4:         CVE-2023-0465.patch
-Patch5:         CVE-2024-0727.patch
-Patch6:         CVE-2023-3817.patch
-Patch7:         CVE-2023-5678.patch
+Patch3:         CVE-2023-45230.patch
+Patch4:         CVE-2023-45229.patch
+Patch5:         CVE-2023-45231.patch
+Patch6:         CVE-2023-45232_CVE-2023-45233.patch
+Patch7:         CVE-2023-45234.patch
+Patch8:         CVE-2023-45235.patch
+Patch9:         CVE-2023-2650.patch
+Patch10:        CVE-2023-0465.patch
+Patch11:        CVE-2024-0727.patch
+Patch12:        CVE-2023-3817.patch
+Patch13:        CVE-2023-5678.patch
+
 BuildRequires:  bc
 BuildRequires:  gcc
 BuildRequires:  build-essential
@@ -37,8 +44,8 @@ ExclusiveArch:  x86_64
 %description
 HvLoader.efi is an EFI application for loading an external hypervisor loader.
 
-HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and 
-calls it's entry point passing HvLoader.efi ImageHandle. This way the 
+HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and
+calls it's entry point passing HvLoader.efi ImageHandle. This way the
 hypervisor loader binary has access to HvLoader.efi's command line options,
 and use those as configuration parameters. The first HvLoader.efi command line
 option is the path to hypervisor loader binary.
@@ -66,12 +73,23 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
-* Mon Mar 03 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.0.1-7
+* Fri Mar 21 2025 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.1-9
+- Reconcile merge issue
+
+* Mon Mar 03 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.0.1-8
 - Add patch for CVE-2023-2650.patch
 - Add patch for CVE-2023-0465.patch
 - Add patch for CVE-2024-0727.patch
 - Add patch for CVE-2023-3817.patch
 - Add patch for CVE-2023-5678.patch
+
+* Fri Feb 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.0.1-7
+- Add patch to resolve CVE-2023-45230
+- Add patch to resolve CVE-2023-45229
+- Add patch to resolve CVE-2023-45231
+- Add patch to resolve CVE-2023-45232 and CVE-2023-45233
+- Add patch to resolve CVE-2023-45234
+- Add patch to resolve CVE-2023-45235
 
 * Mon Nov 25 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.0.1-6
 - Add patch to resolve CVE-2024-5535
@@ -84,7 +102,7 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 
 * Fri May 31 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-3
 - Update edk2_tag to edk2-stable202305
-- Publish edk2-stable202305-submodules source 
+- Publish edk2-stable202305-submodules source
 - Correct the resolution of openssl related CVEs (CVE-2023-0286, CVE-2023-0215, CVE-2022-4450, CVE-2022-4304) that were not successfully addressed in the previous update
 
 * Wed May 08 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-2
