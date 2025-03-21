@@ -1,0 +1,69 @@
+From 26b3a167236e300f05780c4b675ec6e2dba04e24 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 10 Mar 2025 15:28:30 -0700
+Subject: [PATCH] fix mariner test deps
+
+---
+ requirements/tests.txt | 12 +++++-------
+ tests/test_loader.py   |  6 ++++--
+ 2 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/requirements/tests.txt b/requirements/tests.txt
+index 4cd3fe99..31c9bb06 100644
+--- a/requirements/tests.txt
++++ b/requirements/tests.txt
+@@ -7,17 +7,15 @@
+ #
+ attrs==21.4.0
+     # via pytest
+-iniconfig==1.1.1
++exceptiongroup==1.1.1
+     # via pytest
+-packaging==21.3
++iniconfig==1.1.1
+     # via pytest
+-pluggy==1.0.0
++packaging==23.2
+     # via pytest
+-py==1.11.0
++pluggy==1.5.0
+     # via pytest
+-pyparsing==3.0.8
+-    # via packaging
+-pytest==7.1.2
++pytest==7.4.0
+     # via -r requirements/tests.in
+ tomli==2.0.1
+     # via pytest
+
+diff --git a/tests/test_loader.py b/tests/test_loader.py
+index 04c921d24..77d686ef5 100644
+--- a/tests/test_loader.py
++++ b/tests/test_loader.py
+@@ -183,6 +183,7 @@ def test_filename_normpath(self):
+
+ class TestModuleLoader:
+     archive = None
++    mod_env = None
+
+     def compile_down(self, prefix_loader, zip="deflated"):
+         log = []
+@@ -196,13 +197,14 @@ def compile_down(self, prefix_loader, zip="deflated"):
+         self.mod_env = Environment(loader=loaders.ModuleLoader(self.archive))
+         return "".join(log)
+
+-    def teardown(self):
+-        if hasattr(self, "mod_env"):
++    def teardown_method(self):
++        if self.archive is not None:
+             if os.path.isfile(self.archive):
+                 os.remove(self.archive)
+             else:
+                 shutil.rmtree(self.archive)
+             self.archive = None
++            self.mod_env = None
+
+     def test_log(self, prefix_loader):
+         log = self.compile_down(prefix_loader)
+-- 
+2.34.1
