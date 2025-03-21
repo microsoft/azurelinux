@@ -29185,6 +29185,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "trustauthority-cli",
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/intel/trustauthority-client-for-go/archive/refs/tags/v1.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tss2",
           "version": "2.3.2",
           "downloadUrl": "https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss2.3.2.tar.gz"
