@@ -190,7 +190,7 @@ k="${k-}${k+ and }not test_run_installpkg_targz"
 %license %{python3_sitelib}/tox-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* Fri Dec 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.24.1-2
+* Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.24.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
