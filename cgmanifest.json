@@ -28285,6 +28285,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tardev-snapshotter",
+          "version": "0.0.13",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "targetcli",
           "version": "2.1.53",
           "downloadUrl": "https://github.com/open-iscsi/targetcli-fb/archive/v2.1.53/targetcli-fb-2.1.53.tar.gz"
