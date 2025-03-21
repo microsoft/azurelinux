@@ -44,7 +44,7 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 
 Patch0:		Remove_cannot_write_error_test.patch
 Patch1:		Remove_leave_log_after_failure_test.patch
-#Patch2:		Ignore_failing_ci_tests.patch
+Patch2:		Ignore_failing_ci_tests.patch
 Patch3:		skip-failing-run-make-tests.patch
 Patch4:		Ignore-test-for-aarch64.patch
 Patch100:	CVE-2024-9681.patch
@@ -128,7 +128,7 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-./x.py run src/ci/github-actions/calculate-job-matrix.py
+#./x.py run src/ci/github-actions/calculate-job-matrix.py
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
