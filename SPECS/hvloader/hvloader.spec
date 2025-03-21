@@ -23,7 +23,6 @@ Patch5:         CVE-2023-45231.patch
 Patch6:         CVE-2023-45232_CVE-2023-45233.patch
 Patch7:         CVE-2023-45234.patch
 Patch8:         CVE-2023-45235.patch
-
 Patch9:         CVE-2023-2650.patch
 Patch10:        CVE-2023-0465.patch
 Patch11:        CVE-2024-0727.patch
