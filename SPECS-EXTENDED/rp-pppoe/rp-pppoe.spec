@@ -1,28 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: rp-pppoe
-Version: 3.12
-Release: 16%{?dist}
+Version: 4.0
+Release: 6%{?dist}
 Summary: A PPP over Ethernet client (for xDSL support).
-License: GPLv2+
-Url: https://dianne.skoll.ca/projects/rp-pppoe
+License: GPL-2.0-or-later
+Url: https://dianne.skoll.ca/projects/rp-pppoe/
 
-Source: https://dianne.skoll.ca/projects/rp-pppoe/download/OLD/rp-pppoe-%{version}.tar.gz
-Source1: pppoe-connect
-Source2: pppoe-setup
-Source3: pppoe-start
-Source4: pppoe-status
-Source5: pppoe-stop
-Source6: pppoe-server.service
+Source: https://downloads.uls.co.za/rp-pppoe/rp-pppoe-%{version}.tar.gz
 
-Patch0: rp-pppoe-3.12-man.patch
-Patch1: rp-pppoe-3.12-ip-allocation.patch
-Patch2: rp-pppoe-3.12-doc.patch
-Patch3: rp-pppoe-3.12-plugin.patch
-Patch4: rp-pppoe-3.12-pluginpath.patch
-Patch5: rp-pppoe-manpages.patch
-Patch6: rp-pppoe-3.12-bz#1469960-new-kernel-header.patch
-
+BuildRequires: make
 BuildRequires: libtool
 BuildRequires: autoconf
 BuildRequires: automake
@@ -46,66 +33,79 @@ require any kernel modifications. It is fully compliant with RFC 2516,
 the official PPPoE specification.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .config
-%patch 1 -p1 -b .ip-allocation
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1 -b .pluginpath
-%patch 5 -p1 -b .manpages
-%patch 6 -p1 -b .bz#1469960-new-kernel-header
+%autosetup -p1
 
 %build
 cd src
-autoconf
-export CFLAGS="%{optflags} -D_GNU_SOURCE -fno-strict-aliasing"
-%configure --docdir=%{_pkgdocdir} --enable-plugin
+%configure #--docdir=%{_pkgdocdir}
 make
 
 %install
 mkdir -p %{buildroot}%{_sbindir} %{buildroot}%{_unitdir}
 
 make -C src install DESTDIR=%{buildroot}
-
-install -m 0755 %{SOURCE1} %{buildroot}%{_sbindir}
-install -m 0755 %{SOURCE2} %{buildroot}%{_sbindir}
-install -m 0755 %{SOURCE3} %{buildroot}%{_sbindir}
-install -m 0755 %{SOURCE4} %{buildroot}%{_sbindir}
-install -m 0755 %{SOURCE5} %{buildroot}%{_sbindir}
-install -m 0644 %{SOURCE6} %{buildroot}%{_unitdir}/pppoe-server.service
-
-ln -sf pppoe-stop %{buildroot}%{_sbindir}/adsl-stop
-ln -sf pppoe-start %{buildroot}%{_sbindir}/adsl-start
-ln -fs pppoe-start.8 %{buildroot}%{_mandir}/man8/adsl-start.8
-ln -fs pppoe-stop.8 %{buildroot}%{_mandir}/man8/adsl-stop.8
-
-rm -rf %{buildroot}/etc/ppp/pppoe.conf \
-       %{buildroot}/etc/rc.d/init.d/pppoe \
-       %{buildroot}/%{_sysconfdir}/ppp/plugins
-
-%post
-%systemd_post pppoe-server.service
-
-%preun
-%systemd_preun pppoe-server.service
-
-%postun
-%systemd_postun_with_restart pppoe-server.service
+rm -rf %{buildroot}/etc/ppp/plugins
 
 %files
-%license doc/LICENSE
-%doc scripts/pppoe-connect scripts/pppoe-setup scripts/pppoe-init
-%doc scripts/pppoe-start scripts/pppoe-status scripts/pppoe-stop
-%doc SERVPOET README configs doc
 %config(noreplace) %{_sysconfdir}/ppp/pppoe-server-options
-%config(noreplace) %{_sysconfdir}/ppp/firewall*
-%{_unitdir}/pppoe-server.service
 %{_sbindir}/*
 %{_mandir}/man?/*
+%doc %{_docdir}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12-16
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Mar 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4.0-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 27 2023 Than Ngo <than@redhat.com> - 4.0-1
+- fix #2190023, update to 4.0
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 07 2021 Than Ngo <than@redhat.com> - 3.15-1
+- fix bz#1958237, Rebase to 3.15
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.14-5
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jun 03 2020 Than Ngo <than@redhat.com> - 3.14-1
+- update to 3.14
+
+* Wed Apr 08 2020 Than Ngo <than@redhat.com> - 3.13-1
+- update to 3.13
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.12-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
