@@ -1697,8 +1697,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "7.0",
-          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.0.tar.bz2"
+          "version": "7.2",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.2.tar.bz2"
         }
       }
     },
