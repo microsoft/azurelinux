@@ -1,27 +1,30 @@
-Summary:        Packet sniffing beast
-Name:           netsniff-ng
-Version:        0.6.8
-Release:        13%{?dist}
-License:        GPLv2
-Vendor:         Microsoft Corporation
+Name:		netsniff-ng
+Version:	0.6.9
+Release:	2%{?dist}
+Summary:	Packet sniffing beast
+Vendor:         Microsoft Corporations
 Distribution:   Azure Linux
-URL:            http://netsniff-ng.org/
-Source0:        http://www.netsniff-ng.org/pub/%{name}/%{name}-%{version}.tar.xz
-BuildRequires:  make
-BuildRequires:  gcc
-BuildRequires:  ncurses-devel
-BuildRequires:  GeoIP-devel
-BuildRequires:  libnetfilter_conntrack-devel
-BuildRequires:  userspace-rcu-devel
-BuildRequires:  libnl3-devel
-BuildRequires:  flex
-BuildRequires:  bison
-BuildRequires:  libcli-devel
-BuildRequires:  perl-podlators
-BuildRequires:  zlib-devel
-BuildRequires:  libpcap-devel
-BuildRequires:  libnet-devel
-BuildRequires:  libsodium-devel
+License:	GPL-2.0-only
+URL:		https://netsniff-ng.org/
+Source0:	https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:	make
+BuildRequires:	gcc
+BuildRequires:	ncurses-devel
+# GeoIP not in RHEL-9+
+%if 0%{?rhel} < 9
+BuildRequires:	GeoIP-devel
+%endif
+BuildRequires:	libnetfilter_conntrack-devel
+BuildRequires:	userspace-rcu-devel
+BuildRequires:	libnl3-devel
+BuildRequires:	flex
+BuildRequires:	bison
+BuildRequires:	libcli-devel
+BuildRequires:	perl-podlators
+BuildRequires:	zlib-devel
+BuildRequires:	libpcap-devel
+BuildRequires:	libnet-devel
+BuildRequires:	libsodium-devel
 
 %description
 netsniff-ng is a high performance Linux network sniffer for packet inspection.
@@ -49,24 +52,48 @@ export NACL_LIB=sodium
 # use the generic %%configure macro
 ./configure --prefix='%{_prefix}' --sysconfdir='%{_sysconfdir}'
 # the -fcommon is workaround to build with gcc-10, problem reported upstream
-%make_build ETCDIR=%{_sysconfdir} Q= STRIP=: \
+make %{?_smp_mflags} ETCDIR=%{_sysconfdir} Q= STRIP=: \
   CFLAGS="%{optflags} -fPIC -fcommon" LDFLAGS="%{?__global_ldflags}"
 
 %install
-make install PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} DESTDIR=%{buildroot}
+make install PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} DESTDIR="%{buildroot}"
 
 %files
-%license COPYING
-%doc AUTHORS README
+%doc AUTHORS COPYING README
 %{_sbindir}/*
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/*
 %{_mandir}/man8/*
 
 %changelog
-* Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 0.6.8-13
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- license verified
+* Thu Mar 20 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.6.9-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Tue Jan  7 2025 Jaroslav Škarvada <jskarvad@redhat.com> - 0.6.9-1
+- New version
+  Resolves: rhbz#2336119
+
+* Mon Jul 29 2024 Miroslav Suchý <msuchy@redhat.com> - 0.6.8-19
+- convert license to SPDX
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Oct 05 2023 Remi Collet <remi@remirepo.net> - 0.6.8-15
+- rebuild for new libsodium
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
