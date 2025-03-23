@@ -63,6 +63,7 @@ BuildRequires:  python3
 %if 0%{?with_check}
 BuildRequires:  glibc-static >= 2.38-9%{?dist}
 %endif
+
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
 Requires:       curl
