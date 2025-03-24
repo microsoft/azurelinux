@@ -22,8 +22,8 @@ class VendorType(Enum):
     GO = "go"
     CARGO = "cargo"
     CUSTOM = "custom"
+    GIT_SUBMODULES = "git_submodules"
     LEGACY = "legacy" #TODO: remove this once all scripts have been converted
-
 
 class PipelineLogging:
     '''PipelineLogging class contains logging formatting functions used for pipelines'''
@@ -66,6 +66,7 @@ class PipelineLogging:
 vendor_script_mapping = {
     VendorType.GO: "build_go_vendor.sh",
     VendorType.CARGO: "build_cargo_vendor.sh",
+    VendorType.GIT_SUBMODULES: "build_git_submodules_vendor.sh",
     VendorType.CUSTOM: "generate_source_tarball.sh",
     VendorType.LEGACY: "generate_source_tarball.sh" #TODO: remove this once all scripts have been converted
 }
