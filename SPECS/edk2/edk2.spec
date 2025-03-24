@@ -126,6 +126,7 @@ Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
 Patch1004: improve-safety-of-DH.patch
+Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
