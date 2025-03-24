@@ -71,18 +71,23 @@ while (( "$#" )); do
   esac
 done
 
-echo "--srcTarball      -> $SRC_TARBALL"
-echo "--outFolder       -> $OUT_FOLDER"
-echo "--pkgVersion      -> $PKG_VERSION"
-echo "--vendorVersion   -> $VENDOR_VERSION"
+log "${LOG_LEVEL:-debug}" "--srcTarball             -> $SRC_TARBALL"
+log "${LOG_LEVEL:-debug}" "--outFolder              -> $OUT_FOLDER"
+log "${LOG_LEVEL:-debug}" "--pkgVersion             -> $PKG_VERSION"
+log "${LOG_LEVEL:-debug}" "--vendorVersion          -> $VENDOR_VERSION"
+
+if [ -z "$SRC_TARBALL" ]; then
+    log "${LOG_LEVEL:-error}" "--srcTarball parameter cannot be empty"
+    exit 1
+fi
 
 if [ -z "$PKG_VERSION" ]; then
-    echo "--pkgVersion parameter cannot be empty"
+    log "${LOG_LEVEL:-error}" "--pkgVersion parameter cannot be empty"
     exit 1
 fi
 
 if [ -z "$VENDOR_VERSION" ]; then
-    echo "--vendorVersion parameter cannot be empty"
+    log "${LOG_LEVEL:-error}" "--vendorVersion parameter cannot be empty"
     exit 1
 fi
 
@@ -92,7 +97,7 @@ TARBALL_SUFFIX="cargovendor"
 VENDOR_ROOT_FINDER_FILE_NAME="Cargo.toml"
 VENDOR_FOLDER_NAME="vendor"
 
-common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME"
+common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
 
 # fetch cargo crates
 log "${LOG_LEVEL:-debug}" "Fetching cargo crates at $(pwd)"

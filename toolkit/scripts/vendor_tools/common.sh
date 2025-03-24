@@ -35,6 +35,11 @@ function cleanup {
 function pushd_with_logging() {
     local dir=$1
 
+    if [[ $dir == $(pwd) ]]
+    then
+        return
+    fi
+
     log "${LOG_LEVEL:-debug}" "Going inside the folder $dir"
     pushd "$dir" &> /dev/null || {
         log "${LOG_LEVEL:-error}" "Failed to go inside the folder $dir"
@@ -47,6 +52,12 @@ function common_setup(){
     local vendor_version=$2
     local suffix=$3
     local vendor_root_finder_file_name=$4
+    local out_folder=$5
+
+    if [[ ! -d "$out_folder" ]]; then
+        log "${LOG_LEVEL:-error}" "Output folder $out_folder does not exist."
+        exit 1
+    fi
 
     TEMP_DIR=$(mktemp -d)
 
@@ -64,17 +75,27 @@ function common_setup(){
     pushd_with_logging "$vendor_root_folder"
 }
 
+function get_name_version() {
+    local source_base_name=$1
+
+    local name_ver_arr
+    name_ver_arr=($(basename "$source_base_name" | sed -E 's/(.*)-(.*)\.tar\.[^.]+$/ \1 \2/'))
+
+    echo "${name_ver_arr[0]}" "${name_ver_arr[1]}"
+}
+
 function get_vendor_tarball_name() {
     local source_base_name=$1
     local vendor_version=$2
     local suffix=$3
 
     # get only name and version in format
-    local name_ver
-    name_ver=$(basename "$source_base_name" | sed -E 's/(\.tar)?\.[^.]+$//')
+    local name
+    local version
+    read -r name version < <(get_name_version "$source_base_name")
 
     local vendor_tarball_name
-    vendor_tarball_name="$name_ver-$suffix-v$vendor_version.tar.gz"
+    vendor_tarball_name="$name-$version-$suffix-v$vendor_version.tar.gz"
     log "${LOG_LEVEL:-debug}" "Vendor tarball name is '$vendor_tarball_name'"
 
     echo "$vendor_tarball_name"
@@ -83,6 +104,11 @@ function get_vendor_tarball_name() {
 function get_vendor_folder_location(){
     local root_finder_file=$1
     local artifact_location
+
+    if [[ -z "$root_finder_file" ]]; then
+        pwd
+        return 0
+    fi
 
     log "${LOG_LEVEL:-debug}" "Finding root folder name in current path by looking for the file '$root_finder_file'"
 
@@ -130,16 +156,17 @@ function create_vendor_tarball() {
     local folder_to_tar=$2
     local out_folder=$3
 
+    local vendor_tarball_path="$out_folder/$vendor_tarball"
+
     log "${LOG_LEVEL:-debug}" "Creating new tarball $vendor_tarball in $out_folder from folder named $folder_to_tar"
     tar  --sort=name \
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
         --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-        -I pigz -cf "$out_folder/$vendor_tarball" "$folder_to_tar"
+        -I pigz -cf "$vendor_tarball_path" "$folder_to_tar"
 
-
-    if [[ -f "$out_folder/$vendor_tarball" ]]; then
-        log "${LOG_LEVEL:-debug}" "Tarball $vendor_tarball created successfully."
+    if [[ -f "$vendor_tarball_path" ]]; then
+        log "${LOG_LEVEL:-debug}" "Tarball $vendor_tarball created successfully with sha256sum $(sha256sum "$vendor_tarball_path")"
     else
         log "${LOG_LEVEL:-error}" "Failed to create tarball $vendor_tarball."
         exit 1
