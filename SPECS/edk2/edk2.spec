@@ -306,18 +306,16 @@ git config am.keepcr true
 # -M Apply patches up to 999
 %autopatch -M 999
 
-cp -a -- %{SOURCE1} .
+# Unpack the vendored OpenSSL tarball.
+# Add it to the git index so that we can use autopatch, which
+# uses git am since we set it up that way initially.
+# Only apply patches between 1000 and 1999 (inclusive).
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
-# Need to patch CVE-2023-0464 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
-# Need to patch CVE-2023-3817 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
-# Need to patch CVE-2023-0465 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1002}
-# Need to patch CVE-2023-2650 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1003}
-# Apply patch "improve-safety-of-DH.patch"
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1004}
+git add .
+git commit -m 'add vendored openssl'
+%autopatch -p1 -m 1000 -M 1999
+
+cp -a -- %{SOURCE1} .
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
