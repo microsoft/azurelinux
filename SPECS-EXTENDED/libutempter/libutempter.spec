@@ -4,14 +4,15 @@ Distribution:   Azure Linux
 
 Summary: A privileged helper for utmp/wtmp updates
 Name: libutempter
-Version: 1.1.6
-Release: 19%{?dist}
-License: LGPLv2+
-URL: https://github.com/altlinux/libutempter
-# Sourece0: https://github.com/altlinux/libutempter/archive/refs/tags/1.1.6-alt2.tar.gz
-Source0: https://github.com/altlinux/libutempter/archive/refs/tags/%{name}-%{version}.tar.bz2
+Version: 1.2.1
+Release: 16%{?dist}
+License: LGPL-2.1-or-later AND LGPL-2.1-only
+URL: ftp://ftp.altlinux.org/pub/people/ldv/utempter
+
+Source0: ftp://ftp.altlinux.org/pub/people/ldv/utempter/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
+BuildRequires: make
 
 Requires(pre): shadow-utils
 
@@ -37,15 +38,13 @@ make CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" \
     libdir="%{_libdir}" libexecdir="%{_libexecdir}"
 
 %install
-make install DESTDIR="$RPM_BUILD_ROOT" libdir="%{_libdir}" libexecdir="%{_libexecdir}"
+%make_install libdir="%{_libdir}" libexecdir="%{_libexecdir}"
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %pre
-{
-    %{_sbindir}/groupadd -g 22 -r -f utmp || :
-    %{_sbindir}/groupadd -g 35 -r -f utempter || :
-}
+groupadd -g 22 -r -f utmp || :
+groupadd -g 35 -r -f utempter || :
 
 %ldconfig_scriptlets
 
@@ -63,8 +62,58 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.6-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Nov 18 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.2.1-16
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jul 12 2024 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 1.2.1-14
+- Call groupadd without full path
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Oct 31 2023 Tomas Korbar <tkorbar@redhat.com> - 1.2.1-11
+- Add additional SPDX licenses found by scancode tool
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Mar 12 2023 Tomas Korbar <tkorbar@redhat.com> - 1.2.1-9
+- Change the License tag to the SPDX format
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Aug 13 2020 Tomas Korbar <tkorbar@redhat.com> - 1.2.1-3
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 07 2020 Tomas Korbar <tkorbar@redhat.com> - 1.2.1-1
+- Update to 1.2.1 (#1854129)
+
+* Mon May 25 2020 Tomas Korbar <tkorbar@redhat.com> - 1.2.0-1
+- Update to 1.2.0 (#1831940)
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.6-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
