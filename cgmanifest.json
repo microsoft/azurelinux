@@ -20353,8 +20353,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Script",
-          "version": "1.26",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-1.26.tar.gz"
+          "version": "1.29",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-1.29.tar.gz"
         }
       }
     },
