@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 500,
+            "MaxSize": 528,
             "Artifacts": [
                 {
                     "Name": "minimal-os",
