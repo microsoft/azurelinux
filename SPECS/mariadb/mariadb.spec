@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.20
+Version:        10.6.21
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -25,7 +25,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-connector-c
 Conflicts:      mysql
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 %endif
 
@@ -465,6 +465,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Mar 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 10.6.21-1
+- Upgrade to 10.6.21 - address CVE-2025-21490
+
 * Mon Nov 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.6.20-1
 - Auto-upgrade to 10.6.20 - address CVE-2024-21096
 
