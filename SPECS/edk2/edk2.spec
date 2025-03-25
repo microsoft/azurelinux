@@ -121,6 +121,7 @@ Patch0025: CVE-2023-45235.patch
 Patch0026: CVE-2023-45237.patch
 Patch0027: CVE-2023-45236.patch
 
+# Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
