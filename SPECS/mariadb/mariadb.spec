@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.11.10
+Version:        10.11.11
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -469,6 +469,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Mar 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 10.11.11-1
+- Upgrade to 10.11.11 - address CVE-2025-21490
+
 * Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
 - Auto-upgrade to 10.11.10 - to address CVE-2024-21096
 
