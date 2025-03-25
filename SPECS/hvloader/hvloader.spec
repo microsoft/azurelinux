@@ -28,6 +28,7 @@ Patch10:        CVE-2023-0465.patch
 Patch11:        CVE-2024-0727.patch
 Patch12:        CVE-2023-3817.patch
 Patch13:        CVE-2023-5678.patch
+Patch14:        vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 BuildRequires:  bc
 BuildRequires:  gcc
