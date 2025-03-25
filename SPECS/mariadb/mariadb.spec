@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.11.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ MariaDB turns data into structured information in a wide array of applications, 
 %package          server
 Summary:        MariaDB server
 Requires:       %{name}-errmsg = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       mariadb-connector-c-config
 Requires(postun): shadow-utils
 Requires(pre):  shadow-utils
@@ -185,7 +186,6 @@ fi
 %{_bindir}/mariadb-check
 %{_bindir}/mariadb-client-test
 %{_bindir}/mariadb-client-test-embedded
-%{_bindir}/mariadb-conv
 %{_bindir}/mariadb-convert-table-format
 %{_bindir}/mariadb-dump
 %{_bindir}/mariadb-dumpslow
@@ -194,21 +194,16 @@ fi
 %{_bindir}/mariadb-fix-extensions
 %{_bindir}/mariadb-hotcopy
 %{_bindir}/mariadb-import
-%{_bindir}/mariadb-install-db
 %{_bindir}/mariadb-ldb
 %{_bindir}/mariadb-plugin
-%{_bindir}/mariadb-secure-installation
 %{_bindir}/mariadb-setpermission
 %{_bindir}/mariadb-show
 %{_bindir}/mariadb-slap
 %{_bindir}/mariadb-test
 %{_bindir}/mariadb-test-embedded
-%{_bindir}/mariadb-tzinfo-to-sql
 %{_bindir}/mariadb-upgrade
 %{_bindir}/mariadb-waitpid
 %{_bindir}/mariadbd-multi
-%{_bindir}/mariadbd-safe
-%{_bindir}/mariadbd-safe-helper
 %{_bindir}/msql2mysql
 %{_bindir}/mysql
 %{_bindir}/mysql_find_rows
@@ -284,7 +279,7 @@ fi
 %config(noreplace) %{_sysconfdir}/my.cnf.d/hashicorp_key_management.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/provider_bzip2.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/provider_lzma.cnf
-%dir %attr(0750,mysql,mysql) %{_sharedstatedir}/mysql
+%dir %attr(0755,mysql,mysql) %{_sharedstatedir}/mysql
 %{_libdir}/mysql/plugin*
 %{_bindir}/aria_chk
 %{_bindir}/aria_dump_log
@@ -299,6 +294,12 @@ fi
 %{_bindir}/myisamchk
 %{_bindir}/myisamlog
 %{_bindir}/myisampack
+%{_bindir}/mariadb-conv
+%{_bindir}/mariadb-install-db
+%{_bindir}/mariadb-secure-installation
+%{_bindir}/mariadb-tzinfo-to-sql
+%{_bindir}/mariadbd-safe
+%{_bindir}/mariadbd-safe-helper
 %{_bindir}/mysql_install_db
 %{_bindir}/mysql_secure_installation
 %{_bindir}/mysql_tzinfo_to_sql
@@ -469,6 +470,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Feb 17 2025 Mayank Singh <mayansingh@microsoft.com> - 10.11.10-2
+- Fix mariadb package installation by updating the /var/lib/mysql dir permission
+
 * Tue Nov 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.11.10-1
 - Auto-upgrade to 10.11.10 - to address CVE-2024-21096
 
