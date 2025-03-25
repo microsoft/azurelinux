@@ -45,29 +45,32 @@ function pushd_with_logging() {
         log "${LOG_LEVEL:-error}" "Failed to go inside the folder $dir"
         exit 1
     }
+
+    CURRENT_PATH=$(pwd)
 }
 
 function common_setup(){
     local src_tarball=$1
-    local vendor_version=$2
-    local suffix=$3
-    local vendor_root_finder_file_name=$4
-    local out_folder=$5
-
-    if [[ ! -d "$out_folder" ]]; then
-        log "${LOG_LEVEL:-error}" "Output folder $out_folder does not exist."
-        exit 1
-    fi
+    local pkg_version=$2
+    local vendor_version=$3
+    local suffix=$4
+    local vendor_root_finder_file_name=$5
 
     TEMP_DIR=$(mktemp -d)
 
     pushd_with_logging "$TEMP_DIR"
 
-    VENDOR_TARBALL=$(get_vendor_tarball_name "$src_tarball" "$vendor_version" "$suffix")
+    VENDOR_TARBALL=$(get_vendor_tarball_name "$src_tarball" "$pkg_version" "$vendor_version" "$suffix")
 
-    download_tarball "$src_tarball"
+    src_tarball=$(download_tarball "$src_tarball" "$TEMP_DIR")
 
-    unpack_tarball_and_go_inside "$src_tarball"
+    unpack_tarball "$src_tarball" "$TEMP_DIR"
+
+    # find the first folder in the current path as that is the source folder
+    local tarball_folder
+    tarball_folder=$(find "$CURRENT_PATH" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+
+    pushd_with_logging "$tarball_folder"
 
     VENDOR_ROOT_FOLDER=$(get_vendor_folder_location "$vendor_root_finder_file_name")
 
@@ -86,7 +89,8 @@ function get_name_version() {
 function get_vendor_tarball_name() {
     local source_base_name=$1
     local vendor_version=$2
-    local suffix=$3
+    local pkg_version=$3
+    local suffix=$4
 
     # get only name and version in format
     local name
@@ -94,7 +98,7 @@ function get_vendor_tarball_name() {
     read -r name version < <(get_name_version "$source_base_name")
 
     local vendor_tarball_name
-    vendor_tarball_name="$name-$version-$suffix-v$vendor_version.tar.gz"
+    vendor_tarball_name="$name-$pkg_version-$suffix-v$vendor_version.tar.gz"
     log "${LOG_LEVEL:-debug}" "Vendor tarball name is '$vendor_tarball_name'"
 
     echo "$vendor_tarball_name"
@@ -120,40 +124,44 @@ function get_vendor_folder_location(){
 
 function download_tarball() {
     local src_tarball=$1
+    local download_to_folder=$2
+
+    local tarball_name
+    tarball_name=$(basename "$src_tarball")
 
     if [[ -f "$src_tarball" ]]
     then
-        cp "$src_tarball" "$TEMP_DIR"
+        cp "$src_tarball" "$download_to_folder"
     else
-        local tarball_name
-        tarball_name=$(basename "$src_tarball")
-
         log "${LOG_LEVEL:-debug}" "Tarball '$tarball_name' doesn't exist. Will attempt to download from blobstorage."
-        if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$TEMP_DIR/$tarball_name"
+        if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$download_to_folder/$tarball_name"
         then
             log "${LOG_LEVEL:-error}" "ERROR: failed to download the source tarball."
             exit 1
         fi
         log "${LOG_LEVEL:-debug}" "Download successful."
     fi
+
+    echo "$download_to_folder/$tarball_name"
 }
 
-function unpack_tarball_and_go_inside() {
+function unpack_tarball() {
     local src_tarball=$1
+    local path_to_upack=$2
 
     log "${LOG_LEVEL:-debug}" "Unpacking source tarball $src_tarball"
-    tar -xf "$src_tarball"
-
-    local tarball_folder
-    tarball_folder=$(find "$(pwd)" -mindepth 1 -maxdepth 1 -type d | head -n 1)
-
-    pushd_with_logging "$tarball_folder"
+    tar -xf "$src_tarball" -C "$path_to_upack"
 }
 
 function create_vendor_tarball() {
     local vendor_tarball=$1
     local folder_to_tar=$2
     local out_folder=$3
+
+    if [[ ! -d "$out_folder" ]]; then
+        log "${LOG_LEVEL:-error}" "Output folder $out_folder does not exist."
+        exit 1
+    fi
 
     local vendor_tarball_path="$out_folder/$vendor_tarball"
 
@@ -172,3 +180,36 @@ function create_vendor_tarball() {
     fi
 }
 
+# COMMON PARAMETERS
+PKG_VERSION=""
+SRC_TARBALL=""
+VENDOR_VERSION="1"
+OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# parameter handling
+function handle_common_parameters() {
+    log "${LOG_LEVEL:-debug}" "--srcTarball             -> $SRC_TARBALL"
+    log "${LOG_LEVEL:-debug}" "--outFolder              -> $OUT_FOLDER"
+    log "${LOG_LEVEL:-debug}" "--pkgVersion             -> $PKG_VERSION"
+    log "${LOG_LEVEL:-debug}" "--vendorVersion          -> $VENDOR_VERSION"
+
+    if [[ -z "$SRC_TARBALL" ]]; then
+        log "${LOG_LEVEL:-error}" "--srcTarball parameter cannot be empty"
+        exit 1
+    fi
+
+    if [[ -z "$PKG_VERSION" ]]; then
+        log "${LOG_LEVEL:-error}" "--pkgVersion parameter cannot be empty"
+        exit 1
+    fi
+
+    if [[ -z "$VENDOR_VERSION" ]]; then
+        log "${LOG_LEVEL:-error}" "--vendorVersion parameter cannot be empty"
+        exit 1
+    fi
+
+    if [[ ! -d "$OUT_FOLDER" ]]; then
+        log "${LOG_LEVEL:-error}" "--outFolder does not exist"
+        exit 1
+    fi
+}

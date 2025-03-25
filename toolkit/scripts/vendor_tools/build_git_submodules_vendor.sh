@@ -5,13 +5,9 @@
 # Quit on failure
 set -e
 
-PKG_VERSION=""
-SRC_TARBALL=""
-OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-VENDOR_VERSION="1"
+SOURCE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SOURCE_PATH/common.sh"
 GIT_URL=""
-
-source "$OUT_FOLDER/common.sh"
 
 # parameters:
 #
@@ -81,27 +77,10 @@ while (( "$#" )); do
   esac
 done
 
-log "${LOG_LEVEL:-debug}" "--srcTarball             -> $SRC_TARBALL"
-log "${LOG_LEVEL:-debug}" "--outFolder              -> $OUT_FOLDER"
-log "${LOG_LEVEL:-debug}" "--pkgVersion             -> $PKG_VERSION"
-log "${LOG_LEVEL:-debug}" "--vendorVersion          -> $VENDOR_VERSION"
-log "${LOG_LEVEL:-debug}" "--submoduleDirectoryName -> $SUBMODULE_DIRECTORY_NAME"
+handle_common_parameters
+
+# custom parameters
 log "${LOG_LEVEL:-debug}" "--gitUrl                 -> $GIT_URL"
-
-if [ -z "$SRC_TARBALL" ]; then
-    log "${LOG_LEVEL:-error}" "--srcTarball parameter cannot be empty"
-    exit 1
-fi
-
-if [ -z "$PKG_VERSION" ]; then
-    log "${LOG_LEVEL:-error}" "--pkgVersion parameter cannot be empty"
-    exit 1
-fi
-
-if [ -z "$VENDOR_VERSION" ]; then
-    log "${LOG_LEVEL:-error}" "--vendorVersion parameter cannot be empty"
-    exit 1
-fi
 
 if [ -z "$GIT_URL" ]; then
     log "${LOG_LEVEL:-error}" "--gitUrl parameter cannot be empty"
@@ -167,7 +146,7 @@ function generate_vendor {
     rm -rf "$another_temp_dir"
 }
 
-common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
+common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$PKG_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
 
 generate_vendor "$PKG_NAME" "$PKG_VERSION" "$GIT_URL"
 

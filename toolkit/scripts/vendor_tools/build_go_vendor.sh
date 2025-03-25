@@ -5,11 +5,8 @@
 # Quit on failure
 set -e
 
-PKG_VERSION=""
-SRC_TARBALL=""
-OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-VENDOR_VERSION="1"
-source "$OUT_FOLDER/common.sh"
+SOURCE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SOURCE_PATH/common.sh"
 
 # parameters:
 #
@@ -70,25 +67,7 @@ while (( "$#" )); do
   esac
 done
 
-log "${LOG_LEVEL:-debug}" "--srcTarball             -> $SRC_TARBALL"
-log "${LOG_LEVEL:-debug}" "--outFolder              -> $OUT_FOLDER"
-log "${LOG_LEVEL:-debug}" "--pkgVersion             -> $PKG_VERSION"
-log "${LOG_LEVEL:-debug}" "--vendorVersion          -> $VENDOR_VERSION"
-
-if [ -z "$SRC_TARBALL" ]; then
-    log "${LOG_LEVEL:-error}" "--srcTarball parameter cannot be empty"
-    exit 1
-fi
-
-if [ -z "$PKG_VERSION" ]; then
-    log "${LOG_LEVEL:-error}" "--pkgVersion parameter cannot be empty"
-    exit 1
-fi
-
-if [ -z "$VENDOR_VERSION" ]; then
-    log "${LOG_LEVEL:-error}" "--vendorVersion parameter cannot be empty"
-    exit 1
-fi
+handle_common_parameters
 
 trap cleanup EXIT
 
@@ -96,7 +75,7 @@ TARBALL_SUFFIX="govendor"
 VENDOR_ROOT_FINDER_FILE_NAME=""
 VENDOR_FOLDER_NAME="vendor"
 
-common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
+common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$PKG_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
 
 # fetch cargo crates
 log "${LOG_LEVEL:-debug}" "Fetching go modues at $(pwd)"
