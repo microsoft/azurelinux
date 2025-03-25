@@ -53,6 +53,7 @@ make test
 %changelog
 * Tue Mar 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.02-5
 - Removed `BuildRequires: perl(Test::More)` to fix build.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
