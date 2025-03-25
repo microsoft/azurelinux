@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -795,6 +795,9 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Tue Mar 25 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-5
+- Patch vendore3d openssl to only free read buffers if not in use.
+
 * Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
 - Package license for edk2-hvloader
 
