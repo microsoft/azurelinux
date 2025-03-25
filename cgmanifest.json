@@ -185,8 +185,8 @@
         "type": "other",
         "other": {
           "name": "amtk",
-          "version": "5.0.2",
-          "downloadUrl": "https://download.gnome.org/sources/amtk/5.0/amtk-5.0.2.tar.xz"
+          "version": "5.6.1",
+          "downloadUrl": "https://download.gnome.org/sources/amtk/5.6/amtk-5.6.1.tar.xz"
         }
       }
     },
