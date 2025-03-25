@@ -28,8 +28,8 @@ libstdc++-13.2.0-7.azl3.aarch64.rpm
 libstdc++-devel-13.2.0-7.azl3.aarch64.rpm
 libgomp-13.2.0-7.azl3.aarch64.rpm
 libgomp-devel-13.2.0-7.azl3.aarch64.rpm
-gcc-13.2.0-7.azl3.aarch64.rpm
-gcc-c++-13.2.0-7.azl3.aarch64.rpm
+gcc-13.2.0-8.azl3.aarch64.rpm
+gcc-c++-13.2.0-8.azl3.aarch64.rpm
 libpkgconf-2.0.2-1.azl3.aarch64.rpm
 pkgconf-2.0.2-1.azl3.aarch64.rpm
 pkgconf-m4-2.0.2-1.azl3.noarch.rpm

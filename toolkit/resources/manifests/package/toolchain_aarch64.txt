@@ -112,9 +112,9 @@ flex-debuginfo-2.6.4-7.azl3.aarch64.rpm
 flex-devel-2.6.4-7.azl3.aarch64.rpm
 gawk-5.2.2-1.azl3.aarch64.rpm
 gawk-debuginfo-5.2.2-1.azl3.aarch64.rpm
-gcc-13.2.0-7.azl3.aarch64.rpm
-gcc-c++-13.2.0-7.azl3.aarch64.rpm
-gcc-debuginfo-13.2.0-7.azl3.aarch64.rpm
+gcc-13.2.0-8.azl3.aarch64.rpm
+gcc-c++-13.2.0-8.azl3.aarch64.rpm
+gcc-debuginfo-13.2.0-8.azl3.aarch64.rpm
 gdbm-1.23-1.azl3.aarch64.rpm
 gdbm-debuginfo-1.23-1.azl3.aarch64.rpm
 gdbm-devel-1.23-1.azl3.aarch64.rpm
