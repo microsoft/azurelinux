@@ -133,6 +133,7 @@ Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2022-3996.patch
 Patch1001: CVE-2024-6119.patch
+Patch1002: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
