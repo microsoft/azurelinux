@@ -69,10 +69,9 @@ function common_setup(){
 
     unpack_tarball_and_go_inside "$src_tarball"
 
-    local vendor_root_folder
-    vendor_root_folder=$(get_vendor_folder_location "$vendor_root_finder_file_name")
+    VENDOR_ROOT_FOLDER=$(get_vendor_folder_location "$vendor_root_finder_file_name")
 
-    pushd_with_logging "$vendor_root_folder"
+    pushd_with_logging "$VENDOR_ROOT_FOLDER"
 }
 
 function get_name_version() {
@@ -158,7 +157,7 @@ function create_vendor_tarball() {
 
     local vendor_tarball_path="$out_folder/$vendor_tarball"
 
-    log "${LOG_LEVEL:-debug}" "Creating new tarball $vendor_tarball in $out_folder from folder named $folder_to_tar"
+    log "${LOG_LEVEL:-debug}" "Creating new tarball $vendor_tarball in $out_folder from folder $folder_to_tar"
     tar  --sort=name \
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
@@ -171,7 +170,5 @@ function create_vendor_tarball() {
         log "${LOG_LEVEL:-error}" "Failed to create tarball $vendor_tarball."
         exit 1
     fi
-
-    popd > /dev/null || exit
 }
 

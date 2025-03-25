@@ -111,7 +111,6 @@ fi
 trap cleanup EXIT
 TARBALL_SUFFIX="submodules"
 VENDOR_ROOT_FINDER_FILE_NAME=""
-VENDOR_FOLDER_NAME=""
 read -r PKG_NAME PKG_VERSION < <(get_name_version "$SRC_TARBALL")
 
 function generate_vendor {
@@ -119,7 +118,7 @@ function generate_vendor {
     local pkg_version=$2
     local git_url=$3
 
-    log "${LOG_LEVEL:-debug}" "Fetching git submodules for $pkg_name"
+    log "${LOG_LEVEL:-debug}" "Fetching git submodules for package named: $pkg_name version: $pkg_version"
 
     # makesure we get the correct git url
     local git_origin_url
@@ -131,14 +130,14 @@ function generate_vendor {
     local current_dir
     current_dir=$(pwd)
 
-    log "${LOG_LEVEL:-debug}" "using remote git url $git_origin_url"
+    log "${LOG_LEVEL:-debug}" "Reinitilizing repo from source, using remote git url $git_origin_url"
 
     git init
     git remote add "$remote_name" "$git_origin_url"
-    git fetch --tags --depth 1 "$remote_name"
 
     local checkout_name="tags/v$pkg_version"
-    log "${LOG_LEVEL:-debug}" "checking out $checkout_name"
+    log "${LOG_LEVEL:-debug}" "fetching all tags depth 1 and checking out $checkout_name"
+    git fetch --tags --depth 1 "$remote_name"
     git checkout "$checkout_name" -b "$branch_name" -f
 
     log "${LOG_LEVEL:-debug}" "fetching submodules with depth 1, recursive"
@@ -147,7 +146,8 @@ function generate_vendor {
     local submodules_list
     submodules_list=($(git config --file .gitmodules --get-regexp path | awk '{ print $2 }'))
 
-    log "${LOG_LEVEL:-debug}" "removing .git folder from"
+    # remove all submodules from the current directory as it creates different sha256sum every time
+    log "${LOG_LEVEL:-debug}" "removing .git folders from $current_dir"
     find "$current_dir" -name ".git" | xargs rm -rf
 
     local another_temp_dir
@@ -155,7 +155,6 @@ function generate_vendor {
 
     log "${LOG_LEVEL:-debug}" "copying all submodules to $another_temp_dir"
     for submodule in "${submodules_list[@]}"; do
-        log "${LOG_LEVEL:-debug}" "removing $submodule"
         cp -r "$submodule" "$another_temp_dir"
     done
 
@@ -166,18 +165,10 @@ function generate_vendor {
 
     mv "$another_temp_dir"/* "$current_dir"
     rm -rf "$another_temp_dir"
-
-    popd > /dev/null
 }
 
 common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
 
-VENDOR_FOLDER_NAME=$(pwd)
-
 generate_vendor "$PKG_NAME" "$PKG_VERSION" "$GIT_URL"
 
-create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_FOLDER_NAME" "$OUT_FOLDER"
-
-
-
-
+create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_ROOT_FOLDER" "$OUT_FOLDER"

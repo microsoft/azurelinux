@@ -102,4 +102,6 @@ common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FI
 log "${LOG_LEVEL:-debug}" "Fetching go modues at $(pwd)"
 go mod vendor
 
-create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_FOLDER_NAME" "$OUT_FOLDER"
+VENDOR_FOLDER=$(find . -type d -name "$VENDOR_FOLDER_NAME")
+
+create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_FOLDER" "$OUT_FOLDER"
