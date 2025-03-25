@@ -1,0 +1,26 @@
+Fixes: https://github.com/actions/runner-images/issues/9524
+This is directly from https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=d53b3d94aaf211ffb2159614f5aaaf03ceb861cc#patch3
+which in turn corresponds to https://github.com/llvm/llvm-project/commit/4e332bba2f3a51966817088cb4dc4a9188955b64.
+
+diff --git a/libsanitizer/asan/asan_allocator.h b/libsanitizer/asan/asan_allocator.h
+index 0b4dbf03bb9d537135698cab586a69f614962d5d..6a12a6c60252830adbcf3c32ce87488267a88a43 100644 (file)
+--- a/libsanitizer/asan/asan_allocator.h
++++ b/libsanitizer/asan/asan_allocator.h
+@@ -143,11 +143,15 @@ typedef DefaultSizeClassMap SizeClassMap;
+ const uptr kAllocatorSpace = ~(uptr)0;
+ const uptr kAllocatorSize  =  0x8000000000ULL;  // 500G
+ typedef DefaultSizeClassMap SizeClassMap;
+-# else
++#  elif SANITIZER_APPLE
+ const uptr kAllocatorSpace = 0x600000000000ULL;
+ const uptr kAllocatorSize  =  0x40000000000ULL;  // 4T.
+ typedef DefaultSizeClassMap SizeClassMap;
+-# endif
++#  else
++const uptr kAllocatorSpace = 0x500000000000ULL;
++const uptr kAllocatorSize = 0x40000000000ULL;  // 4T.
++typedef DefaultSizeClassMap SizeClassMap;
++#  endif
+ template <typename AddressSpaceViewTy>
+ struct AP64 {  // Allocator64 parameters. Deliberately using a short name.
+   static const uptr kSpaceBeg = kAllocatorSpace;

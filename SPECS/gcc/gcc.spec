@@ -65,6 +65,7 @@ URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
 Patch1:         0011-libsanitizer-Remove-crypt-and-crypt_r-interceptors.patch
+Patch2:         asan-allocator-base.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
