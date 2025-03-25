@@ -170,10 +170,10 @@ function create_vendor_tarball() {
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
         --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-        -I pigz -cf "$vendor_tarball_path" "$folder_to_tar"
+        -I pigz -cf "$vendor_tarball_path" "$(basename "$folder_to_tar")" -C "$(dirname "$folder_to_tar")"
 
     if [[ -f "$vendor_tarball_path" ]]; then
-        log "${LOG_LEVEL:-debug}" "Tarball $vendor_tarball created successfully with sha256sum $(sha256sum "$vendor_tarball_path")"
+        log "${LOG_LEVEL:-debug}" "Tarball $vendor_tarball_path created successfully with sha256sum $(sha256sum "$vendor_tarball_path")"
     else
         log "${LOG_LEVEL:-error}" "Failed to create tarball $vendor_tarball."
         exit 1
