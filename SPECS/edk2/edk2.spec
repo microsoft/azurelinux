@@ -712,7 +712,7 @@ $tests_ok
 
 %changelog
 * Mon Mar 24 2025 Tobias Brick <tobiasb@microsoft.com> - 20230301gitf80f052277c8-41
-- Patch vendore3d openssl to only free read buffers if not in use.
+- Patch vendored openssl to only free read buffers if not in use.
 
 * Mon Sep 16 2024 Minghe Ren <mingheren@microsoft.com> - 20230301gitf80f052277c8-40
 - Add CVE-2022-36763, CVE-2022-36765, CVE-2023-45230, CVE-2023-45232, CVE-2023-45234, CVE-2023-45235, CVE-2023-45236, CVE-2023-45237 patch
