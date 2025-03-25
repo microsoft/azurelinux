@@ -796,7 +796,7 @@ done
 
 %changelog
 * Tue Mar 25 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-5
-- Patch vendore3d openssl to only free read buffers if not in use.
+- Patch vendored openssl to only free read buffers if not in use.
 
 * Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
 - Package license for edk2-hvloader
