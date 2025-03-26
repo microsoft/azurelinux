@@ -6,6 +6,8 @@
     "influxdb.service": "570fdbb685c8468f3c4e75b7f482bbc5c0ab4382ad2259a595e7839244747645",
     "influxdb-user.conf": "ca5a50bb6ca9f4fcb91d745d552e70af934fdad86196c535c4eb8699a20e7aa0",
     "influxdb.tmpfiles": "2e1880f1d7675464b93984a635e770f6f8ac1777d21a607f7e4d9d1480776f68",
-    "influxdb-2.7.5.tar.gz": "4850fd4de964034fe92ef3c12940107eaf04ab377760de66dc90bf40ca6b7c92"
+    "influxdb-2.7.6-static-data-v1.tar.gz": "6158db0d7ae8f7b3a7aa0c950cefb688317c67ff831d280a1aacfbeb82db8c86",
+    "influxdb-2.7.6-govendor-v1.tar.gz": "1b3fc3c81056f7f647b2d22b0ccdcd6745dd38af1af0c2102eddd31922205d53",
+    "influxdb-2.7.6.tar.gz": "d64be97de44275e763307a44f2970e793d44e169b27ed441c5b2a209f227fee0"
   }
 }
