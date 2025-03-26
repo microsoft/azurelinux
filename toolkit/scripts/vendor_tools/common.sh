@@ -183,7 +183,8 @@ function create_vendor_tarball() {
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
         --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-        -I pigz -cf "$vendor_tarball_path" -C "$folder_to_tar" "$folder_to_tar_name"
+        --use-compress-program="pigz --no-name --no-time" \
+        -cf "$vendor_tarball_path" -C "$folder_to_tar" "$folder_to_tar_name"
 
     if [[ -f "$vendor_tarball_path" ]]; then
         log "${LOG_LEVEL:-debug}" "Tarball created successfully (sha256sum) (tarball_name): \n $(sha256sum "$vendor_tarball_path")"
