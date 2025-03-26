@@ -1,0 +1,64 @@
+Description: Hard code in hardening options
+Forwarded: not-needed
+Author: Colin Ian King <colin.i.king@gmail.com>
+
+Index: intel-cmt-cat-24.05/lib/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/lib/Makefile
++++ intel-cmt-cat-24.05/lib/Makefile
+@@ -39,8 +39,8 @@ LIB = libpqos
+ VERSION = 6.0.0
+ SO_VERSION = 6
+ SHARED ?= y
+-LDFLAGS = -L. -lpthread -z noexecstack -z relro -z now
+-CFLAGS = -pthread -I./ -D_GNU_SOURCE \
++LDFLAGS += -L. -lpthread -z noexecstack -z relro -z now
++CFLAGS += -pthread -I./ -D_GNU_SOURCE \
+ 	-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+ 	-Wmissing-declarations -Wold-style-definition -Wpointer-arith \
+ 	-Wcast-qual -Wundef -Wwrite-strings \
+Index: intel-cmt-cat-24.05/pqos/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/pqos/Makefile
++++ intel-cmt-cat-24.05/pqos/Makefile
+@@ -38,9 +38,9 @@ include ../pre-build.mk
+ 
+ OBJDIR = obj
+ LIBDIR ?= ../lib
+-LDFLAGS = -L$(LIBDIR) -pie -z noexecstack -z relro -z now
++LDFLAGS += -L$(LIBDIR) -pie -z noexecstack -z relro -z now
+ LDLIBS = -lpqos -lpthread
+-CFLAGS = -I$(LIBDIR) \
++CFLAGS += -I$(LIBDIR) \
+ 	-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+ 	-Wmissing-declarations -Wold-style-definition -Wpointer-arith \
+ 	-Wcast-qual -Wundef -Wwrite-strings \
+Index: intel-cmt-cat-24.05/rdtset/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/rdtset/Makefile
++++ intel-cmt-cat-24.05/rdtset/Makefile
+@@ -37,9 +37,9 @@
+ include ../pre-build.mk
+ 
+ LIBDIR ?= ../lib
+-LDFLAGS = -L$(LIBDIR) -pie -z noexecstack -z relro -z now
++LDFLAGS += -L$(LIBDIR) -pie -z noexecstack -z relro -z now
+ LDLIBS = -lpqos -lpthread
+-CFLAGS = -I$(LIBDIR) \
++CFLAGS += -I$(LIBDIR) \
+ 	-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+ 	-Wmissing-declarations -Wold-style-definition -Wpointer-arith \
+ 	-Wcast-qual -Wundef -Wwrite-strings \
+Index: intel-cmt-cat-24.05/tools/membw/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/tools/membw/Makefile
++++ intel-cmt-cat-24.05/tools/membw/Makefile
+@@ -44,7 +44,7 @@ PREFIX ?= /usr/local
+ BIN_DIR = $(DESTDIR)/usr/bin
+ MAN_DIR = $(DESTDIR)/usr/share/man/man8
+ 
+-CFLAGS=-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
++CFLAGS += -W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+ 	-Wmissing-declarations -Wold-style-definition -Wpointer-arith \
+ 	-Wcast-qual -Wundef -Wwrite-strings \
+ 	-Wformat -Wformat-security -fstack-protector-strong -fPIE \

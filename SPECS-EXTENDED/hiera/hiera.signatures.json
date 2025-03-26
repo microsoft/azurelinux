@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "hiera-3.7.0.tar.gz": "0ff0a957740273999dbca372606a452b3baa5ddda308d2b04619a0c92df38289"
+  "hiera-3.12.0.tar.gz": "1c258f6b290f0884f6b6e892985b58d0dd24f389b42f5911c83f392030c403e1",
+  "hiera-3.12.0.tar.gz.asc": "d3ce0a0d4c074cfe37d361b8e86f17e80eb9bcefd34f0ebc84f2b55af3e4f4ae",
+  "puppet-gpg-signing-key-20250406.pub": "4d5a9c73f97235eebe8c69f728aa2efcc8e1ee02282f972efdbbbd3a430be454"
  }
 }

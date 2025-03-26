@@ -1,4 +1,4 @@
-From b9d020a7a6ec6a9f63f53c461c84ac88ea32c1d5 Mon Sep 17 00:00:00 2001
+From 35bea40b88739358a0f8e5a104e7cb1180e20f8b Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <chpebeni@linux.microsoft.com>
 Date: Tue, 6 Aug 2024 11:35:33 -0400
 Subject: [PATCH 36/37] fstools: Add additional perms for cloud-utils-growpart.
@@ -7,10 +7,11 @@ Missed in previous growpart patch due to testing errors.
 
 Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
 ---
- policy/modules/admin/cloudinit.if | 38 +++++++++++++++++++++++++++++++
- policy/modules/system/fstools.fc  |  2 ++
- policy/modules/system/fstools.te  | 14 ++++++++++--
- 3 files changed, 52 insertions(+), 2 deletions(-)
+ policy/modules/admin/cloudinit.if   | 38 +++++++++++++++++++++++++++++
+ policy/modules/kernel/filesystem.if | 20 +++++++++++++++
+ policy/modules/system/fstools.fc    |  2 ++
+ policy/modules/system/fstools.te    | 16 ++++++++++--
+ 4 files changed, 74 insertions(+), 2 deletions(-)
 
 diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
 index 6d427e771..25e94729e 100644
@@ -65,6 +66,37 @@ index 6d427e771..25e94729e 100644
 +	files_search_tmp($1)
 +	manage_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
 +')
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index 2f5412c30..f6ba45dd2 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -5552,6 +5552,26 @@ interface(`fs_getattr_tmpfs',`
+ 	allow $1 tmpfs_t:filesystem getattr;
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to get the attributes of a tmpfs
++##	filesystem.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`fs_dontaudit_getattr_tmpfs',`
++	gen_require(`
++		type tmpfs_t;
++	')
++
++	dontaudit $1 tmpfs_t:filesystem getattr;
++')
++
+ ########################################
+ ## <summary>
+ ##	Allow the type to associate to tmpfs filesystems.
 diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
 index 63423802d..0fa9fb5c0 100644
 --- a/policy/modules/system/fstools.fc
@@ -86,10 +118,10 @@ index 63423802d..0fa9fb5c0 100644
  /usr/sbin/install-mbr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /usr/sbin/jfs_.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
-index d5e090c28..18a42890c 100644
+index d5e090c28..49fc02b2c 100644
 --- a/policy/modules/system/fstools.te
 +++ b/policy/modules/system/fstools.te
-@@ -201,8 +201,18 @@ optional_policy(`
+@@ -201,8 +201,20 @@ optional_policy(`
  ')
  
  optional_policy(`
@@ -97,6 +129,8 @@ index d5e090c28..18a42890c 100644
 -	cloudinit_create_tmp_files(fsadm_t)
 +	cloudinit_manage_tmp_files(fsadm_t)
 +	cloudinit_manage_tmp_dirs(fsadm_t)
++
++	fs_dontaudit_getattr_tmpfs(fsadm_t)
 +
 +	optional_policy(`
 +		# cloud-utils-growpart
@@ -111,5 +145,5 @@ index d5e090c28..18a42890c 100644
  
  optional_policy(`
 -- 
-2.46.0
+2.48.1
 

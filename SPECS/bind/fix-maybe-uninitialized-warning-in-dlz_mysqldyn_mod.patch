@@ -1,0 +1,34 @@
+From daa392c65a4a578985fb3188ee81b1e80ee1791c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Mon, 24 Feb 2025 18:17:20 +0000
+Subject: [PATCH] fix maybe-uninitialized warning in dlz_mysqldyn_mod.c
+
+---
+ build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c b/build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c
+index bdd0bcc..4488b94 100644
+--- a/build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c
++++ b/build/contrib/dlz/modules/mysqldyn/dlz_mysqldyn_mod.c
+@@ -375,6 +375,9 @@ build_query(mysql_data_t *state, mysql_instance_t *dbi, const char *command,
+ 	size_t len = 0;
+ 	va_list ap1;
+ 
++	/* Initialize arglist before anything else so we can safely free it if we fail out. */
++	DLZ_LIST_INIT(arglist);
++
+ 	/* Get a DB instance if needed */
+ 	if (dbi == NULL) {
+ 		dbi = get_dbi(state);
+@@ -390,7 +393,6 @@ build_query(mysql_data_t *state, mysql_instance_t *dbi, const char *command,
+ 	}
+ 
+ 	va_start(ap1, command);
+-	DLZ_LIST_INIT(arglist);
+ 	q = querystr = strdup(command);
+ 	if (querystr == NULL) {
+ 		goto fail;
+-- 
+2.45.3
+
