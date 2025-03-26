@@ -2,7 +2,7 @@
 Summary:        Simple kernel loader which boots from a FAT filesystem
 Name:           syslinux
 Version:        6.04
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 URL:            https://www.syslinux.org
 Group:          Applications/System
