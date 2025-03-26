@@ -129,20 +129,23 @@ function download_tarball() {
     local tarball_name
     tarball_name=$(basename "$src_tarball")
 
+    local download_location="$download_to_folder/$tarball_name"
+
     if [[ -f "$src_tarball" ]]
     then
         cp "$src_tarball" "$download_to_folder"
     else
         log "${LOG_LEVEL:-debug}" "Tarball '$tarball_name' doesn't exist. Will attempt to download from blobstorage."
-        if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$download_to_folder/$tarball_name"
+        if ! wget -q "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/$tarball_name" -O "$download_location"
         then
             log "${LOG_LEVEL:-error}" "ERROR: failed to download the source tarball."
             exit 1
         fi
+        cp "$download_location" "$(dirname "$src_tarball")"
         log "${LOG_LEVEL:-debug}" "Download successful."
     fi
 
-    echo "$download_to_folder/$tarball_name"
+    echo "$download_location"
 }
 
 function unpack_tarball() {
@@ -157,6 +160,7 @@ function create_vendor_tarball() {
     local vendor_tarball=$1
     local folder_to_tar=$2
     local out_folder=$3
+    local exclude_parent_folder=$4
 
     if [[ ! -d "$out_folder" ]]; then
         log "${LOG_LEVEL:-error}" "Output folder $out_folder does not exist."
@@ -165,15 +169,24 @@ function create_vendor_tarball() {
 
     local vendor_tarball_path="$out_folder/$vendor_tarball"
 
+    local folder_to_tar_name
+    folder_to_tar_name=$(basename "$folder_to_tar")
+    if [[ "$exclude_parent_folder" =~ [Tt]rue ]]; then
+        log "${LOG_LEVEL:-debug}" "Excluding parent folder $folder_to_tar_name from tarball"
+        folder_to_tar_name="."
+    else
+        folder_to_tar=$(dirname "$folder_to_tar")
+    fi
+
     log "${LOG_LEVEL:-debug}" "Creating new tarball $vendor_tarball in $out_folder from folder $folder_to_tar"
     tar  --sort=name \
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
         --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-        -I pigz -cf "$vendor_tarball_path" "$(basename "$folder_to_tar")" -C "$(dirname "$folder_to_tar")"
+        -I pigz -cf "$vendor_tarball_path" -C "$folder_to_tar" "$folder_to_tar_name"
 
     if [[ -f "$vendor_tarball_path" ]]; then
-        log "${LOG_LEVEL:-debug}" "Tarball $vendor_tarball_path created successfully with sha256sum $(sha256sum "$vendor_tarball_path")"
+        log "${LOG_LEVEL:-debug}" "Tarball created successfully (sha256sum) (tarball_name): \n $(sha256sum "$vendor_tarball_path")"
     else
         log "${LOG_LEVEL:-error}" "Failed to create tarball $vendor_tarball."
         exit 1

@@ -83,4 +83,4 @@ cargo vendor > config.toml
 
 VENDOR_FOLDER=$(find . -type d -name "$VENDOR_FOLDER_NAME")
 
-create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_FOLDER" "$OUT_FOLDER"
+create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_FOLDER" "$OUT_FOLDER" false

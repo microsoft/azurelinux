@@ -127,27 +127,17 @@ function generate_vendor {
 
     # remove all submodules from the current directory as it creates different sha256sum every time
     log "${LOG_LEVEL:-debug}" "removing .git folders from $current_dir"
-    find "$current_dir" -name ".git" | xargs rm -rf
 
-    local another_temp_dir
-    another_temp_dir=$(mktemp -d)
+    ANOTHER_TEMP_DIR=$(mktemp -d)
 
-    log "${LOG_LEVEL:-debug}" "copying all submodules to $another_temp_dir"
+    log "${LOG_LEVEL:-debug}" "copying all submodules to $ANOTHER_TEMP_DIR"
     for submodule in "${submodules_list[@]}"; do
-        cp -r "$submodule" "$another_temp_dir"
+        rsync -a --relative "$submodule" "$ANOTHER_TEMP_DIR"
     done
-
-    popd > /dev/null
-
-    log "${LOG_LEVEL:-debug}" "deleting all files except submodules"
-    rm -rf "${current_dir:?}/"*
-
-    mv "$another_temp_dir"/* "$current_dir"
-    rm -rf "$another_temp_dir"
 }
 
 common_setup "$SRC_TARBALL" "$VENDOR_VERSION" "$PKG_VERSION" "$TARBALL_SUFFIX" "$VENDOR_ROOT_FINDER_FILE_NAME" "$OUT_FOLDER"
 
 generate_vendor "$PKG_NAME" "$PKG_VERSION" "$GIT_URL"
 
-create_vendor_tarball "$VENDOR_TARBALL" "$VENDOR_ROOT_FOLDER" "$OUT_FOLDER"
+create_vendor_tarball "$VENDOR_TARBALL" "$ANOTHER_TEMP_DIR" "$OUT_FOLDER" true
