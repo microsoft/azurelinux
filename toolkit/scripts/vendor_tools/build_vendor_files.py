@@ -75,13 +75,14 @@ vendor_script_mapping = {
 class VendorProcessor:
     '''VendorProcessor class contains functions to process vendor files'''
 
-    def __init__(self, pkg_name: str, pkg_path: str, src_tarball: str, out_folder: str, pkg_version: str, vendor_version: str):
+    def __init__(self, pkg_name: str, pkg_path: str, src_tarball: str, out_folder: str, pkg_version: str, vendor_version: str, source_url: str = None):
         self.pkg_name = pkg_name
         self.pkg_path = pkg_path
         self.src_tarball = src_tarball
         self.out_folder = out_folder
         self.pkg_version = pkg_version
         self.vendor_version = vendor_version
+        self.source_url = source_url
 
     @staticmethod
     def get_toml_name(pkg_name: str) -> str:
@@ -173,6 +174,9 @@ class VendorProcessor:
         if vendor_type != VendorType.LEGACY:
             script_args.extend(["--vendorVersion", self.vendor_version])
 
+        if vendor_type == VendorType.GIT_SUBMODULES:
+            script_args.extend(["--gitUrl", self.source_url])
+
         # run the script
         proc = subprocess.Popen(script_args,
             stdout=subprocess.PIPE,
@@ -205,6 +209,7 @@ parser.add_argument('--pkgVersion',
                     help='package version', required=True)
 parser.add_argument('--vendorVersion',
                     help='vendor version', required=True)
+parser.add_argument('--sourceUrl',help='source url used mainly by Git submodules', required=False)
 args = parser.parse_args()
 
 
@@ -216,6 +221,7 @@ def main():
     vendor_version = args.vendorVersion
     pkg_name = args.pkgName
     pkg_path = args.pkgPath
+    source_url = args.sourceUrl
 
     PipelineLogging.output_debug(
         f"Src tarball path: {src_tarball}")
@@ -229,9 +235,11 @@ def main():
         f"Package name: {pkg_name}")
     PipelineLogging.output_debug(
         f"Package path: {pkg_path}")
+    PipelineLogging.output_debug(
+        f"Source url: {source_url}")
 
     vendor_processor = VendorProcessor(
-        pkg_name, pkg_path, src_tarball, out_folder, pkg_version, vendor_version)
+        pkg_name, pkg_path, src_tarball, out_folder, pkg_version, vendor_version, source_url)
 
     vendor_processor.process_toml_file()
 
