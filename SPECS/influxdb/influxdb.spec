@@ -17,8 +17,8 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.7.5
-Release:        3%{?dist}
+Version:        2.7.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -129,6 +129,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Mar 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.6-1
+- Auto-upgrade to 2.7.6 - test new vendor generation script
+
 * Wed Mar 26 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.5-3
 - Change vendor file naming and update it
 
