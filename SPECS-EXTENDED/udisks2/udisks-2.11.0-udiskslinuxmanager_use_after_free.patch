@@ -1,0 +1,112 @@
+From 3dc036fb5045fc068c6abfbe4e62d0871d7ca82a Mon Sep 17 00:00:00 2001
+From: xinpeng wang <wangxinpeng@uniontech.com>
+Date: Thu, 21 Sep 2023 13:57:40 +0800
+Subject: [PATCH] udiskslinuxmanager:use dbus interface after free
+
+In handle_get_block_devices, call get_block_objects to obtain iface_block_device
+of all current UDisksLinuxBlockObject, and then obtain the corresponding
+UDisksLinuxBlockObject's object_path through iface_block_device.iface_block_device
+is a GDBusInterfaceSkeleton, which saves the object through
+g_dbus_interface_skeleton_set_object. g_object_add_weak_pointer is used here. This
+function is not thread-safe.At this time, if other threads are releasing the object,
+the program will crash.
+This scene can be reproduced by quickly plugging and unplugging the USB disk.
+The core is as follows (the redundant stack is omitted):
+When accessing object in thread 1, the object is released by thread 2
+info threads
+   Id Target Id Frame
+* 1 Thread 0x7f80979e70 (LWP 24559) 0x0000007f8a48dda0 in
+g_dbus_object_get_object_path (object=0x0) at ../../../gio/gdbusobject.c:109
+  2 Thread 0x7f88a43010 (LWP 1159) 0x0000007f8a0a6ae8 in __GI___libc_free
+(mem=0x556a919c80) at malloc.c:3093
+
+thread 1
+(gdb) bt
+0 0x0000007f8a48dda0 in g_dbus_object_get_object_path (object=0x0) at
+../../../gio/gdbusobject.c:109
+1 0x000000556a56911c in handle_get_block_devices (object=0x7f7c007ed0, invocation=
+0x7f74016f20 [GDBusMethodInvocation], arg_options=<optimized out>)
+     at udiskslinuxmanager.c:1063
+
+(gdb) p ((GObject*)(blocks_p->data))->ref_count
+$3 = 1
+(gdb) p *((GDBusInterfaceSkeleton*)(blocks_p->data))
+$6 = {parent_instance = {g_type_instance = {g_class = 0x556a64e740
+[g_type: UDisksLinuxBlock/UDisksBlockSkeleton/GDBusInterfaceSkeleton]}, ref_count = 1,
+qdata = 0x0},  priv = 0x7f7c004ac0}
+(gdb) p *((GDBusInterfaceSkeleton*)(blocks_p->data))->priv
+$7 = {lock = {p = 0x0, i = {0, 0}}, object = 0x0,
+flags = G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD,
+connections = 0x0, object_path = 0x0, hooked_vtable = 0x556a62b9f0}
+
+thread 2
+(gdb) bt
+0 0x0000007f8a0a6ae8 in __GI___libc_free (mem=0x556a919c80) at malloc.c:3093
+1 0x0000007f89ff1224 in () at /lib/aarch64-linux-gnu/libudev.so.1
+2 0x0000007f89ff1348 in () at /lib/aarch64-linux-gnu/libudev.so.1
+3 0x0000007f89ff5520 in () at /lib/aarch64-linux-gnu/libudev.so.1
+4 0x0000007f89fff878 in udev_device_unref () at /lib/aarch64-linux-gnu/libudev.so.1
+5 0x0000007f8a7aeb74 in () at /lib/aarch64-linux-gnu/libgudev-1.0.so.0
+6 0x0000007f8a3193f8 in g_object_unref (_object=<optimized out>) at
+../../../gobject/gobject.c:3346
+7 0x0000007f8a3193f8 in g_object_unref (_object=0x7f680038a0) at
+../../../gobject/gobject.c:3238
+8 0x000000556a57700c in udisks_linux_device_finalize (object=0x7f5c005730
+[UDisksLinuxDevice]) at udiskslinuxdevice.c:75
+9 0x0000007f8a3193f8 in g_object_unref (_object=<optimized out>) at
+../../../gobject/gobject.c:3346
+10 0x0000007f8a3193f8 in g_object_unref (_object=0x7f5c005730) at
+../../../gobject/gobject.c:3238
+11 0x000000556a55d0fc in udisks_linux_drive_object_uevent
+     (object=object@entry=0x556a5df370 [UDisksLinuxDriveObject],
+action=action@entry=0x556a87b120
+"remove",device=device@entry=0x7f74007610 [UDisksLinuxDevice])
+     at udiskslinuxdriveobject.c:715
+12 0x000000556a54840c in handle_block_uevent_for_drive
+     (provider=provider@entry=0x556a5c8200 [UDisksLinuxProvider],
+action=action@entry=0x556a87b120 "remove",device=device@entry=0x7f74007610
+[UDisksLinuxDevice]) at udiskslinuxprovider.c:1035
+13 0x000000556a548ab8 in handle_block_uevent (device=0x7f74007610 [UDisksLinuxDevice],
+action=0x556a87b120 "remove", provider=0x556a5c8200 [UDisksLinuxProvider]) at
+udiskslinuxprovider.c:1349
+14 0x000000556a548ab8 in udisks_linux_provider_handle_uevent
+     (provider=0x556a5c8200 [UDisksLinuxProvider], action=0x556a87b120 "remove",
+device=0x7f74007610 [UDisksLinuxDevice]) at udiskslinuxprovider.c:1399
+15 0x000000556a548cac in on_idle_with_probed_uevent (user_data=0x556a7e65a0) at
+udiskslinuxprovider.c:230
+---
+ src/udiskslinuxmanager.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/src/udiskslinuxmanager.c b/src/udiskslinuxmanager.c
+index 5bfeec103..491edb92b 100644
+--- a/src/udiskslinuxmanager.c
++++ b/src/udiskslinuxmanager.c
+@@ -1196,8 +1196,11 @@ handle_get_block_devices (UDisksManager         *object,
+   blocks = get_block_objects (object, &num_blocks);
+   block_paths = g_new0 (const gchar *, num_blocks + 1);
+ 
+-  for (i = 0,blocks_p = blocks; blocks_p != NULL; blocks_p = blocks_p->next, i++)
+-      block_paths[i] = g_dbus_object_get_object_path (g_dbus_interface_get_object (G_DBUS_INTERFACE (blocks_p->data)));
++  for (blocks_p = blocks; blocks_p != NULL; blocks_p = blocks_p->next) {
++	  GDBusObject * block_object = g_dbus_interface_get_object (G_DBUS_INTERFACE (blocks_p->data));
++	  if (block_object)
++		  block_paths[i++] = g_dbus_object_get_object_path (block_object);
++  }
+ 
+   udisks_manager_complete_get_block_devices  (object,
+                                               invocation,
+@@ -1284,9 +1287,11 @@ handle_resolve_device (UDisksManager         *object,
+     }
+ 
+   ret_paths = g_new0 (const gchar *, num_found + 1);
+-  for (i = 0,ret_p = ret; ret_p != NULL; ret_p = ret_p->next, i++)
++  for (i = 0,ret_p = ret; ret_p != NULL; ret_p = ret_p->next)
+     {
+-      ret_paths[i] = g_dbus_object_get_object_path (g_dbus_interface_get_object (G_DBUS_INTERFACE (ret_p->data)));
++      GDBusObject *block_object = g_dbus_interface_get_object (G_DBUS_INTERFACE (ret_p->data));
++      if (block_object)
++        ret_paths[i++] = g_dbus_object_get_object_path (block_object);
+     }
+ 
+   udisks_manager_complete_resolve_device (object,

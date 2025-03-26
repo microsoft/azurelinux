@@ -1,0 +1,94 @@
+.Dd 8 November 2020
+.Dt MASSAGEVENDOR 8
+.Sh NAME
+.Nm massagevendor
+.Nd convert the ethernet vendor codes master list to arpwatch format
+.Sh SYNOPSIS
+.Nm
+.Op Fl CdhvZ
+.Op Fl -vendor
+.Op Ar csv
+.Sh DESCRIPTION
+.Nm
+is a program that converts a text file containing ethernet vendor codes into a
+format suitable for use by
+.Xr arpwatch 8
+and
+.Xr arpsnmp 8 .
+The input
+.Ar csv
+is a master CSV (comma-separated-value) file containing vendor codes.
+The output is sent to
+.Ar stdout .
+.Pp
+All ethernet devices have a unique identifier which includes a vendor code
+specifying the manufacturer of the device.
+In normal operation
+.Xr arpwatch 8
+and
+.Xr arpsnmp 8
+use the file
+.Ar ethercodes.dat
+to report this vendor code.
+.Nm
+is used to generate the
+.Ar ethercodes.dat
+file from CSV files containing these vendor codes.
+.Pp
+Locations where an ethernet vendor codes master text file can be obtained are
+given below.
+.Pp
+The
+.Fl C
+flag (default) uses compact padded ethernet addresses in
+.Ar ethercodes.dat ,
+e.g. 0:8:e1:1:2:d6; this is the default.
+.Pp
+The
+.Fl d
+flag is used to enable debugging.
+.Pp
+The
+.Fl v
+flag is used to enable verbose messages.
+.Pp
+The
+.Fl Z
+flag uses zero padded ethernet addresses in
+.Ar ethercodes.dat ,
+e.g. 00:08:e1:01:02:d6.
+.Pp
+The
+.Fl h
+flag shows a help message and exits.
+.Pp
+The
+.Fl -version
+option shows the program version number and exits.
+.Sh FILES
+.Bl -tag -width ".Pa /var/lib/arpwatch" -compact
+.It Pa /var/lib/arpwatch
+default location of the ethernet vendor list
+.It Pa ethercodes.dat
+file containing the list of ethernet vendor codes
+.Sh "SEE ALSO"
+.Xr arpwatch 8 ,
+.Xr arpsnmp 8
+.Sh NOTES
+The ethernet vendor codes as assigned by the IEEE can be found at:
+.Pp
+.Dl Ar https://standards-oui.ieee.org/oui/oui.csv
+.Sh AUTHORS
+.An Craig Leres
+of the Lawrence Berkeley National Laboratory Network Research Group,
+University of California, Berkeley, CA.
+.Pp
+The current version is available via anonymous ftp:
+.Pp
+.Dl Ar ftp://ftp.ee.lbl.gov/arpwatch.tar.gz
+.Pp
+This manual page was contributed by Hugo Graumann and updated by Benjamin
+Beasley.
+.Sh BUGS
+Please send bug reports to
+.Aq arpwatch@ee.lbl.gov .

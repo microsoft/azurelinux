@@ -1,0 +1,11 @@
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -4,7 +4,7 @@ import shutil
+ import threading
+ from pathlib import Path
+ 
+-from invoke.vendor.lexicon import Lexicon
++from lexicon import Lexicon
+ 
+ import pytest
+ from paramiko import (

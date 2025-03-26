@@ -1,0 +1,150 @@
+From c99bdc3a6c6beaf0e85bad75966330bab2478fed Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Sun, 1 Jan 2012 16:05:19 +0000
+Subject: [PATCH 02/19] removed some gcc warnings and compilation issues
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@477 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ common/fastmath.c      |  3 +--
+ libmpcdec/mpc_demux.c  | 14 ++------------
+ libmpcdec/streaminfo.c |  3 +--
+ mpcchap/iniparser.c    |  4 ++--
+ mpcdec/CMakeLists.txt  |  8 ++++----
+ mpcgain/mpcgain.c      |  4 ++--
+ 6 files changed, 12 insertions(+), 24 deletions(-)
+
+diff --git a/common/fastmath.c b/common/fastmath.c
+index 2a23a59..518b22c 100644
+--- a/common/fastmath.c
++++ b/common/fastmath.c
+@@ -29,7 +29,7 @@ const float  tabsqrt_m  [   TABSTEP+1] [2];
+ 
+ void   Init_FastMath ( void )
+ {
+-    int i; mpc_floatint X, Y; double xm, x0, xp, x, y; float* p;
++    int i; mpc_floatint X; double xm, x0, xp, x, y; float* p;
+ 
+     p = (float*) tabatan2;
+     for ( i = -TABSTEP; i <= TABSTEP; i++ ) {
+@@ -56,7 +56,6 @@ void   Init_FastMath ( void )
+     p = (float*) tabsqrt_ex;
+     for ( i = 0; i < 255; i++ ) {
+         X.n = (i << 23);
+-        Y.n = (i << 23) + (1<<23) - 1;
+         *p++ = sqrt(X.f);
+     }
+     X.n  = (255 << 23) - 1;
+diff --git a/libmpcdec/mpc_demux.c b/libmpcdec/mpc_demux.c
+index e486382..4d74dc7 100644
+--- a/libmpcdec/mpc_demux.c
++++ b/libmpcdec/mpc_demux.c
+@@ -78,16 +78,6 @@ static mpc_int32_t mpc_unread_bytes_unchecked(mpc_demux * d) {
+ 	return d->bytes_total + d->buffer - d->bits_reader.buff - ((8 - d->bits_reader.count) >> 3);
+ }
+ 
+-// Returns the amount of unread bytes in the demux buffer.
+-static mpc_uint32_t mpc_unread_bytes(mpc_demux * d) {
+-	mpc_int32_t unread_bytes = mpc_unread_bytes_unchecked(d);
+-
+-	if (unread_bytes < 0) return 0;
+-	
+-	return (mpc_uint32_t) unread_bytes;
+-}
+-
+-
+ 
+ // Returns the number of bytes available in the buffer.
+ static mpc_uint32_t
+@@ -96,8 +86,8 @@ mpc_demux_fill(mpc_demux * d, mpc_uint32_t min_bytes, int flags)
+ 	mpc_uint32_t unread_bytes = (mpc_uint32_t) mpc_unread_bytes_unchecked(d);
+ 	int offset = 0;
+ 
+-	if ((mpc_int32_t)
+-		unread_bytes < 0) return 0; // Error - we've been reading past the end of the buffer - abort
++	if ((mpc_int32_t) unread_bytes < 0)
++		return 0; // Error - we've been reading past the end of the buffer - abort
+ 
+ 	if (min_bytes == 0 || min_bytes > DEMUX_BUFFER_SIZE ||
+ 		    (unread_bytes < min_bytes && (flags & MPC_BUFFER_FULL) != 0 ))
+diff --git a/libmpcdec/streaminfo.c b/libmpcdec/streaminfo.c
+index 0e2e844..0e7769d 100644
+--- a/libmpcdec/streaminfo.c
++++ b/libmpcdec/streaminfo.c
+@@ -108,7 +108,6 @@ static mpc_status check_streaminfo(mpc_streaminfo * si)
+ mpc_status
+ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
+ {
+-    mpc_uint16_t Estimatedpeak_title = 0;
+ 	mpc_uint32_t frames, last_frame_samples;
+ 
+ 	si->bitrate            = 0;
+@@ -120,7 +119,7 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
+ 	si->profile_name       = mpc_get_version_string(si->profile);
+ 	mpc_bits_read(r, 2); // Link ?
+ 	si->sample_freq        = samplefreqs[mpc_bits_read(r, 2)];
+-	Estimatedpeak_title    = (mpc_uint16_t) mpc_bits_read(r, 16);   // read the ReplayGain data
++	mpc_bits_read(r, 16);   // skip MaxLevel (maximum level of input PCM)
+ 	si->gain_title         = (mpc_uint16_t) mpc_bits_read(r, 16);
+ 	si->peak_title         = (mpc_uint16_t) mpc_bits_read(r, 16);
+ 	si->gain_album         = (mpc_uint16_t) mpc_bits_read(r, 16);
+diff --git a/mpcchap/iniparser.c b/mpcchap/iniparser.c
+index 2ad88eb..62a2a40 100644
+--- a/mpcchap/iniparser.c
++++ b/mpcchap/iniparser.c
+@@ -184,10 +184,10 @@ char * iniparser_getsecname(dictionary * d, int n)
+ /*--------------------------------------------------------------------------*/
+ int iniparser_getnkey(dictionary * d, int n)
+ {
+-	int i, i_sec, cnt = 0 ;
++	int i, cnt = 0 ;
+ 
+ 	if (d==NULL) return -1 ;
+-	for (i_sec=i=0 ; i<d->size ; i++) {
++	for (i=0 ; i<d->size ; i++) {
+ 		if (d->key[i]==NULL)
+ 			continue ;
+ 		if (strchr(d->key[i], ':')==NULL) {
+diff --git a/mpcdec/CMakeLists.txt b/mpcdec/CMakeLists.txt
+index da3123f..c95f521 100644
+--- a/mpcdec/CMakeLists.txt
++++ b/mpcdec/CMakeLists.txt
+@@ -12,10 +12,6 @@ endif(MSVC)
+ 
+ add_executable(mpcdec_cmd mpcdec.c)
+ 
+-if(NOT MSVC)
+-target_link_libraries(mpcdec_cmd m)
+-endif(NOT MSVC)
+-
+ target_link_libraries(mpcdec_cmd wavformat_static)
+ 
+ if(SHARED)
+@@ -24,6 +20,10 @@ else(SHARED)
+   target_link_libraries(mpcdec_cmd mpcdec_static)
+ endif(SHARED)
+ 
++if(NOT MSVC)
++target_link_libraries(mpcdec_cmd m)
++endif(NOT MSVC)
++
+ SET_TARGET_PROPERTIES(mpcdec_cmd PROPERTIES OUTPUT_NAME "mpcdec")
+ 
+ install(TARGETS mpcdec_cmd RUNTIME DESTINATION bin)
+diff --git a/mpcgain/mpcgain.c b/mpcgain/mpcgain.c
+index d367fff..86a4b02 100644
+--- a/mpcgain/mpcgain.c
++++ b/mpcgain/mpcgain.c
+@@ -163,8 +163,8 @@ int main(int argc, char **argv)
+ 
+ 	for (j = 1; j < argc; j++) {
+ 		MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH];
+-		MPC_SAMPLE_FORMAT title_max = 0, chap_max;
+-		mpc_uint16_t * chap_gain, * chap_peak;
++		MPC_SAMPLE_FORMAT title_max = 0, chap_max = 0;
++		mpc_uint16_t * chap_gain = 0, * chap_peak = 0;
+ 		mpc_reader reader;
+ 		mpc_demux* demux;
+ 		mpc_streaminfo si;
+-- 
+2.46.0
+
