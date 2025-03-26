@@ -150,10 +150,12 @@ function download_tarball() {
 
 function unpack_tarball() {
     local src_tarball=$1
-    local path_to_upack=$2
+    local path_to_unpack=$2
+
+    path_to_unpack=$(realpath "$path_to_unpack")
 
     log "${LOG_LEVEL:-debug}" "Unpacking source tarball $src_tarball"
-    tar -xf "$src_tarball" -C "$path_to_upack"
+    tar -xf "$src_tarball" -C "$path_to_unpack"
 }
 
 function create_vendor_tarball() {
@@ -167,7 +169,8 @@ function create_vendor_tarball() {
         exit 1
     fi
 
-    local vendor_tarball_path="$out_folder/$vendor_tarball"
+    local vendor_tarball_path
+    vendor_tarball_path=$(realpath "$out_folder/$vendor_tarball")
 
     local folder_to_tar_name
     folder_to_tar_name=$(basename "$folder_to_tar")
