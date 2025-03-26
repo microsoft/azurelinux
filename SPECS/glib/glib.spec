@@ -1,8 +1,8 @@
 %define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
-Version:        2.78.1
-Release:        5%{?dist}
+Version:        2.78.6
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -122,6 +122,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.78.6-1
+- Auto-upgrade to 2.78.6 - for CVE-2024-34397
+
 * Thu Nov 14 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 2.78.1-5
 - Patch CVE-2024-52533
 
