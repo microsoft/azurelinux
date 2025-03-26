@@ -1,203 +1,111 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global bootstrap 1
-
+%global _privatelibs libpxbackend-1.0[.]so.*
+%global __provides_exclude ^(%{_privatelibs})$
+%global __requires_exclude ^(%{_privatelibs})$
+ 
 Name:           libproxy
-Version:        0.4.17
-Release:        5%{?dist}
+Version:        0.5.8
+Release:        1%{?dist}
 Summary:        A library handling all the details of proxy configuration
-
-License:        LGPLv2+
+ 
+License:        LGPL-2.1-or-later
 URL:            https://libproxy.github.io/libproxy/
-Source0:        https://github.com/libproxy/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Taken from the Debian package.
-Source1:        proxy.1
-# https://bugzilla.redhat.com/show_bug.cgi?id=1898060
-Patch0:         libproxy-0.4.17-fix-python-version-check.patch
-
-BuildRequires:  cmake >= 2.6.0
-BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig(gio-2.0) >= 2.26
+Source0:        https://github.com/libproxy/%{name}/archive/refs/tags/%{version}.tar.gz
+ 
+BuildRequires:  gcc
+BuildRequires:  meson
+#BuildRequires:  /usr/bin/gi-docgen
+BuildRequires:  /usr/bin/vapigen
+ 
+BuildRequires:  pkgconfig(duktape)
+BuildRequires:  pkgconfig(gio-2.0) >= 2.71.3
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  python3-devel
-
-%if ! 0%{?bootstrap}
-# NetworkManager
-BuildRequires:  pkgconfig(libnm)
-# pacrunner (and NetworkManager)
-BuildRequires:  pkgconfig(dbus-1)
-# webkit (gtk3)
-BuildRequires:  pkgconfig(javascriptcoregtk-4.0)
-# Python
-%else
-# Obsoletes of disabled subpackages.
-Provides: %{name}-mozjs = %{version}-%{release}
-Obsoletes: %{name}-mozjs < %{version}-%{release}
-Provides: %{name}-webkitgtk4 = %{version}-%{release}
-Obsoletes: %{name}-webkitgtk4 < %{version}-%{release}
-%endif
-
-
+# For config-gnome
+BuildRequires:  pkgconfig(gsettings-desktop-schemas)
+ 
+ 
 %description
 libproxy offers the following features:
-
-    * extremely small core footprint (< 35K)
-    * no external dependencies within libproxy core
-      (libproxy plugins may have dependencies)
-    * only 3 functions in the stable external API
+ 
+    * extremely small core footprint
+    * minimal dependencies within libproxy core
+    * only 4 functions in the stable-ish external API
     * dynamic adjustment to changing network topology
     * a standard way of dealing with proxy settings across all scenarios
     * a sublime sense of joy and accomplishment
-
-
+ 
+ 
 %package        bin
 Summary:        Binary to test %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+ 
 %description    bin
 The %{name}-bin package contains the proxy binary for %{name}
-
-%package -n     python3-%{name}
-Summary:        Binding for %{name} and python3
-Requires:       %{name} = %{version}-%{release}
-BuildArch:      noarch
-%{?python_provide:%python_provide python3-%{name}}
-
-%description -n python3-%{name}
-The python3 binding for %{name}
-
-%package        gnome
-Summary:        Plugin for %{name} and gnome
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description    gnome
-The %{name}-gnome package contains the %{name} plugin for gnome.
-
-%package        kde
-Summary:        Plugin for %{name} and kde
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       /usr/bin/kreadconfig5
-
-%description    kde
-The %{name}-kde package contains the %{name} plugin for kde.
-
-%if ! 0%{?bootstrap}
-%package        networkmanager
-Summary:        Plugin for %{name} and networkmanager
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description    networkmanager
-The %{name}-networkmanager package contains the %{name} plugin
-for networkmanager.
-
-%package        webkitgtk4
-Summary:        Plugin for %{name} and webkitgtk3
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       %{name}-pac = %{version}-%{release}
-Obsoletes:      %{name}-mozjs <= %{version}-%{release}
-
-%description    webkitgtk4
-The %{name}-webkitgtk4 package contains the %{name} plugin for
-webkitgtk3.
-
-%package        pacrunner
-Summary:        Plugin for %{name} and PacRunner
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       %{name}-pac = %{version}-%{release}
-Requires:       pacrunner
-
-%description    pacrunner
-The %{name}-pacrunner package contains the %{name} plugin for
-PacRunner.
-%endif
-
+ 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+ 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
+ 
 %prep
 %autosetup -p1
-
-
+ 
+ 
 %build
-export CXXFLAGS="$CXXFLAGS -std=c++14"
-%{cmake} \
-  -DMODULE_INSTALL_DIR=%{_libdir}/%{name}/%{version}/modules \
-  -DBIPR=OFF \
-  -DWITH_KDE=ON \
-  -DWITH_MOZJS=OFF \
-  -DWITH_PERL=OFF \
-  -DWITH_PYTHON2=OFF \
-  -DWITH_PYTHON3=ON \
-%if ! 0%{?bootstrap}
-  -DWITH_GNOME3=ON \
-  -DWITH_WEBKIT3=ON \
-%endif
-   .
-%cmake_build
-
-
+%meson \
+  -Ddocs=false \
+  -Dconfig-gnome=false \
+  -Dconfig-kde=true \
+  -Dconfig-osx=false \
+  -Dconfig-windows=false \
+  -Dintrospection=true \
+  -Dtests=true \
+  -Dvapi=true
+%meson_build
+ 
 %install
-%cmake_install
-
-#In case all modules are disabled
-mkdir -p %{buildroot}%{_libdir}/%{name}/%{version}/modules
-
-# Man page.
-install -Dpm 0644 %{SOURCE1} %{buildroot}/%{_mandir}/man1/proxy.1
-
-
+%meson_install
+ 
 %check
-%ctest
-
+%meson_test
 %ldconfig_scriptlets
 
 
 %files
-%doc AUTHORS README
+%doc README.md
 %license COPYING
-%{_libdir}/*.so.*
-%dir %{_libdir}/%{name}
-%dir %{_libdir}/%{name}/%{version}
-%dir %{_libdir}/%{name}/%{version}/modules
-
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/Libproxy-1.0.typelib
+%{_libdir}/libproxy.so.*
+%dir %{_libdir}/libproxy
+%{_libdir}/libproxy/libpxbackend-1.0.so
+ 
 %files bin
 %{_bindir}/proxy
-%{_mandir}/man1/proxy.1*
-
-%files -n python3-%{name}
-%{python3_sitelib}/__pycache__/*
-%{python3_sitelib}/%{name}.*
-
-%files gnome
-%{_libdir}/%{name}/%{version}/modules/config_gnome3.so
-%{_libexecdir}/pxgsettings
-
-%files kde
-%{_libdir}/%{name}/%{version}/modules/config_kde.so
-
-%if ! 0%{?bootstrap}
-%files networkmanager
-%{_libdir}/%{name}/%{version}/modules/network_networkmanager.so
-
-%files webkitgtk4
-%{_libdir}/%{name}/%{version}/modules/pacrunner_webkit.so
-
-%files pacrunner
-%{_libdir}/%{name}/%{version}/modules/config_pacrunner.so
-%endif
-
+%{_mandir}/man8/proxy.8*
+ 
 %files devel
-%{_includedir}/proxy.h
-%{_libdir}/*.so
+#%{_docdir}/libproxy-1.0/
+%{_includedir}/libproxy/
+%{_libdir}/libproxy.so
 %{_libdir}/pkgconfig/libproxy-1.0.pc
-%{_datadir}/cmake/Modules/Findlibproxy.cmake
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/Libproxy-1.0.gir
+%dir %{_datadir}/vala/vapi/
+%{_datadir}/vala/vapi/libproxy-1.0.deps
+%{_datadir}/vala/vapi/libproxy-1.0.vapi
 
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.5.8-1
+- Update to version 0.5.8
+
 * Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.17-5
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Enabling 'gnome' and 'kde' subpackages.

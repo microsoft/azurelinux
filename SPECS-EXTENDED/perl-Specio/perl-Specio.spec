@@ -5,20 +5,16 @@
 %bcond_with perl_Specio_enables_optional_test
 %endif
 
-# TODO: Use perl(XString) in preference to perl(B) if it becomes available
-
 Name:		perl-Specio
-Version:	0.46
-Release:	2%{?dist}
+Version:	0.48
+Release:	7%{?dist}
 Summary:	Type constraints and coercions for Perl
-# lib/Specio/PartialDump.pm:	GPL+ or Artistic
+# lib/Specio/PartialDump.pm:	GPL-1.0-or-later OR Artistic-1.0-Perl
 #				<https://github.com/houseabsolute/Specio/issues/17>
-# other files:			Artistic 2.0
-License:	Artistic 2.0 and (GPL+ or Artistic)
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# other files:			Artistic-2.0
+License:	Artistic-2.0 AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 URL:		https://metacpan.org/release/Specio
-Source0:	https://cpan.metacpan.org/modules/by-module/Test/Specio-%{version}.tar.gz#/perl-Specio-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Test/Specio-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -73,7 +69,6 @@ BuildRequires:	perl(Mouse)
 BuildRequires:	perl(namespace::autoclean)
 %endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Ref::Util) >= 0.112
 Requires:	perl(Sub::Util) >= 1.40
 Requires:	perl(XString)
@@ -95,7 +90,7 @@ values to that type.
 
 %package -n perl-Test-Specio
 Summary:	Test helpers for Specio
-License:	Artistic 2.0
+License:	Artistic-2.0
 Requires:	%{name} = %{version}-%{release}
 
 %description -n perl-Test-Specio
@@ -166,8 +161,68 @@ make test
 %{_mandir}/man3/Test::Specio.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.46-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.48-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jun 12 2022 Paul Howarth <paul@city-fan.org> - 0.48-1
+- Update to 0.48
+  - Importing types into a class that inherited from another class that had
+    imported types wouldn't work, leaving the child class with no 't()' sub
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.47-7
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.47-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.47-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.47-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.47-3
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.47-2
+- Perl 5.34 rebuild
+
+* Sun Jan 31 2021 Paul Howarth <paul@city-fan.org> - 0.47-1
+- Update to 0.47
+  - Change Specio constraint object's stringification overloading to return the
+    type name rather than the default Perl object stringification, which gives
+    you something like
+    "Specio::Constraint::Parameterized=HASH(0x564d258efb48)"; anonymous types
+    are special cased to return something you can print
+  - All types now overload the 'eq' comparison operator: Moose expects types to
+    be comparable in this manner when doing role summation (GH#18)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.46-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.46-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.46-3
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.46-2
+- Perl 5.32 rebuild
 
 * Sat Mar 14 2020 Paul Howarth <paul@city-fan.org> - 0.46-1
 - Update to 0.46

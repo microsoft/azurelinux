@@ -1,8 +1,11 @@
 {
  "Signatures": {
-  "arpwatch-2.1a15.tar.gz": "c1df9737e208a96a61fa92ddad83f4b4d9be66f8992f3c917e9edf4b05ff5898",
-  "arpwatch-LICENSE.txt": "cdc2ccb8842b3c382856e97279f16177b9de52821922b635b0654d445fc5c7b2",
-  "arpwatch.service": "abe541d0f39f1b7cc5a31913e5a01587719a3404168f939eafa94206685973d0",
-  "ethercodes-20110707.dat.bz2": "9bf372ac98a7860367dd9c84241abdb3d8e62e4506d5e65016b6fa58b4d509c0"
+  "arp2ethers.8": "cdaf4fe78895494acb54ed3bd0f552529588b2f955508633765e1a0a690cbba8",
+  "arpwatch-3.7.tar.gz": "3eb63ea79fbafc8174653e557e28899873c4c3908c66fc81f6f29ced3a10987e",
+  "arpwatch.service": "5d724755406c9ca832a6fa6bff7ef12421c256c0a4cbd856378b1a29f9215cee",
+  "arpwatch.sysconfig": "e8e4b70b3bbf67d6cc6b20e405ca2e6be876014326de7e7d67d78fa9b7195a94",
+  "arpwatch.sysusers": "1639ac145e7d92dc6181ca551e8f034c298d0582e64751a7bef930ea756af165",
+  "massagevendor.8": "67a4ade35ec310cbc3583469a134686e9b8ea98ae0b53c48cf946acd55441036",
+  "oui.csv": "2337413572f4e87aa32bd0eec494b1eaa82dcf4d539f124e37ccf9b41927805e"
  }
 }

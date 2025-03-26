@@ -1,12 +1,14 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 %global apiversion 0.0
 
 Name: librevenge
-Version: 0.0.4
-Release: 18%{?dist}
+Version: 0.0.5
+Release: 1%{?dist}
 Summary: A base library for writing document import filters
 
 # src/lib/RVNGOLEStream.{h,cpp} are BSD
-License: (LGPLv2+ or MPLv2.0) and BSD
+License: ( LGPL-2.1-or-later OR MPL-2.0 ) AND BSD-3-Clause
 URL: http://sourceforge.net/p/libwpd/wiki/librevenge/
 Source: http://downloads.sourceforge.net/libwpd/%{name}-%{version}.tar.xz
 
@@ -15,6 +17,8 @@ BuildRequires: doxygen
 BuildRequires: gcc-c++
 BuildRequires: pkgconfig(cppunit)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: python3-devel
+BuildRequires: make
 
 %description
 %{name} is a base library for writing document import filters. It has
@@ -56,7 +60,6 @@ debugging applications that use %{name}.
 %configure \
     --disable-silent-rules \
     --disable-static \
-    --disable-werror \
 %if ! 0%{?flatpak}
     --enable-pretty-printers
 %endif
@@ -65,19 +68,20 @@ sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     libtool
-make %{?_smp_mflags}
-
+%make_build
 %install
-make install DESTDIR=%{buildroot}
-rm -f %{buildroot}/%{_libdir}/*.la
+%make_install
+rm -f %{buildroot}%{_libdir}/*.la
 # we install API docs directly from build
-rm -rf %{buildroot}/%{_docdir}/%{name}
+rm -rf %{buildroot}%{_docdir}/%{name}
+
+%py_byte_compile %{python3} %{buildroot}%{_datadir}
 
 %ldconfig_scriptlets
 
 %check
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-make %{?_smp_mflags} check
+%make_build check
 
 %files
 %license COPYING.*
@@ -102,13 +106,18 @@ make %{?_smp_mflags} check
 
 %if ! 0%{?flatpak}
 %files gdb
-%{_datadir}/gdb/auto-load%{_libdir}/%{name}-%{apiversion}.py*
-%{_datadir}/gdb/auto-load%{_libdir}/%{name}-stream-%{apiversion}.py*
+%{_datadir}/gdb/auto-load%{_libdir}/%{name}-%{apiversion}-gdb.py*
+%{_datadir}/gdb/auto-load%{_libdir}/%{name}-stream-%{apiversion}-gdb.py*
+%{_datadir}/gdb/auto-load%{_libdir}/__pycache__
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/python
 %endif
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.0.5-1
+- Update to version 0.0.5
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.4-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

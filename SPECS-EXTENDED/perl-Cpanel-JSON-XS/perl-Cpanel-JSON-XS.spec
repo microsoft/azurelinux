@@ -1,59 +1,64 @@
-Summary:        JSON::XS for Cpanel, fast and correct serializing
-Name:           perl-Cpanel-JSON-XS
-Version:        4.27
-Release:        2%{?dist}
-License:        GPL+ OR Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://metacpan.org/release/Cpanel-JSON-XS
-Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
-Patch0:         Cpanel-JSON-XS-4.20-signature.patch
+# Run extra test
+%if ! (0%{?rhel})
+%bcond_without perl_Cpanel_JSON_XS_enables_extra_test
+%else
+%bcond_with perl_Cpanel_JSON_XS_enables_extra_test
+%endif
 
+Name:		perl-Cpanel-JSON-XS
+Summary:	JSON::XS for Cpanel, fast and correct serializing
+Version:	4.38
+Release:	4%{?dist}
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:		https://metacpan.org/release/Cpanel-JSON-XS
+Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
+Patch0:		Cpanel-JSON-XS-4.20-signature.patch
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  findutils
-BuildRequires:  gcc
-BuildRequires:  make
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-# Script Runtime
-BuildRequires:  perl(CBOR::XS)
-BuildRequires:  perl(CPAN::Meta::YAML)
+BuildRequires:	coreutils
+BuildRequires:	findutils
+BuildRequires:	gcc
+BuildRequires:	make
+BuildRequires:	perl-devel
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(Config)
+BuildRequires:	perl(ExtUtils::MakeMaker)
 # Module Runtime
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Compress::LZF)
-BuildRequires:  perl(Config)
-BuildRequires:  perl(Convert::Bencode)
-BuildRequires:  perl(Data::Dump)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(XSLoader)
-BuildRequires:  perl(YAML)
-BuildRequires:  perl(YAML::Syck)
-BuildRequires:  perl(YAML::XS)
-BuildRequires:  perl(overload)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
-BuildRequires:  perl(B)
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Devel::Peek)
-BuildRequires:  perl(Encode) >= 1.9081
-BuildRequires:  perl(POSIX)
-BuildRequires:  perl(Test)
-BuildRequires:  perl(Test::More) >= 0.88
-BuildRequires:  perl(Test::Simple)
-BuildRequires:  perl(Tie::Array)
-BuildRequires:  perl(Tie::Hash)
-BuildRequires:  perl(charnames)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(threads)
-BuildRequires:  perl(threads::shared) >= 1.21
-BuildRequires:  perl(utf8)
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(overload)
+BuildRequires:	perl(Scalar::Util)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(warnings)
+BuildRequires:	perl(XSLoader)
+# Script Runtime
+%if 0%{?fedora} > 22 || 0%{?rhel} > 7
+BuildRequires:	perl(CBOR::XS)
+%endif
+BuildRequires:	perl(Compress::LZF)
+BuildRequires:	perl(Convert::Bencode)
+BuildRequires:	perl(CPAN::Meta::YAML)
+BuildRequires:	perl(Data::Dump)
+BuildRequires:	perl(YAML)
+BuildRequires:	perl(YAML::Syck)
+BuildRequires:	perl(YAML::XS)
+# Test Suite
+BuildRequires:	perl(B)
+BuildRequires:	perl(charnames)
+BuildRequires:	perl(constant)
+BuildRequires:	perl(Data::Dumper)
+BuildRequires:	perl(Devel::Peek)
+BuildRequires:	perl(Encode) >= 1.9081
+BuildRequires:	perl(lib)
+BuildRequires:	perl(POSIX)
+BuildRequires:	perl(Test)
+BuildRequires:	perl(Test::More) >= 0.88
+BuildRequires:	perl(Test::Simple)
+BuildRequires:	perl(threads)
+BuildRequires:	perl(threads::shared) >= 1.21
+BuildRequires:	perl(Tie::Array)
+BuildRequires:	perl(Tie::Hash)
+BuildRequires:	perl(utf8)
 # Optional Tests
 # Cycle: perl-Cpanel-JSON-XS → perl-Test-LeakTrace → perl-Module-Install
 # → perl-YAML-Tiny → perl-JSON-MaybeXS → perl-Cpanel-JSON-XS
@@ -65,51 +70,70 @@ BuildRequires:  perl(utf8)
 # Cycle: perl-Cpanel-JSON-XS → perl-Test-Kwalitee → perl-Module-CPANTS-Analyse
 # → perl-JSON-MaybeXS → perl-Cpanel-JSON-XS
 %if !%{defined perl_bootstrap}
-# Maintainer Tests (Test::Spelling intentionally omitted as associated test would fail due to various technical terms)
-BuildRequires:  perl(Class::XSAccessor)
-BuildRequires:  perl(Hash::Util)
-BuildRequires:  perl(JSON) >= 2.09
-BuildRequires:  perl(JSON::PP) >= 2.09
-BuildRequires:  perl(JSON::XS)
-BuildRequires:  perl(List::MoreUtils)
-BuildRequires:  perl(Math::BigFloat) >= 1.16
-BuildRequires:  perl(Math::BigInt)
-BuildRequires:  perl(Mojo::JSON) >= 6.11
-BuildRequires:  perl(Perl::MinimumVersion) >= 1.20
-BuildRequires:  perl(Pod::Spell::CommonMistakes)
-BuildRequires:  perl(Test::CPAN::Changes)
-BuildRequires:  perl(Test::CPAN::Meta) >= 0.12
-BuildRequires:  perl(Test::CheckChanges)
-BuildRequires:  perl(Test::Kwalitee)
-BuildRequires:  perl(Test::LeakTrace)
-BuildRequires:  perl(Test::MinimumVersion) >= 0.008
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
-BuildRequires:  perl(Text::CSV_XS)
-BuildRequires:  perl(Tie::IxHash)
-BuildRequires:  perl(Time::Piece)
-BuildRequires:  perl(common::sense) >= 3.5
+BuildRequires:	perl(common::sense) >= 3.5
+BuildRequires:	perl(Hash::Util)
+BuildRequires:	perl(JSON) >= 2.09
+BuildRequires:	perl(JSON::PP) >= 2.09
+BuildRequires:	perl(JSON::XS)
+BuildRequires:	perl(Math::BigFloat) >= 1.16
+BuildRequires:	perl(Math::BigInt)
+%if 0%{?fedora:1}
+BuildRequires:	perl(Mojo::JSON) >= 6.11
 %endif
+BuildRequires:	perl(Test::LeakTrace)
+BuildRequires:	perl(Tie::IxHash)
+BuildRequires:	perl(Time::Piece)
+# Maintainer Tests (Test::Spelling intentionally omitted as associated test would fail due to various technical terms)
+%if %{with perl_Cpanel_JSON_XS_enables_extra_test}
+BuildRequires:	perl(Class::XSAccessor)
+BuildRequires:	perl(List::MoreUtils)
+BuildRequires:	perl(Perl::MinimumVersion) >= 1.20
+BuildRequires:	perl(Pod::Spell::CommonMistakes)
+BuildRequires:	perl(Test::CheckChanges)
+BuildRequires:	perl(Test::CPAN::Changes)
+BuildRequires:	perl(Test::CPAN::Meta) >= 0.12
+BuildRequires:	perl(Test::Kwalitee)
+BuildRequires:	perl(Test::MinimumVersion) >= 0.008
+BuildRequires:	perl(Test::Pod) >= 1.00
+BuildRequires:	perl(Test::Pod::Coverage) >= 1.04
+BuildRequires:	perl(Text::CSV_XS)
+%endif
+%endif
+# Dependencies
+Requires:	perl(Carp)
+Requires:	perl(overload)
+Requires:	perl(Scalar::Util)
+%if 0%{?fedora} > 22 || 0%{?rhel} > 7
+Suggests:	perl(CBOR::XS)
+%endif
+%if 0%{?fedora} > 20 || 0%{?rhel} > 7
+Recommends:	perl(Math::BigFloat) >= 1.16
+Recommends:	perl(Math::BigInt)
+Suggests:	perl(Bencode)
+Suggests:	perl(Compress::LZF)
+Suggests:	perl(CPAN::Meta::YAML)
+Suggests:	perl(Data::Dump)
+Suggests:	perl(Data::Dumper)
+Suggests:	perl(Sereal::Decoder)
+Suggests:	perl(Sereal::Encoder)
+Suggests:	perl(YAML)
+Suggests:	perl(YAML::Syck)
+Suggests:	perl(YAML::XS)
+%else
+Requires:	perl(Compress::LZF)
+Requires:	perl(Convert::Bencode)
+Requires:	perl(CPAN::Meta::YAML)
+Requires:	perl(Data::Dump)
+Requires:	perl(Data::Dumper)
+Requires:	perl(Math::BigFloat) >= 1.16
+Requires:	perl(Math::BigInt)
+Requires:	perl(Sereal::Decoder)
+Requires:	perl(Sereal::Encoder)
+Requires:	perl(YAML)
+Requires:	perl(YAML::Syck)
+Requires:	perl(YAML::XS)
 %endif
 
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Carp)
-Requires:       perl(Scalar::Util)
-Requires:       perl(overload)
-Recommends:     perl(Math::BigFloat) >= 1.16
-Recommends:     perl(Math::BigInt)
-Suggests:       perl(Bencode)
-Suggests:       perl(CBOR::XS)
-Suggests:       perl(CPAN::Meta::YAML)
-Suggests:       perl(Compress::LZF)
-Suggests:       perl(Data::Dump)
-Suggests:       perl(Data::Dumper)
-Suggests:       perl(Sereal::Decoder)
-Suggests:       perl(Sereal::Encoder)
-Suggests:       perl(YAML)
-Suggests:       perl(YAML::Syck)
-Suggests:       perl(YAML::XS)
 # Avoid unwanted provides and dependencies
 %{?perl_default_filter}
 
@@ -125,7 +149,7 @@ reach the latter goal it was written in C.
 perl -pi -e 's|^#!/opt/bin/perl|#!/usr/bin/perl|' eg/*
 
 # Skip the signature check as we've tweaked some files
-%patch 0
+%patch -P 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
@@ -138,7 +162,7 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
 %check
-%if !%{defined perl_bootstrap}
+%if !%{defined perl_bootstrap} && %{with perl_Cpanel_JSON_XS_enables_extra_test}
 make test xtest AUTHOR_TESTING=1
 %else
 make test
@@ -156,9 +180,107 @@ make test
 %{_mandir}/man3/Cpanel::JSON::XS::Type.3*
 
 %changelog
-* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.27-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.38-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 4.38-3
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 4.38-2
+- Perl 5.40 rebuild
+
+* Tue May 28 2024 Paul Howarth <paul@city-fan.org> - 4.38-1
+- Update to 4.38
+  - Encode real core booleans as boolean notation (GH#224)
+  - Minor test fixes
+  - Fix docs typo (GH#225)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.37-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.37-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.37-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 4.37-3
+- Perl 5.38 re-rebuild of bootstrapped packages
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 4.37-2
+- Perl 5.38 rebuild
+
+* Tue Jul  4 2023 Paul Howarth <paul@city-fan.org> - 4.37-1
+- Update to 4.37
+  - Fix NAN/INF for AIX (GH#165)
+  - Fix empty string result in object stringification (GH#221)
+  - Allow \' in strings when allow_singlequote is enabled (GH#217)
+- Avoid use of deprecated patch syntax
+
+* Thu Mar  2 2023 Paul Howarth <paul@city-fan.org> - 4.36-1
+- Update to 4.36
+  - Remove the SAVESTACK_POS noop, merged from JSON-XS-3.02, removed there
+    with 4.0
+  - Request to remove: https://github.com/Perl/perl5/pull/20858
+
+* Wed Feb 22 2023 Paul Howarth <paul@city-fan.org> - 4.35-1
+- Update to 4.35
+  - Fix utf8 object stringification (GH#212)
+
+* Wed Feb 22 2023 Paul Howarth <paul@city-fan.org> - 4.34-1
+- Update to 4.34
+  - Fix a security issue, decoding hash keys without ending ':' (GH#208)
+  - Check all bare hash keys for utf8 (GH#209)
+  - Improve overload warnings (GH#205)
+  - Fix a croak leak (GH#206)
+- Use SPDX-format license tag
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.32-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Aug 13 2022 Paul Howarth <paul@city-fan.org> - 4.32-1
+- Update to 4.32
+  - Fix new JSON::PP::Boolean overload redefinition warnings (GH#200)
+
+* Wed Aug 10 2022 Paul Howarth <paul@city-fan.org> - 4.31-1
+- Update to 4.31
+  - Adjust t/20_unknown.t pp bool tests for native bool when supported (GH#198)
+
+* Tue Aug  2 2022 Paul Howarth <paul@city-fan.org> - 4.30-3
+- Re-apply test fixes for t/20_unknown.t now that JSON::PP native bool support
+  is back
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.30-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 17 2022 Paul Howarth <paul@city-fan.org> - 4.30-1
+- Update to 4.30
+  - Fix perl 5.37 utf8n_to_uvuni deprecation (GH#196)
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 4.29-3
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 4.29-2
+- Perl 5.36 rebuild
+
+* Fri May 27 2022 Paul Howarth <paul@city-fan.org> - 4.29-1
+- Update to 4.29
+  - Hack: Revert native bool (unblessed) overloads via JSON::PP 4.08; JSON::PP
+    ignores unblessed bools for now (GH#194)
+
+* Thu May  5 2022 Paul Howarth <paul@city-fan.org> - 4.28-1
+- Update to 4.28
+  - Validate the JSON struct, which might get corrupted by wrong FREEZE/THAW
+    methods, or other serializers, or corrupting our magic object (GH#192)
+  - Improve our DESTROY and END methods to avoid NULL dereferences
+    (https://github.com/rurban/perl-compiler/issues/438)
+  - Fix 3 tests in t/20_unknown.t with the latest 5.35.10 bool enhancements and
+    JSON::PP (GH#194)
+  - Fix t/118_type.t with Windows ivtype long long (GH#178)
+  - Added GitHub actions
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.27-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Fri Oct 15 2021 Paul Howarth <paul@city-fan.org> - 4.27-1
 - Update to 4.27

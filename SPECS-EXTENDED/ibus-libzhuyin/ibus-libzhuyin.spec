@@ -1,24 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
-
 %global snapshot 0
 
 Name:       ibus-libzhuyin
-Version:    1.9.1
-Release:    6%{?dist}
+Version:    1.10.3
+Release:    2%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
-License:    GPLv2+
+License:    GPL-2.0-or-later
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
 Source0:    http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
 %if %snapshot
-Patch0:     ibus-libzhuyin-1.9.x-HEAD.patch
+Patch0:     ibus-libzhuyin-1.10.x-HEAD.patch
 %endif
 
 BuildRequires:  gcc-c++
-BuildRequires:  perl(File::Find)
 BuildRequires:  gettext-devel
 BuildRequires:  intltool
 BuildRequires:  libtool
@@ -28,6 +21,7 @@ BuildRequires:  ibus-devel >= 1.3
 BuildRequires:  libpinyin-devel >= 2.0.91
 BuildRequires:  python3-devel
 BuildRequires:  libpinyin-tools
+BuildRequires: make
 
 # Requires(post): sqlite
 
@@ -42,7 +36,7 @@ based on libzhuyin for IBus.
 %prep
 %setup -q
 %if %snapshot
-%patch 0 -p1 -b .head
+%patch -P0 -p1 -b .head
 %endif
 
 
@@ -52,17 +46,18 @@ based on libzhuyin for IBus.
            --with-python=python3
 
 # make -C po update-gmo
-make %{?_smp_mflags} V=1
+%make_build
 
 %install
-make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
+%make_install
+
+%py_byte_compile %{python3} $RPM_BUILD_ROOT%{_datadir}/ibus-libzhuyin/setup
 
 %find_lang %{name}
 
 %files -f %{name}.lang
-%license COPYING
-%doc AUTHORS README ChangeLog INSTALL NEWS
-%{_datadir}/appdata/*.appdata.xml
+%doc AUTHORS COPYING README ChangeLog INSTALL NEWS
+%{_datadir}/metainfo/*.appdata.xml
 %{_datadir}/glib-2.0/schemas/*.gschema.xml
 %{_datadir}/applications/ibus-setup-libzhuyin.desktop
 %{_libexecdir}/ibus-engine-libzhuyin
@@ -76,14 +71,69 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 
 
 %changelog
-* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-6
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-5
-- Adding missing BRs on Perl modules.
+* Wed Jan 24 2024 Peng Wu <pwu@redhat.com> - 1.10.3-1
+- Update to 1.10.3
+- bug fixes
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri May 19 2023 Peng Wu <pwu@redhat.com> - 1.10.2-3
+- Migrate to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Peng Wu <pwu@redhat.com> - 1.10.2-1
+- Update to 1.10.2
+- bug fixes
+
+* Wed Oct 19 2022 Adam Williamson <awilliam@redhat.com> - 1.10.1-2
+- Rebuild for libzhuyin soname bump
+
+* Thu Sep 15 2022 Peng Wu <pwu@redhat.com> - 1.10.1-1
+- Update to 1.10.1
+- fix setup dialog
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec 16 2020 Peng Wu <pwu@redhat.com> - 1.10.0-1
+- Update to 1.10.0
+- bug fixes
+
+* Mon Nov  2 2020 Peng Wu <pwu@redhat.com> - 1.9.92-1
+- Update to 1.9.92
+- update zhuyin data
+
+* Thu Oct 29 2020 Peng Wu <pwu@redhat.com> - 1.9.91-1
+- Update to 1.9.91
+- support libpinyin 2.4.92
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 1.9.1-5
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Mon Jul 13 2020 Peng Wu <pwu@redhat.com> - 1.9.1-4
+- Switch to use py_byte_compile rpm macro
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

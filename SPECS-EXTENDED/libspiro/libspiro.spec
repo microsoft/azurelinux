@@ -1,19 +1,21 @@
 Summary:        Library to simplify the drawing of beautiful curves
 Name:           libspiro
-Version:        20221101
+Version:        20240903
 Release:        1%{?dist}
+# The files that are used to compile this library are all in GPLv3+
+# https://github.com/fontforge/libspiro/issues/8
 License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            https://github.com/fontforge/libspiro/
-Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Let's use libspiro-dist tarball from upstream as it does not require autoreconf
+Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz
 BuildRequires:  gcc
-BuildRequires:  make
+BuildRequires: make
 
 %description
-This library will take an array of spiro control points and
-convert them into a series of bézier splines which can then
-be used in the myriad of ways the world has come to use béziers.
+This library will take an array of spiro control points and 
+convert them into a series of bézier splines which can then 
+be used in the myriad of ways the world has come to use béziers. 
 
 %package        devel
 Summary:        Development files for %{name}
@@ -28,11 +30,14 @@ developing applications that use %{name}.
 
 %build
 %configure --disable-static
-%make_build
+%{make_build}
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+%{make_install}
+find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+
+%check
+make check
 
 %files
 %doc README* ChangeLog AUTHORS
@@ -46,6 +51,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/libspiro.3.gz
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 20240903-1
+- Update to version 20240903
+
 * Fri Oct 15 2021 Muhammad Falak <mwani@microsoft.com> - 20221101-1
 - Bump version to address CVE-2019-19847
 - Lint spec
