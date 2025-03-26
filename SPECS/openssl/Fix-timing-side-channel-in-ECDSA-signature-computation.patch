@@ -1,0 +1,582 @@
+From c6cc6994932f870b83892db5b69e200ba8743251 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tomas@openssl.org>
+Date: Wed, 15 Jan 2025 18:41:59 +0100
+Subject: [PATCH] Fix timing side-channel in ECDSA signature computation
+
+There is a timing signal of around 300 nanoseconds when the top word of
+the inverted ECDSA nonce value is zero. This can happen with significant
+probability only for some of the supported elliptic curves. In particular
+the NIST P-521 curve is affected. To be able to measure this leak, the
+attacker process must either be located in the same physical computer or
+must have a very fast network connection with low latency.
+
+Attacks on ECDSA nonce are also known as Minerva attack.
+
+Fixes CVE-2024-13176
+
+Reviewed-by: Tim Hudson <tjh@openssl.org>
+Reviewed-by: Neil Horman <nhorman@openssl.org>
+---
+ crypto/bn/bn_err.c               |   6 ++
+ crypto/bn/bn_exp.c               |  23 +++--
+ crypto/bn/bn_lib.c               |  51 +++++++++--
+ crypto/bn/bn_rand.c              | 150 +++++++++++++++++++++++--------
+ crypto/bn/bn_shift.c             |   6 +-
+ crypto/ec/ec_lib.c               |   7 +-
+ crypto/ec/ecdsa_ossl.c           |   6 +-
+ crypto/err/openssl.txt           |   3 +
+ include/crypto/bn.h              |  10 +++
+ include/internal/constant_time.h |  23 +++++
+ include/openssl/bnerr.h          |   3 +
+ 11 files changed, 232 insertions(+), 56 deletions(-)
+
+diff --git a/crypto/bn/bn_err.c b/crypto/bn/bn_err.c
+index 3dd8d9a..33cc5db 100644
+--- a/crypto/bn/bn_err.c
++++ b/crypto/bn/bn_err.c
+@@ -53,6 +53,8 @@ static const ERR_STRING_DATA BN_str_functs[] = {
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_MOD_EXP_MONT, 0), "BN_mod_exp_mont"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_MOD_EXP_MONT_CONSTTIME, 0),
+      "BN_mod_exp_mont_consttime"},
++    {ERR_PACK(ERR_LIB_BN, BN_F_BN_MOD_EXP_MONT_FIXED_TOP, 0),
++     "bn_mod_exp_mont_fixed_top"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_MOD_EXP_MONT_WORD, 0),
+      "BN_mod_exp_mont_word"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_MOD_EXP_RECP, 0), "BN_mod_exp_recp"},
+@@ -73,8 +75,12 @@ static const ERR_STRING_DATA BN_str_functs[] = {
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_SET_WORDS, 0), "bn_set_words"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_STACK_PUSH, 0), "BN_STACK_push"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_BN_USUB, 0), "BN_usub"},
++    {ERR_PACK(ERR_LIB_BN, BN_F_OSSL_BN_GEN_DSA_NONCE_FIXED_TOP, 0),
++     "ossl_bn_gen_dsa_nonce_fixed_top"},
+     {ERR_PACK(ERR_LIB_BN, BN_F_OSSL_BN_RSA_DO_UNBLIND, 0),
+     "ossl_bn_rsa_do_unblind"},
++    {ERR_PACK(ERR_LIB_BN, BN_F_OSSL_BN_PRIV_RAND_RANGE_FIXED_TOP, 0),
++     "ossl_bn_priv_rand_range_fixed_top"},
+     {0, NULL}
+ };
+ 
+diff --git a/crypto/bn/bn_exp.c b/crypto/bn/bn_exp.c
+index 9531acf..ea36875 100644
+--- a/crypto/bn/bn_exp.c
++++ b/crypto/bn/bn_exp.c
+@@ -589,7 +589,7 @@ static int MOD_EXP_CTIME_COPY_FROM_PREBUF(BIGNUM *b, int top,
+  * out by Colin Percival,
+  * http://www.daemonology.net/hyperthreading-considered-harmful/)
+  */
+-int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
++int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
+                               const BIGNUM *m, BN_CTX *ctx,
+                               BN_MONT_CTX *in_mont)
+ {
+@@ -606,12 +606,8 @@ int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
+     unsigned int t4 = 0;
+ #endif
+ 
+-    bn_check_top(a);
+-    bn_check_top(p);
+-    bn_check_top(m);
+-
+     if (!BN_is_odd(m)) {
+-        BNerr(BN_F_BN_MOD_EXP_MONT_CONSTTIME, BN_R_CALLED_WITH_EVEN_MODULUS);
++        BNerr(BN_F_BN_MOD_EXP_MONT_FIXED_TOP, BN_R_CALLED_WITH_EVEN_MODULUS);
+         return 0;
+     }
+ 
+@@ -1112,7 +1108,7 @@ int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
+             goto err;
+     } else
+ #endif
+-    if (!BN_from_montgomery(rr, &tmp, mont, ctx))
++    if (!bn_from_mont_fixed_top(rr, &tmp, mont, ctx))
+         goto err;
+     ret = 1;
+  err:
+@@ -1126,6 +1122,19 @@ int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
+     return ret;
+ }
+ 
++int BN_mod_exp_mont_consttime(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
++                              const BIGNUM *m, BN_CTX *ctx,
++                              BN_MONT_CTX *in_mont)
++{
++    bn_check_top(a);
++    bn_check_top(p);
++    bn_check_top(m);
++    if (!bn_mod_exp_mont_fixed_top(rr, a, p, m, ctx, in_mont))
++        return 0;
++    bn_correct_top(rr);
++    return 1;
++}
++
+ int BN_mod_exp_mont_word(BIGNUM *rr, BN_ULONG a, const BIGNUM *p,
+                          const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont)
+ {
+diff --git a/crypto/bn/bn_lib.c b/crypto/bn/bn_lib.c
+index eb4a318..c390785 100644
+--- a/crypto/bn/bn_lib.c
++++ b/crypto/bn/bn_lib.c
+@@ -598,14 +598,29 @@ int BN_ucmp(const BIGNUM *a, const BIGNUM *b)
+     int i;
+     BN_ULONG t1, t2, *ap, *bp;
+ 
++    ap = a->d;
++    bp = b->d;
++
++    if (BN_get_flags(a, BN_FLG_CONSTTIME)
++            && a->top == b->top) {
++        int res = 0;
++
++        for (i = 0; i < b->top; i++) {
++            res = constant_time_select_int(constant_time_lt_bn(ap[i], bp[i]),
++                                           -1, res);
++            res = constant_time_select_int(constant_time_lt_bn(bp[i], ap[i]),
++                                           1, res);
++        }
++        return res;
++    }
++
+     bn_check_top(a);
+     bn_check_top(b);
+ 
+     i = a->top - b->top;
+     if (i != 0)
+         return i;
+-    ap = a->d;
+-    bp = b->d;
++
+     for (i = a->top - 1; i >= 0; i--) {
+         t1 = ap[i];
+         t2 = bp[i];
+@@ -717,11 +732,10 @@ int BN_is_bit_set(const BIGNUM *a, int n)
+     return (int)(((a->d[i]) >> j) & ((BN_ULONG)1));
+ }
+ 
+-int BN_mask_bits(BIGNUM *a, int n)
++int ossl_bn_mask_bits_fixed_top(BIGNUM *a, int n)
+ {
+     int b, w;
+ 
+-    bn_check_top(a);
+     if (n < 0)
+         return 0;
+ 
+@@ -735,10 +749,21 @@ int BN_mask_bits(BIGNUM *a, int n)
+         a->top = w + 1;
+         a->d[w] &= ~(BN_MASK2 << b);
+     }
+-    bn_correct_top(a);
++    a->flags |= BN_FLG_FIXED_TOP;
+     return 1;
+ }
+ 
++int BN_mask_bits(BIGNUM *a, int n)
++{
++    int ret;
++
++    bn_check_top(a);
++    ret = ossl_bn_mask_bits_fixed_top(a, n);
++    if (ret)
++        bn_correct_top(a);
++    return ret;
++}
++
+ void BN_set_negative(BIGNUM *a, int b)
+ {
+     if (b && !BN_is_zero(a))
+@@ -915,6 +940,22 @@ int BN_is_word(const BIGNUM *a, const BN_ULONG w)
+     return BN_abs_is_word(a, w) && (!w || !a->neg);
+ }
+ 
++int ossl_bn_is_word_fixed_top(const BIGNUM *a, BN_ULONG w)
++{
++    int res, i;
++    const BN_ULONG *ap = a->d;
++
++    if (a->neg || a->top == 0)
++        return 0;
++
++    res = constant_time_select_int(constant_time_eq_bn(ap[0], w), 1, 0);
++
++    for (i = 1; i < a->top; i++)
++        res = constant_time_select_int(constant_time_is_zero_bn(ap[i]),
++                                       res, 0);
++    return res;
++}
++
+ int BN_is_odd(const BIGNUM *a)
+ {
+     return (a->top > 0) && (a->d[0] & 1);
+diff --git a/crypto/bn/bn_rand.c b/crypto/bn/bn_rand.c
+index 6b4b50a..f5e6d1c 100644
+--- a/crypto/bn/bn_rand.c
++++ b/crypto/bn/bn_rand.c
+@@ -194,17 +194,57 @@ int BN_pseudo_rand_range(BIGNUM *r, const BIGNUM *range)
+     return BN_rand_range(r, range);
+ }
+ 
++int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range)
++{
++    int n;
++    int count = 100;
++
++    if (range->neg || BN_is_zero(range)) {
++        BNerr(BN_F_OSSL_BN_PRIV_RAND_RANGE_FIXED_TOP, BN_R_INVALID_RANGE);
++        return 0;
++    }
++
++    n = BN_num_bits(range);     /* n > 0 */
++
++    /* BN_is_bit_set(range, n - 1) always holds */
++
++    if (n == 1) {
++        BN_zero(r);
++    } else {
++        BN_set_flags(r, BN_FLG_CONSTTIME);
++        do {
++            if (!bnrand(PRIVATE, r, n + 1, BN_RAND_TOP_ONE, BN_RAND_BOTTOM_ANY))
++                return 0;
++
++            if (!--count) {
++                BNerr(BN_F_OSSL_BN_PRIV_RAND_RANGE_FIXED_TOP,
++                      BN_R_TOO_MANY_ITERATIONS);
++                return 0;
++            }
++            ossl_bn_mask_bits_fixed_top(r, n);
++        }
++        while (BN_ucmp(r, range) >= 0);
++#ifdef BN_DEBUG
++        /* With BN_DEBUG on a fixed top number cannot be returned */
++        bn_correct_top(r);
++#endif
++    }
++
++    return 1;
++}
++
+ /*
+- * BN_generate_dsa_nonce generates a random number 0 <= out < range. Unlike
+- * BN_rand_range, it also includes the contents of |priv| and |message| in
+- * the generation so that an RNG failure isn't fatal as long as |priv|
++ * ossl_bn_gen_dsa_nonce_fixed_top generates a random number 0 <= out < range.
++ * Unlike BN_rand_range, it also includes the contents of |priv| and |message|
++ * in the generation so that an RNG failure isn't fatal as long as |priv|
+  * remains secret. This is intended for use in DSA and ECDSA where an RNG
+  * weakness leads directly to private key exposure unless this function is
+  * used.
+  */
+-int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
+-                          const BIGNUM *priv, const unsigned char *message,
+-                          size_t message_len, BN_CTX *ctx)
++int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
++                                    const BIGNUM *priv,
++                                    const unsigned char *message,
++                                    size_t message_len, BN_CTX *ctx)
+ {
+     SHA512_CTX sha;
+     /*
+@@ -214,15 +254,19 @@ int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
+     unsigned char random_bytes[64];
+     unsigned char digest[SHA512_DIGEST_LENGTH];
+     unsigned done, todo;
+-    /* We generate |range|+8 bytes of random output. */
+-    const unsigned num_k_bytes = BN_num_bytes(range) + 8;
++    /* We generate |range|+1 bytes of random output. */
++    const unsigned num_k_bytes = BN_num_bytes(range) + 1;
+     unsigned char private_bytes[96];
+-    unsigned char *k_bytes;
++    unsigned char *k_bytes = NULL;
++    const int max_n = 64;           /* Pr(failure to generate) < 2^max_n */
++    int n;
+     int ret = 0;
+ 
+     k_bytes = OPENSSL_malloc(num_k_bytes);
+     if (k_bytes == NULL)
+-        goto err;
++        goto end;
++    /* Ensure top byte is set to avoid non-constant time in bin2bn */
++    k_bytes[0] = 0xff;
+ 
+     /* We copy |priv| into a local buffer to avoid exposing its length. */
+     if (BN_bn2binpad(priv, private_bytes, sizeof(private_bytes)) < 0) {
+@@ -231,35 +275,71 @@ int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
+          * large and we don't handle this case in order to avoid leaking the
+          * length of the private key.
+          */
+-        BNerr(BN_F_BN_GENERATE_DSA_NONCE, BN_R_PRIVATE_KEY_TOO_LARGE);
+-        goto err;
++        BNerr(BN_F_OSSL_BN_GEN_DSA_NONCE_FIXED_TOP, BN_R_PRIVATE_KEY_TOO_LARGE);
++        goto end;
+     }
+ 
+-    for (done = 0; done < num_k_bytes;) {
+-        if (RAND_priv_bytes(random_bytes, sizeof(random_bytes)) != 1)
+-            goto err;
+-        SHA512_Init(&sha);
+-        SHA512_Update(&sha, &done, sizeof(done));
+-        SHA512_Update(&sha, private_bytes, sizeof(private_bytes));
+-        SHA512_Update(&sha, message, message_len);
+-        SHA512_Update(&sha, random_bytes, sizeof(random_bytes));
+-        SHA512_Final(digest, &sha);
+-
+-        todo = num_k_bytes - done;
+-        if (todo > SHA512_DIGEST_LENGTH)
+-            todo = SHA512_DIGEST_LENGTH;
+-        memcpy(k_bytes + done, digest, todo);
+-        done += todo;
+-    }
++    for (n = 0; n < max_n; n++) {
++        unsigned char i = 0;
++
++        for (done = 0; done < num_k_bytes;) {
++            if (RAND_priv_bytes(random_bytes, sizeof(random_bytes)) != 1)
++                goto end;
++            SHA512_Init(&sha);
++            SHA512_Update(&sha, &i, sizeof(i));
++            SHA512_Update(&sha, private_bytes, sizeof(private_bytes));
++            SHA512_Update(&sha, message, message_len);
++            SHA512_Update(&sha, random_bytes, sizeof(random_bytes));
++            SHA512_Final(digest, &sha);
++
++            todo = num_k_bytes - done;
++            if (todo > SHA512_DIGEST_LENGTH)
++                todo = SHA512_DIGEST_LENGTH;
++            memcpy(k_bytes + done, digest, todo);
++            done += todo;
++            ++i;
++        }
+ 
+-    if (!BN_bin2bn(k_bytes, num_k_bytes, out))
+-        goto err;
+-    if (BN_mod(out, out, range, ctx) != 1)
+-        goto err;
+-    ret = 1;
++        if (!BN_bin2bn(k_bytes, num_k_bytes, out))
++            goto end;
+ 
+- err:
+-    OPENSSL_free(k_bytes);
++        /* Clear out the top bits and rejection filter into range */
++        BN_set_flags(out, BN_FLG_CONSTTIME);
++        ossl_bn_mask_bits_fixed_top(out, BN_num_bits(range));
++
++        if (BN_ucmp(out, range) < 0) {
++            ret = 1;
++#ifdef BN_DEBUG
++            /* With BN_DEBUG on a fixed top number cannot be returned */
++            bn_correct_top(out);
++#endif
++            goto end;
++        }
++    }
++    /* Failed to generate anything */
++    BNerr(BN_F_OSSL_BN_GEN_DSA_NONCE_FIXED_TOP, ERR_R_INTERNAL_ERROR);
++
++ end:
++    OPENSSL_clear_free(k_bytes, num_k_bytes);
++    OPENSSL_cleanse(digest, sizeof(digest));
++    OPENSSL_cleanse(random_bytes, sizeof(random_bytes));
+     OPENSSL_cleanse(private_bytes, sizeof(private_bytes));
+     return ret;
+ }
++
++int BN_generate_dsa_nonce(BIGNUM *out, const BIGNUM *range,
++                          const BIGNUM *priv, const unsigned char *message,
++                          size_t message_len, BN_CTX *ctx)
++{
++    int ret;
++
++    ret = ossl_bn_gen_dsa_nonce_fixed_top(out, range, priv, message,
++                                          message_len, ctx);
++    /*
++     * This call makes the BN_generate_dsa_nonce non-const-time, thus we
++     * do not use it internally. But fixed_top BNs currently cannot be returned
++     * from public API calls.
++     */
++    bn_correct_top(out);
++    return ret;
++}
+diff --git a/crypto/bn/bn_shift.c b/crypto/bn/bn_shift.c
+index 210a83f..4018ad9 100644
+--- a/crypto/bn/bn_shift.c
++++ b/crypto/bn/bn_shift.c
+@@ -156,6 +156,9 @@ int BN_rshift(BIGNUM *r, const BIGNUM *a, int n)
+         return 0;
+     }
+ 
++    bn_check_top(r);
++    bn_check_top(a);
++
+     ret = bn_rshift_fixed_top(r, a, n);
+ 
+     bn_correct_top(r);
+@@ -177,9 +180,6 @@ int bn_rshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n)
+     BN_ULONG *t, *f;
+     BN_ULONG l, m, mask;
+ 
+-    bn_check_top(r);
+-    bn_check_top(a);
+-
+     assert(n >= 0);
+ 
+     nw = n / BN_BITS2;
+diff --git a/crypto/ec/ec_lib.c b/crypto/ec/ec_lib.c
+index 08db89f..30339af 100644
+--- a/crypto/ec/ec_lib.c
++++ b/crypto/ec/ec_lib.c
+@@ -12,6 +12,7 @@
+ 
+ #include <openssl/err.h>
+ #include <openssl/opensslv.h>
++#include "crypto/bn.h"
+ 
+ #include "ec_local.h"
+ 
+@@ -1155,10 +1156,10 @@ static int ec_field_inverse_mod_ord(const EC_GROUP *group, BIGNUM *r,
+     if (!BN_sub(e, group->order, e))
+         goto err;
+     /*-
+-     * Exponent e is public.
+-     * No need for scatter-gather or BN_FLG_CONSTTIME.
++     * Although the exponent is public we want the result to be
++     * fixed top.
+      */
+-    if (!BN_mod_exp_mont(r, x, e, group->order, ctx, group->mont_data))
++    if (!bn_mod_exp_mont_fixed_top(r, x, e, group->order, ctx, group->mont_data))
+         goto err;
+ 
+     ret = 1;
+diff --git a/crypto/ec/ecdsa_ossl.c b/crypto/ec/ecdsa_ossl.c
+index 3fe8660..16bf4ab 100644
+--- a/crypto/ec/ecdsa_ossl.c
++++ b/crypto/ec/ecdsa_ossl.c
+@@ -127,20 +127,20 @@ static int ecdsa_sign_setup(EC_KEY *eckey, BN_CTX *ctx_in,
+         /* get random k */
+         do {
+             if (dgst != NULL) {
+-                if (!BN_generate_dsa_nonce(k, order, priv_key,
++                if (!ossl_bn_gen_dsa_nonce_fixed_top(k, order, priv_key,
+                                            dgst, dlen, ctx)) {
+                     ECerr(EC_F_ECDSA_SIGN_SETUP,
+                           EC_R_RANDOM_NUMBER_GENERATION_FAILED);
+                     goto err;
+                 }
+             } else {
+-                if (!BN_priv_rand_range(k, order)) {
++                if (!ossl_bn_priv_rand_range_fixed_top(k, order)) {
+                     ECerr(EC_F_ECDSA_SIGN_SETUP,
+                           EC_R_RANDOM_NUMBER_GENERATION_FAILED);
+                     goto err;
+                 }
+             }
+-        } while (BN_is_zero(k));
++        } while (ossl_bn_is_word_fixed_top(k, 0));
+ 
+         /* compute r the x-coordinate of generator * k */
+         if (!EC_POINT_mul(group, tmp_point, k, NULL, NULL, ctx)) {
+diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
+index cfcfaf0..71a7648 100644
+--- a/crypto/err/openssl.txt
++++ b/crypto/err/openssl.txt
+@@ -214,6 +214,7 @@ BN_F_BN_LSHIFT:145:BN_lshift
+ BN_F_BN_MOD_EXP2_MONT:118:BN_mod_exp2_mont
+ BN_F_BN_MOD_EXP_MONT:109:BN_mod_exp_mont
+ BN_F_BN_MOD_EXP_MONT_CONSTTIME:124:BN_mod_exp_mont_consttime
++BN_F_BN_MOD_EXP_MONT_FIXED_TOP:153:bn_mod_exp_mont_fixed_top
+ BN_F_BN_MOD_EXP_MONT_WORD:117:BN_mod_exp_mont_word
+ BN_F_BN_MOD_EXP_RECP:125:BN_mod_exp_recp
+ BN_F_BN_MOD_EXP_SIMPLE:126:BN_mod_exp_simple
+@@ -232,6 +233,8 @@ BN_F_BN_RSHIFT:146:BN_rshift
+ BN_F_BN_SET_WORDS:144:bn_set_words
+ BN_F_BN_STACK_PUSH:148:BN_STACK_push
+ BN_F_BN_USUB:115:BN_usub
++BN_F_OSSL_BN_GEN_DSA_NONCE_FIXED_TOP:154:ossl_bn_gen_dsa_nonce_fixed_top
++BN_F_OSSL_BN_PRIV_RAND_RANGE_FIXED_TOP:152:ossl_bn_priv_rand_range_fixed_top
+ BN_F_OSSL_BN_RSA_DO_UNBLIND:151:ossl_bn_rsa_do_unblind
+ BUF_F_BUF_MEM_GROW:100:BUF_MEM_grow
+ BUF_F_BUF_MEM_GROW_CLEAN:105:BUF_MEM_grow_clean
+diff --git a/include/crypto/bn.h b/include/crypto/bn.h
+index b5f36fb..3a43461 100644
+--- a/include/crypto/bn.h
++++ b/include/crypto/bn.h
+@@ -72,6 +72,9 @@ int bn_set_words(BIGNUM *a, const BN_ULONG *words, int num_words);
+  */
+ int bn_mul_mont_fixed_top(BIGNUM *r, const BIGNUM *a, const BIGNUM *b,
+                           BN_MONT_CTX *mont, BN_CTX *ctx);
++int bn_mod_exp_mont_fixed_top(BIGNUM *rr, const BIGNUM *a, const BIGNUM *p,
++                              const BIGNUM *m, BN_CTX *ctx,
++                              BN_MONT_CTX *in_mont);
+ int bn_to_mont_fixed_top(BIGNUM *r, const BIGNUM *a, BN_MONT_CTX *mont,
+                          BN_CTX *ctx);
+ int bn_from_mont_fixed_top(BIGNUM *r, const BIGNUM *a, BN_MONT_CTX *mont,
+@@ -91,5 +94,12 @@ int ossl_bn_rsa_do_unblind(const BIGNUM *intermediate,
+                            const BIGNUM *possible_arg2,
+                            const BIGNUM *to_mod, BN_CTX *ctx,
+                            unsigned char *buf, int num);
++int ossl_bn_mask_bits_fixed_top(BIGNUM *a, int n);
++int ossl_bn_is_word_fixed_top(const BIGNUM *a, BN_ULONG w);
++int ossl_bn_priv_rand_range_fixed_top(BIGNUM *r, const BIGNUM *range);
++int ossl_bn_gen_dsa_nonce_fixed_top(BIGNUM *out, const BIGNUM *range,
++                                    const BIGNUM *priv,
++                                    const unsigned char *message,
++                                    size_t message_len, BN_CTX *ctx);
+ 
+ #endif
+diff --git a/include/internal/constant_time.h b/include/internal/constant_time.h
+index 7f0627d..ebce55c 100644
+--- a/include/internal/constant_time.h
++++ b/include/internal/constant_time.h
+@@ -139,6 +139,29 @@ static ossl_inline uint64_t constant_time_lt_64(uint64_t a, uint64_t b)
+     return constant_time_msb_64(a ^ ((a ^ b) | ((a - b) ^ b)));
+ }
+ 
++#ifdef BN_ULONG
++static ossl_inline BN_ULONG constant_time_msb_bn(BN_ULONG a)
++{
++    return 0 - (a >> (sizeof(a) * 8 - 1));
++}
++
++static ossl_inline BN_ULONG constant_time_lt_bn(BN_ULONG a, BN_ULONG b)
++{
++    return constant_time_msb_bn(a ^ ((a ^ b) | ((a - b) ^ b)));
++}
++
++static ossl_inline BN_ULONG constant_time_is_zero_bn(BN_ULONG a)
++{
++    return constant_time_msb_bn(~a & (a - 1));
++}
++
++static ossl_inline BN_ULONG constant_time_eq_bn(BN_ULONG a,
++                                                BN_ULONG b)
++{
++    return constant_time_is_zero_bn(a ^ b);
++}
++#endif
++
+ static ossl_inline unsigned int constant_time_ge(unsigned int a,
+                                                  unsigned int b)
+ {
+diff --git a/include/openssl/bnerr.h b/include/openssl/bnerr.h
+index a0752ce..1616391 100644
+--- a/include/openssl/bnerr.h
++++ b/include/openssl/bnerr.h
+@@ -54,6 +54,7 @@ int ERR_load_BN_strings(void);
+ # define BN_F_BN_MOD_EXP2_MONT                            118
+ # define BN_F_BN_MOD_EXP_MONT                             109
+ # define BN_F_BN_MOD_EXP_MONT_CONSTTIME                   124
++# define BN_F_BN_MOD_EXP_MONT_FIXED_TOP                   153
+ # define BN_F_BN_MOD_EXP_MONT_WORD                        117
+ # define BN_F_BN_MOD_EXP_RECP                             125
+ # define BN_F_BN_MOD_EXP_SIMPLE                           126
+@@ -72,6 +73,8 @@ int ERR_load_BN_strings(void);
+ # define BN_F_BN_SET_WORDS                                144
+ # define BN_F_BN_STACK_PUSH                               148
+ # define BN_F_BN_USUB                                     115
++# define BN_F_OSSL_BN_GEN_DSA_NONCE_FIXED_TOP             154
++# define BN_F_OSSL_BN_PRIV_RAND_RANGE_FIXED_TOP           152
+ # define BN_F_OSSL_BN_RSA_DO_UNBLIND                      151
+ 
+ /*
+-- 
+2.45.3
+
