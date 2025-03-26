@@ -182,11 +182,10 @@ function create_vendor_tarball() {
     fi
 
     log "${LOG_LEVEL:-debug}" "Creating new tarball $vendor_tarball in $out_folder from folder $folder_to_tar"
-    tar  --sort=name \
+    PIGZ=-n tar -Ipigz --sort=name \
         --mtime="2021-04-26 00:00Z" \
         --owner=0 --group=0 --numeric-owner \
         --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-        --use-compress-program="pigz --no-name --no-time" \
         -cf "$vendor_tarball_path" -C "$folder_to_tar" "$folder_to_tar_name"
 
     if [[ -f "$vendor_tarball_path" ]]; then
