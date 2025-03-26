@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -129,6 +129,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Mar 26 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.5-3
+- Change vendor file naming and update it
+
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.7.5-2
 - Fix CVE-2025-22868, CVE-2025-27144 with an upstream patch
 
