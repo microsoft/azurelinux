@@ -73,7 +73,11 @@ Patch17:        CVE-2024-9341.patch
 Patch18:        CVE-2024-45338.patch
 Patch19:        CVE-2023-0778.patch
 Patch20:        CVE-2023-6476.patch
+<<<<<<< HEAD
 Patch21:        CVE-2025-27144.patch
+=======
+Patch21:        CVE-2024-44337.patch
+>>>>>>> 2515f918a (cri-o: add patch for CVE-2024-44337 [Medium] (#10951))
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -226,8 +230,13 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+<<<<<<< HEAD
 * Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 1.22.3-11
 - Add patch for CVE-2025-27144
+=======
+* Fri Mar 21 2025 Archana Choudhary <archana1@microsoft.com> - 1.22.3-11
+- Add patch for CVE-2024-44337
+>>>>>>> 2515f918a (cri-o: add patch for CVE-2024-44337 [Medium] (#10951))
 
 * Thu Jan 23 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.22.3-10
 - Add patch for CVE-2023-0778 & CVE-2023-6476.
