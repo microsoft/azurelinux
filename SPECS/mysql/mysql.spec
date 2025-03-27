@@ -110,7 +110,7 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
 %changelog
 * Tue Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
-- Upgrade to 8.0.41 to fix CVE-2025-21490
+- Upgrade to 8.0.41 to fix CVE-2025-21490 & CVE-2024-11053
 - Remove patch for CVE-2024-9681
 - Refresh patch for CVE-2025-0725
 
