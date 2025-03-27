@@ -88,7 +88,7 @@ if [ -z "$GIT_URL" ]; then
 fi
 
 trap cleanup EXIT
-TARBALL_SUFFIX="submodules"
+TARBALL_SUFFIX="submodules-vendor"
 VENDOR_ROOT_FINDER_FILE_NAME=""
 read -r PKG_NAME PKG_VERSION < <(get_name_version "$SRC_TARBALL")
 
