@@ -6,8 +6,8 @@ Distribution:   Azure Linux
 %bcond_without python3
 
 Name:           python-%{pypi_name}
-Version:        0.4.1
-Release:        6%{?dist}
+Version:        0.4.6
+Release:        1%{?dist}
 Summary:        Cross-platform colored terminal text
 
 License:        BSD
@@ -107,6 +107,9 @@ rm -rf *.egg-info
 %endif
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.6-1
+- Auto-upgrade to 0.4.6 - Extended package upgrade to IDC
+
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 0.4.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix distro check to enable python3 build and disable python2 build
