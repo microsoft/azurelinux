@@ -1,0 +1,48 @@
+storage:
+  bootType: efi
+
+  disks:
+  - partitionTableType: gpt
+    maxSize: 595M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: rootfs
+      type: root
+      start: 9M
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  bootloader:
+    resetType: hard-reset
+
+  hostname: azure-linux
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0
+
+  packages:
+    installLists:
+    - packagelists/base-image-packages.json
+    - packagelists/cloud-init-packages.json
+    - packagelists/qemu-guest-packages.json
+
+scripts:
+  finalizeCustomization:
+  - path: scripts/cleanup.sh

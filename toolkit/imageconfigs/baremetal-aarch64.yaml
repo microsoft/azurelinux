@@ -1,0 +1,54 @@
+storage:
+  bootType: efi
+
+  disks:
+  - partitionTableType: gpt
+    maxSize: 620M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: rootfs
+      type: root
+      start: 9M
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  bootloader:
+    resetType: hard-reset
+
+  hostname: azure-linux
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0
+    - rd.info
+    - log_buf_len=1M
+
+  selinux:
+    mode: enforcing
+
+  packages:
+    installLists:
+    - packagelists/baremetal-packages.yaml
+    - packagelists/base-image-packages.yaml
+    - packagelists/cloud-init-packages.yaml
+    - packagelists/selinux.yaml
+
+scripts:
+  finalizeCustomization:
+  - path: scripts/cleanup.sh
