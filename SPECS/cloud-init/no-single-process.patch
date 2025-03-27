@@ -77,7 +77,7 @@ diff -ruN a/systemd/cloud-config.target b/systemd/cloud-config.target
 -Wants=cloud-init-local.service cloud-init-network.service
 -After=cloud-init-local.service cloud-init-network.service
 +Wants=cloud-init-local.service cloud-init.service
-+After=cloud-init-local.service cloud-init.servic
++After=cloud-init-local.service cloud-init.service
 diff -ruN a/systemd/cloud-final.service.tmpl b/systemd/cloud-final.service.tmpl
 --- a/systemd/cloud-final.service.tmpl	2024-08-30 14:19:57.000000000 -0700
 +++ b/systemd/cloud-final.service.tmpl	2024-09-30 16:06:04.764625254 -0700
@@ -328,4 +328,3 @@ diff -ruN a/tests/unittests/config/test_cc_mounts.py b/tests/unittests/config/te
              /dev/sdb1	none	swap	sw,comment=cloudconfig	0	0
              """  # noqa: E501
              ).strip()
-
