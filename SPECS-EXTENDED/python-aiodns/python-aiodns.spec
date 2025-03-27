@@ -6,8 +6,8 @@ Distribution:   Azure Linux
 
 
 Name:           python-aiodns
-Version:        2.0.0
-Release:        4%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 Summary:        Simple DNS resolver for asyncio
 
 License:        MIT
@@ -64,6 +64,9 @@ with a synchronous looking interface by using pycares.
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0-1
+- Auto-upgrade to 3.2.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
