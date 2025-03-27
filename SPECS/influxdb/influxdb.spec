@@ -26,7 +26,7 @@ Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-Source2:        %{name}-%{version}-static-data-v1.tar.gz
+Source2:        %{name}-%{version}-static-data-vendor-v1.tar.gz
 Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
