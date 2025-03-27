@@ -2809,6 +2809,7 @@
                 "kernel",
                 "kernel-64k",
                 "kernel-headers",
+                "kernel-ipe",
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
