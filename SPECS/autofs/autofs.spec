@@ -1,8 +1,7 @@
-%global debug_package %{nil}
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
 Version:        5.1.8
-Release:        4%{?dist}
+Release:        1000%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +65,9 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 /lib/systemd/system/autofs.service
 
 %changelog
+* Thu Mar 27 2025 Chris Co <chrco@microsoft.com> - 5.1.8-1000
+- rebuilt
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
