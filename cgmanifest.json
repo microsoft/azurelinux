@@ -3347,6 +3347,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "erofs-utils",
+          "version": "1.8.5",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/snapshot/erofs-utils-1.8.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "espeak-ng",
           "version": "1.51.1",
           "downloadUrl": "https://github.com/espeak-ng/espeak-ng/archive/1.51.1/espeak-ng-1.51.1.tar.gz"
@@ -4380,8 +4390,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.78.1",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.1.tar.xz"
+          "version": "2.78.6",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.6.tar.xz"
         }
       }
     },
@@ -6560,8 +6570,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.79.1.tar.gz"
+          "version": "6.6.82.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
         }
       }
     },
@@ -8201,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.79.1.tar.gz"
+          "version": "6.6.82.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.79.1.tar.gz"
+          "version": "6.6.82.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
         }
       }
     },
@@ -8221,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.79.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.79.1.tar.gz"
+          "version": "6.6.82.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
         }
       }
     },
@@ -15283,8 +15293,8 @@
         "type": "other",
         "other": {
           "name": "opencryptoki",
-          "version": "3.17.0",
-          "downloadUrl": "https://github.com/opencryptoki/opencryptoki/archive/v3.17.0/opencryptoki-3.17.0.tar.gz"
+          "version": "3.24.0",
+          "downloadUrl": "https://github.com/opencryptoki/opencryptoki/archive/v3.24.0/opencryptoki-3.24.0.tar.gz"
         }
       }
     },
@@ -17673,8 +17683,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Slurp",
-          "version": "9999.29",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Slurp-9999.29.tar.gz"
+          "version": "9999.32",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Slurp-9999.32.tar.gz"
         }
       }
     },
@@ -17963,8 +17973,8 @@
         "type": "other",
         "other": {
           "name": "perl-Importer",
-          "version": "0.025",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Importer-0.025.tar.gz"
+          "version": "0.026",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Importer-0.026.tar.gz"
         }
       }
     },
@@ -18963,8 +18973,8 @@
         "type": "other",
         "other": {
           "name": "perl-Net-Telnet",
-          "version": "3.04",
-          "downloadUrl": "ftp://ftp.cpan.org/pub/CPAN/authors/id/J/JR/JROGERS/Net-Telnet-3.04.tar.gz"
+          "version": "3.05",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JR/JROGERS/Net-Telnet-3.05.tar.gz"
         }
       }
     },
@@ -21233,8 +21243,8 @@
         "type": "other",
         "other": {
           "name": "plexus-pom",
-          "version": "5.1",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-pom/archive/plexus-5.1.tar.gz"
+          "version": "16",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-pom/archive/plexus-16.tar.gz"
         }
       }
     },
@@ -24096,6 +24106,16 @@
           "version": "1.6.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.6.4.tar.gz"
         }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pyproject-api",
+          "version": "1.6.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyproject-api/pyproject_api-1.6.1.tar.gz"
+        }            
       }
     },
     {
