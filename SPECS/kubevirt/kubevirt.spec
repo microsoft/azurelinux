@@ -42,7 +42,12 @@ Patch09:        CVE-2023-26484.patch
 Patch10:        CVE-2024-45338.patch
 Patch11:        CVE-2023-3978.patch
 Patch12:        CVE-2025-22869.patch
+<<<<<<< HEAD
 Patch13:        CVE-2023-48795.patch
+=======
+Patch13:        CVE-2024-51744.patch
+
+>>>>>>> 656a1455a (Patch kubevirt to fix CVE-2024-51744)
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
@@ -222,6 +227,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Mar 27 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.59.0-26
+- Fix CVE-2024-51744
+
 * Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-26
 - Add patch to resolve CVE-2023-48795
 
