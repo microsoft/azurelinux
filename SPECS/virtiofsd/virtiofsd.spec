@@ -1,6 +1,6 @@
 Name:           virtiofsd
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Virtio-fs vhost-user device daemon (Rust version)
 License:        Apache-2.0 AND BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -17,6 +17,8 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 Source1:        %{name}-v%{version}-cargo.tar.gz
 Source2:        config.toml
 
+Patch0:         CVE-2024-43806.patch
+
 BuildRequires:  cargo
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libseccomp-devel
@@ -25,10 +27,11 @@ BuildRequires:  libseccomp-devel
 Virtio-fs vhost-user device daemon (Rust version)
 
 %prep
-%autosetup -p1 -n %{name}-v%{version}
+%autosetup -N -n %{name}-v%{version}
 
 pushd %{_builddir}/%{name}-v%{version}
 tar -xf %{SOURCE1}
+%autopatch -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 popd
@@ -48,6 +51,9 @@ install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtio
 %{_libexecdir}/virtiofsd-rs
 
 %changelog
+* Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 1.8.0-3
+- Patch CVE-2024-43806
+
 * Fri Feb 16 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.0-2
 - Drop ExclusiveArch: x86_64 to build on all supported platforms
 
