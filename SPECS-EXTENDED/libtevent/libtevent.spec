@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 %global talloc_version 2.3.4
 
 Name: libtevent
-Version: 0.14.1
+Version: 0.16.1
 Release: 1%{?dist}
 Summary: The tevent library
 License: LGPLv3+
@@ -105,6 +105,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %ldconfig_scriptlets
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.16.1-1
+- Auto-upgrade to 0.16.1 - Extended package upgrade to IDC
+
 * Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 0.14.1-1
 - Update to 0.14.1 to build with Python 3.12
 
