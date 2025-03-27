@@ -34,4 +34,5 @@ install -D -m0755 bin/otel-collector %{buildroot}/%{_bindir}
 
 %changelog
 * Thu Mar 27 2025 Adit Jha <aditjha@microsoft.com> - 0.121.0-1
-- Address CVE-2023-45288
+- Original version for Azure Linux
+- License Verified
