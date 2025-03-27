@@ -3,14 +3,14 @@ Distribution:   Azure Linux
 %global srcname	PyGreSQL
 
 Name:		%{srcname}
-Version:	5.2.2
-Release:	3%{?dist}
+Version:	6.0.1
+Release:	1%{?dist}
 Summary:	Python client library for PostgreSQL
 
 URL:		http://www.pygresql.org/
 License:	PostgreSQL
 
-Source0:	https://github.com/PyGreSQL/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:	https://github.com/PyGreSQL/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:	libpq-devel
@@ -58,9 +58,14 @@ find -type f -exec chmod 644 {} +
 %files -n python3-pygresql
 %license docs/copyright.rst
 %doc docs/*.rst
-%{python3_sitearch}/*.so
-%{python3_sitearch}/*.py
-%{python3_sitearch}/__pycache__/*.py{c,o}
+%{python3_sitearch}/pg/*.so
+%{python3_sitearch}/pg/*.py
+%{python3_sitearch}//pg/__pycache__/*.py{c,o}
+%{python3_sitearch}/pg/_pg.pyi
+%{python3_sitearch}/pg/py.typed
+%{python3_sitearch}/pgdb/*.py
+%{python3_sitearch}/pgdb/__pycache__/*.py{c,o}
+%{python3_sitearch}/pgdb/py.typed
 %{python3_sitearch}/*.egg-info
 
 
@@ -79,6 +84,9 @@ EOF
 
 
 %changelog
+* Wed Mar 25 2024 jyoti kanase <v-jykanase@microsoft.com> - 6.0.1-1
+- Update to 6.0.1
+
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.2-3
 - Disabling missing test dependency.
 - License verified.
