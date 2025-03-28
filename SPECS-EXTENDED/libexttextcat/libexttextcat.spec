@@ -1,15 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: libexttextcat
-Version: 3.4.5
-Release: 7%{?dist}
+Version: 3.4.6
+Release: 1%{?dist}
 Summary: Text categorization library
 
-License: BSD
+License: BSD-3-Clause
 URL: https://wiki.documentfoundation.org/Libexttextcat
-Source: http://dev-www.libreoffice.org/src/libexttextcat/%{name}-%{version}.tar.xz
+Source: https://dev-www.libreoffice.org/src/libexttextcat/%{name}-%{version}.tar.xz
 
 BuildRequires: gcc
+BuildRequires: make
 
 %description
 %{name} is an N-Gram-Based Text Categorization library primarily
@@ -36,10 +37,10 @@ you to easily create your own document fingerprints.
 
 %build
 %configure --disable-silent-rules --disable-static --disable-werror
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 rm -f %{buildroot}/%{_libdir}/*.la
 
 %check
@@ -63,6 +64,11 @@ make check
 %{_bindir}/createfp
 
 %changelog
+* Mon Nov 04 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.4.6-1
+- Update to 3.4.6-1
+- License verified.
+- change the Source from http to https
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.5-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,12 +1,14 @@
 Name:           rpmdevtools
 Version:        9.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        RPM Development Tools
 
 # rpmdev-md5 and rpmdev-setuptree are GPL-2.0-only,
 # everything else is GPL-2.0-or-later.
 License:        GPL-2.0-or-later AND GPL-2.0-only
 URL:            https://pagure.io/rpmdevtools
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://releases.pagure.org/rpmdevtools/%{name}-%{version}.tar.xz
 Source1:        progressbar.py
 
@@ -157,6 +159,9 @@ $check_ok
 
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 9.6-9
+- Add missing Vendor and Distribution tags.
+
 * Tue Feb 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 9.6-8
 - Refresh from Fedora 40 (license: MIT)
 - Add conditional flags for azl

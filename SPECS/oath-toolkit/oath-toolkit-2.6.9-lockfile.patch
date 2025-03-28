@@ -2,13 +2,13 @@ diff -ru oath-toolkit-2.6.9-orig/liboath/global.c oath-toolkit-2.6.9/liboath/glo
 --- oath-toolkit-2.6.9-orig/liboath/global.c	2023-11-06 08:52:01.544401132 -0800
 +++ oath-toolkit-2.6.9/liboath/global.c	2023-11-06 08:57:08.612406143 -0800
 @@ -25,9 +25,12 @@
- 
+
  #include <stdio.h>		/* For snprintf, getline. */
  #include <string.h>		/* For strverscmp. */
 +#include <stdlib.h>		/* For free. */
- 
+
  #include "gc.h"
- 
+
 +char *oath_lockfile_path = NULL;
 +
  /**
@@ -17,16 +17,16 @@ diff -ru oath-toolkit-2.6.9-orig/liboath/global.c oath-toolkit-2.6.9/liboath/glo
 @@ -52,6 +55,8 @@
    if (gc_init () != GC_OK)
      return OATH_CRYPTO_ERROR;
- 
+
 +  oath_lockfile_path = NULL;
 +
    return OATH_OK;
  }
- 
+
 @@ -71,6 +76,11 @@
  {
    gc_done ();
- 
+
 +  if (oath_lockfile_path)
 +  {
 +    free(oath_lockfile_path);
@@ -34,9 +34,9 @@ diff -ru oath-toolkit-2.6.9-orig/liboath/global.c oath-toolkit-2.6.9/liboath/glo
 +  }
    return OATH_OK;
  }
- 
+
 @@ -99,3 +109,23 @@
- 
+
    return NULL;
  }
 +
@@ -69,46 +69,21 @@ diff -ru oath-toolkit-2.6.9-orig/liboath/liboath.map oath-toolkit-2.6.9/liboath/
      oath_totp_validate3_callback;
 +    oath_set_lockfile_path;
  } LIBOATH_1.12.0;
- 
+
  LIBOATH_2.6.0
 diff -ru oath-toolkit-2.6.9-orig/liboath/oath.h oath-toolkit-2.6.9/liboath/oath.h
 --- oath-toolkit-2.6.9-orig/liboath/oath.h	2023-11-06 08:52:01.544401132 -0800
 +++ oath-toolkit-2.6.9/liboath/oath.h	2023-11-06 09:46:10.416744428 -0800
 @@ -164,6 +164,9 @@
- 
+
    extern OATHAPI const char *oath_check_version (const char *req_version);
- 
+
 +  extern char *oath_lockfile_path;
 +  extern OATHAPI int oath_set_lockfile_path(const char *lockfile);
 +
  /* Error handling */
- 
+
    extern OATHAPI const char *oath_strerror (int err);
-diff -ru oath-toolkit-2.6.9-orig/liboath/usersfile.c oath-toolkit-2.6.9/liboath/usersfile.c
---- oath-toolkit-2.6.9-orig/liboath/usersfile.c	2023-11-06 08:52:01.548401132 -0800
-+++ oath-toolkit-2.6.9/liboath/usersfile.c	2023-11-06 09:08:36.692294389 -0800
-@@ -325,9 +325,18 @@
-   {
-     int l;
- 
--    l = asprintf (&lockfile, "%s.lock", usersfile);
--    if (lockfile == NULL || ((size_t) l) != strlen (usersfile) + 5)
--      return OATH_PRINTF_ERROR;
-+    if (oath_lockfile_path)
-+    {
-+      l = asprintf (&lockfile, "%s", oath_lockfile_path);
-+      if (lockfile == NULL || ((size_t) l) != strlen (oath_lockfile_path))
-+        return OATH_PRINTF_ERROR;
-+    }
-+    else
-+    {
-+      l = asprintf (&lockfile, "%s.lock", usersfile);
-+      if (lockfile == NULL || ((size_t) l) != strlen (usersfile) + 5)
-+        return OATH_PRINTF_ERROR;
-+    }
- 
-     lockfh = fopen (lockfile, "w");
-     if (!lockfh)
 diff -ru oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c oath-toolkit-2.6.9/pam_oath/pam_oath.c
 --- oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c	2023-11-06 08:52:01.576401132 -0800
 +++ oath-toolkit-2.6.9/pam_oath/pam_oath.c	2023-11-06 09:14:42.848153201 -0800
@@ -127,7 +102,7 @@ diff -ru oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c oath-toolkit-2.6.9/pam_oath
 +  cfg->lockfile = NULL;
    cfg->digits = -1;
    cfg->window = 5;
- 
+
 @@ -102,6 +104,8 @@
  	cfg->use_first_pass = 1;
        if (strncmp (argv[i], "usersfile=", 10) == 0)
@@ -160,6 +135,6 @@ diff -ru oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c oath-toolkit-2.6.9/pam_oath
 +      retval = PAM_AUTHINFO_UNAVAIL;
 +      goto done;
 +    }
- 
+
    if (password == NULL)
      {

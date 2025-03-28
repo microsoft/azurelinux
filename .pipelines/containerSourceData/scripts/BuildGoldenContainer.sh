@@ -58,7 +58,7 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/azurelinux/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false" -u "true"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
@@ -82,6 +82,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
     t ) SBOM_SCRIPT=$OPTARG;;
     u ) DISTROLESS=$OPTARG;;
     v ) VERSION_EXTRACT_CMD=$OPTARG;;
+    w ) TOOLCHAIN_RPMS_TARBALL=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -125,6 +126,7 @@ function print_inputs {
     echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
     echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
     echo "DISTROLESS                    -> $DISTROLESS"
+    echo "TOOLCHAIN_RPMS_TARBALL -> $TOOLCHAIN_RPMS_TARBALL"
 }
 
 function validate_inputs {
@@ -165,6 +167,11 @@ function validate_inputs {
 
     if [[ ! -f $RPMS_TARBALL ]]; then
         echo "Error - No RPMs tarball found."
+        exit 1
+    fi
+
+    if [[ ! -f $TOOLCHAIN_RPMS_TARBALL ]]; then
+        echo "Error - No TOOLCHAIN_RPMS tarball found under '$TOOLCHAIN_RPMS_TARBALL'."
         exit 1
     fi
 
@@ -236,7 +243,9 @@ function prepare_docker_directory {
     mkdir -pv "$HOST_MOUNTED_DIR"
 
     # Copy files into docker context directory
-    tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    tar -xvf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    # we look for the toolchain rpms in the same directory as the rpms tarball
+    tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR/RPMS"/
     cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
 }
 

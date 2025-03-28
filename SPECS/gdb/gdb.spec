@@ -1,13 +1,16 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-39128.patch
+Patch1:         CVE-2023-39129.patch
+Patch2:         CVE-2023-39130.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -44,7 +47,8 @@ another program was doing at the moment it crashed.
     --with-system-zlib \
     --disable-sim \
     --with-python=%{python3} \
-    --enable-unit-tests
+    --enable-unit-tests \
+    --enable-targets=all
 %make_build
 
 %install
@@ -100,6 +104,12 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Mon Feb 03 2025 Andrew Phelps <anphel@microsoft.com> - 13.2-4
+- Enable cross-debugging on all supported targets
+
+* Wed Oct 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 13.2-3
+- Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
+
 * Fri Aug 16 2024 Andrew Phelps <anphel@microsoft.com> - 13.2-2
 - Fix package tests
 - Enable and run unit tests

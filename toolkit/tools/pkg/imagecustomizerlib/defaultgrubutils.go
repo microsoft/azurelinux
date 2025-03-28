@@ -137,7 +137,7 @@ func findDefaultGrubFileVarAssign(varAssigns []defaultGrubFileVarAssign, name de
 //   - cmdLineVarAssign: The variable assignment that matches 'varName'.
 //   - args: The list of kernel command-line args.
 //   - insertAt: An index that new kernel command-line args can be inserted at.
-func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
+func GetDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
 ) (defaultGrubFileVarAssign, []grubConfigLinuxArg, int, error) {
 	varAssigns, err := findDefaultGrubFileVarAssigns(defaultGrubFileContent)
 	if err != nil {
@@ -174,7 +174,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 		insertAt = len(argsString)
 	}
 
-	args, err := parseCommandLineArgs(grubTokens)
+	args, err := ParseCommandLineArgs(grubTokens)
 	if err != nil {
 		err = fmt.Errorf("failed to parse %s's value args:\n%w", varName, err)
 		return defaultGrubFileVarAssign{}, nil, 0, err
@@ -185,7 +185,7 @@ func getDefaultGrubFileLinuxArgs(defaultGrubFileContent string, varName defaultG
 
 // Takes the string contents of /etc/default/grub file and inserts the provided command-line args.
 func addExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCommandLine string) (string, error) {
-	cmdLineVarAssign, _, insertAt, err := getDefaultGrubFileLinuxArgs(defaultGrubFileContent,
+	cmdLineVarAssign, _, insertAt, err := GetDefaultGrubFileLinuxArgs(defaultGrubFileContent,
 		defaultGrubFileVarNameCmdlineLinuxDefault)
 	if err != nil {
 		return "", err
@@ -215,7 +215,7 @@ func addExtraCommandLineToDefaultGrubFile(defaultGrubFileContent string, extraCo
 func updateDefaultGrubFileKernelCommandLineArgs(defaultGrubFileContent string, varName defaultGrubFileVarName,
 	argsToRemove []string, newArgs []string,
 ) (string, error) {
-	cmdLineVarAssign, args, insertAt, err := getDefaultGrubFileLinuxArgs(defaultGrubFileContent, varName)
+	cmdLineVarAssign, args, insertAt, err := GetDefaultGrubFileLinuxArgs(defaultGrubFileContent, varName)
 	if err != nil {
 		return "", err
 	}
@@ -286,7 +286,7 @@ func insertDefaultGrubFileVarAssign(defaultGrubFileContent string, insertAfterLi
 
 // Sets the value of a variable in the /etc/default/grub file, either replacing the existing variable value (if one
 // exists) or adding a new one.
-func updateDefaultGrubFileVariable(defaultGrubFileContent string, varName string, newValue string) (string, error) {
+func UpdateDefaultGrubFileVariable(defaultGrubFileContent string, varName string, newValue string) (string, error) {
 	varAssigns, err := findDefaultGrubFileVarAssigns(defaultGrubFileContent)
 	if err != nil {
 		err = fmt.Errorf("failed to parse %s file:\n%w", installutils.GrubDefFile, err)
@@ -320,7 +320,7 @@ func updateDefaultGrubFileVariable(defaultGrubFileContent string, varName string
 
 // Checks if the image uses grub-mkconfig.
 func isGrubMkconfigEnabled(imageChroot *safechroot.Chroot) (bool, error) {
-	grub2ConfigFile, err := readGrub2ConfigFile(imageChroot)
+	grub2ConfigFile, err := ReadGrub2ConfigFile(imageChroot)
 	if err != nil {
 		return false, err
 	}
@@ -336,7 +336,7 @@ func isGrubMkconfigConfig(grub2Config string) bool {
 }
 
 // Reads the string contents of the /etc/default/grub file.
-func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
+func readDefaultGrubFile(imageChroot safechroot.ChrootInterface) (string, error) {
 	logger.Log.Debugf("Reading %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
@@ -351,7 +351,7 @@ func readDefaultGrubFile(imageChroot *safechroot.Chroot) (string, error) {
 }
 
 // Writes the string contents of the /etc/default/grub file.
-func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) error {
+func WriteDefaultGrubFile(grub2Config string, imageChroot safechroot.ChrootInterface) error {
 	logger.Log.Debugf("Writing %s file", installutils.GrubDefFile)
 
 	grub2ConfigFilePath := getDefaultGrubFilePath(imageChroot)
@@ -365,6 +365,6 @@ func writeDefaultGrubFile(grub2Config string, imageChroot *safechroot.Chroot) er
 	return nil
 }
 
-func getDefaultGrubFilePath(imageChroot *safechroot.Chroot) string {
+func getDefaultGrubFilePath(imageChroot safechroot.ChrootInterface) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubDefFile)
 }

@@ -1,0 +1,112 @@
+From bdc374bfbb0ca34ddb40713eb51d8535fdf11952 Mon Sep 17 00:00:00 2001
+From: Stephan Bergmann <sbergman@redhat.com>
+Date: Wed, 31 Jul 2019 16:27:33 +0200
+Subject: [PATCH 2/2] Avoid deadlock in TestIndexSearcher
+
+---
+ src/test/search/TestIndexSearcher.cpp | 51 +++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 10 deletions(-)
+
+diff --git a/src/test/search/TestIndexSearcher.cpp b/src/test/search/TestIndexSearcher.cpp
+index 02c21aaf..a6dde5ba 100644
+--- a/src/test/search/TestIndexSearcher.cpp
++++ b/src/test/search/TestIndexSearcher.cpp
+@@ -8,9 +8,11 @@
+ 
+ DEFINE_MUTEX(searchMutex);
+ DEFINE_CONDITION(searchCondition);
++bool searchReady;
+ 
+ DEFINE_MUTEX(deleteMutex);
+ DEFINE_CONDITION(deleteCondition);
++bool deleteReady;
+ 
+ _LUCENE_THREAD_FUNC(searchDocs, _searcher) {
+ 
+@@ -19,15 +21,20 @@ _LUCENE_THREAD_FUNC(searchDocs, _searcher) {
+     Query * query = QueryParser::parse(_T("one"), _T("content"), &an);
+     Hits * hits = searcher->search(query);
+     
+-//    _LUCENE_SLEEP(9999); //make sure that searchMutex is being waited on...
++    {
++        SCOPED_LOCK_MUTEX(searchMutex);
++        searchReady = true;
++        CONDITION_NOTIFYALL(searchCondition);
++    }
+ 
+-    CONDITION_NOTIFYALL(searchCondition);
+     SCOPED_LOCK_MUTEX(deleteMutex);
+ 
+     _CLLDELETE(hits);
+     _CLLDELETE(query);
+ 
+-    CONDITION_WAIT(deleteMutex, deleteCondition);
++    while (!deleteReady) {
++        CONDITION_WAIT(deleteMutex, deleteCondition);
++    }
+     _LUCENE_THREAD_FUNC_RETURN(0);
+ }
+ 
+@@ -55,13 +62,24 @@ void testEndThreadException(CuTest *tc) {
+     
+     // this sequence is OK: delete searcher after search thread finish
+     {
++        searchReady = false;
++        deleteReady = false;
++
+         IndexSearcher * searcher = _CLNEW IndexSearcher(&ram);
+         _LUCENE_THREADID_TYPE thread = _LUCENE_THREAD_CREATE(&searchDocs, searcher);
+-        SCOPED_LOCK_MUTEX(searchMutex);
+ 
+-        CONDITION_WAIT(searchMutex, searchCondition);
+-//        _LUCENE_SLEEP(9999); //make sure that deleteMutex is being waited on...
+-        CONDITION_NOTIFYALL(deleteCondition);
++        {
++            SCOPED_LOCK_MUTEX(searchMutex);
++            while (!searchReady) {
++                CONDITION_WAIT(searchMutex, searchCondition);
++            }
++        }
++
++        {
++            SCOPED_LOCK_MUTEX(deleteMutex);
++            deleteReady = true;
++            CONDITION_NOTIFYALL(deleteCondition);
++        }
+ 
+         _LUCENE_THREAD_JOIN(thread);
+ 
+@@ -71,14 +89,27 @@ void testEndThreadException(CuTest *tc) {
+ 
+     // this produces memory exception: delete searcher after search finish but before thread finish
+     {
++        searchReady = false;
++        deleteReady = false;
++
+         IndexSearcher * searcher = _CLNEW IndexSearcher(&ram);
+         _LUCENE_THREADID_TYPE thread = _LUCENE_THREAD_CREATE(&searchDocs, searcher);
+-        SCOPED_LOCK_MUTEX(searchMutex);
+ 
+-        CONDITION_WAIT(searchMutex, searchCondition);
++        {
++            SCOPED_LOCK_MUTEX(searchMutex);
++            while (!searchReady) {
++                CONDITION_WAIT(searchMutex, searchCondition);
++            }
++        }
++
+         searcher->close();
+         _CLLDELETE(searcher);
+-        CONDITION_NOTIFYALL(deleteCondition);
++
++        {
++            SCOPED_LOCK_MUTEX(deleteMutex);
++            deleteReady = true;
++            CONDITION_NOTIFYALL(deleteCondition);
++        }
+ 
+         _LUCENE_THREAD_JOIN(thread);
+     }
+-- 
+2.21.0
+

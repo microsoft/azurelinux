@@ -7,9 +7,14 @@ scripts:
 
 iso:
   additionalFiles:
-    files/cloud-init/user-data: /cloud-init-data/user-data
-    files/cloud-init/network-config: /cloud-init-data/network-config
-    files/cloud-init/meta-data: /cloud-init-data/meta-data
+  - source: files/cloud-init/user-data
+    destination: /cloud-init-data/user-data
+
+  - source: files/cloud-init/network-config
+    destination: /cloud-init-data/network-config
+
+  - source: files/cloud-init/meta-data
+    destination: /cloud-init-data/meta-data
 
   kernelCommandLine:
     extraCommandLine: "ds=nocloud"

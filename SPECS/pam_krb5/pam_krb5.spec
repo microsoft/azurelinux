@@ -1,10 +1,12 @@
 Summary:        A Pluggable Authentication Module for Kerberos 5
 Name:           pam_krb5
 Version:        4.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD OR LGPLv2+
 Group:          System/Libraries
 URL:            https://github.com/rra/pam-krb5
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{url}/archive/refs/tags/upstream/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0001:      0001-Drop-module-long-test.patch
 BuildRequires:  byacc
@@ -56,6 +58,9 @@ make check
 %{_mandir}/man5/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.11-3
+- Add missing Vendor and Distribution tags.
+
 * Wed Jul 20 2022 Henry Li <lihl@microsoft.com> - 4.11-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified

@@ -264,7 +264,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.PermanentlyStopAllChildProcesses(unix.SIGINT)
+	shell.StopAllChildProcesses(unix.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.

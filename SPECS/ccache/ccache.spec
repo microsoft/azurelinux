@@ -1,10 +1,10 @@
 Summary:        Compiler Cache
 Name:           ccache
 Version:        4.8.3
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BeOpen AND BSD AND GPLv3+ AND (Patrick Powell's AND Holger Weiss' license) AND Public Domain AND Python AND zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ccache.dev
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
@@ -28,10 +28,11 @@ pushd build
 %make_install
 popd
 install -dm 755 %{buildroot}%{_libdir}/ccache
-for n in cc gcc g++ c++ ; do
+for n in gcc g++ c++ ; do
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/$n
     ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/%{_host}-$n
 done
+ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/cc
 ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang
 ln -sf ../../bin/ccache %{buildroot}%{_libdir}/ccache/clang++
 
@@ -56,6 +57,12 @@ done
 %{_libdir}/*
 
 %changelog
+* Tue Sep 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.8.3-3
+- Remove dangling link to %%{_host}-cc
+
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.3-2
+- Fix the 'Distribution' tag.
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.8.3-1
 - Upgrade to version 4.8.3
 

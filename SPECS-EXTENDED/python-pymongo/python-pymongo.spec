@@ -7,12 +7,15 @@
 
 Name:           python-pymongo
 Version:        3.10.1
-Release:        5%{?dist}
-# All code is ASL 2.0 except bson/time64*.{c,h} which is MIT
-License:        ASL 2.0 and MIT
+Release:        6%{?dist}
+# All code is ASL 2.0 except for:
+# - bson/time64*.{c,h} - MIT,
+# - encoding_helpers.c - Unicode with a "Portions Copyright 2001 Unicode, Inc." header,
+# - ssl_match_hostname.py - Python-2.0
+License:        ASL 2.0 and MIT and Python-2.0 and Unicode
 Summary:        Python driver for MongoDB
 URL:            https://github.com/mongodb/mongo-python-driver
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/mongodb/mongo-python-driver/archive/%{version}/pymongo-%{version}.tar.gz
 # This patch removes the bundled ssl.match_hostname library as it was vulnerable to CVE-2013-7440
@@ -90,28 +93,32 @@ chmod 755 %{buildroot}%{python3_sitearch}/bson/*.so
 chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 %files doc
-%license LICENSE
+%license LICENSE THIRD-PARTY-NOTICES
 %if 0%{!?bootstrap:1}
 %doc doc/_build/html/*
 %endif
 
 %files -n python3-bson
-%license LICENSE
+%license LICENSE THIRD-PARTY-NOTICES
 %doc README.rst
 %{python3_sitearch}/bson
 
 %files -n python3-pymongo
-%license LICENSE
+%license LICENSE THIRD-PARTY-NOTICES
 %doc README.rst
 %{python3_sitearch}/pymongo
 %{python3_sitearch}/pymongo-%{version}-*.egg-info
 
 %files -n python3-pymongo-gridfs
-%license LICENSE
+%license LICENSE THIRD-PARTY-NOTICES
 %doc README.rst
 %{python3_sitearch}/gridfs
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.10.1-6
+- Release bump to fix package information.
+- License verified.
+
 * Mon Oct 19 2020 Steve Laughman <steve.laughman@microsoft.com> - 3.10.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

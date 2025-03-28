@@ -1,0 +1,30 @@
+--- tyxml-4.6.0/dune-project.orig	2023-09-27 03:44:48.000000000 -0600
++++ tyxml-4.6.0/dune-project	2023-10-03 13:28:22.210416152 -0600
+@@ -81,6 +81,5 @@
+   (alcotest :with-test)
+   (re
+    (>= 1.5.0))
+-   seq
+   (uutf
+    (>= 1.0.0))))
+--- tyxml-4.6.0/lib/dune.orig	2023-09-27 03:44:48.000000000 -0600
++++ tyxml-4.6.0/lib/dune	2023-10-03 13:28:22.210416152 -0600
+@@ -5,7 +5,7 @@
+  (modules_without_implementation
+   Xml_sigs Html_sigs Svg_sigs Html_types Svg_types)
+  (synopsis "Statically correct HTML and SVG documents (Functor version)")
+- (libraries uutf re seq)
++ (libraries uutf re)
+  (flags (:standard
+          -safe-string))
+ )
+--- tyxml-4.6.0/tyxml.opam.orig	2023-09-27 03:44:48.000000000 -0600
++++ tyxml-4.6.0/tyxml.opam	2023-10-03 13:28:22.211416134 -0600
+@@ -15,7 +15,6 @@ depends: [
+   "ocaml" {>= "4.04"}
+   "alcotest" {with-test}
+   "re" {>= "1.5.0"}
+-  "seq"
+   "uutf" {>= "1.0.0"}
+   "odoc" {with-doc}
+ ]

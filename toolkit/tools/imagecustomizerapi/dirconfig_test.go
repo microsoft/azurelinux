@@ -19,8 +19,8 @@ func TestDirConfigListIsValidEmpty(t *testing.T) {
 func TestDirConfigListIsValidValidItem(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:      "a.txt",
-			DestinationPath: "/a.txt",
+			Source:      "a.txt",
+			Destination: "/a.txt",
 		},
 	}
 	err := list.IsValid()
@@ -30,8 +30,8 @@ func TestDirConfigListIsValidValidItem(t *testing.T) {
 func TestDirConfigListIsValidValidItemWithPermissions(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:           "a.txt",
-			DestinationPath:      "/a.txt",
+			Source:               "a.txt",
+			Destination:          "/a.txt",
 			NewDirPermissions:    ptrutils.PtrTo(FilePermissions(0o777)),
 			MergedDirPermissions: ptrutils.PtrTo(FilePermissions(0o777)),
 			ChildFilePermissions: ptrutils.PtrTo(FilePermissions(0o777)),
@@ -44,32 +44,32 @@ func TestDirConfigListIsValidValidItemWithPermissions(t *testing.T) {
 func TestDirConfigListIsValidEmptySource(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:      "",
-			DestinationPath: "/a.txt",
+			Source:      "",
+			Destination: "/a.txt",
 		},
 	}
 	err := list.IsValid()
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "invalid sourcePath value: empty string")
+	assert.ErrorContains(t, err, "invalid 'source' value: empty string")
 }
 
 func TestDirConfigListIsValidEmptyDestination(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:      "a.txt",
-			DestinationPath: "",
+			Source:      "a.txt",
+			Destination: "",
 		},
 	}
 	err := list.IsValid()
 	assert.ErrorContains(t, err, "invalid value at index 0")
-	assert.ErrorContains(t, err, "invalid destinationPath value: empty string")
+	assert.ErrorContains(t, err, "invalid 'destination' value: empty string")
 }
 
 func TestDirConfigListIsValidInvalidNewDirPermissions(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:        "a.txt",
-			DestinationPath:   "/a.txt",
+			Source:            "a.txt",
+			Destination:       "/a.txt",
 			NewDirPermissions: ptrutils.PtrTo(FilePermissions(0o1000)),
 		},
 	}
@@ -82,8 +82,8 @@ func TestDirConfigListIsValidInvalidNewDirPermissions(t *testing.T) {
 func TestDirConfigListIsValidInvalidMergedDirPermissions(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:           "a.txt",
-			DestinationPath:      "/a.txt",
+			Source:               "a.txt",
+			Destination:          "/a.txt",
 			MergedDirPermissions: ptrutils.PtrTo(FilePermissions(0o1000)),
 		},
 	}
@@ -96,8 +96,8 @@ func TestDirConfigListIsValidInvalidMergedDirPermissions(t *testing.T) {
 func TestDirConfigListIsValidInvalidChildFilePermissions(t *testing.T) {
 	list := DirConfigList{
 		DirConfig{
-			SourcePath:           "a.txt",
-			DestinationPath:      "/a.txt",
+			Source:               "a.txt",
+			Destination:          "/a.txt",
 			ChildFilePermissions: ptrutils.PtrTo(FilePermissions(0o1000)),
 		},
 	}

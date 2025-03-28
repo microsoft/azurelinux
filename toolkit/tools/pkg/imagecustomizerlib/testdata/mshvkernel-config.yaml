@@ -13,7 +13,7 @@ storage:
 
   bootType: efi
 
-  fileSystems:
+  filesystems:
   - deviceId: efi
     type: fat32
     mountPoint:

@@ -11,7 +11,7 @@
 
 Name:           libtracefs
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-2.0-only
 Summary:        Library for access kernel tracefs
 
@@ -20,6 +20,8 @@ Summary:        Library for access kernel tracefs
 # cd libtracefs
 # git archive --prefix=libtracefs-%%{version}/ -o libtracefs-%%{version}.tar.gz %%{git_commit}
 URL:            https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
@@ -62,6 +64,9 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %{_libdir}/%{name}.so
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.0-2
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.8.0-1
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified

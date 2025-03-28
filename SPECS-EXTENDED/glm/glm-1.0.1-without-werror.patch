@@ -1,0 +1,12 @@
+diff -ru glm-1.0.1/test/CMakeLists.txt glm-1.0.1-without-werror/test/CMakeLists.txt
+--- glm-1.0.1/test/CMakeLists.txt	2024-02-27 18:19:47.000000000 +0100
++++ glm-1.0.1-without-werror/test/CMakeLists.txt	2024-03-02 11:57:28.431725545 +0100
+@@ -20,7 +20,7 @@
+ 	endif()
+ 
+ 	if(NOT GLM_DISABLE_AUTO_DETECTION)
+-		add_compile_options(-Werror)
++#		add_compile_options(-Werror)
+ #		add_compile_options(-Wpedantic)
+ #		add_compile_options(-Wall)
+ #		add_compile_options(-Wextra)

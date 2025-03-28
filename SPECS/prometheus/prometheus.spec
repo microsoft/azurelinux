@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.45.4
-Release:        3%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,13 @@ Source5:        prometheus.logrotate
 Source6:        promu-%{promu_version}.tar.gz
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
-Patch1:         CVE-2024-6104.patch
+Patch1:         CVE-2023-45288.patch
+Patch2:         CVE-2024-6104.patch
+Patch3:         CVE-2024-24786.patch
+Patch4:         CVE-2023-44487.patch
+Patch5:         CVE-2025-22868.patch
+Patch6:         0001-Fix-exit-condition-of-TestQuerierIndexQueriesRace.patch
+Patch7:         0002-Improve-sensitivity-of-TestQuerierIndexQueriesRace.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
@@ -135,6 +141,21 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Thu Mar 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.45.4-9
+- Add patches to fix test reliability issues with TestQuerierIndexQueriesRace
+
+* Thu Mar 06 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.45.4-8
+- Fix CVE-2025-22868
+
+* Tue Mar 04 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 2.45.4-7
+- Fix CVE-2023-44487
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 2.45.4-6
+- Fix CVE-2024-24786 by patching
+
+* Wed Nov 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.45.4-4
+- Fix CVE-2023-45288
+
 * Fri Aug 02 2024 Bala <balakumaran.kannan@microsoft.com> - 2.45.4-3
 - Fix CVE-2024-6104 by patching vendor gomodule
 

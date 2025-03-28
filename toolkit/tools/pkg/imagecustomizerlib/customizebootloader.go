@@ -50,7 +50,7 @@ func hardResetBootLoader(baseConfigPath string, config *imagecustomizerapi.Confi
 
 	var rootMountIdType imagecustomizerapi.MountIdentifierType
 	var bootType imagecustomizerapi.BootType
-	if config.Storage != nil {
+	if config.CustomizePartitions() {
 		rootFileSystem, foundRootFileSystem := sliceutils.FindValueFunc(config.Storage.FileSystems,
 			func(fileSystem imagecustomizerapi.FileSystem) bool {
 				return fileSystem.MountPoint != nil &&

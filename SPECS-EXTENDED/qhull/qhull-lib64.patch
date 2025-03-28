@@ -1,0 +1,21 @@
+diff -up qhull-8.0.2/CMakeLists.txt.lib64 qhull-8.0.2/CMakeLists.txt
+--- qhull-8.0.2/CMakeLists.txt.lib64	2020-09-03 20:33:16.000000000 -0600
++++ qhull-8.0.2/CMakeLists.txt	2022-10-04 21:49:12.708081647 -0600
+@@ -709,7 +709,7 @@ configure_file(${PROJECT_SOURCE_DIR}/bui
+   @ONLY
+ )
+ 
+-set(ConfigPackageLocation lib/cmake/Qhull)
++set(ConfigPackageLocation ${LIB_INSTALL_DIR}/cmake/Qhull)
+ install(EXPORT QhullTargets
+   FILE
+     QhullTargets.cmake
+@@ -728,7 +728,7 @@ install(
+     Devel
+ )
+ 
+-set(PkgConfigLocation lib/pkgconfig)
++set(PkgConfigLocation ${LIB_INSTALL_DIR}/pkgconfig)
+ foreach(pkgconfig IN ITEMS "${qhull_SHAREDR};Qhull reentrant shared library"
+                            "${qhull_STATIC};Qhull static library"
+                            "${qhull_STATICR};Qhull reentrant static library"

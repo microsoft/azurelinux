@@ -167,7 +167,7 @@ function get_component_name_and_version {
     COMPONENT="$IMAGE"
     echo "Component name                -> $COMPONENT"
 
-    COMPONENT_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE* |  rev | cut -d '.' -f 2- | rev)
+    COMPONENT_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p $HOST_MOUNTED_DIR/RPMS/x86_64/$IMAGE-[0-9]* |  rev | cut -d '.' -f 2- | rev)
     echo "Component Version             -> $COMPONENT_VERSION"
 }
 

@@ -1,0 +1,54 @@
+%__kmod_path           ^/lib/modules/.*/(modules.builtin|.*\.ko|.*\.ko\.gz|.*\.ko\.bz2|.*\.ko\.xz|.*\.ko\.zst)$
+
+# Notes on Lua:
+# The backslash in strings (like "\n" newline) needs to be doubled
+# because we are inside rpm macro. Single backslashes before most chars
+# disappear (removed by rpm's parser), so "\n" turns into just "n".
+# In string.gsub patterns, unlike regexps, backslash has no special meaning.
+# It can't escape . and such. (Use one-character set [.] to represent
+# literal period, or lua's percent escape: %.)
+# Pipe (|) has no special meaning too.
+
+%__kmod_provides() %{lua:
+  function basename(fn)
+      local b = string.gsub(fn, ".*/", "")
+      -- the above adjusts gsub() result to 1 value
+      -- "return f()" construct would return _all_ values, two in case of gsub()
+      return b
+  end
+  function strip_compress_sfx(fn)
+      local cnt
+      fn, cnt = string.gsub(fn, "%.gz$", "")
+      if cnt == 1 then return fn; end
+      fn, cnt = string.gsub(fn, "%.bz2$", "")
+      if cnt == 1 then return fn; end
+      fn, cnt = string.gsub(fn, "%.xz$", "")
+      if cnt == 1 then return fn; end
+      fn, cnt = string.gsub(fn, "%.zst$", "")
+      return fn
+  end
+  function printdep(mod)
+      print("kmod("..mod..") ")
+  end
+  local fn = rpm.expand("%1")
+  local bn = basename(fn)
+  if bn == "modules.builtin" then
+      for l in io.lines(fn) do
+          local builtin_mod = basename(l)
+          printdep(builtin_mod)
+          local nocompr = strip_compress_sfx(builtin_mod)
+          if nocompr ~= builtin_mod then
+              printdep(nocompr)
+          end
+      end
+  else
+      local mod = string.match(bn, "%g+%.ko")
+      if mod then
+          printdep(mod)
+          local nocompr = strip_compress_sfx(mod)
+          if nocompr ~= mod then
+              printdep(nocompr)
+          end
+      end
+  end
+}

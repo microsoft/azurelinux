@@ -1,0 +1,3 @@
+#Type Name     ID             GECOS                   Home directory       Shell
+g     dirsrv   389
+u     dirsrv   389:389        "user for 389-ds-base"  /usr/share/dirsrv/   /sbin/nologin

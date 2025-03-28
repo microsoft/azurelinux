@@ -4,7 +4,7 @@
 
 Name:          trace-cmd
 Version:       3.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 License:       LGPL-2.1-only AND LGPL-2.1-or-later AND GPL-2.0-only AND GPL-2.0-or-later
 Summary:       A user interface to Ftrace
 
@@ -15,6 +15,8 @@ ExcludeArch:   %{ix86} %{arm}
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 URL:           http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 Source0:       https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       trace-cmd.conf
 Source2:       trace-cmd.service
@@ -63,7 +65,7 @@ CFLAGS="%{optflags} -D_GNU_SOURCE" LDFLAGS="%{build_ldflags}" BUILD_TYPE=Release
   make V=9999999999 MANPAGE_DOCBOOK_XSL=$MANPAGE_DOCBOOK_XSL \
   prefix=%{_prefix} libdir=%{_libdir} \
   PYTHON_VERS=python3 all_cmd doc
-for i in python/*.py ; do 
+for i in python/*.py ; do
     sed -i 's/env python2/python3/g' $i
 done
 chrpath --delete tracecmd/trace-cmd
@@ -101,6 +103,9 @@ rm -rf %{buildroot}/%{_mandir}/man3/*
 %{_libdir}/%{name}/python/
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2-2
+- Add missing Vendor and Distribution tags.
+
 * Mon Feb 12 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2-1
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified

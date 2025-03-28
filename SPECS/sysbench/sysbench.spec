@@ -1,10 +1,12 @@
 Summary:        Scriptable database and system performance benchmark
 Name:           sysbench
 Version:        1.0.20
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Group:          Applications/System
 URL:            https://github.com/akopytov/sysbench/
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://github.com/akopytov/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         enable-python3.patch
 Patch1:         CVE-2019-19391.patch
@@ -60,6 +62,9 @@ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
 %{_datadir}/%{name}
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.20-4
+- Add missing Vendor and Distribution tags.
+
 * Thu Jun 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.20-3
 - Address CVE-2019-19391.
 

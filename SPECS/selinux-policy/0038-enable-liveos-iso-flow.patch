@@ -1,0 +1,223 @@
+From 43b44054474cf139ee11afa386f0d4e5b2204a07 Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@outlook.com>
+Date: Fri, 6 Dec 2024 14:21:18 -0800
+Subject: [PATCH] Enable LiveOS ISO Flow
+
+In the LiveOS ISO flow, when selinux is enabled, initrd loads the
+default selinux policy from the rootfs, then transitions to the
+the rootfs where the final OS processes are started.
+
+The problem is that selinux denies many of these processes access
+to a number of resources (mostly file descriptors, but here is also
+access to the boot media, and other resources).
+
+This patch allows these failing processes access to the resources
+they need.
+---
+ policy/modules/admin/usermanage.te   |  2 ++
+ policy/modules/apps/loadkeys.te      |  2 ++
+ policy/modules/kernel/devices.if     | 18 ++++++++++++++++++
+ policy/modules/kernel/kernel.if      | 19 +++++++++++++++++++
+ policy/modules/kernel/kernel.te      |  1 +
+ policy/modules/system/authlogin.te   |  1 +
+ policy/modules/system/getty.te       |  2 ++
+ policy/modules/system/init.te        |  7 +++++++
+ policy/modules/system/locallogin.te  |  1 +
+ policy/modules/system/selinuxutil.te |  2 ++
+ policy/modules/system/udev.te        |  2 ++
+ 11 files changed, 57 insertions(+)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 57a9848bc..ef24fb85b 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -317,6 +317,7 @@ allow passwd_t self:shm create_shm_perms;
+ allow passwd_t self:sem create_sem_perms;
+ allow passwd_t self:msgq create_msgq_perms;
+ allow passwd_t self:msg { send receive };
++allow passwd_t kernel_t:fd use;
+ 
+ allow passwd_t crack_db_t:dir list_dir_perms;
+ read_lnk_files_pattern(passwd_t, crack_db_t, crack_db_t)
+@@ -492,6 +493,7 @@ allow useradd_t self:unix_dgram_socket create_socket_perms;
+ allow useradd_t self:unix_stream_socket create_stream_socket_perms;
+ allow useradd_t self:unix_dgram_socket sendto;
+ allow useradd_t self:unix_stream_socket connectto;
++allow useradd_t kernel_t:fd use;
+ 
+ # for getting the number of groups
+ kernel_read_kernel_sysctls(useradd_t)
+diff --git a/policy/modules/apps/loadkeys.te b/policy/modules/apps/loadkeys.te
+index 2263e9dba..61d098341 100644
+--- a/policy/modules/apps/loadkeys.te
++++ b/policy/modules/apps/loadkeys.te
+@@ -21,6 +21,8 @@ allow loadkeys_t self:capability { dac_override dac_read_search setuid sys_tty_c
+ allow loadkeys_t self:fifo_file rw_fifo_file_perms;
+ allow loadkeys_t self:unix_stream_socket { connect create };
+ 
++kernel_getattr_unlabeled_dirs(loadkeys_t)
++kernel_use_fds(loadkeys_t)
+ kernel_read_system_state(loadkeys_t)
+ 
+ init_use_fds(loadkeys_t)
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index 35e14a021..13026d7a0 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -2206,6 +2206,24 @@ interface(`dev_setattr_input_dev',`
+ 	allow $1 event_device_t:chr_file setattr;
+ ')
+ 
++########################################
++## <summary>
++##	Get the attributes of the event devices.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dev_read_input_dev',`
++	gen_require(`
++		type event_device_t;
++	')
++
++	allow $1 event_device_t:chr_file read_chr_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read input event devices (/dev/input).
+diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
+index 1d696a07c..90583facf 100644
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -330,6 +330,25 @@ interface(`kernel_stream_connect',`
+ 	allow $1 kernel_t:unix_stream_socket connectto;
+ ')
+ 
++########################################
++## <summary>
++##	Connect to kernel using a unix
++##	domain stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`kernel_stream_read_write',`
++	gen_require(`
++		type kernel_t;
++	')
++
++	allow $1 kernel_t:unix_stream_socket { rw_socket_perms };
++')
++
+ ########################################
+ ## <summary>
+ ##	Getattr on kernel unix datagram sockets.
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index ea08036b6..59c1afeaf 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -238,6 +238,7 @@ sid tcp_socket		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
+ #
+ 
+ allow kernel_t self:capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap };
++allow kernel_t self:capability2 checkpoint_restore;
+ allow kernel_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr noatsecure siginh rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+ allow kernel_t self:shm create_shm_perms;
+ allow kernel_t self:sem create_sem_perms;
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index 9dfef7a0c..791be68c2 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -116,6 +116,7 @@ allow chkpwd_t self:process { getattr signal };
+ dontaudit chkpwd_t self:process getcap;
+ 
+ allow chkpwd_t shadow_t:file read_file_perms;
++allow chkpwd_t kernel_t:fd use;
+ files_list_etc(chkpwd_t)
+ 
+ kernel_dontaudit_search_kernel_sysctl(chkpwd_t)
+diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
+index a900226bf..360f7c67f 100644
+--- a/policy/modules/system/getty.te
++++ b/policy/modules/system/getty.te
+@@ -37,6 +37,8 @@ dontaudit getty_t self:capability sys_tty_config;
+ allow getty_t self:capability2 checkpoint_restore;
+ allow getty_t self:process { getpgid getsession setpgid signal_perms };
+ allow getty_t self:fifo_file rw_fifo_file_perms;
++allow getty_t kernel_t:fd use;
++allow getty_t tmpfs_t:dir search;
+ 
+ read_files_pattern(getty_t, getty_conf_t, getty_conf_t)
+ read_lnk_files_pattern(getty_t, getty_conf_t, getty_conf_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 9ec685c74..a1d90762b 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1542,12 +1542,19 @@ optional_policy(`
+ 	zebra_read_config(initrc_t)
+ ')
+ 
++########################################
++#
++# Rules applied to all system processes
++#
++kernel_use_fds(systemprocess)
++
+ ########################################
+ #
+ # Rules applied to all daemons
+ #
+ 
+ domain_dontaudit_use_interactive_fds(daemon)
++kernel_use_fds(daemon)
+ 
+ # daemons started from init will
+ # inherit fds from init for the console
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 8330be8a9..9f2f160a4 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -47,6 +47,7 @@ allow local_login_t self:sem create_sem_perms;
+ allow local_login_t self:msgq create_msgq_perms;
+ allow local_login_t self:msg { send receive };
+ allow local_login_t self:key { search write link };
++allow local_login_t kernel_t:fd use;
+ 
+ allow local_login_t local_login_lock_t:file manage_file_perms;
+ files_lock_filetrans(local_login_t, local_login_lock_t, file)
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index 8e521e583..c7fb76550 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -119,6 +119,8 @@ type setfiles_t alias restorecon_t, can_relabelto_binary_policy;
+ type setfiles_exec_t alias restorecon_exec_t;
+ init_system_domain(setfiles_t, setfiles_exec_t)
+ domain_obj_id_change_exemption(setfiles_t)
++dev_read_input_dev(setfiles_t)
++kernel_stream_read_write(setfiles_t)
+ 
+ ########################################
+ #
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index 8af0d90e0..a7bb89658 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -57,6 +57,8 @@ allow udev_t self:rawip_socket create_socket_perms;
+ # rdma_rename
+ allow udev_t self:netlink_rdma_socket create_socket_perms;
+ 
++fs_getattr_iso9660_files(udev_t)
++
+ ifdef(`init_systemd',`
+ 	# systemd-vconsole-setup will be called by udev during virtual terminal initialization
+ 	allow udev_t self:capability sys_tty_config;
+-- 
+2.34.1
+

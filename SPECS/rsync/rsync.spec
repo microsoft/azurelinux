@@ -1,6 +1,6 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.2.7
+Version:        3.4.1
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Wed Jan 15 2025 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-1
+- Upgrade to version 3.4.1 to fix CVE-2024-12084, CVE-2024-12085, CVE-2024-12086, CVE-2024-12087, CVE-2024-12088, CVE-2024-12747
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.7-1
 - Auto-upgrade to 3.2.7 - Azure Linux 3.0 - package upgrades
 

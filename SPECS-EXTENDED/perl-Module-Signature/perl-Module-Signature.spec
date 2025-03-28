@@ -1,12 +1,15 @@
+# Store keys in a temp directory
+%global gnupghome %(mktemp --directory)
+
 Name:           perl-Module-Signature
-Version:        0.83
-Release:        8%{?dist}
+Version:        0.89
+Release:        1%{?dist}
 Summary:        CPAN signature management utilities and modules
 License:        CC0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Signature
-Source0:        https://cpan.metacpan.org/modules/by-module/Module/Module-Signature-%{version}.tar.gz#/perl-Module-Signature-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMLEGGE/Module-Signature-0.89.tar.gz#/perl-Module-Signature-%{version}.tar.gz
 BuildArch:      noarch
 # Module build
 BuildRequires:  coreutils
@@ -16,6 +19,7 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install) >= 0.92
+BuildRequires:  perl(lib)
 BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Can)
 BuildRequires:  perl(Module::Install::External)
@@ -82,6 +86,9 @@ find %{buildroot} -type f -name .packlist -delete
 export GNUPGHOME=$(pwd)/gnupghome
 make test
 
+%clean
+rm -rf %{buildroot} %{gnupghome}
+
 %files
 %license README
 %doc AUTHORS Changes *.pub
@@ -91,6 +98,10 @@ make test
 %{_mandir}/man3/Module::Signature.3*
 
 %changelog
+* Wed Dec 11 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.89-1
+- Upgrade to 0.89
+- License verified
+
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.83-8
 - License verified.
 

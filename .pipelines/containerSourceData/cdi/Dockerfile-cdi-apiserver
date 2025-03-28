@@ -10,9 +10,6 @@ ARG USER
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-# workaround till binaries rename is merged
-RUN [ -f /usr/bin/virt-cdi-apiserver ] && mv -f /usr/bin/virt-cdi-apiserver /usr/bin/cdi-apiserver
-
 #simple smoke test
 RUN ls /usr/bin/cdi-apiserver
 

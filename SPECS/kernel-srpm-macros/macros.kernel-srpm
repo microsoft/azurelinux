@@ -1,0 +1,3 @@
+# kernel_arches lists what arches the full kernel is built for.
+
+%kernel_arches x86_64 s390x ppc64le aarch64 %{arm} riscv64

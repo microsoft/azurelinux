@@ -8,6 +8,9 @@
 
 ######## DEFINITIONS ########
 
+# Ubuntu has actual /bin/sh vs Azure Linux having a sym link to /bin/bash. Force the Make scripts to use /bin/bash
+SHELL=/bin/bash
+
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
@@ -45,6 +48,8 @@ RUN_CHECK                            ?= n
 USE_PREVIEW_REPO                     ?= n
 DISABLE_UPSTREAM_REPOS               ?= n
 DISABLE_DEFAULT_REPOS                ?= n
+##help:var:REPO_SNAPSHOT_TIME:<posix_time>=Posix time to be used as a snapshot for remote repositories when fetching packages. Example: REPO_SNAPSHOT_TIME="1724119509".
+REPO_SNAPSHOT_TIME                   ?=
 TOOLCHAIN_CONTAINER_ARCHIVE          ?=
 TOOLCHAIN_ARCHIVE                    ?=
 TOOLCHAIN_SOURCES_ARCHIVE            ?=
@@ -53,8 +58,8 @@ PACKAGE_CACHE_SUMMARY                ?=
 IMAGE_CACHE_SUMMARY                  ?=
 INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
-PACKAGE_BUILD_RETRIES                ?= 1
-CHECK_BUILD_RETRIES                  ?= 1
+PACKAGE_BUILD_RETRIES                ?= 0
+CHECK_BUILD_RETRIES                  ?= 0
 EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
