@@ -1,0 +1,20 @@
+os:
+  hostname: azure-linux
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0
+
+  selinux:
+    mode: enforcing
+
+  packages:
+    installLists:
+    - packagelists/base-image-packages.json
+    - packagelists/cloud-init-packages.json
+    - packagelists/qemu-guest-packages.json
+
+scripts:
+  finalizeCustomization:
+  - path: scripts/cleanup.sh
