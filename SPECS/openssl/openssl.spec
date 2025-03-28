@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        35%{?dist}
+Release:        36%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,7 @@ Patch41:        openssl-1.1.1-pkcs1-implicit-rejection.patch
 Patch42:        openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failure.patch
 Patch44:        CVE-2024-5535.patch
+Patch45:        openssl-1.1.1-Fix-timing-side-channel-in-ECDSA-signature-computation.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -138,50 +139,7 @@ cp %{SOURCE2} crypto/ec/
 cp %{SOURCE3} test/
 cp %{SOURCE4} test/
 
-%patch0  -p1
-%patch2  -p1
-%patch3  -p1
-%patch4  -p1
-%patch5  -p1
-%patch6  -p1
-%patch7  -p1
-%patch8  -p1
-%patch9  -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
-%patch43 -p1
-%patch44 -p1
+%autopatch -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -371,6 +329,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Wed Mar 26 2025 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-36
+- Fix timing side-channel in ECDSA signature computation.
+
 * Mon Jul 29 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.1.1k-35
 - Bug fix for the Patch CVE-2024-5535
 
