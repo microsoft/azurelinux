@@ -7,11 +7,12 @@ Version:        4.12.3
 Release:        8%{?dist}
 Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
 License:        MIT
-Vendor:         Microsoft Corporation                                                          
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.crummy.com/software/BeautifulSoup/
 Source0:        https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # https://git.launchpad.net/beautifulsoup/commit/?id=9786a62726de5a8caba10021c4d4a58c8a3e9e3f
+
 Patch0:         soupsieve26.patch
 
 BuildArch:      noarch
