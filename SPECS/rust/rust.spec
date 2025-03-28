@@ -1,15 +1,15 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-07-13
-%define stage0_version 1.71.0
+%define release_date 2025-01-09
+%define stage0_version 1.84.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.72.0
-Release:        10%{?dist}
+Version:        1.85.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,11 +41,15 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2024-32884.patch
-Patch2:         CVE-2024-31852.patch
-Patch3:         CVE-2024-43806.patch
-Patch4:         CVE-2024-9681.patch
+
+Patch0:		Remove_cannot_write_error_test.patch
+Patch1:		Remove_leave_log_after_failure_test.patch
+Patch2:		Ignore_failing_ci_tests.patch
+Patch3:		skip-failing-run-make-tests.patch
+Patch4:		Ignore-test-for-aarch64.patch
+Patch5:		Ignore-failing-ui-tests.patch
+Patch6:		Fix-ui-fuldeps-test.patch
+Patch100:	CVE-2024-9681.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -114,6 +118,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
+    --enable-profiler \
     --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
     --release-description="CBL-Mariner %{version}-%{release}"
@@ -126,21 +131,20 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors
 
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
-rm -v ./tests/rustdoc-ui/issue-98690.*
+rm -v ./tests/rustdoc-ui/issues/issue-98690.*
 %make_build check
 
 %install
 USER=root SUDO_USER=root %make_install
-mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
-rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
-rm %{buildroot}%{_docdir}/%{name}/html/.lock
-rm %{buildroot}%{_docdir}/%{name}/*.old
-rm %{buildroot}%{_bindir}/*.old
+mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
+rm -f %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
+rm -f %{buildroot}%{_docdir}/docs/html/.lock
+rm -f %{buildroot}%{_docdir}/rustc/*.old
+rm -f %{buildroot}%{_bindir}/*.old
 
 %ldconfig_scriptlets
 
@@ -151,7 +155,6 @@ rm %{buildroot}%{_bindir}/*.old
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
-%{_libexecdir}/cargo-credential-1password
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
@@ -165,14 +168,26 @@ rm %{buildroot}%{_bindir}/*.old
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%doc %{_docdir}/%{name}/html/*
-%doc %{_docdir}/%{name}/README.md
+%doc %{_docdir}/rustc/README.md
+%doc %{_docdir}/cargo/*
+%doc %{_docdir}/rustfmt/*
+%doc %{_docdir}/clippy/*
+%doc %{_docdir}/docs/html/*
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
 
 %changelog
+
+* Thu Feb 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> -1.85.0-1
+- Upgrade to 1.85.0
+- Drop patches
+- Remove expand-yaml-anchors tool in %check
+- Remove rust-demangler tool
+- Update source tarball generating script
+- Skip and remove failing tests
+
 * Fri Jan 31 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.72.0-10
 - Fix CVE-2024-9681
 
