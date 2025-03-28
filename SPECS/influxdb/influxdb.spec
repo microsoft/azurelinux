@@ -18,15 +18,39 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-govendor-v1.tar.gz
-Source2:        %{name}-%{version}-static-data-vendor-v1.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
+# How to re-build this file:
+#   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
+# Use generate_source_tarbbal.sh to get this generated from a source code file.
+# How to rebuild this file:
+#   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. make generate-web-assets
+#   5. cd static
+#   6. tar -cvf %%{name}-%%{version}-static-data.tar.gz data/
+Source2:        %{name}-%{version}-static-data.tar.gz
 Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
@@ -129,9 +153,6 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Wed Mar 26 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.5-3
-- Change vendor file naming and update it
-
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.7.5-2
 - Fix CVE-2025-22868, CVE-2025-27144 with an upstream patch
 
