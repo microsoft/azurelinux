@@ -1,0 +1,34 @@
+From 321812a2d55025ac5fda372b897728b63b7c1902 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Thu, 13 Mar 2025 16:23:44 +0000
+Subject: [PATCH] patch for failing test with rust 1.85
+
+---
+ rust/libdnf-sys/build.rs | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/rust/libdnf-sys/build.rs b/rust/libdnf-sys/build.rs
+index 303e8a44..363a6b8b 100644
+--- a/rust/libdnf-sys/build.rs
++++ b/rust/libdnf-sys/build.rs
+@@ -48,8 +48,6 @@ fn main() -> Result<()> {
+         "cargo:rustc-link-search=native={}/build/libdnf",
+         libdnf.display()
+     );
+-    println!("cargo:rustc-link-lib=static=dnf");
+-    println!("cargo:rustc-link-lib=glib-2.0");
+ 
+     // now, our thin cxx.rs bridge wrapper
+     let mut libdnfcxx = cxx_build::bridge("lib.rs");
+@@ -61,5 +59,8 @@ fn main() -> Result<()> {
+     libdnfcxx.includes(libs.all_include_paths());
+     libdnfcxx.compile("libdnfcxx.a");
+ 
++    println!("cargo:rustc-link-lib=static=dnf");
++    println!("cargo:rustc-link-lib=glib-2.0");
++
+     Ok(())
+ }
+-- 
+2.45.3
+
