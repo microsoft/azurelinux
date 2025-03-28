@@ -1,5 +1,5 @@
 Name:          libdwarf
-Version:       0.9.0
+Version:       0.9.2
 Release:       1%{?dist}
 Summary:       Library to access the DWARF Debugging file format
 
@@ -89,6 +89,9 @@ TZ=:America/Los_Angeles %__make check
 
 
 %changelog
+* Fri Mar 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.2-1
+- Auto-upgrade to 0.9.2 - for CVE-2024-2002
+
 * Tue Jan 02 2024 Sindhu Karri <lakarri@microsoft.com> - 0.9.0-1
 - Upgraded to 0.9.0
 - License verified
