@@ -1,25 +1,16 @@
 # Run extra tests
-
-%bcond_without perl_Software_License_enables_extra_test
-
-
-
-# Run optional tests
-%if 0%{!?perl_bootstrap:1} && 0%{?fedora}
-%bcond_without perl_Software_License_enables_optional_test
-%else
+%bcond_with perl_Software_License_enables_extra_test
 %bcond_with perl_Software_License_enables_optional_test
-%endif
 
 Name:           perl-Software-License
-Version:        0.103014
-Release:        7%{?dist}
+Version:        0.104006
+Release:        1%{?dist}
 Summary:        Package that provides templated software licenses
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Software-License
-Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Software-License-%{version}.tar.gz#/perl-Software-License-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Software-License-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -27,7 +18,7 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.78
 # Module Runtime
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Section)
@@ -53,8 +44,8 @@ BuildRequires:  perl(Software::License::CCpack)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Test::Pod)
 %endif
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
+# (none)
 
 %description
 Software-License contains templates for common open source software licenses.
@@ -63,26 +54,21 @@ Software-License contains templates for common open source software licenses.
 %setup -q -n Software-License-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
-make test
+%{make_build} test
 %if %{with perl_Software_License_enables_extra_test}
-make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
+%{make_build} test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %endif
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README
 %{perl_vendorlib}/Software/
 %{_mandir}/man3/Software::License.3*
@@ -90,6 +76,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Software::LicenseUtils.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.104006-1
+- Update to version 0.104006
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.103014-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

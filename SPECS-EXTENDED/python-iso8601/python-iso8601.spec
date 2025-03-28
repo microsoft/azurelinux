@@ -1,76 +1,117 @@
-%{!?upstream_version: %global upstream_version %{version}%{?milestone}}
-
 %global srcname iso8601
 %global pkgdesc \
 This module parses the most common forms of ISO 8601 date strings \
 (e.g. 2007-01-14T20:34:22+00:00) into datetime objects.
 
+# avoid unavailable test dependencies in RHEL builds
+%bcond tests %{undefined rhel}
+
 Name:           python-%{srcname}
-Version:        0.1.12
-Release:        2%{?dist}
+Version:        1.1.0
+Release:        8%{?dist}
 Summary:        Simple module to parse ISO 8601 dates
 
 License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            https://github.com/micktwomey/pyiso8601
-# source0:      https://github.com/micktwomey/pyiso8601/archive/refs/tags/0.1.12.tar.gz
-Source0:        %{pypi_source}
+Source:         %{pypi_source}
+# https://github.com/micktwomey/pyiso8601/pull/19
+Patch:          0001-Add-docs-and-test-extras.patch
 BuildArch:      noarch
 
 %description %{pkgdesc}
 
-%package -n python%{python3_pkgversion}-%{srcname}
+%package -n python3-%{srcname}
 Summary:        %{summary}
+BuildRequires:  python3-devel
 
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-
-%description -n python%{python3_pkgversion}-%{srcname} %{pkgdesc}
-
-%if 0%{?with_python3_other}
-%package -n python%{python3_other_pkgversion}-%{srcname}
-Summary:        %{summary}
-
-BuildRequires:  python%{python3_other_pkgversion}-devel
-BuildRequires:  python%{python3_other_pkgversion}-setuptools
-%{?python_provide:%python_provide python%{python3_other_pkgversion}-%{srcname}}
-
-%description -n python%{python3_other_pkgversion}-%{srcname} %{pkgdesc}
-%endif
+%description -n python3-%{srcname} %{pkgdesc}
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p 1 -n %{srcname}-%{version}
+# relax upper bounds on dependencies
+sed -e 's/\^/>=/' -i pyproject.toml
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-x test}
 
 %build
-%py3_build
-%if 0%{?with_python3_other}
-%py3_other_build
-%endif
+%pyproject_wheel
 
 %install
-%py3_install
-%if 0%{?with_python3_other}
-%py3_other_install
+%pyproject_install
+%pyproject_save_files %{srcname}
+
+%check
+%if %{with tests}
+%pytest
+%else
+%pyproject_check_import -e iso8601.test_iso8601
 %endif
 
-%files -n python%{python3_pkgversion}-%{srcname}
-%doc LICENSE README.rst
-%{python3_sitelib}/*
-
-%if 0%{?with_python3_other}
-%files -n python%{python3_other_pkgversion}-%{srcname}
-%doc LICENSE README.rst
-%{python3_other_sitelib}/*
-%endif
+%files -n python3-%{srcname} -f %{pyproject_files}
+%license LICENSE
+%doc README.rst
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.12-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.1.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.1.0-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Oct 14 2022 Carl George <carl@george.computer> - 1.1.0-1
+- Update to 1.1.0
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 1.0.2-3
+- Rebuilt for Python 3.11
+
+* Fri May 06 2022 Carl George <carl@george.computer> - 1.0.2-2
+- Convert to pyproject macros
+
+* Thu Mar 24 2022 Fabian Affolter <mail@fabian-affolter.ch> - 1.0.2-1
+- Update to latest upstream release 1.0.2
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.13-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.13-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 0.1.13-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 04 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.1.13-1
+- Update to latest upstream release 0.1.13 (#1904533)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 0.1.12-2
+- Rebuilt for Python 3.9
 
 * Thu Mar 05 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.1.12-1
-- Update to latest upstream release 0.1.12 (rhbz#1792662)
+- Update to latest upstream release 0.1.12 (#1792662)
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.11-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

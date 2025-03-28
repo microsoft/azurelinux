@@ -7,8 +7,8 @@ Distribution:   Azure Linux
 
 
 Name:           lua-term
-Version:        0.07
-Release:        11%{?dist}
+Version:        0.08
+Release:        1%{?dist}
 Summary:        Terminal functions for Lua
 
 License:        MIT
@@ -17,7 +17,8 @@ Source0:        https://github.com/hoelzro/%{name}/archive/%{version}.tar.gz#/%{
 
 BuildRequires:  gcc
 BuildRequires:  lua-devel >= %{luaminver}
-Requires:       lua(abi) >= %{luaminver}
+Requires:       lua(abi) = %{lua_version}
+Requires:       lua >= %{lua_version}
 
 
 %description
@@ -57,6 +58,10 @@ cp -p core.so %{buildroot}%{lualibdir}/term/
 
 
 %changelog
+* Tue Nov 19 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.08-1
+- Updated to version 0.08
+- License verified
+
 * Fri Jan 08 2021 Joe Schmitt <joschmit@microsoft.com> - 0.07-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora/RHEL version checks

@@ -2,20 +2,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Locale-Msgfmt
 Version:        0.15
-Release:        28%{?dist}
+Release:        29%{?dist}
 Summary:        Compile .po files to .mo files
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-Msgfmt
 Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
+# Update Makefile.PL to not use Module::Install::DSL CPAN RT#148295
+Patch0:         Locale-Msgfmt-0.15-Remove-using-of-MI-DSL.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(inc::Module::Install::DSL) >= 0.92
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(File::Remove)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Metadata)
-BuildRequires:  sed
+BuildRequires:  perl(Module::Install::WriteAll)
 # Run-time
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Spec)
@@ -26,11 +30,9 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(Locale::Maketext::Gettext)
 BuildRequires:  perl(Test::More)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This module does the same thing as msgfmt from GNU gettext-tools, 
@@ -39,21 +41,21 @@ examples on home page.
 
 %prep
 %setup -q -n Locale-Msgfmt-%{version}
+%patch -P0 -p1
 
 # Remove bundled libraries
 rm -r inc
-sed -i -e '/^inc\// d' MANIFEST
+perl -i -ne 'print $_ unless m{^inc/}' MANIFEST
 find -type f -exec chmod -x {} +
 
 %build
-perl Makefile.PL installdirs=vendor
-make %{?_smp_mflags}
+perl Makefile.PL installdirs=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
+%{make_install}
 mkdir $RPM_BUILD_ROOT%{_bindir}
 cp -v script/msgfmt.pl $RPM_BUILD_ROOT%{_bindir}
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
@@ -61,11 +63,15 @@ make test
 
 %files
 %doc Changes README
-%{perl_vendorlib}/*
+%{perl_vendorlib}/Locale*
+%{perl_vendorlib}/Module*
 %{_bindir}/msgfmt.pl
-%{_mandir}/man3/*
+%{_mandir}/man3/Locale*
 
 %changelog
+* Thu Feb 12 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.15-29
+- Added necessary patches as per Fedora 41.
+
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15-28
 - License verified.
 

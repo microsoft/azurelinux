@@ -1,0 +1,11 @@
+diff -up dyninst-12.3.0/cmake/warnings.cmake.cmake3.27 dyninst-12.3.0/cmake/warnings.cmake
+--- dyninst-12.3.0/cmake/warnings.cmake.cmake3.27	2023-02-22 14:39:56.000000000 -0700
++++ dyninst-12.3.0/cmake/warnings.cmake	2023-06-09 19:59:32.831350952 -0600
+@@ -127,6 +127,7 @@ endif()
+ 
+ if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
+     include(CheckCXXCompilerFlag)
++    include(CheckCXXSourceCompiles)
+     foreach(f IN LISTS REQUESTED_WARNING_FLAGS)
+         string(REGEX REPLACE "[^a-zA-Z0-9]" "_" v "HAS_CPP_FLAG_${f}")
+         set(CMAKE_REQUIRED_FLAGS "-${f}")

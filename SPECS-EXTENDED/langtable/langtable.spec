@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           langtable
-Version:        0.0.53
-Release:        2%{?dist}
+Version:        0.0.68
+Release:        1%{?dist}
 Summary:        Guessing reasonable defaults for locale, keyboard layout, territory, and language.
 # the translations in languages.xml and territories.xml are (mostly)
 # imported from CLDR and are thus under the Unicode license, the
@@ -10,7 +10,7 @@ Summary:        Guessing reasonable defaults for locale, keyboard layout, territ
 # https://fedoraproject.org/wiki/Licensing:MIT?rd=Licensing/MIT#Modern_Style_without_sublicense_.28Unicode.29
 License:        GPLv3+
 URL:            https://github.com/mike-fabian/langtable
-Source0:        https://github.com/mike-fabian/langtable/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/mike-fabian/langtable/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-interpreter
 BuildRequires:  python3-devel
@@ -76,6 +76,10 @@ xmllint --noout --relaxng \
 %{python3_sitelib}/langtable-*.egg-info/*
 
 %changelog
+* Tue Oct 29 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.0.68-1
+- Update to 0.0.68
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.53-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,10 +1,8 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Summary: A program for faxing using a Class 1, 2 or 2.0 fax modem
 Name: efax
 Version: 0.9a
-Release: 34%{?dist}
-License: GPLv2+
+Release: 44.001114%{?dist}
+License: GPL-2.0-or-later
 Url: http://www.cce.com/efax/
 Source: http://www.cce.com/efax/download/%{name}-%{version}-001114.tar.gz
 Source1: logrotate-efax
@@ -39,19 +37,19 @@ Class 1, 2 or 2.0 fax modem.
 %prep
 %setup -q -n %{name}-%{version}-001114
 
-%patch 0 -p1 -b .config
-%patch 1 -p1 -b .numlines
-%patch 2 -p1 -b .time
-%patch 3 -p0 -b .manpage
-%patch 5 -p1 -b .nullptr
-%patch 6 -p1 -b .misc
-%patch 7 -p1 -b .viewcmd
-%patch 8 -p1 -b .quote
-%patch 9 -p1 -b .msg-va_list
-%patch 10 -p1 -b .crash
-%patch 11 -p0 -b .pdf
-%patch 12 -p1 -b .format-security
-%patch 13 -p1 -b .multiple-definition
+%patch -P0 -p1 -b .config
+%patch -P1 -p1 -b .numlines
+%patch -P2 -p1 -b .time
+%patch -P3 -p0 -b .manpage
+%patch -P5 -p1 -b .nullptr
+%patch -P6 -p1 -b .misc
+%patch -P7 -p1 -b .viewcmd
+%patch -P8 -p1 -b .quote
+%patch -P9 -p1 -b .msg-va_list
+%patch -P10 -p1 -b .crash
+%patch -P11 -p0 -b .pdf
+%patch -P12 -p1 -b .format-security
+%patch -P13 -p1 -b .multiple-definition
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="-ansi $RPM_OPT_FLAGS -fno-strict-aliasing"
@@ -76,9 +74,38 @@ install -c -m 644 %{SOURCE1} %{buildroot}/etc/logrotate.d/efax
 %dir %{_localstatedir}/log/fax
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9a-34
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-44.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-43.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-42.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-41.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 12 2023 Than Ngo <than@redhat.com> - 0.9a-40.001114
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-39.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-38.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-37.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-36.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-35.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9a-34.001114
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Than Ngo <than@redhat.com> - 0.9a-33.001114
 - fix compile issue for multiple definition

@@ -1,0 +1,38 @@
+Defining _XOPEN_SOURCE on its own hides definitions in other headers
+(which is already mentioned in upstream commit f49941a). One way to
+deal with this is to define _DEFAULT_SOURCE in addition to
+_XOPEN_SOURCE, which is what this commit implements.
+
+This is one way to avoid an implicit function declaration in the
+built-in mmap test that autoconf provides. It includes <unistd.h> and
+expects that to provide a declaration of getpagesize because the
+earlier check for HAVE_GETPAGESIZE succeeded. Without addressing the
+implicit function declaration, the outcome of this check will change
+with future compilers which no longer support them by default.
+
+Submitted upstream: <https://github.com/baszoetekouw/pinfo/pull/35>
+
+
+diff --git a/macros/wchar.m4 b/macros/wchar.m4
+index 2dc3d3a940f6c6fd..a7d6e967024df594 100644
+--- a/macros/wchar.m4
++++ b/macros/wchar.m4
+@@ -78,7 +78,8 @@ AC_DEFUN([AC_CHECK_WCHAR],[
+ 		then
+ 			AC_COMPILE_IFELSE([
+ 				AC_LANG_PROGRAM( 
+-					[[ 
++					[[
++						#define _DEFAULT_SOURCE
+ 						#define _XOPEN_SOURCE 600
+ 						#include <wchar.h> 
+ 					]],
+@@ -87,7 +88,7 @@ AC_DEFUN([AC_CHECK_WCHAR],[
+ 				[
+ 					dnl if found, set variables and print result
+ 					have_wcwidth=true
+-					wchar_flags="$wchar_flags -D_XOPEN_SOURCE=600"
++					wchar_flags="$wchar_flags -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600"
+ 					AC_MSG_RESULT([with -D_XOPEN_SOURCE=600])
+ 				],
+ 				[ ]

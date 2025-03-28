@@ -1,25 +1,17 @@
-%global debug_package %{nil}
-%global _binaries_in_noarch_packages_terminate_build   0
-
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname Genshi
 
 Name:           python-genshi
-Version:        0.7.5
-Release:        4%{?dist}
+Version:        0.7.9
+Release:        2%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
 
 License:        BSD
-URL:            http://genshi.edgewall.org/
+URL:            https://genshi.edgewall.org/
 
 Source0:        %pypi_source
 
-BuildArch:      noarch
-
+BuildRequires:  gcc
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
 
 %description
 Genshi is a Python library that provides an integrated set of
@@ -46,34 +38,92 @@ rm -rf %{modname}.egg-info
 
 find examples -type f | xargs chmod a-x
 
+%generate_buildrequires
+%pyproject_buildrequires -x i18n
+
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
-rm -r %{buildroot}%{python3_sitelib}/genshi/tests
-rm -r %{buildroot}%{python3_sitelib}/genshi/{filters,template}/tests
-rm %{buildroot}%{python3_sitelib}/genshi/*.c
+%pyproject_install
+%pyproject_save_files genshi
+
+sed -i -e '/\/tests/d' %{pyproject_files}
+sed -i -e '/_speedups.c/d' %{pyproject_files}
 
 
 %check
 %{python3} setup.py test
 
 
-%files -n python3-genshi
-%license COPYING
-%doc ChangeLog doc examples README.txt
-%{python3_sitelib}/%{srcname}-%{version}-py*.egg-info/
-%{python3_sitelib}/genshi/
+%files -n python3-genshi -f %{pyproject_files}
+%{python3_sitearch}/genshi/_speedups.*.so
+%exclude %{python3_sitearch}/genshi/{_speedups.c,tests}
+%exclude %{python3_sitearch}/genshi/{filters,template}/tests
+# COPYING file already listed in {pyproject_files}
+%doc ChangeLog doc examples README.md
 
 
 %changelog
-* Wed Mar 24 2021 Henry Li <lihl@microsoft.com> - 0.7.5-4
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- Disable debuginfo 
-- Disable RPM complaining about shipping *.so binaries as noarch
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 16 2024 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.9-1
+- update to 0.7.9
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.7.7-11
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov 09 2023 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.7-8
+- add patch to replace "unittest.makeSuite()" (rhbz #2245863)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.7.7-6
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.7.7-3
+- Rebuilt for Python 3.11
+
+* Tue May 31 2022 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.7-2
+- enable optional speedups
+
+* Fri Apr 22 2022 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.7-1
+- update to 0.7.7
+
+* Wed Feb 09 2022 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.6-1
+- update to 0.7.6
+
+* Mon Feb 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 0.7.5-8
+- Backport patch to add compatibility with Python 3.11
+- Fixes: rhbz#2019393
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.5-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 16 2021 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.5-6
+- add patch to get the full test suite passing on Python 3.10
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 0.7.5-4
+- Rebuilt for Python 3.10
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
