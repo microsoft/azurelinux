@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch7:         CVE-2025-22868.patch
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 Patch8:         coredns-example-net-test.patch
+Patch9:		CVE-2024-51744.patch
 
 BuildRequires:  msft-golang
 
@@ -79,6 +80,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Mon Mar 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.11.1-15
+- Patch for CVE-2024-51744
+
 * Mon Mar 03 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.1-14
 - Fix package test with upstream patch
 
