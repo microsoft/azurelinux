@@ -3418,8 +3418,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.6.3",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_3/expat-2.6.3.tar.bz2"
+          "version": "2.6.4",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.bz2"
         }
       }
     },
@@ -12891,8 +12891,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.20",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.20.tar.gz"
+          "version": "10.6.21",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.21.tar.gz"
         }
       }
     },
@@ -13803,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.40",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
+          "version": "8.0.41",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.41.tar.gz"
         }
       }
     },
