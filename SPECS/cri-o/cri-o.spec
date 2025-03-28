@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,7 +73,8 @@ Patch17:        CVE-2024-9341.patch
 Patch18:        CVE-2024-45338.patch
 Patch19:        CVE-2023-0778.patch
 Patch20:        CVE-2023-6476.patch
-Patch21:        CVE-2025-27144.patch
+Patch21:        CVE-2024-44337.patch
+Patch22:        CVE-2025-27144.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -226,8 +227,11 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
-* Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 1.22.3-11
+* Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 1.22.3-12
 - Add patch for CVE-2025-27144
+
+* Fri Mar 21 2025 Archana Choudhary <archana1@microsoft.com> - 1.22.3-11
+- Add patch for CVE-2024-44337
 
 * Thu Jan 23 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.22.3-10
 - Add patch for CVE-2023-0778 & CVE-2023-6476.
