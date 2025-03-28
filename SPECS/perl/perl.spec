@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        489%{?dist}
+Release:        490%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -177,6 +177,7 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 Patch202:       CVE-2023-47100.patch
 Patch203:       CVE-2023-31486.patch
 Patch204:       CVE-2023-31484.patch
+Patch205:       CVE-2023-47038.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6820,6 +6821,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4:5.34.1-490
+- Patch CVE-2023-47038
+
 * Thu Apr 04 2024 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-489
 - Add patch for CVE-2023-47100
 
