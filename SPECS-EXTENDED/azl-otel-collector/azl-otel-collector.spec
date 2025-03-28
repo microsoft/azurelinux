@@ -1,3 +1,5 @@
+%global debug_package   %{nil}
+
 Summary:        Azure Linux OpenTelemetry Collector Distribution
 Name:           otel-collector
 Version:        0.121.0
@@ -7,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/open-telemetry/opentelemetry-collector
 Source0:        https://github.com/open-telemetry/opentelemetry-collector/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor-1.tar.gz
+Source1:        %{name}-%{version}-vendor-2.tar.gz
 BuildRequires:  golang
 
 %description
@@ -17,11 +19,14 @@ https://github.com/open-telemetry/opentelemetry-collector-contrib repository and
 also includes receivers developed by the Azure Linux team.
 
 %prep
-%autosetup -n otel-collector-%{version}
-tar -xf %{SOURCE1} --no-same-owner
-
+%autosetup -n opentelemetry-collector-%{version}
+tar -xf %{SOURCE1} --no-same-owner -C cmd/otelcorecol
 %build
-pushd cmd/otelcorecol && CGO_ENABLED=0 go build -mod=vendor -ldflags="-s -w" -trimpath -o ./bin/otel-collector -tags "netgo" ./cmd/otelcorecol && popd
+pushd cmd/otelcorecol && \
+  CGO_ENABLED=0 go build -mod=vendor -ldflags="-s -w" -trimpath \
+  -o ../../bin/otel-collector -tags "netgo osusergo static_build" . && \
+popd
+
 
 %install
 mkdir -p "%{buildroot}/%{_bindir}"
