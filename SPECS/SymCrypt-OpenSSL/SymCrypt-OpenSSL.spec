@@ -61,7 +61,10 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 mkdir -p -m 1733 /var/log/keysinuse
 
 %preun
-rm -r /var/log/keysinuse
+# Remove the logging directory on uninstall, leaving it there on upgrade.
+if [ "${1}" = "0" ]; then
+    rm -rf /var/log/keysinuse
+fi
 
 %check
 ./bin/SslPlay/SslPlay
