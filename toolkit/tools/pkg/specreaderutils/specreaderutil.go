@@ -225,8 +225,8 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 
 	results := make(chan *parseResult, len(specFiles))
 	requests := make(chan string, len(specFiles))
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+	ctx, closeCtx := context.WithCancel(context.Background())
+	defer closeCtx()
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
@@ -245,7 +245,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 		parseResult := <-results
 		if parseResult.err != nil {
 			err = parseResult.err
-			cancelFunc()
+			closeCtx()
 			break
 		}
 		packageList = append(packageList, parseResult.packages...)
