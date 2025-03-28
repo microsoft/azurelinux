@@ -2022,6 +2022,7 @@
                 "t1utils",
                 "taglib",
                 "tang",
+                "tardev-snapshotter",
                 "targetcli",
                 "tbb",
                 "tcl-pgtcl",
