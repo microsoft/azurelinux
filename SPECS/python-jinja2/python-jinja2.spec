@@ -1,7 +1,7 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,8 @@ Patch0:         CVE-2024-22195.patch
 Patch1:         CVE-2024-34064.patch
 Patch2:         CVE-2024-56201.patch
 Patch3:         CVE-2024-56326.patch
+Patch4:         CVE-2025-27516.patch
+Patch5:         python-jinja2-testing-deps.patch
 BuildArch:      noarch
 
 %description
@@ -25,6 +27,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 Requires:       python3
 Requires:       python3-markupsafe
@@ -47,8 +50,8 @@ sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 %py3_install
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+pip3 install tox packaging==23.2
+tox -v -e py%{python3_version_nodots} --
 
 %files -n python3-jinja2
 %defattr(-,root,root)
@@ -57,6 +60,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Fri Mar 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-3
+- Address CVE-2025-27516 with an upstream patch and fix the ptest
+
 * Thu Jan 2 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-2
 - Address CVE-2024-22195, CVE-2024-34064, CVE-2024-56201, CVE-2024-56326 with an upstream patch.
 
