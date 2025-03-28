@@ -3,7 +3,7 @@
 Summary: Tardev Snapshotter for containerd
 Name: tardev-snapshotter
 Version: 0.0.13
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 # URL: https://www.containerd.io
@@ -45,10 +45,7 @@ popd
 export CARGO_NET_OFFLINE=true
 make
 
-# %check
-
 %install
-
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -D -m 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
@@ -73,5 +70,8 @@ fi
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
-* Tue Dec 31 2024 Jiri Appl <jiria@microsoft.com> - 0.0.1-1
+* Fri Mar 28 2025 Dallas Delaney <dadelan@microsoft.com> - 0.0.13-2
+- Add package to specs-extended
+
+* Tue Dec 31 2024 Jiri Appl <jiria@microsoft.com> - 0.0.13-1
 - Initial version
