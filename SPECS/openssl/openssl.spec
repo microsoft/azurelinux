@@ -65,7 +65,7 @@ Patch41:        openssl-1.1.1-pkcs1-implicit-rejection.patch
 Patch42:        openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failure.patch
 Patch44:        CVE-2024-5535.patch
-Patch45:        Fix-timing-side-channel-in-ECDSA-signature-computation.patch
+Patch45:        openssl-1.1.1-Fix-timing-side-channel-in-ECDSA-signature-computation.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
