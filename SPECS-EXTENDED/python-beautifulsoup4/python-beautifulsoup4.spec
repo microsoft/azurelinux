@@ -4,12 +4,15 @@
 
 Name:           python-beautifulsoup4
 Version:        4.12.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
 License:        MIT
-URL:            http://www.crummy.com/software/BeautifulSoup/
-Source0:        https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-%{version}.tar.gz
+Vendor:         Microsoft Corporation                                                          
+Distribution:   Azure Linux
+URL:            https://www.crummy.com/software/BeautifulSoup/
+Source0:        https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # https://git.launchpad.net/beautifulsoup/commit/?id=9786a62726de5a8caba10021c4d4a58c8a3e9e3f
+
 Patch0:         soupsieve26.patch
 
 BuildArch:      noarch
@@ -20,6 +23,20 @@ BuildRequires:  python3-lxml
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-wheel
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-trove-classifiers
+BuildRequires:  python3-tox
+BuildRequires:  python-filelock
+BuildRequires:  python3-toml
+BuildRequires:  python3-virtualenv
+BuildRequires:  python3-colorama
+BuildRequires:  python3-chardet
+BuildRequires:  python-cachetools
+BuildRequires:  python3-pyproject-api
 %if %{with soupsieve}
 BuildRequires:  python3-packaging
 BuildRequires:  python3-soupsieve
@@ -75,7 +92,7 @@ sed -i "s/strip_cdata=False,//" bs4/builder/_lxml.py
 
 %if %{with tests}
 %check
-%tox
+python3 -m tox -q --recreate -e py312
 %endif
 
 %files -n python3-beautifulsoup4
@@ -85,6 +102,10 @@ sed -i "s/strip_cdata=False,//" bs4/builder/_lxml.py
 %{python3_sitelib}/bs4
 
 %changelog
+* Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.12.3-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
 * Tue Aug 13 2024 Lumír Balhar <lbalhar@redhat.com> - 4.12.3-7
 - Fix compatibility with lxml 5.3.0
 
