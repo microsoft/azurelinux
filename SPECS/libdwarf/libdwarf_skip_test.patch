@@ -1,12 +1,21 @@
+From 891b29b1a5a6df0b733641a7fc4b985482e506df Mon Sep 17 00:00:00 2001
+From: Kanishk-Bansal <kbkanishk975@gmail.com>
+Date: Fri, 28 Mar 2025 16:11:19 +0000
+Subject: [PATCH] libdwarf_skip_test
+
+---
+ test/Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
 diff --git a/test/Makefile.am b/test/Makefile.am
-index 2a2827e..b7c3ed7 100644
+index 437fa2b..65697b5 100644
 --- a/test/Makefile.am
 +++ b/test/Makefile.am
 @@ -272,7 +272,7 @@ if HAVE_DWARFEXAMPLE
    TESTS += test_debuglink-a.sh test_debuglink-b.sh
  endif
  endif
--TESTS += test_dwarfdumpLinux.sh  test_dwarfdumpPE.sh test_dwarfdumpMacos.sh 
+-TESTS += test_dwarfdumpLinux.sh  test_dwarfdumpPE.sh test_dwarfdumpMacos.sh
 +TESTS += test_dwarfdumpLinux.sh
  if HAVE_DWARFEXAMPLE
  TESTS += test_jitreaderdiff.sh
@@ -22,3 +31,6 @@ index 2a2827e..b7c3ed7 100644
  test_dwarfdump.py \
  test_dwarf_leb.c \
  test_dwarf_tied.c \
+-- 
+2.45.2
+
