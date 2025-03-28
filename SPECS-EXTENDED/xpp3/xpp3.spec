@@ -2,13 +2,13 @@
 
 Summary:        XML Pull Parser
 Name:           xpp3
-Version:        1.1.4
+Version:        1.1.4c
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Release:        28.c%{?dist}
+Release:        28%{?dist}
 License:        ASL 1.1
 URL:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
-Source0:        https://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{oversion}_src.tgz#/xpp3-%{version}c.tgz
+Source0:        https://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{oversion}_src.tgz#/xpp3-%{version}.tgz
 Source1:        https://repo1.maven.org/maven2/xpp3/xpp3/%{oversion}/xpp3-%{oversion}.pom
 Source2:        https://repo1.maven.org/maven2/xpp3/xpp3_xpath/%{oversion}/xpp3_xpath-%{oversion}.pom
 Source3:        https://repo1.maven.org/maven2/xpp3/xpp3_min/%{oversion}/xpp3_min-%{oversion}.pom
@@ -65,13 +65,13 @@ jar ufm build/%{name}-%{oversion}.jar %{SOURCE4}
 %install
 # jars
 mkdir -p %{buildroot}%{_javadir}
-cp -p build/%{name}-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-%{version}c.jar
-cp -p build/%{name}_min-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-minimal-%{version}c.jar
-cp -p build/%{name}_xpath-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-xpath-%{version}c.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}c.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}c||g"`; done)
+cp -p build/%{name}-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-%{version}.jar
+cp -p build/%{name}_min-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-minimal-%{version}.jar
+cp -p build/%{name}_xpath-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-xpath-%{version}.jar
+(cd %{buildroot}%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
 # javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr doc/api/* %{buildroot}%{_javadocdir}/%{name}
@@ -89,9 +89,9 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 %doc README.html LICENSE.txt doc/*
 %{_datadir}/java/xpp3.jar
 %{_datadir}/javadoc/xpp3/*
-%{_javadir}/%{name}-%{version}c.jar
+%{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}-xpath.jar
-%{_javadir}/%{name}-xpath-%{version}c.jar
+%{_javadir}/%{name}-xpath-%{version}.jar
 %{_mavenpomdir}/%{name}.pom
 %{_mavenpomdir}/%{name}-xpath.pom
 %if %{defined _maven_repository}
@@ -102,7 +102,7 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 %files minimal
 %defattr(0644,root,root,0755)
 %{_javadir}/%{name}-minimal.jar
-%{_javadir}/%{name}-minimal-%{version}c.jar
+%{_javadir}/%{name}-minimal-%{version}.jar
 %{_mavenpomdir}/%{name}-minimal.pom
 %if %{defined _maven_repository}
 %{_mavendepmapfragdir}/%{name}-minimal
