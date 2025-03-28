@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -129,8 +129,11 @@ Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 %endif
 Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
 Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
+
+# Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2022-3996.patch
 Patch1001: CVE-2024-6119.patch
+Patch1002: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -338,11 +341,17 @@ git config am.keepcr true
 # -M Apply patches up to 999
 %autopatch -M 999
 
+# Unpack the vendored OpenSSL tarball. This tarball has a '.git' directory
+# which will confuse the git repo we unpack it into, so exclude that.
+# Then add it to the git index so that we can use autopatch, which
+# uses git am since we set it up that way initially.
+# Only apply patches between 1000 and 1999 (inclusive).
+tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x --exclude '.git'
+git add .
+git commit -m 'add vendored openssl'
+%autopatch -p1 -m 1000 -M 1999
+
 cp -a -- %{SOURCE1} .
-tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
-# Need to patch CVE-2022-3996 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
@@ -786,6 +795,9 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Tue Mar 25 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-5
+- Patch vendored openssl to only free read buffers if not in use.
+
 * Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
 - Package license for edk2-hvloader
 
