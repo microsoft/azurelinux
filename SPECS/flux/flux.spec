@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,7 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
 Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+Patch3:         CVE-2024-43806.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -77,6 +78,7 @@ tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
 
 patch -p2 < %{PATCH1}
+patch -p2 < %{PATCH3}
 patch -p2 <<EOF
 --- a/libflux/flux/build.rs
 +++ b/libflux/flux/build.rs
@@ -139,6 +141,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 0.194.5-2
+- Patch for CVE-2024-43806
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
 
