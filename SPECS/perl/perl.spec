@@ -4081,6 +4081,7 @@ you're not running VMS, this module does nothing.
 %patch202 -p1
 %patch203 -p1
 %patch204 -p1
+%patch205 -p1
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
