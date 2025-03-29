@@ -2,13 +2,14 @@
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
 Version:        5.1.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git/
 Source0:        https://www.kernel.org/pub/linux/daemons/%{name}/v5/%{name}-%{version}.tar.xz
+Patch0:         fix-deadlock-write-cache.patch
 BuildRequires:  libtirpc-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  systemd-devel
@@ -19,7 +20,7 @@ Requires:       systemd
 Automounting is the process of automatically mounting and unmounting of file systems by a daemon. Autofs includes both a user-space daemon and code in the kernel that assists the daemon.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure \
@@ -66,6 +67,9 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 /lib/systemd/system/autofs.service
 
 %changelog
+* Mon Mar 24 2025 Andy Zaugg <azaugg@linkedin.com> - 5.1.8-5
+- Backport patch from 5.1.9 to address deadlock issue
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
