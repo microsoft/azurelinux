@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,6 +142,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu Mar 27 2025 Chris Co <chrco@microsoft.com> - 24.3.1-2
+- Fix After= in cloud-config service unit
+
 * Tue Oct 01 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-1
 - Upgrade cloud-init to 24.3.1 to support azure-proxy-agent
 - Add upstream patch no-single-process.patch to revert a behavior change on cloud-init systemd
