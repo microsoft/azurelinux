@@ -37,7 +37,7 @@ Requires:       zip
 RabbitMQ is a reliable and mature messaging and streaming broker, which is easy to deploy on cloud environments, on-premises, and on your local machine.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 export LANG="en_US.UTF-8"
@@ -66,7 +66,7 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
-* Mon mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.13.7-2
+* Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.13.7-2
 - Address CVE-2025-30219 with a patch
 
 * Tue Sep 17 2024 Archana Choudhary <archana1@microsoft.com> - 3.13.7-1
